@@ -249,13 +249,13 @@ export default async function ProgramHolderVerificationPage() {
                   {/* Actions */}
                   <div className="flex gap-3">
                     <Link
-                      href={`/admin/program-holders/verification/${holder.id}/review`}
+                      href={`/program-holders/verification/${holder.id}/review`}
                       className="flex-1 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-center font-medium"
                     >
                       Review & Verify
                     </Link>
                     <Link
-                      href={`/admin/program-holders/${holder.id}`}
+                      href={`/program-holders/${holder.id}`}
                       className="px-4 py-2 bg-slate-200 text-black rounded-lg hover:bg-slate-300 font-medium"
                     >
                       View Details
@@ -294,7 +294,7 @@ export default async function ProgramHolderVerificationPage() {
                       {holder.verification_status === 'verified' ? 'Verified' : 'Rejected'}
                     </span>
                     <Link
-                      href={`/admin/program-holders/${holder.id}`}
+                      href={`/program-holders/${holder.id}`}
                       className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                     >
                       View

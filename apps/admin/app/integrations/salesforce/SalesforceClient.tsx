@@ -93,7 +93,7 @@ export default function SalesforceClient() {
         </div>
 
         <Link
-          href="/admin/integrations"
+          href="/integrations"
           className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Integrations

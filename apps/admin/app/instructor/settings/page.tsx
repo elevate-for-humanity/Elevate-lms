@@ -64,7 +64,7 @@ export default async function InstructorSettingsPage() {
               <p className="text-slate-700">Manage your profile and preferences</p>
             </div>
             <Link
-              href="/admin/instructor/dashboard"
+              href="/instructor/dashboard"
               className="px-4 py-2 text-slate-700 hover:text-slate-900"
             >
               ← Dashboard

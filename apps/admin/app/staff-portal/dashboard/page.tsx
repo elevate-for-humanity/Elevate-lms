@@ -168,7 +168,7 @@ export default async function StaffDashboard() {
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-2">
               <Link
-                href={`https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/students`}
+                href={`/students`}
                 className="block p-3 border rounded-lg hover:bg-slate-50 transition"
               >
                 <div className="font-semibold">View All Students</div>
@@ -182,7 +182,7 @@ export default async function StaffDashboard() {
                 <div className="text-sm text-black">Browse available training programs</div>
               </Link>
               <Link
-                href="/admin/reports"
+                href="/reports"
                 className="block p-3 border rounded-lg hover:bg-slate-50 transition"
               >
                 <div className="font-semibold">Generate Reports</div>
@@ -299,7 +299,7 @@ export default async function StaffDashboard() {
           <h3 className="text-lg font-semibold text-black mb-4">Booth &amp; Suite Rentals</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
-              href="/admin/staff-portal/booth-renters"
+              href="/staff-portal/booth-renters"
               className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
             >
               <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
@@ -334,28 +334,28 @@ export default async function StaffDashboard() {
           <h3 className="text-lg font-semibold text-black mb-4">Staff Tools</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Link
-              href="/admin/staff-portal/students"
+              href="/staff-portal/students"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Students
             </Link>
             <Link
-              href="/admin/staff-portal/courses"
+              href="/staff-portal/courses"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Courses
             </Link>
             <Link
-              href="/admin/staff-portal/campaigns"
+              href="/staff-portal/campaigns"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Campaigns
             </Link>
             <Link
-              href="/admin/staff-portal/customer-service"
+              href="/staff-portal/customer-service"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
@@ -369,14 +369,14 @@ export default async function StaffDashboard() {
               Processes
             </Link>
             <Link
-              href="/admin/staff-portal/qa-checklist"
+              href="/staff-portal/qa-checklist"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               QA Checklist
             </Link>
             <Link
-              href="/admin/staff-portal/training"
+              href="/staff-portal/training"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
@@ -407,7 +407,7 @@ export default async function StaffDashboard() {
               </Link>
 
               <Link
-                href="/admin/applications"
+                href="/applications"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
@@ -423,7 +423,7 @@ export default async function StaffDashboard() {
 
               {/* Employees */}
               <Link
-                href="/admin/hr/employees"
+                href="/hr/employees"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -439,7 +439,7 @@ export default async function StaffDashboard() {
 
               {/* Payroll */}
               <Link
-                href="/admin/hr/payroll"
+                href="/hr/payroll"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -455,7 +455,7 @@ export default async function StaffDashboard() {
 
               {/* Time tracking */}
               <Link
-                href="/admin/hr/time"
+                href="/hr/time"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -471,7 +471,7 @@ export default async function StaffDashboard() {
 
               {/* Leave */}
               <Link
-                href="/admin/hr/leave"
+                href="/hr/leave"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">

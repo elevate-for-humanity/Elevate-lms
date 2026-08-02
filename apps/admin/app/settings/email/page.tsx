@@ -59,7 +59,7 @@ export default async function EmailSettingsPage() {
     <div className="w-full space-y-6 px-6 py-6">
       <div>
         <p className="text-sm font-medium text-slate-500">
-          <Link href="/admin/settings" className="hover:text-slate-700">Settings</Link> / Email
+          <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Email
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Email Settings</h1>
         <p className="text-slate-500">Sender identity, provider configuration, and email templates.</p>
@@ -69,11 +69,11 @@ export default async function EmailSettingsPage() {
 
       <p className="text-xs text-slate-400 max-w-xl">
         Email API keys (SendGrid, Resend, SMTP) are configured in{' '}
-        <Link href="/admin/settings/integrations" className="text-brand-blue-600 underline">
+        <Link href="/settings/integrations" className="text-brand-blue-600 underline">
           Dev Studio → Secrets
         </Link>{' '}
         or the{' '}
-        <Link href="/admin/integrations/env-manager" className="text-brand-blue-600 underline">
+        <Link href="/integrations/env-manager" className="text-brand-blue-600 underline">
           Env Manager
         </Link>.
         Values saved here override the <code className="bg-slate-100 px-1 rounded">NEXT_PUBLIC_EMAIL_FROM_*</code> env vars at runtime.

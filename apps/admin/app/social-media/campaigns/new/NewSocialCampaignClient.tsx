@@ -82,7 +82,7 @@ export default function NewSocialCampaignPage({ programs = [] }: { programs?: Pr
     });
     if (response.ok) {
       toast.success('Campaign saved as draft!');
-      router.push('/admin/social-media');
+      router.push('/social-media');
     }
   };
 
@@ -96,7 +96,7 @@ export default function NewSocialCampaignPage({ programs = [] }: { programs?: Pr
     });
     if (response.ok) {
       toast.success('Campaign activated! Posts will go out 3x daily.');
-      router.push('/admin/social-media');
+      router.push('/social-media');
     }
   };
 
@@ -124,7 +124,7 @@ export default function NewSocialCampaignPage({ programs = [] }: { programs?: Pr
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/admin/social-media')}
+                onClick={() => router.push('/social-media')}
                 className="p-2 hover:bg-slate-100 rounded-lg"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -468,7 +468,7 @@ export default function NewSocialCampaignPage({ programs = [] }: { programs?: Pr
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/admin/social-media/campaigns/new"
+                  href="/social-media/campaigns/new"
                   className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-slate-50 text-lg shadow-2xl transition-all"
                 >
                   View Campaigns

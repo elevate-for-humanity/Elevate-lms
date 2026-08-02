@@ -235,14 +235,14 @@ export default function ApplicationsTableClient({
                   <div className="flex items-center justify-end gap-1.5 flex-wrap">
                     {/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(app.id) ? (
                       <Link
-                        href={`/admin/applications/review/${app.id}`}
+                        href={`/applications/review/${app.id}`}
                         className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded bg-slate-100 text-slate-900 hover:bg-slate-200 transition-colors"
                       >
                         <Eye className="w-2.5 h-2.5" /> View
                       </Link>
                     ) : (
                       <Link
-                        href={`/admin/applications/review/${app.id}${app.email ? `?email=${encodeURIComponent(app.email)}` : ''}`}
+                        href={`/applications/review/${app.id}${app.email ? `?email=${encodeURIComponent(app.email)}` : ''}`}
                         className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 transition-colors"
                         title="Legacy intake record — load from apprenticeship intake fallback"
                       >

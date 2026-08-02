@@ -46,7 +46,7 @@ export default async function ComplianceAuditPage() {
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/compliance" className="hover:text-slate-700">Compliance</Link>
+          <Link href="/compliance" className="hover:text-slate-700">Compliance</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Audit Log</span>
         </nav>
@@ -55,7 +55,7 @@ export default async function ComplianceAuditPage() {
             <h1 className="text-2xl font-bold text-slate-900">Compliance Audit</h1>
             <p className="text-sm text-slate-500 mt-1">Compliance event log, audit trail, and regulatory reporting</p>
           </div>
-          <Link href="/admin/audit-logs"
+          <Link href="/audit-logs"
             className="text-sm text-slate-600 border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
             Full Audit Logs →
           </Link>

@@ -47,7 +47,7 @@ export default async function IssueCertificatePage() {
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/certificates" className="hover:text-primary">
+                <Link href="/certificates" className="hover:text-primary">
                   Certificates
                 </Link>
               </li>
@@ -215,7 +215,7 @@ export default async function IssueCertificatePage() {
                 Issue Certificate
               </button>
               <Link
-                href="/admin/certificates"
+                href="/certificates"
                 className="px-4 py-2 border rounded-lg hover:bg-slate-50 text-center"
               >
                 Cancel

@@ -34,7 +34,7 @@ export default async function LegalGovernancePage() {
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link
-            href="/admin/governance"
+            href="/governance"
             className="inline-flex items-center text-slate-400 hover:text-white mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

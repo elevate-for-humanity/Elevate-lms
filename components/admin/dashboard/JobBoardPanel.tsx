@@ -155,7 +155,7 @@ export function JobBoardPanel() {
           {importing ? 'Importing…' : 'Run Import'}
         </button>
         <Link
-          href="/admin/jobs/new"
+          href="/jobs/new"
           className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700 border border-slate-300 hover:bg-slate-50 px-3 py-2 rounded-lg transition-colors"
         >
           <Briefcase className="w-3.5 h-3.5" />

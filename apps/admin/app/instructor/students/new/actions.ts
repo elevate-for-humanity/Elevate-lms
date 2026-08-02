@@ -29,5 +29,5 @@ export async function enrollStudentAction(formData: FormData) {
     status: 'new',
   });
 
-  redirect('/admin/instructor/students');
+  redirect('/instructor/students');
 }

@@ -75,7 +75,7 @@ export default async function CatalogSanityPage() {
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/store" className="hover:text-brand-blue-600">
+              <Link href="/store" className="hover:text-brand-blue-600">
                 Store
               </Link>
             </li>

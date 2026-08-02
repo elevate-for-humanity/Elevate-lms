@@ -75,7 +75,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
 
         {/* Header */}
         <div className="flex items-start gap-4">
-          <Link href="/admin/tenants" className="mt-1 text-slate-400 hover:text-slate-600">
+          <Link href="/tenants" className="mt-1 text-slate-400 hover:text-slate-600">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex-1">

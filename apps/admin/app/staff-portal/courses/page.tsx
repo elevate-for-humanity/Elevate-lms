@@ -66,7 +66,7 @@ export default async function StaffCoursesPage() {
               />
             </div>
             <Link
-              href="/admin/staff-portal/courses/create"
+              href="/staff-portal/courses/create"
               className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-5 h-5" /> New Course

@@ -33,7 +33,7 @@ export default function NewFinancialAssurancePage() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to save');
-      router.push('/admin/compliance/financial-assurance');
+      router.push('/compliance/financial-assurance');
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -115,7 +115,7 @@ export default function NewFinancialAssurancePage() {
             {saving ? 'Saving…' : 'Save Record'}
           </button>
           <Link
-            href="/admin/compliance/financial-assurance"
+            href="/compliance/financial-assurance"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel

@@ -215,7 +215,7 @@ export default async function AtRiskPage() {
                       <td className="py-3.5 px-5 text-right">
                         {p?.id && (
                           <Link
-                            href={`/admin/students/${p.id}`}
+                            href={`/students/${p.id}`}
                             className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                           >
                             View <ArrowRight className="w-3 h-3" />
@@ -283,7 +283,7 @@ export default async function AtRiskPage() {
                       <td className="py-3.5 px-5 text-right">
                         {p?.id && (
                           <Link
-                            href={`/admin/students/${p.id}`}
+                            href={`/students/${p.id}`}
                             className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                           >
                             View <ArrowRight className="w-3 h-3" />

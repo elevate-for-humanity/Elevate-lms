@@ -72,7 +72,7 @@ export default async function ModulesPage() {
               <p className="text-black mt-1">Manage program modules and SCORM content</p>
             </div>
             <Link
-              href="/admin/modules/new"
+              href="/modules/new"
               className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               + Create Module

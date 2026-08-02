@@ -72,7 +72,7 @@ export default function AppointmentsPage() {
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <Link
-              href="/admin/crm/appointments/new"
+              href="/crm/appointments/new"
               className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
             >
               <Plus className="w-4 h-4" /> New Appointment
@@ -106,7 +106,7 @@ export default function AppointmentsPage() {
                 {search ? 'No matching appointments.' : 'No appointments scheduled.'}
               </p>
               <Link
-                href="/admin/crm/appointments/new"
+                href="/crm/appointments/new"
                 className="inline-block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
               >
                 Schedule an appointment

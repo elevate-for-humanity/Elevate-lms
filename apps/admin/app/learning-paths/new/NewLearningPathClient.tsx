@@ -38,7 +38,7 @@ export default function NewLearningPathClient() {
         const d = await res.json().catch(() => ({}));
         throw new Error(d.error ?? `HTTP ${res.status}`);
       }
-      router.push('/admin/learning-paths');
+      router.push('/learning-paths');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Save failed');
     } finally {
@@ -111,7 +111,7 @@ export default function NewLearningPathClient() {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? 'Saving…' : 'Create Learning Path'}
         </button>
-        <button onClick={() => router.push('/admin/learning-paths')}
+        <button onClick={() => router.push('/learning-paths')}
           className="text-sm text-slate-500 hover:text-slate-700 px-4 py-2.5 rounded-lg hover:bg-slate-100 transition-colors">
           Cancel
         </button>

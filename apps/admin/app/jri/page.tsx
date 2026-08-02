@@ -73,10 +73,10 @@ export default async function JRIPage() {
               <p className="text-slate-500 mt-1">Indianapolis Workforce Initiative — JRI-funded enrollments</p>
             </div>
             <div className="flex gap-3">
-              <Link href="/admin/jri/reports" className="border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 text-sm">
+              <Link href="/jri/reports" className="border border-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 text-sm">
                 Reports
               </Link>
-              <Link href="/admin/jri/participants/new" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
+              <Link href="/jri/participants/new" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
                 Add Participant
               </Link>
             </div>
@@ -131,7 +131,7 @@ export default async function JRIPage() {
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border">
             <div className="p-5 border-b flex justify-between items-center">
               <h2 className="text-base font-semibold text-slate-900">Recent Participants</h2>
-              <Link href="/admin/jri/participants" className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1">
+              <Link href="/jri/participants" className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1">
                 View all <ArrowRight size={14} />
               </Link>
             </div>

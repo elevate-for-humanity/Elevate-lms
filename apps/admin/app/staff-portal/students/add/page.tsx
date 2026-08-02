@@ -287,7 +287,7 @@ export default function AddStudentPage() {
 
             <div className="flex items-center justify-end gap-4 pt-4 border-t">
               <Link
-                href="/admin/staff-portal/students"
+                href="/staff-portal/students"
                 className="px-6 py-2 text-slate-900 hover:text-slate-900"
               >
                 Cancel

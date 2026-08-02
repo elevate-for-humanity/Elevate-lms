@@ -87,7 +87,7 @@ export default function QuickBooksClient() {
       ]} />
 
       <div className="flex items-center gap-3 mt-6 mb-8">
-        <Link href="/admin/integrations" className="text-slate-400 hover:text-slate-700">
+        <Link href="/integrations" className="text-slate-400 hover:text-slate-700">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>

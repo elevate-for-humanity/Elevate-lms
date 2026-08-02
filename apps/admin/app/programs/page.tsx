@@ -62,7 +62,7 @@ export default async function ProgramsPage() {
               <p className="text-black mt-1">Manage training programs and curriculum</p>
             </div>
             <Link
-              href="/admin/programs/new"
+              href="/programs/new"
               className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               + Create Program
@@ -126,14 +126,14 @@ export default async function ProgramsPage() {
         <div className="mt-8 border-t border-slate-100 pt-6">
           <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4">Related</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Link href="/admin/program-holders" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
+            <Link href="/program-holders" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
               <div>
                 <p className="font-semibold text-slate-900 text-sm">Program Holders</p>
                 <p className="text-xs text-slate-500 mt-0.5">Partner organizations delivering programs</p>
               </div>
               <span className="text-slate-300 group-hover:text-slate-600 transition-colors">→</span>
             </Link>
-            <Link href="/admin/program-holder-documents" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
+            <Link href="/program-holder-documents" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
               <div>
                 <p className="font-semibold text-slate-900 text-sm">Program Holder Documents</p>
                 <p className="text-xs text-slate-500 mt-0.5">MOU, compliance, and onboarding docs</p>
@@ -147,7 +147,7 @@ export default async function ProgramsPage() {
               </div>
               <span className="text-slate-300 group-hover:text-slate-600 transition-colors">→</span>
             </Link>
-            <Link href="/admin/programs/catalog" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
+            <Link href="/programs/catalog" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
               <div>
                 <p className="font-semibold text-slate-900 text-sm">Programs Catalog</p>
                 <p className="text-xs text-slate-500 mt-0.5">Public-facing program catalog</p>
@@ -161,7 +161,7 @@ export default async function ProgramsPage() {
               </div>
               <span className="text-slate-300 group-hover:text-slate-600 transition-colors">→</span>
             </Link>
-            <Link href="/admin/enrollments" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
+            <Link href="/enrollments" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
               <div>
                 <p className="font-semibold text-slate-900 text-sm">Enrollments</p>
                 <p className="text-xs text-slate-500 mt-0.5">Student program enrollments</p>

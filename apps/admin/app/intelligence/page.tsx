@@ -100,7 +100,7 @@ export default async function IntelligencePage() {
               <p className="text-slate-400 text-sm mt-0.5">AI-scored dropout risk · Placement & completion probabilities · Cohort forecasting</p>
             </div>
           </div>
-          <Link href="/admin/at-risk" className="text-sm text-brand-blue-400 hover:text-brand-blue-300 flex items-center gap-1">
+          <Link href="/at-risk" className="text-sm text-brand-blue-400 hover:text-brand-blue-300 flex items-center gap-1">
             At-Risk Students <ArrowRight className="w-3 h-3" />
           </Link>
         </div>

@@ -26,5 +26,5 @@ export async function updateInstructorProfile(formData: FormData) {
     })
     .eq('id', user.id);
 
-  revalidatePath('/admin/instructor/settings');
+  revalidatePath('/instructor/settings');
 }

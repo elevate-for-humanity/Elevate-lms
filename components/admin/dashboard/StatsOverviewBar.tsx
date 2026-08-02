@@ -81,35 +81,35 @@ export function StatsOverviewBar({ data }: Props) {
           label="Total Students"
           value={totalStudents.toLocaleString()}
           sub="all time"
-          href="/admin/students"
+          href="/students"
         />
         <StatCard
           icon={<BookOpen className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Active Enrollments"
           value={counts.activeEnrollments.toLocaleString()}
           sub="currently enrolled"
-          href="/admin/students?status=active"
+          href="/students?status=active"
         />
         <StatCard
           icon={<DollarSign className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Revenue (Month)"
           value={fmt(counts.revenueThisMonthCents)}
           sub={`${fmt(revenueAllTimeCents)} all time`}
-          href="/admin/students?payment_status=paid"
+          href="/students?payment_status=paid"
         />
         <StatCard
           icon={<BadgeCheck className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Certificates"
           value={counts.certificatesIssued.toLocaleString()}
           sub="issued all time"
-          href="/admin/certificates"
+          href="/certificates"
         />
         <StatCard
           icon={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
           label="Pending Applications"
           value={counts.pendingApplications.toLocaleString()}
           sub="awaiting review"
-          href="/admin/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding"
+          href="/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding"
           urgent={counts.pendingApplications > 0}
         />
         <StatCard
@@ -117,7 +117,7 @@ export function StatsOverviewBar({ data }: Props) {
           label="New Today"
           value={(operational.newAppsToday + operational.newLeadsToday + operational.newEnrollmentsToday).toLocaleString()}
           sub={`${operational.newAppsToday} apps · ${operational.newLeadsToday} leads · ${operational.newEnrollmentsToday} enrolls`}
-          href="/admin/activity"
+          href="/activity"
         />
       </div>
     </div>

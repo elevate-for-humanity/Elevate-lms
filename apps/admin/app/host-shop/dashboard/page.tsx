@@ -185,7 +185,7 @@ export default async function HostShopDashboardPage() {
               <BookOpen className="w-5 h-5" />
               Apprentice Progress & Syllabus
             </h2>
-            <a href="/admin/host-shop/apprentices" className="text-sm text-blue-600 hover:underline">
+            <a href="/host-shop/apprentices" className="text-sm text-blue-600 hover:underline">
               View All
             </a>
           </div>
@@ -285,19 +285,19 @@ export default async function HostShopDashboardPage() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-4 gap-4">
-          <a href="/admin/host-shop/ojt" className="p-4 bg-blue-50 rounded-xl text-center hover:bg-blue-100 border border-blue-200">
+          <a href="/host-shop/ojt" className="p-4 bg-blue-50 rounded-xl text-center hover:bg-blue-100 border border-blue-200">
             <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
             <p className="font-medium text-blue-700">Log OJT Hours</p>
           </a>
-          <a href="/admin/host-shop/apprentices" className="p-4 bg-green-50 rounded-xl text-center hover:bg-green-100 border border-green-200">
+          <a href="/host-shop/apprentices" className="p-4 bg-green-50 rounded-xl text-center hover:bg-green-100 border border-green-200">
             <BookOpen className="w-6 h-6 text-green-600 mx-auto mb-2" />
             <p className="font-medium text-green-700">View Apprentices</p>
           </a>
-          <a href="/admin/host-shop/compliance" className="p-4 bg-purple-50 rounded-xl text-center hover:bg-purple-100 border border-purple-200">
+          <a href="/host-shop/compliance" className="p-4 bg-purple-50 rounded-xl text-center hover:bg-purple-100 border border-purple-200">
             <AlertCircle className="w-6 h-6 text-purple-600 mx-auto mb-2" />
             <p className="font-medium text-purple-700">DOL Compliance</p>
           </a>
-          <a href="/admin/host-shop/reports" className="p-4 bg-amber-50 rounded-xl text-center hover:bg-amber-100 border border-amber-200">
+          <a href="/host-shop/reports" className="p-4 bg-amber-50 rounded-xl text-center hover:bg-amber-100 border border-amber-200">
             <CheckCircle className="w-6 h-6 text-amber-600 mx-auto mb-2" />
             <p className="font-medium text-amber-700">Progress Reports</p>
           </a>

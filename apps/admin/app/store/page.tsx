@@ -97,7 +97,7 @@ export default async function AdminStorePage() {
                 <ExternalLink size={14} /> View Store
               </Link>
               <Link
-                href="/admin/licenses"
+                href="/licenses"
                 className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
               >
                 Manage Licenses
@@ -192,7 +192,7 @@ export default async function AdminStorePage() {
             <div className="p-5 border-b flex justify-between items-center">
               <h2 className="text-base font-semibold text-slate-900">Recent Orders</h2>
               <Link
-                href="/admin/licenses"
+                href="/licenses"
                 className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
               >
                 Licenses <ArrowRight size={14} />
@@ -236,7 +236,7 @@ export default async function AdminStorePage() {
             <div className="p-5 border-b flex justify-between items-center">
               <h2 className="text-base font-semibold text-slate-900">Recent License Sales</h2>
               <Link
-                href="/admin/licenses"
+                href="/licenses"
                 className="text-sm text-brand-blue-600 hover:text-brand-blue-800"
               >
                 Manage licenses

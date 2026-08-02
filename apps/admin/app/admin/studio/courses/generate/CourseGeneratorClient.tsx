@@ -181,7 +181,7 @@ export default function CourseGeneratorClient({ programs }: { programs: Program[
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Publish failed');
-      router.push(`/admin/courses/${data.courseId}/content`);
+      router.push(`/courses/${data.courseId}/content`);
     } catch (e: any) {
       setError(e.message);
       setPublishing(false);

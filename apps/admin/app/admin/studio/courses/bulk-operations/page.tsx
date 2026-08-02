@@ -40,7 +40,7 @@ export default async function BulkOperationsPage() {
             <h1 className="text-2xl font-extrabold text-slate-900">Bulk Course Operations</h1>
             <p className="text-slate-500 text-sm mt-0.5">{count ?? 0} courses total</p>
           </div>
-          <Link href="/admin/courses" className="text-sm text-slate-600 hover:underline">
+          <Link href="/courses" className="text-sm text-slate-600 hover:underline">
             ← Back to Courses
           </Link>
         </div>

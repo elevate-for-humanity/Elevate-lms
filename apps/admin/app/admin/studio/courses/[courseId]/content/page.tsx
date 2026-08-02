@@ -90,7 +90,7 @@ export default async function CourseContentPage({
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/courses" className="hover:text-primary">
+                <Link href="/courses" className="hover:text-primary">
                   Courses
                 </Link>
               </li>

@@ -83,7 +83,7 @@ export default async function SampleReportsPage() {
 
         <div className="flex items-center justify-between mb-6">
           <div>
-            <Link href="/admin/reports" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2">
+            <Link href="/reports" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2">
               <ArrowLeft className="w-4 h-4" /> Back to Reports
             </Link>
             <h1 className="text-2xl font-bold text-slate-900">Sample Reports</h1>

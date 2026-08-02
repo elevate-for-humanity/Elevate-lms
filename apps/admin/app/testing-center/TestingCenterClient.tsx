@@ -152,7 +152,7 @@ function BookingsTab({ bookings }: { bookings: Booking[] }) {
             </button>
           ))}
         </div>
-        <Link href="/admin/exam-authorizations" className="ml-auto text-xs text-blue-600 hover:underline">
+        <Link href="/exam-authorizations" className="ml-auto text-xs text-blue-600 hover:underline">
           Exam Authorizations →
         </Link>
       </div>
@@ -250,7 +250,7 @@ function SessionsTab({ sessions }: { sessions: Session[] }) {
             </button>
           ))}
         </div>
-        <Link href="/admin/proctor-portal" className="ml-auto text-xs text-purple-600 hover:underline">
+        <Link href="/proctor-portal" className="ml-auto text-xs text-purple-600 hover:underline">
           Proctor Portal →
         </Link>
       </div>
@@ -346,7 +346,7 @@ function ScheduleTab({ slots }: { slots: Slot[] }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="font-semibold text-slate-800">Upcoming Slots ({upcoming.length})</h2>
-        <Link href="/admin/exam-authorizations" className="text-xs text-blue-600 hover:underline">Manage Authorizations →</Link>
+        <Link href="/exam-authorizations" className="text-xs text-blue-600 hover:underline">Manage Authorizations →</Link>
       </div>
       {upcoming.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -406,7 +406,7 @@ export default function TestingCenterClient({
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/admin/proctor-portal"
+            href="/proctor-portal"
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
           >
             <Users className="w-4 h-4" />

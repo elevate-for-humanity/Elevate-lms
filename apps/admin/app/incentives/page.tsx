@@ -43,7 +43,7 @@ export default async function IncentivesPage() {
             <p className="text-slate-500 text-sm mt-1">WEX and OJT employer incentive programs</p>
           </div>
           <Link
-            href="/admin/incentives/create"
+            href="/incentives/create"
             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
           >
             <Plus className="w-4 h-4" /> New Incentive
@@ -75,7 +75,7 @@ export default async function IncentivesPage() {
               <DollarSign className="w-12 h-12 mx-auto mb-3 text-slate-200" />
               <p>No incentive programs yet.</p>
               <Link
-                href="/admin/incentives/create"
+                href="/incentives/create"
                 className="text-slate-900 underline text-sm mt-2 inline-block"
               >
                 Create one

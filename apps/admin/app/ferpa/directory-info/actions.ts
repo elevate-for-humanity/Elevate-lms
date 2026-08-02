@@ -11,5 +11,5 @@ export async function toggleDirectoryField(key: string, value: boolean) {
 
   await db.from('platform_settings').upsert({ key, value: String(value) }, { onConflict: 'key' });
 
-  revalidatePath('/admin/ferpa/directory-info');
+  revalidatePath('/ferpa/directory-info');
 }

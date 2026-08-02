@@ -254,7 +254,7 @@ export default async function WioaReportPage({
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/reports" className="hover:text-slate-700">Reports</Link>
+          <Link href="/reports" className="hover:text-slate-700">Reports</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">WIOA Performance</span>
         </nav>
@@ -315,7 +315,7 @@ export default async function WioaReportPage({
               <button type="submit" className="flex-1 bg-slate-900 text-white text-sm font-semibold rounded-xl px-3 py-2 hover:bg-slate-800 transition-colors">
                 Filter
               </button>
-              <a href="/admin/reports/wioa" className="flex-shrink-0 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl px-3 py-2 hover:bg-slate-50 transition-colors">
+              <a href="/reports/wioa" className="flex-shrink-0 border border-slate-200 text-slate-600 text-sm font-medium rounded-xl px-3 py-2 hover:bg-slate-50 transition-colors">
                 Clear
               </a>
             </div>

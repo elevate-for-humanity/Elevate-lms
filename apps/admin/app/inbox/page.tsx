@@ -82,7 +82,7 @@ export default async function AdminInboxPage() {
         metadata: { new_status: status },
       });
 
-    redirect('/admin/inbox');
+    redirect('/inbox');
   }
 
   async function updateLicense(formData: FormData) {
@@ -109,7 +109,7 @@ export default async function AdminInboxPage() {
         metadata: { new_status: status },
       });
 
-    redirect('/admin/inbox');
+    redirect('/inbox');
   }
 
   return (
@@ -123,7 +123,7 @@ export default async function AdminInboxPage() {
           <h2 className="text-xl font-bold text-zinc-900">Partner Inquiries</h2>
           <Link
             className="text-sm font-semibold text-zinc-700 underline"
-            href="/admin/partner-inquiries"
+            href="/partner-inquiries"
           >
             Open full list
           </Link>
@@ -198,7 +198,7 @@ export default async function AdminInboxPage() {
           <h2 className="text-xl font-bold text-zinc-900">License Requests</h2>
           <Link
             className="text-sm font-semibold text-zinc-700 underline"
-            href="/admin/licenses"
+            href="/licenses"
           >
             Open full list
           </Link>

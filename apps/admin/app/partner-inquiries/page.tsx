@@ -79,7 +79,7 @@ export default async function PartnerInquiriesAdminPage() {
         metadata: { new_status: status },
       });
 
-    redirect('/admin/partner-inquiries');
+    redirect('/partner-inquiries');
   }
 
   return (

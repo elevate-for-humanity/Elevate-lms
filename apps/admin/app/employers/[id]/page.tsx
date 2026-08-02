@@ -61,7 +61,7 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <div className="text-xs text-slate-400 mb-1">
-              <Link href="/admin/employers" className="hover:text-blue-600">
+              <Link href="/employers" className="hover:text-blue-600">
                 Employers
               </Link>{' '}
               / {employer.name}

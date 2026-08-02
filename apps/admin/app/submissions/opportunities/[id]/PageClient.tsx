@@ -184,7 +184,7 @@ export default function OpportunityProfilePage() {
       <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500">Opportunity not found.</p>
         <Link
-          href="/admin/submissions/opportunities"
+          href="/submissions/opportunities"
           className="text-brand-blue-600 hover:underline text-sm"
         >
           ← Back to Opportunities
@@ -204,7 +204,7 @@ export default function OpportunityProfilePage() {
         {/* Header */}
         <div className="flex items-start gap-3 mb-6">
           <button
-            onClick={() => router.push('/admin/submissions/opportunities')}
+            onClick={() => router.push('/submissions/opportunities')}
             className="text-slate-400 hover:text-slate-600 mt-1"
           >
             <ArrowLeft className="w-5 h-5" />

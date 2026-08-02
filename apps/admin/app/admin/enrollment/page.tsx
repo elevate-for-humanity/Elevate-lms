@@ -206,7 +206,7 @@ export default function AdminEnrollmentPage() {
                           className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium flex items-center gap-1">
                           <Eye className="w-3 h-3" /> Review
                         </button>
-                        <Link href={`/admin/applications/${app.id}`}
+                        <Link href={`/applications/${app.id}`}
                           className="text-slate-500 hover:text-slate-700 text-sm">
                           Full →
                         </Link>
@@ -283,7 +283,7 @@ export default function AdminEnrollmentPage() {
                   </div>
                 )}
                 <div className="flex gap-3">
-                  <Link href={`/admin/applications/${selectedApp.id}`}
+                  <Link href={`/applications/${selectedApp.id}`}
                     className="flex-1 text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors text-sm">
                     Full Application
                   </Link>

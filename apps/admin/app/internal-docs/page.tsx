@@ -48,7 +48,7 @@ export default async function InternalDocsPage() {
             </p>
           </div>
           <Link
-            href="/admin/document-center"
+            href="/document-center"
             className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
           >
             Document Center
@@ -130,7 +130,7 @@ export default async function InternalDocsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <Link
-                            href={`/admin/documents/review/${doc.id}`}
+                            href={`/documents/review/${doc.id}`}
                             className="text-brand-blue-600 hover:underline text-xs font-medium"
                           >
                             Review →

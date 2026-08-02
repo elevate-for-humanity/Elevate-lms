@@ -92,7 +92,7 @@ export default async function ContactsPage() {
               <p className="text-slate-700">Manage your contacts and relationships</p>
             </div>
             <Link
-              href="/admin/crm/contacts/new"
+              href="/crm/contacts/new"
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />

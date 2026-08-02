@@ -52,7 +52,7 @@ export default async function NotificationSettingsPage() {
     <div className="w-full space-y-6 px-6 py-6">
       <div>
         <p className="text-sm font-medium text-slate-500">
-          <Link href="/admin/settings" className="hover:text-slate-700">Settings</Link> / Notifications
+          <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Notifications
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Notification Settings</h1>
         <p className="text-slate-500">Configure email, SMS, and webhook notifications.</p>
@@ -62,7 +62,7 @@ export default async function NotificationSettingsPage() {
 
       <p className="text-xs text-slate-400 max-w-xl">
         Email API keys (SendGrid, Resend, SMTP) are configured in{' '}
-        <Link href="/admin/settings/integrations" className="text-brand-blue-600 underline">
+        <Link href="/settings/integrations" className="text-brand-blue-600 underline">
           Dev Studio → Secrets
         </Link>.
       </p>

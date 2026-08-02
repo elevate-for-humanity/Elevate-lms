@@ -63,8 +63,8 @@ export async function createProgram(formData: FormData) {
     metadata: { name, slug },
   });
 
-  revalidatePath('/admin/programs');
-  redirect('/admin/programs');
+  revalidatePath('/programs');
+  redirect('/programs');
 }
 
 export async function updateProgram(id: string, formData: FormData) {
@@ -125,8 +125,8 @@ export async function updateProgram(id: string, formData: FormData) {
     metadata: { name },
   });
 
-  revalidatePath('/admin/programs');
-  redirect('/admin/programs');
+  revalidatePath('/programs');
+  redirect('/programs');
 }
 
 export async function deleteProgram(id: string) {
@@ -162,5 +162,5 @@ export async function deleteProgram(id: string) {
     metadata: {},
   });
 
-  revalidatePath('/admin/programs');
+  revalidatePath('/programs');
 }

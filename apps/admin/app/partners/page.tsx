@@ -117,19 +117,19 @@ export default async function PartnersPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/admin/partners/applications"
+                href="/partners/applications"
                 className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
               >
                 Review Applications
               </Link>
               <Link
-                href="/admin/partners"
+                href="/partners"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 View Partners
               </Link>
               <Link
-                href="/admin/program-holders"
+                href="/program-holders"
                 className="bg-brand-blue-900 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 border-2 border-white text-lg"
               >
                 View Program Holders

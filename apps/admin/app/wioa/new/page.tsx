@@ -20,7 +20,7 @@ async function createWioaParticipant(formData: FormData) {
     household_size: parseInt((formData.get('household_size') as string) || '1', 10),
     annual_income: parseFloat((formData.get('annual_income') as string) || '0'),
   });
-  if (!error) redirect('/admin/wioa');
+  if (!error) redirect('/wioa');
 }
 
 export default async function NewWioaParticipantPage() {
@@ -28,7 +28,7 @@ export default async function NewWioaParticipantPage() {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-xl mx-auto">
-        <Link href="/admin/wioa" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
+        <Link href="/wioa" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to WIOA
         </Link>
         <div className="flex items-center gap-2 mb-6">
@@ -70,7 +70,7 @@ export default async function NewWioaParticipantPage() {
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/wioa" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
+            <Link href="/wioa" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
             <button type="submit" className="px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">Add Participant</button>
           </div>
         </form>

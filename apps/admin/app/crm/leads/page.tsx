@@ -77,7 +77,7 @@ export default async function CRMLeadsPage() {
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/crm" className="hover:text-slate-700">
+          <Link href="/crm" className="hover:text-slate-700">
             CRM
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -91,7 +91,7 @@ export default async function CRMLeadsPage() {
             </p>
           </div>
           <Link
-            href="/admin/crm/leads/new"
+            href="/crm/leads/new"
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" /> Add Lead

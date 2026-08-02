@@ -12,15 +12,15 @@ import { useState, useRef, useEffect } from 'react';
 import { useI18n, LOCALES, LOCALE_NAMES, LOCALE_FLAGS, type Locale } from '@/lib/i18n/context';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-  { label: 'Applications', href: '/admin/applications', icon: FileText },
-  { label: 'Students', href: '/admin/students', icon: Users },
-  { label: 'Programs', href: '/admin/programs', icon: BookOpen },
-  { label: 'Funding', href: '/admin/funding', icon: DollarSign },
-  { label: 'Partners', href: '/admin/partners', icon: Handshake },
-  { label: 'Marketing', href: '/admin/crm', icon: Megaphone },
-  { label: 'Compliance', href: '/admin/compliance', icon: ShieldCheck },
-  { label: 'Dev Studio', href: '/admin/studio', icon: Bot },
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Applications', href: '/applications', icon: FileText },
+  { label: 'Students', href: '/students', icon: Users },
+  { label: 'Programs', href: '/programs', icon: BookOpen },
+  { label: 'Funding', href: '/funding', icon: DollarSign },
+  { label: 'Partners', href: '/partners', icon: Handshake },
+  { label: 'Marketing', href: '/crm', icon: Megaphone },
+  { label: 'Compliance', href: '/compliance', icon: ShieldCheck },
+  { label: 'Dev Studio', href: '/admin/studio', icon: Bot }, // points to /admin/admin/studio
 ];
 
 function LanguageSwitcher() {
@@ -94,7 +94,7 @@ export default function AdminHeader() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/admin/students?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/students?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
       setSearchOpen(false);
     }

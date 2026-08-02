@@ -248,7 +248,7 @@ export default async function InstructorSubmissionsPage({
             <p className="text-slate-500 font-medium">No submissions found.</p>
             {filterStatus && (
               <Link
-                href="/admin/instructor/submissions"
+                href="/instructor/submissions"
                 className="mt-3 inline-block text-sm text-brand-blue-600 hover:underline"
               >
                 Clear filter

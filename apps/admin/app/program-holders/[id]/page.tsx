@@ -52,7 +52,7 @@ async function verifyApprovalCaller(
 
   // Guard against null user
   if (!user) redirect('/login');
-    redirect(`/admin/program-holders/${holderId}?error=${encodeURIComponent('Session expired')}`);
+    redirect(`/program-holders/${holderId}?error=${encodeURIComponent('Session expired')}`);
   }
 
   const { data: callerProfile } = await sdb
@@ -63,13 +63,13 @@ async function verifyApprovalCaller(
 
   if (!callerProfile || !canApprove(callerProfile.role as AdminRole)) {
     redirect(
-      `/admin/program-holders/${holderId}?error=${encodeURIComponent('Approval requires admin or admin role')}`,
+      `/program-holders/${holderId}?error=${encodeURIComponent('Approval requires admin or admin role')}`,
     );
   }
 
   if (!adb) {
     redirect(
-      `/admin/program-holders/${holderId}?error=${encodeURIComponent('Database not configured')}`,
+      `/program-holders/${holderId}?error=${encodeURIComponent('Database not configured')}`,
     );
   }
 
@@ -172,7 +172,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     const programId = formData.get('program_id') as string;
     if (!programId) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Program selection is required')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Program selection is required')}`,
       );
     }
 
@@ -187,14 +187,14 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     if (rpcError) {
       logger.error('[PH Approve RPC] Database error', undefined, { id, error: rpcError });
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Database error during approval — check server logs')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Database error during approval — check server logs')}`,
       );
     }
 
     if (data && !data.success) {
       logger.warn('[PH Approve RPC] Validation failed', { id, result: data });
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent(data.error || 'Approval validation failed')}`,
+        `/program-holders/${id}?error=${encodeURIComponent(data.error || 'Approval validation failed')}`,
       );
     }
 
@@ -231,7 +231,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     }
 
     redirect(
-      `/admin/program-holders/${id}?success=${encodeURIComponent('Holder approved and program provisioned')}`,
+      `/program-holders/${id}?success=${encodeURIComponent('Holder approved and program provisioned')}`,
     );
   }
 
@@ -247,7 +247,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
     if (updateErr) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Failed to reject — check server logs')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Failed to reject — check server logs')}`,
       );
     }
 
@@ -261,7 +261,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     });
 
     logger.info('[PH Reject]', { holderId: id, rejectedBy: callerId });
-    redirect(`/admin/program-holders/${id}?success=${encodeURIComponent('Holder rejected')}`);
+    redirect(`/program-holders/${id}?success=${encodeURIComponent('Holder rejected')}`);
   }
 
   async function suspendHolder() {
@@ -276,7 +276,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
 
     if (updateErr) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Failed to suspend — check server logs')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Failed to suspend — check server logs')}`,
       );
     }
 
@@ -289,7 +289,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     });
 
     logger.info('[PH Suspend]', { holderId: id, suspendedBy: callerId });
-    redirect(`/admin/program-holders/${id}?success=${encodeURIComponent('Holder suspended')}`);
+    redirect(`/program-holders/${id}?success=${encodeURIComponent('Holder suspended')}`);
   }
 
   async function provisionProgram(formData: FormData) {
@@ -297,7 +297,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     const programId = formData.get('program_id') as string;
     if (!programId) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Program selection is required')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Program selection is required')}`,
       );
     }
 
@@ -312,17 +312,17 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     if (rpcError) {
       logger.error('[PH Provision RPC] Database error', undefined, { id, programId, error: rpcError });
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Database error during provisioning — check server logs')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Database error during provisioning — check server logs')}`,
       );
     }
 
     if (data && !data.success) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent(data.error || 'Provisioning validation failed')}`,
+        `/program-holders/${id}?error=${encodeURIComponent(data.error || 'Provisioning validation failed')}`,
       );
     }
 
-    redirect(`/admin/program-holders/${id}?success=${encodeURIComponent('Program provisioned')}`);
+    redirect(`/program-holders/${id}?success=${encodeURIComponent('Program provisioned')}`);
   }
 
   async function removeProgram(formData: FormData) {
@@ -330,7 +330,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     const assignmentId = formData.get('assignment_id') as string;
     if (!assignmentId) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Assignment ID is required')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Assignment ID is required')}`,
       );
     }
 
@@ -344,17 +344,17 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
     if (rpcError) {
       logger.error('[PH Deprovision RPC] Database error', undefined, { id, assignmentId, error: rpcError });
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent('Database error during deprovisioning — check server logs')}`,
+        `/program-holders/${id}?error=${encodeURIComponent('Database error during deprovisioning — check server logs')}`,
       );
     }
 
     if (data && !data.success) {
       redirect(
-        `/admin/program-holders/${id}?error=${encodeURIComponent(data.error || 'Deprovisioning failed')}`,
+        `/program-holders/${id}?error=${encodeURIComponent(data.error || 'Deprovisioning failed')}`,
       );
     }
 
-    redirect(`/admin/program-holders/${id}?success=${encodeURIComponent('Program removed')}`);
+    redirect(`/program-holders/${id}?success=${encodeURIComponent('Program removed')}`);
   }
 
   const statusColor: Record<string, string> = {
@@ -378,7 +378,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
         </div>
 
         <Link
-          href="/admin/program-holders"
+          href="/program-holders"
           className="inline-flex items-center gap-1 text-sm text-slate-700 hover:text-slate-900 mb-4"
         >
           <ArrowLeft className="w-4 h-4" /> Back to list
@@ -687,7 +687,7 @@ export default async function AdminProgramHolderDetailPage({ params, searchParam
             <h2 className="text-lg font-semibold text-slate-900 mb-2">MOU</h2>
             <p className="text-sm text-slate-700 mb-4">This holder has not signed the MOU yet.</p>
             <Link
-              href={`/admin/program-holders/${id}/countersign-mou`}
+              href={`/program-holders/${id}/countersign-mou`}
               className="text-sm text-brand-blue-600 hover:underline font-medium"
             >
               Go to MOU management →

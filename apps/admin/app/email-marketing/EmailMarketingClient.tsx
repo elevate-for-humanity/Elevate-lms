@@ -146,13 +146,13 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
               Templates
             </button>
             <button
-              onClick={() => router.push('/admin/email-marketing/analytics')}
+              onClick={() => router.push('/email-marketing/analytics')}
               className="pb-3 px-1 text-sm font-semibold border-b-2 border-transparent text-black hover:text-black transition"
             >
               Analytics
             </button>
             <button
-              onClick={() => router.push('/admin/email-marketing/sendgrid')}
+              onClick={() => router.push('/email-marketing/sendgrid')}
               className="pb-3 px-1 text-sm font-semibold border-b-2 border-transparent text-black hover:text-black transition flex items-center gap-1.5"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -167,7 +167,7 @@ export default function EmailMarketingPage({ stats }: EmailMarketingPageProps) {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold text-black">Email Campaigns</h2>
               <button
-                onClick={() => router.push('/admin/email-marketing/campaigns/new')}
+                onClick={() => router.push('/email-marketing/campaigns/new')}
                 className="inline-flex items-center gap-2 rounded-xl bg-brand-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-orange-700 transition"
               >
                 <Plus className="h-4 w-4" />

@@ -58,8 +58,8 @@ export async function createGrantOpportunity(formData: FormData) {
     metadata: { title: grantData.title },
   });
 
-  revalidatePath('/admin/grants');
-  redirect('/admin/grants');
+  revalidatePath('/grants');
+  redirect('/grants');
 }
 
 export async function updateGrantOpportunity(id: string, formData: FormData) {
@@ -118,9 +118,9 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
     metadata: { title: updateData.title },
   });
 
-  revalidatePath('/admin/grants');
+  revalidatePath('/grants');
   revalidatePath(`/admin/grants/${id}`);
-  redirect('/admin/grants');
+  redirect('/grants');
 }
 
 export async function deleteGrantOpportunity(id: string) {
@@ -156,8 +156,8 @@ export async function deleteGrantOpportunity(id: string) {
     });
   }
 
-  revalidatePath('/admin/grants');
-  redirect('/admin/grants');
+  revalidatePath('/grants');
+  redirect('/grants');
 }
 
 export async function createGrantApplication(formData: FormData) {
@@ -201,8 +201,8 @@ export async function createGrantApplication(formData: FormData) {
     metadata: { grant_id: applicationData.grant_id, status: applicationData.status },
   });
 
-  revalidatePath('/admin/grants');
-  redirect('/admin/grants');
+  revalidatePath('/grants');
+  redirect('/grants');
 }
 
 export async function updateGrantApplicationStatus(
@@ -258,6 +258,6 @@ export async function updateGrantApplicationStatus(
     });
   }
 
-  revalidatePath('/admin/grants');
+  revalidatePath('/grants');
   return { success: true };
 }

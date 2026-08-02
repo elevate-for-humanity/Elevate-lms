@@ -52,7 +52,7 @@ export default async function StaffPortalLanding() {
   }
 
   const quickLinks = [
-    { label: 'Students', href: '/admin/students', icon: Users, desc: 'Manage enrollments' },
+    { label: 'Students', href: '/students', icon: Users, desc: 'Manage enrollments' },
     {
       label: 'Attendance',
       href: '/admin/attendance',

@@ -47,7 +47,7 @@ export default async function JRIParticipantsPage() {
               <p className="text-slate-700 mt-1">{participants?.length || 0} total participants</p>
             </div>
             <Link
-              href="/admin/jri/participants/new"
+              href="/jri/participants/new"
               className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
             >
               Add Participant

@@ -107,7 +107,7 @@ export default async function AccreditationReportPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <Link
-              href="/admin/accreditation"
+              href="/accreditation"
               className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Accreditation

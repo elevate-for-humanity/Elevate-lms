@@ -45,7 +45,7 @@ export default function NewSignaturePage() {
       }
 
       // Redirect to signatures list — admin can copy the sign link from there
-      router.push(`/admin/signatures?created=${data.document.id}`);
+      router.push(`/signatures?created=${data.document.id}`);
     } catch {
       setError('Network error. Please try again.');
       setSubmitting(false);
@@ -135,7 +135,7 @@ export default function NewSignaturePage() {
                 {submitting ? 'Creating...' : 'Create Document'}
               </button>
               <Link
-                href="/admin/signatures"
+                href="/signatures"
                 className="px-6 py-3 border border-slate-300 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
               >
                 Cancel

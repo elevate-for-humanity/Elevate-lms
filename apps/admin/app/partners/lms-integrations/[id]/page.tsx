@@ -84,7 +84,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href="/admin/partners/lms-integrations"
+          href="/partners/lms-integrations"
           className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />

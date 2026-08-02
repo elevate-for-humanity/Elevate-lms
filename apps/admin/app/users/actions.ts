@@ -69,7 +69,7 @@ export async function activateUser(userId: string) {
     metadata: { email: target.email },
   });
 
-  revalidatePath('/admin/users');
+  revalidatePath('/users');
   return { success: true };
 }
 
@@ -103,7 +103,7 @@ export async function deactivateUser(userId: string) {
     metadata: { email: target.email },
   });
 
-  revalidatePath('/admin/users');
+  revalidatePath('/users');
   return { success: true };
 }
 
@@ -135,6 +135,6 @@ export async function deleteUser(userId: string) {
     metadata: { email: target.email },
   });
 
-  revalidatePath('/admin/users');
+  revalidatePath('/users');
   return { success: true };
 }

@@ -54,7 +54,7 @@ export default function CourseBuilderTopBar({
           {/* Left: back + title + status */}
           <div className="flex min-w-0 items-center gap-3">
             <Link
-              href="/admin/programs"
+              href="/programs"
               className="flex-shrink-0 text-slate-400 hover:text-slate-700 transition-colors"
               title="Back to Programs"
             >

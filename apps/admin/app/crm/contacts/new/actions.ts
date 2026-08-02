@@ -34,5 +34,5 @@ export async function createContactAction(formData: FormData) {
     created_by: user.id,
   });
 
-  redirect('/admin/crm/contacts');
+  redirect('/crm/contacts');
 }

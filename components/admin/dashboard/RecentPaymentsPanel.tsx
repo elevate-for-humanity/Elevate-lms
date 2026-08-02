@@ -37,7 +37,7 @@ export function RecentPaymentsPanel({ payments }: Props) {
           <h2 className="font-bold text-slate-900 text-sm">Recent Payments</h2>
         </div>
         <Link
-          href="/admin/students?payment_status=paid"
+          href="/students?payment_status=paid"
           className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
         >
           View all <ArrowRight className="w-3 h-3" />

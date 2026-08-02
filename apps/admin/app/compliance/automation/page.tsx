@@ -116,7 +116,7 @@ export default async function ComplianceAutomationPage() {
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/compliance" className="hover:text-slate-700">Compliance</Link>
+          <Link href="/compliance" className="hover:text-slate-700">Compliance</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Automation</span>
         </nav>
@@ -128,10 +128,10 @@ export default async function ComplianceAutomationPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Link href="/admin/contracts" className="px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 transition-colors">
+            <Link href="/contracts" className="px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 transition-colors">
               New Contract
             </Link>
-            <Link href="/admin/grants/applications/new" className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors">
+            <Link href="/grants/applications/new" className="px-4 py-2 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors">
               New Application
             </Link>
           </div>
@@ -206,7 +206,7 @@ export default async function ComplianceAutomationPage() {
                 Keep this current to ensure accurate contract and grant prefill.
               </p>
             </div>
-            <Link href="/admin/settings/organization-profile"
+            <Link href="/settings/organization-profile"
               className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors whitespace-nowrap">
               Manage Profile
             </Link>

@@ -52,7 +52,7 @@ export default function InstructorAnnouncementsPage() {
       .maybeSingle();
 
     if (!courseData || courseData.instructor_id !== user.id) {
-      router.push('/admin/instructor/courses');
+      router.push('/instructor/courses');
       return;
     }
 

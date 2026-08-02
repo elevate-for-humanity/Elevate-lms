@@ -46,7 +46,7 @@ export default async function AccreditationStandardPage({ params }: { params: Pr
       </div>
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/accreditation" className="p-2 hover:bg-slate-100 rounded-lg">
+          <Link href="/accreditation" className="p-2 hover:bg-slate-100 rounded-lg">
             <ArrowLeft className="w-4 h-4 text-slate-600" />
           </Link>
           <div className="flex-1">
@@ -94,7 +94,7 @@ export default async function AccreditationStandardPage({ params }: { params: Pr
               Open Admin Link
             </a>
           )}
-          <Link href="/admin/accreditation"
+          <Link href="/accreditation"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 ml-auto">
             Back to Accreditation
           </Link>

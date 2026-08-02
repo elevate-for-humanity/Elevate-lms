@@ -40,7 +40,7 @@ export default async function PartnerApplicationsPage() {
             <p className="text-slate-600 mt-1">Review, approve, or deny incoming partner requests.</p>
           </div>
           <Link
-            href="/admin/partners"
+            href="/partners"
             className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             Back to Partners

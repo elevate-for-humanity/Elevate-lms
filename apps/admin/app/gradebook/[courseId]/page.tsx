@@ -44,7 +44,7 @@ export default async function AdminGradebookPage({
     .eq('id', courseId)
     .maybeSingle();
 
-  if (!course) redirect('/admin/courses');
+  if (!course) redirect('/courses');
 
   // Fetch enrollments with student profiles
   const { data: rawGradebookEnrollments } = await supabase
@@ -87,7 +87,7 @@ export default async function AdminGradebookPage({
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
           <Link
-            href="/admin/courses"
+            href="/courses"
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />

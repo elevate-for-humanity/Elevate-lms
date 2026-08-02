@@ -27,7 +27,7 @@ export default async function TemplatesPage() {
           <p className="text-gray-600 mt-1">Manage reusable communication templates</p>
         </div>
         <Link
-          href="/admin/communications/templates/new"
+          href="/communications/templates/new"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -93,7 +93,7 @@ export default async function TemplatesPage() {
           <h3 className="text-lg font-medium text-gray-900 mb-2">No templates yet</h3>
           <p className="text-gray-500 mb-4">Create your first email or message template</p>
           <Link
-            href="/admin/communications/templates/new"
+            href="/communications/templates/new"
             className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4" />

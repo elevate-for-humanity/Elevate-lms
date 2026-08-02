@@ -88,7 +88,7 @@ export default async function PartnerReportsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Partners</h2>
-              <Link href="/admin/partners" className="text-sm text-brand-blue-600 hover:underline">View all</Link>
+              <Link href="/partners" className="text-sm text-brand-blue-600 hover:underline">View all</Link>
             </div>
             {partners.length > 0 ? (
               <div className="space-y-3">
@@ -117,7 +117,7 @@ export default async function PartnerReportsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Recent Inquiries</h2>
-              <Link href="/admin/partner-inquiries" className="text-sm text-brand-blue-600 hover:underline">View all</Link>
+              <Link href="/partner-inquiries" className="text-sm text-brand-blue-600 hover:underline">View all</Link>
             </div>
             {inquiries.length > 0 ? (
               <div className="space-y-3">

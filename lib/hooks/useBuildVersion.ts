@@ -41,8 +41,12 @@ export function useBuildVersion() {
       });
       
       if (!response.ok) return false;
-      
-      const { buildVersion: serverVersion } = await response.json();
+
+      const data = await response.json();
+      // Handle multiple field name formats across services
+      const serverVersion = data.buildVersion ?? data.commit ?? data.gitSha ?? null;
+      if (!serverVersion) return false;
+
       const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
       
       if (storedVersion && storedVersion !== serverVersion) {
@@ -74,8 +78,9 @@ export function useBuildVersion() {
         // Fetch and store the version
         fetch('/api/health/build-version', { cache: 'no-store' })
           .then(r => r.json())
-          .then(({ buildVersion }) => {
-            sessionStorage.setItem(BUILD_VERSION_KEY, buildVersion);
+          .then((data) => {
+            const version = data?.buildVersion ?? data?.commit ?? data?.gitSha ?? null;
+            if (version) sessionStorage.setItem(BUILD_VERSION_KEY, version);
           })
           .catch(() => {});
       }

@@ -244,7 +244,7 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
               Admin
             </Link>
             {' / '}
-            <Link href="/admin/hr" className="hover:text-brand-blue-600">
+            <Link href="/hr" className="hover:text-brand-blue-600">
               HR
             </Link>
             {' / '}
@@ -393,7 +393,7 @@ export default function PayrollClient({ staffCount, payrollRuns: initial, w9Queu
                 </span>
               )}
             </div>
-            <Link href="/admin/provider-applications" className="text-xs text-amber-700 hover:underline flex items-center gap-1">
+            <Link href="/provider-applications" className="text-xs text-amber-700 hover:underline flex items-center gap-1">
               View all <ChevronRight className="w-3 h-3" />
             </Link>
           </div>

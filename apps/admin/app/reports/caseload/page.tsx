@@ -62,7 +62,7 @@ export default async function CaseloadReportsPage() {
             <ol className="flex items-center space-x-2 text-slate-700">
               <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
               <li>/</li>
-              <li><Link href="/admin/reports" className="hover:text-primary">Reports</Link></li>
+              <li><Link href="/reports" className="hover:text-primary">Reports</Link></li>
               <li>/</li>
               <li className="text-slate-900 font-medium">Caseload</li>
             </ol>

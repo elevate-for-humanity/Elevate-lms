@@ -41,7 +41,7 @@ export default async function PressPage() {
               <p className="text-sm text-slate-500 mt-1">Manage press releases and news coverage</p>
             </div>
             <Link
-              href="/admin/blog/management"
+              href="/blog/management"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -95,7 +95,7 @@ export default async function PressPage() {
               <h3 className="text-lg font-semibold text-slate-900 mb-2">No Press Releases</h3>
               <p className="text-sm text-slate-500 mb-6">Create your first press release to share news with media.</p>
               <Link
-                href="/admin/blog/management"
+                href="/blog/management"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />

@@ -60,7 +60,7 @@ export default async function BarberShopApplicationDetailPage({
 
         <div className="flex items-center justify-between mt-6 mb-8">
           <div>
-            <Link href="/admin/barber-shop-applications" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm mb-2">
+            <Link href="/barber-shop-applications" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm mb-2">
               <ArrowLeft className="w-4 h-4" /> Back to Applications
             </Link>
             <h1 className="text-2xl font-bold text-slate-900">{app.shop_legal_name}</h1>

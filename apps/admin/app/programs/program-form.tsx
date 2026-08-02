@@ -40,7 +40,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
       } else {
         await createProgram(formData);
       }
-      router.push('/admin/programs');
+      router.push('/programs');
       router.refresh();
     } catch (err: any) {
       setError('An error occurred');

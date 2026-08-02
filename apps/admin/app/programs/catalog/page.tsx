@@ -67,7 +67,7 @@ export default async function ProgramCatalogPage() {
                 Admin
               </Link>
               <span>/</span>
-              <Link href="/admin/programs" className="hover:text-slate-900">
+              <Link href="/programs" className="hover:text-slate-900">
                 Programs
               </Link>
               <span>/</span>
@@ -158,7 +158,7 @@ export default async function ProgramCatalogPage() {
                     Download PDF
                   </Link>
                   <Link
-                    href="/admin/programs/catalog"
+                    href="/programs/catalog"
                     className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-900 rounded-lg hover:bg-slate-50 text-sm font-medium"
                   >
                     <Eye className="w-4 h-4" />

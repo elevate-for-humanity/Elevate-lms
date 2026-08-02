@@ -367,7 +367,7 @@ export default function PageBuilderClient() {
 
         <p className="text-slate-600 text-xs">
           Pages are rendered at <code>/{'{slug}'}</code> on the public site.
-          Use <Link href="/admin/content" className="text-brand-blue-400 hover:underline">Content Management</Link> to edit team members and partners.
+          Use <Link href="/content" className="text-brand-blue-400 hover:underline">Content Management</Link> to edit team members and partners.
         </p>
       </div>
     </div>

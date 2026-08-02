@@ -23,7 +23,7 @@ interface AdminNavProps {
 }
 
 function isActive(pathname: string, href: string) {
-  if (href === '/admin/dashboard') return pathname === href;
+  if (href === '/dashboard') return pathname === href;
   return pathname === href || pathname.startsWith(href + '/');
 }
 
@@ -72,7 +72,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (search.trim()) {
-      router.push(`/admin/students?search=${encodeURIComponent(search.trim())}`);
+      router.push(`/students?search=${encodeURIComponent(search.trim())}`);
       setSearch('');
     }
   }
@@ -86,7 +86,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 shadow-sm">
         <div className="h-14 flex items-center gap-2 px-4 sm:px-6">
-          <Link href="/admin/dashboard" className="flex items-center gap-2 flex-shrink-0">
+          <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0">
             <LogoImage alt="Elevate" width={28} height={42} className="w-auto h-8" />
             <span className="font-bold text-slate-900 text-sm hidden sm:block">
               Elevate <span className="text-brand-red-600 font-semibold">Admin</span>
@@ -166,7 +166,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl border border-slate-200 shadow-xl z-50">
                   <div className="flex items-center justify-between px-4 py-3 border-b">
                     <p className="text-sm font-bold text-slate-900">Notifications</p>
-                    <Link href="/admin/notifications" className="text-xs font-semibold text-blue-600">View all</Link>
+                    <Link href="/notifications" className="text-xs font-semibold text-blue-600">View all</Link>
                   </div>
                   <div className="max-h-72 overflow-y-auto divide-y">
                     {notifs.length === 0 ? (
@@ -189,7 +189,7 @@ export default function AdminNav({ userName = 'Admin', notifs = [], navSections 
 
             {/* Settings + User */}
             <div className="hidden md:flex items-center gap-1 pl-3 border-l border-slate-200">
-              <Link href="/admin/settings" className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100">
+              <Link href="/settings" className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100">
                 <Settings className="w-4 h-4" />
               </Link>
               <span className="text-sm text-slate-700 px-1 hidden xl:block">{userName}</span>

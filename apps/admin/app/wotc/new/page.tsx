@@ -22,7 +22,7 @@ export default async function NewWOTCPage() {
         {/* Header */}
         <div className="mb-8">
           <Link
-            href="/admin/wotc"
+            href="/wotc"
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -266,7 +266,7 @@ export default async function NewWOTCPage() {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-200">
-            <Link href="/admin/wotc" className="px-4 py-2 text-slate-900 hover:text-slate-900">
+            <Link href="/wotc" className="px-4 py-2 text-slate-900 hover:text-slate-900">
               Cancel
             </Link>
             <button

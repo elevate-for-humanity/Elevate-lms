@@ -34,7 +34,7 @@ export default async function EmployeesPage() {
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/hr" className="hover:text-primary">
+                <Link href="/hr" className="hover:text-primary">
                   HR
                 </Link>
               </li>
@@ -48,7 +48,7 @@ export default async function EmployeesPage() {
               <p className="text-slate-700 mt-2">{count || 0} employees</p>
             </div>
             <Link
-              href="/admin/hr/employees/new"
+              href="/hr/employees/new"
               className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
             >
               Add Employee

@@ -68,7 +68,7 @@ export default async function WIOAEligibilityPage() {
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/wioa" className="hover:text-slate-700">
+          <Link href="/wioa" className="hover:text-slate-700">
             WIOA
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -180,7 +180,7 @@ export default async function WIOAEligibilityPage() {
                     </td>
                     <td className="py-3.5 px-5 text-right">
                       <Link
-                        href={`/admin/applications/review/${a.id}`}
+                        href={`/applications/review/${a.id}`}
                         className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                       >
                         Review <ArrowRight className="w-3 h-3" />

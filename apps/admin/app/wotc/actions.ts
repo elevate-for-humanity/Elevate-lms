@@ -66,8 +66,8 @@ export async function createWOTCApplication(formData: FormData) {
     metadata: { employer_name: applicationData.employer_name, ssn_last4: ssnData.ssn_last4 },
   });
 
-  revalidatePath('/admin/wotc');
-  redirect('/admin/wotc');
+  revalidatePath('/wotc');
+  redirect('/wotc');
 }
 
 export async function updateWOTCApplication(id: string, formData: FormData) {
@@ -126,9 +126,9 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
     metadata: { employer_name: updateData.employer_name },
   });
 
-  revalidatePath('/admin/wotc');
+  revalidatePath('/wotc');
   revalidatePath(`/admin/wotc/${id}`);
-  redirect('/admin/wotc');
+  redirect('/wotc');
 }
 
 export async function submitWOTCApplication(id: string) {
@@ -163,7 +163,7 @@ export async function submitWOTCApplication(id: string) {
     return { error: 'Operation failed' };
   }
 
-  revalidatePath('/admin/wotc');
+  revalidatePath('/wotc');
   return { success: true };
 }
 
@@ -204,7 +204,7 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
     return { error: 'Operation failed' };
   }
 
-  revalidatePath('/admin/wotc');
+  revalidatePath('/wotc');
   revalidatePath(`/admin/wotc/${id}`);
   return { success: true };
 }
@@ -243,6 +243,6 @@ export async function deleteWOTCApplication(id: string) {
     });
   }
 
-  revalidatePath('/admin/wotc');
-  redirect('/admin/wotc');
+  revalidatePath('/wotc');
+  redirect('/wotc');
 }

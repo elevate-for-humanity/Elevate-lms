@@ -74,7 +74,7 @@ export function MissionControlLiveOpsPanel() {
             Refresh
           </button>
           <Link
-            href="/admin/at-risk"
+            href="/at-risk"
             className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
           >
             Mission details

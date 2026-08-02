@@ -79,7 +79,7 @@ export default async function CohortTrackerPage() {
               </p>
             </div>
             <Link
-              href="/admin/cohorts/new"
+              href="/cohorts/new"
               className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-red-700 transition-colors"
             >
               <Plus className="w-4 h-4" /> New Cohort
@@ -123,7 +123,7 @@ export default async function CohortTrackerPage() {
               Create your first cohort to start tracking enrollment and progress.
             </p>
             <Link
-              href="/admin/cohorts/new"
+              href="/cohorts/new"
               className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-red-700 transition-colors"
             >
               <Plus className="w-4 h-4" /> Create Cohort

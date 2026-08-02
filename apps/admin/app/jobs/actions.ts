@@ -50,6 +50,6 @@ export async function createJob(formData: FormData) {
     metadata: { title: formData.get('title') as string },
   });
 
-  revalidatePath('/admin/jobs');
-  redirect('/admin/jobs');
+  revalidatePath('/jobs');
+  redirect('/jobs');
 }

@@ -9,7 +9,7 @@ export function InactiveLearnersList({ items }: { items: InactiveLearner[] }) {
         <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
           Inactive Learners
         </h2>
-        <Link href="/admin/at-risk" className="text-xs text-blue-600 font-medium hover:underline">
+        <Link href="/at-risk" className="text-xs text-blue-600 font-medium hover:underline">
           View all →
         </Link>
       </div>

@@ -71,7 +71,7 @@ export default async function FinancialReportPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <Link 
-            href="/admin/reports"
+            href="/reports"
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -128,7 +128,7 @@ export default async function FinancialReportPage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">WOTC Applications</h2>
-              <Link href="/admin/wotc" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
+              <Link href="/wotc" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 View All
               </Link>
             </div>
@@ -164,7 +164,7 @@ export default async function FinancialReportPage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">Grant Applications</h2>
-              <Link href="/admin/grants" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
+              <Link href="/grants" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 View All
               </Link>
             </div>
@@ -207,7 +207,7 @@ export default async function FinancialReportPage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900">Open Grant Opportunities</h2>
-            <Link href="/admin/grants" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
+            <Link href="/grants" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
               Add New
             </Link>
           </div>

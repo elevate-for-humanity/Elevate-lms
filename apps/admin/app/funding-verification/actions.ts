@@ -80,7 +80,7 @@ export async function verifyFunding(enrollmentId: string, note?: string) {
     },
   });
 
-  revalidatePath('/admin/funding-verification');
+  revalidatePath('/funding-verification');
 }
 
 export async function rejectFunding(enrollmentId: string, reason: string) {
@@ -138,5 +138,5 @@ export async function rejectFunding(enrollmentId: string, reason: string) {
     },
   });
 
-  revalidatePath('/admin/funding-verification');
+  revalidatePath('/funding-verification');
 }

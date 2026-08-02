@@ -114,7 +114,7 @@ export default async function InstructorAddStudentPage() {
               Add Student
             </button>
             <Link
-              href="/admin/instructor/students"
+              href="/instructor/students"
               className="border border-slate-300 px-6 py-2 rounded-lg hover:bg-slate-50 transition-colors"
             >
               Cancel

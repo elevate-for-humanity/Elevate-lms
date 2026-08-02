@@ -215,7 +215,7 @@ export default async function EtplDashboard() {
                   Submit forms immediately to preserve tax credits.
                 </p>
                 <Link
-                  href="/admin/wotc"
+                  href="/wotc"
                   className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
                   View WOTC Dashboard →
@@ -228,7 +228,7 @@ export default async function EtplDashboard() {
         {/* Quick Links */}
         <div className="grid md:grid-cols-3 gap-6">
           <Link
-            href="/admin/employers/onboarding"
+            href="/employers/onboarding"
             className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition"
           >
             <h3 className="font-bold text-black mb-2">Review Employer Applications</h3>
@@ -236,7 +236,7 @@ export default async function EtplDashboard() {
           </Link>
 
           <Link
-            href="/admin/funding"
+            href="/funding"
             className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition"
           >
             <h3 className="font-bold text-black mb-2">Funding Cases</h3>
@@ -244,7 +244,7 @@ export default async function EtplDashboard() {
           </Link>
 
           <Link
-            href="/admin/rapids"
+            href="/rapids"
             className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition"
           >
             <h3 className="font-bold text-black mb-2">RAPIDS Tracking</h3>

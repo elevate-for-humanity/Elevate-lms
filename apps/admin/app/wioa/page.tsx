@@ -79,13 +79,13 @@ export default async function WioaPage() {
           <div className="flex items-center gap-2">
             <WioaExportButton />
             <Link
-              href="/admin/wioa/iep"
+              href="/wioa/iep"
               className="flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
             >
               <ArrowRight className="w-4 h-4" /> Employment Plans
             </Link>
             <Link
-              href="/admin/wioa/new"
+              href="/wioa/new"
               className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
             >
               <Plus className="w-4 h-4" /> Add Participant
@@ -156,7 +156,7 @@ export default async function WioaPage() {
               <HeartHandshake className="w-8 h-8 text-slate-300 mx-auto mb-3" />
               <p className="text-sm text-slate-500 font-medium">No WIOA participants yet</p>
               <Link
-                href="/admin/wioa/new"
+                href="/wioa/new"
                 className="inline-flex items-center gap-1.5 mt-4 text-sm text-brand-blue-600 font-semibold hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Participant

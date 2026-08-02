@@ -64,7 +64,7 @@ export default function DashboardError({
             Retry
           </button>
           <Link
-            href="/admin/operations"
+            href="/operations"
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
           >
             Operations hub

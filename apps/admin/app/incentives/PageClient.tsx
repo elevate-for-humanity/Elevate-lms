@@ -95,7 +95,7 @@ export default function IncentivesPage() {
               <p className="text-black">Track WEX and OJT employer incentive programs</p>
             </div>
             <Link
-              href="/admin/incentives/create"
+              href="/incentives/create"
               className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 font-medium"
             >
               + New Incentive

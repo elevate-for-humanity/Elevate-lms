@@ -245,7 +245,7 @@ export default async function AdminIntegrationsPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Link
-          href="/admin/integrations/env-manager"
+          href="/integrations/env-manager"
           className="mb-8 flex flex-col gap-1 rounded-xl border-2 border-brand-blue-200 bg-brand-blue-50 p-5 transition-colors hover:border-brand-blue-400 sm:flex-row sm:items-center sm:justify-between"
         >
           <div>

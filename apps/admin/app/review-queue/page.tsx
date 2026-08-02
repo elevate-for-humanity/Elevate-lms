@@ -120,7 +120,7 @@ export default async function ReviewQueuePage({
               </span>
             </h2>
             <Link
-              href="/admin/applications"
+              href="/applications"
               className="text-sm text-brand-blue-600 hover:underline"
             >
               View all applications →
@@ -160,7 +160,7 @@ export default async function ReviewQueuePage({
                     {new Date(app.created_at).toLocaleDateString()}
                   </span>
                   <Link
-                    href={`/admin/applications/review/${app.id}`}
+                    href={`/applications/review/${app.id}`}
                     className="px-3 py-1.5 bg-brand-blue-600 text-white text-xs font-medium rounded-lg hover:bg-brand-blue-700"
                   >
                     Review
@@ -175,7 +175,7 @@ export default async function ReviewQueuePage({
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-2">
         <Link
-          href="/admin/review-queue"
+          href="/review-queue"
           className={`px-4 py-2 rounded-lg text-sm font-medium ${
             !queue_type ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
           }`}
@@ -185,7 +185,7 @@ export default async function ReviewQueuePage({
         {Object.entries(QUEUE_TYPE_CONFIG).map(([type, config]) => (
           <Link
             key={type}
-            href={`/admin/review-queue?queue_type=${type}`}
+            href={`/review-queue?queue_type=${type}`}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               queue_type === type
                 ? 'bg-slate-900 text-white'
@@ -268,7 +268,7 @@ export default async function ReviewQueuePage({
                       {new Date(item.created_at).toLocaleDateString()}
                     </span>
                     <Link
-                      href={`/admin/review-queue/${item.id}`}
+                      href={`/review-queue/${item.id}`}
                       className="px-3 py-1.5 bg-brand-blue-600 text-white text-sm font-medium rounded-lg hover:bg-brand-blue-700"
                     >
                       Review

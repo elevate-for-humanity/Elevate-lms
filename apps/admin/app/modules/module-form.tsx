@@ -44,7 +44,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
       } else {
         await createModule(formData);
       }
-      router.push('/admin/modules');
+      router.push('/modules');
       router.refresh();
     } catch (err: any) {
       setError('An error occurred');

@@ -193,7 +193,7 @@ export default async function StaffSkillsPage() {
             Ask your manager to verify your completed skills in the admin portal.
           </p>
           <Link
-            href="/admin/staff-portal/training"
+            href="/staff-portal/training"
             className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-50"
           >
             View Training Resources <ChevronRight className="w-4 h-4" />

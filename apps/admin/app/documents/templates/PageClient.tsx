@@ -708,7 +708,7 @@ export default function DocumentTemplatesPage() {
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/documents" className="hover:text-brand-blue-600">
+              <Link href="/documents" className="hover:text-brand-blue-600">
                 Documents
               </Link>
             </li>

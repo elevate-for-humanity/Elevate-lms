@@ -59,7 +59,7 @@ export default async function ApprenticeshipsPage() {
             <h1 className="text-2xl font-bold text-slate-900">Apprenticeships</h1>
             <p className="text-sm text-slate-500 mt-1">DOL-registered apprenticeship enrollments and OJT hours</p>
           </div>
-          <Link href="/admin/rapids"
+          <Link href="/rapids"
             className="flex items-center gap-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
             RAPIDS Export →
           </Link>

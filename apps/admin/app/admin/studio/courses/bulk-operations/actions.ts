@@ -38,7 +38,7 @@ export async function bulkUpdateCourseStatus(
     metadata: { operation: 'bulk_status_update', status, count: ids.length },
   });
 
-  revalidatePath('/admin/courses');
+  revalidatePath('/courses');
   revalidatePath('/admin/courses/bulk-operations');
   return { success: true };
 }

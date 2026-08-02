@@ -102,7 +102,7 @@ export default async function SignaturesPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">Signature Documents</h2>
                 <Link
-                  href="/admin/signatures/new"
+                  href="/signatures/new"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-brand-blue-700 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
@@ -131,7 +131,7 @@ export default async function SignaturesPage() {
                 <p className="text-slate-400 text-center py-6">
                   No documents yet.{' '}
                   <Link
-                    href="/admin/signatures/new"
+                    href="/signatures/new"
                     className="text-brand-blue-600 hover:underline"
                   >
                     Create one
@@ -202,13 +202,13 @@ export default async function SignaturesPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/admin/signatures"
+                href="/signatures"
                 className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
               >
                 View Signatures
               </Link>
               <Link
-                href="/admin/document-center"
+                href="/document-center"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 Document Center

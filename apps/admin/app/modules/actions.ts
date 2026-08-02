@@ -57,8 +57,8 @@ export async function createModule(formData: FormData) {
     metadata: { title },
   });
 
-  revalidatePath('/admin/modules');
-  redirect('/admin/modules');
+  revalidatePath('/modules');
+  redirect('/modules');
 }
 
 export async function updateModule(id: string, formData: FormData) {
@@ -113,8 +113,8 @@ export async function updateModule(id: string, formData: FormData) {
     metadata: {},
   });
 
-  revalidatePath('/admin/modules');
-  redirect('/admin/modules');
+  revalidatePath('/modules');
+  redirect('/modules');
 }
 
 export async function deleteModule(id: string) {
@@ -150,5 +150,5 @@ export async function deleteModule(id: string) {
     metadata: {},
   });
 
-  revalidatePath('/admin/modules');
+  revalidatePath('/modules');
 }

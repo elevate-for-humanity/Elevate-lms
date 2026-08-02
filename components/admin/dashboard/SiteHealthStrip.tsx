@@ -52,7 +52,7 @@ export function SiteHealthStrip({ targets }: { targets: PreviewTarget[] }) {
             <RefreshCw className={`h-3 w-3 ${checking ? 'animate-spin' : ''}`} />
             Check
           </button>
-          <Link href="/admin/monitoring" className="text-[10px] font-semibold text-brand-blue-600 hover:underline">
+          <Link href="/monitoring" className="text-[10px] font-semibold text-brand-blue-600 hover:underline">
             Monitoring →
           </Link>
         </div>

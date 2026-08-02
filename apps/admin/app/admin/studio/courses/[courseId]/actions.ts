@@ -152,7 +152,7 @@ export async function publishCourse(formData: FormData) {
     metadata: {},
   });
   revalidatePath(`/admin/courses/${courseId}`);
-  revalidatePath('/admin/courses');
+  revalidatePath('/courses');
 }
 
 export async function unpublishCourse(formData: FormData) {
@@ -178,7 +178,7 @@ export async function unpublishCourse(formData: FormData) {
     metadata: {},
   });
   revalidatePath(`/admin/courses/${courseId}`);
-  revalidatePath('/admin/courses');
+  revalidatePath('/courses');
 }
 
 // ── Lesson-level actions ──────────────────────────────────────────────────────

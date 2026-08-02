@@ -35,7 +35,7 @@ export default function NewEmployerPage() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to save');
-      router.push('/admin/employers');
+      router.push('/employers');
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -122,7 +122,7 @@ export default function NewEmployerPage() {
             {saving ? 'Saving…' : 'Add Employer'}
           </button>
           <Link
-            href="/admin/employers"
+            href="/employers"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel

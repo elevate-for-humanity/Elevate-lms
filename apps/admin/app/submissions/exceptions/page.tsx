@@ -37,7 +37,7 @@ export default async function ExceptionQueuePage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Link
-          href="/admin/submissions"
+          href="/submissions"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Submissions OS

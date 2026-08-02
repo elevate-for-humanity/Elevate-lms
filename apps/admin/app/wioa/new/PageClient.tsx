@@ -35,7 +35,7 @@ export default function NewWioaPage() {
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to save');
-      router.push('/admin/wioa');
+      router.push('/wioa');
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -128,7 +128,7 @@ export default function NewWioaPage() {
             {saving ? 'Saving…' : 'Add Participant'}
           </button>
           <a
-            href="/admin/wioa"
+            href="/wioa"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel

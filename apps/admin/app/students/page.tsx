@@ -120,7 +120,7 @@ export default async function StudentsPage() {
       ]}
       actions={
         <Link
-          href="/admin/students/export"
+          href="/students/export"
           className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg border border-white/20 transition-colors"
         >
           Export CSV
@@ -198,7 +198,7 @@ export default async function StudentsPage() {
                   </div>
                   <div className="col-span-1 text-right">
                     <Link
-                      href={`/admin/students/${student.id}`}
+                      href={`/students/${student.id}`}
                       className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                     >
                       View →

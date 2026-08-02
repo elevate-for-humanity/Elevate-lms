@@ -111,7 +111,7 @@ export default function TakeAttendancePage() {
 
     setSaved(true);
     setSaving(false);
-    if (!draft) setTimeout(() => router.push('/admin/staff-portal/attendance'), 1500);
+    if (!draft) setTimeout(() => router.push('/staff-portal/attendance'), 1500);
   };
 
   if (loading) {
@@ -148,7 +148,7 @@ export default function TakeAttendancePage() {
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/staff-portal/attendance" className="text-slate-500 hover:text-slate-700">
+          <Link href="/staff-portal/attendance" className="text-slate-500 hover:text-slate-700">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>

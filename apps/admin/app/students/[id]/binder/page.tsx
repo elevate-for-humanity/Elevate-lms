@@ -80,7 +80,7 @@ export default async function StudentBinderPage({ params }: PageProps) {
       <div className="flex items-start justify-between mb-6">
         <div>
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/admin/students" className="hover:text-blue-600">Students</Link>
+            <Link href="/students" className="hover:text-blue-600">Students</Link>
             <span>/</span>
             <span>{student.name || `${student.first_name} ${student.last_name}`}</span>
             <span>/</span>

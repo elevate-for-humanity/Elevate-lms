@@ -20,7 +20,7 @@ async function createDeal(formData: FormData) {
     expected_close_date: (formData.get('expected_close_date') as string) || null,
     notes: (formData.get('notes') as string) || null,
   });
-  if (!error) redirect('/admin/crm/deals');
+  if (!error) redirect('/crm/deals');
 }
 
 export default async function NewDealPage() {
@@ -28,7 +28,7 @@ export default async function NewDealPage() {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-xl mx-auto">
-        <Link href="/admin/crm/deals" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
+        <Link href="/crm/deals" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Deals
         </Link>
         <div className="flex items-center gap-2 mb-6">
@@ -70,7 +70,7 @@ export default async function NewDealPage() {
             <textarea name="notes" rows={3} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-none" />
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/crm/deals" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
+            <Link href="/crm/deals" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
             <button type="submit" className="px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">Create Deal</button>
           </div>
         </form>

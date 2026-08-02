@@ -461,13 +461,13 @@ export default function StoreBuilderPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/admin/store/clones"
+                  href="/store/clones"
                   className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-slate-50 text-lg shadow-2xl transition-all"
                 >
                   View Clones
                 </Link>
                 <Link
-                  href="/admin/store"
+                  href="/store"
                   className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                 >
                   View Store

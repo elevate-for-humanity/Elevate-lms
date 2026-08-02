@@ -46,13 +46,13 @@ export default async function ProgramMediaPage({ params }: { params: Promise<{ c
       <nav className="text-sm mb-4">
         <ol className="flex items-center space-x-2 text-slate-700">
           <li>
-            <Link href="/admin/programs" className="hover:text-brand-blue-600">
+            <Link href="/programs" className="hover:text-brand-blue-600">
               Programs
             </Link>
           </li>
           <li>/</li>
           <li>
-            <Link href={`/admin/programs/${code}/dashboard`} className="hover:text-brand-blue-600">
+            <Link href={`/programs/${code}/dashboard`} className="hover:text-brand-blue-600">
               {program.title}
             </Link>
           </li>

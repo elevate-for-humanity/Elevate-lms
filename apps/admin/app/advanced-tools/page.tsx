@@ -195,7 +195,7 @@ export default async function AdvancedToolsPage() {
             {[
               { label: 'Operations', href: '/admin/operations' },
               { label: 'Settings', href: '/admin/settings' },
-              { label: 'Users', href: '/admin/students' },
+              { label: 'Users', href: '/students' },
               { label: 'Licenses', href: '/admin/licenses' },
               { label: 'Tenants', href: '/admin/tenants' },
               { label: 'Monitoring', href: '/admin/monitoring' },

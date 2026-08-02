@@ -135,7 +135,7 @@ export default async function HRPage() {
               <p className="text-slate-700 mt-1">Human resources management</p>
             </div>
             <Link
-              href="/admin/hr/employees/new"
+              href="/hr/employees/new"
               className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
             >
               Add Employee
@@ -170,13 +170,13 @@ export default async function HRPage() {
               </span>{' '}
               require your approval —{' '}
               {pendingLeaveCount ? (
-                <Link href="/admin/hr/leave" className="underline">
+                <Link href="/hr/leave" className="underline">
                   {pendingLeaveCount} leave
                 </Link>
               ) : null}
               {pendingLeaveCount && pendingTimeOffCount ? ', ' : ''}
               {pendingTimeOffCount ? (
-                <Link href="/admin/hr/time" className="underline">
+                <Link href="/hr/time" className="underline">
                   {pendingTimeOffCount} time off
                 </Link>
               ) : null}
@@ -190,7 +190,7 @@ export default async function HRPage() {
             <div className="p-5 border-b flex justify-between items-center">
               <h2 className="text-base font-semibold text-slate-900">Recent Employees</h2>
               <Link
-                href="/admin/hr/employees"
+                href="/hr/employees"
                 className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
               >
                 View all <ArrowRight size={14} />
@@ -226,7 +226,7 @@ export default async function HRPage() {
                 <div className="p-8 text-center text-slate-700 text-sm">
                   No employees yet —{' '}
                   <Link
-                    href="/admin/hr/employees/new"
+                    href="/hr/employees/new"
                     className="text-brand-blue-600 hover:underline"
                   >
                     add one
@@ -241,7 +241,7 @@ export default async function HRPage() {
             <div className="p-5 border-b flex justify-between items-center">
               <h2 className="text-base font-semibold text-slate-900">Recent Payroll Runs</h2>
               <Link
-                href="/admin/hr/payroll"
+                href="/hr/payroll"
                 className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
               >
                 View all <ArrowRight size={14} />

@@ -64,7 +64,7 @@ export function SystemHealthPanel({ health }: Props) {
             </span>
           )}
           <Link
-            href="/admin/system-health"
+            href="/system-health"
             className="text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
           >
             Details →

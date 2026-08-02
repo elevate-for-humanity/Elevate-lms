@@ -142,7 +142,7 @@ export function PublishWebsitePanel() {
                 {status.content.unpublishedPrograms > 0 && (
                   <span>
                     {status.content.unpublishedPrograms} program(s) still unpublished — use{' '}
-                    <Link href="/admin/programs" className="font-semibold underline">
+                    <Link href="/programs" className="font-semibold underline">
                       Programs
                     </Link>{' '}
                     to publish catalog changes first.{' '}

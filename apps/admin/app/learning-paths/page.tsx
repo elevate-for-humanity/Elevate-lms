@@ -38,7 +38,7 @@ export default async function LearningPathsPage() {
             <p className="text-sm text-slate-500 mt-1">Structured career development pathways</p>
           </div>
           <Link
-            href="/admin/learning-paths/new"
+            href="/learning-paths/new"
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" /> Add Path

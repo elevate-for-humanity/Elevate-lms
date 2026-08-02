@@ -40,7 +40,7 @@ export default function NewDealPage() {
       });
 
       if (res.ok) {
-        router.push('/admin/crm/deals');
+        router.push('/crm/deals');
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to create deal');
@@ -68,7 +68,7 @@ export default function NewDealPage() {
       </div>
       <div className="max-w-2xl mx-auto">
         <Link
-          href="/admin/crm/deals"
+          href="/crm/deals"
           className="flex items-center gap-2 text-slate-700 hover:text-brand-blue-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />

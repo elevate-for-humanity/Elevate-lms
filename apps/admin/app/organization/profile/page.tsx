@@ -124,13 +124,13 @@ export default function OrganizationProfilePage() {
               <a href="/admin/organization/edit" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
                 Edit Organization Details
               </a>
-              <a href="/admin/settings" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+              <a href="/settings" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
                 Platform Settings
               </a>
-              <a href="/admin/integrations" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+              <a href="/integrations" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
                 Integrations
               </a>
-              <a href="/admin/api-keys" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+              <a href="/api-keys" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
                 API Keys
               </a>
             </div>

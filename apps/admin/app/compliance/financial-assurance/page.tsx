@@ -51,7 +51,7 @@ export default async function FinancialAssurancePage() {
             </p>
           </div>
           <Link
-            href="/admin/compliance/financial-assurance/new"
+            href="/compliance/financial-assurance/new"
             className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
           >
             + Add Record

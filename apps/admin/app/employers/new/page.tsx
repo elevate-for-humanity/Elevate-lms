@@ -20,7 +20,7 @@ async function createEmployer(formData: FormData) {
     email: (formData.get('email') as string) || null,
     status: 'active',
   });
-  if (!error) redirect('/admin/employers');
+  if (!error) redirect('/employers');
 }
 
 export default async function NewEmployerPage() {
@@ -28,7 +28,7 @@ export default async function NewEmployerPage() {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-xl mx-auto">
-        <Link href="/admin/employers" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
+        <Link href="/employers" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Employers
         </Link>
         <div className="flex items-center gap-2 mb-6">
@@ -65,7 +65,7 @@ export default async function NewEmployerPage() {
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/employers" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
+            <Link href="/employers" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
             <button type="submit" className="px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">Add Employer</button>
           </div>
         </form>

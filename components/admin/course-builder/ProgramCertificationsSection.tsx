@@ -176,7 +176,7 @@ export default function ProgramCertificationsSection({
         {unattachedCredentials.length === 0 && credentials.length === 0 && (
           <p className="text-sm text-slate-400">
             No credentials exist in the registry yet.{' '}
-            <Link href="/admin/credentials" className="text-brand-blue-600 hover:underline">
+            <Link href="/credentials" className="text-brand-blue-600 hover:underline">
               Add credentials →
             </Link>
           </p>

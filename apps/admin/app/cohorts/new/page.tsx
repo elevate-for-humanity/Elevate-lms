@@ -180,7 +180,7 @@ export default async function NewCohortPage() {
               Create Cohort
             </button>
             <Link
-              href="/admin/cohorts"
+              href="/cohorts"
               className="flex-1 text-center border border-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-sm hover:bg-slate-50 transition"
             >
               Cancel

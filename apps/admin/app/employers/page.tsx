@@ -44,7 +44,7 @@ export default async function AdminEmployersPage() {
             </p>
           </div>
           <Link
-            href="/admin/employers/new"
+            href="/employers/new"
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" /> Add Employer
@@ -61,7 +61,7 @@ export default async function AdminEmployersPage() {
               Add employer partners to track apprenticeships and job placements
             </p>
             <Link
-              href="/admin/employers/new"
+              href="/employers/new"
               className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue-600 hover:underline"
             >
               Add first employer <ArrowRight className="w-3.5 h-3.5" />

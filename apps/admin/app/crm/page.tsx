@@ -83,7 +83,7 @@ export default async function CRMHubPage() {
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link
-            href="/admin/crm/contacts"
+            href="/crm/contacts"
             aria-label="Link"
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
@@ -97,7 +97,7 @@ export default async function CRMHubPage() {
           </Link>
 
           <Link
-            href="/admin/crm/leads"
+            href="/crm/leads"
             aria-label="Link"
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
@@ -111,7 +111,7 @@ export default async function CRMHubPage() {
           </Link>
 
           <Link
-            href="/admin/crm/follow-ups"
+            href="/crm/follow-ups"
             aria-label="Link"
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
@@ -125,7 +125,7 @@ export default async function CRMHubPage() {
           </Link>
 
           <Link
-            href="/admin/crm/appointments"
+            href="/crm/appointments"
             aria-label="Link"
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
@@ -142,7 +142,7 @@ export default async function CRMHubPage() {
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <Link
-            href="/admin/crm/campaigns/new"
+            href="/crm/campaigns/new"
             className="bg-zinc-900   text-white rounded-xl p-6 hover:shadow-lg transition-shadow"
           >
             <Mail className="w-8 h-8 mb-4" />
@@ -151,7 +151,7 @@ export default async function CRMHubPage() {
           </Link>
 
           <Link
-            href="/admin/crm/deals/new"
+            href="/crm/deals/new"
             className="bg-zinc-900   text-white rounded-xl p-6 hover:shadow-lg transition-shadow"
           >
             <DollarSign className="w-8 h-8 mb-4" />
@@ -160,7 +160,7 @@ export default async function CRMHubPage() {
           </Link>
 
           <Link
-            href="/admin/crm/appointments/new"
+            href="/crm/appointments/new"
             className="bg-zinc-900   text-white rounded-xl p-6 hover:shadow-lg transition-shadow"
           >
             <Calendar className="w-8 h-8 mb-4" />
@@ -176,7 +176,7 @@ export default async function CRMHubPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-black">Recent Campaigns</h2>
               <Link
-                href="/admin/crm/campaigns"
+                href="/crm/campaigns"
                 aria-label="Link"
                 className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
@@ -210,7 +210,7 @@ export default async function CRMHubPage() {
                 <Mail className="w-12 h-12 mx-auto mb-4 text-black" />
                 <p>No campaigns yet</p>
                 <Link
-                  href="/admin/crm/campaigns/new"
+                  href="/crm/campaigns/new"
                   aria-label="Link"
                   className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold mt-2 inline-block"
                 >
@@ -233,7 +233,7 @@ export default async function CRMHubPage() {
                 </p>
               </div>
               <Link
-                href="/admin/crm/deals"
+                href="/crm/deals"
                 aria-label="Link"
                 className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
@@ -274,7 +274,7 @@ export default async function CRMHubPage() {
                 <DollarSign className="w-12 h-12 mx-auto mb-4 text-black" />
                 <p>No open deals</p>
                 <Link
-                  href="/admin/crm/deals/new"
+                  href="/crm/deals/new"
                   aria-label="Link"
                   className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold mt-2 inline-block"
                 >

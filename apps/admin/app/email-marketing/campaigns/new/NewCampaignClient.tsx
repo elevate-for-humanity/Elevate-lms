@@ -65,7 +65,7 @@ export default function NewCampaignPage() {
 
     if (response.ok) {
       toast.success('Campaign saved as draft!');
-      router.push('/admin/email-marketing');
+      router.push('/email-marketing');
     }
   };
 
@@ -80,7 +80,7 @@ export default function NewCampaignPage() {
 
     if (response.ok) {
       toast.success('Campaign sent successfully!');
-      router.push('/admin/email-marketing');
+      router.push('/email-marketing');
     }
   };
 
@@ -93,7 +93,7 @@ export default function NewCampaignPage() {
 
     if (response.ok) {
       toast.success('Campaign scheduled successfully!');
-      router.push('/admin/email-marketing');
+      router.push('/email-marketing');
     }
   };
 
@@ -121,7 +121,7 @@ export default function NewCampaignPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/admin/email-marketing')}
+                onClick={() => router.push('/email-marketing')}
                 className="p-2 hover:bg-slate-100 rounded-lg"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -619,13 +619,13 @@ export default function NewCampaignPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/admin/email-marketing"
+                  href="/email-marketing"
                   className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-slate-50 text-lg shadow-2xl transition-all"
                 >
                   View Campaigns
                 </Link>
                 <Link
-                  href="/admin/email-marketing/analytics"
+                  href="/email-marketing/analytics"
                   className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                 >
                   View Analytics

@@ -31,7 +31,7 @@ export default async function EnvManagerPage() {
         </p>
         <p className="mt-1 text-xs text-slate-500">
           Encrypted runtime secrets:{' '}
-          <Link href="/admin/settings/integrations" className="text-brand-blue-600 underline">
+          <Link href="/settings/integrations" className="text-brand-blue-600 underline">
             Dev Studio → Secrets
           </Link>
           . Container env:{' '}

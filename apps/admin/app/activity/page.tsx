@@ -112,7 +112,7 @@ export default async function ActivityPage() {
             </div>
           </div>
           <Link
-            href="/admin/audit-logs"
+            href="/audit-logs"
             className="text-sm text-blue-600 hover:underline font-medium"
           >
             Full Audit Log →
@@ -198,7 +198,7 @@ export default async function ActivityPage() {
 
         <p className="text-xs text-slate-400 text-center">
           Showing most recent 200 events.{' '}
-          <Link href="/admin/audit-logs" className="text-blue-600 hover:underline">
+          <Link href="/audit-logs" className="text-blue-600 hover:underline">
             View full audit log
           </Link>
         </p>

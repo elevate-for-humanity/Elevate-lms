@@ -24,7 +24,7 @@ export function LizzyVideoPanel() {
           Video tools
         </div>
         <Link
-          href="/admin/video-generator"
+          href="/video-generator"
           className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:underline"
         >
           Open full page <ExternalLink className="h-3 w-3" />

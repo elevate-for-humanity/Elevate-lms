@@ -204,7 +204,7 @@ export default async function AnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-base font-bold text-slate-900">Enrollments by Program</h2>
             <Link
-              href="/admin/programs"
+              href="/programs"
               className="text-xs text-brand-blue-600 hover:underline font-medium"
             >
               View all →

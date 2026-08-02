@@ -67,7 +67,7 @@ export async function approveTransferHours(
     metadata: { decision: 'approved', hours_approved: hoursApproved },
   });
 
-  revalidatePath('/admin/transfer-hours');
+  revalidatePath('/transfer-hours');
 }
 
 export async function denyTransferHours(requestId: string, notes?: string) {
@@ -106,5 +106,5 @@ export async function denyTransferHours(requestId: string, notes?: string) {
     metadata: { decision: 'denied' },
   });
 
-  revalidatePath('/admin/transfer-hours');
+  revalidatePath('/transfer-hours');
 }

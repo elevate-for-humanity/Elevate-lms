@@ -54,7 +54,7 @@ export default async function SecuritySettingsPage() {
     <div className="w-full space-y-6 px-6 py-6">
       <div>
         <p className="text-sm font-medium text-slate-500">
-          <Link href="/admin/settings" className="hover:text-slate-700">Settings</Link> / Security
+          <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Security
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Security Settings</h1>
         <p className="text-slate-500">MFA, session management, and IP access controls.</p>

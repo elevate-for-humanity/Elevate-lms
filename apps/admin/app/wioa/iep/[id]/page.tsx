@@ -130,7 +130,7 @@ export default async function IepDetailPage({
           <div>
             <div className="flex items-center gap-3 mb-1">
               <Link
-                href="/admin/wioa/iep"
+                href="/wioa/iep"
                 className="text-slate-400 hover:text-slate-600 transition"
               >
                 <ArrowLeft className="w-4 h-4" />

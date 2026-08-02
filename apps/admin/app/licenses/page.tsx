@@ -46,7 +46,7 @@ export default async function AdminLicensesPage() {
             <h1 className="text-2xl font-bold text-slate-900">Platform Licenses</h1>
             <p className="text-sm text-slate-500 mt-1">{rows.length} total · {active.length} active · {expiring.length} expiring soon</p>
           </div>
-          <Link href="/admin/licenses/create">
+          <Link href="/licenses/create">
             <Button>New License</Button>
           </Link>
         </div>

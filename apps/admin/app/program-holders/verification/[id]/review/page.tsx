@@ -23,7 +23,7 @@ export default async function ReviewVerificationPage({ params }: { params: { id:
     .maybeSingle();
 
   if (!rawHolder) {
-    redirect('/admin/program-holders/verification');
+    redirect('/program-holders/verification');
   }
 
   // Hydrate user profile separately (program_holders.user_id has no FK to profiles)

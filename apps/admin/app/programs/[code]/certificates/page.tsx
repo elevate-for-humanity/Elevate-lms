@@ -42,7 +42,7 @@ export default async function ProgramCertificatesPage({
       <nav className="text-sm mb-4">
         <ol className="flex items-center space-x-2 text-slate-700">
           <li>
-            <Link href="/admin/programs" className="hover:text-brand-blue-600">
+            <Link href="/programs" className="hover:text-brand-blue-600">
               Programs
             </Link>
           </li>
@@ -60,7 +60,7 @@ export default async function ProgramCertificatesPage({
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Certificates — {program.title}</h1>
         <Link
-          href="/admin/certificates/issue"
+          href="/certificates/issue"
           className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
         >
           Issue Certificate

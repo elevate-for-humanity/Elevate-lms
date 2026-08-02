@@ -105,7 +105,7 @@ export default async function AffiliatesPage() {
           </p>
         </div>
         <Link
-          href="/admin/affiliates/new"
+          href="/affiliates/new"
           className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
         >
           <UserPlus className="w-5 h-5" />

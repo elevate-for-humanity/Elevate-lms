@@ -57,7 +57,7 @@ export default async function QuizPage({
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <div className="text-xs text-slate-400 mb-1">
-              <Link href="/admin/courses" className="hover:text-blue-600">
+              <Link href="/courses" className="hover:text-blue-600">
                 Courses
               </Link>
               {course && (

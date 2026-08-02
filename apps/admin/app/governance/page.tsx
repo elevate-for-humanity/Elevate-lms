@@ -178,7 +178,7 @@ export default async function GovernancePage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Resources</h2>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/admin/governance/legal"
+              href="/governance/legal"
               className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
             >
               Legal &amp; Entity Info
@@ -217,7 +217,7 @@ export default async function GovernancePage() {
             For diligence inquiries or governance questions, contact our team.
           </p>
           <Link
-            href="/admin/governance/contact"
+            href="/governance/contact"
             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
           >
             <Mail className="w-5 h-5" />

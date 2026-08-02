@@ -24,7 +24,7 @@ export default async function NewContactPage() {
         {/* Header */}
         <div className="mb-8">
           <Link
-            href="/admin/crm/contacts"
+            href="/crm/contacts"
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -214,7 +214,7 @@ export default async function NewContactPage() {
           {/* Actions */}
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-200">
             <Link
-              href="/admin/crm/contacts"
+              href="/crm/contacts"
               className="px-4 py-2 text-slate-900 hover:text-slate-900"
             >
               Cancel

@@ -62,7 +62,7 @@ export default async function GrantsPage() {
           <div className="flex items-center gap-2">
             <GrantsSyncButton />
             <Link
-              href="/admin/grants"
+              href="/grants"
               className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
             >
               <Plus className="w-4 h-4" /> Add Grant
@@ -122,7 +122,7 @@ export default async function GrantsPage() {
               <Briefcase className="w-8 h-8 text-slate-300 mx-auto mb-3" />
               <p className="text-sm text-slate-500 font-medium">No grants recorded</p>
               <Link
-                href="/admin/grants"
+                href="/grants"
                 className="inline-flex items-center gap-1.5 mt-4 text-sm text-brand-blue-600 font-semibold hover:underline"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Grant

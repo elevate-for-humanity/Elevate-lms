@@ -226,7 +226,7 @@ export default async function InstructorDashboard() {
               <p className="text-black mt-1">Welcome back, {profile?.full_name || 'Instructor'}!</p>
             </div>
             <Link
-              href="/admin/instructor/students/new"
+              href="/instructor/students/new"
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Add Student
@@ -297,7 +297,7 @@ export default async function InstructorDashboard() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-black">Recent Students</h2>
                 <Link
-                  href="/admin/instructor/students"
+                  href="/instructor/students"
                   className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                 >
                   View All
@@ -347,7 +347,7 @@ export default async function InstructorDashboard() {
                   <Users className="mx-auto h-12 w-12 text-slate-400 mb-4" />
                   <p className="text-black mb-4">No students yet</p>
                   <Link
-                    href="/admin/instructor/students/new"
+                    href="/instructor/students/new"
                     className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                   >
                     Add Your First Student
@@ -365,7 +365,7 @@ export default async function InstructorDashboard() {
               <div className="space-y-3">
                 {/* Submissions — shown prominently with pending count */}
                 <Link
-                  href="/admin/instructor/submissions"
+                  href="/instructor/submissions"
                   className="flex items-center justify-between w-full px-4 py-3 bg-brand-blue-50 hover:bg-brand-blue-100 rounded-lg border border-brand-blue-200 transition"
                 >
                   <div className="flex items-center gap-3">
@@ -384,21 +384,21 @@ export default async function InstructorDashboard() {
                   )}
                 </Link>
                 <Link
-                  href="/admin/instructor/students"
+                  href="/instructor/students"
                   className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
                 >
                   <p className="font-medium text-black">Manage Students</p>
                   <p className="text-xs text-slate-500">View and manage all students</p>
                 </Link>
                 <Link
-                  href="/admin/instructor/programs"
+                  href="/instructor/programs"
                   className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
                 >
                   <p className="font-medium text-black">View Programs</p>
                   <p className="text-xs text-slate-500">Browse available programs</p>
                 </Link>
                 <Link
-                  href="/admin/instructor/settings"
+                  href="/instructor/settings"
                   className="block w-full text-left px-4 py-3 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition"
                 >
                   <p className="font-medium text-black">Settings</p>
@@ -411,28 +411,28 @@ export default async function InstructorDashboard() {
                 <h3 className="text-lg font-semibold text-black mb-4">Instructor Tools</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <Link
-                    href="/admin/instructor/courses"
+                    href="/instructor/courses"
                     aria-label="Courses"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
                   >
                     Courses
                   </Link>
                   <Link
-                    href="/admin/instructor/students"
+                    href="/instructor/students"
                     aria-label="Students"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
                   >
                     Students
                   </Link>
                   <Link
-                    href="/admin/instructor/programs"
+                    href="/instructor/programs"
                     aria-label="Programs"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
                   >
                     Programs
                   </Link>
                   <Link
-                    href="/admin/instructor/submissions"
+                    href="/instructor/submissions"
                     aria-label="Submissions"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm flex items-center justify-between gap-1"
                   >
@@ -444,21 +444,21 @@ export default async function InstructorDashboard() {
                     )}
                   </Link>
                   <Link
-                    href="/admin/instructor/campaigns"
+                    href="/instructor/campaigns"
                     aria-label="Campaigns"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
                   >
                     Campaigns
                   </Link>
                   <Link
-                    href="/admin/instructor/analytics"
+                    href="/instructor/analytics"
                     aria-label="Analytics"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
                   >
                     Analytics
                   </Link>
                   <Link
-                    href="/admin/instructor/settings"
+                    href="/instructor/settings"
                     aria-label="Settings"
                     className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
                   >

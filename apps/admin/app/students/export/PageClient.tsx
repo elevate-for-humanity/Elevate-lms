@@ -76,7 +76,7 @@ export default function ExportStudentsPage({ programs = [] }: { programs?: Progr
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link
-            href="/admin/students"
+            href="/students"
             className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Students
@@ -252,7 +252,7 @@ export default function ExportStudentsPage({ programs = [] }: { programs?: Progr
               <div className="text-sm text-black">Ready to export student data</div>
               <div className="flex gap-4">
                 <Link
-                  href="/admin/students"
+                  href="/students"
                   className="px-4 py-2 border border-slate-300 rounded-md text-black hover:bg-slate-50"
                 >
                   Cancel

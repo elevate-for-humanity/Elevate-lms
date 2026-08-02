@@ -33,7 +33,7 @@ export async function issueCertificate(formData: FormData) {
   const notes = formData.get('notes') as string;
 
   if (!recipientName || !email || !issueDate) {
-    redirect('/admin/certificates/issue?error=missing_fields');
+    redirect('/certificates/issue?error=missing_fields');
   }
 
   const certNumber = generateCertificateNumber('EFH', user.id);
@@ -61,7 +61,7 @@ export async function issueCertificate(formData: FormData) {
     .maybeSingle();
 
   if (error) {
-    redirect('/admin/certificates/issue?error=insert_failed');
+    redirect('/certificates/issue?error=insert_failed');
   }
 
   // Log to audit (non-blocking - don't fail cert issuance if audit fails)
@@ -77,7 +77,7 @@ export async function issueCertificate(formData: FormData) {
     .then(() => {})
     .catch((err: unknown) => console.error('[audit] certificate_issued failed:', err));
 
-  redirect('/admin/certificates?success=issued&cert=' + certNumber);
+  redirect('/certificates?success=issued&cert=' + certNumber);
 }
 
 export async function revokeCertificate(formData: FormData) {
@@ -94,7 +94,7 @@ export async function revokeCertificate(formData: FormData) {
   const certId = formData.get('certId') as string;
   const reason = formData.get('reason') as string;
 
-  if (!certId) redirect('/admin/certificates?error=missing_id');
+  if (!certId) redirect('/certificates?error=missing_id');
 
   // Update status and append revocation reason to description
   const { data: existing } = await db
@@ -125,5 +125,5 @@ export async function revokeCertificate(formData: FormData) {
     .then(() => {})
     .catch((err: unknown) => console.error('[audit] certificate_revoked failed:', err));
 
-  redirect('/admin/certificates?success=revoked');
+  redirect('/certificates?success=revoked');
 }

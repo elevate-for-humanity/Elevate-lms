@@ -45,7 +45,7 @@ export default function NewAppointmentPage() {
       });
 
       if (res.ok) {
-        router.push('/admin/crm/appointments');
+        router.push('/crm/appointments');
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to create appointment');
@@ -73,7 +73,7 @@ export default function NewAppointmentPage() {
       </div>
       <div className="max-w-2xl mx-auto">
         <Link
-          href="/admin/crm/appointments"
+          href="/crm/appointments"
           className="flex items-center gap-2 text-slate-700 hover:text-brand-blue-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />

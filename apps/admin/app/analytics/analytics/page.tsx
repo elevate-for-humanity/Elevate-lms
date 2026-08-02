@@ -139,7 +139,7 @@ export default async function AnalyticsPage() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-slate-900">Platform Analytics</h1>
           <Link
-            href="/admin/analytics"
+            href="/analytics"
             className="inline-flex items-center gap-1 text-sm font-semibold text-brand-red-600 hover:underline"
           >
             Full admin analytics <ArrowRight className="w-4 h-4" />
@@ -165,7 +165,7 @@ export default async function AnalyticsPage() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
             <h2 className="font-bold text-slate-900">Recent Enrollments</h2>
             <Link
-              href="/admin/enrollments"
+              href="/enrollments"
               className="text-sm text-brand-red-600 hover:underline flex items-center gap-1"
             >
               View all <ChevronRight className="w-3.5 h-3.5" />

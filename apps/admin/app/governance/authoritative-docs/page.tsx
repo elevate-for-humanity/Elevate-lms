@@ -156,7 +156,7 @@ export default async function AuthoritativeDocsPage() {
             governance team.
           </p>
           <Link
-            href="/admin/governance/contact"
+            href="/governance/contact"
             className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
           >
             <Download className="w-5 h-5" />

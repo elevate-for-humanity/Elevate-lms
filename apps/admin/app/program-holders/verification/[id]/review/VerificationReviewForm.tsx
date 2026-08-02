@@ -75,7 +75,7 @@ export default function VerificationReviewForm({
       const result = await submitVerificationDecision(holder.id, mappedDecision, notes);
       if (result.error) throw new Error(result.error);
 
-      router.push('/admin/program-holders/verification');
+      router.push('/program-holders/verification');
       router.refresh();
     } catch (err: any) {
       setError((err as Error).message || 'Failed to process verification');
@@ -89,7 +89,7 @@ export default function VerificationReviewForm({
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <Link
-            href="/admin/program-holders/verification"
+            href="/program-holders/verification"
             className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />

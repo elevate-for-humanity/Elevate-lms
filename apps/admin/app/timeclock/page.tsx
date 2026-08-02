@@ -151,7 +151,7 @@ export default async function TimeclockPage({
           </p>
         </div>
         <Link
-          href="/admin/student-hours"
+          href="/student-hours"
           className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
         >
           <Clock className="w-4 h-4" /> OJT Hours

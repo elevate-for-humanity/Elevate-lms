@@ -312,7 +312,7 @@ export default async function ForecastPage() {
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/intelligence" className="hover:text-slate-700">Intelligence</Link>
+          <Link href="/intelligence" className="hover:text-slate-700">Intelligence</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Completion Forecast</span>
         </nav>

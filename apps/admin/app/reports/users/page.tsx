@@ -63,7 +63,7 @@ export default async function UsersReportPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <Link 
-            href="/admin/reports"
+            href="/reports"
             className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -121,7 +121,7 @@ export default async function UsersReportPage() {
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">Recent Users</h2>
-              <Link href="/admin/students" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
+              <Link href="/students" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 View All
               </Link>
             </div>

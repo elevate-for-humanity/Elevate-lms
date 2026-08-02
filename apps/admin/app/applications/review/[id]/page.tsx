@@ -97,7 +97,7 @@ export default async function ReviewApplicationPage({
           This usually means a link was generated with a stale or malformed ID. Check the
           applications list for the correct record.
         </p>
-        <Link href="/admin/applications" className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-colors">
+        <Link href="/applications" className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-700 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Applications
         </Link>
       </div>
@@ -217,7 +217,7 @@ export default async function ReviewApplicationPage({
           <Breadcrumbs
             items={[
               { label: 'Admin', href: '/admin' },
-              { label: 'Applications', href: '/admin/applications' },
+              { label: 'Applications', href: '/applications' },
               { label: displayName },
             ]}
             className="text-white/70 mb-3"
@@ -239,7 +239,7 @@ export default async function ReviewApplicationPage({
                 {effectiveStatus === 'revoked' ? 'Revoked' : statusLabels[app.status] || app.status}
               </span>
               <Link
-                href="/admin/applications"
+                href="/applications"
                 className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-4 py-2 rounded-xl backdrop-blur-sm transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" /> Back

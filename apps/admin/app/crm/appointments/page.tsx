@@ -61,7 +61,7 @@ export default async function AppointmentsPage() {
             <p className="text-slate-500 text-sm mt-1">Schedule and manage CRM appointments</p>
           </div>
           <Link
-            href="/admin/crm/appointments/new"
+            href="/crm/appointments/new"
             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
           >
             <Plus className="w-4 h-4" /> New Appointment
@@ -90,7 +90,7 @@ export default async function AppointmentsPage() {
           {upcoming.length === 0 ? (
             <div className="bg-white rounded-xl border p-8 text-center text-slate-500">
               No upcoming appointments.{' '}
-              <Link href="/admin/crm/appointments/new" className="underline">
+              <Link href="/crm/appointments/new" className="underline">
                 Schedule one
               </Link>
             </div>

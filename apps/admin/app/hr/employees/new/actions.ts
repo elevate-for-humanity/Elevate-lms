@@ -27,5 +27,5 @@ export async function createEmployeeAction(formData: FormData) {
     employment_status: 'active',
   });
 
-  redirect('/admin/hr/employees');
+  redirect('/hr/employees');
 }

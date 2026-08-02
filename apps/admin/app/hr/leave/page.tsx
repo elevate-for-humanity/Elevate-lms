@@ -48,7 +48,7 @@ export default async function LeavePage() {
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/hr" className="hover:text-primary">
+                <Link href="/hr" className="hover:text-primary">
                   HR
                 </Link>
               </li>

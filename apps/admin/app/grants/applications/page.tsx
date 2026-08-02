@@ -33,7 +33,7 @@ export default async function GrantApplicationsPage() {
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/grants" className="hover:text-slate-700">Grants</Link>
+          <Link href="/grants" className="hover:text-slate-700">Grants</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Applications</span>
         </nav>
@@ -43,7 +43,7 @@ export default async function GrantApplicationsPage() {
             <p className="text-sm text-slate-500 mt-1">Draft, submit, and track grant applications.</p>
           </div>
           <Link
-            href="/admin/grants/applications/new"
+            href="/grants/applications/new"
             className="flex items-center gap-2 px-4 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors"
           >
             <Plus className="w-4 h-4" /> New Application
@@ -57,7 +57,7 @@ export default async function GrantApplicationsPage() {
             <FileText className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-sm font-medium text-slate-500">No applications yet.</p>
             <Link
-              href="/admin/grants/applications/new"
+              href="/grants/applications/new"
               className="mt-3 inline-flex items-center gap-1.5 text-sm text-violet-600 font-semibold hover:underline"
             >
               <Plus className="w-4 h-4" /> Start your first application

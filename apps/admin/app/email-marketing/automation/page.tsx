@@ -47,7 +47,7 @@ export default async function EmailAutomationPage() {
             <p className="text-slate-700 text-sm mt-1">Live workflow records from the database</p>
           </div>
           <Link
-            href="/admin/email-marketing/automation/new"
+            href="/email-marketing/automation/new"
             className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
           >
             + New Automation

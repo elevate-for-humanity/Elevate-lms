@@ -42,7 +42,7 @@ export async function approveApplication(id: string): Promise<void> {
   }
 
   logger.info('[admin/applications/actions] approved', { id, userId: result.userId });
-  revalidatePath('/admin/applications');
+  revalidatePath('/applications');
 }
 
 /**
@@ -88,5 +88,5 @@ export async function rejectApplication(id: string): Promise<void> {
   }
 
   logger.info('[admin/applications/actions] rejected', { id });
-  revalidatePath('/admin/applications');
+  revalidatePath('/applications');
 }

@@ -55,11 +55,11 @@ export default async function MonitoringPage() {
             <p className="text-sm text-slate-500 mt-1">Platform alerts, error tracking, and schema health</p>
           </div>
           <div className="flex gap-2">
-            <Link href="/admin/system-health"
+            <Link href="/system-health"
               className="flex items-center gap-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
               <ExternalLink className="w-3.5 h-3.5" /> System Health
             </Link>
-            <Link href="/admin/audit-logs"
+            <Link href="/audit-logs"
               className="flex items-center gap-1.5 text-sm text-slate-600 border border-slate-200 rounded-lg px-3 py-2 hover:bg-slate-50 transition-colors">
               <ExternalLink className="w-3.5 h-3.5" /> Audit Logs
             </Link>

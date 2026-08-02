@@ -49,14 +49,14 @@ export default async function WorkforcePage() {
         </div>
         <div className="flex gap-3">
           <Link
-            href="/admin/workforce/participants/new"
+            href="/workforce/participants/new"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <Users className="w-4 h-4" />
             Add Participant
           </Link>
           <Link
-            href="/admin/workforce/cases"
+            href="/workforce/cases"
             className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 flex items-center gap-2"
           >
             <Briefcase className="w-4 h-4" />
@@ -122,7 +122,7 @@ export default async function WorkforcePage() {
               <Users className="w-5 h-5" />
               Participants
             </h2>
-            <Link href="/admin/workforce/participants" className="text-blue-600 hover:underline text-sm">
+            <Link href="/workforce/participants" className="text-blue-600 hover:underline text-sm">
               View All
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default async function WorkforcePage() {
                       <td className="px-4 py-3 text-sm">{p.funding_source || 'N/A'}</td>
                       <td className="px-4 py-3">
                         <Link
-                          href={`/admin/students/${p.id}`}
+                          href={`/students/${p.id}`}
                           className="text-blue-600 hover:underline text-sm"
                         >
                           View
@@ -249,19 +249,19 @@ export default async function WorkforcePage() {
             </div>
             <div className="p-4 space-y-2">
               <Link
-                href="/admin/workforce/reports"
+                href="/workforce/reports"
                 className="block w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm"
               >
                 📊 Generate Reports
               </Link>
               <Link
-                href="/admin/workforce/outcomes"
+                href="/workforce/outcomes"
                 className="block w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm"
               >
                 📈 Track Outcomes
               </Link>
               <Link
-                href="/admin/workforce/compliance"
+                href="/workforce/compliance"
                 className="block w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm"
               >
                 ✅ Compliance Checklist

@@ -120,7 +120,7 @@ export default function DocumentDetailClient({
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-            <Link href="/admin/documents" className="hover:text-slate-700">Documents</Link>
+            <Link href="/documents" className="hover:text-slate-700">Documents</Link>
             <ChevronRight className="w-3 h-3" />
             <span className="text-slate-900 font-medium truncate max-w-[200px]">{name}</span>
           </nav>

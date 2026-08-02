@@ -28,7 +28,7 @@ export function QuickCreateForm({ programs }: { programs: Program[] }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) { setError(data.error ?? 'Failed to create course'); return; }
-      router.push(`/admin/courses/${data.course?.id ?? ''}`);
+      router.push(`/courses/${data.course?.id ?? ''}`);
     } catch {
       setError('Network error — try again');
     } finally {

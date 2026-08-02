@@ -112,7 +112,7 @@ export default async function ReferralsPage({
             </p>
           </div>
           <Link
-            href="/admin/workone-queue"
+            href="/workone-queue"
             className="inline-flex items-center gap-2 text-sm font-semibold bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg transition"
           >
             <Clock className="w-4 h-4" /> WorkOne Queue
@@ -309,7 +309,7 @@ export default async function ReferralsPage({
                       />
                       {r.application_id && (
                         <Link
-                          href={`/admin/applications/review/${r.application_id}`}
+                          href={`/applications/review/${r.application_id}`}
                           className="inline-flex items-center gap-1.5 text-xs font-semibold border border-slate-200 text-slate-600 hover:border-slate-300 px-3 py-1.5 rounded-lg transition"
                         >
                           Application <ArrowRight className="w-3 h-3" />

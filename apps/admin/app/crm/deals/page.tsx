@@ -69,7 +69,7 @@ export default async function DealsPage() {
               </p>
             </div>
             <Link
-              href="/admin/crm/deals/new"
+              href="/crm/deals/new"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-sm"
             >
               <Plus className="w-4 h-4" />
@@ -131,7 +131,7 @@ export default async function DealsPage() {
                     Create your first deal to start tracking your sales pipeline.
                   </p>
                   <Link
-                    href="/admin/crm/deals/new"
+                    href="/crm/deals/new"
                     className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2 text-sm"
                   >
                     <Plus className="w-4 h-4" /> Add Deal

@@ -79,13 +79,13 @@ export default async function DocumentsPage() {
         </div>
         <div className="flex gap-3">
           <Link
-            href="/admin/documents/templates"
+            href="/documents/templates"
             className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
           >
             Templates
           </Link>
           <Link
-            href="/admin/documents/upload"
+            href="/documents/upload"
             className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
           >
             <Upload className="w-4 h-4" /> Upload
@@ -100,7 +100,7 @@ export default async function DocumentsPage() {
             <p className="text-sm font-semibold text-slate-700">No documents yet</p>
             <p className="text-xs text-slate-400 mt-1">Upload documents to get started</p>
             <Link
-              href="/admin/documents/upload"
+              href="/documents/upload"
               className="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 transition-colors"
             >
               <Upload className="w-4 h-4" /> Upload first document

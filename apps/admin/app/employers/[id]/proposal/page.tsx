@@ -61,7 +61,7 @@ export default async function EmployerProposalPage({
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/employers" className="hover:text-slate-900">
+              <Link href="/employers" className="hover:text-slate-900">
                 Employers
               </Link>
             </li>

@@ -54,7 +54,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/crm/leads" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+          <Link href="/crm/leads" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
             <ArrowLeft className="w-4 h-4 text-slate-600" />
           </Link>
           <div>
@@ -142,7 +142,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </a>
           )}
           <Link
-            href="/admin/crm/leads"
+            href="/crm/leads"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors ml-auto"
           >
             Back to Leads

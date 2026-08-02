@@ -66,7 +66,7 @@ export default async function ProgramAnalyticsPage() {
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/analytics" className="hover:text-slate-700">
+          <Link href="/analytics" className="hover:text-slate-700">
             Analytics
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -148,7 +148,7 @@ export default async function ProgramAnalyticsPage() {
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-semibold text-slate-900 text-sm">Programs by Enrollment</h2>
             <Link
-              href="/admin/programs"
+              href="/programs"
               className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
             >
               Manage <ArrowRight className="w-3 h-3" />

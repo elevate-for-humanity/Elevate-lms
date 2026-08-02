@@ -21,10 +21,10 @@ export const metadata: Metadata = {
 };
 
 const QUICK_LINKS = [
-  { href: '/admin/operations', label: 'Operations hub', icon: RefreshCw },
-  { href: '/admin/at-risk', label: 'At-risk learners', icon: Users },
-  { href: '/admin/inbox', label: 'Admin inbox', icon: Inbox },
-  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/operations', label: 'Operations hub', icon: RefreshCw },
+  { href: '/at-risk', label: 'At-risk learners', icon: Users },
+  { href: '/inbox', label: 'Admin inbox', icon: Inbox },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/studio/workflows', label: 'Workflows', icon: Zap },
 ] as const;
 
@@ -56,7 +56,7 @@ export default async function MissionControlPage() {
               </p>
             </div>
             <Link
-              href="/admin/operations"
+              href="/operations"
               className="inline-flex items-center gap-2 rounded-lg bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800"
             >
               Full operations hub

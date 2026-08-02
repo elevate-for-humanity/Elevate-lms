@@ -111,7 +111,7 @@ export function ProgramIntegrityPanel() {
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <Link
-            href="/admin/programs"
+            href="/programs"
             className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
           >
             All programs <ArrowRight className="w-3 h-3" />

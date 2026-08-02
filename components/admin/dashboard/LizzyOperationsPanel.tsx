@@ -16,7 +16,7 @@ export function LizzyOperationsPanel({
   pendingProgramHolders: number;
   pendingEmployerHint?: string;
 }) {
-  const applicationsHref = `/admin/applications?status=${PENDING_APPLICATION_STATUS_QUERY}`;
+  const applicationsHref = `/applications?status=${PENDING_APPLICATION_STATUS_QUERY}`;
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-white">
@@ -38,21 +38,21 @@ export function LizzyOperationsPanel({
         <QueueCard
           label="Program holders"
           count={pendingProgramHolders}
-          href="/admin/program-holders"
+          href="/program-holders"
           Icon={Users}
           urgent={pendingProgramHolders > 0}
         />
         <QueueCard
           label="Employers"
           count={null}
-          href="/admin/employers/onboarding"
+          href="/employers/onboarding"
           Icon={Building2}
           detail={pendingEmployerHint ?? 'Review employer onboarding'}
         />
         <QueueCard
           label="Apprenticeship partners"
           count={null}
-          href="/admin/program-holders?type=apprenticeship"
+          href="/program-holders?type=apprenticeship"
           Icon={Briefcase}
           detail="Program holder / sponsor queue"
         />

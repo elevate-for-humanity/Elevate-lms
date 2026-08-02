@@ -30,13 +30,13 @@ export default async function NewEmployeePage() {
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/hr" className="hover:text-primary">
+                <Link href="/hr" className="hover:text-primary">
                   HR
                 </Link>
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/hr/employees" className="hover:text-primary">
+                <Link href="/hr/employees" className="hover:text-primary">
                   Employees
                 </Link>
               </li>
@@ -122,7 +122,7 @@ export default async function NewEmployeePage() {
                 Add Employee
               </button>
               <Link
-                href="/admin/hr/employees"
+                href="/hr/employees"
                 className="px-4 py-2 border rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Cancel

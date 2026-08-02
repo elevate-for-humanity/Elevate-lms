@@ -30,7 +30,7 @@ export default async function WioaEtplCompliancePage() {
 
       <div className="max-w-7xl mx-auto px-4 pb-12">
         <Link
-          href="/admin/compliance"
+          href="/compliance"
           className="inline-flex items-center text-sm text-slate-600 hover:text-brand-blue-700 mb-4"
         >
           <ChevronLeft className="w-4 h-4" /> Compliance dashboard

@@ -60,6 +60,6 @@ export async function createAffiliate(formData: FormData) {
     metadata: { name, email },
   });
 
-  revalidatePath('/admin/affiliates');
-  redirect('/admin/affiliates');
+  revalidatePath('/affiliates');
+  redirect('/affiliates');
 }

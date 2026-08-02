@@ -78,7 +78,7 @@ export default async function AdminProvidersPage() {
             </p>
           </div>
           <Link
-            href="/admin/provider-applications"
+            href="/provider-applications"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
           >
             Applications
@@ -108,7 +108,7 @@ export default async function AdminProvidersPage() {
             <Building2 className="w-10 h-10 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-500 text-sm">No approved providers yet.</p>
             <Link
-              href="/admin/provider-applications"
+              href="/provider-applications"
               className="mt-4 inline-block text-sm text-brand-blue-600 hover:underline"
             >
               Review pending applications →

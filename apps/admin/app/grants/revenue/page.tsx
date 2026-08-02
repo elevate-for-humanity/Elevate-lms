@@ -52,7 +52,7 @@ export default async function GrantRevenuePage() {
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/grants" className="hover:text-primary">
+                <Link href="/grants" className="hover:text-primary">
                   Grants
                 </Link>
               </li>

@@ -128,7 +128,7 @@ export default async function GrantSubmissionsPage() {
               <p className="text-black">Complete history of all submitted grant applications</p>
             </div>
             <Link
-              href="/admin/grants/workflow"
+              href="/grants/workflow"
               className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 font-semibold"
             >
               ← Back to Workflow
@@ -260,7 +260,7 @@ export default async function GrantSubmissionsPage() {
                 Start by drafting and submitting your first grant application.
               </p>
               <Link
-                href="/admin/grants/workflow"
+                href="/grants/workflow"
                 className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 font-semibold"
               >
                 Go to Workflow

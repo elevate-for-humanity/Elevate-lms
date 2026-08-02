@@ -60,7 +60,7 @@ export default async function AdminBlogPage() {
             </p>
           </div>
           <Link
-            href="/admin/blog"
+            href="/blog"
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors"
           >
             <Plus className="w-4 h-4" /> New Post
@@ -119,7 +119,7 @@ export default async function AdminBlogPage() {
               <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
               <p className="text-sm text-slate-500">No blog posts yet</p>
               <Link
-                href="/admin/blog"
+                href="/blog"
                 className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue-600 hover:underline"
               >
                 Create your first post <ArrowRight className="w-3.5 h-3.5" />

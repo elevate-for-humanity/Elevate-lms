@@ -42,7 +42,7 @@ export default async function CompliancePage() {
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <Link
-            href="/admin/governance"
+            href="/governance"
             className="inline-flex items-center text-slate-400 hover:text-white mb-6 text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -255,13 +255,13 @@ export default async function CompliancePage() {
           <p className="text-center text-slate-500 text-sm mb-6">End of Document</p>
           <div className="flex justify-center gap-4">
             <Link
-              href="/admin/governance"
+              href="/governance"
               className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition-colors"
             >
               Back to Index
             </Link>
             <Link
-              href="/admin/governance/contact"
+              href="/governance/contact"
               className="px-6 py-3 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition-colors"
             >
               Contact Compliance

@@ -119,9 +119,7 @@ const adminConfig = {
       { source: '/admin/copilot/:path*', destination: '/admin/dev-studio', permanent: true },
       { source: '/admin/video-manager', destination: '/admin/dev-studio', permanent: true },
       { source: '/admin/video-manager/:path*', destination: '/admin/dev-studio', permanent: true },
-      // Dev Studio canonical route
-      { source: '/admin/studio', destination: '/admin/dev-studio', permanent: true },
-      { source: '/admin/studio/:path*', destination: '/admin/dev-studio/:path*', permanent: true },
+      // Dev Studio is at /admin/admin/studio (real page) — no redirect needed
       // course-builder redirects removed - page now exists at /admin/course-builder
       // document-center â†’ documents (canonical)
       {

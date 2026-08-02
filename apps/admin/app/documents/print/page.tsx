@@ -12,10 +12,10 @@ export default function AdminDocumentsPrintPage() {
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/admin/document-center" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <Link href="/document-center" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
             Open Document Center
           </Link>
-          <Link href="/admin/documents/upload" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <Link href="/documents/upload" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
             Upload Documents
           </Link>
           <button onClick={() => window.print()} className="rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700">

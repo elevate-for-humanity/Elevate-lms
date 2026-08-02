@@ -50,7 +50,7 @@ export default async function WIOAVerifyPage({
       <div className="min-h-screen bg-white p-8">
         <div className="max-w-5xl mx-auto">
           <Link
-            href="/admin/wioa/eligibility"
+            href="/wioa/eligibility"
             className="flex items-center gap-2 text-slate-700 hover:text-brand-blue-600 mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -115,7 +115,7 @@ export default async function WIOAVerifyPage({
         <div className="max-w-5xl mx-auto text-center py-12">
           <p className="text-slate-700">Participant not found.</p>
           <Link
-            href="/admin/wioa/verify"
+            href="/wioa/verify"
             className="text-brand-blue-600 hover:underline mt-2 inline-block"
           >
             Back to list
@@ -154,7 +154,7 @@ export default async function WIOAVerifyPage({
       {/* Hero Image */}
       <div className="max-w-5xl mx-auto">
         <Link
-          href="/admin/wioa/verify"
+          href="/wioa/verify"
           className="flex items-center gap-2 text-slate-700 hover:text-brand-blue-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />

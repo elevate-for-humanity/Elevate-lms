@@ -154,7 +154,7 @@ export function EditCourseForm({ course, programs }: Props) {
           Manage Lessons
         </Link>
         <Link
-          href="/admin/courses"
+          href="/courses"
           className="px-4 py-2.5 border rounded-lg hover:bg-slate-50 text-slate-900"
         >
           Back

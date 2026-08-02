@@ -61,7 +61,7 @@ export function ReviewActions({
         throw new Error(data.error || 'Failed to process action');
       }
 
-      router.push('/admin/review-queue');
+      router.push('/review-queue');
       router.refresh();
     } catch (err) {
       setError('An error occurred');

@@ -55,7 +55,7 @@ export default function NewCampaignPage() {
 
       if (response.ok) {
         toast.success(`Campaign sent to ${data.sent_count} recipients!`);
-        router.push('/admin/crm/campaigns');
+        router.push('/crm/campaigns');
       } else {
         toast.error(`Error: ${data.error}`);
       }

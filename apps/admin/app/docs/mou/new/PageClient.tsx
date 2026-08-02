@@ -28,13 +28,13 @@ export default function NewMouPage() {
     setSaving(true);
     setError('');
     try {
-      const res = await fetch('/api/admin/docs/mou', {
+      const res = await fetch('/api/docs/mou', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to save');
-      router.push('/admin/docs/mou');
+      router.push('/docs/mou');
     } catch (err: any) {
       setError(err.message);
       setSaving(false);
@@ -46,7 +46,7 @@ export default function NewMouPage() {
       <Breadcrumbs
         items={[
           { label: 'Admin', href: '/dashboard' },
-          { label: 'MOU Documents', href: '/admin/docs/mou' },
+          { label: 'MOU Documents', href: '/docs/mou' },
           { label: 'New MOU' },
         ]}
       />
@@ -118,7 +118,7 @@ export default function NewMouPage() {
             {saving ? 'Saving…' : 'Create MOU'}
           </button>
           <Link
-            href="/admin/docs/mou"
+            href="/docs/mou"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel

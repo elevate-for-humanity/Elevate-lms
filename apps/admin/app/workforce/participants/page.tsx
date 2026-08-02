@@ -27,7 +27,7 @@ export default async function ParticipantsPage() {
           <p className="text-gray-600 mt-1">Manage workforce development program participants</p>
         </div>
         <Link
-          href="/admin/workforce/participants/new"
+          href="/workforce/participants/new"
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default async function ParticipantsPage() {
                   <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <p>No participants found</p>
                   <Link
-                    href="/admin/workforce/participants/new"
+                    href="/workforce/participants/new"
                     className="text-blue-600 hover:text-blue-800 mt-2 inline-block"
                   >
                     Add your first participant

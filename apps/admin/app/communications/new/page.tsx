@@ -22,7 +22,7 @@ export default async function NewMessagePage() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <Link
-          href="/admin/communications"
+          href="/communications"
           className="text-gray-500 hover:text-gray-700 flex items-center gap-2 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />

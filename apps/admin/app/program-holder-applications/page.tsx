@@ -45,7 +45,7 @@ export default async function ProgramHolderApplicationsPage() {
             <p className="text-slate-600 mt-1">Review and process program holder requests.</p>
           </div>
           <Link
-            href="/admin/program-holders"
+            href="/program-holders"
             className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             Back to Program Holders

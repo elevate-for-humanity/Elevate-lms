@@ -97,7 +97,7 @@ export default async function AdminFerpaPage() {
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/compliance" className="hover:text-slate-700">
+          <Link href="/compliance" className="hover:text-slate-700">
             Compliance
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -114,7 +114,7 @@ export default async function AdminFerpaPage() {
             </p>
           </div>
           <Link
-            href="/admin/compliance"
+            href="/compliance"
             className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
           >
             ← Compliance
@@ -176,7 +176,7 @@ export default async function AdminFerpaPage() {
                 <p className="text-3xl font-bold text-red-700">{ferpaViolations}</p>
                 <p className="text-xs text-red-600 mt-1">Requires immediate review</p>
                 <Link
-                  href="/admin/compliance"
+                  href="/compliance"
                   className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-red-700 hover:underline"
                 >
                   View alerts <ArrowRight className="w-3 h-3" />
@@ -190,7 +190,7 @@ export default async function AdminFerpaPage() {
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
               <h2 className="font-semibold text-slate-900">Recent Audit Activity</h2>
               <Link
-                href="/admin/audit-logs"
+                href="/audit-logs"
                 className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
               >
                 View all <ArrowRight className="w-3 h-3" />

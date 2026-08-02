@@ -84,7 +84,7 @@ export default async function AIQualityPage() {
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <span>/</span>
-          <Link href="/admin/paris" className="hover:text-slate-700">PARIS AI</Link>
+          <Link href="/paris" className="hover:text-slate-700">PARIS AI</Link>
           <span>/</span>
           <span className="text-slate-900 font-medium">Quality Monitor</span>
         </nav>
@@ -170,7 +170,7 @@ export default async function AIQualityPage() {
             </div>
           </div>
           <div className="mt-4">
-            <Link href="/admin/inbox" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/inbox" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
               View Escalated Tickets →
             </Link>
           </div>
@@ -190,7 +190,7 @@ export default async function AIQualityPage() {
               <p className="text-sm font-medium text-slate-700">AI Workflows</p>
               <p className="text-xs text-slate-400">Orchestrate AI actions</p>
             </Link>
-            <Link href="/admin/intelligence" className="p-4 rounded-xl border border-slate-200 hover:border-green-200 hover:bg-green-50 transition-all">
+            <Link href="/intelligence" className="p-4 rounded-xl border border-slate-200 hover:border-green-200 hover:bg-green-50 transition-all">
               <BarChart3 className="w-6 h-6 text-green-600 mb-2" />
               <p className="text-sm font-medium text-slate-700">Student Intelligence</p>
               <p className="text-xs text-slate-400">Risk & intervention data</p>

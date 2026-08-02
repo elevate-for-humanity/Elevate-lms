@@ -18,7 +18,7 @@ async function createCampaign(formData: FormData) {
     status: 'draft',
     audience: formData.get('audience') as string || 'all',
   });
-  if (!error) redirect('/admin/crm/campaigns');
+  if (!error) redirect('/crm/campaigns');
 }
 
 export default async function NewCampaignPage() {
@@ -26,7 +26,7 @@ export default async function NewCampaignPage() {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-2xl mx-auto">
-        <Link href="/admin/crm/campaigns" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
+        <Link href="/crm/campaigns" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Campaigns
         </Link>
         <div className="flex items-center gap-2 mb-6">
@@ -56,7 +56,7 @@ export default async function NewCampaignPage() {
             <textarea name="body" required rows={6} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-none" placeholder="Email body content..." />
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/crm/campaigns" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
+            <Link href="/crm/campaigns" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
             <button type="submit" className="px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">Save as Draft</button>
           </div>
         </form>

@@ -72,7 +72,7 @@ export default async function EditCoursePage({
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/courses" className="hover:text-brand-blue-600">
+              <Link href="/courses" className="hover:text-brand-blue-600">
                 Courses
               </Link>
             </li>

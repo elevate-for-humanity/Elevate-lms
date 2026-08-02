@@ -79,7 +79,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
         throw new Error(data.error || 'Failed to review document');
       }
 
-      router.push('/admin/documents/review?success=true');
+      router.push('/documents/review?success=true');
       router.refresh();
     } catch (err: any) {
       setError('Failed to review document');

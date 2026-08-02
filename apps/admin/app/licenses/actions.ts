@@ -40,6 +40,6 @@ export async function createLicense(formData: FormData) {
     metadata: { tier: formData.get('tier') as string },
   });
 
-  revalidatePath('/admin/licenses');
-  redirect('/admin/licenses');
+  revalidatePath('/licenses');
+  redirect('/licenses');
 }

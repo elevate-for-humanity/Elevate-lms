@@ -76,7 +76,7 @@ export default async function EnrollmentDetailPage({ params }: { params: Promise
 
       <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/enrollments" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+          <Link href="/enrollments" className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
             <ArrowLeft className="w-4 h-4 text-slate-600" />
           </Link>
           <div>
@@ -108,7 +108,7 @@ export default async function EnrollmentDetailPage({ params }: { params: Promise
               {enrollment.user_id && (
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-0.5">Profile</p>
-                  <Link href={`/admin/students/${enrollment.user_id}`} className="text-sm text-brand-blue-600 hover:underline">
+                  <Link href={`/students/${enrollment.user_id}`} className="text-sm text-brand-blue-600 hover:underline">
                     View student profile →
                   </Link>
                 </div>
@@ -160,14 +160,14 @@ export default async function EnrollmentDetailPage({ params }: { params: Promise
         <div className="flex gap-3 mt-6">
           {enrollment.user_id && (
             <Link
-              href={`/admin/students/${enrollment.user_id}`}
+              href={`/students/${enrollment.user_id}`}
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               View Student Profile
             </Link>
           )}
           <Link
-            href="/admin/enrollments"
+            href="/enrollments"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors ml-auto"
           >
             Back to Enrollments

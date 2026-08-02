@@ -104,13 +104,13 @@ export default async function ExportsPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/admin/compliance/exports"
+                href="/compliance/exports"
                 className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
               >
                 View Requests
               </Link>
               <Link
-                href="/admin/ferpa"
+                href="/ferpa"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 FERPA Settings

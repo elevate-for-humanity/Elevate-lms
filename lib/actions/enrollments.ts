@@ -189,7 +189,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
       }
     }
     // 9. Revalidate relevant paths
-    revalidatePath('/admin/enrollments');
+    revalidatePath('/enrollments');
     revalidatePath(`/admin/students/${input.student_id}`);
     revalidatePath(`/admin/programs/${program.slug}`);
     return {

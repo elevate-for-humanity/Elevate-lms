@@ -90,7 +90,7 @@ export default function BulkIssueForm({
           {result.success} issued, {result.failed} failed
         </p>
         <button
-          onClick={() => router.push('/admin/certificates')}
+          onClick={() => router.push('/certificates')}
           className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-brand-blue-700"
         >
           View All Certificates

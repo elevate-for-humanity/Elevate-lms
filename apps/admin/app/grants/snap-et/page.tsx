@@ -15,7 +15,7 @@ export default async function SnapEtPage() {
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/grants" className="hover:text-slate-700">Grants</Link>
+          <Link href="/grants" className="hover:text-slate-700">Grants</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">SNAP E&T TPP Application</span>
         </nav>

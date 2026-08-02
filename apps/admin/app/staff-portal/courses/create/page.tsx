@@ -120,7 +120,7 @@ export default function CreateCoursePage() {
         return;
       }
 
-      router.push('/admin/staff-portal/courses');
+      router.push('/staff-portal/courses');
     } catch {
       setError('Failed to create course. Please try again.');
     } finally {
@@ -145,7 +145,7 @@ export default function CreateCoursePage() {
       <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
         <div className="max-w-4xl mx-auto px-4 py-12">
           <Link
-            href="/admin/staff-portal/courses"
+            href="/staff-portal/courses"
             className="inline-flex items-center gap-2 text-purple-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Courses
@@ -368,7 +368,7 @@ export default function CreateCoursePage() {
           {/* Submit */}
           <div className="flex items-center justify-between">
             <Link
-              href="/admin/staff-portal/courses"
+              href="/staff-portal/courses"
               className="px-6 py-3 text-slate-700 hover:text-slate-900"
             >
               Cancel

@@ -204,7 +204,7 @@ export default function GrantApplicationForm({
       const { application: saved_app } = await res.json();
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-      if (mode === 'new') router.push(`/admin/grants/applications/${saved_app.id}`);
+      if (mode === 'new') router.push(`/grants/applications/${saved_app.id}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Save failed');
     } finally {

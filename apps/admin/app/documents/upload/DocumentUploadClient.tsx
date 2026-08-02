@@ -158,7 +158,7 @@ export function DocumentUploadClient() {
           </li>
           <li>/</li>
           <li>
-            <Link href="/admin/documents" className="hover:text-slate-900">
+            <Link href="/documents" className="hover:text-slate-900">
               Documents
             </Link>
           </li>
@@ -310,7 +310,7 @@ export function DocumentUploadClient() {
       {/* Link to document center */}
       <div className="mt-8 pt-6 border-t border-slate-100">
         <Link
-          href="/admin/document-center"
+          href="/document-center"
           className="flex items-center gap-2 text-sm text-slate-700 hover:text-slate-900"
         >
           <FolderOpen className="w-4 h-4" />

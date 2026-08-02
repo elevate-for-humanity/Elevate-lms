@@ -155,7 +155,7 @@ export default async function AdminEnrollmentsPage({
             Filter
           </button>
           <Link
-            href="/admin/enrollments"
+            href="/enrollments"
             className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-200 transition-colors"
           >
             Clear

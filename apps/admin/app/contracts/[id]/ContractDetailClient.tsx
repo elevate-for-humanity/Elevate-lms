@@ -142,7 +142,7 @@ export default function ContractDetailClient({
       {/* Breadcrumb + header */}
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
-          <Link href="/admin/contracts" className="hover:text-slate-700 flex items-center gap-1">
+          <Link href="/contracts" className="hover:text-slate-700 flex items-center gap-1">
             <ArrowLeft className="w-3 h-3" /> Contracts
           </Link>
           <ChevronRight className="w-3 h-3" />

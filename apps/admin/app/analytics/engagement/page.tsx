@@ -54,7 +54,7 @@ export default async function EngagementPage() {
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/analytics" className="hover:text-slate-700">
+          <Link href="/analytics" className="hover:text-slate-700">
             Analytics
           </Link>
           <ChevronRight className="w-3 h-3" />
@@ -154,7 +154,7 @@ export default async function EngagementPage() {
           </p>
           <p className="text-xs text-slate-400 mt-1">Audit log entries in the last 7 days</p>
           <Link
-            href="/admin/audit-logs"
+            href="/audit-logs"
             className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:underline"
           >
             View audit log <ArrowRight className="w-3 h-3" />
@@ -166,7 +166,7 @@ export default async function EngagementPage() {
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-semibold text-slate-900 text-sm">Recently Active Users</h2>
             <Link
-              href="/admin/students"
+              href="/students"
               className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1"
             >
               All users <ArrowRight className="w-3 h-3" />

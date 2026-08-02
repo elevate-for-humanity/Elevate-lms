@@ -351,7 +351,7 @@ export default function OpportunitiesPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <Link
-            href="/admin/submissions"
+            href="/submissions"
             className="text-slate-400 hover:text-slate-600 transition"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -52,7 +52,7 @@ export default async function CompliancePage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Link
-          href="/admin/submissions"
+          href="/submissions"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Submissions OS
@@ -70,7 +70,7 @@ export default async function CompliancePage() {
             </div>
           </div>
           <Link
-            href="/admin/submissions/compliance"
+            href="/submissions/compliance"
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition"
           >
             <Plus className="w-4 h-4" /> Add Record
@@ -102,7 +102,7 @@ export default async function CompliancePage() {
               Add SAM registration, state licenses, certifications, and insurance records.
             </p>
             <Link
-              href="/admin/submissions/compliance"
+              href="/submissions/compliance"
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition"
             >
               <Plus className="w-4 h-4" /> Add First Record

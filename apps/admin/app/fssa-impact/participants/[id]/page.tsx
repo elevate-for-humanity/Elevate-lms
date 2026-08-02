@@ -1,4 +1,4 @@
 export const metadata = { robots: { index: false } };
 
 import { redirect } from 'next/navigation';
-export default function Page() { redirect('/admin/fssa-impact'); }
+export default function Page() { redirect('/fssa-impact'); }

@@ -64,7 +64,7 @@ export default async function InspectCoursePage({
           </div>
           <div className="flex gap-2 flex-shrink-0">
             <Link
-              href="/admin/courses"
+              href="/courses"
               className="rounded-lg bg-brand-blue-600 hover:bg-brand-blue-500 text-white px-3 py-1.5 text-sm font-medium"
             >
               ← Courses

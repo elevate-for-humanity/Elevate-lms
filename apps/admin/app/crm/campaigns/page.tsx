@@ -54,7 +54,7 @@ export default async function CampaignsPage() {
             <p className="text-black mt-2">Send and track bulk email campaigns</p>
           </div>
           <Link
-            href="/admin/crm/campaigns/new"
+            href="/crm/campaigns/new"
             className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -164,7 +164,7 @@ export default async function CampaignsPage() {
               <h3 className="text-lg font-semibold text-black mb-2">No campaigns yet</h3>
               <p className="text-black mb-6">Create your first email campaign to get started</p>
               <Link
-                href="/admin/crm/campaigns/new"
+                href="/crm/campaigns/new"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5" />

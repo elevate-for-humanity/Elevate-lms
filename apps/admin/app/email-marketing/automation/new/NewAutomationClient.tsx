@@ -87,7 +87,7 @@ export default function NewWorkflowPage({ programs = [] }: { programs?: Program[
 
     if (response.ok) {
       toast.success(status === 'draft' ? 'Workflow saved as draft!' : 'Workflow activated!');
-      router.push('/admin/email-marketing/automation');
+      router.push('/email-marketing/automation');
     }
   };
 
@@ -115,7 +115,7 @@ export default function NewWorkflowPage({ programs = [] }: { programs?: Program[
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/admin/email-marketing/automation')}
+                onClick={() => router.push('/email-marketing/automation')}
                 className="p-2 hover:bg-slate-100 rounded-lg"
               >
                 <ArrowLeft className="w-5 h-5" />

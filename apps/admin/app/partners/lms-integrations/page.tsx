@@ -105,13 +105,13 @@ export default async function LmsIntegrationsPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/admin/partners/lms-integrations"
+                href="/partners/lms-integrations"
                 className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
               >
                 View Integrations
               </Link>
               <Link
-                href="/admin/partners"
+                href="/partners"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 View Partners

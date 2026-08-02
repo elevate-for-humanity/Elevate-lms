@@ -87,7 +87,7 @@ export default async function VideosPage() {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold">Videos</h2>
                 <Link
-                  href="/admin/videos/upload"
+                  href="/videos/upload"
                   className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
                 >
                   <Upload className="h-4 w-4" />
@@ -168,7 +168,7 @@ export default async function VideosPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/admin/videos"
+                href="/videos"
                 className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
               >
                 View Videos

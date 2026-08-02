@@ -246,7 +246,7 @@ export default function CoursePipelineClient({ programs }: { programs: Program[]
           <p className="text-slate-400 text-sm mt-0.5">Blueprint → Lessons → Quizzes → Publish in one flow</p>
         </div>
         <div className="flex items-center gap-2 text-xs text-slate-500">
-          <Link href="/admin/courses" className="hover:text-slate-300 transition-colors">All Courses</Link>
+          <Link href="/courses" className="hover:text-slate-300 transition-colors">All Courses</Link>
           <ChevronRight className="w-3 h-3" />
           <Link href="/admin/studio" className="hover:text-slate-300 transition-colors">Blueprint Builder</Link>
           <ChevronRight className="w-3 h-3" />

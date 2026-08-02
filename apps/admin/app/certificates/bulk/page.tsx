@@ -77,7 +77,7 @@ export default async function BulkCertificatesPage({
             <ol className="flex items-center space-x-2 text-slate-500">
               <li><Link href="/admin" className="hover:text-slate-900">Admin</Link></li>
               <li>/</li>
-              <li><Link href="/admin/certificates" className="hover:text-slate-900">Certificates</Link></li>
+              <li><Link href="/certificates" className="hover:text-slate-900">Certificates</Link></li>
               <li>/</li>
               <li className="text-slate-900 font-medium">Bulk</li>
             </ol>
@@ -89,7 +89,7 @@ export default async function BulkCertificatesPage({
         {/* Tab bar */}
         <div className="flex gap-1 border-b border-slate-200 mb-8">
           <Link
-            href="/admin/certificates/bulk?tab=issue"
+            href="/certificates/bulk?tab=issue"
             className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
               activeTab === 'issue'
                 ? 'border-brand-blue-600 text-brand-blue-600'
@@ -104,7 +104,7 @@ export default async function BulkCertificatesPage({
             )}
           </Link>
           <Link
-            href="/admin/certificates/bulk?tab=manage"
+            href="/certificates/bulk?tab=manage"
             className={`px-5 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
               activeTab === 'manage'
                 ? 'border-brand-blue-600 text-brand-blue-600'

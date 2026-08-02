@@ -187,7 +187,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
           Dashboard
         </Link>
         <span>/</span>
-        <Link href="/admin/students" className="hover:text-slate-700">
+        <Link href="/students" className="hover:text-slate-700">
           Students
         </Link>
         <span>/</span>
@@ -197,7 +197,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
       {/* Header */}
       <div className="flex items-start gap-4 flex-wrap">
         <Link
-          href="/admin/students"
+          href="/students"
           className="mt-1 p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -225,7 +225,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
             </a>
           )}
           <Link
-            href={`/admin/applications?search=${encodeURIComponent(student.email || '')}`}
+            href={`/applications?search=${encodeURIComponent(student.email || '')}`}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-700 transition-colors"
           >
             <FileText className="w-3.5 h-3.5" /> View Applications

@@ -29,14 +29,14 @@ const MAIN_NAV_CARDS: NavCard[] = [
   {
     title: 'Programs',
     description: 'Manage credential-bearing workforce programs, curriculum, and course content.',
-    href: '/admin/programs',
+    href: '/programs',
     icon: <GraduationCap className="w-6 h-6" />,
     color: 'bg-brand-blue-600',
   },
   {
     title: 'Students',
     description: 'Track enrollment, progress, certifications, and learner outcomes.',
-    href: '/admin/students',
+    href: '/students',
     icon: <Users className="w-6 h-6" />,
     color: 'bg-brand-green-600',
   },
@@ -64,19 +64,19 @@ const MAIN_NAV_CARDS: NavCard[] = [
   {
     title: 'Partners',
     description: 'Manage employer partnerships, host shops, and program holders.',
-    href: '/admin/partners',
+    href: '/partners',
     icon: <Building2 className="w-6 h-6" />,
     color: 'bg-teal-600',
   },
 ];
 
 const QUICK_ACTIONS = [
-  { label: 'Add New Student', href: '/admin/students/new', icon: <Users className="w-4 h-4" /> },
-  { label: 'Create Program', href: '/admin/programs/new', icon: <GraduationCap className="w-4 h-4" /> },
+  { label: 'Add New Student', href: '/students/new', icon: <Users className="w-4 h-4" /> },
+  { label: 'Create Program', href: '/programs/new', icon: <GraduationCap className="w-4 h-4" /> },
   { label: 'Schedule Orientation', href: '/admin/operations', icon: <Activity className="w-4 h-4" /> },
   { label: 'View Analytics', href: '/admin/analytics', icon: <BarChart3 className="w-4 h-4" /> },
   { label: 'System Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
-  { label: 'Compliance Reports', href: '/admin/compliance', icon: <Shield className="w-4 h-4" /> },
+  { label: 'Compliance Reports', href: '/compliance', icon: <Shield className="w-4 h-4" /> },
 ];
 
 const FEATURES = [
@@ -191,7 +191,7 @@ export default async function AdminHomePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {[
             { label: 'Settings', href: '/admin/settings', icon: <Settings className="w-5 h-5" /> },
-            { label: 'Compliance', href: '/admin/compliance', icon: <Shield className="w-5 h-5" /> },
+            { label: 'Compliance', href: '/compliance', icon: <Shield className="w-5 h-5" /> },
             { label: 'Notifications', href: '/admin/notifications', icon: <Bell className="w-5 h-5" /> },
             { label: 'Documents', href: '/admin/documents', icon: <FileText className="w-5 h-5" /> },
             { label: 'Billing', href: '/admin/billing', icon: <CreditCard className="w-5 h-5" /> },

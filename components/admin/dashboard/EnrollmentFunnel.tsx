@@ -30,7 +30,7 @@ export function EnrollmentFunnel({ data }: Props) {
   const enrolled  = active + certs;
 
   const steps: FunnelStep[] = [
-    { label: 'Applied',    value: applied,  href: '/admin/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding', color: 'text-amber-700',      bg: 'bg-amber-50 border-amber-200' },
+    { label: 'Applied',    value: applied,  href: '/applications?status=submitted,pending,in_review,under_review,pending_admin_review,pending_funding', color: 'text-amber-700',      bg: 'bg-amber-50 border-amber-200' },
     { label: 'Enrolled',   value: enrolled, href: '/admin/students',                                                              color: 'text-brand-blue-700', bg: 'bg-brand-blue-50 border-brand-blue-200' },
     { label: 'Active',     value: active,   href: '/admin/students?status=active',                                                color: 'text-emerald-700',    bg: 'bg-emerald-50 border-emerald-200' },
     { label: 'Certified',  value: certs,    href: '/admin/certificates',                                                          color: 'text-purple-700',     bg: 'bg-purple-50 border-purple-200' },
@@ -44,7 +44,7 @@ export function EnrollmentFunnel({ data }: Props) {
     <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
         <h2 className="font-bold text-slate-900 text-sm">Enrollment Funnel</h2>
-        <Link href="/admin/analytics" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
+        <Link href="/analytics" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
           Analytics <ArrowRight className="w-3 h-3" />
         </Link>
       </div>

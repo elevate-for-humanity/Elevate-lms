@@ -167,7 +167,7 @@ export default async function AdminNotificationsPage() {
           <h2 className="font-bold text-slate-900 text-sm flex items-center gap-2">
             <Bell className="w-4 h-4 text-slate-400" /> In-App Admin Alerts
           </h2>
-          <Link href="/admin/monitoring" className="text-xs font-semibold text-brand-blue-700 hover:text-brand-blue-800">
+          <Link href="/monitoring" className="text-xs font-semibold text-brand-blue-700 hover:text-brand-blue-800">
             Open Monitoring
           </Link>
         </div>

@@ -55,7 +55,7 @@ export default function InstructorProgramAnnouncementsPage() {
       .maybeSingle();
 
     if (!programData) {
-      router.push('/admin/instructor/programs');
+      router.push('/instructor/programs');
       return;
     }
 
@@ -152,7 +152,7 @@ export default function InstructorProgramAnnouncementsPage() {
         {/* Header */}
         <div className="mb-8">
           <Link
-            href="/admin/instructor/programs"
+            href="/instructor/programs"
             className="inline-flex items-center text-brand-blue-600 hover:text-brand-blue-700 mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />

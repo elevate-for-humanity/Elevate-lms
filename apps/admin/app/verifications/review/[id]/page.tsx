@@ -27,7 +27,7 @@ export default async function ReviewVerificationPage({
     .maybeSingle();
 
   if (!rawVerification) {
-    redirect('/admin/verifications/review');
+    redirect('/verifications/review');
   }
 
   // Hydrate profile separately (id_verifications.user_id → auth.users, no FK to profiles)

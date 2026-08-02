@@ -82,7 +82,7 @@ export default async function ProgramHolderAcknowledgementsPage() {
         <Breadcrumbs
           items={[
             { label: 'Admin', href: '/admin' },
-            { label: 'Program Holders', href: '/admin/program-holders' },
+            { label: 'Program Holders', href: '/program-holders' },
             { label: 'Acknowledgements' },
           ]}
         />
@@ -101,7 +101,7 @@ export default async function ProgramHolderAcknowledgementsPage() {
           </div>
           <div className="ml-auto">
             <Link
-              href="/admin/program-holders"
+              href="/program-holders"
               className="text-sm text-brand-blue-600 hover:underline"
             >
               ← All Program Holders

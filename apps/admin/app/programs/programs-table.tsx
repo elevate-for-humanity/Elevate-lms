@@ -154,7 +154,7 @@ export function ProgramsTable({
                         ✦ Build Course
                       </Link>
                       <Link
-                        href={`/admin/programs/${program.slug}/manage`}
+                        href={`/programs/${program.slug}/manage`}
                         className="text-brand-blue-600 hover:text-brand-blue-900"
                       >
                         Edit

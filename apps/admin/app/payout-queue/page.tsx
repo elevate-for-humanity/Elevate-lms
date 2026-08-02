@@ -166,7 +166,7 @@ export default async function PayoutQueuePage({
               <strong>QuickBooks not connected</strong> — payouts will be marked paid locally only.
             </span>
             <Link
-              href="/admin/integrations/quickbooks"
+              href="/integrations/quickbooks"
               className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition-colors"
             >
               Connect QuickBooks
@@ -358,7 +358,7 @@ export default async function PayoutQueuePage({
                               </span>
                             )}
                             <Link
-                              href={`/admin/students/${row.user_id}`}
+                              href={`/students/${row.user_id}`}
                               className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />

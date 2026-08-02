@@ -70,7 +70,7 @@ export class DashboardPageGuard extends React.Component<Props, State> {
                   Hard refresh
                 </button>
                 <Link
-                  href="/admin/operations"
+                  href="/operations"
                   className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-amber-200 text-amber-900 hover:bg-amber-100"
                 >
                   Operations hub

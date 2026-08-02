@@ -55,7 +55,7 @@ export default async function MouDocumentsPage() {
             <p className="text-slate-700 text-sm mt-1">Live MOU records from the database</p>
           </div>
           <Link
-            href="/admin/docs/mou/new"
+            href="/docs/mou/new"
             className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
           >
             + New MOU

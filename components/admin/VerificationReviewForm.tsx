@@ -51,7 +51,7 @@ export function VerificationReviewForm({ verification, adminId }: Props) {
         throw new Error(data.error || 'Failed to review verification');
       }
 
-      router.push('/admin/verifications/review?success=true');
+      router.push('/verifications/review?success=true');
       router.refresh();
     } catch (err: any) {
       setError('Failed to review verification');

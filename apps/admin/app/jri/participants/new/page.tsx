@@ -114,7 +114,7 @@ export default async function NewJRIParticipantPage() {
               Add Participant
             </button>
             <Link
-              href="/admin/jri/participants"
+              href="/jri/participants"
               className="border border-slate-300 text-slate-900 px-5 py-2 rounded-lg hover:bg-slate-50 text-sm"
             >
               Cancel

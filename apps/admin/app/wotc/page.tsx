@@ -76,7 +76,7 @@ export default async function WOTCAdminPage() {
             </p>
           </div>
           <Link
-            href="/admin/wotc/new"
+            href="/wotc/new"
             className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -130,7 +130,7 @@ export default async function WOTCAdminPage() {
                 Get started by creating your first WOTC application.
               </p>
               <Link
-                href="/admin/wotc/new"
+                href="/wotc/new"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-4 h-4" />

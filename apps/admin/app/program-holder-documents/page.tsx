@@ -78,7 +78,7 @@ export default async function ProgramHolderDocumentsPage() {
             Admin
           </Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/program-holders" className="hover:text-slate-700">
+          <Link href="/program-holders" className="hover:text-slate-700">
             Program Holders
           </Link>
           <ChevronRight className="w-3 h-3" />

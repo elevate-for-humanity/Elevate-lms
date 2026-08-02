@@ -53,7 +53,7 @@ export default async function ProgramDashboardPage({
           <p className="text-slate-700 mt-2">No program with code &quot;{code}&quot;</p>
         </div>
       );
-    redirect(`/admin/programs/${bySlug.code || bySlug.slug}/dashboard`);
+    redirect(`/programs/${bySlug.code || bySlug.slug}/dashboard`);
   }
 
   // Counts
@@ -76,35 +76,35 @@ export default async function ProgramDashboardPage({
   const sections = [
     {
       name: 'Courses',
-      href: `/admin/programs/${code}/courses`,
+      href: `/programs/${code}/courses`,
       icon: BookOpen,
       count: courseCount || 0,
       desc: 'Manage courses in this program',
     },
     {
       name: 'Enrollments',
-      href: `/admin/programs/${code}/enrollments`,
+      href: `/programs/${code}/enrollments`,
       icon: Users,
       count: enrollmentCount || 0,
       desc: 'View and manage student enrollments',
     },
     {
       name: 'Certificates',
-      href: `/admin/programs/${code}/certificates`,
+      href: `/programs/${code}/certificates`,
       icon: Award,
       count: certCount || 0,
       desc: 'Issue and manage certificates',
     },
     {
       name: 'Completion Rules',
-      href: `/admin/programs/${code}/completion`,
+      href: `/programs/${code}/completion`,
       icon: ClipboardCheck,
       count: null,
       desc: 'Configure completion criteria',
     },
     {
       name: 'Media',
-      href: `/admin/programs/${code}/media`,
+      href: `/programs/${code}/media`,
       icon: Upload,
       count: null,
       desc: 'Manage videos, audio, and diagrams',
@@ -122,7 +122,7 @@ export default async function ProgramDashboardPage({
           </li>
           <li>/</li>
           <li>
-            <Link href="/admin/programs" className="hover:text-brand-blue-600">
+            <Link href="/programs" className="hover:text-brand-blue-600">
               Programs
             </Link>
           </li>

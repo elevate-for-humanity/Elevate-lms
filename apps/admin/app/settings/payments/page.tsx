@@ -71,7 +71,7 @@ export default async function PaymentSettingsPage() {
     <div className="w-full space-y-6 px-6 py-6">
       <div>
         <p className="text-sm font-medium text-slate-500">
-          <Link href="/admin/settings" className="hover:text-slate-700">Settings</Link> / Payments
+          <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Payments
         </p>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment Settings</h1>
         <p className="text-slate-500">Stripe configuration, payment methods, and currency.</p>
@@ -86,10 +86,10 @@ export default async function PaymentSettingsPage() {
 
       <p className="text-xs text-slate-400 max-w-xl">
         Stripe API keys are managed in{' '}
-        <Link href="/admin/settings/integrations" className="text-brand-blue-600 underline">
+        <Link href="/settings/integrations" className="text-brand-blue-600 underline">
           Dev Studio → Secrets
         </Link>. Webhook endpoints and price IDs live in the{' '}
-        <Link href="/admin/integrations/env-manager" className="text-brand-blue-600 underline">
+        <Link href="/integrations/env-manager" className="text-brand-blue-600 underline">
           Env Manager
         </Link>.
       </p>

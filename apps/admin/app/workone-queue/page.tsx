@@ -204,7 +204,7 @@ export default async function WorkOneQueuePage() {
                     {/* Actions */}
                     <div className="flex flex-col gap-2 shrink-0">
                       <Link
-                        href={`/admin/applications/review/${app.id}`}
+                        href={`/applications/review/${app.id}`}
                         className="inline-flex items-center gap-1.5 text-xs font-semibold border border-slate-200 text-slate-600 hover:border-slate-300 px-3 py-1.5 rounded-lg transition"
                       >
                         View application <ExternalLink className="w-3 h-3" />

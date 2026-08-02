@@ -151,7 +151,7 @@ export default async function ReviewQueuePage({
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
           <Link href="/admin" className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/applications" className="hover:text-slate-700">Applications</Link>
+          <Link href="/applications" className="hover:text-slate-700">Applications</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Review Queue</span>
         </nav>
@@ -166,7 +166,7 @@ export default async function ReviewQueuePage({
           
           <div className="flex items-center gap-3">
             <Link
-              href="/admin/applications?status=manual_review"
+              href="/applications?status=manual_review"
               className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1"
             >
               <Filter className="w-4 h-4" />
@@ -367,7 +367,7 @@ function QueueCard({ item }: { item: any }) {
           </div>
           
           <Link
-            href={`/admin/applications/${app?.id}`}
+            href={`/applications/${app?.id}`}
             className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700"
           >
             Review

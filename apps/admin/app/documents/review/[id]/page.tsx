@@ -28,7 +28,7 @@ export default async function ReviewDocumentPage({ params }: { params: Promise<{
     .maybeSingle();
 
   if (!rawDocument) {
-    redirect('/admin/documents/review');
+    redirect('/documents/review');
   }
 
   // Hydrate profile separately (documents.user_id has no FK to profiles)

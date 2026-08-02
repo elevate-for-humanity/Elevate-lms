@@ -64,7 +64,7 @@ function DegradedBanner({
         <div>
           <span className="font-semibold">Live dashboard data could not be loaded.</span>{' '}
           Counts below may show zero until Supabase reconnects. Use{' '}
-          <Link href="/admin/operations" className="underline font-medium">
+          <Link href="/operations" className="underline font-medium">
             Operations
           </Link>{' '}
           or hard-refresh. If this persists, verify admin deploy SHA matches main.
@@ -124,7 +124,7 @@ const ADMIN_CATEGORY_CARDS = [
     href: '/admin/students',
     Icon: Users,
     links: [
-      { label: 'Applications', href: '/admin/applications' },
+      { label: 'Applications', href: '/applications' },
       { label: 'Enrollments', href: '/admin/enrollments' },
       { label: 'Documents', href: '/admin/documents/review' },
     ],
@@ -275,7 +275,7 @@ function AdminCategoryLanding() {
             subpage — applications, enrollments, Dev Studio, funding, compliance, and more.
           </p>
         </div>
-        <Link href="/admin/settings/nav" className="hidden text-xs font-semibold text-brand-blue-600 hover:underline sm:inline">
+        <Link href="/settings/nav" className="hidden text-xs font-semibold text-brand-blue-600 hover:underline sm:inline">
           Configure navigation →
         </Link>
       </div>
@@ -554,7 +554,7 @@ function RecentStudentsPanel({ students }: { students: import('./types').RecentS
           </div>
           <h2 className="font-bold text-slate-900 text-sm">Recent Students</h2>
         </div>
-        <Link href="/admin/students" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
+        <Link href="/students" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
           View all <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
@@ -655,14 +655,14 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
 
         {/* Quick-action strip — mobile only. Desktop has the full nav bar. */}
         <div className="md:hidden flex gap-2 overflow-x-auto pb-2 mb-6 -mx-4 px-4 scrollbar-none">
-          <Link href="/admin/applications?status=submitted,pending,in_review,pending_admin_review" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-slate-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors">Review Applications</Link>
-          <Link href="/admin/compliance" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Compliance</Link>
-          <Link href="/admin/documents/templates" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Document Templates</Link>
+          <Link href="/applications?status=submitted,pending,in_review,pending_admin_review" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-slate-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors">Review Applications</Link>
+          <Link href="/compliance" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Compliance</Link>
+          <Link href="/documents/templates" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Document Templates</Link>
           <Link href="/admin/studio" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Course Templates</Link>
-          <Link href="/admin/crm/leads" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">CRM Queue</Link>
-          <Link href="/admin/students" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Students</Link>
-          <Link href="/admin/enrollments" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Enrollments</Link>
-          <Link href="/admin/reports" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Reports</Link>
+          <Link href="/crm/leads" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">CRM Queue</Link>
+          <Link href="/students" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Students</Link>
+          <Link href="/enrollments" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Enrollments</Link>
+          <Link href="/reports" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Reports</Link>
           <Link href="/admin/studio" className="flex-shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-slate-200 text-slate-700 text-xs sm:text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors">Dev Studio</Link>
         </div>
 
@@ -715,7 +715,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
                     <Inbox className="w-4 h-4 text-slate-500" />
                     <h2 className="font-bold text-slate-900 text-sm">Recent Applications</h2>
                   </div>
-                  <Link href="/admin/applications" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
+                  <Link href="/applications" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
                     View all <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -736,7 +736,7 @@ export function AdminDashboardContent({ data }: { data: AdminDashboardData }) {
                   <TrendingUp className="w-4 h-4 text-slate-500" />
                   <h2 className="font-bold text-slate-900">Top Programs</h2>
                 </div>
-                <Link href="/admin/programs" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
+                <Link href="/programs" className="text-xs font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
                   All programs <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>

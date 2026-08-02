@@ -63,7 +63,7 @@ export default async function OrgProfilePage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Link
-          href="/admin/submissions"
+          href="/submissions"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Submissions OS
@@ -81,7 +81,7 @@ export default async function OrgProfilePage() {
             </div>
           </div>
           <Link
-            href="/admin/submissions/org"
+            href="/submissions/org"
             className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition"
           >
             Edit
@@ -96,7 +96,7 @@ export default async function OrgProfilePage() {
               Apply the Submissions OS migrations, then add your organization.
             </p>
             <Link
-              href="/admin/submissions/org"
+              href="/submissions/org"
               className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700 transition"
             >
               Add Organization

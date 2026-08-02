@@ -65,7 +65,7 @@ export default async function ApplicationsPage({
           <code className="mx-1 px-1 bg-slate-100 rounded">SUPABASE_SERVICE_ROLE_KEY</code>
           is missing from the container environment.
         </p>
-        <Link href="/admin/applications" className="text-sm text-blue-600 underline">Retry</Link>
+        <Link href="/applications" className="text-sm text-blue-600 underline">Retry</Link>
       </div>
     );
 
@@ -113,7 +113,7 @@ export default async function ApplicationsPage({
         <p className="text-slate-500 text-sm mb-1">
           Database error — check server logs for details.
         </p>
-        <Link href="/admin/applications" className="text-sm text-blue-600 underline">Retry</Link>
+        <Link href="/applications" className="text-sm text-blue-600 underline">Retry</Link>
       </div>
     );
   }
@@ -125,7 +125,7 @@ export default async function ApplicationsPage({
         <p className="text-slate-500 text-sm mb-1">
           Database error — check server logs for details.
         </p>
-        <Link href="/admin/applications" className="text-sm text-blue-600 underline">Retry</Link>
+        <Link href="/applications" className="text-sm text-blue-600 underline">Retry</Link>
       </div>
     );
   }
@@ -234,7 +234,7 @@ export default async function ApplicationsPage({
             Filter
           </button>
           <Link
-            href="/admin/applications"
+            href="/applications"
             className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-200 transition-colors"
           >
             Clear

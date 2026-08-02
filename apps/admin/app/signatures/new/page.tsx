@@ -29,7 +29,7 @@ async function createSignatureRequest(formData: FormData) {
     role: (formData.get('role') as string) || 'participant',
     status: 'pending',
   });
-  redirect('/admin/signatures');
+  redirect('/signatures');
 }
 
 export default async function NewSignaturePage() {
@@ -37,7 +37,7 @@ export default async function NewSignaturePage() {
   return (
     <div className="min-h-screen bg-white p-6">
       <div className="max-w-xl mx-auto">
-        <Link href="/admin/signatures" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
+        <Link href="/signatures" className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:underline mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Signatures
         </Link>
         <div className="flex items-center gap-2 mb-6">
@@ -77,7 +77,7 @@ export default async function NewSignaturePage() {
             </select>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/signatures" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
+            <Link href="/signatures" className="px-4 py-2 text-sm text-slate-600 hover:text-slate-900">Cancel</Link>
             <button type="submit" className="px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">Send Request</button>
           </div>
         </form>

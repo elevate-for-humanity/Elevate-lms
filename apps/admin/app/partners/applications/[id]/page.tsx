@@ -54,7 +54,7 @@ export default async function PartnerApplicationDetailPage({
 
         <div className="flex items-center justify-between mt-6 mb-8">
           <div>
-            <Link href="/admin/partners/applications" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm mb-2">
+            <Link href="/partners/applications" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm mb-2">
               <ArrowLeft className="w-4 h-4" /> Back
             </Link>
             <h1 className="text-2xl font-bold text-slate-900">{app.organization_name as string}</h1>

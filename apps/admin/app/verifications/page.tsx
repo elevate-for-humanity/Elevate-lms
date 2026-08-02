@@ -90,7 +90,7 @@ export default async function VerificationsPage() {
       ]}
       actions={
         <Link
-          href="/admin/verifications/review"
+          href="/verifications/review"
           className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-4 py-2 rounded-lg border border-white/20 transition-colors"
         >
           <Eye className="w-4 h-4" /> Review Queue
@@ -146,7 +146,7 @@ export default async function VerificationsPage() {
                   </div>
                   <div className="col-span-1 text-right">
                     <Link
-                      href={`/admin/verifications/review/${v.id}`}
+                      href={`/verifications/review/${v.id}`}
                       className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:text-brand-blue-700"
                     >
                       Review <ArrowRight className="w-3 h-3" />

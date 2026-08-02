@@ -147,7 +147,7 @@ export default async function AdminProgramHoldersPage() {
                       <td className="px-4 py-3 text-center">
                         <div className="flex items-center justify-center gap-3">
                           <Link
-                            href={`/admin/program-holders/${h.id}`}
+                            href={`/program-holders/${h.id}`}
                             className="inline-flex items-center gap-1 text-brand-blue-600 hover:underline text-sm font-medium"
                           >
                             <Eye className="w-3.5 h-3.5" />

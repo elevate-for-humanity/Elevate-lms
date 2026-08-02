@@ -134,7 +134,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Save failed');
-      router.push('/admin/credentials');
+      router.push('/credentials');
       router.refresh();
     } catch (err: any) {
       setError(err.message);
@@ -415,7 +415,7 @@ export default function CredentialForm({ initial, mode }: CredentialFormProps) {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {mode === 'create' ? 'Create Credential' : 'Save Changes'}
         </button>
-        <Link href="/admin/credentials" className="text-sm text-slate-500 hover:text-slate-700">
+        <Link href="/credentials" className="text-sm text-slate-500 hover:text-slate-700">
           Cancel
         </Link>
       </div>

@@ -65,7 +65,7 @@ export default async function EmployerAnalyticsPage() {
             </li>
             <li>/</li>
             <li>
-              <Link href="/admin/analytics" className="hover:text-primary">
+              <Link href="/analytics" className="hover:text-primary">
                 Analytics
               </Link>
             </li>

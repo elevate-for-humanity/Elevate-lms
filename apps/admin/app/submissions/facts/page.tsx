@@ -66,7 +66,7 @@ export default async function FactsVaultPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Link
-          href="/admin/submissions"
+          href="/submissions"
           className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 mb-6 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Submissions OS
@@ -85,7 +85,7 @@ export default async function FactsVaultPage() {
             </div>
           </div>
           <Link
-            href="/admin/submissions/facts"
+            href="/submissions/facts"
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition"
           >
             <Plus className="w-4 h-4" /> Add Fact
@@ -132,7 +132,7 @@ export default async function FactsVaultPage() {
                 Add approved facts to use as merge fields in generated documents.
               </p>
               <Link
-                href="/admin/submissions/facts"
+                href="/submissions/facts"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-4 h-4" /> Add First Fact

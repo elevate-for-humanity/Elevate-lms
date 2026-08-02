@@ -137,7 +137,7 @@ export default async function GrantWorkflowPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-black">🟡 Intake: New Opportunities</h2>
                 <Link
-                  href="/admin/grants/intake"
+                  href="/grants/intake"
                   className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                 >
                   View All →

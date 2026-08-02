@@ -41,7 +41,7 @@ export default async function CoursePartnersPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <Link
-              href="/admin/courses"
+              href="/courses"
               className="text-sm text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 mb-2"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Courses
@@ -60,7 +60,7 @@ export default async function CoursePartnersPage() {
                 Partners will appear here when profiles with the partner role are created.
               </p>
               <Link
-                href="/admin/partners"
+                href="/partners"
                 className="inline-block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
               >
                 Go to Partner Management

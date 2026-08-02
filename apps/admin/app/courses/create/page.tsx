@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminCoursesCreatePage() {
-  redirect('/admin/curriculum');
+  redirect('/curriculum');
 }

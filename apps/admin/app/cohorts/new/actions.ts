@@ -48,6 +48,6 @@ export async function createCohort(formData: FormData) {
 
   if (error) throw new Error(error.message);
 
-  revalidatePath('/admin/cohorts');
-  redirect(`/admin/cohorts`);
+  revalidatePath('/cohorts');
+  redirect(`/cohorts`);
 }

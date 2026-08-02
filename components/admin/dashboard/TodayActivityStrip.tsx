@@ -49,24 +49,24 @@ export function TodayActivityStrip({ operational }: Props) {
           icon={<FileText className="w-4 h-4" />}
           label="applications"
           value={operational.newAppsToday}
-          href="/admin/applications?status=submitted,pending,in_review,pending_admin_review"
+          href="/applications?status=submitted,pending,in_review,pending_admin_review"
           urgent
         />
         <StatPill
           icon={<TrendingUp className="w-4 h-4" />}
           label="new leads"
           value={operational.newLeadsToday}
-          href="/admin/crm/leads"
+          href="/crm/leads"
         />
         <StatPill
           icon={<Users className="w-4 h-4" />}
           label="enrollments"
           value={operational.newEnrollmentsToday}
-          href="/admin/students?status=active"
+          href="/students?status=active"
         />
         {total > 0 && (
           <Link
-            href="/admin/activity"
+            href="/activity"
             className="flex items-center gap-1 px-3 py-2.5 text-xs text-brand-blue-600 hover:underline ml-auto"
           >
             Full activity log <ArrowRight className="w-3 h-3" />

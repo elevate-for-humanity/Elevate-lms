@@ -55,7 +55,7 @@ export default async function ExportAttendancePage() {
       <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
           <Link
-            href="/admin/staff-portal/attendance"
+            href="/staff-portal/attendance"
             className="inline-flex items-center gap-2 text-emerald-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" />

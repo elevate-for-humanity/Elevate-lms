@@ -140,7 +140,7 @@ export default async function GovernanceContactPage() {
             <li>• Indicate your timeline and any specific format requirements</li>
           </ul>
           <Link
-            href="/admin/governance/authoritative-docs"
+            href="/governance/authoritative-docs"
             className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
           >
             <FileText className="w-4 h-4" />
@@ -171,19 +171,19 @@ export default async function GovernanceContactPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Resources</h2>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href="/admin/governance"
+              href="/governance"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Governance Hub
             </Link>
             <Link
-              href="/admin/governance/security"
+              href="/governance/security"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Security Statement
             </Link>
             <Link
-              href="/admin/governance/compliance"
+              href="/governance/compliance"
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
             >
               Compliance Framework

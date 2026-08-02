@@ -90,7 +90,7 @@ export default async function InstructorStudentsPage() {
               <p className="text-slate-700">View and manage enrolled students</p>
             </div>
             <Link
-              href="/admin/instructor/dashboard"
+              href="/instructor/dashboard"
               className="px-4 py-2 text-slate-700 hover:text-slate-900"
             >
               ← Dashboard

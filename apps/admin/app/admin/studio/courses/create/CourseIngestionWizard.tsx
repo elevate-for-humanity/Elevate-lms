@@ -170,7 +170,7 @@ export default function CourseIngestionWizard({ programs }: Props) {
         setPhase('review');
         return;
       }
-      router.push(`/admin/courses/${json.courseId}/content`);
+      router.push(`/courses/${json.courseId}/content`);
     } catch {
       setError('Network error. Please try again.');
       setPhase('review');

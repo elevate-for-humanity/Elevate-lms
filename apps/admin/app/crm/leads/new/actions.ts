@@ -30,5 +30,5 @@ export async function createLeadAction(formData: FormData) {
     status: 'new',
   });
 
-  redirect('/admin/crm/leads');
+  redirect('/crm/leads');
 }

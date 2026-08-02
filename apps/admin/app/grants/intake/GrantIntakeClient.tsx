@@ -48,7 +48,7 @@ export default function GrantIntakeClient({ opportunities }: Props) {
         throw new Error(data.error ?? `HTTP ${res.status}`);
       }
 
-      router.push('/admin/grants');
+      router.push('/grants');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save');
@@ -183,7 +183,7 @@ export default function GrantIntakeClient({ opportunities }: Props) {
         )}
         <div className="flex gap-3 ml-auto">
           <Link
-            href="/admin/grants"
+            href="/grants"
             className="px-4 py-2 text-sm border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors"
           >
             Cancel

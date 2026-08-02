@@ -54,7 +54,7 @@ export default async function ProgramCoursesPage({
       <nav className="text-sm mb-4">
         <ol className="flex items-center space-x-2 text-slate-700">
           <li>
-            <Link href="/admin/programs" className="hover:text-brand-blue-600">
+            <Link href="/programs" className="hover:text-brand-blue-600">
               Programs
             </Link>
           </li>
@@ -72,7 +72,7 @@ export default async function ProgramCoursesPage({
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Courses — {program.title}</h1>
         <Link
-          href="/admin/staff-portal/courses/create"
+          href="/staff-portal/courses/create"
           className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
         >
           <Plus className="w-4 h-4" /> Add Course
@@ -84,7 +84,7 @@ export default async function ProgramCoursesPage({
           <BookOpen className="w-12 h-12 text-slate-700 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-900 mb-2">No courses yet</h3>
           <p className="text-slate-700 mb-4">Create the first course for this program.</p>
-          <Link href="/admin/staff-portal/courses/create" className="text-brand-blue-600 hover:underline">
+          <Link href="/staff-portal/courses/create" className="text-brand-blue-600 hover:underline">
             Create Course
           </Link>
         </div>

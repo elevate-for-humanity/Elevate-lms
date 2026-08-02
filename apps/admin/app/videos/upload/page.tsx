@@ -40,7 +40,7 @@ export default async function UploadVideosPage() {
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/videos" className="hover:text-primary">
+                <Link href="/videos" className="hover:text-primary">
                   Videos
                 </Link>
               </li>

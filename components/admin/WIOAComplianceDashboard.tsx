@@ -215,7 +215,7 @@ export default function WIOAComplianceDashboard({
             No WIOA data found. Tables may not be populated yet.
           </p>
           <Link
-            href="/admin/compliance"
+            href="/compliance"
             className="mt-3 inline-block text-xs font-semibold text-blue-600 hover:text-blue-700"
           >
             Run compliance audit →

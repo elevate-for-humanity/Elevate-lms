@@ -14,7 +14,7 @@ export default async function NewLearningPathPage() {
       <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-6">
         <Link href="/dashboard" className="hover:text-slate-700">Admin</Link>
         <ChevronRight className="w-3 h-3" />
-        <Link href="/admin/learning-paths" className="hover:text-slate-700">Learning Paths</Link>
+        <Link href="/learning-paths" className="hover:text-slate-700">Learning Paths</Link>
         <ChevronRight className="w-3 h-3" />
         <span className="text-slate-900 font-medium">New</span>
       </nav>

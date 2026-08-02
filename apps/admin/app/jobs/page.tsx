@@ -101,7 +101,7 @@ export default async function JobsPage() {
             <p className="text-slate-700 mt-1">Manage job listings and track applications</p>
           </div>
           <Link
-            href="/admin/jobs/new"
+            href="/jobs/new"
             className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />

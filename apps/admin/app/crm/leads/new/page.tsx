@@ -26,7 +26,7 @@ export default async function NewLeadPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/admin/crm/leads" className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4">
+          <Link href="/crm/leads" className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Leads
           </Link>
@@ -163,7 +163,7 @@ export default async function NewLeadPage() {
           </div>
 
           <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-200">
-            <Link href="/admin/crm/leads" className="px-4 py-2 text-slate-600 hover:text-slate-900">Cancel</Link>
+            <Link href="/crm/leads" className="px-4 py-2 text-slate-600 hover:text-slate-900">Cancel</Link>
             <button type="submit"
               className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               Create Lead

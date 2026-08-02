@@ -108,13 +108,13 @@ export default async function ExternalProgressPage() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
-                href="/admin/external-progress"
+                href="/external-progress"
                 className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 text-lg"
               >
                 View Progress
               </Link>
               <Link
-                href="/admin/integrations"
+                href="/integrations"
                 className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 View Integrations

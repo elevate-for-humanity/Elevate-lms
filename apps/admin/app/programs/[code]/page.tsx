@@ -57,7 +57,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ code: 
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div>
             <div className="text-xs text-slate-400 mb-1">
-              <Link href="/admin/programs" className="hover:text-blue-600">
+              <Link href="/programs" className="hover:text-blue-600">
                 Programs
               </Link>{' '}
               / {program.title}
@@ -70,19 +70,19 @@ export default async function ProgramPage({ params }: { params: Promise<{ code: 
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href={`/admin/programs/${code}/dashboard`}
+              href={`/programs/${code}/dashboard`}
               className="inline-flex items-center gap-1.5 border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors"
             >
               <BarChart3 className="w-4 h-4" /> Dashboard
             </Link>
             <Link
-              href={`/admin/compliance/wioa-etpl/${program.id}`}
+              href={`/compliance/wioa-etpl/${program.id}`}
               className="inline-flex items-center gap-1.5 border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors"
             >
               WIOA compliance
             </Link>
             <Link
-              href={`/admin/programs/${code}/manage`}
+              href={`/programs/${code}/manage`}
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
             >
               <Edit3 className="w-4 h-4" /> Edit

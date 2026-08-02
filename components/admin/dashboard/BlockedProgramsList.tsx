@@ -7,7 +7,7 @@ export function BlockedProgramsList({ items }: { items: BlockedProgram[] }) {
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
       <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
         <h2 className="text-sm font-bold text-slate-900">Unpublished Programs</h2>
-        <Link href="/admin/programs" className="text-xs text-blue-600 font-medium hover:underline">
+        <Link href="/programs" className="text-xs text-blue-600 font-medium hover:underline">
           View all →
         </Link>
       </div>

@@ -53,6 +53,6 @@ export async function createIncentive(formData: FormData) {
     metadata: { name },
   });
 
-  revalidatePath('/admin/incentives');
-  redirect('/admin/incentives');
+  revalidatePath('/incentives');
+  redirect('/incentives');
 }

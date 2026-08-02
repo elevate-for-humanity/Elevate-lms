@@ -153,7 +153,7 @@ export default async function AdminDocumentReviewPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Link
-                      href={`/admin/documents/review/${doc.id}`}
+                      href={`/documents/review/${doc.id}`}
                       className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
@@ -236,7 +236,7 @@ export default async function AdminDocumentReviewPage() {
                       <span className="text-slate-500 text-sm">No file</span>
                     )}
                     <Link
-                      href={`/admin/documents/review/${doc.id}`}
+                      href={`/documents/review/${doc.id}`}
                       className="px-4 py-2 bg-slate-200 text-black font-semibold rounded-lg hover:bg-slate-300 transition"
                     >
                       Review

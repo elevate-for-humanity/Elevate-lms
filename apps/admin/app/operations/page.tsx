@@ -326,7 +326,7 @@ export default async function OperationsPage() {
             <h2 className="text-sm font-semibold text-slate-900">Unresolved admin alerts</h2>
             <span className="ml-auto text-xs text-slate-500">{openAlertsCount} open</span>
             <Link
-              href="/admin/monitoring"
+              href="/monitoring"
               className="ml-2 text-xs font-semibold text-brand-blue-600 hover:underline"
             >
               Monitoring →

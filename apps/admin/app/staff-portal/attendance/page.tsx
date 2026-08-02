@@ -63,13 +63,13 @@ export default async function StaffPortalAttendancePage() {
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-4 mb-6">
           <Link
-            href="/admin/staff-portal/attendance/take"
+            href="/staff-portal/attendance/take"
             className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
           >
             Take Attendance
           </Link>
           <Link
-            href="/admin/staff-portal/attendance/export"
+            href="/staff-portal/attendance/export"
             className="border border-slate-300 px-4 py-2 rounded-lg hover:bg-white"
           >
             Export Report

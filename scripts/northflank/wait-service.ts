@@ -395,6 +395,26 @@ async function main() {
         }
       }
 
+      // KEY FIX: For combined services (elevate-marketing, elevate-lms), the Northflank API
+      // often returns status: {} after trigger-deployment.ts fires, even when containers are
+      // running. When the build is done but deployment status is missing, use HTTP health
+      // as the readiness signal. This avoids 60-minute timeouts.
+      if (buildDone && !deploy && SERVICE_HEALTH_URLS[serviceId]) {
+        const expectedSha = getExpectedSha();
+        console.log(`${serviceId}: build done (${buildStatus}), deployment status unknown — switching to HTTP health polling`);
+        while (Date.now() - start < timeoutMs) {
+          const health = await checkHttpHealth(serviceId, expectedSha);
+          if (health.ok) {
+            console.log(`${serviceId}: HTTP health OK ✅ (commit: ${health.currentCommit.slice(0, 7) || 'unknown'})`);
+            process.exit(0);
+          }
+          console.log(`${serviceId}: health: ${health.error} — retrying in 15s...`);
+          await new Promise((r) => setTimeout(r, 15000));
+        }
+        console.error(`${serviceId}: HTTP health check timeout after ${Math.round((Date.now() - start) / 1000)}s`);
+        process.exit(1);
+      }
+
       if (DEPLOY_FAILURE_STATUSES.has(deploy ?? '')) {
         console.error(`${serviceId}: deployment failed (${deploy})`);
         process.exit(1);

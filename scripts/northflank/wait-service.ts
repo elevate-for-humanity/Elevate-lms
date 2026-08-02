@@ -50,7 +50,9 @@ const BUILD_FAILURE_STATUSES = new Set([
   'SUBMISSION_FAILURE',
 ]);
 const BUILD_DONE_STATUSES = new Set(['SUCCESS', 'COMPLETED', 'SKIPPED']);
-const DEPLOY_READY_STATUSES = new Set(['COMPLETED', 'RUNNING', 'SUCCESS']);
+// PENDING is included because Northflank combined services sometimes report
+// deployment status as PENDING even after containers are running and healthy.
+const DEPLOY_READY_STATUSES = new Set(['COMPLETED', 'RUNNING', 'SUCCESS', 'PENDING']);
 const DEPLOY_FAILURE_STATUSES = new Set(['FAILED', 'ERROR']);
 
 // Map service IDs to their health check URLs
@@ -370,18 +372,23 @@ async function main() {
       }
 
       if (buildDone && deployReady) {
-        // Build and deployment status say ready — but verify with HTTP health check
-        // to confirm the new container image is actually running. This prevents false
-        // positives where PENDING or stale containers are reported as ready.
+        // Build and deployment status say ready. Now poll HTTP health until the new
+        // container image is actually serving (health endpoint returns expected SHA).
         const expectedSha = getExpectedSha();
         if (expectedSha) {
-          console.log(`${serviceId}: build/deploy ready — checking HTTP health (expecting ${expectedSha.slice(0, 7)})...`);
-          const health = await checkHttpHealth(serviceId, expectedSha);
-          if (health.ok) {
-            console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7) || 'unknown'})`);
-            process.exit(0);
+          console.log(`${serviceId}: build/deploy ready — polling HTTP health (expecting ${expectedSha.slice(0, 7)})...`);
+          // Poll the health endpoint until it returns the expected SHA or times out
+          while (Date.now() - start < timeoutMs) {
+            const health = await checkHttpHealth(serviceId, expectedSha);
+            if (health.ok) {
+              console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7) || 'unknown'})`);
+              process.exit(0);
+            }
+            console.log(`${serviceId}: health: ${health.error} — new container not ready yet, retrying in 15s...`);
+            await new Promise((r) => setTimeout(r, 15000));
           }
-          console.log(`${serviceId}: health check: ${health.error} — containers may still be starting, waiting...`);
+          console.error(`${serviceId}: health check timeout after ${Math.round((Date.now() - start) / 1000)}s — new container never reached expected SHA`);
+          process.exit(1);
         } else {
           console.log(`${serviceId}: service ready ✅ (no SHA to verify)`);
           process.exit(0);

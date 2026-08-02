@@ -61,12 +61,12 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 RUN addgroup \
-      --system \
-      --gid 1001 \
+      -g 1001 \
       nodejs \
     && adduser \
-      --system \
-      --uid 1001 \
+      -S \
+      -u 1001 \
+      -G nodejs \
       nextjs
 
 COPY --from=builder \

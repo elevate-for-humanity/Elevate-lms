@@ -73,17 +73,15 @@ const adminConfig = {
     }
     // Browser polyfill for @webcontainer/api and other Node.js modules
     if (!isServer) {
-      // Access webpack's ProvidePlugin via the compiler instance (webpack 5 API)
-      const webpack = config.compiler?.webpack;
-      if (webpack?.ProvidePlugin) {
-        config.plugins = config.plugins || [];
-        config.plugins.push(
-          new webpack.ProvidePlugin({
-            Buffer: ['buffer', 'Buffer'],
-            buffer: 'buffer',
-          })
-        );
-      }
+      // Use require() to get webpack's ProvidePlugin (not config.compiler.webpack)
+      const { ProvidePlugin } = require('webpack');
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+          buffer: 'buffer',
+        })
+      );
     }
     return config;
   },

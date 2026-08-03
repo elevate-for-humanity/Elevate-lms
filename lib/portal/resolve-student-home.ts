@@ -8,7 +8,8 @@ import { PORTAL_PATHS, PORTAL_FALLBACK, type PortalKey } from '@/lib/portal/rout
 
 /**
  * Resolves where a student should land after login.
- * Apprenticeship program_slug wins over generic portal_type `apprentice`.
+ * Priority: (1) program_slug in active enrollment, (2) program lookup by program_id,
+ * (3) cached portal_type, (4) student default.
  */
 export async function resolveStudentHomePath(
   supabase: SupabaseClient,
@@ -24,7 +25,8 @@ export async function resolveStudentHomePath(
     .limit(1)
     .maybeSingle();
 
-  const slugPath = portalPathForProgramSlug(enrollment?.program_slug);
+  // Try program_slug directly first
+  let slugPath = portalPathForProgramSlug(enrollment?.program_slug);
   if (slugPath) {
     const portalType = portalTypeForProgramSlug(enrollment?.program_slug);
     if (portalType) {
@@ -33,6 +35,27 @@ export async function resolveStudentHomePath(
     return slugPath;
   }
 
+  // Fallback: look up program by program_id if program_slug is empty
+  if (enrollment?.program_id) {
+    const { data: program } = await supabase
+      .from('programs')
+      .select('slug')
+      .eq('id', enrollment.program_id)
+      .maybeSingle();
+
+    if (program?.slug) {
+      slugPath = portalPathForProgramSlug(program.slug);
+      if (slugPath) {
+        const portalType = portalTypeForProgramSlug(program.slug);
+        if (portalType) {
+          await supabase.from('profiles').update({ portal_type: portalType }).eq('id', userId);
+        }
+        return slugPath;
+      }
+    }
+  }
+
+  // Try cached portal_type
   if (cachedPortalType) {
     const canonical = PORTAL_PATHS[cachedPortalType as PortalKey];
     if (canonical) return canonical;

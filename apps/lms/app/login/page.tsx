@@ -41,7 +41,7 @@ export default function LoginPage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role, onboarding_completed')
+        .select('role, portal_type, onboarding_completed')
         .eq('id', data.user.id)
         .maybeSingle();
 
@@ -50,7 +50,15 @@ export default function LoginPage() {
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         router.replace('/onboarding/employer');
       } else {
-        router.replace(getRoleDestination(profile.role));
+        // Apprentices are routed to their program portal based on portal_type.
+        // If portal_type is set (e.g. 'barber', 'cosmetology'), go to /portal/[portal_type].
+        // Otherwise fall back to role-based routing.
+        const portalType = profile.portal_type;
+        if (portalType && typeof portalType === 'string' && portalType.trim() !== '') {
+          router.replace(`/portal/${portalType.trim()}`);
+        } else {
+          router.replace(getRoleDestination(profile.role));
+        }
       }
       router.refresh();
     } catch (caughtError) {

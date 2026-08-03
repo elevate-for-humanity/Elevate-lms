@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getHostShopBoard } from '@/lib/partner/board';
 import Link from 'next/link';
 import { AlertCircle, CheckCircle, Clock, FileText, TrendingUp, Users } from 'lucide-react';
+import MatchRequestsButton from './MatchRequestsButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -196,7 +197,8 @@ export default async function PartnerBoardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <MatchRequestsButton />
         <Link href="/host-shop/dashboard/attendance/record" className="bg-white rounded-xl border p-5 hover:border-blue-300 hover:shadow-sm transition block">
           <h3 className="font-semibold text-slate-900">Record Attendance</h3>
           <p className="text-sm text-slate-600 mt-1">Log a training session</p>

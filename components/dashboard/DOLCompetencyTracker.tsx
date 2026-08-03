@@ -87,8 +87,8 @@ const PROGRAM_COMPETENCIES: Record<string, ProgramCompetencies> = {
   'barber-apprenticeship': {
     programSlug: 'barber-apprenticeship',
     programName: 'Barber',
-    totalOJT: 1000,
-    totalRTI: 500,
+    totalOJT: 2000,
+    totalRTI: 260,
     onetCode: '39-5011.00',
     rapidsCode: '0311CB',
     competencies: [
@@ -162,7 +162,7 @@ const RTI_COURSES: Record<string, any> = {
   },
   'barber-apprenticeship': {
     courseTitle: 'Barbering Related Instruction',
-    totalHours: 500,
+    totalHours: 260,
     courses: [
       { title: 'History of Barbering & Professional Ethics', hours: 20 },
       { title: 'Sanitation, Hygiene & Safety', hours: 40 },

@@ -6,7 +6,9 @@
   "state": "IN",
   "programSlug": "barber-apprenticeship",
   "credentialCode": "IN-BARBER",
-  "trackVariants": ["apprenticeship"],
+  "trackVariants": [
+    "apprenticeship"
+  ],
   "status": "active",
   "generationRules": {
     "allowRemediation": true,
@@ -70,7 +72,7 @@
           "objective": "Describe the history and legal framework of barbering in Indiana, explain the DOL apprenticeship structure, and identify the scope of practice for licensed barbers.",
           "durationMinutes": 25,
           "videoFile": "/videos/barber-lessons/barber-apprenticeship-intro.mp4",
-          "content": "<h2>Introduction to Barbering</h2>\n\n<h3>Objective</h3>\n<p>By the end of this lesson, you will be able to: (1) describe the history of barbering and the origin of the barber pole; (2) explain Indiana's licensing requirements and scope of practice; (3) describe the DOL apprenticeship structure and your obligations as a registered apprentice; (4) identify the consequences of practicing without a license.</p>\n\n<h3>Key Concepts</h3>\n<ul>\n  <li><strong>Scope of practice</strong> — the specific services a licensed barber is legally permitted to perform in Indiana</li>\n  <li><strong>Indiana Code Title 25, Article 8</strong> — the state law governing barbering licensure and practice</li>\n  <li><strong>Indiana Professional Licensing Agency (IPLA)</strong> — the state body that issues and regulates barber licenses</li>\n  <li><strong>DOL-registered apprenticeship</strong> — a federally recognized training program combining on-the-job hours with related technical instruction</li>\n  <li><strong>Related Technical Instruction (RTI)</strong> — the coursework you are completing now; required alongside your 2,000 OJT hours</li>\n  <li><strong>Supervision requirement</strong> — apprentices must work under a licensed barber at all times; independent practice is illegal</li>\n</ul>\n\n<h3>Explanation</h3>\n\n<h4>History of Barbering</h4>\n<p>The barber pole — red, white, and blue — is one of the oldest professional symbols in the world. In medieval Europe, barbers performed surgery, tooth extractions, and bloodletting alongside haircuts. The red stripe represents blood, the white represents bandages, and the blue (added in the United States) represents veins. The rotating pole mimics the bandages wrung out after bloodletting.</p>\n<p>By the 19th century, medicine and barbering separated into distinct professions. Today, barbering is a regulated trade in all 50 states. The first barber licensing law in the United States was passed in Minnesota in 1897.</p>\n\n<h4>Indiana Licensing Requirements</h4>\n<table style=\"width:100%; border-collapse:collapse; margin:1rem 0;\">\n  <thead>\n    <tr style=\"background:#f3f4f6;\">\n      <th style=\"padding:8px; border:1px solid #d1d5db; text-align:left;\">Requirement</th>\n      <th style=\"padding:8px; border:1px solid #d1d5db; text-align:left;\">Standard Path</th>\n      <th style=\"padding:8px; border:1px solid #d1d5db; text-align:left;\">Apprenticeship Path</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Training hours</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">1,500 school hours</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">2,000 OJT hours + RTI</td>\n    </tr>\n    <tr style=\"background:#f9fafb;\">\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Written exam</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n    </tr>\n    <tr>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Practical exam</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n    </tr>\n    <tr style=\"background:#f9fafb;\">\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">License renewal</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Every 2 years</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Every 2 years</td>\n    </tr>\n    <tr>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">License display</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">At workstation</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">At workstation</td>\n    </tr>\n  </tbody>\n</table>\n\n<h4>Indiana Scope of Practice</h4>\n<p>Indiana-licensed barbers are authorized to perform the following services on the head, face, and neck:</p>\n<ul>\n  <li>Haircutting and styling</li>\n  <li>Shaving and beard trimming</li>\n  <li>Scalp treatments and massages</li>\n  <li>Limited chemical services (color, relaxers) — within training</li>\n  <li>Eyebrow arching (with blade or thread)</li>\n</ul>\n<p>Barbers are <strong>not</strong> authorized to perform nail services, full-body waxing, or medical procedures. Performing services outside your scope of practice is a licensing violation.</p>\n\n<h4>Your DOL Apprenticeship Obligations</h4>\n<p>As a registered apprentice, you have three obligations: (1) complete your 2,000 OJT hours under a licensed supervising barber; (2) complete all RTI coursework (this program); (3) maintain your apprenticeship registration with the DOL. Your supervising barber is legally responsible for your work. If you perform a service without supervision and something goes wrong, both you and your supervisor face liability.</p>\n\n<h3>Real-World Application</h3>\n<p>On your first day, a walk-in client asks if you can cut their hair. Your supervisor is in the back. You are a registered apprentice — not yet licensed. The correct response: \"I'm an apprentice — let me get my supervising barber.\" Do not start the service. Do not ask the client to wait while you \"just do a quick trim.\" There is no such thing as a quick trim that is legally protected for an unsupervised apprentice. Get your supervisor first, every time.</p>\n\n<h3>Summary</h3>\n<ul>\n  <li>The barber pole's red/white/blue stripes trace to medieval surgical practice</li>\n  <li>Indiana requires 2,000 OJT hours + RTI + written and practical exams for the apprenticeship path</li>\n  <li>Scope of practice: head, face, and neck services only — no nail or medical services</li>\n  <li>Apprentices must work under licensed supervision at all times — no exceptions</li>\n  <li>License must be displayed at your workstation and renewed every 2 years</li>\n</ul>\n\n<h4>State Board Alignment</h4>\n<ul>\n  <li>Indiana Code Title 25, Article 8 — Barbering Licensure</li>\n  <li>Indiana Professional Licensing Agency — License Requirements</li>\n  <li>U.S. Department of Labor — Registered Apprenticeship Standards</li>\n</ul>",
+          "content": "<h2>Introduction to Barbering</h2>\n\n<h3>Objective</h3>\n<p>By the end of this lesson, you will be able to: (1) describe the history of barbering and the origin of the barber pole; (2) explain Indiana's licensing requirements and scope of practice; (3) describe the DOL apprenticeship structure and your obligations as a registered apprentice; (4) identify the consequences of practicing without a license.</p>\n\n<h3>Key Concepts</h3>\n<ul>\n  <li><strong>Scope of practice</strong> — the specific services a licensed barber is legally permitted to perform in Indiana</li>\n  <li><strong>Indiana Code Title 25, Article 8</strong> — the state law governing barbering licensure and practice</li>\n  <li><strong>Indiana Professional Licensing Agency (IPLA)</strong> — the state body that issues and regulates barber licenses</li>\n  <li><strong>DOL-registered apprenticeship</strong> — a federally recognized training program combining on-the-job hours with related technical instruction</li>\n  <li><strong>Related Technical Instruction (RTI)</strong> — the coursework you are completing now; required alongside your 1,500 OJT hours + 144 RTI</li>\n  <li><strong>Supervision requirement</strong> — apprentices must work under a licensed barber at all times; independent practice is illegal</li>\n</ul>\n\n<h3>Explanation</h3>\n\n<h4>History of Barbering</h4>\n<p>The barber pole — red, white, and blue — is one of the oldest professional symbols in the world. In medieval Europe, barbers performed surgery, tooth extractions, and bloodletting alongside haircuts. The red stripe represents blood, the white represents bandages, and the blue (added in the United States) represents veins. The rotating pole mimics the bandages wrung out after bloodletting.</p>\n<p>By the 19th century, medicine and barbering separated into distinct professions. Today, barbering is a regulated trade in all 50 states. The first barber licensing law in the United States was passed in Minnesota in 1897.</p>\n\n<h4>Indiana Licensing Requirements</h4>\n<table style=\"width:100%; border-collapse:collapse; margin:1rem 0;\">\n  <thead>\n    <tr style=\"background:#f3f4f6;\">\n      <th style=\"padding:8px; border:1px solid #d1d5db; text-align:left;\">Requirement</th>\n      <th style=\"padding:8px; border:1px solid #d1d5db; text-align:left;\">Standard Path</th>\n      <th style=\"padding:8px; border:1px solid #d1d5db; text-align:left;\">Apprenticeship Path</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Training hours</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">1,500 school hours</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">1,500 OJT hours + 144 RTI</td>\n    </tr>\n    <tr style=\"background:#f9fafb;\">\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Written exam</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n    </tr>\n    <tr>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Practical exam</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Required</td>\n    </tr>\n    <tr style=\"background:#f9fafb;\">\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">License renewal</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Every 2 years</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">Every 2 years</td>\n    </tr>\n    <tr>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">License display</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">At workstation</td>\n      <td style=\"padding:8px; border:1px solid #d1d5db;\">At workstation</td>\n    </tr>\n  </tbody>\n</table>\n\n<h4>Indiana Scope of Practice</h4>\n<p>Indiana-licensed barbers are authorized to perform the following services on the head, face, and neck:</p>\n<ul>\n  <li>Haircutting and styling</li>\n  <li>Shaving and beard trimming</li>\n  <li>Scalp treatments and massages</li>\n  <li>Limited chemical services (color, relaxers) — within training</li>\n  <li>Eyebrow arching (with blade or thread)</li>\n</ul>\n<p>Barbers are <strong>not</strong> authorized to perform nail services, full-body waxing, or medical procedures. Performing services outside your scope of practice is a licensing violation.</p>\n\n<h4>Your DOL Apprenticeship Obligations</h4>\n<p>As a registered apprentice, you have three obligations: (1) complete your 1,500 OJT hours + 144 RTI</p>\n\n<h3>Real-World Application</h3>\n<p>On your first day, a walk-in client asks if you can cut their hair. Your supervisor is in the back. You are a registered apprentice — not yet licensed. The correct response: \"I'm an apprentice — let me get my supervising barber.\" Do not start the service. Do not ask the client to wait while you \"just do a quick trim.\" There is no such thing as a quick trim that is legally protected for an unsupervised apprentice. Get your supervisor first, every time.</p>\n\n<h3>Summary</h3>\n<ul>\n  <li>The barber pole's red/white/blue stripes trace to medieval surgical practice</li>\n  <li>Indiana requires 1,500 OJT hours + 144 RTI</li>\n  <li>Scope of practice: head, face, and neck services only — no nail or medical services</li>\n  <li>Apprentices must work under licensed supervision at all times — no exceptions</li>\n  <li>License must be displayed at your workstation and renewed every 2 years</li>\n</ul>\n\n<h4>State Board Alignment</h4>\n<ul>\n  <li>Indiana Code Title 25, Article 8 — Barbering Licensure</li>\n  <li>Indiana Professional Licensing Agency — License Requirements</li>\n  <li>U.S. Department of Labor — Registered Apprenticeship Standards</li>\n</ul>",
           "quizQuestions": [
             {
               "id": "mod1-l1-q1",
@@ -87,9 +89,14 @@
             {
               "id": "mod1-l1-q2",
               "question": "Under the Indiana apprenticeship path, how many on-the-job training hours are required before licensure?",
-              "options": ["1,000", "1,500", "2,000", "2,500"],
+              "options": [
+                "1,000",
+                "1,500",
+                "2,000",
+                "2,500"
+              ],
               "correctAnswer": 2,
-              "explanation": "The Indiana apprenticeship path requires 2,000 OJT hours plus completion of Related Technical Instruction (RTI)."
+              "explanation": "The Indiana apprenticeship path requires 1,500 OJT hours + 144 RTI"
             },
             {
               "id": "mod1-l1-q3",
@@ -118,7 +125,12 @@
             {
               "id": "mod1-l1-q5",
               "question": "Indiana barber licenses must be renewed every:",
-              "options": ["1 year", "2 years", "3 years", "5 years"],
+              "options": [
+                "1 year",
+                "2 years",
+                "3 years",
+                "5 years"
+              ],
               "correctAnswer": 1,
               "explanation": "Indiana requires barber license renewal every two years."
             },
@@ -137,7 +149,12 @@
             {
               "id": "mod1-l1-q7",
               "question": "The first barber licensing law in the United States was passed in which state?",
-              "options": ["New York", "Indiana", "Minnesota", "California"],
+              "options": [
+                "New York",
+                "Indiana",
+                "Minnesota",
+                "California"
+              ],
               "correctAnswer": 2,
               "explanation": "Minnesota passed the first barber licensing law in the United States in 1897."
             },
@@ -240,21 +257,36 @@
             {
               "id": "mod1-l3-q2",
               "question": "When using shears, which finger should be the only one that moves?",
-              "options": ["Index finger", "Ring finger", "Thumb", "Pinky"],
+              "options": [
+                "Index finger",
+                "Ring finger",
+                "Thumb",
+                "Pinky"
+              ],
               "correctAnswer": 2,
               "explanation": "Only the thumb moves when cutting with shears. The bottom blade stays stationary."
             },
             {
               "id": "mod1-l3-q3",
               "question": "What is the correct blade angle when using a straight razor on a client?",
-              "options": ["10 degrees", "20 degrees", "30 degrees", "45 degrees"],
+              "options": [
+                "10 degrees",
+                "20 degrees",
+                "30 degrees",
+                "45 degrees"
+              ],
               "correctAnswer": 2,
               "explanation": "A 30-degree angle provides the correct balance between closeness and safety."
             },
             {
               "id": "mod1-l3-q4",
               "question": "Which tool is used for detail work, lineups, and edges?",
-              "options": ["Clipper", "Trimmer (edger)", "Wide-tooth comb", "Boar bristle brush"],
+              "options": [
+                "Clipper",
+                "Trimmer (edger)",
+                "Wide-tooth comb",
+                "Boar bristle brush"
+              ],
               "correctAnswer": 1,
               "explanation": "Trimmers (edgers) are smaller and more precise than clippers — designed for detail work."
             },
@@ -318,7 +350,12 @@
             {
               "id": "mod1-l4-q1",
               "question": "What type of microorganism requires a living host to survive and reproduce?",
-              "options": ["Bacteria", "Virus", "Fungus", "Parasite"],
+              "options": [
+                "Bacteria",
+                "Virus",
+                "Fungus",
+                "Parasite"
+              ],
               "correctAnswer": 1,
               "explanation": "Viruses cannot reproduce without a host cell. Examples relevant to barbering: hepatitis B, hepatitis C, HIV."
             },
@@ -397,14 +434,24 @@
             {
               "id": "mod1-l4-q8",
               "question": "What is the minimum time tools must remain submerged in Barbicide?",
-              "options": ["2 minutes", "5 minutes", "10 minutes", "15 minutes"],
+              "options": [
+                "2 minutes",
+                "5 minutes",
+                "10 minutes",
+                "15 minutes"
+              ],
               "correctAnswer": 2,
               "explanation": "Barbicide requires a minimum 10-minute full submersion to achieve proper disinfection. Partial soaking or early removal does not meet the standard."
             },
             {
               "id": "mod1-l4-q9",
               "question": "What level of decontamination is primarily used in barbering between clients?",
-              "options": ["Sanitation", "Disinfection", "Sterilization", "Dehydration"],
+              "options": [
+                "Sanitation",
+                "Disinfection",
+                "Sterilization",
+                "Dehydration"
+              ],
               "correctAnswer": 1,
               "explanation": "Disinfection with an EPA-registered product is the primary standard in barbering. Sterilization is not required for standard barbering tools."
             },
@@ -423,7 +470,12 @@
             {
               "id": "mod1-l4-q11",
               "question": "What item prevents the cape from directly touching the client's skin?",
-              "options": ["A clean towel", "A neck strip", "Gloves", "An apron"],
+              "options": [
+                "A clean towel",
+                "A neck strip",
+                "Gloves",
+                "An apron"
+              ],
               "correctAnswer": 1,
               "explanation": "A clean neck strip is applied before the cape to create a barrier between the cape and the client's skin. This is a client protection requirement."
             },
@@ -687,7 +739,12 @@
             {
               "id": "cp1-q3",
               "question": "What level of decontamination is required for barbering tools between clients in Indiana?",
-              "options": ["Sanitation", "Disinfection", "Sterilization", "Hot water rinse"],
+              "options": [
+                "Sanitation",
+                "Disinfection",
+                "Sterilization",
+                "Hot water rinse"
+              ],
               "correctAnswer": 1,
               "explanation": "Indiana requires EPA-registered disinfection of all tools between every client."
             },
@@ -718,7 +775,12 @@
             {
               "id": "cp1-q6",
               "question": "When using shears, which finger should be the only one that moves?",
-              "options": ["Index finger", "Ring finger", "Thumb", "Pinky"],
+              "options": [
+                "Index finger",
+                "Ring finger",
+                "Thumb",
+                "Pinky"
+              ],
               "correctAnswer": 2,
               "explanation": "Only the thumb moves when cutting with shears. The bottom blade stays stationary."
             },
@@ -896,14 +958,24 @@
             {
               "id": "hs-q1",
               "question": "Which layer of the hair shaft contains melanin and determines hair color?",
-              "options": ["Cuticle", "Cortex", "Medulla", "Follicle"],
+              "options": [
+                "Cuticle",
+                "Cortex",
+                "Medulla",
+                "Follicle"
+              ],
               "correctAnswer": 1,
               "explanation": "The cortex contains melanin granules that give hair its color."
             },
             {
               "id": "hs-q2",
               "question": "During which phase of the hair growth cycle is hair actively growing?",
-              "options": ["Telogen", "Catagen", "Anagen", "Exogen"],
+              "options": [
+                "Telogen",
+                "Catagen",
+                "Anagen",
+                "Exogen"
+              ],
               "correctAnswer": 2,
               "explanation": "Anagen is the active growth phase, lasting 2-7 years."
             },
@@ -922,7 +994,12 @@
             {
               "id": "hs-q4",
               "question": "Hair that absorbs moisture quickly but loses it fast has:",
-              "options": ["Low porosity", "Normal porosity", "High porosity", "No porosity"],
+              "options": [
+                "Low porosity",
+                "Normal porosity",
+                "High porosity",
+                "No porosity"
+              ],
               "correctAnswer": 2,
               "explanation": "High porosity hair has a damaged cuticle that cannot retain moisture."
             },
@@ -941,7 +1018,12 @@
             {
               "id": "hs-q6",
               "question": "Approximately how much hair does a person normally shed per day?",
-              "options": ["5-10 hairs", "50-100 hairs", "200-300 hairs", "500+ hairs"],
+              "options": [
+                "5-10 hairs",
+                "50-100 hairs",
+                "200-300 hairs",
+                "500+ hairs"
+              ],
               "correctAnswer": 1,
               "explanation": "Losing 50-100 hairs per day is normal as part of the telogen phase."
             }
@@ -1105,14 +1187,24 @@
             {
               "id": "te-q1",
               "question": "Which guard size produces the closest cut without going bare skin?",
-              "options": ["#4", "#2", "#1", "#0"],
+              "options": [
+                "#4",
+                "#2",
+                "#1",
+                "#0"
+              ],
               "correctAnswer": 2,
               "explanation": "#1 is 1/8 inch — the shortest guard. #0 removes the guard entirely for a skin fade."
             },
             {
               "id": "te-q2",
               "question": "What type of shears removes bulk without changing the overall length?",
-              "options": ["Straight shears", "Thinning shears", "Curved shears", "Razor shears"],
+              "options": [
+                "Straight shears",
+                "Thinning shears",
+                "Curved shears",
+                "Razor shears"
+              ],
               "correctAnswer": 1,
               "explanation": "Thinning shears have one serrated blade that removes bulk while leaving length."
             },
@@ -1131,7 +1223,12 @@
             {
               "id": "te-q4",
               "question": "How many drops of oil should you apply to clipper blades during maintenance?",
-              "options": ["10-15 drops", "5-8 drops", "2-3 drops", "Soak the blades"],
+              "options": [
+                "10-15 drops",
+                "5-8 drops",
+                "2-3 drops",
+                "Soak the blades"
+              ],
               "correctAnswer": 2,
               "explanation": "2-3 drops while the clipper is running is sufficient — excess oil attracts debris."
             },
@@ -1150,7 +1247,12 @@
             {
               "id": "te-q6",
               "question": "What is placed around the client's neck before the cutting cape?",
-              "options": ["A towel", "A neck strip", "A paper collar", "Nothing"],
+              "options": [
+                "A towel",
+                "A neck strip",
+                "A paper collar",
+                "Nothing"
+              ],
               "correctAnswer": 1,
               "explanation": "A neck strip prevents the cape from directly touching the client's skin."
             }
@@ -1431,14 +1533,24 @@
             {
               "id": "hc-q1",
               "question": "A mid fade starts at which reference point?",
-              "options": ["The nape", "The occipital bone", "The temple", "The parietal ridge"],
+              "options": [
+                "The nape",
+                "The occipital bone",
+                "The temple",
+                "The parietal ridge"
+              ],
               "correctAnswer": 2,
               "explanation": "A mid fade starts at the temple area, between the low and high fade."
             },
             {
               "id": "hc-q2",
               "question": "Which technique produces a softer result than clipper over comb?",
-              "options": ["Skin fade", "Scissor over comb", "Razor cutting", "Clipper flicking"],
+              "options": [
+                "Skin fade",
+                "Scissor over comb",
+                "Razor cutting",
+                "Clipper flicking"
+              ],
               "correctAnswer": 1,
               "explanation": "Scissor over comb produces a softer, more natural finish than clipper over comb."
             },
@@ -1550,7 +1662,12 @@
             {
               "id": "l29-q1",
               "question": "How long should a hot towel be applied to the face before shaving?",
-              "options": ["30 seconds", "2–3 minutes", "10 minutes", "15 minutes"],
+              "options": [
+                "30 seconds",
+                "2–3 minutes",
+                "10 minutes",
+                "15 minutes"
+              ],
               "correctAnswer": 1,
               "explanation": "2–3 minutes softens the beard and opens the pores without overheating the skin."
             },
@@ -1581,7 +1698,12 @@
             {
               "id": "l29-q4",
               "question": "Which pre-shave product requires a brush to build lather?",
-              "options": ["Shaving cream", "Pre-shave oil", "Shaving soap", "Aftershave balm"],
+              "options": [
+                "Shaving cream",
+                "Pre-shave oil",
+                "Shaving soap",
+                "Aftershave balm"
+              ],
               "correctAnswer": 2,
               "explanation": "Traditional shaving soap must be worked with a brush — it does not lather from direct hand application."
             },
@@ -1612,7 +1734,12 @@
             {
               "id": "l30-q1",
               "question": "At what angle should a straight razor be held during shaving?",
-              "options": ["15 degrees", "30 degrees", "45 degrees", "60 degrees"],
+              "options": [
+                "15 degrees",
+                "30 degrees",
+                "45 degrees",
+                "60 degrees"
+              ],
               "correctAnswer": 1,
               "explanation": "30 degrees provides optimal closeness without increasing the risk of cuts."
             },
@@ -1679,7 +1806,12 @@
             {
               "id": "l31-q1",
               "question": "For a client with a round face, where should beard length be added?",
-              "options": ["The sides", "The chin", "The cheeks", "All around evenly"],
+              "options": [
+                "The sides",
+                "The chin",
+                "The cheeks",
+                "All around evenly"
+              ],
               "correctAnswer": 1,
               "explanation": "Adding length at the chin elongates a round face and creates better proportion."
             },
@@ -1746,14 +1878,24 @@
             {
               "id": "l32-q1",
               "question": "What product stops minor bleeding from razor nicks?",
-              "options": ["Aftershave balm", "Witch hazel", "Alum block", "Pre-shave oil"],
+              "options": [
+                "Aftershave balm",
+                "Witch hazel",
+                "Alum block",
+                "Pre-shave oil"
+              ],
               "correctAnswer": 2,
               "explanation": "An alum block is an antiseptic astringent that constricts blood vessels to stop minor bleeding."
             },
             {
               "id": "l32-q2",
               "question": "How long should an alum block be held on a nick?",
-              "options": ["2–3 seconds", "10–15 seconds", "1 minute", "5 minutes"],
+              "options": [
+                "2–3 seconds",
+                "10–15 seconds",
+                "1 minute",
+                "5 minutes"
+              ],
               "correctAnswer": 1,
               "explanation": "10–15 seconds of pressure is sufficient for the alum block to constrict the blood vessel."
             },
@@ -1784,7 +1926,12 @@
             {
               "id": "l32-q5",
               "question": "Razor bumps (pseudofolliculitis barbae) are most common in clients with:",
-              "options": ["Straight hair", "Fine hair", "Curly hair", "Thinning hair"],
+              "options": [
+                "Straight hair",
+                "Fine hair",
+                "Curly hair",
+                "Thinning hair"
+              ],
               "correctAnswer": 2,
               "explanation": "Curly hair tends to curl back into the skin after shaving, causing ingrown hairs and razor bumps."
             }
@@ -1803,7 +1950,12 @@
             {
               "id": "l33-q1",
               "question": "Which mustache style features long ends that are styled upward?",
-              "options": ["Chevron", "Natural", "Handlebar", "Pencil"],
+              "options": [
+                "Chevron",
+                "Natural",
+                "Handlebar",
+                "Pencil"
+              ],
               "correctAnswer": 2,
               "explanation": "The handlebar mustache has long ends that are styled upward and outward, often with wax."
             },
@@ -1834,14 +1986,24 @@
             {
               "id": "l33-q4",
               "question": "Which mustache style is a thin line just above the upper lip?",
-              "options": ["Handlebar", "Chevron", "Natural", "Pencil"],
+              "options": [
+                "Handlebar",
+                "Chevron",
+                "Natural",
+                "Pencil"
+              ],
               "correctAnswer": 3,
               "explanation": "The pencil mustache is a very thin, precise line directly above the lip."
             },
             {
               "id": "l33-q5",
               "question": "What product is applied when finishing a handlebar mustache?",
-              "options": ["Beard oil", "Pomade", "Mustache wax", "Aftershave balm"],
+              "options": [
+                "Beard oil",
+                "Pomade",
+                "Mustache wax",
+                "Aftershave balm"
+              ],
               "correctAnswer": 2,
               "explanation": "Mustache wax provides hold and allows shaping of the handlebar's upward curled ends."
             }
@@ -1860,7 +2022,12 @@
             {
               "id": "sh-q1",
               "question": "What angle should the straight razor be held at during shaving?",
-              "options": ["15 degrees", "30 degrees", "45 degrees", "60 degrees"],
+              "options": [
+                "15 degrees",
+                "30 degrees",
+                "45 degrees",
+                "60 degrees"
+              ],
               "correctAnswer": 1,
               "explanation": "A 30-degree angle provides the optimal balance between closeness and safety."
             },
@@ -1891,21 +2058,36 @@
             {
               "id": "sh-q4",
               "question": "Which product stops minor bleeding from razor nicks?",
-              "options": ["Aftershave balm", "Witch hazel", "Alum block", "Pre-shave oil"],
+              "options": [
+                "Aftershave balm",
+                "Witch hazel",
+                "Alum block",
+                "Pre-shave oil"
+              ],
               "correctAnswer": 2,
               "explanation": "An alum block is an antiseptic that constricts blood vessels to stop minor bleeding."
             },
             {
               "id": "sh-q5",
               "question": "Razor bumps are most common in clients with:",
-              "options": ["Straight hair", "Fine hair", "Curly hair", "Thick hair"],
+              "options": [
+                "Straight hair",
+                "Fine hair",
+                "Curly hair",
+                "Thick hair"
+              ],
               "correctAnswer": 2,
               "explanation": "Curly hair is more likely to curl back into the skin, causing ingrown hairs and razor bumps."
             },
             {
               "id": "sh-q6",
               "question": "How long should a hot towel be applied before shaving?",
-              "options": ["30 seconds", "2-3 minutes", "10 minutes", "15 minutes"],
+              "options": [
+                "30 seconds",
+                "2-3 minutes",
+                "10 minutes",
+                "15 minutes"
+              ],
               "correctAnswer": 1,
               "explanation": "2-3 minutes is sufficient to soften the beard and open the pores."
             }
@@ -1976,14 +2158,24 @@
             {
               "id": "l35-q2",
               "question": "On the hair color level scale, level 1 represents:",
-              "options": ["Lightest blonde", "Medium brown", "Dark brown", "Black"],
+              "options": [
+                "Lightest blonde",
+                "Medium brown",
+                "Dark brown",
+                "Black"
+              ],
               "correctAnswer": 3,
               "explanation": "Level 1 is the darkest (black). Level 10 is the lightest blonde."
             },
             {
               "id": "l35-q3",
               "question": "Which type of hair color deposits tone WITHOUT lifting the natural color?",
-              "options": ["Permanent", "Semi-permanent", "Bleach", "High-lift tint"],
+              "options": [
+                "Permanent",
+                "Semi-permanent",
+                "Bleach",
+                "High-lift tint"
+              ],
               "correctAnswer": 1,
               "explanation": "Semi-permanent color deposits tone without using developer, so it cannot lift the natural color."
             },
@@ -2026,7 +2218,12 @@
             {
               "id": "l36-q1",
               "question": "When must a patch test be performed before a chemical service?",
-              "options": ["1 hour before", "6 hours before", "24–48 hours before", "1 week before"],
+              "options": [
+                "1 hour before",
+                "6 hours before",
+                "24–48 hours before",
+                "1 week before"
+              ],
               "correctAnswer": 2,
               "explanation": "A patch test needs 24–48 hours to reveal any allergic reaction before the full service."
             },
@@ -2117,7 +2314,12 @@
             {
               "id": "l37-q3",
               "question": "Before applying a relaxer, the scalp should be protected with:",
-              "options": ["Witch hazel", "Petroleum jelly", "Conditioner", "Alum block"],
+              "options": [
+                "Witch hazel",
+                "Petroleum jelly",
+                "Conditioner",
+                "Alum block"
+              ],
               "correctAnswer": 1,
               "explanation": "Petroleum jelly (base) protects the scalp from chemical burns during relaxer application."
             },
@@ -2136,7 +2338,12 @@
             {
               "id": "l37-q5",
               "question": "What stops the relaxer chemical process?",
-              "options": ["Shampoo", "Conditioner", "Neutralizer", "Water rinse alone"],
+              "options": [
+                "Shampoo",
+                "Conditioner",
+                "Neutralizer",
+                "Water rinse alone"
+              ],
               "correctAnswer": 2,
               "explanation": "The neutralizer restores the hair's pH and stops the relaxer from processing further."
             }
@@ -2227,28 +2434,48 @@
             {
               "id": "cs-q1",
               "question": "How long before a chemical service should a patch test be performed?",
-              "options": ["1 hour", "6 hours", "24-48 hours", "1 week"],
+              "options": [
+                "1 hour",
+                "6 hours",
+                "24-48 hours",
+                "1 week"
+              ],
               "correctAnswer": 2,
               "explanation": "A patch test needs 24-48 hours to reveal any allergic reaction."
             },
             {
               "id": "cs-q2",
               "question": "Which type of hair color requires a developer to open the cuticle?",
-              "options": ["Temporary", "Semi-permanent", "Permanent", "Rinse"],
+              "options": [
+                "Temporary",
+                "Semi-permanent",
+                "Permanent",
+                "Rinse"
+              ],
               "correctAnswer": 2,
               "explanation": "Permanent color uses developer (hydrogen peroxide) to open the cuticle and deposit color."
             },
             {
               "id": "cs-q3",
               "question": "What stops the chemical process during a relaxer service?",
-              "options": ["Shampoo", "Conditioner", "Neutralizer", "Water rinse"],
+              "options": [
+                "Shampoo",
+                "Conditioner",
+                "Neutralizer",
+                "Water rinse"
+              ],
               "correctAnswer": 2,
               "explanation": "The neutralizer restores the hair's pH and stops the relaxer from processing."
             },
             {
               "id": "cs-q4",
               "question": "Hair color level 1 represents:",
-              "options": ["Lightest blonde", "Medium brown", "Dark brown", "Black"],
+              "options": [
+                "Lightest blonde",
+                "Medium brown",
+                "Dark brown",
+                "Black"
+              ],
               "correctAnswer": 3,
               "explanation": "Level 1 is the darkest — black. Level 10 is the lightest blonde."
             },
@@ -2319,7 +2546,12 @@
             {
               "id": "l40-q1",
               "question": "Within how many seconds do clients typically decide whether they will return?",
-              "options": ["10 seconds", "30 seconds", "2 minutes", "5 minutes"],
+              "options": [
+                "10 seconds",
+                "30 seconds",
+                "2 minutes",
+                "5 minutes"
+              ],
               "correctAnswer": 1,
               "explanation": "Clients form a first impression within the first 30 seconds — punctuality, cleanliness, and professionalism matter immediately."
             },
@@ -2386,7 +2618,12 @@
             {
               "id": "l41-q1",
               "question": "In a commission arrangement, the barber typically receives what percentage of service revenue?",
-              "options": ["10–20%", "40–60%", "80–90%", "100%"],
+              "options": [
+                "10–20%",
+                "40–60%",
+                "80–90%",
+                "100%"
+              ],
               "correctAnswer": 1,
               "explanation": "Commission barbers typically receive 40–60% of service revenue; the shop provides clients, supplies, and equipment."
             },
@@ -2405,7 +2642,12 @@
             {
               "id": "l41-q3",
               "question": "Which business model offers the maximum income potential?",
-              "options": ["Commission", "Booth rental", "Shop ownership", "Franchise employment"],
+              "options": [
+                "Commission",
+                "Booth rental",
+                "Shop ownership",
+                "Franchise employment"
+              ],
               "correctAnswer": 2,
               "explanation": "Shop ownership has the highest income ceiling but also carries the most financial risk and responsibility."
             },
@@ -2448,14 +2690,24 @@
             {
               "id": "l42-q1",
               "question": "What percentage of income should a self-employed barber set aside for taxes?",
-              "options": ["5–10%", "10–15%", "25–30%", "50%"],
+              "options": [
+                "5–10%",
+                "10–15%",
+                "25–30%",
+                "50%"
+              ],
               "correctAnswer": 2,
               "explanation": "Self-employed barbers pay both income tax and self-employment tax (Social Security + Medicare), totaling 25–30%."
             },
             {
               "id": "l42-q2",
               "question": "The standard tip for barbering services is:",
-              "options": ["5–10%", "15–20%", "25–30%", "Tips are not standard for barbers"],
+              "options": [
+                "5–10%",
+                "15–20%",
+                "25–30%",
+                "Tips are not standard for barbers"
+              ],
               "correctAnswer": 1,
               "explanation": "15–20% is the industry standard tip for personal service professionals including barbers."
             },
@@ -2582,7 +2834,12 @@
             {
               "id": "l44-q1",
               "question": "Which styling product provides high hold with a MATTE finish?",
-              "options": ["Pomade", "Gel", "Clay", "Cream"],
+              "options": [
+                "Pomade",
+                "Gel",
+                "Clay",
+                "Cream"
+              ],
               "correctAnswer": 2,
               "explanation": "Clay provides medium-to-high hold with a natural matte finish — popular for modern textured styles."
             },
@@ -2649,28 +2906,48 @@
             {
               "id": "ps-q1",
               "question": "In a booth rental arrangement, who keeps 100% of service revenue?",
-              "options": ["The shop owner", "The barber", "They split it 50/50", "The landlord"],
+              "options": [
+                "The shop owner",
+                "The barber",
+                "They split it 50/50",
+                "The landlord"
+              ],
               "correctAnswer": 1,
               "explanation": "Booth renters are self-employed and keep all service revenue after paying their booth fee."
             },
             {
               "id": "ps-q2",
               "question": "What percentage of income should a self-employed barber set aside for taxes?",
-              "options": ["5-10%", "10-15%", "25-30%", "50%"],
+              "options": [
+                "5-10%",
+                "10-15%",
+                "25-30%",
+                "50%"
+              ],
               "correctAnswer": 2,
               "explanation": "Self-employed individuals pay both income tax and self-employment tax, totaling 25-30%."
             },
             {
               "id": "ps-q3",
               "question": "Which styling product provides high hold with a matte finish?",
-              "options": ["Pomade", "Gel", "Clay", "Cream"],
+              "options": [
+                "Pomade",
+                "Gel",
+                "Clay",
+                "Cream"
+              ],
               "correctAnswer": 2,
               "explanation": "Clay provides medium to high hold with a matte finish, popular for modern styles."
             },
             {
               "id": "ps-q4",
               "question": "The standard tip for barbering services is:",
-              "options": ["5-10%", "15-20%", "25-30%", "Tips are not expected"],
+              "options": [
+                "5-10%",
+                "15-20%",
+                "25-30%",
+                "Tips are not expected"
+              ],
               "correctAnswer": 1,
               "explanation": "15-20% is the standard tip for personal service professionals including barbers."
             },
@@ -2740,14 +3017,24 @@
             {
               "id": "l46-q1",
               "question": "How many questions are on the Indiana barber written exam?",
-              "options": ["50", "75", "100", "150"],
+              "options": [
+                "50",
+                "75",
+                "100",
+                "150"
+              ],
               "correctAnswer": 2,
               "explanation": "The Indiana barber written exam consists of 100 multiple-choice questions."
             },
             {
               "id": "l46-q2",
               "question": "What passing score is required on the Indiana barber written exam?",
-              "options": ["60%", "70%", "75%", "80%"],
+              "options": [
+                "60%",
+                "70%",
+                "75%",
+                "80%"
+              ],
               "correctAnswer": 2,
               "explanation": "Indiana requires a 75% passing score on the written state board examination."
             },
@@ -2766,14 +3053,24 @@
             {
               "id": "l46-q4",
               "question": "What percentage of the Indiana written exam covers infection control and sanitation?",
-              "options": ["10%", "15%", "20%", "25%"],
+              "options": [
+                "10%",
+                "15%",
+                "20%",
+                "25%"
+              ],
               "correctAnswer": 3,
               "explanation": "Infection control and sanitation is the largest single category, making up 25% of the written exam."
             },
             {
               "id": "l46-q5",
               "question": "Indiana laws and regulations account for what percentage of the written exam?",
-              "options": ["5%", "10%", "15%", "25%"],
+              "options": [
+                "5%",
+                "10%",
+                "15%",
+                "25%"
+              ],
               "correctAnswer": 2,
               "explanation": "Indiana laws and regulations comprise 15% of the written exam — the same as chemical services."
             }
@@ -2804,14 +3101,24 @@
             {
               "id": "l47-q2",
               "question": "Which layer of the hair shaft contains melanin?",
-              "options": ["Cuticle", "Cortex", "Medulla", "Follicle"],
+              "options": [
+                "Cuticle",
+                "Cortex",
+                "Medulla",
+                "Follicle"
+              ],
               "correctAnswer": 1,
               "explanation": "The cortex is the middle layer of the hair shaft and contains melanin granules that determine hair color."
             },
             {
               "id": "l47-q3",
               "question": "What is the normal range of daily hair loss for a healthy adult?",
-              "options": ["10–25 hairs", "50–100 hairs", "150–200 hairs", "300+ hairs"],
+              "options": [
+                "10–25 hairs",
+                "50–100 hairs",
+                "150–200 hairs",
+                "300+ hairs"
+              ],
               "correctAnswer": 1,
               "explanation": "Losing 50–100 hairs per day is considered within the normal range for healthy hair cycling."
             },
@@ -2830,7 +3137,12 @@
             {
               "id": "l47-q5",
               "question": "The anagen phase of the hair growth cycle lasts approximately:",
-              "options": ["A few weeks", "3–6 months", "2–7 years", "10+ years"],
+              "options": [
+                "A few weeks",
+                "3–6 months",
+                "2–7 years",
+                "10+ years"
+              ],
               "correctAnswer": 2,
               "explanation": "Anagen is the active growth phase, lasting 2–7 years — its length determines maximum hair length."
             }
@@ -2844,19 +3156,29 @@
           "objective": "Review haircutting techniques and Indiana laws for the written exam.",
           "durationMinutes": 25,
           "videoFile": "/videos/course-barber-fade-narrated.mp4",
-          "content": "<h2>Written Exam Review: Techniques & Laws</h2>\n<h3>Key Technique Facts</h3>\n<ul>\n<li>Parietal ridge = widest part of head = high fade reference</li>\n<li>Occipital bone = back of skull = low/mid fade reference</li>\n<li>Razor angle = 30 degrees</li>\n<li>Neckline = 2 finger-widths above Adam's apple</li>\n<li>First shave pass = with the grain</li>\n<li>Thinning shears = remove bulk, not length</li>\n</ul>\n<h3>Key Indiana Law Facts</h3>\n<ul>\n<li>Apprenticeship path = 2,000 OJT hours</li>\n<li>School path = 1,500 hours</li>\n<li>Written exam passing score = 75%</li>\n<li>License renewal = every 2 years</li>\n<li>License must be displayed at workstation</li>\n<li>Governed by Indiana Code Title 25, Article 8</li>\n</ul>",
+          "content": "<h2>Written Exam Review: Techniques & Laws</h2>\n<h3>Key Technique Facts</h3>\n<ul>\n<li>Parietal ridge = widest part of head = high fade reference</li>\n<li>Occipital bone = back of skull = low/mid fade reference</li>\n<li>Razor angle = 30 degrees</li>\n<li>Neckline = 2 finger-widths above Adam's apple</li>\n<li>First shave pass = with the grain</li>\n<li>Thinning shears = remove bulk, not length</li>\n</ul>\n<h3>Key Indiana Law Facts</h3>\n<ul>\n<li>Apprenticeship path = 1,500 OJT hours + 144 RTI</li>\n<li>School path = 1,500 hours</li>\n<li>Written exam passing score = 75%</li>\n<li>License renewal = every 2 years</li>\n<li>License must be displayed at workstation</li>\n<li>Governed by Indiana Code Title 25, Article 8</li>\n</ul>",
           "quizQuestions": [
             {
               "id": "l48-q1",
               "question": "How many hours does the Indiana barber school path require?",
-              "options": ["1,000 hours", "1,500 hours", "2,000 hours", "2,500 hours"],
+              "options": [
+                "1,000 hours",
+                "1,500 hours",
+                "2,000 hours",
+                "2,500 hours"
+              ],
               "correctAnswer": 1,
               "explanation": "The cosmetology/barber school path requires 1,500 hours in Indiana."
             },
             {
               "id": "l48-q2",
               "question": "How many OJT hours does the Indiana apprenticeship path require?",
-              "options": ["1,000 hours", "1,500 hours", "2,000 hours", "2,500 hours"],
+              "options": [
+                "1,000 hours",
+                "1,500 hours",
+                "2,000 hours",
+                "2,500 hours"
+              ],
               "correctAnswer": 2,
               "explanation": "The DOL-registered apprenticeship path requires 2,000 on-the-job training hours."
             },
@@ -2875,14 +3197,24 @@
             {
               "id": "l48-q4",
               "question": "Indiana barber licenses must be renewed every:",
-              "options": ["1 year", "2 years", "3 years", "5 years"],
+              "options": [
+                "1 year",
+                "2 years",
+                "3 years",
+                "5 years"
+              ],
               "correctAnswer": 1,
               "explanation": "Indiana requires barber license renewal every two years."
             },
             {
               "id": "l48-q5",
               "question": "The parietal ridge is the reference point for which type of fade?",
-              "options": ["Low fade", "Mid fade", "High fade", "Skin fade only"],
+              "options": [
+                "Low fade",
+                "Mid fade",
+                "High fade",
+                "Skin fade only"
+              ],
               "correctAnswer": 2,
               "explanation": "The parietal ridge — the widest part of the head — is the reference point for starting a high fade."
             }
@@ -2937,7 +3269,12 @@
             {
               "id": "l49-q4",
               "question": "The razor angle for the shave portion of the practical exam is:",
-              "options": ["15 degrees", "30 degrees", "45 degrees", "60 degrees"],
+              "options": [
+                "15 degrees",
+                "30 degrees",
+                "45 degrees",
+                "60 degrees"
+              ],
               "correctAnswer": 1,
               "explanation": "A 30-degree razor angle is the standard taught and evaluated on the Indiana state board practical exam."
             },
@@ -3028,21 +3365,36 @@
             {
               "id": "ep-q6",
               "question": "Which layer of the hair shaft contains melanin?",
-              "options": ["Cuticle", "Cortex", "Medulla", "Follicle sheath"],
+              "options": [
+                "Cuticle",
+                "Cortex",
+                "Medulla",
+                "Follicle sheath"
+              ],
               "correctAnswer": 1,
               "explanation": "The cortex is the middle layer of the hair shaft and contains the melanin granules that determine hair color."
             },
             {
               "id": "ep-q7",
               "question": "The active hair growth phase is called:",
-              "options": ["Telogen", "Catagen", "Anagen", "Kenogen"],
+              "options": [
+                "Telogen",
+                "Catagen",
+                "Anagen",
+                "Kenogen"
+              ],
               "correctAnswer": 2,
               "explanation": "Anagen is the active growth phase, lasting 2–7 years and determining the potential length of the hair."
             },
             {
               "id": "ep-q8",
               "question": "Normal daily hair loss for a healthy adult is approximately:",
-              "options": ["10–25 hairs", "50–100 hairs", "150–200 hairs", "300+ hairs"],
+              "options": [
+                "10–25 hairs",
+                "50–100 hairs",
+                "150–200 hairs",
+                "300+ hairs"
+              ],
               "correctAnswer": 1,
               "explanation": "Losing 50–100 hairs per day is within the normal range for the hair growth cycle."
             },
@@ -3061,28 +3413,48 @@
             {
               "id": "ep-q10",
               "question": "The healthy pH range for hair and scalp is:",
-              "options": ["1.0–2.0", "4.5–5.5", "7.0–8.0", "9.0–10.0"],
+              "options": [
+                "1.0–2.0",
+                "4.5–5.5",
+                "7.0–8.0",
+                "9.0–10.0"
+              ],
               "correctAnswer": 1,
               "explanation": "Hair and scalp are slightly acidic at pH 4.5–5.5. Products outside this range can disrupt the moisture balance."
             },
             {
               "id": "ep-q11",
               "question": "What is placed around the client's neck before the cutting cape?",
-              "options": ["A towel", "A neck strip", "A paper collar", "Nothing is required"],
+              "options": [
+                "A towel",
+                "A neck strip",
+                "A paper collar",
+                "Nothing is required"
+              ],
               "correctAnswer": 1,
               "explanation": "A neck strip (paper neck strip) prevents the cape from directly touching and irritating the client's skin."
             },
             {
               "id": "ep-q12",
               "question": "How many drops of oil should be applied to clipper blades during maintenance?",
-              "options": ["10–15 drops", "5–8 drops", "2–3 drops", "Soak the blades"],
+              "options": [
+                "10–15 drops",
+                "5–8 drops",
+                "2–3 drops",
+                "Soak the blades"
+              ],
               "correctAnswer": 2,
               "explanation": "2–3 drops while the clipper is running is sufficient — excess oil attracts hair debris."
             },
             {
               "id": "ep-q13",
               "question": "The #0 clipper guard (no guard attached) produces:",
-              "options": ["1/8 inch", "1/4 inch", "Skin-level (closest to skin)", "3/8 inch"],
+              "options": [
+                "1/8 inch",
+                "1/4 inch",
+                "Skin-level (closest to skin)",
+                "3/8 inch"
+              ],
               "correctAnswer": 2,
               "explanation": "Removing the guard entirely (or using #0) produces the closest possible clipper cut — used for skin fades."
             },
@@ -3125,14 +3497,24 @@
             {
               "id": "ep-q17",
               "question": "A mid fade starts at which reference point?",
-              "options": ["The nape", "The occipital bone", "The temple", "The parietal ridge"],
+              "options": [
+                "The nape",
+                "The occipital bone",
+                "The temple",
+                "The parietal ridge"
+              ],
               "correctAnswer": 2,
               "explanation": "A mid fade begins at the temple area — between the low fade (near occipital) and high fade (parietal ridge)."
             },
             {
               "id": "ep-q18",
               "question": "The parietal ridge is the reference point for:",
-              "options": ["Low fade", "Mid fade", "High fade", "Neckline placement"],
+              "options": [
+                "Low fade",
+                "Mid fade",
+                "High fade",
+                "Neckline placement"
+              ],
               "correctAnswer": 2,
               "explanation": "The parietal ridge — the widest part of the head — is the starting point for a high fade."
             },
@@ -3175,21 +3557,36 @@
             {
               "id": "ep-q22",
               "question": "The straight razor should be held at what angle to the skin?",
-              "options": ["15 degrees", "30 degrees", "45 degrees", "60 degrees"],
+              "options": [
+                "15 degrees",
+                "30 degrees",
+                "45 degrees",
+                "60 degrees"
+              ],
               "correctAnswer": 1,
               "explanation": "A 30-degree angle provides optimal closeness while minimizing the risk of cuts."
             },
             {
               "id": "ep-q23",
               "question": "Razor bumps (pseudofolliculitis barbae) are most common in clients with:",
-              "options": ["Straight hair", "Fine hair", "Curly hair", "Thick hair"],
+              "options": [
+                "Straight hair",
+                "Fine hair",
+                "Curly hair",
+                "Thick hair"
+              ],
               "correctAnswer": 2,
               "explanation": "Curly hair tends to re-enter the skin after shaving, causing ingrown hairs and razor bumps."
             },
             {
               "id": "ep-q24",
               "question": "Which product is applied to a razor nick to stop minor bleeding?",
-              "options": ["Pre-shave oil", "Aftershave balm", "Alum block", "Witch hazel"],
+              "options": [
+                "Pre-shave oil",
+                "Aftershave balm",
+                "Alum block",
+                "Witch hazel"
+              ],
               "correctAnswer": 2,
               "explanation": "An alum block is an antiseptic astringent that constricts blood vessels to stop minor bleeding from nicks."
             },
@@ -3208,7 +3605,12 @@
             {
               "id": "ep-q26",
               "question": "A patch test must be performed how long before a chemical service?",
-              "options": ["1 hour", "6 hours", "24–48 hours", "1 week"],
+              "options": [
+                "1 hour",
+                "6 hours",
+                "24–48 hours",
+                "1 week"
+              ],
               "correctAnswer": 2,
               "explanation": "A 24–48 hour window is required to detect any allergic reaction before performing the service."
             },
@@ -3227,14 +3629,24 @@
             {
               "id": "ep-q28",
               "question": "What stops the relaxer chemical process?",
-              "options": ["Shampoo", "Water rinse", "Neutralizer", "Conditioner"],
+              "options": [
+                "Shampoo",
+                "Water rinse",
+                "Neutralizer",
+                "Conditioner"
+              ],
               "correctAnswer": 2,
               "explanation": "The neutralizer restores the hair's pH and halts the relaxer from processing further."
             },
             {
               "id": "ep-q29",
               "question": "Hair color level 1 represents:",
-              "options": ["Lightest blonde", "Medium brown", "Dark brown", "Black"],
+              "options": [
+                "Lightest blonde",
+                "Medium brown",
+                "Dark brown",
+                "Black"
+              ],
               "correctAnswer": 3,
               "explanation": "Level 1 is the darkest (black). Level 10 is the lightest (pale blonde). The scale goes darkest to lightest."
             },
@@ -3253,35 +3665,60 @@
             {
               "id": "ep-q31",
               "question": "Indiana barber licenses must be renewed every:",
-              "options": ["1 year", "2 years", "3 years", "5 years"],
+              "options": [
+                "1 year",
+                "2 years",
+                "3 years",
+                "5 years"
+              ],
               "correctAnswer": 1,
               "explanation": "Indiana requires barber license renewal every two years."
             },
             {
               "id": "ep-q32",
               "question": "In a booth rental arrangement, the barber keeps what percentage of service revenue?",
-              "options": ["40–60%", "70–80%", "90–95%", "100%"],
+              "options": [
+                "40–60%",
+                "70–80%",
+                "90–95%",
+                "100%"
+              ],
               "correctAnswer": 3,
               "explanation": "Booth renters are self-employed — they keep 100% of service revenue after paying their fixed booth fee."
             },
             {
               "id": "ep-q33",
               "question": "What is the standard tip for barbering services?",
-              "options": ["5–10%", "15–20%", "25–30%", "Tips are not standard"],
+              "options": [
+                "5–10%",
+                "15–20%",
+                "25–30%",
+                "Tips are not standard"
+              ],
               "correctAnswer": 1,
               "explanation": "15–20% is the industry standard tip for personal service professionals including barbers."
             },
             {
               "id": "ep-q34",
               "question": "Self-employed barbers should set aside what percentage of income for taxes?",
-              "options": ["5–10%", "15–20%", "25–30%", "40–50%"],
+              "options": [
+                "5–10%",
+                "15–20%",
+                "25–30%",
+                "40–50%"
+              ],
               "correctAnswer": 2,
               "explanation": "Self-employed individuals pay income tax plus self-employment tax (Social Security + Medicare), totaling 25–30%."
             },
             {
               "id": "ep-q35",
               "question": "Which styling product provides medium-to-high hold with a MATTE finish?",
-              "options": ["Pomade", "Gel", "Clay", "Cream"],
+              "options": [
+                "Pomade",
+                "Gel",
+                "Clay",
+                "Cream"
+              ],
               "correctAnswer": 2,
               "explanation": "Clay provides medium-to-high hold with a natural matte finish — popular for modern textured styles."
             },
@@ -3324,7 +3761,12 @@
             {
               "id": "ep-q39",
               "question": "The passing score for the Indiana barber written state board exam is:",
-              "options": ["60%", "70%", "75%", "80%"],
+              "options": [
+                "60%",
+                "70%",
+                "75%",
+                "80%"
+              ],
               "correctAnswer": 2,
               "explanation": "Indiana requires a 75% passing score on the written portion of the state board examination."
             },
@@ -3334,7 +3776,7 @@
               "options": [
                 "1,000 OJT hours",
                 "1,500 OJT hours",
-                "2,000 OJT hours",
+                "1,500 OJT hours + 144 RTI",
                 "2,500 OJT hours"
               ],
               "correctAnswer": 2,
@@ -3343,28 +3785,48 @@
             {
               "id": "ep-q41",
               "question": "The human skull has how many cranial bones?",
-              "options": ["6", "7", "8", "10"],
+              "options": [
+                "6",
+                "7",
+                "8",
+                "10"
+              ],
               "correctAnswer": 2,
               "explanation": "There are 8 cranial bones: frontal, 2 parietal, 2 temporal, occipital, ethmoid, and sphenoid."
             },
             {
               "id": "ep-q42",
               "question": "The largest movable bone in the face is the:",
-              "options": ["Frontal bone", "Zygomatic bone", "Maxilla", "Mandible"],
+              "options": [
+                "Frontal bone",
+                "Zygomatic bone",
+                "Maxilla",
+                "Mandible"
+              ],
               "correctAnswer": 3,
               "explanation": "The mandible (lower jaw) is the only movable bone of the face — it hinges at the temporomandibular joint."
             },
             {
               "id": "ep-q43",
               "question": "The muscle primarily responsible for chewing is the:",
-              "options": ["Frontalis", "Masseter", "Trapezius", "Orbicularis oris"],
+              "options": [
+                "Frontalis",
+                "Masseter",
+                "Trapezius",
+                "Orbicularis oris"
+              ],
               "correctAnswer": 1,
               "explanation": "The masseter muscle closes the jaw and is the primary muscle of mastication (chewing)."
             },
             {
               "id": "ep-q44",
               "question": "The trigeminal nerve is cranial nerve number:",
-              "options": ["III", "IV", "V", "VII"],
+              "options": [
+                "III",
+                "IV",
+                "V",
+                "VII"
+              ],
               "correctAnswer": 2,
               "explanation": "Cranial nerve V (the trigeminal) provides sensation to the face and scalp and is key to facial massage knowledge."
             },
@@ -3383,7 +3845,12 @@
             {
               "id": "ep-q46",
               "question": "Hair follicles and sebaceous glands are located in the:",
-              "options": ["Epidermis", "Dermis", "Subcutaneous layer", "Stratum corneum"],
+              "options": [
+                "Epidermis",
+                "Dermis",
+                "Subcutaneous layer",
+                "Stratum corneum"
+              ],
               "correctAnswer": 1,
               "explanation": "The dermis (middle layer of the skin) contains hair follicles, sebaceous glands, sweat glands, and blood vessels."
             },
@@ -3402,21 +3869,36 @@
             {
               "id": "ep-q48",
               "question": "The opening and closing stroke used in facial massage is called:",
-              "options": ["Petrissage", "Tapotement", "Effleurage", "Friction"],
+              "options": [
+                "Petrissage",
+                "Tapotement",
+                "Effleurage",
+                "Friction"
+              ],
               "correctAnswer": 2,
               "explanation": "Effleurage is the light, stroking movement used to open and close a facial massage — it relaxes and prepares the skin."
             },
             {
               "id": "ep-q49",
               "question": "20-volume developer lifts hair approximately:",
-              "options": ["0–1 level", "1–2 levels", "3–4 levels", "5+ levels"],
+              "options": [
+                "0–1 level",
+                "1–2 levels",
+                "3–4 levels",
+                "5+ levels"
+              ],
               "correctAnswer": 1,
               "explanation": "20-volume developer provides 1–2 levels of lift — the most common developer for permanent color services."
             },
             {
               "id": "ep-q50",
               "question": "Purple toner is used to neutralize which unwanted hair tone?",
-              "options": ["Orange", "Red", "Yellow/brassy", "Green"],
+              "options": [
+                "Orange",
+                "Red",
+                "Yellow/brassy",
+                "Green"
+              ],
               "correctAnswer": 2,
               "explanation": "Purple and yellow are complementary colors — purple toner cancels out yellow/brassy tones in lightened hair."
             }
@@ -3437,7 +3919,13 @@
     "ttsVoice": "onyx",
     "ttsSpeed": 0.88,
     "slideCount": 5,
-    "segments": ["intro", "concept", "visual", "application", "wrapup"],
+    "segments": [
+      "intro",
+      "concept",
+      "visual",
+      "application",
+      "wrapup"
+    ],
     "generateDalleImage": true,
     "dalleImageStyle": "natural"
   },

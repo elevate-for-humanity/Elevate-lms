@@ -145,6 +145,6 @@ export const BARBER_SECTIONS: RubricSection[] = [
 export const BARBER_STATS: BarberStats = {
   totalCompetencies: 14,
   sections: 5,
-  totalRTIHours: 145,
-  totalOJTHours: 335,
+  totalRTIHours: 260,
+  totalOJTHours: 1500,
 };

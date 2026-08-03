@@ -16,7 +16,11 @@ export async function GET() {
     {
       ok: true,
       service: 'lms',
-      commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
+      commit:
+        process.env.GITHUB_SHA ??
+        process.env.GIT_SHA ??
+        process.env.NEXT_PUBLIC_GIT_SHA ??
+        'unknown',
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
     },

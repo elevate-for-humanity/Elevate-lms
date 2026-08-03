@@ -1,37 +1,6 @@
 "use client";
 
 
-import { Buffer } from "buffer";
-import process from "process/browser";
-
-
-const browserGlobals =
-  globalThis as typeof globalThis & {
-    Buffer?: typeof Buffer;
-
-
-    buffer?: {
-      Buffer: typeof Buffer;
-    };
-
-
-    process?: typeof process;
-  };
-
-
-browserGlobals.Buffer ??=
-  Buffer;
-
-
-browserGlobals.buffer ??= {
-  Buffer
-};
-
-
-browserGlobals.process ??=
-  process;
-
-
 // ─────────────────────────────────────────────────────────────
 // Sync Supabase session from localStorage → cookies
 // so server components can read the session for auth checks.
@@ -39,9 +8,14 @@ browserGlobals.process ??=
 // ─────────────────────────────────────────────────────────────
 function syncSupabaseSessionToCookies() {
   try {
-    const SUPABASE_REF = 'cuxzzpsyufcewtmicszk';
-    const SESSION_KEY = `sb-${SUPABASE_REF}-auth-token`;
+    // Find the Supabase auth token in localStorage.
+    // The key format is sb-{project-ref}-auth-token.
+    const keys = Object.keys(localStorage).filter(
+      (k) => k.startsWith('sb-') && k.endsWith('-auth-token'),
+    );
+    if (!keys.length) return;
 
+    const SESSION_KEY = keys[0]; // e.g. sb-cuxzzpsyufcewtmicszk-auth-token
     const stored = localStorage.getItem(SESSION_KEY);
     if (!stored) return;
 
@@ -51,12 +25,11 @@ function syncSupabaseSessionToCookies() {
     // Write to cookie (14 day expiry, root path, same-site lax)
     const maxAge = 14 * 24 * 60 * 60;
     document.cookie =
-      `sb-${SUPABASE_REF}-auth-token=${encodeURIComponent(JSON.stringify(session))}` +
+      `${SESSION_KEY}=${encodeURIComponent(JSON.stringify(session))}` +
       `; max-age=${maxAge}; path=/; SameSite=Lax`;
   } catch {
     // Ignore errors — non-critical quality-of-life improvement
   }
 }
-
 
 syncSupabaseSessionToCookies();

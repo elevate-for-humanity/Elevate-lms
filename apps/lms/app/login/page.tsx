@@ -45,22 +45,26 @@ export default function LoginPage() {
         .eq('id', data.user.id)
         .maybeSingle();
 
+      let destination: string;
       if (!profile) {
-        router.replace('/onboarding/learner');
+        destination = '/onboarding/learner';
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
-        router.replace('/onboarding/employer');
+        destination = '/onboarding/employer';
       } else {
         // Apprentices are routed to their program portal based on portal_type.
         // If portal_type is set (e.g. 'barber', 'cosmetology'), go to /portal/[portal_type].
         // Otherwise fall back to role-based routing.
         const portalType = profile.portal_type;
         if (portalType && typeof portalType === 'string' && portalType.trim() !== '') {
-          router.replace(`/portal/${portalType.trim()}`);
+          destination = `/portal/${portalType.trim()}`;
         } else {
-          router.replace(getRoleDestination(profile.role));
+          destination = getRoleDestination(profile.role);
         }
       }
-      router.refresh();
+
+      // Use window.location for a full page reload so server-side auth checks
+      // in portal pages can read the session cookie synced from localStorage.
+      window.location.href = destination;
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : 'Invalid email or password.';
       setError(message);

@@ -32,8 +32,8 @@ export const GET = withAuth(async () => {
     // Get module/lesson counts per course
     const courseIds = courses.map((c: { id: string }) => c.id);
     
-    let moduleCounts: Record<string, number> = {};
-    let lessonCounts: Record<string, number> = {};
+    const moduleCounts: Record<string, number> = {};
+    const lessonCounts: Record<string, number> = {};
     
     if (courseIds.length > 0) {
       const idsParam = courseIds.map(id => `course_id=eq.${id}`).join('&');

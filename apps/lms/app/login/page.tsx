@@ -45,20 +45,21 @@ export default function LoginPage() {
         .eq('id', data.user.id)
         .maybeSingle();
 
+      const WWW = 'https://www.elevateforhumanity.org';
       let destination: string;
       if (!profile) {
-        destination = '/onboarding/learner';
+        destination = `${WWW}/onboarding/learner`;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
-        destination = '/onboarding/employer';
+        destination = `${WWW}/onboarding/employer`;
       } else {
         // Apprentices are routed to their program portal based on portal_type.
         // If portal_type is set (e.g. 'barber', 'cosmetology'), go to /portal/[portal_type].
         // Otherwise fall back to role-based routing.
         const portalType = profile.portal_type;
         if (portalType && typeof portalType === 'string' && portalType.trim() !== '') {
-          destination = `/portal/${portalType.trim()}`;
+          destination = `${WWW}/portal/${portalType.trim()}`;
         } else {
-          destination = getRoleDestination(profile.role);
+          destination = `${WWW}${getRoleDestination(profile.role)}`;
         }
       }
 

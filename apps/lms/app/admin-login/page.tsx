@@ -20,6 +20,7 @@ function AdminLoginForm() {
   const isLocalConfiguredAdminUrl = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(
     configuredAdminUrl,
   );
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const ADMIN_URL =
     process.env.NODE_ENV === 'development'
       ? isLocalConfiguredAdminUrl
@@ -30,8 +31,8 @@ function AdminLoginForm() {
   const redirectTo = requestedRedirect
     ? requestedRedirect.startsWith('http')
       ? requestedRedirect
-      : `${ADMIN_URL}${requestedRedirect.startsWith('/') ? requestedRedirect : `/${requestedRedirect}`}`
-    : `${ADMIN_URL}/admin/dashboard`;
+      : `${currentOrigin}${requestedRedirect.startsWith('/') ? requestedRedirect : `/${requestedRedirect}`}`
+    : `${currentOrigin}/admin/studio`;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +56,18 @@ function AdminLoginForm() {
         .eq('id', data.user.id)
         .maybeSingle();
 
-      if (!profile || !ADMIN_ROLES.includes(profile.role)) {
+      const { data: secondaryRoles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .maybeSingle();
+
+      const effectiveRoles = [
+        profile?.role,
+        ...(secondaryRoles?.role ? [secondaryRoles.role] : []),
+      ].filter(Boolean);
+
+      if (!effectiveRoles.some((r) => ADMIN_ROLES.includes(r))) {
         await supabase.auth.signOut();
         setError('This login is for administrators only.');
         setLoading(false);

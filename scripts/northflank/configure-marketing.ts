@@ -49,8 +49,9 @@ async function main() {
   console.info(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
   console.info(`Project: ${projectId}, Service: ${serviceId}`);
 
-  // Read current service to know ephemeral storage size already in use
-  const service = await nfFetch<any>(combinedServicePatchPath(projectId, serviceId));
+  // Read current service using the regular service path (combined path only works for PATCH, not GET)
+  const serviceGetPath = `/projects/${projectId}/services/${serviceId}`;
+  const service = await nfFetch<any>(serviceGetPath);
   const currentEphemeralMb =
     service?.buildSettings?.storage?.ephemeralStorage?.storageSize ??
     service?.buildConfiguration?.storage?.ephemeralStorage?.storageSize ??

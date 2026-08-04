@@ -108,6 +108,7 @@ async function main() {
     GIT_SHA: currentSha,
     NEXT_PUBLIC_GIT_SHA: currentSha,
     NEXT_PUBLIC_BUILD_ID: `${serviceName}-${currentSha}`,
+    NEXT_PUBLIC_COMMIT_SHA: currentSha,
     NEXT_PUBLIC_SERVICE_NAME: serviceName,
     BUILD_TIMESTAMP: new Date().toISOString(),
     FALLBACK_COMMIT: currentSha,

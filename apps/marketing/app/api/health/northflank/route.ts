@@ -25,8 +25,8 @@ export async function GET() {
     node_env: process.env.NODE_ENV,
     port: process.env.PORT || '3000 (default)',
     build_identity: {
-      commit_sha: process.env.NEXT_PUBLIC_COMMIT_SHA || 'dev-local',
-      build_time: process.env.NEXT_PUBLIC_BUILD_TIME || 'unknown',
+      commit_sha: process.env.NEXT_PUBLIC_COMMIT_SHA || process.env.GIT_SHA || process.env.GITHUB_SHA || 'dev-local',
+      build_time: process.env.BUILD_TIMESTAMP || 'unknown',
     },
     env_diagnostics: {
       SUPABASE_URL: checkEnv('NEXT_PUBLIC_SUPABASE_URL'),

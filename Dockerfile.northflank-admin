@@ -109,9 +109,18 @@ ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG GIT_SHA=local-build
 ARG BUILD_TIMESTAMP
 
-# GIT_SHA is validated if provided. GitHub Actions passes it via --build-arg.
-RUN echo "Validating GIT_SHA=${GIT_SHA}" && \
-    (echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && echo "GIT_SHA validated: ${GIT_SHA}" || echo "GIT_SHA=${GIT_SHA} (set --build-arg for production)")
+# Validate GIT_SHA when a production SHA is supplied.
+# Local builds may use the default value "local-build".
+RUN set -eux; \
+    echo "Validating GIT_SHA=${GIT_SHA}"; \
+    if [ "${GIT_SHA}" = "local-build" ]; then \
+      echo "GIT_SHA is using the local-build fallback"; \
+    elif echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; then \
+      echo "GIT_SHA validated: ${GIT_SHA}"; \
+    else \
+      echo "ERROR: Invalid GIT_SHA: ${GIT_SHA}" >&2; \
+      exit 1; \
+    fi
 
 ENV NODE_ENV=production
 ENV CI=true

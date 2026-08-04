@@ -358,8 +358,29 @@ async function main() {
         last = buildStatus ?? '';
       }
 
+      // Detect instances=0 (containers won't start — billing disabled or pod crash loop)
+      // Get raw service data to check instances directly
+      let instances: number | undefined;
+      try {
+        const rawSingle = await nfFetch<{ data?: { deployment?: { instances?: number } } }>(
+          projectApiPath(projectId, `/services/${serviceId}`),
+        ).catch(() => null);
+        instances = rawSingle?.data?.deployment?.instances;
+      } catch {
+        // ignore
+      }
+
       const deployReady = deploy && DEPLOY_READY_STATUSES.has(deploy);
       const buildDone = !buildStatus || BUILD_DONE_STATUSES.has(buildStatus);
+
+      // KEY FIX: If instances=0 and build is done, containers won't start (billing/suspension crash).
+      // Northflank won't schedule pods — polling HTTP health forever will never succeed.
+      // Detect this early and exit with a clear error.
+      if (instances === 0 && buildDone) {
+        console.error(`${serviceId}: instances=0 (containers won't start — check billing/suspension).`);
+        console.error(`Build status: ${buildStatus ?? 'unknown'}, Deployment status: ${deploy ?? 'N/A'}.`);
+        process.exit(1);
+      }
 
       // If build failed but deployment is RUNNING/COMPLETED, the old deployment is still live
       if (BUILD_FAILURE_STATUSES.has(buildStatus ?? '')) {

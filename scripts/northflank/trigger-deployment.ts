@@ -1,9 +1,12 @@
 #!/usr/bin/env tsx
 /**
- * Roll out a specific build for a Northflank combined service.
- * 
- * CRITICAL: Uses exact Git SHA for deployment to ensure release integrity.
- * Never uses 'latest' which is mutable and can cause cross-commit drift.
+ * Trigger a new deployment for a Northflank combined service.
+ *
+ * Uses exact Git SHA to ensure release integrity — never uses 'latest'.
+ *
+ * API Bug: /services/{id}/deployment (POST) returns 404 for combined services.
+ * The correct endpoint is /services/{id}/scale (POST) which actually starts
+ * the containers with the newly built image.
  *
  *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin
  *   npx tsx scripts/northflank/trigger-deployment.ts elevate-lms
@@ -11,16 +14,10 @@
 
 import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
-function argValue(name: string): string | undefined {
-  const index = process.argv.indexOf(name);
-  return index >= 0 ? process.argv[index + 1] : undefined;
-}
-
 async function main() {
   const serviceId = process.argv[2];
   if (!serviceId || serviceId.startsWith('--')) {
     console.error('Usage: npx tsx scripts/northflank/trigger-deployment.ts <service-id>');
-    console.error('Uses GITHUB_SHA from environment for immutable deployment');
     process.exit(1);
   }
 
@@ -30,16 +27,12 @@ async function main() {
     process.exit(1);
   }
 
-  // Get exact SHA from environment (set by GitHub Actions)
   const sha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA;
-  
   if (!sha) {
     console.error('ERROR: GITHUB_SHA not set. Cannot deploy without exact SHA.');
-    console.error('Set GITHUB_SHA environment variable.');
     process.exit(1);
   }
 
-  // Validate SHA format (40 hex characters)
   if (!/^[a-f0-9]{40}$/i.test(sha)) {
     console.error(`ERROR: Invalid SHA format: ${sha}`);
     process.exit(1);
@@ -47,27 +40,36 @@ async function main() {
 
   const branch = process.env.DEPLOY_BRANCH || 'main';
 
-  const payload = {
+  // BUGFIX: /services/{id}/deployment returns 404 for combined services.
+  // /services/{id}/scale (POST) is the correct endpoint — it actually starts
+  // containers with the newly built image and returns HTTP 200.
+  const path = projectApiPath(projectId, `/services/${serviceId}`);
+
+  console.log(`Triggering deployment for ${serviceId} (branch=${branch}, buildSHA=${sha.slice(0, 12)})...`);
+
+  // Step 1: Tell Northflank which SHA to deploy
+  const buildPayload = {
     internal: {
       id: serviceId,
       branch,
-      buildSHA: sha,  // Exact SHA - immutable
+      buildSHA: sha,
     },
     docker: { configType: 'default' as const },
   };
+  await nfFetch(path, { method: 'PATCH', body: JSON.stringify(buildPayload) });
 
-  console.log(`Deploying ${serviceId} with exact SHA: ${sha.slice(0, 12)}...`);
-
-  const result = await nfFetch(projectApiPath(projectId, `/services/${serviceId}/deployment`), {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
-
-  console.log(
-    `Triggered deployment for ${serviceId} (branch=${branch}, buildSHA=${sha.slice(0, 12)})`,
+  // Step 2: Scale up to 1 instance — this is what actually starts the containers
+  // /restart returns {"data":{}} but doesn't start containers.
+  // /scale returns HTTP 200 and DOES start the containers.
+  const scaleResult = await nfFetch(
+    projectApiPath(projectId, `/services/${serviceId}/scale`),
+    { method: 'POST', body: JSON.stringify({ instances: 1 }) },
   );
-  
-  return result;
+
+  console.log(`Deployment triggered for ${serviceId} ✅`);
+  console.log(`Scale result:`, scaleResult);
+
+  return scaleResult;
 }
 
 main().catch((e) => {

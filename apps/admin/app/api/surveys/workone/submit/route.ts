@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Get application info
     const { data: application } = await supabase
-      .from('paris_applications')
+      .from('applications')
       .select('id, first_name, last_name, email')
       .eq('id', applicationId)
       .single();
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     
     const { data: application } = await supabase
-      .from('paris_applications')
+      .from('applications')
       .select('id, first_name, last_name, email')
       .eq('id', applicationId)
       .single();

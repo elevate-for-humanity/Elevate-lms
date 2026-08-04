@@ -39,14 +39,14 @@ export async function POST(request: NextRequest) {
     const { applicationIds, sendToAll } = body;
 
     let query = supabase
-      .from('paris_applications')
+      .from('applications')
       .select(`
         id,
         first_name,
         last_name,
         email,
-        workflow_status,
-        admissions_decision
+        status,
+        program_interest
       `);
 
     // Filter by specific application IDs
@@ -56,15 +56,8 @@ export async function POST(request: NextRequest) {
 
     // Or send to all eligible applicants
     if (sendToAll) {
-      // Send to applicants who are in review, accepted, or need funding
-      query = query.in('workflow_status', [
-        'ELIGIBILITY_REVIEW',
-        'DOCUMENTS_REQUIRED',
-        'FUNDING_REVIEW',
-        'ADMISSIONS_REVIEW',
-        'ACCEPTED',
-        'ENROLLED',
-      ]);
+      // Send to all applicants who have submitted (not drafts)
+      query = query.not('submitted_at', 'is', null);
     }
 
     const { data: applications, error } = await query;

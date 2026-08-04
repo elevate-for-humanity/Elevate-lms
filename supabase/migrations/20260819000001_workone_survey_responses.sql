@@ -4,8 +4,8 @@
 CREATE TABLE IF NOT EXISTS public.workone_survey_responses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
-  -- Applicant reference (from paris_applications)
-  application_id UUID REFERENCES public.paris_applications(id) ON DELETE SET NULL,
+  -- Applicant reference (from applications table)
+  application_id UUID REFERENCES public.applications(id) ON DELETE SET NULL,
   applicant_email TEXT NOT NULL,
   applicant_name TEXT,
   
@@ -40,7 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_workone_survey_email ON public.workone_survey_res
 CREATE INDEX IF NOT EXISTS idx_workone_survey_submitted ON public.workone_survey_responses(submitted_at) WHERE submitted_at IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_workone_survey_app ON public.workone_survey_responses(application_id);
 
--- RLS: Staff and admin can read all; applicants can only insert/read their own by email
+-- RLS: Staff and admin can read all
 ALTER TABLE public.workone_survey_responses ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Staff and admin can read all survey responses"
@@ -54,10 +54,10 @@ CREATE POLICY "Staff and admin can read all survey responses"
     )
   );
 
-CREATE POLICY "Authenticated users can insert survey responses"
+CREATE POLICY "Anyone can insert survey responses"
   ON public.workone_survey_responses
   FOR INSERT
-  WITH CHECK (auth.uid() IS NOT NULL);
+  WITH CHECK (true);
 
 CREATE POLICY "Staff and admin can update survey responses"
   ON public.workone_survey_responses
@@ -71,7 +71,7 @@ CREATE POLICY "Staff and admin can update survey responses"
   );
 
 -- Updated at trigger
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION update_workone_survey_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -81,4 +81,4 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_workone_survey_responses_updated_at
   BEFORE UPDATE ON public.workone_survey_responses
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  FOR EACH ROW EXECUTE FUNCTION update_workone_survey_updated_at();

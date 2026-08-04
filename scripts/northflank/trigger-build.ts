@@ -130,6 +130,23 @@ async function main() {
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${buildId}\n`, 'utf8');
   }
   console.log('=== TRIGGER BUILD END ===');
+  // Trigger build from the current branch
+  // Northflank expects {"value": "branch_name"} - not sha/no_cache
+  const build = await nfFetch<{
+    id: string;
+    branch?: string;
+    status?: string;
+    sha?: string;
+    concluded?: boolean;
+  }>(projectApiPath(projectId, `/services/${serviceId}/build`), {
+    method: 'POST',
+    body: JSON.stringify({ value: branch }),
+  });
+  console.log(`Triggered build for ${serviceId}:`, build);
+
+  if (process.env.GITHUB_OUTPUT && build.id) {
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${build.id}\n`, 'utf8');
+  }
 }
 
 main().catch((e) => {

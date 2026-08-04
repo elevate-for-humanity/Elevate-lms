@@ -17,9 +17,10 @@ async function setBranch(projectId: string, serviceId: string, branch: string) {
 }
 
 async function triggerBuild(projectId: string, serviceId: string) {
+  const branch = process.env.DEPLOY_BRANCH || 'main';
   const build = await nfFetch<{ id?: string; status?: string }>(
     projectApiPath(projectId, `/services/${serviceId}/build`),
-    { method: 'POST', body: JSON.stringify({}) },
+    { method: 'POST', body: JSON.stringify({ value: branch }) },
   );
   console.log(`Build ${serviceId}:`, build);
 }

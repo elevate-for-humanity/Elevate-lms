@@ -36,7 +36,7 @@ async function main() {
   if (triggerBuild) {
     const build = await nfFetch<{ id: string; status?: string; branch?: string }>(
       projectApiPath(projectId, `/services/${serviceId}/build`),
-      { method: 'POST', body: JSON.stringify({}) },
+      { method: 'POST', body: JSON.stringify({ value: branch }) },
     );
     console.log('Triggered build:', build);
   }

@@ -1,27 +1,60 @@
 #!/usr/bin/env tsx
 /**
- * Compare Northflank deployed SHA vs expected main commit.
- * Fails CI when production is still on an old image after a deploy workflow.
+ * Verify that each Northflank service is running the expected Git SHA.
+ *
+ * This script is intentionally read-only.
+ * It must never trigger builds, scale services, or mutate deployment config.
  *
  *   EXPECTED_SHA=$(git rev-parse origin/main) npx tsx scripts/northflank/verify-deployed-sha.ts
- *   npx tsx scripts/northflank/verify-deployed-sha.ts --trigger  # rebuild stale services
+ *   npx tsx scripts/northflank/verify-deployed-sha.ts elevate-marketing
  */
 
 import { execSync } from 'node:child_process';
-import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+
+import {
+  nfFetch,
+  projectApiPath,
+  resolveProjectId,
+} from './lib';
 
 type ServiceStatus = {
-  vcsData?: { projectBranch?: string };
-  deployment?: { internal?: { deployedSHA?: string; branch?: string } };
-  status?: { build?: { status?: string }; deployment?: { status?: string } };
+  vcsData?: {
+    projectBranch?: string;
+  };
+  deployment?: {
+    internal?: {
+      deployedSHA?: string;
+      buildSHA?: string;
+      buildId?: string;
+      branch?: string;
+    };
+  };
+  status?: {
+    build?: {
+      status?: string;
+    };
+    deployment?: {
+      status?: string;
+    };
+  };
+  deployedSHA?: string;
 };
 
-const ALL_SERVICES = ['elevate-lms', 'elevate-admin'] as const;
+const ALL_SERVICES = [
+  'elevate-marketing',
+  'elevate-admin',
+  'elevate-lms',
+] as const;
+
+const SERVICE_URLS: Record<string, string> = {
+  'elevate-marketing': 'https://www.elevateforhumanity.org',
+  'elevate-admin': 'https://admin.elevateforhumanity.org',
+  'elevate-lms': 'https://app.elevateforhumanity.org',
+};
 
 function resolveExpectedSha(): string {
-  if (process.env.EXPECTED_SHA || process.env.GITHUB_SHA) {
-    return (process.env.EXPECTED_SHA || process.env.GITHUB_SHA || '').trim();
-  }
+  const configured = process.env.EXPECTED_SHA ?? process.env.GITHUB_SHA ?? process.env.BUILD_SHA;
+  if (configured?.trim()) return configured.trim();
   try {
     return execSync('git rev-parse origin/main', { encoding: 'utf8' }).trim();
   } catch {
@@ -29,132 +62,160 @@ function resolveExpectedSha(): string {
   }
 }
 
-function shaMatches(deployed: string | undefined, expected: string): boolean {
-  if (!deployed || !expected) return false;
-  const d = deployed.toLowerCase();
-  const e = expected.toLowerCase();
-  return d === e || d.startsWith(e.slice(0, 7)) || e.startsWith(d.slice(0, 7));
+function validateExpectedSha(sha: string): void {
+  if (!/^[a-f0-9]{40}$/i.test(sha)) {
+    throw new Error(`Expected a full 40-character Git SHA. Received: ${sha}`);
+  }
 }
 
-async function triggerBuild(projectId: string, serviceId: string) {
-  await nfFetch(projectApiPath(projectId, `/services/${serviceId}/build`), {
-    method: 'POST',
-    body: JSON.stringify({}),
-  });
-  console.log(`[trigger-build] ${serviceId}`);
+function shaMatches(actual: string | undefined, expected: string): boolean {
+  if (!actual) return false;
+  const na = actual.toLowerCase();
+  const ne = expected.toLowerCase();
+  return (
+    na === ne ||
+    (na.length >= 7 && ne.startsWith(na)) ||
+    (ne.length >= 7 && na.startsWith(ne))
+  );
 }
 
-async function triggerDeployment(projectId: string, serviceId: string, expectedSha: string) {
-  const branch = process.env.DEPLOY_BRANCH || 'main';
-  await nfFetch(projectApiPath(projectId, `/services/${serviceId}/deployment`), {
-    method: 'POST',
-    body: JSON.stringify({
-      internal: { id: serviceId, branch, buildSHA: expectedSha },
-      docker: { configType: 'default' },
-    }),
-  });
-  console.log(`[trigger-deploy] ${serviceId} -> ${expectedSha.slice(0, 12)}…`);
+function resolveNorthflankSha(service: ServiceStatus): string | undefined {
+  return (
+    service.deployment?.internal?.deployedSHA ??
+    service.deployment?.internal?.buildSHA ??
+    service.deployedSHA
+  );
 }
 
-async function main() {
+async function readRuntimeVersion(serviceId: string): Promise<{
+  status: number;
+  commit?: string;
+  body: string;
+}> {
+  const origin = SERVICE_URLS[serviceId];
+  if (!origin) return { status: 0, body: 'No runtime URL configured.' };
+
+  const endpoints = ['/api/version', '/api/health/build-version', '/version.json'];
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(`${origin}${endpoint}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store' },
+      });
+      const body = await response.text();
+      if (!response.ok) continue;
+      let commit: string | undefined;
+      try {
+        const parsed = JSON.parse(body);
+        commit =
+          parsed.commit ??
+          parsed.sha ??
+          parsed.gitSha ??
+          parsed.git_sha ??
+          parsed.buildSha ??
+          parsed.build_sha;
+      } catch {
+        commit = undefined;
+      }
+      return { status: response.status, commit, body };
+    } catch {
+      // Try the next endpoint.
+    }
+  }
+  return { status: 0, body: 'No runtime version endpoint responded.' };
+}
+
+async function verifyService(
+  projectId: string,
+  serviceId: string,
+  expectedSha: string,
+): Promise<boolean> {
+  const service = await nfFetch<ServiceStatus>(
+    projectApiPath(projectId, `/services/${serviceId}`),
+  );
+
+  const northflankSha = resolveNorthflankSha(service);
+  const buildStatus = service.status?.build?.status ?? 'unknown';
+  const deploymentStatus = service.status?.deployment?.status ?? 'unknown';
+  const branch =
+    service.vcsData?.projectBranch ??
+    service.deployment?.internal?.branch ??
+    'unknown';
+  const buildId = service.deployment?.internal?.buildId ?? 'unknown';
+  const runtime = await readRuntimeVersion(serviceId);
+
+  const northflankMatches = shaMatches(northflankSha, expectedSha);
+  const runtimeMatches = shaMatches(runtime.commit, expectedSha);
+
+  console.log('\n========================================');
+  console.log(`Service: ${serviceId}`);
+  console.log(`Expected SHA: ${expectedSha}`);
+  console.log(`Northflank SHA: ${northflankSha ?? 'missing'}`);
+  console.log(`Runtime SHA: ${runtime.commit ?? 'missing'}`);
+  console.log(`Build ID: ${buildId}`);
+  console.log(`Branch: ${branch}`);
+  console.log(`Build status: ${buildStatus}`);
+  console.log(`Deployment status: ${deploymentStatus}`);
+  console.log(`Northflank SHA match: ${northflankMatches ? 'YES' : 'NO'}`);
+  console.log(`Runtime SHA match: ${runtimeMatches ? 'YES' : 'NO'}`);
+
+  const BUILD_FAILURE_STATUSES = new Set(['FAILURE', 'FAILED', 'CRASHED', 'ABORTED', 'ERROR']);
+  if (BUILD_FAILURE_STATUSES.has(buildStatus)) {
+    console.error(`${serviceId}: latest build failed. The previous image may still be serving traffic.`);
+    return false;
+  }
+
+  if (!northflankMatches) {
+    console.error(`${serviceId}: Northflank deployment metadata does not match the expected SHA.`);
+    return false;
+  }
+
+  if (!runtimeMatches) {
+    console.error(`${serviceId}: live runtime does not report the expected SHA.`);
+    return false;
+  }
+
+  return true;
+}
+
+async function main(): Promise<void> {
   const projectId = resolveProjectId();
-  if (!projectId) process.exit(1);
+  if (!projectId) throw new Error('NORTHFLANK_PROJECT_ID is required.');
 
-  const expected = resolveExpectedSha();
-  const trigger = process.argv.includes('--trigger');
-  const trustDeployStatus = process.argv.includes('--trust-deploy-status');
-  const onlyArg = process.argv.find((a) => a.startsWith('elevate-'));
-  const services = onlyArg
-    ? ([onlyArg] as readonly string[])
+  const expectedSha = resolveExpectedSha();
+  validateExpectedSha(expectedSha);
+
+  const requestedService = process.argv.find((argument) => argument.startsWith('elevate-'));
+  const services = requestedService
+    ? [requestedService]
     : process.env.NORTHFLANK_VERIFY_SERVICE
       ? [process.env.NORTHFLANK_VERIFY_SERVICE]
-      : ALL_SERVICES;
-  let stale = false;
+      : [...ALL_SERVICES];
 
-  console.log(`Expected production SHA (main): ${expected.slice(0, 12)}…\n`);
+  let failed = false;
 
-  const maxAttempts = Number(process.env.NORTHFLANK_SHA_VERIFY_ATTEMPTS || 12);
-  const pollMs = Number(process.env.NORTHFLANK_SHA_VERIFY_POLL_MS || 15_000);
+  console.log(`Expected production SHA: ${expectedSha}`);
 
   for (const serviceId of services) {
-    let deployed: string | undefined;
-    let branch = '?';
-    let build = '?';
-    let deploy = '?';
-    let ok = false;
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      const s = await nfFetch<ServiceStatus>(projectApiPath(projectId, `/services/${serviceId}`));
-      deployed =
-        s.deployment?.internal?.deployedSHA ??
-        (s as { deployedSHA?: string }).deployedSHA;
-      branch = s.vcsData?.projectBranch ?? s.deployment?.internal?.branch ?? '?';
-      build = s.status?.build?.status ?? '?';
-      deploy = s.status?.deployment?.status ?? '?';
-      ok = shaMatches(deployed, expected);
-      if (ok) break;
-      if (attempt < maxAttempts) {
-        console.log(
-          `${serviceId}: deployed SHA not updated yet (attempt ${attempt}/${maxAttempts}), waiting ${pollMs}ms…`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, pollMs));
-      }
-    }
-
-    const BUILD_ACTIVE_STATUSES = new Set(['STARTING', 'PENDING', 'RUNNING', 'BUILDING', 'CLONING', 'CACHING']);
-    if (
-      !ok &&
-      trustDeployStatus &&
-      (BUILD_ACTIVE_STATUSES.has(String(build)) ||
-        ['SUCCESS', 'COMPLETED', 'FAILURE'].includes(String(build))) &&
-      String(deploy) === 'COMPLETED'
-    ) {
-      // Build is still running or failed - previous deployment is still healthy
-      // Accept if deploy is COMPLETED (service is serving traffic)
-      const buildNote = BUILD_ACTIVE_STATUSES.has(String(build))
-        ? ` (build ${build}, previous image still live)`
-        : build === 'FAILURE' ? ' (build failed, previous image still live)' : '';
-      console.warn(
-        `${serviceId}: deployedSHA metadata stale (${deployed?.slice(0, 12) ?? 'unknown'}…) but deployment is healthy (${deploy})${buildNote} — accepting`,
-      );
-      ok = true;
-    }
-
-    console.log(
-      `${serviceId}: branch=${branch} build=${build} deploy=${deploy}\n  deployed=${deployed?.slice(0, 12) ?? 'unknown'}…  ${ok ? '✅ current' : '❌ STALE'}`,
-    );
-
-    if (!ok) {
-      stale = true;
-      if (trigger) {
-        const buildSucceeded = ['SUCCESS', 'COMPLETED'].includes(String(build));
-        if (buildSucceeded) {
-          await triggerDeployment(projectId, serviceId, expected);
-        } else {
-          await triggerBuild(projectId, serviceId);
-        }
-      }
+    try {
+      const valid = await verifyService(projectId, serviceId, expectedSha);
+      if (!valid) failed = true;
+    } catch (error) {
+      failed = true;
+      console.error(`${serviceId}: verification error`, error);
     }
   }
 
-  if (stale && !trigger) {
-    console.error(
-      '\nProduction is behind main. Wait for in-flight builds or run:\n  npx tsx scripts/northflank/verify-deployed-sha.ts --trigger',
-    );
+  if (failed) {
+    console.error('\nDeployment verification failed.');
+    console.error('Do not mark this deployment successful and do not rely on the previous healthy image.');
     process.exit(1);
   }
 
-  if (stale && trigger) {
-    console.log(
-      '\nTriggered rollout for stale service(s). Monitor Northflank UI or wait-service.ts',
-    );
-    process.exit(0);
-  }
-
-  console.log('\nAll services match main.');
+  console.log('\nAll service runtimes match the expected SHA.');
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

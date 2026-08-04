@@ -131,8 +131,19 @@ jobs:
       - name: Wait for Marketing build to complete
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.trigger_build.outputs.build_id }}" --timeout-ms 3600000
 
-      - name: Roll out latest Marketing image
-        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
+      - name: Verify exact Marketing build succeeded
+        run: |
+          pnpm tsx scripts/northflank/verify-build.ts \
+            "$NORTHFLANK_MARKETING_SERVICE_ID" \
+            --build-id "${{ steps.trigger_build.outputs.build_id }}" \
+            --sha "${{ github.sha }}"
+
+      - name: Deploy exact Marketing build
+        run: |
+          pnpm tsx scripts/northflank/trigger-deployment.ts \
+            "$NORTHFLANK_MARKETING_SERVICE_ID" \
+            --build-id "${{ steps.trigger_build.outputs.build_id }}" \
+            --sha "${{ github.sha }}"
 
       - name: Wait for Marketing deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 3600000

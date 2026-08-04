@@ -30,6 +30,46 @@ async function getRecentBuilds(projectId: string, serviceId: string, sha: string
   }
 }
 
+/** Find a reusable build for the given SHA - only reuse successful/in-progress builds */
+async function findReusableBuild(
+  recentBuilds: Array<{ id: string; sha?: string; status?: string; concluded?: boolean }>,
+  currentSha: string,
+): Promise<{ id: string; status: string } | null> {
+  const reusableBuild = recentBuilds.find(
+    (build) =>
+      build.sha === currentSha &&
+      (build.status === 'SUCCESS' ||
+        build.status === 'BUILDING' ||
+        build.status === 'PENDING' ||
+        build.status === 'QUEUED' ||
+        build.status === 'IN_PROGRESS'),
+  );
+
+  if (reusableBuild) {
+    console.log(
+      `Reusing build ${reusableBuild.id} for SHA ${currentSha}. Status: ${reusableBuild.status}`,
+    );
+    return { id: reusableBuild.id, status: reusableBuild.status || 'unknown' };
+  }
+
+  const failedBuild = recentBuilds.find(
+    (build) =>
+      build.sha === currentSha &&
+      (build.status === 'FAILURE' ||
+        build.status === 'CRASHED' ||
+        build.status === 'ABORTED' ||
+        build.status === 'SUBMISSION_FAILURE'),
+  );
+
+  if (failedBuild) {
+    console.log(
+      `Previous build ${failedBuild.id} for ${currentSha} failed. Starting a fresh build.`,
+    );
+  }
+
+  return null;
+}
+
 /** Fetch existing buildArguments from Northflank to preserve them. */
 async function getExistingBuildArguments(
   projectId: string,
@@ -81,19 +121,18 @@ async function main() {
     process.env.VERCEL_GIT_COMMIT_SHA ||
     '';
 
-  // Check for existing build with same SHA — skip if ANY build exists for this SHA
-  // (prevents Northflank from running multiple containers when set-service-branch + trigger-build
-  // are called in the same workflow, or when CI/CD and deploy workflows overlap)
+  // Check for existing build with same SHA — only skip if a SUCCESSFUL/in-progress build exists
+  // Do NOT reuse failed builds - they need a fresh build attempt
   if (currentSha) {
     const recentBuilds = await getRecentBuilds(projectId, serviceId, currentSha);
-    const existingBuild = recentBuilds.find((b) => b.sha === currentSha);
+    const reusableBuild = await findReusableBuild(recentBuilds, currentSha);
 
-    if (existingBuild) {
+    if (reusableBuild) {
       console.log(
-        `Skipping build for ${serviceId} - SHA ${currentSha} already has build ${existingBuild.id} (status: ${existingBuild.status}, concluded: ${existingBuild.concluded})`,
+        `Skipping build for ${serviceId} - SHA ${currentSha} already has successful build ${reusableBuild.id} (status: ${reusableBuild.status})`,
       );
       if (process.env.GITHUB_OUTPUT) {
-        fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${existingBuild.id}\n`, 'utf8');
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `build_id=${reusableBuild.id}\n`, 'utf8');
         fs.appendFileSync(process.env.GITHUB_OUTPUT, `skipped=true\n`, 'utf8');
       }
       return;

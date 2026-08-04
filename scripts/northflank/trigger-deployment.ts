@@ -1,71 +1,126 @@
 #!/usr/bin/env tsx
 /**
- * Trigger a new deployment for a Northflank combined service.
+ * Deploy an exact build for a Northflank combined service.
  *
- * Uses exact Git SHA to ensure release integrity -- never uses 'latest'.
+ * Uses exact Git SHA and Build ID to ensure release integrity -- never uses 'latest'.
+ * Explicitly selects the image produced by the completed build rather than merely
+ * restarting an existing pod.
  *
- * API endpoints:
- *   PATCH /services/combined/{id}  -- update build config (GIT_SHA, etc.)
- *   POST  /services/{id}/scale     -- start containers with built image
+ * Usage:
+ *   npx tsx scripts/northflank/trigger-deployment.ts <service-id> --build-id <build-id> --sha <sha>
  *
- *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin
- *   npx tsx scripts/northflank/trigger-deployment.ts elevate-lms
+ * API endpoint:
+ *   PATCH /services/combined/{id}  -- update deployment config with exact build ID and SHA
  */
 
 import { nfFetch, combinedServicePatchPath, projectApiPath, resolveProjectId } from './lib';
 
-async function main() {
+function readArgument(name: string): string | undefined {
+  const index = process.argv.indexOf(name);
+  return index === -1 ? undefined : process.argv[index + 1];
+}
+
+async function main(): Promise<void> {
   const serviceId = process.argv[2];
+
   if (!serviceId || serviceId.startsWith('--')) {
-    console.error('Usage: npx tsx scripts/northflank/trigger-deployment.ts <service-id>');
+    console.error(
+      'Usage: trigger-deployment.ts <service-id> --build-id <build-id> --sha <sha>',
+    );
     process.exit(1);
   }
 
   const projectId = resolveProjectId();
+
   if (!projectId) {
-    console.error('Set NORTHFLANK_PROJECT_ID');
+    console.error('NORTHFLANK_PROJECT_ID is required.');
     process.exit(1);
   }
 
-  const sha = process.env.GITHUB_SHA || process.env.VERCEL_GIT_COMMIT_SHA;
-  if (!sha) {
-    console.error('ERROR: GITHUB_SHA not set. Cannot deploy without exact SHA.');
+  const buildId = readArgument('--build-id');
+  const sha = readArgument('--sha') ?? process.env.GITHUB_SHA ?? process.env.BUILD_SHA;
+  const branch = process.env.DEPLOY_BRANCH ?? 'main';
+
+  if (!buildId) {
+    console.error(
+      'A Northflank build ID is required. Refusing to deploy an unspecified image.',
+    );
     process.exit(1);
   }
 
-  if (!/^[a-f0-9]{40}$/i.test(sha)) {
-    console.error(`ERROR: Invalid SHA format: ${sha}`);
+  if (!sha || !/^[a-f0-9]{40}$/i.test(sha)) {
+    console.error(
+      `A valid 40-character Git SHA is required. Received: ${sha ?? 'missing'}`,
+    );
     process.exit(1);
   }
 
-  const branch = process.env.DEPLOY_BRANCH || 'main';
+  console.log('=== EXACT BUILD DEPLOYMENT ===');
+  console.log(`Service:  ${serviceId}`);
+  console.log(`Build ID: ${buildId}`);
+  console.log(`SHA:      ${sha}`);
+  console.log(`Branch:   ${branch}`);
 
-  // Step 1: PATCH the service to set build config (GIT_SHA, branch)
-  // Combined services use /services/combined/{id}, not /services/{id}
-  const patchPath = combinedServicePatchPath(projectId, serviceId);
-  const buildPayload = {
-    internal: {
-      id: serviceId,
-      branch,
-      buildSHA: sha,
+  /*
+   * Combined services require deployment settings inside the
+   * `deployment` object. This explicitly selects the image produced
+   * by the completed build rather than merely restarting an existing pod.
+   */
+  const payload = {
+    deployment: {
+      instances: 1,
+      internal: {
+        id: serviceId,
+        branch,
+        buildSHA: sha,
+        buildId,
+      },
+      docker: {
+        configType: 'default' as const,
+      },
     },
-    docker: { configType: 'default' as const },
   };
 
-  console.log(`Patching ${serviceId} at ${patchPath} (branch=${branch}, buildSHA=${sha.slice(0, 12)})...`);
-  await nfFetch(patchPath, { method: 'PATCH', body: JSON.stringify(buildPayload) });
-  console.log(`PATCH OK`);
+  const endpoint = combinedServicePatchPath(projectId, serviceId);
 
-  // Step 2: Scale to 1 instance -- this actually starts the containers
-  const scaleResult = await nfFetch(
-    projectApiPath(projectId, `/services/${serviceId}/scale`),
-    { method: 'POST', body: JSON.stringify({ instances: 1 }) },
-  );
+  console.log(`Deploying exact build through ${endpoint}`);
+  await nfFetch(endpoint, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 
-  console.log(`Deployment triggered for ${serviceId} (scale result: ${JSON.stringify(scaleResult)})`);
+  /*
+   * Read the service back and verify that Northflank recorded
+   * the requested deployment SHA and build ID.
+   */
+  const service = await nfFetch<any>(projectApiPath(projectId, `/services/${serviceId}`));
+
+  const deployedSha =
+    service?.deployment?.internal?.buildSHA ??
+    service?.data?.deployment?.internal?.buildSHA;
+  const deployedBuildId =
+    service?.deployment?.internal?.buildId ??
+    service?.data?.deployment?.internal?.buildId;
+
+  console.log(`Northflank deployment SHA: ${deployedSha ?? 'unavailable'}`);
+  console.log(`Northflank deployment build ID: ${deployedBuildId ?? 'unavailable'}`);
+
+  if (deployedSha && deployedSha !== sha) {
+    throw new Error(
+      `Deployment SHA mismatch. Expected ${sha}, Northflank recorded ${deployedSha}`,
+    );
+  }
+
+  if (deployedBuildId && deployedBuildId !== buildId) {
+    throw new Error(
+      `Deployment build ID mismatch. Expected ${buildId}, Northflank recorded ${deployedBuildId}`,
+    );
+  }
+
+  console.log(`✅ Exact Marketing build ${buildId} selected for deployment.`);
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error('❌ Exact deployment failed:', error);
   process.exit(1);
 });

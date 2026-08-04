@@ -110,9 +110,8 @@ ARG GIT_SHA=local-build
 ARG BUILD_TIMESTAMP
 
 # GIT_SHA is validated if provided. GitHub Actions passes it via --build-arg.
-RUN echo "Validating GIT_SHA=${GIT_SHA}" && (
-    echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && echo "GIT_SHA validated: ${GIT_SHA}" || echo "GIT_SHA=${GIT_SHA} (set --build-arg for production)"
-)
+RUN echo "Validating GIT_SHA=${GIT_SHA}" && \
+    (echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && echo "GIT_SHA validated: ${GIT_SHA}" || echo "GIT_SHA=${GIT_SHA} (set --build-arg for production)")
 
 ENV NODE_ENV=production
 ENV CI=true

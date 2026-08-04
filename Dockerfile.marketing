@@ -19,9 +19,9 @@ RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
 
-ARG GITHUB_SHA=unknown
-ARG GIT_SHA=unknown
-ARG NEXT_PUBLIC_GIT_SHA=unknown
+ARG GITHUB_SHA
+ARG GIT_SHA
+ARG NEXT_PUBLIC_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
 
 ENV NODE_ENV=production
@@ -36,6 +36,23 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 COPY --from=dependencies /workspace/node_modules ./node_modules
 
 COPY . .
+
+# Stamp the service worker with the real Git SHA before building.
+# Fails if no valid SHA or if stamping does not occur.
+RUN echo "Validating GIT_SHA=${GIT_SHA}" && \
+    test "${GIT_SHA}" != "unknown" || \
+    (test -n "${GITHUB_SHA}" && echo "Using GITHUB_SHA" && GIT_SHA="${GITHUB_SHA}") || \
+    (echo "ERROR: GIT_SHA is required" && exit 1) && \
+    echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
+    echo "SHA validated: ${GIT_SHA}"
+
+RUN node scripts/stamp-sw.mjs
+
+# Verify stamping replaced the placeholder (fail fast if sw.js was not stamped)
+RUN echo "Verifying service worker cache version..." && \
+    ! grep -q '__CACHE_VERSION__' /workspace/public/sw.js || \
+    (echo "ERROR: __CACHE_VERSION__ still in sw.js" && exit 1) && \
+    echo "Service worker stamped correctly"
 
 RUN pnpm --filter @elevate/marketing build
 

@@ -1,14 +1,14 @@
 // Service Worker for Elevate for Humanity PWA
-// CACHE_VERSION is replaced at build time by scripts/stamp-sw.mjs.
-// Bump this manually when deploying fixes that must bypass stale cache.
-const CACHE_VERSION =
-  "elevate-v1776550800000";
+// __CACHE_VERSION__ is replaced at build time by scripts/stamp-sw.mjs.
+// Must contain a real Git SHA — build fails if stamping does not occur.
+const CACHE_VERSION = '__CACHE_VERSION__';
 
 const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 
-const STATIC_CACHE = `elevate-static-${CACHE_VERSION}`;
-const DYNAMIC_CACHE = `elevate-dynamic-${CACHE_VERSION}`;
-const COURSE_CACHE = `elevate-courses-${CACHE_VERSION}`;
+// Cache names derive from CACHE_VERSION so every deploy gets unique caches.
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
+const COURSE_CACHE = `${CACHE_VERSION}-courses`;
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install (critical path)
@@ -35,39 +35,49 @@ const CACHE_STRATEGIES = {
   ],
   // Network-first for Next.js chunks — prevents stale chunks from breaking the app
   nextChunks: [/\/_next\/static\//, /\/_next\/data\//],
-  // Cache-first for static assets (images, fonts, etc.)
-  static: [/\.(js|css|woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
+  // Cache-first for fonts and images only — NEVER cache JS/CSS
+  static: [/\.(woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
   // Network-first for dynamic content
   networkFirst: [/\/courses\//, /\/programs\//, /\/lms\//],
   // Stale-while-revalidate for API data
   staleWhileRevalidate: [/\/api\/public\//],
 };
 
-// Install event - cache essential assets
+// Install event — precache essential assets.
+// Uses Promise.allSettled so a missing icon does not prevent SW activation.
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches
-      .open(STATIC_CACHE)
-      .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting()),
+    (async () => {
+      const cache = await caches.open(STATIC_CACHE);
+      const results = await Promise.allSettled(
+        PRECACHE_ASSETS.map(async (asset) => {
+          const req = new Request(asset, { cache: 'reload' });
+          const res = await fetch(req);
+          if (!res.ok) throw new Error(`Precache failed: ${asset} HTTP ${res.status}`);
+          await cache.put(req, res);
+        }),
+      );
+      const failures = results.filter((r) => r.status === 'rejected');
+      if (failures.length > 0) {
+        console.warn('[SW] Some optional assets failed to precache', failures);
+      }
+      await self.skipWaiting();
+    })(),
   );
 });
 
-// Activate event - clean up old caches
+// Activate event — evict all old Elevate caches from previous deployments.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames
-            .filter((name) => {
-              return name.startsWith('elevate-') && !name.includes(CACHE_VERSION);
-            })
-            .map((name) => caches.delete(name)),
-        );
-      })
-      .then(() => self.clients.claim()),
+    (async () => {
+      const names = await caches.keys();
+      await Promise.all(
+        names
+          .filter((name) => name.startsWith('elevate-') && !name.startsWith(CACHE_VERSION))
+          .map((name) => caches.delete(name)),
+      );
+      await self.clients.claim();
+    })(),
   );
 });
 
@@ -122,16 +132,11 @@ self.addEventListener('fetch', (event) => {
   if (matchesPattern(request.url, CACHE_STRATEGIES.noCache)) return;
 
   // ================================================================
-  // Never serve stale Next.js chunks before checking the network.
+  // Never serve stale Next.js chunks. Always fetch from network so the
+  // browser always gets the correct chunk for the current deployment.
   // ================================================================
   if (matchesPattern(request.url, CACHE_STRATEGIES.nextChunks)) {
-    event.respondWith(
-      fetch(request).catch(async () => {
-        const cached = await caches.match(request);
-        if (cached) return cached;
-        throw new Error('Next.js asset unavailable.');
-      }),
-    );
+    event.respondWith(fetch(request, { cache: 'no-store' }));
     return;
   }
 

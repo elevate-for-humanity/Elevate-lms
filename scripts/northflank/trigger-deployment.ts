@@ -2,17 +2,17 @@
 /**
  * Trigger a new deployment for a Northflank combined service.
  *
- * Uses exact Git SHA to ensure release integrity — never uses 'latest'.
+ * Uses exact Git SHA to ensure release integrity -- never uses 'latest'.
  *
- * API Bug: /services/{id}/deployment (POST) returns 404 for combined services.
- * The correct endpoint is /services/{id}/scale (POST) which actually starts
- * the containers with the newly built image.
+ * API endpoints:
+ *   PATCH /services/combined/{id}  -- update build config (GIT_SHA, etc.)
+ *   POST  /services/{id}/scale     -- start containers with built image
  *
  *   npx tsx scripts/northflank/trigger-deployment.ts elevate-admin
  *   npx tsx scripts/northflank/trigger-deployment.ts elevate-lms
  */
 
-import { nfFetch, projectApiPath, resolveProjectId } from './lib';
+import { nfFetch, combinedServicePatchPath, projectApiPath, resolveProjectId } from './lib';
 
 async function main() {
   const serviceId = process.argv[2];
@@ -40,14 +40,9 @@ async function main() {
 
   const branch = process.env.DEPLOY_BRANCH || 'main';
 
-  // BUGFIX: /services/{id}/deployment returns 404 for combined services.
-  // /services/{id}/scale (POST) is the correct endpoint — it actually starts
-  // containers with the newly built image and returns HTTP 200.
-  const path = projectApiPath(projectId, `/services/${serviceId}`);
-
-  console.log(`Triggering deployment for ${serviceId} (branch=${branch}, buildSHA=${sha.slice(0, 12)})...`);
-
-  // Step 1: Tell Northflank which SHA to deploy
+  // Step 1: PATCH the service to set build config (GIT_SHA, branch)
+  // Combined services use /services/combined/{id}, not /services/{id}
+  const patchPath = combinedServicePatchPath(projectId, serviceId);
   const buildPayload = {
     internal: {
       id: serviceId,
@@ -56,20 +51,18 @@ async function main() {
     },
     docker: { configType: 'default' as const },
   };
-  await nfFetch(path, { method: 'PATCH', body: JSON.stringify(buildPayload) });
 
-  // Step 2: Scale up to 1 instance — this is what actually starts the containers
-  // /restart returns {"data":{}} but doesn't start containers.
-  // /scale returns HTTP 200 and DOES start the containers.
+  console.log(`Patching ${serviceId} at ${patchPath} (branch=${branch}, buildSHA=${sha.slice(0, 12)})...`);
+  await nfFetch(patchPath, { method: 'PATCH', body: JSON.stringify(buildPayload) });
+  console.log(`PATCH OK`);
+
+  // Step 2: Scale to 1 instance -- this actually starts the containers
   const scaleResult = await nfFetch(
     projectApiPath(projectId, `/services/${serviceId}/scale`),
     { method: 'POST', body: JSON.stringify({ instances: 1 }) },
   );
 
-  console.log(`Deployment triggered for ${serviceId} ✅`);
-  console.log(`Scale result:`, scaleResult);
-
-  return scaleResult;
+  console.log(`Deployment triggered for ${serviceId} (scale result: ${JSON.stringify(scaleResult)})`);
 }
 
 main().catch((e) => {

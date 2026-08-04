@@ -110,10 +110,13 @@ async function readRuntimeVersion(serviceId: string): Promise<{
         commit =
           parsed.commit ??
           parsed.sha ??
+          parsed.commitSha ??
+          parsed.shortSha ??
           parsed.gitSha ??
           parsed.git_sha ??
           parsed.buildSha ??
-          parsed.build_sha;
+          parsed.build_sha ??
+          parsed.version;
       } catch {
         commit = undefined;
       }

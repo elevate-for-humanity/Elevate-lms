@@ -96,6 +96,17 @@ async function checkHttpHealth(serviceId: string, commitSha: string): Promise<{ 
     const body = await res.json().catch(() => ({}));
     const currentCommit = body.commit || body.buildId || '';
 
+    // Fail immediately if build identity is missing — this means the Docker
+    // runner stage never received the GIT_SHA/GITHUB_SHA build args.
+    // Waiting for "unknown" to match the expected SHA will never succeed.
+    if (!currentCommit || currentCommit === 'unknown' || currentCommit === 'MISSING') {
+      return {
+        ok: false,
+        currentCommit,
+        error: `runtime build identity missing (got "${currentCommit || ''}"). Dockerfile runner stage is missing GIT_SHA/GITHUB_SHA env vars — fix Dockerfile and redeploy.`,
+      };
+    }
+
     // If we have an expected SHA, verify it matches
     if (commitSha && currentCommit && !currentCommit.startsWith(commitSha.slice(0, 7))) {
       return {
@@ -402,8 +413,13 @@ async function main() {
           while (Date.now() - start < timeoutMs) {
             const health = await checkHttpHealth(serviceId, expectedSha);
             if (health.ok) {
-              console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7) || 'unknown'})`);
+              console.log(`${serviceId}: service ready ✅ (commit: ${health.currentCommit.slice(0, 7)})`);
               process.exit(0);
+            }
+            // Fail immediately if build identity is missing — retrying won't fix it.
+            if (health.error?.includes('build identity missing')) {
+              console.error(`${serviceId}: FATAL — ${health.error}`);
+              process.exit(1);
             }
             console.log(`${serviceId}: health: ${health.error} — new container not ready yet, retrying in 15s...`);
             await new Promise((r) => setTimeout(r, 15000));
@@ -426,8 +442,13 @@ async function main() {
         while (Date.now() - start < timeoutMs) {
           const health = await checkHttpHealth(serviceId, expectedSha);
           if (health.ok) {
-            console.log(`${serviceId}: HTTP health OK ✅ (commit: ${health.currentCommit.slice(0, 7) || 'unknown'})`);
+            console.log(`${serviceId}: HTTP health OK ✅ (commit: ${health.currentCommit.slice(0, 7)})`);
             process.exit(0);
+          }
+          // Fail immediately if build identity is missing — retrying won't fix it.
+          if (health.error?.includes('build identity missing')) {
+            console.error(`${serviceId}: FATAL — ${health.error}`);
+            process.exit(1);
           }
           console.log(`${serviceId}: health: ${health.error} — retrying in 15s...`);
           await new Promise((r) => setTimeout(r, 15000));

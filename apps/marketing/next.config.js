@@ -27,6 +27,8 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
+  // Transpile buffer and process packages for proper browser bundling
+  transpilePackages: ['buffer', 'process'],
   async redirects() {
     return [
       // WIOA redirects
@@ -68,12 +70,19 @@ const nextConfig = {
         'async_hooks', 'events', 'string_decoder', 'timers',
         'domain', 'punycode', 'readline', 'repl', 'sys', 'tty', 'vm',
       ];
-      // BUNDLE buffer package - do NOT externalize it
-      // This ensures Buffer is available in the browser bundle
+      // BUNDLE buffer and process packages - do NOT externalize
+      // This ensures Buffer and process are available in the browser bundle
       config.resolve.fallback = {
         ...config.resolve.fallback,
         buffer: false, // Tell webpack to bundle buffer, not externalize
+        process: false, // Tell webpack to bundle process, not externalize
       };
+      // Provide global Buffer and process for any code that expects them
+      config.plugins.push(
+        new (require('webpack').DefinePlugin)({
+          'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+        })
+      );
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
         cacheGroups: {

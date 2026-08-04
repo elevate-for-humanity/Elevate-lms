@@ -65,9 +65,15 @@ const nextConfig = {
         'fs', 'path', 'os', 'crypto', 'child_process', 'worker_threads',
         'net', 'tls', 'http', 'https', 'dgram', 'querystring', 'stream',
         'util', 'url', 'zlib', 'module', 'constants', 'v8', 'inspector',
-        'async_hooks', 'events', 'buffer', 'string_decoder', 'timers',
+        'async_hooks', 'events', 'string_decoder', 'timers',
         'domain', 'punycode', 'readline', 'repl', 'sys', 'tty', 'vm',
       ];
+      // BUNDLE buffer package - do NOT externalize it
+      // This ensures Buffer is available in the browser bundle
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        buffer: false, // Tell webpack to bundle buffer, not externalize
+      };
       config.optimization.splitChunks = {
         ...config.optimization.splitChunks,
         cacheGroups: {

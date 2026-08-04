@@ -100,13 +100,11 @@ async function main() {
     },
     buildArguments: marketingBuildArguments,
     healthChecks,
+    // NOTE: pathIgnoreRules removed. When Dockerfile.marketing is excluded,
+    // Northflank uses cached layers and does not push a new image — so the
+    // deployment.internal.buildSHA never updates. Always include all files so
+    // each build produces a unique image and the deployment tracks the new SHA.
     buildConfiguration: {
-      pathIgnoreRules: [
-        'apps/admin/**',
-        'apps/lms/**',
-        'Dockerfile.northflank-admin',
-        'Dockerfile.northflank-lms',
-      ],
       storage: {
         ephemeralStorage: {
           storageSize: currentEphemeralMb,

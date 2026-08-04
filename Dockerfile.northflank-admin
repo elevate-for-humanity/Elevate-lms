@@ -100,9 +100,9 @@ RUN set -eux; \
 # =============================================================================
 FROM base AS builder
 
-ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
-ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_ADMIN_URL
+ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -118,9 +118,9 @@ ENV CI=true
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV NEXT_STANDALONE_OUTPUT=1
 
-ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL}"
-ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL}"
-ENV NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL}"
+ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://www.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL:-https://admin.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-https://app.elevateforhumanity.org}"
 ENV NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
 

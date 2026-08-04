@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createClient as createSupabaseServer } from '@/lib/supabase/server';
+
+function createServiceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  return createSupabaseClient(url, key);
+}
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -25,22 +32,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body = await req.json();
-  const { action, shop_notes } = body; // action: 'approve' | 'decline' | 'withdraw'
+  const { status, shop_notes } = body;
 
-  let newStatus: string;
-  if (action === 'approve') newStatus = 'approved';
-  else if (action === 'decline') newStatus = 'declined';
-  else if (action === 'withdraw') newStatus = 'withdrawn';
-  else return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+  // Validate status
+  if (!['approved', 'declined'].includes(status)) {
+    return NextResponse.json({ error: 'Invalid status. Must be "approved" or "declined"' }, { status: 400 });
+  }
 
-  const { data, error } = await supabase
+  // Use service client for admin operations
+  const serviceClient = createServiceClient();
+
+  const { data, error } = await serviceClient
     .from('host_shop_match_requests')
     .update({
-      status: newStatus,
-      shop_notes,
+      status,
+      shop_notes: shop_notes || null,
       responded_at: new Date().toISOString(),
       responded_by: user.id,
-      updated_at: new Date().toISOString(),
     })
     .eq('id', id)
     .select()
@@ -48,9 +56,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // If approved, send notification to apprentice
-  if (newStatus === 'approved' && req_data.apprentice_email) {
-    // TODO: Send email
+  // If approved, increment the shop's apprentice count
+  if (status === 'approved' && req_data.host_shop_id) {
+    // Get current shop data
+    const { data: currentShop } = await serviceClient
+      .from('host_shops')
+      .select('current_apprentice_count, max_apprentices')
+      .eq('id', req_data.host_shop_id)
+      .single();
+
+    if (currentShop) {
+      const newCount = (currentShop.current_apprentice_count || 0) + 1;
+      await serviceClient
+        .from('host_shops')
+        .update({ current_apprentice_count: newCount })
+        .eq('id', req_data.host_shop_id);
+    }
   }
 
   return NextResponse.json({ request: data });
@@ -67,7 +88,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     .select(`
       id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
       apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, phone, image_url, owner_name),
+      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, business_name, name, address_line1, city, state, zip_code, phone, image_url, owner_name, owner_email, owner_phone),
       placement:apprentice_placements(id, status, start_date)
     `)
     .eq('id', id)

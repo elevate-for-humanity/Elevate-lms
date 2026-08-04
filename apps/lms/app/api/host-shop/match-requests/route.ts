@@ -4,6 +4,10 @@ import { createClient as createSupabaseServer } from '@/lib/supabase/server';
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const status = searchParams.get('status');
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '10');
+  const offset = (page - 1) * limit;
+
   const supabase = await createSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,12 +19,13 @@ export async function GET(req: NextRequest) {
     .from('host_shop_match_requests')
     .select(`
       id, status, message, apprentice_notes, shop_notes, created_at, responded_at, expires_at, program_slug,
-      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url),
-      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, name, address, city, state, phone, image_url, owner_name),
+      apprentice:profiles!host_shop_match_requests_apprentice_id_fkey(id, full_name, email, avatar_url, phone),
+      shop:host_shops!host_shop_match_requests_host_shop_id_fkey(id, business_name, name, address_line1, city, state, zip_code, phone, image_url, owner_name, owner_email),
       placement:apprentice_placements(id, status, start_date)
-    `)
+    `, { count: 'exact' })
     .is('deleted_at', null)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
   // Shop owners see their own shop's requests
   const { data: ownShop } = await supabase
@@ -36,9 +41,18 @@ export async function GET(req: NextRequest) {
   }
 
   if (status) query = query.eq('status', status);
-  const { data, error } = await query;
+  const { data, error, count } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ requests: data || [] });
+  
+  return NextResponse.json({
+    requests: data || [],
+    pagination: {
+      page,
+      limit,
+      total: count || 0,
+      pages: Math.ceil((count || 0) / limit),
+    }
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -74,7 +88,7 @@ export async function POST(req: NextRequest) {
     .in('status', ['pending', 'approved'])
     .single();
 
-  if (existing) return NextResponse.json({ error: 'Request already exists' }, { status: 400 });
+  if (existing) return NextResponse.json({ error: 'You already have a pending or approved request for this shop' }, { status: 409 });
 
   const { data, error } = await supabase
     .from('host_shop_match_requests')

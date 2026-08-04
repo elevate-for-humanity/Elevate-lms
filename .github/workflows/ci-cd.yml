@@ -4,8 +4,42 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'lib/**'
+      - 'components/**'
+      - 'public/**'
+      - 'styles/**'
+      - 'data/**'
+      - 'types/**'
+      - 'hooks/**'
+      - 'contexts/**'
+      - 'config/**'
+      - 'content/**'
+      - 'utils/**'
+      - 'next.config.mjs'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+      - 'proxy.ts'
+      - 'Dockerfile.*'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
   pull_request:
     branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'lib/**'
+      - 'components/**'
+      - 'next.config.mjs'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+      - 'proxy.ts'
+      - 'Dockerfile.*'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+
 
 # Prevent multiple CI runs from conflicting - wait for pending runs to complete
 concurrency:

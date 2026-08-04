@@ -6,30 +6,19 @@ on:
       - main
     paths:
       - 'apps/marketing/**'
-      - 'apps/lms/**'
-      - 'apps/admin/**'
-      - 'packages/**'
-      - 'public/**'
-      - 'styles/**'
-      - 'data/**'
-      - 'types/**'
-      - 'lib/**'
-      - 'hooks/**'
-      - 'contexts/**'
-      - 'config/**'
-      - 'content/**'
-      - 'utils/**'
+      - 'apps/lms/app/lms/**'
+      - 'components/site/**'
+      - 'lib/navigation/**'
+      - 'middleware.ts'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
       - 'Dockerfile.marketing'
-      - 'Dockerfile.lms'
-      - 'Dockerfile.northflank-admin'
       - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
       - 'package.json'
+      - 'pnpm-workspace.yaml'
       - '.github/workflows/deploy-marketing.yml'
-      - 'middleware.ts'
   workflow_dispatch:
     inputs:
       branch:
@@ -60,7 +49,7 @@ jobs:
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
       # FIX: Use actual branch from PR (github.head_ref) not hardcoded main
-      DEPLOY_BRANCH: ${{ github.head_ref || 'main' }}
+      DEPLOY_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
@@ -121,6 +110,13 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
+      # PHASE 4: Standardize Northflank preparation
+      - name: Configure Northflank Marketing service
+        run: pnpm tsx scripts/northflank/configure-marketing.ts --execute
+
+      - name: Patch Marketing build ephemeral storage
+        run: NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts elevate-marketing --execute
 
       # Note: Ensure elevate-marketing service is set to "external-git" build mode
       # with Dockerfile path /Dockerfile.marketing in Northflank dashboard before running

@@ -41,7 +41,7 @@ export function PlansPageClient({ vertical }: Props) {
               Enterprise licensing
             </Link>
             {' · '}
-            <Link href="/store/beauty-programs" className="text-brand-blue-600 font-semibold hover:underline">
+            <Link href="" className="text-brand-blue-600 font-semibold hover:underline">
               Beauty program overview
             </Link>
           </p>

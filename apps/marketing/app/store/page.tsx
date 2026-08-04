@@ -144,7 +144,7 @@ export default function StorePage() {
                 Beauty plans from $29/mo <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/store/beauty-programs"
+                href=""
                 className="inline-flex items-center gap-2 border border-slate-300 bg-white px-6 py-3 rounded-lg font-bold text-slate-900 hover:bg-slate-50"
               >
                 Program overview

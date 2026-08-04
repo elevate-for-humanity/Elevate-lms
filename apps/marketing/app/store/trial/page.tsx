@@ -337,7 +337,7 @@ function TrialPageContent() {
                   <Link href="/store/demos" className="text-brand-red-600 font-medium hover:underline">Open full demo →</Link>
                 </p>
                 <p className="text-sm text-slate-500">Beauty schools & salons?{' '}
-                  <Link href="/store/beauty-programs" className="text-brand-red-600 font-medium hover:underline">Dashboard clone for beauty programs →</Link>
+                  <Link href="" className="text-brand-red-600 font-medium hover:underline">Dashboard clone for beauty programs →</Link>
                 </p>
               </div>
             </div>

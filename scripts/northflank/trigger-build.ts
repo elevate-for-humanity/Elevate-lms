@@ -123,7 +123,9 @@ async function main() {
 
   // Check for existing build with same SHA — only skip if a SUCCESSFUL/in-progress build exists
   // Do NOT reuse failed builds - they need a fresh build attempt
-  if (currentSha) {
+  const forceFreshBuild = process.env.FORCE_FRESH_BUILD === 'true';
+  
+  if (currentSha && !forceFreshBuild) {
     const recentBuilds = await getRecentBuilds(projectId, serviceId, currentSha);
     const reusableBuild = await findReusableBuild(recentBuilds, currentSha);
 
@@ -137,6 +139,10 @@ async function main() {
       }
       return;
     }
+  } else if (forceFreshBuild) {
+    console.log(
+      `FORCE_FRESH_BUILD=true — bypassing build reuse, starting fresh build.`,
+    );
   }
 
   console.log('=== TRIGGER BUILD ===');

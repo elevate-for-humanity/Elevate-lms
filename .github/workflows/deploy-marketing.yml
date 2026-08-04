@@ -7,8 +7,11 @@ on:
     paths:
       - 'apps/marketing/**'
       - 'apps/lms/app/lms/**'
+      - 'components/marketing/**'
       - 'components/site/**'
       - 'lib/navigation/**'
+      - 'public/sw.js'
+      - 'public/manifest.webmanifest'
       - 'middleware.ts'
       - 'next.config.mjs'
       - 'tailwind.config.js'
@@ -48,6 +51,8 @@ jobs:
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
+      # Force fresh build to ensure new SHA is always built
+      FORCE_FRESH_BUILD: 'true'
       # FIX: Use actual branch from PR (github.head_ref) not hardcoded main
       DEPLOY_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}

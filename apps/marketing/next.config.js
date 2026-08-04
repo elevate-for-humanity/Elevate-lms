@@ -63,27 +63,31 @@ const nextConfig = {
       /*
        * Browser-compatible replacements for dependencies that expect
        * Node's Buffer or process globals.
+       * 
+       * IMPORTANT: Use `false` in fallback to BUNDLE these modules,
+       * not an absolute path.
        */
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),
-        buffer: require.resolve('buffer/'),
-        process: require.resolve('process/browser'),
+        buffer: false, // Bundle buffer module
+        process: false, // Bundle process module
       };
 
       config.resolve.alias = {
         ...(config.resolve.alias ?? {}),
-        buffer: require.resolve('buffer/'),
-        'process/browser': require.resolve('process/browser'),
+        buffer: false, // Bundle buffer, not alias to file path
+        'process/browser': false, // Bundle process
       };
 
       /*
-       * Inject Buffer and process only where a browser module
-       * references those globals.
+       * Inject Buffer, buffer, and process as globals where needed.
+       * Chunk 33105 uses lowercase `buffer` as a free variable.
        */
       const { ProvidePlugin } = require('webpack');
       config.plugins.push(
         new ProvidePlugin({
           Buffer: ['buffer', 'Buffer'],
+          buffer: ['buffer'], // Provide lowercase 'buffer' for chunks that use it
           process: ['process/browser'],
         }),
       );

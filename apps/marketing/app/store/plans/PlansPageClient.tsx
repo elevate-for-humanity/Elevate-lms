@@ -5,15 +5,8 @@ import Link from 'next/link';
 import { PlatformBasePlansSection } from '@/components/store/PlatformBasePlansSection';
 import { AddOnMarketplaceSection } from '@/components/store/AddOnMarketplaceSection';
 
-interface Props {
-  vertical?: string;
-}
-
-const BEAUTY_DEFAULT_ADDONS = ['student-management', 'apprenticeship-management'];
-
-export function PlansPageClient({ vertical }: Props) {
-  const initialAddons = vertical === 'beauty' ? BEAUTY_DEFAULT_ADDONS : [];
-  const [selectedAddons, setSelectedAddons] = useState<string[]>(initialAddons);
+export function PlansPageClient() {
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
 
   const toggleAddon = (slug: string) => {
     setSelectedAddons((prev) =>
@@ -25,12 +18,8 @@ export function PlansPageClient({ vertical }: Props) {
     <>
       <PlatformBasePlansSection
         selectedAddonSlugs={selectedAddons}
-        headline={vertical === 'beauty' ? 'Plans for beauty schools & salons' : 'Base plans'}
-        subheadline={
-          vertical === 'beauty'
-            ? 'Start as a solo barber or spa at $29/month. Add student management, apprenticeship, and workforce modules as you grow.'
-            : 'Start simple. Add workforce, LMS, and apprenticeship modules when you are ready.'
-        }
+        headline="Base plans"
+        subheadline="Start simple. Add workforce, LMS, and apprenticeship modules when you are ready."
       />
       <AddOnMarketplaceSection selectedSlugs={selectedAddons} onToggle={toggleAddon} />
       <section className="py-12 px-4 border-t border-slate-200">
@@ -39,10 +28,6 @@ export function PlansPageClient({ vertical }: Props) {
             Need a full platform license or source-code clone?{' '}
             <Link href="/store/licenses" className="text-brand-blue-600 font-semibold hover:underline">
               Enterprise licensing
-            </Link>
-            {' · '}
-            <Link href="" className="text-brand-blue-600 font-semibold hover:underline">
-              Beauty program overview
             </Link>
           </p>
         </div>

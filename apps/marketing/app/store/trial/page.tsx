@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react';
 import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { BEAUTY_TRIAL_PROGRAMS_PREFILL } from '@/lib/store/beauty-dashboard-clone';
 import Image from 'next/image';
 import {
   ArrowRight, Clock, Shield, Loader2, AlertCircle,
@@ -53,11 +52,6 @@ function TrialPageContent() {
   const [programs, setPrograms] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (searchParams.get('vertical') === 'beauty') {
-      setPrograms((prev) => (prev.trim() ? prev : BEAUTY_TRIAL_PROGRAMS_PREFILL));
-    }
-  }, [searchParams]);
   const [error, setError] = useState<string | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [result, setResult] = useState<TrialResult | null>(null);
@@ -335,9 +329,6 @@ function TrialPageContent() {
                 </p>
                 <p className="text-sm text-slate-500">Want to see the platform first?{' '}
                   <Link href="/store/demos" className="text-brand-red-600 font-medium hover:underline">Open full demo →</Link>
-                </p>
-                <p className="text-sm text-slate-500">Beauty schools & salons?{' '}
-                  <Link href="" className="text-brand-red-600 font-medium hover:underline">Dashboard clone for beauty programs →</Link>
                 </p>
               </div>
             </div>

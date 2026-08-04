@@ -124,44 +124,6 @@ export default function StorePage() {
         </div>
       </section>
 
-      {/* ============ BEAUTY DASHBOARD CLONE ============ */}
-      <section className="py-14 sm:py-20 bg-brand-red-50 border-y border-brand-red-100">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row gap-8 items-center">
-          <div className="flex-1">
-            <p className="text-brand-red-700 font-bold text-xs uppercase tracking-widest mb-2">Store · Beauty vertical</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">
-              Dashboard clone for outside beauty organizations
-            </h2>
-            <p className="text-slate-600 mb-6">
-              Barber, cosmetology, esthetician, and nail schools can license your admin dashboard experience —
-              branded tenant, 14-day trial, and program templates ready to configure.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/store/plans?vertical=beauty"
-                className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-red-700"
-              >
-                Beauty plans from $29/mo <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href=""
-                className="inline-flex items-center gap-2 border border-slate-300 bg-white px-6 py-3 rounded-lg font-bold text-slate-900 hover:bg-slate-50"
-              >
-                Program overview
-              </Link>
-            </div>
-          </div>
-          <div className="relative w-full md:w-72 aspect-square rounded-xl overflow-hidden shadow-lg flex-shrink-0">
-            <Image
-              src="/images/pages/barber-gallery-1.webp"
-              alt="Beauty school training"
-              fill
-              className="object-cover"
-              sizes="288px"
-            />
-          </div>
-        </div>
-      </section>
 
       {/* ============ WHO BUYS THIS ============ */}
       <section className="py-14 sm:py-20">

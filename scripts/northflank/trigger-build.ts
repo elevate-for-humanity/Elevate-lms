@@ -26,6 +26,14 @@ interface NorthflankBuildResponse {
   createdAt?: string;
 }
 
+function requireEnvironmentVariable(name: string): string {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(`${name} is required but was not provided.`);
+  }
+  return value;
+}
+
 async function getExistingBuildArguments(
   projectId: string,
   serviceId: string,
@@ -72,15 +80,30 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('=== TRIGGER BUILD ===');
-  console.log('Service:', serviceId);
-  console.log('SHA:', currentSha);
+  // ─── Build arguments ───────────────────────────────────────────────────────
+  const nextPublicSupabaseUrl = requireEnvironmentVariable('NEXT_PUBLIC_SUPABASE_URL');
+  const nextPublicSupabaseAnonKey = requireEnvironmentVariable('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
-  // Step 1: PATCH combined/{id} to set buildArguments + trigger config build
+  const nextPublicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
+  const nextPublicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhumanity.org';
+  const nextPublicAdminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org';
+
   const existingArgs = await getExistingBuildArguments(projectId, serviceId);
   const serviceName = serviceId.replace(/^elevate-/, '');
+
   const mergedBuildArguments: Record<string, string> = {
     ...existingArgs,
+
+    // Supabase — REQUIRED for all services
+    NEXT_PUBLIC_SUPABASE_URL: nextPublicSupabaseUrl,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: nextPublicSupabaseAnonKey,
+
+    // URLs — REQUIRED for all services
+    NEXT_PUBLIC_SITE_URL: nextPublicSiteUrl,
+    NEXT_PUBLIC_APP_URL: nextPublicAppUrl,
+    NEXT_PUBLIC_ADMIN_URL: nextPublicAdminUrl,
+
+    // Build identity
     GITHUB_SHA: currentSha,
     GIT_SHA: currentSha,
     NEXT_PUBLIC_GIT_SHA: currentSha,
@@ -90,6 +113,23 @@ async function main() {
     FALLBACK_COMMIT: currentSha,
   };
 
+  // ─── Validation ───────────────────────────────────────────────────────────
+  for (const required of [
+    'GIT_SHA',
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+  ]) {
+    if (!mergedBuildArguments[required]) {
+      throw new Error(`Missing required Northflank build argument: ${required}`);
+    }
+  }
+
+  console.log('=== TRIGGER BUILD ===');
+  console.log('Service:', serviceId);
+  console.log('SHA:', currentSha);
+  console.log('Build arguments:', Object.keys(mergedBuildArguments));
+
+  // Step 1: PATCH combined/{id} to set buildArguments + trigger config build
   const patchPath = projectApiPath(projectId, `/services/combined/${serviceId}`);
   const patchPayload = {
     buildArguments: mergedBuildArguments,

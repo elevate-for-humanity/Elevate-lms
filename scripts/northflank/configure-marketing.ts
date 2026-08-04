@@ -36,6 +36,14 @@ const healthChecks = [
   },
 ];
 
+function requireEnvironmentVariable(name: string): string {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    throw new Error(`${name} is required but was not provided.`);
+  }
+  return value;
+}
+
 async function main() {
   const dryRun = !process.argv.includes('--execute');
   const projectId = resolveProjectId();
@@ -46,8 +54,24 @@ async function main() {
     process.exit(1);
   }
 
+  // ─── Build arguments (required for Docker build) ──────────────────────────
+  const nextPublicSupabaseUrl = requireEnvironmentVariable('NEXT_PUBLIC_SUPABASE_URL');
+  const nextPublicSupabaseAnonKey = requireEnvironmentVariable('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+  const nextPublicSiteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
+  const nextPublicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhumanity.org';
+  const nextPublicAdminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org';
+
+  const marketingBuildArguments: Record<string, string> = {
+    NEXT_PUBLIC_SITE_URL: nextPublicSiteUrl,
+    NEXT_PUBLIC_APP_URL: nextPublicAppUrl,
+    NEXT_PUBLIC_ADMIN_URL: nextPublicAdminUrl,
+    NEXT_PUBLIC_SUPABASE_URL: nextPublicSupabaseUrl,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: nextPublicSupabaseAnonKey,
+  };
+
   console.info(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
   console.info(`Project: ${projectId}, Service: ${serviceId}`);
+  console.info('Build arguments:', Object.keys(marketingBuildArguments));
 
   // Read current service using the regular service path (combined path only works for PATCH, not GET)
   const serviceGetPath = `/projects/${projectId}/services/${serviceId}`;
@@ -74,6 +98,7 @@ async function main() {
         },
       },
     },
+    buildArguments: marketingBuildArguments,
     healthChecks,
     buildConfiguration: {
       pathIgnoreRules: [
@@ -111,6 +136,7 @@ async function main() {
     console.info('   Dockerfile: /Dockerfile.marketing');
     console.info('   Port: 3000');
     console.info('   Health check: /api/ping');
+    console.info('   Build arguments:', Object.keys(marketingBuildArguments));
   } else {
     console.info('\nRe-run with --execute to apply.');
   }

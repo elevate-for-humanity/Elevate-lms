@@ -117,6 +117,23 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       # PHASE 4: Standardize Northflank preparation
+      - name: Verify required Marketing secrets
+        run: |
+          set -euo pipefail
+
+          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || {
+            echo "NEXT_PUBLIC_SUPABASE_URL GitHub secret is missing"
+            exit 1
+          }
+
+          test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" || {
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY GitHub secret is missing"
+            exit 1
+          }
+
+          echo "Supabase URL is configured"
+          echo "Supabase anonymous key is configured"
+
       - name: Configure Northflank Marketing service
         run: pnpm tsx scripts/northflank/configure-marketing.ts --execute
 

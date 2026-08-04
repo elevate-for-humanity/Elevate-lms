@@ -21,17 +21,24 @@ function requireUrl(name: string): string {
 export function getPublicSiteUrl(): string {
   const publicUrl = (process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || '').trim();
   if (publicUrl) return publicUrl.replace(/\/$/, '');
-  return getSiteUrl();
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || '').trim();
+  if (siteUrl) return siteUrl.replace(/\/$/, '');
+  return `https://${PLATFORM_DEFAULTS.canonicalDomain}`;
 }
 
 /** LMS app base URL — canonical public site (www), not the admin subdomain */
 export function getSiteUrl(): string {
-  return requireUrl('NEXT_PUBLIC_SITE_URL');
+  const val = (process.env.NEXT_PUBLIC_SITE_URL || '').trim();
+  if (val) return val.replace(/\/$/, '');
+  return `https://${PLATFORM_DEFAULTS.canonicalDomain}`;
 }
 
 /** Admin app base URL — https://admin.${PLATFORM_DEFAULTS.canonicalDomain} */
 export function getAdminUrl(): string {
-  const url = requireUrl('NEXT_PUBLIC_ADMIN_URL');
+  const url = (process.env.NEXT_PUBLIC_ADMIN_URL || '').trim();
+  if (!url) {
+    return `https://admin.${PLATFORM_DEFAULTS.canonicalDomain.replace(/^www\./, '')}`;
+  }
   try {
     const parsed = new URL(url);
     if (parsed.hostname.toLowerCase().endsWith('.elb.amazonaws.com')) {

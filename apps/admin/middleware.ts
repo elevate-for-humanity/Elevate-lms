@@ -18,6 +18,8 @@ const PUBLIC_PATHS = [
   '/admin/studio',
   '/admin/dev-studio',
   '/admin/install',
+  '/admin/course-builder',
+  '/admin/cfd-studio',
 ];
 
 export async function middleware(req: NextRequest) {
@@ -29,6 +31,14 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
     /[a-z0-9]+\.[a-z]+$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
+  // Explicitly allow course-builder and cfd-studio before IP check
+  if (
+    pathname.startsWith('/admin/course-builder') ||
+    pathname.startsWith('/cfd-studio')
   ) {
     return NextResponse.next();
   }

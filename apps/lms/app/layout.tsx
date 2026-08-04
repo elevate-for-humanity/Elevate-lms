@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
+import './client-polyfills';
 import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 import { I18nProvider } from '@/lib/i18n/context';
 

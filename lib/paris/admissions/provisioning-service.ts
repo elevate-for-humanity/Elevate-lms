@@ -183,6 +183,16 @@ export async function provisionEnrollment(
       barriers: application.barriers,
     });
     result.profileId = profileId;
+
+    // 3a. Save career goal and employment status to learner_onboarding
+    await upsertLearnerGoals(supabase, {
+      userId,
+      careerGoal: application.career_goal as string | undefined,
+    });
+    await upsertLearnerEmploymentStatus(supabase, {
+      userId,
+      employmentStatus: application.employment_status as string | undefined,
+    });
     
     // 4. Assign student role
     const roleId = await assignStudentRole(supabase, {
@@ -439,6 +449,25 @@ async function ensureStudentProfile(
     barriers?: unknown[];
   },
 ): Promise<string> {
+  const combinedAddress = [
+    data.address.line1?.trim(),
+    data.address.line2?.trim(),
+  ]
+    .filter((v): v is string => Boolean(v))
+    .join(', ');
+
+  const profilePayload = {
+    first_name: data.firstName.trim(),
+    last_name: data.lastName.trim(),
+    phone: data.phone?.trim() || null,
+    address: combinedAddress || null,
+    city: data.address.city?.trim() || null,
+    state: data.address.state?.trim() || null,
+    zip_code: data.address.postalCode?.trim() || null,
+    date_of_birth: data.dateOfBirth || null,
+    updated_at: new Date().toISOString(),
+  };
+
   // Check existing profile
   const { data: existing } = await supabase
     .from('profiles')
@@ -448,53 +477,149 @@ async function ensureStudentProfile(
   
   if (existing) {
     // Update existing profile
-    await supabase
+    const { error: updateError } = await supabase
       .from('profiles')
-      .update({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        phone: data.phone,
-        address_line_1: data.address.line1,
-        address_line_2: data.address.line2,
-        city: data.address.city,
-        state: data.address.state,
-        postal_code: data.address.postalCode,
-        date_of_birth: data.dateOfBirth,
-        updated_at: new Date().toISOString(),
-      })
+      .update(profilePayload)
       .eq('id', data.userId);
+
+    if (updateError) {
+      throw new Error(`Failed to update profile: ${updateError.message}`);
+    }
     
     return existing.id;
   }
   
   // Create new profile
-  const { data: profile, error } = await supabase
+  const { data: profile, error: insertError } = await supabase
     .from('profiles')
     .insert({
       id: data.userId,
-      email: data.email,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      phone: data.phone,
-      address_line_1: data.address.line1,
-      address_line_2: data.address.line2,
-      city: data.address.city,
-      state: data.address.state,
-      postal_code: data.address.postalCode,
-      date_of_birth: data.dateOfBirth,
-      highest_education: data.highestEducation,
-      employment_status: data.employmentStatus,
-      career_goal: data.careerGoal,
-      barriers: data.barriers,
+      email: data.email.trim().toLowerCase(),
+      ...profilePayload,
     })
     .select('id')
     .single();
   
-  if (error) {
-    throw new Error(`Failed to create profile: ${error.message}`);
+  if (insertError) {
+    throw new Error(`Failed to create profile: ${insertError.message}`);
+  }
+
+  if (!profile?.id) {
+    throw new Error('Profile creation succeeded but no profile ID was returned.');
   }
   
   return profile.id;
+}
+
+/**
+ * Saves career goal to learner_onboarding.
+ * NOTE: learner_onboarding.user_id is UUID (matches auth.users.id).
+ * The goals column stores free-text career goal.
+ */
+async function upsertLearnerGoals(
+  supabase: ReturnType<typeof getServiceClient>,
+  data: { userId: string; careerGoal?: string },
+): Promise<void> {
+  if (!data.careerGoal?.trim()) {
+    return;
+  }
+
+  // Check if record exists
+  const { data: existing } = await supabase
+    .from('learner_onboarding')
+    .select('id')
+    .eq('user_id', data.userId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from('learner_onboarding')
+      .update({
+        goals: data.careerGoal.trim(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', data.userId);
+
+    if (error) {
+      logger.warn('[provisioning] Failed to update learner goals', {
+        error: error.message,
+        userId: data.userId,
+      });
+    }
+    return;
+  }
+
+  // Insert new record
+  const { error } = await supabase
+    .from('learner_onboarding')
+    .insert({
+      user_id: data.userId,
+      goals: data.careerGoal.trim(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+  if (error) {
+    logger.warn('[provisioning] Failed to create learner goals record', {
+      error: error.message,
+      userId: data.userId,
+    });
+  }
+}
+
+/**
+ * Saves employment status to learner_onboarding.
+ * The employment_status column stores the value from application.
+ */
+async function upsertLearnerEmploymentStatus(
+  supabase: ReturnType<typeof getServiceClient>,
+  data: { userId: string; employmentStatus?: string },
+): Promise<void> {
+  if (!data.employmentStatus?.trim()) {
+    return;
+  }
+
+  // Check if record exists
+  const { data: existing } = await supabase
+    .from('learner_onboarding')
+    .select('id')
+    .eq('user_id', data.userId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from('learner_onboarding')
+      .update({
+        employment_status: data.employmentStatus.trim(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', data.userId);
+
+    if (error) {
+      logger.warn('[provisioning] Failed to update learner employment status', {
+        error: error.message,
+        userId: data.userId,
+      });
+    }
+    return;
+  }
+
+  // Insert new record
+  const { error } = await supabase
+    .from('learner_onboarding')
+    .insert({
+      user_id: data.userId,
+      employment_status: data.employmentStatus.trim(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+
+  if (error) {
+    logger.warn('[provisioning] Failed to create learner employment status record', {
+      error: error.message,
+      userId: data.userId,
+    });
+  }
 }
 
 async function assignStudentRole(

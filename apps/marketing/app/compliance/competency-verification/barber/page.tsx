@@ -170,7 +170,7 @@ export default function BarberCompetencyRubricPage() {
       <div className="hidden print:block px-8 pt-8 pb-4 border-b-2 border-slate-900">
         <h1 className="text-2xl font-bold text-slate-900">Barber Apprenticeship — Competency Rubric</h1>
         <p className="text-sm text-slate-700">{PLATFORM_DEFAULTS.orgName} | RAPIDS ID: 2025-IN-132301</p>
-        <p className="text-xs text-slate-700 mt-1">Occupation: Barber (330.371-010) | Total: 2,000 hours (144 RTI + 1,500 OJT)</p>
+        <p className="text-xs text-slate-700 mt-1">Occupation: Barber (330.371-010) | Total: 2,000 hours (260 RTI + 1,500 OJT)</p>
       </div>
 
       {/* Overview */}
@@ -216,7 +216,7 @@ export default function BarberCompetencyRubricPage() {
               <dl className="space-y-1.5 text-xs text-slate-900">
                 <div><dt className="font-semibold text-slate-700 inline">RAPIDS ID:</dt> <dd className="inline">2025-IN-132301</dd></div>
                 <div><dt className="font-semibold text-slate-700 inline">Occupation:</dt> <dd className="inline">Barber (DOT 330.371-010)</dd></div>
-                <div><dt className="font-semibold text-slate-700 inline">Total Hours:</dt> <dd className="inline">2,000 (144 RTI + 1,500 OJT + supplemental)</dd></div>
+                <div><dt className="font-semibold text-slate-700 inline">Total Hours:</dt> <dd className="inline">2,000 (260 RTI + 1,500 OJT)</dd></div>
                 <div><dt className="font-semibold text-slate-700 inline">Credential:</dt> <dd className="inline">Indiana Barber License (PLA)</dd></div>
                 <div><dt className="font-semibold text-slate-700 inline">State Board:</dt> <dd className="inline">Indiana Professional Licensing Agency</dd></div>
               </dl>

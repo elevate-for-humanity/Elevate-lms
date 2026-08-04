@@ -39,8 +39,8 @@ export function AdminFooter() {
           <div>
             <h3 className="font-bold text-sm mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><Link href="/help" className="text-slate-400 hover:text-white text-sm transition-colors">Help Center</Link></li>
-              <li><Link href="/documentation" className="text-slate-400 hover:text-white text-sm transition-colors">Documentation</Link></li>
+              <li><a href="https://docs.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white text-sm transition-colors">Help Center</a></li>
+              <li><a href="https://docs.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white text-sm transition-colors">Documentation</a></li>
               <li><Link href="/api-keys" className="text-slate-400 hover:text-white text-sm transition-colors">API Keys</Link></li>
               <li><Link href="/system-health" className="text-slate-400 hover:text-white text-sm transition-colors">System Status</Link></li>
             </ul>
@@ -57,7 +57,7 @@ export function AdminFooter() {
                 </a>
               </li>
               <li>
-                <a href="https://lms.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" 
+                <a href="https://app.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" 
                    className="text-slate-400 hover:text-white text-sm transition-colors flex items-center gap-1">
                   Student LMS <ExternalLink className="w-3 h-3" />
                 </a>

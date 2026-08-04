@@ -34,14 +34,14 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop nav - horizontal links (xl screens and up) */}
-        <div className="hidden xl:flex justify-center min-w-0 overflow-visible">
+        {/* Desktop nav - horizontal links (lg screens and up) */}
+        <div className="hidden md:flex justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
-        <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 xl:gap-1 flex-shrink-0 min-w-0">
+        <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 lg:gap-1 flex-shrink-0 min-w-0">
           {/* Desktop: Sign In / Apply buttons */}
-          <div className="hidden xl:flex items-center gap-2 mr-2">
+          <div className="hidden md:flex items-center gap-2 mr-2">
             <Link
               href="/login"
               className="text-sm text-slate-600 hover:text-slate-900 px-3 py-2"
@@ -55,8 +55,8 @@ export default function Header() {
               Apply
             </Link>
           </div>
-          {/* Mobile hamburger menu - show on screens below xl (vertical drawer with subpages) */}
-          <span className="xl:hidden">
+          {/* Mobile hamburger menu - show on screens below lg (vertical drawer with subpages) */}
+          <span className="md:hidden">
             <HeaderMobileMenu items={NAV_ITEMS} programApplyLinks={PROGRAM_APPLY_LINKS} />
           </span>
         </div>

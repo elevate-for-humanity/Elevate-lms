@@ -11,7 +11,7 @@ export const barberConfig: ProgramConfig = {
   primaryCta: { label: 'Apply Now', href: '/programs/barber-apprenticeship/apply' },
   secondaryCta: { label: 'Learn More', href: '/apply' },
   stats: [
-    { value: '2,000', label: 'Training Hours' },
+    { value: '2,000', label: 'Total Hours (1,500 OJT + 260 RTI)' },
     { value: '12-18', label: 'Months' },
     { value: '$0', label: 'with Funding' },
   ],
@@ -83,7 +83,7 @@ export const barberConfig: ProgramConfig = {
     { 
       icon: '🎉', 
       title: 'Graduate & License', 
-      description: 'Complete 2,000 hours, pass the state exam, and earn your Barber License',
+      description: 'Complete 2,000 total hours (1,500 OJT + 260 RTI), pass the state exam, and earn your Barber License',
       image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=100&h=100&fit=crop'
     },
   ],
@@ -254,7 +254,7 @@ export const barberConfig: ProgramConfig = {
     },
     {
       question: 'How many hours are required for licensure?',
-      answer: 'The Indiana Barber License requires 2,000 hours of training, which includes both Related Technical Instruction (RTI) and On-the-Job Training (OJT).',
+      answer: 'The Indiana Barber License requires 2,000 total hours: 1,500 OJT + 260 RTI.',
     },
     {
       question: 'What certifications will I earn?',

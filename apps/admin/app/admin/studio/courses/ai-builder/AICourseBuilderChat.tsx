@@ -103,7 +103,7 @@ export default function AICourseBuilderChat({
           title: c.title,
           slug: c.slug,
           status: c.status,
-          manageUrl: `/admin/courses/${c.id}`,
+          manageUrl: `/admin/studio/courses/${c.id}`,
           viewUrl: `${SITE_URL}/lms/courses/${c.id}`,
         }));
         setExistingCourses(courses);

@@ -34,6 +34,7 @@ export type UserRole =
   | 'case_manager'
   | 'provider_admin'
   | 'grant_client'
+  | 'apprentice'
 
 /**
  * Maps every role to its canonical post-auth landing page.
@@ -72,6 +73,13 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
 
   // ── Learners ──────────────────────────────────────────────────────
   student: '/learner/dashboard',
+
+  // ── Apprentices ──────────────────────────────────────────────────
+  // Apprentices are enrolled in a program and should land on their program portal.
+  // The ApprenticeLoginForm calls resolveStudentHomePath which resolves the exact
+  // portal (/portal/barber, /portal/cosmetology, etc.) based on program enrollment.
+  // Direct role-based routing falls back to /apprentice if no program portal matches.
+  apprentice: '/portal/barber',
 
   // ── Family ────────────────────────────────────────────────────────
   // parent role handled via /parent-portal — no requireRole yet, falls through

@@ -9,8 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "next": "15.5.15",
+    "process": "^0.11.10",
     "react": "19.2.7",
     "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
   }
 }

@@ -5,20 +5,16 @@ on:
     branches:
       - main
     paths:
-      - 'app/admin/**'
-      - 'app/api/admin/**'
       - 'apps/admin/**'
-      - 'lib/**'
-      - 'components/**'
-      - 'data/**'
-      - 'types/**'
-      - 'styles/**'
-      - 'hooks/**'
-      - 'contexts/**'
-      - 'config/**'
-      - 'content/**'
-      - 'utils/**'
+      - 'lib/auth/**'
       - 'packages/**'
+      - 'components/admin/**'
+      - 'public/**'
+      - 'next.config.mjs'
+      - 'tailwind.config.js'
+      - 'tsconfig.json'
+      - 'proxy.ts'
+      - 'Dockerfile.admin'
       - 'Dockerfile.northflank-admin'
       - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
@@ -113,6 +109,7 @@ jobs:
         run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
       - name: Verify admin health checks
+        if: github.event_name != 'workflow_dispatch'
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank

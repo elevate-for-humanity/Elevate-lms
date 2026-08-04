@@ -1,9 +1,13 @@
 #!/usr/bin/env tsx
 /**
- * Restart a Northflank combined service container.
+ * Restart/scale-up a Northflank combined service container.
  *
- * After patching service config (health checks, CI/CD, strategy), this script
- * restarts the container using POST /services/{serviceId}/restart.
+ * API Bug: POST /services/{serviceId}/restart returns HTTP 200 + {"data":{}}
+ * but does NOT start containers when instances=0.
+ *
+ * The correct endpoint is POST /services/{serviceId}/scale with {"instances":1}.
+ * This actually starts the containers and returns HTTP 200.
+ *
  * No new build is triggered — uses the currently deployed image.
  *
  * Usage:
@@ -28,23 +32,29 @@ async function main() {
     process.exit(1);
   }
 
-  // Restart endpoint: POST /services/{serviceId}/restart (no payload needed)
-  // This restarts the currently deployed container with the latest config
-  const endpoint = projectApiPath(projectId, `/services/${serviceId}/restart`);
+  // BUGFIX: POST /services/{serviceId}/restart returns 200 but doesn't start containers.
+  // POST /services/{serviceId}/scale with instances=1 is the correct endpoint.
+  const scaleEndpoint = projectApiPath(projectId, `/services/${serviceId}/scale`);
+  console.info(`POST ${scaleEndpoint} (scale up to 1 instance)`);
 
-  console.info(`POST ${endpoint} (restart currently deployed container)`);
-
+  // Try /restart first to do a proper restart if containers are already running.
+  // Ignore errors — /restart fails silently when containers are suspended.
   try {
-    const result = await nfFetch(endpoint, {
-      method: 'POST',
-      body: '{}',
-    });
-    console.info(`[restart-ok] ${serviceId}: restarted`);
-  } catch (e) {
-    const err = e instanceof Error ? e.message : String(e);
-    console.error(`[restart-fail] ${serviceId}: ${err}`);
-    process.exit(1);
+    const restartEndpoint = projectApiPath(projectId, `/services/${serviceId}/restart`);
+    await nfFetch(restartEndpoint, { method: 'POST', body: '{}' });
+    console.info(`[restart] ${serviceId}: restart OK`);
+  } catch {
+    console.info(`[restart] ${serviceId}: returned non-200 (suspended — will scale up)`);
   }
+
+  // Scale up to 1 instance — this is what actually starts containers
+  // This is the key fix: /scale actually brings containers online when instances=0.
+  const result = await nfFetch(scaleEndpoint, {
+    method: 'POST',
+    body: JSON.stringify({ instances: 1 }),
+  });
+  console.info(`[restart-ok] ${serviceId}: scaled to 1 instance ✅`);
+  console.info(`Scale result:`, result);
 }
 
 main().catch((e) => {

@@ -98,7 +98,7 @@ export default function FinalSignoffPage() {
             <tbody>
               <tr>
                 <td className="p-2 border print:p-1">Related Technical Instruction (RTI)</td>
-                <td className="p-2 border text-center print:p-1">144 hours</td>
+                <td className="p-2 border text-center print:p-1">260 hours</td>
                 <td className="p-2 border text-center print:p-1">&nbsp;</td>
                 <td className="p-2 border text-center print:p-1">☐</td>
               </tr>

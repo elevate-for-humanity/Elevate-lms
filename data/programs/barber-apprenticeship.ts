@@ -4,13 +4,13 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * Barber Apprenticeship — Program Detail Template v1
  * Indiana DOL Registered Apprenticeship
- * Indiana requires 2,000 hours total: 1,500 OJT + 500 RTI.
+ * Indiana requires 2,000 hours total: 1,500 OJT + 260 RTI.
  * Tuition ($4,980) covers the full program — RTI instruction, tool kit, exam fees, and placement support.
  */
 export const BARBER_APPRENTICESHIP: ProgramSchema = {
   slug: 'barber-apprenticeship',
   title: 'Barber Apprenticeship',
-  subtitle: 'DOL Registered Apprenticeship in barbering. Complete 2,000 hours of training (1,500 OJT + 500 RTI) to earn your Indiana Barber License.',
+  subtitle: 'DOL Registered Apprenticeship in barbering. Complete 2,000 hours of training (1,500 OJT + 260 RTI) to earn your Indiana Barber License.',
   sector: 'personal-services',
   category: 'Personal Services',
   programType: 'apprenticeship',
@@ -134,7 +134,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
 
   complianceAlignment: [
     { standard: 'DOL Registered Apprenticeship', description: 'Program registered with the U.S. Department of Labor. Apprentices earn a nationally portable credential.' },
-    { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (2,000 hours: 1,500 OJT + 500 RTI).' },
+    { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (2,000 hours: 1,500 OJT + 260 RTI).' },
     { standard: 'Indiana Board of Cosmetology and Barber Examiners', description: 'Curriculum aligned to state licensing exam content and sanitation standards.' },
     { standard: 'DOL Apprenticeship Standards', description: 'Program follows DOL registered apprenticeship wage and hour requirements. Employer-sponsored funding may apply.' },
     { standard: 'Indiana Professional Licensing Agency', description: 'Program prepares apprentices for the Indiana Barber License exam administered by the Indiana Professional Licensing Agency.' },
@@ -184,7 +184,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       weeks: 'Weeks 41–52',
       focus: 'Supervised shop floor hours, client management, and Indiana state board exam preparation.',
       labCompetencies: [
-        'Complete 2,000 supervised apprenticeship hours (1,500 OJT + 500 RTI)',
+        'Complete 2,000 supervised apprenticeship hours (1,500 OJT + 260 RTI)',
         'Manage a personal client book of 20+ regular clients',
         'Pass practical exam simulation (4 required skills)',
         'Pass written exam practice test with 75%+ score',
@@ -250,7 +250,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     'Indiana Barber Association',
   ],
   pricingIncludes: [
-    'Full 2,000-hour program (500 hrs RTI + 1,500 hrs OJT)',
+    'Full 2,000-hour program (260 hrs RTI + 1,500 hrs OJT)',
     'Starter barber tool kit',
     'Indiana Barber License exam fee',
     'LMS access for full program duration',
@@ -276,8 +276,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       courseId: 'prestige-elevation-barber-curriculum',
       label: 'Prestige Elevation Barber Curriculum',
       partnerName: 'Elevate for Humanity',
-      credentialIssued: 'RTI completion (500 hours)',
-      duration: '500 hours RTI',
+      credentialIssued: 'RTI completion (260 hours)',
+      duration: '260 hours RTI',
       required: true,
       enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
@@ -296,7 +296,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
 
   faqs: [
     { question: 'How much does the program cost?', answer: 'Tuition is $4,980. Payment plans are available — contact us to discuss options.' },
-    { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 500 hours of Related Technical Instruction delivered online.' },
+    { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 260 hours of Related Technical Instruction delivered online.' },
     { question: 'Do I need my own barbershop?', answer: 'No. We match you with a licensed host barbershop in the Indianapolis area. The host shop provides your on-the-job training environment.' },
     { question: 'What license do I earn?', answer: 'The Indiana Barber License, issued by the Indiana State Board of Cosmetology and Barber Examiners. You also earn a DOL Registered Apprenticeship certificate, which is recognized in all 50 states.' },
   ],

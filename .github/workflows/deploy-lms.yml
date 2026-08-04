@@ -5,31 +5,26 @@ on:
     branches:
       - main
     paths:
-      - 'app/**'
-      - '!app/admin/**'
-      - 'apps/admin/**'
       - 'apps/lms/**'
+      - 'lib/auth/**'
+      - 'lib/portal/**'
+      - 'lib/supabase/**'
+      - 'lib/llm/**'
+      - 'lib/embeddings/**'
+      - 'components/lms/**'
+      - 'components/portal/**'
+      - 'components/auth/**'
+      - 'packages/shared-utils/**'
       - 'Dockerfile.lms'
-      - 'components/**'
-      - 'lib/**'
-      - 'public/**'
-      - 'packages/**'
-      - 'styles/**'
-      - 'data/**'
-      - 'types/**'
-      - 'hooks/**'
-      - 'contexts/**'
-      - 'config/**'
-      - 'content/**'
-      - 'utils/**'
-      - 'proxy.ts'
+      - 'Dockerfile.northflank-lms'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
-      - 'Dockerfile.northflank-lms'
+      - 'proxy.ts'
       - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
       - 'package.json'
+      - 'pnpm-workspace.yaml'
       - '.github/workflows/deploy-lms.yml'
   workflow_dispatch:
     inputs:
@@ -66,6 +61,7 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_GIT_SHA: ${{ github.sha }}
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org

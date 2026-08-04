@@ -1,19 +1,28 @@
-const BUILD_ID = "elevate-admin-v1";
+const BUILD_ID = "elevate-admin-v3";
+const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 const STATIC_CACHE = `${BUILD_ID}-static`;
 
 const STATIC_ASSETS = [
-  "/admin/install",
-  "/icons/admin-192.png",
-  "/icons/admin-512.png",
-  "/icons/admin-maskable-512.png",
+  `${CDN}/icons/admin-192.png`,
+  `${CDN}/icons/admin-512.png`,
+  `${CDN}/icons/admin-512-maskable.png`,
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(STATIC_CACHE)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
-      .then(() => self.skipWaiting()),
+      .then((cache) => 
+        Promise.all(
+          STATIC_ASSETS.map((url) =>
+            fetch(url).then((res) => {
+              if (res.ok) return cache.put(url, res);
+            }).catch(() => {})
+          )
+        )
+      )
+      .then(() => self.skipWaiting())
+      .catch(() => self.skipWaiting()),
   );
 });
 
@@ -24,6 +33,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
+            .filter((key) => key.startsWith("elevate-admin-"))
             .filter((key) => key !== STATIC_CACHE)
             .map((key) => caches.delete(key)),
         ),

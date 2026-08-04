@@ -102,7 +102,15 @@ export function combinedServicePatchPath(projectId: string, serviceId: string): 
   return projectApiPath(projectId, `/services/combined/${serviceId}`);
 }
 
-/** @deprecated Use combinedServicePatchPath for PATCH. */
+/**
+ * GET combined service status — uses /services/{id} (not /services/combined/{id}).
+ * The /services/combined/{id} endpoint only supports PATCH, not GET (returns 405).
+ * For GET operations (status polling, build wait), use the regular service path.
+ *
+ * @deprecated Use serviceGetPath() for GET operations. Only use this for PATCH via combinedServicePatchPath().
+ */
 export function combinedServicePath(projectId: string, serviceId: string): string {
-  return combinedServicePatchPath(projectId, serviceId);
+  // BUGFIX: Was returning /services/combined/{id} which returns 405 for GET.
+  // Northflank combined services use /services/{id} for GET, /services/combined/{id} for PATCH only.
+  return serviceGetPath(projectId, serviceId);
 }

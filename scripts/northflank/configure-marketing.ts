@@ -1,73 +1,119 @@
 #!/usr/bin/env tsx
 /**
- * Configure elevate-marketing service to use correct Dockerfile and port
- * Usage: NORTHFLANK_API_TOKEN=<token> NORTHFLANK_PROJECT_ID=<id> npx tsx scripts/northflank/configure-marketing.ts
+ * Configure elevate-marketing service to use correct Dockerfile and port.
+ * Uses combinedServicePatchPath to avoid 405 "Method Not Allowed" errors.
+ * Usage: npx tsx scripts/northflank/configure-marketing.ts --dry-run
+ *        npx tsx scripts/northflank/configure-marketing.ts --execute
  */
 
-import { nfFetch, projectApiPath, resolveProjectId, resolveTeamId } from './lib';
+import {
+  combinedServicePatchPath,
+  nfFetch,
+  resolveProjectId,
+} from './lib';
+
+const healthChecks = [
+  {
+    protocol: 'HTTP',
+    type: 'startupProbe',
+    path: '/api/ping',
+    port: 3000,
+    initialDelaySeconds: 60,
+    periodSeconds: 10,
+    timeoutSeconds: 10,
+    failureThreshold: 12,
+  },
+  {
+    protocol: 'HTTP',
+    type: 'readinessProbe',
+    path: '/api/health',
+    port: 3000,
+    initialDelaySeconds: 30,
+    periodSeconds: 10,
+    timeoutSeconds: 10,
+    failureThreshold: 3,
+    successThreshold: 1,
+  },
+];
 
 async function main() {
+  const dryRun = !process.argv.includes('--execute');
   const projectId = resolveProjectId();
-  const teamId = resolveTeamId();
-  
+  const serviceId = process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing';
+
   if (!projectId) {
     console.error('Missing NORTHFLANK_PROJECT_ID');
     process.exit(1);
   }
-  
-  const serviceId = 'elevate-marketing';
-  
-  console.log(`Configuring service "${serviceId}" in project ${projectId}...`);
-  
-  // First, get current service configuration
-  const path = teamId 
-    ? `/teams/${teamId}/projects/${projectId}/services/${serviceId}`
-    : `/projects/${projectId}/services/${serviceId}`;
-  
-  const service = await nfFetch<any>(path);
-  console.log('Current service config:', JSON.stringify(service, null, 2));
-  
-  // Update Dockerfile path
-  console.log('\nUpdating Dockerfile path to /Dockerfile.marketing...');
-  await nfFetch(`${path}/build`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      vcsData: {
+
+  console.info(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
+  console.info(`Project: ${projectId}, Service: ${serviceId}`);
+
+  // Read current service using the regular service path (combined path only works for PATCH, not GET)
+  const serviceGetPath = `/projects/${projectId}/services/${serviceId}`;
+  const service = await nfFetch<any>(serviceGetPath);
+  const currentEphemeralMb =
+    service?.buildSettings?.storage?.ephemeralStorage?.storageSize ??
+    service?.buildConfiguration?.storage?.ephemeralStorage?.storageSize ??
+    16384;
+
+  const patch = {
+    buildSettings: {
+      dockerfile: {
+        buildEngine: 'buildkit',
         dockerFilePath: '/Dockerfile.marketing',
-        dockerWorkDir: '/'
-      }
-    })
-  });
-  console.log('✓ Dockerfile path updated');
-  
-  // Update health check port to 3000
-  console.log('\nUpdating health check port to 3000...');
-  await nfFetch(`${path}/health-check`, {
-    method: 'PATCH',
-    body: JSON.stringify({
-      healthCheck: {
-        enabled: true,
-        path: '/api/ping',
-        port: 3000,
-        protocol: 'HTTP',
-        initialDelaySeconds: 60,
-        periodSeconds: 10,
-        timeoutSeconds: 5,
-        failureThreshold: 3
-      }
-    })
-  });
-  console.log('✓ Health check updated');
-  
-  // Verify the changes
-  console.log('\nVerifying configuration...');
-  const updated = await nfFetch<any>(path);
-  console.log('Updated service config:', JSON.stringify(updated, null, 2));
-  
-  console.log('\n✅ Marketing service configured correctly!');
-  console.log('   Dockerfile: /Dockerfile.marketing');
-  console.log('   Port: 3000');
-  console.log('   Health check: /api/ping');
+        dockerWorkDir: '/',
+        buildkit: {
+          useCache: false,
+          cacheStorageSize: 0,
+        },
+      },
+      storage: {
+        ephemeralStorage: {
+          storageSize: currentEphemeralMb,
+        },
+      },
+    },
+    healthChecks,
+    buildConfiguration: {
+      pathIgnoreRules: [
+        'apps/admin/**',
+        'apps/lms/**',
+        'Dockerfile.northflank-admin',
+        'Dockerfile.northflank-lms',
+      ],
+      storage: {
+        ephemeralStorage: {
+          storageSize: currentEphemeralMb,
+        },
+      },
+    },
+  };
+
+  console.info(
+    `${dryRun ? '[dry-run]' : '[patch]'} ${serviceId} -> Dockerfile.marketing, health /api/ping:3000`,
+  );
+
+  if (!dryRun) {
+    const response = await nfFetch<any>(combinedServicePatchPath(projectId, serviceId), {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+
+    const probes = Array.isArray(response?.healthChecks) ? response.healthChecks : healthChecks;
+    const probeSummary = probes
+      .map((p: { type?: string; path?: string; port?: number }) =>
+        `${p.type ?? '?'}:${p.path ?? '?'}:${p.port ?? '?'}`
+      )
+      .join(', ');
+    console.info(`[patch-ok] ${serviceId} health=[${probeSummary}]`);
+    console.info('\n✅ Marketing service configured correctly!');
+    console.info('   Dockerfile: /Dockerfile.marketing');
+    console.info('   Port: 3000');
+    console.info('   Health check: /api/ping');
+  } else {
+    console.info('\nRe-run with --execute to apply.');
+  }
 }
 
 main().catch((e) => {

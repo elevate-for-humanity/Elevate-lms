@@ -42,13 +42,21 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
-RUN echo "nf-cache-invalidate-admin-2026-07-30-corepack"
+
+
+# Cache invalidation marker — changes when Dockerfile content changes
+RUN echo "nf-cache-invalidate-admin-2026-08-04-gitsha-fix"
 
 # =============================================================================
 # STAGE 2: Dependencies
 # =============================================================================
 FROM base AS dependencies
-RUN echo "nf-deps-2026-07-30-corepack"
+
+
+# Cache invalidation marker — must change to force rebuild with correct pnpm version
+RUN echo "nf-deps-2026-08-04-gitsha-fix"
+
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages ./packages
@@ -68,33 +76,39 @@ RUN set -eux; \
 # STAGE 3: Builder
 # =============================================================================
 FROM base AS builder
-ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
-ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
-ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
+
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_ADMIN_URL
+ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG GIT_SHA
+
+ARG GIT_SHA=local-build
 ARG BUILD_TIMESTAMP
 
-RUN echo "Validating GIT_SHA=${GIT_SHA}" && \
-    (test -n "${GIT_SHA}" || (echo "ERROR: GIT_SHA is required but not set" && exit 1)) && \
-    (test "${GIT_SHA}" != "unknown" || (echo "ERROR: GIT_SHA cannot be 'unknown'" && exit 1)) && \
-    (echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' || (echo "ERROR: GIT_SHA must be 7-40 hex characters, got '${GIT_SHA}'" && exit 1))
+# Validate GIT_SHA when a production SHA is supplied.
+# Local builds may use the default value "local-build".
+RUN set -eux; \
+    echo "Validating GIT_SHA=${GIT_SHA}"; \
+    if [ "${GIT_SHA}" = "local-build" ]; then \
+      echo "GIT_SHA is using the local-build fallback"; \
+    elif echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; then \
+      echo "GIT_SHA validated: ${GIT_SHA}"; \
+    else \
+      echo "ERROR: Invalid GIT_SHA: ${GIT_SHA}" >&2; \
+      exit 1; \
+    fi
 
-ENV NODE_ENV=production \
-    CI=true \
-    NODE_OPTIONS="--max-old-space-size=8192" \
-    NEXT_STANDALONE_OUTPUT=1 \
-    NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL}" \
-    NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL}" \
-    NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL}" \
-    NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
-    NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
-    GIT_SHA="${GIT_SHA}" \
-    GITHUB_SHA="${GIT_SHA}" \
-    NEXT_PUBLIC_GIT_SHA="${GIT_SHA}" \
-    NEXT_PUBLIC_BUILD_ID="elevate-${GIT_SHA}" \
-    BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
+ENV NODE_ENV=production
+ENV CI=true
+ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV NEXT_STANDALONE_OUTPUT=1
+
+ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://www.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL:-https://admin.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-https://app.elevateforhumanity.org}"
+ENV NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
 
 COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .

@@ -39,7 +39,7 @@ export default function BarberScoringSheetPage() {
             <p className="text-[10px] text-slate-700">{PLATFORM_DEFAULTS.orgName} | RAPIDS ID: 2025-IN-132301 | Occupation: Barber (330.371-010)</p>
           </div>
           <div className="text-right text-[10px] text-slate-700">
-            <p>Total: 2,000 hours (144 RTI + 1,500 OJT)</p>
+            <p>Total: 2,000 hours (260 RTI + 1,500 OJT)</p>
             <p>{BARBER_STATS.totalCompetencies} competencies | {BARBER_STATS.sections} sections</p>
           </div>
         </div>

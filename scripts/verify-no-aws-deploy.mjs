@@ -22,7 +22,7 @@ const forbiddenRepoPaths = [
   'aws/buildspec-admin.yml',
   '.github/workflows/deploy-aws.yml',
   'Dockerfile.package',
-  'Dockerfile.admin',
+  // Dockerfile.admin is allowed - standard Dockerfile for local dev / Northflank (not AWS ECS)
 ];
 
 let failed = false;

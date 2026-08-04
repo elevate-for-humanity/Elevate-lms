@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, FileText, BookOpen, DollarSign, 
   Settings, Bell, Search, ChevronDown, LogOut, User,
   Handshake, ShieldCheck, Bot, Megaphone, Plus, Minus,
-  Globe, X
+  Globe, X, ClipboardList
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useI18n, LOCALES, LOCALE_NAMES, LOCALE_FLAGS, type Locale } from '@/lib/i18n/context';
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Students', href: '/students', icon: Users },
   { label: 'Programs', href: '/programs', icon: BookOpen },
   { label: 'Funding', href: '/funding', icon: DollarSign },
+  { label: 'Surveys', href: '/surveys/workone', icon: ClipboardList },
   { label: 'Partners', href: '/partners', icon: Handshake },
   { label: 'Marketing', href: '/crm', icon: Megaphone },
   { label: 'Compliance', href: '/compliance', icon: ShieldCheck },

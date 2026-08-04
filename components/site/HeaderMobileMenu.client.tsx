@@ -157,7 +157,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               aria-labelledby="mobile-nav-title"
             >
               {/* Panel header with close button */}
-              <div className="flex h-16 items-center justify-between border-b border-slate-100 px-4 shrink-0">
+              <div className="flex h-14 items-center justify-between border-b border-slate-100 px-4 shrink-0">
                 <h2 className="font-semibold text-slate-900 text-base" id="mobile-nav-title">Menu</h2>
                 <button
                   type="button"
@@ -171,7 +171,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
               {/* Scrollable nav */}
               <nav
-                className="flex-1 overflow-y-auto overscroll-contain p-3 pb-2"
+                className="flex-1 overflow-y-auto overscroll-contain px-3 py-2"
                 aria-label="Site navigation"
               >
                 {items.map((item, idx) => {
@@ -254,7 +254,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                       onClick={() =>
                                         setExpandedCategory(categoryOpen ? null : categoryKey)
                                       }
-                                      className="flex w-full min-h-[40px] items-center justify-between py-2 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                      className="flex w-full min-h-[40px] items-center justify-between py-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
                                       aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
                                       aria-expanded={categoryOpen}
                                     >
@@ -324,7 +324,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                   ) : (
                                     <p
                                       key={subItem.name}
-                                      className="pt-3 pb-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 break-words"
+                                      className="pt-2 pb-0.5 text-xs font-bold uppercase tracking-wide text-brand-red-600 break-words"
                                     >
                                       {headerLabel}
                                     </p>

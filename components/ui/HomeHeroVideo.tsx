@@ -36,7 +36,6 @@ export interface HomeHeroVideoProps {
 
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const voiceoverRef = useRef<HTMLAudioElement>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
 
@@ -63,14 +62,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     if (videoRef.current) {
       if (isMuted) {
         videoRef.current.muted = false;
-        if (banner.voiceoverSrc && voiceoverRef.current) {
-          voiceoverRef.current.play().catch(() => {});
-        }
       } else {
         videoRef.current.muted = true;
-        if (voiceoverRef.current) {
-          voiceoverRef.current.pause();
-        }
       }
       setIsMuted(!isMuted);
     }
@@ -149,8 +142,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           preload="metadata"
           className="absolute inset-0 w-full h-full object-cover"
         />
-
-        <audio ref={voiceoverRef} src={banner.voiceoverSrc} preload="none" />
 
         {/* ON-VIDEO ELEMENTS (only sound controls + micro-label are allowed) */}
 

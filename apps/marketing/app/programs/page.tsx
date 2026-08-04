@@ -184,7 +184,7 @@ export default async function ProgramsPage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="(max-width: 768px) 100vw, 1200px" src="/images/programs-hero-vibrant.webp" alt={`${PLATFORM_DEFAULTS.orgName} programs`} fill className="object-cover object-center" priority  />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/85 to-brand-blue-900/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
           <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
@@ -252,6 +252,7 @@ export default async function ProgramsPage() {
                       <Image src={resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug))} alt={p.title} fill
                         className={card.programImageFill}
                         sizes={IMAGE_SIZES.programCard}  />
+                      <div className="absolute inset-0 bg-black/20" />
                       {p.funding_eligible&&(
                         <span className="absolute top-2 left-2 bg-brand-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">WIOA Eligible</span>
                       )}

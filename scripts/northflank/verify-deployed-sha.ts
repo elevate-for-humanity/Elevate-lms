@@ -165,17 +165,25 @@ async function verifyService(
     return false;
   }
 
+  // Runtime HTTP health is the source of truth. Northflank deployment.internal.deployedSHA
+  // is known to be stale for API-triggered builds — it only updates for UI-triggered deploys.
+  // If runtime matches, the container is running the correct SHA.
+  if (runtimeMatches) {
+    if (!northflankMatches) {
+      console.warn(`${serviceId}: Northflank metadata SHA is stale (${northflankSha ?? 'null'}), but runtime confirms ${expectedSha.slice(0, 7)}. Trusting runtime.`);
+    }
+    return true;
+  }
+
+  // Runtime doesn't match — this is a real problem.
   if (!northflankMatches) {
-    console.error(`${serviceId}: Northflank deployment metadata does not match the expected SHA.`);
+    console.error(`${serviceId}: neither Northflank metadata nor runtime commit matches ${expectedSha.slice(0, 7)}.`);
     return false;
   }
 
-  if (!runtimeMatches) {
-    console.error(`${serviceId}: live runtime does not report the expected SHA.`);
-    return false;
-  }
-
-  return true;
+  // Northflank matches but runtime doesn't — unusual state, fail.
+  console.error(`${serviceId}: Northflank metadata matches but runtime reports ${runtime.commit ?? 'null'}.`);
+  return false;
 }
 
 async function main(): Promise<void> {

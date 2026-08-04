@@ -1,20 +1,21 @@
+# syntax=docker/dockerfile:1.7
 FROM node:22-alpine AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN corepack enable
-RUN corepack prepare pnpm@10.28.2 --activate
+RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
-WORKDIR /app
+WORKDIR /workspace
 
 FROM base AS dependencies
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/marketing/package.json ./apps/marketing/package.json
+COPY packages ./packages
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
 
@@ -24,6 +25,7 @@ ARG NEXT_PUBLIC_GIT_SHA=unknown
 ARG BUILD_TIMESTAMP=unknown
 
 ENV NODE_ENV=production
+ENV CI=true
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV GITHUB_SHA=$GITHUB_SHA
@@ -31,25 +33,14 @@ ENV GIT_SHA=$GIT_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$NEXT_PUBLIC_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
-COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=dependencies /app/apps/marketing/node_modules ./apps/marketing/node_modules
+COPY --from=dependencies /workspace/node_modules ./node_modules
 
 COPY . .
 
 RUN pnpm --filter @elevate/marketing build
 
-RUN test -d /app/apps/marketing/.next
-RUN test -f /app/apps/marketing/.next/BUILD_ID
-
-RUN if [ -f /app/apps/marketing/.next/standalone/server.js ]; then \
-      echo "Standalone server found at workspace level"; \
-    elif [ -f /app/apps/marketing/.next/standalone/apps/marketing/server.js ]; then \
-      echo "Standalone server found at monorepo app level"; \
-    else \
-      echo "ERROR: standalone server.js was not generated"; \
-      find /app/apps/marketing/.next -maxdepth 5 -name "server.js" -print; \
-      exit 1; \
-    fi
+RUN test -d /workspace/apps/marketing/.next
+RUN test -f /workspace/apps/marketing/.next/BUILD_ID
 
 FROM node:22-alpine AS runner
 
@@ -60,42 +51,27 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-RUN addgroup \
-      -g 1001 \
-      nodejs \
-    && adduser \
-      -S \
-      -u 1001 \
-      -G nodejs \
-      nextjs
+RUN addgroup -g 1001 nodejs && adduser -S -u 1001 -G nodejs nextjs
 
-COPY --from=builder \
-  --chown=nextjs:nodejs \
-  /app/apps/marketing/.next/standalone \
-  ./
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/marketing/.next/standalone \
+    ./
 
-COPY --from=builder \
-  --chown=nextjs:nodejs \
-  /app/apps/marketing/.next/static \
-  ./apps/marketing/.next/static
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/marketing/.next/static \
+    ./apps/marketing/.next/static/
 
-COPY --from=builder \
-  --chown=nextjs:nodejs \
-  /app/apps/marketing/public \
-  ./apps/marketing/public
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/marketing/public \
+    ./apps/marketing/public/
 
-RUN if [ -f /app/apps/marketing/server.js ]; then \
-      cp /app/apps/marketing/server.js /app/server.js; \
-    elif [ -f /app/server.js ]; then \
-      true; \
-    else \
-      echo "ERROR: No runnable server.js in runtime image"; \
-      find /app -maxdepth 5 -name "server.js" -print; \
-      exit 1; \
-    fi
+# Fix: Next.js standalone output inherits "type":"module" from the monorepo
+# root package.json, but server.js is compiled as CommonJS. Remove it so
+# Node.js treats server.js as CommonJS (no require/import mismatch).
+RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "--max-old-space-size=4096", "server.js"]
+CMD ["node", "--max-old-space-size=4096", "apps/marketing/server.js"]

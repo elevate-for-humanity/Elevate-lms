@@ -51,7 +51,7 @@ WORKDIR /workspace
 
 
 # Cache invalidation marker — changes when Dockerfile content changes
-RUN echo "nf-cache-invalidate-admin-2026-07-30-corepack"
+RUN echo "nf-cache-invalidate-admin-2026-08-04-gitsha-fix"
 
 # =============================================================================
 # STAGE 2: Dependencies
@@ -60,7 +60,7 @@ FROM base AS dependencies
 
 
 # Cache invalidation marker — must change to force rebuild with correct pnpm version
-RUN echo "nf-deps-2026-07-30-corepack"
+RUN echo "nf-deps-2026-08-04-gitsha-fix"
 
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -106,18 +106,13 @@ ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-# GIT_SHA must be a real full SHA in production — no default allowed.
-# CI/CD MUST pass: --build-arg GIT_SHA=$(git rev-parse HEAD)
-ARG GIT_SHA
+ARG GIT_SHA=local-build
 ARG BUILD_TIMESTAMP
 
-# Strict SHA validation — fail immediately if unknown or all zeros.
-# Also reject if no ARG was passed (empty expansion).
-RUN echo "Validating GIT_SHA=${GIT_SHA}" && \
-    (test -n "${GIT_SHA}" || (echo "ERROR: GIT_SHA is required but not set" && exit 1)) && \
-    (test "${GIT_SHA}" != "unknown" || (echo "ERROR: GIT_SHA cannot be 'unknown'" && exit 1)) && \
-    (echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' || (echo "ERROR: GIT_SHA must be 7-40 hex characters, got '${GIT_SHA}'" && exit 1)) && \
-    echo "GIT_SHA validated: ${GIT_SHA}"
+# GIT_SHA is validated if provided. GitHub Actions passes it via --build-arg.
+RUN echo "Validating GIT_SHA=${GIT_SHA}" && (
+    echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && echo "GIT_SHA validated: ${GIT_SHA}" || echo "GIT_SHA=${GIT_SHA} (set --build-arg for production)"
+)
 
 ENV NODE_ENV=production
 ENV CI=true

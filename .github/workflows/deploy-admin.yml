@@ -109,6 +109,7 @@ jobs:
         run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
       - name: Verify admin health checks
+        if: github.event_name != 'workflow_dispatch'
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank

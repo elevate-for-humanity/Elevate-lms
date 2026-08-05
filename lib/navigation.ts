@@ -2,90 +2,93 @@
 // Single source of truth for the public marketing site header navigation.
 // Consumed by HeaderDesktopNav and HeaderMobileMenu.
 //
-// HEADER NAV — student-focused, minimal. 5 top-level items + 2 action buttons.
-// Sign In and Apply Now are on the right side only, NOT in the nav dropdown.
-// Testing is moved to About dropdown. Employers has its own top-level item.
+// All routes come from lib/navigation/routes.ts to prevent drift.
 
 import { type NavItem } from '@/types/navigation';
+import { ROUTES } from '@/lib/navigation/routes';
 
 export const NAV_ITEMS: NavItem[] = [
   // ── 1. Programs ──────────────────────────────────────────────────────────────
   {
     id: 'programs',
     name: 'Programs',
-    href: '/programs',
+    href: ROUTES.programs,
     subItems: [
-      { name: 'Healthcare', isHeader: true, href: '/programs/healthcare' },
-      { name: 'CNA', href: '/programs/cna', isSectionLink: true },
-      { name: 'QMA', href: '/programs/qma', isSectionLink: true },
-      { name: 'Medical Assistant', href: '/programs/medical-assistant', isSectionLink: true },
-      { name: 'Phlebotomy', href: '/programs/phlebotomy', isSectionLink: true },
+      { name: 'Healthcare', isHeader: true, href: ROUTES.programsHealthcare },
+      { name: 'CNA', href: ROUTES.programsCNA, isSectionLink: true },
+      { name: 'QMA', href: ROUTES.programsQMA, isSectionLink: true },
+      { name: 'Medical Assistant', href: ROUTES.programsMedicalAssistant, isSectionLink: true },
+      { name: 'Phlebotomy', href: ROUTES.programsPhlebotomy, isSectionLink: true },
       { name: 'Skilled Trades', isHeader: true, href: '/programs/skilled-trades' },
-      { name: 'HVAC', href: '/programs/hvac-technician', isSectionLink: true },
-      { name: 'CDL Training', href: '/programs/cdl-training', isSectionLink: true },
-      { name: 'Beauty', isHeader: true, href: '/programs/beauty-cosmetology' },
-      { name: 'Barber & Beauty', href: '/programs/barber-apprenticeship', isSectionLink: true },
-      { name: 'Tech & Business', isHeader: true, href: '/programs/technology' },
-      { name: 'IT Help Desk', href: '/programs/it-helpdesk', isSectionLink: true },
-      { name: 'All Programs', href: '/programs', isSectionLink: true },
+      { name: 'HVAC', href: ROUTES.programsHVAC, isSectionLink: true },
+      { name: 'CDL Training', href: ROUTES.programsCDL, isSectionLink: true },
+      { name: 'Beauty', isHeader: true, href: ROUTES.programsBeauty },
+      { name: 'Barber & Beauty', href: ROUTES.programsBarber, isSectionLink: true },
+      { name: 'Tech & Business', isHeader: true, href: ROUTES.programsTechnology },
+      { name: 'IT Help Desk', href: ROUTES.programsIT, isSectionLink: true },
+      { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
     ],
   },
   // ── 2. Apprenticeships ────────────────────────────────────────────────────────
   {
     id: 'apprenticeships',
     name: 'Apprenticeships',
+    href: ROUTES.apprenticeships,
     subItems: [
-      { name: 'How It Works', href: '/apprenticeships/how-it-works', isSectionLink: true },
-      { name: 'All Apprenticeships', href: '/apprenticeships', isSectionLink: true },
+      { name: 'How It Works', href: ROUTES.apprenticeshipsHowItWorks, isSectionLink: true },
+      { name: 'All Apprenticeships', href: ROUTES.apprenticeships, isSectionLink: true },
       { name: 'Programs', isHeader: true },
-      { name: 'Barber', href: '/programs/barber-apprenticeship', isSectionLink: true },
-      { name: 'Cosmetology', href: '/programs/cosmetology-apprenticeship', isSectionLink: true },
-      { name: 'Esthetics', href: '/programs/esthetician-apprenticeship', isSectionLink: true },
-      { name: 'Nail Technician', href: '/programs/nail-technician-apprenticeship', isSectionLink: true },
-      { name: 'Host Shops', href: '/apprenticeships/host-shop', isSectionLink: true },
-      { name: 'Employer Sponsorship', href: '/apprenticeship-sponsor', isSectionLink: true },
+      { name: 'Barber', href: ROUTES.programsBarber, isSectionLink: true },
+      { name: 'Cosmetology', href: ROUTES.programsCosmetology, isSectionLink: true },
+      { name: 'Esthetics', href: ROUTES.programsEsthetician, isSectionLink: true },
+      { name: 'Nail Technician', href: ROUTES.programsNailTech, isSectionLink: true },
+      { name: 'Host Shops', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
+      { name: 'Employer Sponsorship', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
     ],
   },
   // ── 3. Funding ──────────────────────────────────────────────────────────────
   {
     id: 'funding',
     name: 'Funding',
+    href: ROUTES.funding,
     subItems: [
-      { name: 'WIOA / WorkOne', href: '/funding/wioa', isSectionLink: true },
-      { name: 'Workforce Ready Grant', href: '/funding/wioa', isSectionLink: true },
-      { name: 'Job Ready Indy', href: '/funding/job-ready-indy', isSectionLink: true },
-      { name: 'Vocational Rehabilitation', href: '/funding/voc-rehab', isSectionLink: true },
-      { name: 'Scholarships', href: '/scholarships', isSectionLink: true },
-      { name: 'Payment Plans', href: '/funding', isSectionLink: true },
-      { name: 'Check Eligibility', href: '/eligibility/quiz', isSectionLink: true },
+      { name: 'WIOA / WorkOne', href: ROUTES.fundingWIOA, isSectionLink: true },
+      { name: 'Workforce Ready Grant', href: ROUTES.fundingWIOA, isSectionLink: true },
+      { name: 'Job Ready Indy', href: ROUTES.fundingJobReadyIndy, isSectionLink: true },
+      { name: 'Vocational Rehabilitation', href: ROUTES.fundingVocRehab, isSectionLink: true },
+      { name: 'Scholarships', href: ROUTES.scholarships, isSectionLink: true },
+      { name: 'Payment Plans', href: ROUTES.funding, isSectionLink: true },
+      { name: 'Check Eligibility', href: ROUTES.eligibility, isSectionLink: true },
     ],
   },
   // ── 4. Employers ──────────────────────────────────────────────────────────────
   {
     id: 'employers',
     name: 'Employers',
+    href: ROUTES.employers,
     subItems: [
-      { name: 'Hire Graduates', href: '/hire-graduates', isSectionLink: true },
-      { name: 'Sponsor an Apprentice', href: '/apprenticeship-sponsor', isSectionLink: true },
-      { name: 'Post a Job', href: '/employers/post-job', isSectionLink: true },
-      { name: 'Employer Portal', href: '/employers', isSectionLink: true },
-      { name: 'Workforce Agency Tools', href: '/for-agencies', isSectionLink: true },
-      { name: 'Request Demo', href: '/store/demo', isSectionLink: true },
+      { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
+      { name: 'Sponsor an Apprentice', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
+      { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
+      { name: 'Employer Portal', href: ROUTES.employers, isSectionLink: true },
+      { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },
+      { name: 'Request Demo', href: ROUTES.storeDemo, isSectionLink: true },
     ],
   },
   // ── 5. About ───────────────────────────────────────────────────────────────
   {
     id: 'about',
     name: 'About',
+    href: ROUTES.about,
     subItems: [
-      { name: 'Mission', href: '/about', isSectionLink: true },
-      { name: 'Locations', href: '/about/locations', isSectionLink: true },
-      { name: 'Success Stories', href: '/success-stories', isSectionLink: true },
-      { name: 'Testing Center', href: '/testing', isSectionLink: true },
-      { name: 'Approvals', href: '/about/approvals', isSectionLink: true },
-      { name: 'Blog', href: '/blog', isSectionLink: true },
-      { name: 'FAQ', href: '/faq', isSectionLink: true },
-      { name: 'Contact', href: '/contact', isSectionLink: true },
+      { name: 'Mission', href: ROUTES.about, isSectionLink: true },
+      { name: 'Locations', href: ROUTES.aboutLocations, isSectionLink: true },
+      { name: 'Success Stories', href: ROUTES.successStories, isSectionLink: true },
+      { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },
+      { name: 'Approvals', href: ROUTES.aboutApprovals, isSectionLink: true },
+      { name: 'Blog', href: ROUTES.blog, isSectionLink: true },
+      { name: 'FAQ', href: ROUTES.faq, isSectionLink: true },
+      { name: 'Contact', href: ROUTES.contact, isSectionLink: true },
     ],
   },
 ];

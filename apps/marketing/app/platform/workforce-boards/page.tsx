@@ -277,7 +277,7 @@ export default function WorkforceBoardsPage() {
                 Schedule a Demo
               </Link>
               <Link
-                href="/partners/workforce"
+                href="/for-agencies"
                 className="inline-flex items-center gap-2 bg-blue-500/30 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-500/40 transition border border-white/30"
               >
                 Learn More

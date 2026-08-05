@@ -176,6 +176,46 @@ export async function middleware(request: NextRequest) {
   const isLocal = isLocalhost(host);
 
   // =============================================================================
+  // PORTAL ROUTING: www → app/admin subdomains
+  // Redirects portal paths from www to their respective subdomains.
+  // Only applies when host is www.elevateforhumanity.org.
+  // =============================================================================
+  const configuredAppHost = process.env.NEXT_PUBLIC_APP_URL
+    ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
+    : 'app.elevateforhumanity.org';
+  const configuredAdminHost = process.env.NEXT_PUBLIC_ADMIN_URL
+    ? new URL(process.env.NEXT_PUBLIC_ADMIN_URL).hostname
+    : 'admin.elevateforhumanity.org';
+  const wwwHost = 'www.elevateforhumanity.org';
+
+  if (host === wwwHost) {
+    // LMS / student portal paths → app subdomain
+    if (
+      pathname.startsWith('/lms/') ||
+      pathname.startsWith('/student/') ||
+      pathname.startsWith('/instructor/') ||
+      pathname.startsWith('/employer/') ||
+      pathname.startsWith('/apprentice/') ||
+      pathname.startsWith('/parent-portal/') ||
+      pathname.startsWith('/workforce/') ||
+      pathname.startsWith('/cosmetology-host-shop/') ||
+      pathname === '/host-shop/dashboard'
+    ) {
+      const url = request.nextUrl.clone();
+      url.hostname = configuredAppHost;
+      url.protocol = 'https:';
+      return NextResponse.redirect(url, 307);
+    }
+    // Admin paths → admin subdomain
+    if (pathname.startsWith('/admin/')) {
+      const url = request.nextUrl.clone();
+      url.hostname = configuredAdminHost;
+      url.protocol = 'https:';
+      return NextResponse.redirect(url, 307);
+    }
+  }
+
+  // =============================================================================
   // HIGH-PRIORITY PROGRAM SLUG REDIRECTS
   // These MUST run before any page resolution to ensure proper HTTP 307 redirects.
   // Critical for SEO - prevents dynamic [program] route from catching these first.
@@ -272,6 +312,15 @@ export async function middleware(request: NextRequest) {
     ['/admissions', '/apply'],
     // Signup → apply (students sign up through the application flow)
     ['/signup', '/apply'],
+    // ── Broken nav link fixes (header/footer had wrong hrefs) ─────────────────
+    ['/apply/eligibility', '/eligibility/quiz'],
+    ['/funding/workforce-ready', '/funding/wioa'],
+    ['/funding/scholarships', '/scholarships'],
+    ['/funding/self-pay', '/funding'],
+    ['/apprenticeships/sponsor', '/apprenticeship-sponsor'],
+    ['/partners/workforce', '/for-agencies'],
+    ['/credentials', '/about/approvals'],
+    ['/host-shop', '/apprenticeships/host-shop'],
   ];
 
   for (const [from, to] of LEGACY_REDIRECTS) {

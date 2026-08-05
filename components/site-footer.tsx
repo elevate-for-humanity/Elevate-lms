@@ -71,7 +71,7 @@ export function SiteFooter() {
               <li><Link href="/programs/cosmetology-apprenticeship" className="hover:text-slate-900">Cosmetology</Link></li>
               <li><Link href="/programs/esthetician-apprenticeship" className="hover:text-slate-900">Esthetics</Link></li>
               <li><Link href="/apprenticeships/host-shop" className="hover:text-slate-900">Host Shops</Link></li>
-              <li><Link href="/apprenticeships/sponsor" className="hover:text-slate-900">Sponsor</Link></li>
+              <li><Link href="/apprenticeship-sponsor" className="hover:text-slate-900">Sponsor</Link></li>
             </ul>
           </div>
 
@@ -169,7 +169,7 @@ export function SiteFooter() {
             <p className="text-sm font-semibold text-slate-900">Get Started</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><Link href="/apply" className="hover:text-slate-900">Apply Now</Link></li>
-              <li><Link href="/apply/eligibility" className="hover:text-slate-900">Check Eligibility</Link></li>
+              <li><Link href="/eligibility/quiz" className="hover:text-slate-900">Check Eligibility</Link></li>
               <li><Link href="/orientation/schedule" className="hover:text-slate-900">Schedule Orientation</Link></li>
               <li><Link href="/login" className="hover:text-slate-900">Student Login</Link></li>
               <li><a href="https://admin.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 flex items-center gap-1">Admin Portal <ExternalLink className="w-3 h-3" /></a></li>

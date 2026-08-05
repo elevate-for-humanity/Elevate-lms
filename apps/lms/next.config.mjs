@@ -1,9 +1,6 @@
-import { resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 /** @type {import('next').NextConfig} */
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   output: 'standalone',
 

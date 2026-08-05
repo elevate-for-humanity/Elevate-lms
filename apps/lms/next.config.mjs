@@ -2,7 +2,8 @@ import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // Temporarily disable standalone output to isolate build issue
+  // output: 'standalone',
 
   // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
   generateBuildId: async () => {

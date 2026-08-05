@@ -131,7 +131,7 @@ export default function AppsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/start"
+                href="/start-trial"
                 className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-white transition"
               >
                 Apply Now

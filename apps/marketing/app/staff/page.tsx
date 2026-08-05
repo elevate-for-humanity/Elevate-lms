@@ -188,7 +188,7 @@ export default async function StaffPortalLanding() {
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/login?redirect=/admin/staff-portal"
+                href="/admin-login"
                 className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-xl hover:bg-brand-blue-700"
               >
                 Sign In

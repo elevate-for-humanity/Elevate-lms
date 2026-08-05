@@ -332,7 +332,7 @@ export default function WIOAEligibilityPage() {
               Register at Indiana Career Connect
             </a>
             <Link
-              href="/start"
+              href="/start-trial"
               className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors"
             >
               Apply for Training

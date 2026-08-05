@@ -242,23 +242,9 @@ const nextConfig = {
   },
 
   async redirects() {
-    // Load from JSON — SSOT for all legacy redirects (324 routes).
-    // Standalone container copies these files so middleware can also read them at runtime.
-    const canonicalRoutesPath = path.join(process.cwd(), 'lib/routes/canonical-routes.json');
-    const canonicalConfig = JSON.parse(fs.readFileSync(canonicalRoutesPath, 'utf8'));
-    const canonicalAliasRedirects = (canonicalConfig.legacyAliases || []).map((alias) => ({
-      source: alias.source,
-      destination: alias.destination,
-      permanent: alias.permanent !== false,
-    }));
-
-    const imageManifestPath = path.join(process.cwd(), 'scripts/.image-conversion-manifest.json');
-    const imageManifest = JSON.parse(fs.readFileSync(imageManifestPath, 'utf8'));
-    const imageJpgRedirects = imageManifest.map((row) => ({
-      source: row.origRel,
-      destination: row.webpRel,
-      permanent: true,
-    }));
+    // NOTE: All legacy/admin/lms redirect rules have been removed.
+    // Nav links now point directly to correct pages. No redirect patching needed.
+    // Portal routing is handled by middleware.ts at the edge level.
 
     return [
       // ── Domain routing: elevateforhumanity.org → www ──────────────────────
@@ -281,16 +267,6 @@ const nextConfig = {
         destination: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4',
         permanent: false,
       },
-
-      // ── Legacy redirects from canonical-routes.json (324 routes) ─────────
-      ...canonicalAliasRedirects,
-
-      // ── Image .jpg → .webp from manifest ────────────────────────────────
-      ...imageJpgRedirects,
-
-      // ── Portal routing is now handled by middleware.ts (edge-level) ─────
-      // These rules were removed here to eliminate duplication.
-      // Middleware handles: /lms/*, /employer/*, /admin/*, /workforce/*, etc.
     ];
   },
 

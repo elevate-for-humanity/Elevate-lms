@@ -120,7 +120,7 @@ export default function StudentSupportPage() {
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/start"
+            href="/start-trial"
             className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-7 py-3 rounded-lg font-bold hover:bg-brand-green-700 transition text-sm"
           >
             Apply Now <ArrowRight className="w-4 h-4" />
@@ -245,7 +245,7 @@ export default function StudentSupportPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/start"
+              href="/start-trial"
               className="inline-flex items-center justify-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
             >
               Apply Now <ArrowRight className="w-5 h-5" />

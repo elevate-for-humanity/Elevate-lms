@@ -59,7 +59,7 @@ export default function JobReadyIndyPage() {
                 the employment outcomes Job Ready Indy is designed to achieve.
               </p>
               <Link
-                href="/start"
+                href="/start-trial"
                 className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg"
               >
                 Apply Now <ArrowRight className="w-5 h-5" />
@@ -161,7 +161,7 @@ export default function JobReadyIndyPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              href="/start"
+              href="/start-trial"
               className="bg-white text-brand-blue-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg"
             >
               Apply Now

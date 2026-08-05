@@ -37,7 +37,7 @@ export default function PayPage() {
             Many students qualify for no-cost training through WIOA, WRG, or Job Ready Indy.
           </p>
           <Link
-            href="/start"
+            href="/start-trial"
             className="inline-block px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700"
           >
             Register at Indiana Career Connect

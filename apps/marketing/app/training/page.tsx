@@ -284,7 +284,7 @@ export default function TrainingPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/start"
+              href="/start-trial"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-10 py-4 rounded-xl transition-colors text-base w-full sm:w-auto"
             >
               Apply Now

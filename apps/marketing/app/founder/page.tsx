@@ -314,7 +314,7 @@ export default function FounderPage() {
               Explore Programs
             </Link>
             <Link
-              href="/start"
+              href="/start-trial"
               className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition"
             >
               Apply Now <ArrowRight className="w-5 h-5 ml-2" />

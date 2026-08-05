@@ -468,7 +468,7 @@ export default function FundingPage() {
               Go to Indiana Career Connect
             </a>
             <Link
-              href="/start"
+              href="/start-trial"
               className="border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-8 py-4 rounded-xl transition-colors text-base"
             >
               Apply for Training

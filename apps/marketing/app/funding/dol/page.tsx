@@ -73,7 +73,7 @@ export default async function DOLFundingPage() {
                 quality, safety, and outcomes.
               </p>
               <Link
-                href="/start"
+                href="/start-trial"
                 className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg"
               >
                 Apply Now <ArrowRight className="w-5 h-5" />
@@ -161,7 +161,7 @@ export default async function DOLFundingPage() {
             ))}
           </div>
           <Link
-            href="/start"
+            href="/start-trial"
             className="inline-block mt-10 bg-white text-slate-900 px-10 py-4 rounded-full font-bold text-lg hover:bg-white transition"
           >
             Apply Now

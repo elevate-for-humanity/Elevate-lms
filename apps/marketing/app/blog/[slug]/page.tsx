@@ -230,7 +230,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/start"
+              href="/start-trial"
               className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-white transition"
             >
               Apply Now

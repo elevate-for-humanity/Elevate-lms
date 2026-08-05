@@ -74,7 +74,7 @@ export default function ProgramTemplate() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href="/start"
+              href="/start-trial"
               className="px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition text-center"
             >
               Apply Now
@@ -186,7 +186,7 @@ export default function ProgramTemplate() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/start"
+              href="/start-trial"
               className="px-8 py-4 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold rounded-xl transition text-center"
             >
               Apply Now

@@ -1,127 +1,61 @@
 /**
  * Unified Middleware
- * 
+ *
  * Handles domain-based routing and security headers for the unified platform.
  * All three domains (www, app, admin) route to the same container.
- * 
- * Target Architecture:
- * - www.elevateforhumanity.org → Marketing/public routes
- * - app.elevateforhumanity.org → LMS/student routes
+ *
+ * Routing:
+ * - www.elevateforhumanity.org  → Marketing/public routes
+ * - app.elevateforhumanity.org  → LMS/student routes
  * - admin.elevateforhumanity.org → Admin routes
- * 
- * All APIs are in the unified app/api/ tree.
+ *
+ * NOTE: All legacy/admin/lms redirect rules have been removed.
+ * Nav links now point directly to correct pages. No redirect patching needed.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
 // =============================================================================
-// CONFIGURATION — loaded from JSON files at runtime
-// Without these files in the standalone container, all legacy redirects 404.
+// CONFIG
 // =============================================================================
-
-function loadCanonicalRoutes(): Array<[from: string, to: string]> {
-  const paths = [
-    join(process.cwd(), 'lib/routes/canonical-routes.json'),
-    join(process.cwd(), 'apps/marketing/lib/routes/canonical-routes.json'),
-  ];
-  for (const p of paths) {
-    if (existsSync(p)) {
-      const data = JSON.parse(readFileSync(p, 'utf8'));
-      return (data.legacyAliases || []).map((a: { source: string; destination: string }) =>
-        [a.source, a.destination] as [string, string]
-      );
-    }
-  }
-  return [];
-}
-
-function loadProgramSlugRedirects(): Array<[from: string, to: string]> {
-  const paths = [
-    join(process.cwd(), 'lib/routes/program-slug-redirects.json'),
-    join(process.cwd(), 'apps/marketing/lib/routes/program-slug-redirects.json'),
-  ];
-  for (const p of paths) {
-    if (existsSync(p)) {
-      const data = JSON.parse(readFileSync(p, 'utf8'));
-      return data.map((a: { source: string; destination: string }) =>
-        [a.source, a.destination] as [string, string]
-      );
-    }
-  }
-  return [];
-}
-
-function loadImageRedirects(): Array<[from: string, to: string]> {
-  const paths = [
-    join(process.cwd(), 'scripts/.image-conversion-manifest.json'),
-    join(process.cwd(), 'apps/marketing/scripts/.image-conversion-manifest.json'),
-  ];
-  for (const p of paths) {
-    if (existsSync(p)) {
-      const data = JSON.parse(readFileSync(p, 'utf8'));
-      return data.map((a: { origRel: string; webpRel: string }) =>
-        [a.origRel, a.webpRel] as [string, string]
-      );
-    }
-  }
-  return [
-    ['/hero-images/how-it-works-hero.jpg', '/hero-images/how-it-works-hero.webp'],
-    ['/images/hero-images/about-hero.jpg', '/images/hero-images/about-hero.webp'],
-  ];
-}
-
-// Load all redirect configs at module init (runs once per cold start)
-const CANONICAL_REDIRECTS = loadCanonicalRoutes();
-const PROGRAM_SLUG_REDIRECTS = loadProgramSlugRedirects();
-const IMAGE_REDIRECTS = loadImageRedirects();
 
 const PUBLIC_PATHS = [
-  '/api/health',
-  '/api/version',
-  '/api/ping',
-  '/api/ready',
-  '/apply',
-  '/auth/confirm',
-  '/auth/reset-password',
-  '/login',
-  '/unauthorized',
-  '/forgot-password',
-  '/signup',
-  '/verify-email',
+  '/api/health', '/api/version', '/api/ping', '/api/ready',
+  '/apply', '/auth/confirm', '/auth/reset-password', '/login',
+  '/unauthorized', '/forgot-password', '/signup', '/verify-email',
   '/update-password',
 ];
 
-// Admin + marketing portal paths that need x-pathname header set for auth redirects
 const ADMIN_PATHS = [
-  '/admin',
-  '/api/admin',
-  '/api/staff',
-  '/api/devstudio',
-  '/api/platform',
-  // Marketing portal routes — requireRole uses x-pathname to preserve redirect destination
-  '/provider',
-  '/program-holder',
-  '/case-manager',
-  '/workforce-board',
-  '/staff-portal',
+  '/admin', '/api/admin', '/api/staff', '/api/devstudio', '/api/platform',
+  '/provider', '/program-holder', '/case-manager', '/workforce-board', '/staff-portal',
 ];
 
 const STUDENT_PATHS = [
-  '/lms',
-  '/student',
-  '/instructor',
-  '/employer',
-  '/program-holder',
-  '/api/enrollments',
-  '/api/courses',
-  '/api/grades',
-  '/api/attendance',
+  '/lms', '/student', '/instructor', '/employer', '/program-holder',
+  '/api/enrollments', '/api/courses', '/api/grades', '/api/attendance',
+];
+
+// Minimal legacy redirects — only for external links/bookmarks that cannot be fixed via nav
+const LEGACY_REDIRECTS: Array<[from: string, to: string]> = [
+  // Legal
+  ['/terms', '/legal'],
+  ['/terms-of-service', '/legal'],
+  ['/privacy-policy', '/legal/privacy'],
+  // Marketing-era placeholders → homepage
+  ['/paris', '/'],
+  ['/lizzy', '/'],
+  ['/studio', '/'],
+  // Legacy support
+  ['/mentorship', '/career-services'],
+  ['/vita', '/career-services'],
+  // Legacy apply
+  ['/admissions', '/apply'],
+  ['/signup', '/apply'],
 ];
 
 // =============================================================================
-// HELPER FUNCTIONS
+// HELPERS
 // =============================================================================
 
 function getHost(req: NextRequest): string {
@@ -130,12 +64,6 @@ function getHost(req: NextRequest): string {
 
 function isLocalhost(host: string): boolean {
   return host === 'localhost' || host === '127.0.0.1' || host === '::1';
-}
-
-function getSessionCookieName(): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const match = url.match(/https?:\/\/([^.]+)\./);
-  return match?.[1] ? `sb-${match[1]}-auth-token` : 'sb-elevate-auth-token';
 }
 
 function isPublicPath(pathname: string): boolean {
@@ -149,8 +77,11 @@ function isAdminPath(pathname: string): boolean {
   return ADMIN_PATHS.some(p => pathname.startsWith(p));
 }
 
-function isStudentPath(pathname: string): boolean {
-  return STUDENT_PATHS.some(p => pathname.startsWith(p));
+function redirectTo(url: NextRequest['nextUrl'], pathname: string, permanent = false): NextResponse {
+  const u = url.clone();
+  u.pathname = pathname;
+  u.search = '';
+  return NextResponse.redirect(u, permanent ? 308 : 307);
 }
 
 // =============================================================================
@@ -167,29 +98,24 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 }
 
 // =============================================================================
-// MAIN MIDDLEWARE HANDLER
+// MAIN
 // =============================================================================
 
 export async function middleware(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+  const { pathname } = request.nextUrl;
   const host = getHost(request);
   const isLocal = isLocalhost(host);
 
-  // =============================================================================
-  // PORTAL ROUTING: www → app/admin subdomains
-  // Redirects portal paths from www to their respective subdomains.
-  // Only applies when host is www.elevateforhumanity.org.
-  // =============================================================================
-  const configuredAppHost = process.env.NEXT_PUBLIC_APP_URL
-    ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
-    : 'app.elevateforhumanity.org';
-  const configuredAdminHost = process.env.NEXT_PUBLIC_ADMIN_URL
-    ? new URL(process.env.NEXT_PUBLIC_ADMIN_URL).hostname
-    : 'admin.elevateforhumanity.org';
-  const wwwHost = 'www.elevateforhumanity.org';
+  // ── Portal routing: www → app/admin subdomains ─────────────────────────────
+  if (host === 'www.elevateforhumanity.org') {
+    const appHost = process.env.NEXT_PUBLIC_APP_URL
+      ? new URL(process.env.NEXT_PUBLIC_APP_URL).hostname
+      : 'app.elevateforhumanity.org';
+    const adminHost = process.env.NEXT_PUBLIC_ADMIN_URL
+      ? new URL(process.env.NEXT_PUBLIC_ADMIN_URL).hostname
+      : 'admin.elevateforhumanity.org';
 
-  if (host === wwwHost) {
-    // LMS / student portal paths → app subdomain
+    // App portal paths
     if (
       pathname.startsWith('/lms/') ||
       pathname.startsWith('/student/') ||
@@ -202,193 +128,31 @@ export async function middleware(request: NextRequest) {
       pathname === '/host-shop/dashboard'
     ) {
       const url = request.nextUrl.clone();
-      url.hostname = configuredAppHost;
+      url.hostname = appHost;
       url.protocol = 'https:';
       return NextResponse.redirect(url, 307);
     }
-    // Admin paths → admin subdomain
+
+    // Admin portal paths
     if (pathname.startsWith('/admin/')) {
       const url = request.nextUrl.clone();
-      url.hostname = configuredAdminHost;
+      url.hostname = adminHost;
       url.protocol = 'https:';
       return NextResponse.redirect(url, 307);
     }
   }
 
-  // =============================================================================
-  // HIGH-PRIORITY PROGRAM SLUG REDIRECTS
-  // These MUST run before any page resolution to ensure proper HTTP 307 redirects.
-  // Critical for SEO - prevents dynamic [program] route from catching these first.
-  // =============================================================================
-  const PROGRAM_SLUG_REDIRECTS: Array<[from: string, to: string]> = [
-    ['/programs/barber', '/programs/barber-apprenticeship'],
-    ['/programs/hvac', '/programs/hvac-technician'],
-    ['/programs/finance-bookkeeping-accounting', '/programs/bookkeeping'],
-  ];
-
-  for (const [from, to] of PROGRAM_SLUG_REDIRECTS) {
-    if (pathname === from) {
-      const url = request.nextUrl.clone();
-      url.pathname = to;
-      url.search = '';
-      return NextResponse.redirect(url, 308);
-    }
-  }
-
-  // =============================================================================
-  // LEGACY ROUTE REDIRECTS (MUST CHECK FIRST - before public paths)
-  // All redirects are permanent (308) to preserve SEO equity.
-  // =============================================================================
-
-  // ── Reflexive URL redirects (/foo/foo → /foo) ──────────────────────────────
-  const REFLEXIVE_REDIRECTS: Array<[from: string, to: string]> = [
-    // Admin CRM mirror tree (app/admin/crm/crm/ was identical to app/admin/crm/)
-    ['/admin/crm/crm', '/admin/crm'],
-    // Admin governance mirror
-    ['/admin/governance/governance', '/admin/governance'],
-    // Public reflexive routes
-    ['/accessibility/accessibility', '/accessibility'],
-    ['/ai-chat/ai-chat', '/ai-chat'],
-    ['/ai/ai', '/ai'],
-    ['/calendar/calendar', '/calendar'],
-    ['/pay/pay', '/pay'],
-    ['/press/press', '/press'],
-    ['/resources/resources', '/resources'],
-    ['/verify/verify', '/verify'],
-    ['/pathways/pathways', '/pathways'],
-    ['/success-stories/success-stories', '/success-stories'],
-  ];
-
-  for (const [from, to] of REFLEXIVE_REDIRECTS) {
-    if (pathname === from || pathname.startsWith(`${from}/`)) {
-      const url = request.nextUrl.clone();
-      url.pathname = to + pathname.slice(from.length);
-      url.search = '';
-      return NextResponse.redirect(url, 308);
-    }
-  }
-
-  // ── Legacy URL redirects ──────────────────────────────────────────────────
-  const LEGACY_REDIRECTS: Array<[from: string, to: string]> = [
-    // Legal canonical
-    ['/terms', '/legal'],
-    ['/terms-of-service', '/legal'],
-    ['/privacy-policy', '/legal/privacy'],
-    // Legacy Indiana-specific routes → canonical
-    ['/career-training-indiana', '/programs'],
-    ['/skilled-trades-training-indiana', '/programs/skilled-trades'],
-    ['/healthcare-training-indianapolis', '/programs/healthcare'],
-    ['/hiset', '/testing'],
-    ['/certification-testing', '/testing/nha'],
-    // Program slug redirects (now in PROGRAM_SLUG_REDIRECTS for priority)
-    // FSSA funding removed
-    ['/fssa', '/funding'],
-    ['/apply/fssa', '/apply'],
-    // Programs on waitlist
-    ['/programs/plumbing', '/programs'],
-    ['/programs/forklift', '/programs'],
-    // Old /courses routes → /courses
-    ['/courses/healthcare', '/courses'],
-    ['/courses/trades', '/courses'],
-    ['/courses/technology', '/courses'],
-    ['/courses/business', '/courses'],
-    // Old /apply category pages (absorbed into main apply)
-    ['/apply/healthcare', '/apply'],
-    ['/apply/trades', '/apply'],
-    ['/apply/technology', '/apply'],
-    ['/apply/business', '/apply'],
-    ['/apply/beauty', '/apply'],
-    // Funding/payment related
-    ['/financial-aid', '/funding'],
-    ['/payment', '/funding'],
-    // Marketing-era AI routes (placeholder - returns 404)
-    ['/paris', '/'],
-    ['/lizzy', '/'],
-    ['/studio', '/'],
-    // Legacy support routes
-    ['/mentorship', '/career-services'],
-    ['/vita', '/career-services'],
-    // Admissions absorbed into apply
-    ['/admissions', '/apply'],
-    // Signup → apply (students sign up through the application flow)
-    ['/signup', '/apply'],
-    // ── Broken nav link fixes (header/footer had wrong hrefs) ─────────────────
-    ['/apply/eligibility', '/eligibility/quiz'],
-    ['/funding/workforce-ready', '/funding/wioa'],
-    ['/funding/scholarships', '/scholarships'],
-    ['/funding/self-pay', '/funding'],
-    ['/apprenticeships/sponsor', '/apprenticeship-sponsor'],
-    ['/partners/workforce', '/for-agencies'],
-    ['/credentials', '/approvals'], // /about/approvals doesn't exist; /approvals does
-    ['/host-shop', '/apprenticeships/host-shop'],
-    // ── Missing page fallbacks (footer links to pages that don't exist) ─────────
-    ['/about/locations', '/about'],
-    ['/orientation/schedule', '/eligibility/quiz'],
-    ['/programs/beauty-cosmetology', '/barber-and-beauty-apprenticeships'],
-    ['/testing/act-workkeys', '/testing'],
-    ['/testing/epa-608', '/testing'],
-    ['/testing/cpr', '/testing'],
-    ['/testing/nha', '/testing'],
-  ];
-
+  // ── Minimal legacy redirects ──────────────────────────────────────────────
   for (const [from, to] of LEGACY_REDIRECTS) {
-    if (pathname === from) {
-      const url = request.nextUrl.clone();
-      url.pathname = to;
-      url.search = '';
-      return NextResponse.redirect(url, 308);
-    }
+    if (pathname === from) return redirectTo(request.nextUrl, to, true);
   }
 
-  // ── Canonical redirects from canonical-routes.json ──────────────────────────
-  for (const [from, to] of CANONICAL_REDIRECTS) {
-    if (pathname === from) {
-      const url = request.nextUrl.clone();
-      url.pathname = to;
-      url.search = '';
-      return NextResponse.redirect(url, 308);
-    }
-  }
-
-  // ── Image .jpg → .webp redirects ─────────────────────────────────────────
-  for (const [from, to] of IMAGE_REDIRECTS) {
-    if (pathname === from) {
-      const url = request.nextUrl.clone();
-      url.pathname = to;
-      url.search = '';
-      return NextResponse.redirect(url, 308);
-    }
-  }
-
-
-  // Always allow public paths and static files
+  // ── Public / static files → pass through ──────────────────────────────────
   if (isPublicPath(pathname)) {
     return addSecurityHeaders(NextResponse.next());
   }
 
-  // =============================================================================
-  // NON-WWW TO WWW REDIRECT (Preserve full path and query)
-  // =============================================================================
-  
-  const wwwHost = process.env.NEXT_PUBLIC_WWW_URL || 'www.elevateforhumanity.org';
-  const isWwwConfigured = wwwHost.includes('www.');
-  
-  // Only redirect if:
-  // 1. Not localhost
-  // 2. Not already www
-  // 3. Not an API route (APIs should not redirect)
-  // 4. www host is configured
-  if (!isLocal && 
-      !host.startsWith('www.') && 
-      !pathname.startsWith('/api/') &&
-      isWwwConfigured) {
-    const url = request.nextUrl.clone();
-    url.host = `www.${host}`;
-    url.protocol = 'https:';
-    return NextResponse.redirect(url);
-  }
-  
-  // Force non-www to www for main domain (always, unless localhost)
+  // ── Non-www → www redirect ────────────────────────────────────────────────
   if (!isLocal && host === 'elevateforhumanity.org') {
     const url = request.nextUrl.clone();
     url.host = 'www.elevateforhumanity.org';
@@ -396,93 +160,56 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // =============================================================================
-  // DOMAIN-BASED ROUTING (Production)
-  // =============================================================================
-
-  // FIX: Use EXPLICIT hosts - do NOT fall back to NEXT_PUBLIC_SITE_URL
-  // This prevents www from being treated as the app domain
+  // ── Domain-based routing: ensure correct paths on subdomains ─────────────
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL; // No fallback - must be explicit
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  // Extract configured hosts
-  let configuredAdminHost: string | null = null;
-  let configuredAppHost: string | null = null;
+  let adminHost: string | null = null;
+  let appHost: string | null = null;
 
-  if (adminUrl) {
-    try {
-      configuredAdminHost = new URL(adminUrl).host;
-    } catch { /* invalid URL */ }
-  }
+  if (adminUrl) { try { adminHost = new URL(adminUrl).host; } catch { /* */ } }
+  if (appUrl) { try { appHost = new URL(appUrl).host; } catch { /* */ } }
 
-  if (appUrl) {
-    try {
-      configuredAppHost = new URL(appUrl).host;
-    } catch { /* invalid URL */ }
-  }
-
-  // If we're on the admin domain, ensure /admin/* or /api/admin/* routes
-  if (configuredAdminHost && host === configuredAdminHost && !isLocal) {
-    if (!pathname.startsWith('/admin') && !pathname.startsWith('/api/admin') && 
-        !pathname.startsWith('/api/devstudio') && !pathname.startsWith('/api/staff')) {
-      // Redirect non-admin paths to /admin
+  if (adminHost && host === adminHost && !isLocal) {
+    if (
+      !pathname.startsWith('/admin') &&
+      !pathname.startsWith('/api/admin') &&
+      !pathname.startsWith('/api/devstudio') &&
+      !pathname.startsWith('/api/staff')
+    ) {
       const url = request.nextUrl.clone();
       url.pathname = `/admin${pathname === '/' ? '' : pathname}`;
       return NextResponse.redirect(url);
     }
   }
 
-  // If we're on the app domain, ensure /lms/* or /student/* routes
-  if (configuredAppHost && host === configuredAppHost && !isLocal) {
+  if (appHost && host === appHost && !isLocal) {
     const studentPaths = ['/lms', '/student', '/instructor', '/employer', '/program-holder', '/api/enrollments', '/api/courses'];
     if (!studentPaths.some(p => pathname.startsWith(p))) {
-      // Redirect non-student paths to /lms
       const url = request.nextUrl.clone();
       url.pathname = `/lms${pathname === '/' ? '' : pathname}`;
       return NextResponse.redirect(url);
     }
   }
 
-  // =============================================================================
-  // ADMIN PROTECTION
-  // =============================================================================
-
+  // ── Admin: set pathname header for auth ─────────────────────────────────
   if (isAdminPath(pathname)) {
-    // Set a cookie as a reliable fallback for server components that can't
-    // read Edge middleware headers in standalone Node.js deployments.
     const response = NextResponse.next();
     response.cookies.set('__efh_pathname', pathname, {
-      httpOnly: false,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-      maxAge: 60,
+      httpOnly: false, secure: true, sameSite: 'lax', path: '/', maxAge: 60,
     });
-
-    // Also set request headers for Edge-compatible header-based passing.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-pathname', pathname);
     requestHeaders.set('x-host', host);
-
-    return addSecurityHeaders(
-      NextResponse.next({ request: { headers: requestHeaders } })
-    );
+    return addSecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
-  // =============================================================================
-  // DEFAULT: Pass through with security headers
-  // =============================================================================
-
+  // ── Default: pass through with security headers ──────────────────────────
   return addSecurityHeaders(NextResponse.next());
 }
 
-// =============================================================================
-// CONFIGURATION
-// =============================================================================
-
 export const config = {
   matcher: [
-    // Match all paths except static files and Next.js internals
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2|ttf|eot)).*)',
   ],
 };

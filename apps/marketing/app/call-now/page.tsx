@@ -45,7 +45,7 @@ export default function GetStartedPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
             <Link
-              href="/start"
+              href="/start-trial"
               className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
             >
               <GraduationCap aria-label="graduationcap" className="w-10 h-10 text-brand-blue-600 mb-4" />

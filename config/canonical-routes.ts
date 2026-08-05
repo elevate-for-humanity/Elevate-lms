@@ -12,13 +12,13 @@
  *   experimental — feature-flagged or in-progress; not yet canonical
  *
  * How redirects are applied:
- *   1. next.config.mjs reads lib/routes/canonical-routes.json for static redirects (legacyAliases)
+ *   1. next.config.mjs reads lib/routes/canonical-routes.json for static redirects
  *   2. proxy.ts handles middleware-level redirects for auth-gated paths
  *   3. This file provides the typed registry for scripts/route-audit.ts and scripts/route-governance-check.ts
  *
  * To add a new redirect:
  *   1. Add the entry here with classification: "legacy" or "redirect"
- *   2. Add the corresponding entry to lib/routes/canonical-routes.json legacyAliases
+ *   2. Add the corresponding entry to middleware.ts LEGACY_REDIRECTS
  *   3. Run: pnpm route:audit to verify no duplicate page files remain
  *   4. Delete the old page.tsx file once the redirect is confirmed live
  */

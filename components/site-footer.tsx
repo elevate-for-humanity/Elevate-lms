@@ -56,7 +56,7 @@ export function SiteFooter() {
               <li><Link href="/programs" className="hover:text-slate-900">All Programs</Link></li>
               <li><Link href="/programs/healthcare" className="hover:text-slate-900">Healthcare</Link></li>
               <li><Link href="/programs/skilled-trades" className="hover:text-slate-900">Skilled Trades</Link></li>
-              <li><Link href="/programs/beauty-cosmetology" className="hover:text-slate-900">Beauty & Cosmetology</Link></li>
+              <li><Link href="/programs/cosmetology-apprenticeship" className="hover:text-slate-900">Beauty & Cosmetology</Link></li>
               <li><Link href="/programs/technology" className="hover:text-slate-900">Technology</Link></li>
               <li><Link href="/programs" className="hover:text-slate-900">View All</Link></li>
             </ul>
@@ -130,7 +130,7 @@ export function SiteFooter() {
             <p className="text-sm font-semibold text-slate-900">About</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><Link href="/about" className="hover:text-slate-900">Mission</Link></li>
-              <li><Link href="/about/locations" className="hover:text-slate-900">Locations</Link></li>
+              <li><Link href="/about" className="hover:text-slate-900">Locations</Link></li>
               <li><Link href="/success-stories" className="hover:text-slate-900">Success Stories</Link></li>
               <li><Link href="/blog" className="hover:text-slate-900">Blog</Link></li>
               <li><Link href="/faq" className="hover:text-slate-900">FAQ</Link></li>
@@ -156,12 +156,12 @@ export function SiteFooter() {
             <p className="text-sm font-semibold text-slate-900">Testing</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><Link href="/testing" className="hover:text-slate-900">Testing Center</Link></li>
-              <li><Link href="/testing/act-workkeys" className="hover:text-slate-900">ACT WorkKeys</Link></li>
-              <li><Link href="/testing/certiport" className="hover:text-slate-900">Certiport</Link></li>
-              <li><Link href="/testing/careersafe" className="hover:text-slate-900">CareerSafe</Link></li>
-              <li><Link href="/testing/epa-608" className="hover:text-slate-900">EPA 608</Link></li>
-              <li><Link href="/testing/cpr" className="hover:text-slate-900">CPR / First Aid</Link></li>
-              <li><Link href="/testing/nha" className="hover:text-slate-900">NHA</Link></li>
+              <li><Link href="/testing" className="hover:text-slate-900">ACT WorkKeys</Link></li>
+              <li><Link href="/testing" className="hover:text-slate-900">Certiport</Link></li>
+              <li><Link href="/testing" className="hover:text-slate-900">CareerSafe</Link></li>
+              <li><Link href="/testing" className="hover:text-slate-900">EPA 608</Link></li>
+              <li><Link href="/testing" className="hover:text-slate-900">CPR / First Aid</Link></li>
+              <li><Link href="/testing/book?type=nha" className="hover:text-slate-900">NHA</Link></li>
             </ul>
           </div>
 
@@ -171,7 +171,7 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><Link href="/apply" className="hover:text-slate-900">Apply Now</Link></li>
               <li><Link href="/eligibility/quiz" className="hover:text-slate-900">Check Eligibility</Link></li>
-              <li><Link href="/orientation/schedule" className="hover:text-slate-900">Schedule Orientation</Link></li>
+              <li><Link href="/booking/booking/enrollment" className="hover:text-slate-900">Schedule Orientation</Link></li>
               <li><Link href="/login" className="hover:text-slate-900">Student Login</Link></li>
               <li><a href="https://admin.elevateforhumanity.org" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 flex items-center gap-1">Admin Portal <ExternalLink className="w-3 h-3" /></a></li>
             </ul>

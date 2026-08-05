@@ -46,7 +46,7 @@ export default function ApprenticeshipPage() {
         actions={
           <>
             <Link
-              href="/start"
+              href="/start-trial"
               className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-orange-700 transition-colors"
             >
               Start Your Journey <ArrowRight className="w-5 h-5" />
@@ -417,7 +417,7 @@ export default function ApprenticeshipPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
-              href="/start"
+              href="/start-trial"
               className="inline-flex items-center justify-center gap-3 bg-white text-brand-orange-600 px-12 py-6 rounded-xl text-xl font-bold hover:bg-white transition shadow-2xl"
             >
               Apply Now

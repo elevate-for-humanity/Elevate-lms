@@ -121,10 +121,10 @@ export default async function AboutPage() {
             </p>
           </div>
           <div className="mt-6 flex flex-wrap gap-4">
-            <Link href="/pathways" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
+            <Link href="/platform/partners" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
               See Our Career Pathways <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
-            <Link href="/start" className="bg-white hover:bg-brand-red-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
+            <Link href="/start-trial" className="bg-white hover:bg-brand-red-50 text-brand-red-600 border-2 border-brand-red-200 px-6 py-3 rounded-lg font-bold transition">
               Check Eligibility &amp; Apply
             </Link>
           </div>
@@ -308,7 +308,7 @@ export default async function AboutPage() {
             </div>
           </div>
           <div className="mt-4">
-            <Link href="/governance" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
+            <Link href="/legal" className="text-brand-red-600 font-semibold text-sm inline-flex items-center hover:text-brand-red-700">
               View Governance &amp; Program Structure <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </div>
@@ -364,7 +364,7 @@ export default async function AboutPage() {
             ))}
           </div>
           <div className="mt-8 text-center">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
+            <Link href="/start-trial" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-6 py-3 rounded-lg font-bold transition inline-flex items-center">
               Check Your Eligibility <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </div>
@@ -601,7 +601,7 @@ export default async function AboutPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-slate-900 text-center mb-6">For Organizations &amp; Partners</h2>
           <div className="grid sm:grid-cols-3 gap-6">
-            <Link href="/pathways/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
+            <Link href="/about/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/about-partner-cta.webp" alt="Partner with Elevate" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
@@ -625,7 +625,7 @@ export default async function AboutPage() {
                 </span>
               </div>
             </Link>
-            <Link href="/pathways" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
+            <Link href="/platform/partners" className="bg-white rounded-xl overflow-hidden border border-slate-200 hover:shadow-md transition">
               <div className="relative h-40 overflow-hidden">
                 <Image src="/images/pages/job-placement.webp" alt="Career pathways" fill sizes="(max-width: 640px) 100vw, 33vw" quality={90} className="object-cover" />
               </div>
@@ -650,7 +650,7 @@ export default async function AboutPage() {
             funding may cover tuition, materials, certifications, and career services for eligible participants.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/start" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition inline-flex items-center">
+            <Link href="/start-trial" className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition inline-flex items-center">
               Check Eligibility &amp; Apply <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-bold text-lg transition border-2 border-white/30">

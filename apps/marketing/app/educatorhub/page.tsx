@@ -99,7 +99,7 @@ export default function EducatorHubPage() {
             Share your expertise and help others achieve their career goals.
           </p>
           <Link
-            href="/start"
+            href="/start-trial"
             className="inline-flex items-center gap-2 bg-teal-600 text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-teal-700"
           >
             Apply to Teach

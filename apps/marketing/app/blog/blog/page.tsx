@@ -191,7 +191,7 @@ export default async function BlogPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/start"
+              href="/start-trial"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-3.5 rounded-lg font-bold transition-colors"
             >
               Apply Now

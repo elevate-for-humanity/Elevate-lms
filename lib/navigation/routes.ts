@@ -32,7 +32,7 @@ export const ROUTES = {
 
   // Apprenticeships
   apprenticeships: '/apprenticeships',
-  apprenticeshipsHowItWorks: '/apprenticeships/how-it-works',
+  apprenticeshipsHowItWorks: '/how-it-works', // '/apprenticeships/how-it-works' doesn't exist; use /how-it-works
   apprenticeshipsHostShop: '/apprenticeships/host-shop',
 
   // Key apprenticeship route (was /apprenticeships/sponsor — now correct)

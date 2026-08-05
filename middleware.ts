@@ -319,8 +319,16 @@ export async function middleware(request: NextRequest) {
     ['/funding/self-pay', '/funding'],
     ['/apprenticeships/sponsor', '/apprenticeship-sponsor'],
     ['/partners/workforce', '/for-agencies'],
-    ['/credentials', '/about/approvals'],
+    ['/credentials', '/approvals'], // /about/approvals doesn't exist; /approvals does
     ['/host-shop', '/apprenticeships/host-shop'],
+    // ── Missing page fallbacks (footer links to pages that don't exist) ─────────
+    ['/about/locations', '/about'],
+    ['/orientation/schedule', '/eligibility/quiz'],
+    ['/programs/beauty-cosmetology', '/barber-and-beauty-apprenticeships'],
+    ['/testing/act-workkeys', '/testing'],
+    ['/testing/epa-608', '/testing'],
+    ['/testing/cpr', '/testing'],
+    ['/testing/nha', '/testing'],
   ];
 
   for (const [from, to] of LEGACY_REDIRECTS) {

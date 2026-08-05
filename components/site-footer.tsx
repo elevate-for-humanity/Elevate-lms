@@ -161,6 +161,7 @@ export function SiteFooter() {
               <li><Link href="/testing/careersafe" className="hover:text-slate-900">CareerSafe</Link></li>
               <li><Link href="/testing/epa-608" className="hover:text-slate-900">EPA 608</Link></li>
               <li><Link href="/testing/cpr" className="hover:text-slate-900">CPR / First Aid</Link></li>
+              <li><Link href="/testing/nha" className="hover:text-slate-900">NHA</Link></li>
             </ul>
           </div>
 

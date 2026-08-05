@@ -291,3 +291,87 @@ export interface ExecutionContext {
   agent?: AIAgent;
   intent?: AgentIntent;
 }
+
+// ============================================================
+// AI Service Types
+// ============================================================
+
+export type AIProviderName = 'openai' | 'gemini' | 'azure' | 'groq' | 'none';
+export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';
+
+export interface ChatMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
+export interface ChatCompletionOptions {
+  model?: string;
+  messages: ChatMessage[];
+  temperature?: number;
+  maxTokens?: number;
+  provider?: AIProviderName;
+}
+
+export interface ChatCompletionResult {
+  content: string;
+  model: string;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+}
+
+export interface ImageGenerationOptions {
+  prompt: string;
+  count?: number;
+  size?: '1024x1024' | '1024x1792' | '1792x1024';
+  format?: 'url' | 'b64_json';
+  style?: 'natural' | 'vivid';
+}
+
+export interface GeneratedImage {
+  url?: string;
+  b64Json?: string;
+}
+
+export interface QuizGenerationOptions {
+  topic?: string;
+  content?: string;
+  count?: number;
+  difficulty?: 'easy' | 'medium' | 'hard';
+}
+
+export interface QuizQuestion {
+  question: string;
+  type: 'multiple_choice' | 'true_false' | 'open_ended';
+  options?: string[];
+  correctAnswer: string | boolean;
+  explanation?: string;
+}
+
+export interface GradingOptions {
+  question: string;
+  studentAnswer: string;
+  correctAnswer?: string;
+  rubric?: string;
+  maxScore?: number;
+}
+
+export interface GradingResult {
+  score: number;
+  maxScore: number;
+  feedback: string;
+  passed: boolean;
+}
+
+export interface AIProvider {
+  readonly name: string;
+  isAvailable(): boolean;
+  chat(options: ChatCompletionOptions): Promise<ChatCompletionResult>;
+}
+
+export interface AIImageProvider {
+  isAvailable(): boolean;
+  generateImage(options: ImageGenerationOptions): Promise<GeneratedImage[]>;
+}

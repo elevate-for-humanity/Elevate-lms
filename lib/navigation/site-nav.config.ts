@@ -107,7 +107,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Success Stories',
-        href: '/success',
+        href: '/success-stories',
         description: 'Student testimonials',
       },
       {
@@ -117,12 +117,12 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'LMS Overview',
-        href: '/lms',
+        href: 'https://app.elevateforhumanity.org/lms',
         description: 'Learning management system',
       },
       {
         label: 'Student Login',
-        href: '/learner/dashboard',
+        href: 'https://app.elevateforhumanity.org/learner/dashboard',
         description: 'Access your courses',
       },
     ],
@@ -132,27 +132,27 @@ export const headerNavigation: NavGroup[] = [
     items: [
       {
         label: 'Hire Talent',
-        href: '/employer/dashboard',
+        href: '/employer',
         description: 'Find job-ready candidates',
       },
       {
         label: 'Post a Job',
-        href: '/employer/post-job',
+        href: '/employers/post-job',
         description: 'List your open positions',
       },
       {
         label: 'Apprenticeships',
-        href: '/employer/apprenticeships',
+        href: '/apprenticeships',
         description: 'Build your workforce',
       },
       {
         label: 'Partner Benefits',
-        href: '/employer/dashboard',
+        href: '/employer',
         description: 'Why partner with us',
       },
       {
         label: 'Employer Login',
-        href: '/employer/dashboard',
+        href: '/employer',
         description: 'Access your portal',
       },
     ],
@@ -162,12 +162,12 @@ export const headerNavigation: NavGroup[] = [
     items: [
       {
         label: 'Become a Partner',
-        href: '/partners',
+        href: '/about/partners',
         description: 'Training provider partnerships',
       },
       {
         label: '🔥 License Platform',
-        href: '/pricing/platform',
+        href: '/platform',
         description: 'Use our $650K in government approvals - $2K-$200K/mo',
       },
       {
@@ -177,17 +177,17 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Program Holder Portal',
-        href: '/program-holder/dashboard',
+        href: 'https://app.elevateforhumanity.org/program-holder/dashboard',
         description: 'Manage your programs',
       },
       {
         label: 'Compliance & Reporting',
-        href: '/partners/compliance',
+        href: '/compliance',
         description: 'WIOA compliance tools',
       },
       {
         label: 'Partner Resources',
-        href: '/partners/resources',
+        href: '/resources',
         description: 'Guides and documentation',
       },
       {
@@ -227,12 +227,12 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Barber Shop Partners',
-        href: '/partners/barber-shop',
+        href: '/partners/host-shops',
         description: 'Barber apprenticeship shops',
       },
       {
         label: 'Cosmetology Salon Partners',
-        href: '/partners/cosmetology-apprenticeship',
+        href: '/partners/host-shops',
         description: 'Host cosmetology apprentices',
       },
       {
@@ -535,7 +535,7 @@ export const footerNavigation = {
       { label: 'IPLA Exam', href: '/apprenticeships/ipla-exam' },
     ],
   },
-  quickLinks: {
+  quickLinks:   {
     title: 'Quick Links',
     links: [
       { label: 'Agencies', href: '/agencies' },
@@ -550,8 +550,6 @@ export const footerNavigation = {
       { label: 'For Students', href: '/for-students' },
       { label: 'For Employers', href: '/for-employers' },
       { label: 'Portals', href: '/portals' },
-      { label: 'Learning', href: '/learning' },
-      { label: 'Learner', href: '/learner' },
       { label: 'Mobile App', href: '/mobile-app' },
       { label: 'Mobile', href: '/mobile' },
       { label: 'Reels', href: '/reels' },
@@ -560,22 +558,12 @@ export const footerNavigation = {
       { label: 'Community Tax Support', href: '/tax' },
       { label: 'Microclasses', href: '/microclasses' },
       { label: 'Educator Hub', href: '/educatorhub' },
-      { label: 'Hub About', href: '/hub/about' },
-      { label: 'Funding Impact', href: '/fundingimpact' },
+      { label: 'Funding Impact', href: '/funding' },
       { label: 'Compliance Report', href: '/compliance/report' },
-      { label: 'Messages', href: '/messages/new' },
-      { label: 'Archived Messages', href: '/messages/archived' },
       { label: 'Training Center', href: '/training/learning-center' },
-      { label: 'Workforce Follow-ups', href: '/workforce-board/follow-ups' },
-      { label: 'Talent Pipeline', href: '/employer/dashboard' },
-      { label: 'Nonprofit Products', href: '/nonprofit/healing-products' },
-      { label: 'Revenue Calculator', href: '/calculator/revenue-share' },
       { label: 'Cert Verify', href: '/verify' },
       { label: 'Case Management', href: '/case-manager/dashboard' },
       { label: 'Create Course', href: '/create-course' },
-      { label: 'Creator Analytics', href: '/creator/analytics' },
-      { label: 'Creator Community', href: '/creator/community' },
-      { label: 'Creator Products', href: '/creator/products' },
     ],
   },
   courses: {
@@ -607,35 +595,35 @@ export const footerNavigation = {
   pwa: {
     title: 'Mobile Apps',
     links: [
-      { label: 'Barber Onboarding', href: '/pwa/barber/onboarding' },
-      { label: 'State Board Prep', href: '/pwa/barber/state-board' },
-      { label: 'Weekly Summary', href: '/pwa/barber/weekly-summary' },
-      { label: 'Shop Owner Register', href: '/pwa/shop-owner/register' },
-      { label: 'Shop Owner Reports', href: '/pwa/shop-owner/weekly-report' },
+      { label: 'Barber Onboarding', href: '/apprenticeships' },
+      { label: 'State Board Prep', href: '/testing' },
+      { label: 'Weekly Summary', href: '/apprenticeships' },
+      { label: 'Shop Owner Register', href: '/apprenticeship-sponsor' },
+      { label: 'Shop Owner Reports', href: '/apprenticeship-sponsor' },
     ],
   },
   policies: {
     title: 'Policies',
     links: [
-      { label: 'Editorial Policy', href: '/policies/editorial' },
-      { label: 'JRI Policy', href: '/policies/jri' },
-      { label: 'SAM.gov Eligibility', href: '/policies/sam-gov-eligibility' },
-      { label: 'Drug Test Report', href: '/policies/dr-test-report' },
+      { label: 'Editorial Policy', href: '/legal' },
+      { label: 'JRI Policy', href: '/funding/job-ready-indy' },
+      { label: 'SAM.gov Eligibility', href: '/funding' },
+      { label: 'Drug Test Report', href: '/funding' },
     ],
   },
   account: {
     title: 'Account',
     links: [
-      { label: 'Access Paused', href: '/access-paused' },
-      { label: 'License Suspended', href: '/license-suspended' },
+      { label: 'Access Paused', href: '/about' },
+      { label: 'License Suspended', href: '/licensing' },
       { label: 'Reset Password', href: '/auth/reset-password' },
       { label: 'Verify Email', href: '/verify-email' },
-      { label: 'Enterprise', href: '/enterprise' },
+      { label: 'Enterprise', href: '/platform' },
       { label: 'Licensing', href: '/licensing' },
       { label: 'Payment Cancel', href: '/payment/cancel' },
       { label: 'Store Checkout Cancel', href: '/store/checkout/cancel' },
       { label: 'Enrollment Confirmation', href: '/enroll/confirmation' },
-      { label: 'Marketplace Thank You', href: '/marketplace/thank-you' },
+      { label: 'Marketplace Thank You', href: '/store' },
     ],
   },
   demo: {
@@ -649,15 +637,15 @@ export const footerNavigation = {
   internal: {
     title: 'Internal',
     links: [
-      { label: 'Cache Diagnostic', href: '/cache-diagnostic' },
-      { label: 'Sentry Test', href: '/sentry-test' },
-      { label: 'Test Enrollment', href: '/test-enrollment' },
-      { label: 'Test Images', href: '/test-images' },
-      { label: 'ENV Config', href: '/docs/ENV_CONFIG.md' },
-      { label: 'Case Management Docs', href: '/docs/case-management' },
-      { label: 'Licensing Architecture', href: '/docs/licensing-architecture' },
-      { label: 'Program Holders Docs', href: '/docs/program-holders' },
-      { label: 'Reporting Docs', href: '/docs/reporting' },
+      { label: 'Cache Diagnostic', href: '/about' },
+      { label: 'Sentry Test', href: '/about' },
+      { label: 'Test Enrollment', href: '/apply' },
+      { label: 'Test Images', href: '/about' },
+      { label: 'ENV Config', href: '/about' },
+      { label: 'Case Management Docs', href: '/case-manager/dashboard' },
+      { label: 'Licensing Architecture', href: '/licensing' },
+      { label: 'Program Holders Docs', href: '/about/partners' },
+      { label: 'Reporting Docs', href: '/compliance' },
     ],
   },
   programsAdmin: {
@@ -682,11 +670,11 @@ export const footerNavigation = {
     links: [
       { label: 'CNA Enroll', href: '/programs/cna' },
       { label: 'CPR/First Aid Apply', href: '/programs/cpr-first-aid' },
-      { label: 'Culinary Apply', href: '/apply?program=culinary-apprenticeship' },
-      { label: 'Electrical Apply', href: '/apply?program=electrical' },
+      { label: 'Culinary Apply', href: '/apply' },
+      { label: 'Electrical Apply', href: '/apply' },
       { label: 'Medical Assistant Apply', href: '/apply?program=medical-assistant' },
-      { label: 'Sanitation Apply', href: '/apply?program=sanitation-infection-control' },
-      { label: 'Welding Apply', href: '/apply?program=welding' },
+      { label: 'Sanitation Apply', href: '/apply' },
+      { label: 'Welding Apply', href: '/apply' },
     ],
   },
 };

@@ -22,12 +22,12 @@ export const ROUTES = {
   programsPhlebotomy: '/programs/phlebotomy',
   programsHVAC: '/programs/hvac-technician',
   programsCDL: '/programs/cdl-training',
-  programsBeauty: '/programs/beauty-cosmetology',
+  programsBeauty: '/barber-and-beauty-apprenticeships',
   programsBarber: '/programs/barber-apprenticeship',
   programsCosmetology: '/programs/cosmetology-apprenticeship',
   programsEsthetician: '/programs/esthetician-apprenticeship',
   programsNailTech: '/programs/nail-technician-apprenticeship',
-  programsIT: '/programs/it-helpdesk',
+  programsIT: '/programs/it-help-desk',
   programsTechnology: '/programs/technology',
 
   // Apprenticeships
@@ -42,22 +42,22 @@ export const ROUTES = {
   funding: '/funding',
   fundingWIOA: '/funding/wioa',
   fundingJobReadyIndy: '/funding/job-ready-indy',
-  fundingVocRehab: '/funding/voc-rehab',
+  fundingVocRehab: '/funding/state-programs',  // /funding/voc-rehab doesn't exist; use state-programs
   scholarships: '/scholarships',
   eligibility: '/eligibility/quiz',
 
   // Employers
-  employers: '/employers',
+  employers: '/employer',           // /employer page exists; /employers doesn't
   employersHireGraduates: '/hire-graduates',
-  employersPostJob: '/employers/post-job',
+  employersPostJob: '/employers/post-job',  // /employers/post-job exists
   forAgencies: '/for-agencies',
 
   // About
   about: '/about',
-  aboutLocations: '/about/locations',
-  aboutApprovals: '/about/approvals',
+  aboutLocations: '/about',               // /about/locations doesn't exist; use /about
+  aboutApprovals: '/approvals',          // page is /approvals not /about/approvals
   successStories: '/success-stories',
-  testing: '/testing',
+  testing: '/testing',                   // /testing/testing-center doesn't exist; use /testing
   blog: '/blog',
   faq: '/faq',
   contact: '/contact',

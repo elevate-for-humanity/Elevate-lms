@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/platform`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${baseUrl}/platform/sponsors`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${baseUrl}/partners`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/employers`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
+    { url: `${baseUrl}/employer`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
     { url: `${baseUrl}/compliance`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${baseUrl}/federal-compliance`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
     { url: `${baseUrl}/onboarding`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
@@ -47,7 +47,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { slug: 'programs/electrical', priority: 0.8 },
     { slug: 'programs/plumbing', priority: 0.8 },
     { slug: 'programs/cdl-training', priority: 0.9 },
-    { slug: 'programs/welding', priority: 0.8 },
     // Beauty
     { slug: 'programs/barber-apprenticeship', priority: 0.9 },
     { slug: 'programs/cosmetology-apprenticeship', priority: 0.8 },
@@ -55,11 +54,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { slug: 'programs/nail-technician-apprenticeship', priority: 0.7 },
     // Technology
     { slug: 'programs/technology', priority: 0.8 },
-    { slug: 'programs/it-help-desk', priority: 0.8 },
-    { slug: 'programs/cybersecurity-analyst', priority: 0.8 },
+    { slug: 'programs/it-helpdesk', priority: 0.8 },
     // Business
-    { slug: 'programs/finance-bookkeeping-accounting', priority: 0.8 },
-    { slug: 'programs/bookkeeping', priority: 0.7 },
+    { slug: 'programs/business-administration', priority: 0.8 },
   ];
 
   const programSitemap = programPages.map(page => ({

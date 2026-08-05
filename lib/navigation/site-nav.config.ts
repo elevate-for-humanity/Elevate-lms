@@ -202,7 +202,7 @@ export const headerNavigation: NavGroup[] = [
       },
       {
         label: 'Workforce Partners',
-        href: '/partners/workforce',
+        href: '/hire-graduates',
         description: 'Workforce development partnerships',
       },
       {

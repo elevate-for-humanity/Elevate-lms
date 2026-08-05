@@ -100,6 +100,20 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/public \
     ./apps/marketing/public/
 
+# Copy routing config files needed by middleware at runtime
+# Without these, all legacy redirects 404 in the standalone container
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/lib/routes/canonical-routes.json \
+    ./lib/routes/canonical-routes.json
+
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/lib/routes/program-slug-redirects.json \
+    ./lib/routes/program-slug-redirects.json
+
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/scripts/.image-conversion-manifest.json \
+    ./scripts/.image-conversion-manifest.json
+
 # Fix: Next.js standalone output inherits "type":"module" from the monorepo
 # root package.json, but server.js is compiled as CommonJS. Remove it so
 # Node.js treats server.js as CommonJS (no require/import mismatch).

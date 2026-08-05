@@ -81,11 +81,11 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><Link href="/funding" className="hover:text-slate-900">All Funding Options</Link></li>
               <li><Link href="/funding/wioa" className="hover:text-slate-900">WIOA / WorkOne</Link></li>
-              <li><Link href="/funding/workforce-ready" className="hover:text-slate-900">Workforce Ready Grant</Link></li>
+              <li><Link href="/funding/wioa" className="hover:text-slate-900">Workforce Ready Grant</Link></li>
               <li><Link href="/funding/job-ready-indy" className="hover:text-slate-900">Job Ready Indy</Link></li>
-              <li><Link href="/funding/scholarships" className="hover:text-slate-900">Scholarships</Link></li>
-              <li><Link href="/funding/self-pay" className="hover:text-slate-900">Payment Plans</Link></li>
-              <li><Link href="/apply/eligibility" className="hover:text-slate-900">Check Eligibility</Link></li>
+              <li><Link href="/scholarships" className="hover:text-slate-900">Scholarships</Link></li>
+              <li><Link href="/funding" className="hover:text-slate-900">Payment Plans</Link></li>
+              <li><Link href="/eligibility/quiz" className="hover:text-slate-900">Check Eligibility</Link></li>
             </ul>
           </div>
 

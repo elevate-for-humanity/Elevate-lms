@@ -242,6 +242,8 @@ const nextConfig = {
   },
 
   async redirects() {
+    // Load from JSON — SSOT for all legacy redirects (324 routes).
+    // Standalone container copies these files so middleware can also read them at runtime.
     const canonicalRoutesPath = path.join(process.cwd(), 'lib/routes/canonical-routes.json');
     const canonicalConfig = JSON.parse(fs.readFileSync(canonicalRoutesPath, 'utf8'));
     const canonicalAliasRedirects = (canonicalConfig.legacyAliases || []).map((alias) => ({
@@ -250,23 +252,16 @@ const nextConfig = {
       permanent: alias.permanent !== false,
     }));
 
-    const imageManifest = JSON.parse(
-      fs.readFileSync(path.join(process.cwd(), 'scripts/.image-conversion-manifest.json'), 'utf8'),
-    );
+    const imageManifestPath = path.join(process.cwd(), 'scripts/.image-conversion-manifest.json');
+    const imageManifest = JSON.parse(fs.readFileSync(imageManifestPath, 'utf8'));
     const imageJpgRedirects = imageManifest.map((row) => ({
       source: row.origRel,
       destination: row.webpRel,
       permanent: true,
     }));
-    imageJpgRedirects.push(
-      {
-        source: '/hero-images/how-it-works-hero.jpg',
-        destination: '/hero-images/how-it-works-hero.webp',
-        permanent: true,
-      },
-    );
 
     return [
+      // ── Domain routing: elevateforhumanity.org → www ──────────────────────
       {
         source: '/',
         has: [{ type: 'host', value: 'elevateforhumanity.org' }],
@@ -279,283 +274,21 @@ const nextConfig = {
         destination: 'https://www.elevateforhumanity.org/:path+',
         permanent: true,
       },
+
+      // ── Video asset ──────────────────────────────────────────────────────
       {
         source: '/videos/barber-hero-final.mp4',
         destination: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4',
         permanent: false,
       },
-      { source: '/admin/leads', destination: '/admin/crm/leads', permanent: true },
-      { source: '/admin/leads/new', destination: '/admin/crm/leads/new', permanent: true },
-      { source: '/admin/syllabus-generator', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-templates', destination: '/admin/studio', permanent: true },
-      { source: '/admin/courses/manage', destination: '/admin/courses', permanent: true },
-      { source: '/admin/course-import', destination: '/admin/studio', permanent: true },
-      { source: '/admin/quiz-builder', destination: '/admin/studio', permanent: true },
-      { source: '/admin/external-courses', destination: '/admin/courses', permanent: true },
-      { source: '/admin/enrollment', destination: '/admin/students', permanent: true },
-      { source: '/admin/users', destination: '/admin/staff', permanent: true },
-      { source: '/admin/contacts', destination: '/admin/crm/contacts', permanent: true },
-      { source: '/admin/campaigns', destination: '/admin/crm/campaigns', permanent: true },
-      { source: '/admin/email-marketing', destination: '/admin/crm/campaigns', permanent: true },
-      { source: '/admin/social-media', destination: '/admin/crm/campaigns', permanent: true },
-      { source: '/admin/marketing', destination: '/admin/crm', permanent: true },
-      { source: '/admin/compliance-audit', destination: '/admin/compliance', permanent: true },
-      { source: '/admin/license', destination: '/admin/licenses', permanent: true },
-      { source: '/admin/license-requests', destination: '/admin/licenses', permanent: true },
-      { source: '/admin/progress', destination: '/admin/analytics/learning', permanent: true },
-      { source: '/admin/completions', destination: '/admin/analytics/learning', permanent: true },
-      { source: '/admin/outcomes', destination: '/admin/analytics', permanent: true },
-      { source: '/admin/copilot', destination: '/admin/studio', permanent: true },
-      { source: '/admin/video-manager', destination: '/admin/studio', permanent: true },
-      { source: '/admin/course-builder', destination: '/admin/studio', permanent: true },
-      { source: '/studio(.*)', destination: '/admin/studio$1', permanent: false },
-      { source: '/admin-dashboard', destination: '/admin/dashboard', permanent: true },
-      { source: '/host-shops', destination: '/partners/host-shops', permanent: true },
-      {
-        source: '/store/codebase-clone',
-        destination: '/store/licenses#clone',
-        permanent: false,
-      },
-      { source: '/forgotpassword', destination: '/reset-password', permanent: true },
-      { source: '/resetpassword', destination: '/reset-password', permanent: true },
-      { source: '/verifyemail', destination: '/verify-email', permanent: true },
-      { source: '/lms/messages/new', destination: '/lms/messages', permanent: true },
-      { source: '/lms/messages/support/new', destination: '/lms/messages', permanent: true },
-      { source: '/apprentice/dashboard', destination: '/apprentice', permanent: true },
-      { source: '/apprentice/progress', destination: '/apprentice/hours', permanent: true },
-      { source: '/dashboard/sub-offices/new', destination: '/dashboard', permanent: true },
-      { source: '/employer/apprenticeship', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer/apprenticeship/new', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer/applications', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer/apprentices/new', destination: '/employer/dashboard', permanent: true },
-      // /login page doesn't exist in marketing app, redirect to /app/login
-      { source: '/login', destination: '/app/login', permanent: true },
-      { source: '/employer/login', destination: '/app/login', permanent: true },
-      { source: '/employer/postings/new', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer/register', destination: '/apply/employer', permanent: true },
-      { source: '/employer-portal', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer-portal/dashboard', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer-portal/jobs', destination: '/employer/jobs', permanent: true },
-      { source: '/employer-portal/applications', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer-portal/candidates', destination: '/employer/candidates', permanent: true },
-      { source: '/employer-portal/analytics', destination: '/employer/analytics', permanent: true },
-      { source: '/employer-portal/company', destination: '/employer/company', permanent: true },
-      { source: '/employer-portal/settings', destination: '/employer/settings', permanent: true },
-      { source: '/employer-portal/messages', destination: '/employer/dashboard', permanent: true },
-      { source: '/employer-portal/interviews', destination: '/employer/candidates', permanent: true },
-      { source: '/employer-portal/programs', destination: '/employer/opportunities', permanent: true },
-      { source: '/employer-portal/wotc', destination: '/employer/wotc', permanent: true },
-      { source: '/employer-portal/:path*', destination: '/employer/:path*', permanent: true },
-      { source: '/lms/catalog', destination: '/lms/courses', permanent: true },
-      { source: '/admin/curriculum',        destination: '/admin/studio', permanent: true },
-      { source: '/admin/media-studio',      destination: '/admin/studio', permanent: true },
-      { source: '/admin/video-generator',   destination: '/admin/studio', permanent: true },
-      { source: '/admin/courses/pipeline',  destination: '/admin/studio', permanent: true },
-      { source: '/admin/courses/generate',  destination: '/admin/studio', permanent: true },
-      { source: '/learners/:path*', destination: '/lms/:path*', permanent: true },
-      {
-        source: '/program-holder-portal/:path*',
-        destination: '/program-holder/:path*',
-        permanent: true,
-      },
-      { source: '/program-holder/portal/students', destination: '/program-holder/students', permanent: true },
-      { source: '/program-holder/portal/reports', destination: '/program-holder/dashboard', permanent: true },
-      { source: '/program-holder/portal/page', destination: '/program-holder/dashboard', permanent: false },
-      { source: '/program-holders', destination: '/program-holder', permanent: true },
-      {
-        source: '/program-holders/portal',
-        destination: '/program-holder/dashboard',
-        permanent: true,
-      },
-      {
-        source: '/program-holders/universal-mou',
-        destination: '/legal/program-host-agreement',
-        permanent: true,
-      },
-      {
-        source: '/program-holders/sign-mou',
-        destination: '/program-holder/sign-mou',
-        permanent: true,
-      },
-      { source: '/program-holders/apply', destination: '/apply/program-holder', permanent: true },
-      {
-        source: '/program-holders/onboarding',
-        destination: '/program-holder/onboarding',
-        permanent: true,
-      },
-      {
-        source: '/program-holders/training-providers',
-        destination: '/program-holder',
-        permanent: true,
-      },
-      {
-        source: '/program-holders/acknowledgement',
-        destination: '/program-holder/rights-responsibilities',
-        permanent: true,
-      },
-      { source: '/program-holders/:path*', destination: '/program-holder/:path*', permanent: true },
-      { source: '/tax-filing/:path*', destination: '/tax/:path*', permanent: true },
-      { source: '/tax-services/:path*', destination: '/tax/:path*', permanent: true },
-      { source: '/tax-software/:path*', destination: '/tax/:path*', permanent: true },
-      { source: '/programs-catalog/:path*', destination: '/programs/:path*', permanent: true },
-      { source: '/program-finder/:path*', destination: '/programs/:path*', permanent: true },
-      { source: '/apply/barber', destination: '/partners/barber-host-shop/apply', permanent: true },
-      { source: '/partners/barbershop-apprenticeship/:path*', destination: '/partners/barber-host-shop/:path*', permanent: true },
-      { source: '/partners/cosmetology-partner-shop/:path*', destination: '/partners/cosmetology-host-shop/:path*', permanent: true },
-      { source: '/partners/cosmetology-apprenticeship/:path*', destination: '/partners/cosmetology-host-shop/:path*', permanent: true },
-      { source: '/apply/cosmetology', destination: '/partners/cosmetology-host-shop/apply', permanent: true },
-      { source: '/partner-courses/:path*', destination: '/partners/:path*', permanent: true },
-      { source: '/partner-playbook/:path*', destination: '/partners/:path*', permanent: true },
-      { source: '/credentials/checksheets', destination: '/programs', permanent: false },
-      { source: '/credentials/:path+', destination: '/programs', permanent: false },
-      { source: '/mission', destination: '/about', permanent: false },
-      { source: '/financial-support', destination: '/funding', permanent: true },
-      { source: '/community/groups', destination: '/community-services', permanent: false },
-      { source: '/community/:path*', destination: '/community-services', permanent: true },
-      { source: '/outcomes/indiana', destination: '/about', permanent: false },
-      { source: '/legal/terms-of-service', destination: '/legal', permanent: true },
-      {
-        source: '/legal/governance/lms',
-        destination: '/legal/governance/lms-standards',
-        permanent: true,
-      },
-      {
-        source: '/legal/governance/store',
-        destination: '/legal/governance/store-payments',
-        permanent: true,
-      },
-      { source: '/policies/grievance', destination: '/grievance', permanent: true },
-      { source: '/policies/:path*', destination: '/legal/disclosures', permanent: true },
-      { source: '/partners/login', destination: '/app/login', permanent: true },
-      { source: '/store/trial', destination: '/launch', permanent: false },
-      { source: '/marketplace', destination: '/store/digital', permanent: true },
-      { source: '/store/demo', destination: '/store/demos', permanent: true },
-      { source: '/store/orders', destination: '/store', permanent: true },
-      { source: '/platform/licensing', destination: '/licensing', permanent: true },
-      { source: '/certificates/verify', destination: '/verify', permanent: true },
-      { source: '/verifycertificate/:path*', destination: '/verify/:path*', permanent: true },
-      { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },
-      { source: '/portal', destination: '/portals', permanent: true },
-      { source: '/receptionist/:path*', destination: '/admin/staff-portal/:path*', permanent: true },
-      { source: '/forum/:path*', destination: '/blog', permanent: true },
-      { source: '/about/founder', destination: '/about/team', permanent: true },
-      { source: '/docs/:path*', destination: '/resources', permanent: false },
-      {
-        source: '/apply/barber-apprenticeship',
-        destination: '/programs/barber-apprenticeship/apply',
-        permanent: true,
-      },
-      {
-        source: '/enroll/barber-apprenticeship',
-        destination: '/programs/barber-apprenticeship/apply',
-        permanent: true,
-      },
-      {
-        source: '/pwa/barber/enroll',
-        destination: '/programs/barber-apprenticeship/apply',
-        permanent: true,
-      },
-      { source: '/career-uplift-services/:path*', destination: '/career-services', permanent: true },
-      { source: '/lms/my-courses', destination: '/lms/courses', permanent: true },
-      { source: '/student-portal', destination: '/learner/dashboard', permanent: true },
-      { source: '/admin-portal', destination: '/app/login', permanent: true },
-      { source: '/for-workforce-boards', destination: '/workforce-board', permanent: true },
-      { source: '/get-started', destination: '/start', permanent: true },
-      { source: '/training/cna', destination: '/programs/cna', permanent: true },
-      { source: '/programs/it-support', destination: '/programs/it-help-desk', permanent: true },
-      { source: '/wioa-training', destination: '/wioa-eligibility', permanent: true },
-      { source: '/wioa-training-indiana', destination: '/wioa-eligibility', permanent: true },
-      { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: true },
-      { source: '/healthcare-training', destination: '/healthcare-training-indianapolis', permanent: true },
-      { source: '/skilled-trades-training', destination: '/skilled-trades-training-indiana', permanent: true },
-      { source: '/logout', destination: '/app/login', permanent: false },
-      { source: '/elevate-platform-overview.pdf', destination: '/resources', permanent: false },
-      { source: '/usermanagement', destination: '/admin/reports/users', permanent: true },
-      { source: '/curriculumupload', destination: '/admin/curriculum/upload', permanent: true },
-      { source: '/community', destination: '/community-services', permanent: true },
-      { source: '/admin/live-sessions/new', destination: '/admin/dashboard', permanent: false },
-      { source: '/admin/live-sessions', destination: '/admin/dashboard', permanent: true },
-      { source: '/auth/signin', destination: '/app/login', permanent: true },
-      { source: '/sign-in', destination: '/app/login', permanent: true },
-      { source: '/signin', destination: '/app/login', permanent: true },
-      { source: '/auth/signup', destination: '/signup', permanent: true },
-      { source: '/register', destination: '/signup', permanent: true },
-      { source: '/auth/forgot-password', destination: '/reset-password', permanent: true },
-      { source: '/auth/verify-email', destination: '/verify-email', permanent: true },
-      { source: '/update-password', destination: '/auth/reset-password', permanent: true },
-      { source: '/cm', destination: '/case-manager/dashboard', permanent: true },
-      { source: '/cm/learners/:id', destination: '/case-manager/participants/:id', permanent: true },
-      { source: '/cm/:path*', destination: '/case-manager/:path*', permanent: true },
-      { source: '/employers/post-job', destination: '/employer/post-job', permanent: true },
-      { source: '/employers/apprenticeships', destination: '/employer/apprenticeships', permanent: true },
-      { source: '/employers/benefits', destination: '/employer/dashboard', permanent: true },
-      { source: '/employers/talent-pipeline', destination: '/employer/dashboard', permanent: true },
-      { source: '/partner-portal', destination: '/partner/dashboard', permanent: true },
-      { source: '/partner-portal/:path*', destination: '/partner/:path*', permanent: true },
-      { source: '/career-training-illinois', destination: '/career-training-indiana', permanent: true },
-      { source: '/career-training-ohio', destination: '/career-training-indiana', permanent: true },
-      { source: '/career-training-tennessee', destination: '/career-training-indiana', permanent: true },
-      { source: '/career-training-texas', destination: '/career-training-indiana', permanent: true },
-      { source: '/community-services-illinois', destination: '/community-services-indiana', permanent: true },
-      { source: '/community-services-ohio', destination: '/community-services-indiana', permanent: true },
-      { source: '/community-services-tennessee', destination: '/community-services-indiana', permanent: true },
-      { source: '/community-services-texas', destination: '/community-services-indiana', permanent: true },
-      { source: '/cert/verify', destination: '/verify', permanent: true },
-      { source: '/cert/verify/:id', destination: '/verify/:id', permanent: true },
-      { source: '/certificates/verify/:id', destination: '/verify/:id', permanent: true },
-      { source: '/verify-credential', destination: '/verify', permanent: true },
-      { source: '/certifications', destination: '/certificates', permanent: true },
-      { source: '/certification', destination: '/certificates', permanent: true },
-      { source: '/privacy', destination: '/legal/privacy', permanent: true },
-      { source: '/privacy-policy', destination: '/legal/privacy', permanent: true },
-      { source: '/terms', destination: '/legal', permanent: true },
-      { source: '/terms-of-service', destination: '/legal', permanent: true },
-      { source: '/eula', destination: '/legal/eula', permanent: true },
-      { source: '/license-agreement', destination: '/legal/license-agreement', permanent: true },
-      { source: '/disclosures', destination: '/legal/disclosures', permanent: true },
-      { source: '/micro-classes', destination: '/microclasses', permanent: true },
-      { source: '/donations', destination: '/donate', permanent: true },
-      { source: '/funding-impact', destination: '/funding', permanent: true },
-      { source: '/fundingimpact', destination: '/funding', permanent: true },
-      { source: '/for/students', destination: '/for-students', permanent: true },
-      { source: '/connects', destination: '/connect', permanent: true },
-      { source: '/store/licensing', destination: '/store/licenses', permanent: true },
-      { source: '/store/licensing/enterprise', destination: '/store/licenses/enterprise-license', permanent: true },
-      { source: '/store/licensing/managed', destination: '/store/licenses', permanent: true },
-      { source: '/store/licenses/managed', destination: '/store/licenses', permanent: true },
-      { source: '/store/licensing/:path*', destination: '/store/licenses/:path*', permanent: true },
 
-      // SEO Redirect Stubs - Moved from page.tsx to config for better performance
-      { source: '/career-training-indiana', destination: '/career-training', permanent: true },
-      { source: '/community-services-indiana', destination: '/community-services', permanent: true },
-      { source: '/connect', destination: '/career-services', permanent: true },
-      { source: '/healthcare', destination: '/programs/healthcare', permanent: true },
-      { source: '/learner', destination: '/lms', permanent: true },
-      { source: '/partner', destination: '/host-shop', permanent: true },
-      { source: '/skilled-trades-training-indiana', destination: '/programs/skilled-trades', permanent: true },
-      { source: '/verify-email', destination: '/verify', permanent: true },
-      { source: '/launch', destination: '/store', permanent: true },
-      { source: '/microclasses', destination: '/programs', permanent: true },
-
-      // Legacy /demo duplicate - consolidate to /demos
-      { source: '/demo', destination: '/demos', permanent: true },
-
-      // Fix redirect chains
-      { source: '/healthcare-training-indianapolis', destination: '/programs/healthcare', permanent: true },
-
-      // Include legacy aliases from canonical-routes.json
+      // ── Legacy redirects from canonical-routes.json (324 routes) ─────────
       ...canonicalAliasRedirects,
 
-      // Include image .jpg -> .webp redirects
+      // ── Image .jpg → .webp from manifest ────────────────────────────────
       ...imageJpgRedirects,
 
-      // ============================================================
-      // PORTAL ROUTE ROUTING
-      // Route portal links from www. to the correct subdomain apps.
-      // Uses has:host condition so these don't run on other subdomains.
-      // ============================================================
-
-      // LMS app routes → app.elevateforhumanity.org
+      // ── Portal routing: www → app/admin subdomains ──────────────────────
       {
         source: '/lms/:path*',
         has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
@@ -598,45 +331,15 @@ const nextConfig = {
         destination: 'https://app.elevateforhumanity.org/host-shop/dashboard',
         permanent: false,
       },
-
-      // Admin app routes → admin.elevateforhumanity.org
       {
         source: '/admin/:path*',
         has: [{ type: 'host', value: 'www.elevateforhumanity.org' }],
         destination: 'https://admin.elevateforhumanity.org/admin/:path*',
         permanent: false,
       },
-
-      // ============================================================
-      // BROKEN NAV LINKS → EXISTING ROUTES
-      // Nav config links to routes that don't exist. Redirect to nearest match.
-      // ============================================================
-
-      // /apply/eligibility → /apply (check-eligibility page exists)
-      { source: '/apply/eligibility', destination: '/apply', permanent: true },
-
-      // /funding/workforce-ready → /funding/wioa (WIOA/Workforce Ready page)
-      { source: '/funding/workforce-ready', destination: '/funding/wioa', permanent: true },
-
-      // /funding/scholarships → /scholarships (top-level page exists)
-      { source: '/funding/scholarships', destination: '/scholarships', permanent: true },
-
-      // /funding/self-pay → /funding (payment plans info)
-      { source: '/funding/self-pay', destination: '/funding', permanent: true },
-
-      // /apprenticeships/sponsor → /apprenticeship-sponsor
-      { source: '/apprenticeships/sponsor', destination: '/apprenticeship-sponsor', permanent: true },
-
-      // /partners/workforce → /hire-graduates (nearest workforce/employer page)
-      { source: '/partners/workforce', destination: '/hire-graduates', permanent: true },
-
-      // /host-shop (standalone) → /apprenticeships/host-shop
-      { source: '/host-shop', destination: '/apprenticeships/host-shop', permanent: true },
-
-      // /credentials → /programs (credential/certification programs)
-      { source: '/credentials', destination: '/programs', permanent: true },
     ];
   },
+
 
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';

@@ -26,7 +26,7 @@ const sections = [
     icon: DollarSign,
     links: [
       { label: 'WIOA Funding', href: '/funding/wioa' },
-      { label: 'Workforce Ready Grant', href: '/funding/workforce-ready' },
+      { label: 'Workforce Ready Grant', href: '/funding/wioa' },
       { label: 'Job-Ready Incentive', href: '/funding/jri' },
       { label: 'DOL Registered Apprenticeship', href: '/funding/dol' },
       { label: 'Indiana Career Connect', href: 'https://www.indianacareerconnect.com', external: true },

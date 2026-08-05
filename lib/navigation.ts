@@ -43,7 +43,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Esthetics', href: '/programs/esthetician-apprenticeship', isSectionLink: true },
       { name: 'Nail Technician', href: '/programs/nail-technician-apprenticeship', isSectionLink: true },
       { name: 'Host Shops', href: '/apprenticeships/host-shop', isSectionLink: true },
-      { name: 'Employer Sponsorship', href: '/apprenticeships/sponsor', isSectionLink: true },
+      { name: 'Employer Sponsorship', href: '/apprenticeship-sponsor', isSectionLink: true },
     ],
   },
   // ── 3. Funding ──────────────────────────────────────────────────────────────
@@ -52,12 +52,12 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Funding',
     subItems: [
       { name: 'WIOA / WorkOne', href: '/funding/wioa', isSectionLink: true },
-      { name: 'Workforce Ready Grant', href: '/funding/workforce-ready', isSectionLink: true },
+      { name: 'Workforce Ready Grant', href: '/funding/wioa', isSectionLink: true },
       { name: 'Job Ready Indy', href: '/funding/job-ready-indy', isSectionLink: true },
       { name: 'Vocational Rehabilitation', href: '/funding/voc-rehab', isSectionLink: true },
-      { name: 'Scholarships', href: '/funding/scholarships', isSectionLink: true },
-      { name: 'Payment Plans', href: '/funding/self-pay', isSectionLink: true },
-      { name: 'Check Eligibility', href: '/apply/eligibility', isSectionLink: true },
+      { name: 'Scholarships', href: '/scholarships', isSectionLink: true },
+      { name: 'Payment Plans', href: '/funding', isSectionLink: true },
+      { name: 'Check Eligibility', href: '/eligibility/quiz', isSectionLink: true },
     ],
   },
   // ── 4. Employers ──────────────────────────────────────────────────────────────

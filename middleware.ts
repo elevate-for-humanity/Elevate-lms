@@ -13,26 +13,69 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 // =============================================================================
-// CONFIGURATION
+// CONFIGURATION — loaded from JSON files at runtime
+// Without these files in the standalone container, all legacy redirects 404.
 // =============================================================================
 
-// Canonical route redirects - embedded directly to work in edge runtime
-// Source: lib/routes/canonical-routes.json
-const CANONICAL_REDIRECTS: Array<[from: string, to: string]> = [
-  ['/apply/barber', '/partners/barber-host-shop/apply'],
-  ['/partners/barbershop-apprenticeship', '/partners/barber-host-shop'],
-  ['/partners/barbershop-apprenticeship/:path*', '/partners/barber-host-shop/:path*'],
-  ['/ebook/barber-theory', '/programs/barber-apprenticeship'],
-  ['/pwa/barber', '/programs/barber-apprenticeship'],
-];
+function loadCanonicalRoutes(): Array<[from: string, to: string]> {
+  const paths = [
+    join(process.cwd(), 'lib/routes/canonical-routes.json'),
+    join(process.cwd(), 'apps/marketing/lib/routes/canonical-routes.json'),
+  ];
+  for (const p of paths) {
+    if (existsSync(p)) {
+      const data = JSON.parse(readFileSync(p, 'utf8'));
+      return (data.legacyAliases || []).map((a: { source: string; destination: string }) =>
+        [a.source, a.destination] as [string, string]
+      );
+    }
+  }
+  return [];
+}
 
-// Image .jpg → .webp redirects
-const IMAGE_REDIRECTS: Array<[from: string, to: string]> = [
-  ['/hero-images/how-it-works-hero.jpg', '/hero-images/how-it-works-hero.webp'],
-  ['/images/hero-images/about-hero.jpg', '/images/hero-images/about-hero.webp'],
-];
+function loadProgramSlugRedirects(): Array<[from: string, to: string]> {
+  const paths = [
+    join(process.cwd(), 'lib/routes/program-slug-redirects.json'),
+    join(process.cwd(), 'apps/marketing/lib/routes/program-slug-redirects.json'),
+  ];
+  for (const p of paths) {
+    if (existsSync(p)) {
+      const data = JSON.parse(readFileSync(p, 'utf8'));
+      return data.map((a: { source: string; destination: string }) =>
+        [a.source, a.destination] as [string, string]
+      );
+    }
+  }
+  return [];
+}
+
+function loadImageRedirects(): Array<[from: string, to: string]> {
+  const paths = [
+    join(process.cwd(), 'scripts/.image-conversion-manifest.json'),
+    join(process.cwd(), 'apps/marketing/scripts/.image-conversion-manifest.json'),
+  ];
+  for (const p of paths) {
+    if (existsSync(p)) {
+      const data = JSON.parse(readFileSync(p, 'utf8'));
+      return data.map((a: { origRel: string; webpRel: string }) =>
+        [a.origRel, a.webpRel] as [string, string]
+      );
+    }
+  }
+  return [
+    ['/hero-images/how-it-works-hero.jpg', '/hero-images/how-it-works-hero.webp'],
+    ['/images/hero-images/about-hero.jpg', '/images/hero-images/about-hero.webp'],
+  ];
+}
+
+// Load all redirect configs at module init (runs once per cold start)
+const CANONICAL_REDIRECTS = loadCanonicalRoutes();
+const PROGRAM_SLUG_REDIRECTS = loadProgramSlugRedirects();
+const IMAGE_REDIRECTS = loadImageRedirects();
 
 const PUBLIC_PATHS = [
   '/api/health',

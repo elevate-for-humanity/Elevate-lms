@@ -37,10 +37,13 @@ const shortSha = sha.slice(0, 12);
 
 // Map domain name → cache prefix
 const DOMAIN_CACHE_PREFIX = {
+  // Domain-specific service workers
   'sw-marketing.js': `elevate-marketing-${shortSha}`,
   'sw-admin.js':     `elevate-admin-${shortSha}`,
   'sw-lms.js':       `elevate-lms-${shortSha}`,
   'sw-portal.js':    `elevate-portal-${shortSha}`,
+  // Legacy sw.js — stamped to same prefix as marketing for backward compat
+  'sw.js':           `elevate-marketing-${shortSha}`,
 };
 
 let stampedCount = 0;

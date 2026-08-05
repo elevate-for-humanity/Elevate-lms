@@ -502,6 +502,44 @@ grep "max-old-space-size" Dockerfile.*
 
 ---
 
+### ROUTING ARCHITECTURE (Updated 2024)
+
+#### Portal Routing (middleware.ts)
+All portal paths on www.elevateforhumanity.org are redirected to subdomains:
+- /lms/, /student/, /instructor/, /employer/, /apprentice/, /parent-portal/, /workforce/, /cosmetology-host-shop/ → app.elevateforhumanity.org
+- /admin/* → admin.elevateforhumanity.org
+
+CRITICAL: DO NOT add admin/lms/apprentice redirects to canonical-routes.json or next.config.mjs — they conflict with portal routing and cause 404s. All portal paths should go through the subdomain.
+
+#### Nav Routing (lib/navigation/routes.ts + site-nav.config.ts)
+- Single source of truth: lib/navigation/routes.ts for all canonical routes
+- lib/navigation/site-nav.config.ts for all nav links
+- NEVER add redirect patching for broken nav links — fix the nav link itself
+
+#### Common Route Bugs (CHECK BEFORE ADDING REDIRECTS)
+- programsBeauty: MUST be /barber-and-beauty-apprenticeship (NOT /programs/beauty-cosmetology)
+- employers: MUST be /employer (NOT /employers — page is at /employer)
+- programsIT: MUST be /programs/it-help-desk (WITH hyphen)
+- aboutApprovals: MUST be /approvals (NOT /about/approvals)
+- aboutLocations: Use /about (NOT /about/locations — doesn't exist)
+- testing: Use /testing (NOT /testing/testing-center — doesn't exist)
+- fundingVocRehab: Use /funding/state-programs (NOT /funding/voc-rehab — doesn't exist)
+- successStories: Use /success-stories (NOT /success — doesn't exist)
+
+#### Program Routes
+- Static pages: /programs/[program]/page.tsx (e.g., /programs/cna)
+- Dynamic routes: /programs/[program] catch-all (handles 30+ programs via data files)
+- Always check data/programs/index.ts for valid slugs
+
+#### Portal URLs in Marketing Nav
+For links to portal features, use external URLs:
+- LMS: https://app.elevateforhumanity.org/lms
+- Student dashboard: https://app.elevateforhumanity.org/learner/dashboard
+- Employer dashboard: /employer (or /employers/post-job for job posting)
+- Admin: NEVER link from marketing nav to /admin/* — use portal subdomain
+
+---
+
 ### REMEMBER
 
 **You are too fast. Slow down and audit line by line.**

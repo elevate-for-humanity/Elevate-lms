@@ -268,10 +268,8 @@ export default function ApprenticeForm({
       } // end if (!applicationId)
 
       if (!isSelfPay) {
-        const successQs = new URLSearchParams();
-        if (applicationId) successQs.set('id', applicationId);
-        successQs.set('funded', '1');
-        window.location.href = `/programs/barber-apprenticeship/apply/success?${successQs.toString()}`;
+        const ref = applicationId || '';
+        window.location.href = `/apply/confirmation?program=barber-apprenticeship${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`;
         return;
       }
 
@@ -287,7 +285,7 @@ export default function ApprenticeForm({
         has_host_shop: formData.hasHostShop,
         host_shop_name: formData.hostShopName,
         hours_per_week: 40,
-        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${window.location.origin}/programs/barber-apprenticeship/apply/success?session_id={CHECKOUT_SESSION_ID}&redirect=/apply/confirmation?program=barber-apprenticeship`,
         cancel_url: `${window.location.origin}/programs/barber-apprenticeship/apply`,
       };
 

@@ -151,9 +151,10 @@ export default function HvacApplyPage() {
         return;
       }
 
-      // Non-self-pay: application saved, redirect to success page (no payment needed)
+      // Non-self-pay: application saved, redirect to canonical confirmation page
       if (formData.fundingInterest && formData.fundingInterest !== 'self-pay') {
-        window.location.href = `/programs/hvac-technician/apply/success${applicationId ? `?id=${applicationId}` : ''}`;
+        const ref = appData.referenceNumber || applicationId || '';
+        window.location.href = `/apply/confirmation?program=hvac-technician${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`;
         return;
       }
 

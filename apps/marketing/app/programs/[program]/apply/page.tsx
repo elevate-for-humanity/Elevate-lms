@@ -124,13 +124,17 @@ export default function BeautyApplyPage() {
         throw new Error(json.error || 'Submission failed. Please try again.');
       }
 
+      const json = await res.json();
+
       if (fundingType === 'self_pay') {
         const link = paymentPlan === 'full' ? links.full : links.deposit;
-        window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}`;
+        window.location.href = `${link}?prefilled_email=${encodeURIComponent(email)}&ref=${encodeURIComponent(json.referenceNumber || json.id || '')}`;
         return;
       }
 
-      router.push(`/programs/${cfg.slug}/apply/success`);
+      router.push(
+        `/apply/confirmation?program=${encodeURIComponent(cfg.slug)}&ref=${encodeURIComponent(json.referenceNumber || '')}`,
+      );
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setLoading(false);

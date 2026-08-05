@@ -104,19 +104,20 @@ export default function PeerRecoveryApplyPage() {
         return;
       }
 
-      // Self-pay: redirect to Stripe payment link
+      // Self-pay: redirect to Stripe payment link (with ref for post-payment confirmation)
       if (fundingType === 'self_pay') {
         const link =
           paymentPlan === 'full'
             ? PAYMENT_LINKS.peerRecovery.full
             : PAYMENT_LINKS.peerRecovery.deposit;
         const emailParam = encodeURIComponent(form.email);
-        window.location.href = `${link}?prefilled_email=${emailParam}`;
+        const refParam = encodeURIComponent(data.referenceNumber || data.id || '');
+        window.location.href = `${link}?prefilled_email=${emailParam}${refParam ? `&ref=${refParam}` : ''}`;
         return;
       }
 
       router.push(
-        `/programs/peer-recovery-specialist/apply/success${data.id ? `?id=${data.id}` : ''}`,
+        `/apply/confirmation?program=peer-recovery-specialist&ref=${encodeURIComponent(data.referenceNumber || data.id || '')}`,
       );
     } catch {
       setError(`Unexpected error. Please call ${PLATFORM_DEFAULTS.supportPhone}.`);

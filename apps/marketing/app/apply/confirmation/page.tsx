@@ -20,11 +20,36 @@ export const metadata: Metadata = {
 export default async function ConfirmationPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ref?: string; program?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
-  const refNumber = params.ref ? decodeURIComponent(params.ref) : null;
-  const programName = params.program ? decodeURIComponent(params.program) : null;
+  const refNumber = params.ref && typeof params.ref === 'string' ? decodeURIComponent(params.ref) : null;
+  const programSlug = params.program && typeof params.program === 'string' ? decodeURIComponent(params.program) : null;
+  // Additional params from program-specific success pages
+  const paymentType = params.payment && typeof params.payment === 'string' ? params.payment : null;
+  const sessionId = params.session_id && typeof params.session_id === 'string' ? params.session_id : null;
+  const isFunded = params.funded === '1';
+  // Params from legacy /apply/success (role-based flows)
+  const role = (params.role && typeof params.role === 'string' ? params.role : 'student') as string;
+  const isEnrolled = params.enrolled === 'true';
+  const funding = params.funding && typeof params.funding === 'string' ? params.funding : null;
+  const hasPassword = params.pw === '1';
+
+  // Map program slug to display name
+  const PROGRAM_DISPLAY_NAMES: Record<string, string> = {
+    'barber-apprenticeship': 'Barber Apprenticeship',
+    'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
+    'esthetician-apprenticeship': 'Esthetician Apprenticeship',
+    'nail-technician-apprenticeship': 'Nail Technician Apprenticeship',
+    'hvac-technician': 'HVAC Technician',
+    'peer-recovery-specialist': 'Peer Recovery Specialist',
+    'qma': 'Qualified Medication Aide (QMA)',
+    'cna': 'Certified Nursing Assistant (CNA)',
+    'phlebotomy': 'Phlebotomy',
+    'medical-assistant': 'Medical Assistant',
+    'pharmacy-tech': 'Pharmacy Technician',
+  };
+  const programName = programSlug ? (PROGRAM_DISPLAY_NAMES[programSlug] || programSlug.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())) : null;
 
   // Only create Supabase client if configured — prevents build-time crashes
   let supabaseAvailable = false;
@@ -61,9 +86,28 @@ export default async function ConfirmationPage({
               <CheckCircle className="w-10 h-10 text-emerald-600" />
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
-              Application Received!
-            </h1>
+            {/* Role-based title */}
+            {isEnrolled ? (
+              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
+                You&apos;re Approved — Let&apos;s Get Started!
+              </h1>
+            ) : role === 'employer' ? (
+              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
+                Employer Application Submitted
+              </h1>
+            ) : role === 'program-holder' ? (
+              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
+                Partnership Application Submitted
+              </h1>
+            ) : role === 'staff' ? (
+              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
+                Staff Application Submitted
+              </h1>
+            ) : (
+              <h1 className="text-3xl sm:text-4xl font-bold text-black mb-4">
+                Application Received!
+              </h1>
+            )}
 
             {/* Reference number — shown when available */}
             {refNumber && (
@@ -80,13 +124,39 @@ export default async function ConfirmationPage({
               </p>
             )}
 
-            <p className="text-lg text-black mb-8">
-              Thank you for applying to {PLATFORM_DEFAULTS.orgName}. We've received your application and
-              will review it within 1–2 business days.
-              {refNumber && (
-                <> Save your reference number — you&apos;ll need it to track your application status.</>
-              )}
-            </p>
+            {(paymentType || sessionId) && (
+              <p className="text-sm font-semibold text-brand-green-700 bg-brand-green-50 border border-brand-green-100 rounded-lg px-4 py-2 mb-4 inline-block">
+                Payment {paymentType === 'stripe' ? 'via Card' : paymentType === 'bnpl' ? 'via BNPL' : 'Confirmed'}
+                {sessionId && ` — Session ${sessionId.slice(0, 16)}…`}
+              </p>
+            )}
+
+            {/* Role-based description */}
+            {isEnrolled ? (
+              <p className="text-lg text-black mb-8">
+                Your enrollment has been approved. Create your account now to access your courses and complete onboarding.
+              </p>
+            ) : role === 'employer' ? (
+              <p className="text-lg text-black mb-8">
+                Our employer relations team will review your submission and contact you within 2 business days.
+              </p>
+            ) : role === 'program-holder' ? (
+              <p className="text-lg text-black mb-8">
+                Our team will review your organization details and contact you within 2 business days to discuss partnership options.
+              </p>
+            ) : role === 'staff' ? (
+              <p className="text-lg text-black mb-8">
+                HR will review your application. Qualified candidates will be contacted for interviews.
+              </p>
+            ) : (
+              <p className="text-lg text-black mb-8">
+                Thank you for applying to {PLATFORM_DEFAULTS.orgName}. We&apos;ve received your application and
+                will review it within 1–2 business days.
+                {refNumber && (
+                  <> Save your reference number — you&apos;ll need it to track your application status.</>
+                )}
+              </p>
+            )}
 
             {/* What's Next */}
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 mb-8 text-left">
@@ -134,15 +204,45 @@ export default async function ConfirmationPage({
               </div>
             </div>
 
-            {/* Next steps */}
+            {/* Next steps — role-based CTAs */}
             <div className="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/funding/confirm"
-                className="inline-flex items-center justify-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
-              >
-                Start Onboarding
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
+              {/* Enrolled — show account creation */}
+              {isEnrolled && (
+                <Link
+                  href="/signup?redirect=/onboarding/learner"
+                  className="inline-flex items-center justify-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
+                >
+                  Create My Account <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              )}
+              {/* Employer — employer resources */}
+              {role === 'employer' && !isEnrolled && (
+                <Link
+                  href="/employer"
+                  className="inline-flex items-center justify-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
+                >
+                  Employer Resources <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              )}
+              {/* Program-holder — browse programs */}
+              {role === 'program-holder' && !isEnrolled && (
+                <Link
+                  href="/programs"
+                  className="inline-flex items-center justify-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
+                >
+                  Browse Programs <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              )}
+              {/* Student — explore funding */}
+              {role === 'student' && !isEnrolled && (
+                <Link
+                  href="/funding"
+                  className="inline-flex items-center justify-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-sm"
+                >
+                  Explore Funding Options <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              )}
+              {/* Track Application */}
               {refNumber && (
                 <Link
                   href={`/apply/track?id=${encodeURIComponent(refNumber)}`}
@@ -151,6 +251,7 @@ export default async function ConfirmationPage({
                   Track Application
                 </Link>
               )}
+              {/* Return home */}
               <Link
                 href="/"
                 className="inline-flex items-center justify-center border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-6 py-3 rounded-lg transition-colors text-sm"
@@ -166,6 +267,34 @@ export default async function ConfirmationPage({
               Check your email (including spam folder) for a confirmation message.
             </p>
           </div>
+
+          {/* Workforce funding notice for WIOA/WorkOne students */}
+          {role === 'student' && !isEnrolled && funding && (funding.toLowerCase().includes('wioa') || funding.toLowerCase().includes('workone') || funding.toLowerCase().includes('workforce') || funding.toLowerCase().includes('employindy') || funding.toLowerCase().includes('impact')) && (
+            <div className="mt-6 bg-amber-50 border-2 border-amber-400 rounded-xl p-5 text-left">
+              <h3 className="font-bold text-amber-900 mb-2">Action Required — Register on Indiana Career Connect</h3>
+              <p className="text-sm text-amber-800 mb-3">
+                To receive {funding} funding, you must be registered on Indiana Career Connect and have an active case with your local WorkOne office before enrollment can be finalized.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <a
+                  href="https://www.indianacareerconnect.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2 rounded-lg text-xs transition-colors"
+                >
+                  Go to Indiana Career Connect
+                </a>
+                <a
+                  href="https://www.workone.in.gov/find-a-workone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border border-amber-400 text-amber-800 hover:bg-amber-100 font-semibold px-4 py-2 rounded-lg text-xs transition-colors"
+                >
+                  Find My WorkOne Office
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>

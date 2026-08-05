@@ -11,6 +11,8 @@ import { AdminFooter } from '@/components/admin/AdminFooter';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
 import { AdminUpdateNotice } from '@/components/pwa/AdminUpdateNotice';
+import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
+import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
   },
   description:
     "Manage Elevate for Humanity programs, courses, students, website content, and operations.",
-  manifest: "/manifest.webmanifest",
+  manifest: "/manifest-admin.json",
   applicationName: "Elevate Admin",
   appleWebApp: {
     capable: true,
@@ -70,7 +72,11 @@ export default async function AdminGroupLayout({
 
   return (
     <html lang="en">
+      <head>
+        <SupabasePublicConfigScript />
+      </head>
       <body>
+        <SupabaseConfigBootstrap />
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>

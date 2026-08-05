@@ -7,7 +7,8 @@ import './globals.css';
 import ToasterClient from '@/components/ui/ToasterClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
-import SupabaseConfigBootstrap from '@/components/supabase/SupabaseConfigBootstrap';
+import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
+import { PortalPwaRegistration } from '@/components/pwa/PortalPwaRegistration';
 
 const ADMIN_METADATA_BASE =
   (process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(
@@ -32,6 +33,7 @@ export const metadata: Metadata = {
     template: '%s | Elevate Admin',
   },
   description: `${PLATFORM_DEFAULTS.orgName} — Admin Portal`,
+  manifest: '/manifest-portal.json',
   robots: { index: false, follow: false },
   icons: {
     icon: [
@@ -51,6 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-sans antialiased">
         <SupabaseConfigBootstrap />
+        <PortalPwaRegistration />
         {children}
         {/* Single Toaster mount for the entire admin app — covers /admin, /instructor, /login */}
         <ToasterClient />

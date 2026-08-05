@@ -13,11 +13,21 @@ import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import { I18nProvider } from '@/lib/i18n/context';
 import { ChunkRecovery } from '@/components/system/ChunkRecovery';
+import { MarketingPwaRegistration } from '@/components/pwa/MarketingPwaRegistration';
+import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
+import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
+import dynamic from 'next/dynamic';
+
+const PwaInstallBanner = dynamic(
+  () => import('@/components/pwa/PwaInstallBanner').then((m) => m.PwaInstallBanner || m),
+  { ssr: false },
+);
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
   description: 'Vocational education and workforce development',
   metadataBase: new URL('https://www.elevateforhumanity.org'),
+  manifest: '/manifest-marketing.json',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -33,7 +43,13 @@ export const dynamic = 'force-dynamic';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <SupabasePublicConfigScript />
+      </head>
       <body>
+        <SupabaseConfigBootstrap />
+        <MarketingPwaRegistration />
+        <PwaInstallBanner />
         <ChunkRecovery />
         <I18nProvider>
           <Header />

@@ -2,7 +2,7 @@
   "name": "Elevate Admin",
   "short_name": "Admin",
   "description": "Administrative dashboard for managing programs, students, and operations",
-  "start_url": "/dashboard",
+  "start_url": "/?utm_source=homescreen&utm_medium=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",

@@ -1,5 +1,10 @@
 "use client";
 
+/**
+ * @deprecated Use LmsPwaRegistration, MarketingPwaRegistration, or PortalPwaRegistration.
+ * This file is kept for backward compatibility and will be removed after migration.
+ * Now registers sw-admin.js instead of the root sw.js.
+ */
 import { useEffect } from "react";
 
 export function AdminPwaRegister() {
@@ -14,7 +19,7 @@ export function AdminPwaRegister() {
     const register = async () => {
       try {
         const registration =
-          await navigator.serviceWorker.register("/sw.js", {
+          await navigator.serviceWorker.register("/sw-admin.js", {
             scope: "/",
           });
 

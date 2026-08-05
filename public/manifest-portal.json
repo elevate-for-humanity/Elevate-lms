@@ -1,0 +1,44 @@
+{
+  "name": "Elevate Portal",
+  "short_name": "Portal",
+  "description": "Student and employer portal for Elevate for Humanity",
+  "start_url": "/?utm_source=homescreen&utm_medium=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1E3A5F",
+  "theme_color": "#1E3A5F",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["education", "business"],
+  "icons": [
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

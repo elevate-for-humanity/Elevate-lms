@@ -4,15 +4,9 @@ import './layout.css';
 import './client-polyfills';
 import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 import { I18nProvider } from '@/lib/i18n/context';
-import { LmsPwaRegistration } from '@/components/pwa/LmsPwaRegistration';
+import { LmsPwaClient } from '@/components/pwa/LmsPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
-import dynamic from 'next/dynamic';
-
-const PwaInstallBanner = dynamic(
-  () => import('@/components/pwa/PwaInstallBanner').then((m) => m.PwaInstallBanner || m),
-  { ssr: false },
-);
 
 export const dynamic = 'force-dynamic';
 
@@ -31,8 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <SupabaseConfigBootstrap />
-        <LmsPwaRegistration />
-        <PwaInstallBanner />
+        <LmsPwaClient />
         <I18nProvider>
           {children}
           <LiveChatWidget />

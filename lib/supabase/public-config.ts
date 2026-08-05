@@ -96,8 +96,6 @@ export async function hydrateBrowserSupabaseConfig(): Promise<SupabasePublicConf
       return null;
     }
     window.__EFH_SUPABASE_PUBLIC__ = { url: data.url, anonKey: data.anonKey };
-    const { resetSupabaseBrowserClientCache } = await import('@/lib/supabase/client');
-    resetSupabaseBrowserClientCache();
     return { url: data.url, anonKey: data.anonKey };
   } catch {
     return null;

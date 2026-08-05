@@ -31,7 +31,7 @@ fi
 REQUIRED_CANONICAL_ROUTE_FILES=(
   "apps/partner/app/partner/dashboard/page.tsx"
   "apps/admin/app/admin/staff-portal/dashboard/page.tsx"
-  "apps/admin/app/admin/dashboard/page.tsx"
+  "apps/admin/app/dashboard/page.tsx"
 )
 
 missing=0

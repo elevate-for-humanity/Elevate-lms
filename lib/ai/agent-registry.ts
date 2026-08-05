@@ -5,9 +5,12 @@
  * configurations, capabilities, and health monitoring.
  */
 
-import type {
+import {
   AIAgent,
   AgentIntent,
+} from './types';
+
+import type {
   AgentConfig,
   AgentCapabilities,
   AgentStatus,

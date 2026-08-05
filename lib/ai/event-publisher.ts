@@ -5,8 +5,11 @@
  * and in-memory retention of last 1000 events.
  */
 
-import type {
+import {
   EventType,
+} from './types';
+
+import type {
   EventPayload,
   EventSubscription,
   WebhookConfig,

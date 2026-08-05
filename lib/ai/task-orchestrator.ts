@@ -5,11 +5,14 @@
  * timeout handling, and event subscriptions.
  */
 
-import type {
+import {
   AIAgent,
   AgentIntent,
   TaskPriority,
   TaskStatus,
+} from './types';
+
+import type {
   TaskPayload,
   TaskCreationOptions,
   TaskFilterOptions,

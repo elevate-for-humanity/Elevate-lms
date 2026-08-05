@@ -5,11 +5,14 @@
  * Supports request/response patterns with correlation IDs.
  */
 
-import type {
+import {
   AIAgent,
-  AgentMessage,
   MessageType,
   MessageBusChannel,
+} from './types';
+
+import type {
+  AgentMessage,
   MessageBusSubscription,
 } from './types';
 

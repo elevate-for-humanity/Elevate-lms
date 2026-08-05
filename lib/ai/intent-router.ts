@@ -5,10 +5,13 @@
  * Uses keyword matching and pattern analysis with confidence scoring.
  */
 
-import type {
+import {
   AIAgent,
   AgentIntent,
   TaskPriority,
+} from './types';
+
+import type {
   AIRequest,
   IntentClassification,
   RoutingDecision,

@@ -1,11 +1,11 @@
 /**
  * AI Gateway Module - Message Bus
- * 
+ *
  * Pub/sub message bus for inter-agent communication.
  * Supports request/response patterns with correlation IDs.
  */
 
-import {
+import type {
   AIAgent,
   AgentMessage,
   MessageType,

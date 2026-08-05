@@ -1,11 +1,11 @@
 /**
  * AI Gateway Module - Task Orchestrator
- * 
+ *
  * Unified task orchestration with priority queue, auto-retry,
  * timeout handling, and event subscriptions.
  */
 
-import {
+import type {
   AIAgent,
   AgentIntent,
   TaskPriority,

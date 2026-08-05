@@ -1,11 +1,11 @@
 /**
  * AI Gateway Module - Event Publisher
- * 
+ *
  * Event publishing system for system events with webhook support
  * and in-memory retention of last 1000 events.
  */
 
-import {
+import type {
   EventType,
   EventPayload,
   EventSubscription,

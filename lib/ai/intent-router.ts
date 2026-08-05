@@ -1,11 +1,11 @@
 /**
  * AI Gateway Module - Intent Router
- * 
+ *
  * Classifies incoming requests and routes them to the appropriate agent.
  * Uses keyword matching and pattern analysis with confidence scoring.
  */
 
-import {
+import type {
   AIAgent,
   AgentIntent,
   TaskPriority,

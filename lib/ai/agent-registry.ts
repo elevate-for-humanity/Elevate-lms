@@ -1,11 +1,11 @@
 /**
  * AI Gateway Module - Agent Registry
- * 
+ *
  * Manages all AI agents (PARS, ELLIE, LIZZY, ZORA) with their
  * configurations, capabilities, and health monitoring.
  */
 
-import {
+import type {
   AIAgent,
   AgentIntent,
   AgentConfig,

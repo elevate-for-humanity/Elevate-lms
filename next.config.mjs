@@ -606,6 +606,35 @@ const nextConfig = {
         destination: 'https://admin.elevateforhumanity.org/admin/:path*',
         permanent: false,
       },
+
+      // ============================================================
+      // BROKEN NAV LINKS → EXISTING ROUTES
+      // Nav config links to routes that don't exist. Redirect to nearest match.
+      // ============================================================
+
+      // /apply/eligibility → /apply (check-eligibility page exists)
+      { source: '/apply/eligibility', destination: '/apply', permanent: true },
+
+      // /funding/workforce-ready → /funding/wioa (WIOA/Workforce Ready page)
+      { source: '/funding/workforce-ready', destination: '/funding/wioa', permanent: true },
+
+      // /funding/scholarships → /scholarships (top-level page exists)
+      { source: '/funding/scholarships', destination: '/scholarships', permanent: true },
+
+      // /funding/self-pay → /funding (payment plans info)
+      { source: '/funding/self-pay', destination: '/funding', permanent: true },
+
+      // /apprenticeships/sponsor → /apprenticeship-sponsor
+      { source: '/apprenticeships/sponsor', destination: '/apprenticeship-sponsor', permanent: true },
+
+      // /partners/workforce → /hire-graduates (nearest workforce/employer page)
+      { source: '/partners/workforce', destination: '/hire-graduates', permanent: true },
+
+      // /host-shop (standalone) → /apprenticeships/host-shop
+      { source: '/host-shop', destination: '/apprenticeships/host-shop', permanent: true },
+
+      // /credentials → /programs (credential/certification programs)
+      { source: '/credentials', destination: '/programs', permanent: true },
     ];
   },
 

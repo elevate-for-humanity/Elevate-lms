@@ -78,9 +78,15 @@ export default function BarberHostShopApplyPage() {
         }),
       });
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok && data.ok) {
         setResult({ success: true, message: 'Application received! We will review your application and contact you within 2-3 business days.' });
-        setTimeout(() => router.push('/apply/success'), 2000);
+        const ref = data.referenceNumber || '';
+        const prog = data.program || '';
+        const q = new URLSearchParams();
+        if (ref) q.set('ref', ref);
+        if (prog) q.set('program', prog);
+        const suffix = q.toString() ? '?' + q.toString() : '';
+        setTimeout(() => router.push('/apply/success' + suffix), 2000);
       } else {
         setResult({ success: false, error: data.error || 'Something went wrong. Please try again.' });
       }

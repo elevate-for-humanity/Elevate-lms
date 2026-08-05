@@ -118,7 +118,7 @@ export async function POST(req: Request) {
     const upstreamJson = await upstream.json().catch(() => ({}));
 
     if (contentType.includes('application/json')) {
-      return NextResponse.json(upstreamJson, { status: upstream.status });
+      return NextResponse.json({ ok: upstream.ok, ...upstreamJson }, { status: upstream.status });
     }
 
     if (!upstream.ok) {

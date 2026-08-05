@@ -41,9 +41,15 @@ export default function IntakeFormInner({ programs }: IntakeFormInnerProps) {
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok && data.ok) {
         setResult({ success: true, message: 'Application received! Check your email for next steps.' });
-        setTimeout(() => router.push('/apply/success'), 1500);
+        const ref = data.referenceNumber || '';
+        const prog = data.program || '';
+        const q = new URLSearchParams();
+        if (ref) q.set('ref', ref);
+        if (prog) q.set('program', prog);
+        const suffix = q.toString() ? '?' + q.toString() : '';
+        setTimeout(() => router.push('/apply/success' + suffix), 1500);
       } else {
         setResult({ success: false, error: data.error || 'Something went wrong. Please try again.' });
       }

@@ -49,9 +49,15 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
         }),
       });
       const data = await res.json();
-      if (res.ok && data.success) {
+      if (res.ok && data.ok) {
         setResult({ success: true, message: 'Application submitted successfully! We will contact you within one business day.' });
-        setTimeout(() => router.push('/apply/success'), 2000);
+        const ref = data.referenceNumber || '';
+        const prog = data.program || '';
+        const q = new URLSearchParams();
+        if (ref) q.set('ref', ref);
+        if (prog) q.set('program', prog);
+        const suffix = q.toString() ? '?' + q.toString() : '';
+        setTimeout(() => router.push('/apply/success' + suffix), 2000);
       } else {
         setResult({ success: false, error: data.error || 'Something went wrong. Please try again.' });
       }

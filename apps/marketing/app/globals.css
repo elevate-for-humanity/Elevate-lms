@@ -6,79 +6,6 @@
 @tailwind utilities;
 
 /* ============================================================================
-   ADMIN PORTAL - INSTITUTIONAL TYPOGRAPHY
-   Enterprise-grade visual standards for audit-safe presentation
-   ============================================================================ */
-
-/* Admin portal base typography - minimum 16px, darker colors */
-[class*='/admin'] body,
-.admin-portal {
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-/* Override light grays with institutional dark tones */
-.admin-portal .text-gray-500,
-[class*='/admin'] .text-gray-500 {
-  color: #374151 !important; /* gray-700 */
-}
-
-.admin-portal .text-gray-600,
-[class*='/admin'] .text-gray-600 {
-  color: #1f2937 !important; /* gray-800 */
-}
-
-.admin-portal .text-gray-400,
-[class*='/admin'] .text-gray-400 {
-  color: #4b5563 !important; /* gray-600 */
-}
-
-/* Admin headings - always dark and authoritative */
-.admin-portal h1,
-.admin-portal h2,
-.admin-portal h3,
-.admin-portal h4,
-[class*='/admin'] h1,
-[class*='/admin'] h2,
-[class*='/admin'] h3,
-[class*='/admin'] h4 {
-  color: #111827; /* gray-900 */
-  font-weight: 600;
-}
-
-/* Admin body text minimum size */
-.admin-portal p,
-.admin-portal span,
-.admin-portal td,
-.admin-portal th,
-.admin-portal label,
-[class*='/admin'] p,
-[class*='/admin'] span,
-[class*='/admin'] td,
-[class*='/admin'] th,
-[class*='/admin'] label {
-  font-size: max(0.875rem, 14px);
-}
-
-/* Admin tables - clear, readable */
-.admin-portal table,
-[class*='/admin'] table {
-  font-size: 14px;
-}
-
-.admin-portal th,
-[class*='/admin'] th {
-  font-weight: 600;
-  color: #111827;
-  background-color: #f9fafb;
-}
-
-.admin-portal td,
-[class*='/admin'] td {
-  color: #374151;
-}
-
-/* ============================================================================
    PREVENT FLASH OF UNSTYLED CONTENT ON FIRST LOAD
    ============================================================================ */
 
@@ -89,6 +16,15 @@ body {
   opacity: 1;
   background-color: #ffffff;
   color: #0f172a; /* slate-950 — platform-wide default. Prevents light/missing text-color bugs. */
+}
+
+/* ============================================================================
+   SITE MAIN - Explicit layout container for root <main>
+   ============================================================================ */
+.site-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ============================================================================
@@ -149,8 +85,8 @@ body {
   }
 
   /* Links that look like buttons */
-  a[class*='bg-'],
-  a[class*='rounded'] {
+  /* Links that look like buttons (bg- only — rounded is too broad) */
+  a[class*='bg-'] {
     min-height: 44px;
     display: inline-flex;
     align-items: center;
@@ -178,11 +114,7 @@ body {
 
   /* High contrast focus for better visibility */
   @media (prefers-contrast: high) {
-    *:focus-visible {
-      outline: 4px solid #000;
-      outline-offset: 3px;
-    }
-  }
+      }
 
   /* Skip to main content link */
   .skip-to-main {
@@ -304,8 +236,6 @@ body {
   }
 
   /* Focus-visible styles — only show on keyboard navigation, not mouse clicks */
-  *:focus-visible {
-    outline: 3px solid #2563eb;
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -320,15 +250,6 @@ body {
    ============================================================================ */
 
 /* Consistent container - matches SkilledUS */
-.container {
-  width: 100%;
-  max-width: 1152px; /* 6xl - consistent with SkilledUS */
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
 @media (min-width: 640px) {
   .container {
     padding-left: 1.5rem;
@@ -1421,8 +1342,6 @@ html {
 }
 
 /* Enhanced focus styles for accessibility */
-*:focus-visible {
-  outline: 3px solid #ea580c;
   outline-offset: 2px;
   border-radius: 4px;
 }

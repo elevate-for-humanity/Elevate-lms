@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ChunkRecovery />
         <I18nProvider>
           <Header />
-          <main className="pt-[60px]">{children}</main>
+          <main className="site-main pt-[60px]">{children}</main>
           <SiteFooter />
         </I18nProvider>
       </body>

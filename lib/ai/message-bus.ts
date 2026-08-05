@@ -440,4 +440,4 @@ export function resetMessageBus(): void {
   messageBusInstance = null;
 }
 
-export { AgentMessage, MessageType, MessageBusChannel };
+export type { AgentMessage, MessageType, MessageBusChannel };

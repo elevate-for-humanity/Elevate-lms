@@ -466,4 +466,4 @@ export function resetIntentRouter(): void {
   intentRouterInstance = null;
 }
 
-export { AIAgent, AgentIntent, TaskPriority, AIRequest, IntentClassification, RoutingDecision, TaskPayload };
+export type { AIAgent, AgentIntent, TaskPriority, AIRequest, IntentClassification, RoutingDecision, TaskPayload };

@@ -386,4 +386,4 @@ export function resetAgentRegistry(): void {
   agentRegistryInstance = null;
 }
 
-export { AIAgent, AgentIntent, AgentConfig, AgentCapabilities, AgentStatus, AgentHealthStatus };
+export type { AIAgent, AgentIntent, AgentConfig, AgentCapabilities, AgentStatus, AgentHealthStatus };

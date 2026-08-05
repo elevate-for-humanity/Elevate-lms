@@ -53,11 +53,6 @@ const nextConfig = {
     'esbuild',
   ],
   webpack: (config, { isServer }) => {
-    // Map @ to repo root where lms-data lives
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': resolve(__dirname, '../..'),
-    };
     // Browser polyfill for @react-pdf/renderer and other Node.js modules that use Buffer
     if (!isServer) {
       // Access webpack's ProvidePlugin via the compiler instance (webpack 5 API)

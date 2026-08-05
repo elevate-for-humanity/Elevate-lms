@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, ChevronRight, ChevronLeft, AlertCircle } from 'lucide-react';
 
@@ -21,7 +21,7 @@ interface SurveyConfig {
   questions: SurveyQuestion[];
 }
 
-export default function WorkOneSurveyPage() {
+function WorkOneSurveyContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   
@@ -327,5 +327,13 @@ export default function WorkOneSurveyPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function WorkOneSurveyPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><span>Loading...</span></div>}>
+      <WorkOneSurveyContent />
+    </Suspense>
   );
 }

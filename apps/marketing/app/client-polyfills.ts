@@ -30,6 +30,8 @@ function syncSupabaseSessionToCookies() {
     const sess = JSON.parse(s);
     if (!sess?.access_token) return;
     document.cookie = k+'='+encodeURIComponent(JSON.stringify(sess))+'; max-age='+(14*24*60*60)+'; path=/; SameSite=Lax';
-  } catch {}
+  } catch {
+    // ignore - localStorage may be unavailable in some environments
+  }
 }
 syncSupabaseSessionToCookies();

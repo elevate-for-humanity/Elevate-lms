@@ -71,11 +71,11 @@ export default function BeautyApplyPage() {
     { value: 'unsure', label: 'Not Sure', desc: "We'll help you find the right funding option during your intake call." },
   ];
 
-  // Stripe payment links keyed by program slug
+  // Stripe payment links keyed by canonical program slug
   const paymentLinks: Record<string, { full: string; deposit: string }> = {
     'barber-apprenticeship': { full: PAYMENT_LINKS.barber?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.barber?.deposit ?? cfg.stripeDepositLink },
     'cosmetology-apprenticeship': { full: PAYMENT_LINKS.cosmetology?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.cosmetology?.deposit ?? cfg.stripeDepositLink },
-    'esthetician': { full: PAYMENT_LINKS.esthetician?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.esthetician?.deposit ?? cfg.stripeDepositLink },
+    'esthetician-apprenticeship': { full: PAYMENT_LINKS.esthetician?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.esthetician?.deposit ?? cfg.stripeDepositLink },
     'nail-technician-apprenticeship': { full: PAYMENT_LINKS.nailTech?.full ?? cfg.stripeFullLink, deposit: PAYMENT_LINKS.nailTech?.deposit ?? cfg.stripeDepositLink },
   };
   const links = paymentLinks[cfg.slug] ?? { full: cfg.stripeFullLink, deposit: cfg.stripeDepositLink };

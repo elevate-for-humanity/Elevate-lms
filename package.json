@@ -262,6 +262,7 @@
     "audit:hero-banners": "tsx scripts/audit-hero-banners.ts",
     "audit:visual-layout": "node scripts/audit-visual-layout.mjs",
     "audit:image-assets": "node scripts/audit-image-assets.mjs",
+    "audit:app-routes": "node scripts/audit-program-application-routes.mjs",
     "verify:system": "tsx scripts/verify-system.ts",
     "link:hvac-videos": "tsx scripts/link-hvac-videos.ts",
     "verify": "pnpm typecheck && pnpm lint && pnpm build && pnpm smoke",

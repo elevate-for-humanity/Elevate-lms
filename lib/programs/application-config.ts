@@ -99,12 +99,12 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
       stripeFullLink: 'https://buy.stripe.com/9B600jbrq1EGdkvgvTgIo09',
     },
   },
-  'esthetician': {
-    slug: 'esthetician',
-    name: 'Esthetician Program',
+  'esthetician-apprenticeship': {
+    slug: 'esthetician-apprenticeship',
+    name: 'Esthetician Apprenticeship',
     shortName: 'Esthetician',
     formEngine: 'dedicated',
-    formPath: '/programs/esthetician/apply',
+    formPath: '/programs/esthetician-apprenticeship/apply',
     color: 'pink',
     funding: {
       available: ['wioa', 'employer', 'self_pay', 'unsure'],
@@ -354,13 +354,40 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
 };
 
 /**
+ * Legacy program slugs retained for old links, bookmarks, emails, and previous deployments.
+ * Maps an old short slug to its canonical key in ALL_PROGRAMS.
+ */
+const PROGRAM_SLUG_ALIASES: Readonly<Record<string, string>> = {
+  esthetician: 'esthetician-apprenticeship',
+  'nail-technician': 'nail-technician-apprenticeship',
+  cosmetology: 'cosmetology-apprenticeship',
+  barber: 'barber-apprenticeship',
+};
+
+/**
+ * Normalizes a program slug for lookup in ALL_PROGRAMS.
+ * Handles: lowercase, hyphen replacement, URL decoding, and legacy aliases.
+ */
+function normalizeProgramSlug(value: string): string {
+  const slug = decodeURIComponent(value)
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, '-')
+    .replace(/\s+/g, '-');
+
+  return PROGRAM_SLUG_ALIASES[slug] ?? slug;
+}
+
+/**
  * Returns the application config for a program slug.
  * Returns null if the program is not found.
+ * Handles legacy/short slugs via aliases.
  */
 export function getProgramApplicationConfig(
   slug: string,
 ): ProgramApplicationConfig | null {
-  return ALL_PROGRAMS[slug] ?? null;
+  const canonicalSlug = normalizeProgramSlug(slug);
+  return ALL_PROGRAMS[canonicalSlug] ?? null;
 }
 
 /**
@@ -387,12 +414,13 @@ export function getDedicatedPrograms(): ProgramApplicationConfig[] {
  * For 'canonical' programs: /apply/student?program=<slug>
  * For 'dedicated' programs: the formPath
  * For 'external' programs: the formPath
+ * Handles legacy/short slugs via aliases.
  */
 export function getApplyUrl(slug: string): string | null {
-  const cfg = ALL_PROGRAMS[slug];
+  const cfg = getProgramApplicationConfig(slug);
   if (!cfg) return null;
   if (cfg.formEngine === 'canonical') {
-    return `/apply/student?program=${slug}`;
+    return `/apply/student?program=${cfg.slug}`;
   }
   return cfg.formPath ?? null;
 }

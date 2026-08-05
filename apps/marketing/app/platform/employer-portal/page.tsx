@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Header } from '@/components/ui/Header';
-import { Footer } from '@/components/ui/Footer';
 import { 
   Users, 
   Briefcase, 
@@ -71,7 +69,6 @@ const BENEFITS = [
 export default function EmployerPortalPage() {
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 text-white overflow-hidden">
@@ -283,7 +280,6 @@ export default function EmployerPortalPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

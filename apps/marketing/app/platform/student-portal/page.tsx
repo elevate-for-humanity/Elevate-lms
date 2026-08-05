@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Header } from '@/components/ui/Header';
-import { Footer } from '@/components/ui/Footer';
 import { 
   BookOpen, 
   Award, 
@@ -72,7 +70,6 @@ const DASHBOARD_SECTIONS = [
 export default function StudentPortalPage() {
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white overflow-hidden">
@@ -285,7 +282,6 @@ export default function StudentPortalPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

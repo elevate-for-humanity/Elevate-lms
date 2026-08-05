@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Header } from '@/components/ui/Header';
-import { Footer } from '@/components/ui/Footer';
 import { 
   GraduationCap, 
   Users, 
@@ -80,7 +78,6 @@ const PROGRAM_TYPES = [
 export default function TrainingProvidersPage() {
   return (
     <>
-      <Header />
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white overflow-hidden">
@@ -287,7 +284,6 @@ export default function TrainingProvidersPage() {
           </div>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

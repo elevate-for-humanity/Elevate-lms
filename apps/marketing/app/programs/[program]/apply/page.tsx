@@ -12,44 +12,40 @@ import { PAYMENT_LINKS } from '@/lib/stripe/price-map';
 import { getBeautyProgram, colorClasses } from '@/lib/programs/beauty-programs';
 import { BNPL_PROVIDER_SUMMARY } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-// Programs with dedicated enrollment flows — redirect away from this shared page.
-const DEDICATED_FLOWS: Record<string, string> = {
-  'barber-apprenticeship': '/programs/barber-apprenticeship/apply',
-  'cosmetology-apprenticeship': '/programs/cosmetology-apprenticeship/apply',
-  'nail-technician-apprenticeship': '/programs/nail-technician-apprenticeship/apply',
-  'esthetician-apprenticeship': '/programs/esthetician-apprenticeship/apply',
-};
-
-type FundingType = 'wioa' | 'self_pay' | 'employer' | 'unsure';
+import { getProgramApplicationConfig, type FundingType } from '@/lib/programs/application-config';
 
 export default function BeautyApplyPage() {
   const params = useParams<{ program: string }>();
   const router = useRouter();
 
   const cfg = getBeautyProgram(params.program);
-  const dedicatedFlow = DEDICATED_FLOWS[params.program];
+  const appConfig = getProgramApplicationConfig(params.program);
   const c = colorClasses(cfg?.color ?? 'blue');
+
+  // Determine the default funding type from the program config
+  const defaultFunding: FundingType = appConfig?.funding.available.includes('wioa')
+    ? 'wioa'
+    : (appConfig?.funding.available[0] ?? 'unsure');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [fundingType, setFundingType] = useState<FundingType>('wioa');
+  const [fundingType, setFundingType] = useState<FundingType>(defaultFunding);
   const [eligibilityStatus, setEligibilityStatus] = useState<EligibilityStatus | null>(null);
   const [paymentPlan, setPaymentPlan] = useState<'full' | 'deposit'>('deposit');
   const [turnstileToken, setTurnstileToken] = useState('');
 
   // Redirects must run in useEffect — router.replace during render throws on SSR (location is not defined).
   useEffect(() => {
-    if (dedicatedFlow) {
-      router.replace(dedicatedFlow);
+    if (appConfig?.formEngine === 'dedicated' && appConfig.formPath) {
+      router.replace(appConfig.formPath);
       return;
     }
     if (!cfg) {
       router.replace(`/apply?program=${params.program}`);
     }
-  }, [cfg, dedicatedFlow, params.program, router]);
+  }, [cfg, appConfig, params.program, router]);
 
-  if (dedicatedFlow || !cfg) {
+  if ((appConfig?.formEngine === 'dedicated' && appConfig.formPath) || !cfg) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <Loader2 className="w-8 h-8 animate-spin text-slate-400" aria-label="Redirecting" />

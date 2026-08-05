@@ -50,14 +50,19 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        setResult({ success: true, message: 'Application submitted successfully! We will contact you within one business day.' });
+        const duplicateWarning = data.duplicateWarning || undefined;
+        setResult({
+          success: true,
+          message: 'Application submitted successfully! We will contact you within one business day.',
+          ...(duplicateWarning ? { warning: duplicateWarning } : {}),
+        });
         const ref = data.referenceNumber || '';
         const prog = data.program || '';
         const q = new URLSearchParams();
         if (ref) q.set('ref', ref);
         if (prog) q.set('program', prog);
         const suffix = q.toString() ? '?' + q.toString() : '';
-        setTimeout(() => router.push('/apply/success' + suffix), 2000);
+        setTimeout(() => router.push('/apply/success' + suffix), 3000);
       } else {
         setResult({ success: false, error: data.error || 'Something went wrong. Please try again.' });
       }
@@ -94,7 +99,14 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
           </div>
           <h3 className="text-2xl font-bold text-slate-900 mb-3">Application Submitted!</h3>
           <p className="text-slate-600 mb-2">{result.message}</p>
-          <p className="text-sm text-slate-500">Redirecting...</p>
+          {result.warning && (
+            <div className="mt-4 mx-auto max-w-md bg-amber-50 border border-amber-200 rounded-lg p-3 text-left">
+              <p className="text-sm text-amber-800">
+                <strong>Note:</strong> {result.warning}
+              </p>
+            </div>
+          )}
+          <p className="text-sm text-slate-500 mt-3">Redirecting...</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">

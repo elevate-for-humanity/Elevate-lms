@@ -29,6 +29,7 @@ export default async function ConfirmationPage({
   const paymentType = params.payment && typeof params.payment === 'string' ? params.payment : null;
   const sessionId = params.session_id && typeof params.session_id === 'string' ? params.session_id : null;
   const isFunded = params.funded === '1';
+  const warning = params.warning && typeof params.warning === 'string' ? decodeURIComponent(params.warning) : null;
   // Params from legacy /apply/success (role-based flows)
   const role = (params.role && typeof params.role === 'string' ? params.role : 'student') as string;
   const isEnrolled = params.enrolled === 'true';
@@ -156,6 +157,15 @@ export default async function ConfirmationPage({
                   <> Save your reference number — you&apos;ll need it to track your application status.</>
                 )}
               </p>
+            )}
+
+            {/* Duplicate-application warning */}
+            {warning && (
+              <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-left">
+                <p className="text-sm text-amber-800">
+                  <strong>Note:</strong> {warning}
+                </p>
+              </div>
             )}
 
             {/* What's Next */}

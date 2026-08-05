@@ -135,6 +135,9 @@ export async function POST(req: Request) {
     const dest = new URL('/apply/success', req.url);
     if (funding) dest.searchParams.set('funding', funding);
     if (program) dest.searchParams.set('program', program);
+    if (upstreamJson?.duplicateWarning) {
+      dest.searchParams.set('warning', upstreamJson.duplicateWarning);
+    }
     return NextResponse.redirect(dest, { status: 303 });
   } catch (error) {
     logger.error('Apply compatibility route error', { error: error instanceof Error ? error.message : String(error) });

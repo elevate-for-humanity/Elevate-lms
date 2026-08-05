@@ -287,6 +287,26 @@ async function _POST(req: Request) {
       );
     }
 
+    // Active-application check: warn (don't block) if same email has an active
+    // application for the SAME program that isn't rejected/withdrawn.
+    // This helps students who forgot they already applied.
+    const { data: activeApp } = await supabase
+      .from('applications')
+      .select('id, reference_number, status')
+      .eq('email', body.email.toLowerCase().trim())
+      .eq('program_interest', program)
+      .not('status', 'in', '("rejected","withdrawn","duplicate")')
+      .limit(1)
+      .maybeSingle();
+
+    let duplicateWarning: string | undefined;
+    if (activeApp) {
+      duplicateWarning =
+        `You already have an active application for this program. ` +
+        `Reference: ${activeApp.reference_number ?? activeApp.id}. ` +
+        `Track your application: /apply/track?id=${activeApp.reference_number ?? activeApp.id}`;
+    }
+
     // Generate reference number
     const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 
@@ -755,6 +775,7 @@ async function _POST(req: Request) {
         program: data.program_id,
         referenceNumber: referenceNumber,
         emailStatus,
+        ...(duplicateWarning ? { duplicateWarning } : {}),
       },
       { status: 200, headers: corsHeadersForOrigin(origin, allowedOrigins) },
     );

@@ -643,4 +643,5 @@ export function resetEventPublisher(): void {
   eventPublisherInstance = null;
 }
 
-export type { EventType, EventPayload };
+export { EventType };
+export type { EventPayload };

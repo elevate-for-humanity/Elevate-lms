@@ -8,12 +8,12 @@
 import {
   AIAgent,
   AgentIntent,
+  AgentStatus,
 } from './types';
 
 import type {
   AgentConfig,
   AgentCapabilities,
-  AgentStatus,
   AgentHealthStatus,
 } from './types';
 
@@ -389,4 +389,5 @@ export function resetAgentRegistry(): void {
   agentRegistryInstance = null;
 }
 
-export type { AIAgent, AgentIntent, AgentConfig, AgentCapabilities, AgentStatus, AgentHealthStatus };
+export { AIAgent, AgentIntent, AgentStatus };
+export type { AgentConfig, AgentCapabilities, AgentHealthStatus };

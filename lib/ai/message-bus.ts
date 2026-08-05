@@ -443,4 +443,5 @@ export function resetMessageBus(): void {
   messageBusInstance = null;
 }
 
-export type { AgentMessage, MessageType, MessageBusChannel };
+export { AIAgent, MessageType, MessageBusChannel };
+export type { AgentMessage };

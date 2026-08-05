@@ -613,4 +613,5 @@ export function resetTaskOrchestrator(): void {
   taskOrchestratorInstance = null;
 }
 
-export type { AIAgent, AgentIntent, TaskPriority, TaskStatus, TaskPayload, TaskCreationOptions, TaskFilterOptions };
+export { AIAgent, AgentIntent, TaskPriority, TaskStatus };
+export type { TaskPayload, TaskCreationOptions, TaskFilterOptions };

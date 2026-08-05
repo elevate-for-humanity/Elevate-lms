@@ -30,7 +30,8 @@ on:
         default: ''
 
 permissions:
-  contents: read
+  contents: write
+  actions: write
 
 # FIX #1: Use separate concurrency group - marketing deploys INDEPENDENTLY
 # FIX #2: cancel-in-progress: true — cancels old queued/in-progress runs so only the

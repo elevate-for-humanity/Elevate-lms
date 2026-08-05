@@ -29,34 +29,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const programPages = [
-    // Healthcare
+    // Catalog — redirect page
+    { slug: 'programs/catalog', priority: 0.9 },
+    // Healthcare — dedicated + dynamic
     { slug: 'programs/healthcare', priority: 0.9 },
-    { slug: 'programs/cna', priority: 0.8 },
+    { slug: 'programs/cna', priority: 0.9 },
     { slug: 'programs/medical-assistant', priority: 0.8 },
     { slug: 'programs/phlebotomy', priority: 0.8 },
-    { slug: 'programs/qma', priority: 0.7 },
-    { slug: 'programs/emt-apprenticeship', priority: 0.8 },
-    { slug: 'programs/peer-recovery-specialist', priority: 0.7 },
-    { slug: 'programs/direct-support-professional', priority: 0.7 },
-    { slug: 'programs/drug-collector', priority: 0.7 },
-    { slug: 'programs/cpr-first-aid', priority: 0.7 },
-    // Trades
+    { slug: 'programs/qma', priority: 0.8 },
+    { slug: 'programs/peer-recovery-specialist', priority: 0.8 },
+    { slug: 'programs/cpr-first-aid', priority: 0.8 },
+    // Trades — dedicated + dynamic
     { slug: 'programs/hvac-technician', priority: 0.9 },
     { slug: 'programs/skilled-trades', priority: 0.8 },
-    { slug: 'programs/building-services-technician', priority: 0.8 },
-    { slug: 'programs/electrical', priority: 0.8 },
-    { slug: 'programs/plumbing', priority: 0.8 },
     { slug: 'programs/cdl-training', priority: 0.9 },
+    { slug: 'programs/electrical', priority: 0.7 },
+    { slug: 'programs/plumbing', priority: 0.7 },
     // Beauty
     { slug: 'programs/barber-apprenticeship', priority: 0.9 },
     { slug: 'programs/cosmetology-apprenticeship', priority: 0.8 },
     { slug: 'programs/esthetician-apprenticeship', priority: 0.8 },
     { slug: 'programs/nail-technician-apprenticeship', priority: 0.7 },
-    // Technology
+    // Technology — single hub page for all tech programs
     { slug: 'programs/technology', priority: 0.8 },
-    { slug: 'programs/it-helpdesk', priority: 0.8 },
-    // Business
-    { slug: 'programs/business-administration', priority: 0.8 },
+    // Business — single hub page for all business programs
+    { slug: 'programs/business', priority: 0.8 },
   ];
 
   const programSitemap = programPages.map(page => ({

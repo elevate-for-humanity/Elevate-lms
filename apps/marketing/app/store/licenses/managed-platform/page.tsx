@@ -1,9 +1,7 @@
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Check, Shield, Users, BarChart3, Lock, Headphones, ArrowRight, AlertTriangle } from 'lucide-react';
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -126,16 +124,25 @@ export default function ManagedPlatformPage() {
 
             {/* Platform screenshot */}
             <div className="mt-12 max-w-4xl mx-auto">
-              <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-200">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-                  src="/images/pages/admin-dashboard-hero.webp"
-                  alt="Elevate managed platform dashboard"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 80vw"
-                />
+              <div className="rounded-xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <p className="text-slate-400 text-sm">Your Platform</p>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {['Dashboard', 'Courses', 'Students'].map((name, i) => (
+                    <div key={name} className="rounded-lg bg-slate-800 p-4 text-center">
+                      <div className="w-full h-24 bg-slate-700 rounded mb-2 flex items-center justify-center">
+                        <span className="text-slate-500 text-xs">{i + 1}</span>
+                      </div>
+                      <p className="text-white text-sm font-medium">{name}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

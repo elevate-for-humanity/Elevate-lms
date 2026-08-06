@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import {
   ArrowRight, Clock, Shield, Loader2, AlertCircle,
   Globe, Link2, CheckCircle2, ChevronRight,
@@ -224,8 +222,31 @@ function TrialPageContent() {
 
             {/* Left: value prop */}
             <div className="hidden lg:block">
-              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-slate-200 mb-6">
-                <Image src="/images/pages/admin-dashboard-hero.webp" alt="Admin dashboard preview" fill sizes="50vw" className="object-cover" placeholder="empty" />
+              <div className="rounded-2xl overflow-hidden shadow-xl border border-slate-200 bg-slate-900 p-4 mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                  </div>
+                  <p className="text-slate-400 text-xs">your-org.elevateforhumanity.org</p>
+                </div>
+                <div className="bg-slate-800 rounded-lg p-4">
+                  <div className="flex gap-3 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-brand-red-600 mt-1.5" />
+                    <div>
+                      <p className="text-white font-bold text-sm">Your Training Platform</p>
+                      <p className="text-slate-400 text-xs">Programs • Students • Reports</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['Programs', 'Students', 'Reports'].map((item) => (
+                      <div key={item} className="bg-slate-700 rounded p-2 text-center">
+                        <p className="text-white text-xs font-medium">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
               <p className="text-sm text-slate-500 text-center mb-6">Your branded training website + LMS — ready in under 60 seconds</p>
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-200 space-y-3">

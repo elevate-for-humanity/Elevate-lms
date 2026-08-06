@@ -2,9 +2,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   Users, 
   ArrowRight, 
@@ -86,10 +84,19 @@ export default function AddOnsPage() {
       {/* Hero Section */}
       {/* Hero */}
       <section className="relative w-full">
-        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/admin-dashboard-hero.webp" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500">
+          <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="grid grid-cols-3 gap-4 px-8">
+              {['Community Hub', 'Analytics Pro', 'Compliance'].map((name, i) => (
+                <div key={name} className="rounded-xl bg-white/20 backdrop-blur p-4 text-center">
+                  <p className="text-white font-bold text-sm">{name}</p>
+                  <p className="text-white/70 text-xs mt-1">Add-On</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

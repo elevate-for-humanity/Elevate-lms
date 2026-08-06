@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   Building2, 
   Users, 
@@ -110,15 +109,62 @@ export default function WorkforceBoardsPage() {
                 </div>
               </div>
               <div className="relative hidden lg:block">
-                <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                  <Image
-                    src="/images/pages/admin-dashboard-hero.webp"
-                    alt="Workforce Board Portal"
-                    fill
-                    className="object-cover"
-                    sizes="50vw"
-                    priority
-                  />
+                <div className="rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-blue-200">
+                        Workforce Dashboard
+                      </p>
+                      <p className="text-xl font-black text-white">
+                        WIOA Management
+                      </p>
+                    </div>
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
+                      <Building2 className="h-5 w-5 text-white" />
+                    </div>
+                  </div>
+
+                  <div className="mb-4 rounded-xl bg-white p-4 text-slate-900">
+                    <div className="mb-2 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-slate-500">
+                          Active Participants
+                        </p>
+                        <p className="text-lg font-bold">
+                          1,247
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+                        +12%
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                      <div className="h-full w-[78%] rounded-full bg-blue-600" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-white/10 p-3">
+                      <Users className="mb-2 h-5 w-5 text-blue-200" />
+                      <p className="text-xl font-black text-white">847</p>
+                      <p className="text-xs text-blue-100">Enrolled</p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-3">
+                      <Award className="mb-2 h-5 w-5 text-blue-200" />
+                      <p className="text-xl font-black text-white">234</p>
+                      <p className="text-xs text-blue-100">Credentials</p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-3">
+                      <TrendingUp className="mb-2 h-5 w-5 text-blue-200" />
+                      <p className="text-xl font-black text-white">78%</p>
+                      <p className="text-xs text-blue-100">Employed</p>
+                    </div>
+                    <div className="rounded-xl bg-white/10 p-3">
+                      <BarChart className="mb-2 h-5 w-5 text-blue-200" />
+                      <p className="text-xl font-black text-white">92%</p>
+                      <p className="text-xs text-blue-100">Compliance</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -244,14 +290,42 @@ export default function WorkforceBoardsPage() {
                   ))}
                 </div>
               </div>
-              <div className="relative h-[400px] rounded-2xl overflow-hidden">
-                <Image
-                  src="/images/pages/admin-dashboard-hero.webp"
-                  alt="System Integration"
-                  fill
-                  className="object-cover"
-                  sizes="50vw"
-                />
+              <div className="rounded-2xl border border-slate-600 bg-slate-800 p-6 overflow-hidden">
+                <div className="mb-4 flex items-center justify-between border-b border-slate-700 pb-4">
+                  <div>
+                    <p className="text-sm text-slate-400">
+                      State Integration
+                    </p>
+                    <h3 className="text-lg font-bold text-white">
+                      System Connectivity
+                    </h3>
+                  </div>
+                  <Globe className="h-6 w-6 text-slate-400" />
+                </div>
+
+                <div className="space-y-4">
+                  {[
+                    { name: 'State MIS', status: 'Connected', color: 'text-green-400' },
+                    { name: 'Wage Records', status: 'Syncing', color: 'text-blue-400' },
+                    { name: 'UI Reports', status: 'Ready', color: 'text-green-400' },
+                    { name: 'PIRL Export', status: 'Scheduled', color: 'text-yellow-400' },
+                  ].map((system) => (
+                    <div key={system.name} className="flex items-center justify-between rounded-lg bg-slate-900 p-3">
+                      <span className="font-medium text-slate-300">{system.name}</span>
+                      <span className={`text-sm font-semibold ${system.color}`}>{system.status}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 rounded-lg bg-slate-900 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-slate-400">Data Sync Status</span>
+                    <span className="text-sm font-semibold text-green-400">Active</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-slate-700">
+                    <div className="h-full w-[85%] rounded-full bg-gradient-to-r from-blue-500 to-green-500" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

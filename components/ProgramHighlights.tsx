@@ -25,7 +25,7 @@ const defaultHighlights: Highlight[] = [
   {
     title: 'Industry Certification',
     description: 'Earn recognized certifications that employers value and actively seek.',
-    image: '/images/pages/admin-dashboard-hero.webp',
+    image: '/images/pages/certification-ceremony.webp',
   },
   {
     title: 'Job Placement Support',

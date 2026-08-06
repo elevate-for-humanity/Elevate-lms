@@ -18,7 +18,7 @@ export const ADMIN_SCENES: DemoScene[] = [
     title: 'Admin Dashboard Overview',
     description: 'See enrollment, compliance, and outcomes across all programs at a glance.',
     videoSrc: '/videos/demo/demo-admin-overview.mp4',
-    poster: '/images/pages/admin-dashboard-hero.webp',
+    poster: '/images/pages/admin-overview-hero.webp',
     choices: [
       {
         label: 'Review Applications',

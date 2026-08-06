@@ -59,11 +59,6 @@
     "size": 299762,
     "path": "public/images/pages/higher-ed-hero.webp"
   },
-  "/images/pages/admin-dashboard-hero.webp": {
-    "newUrl": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/admin-dashboard-hero.webp",
-    "size": 293016,
-    "path": "public/images/pages/admin-dashboard-hero.webp"
-  },
   "/images/pages/networking-hero.webp": {
     "newUrl": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/pages/networking-hero.webp",
     "size": 292712,

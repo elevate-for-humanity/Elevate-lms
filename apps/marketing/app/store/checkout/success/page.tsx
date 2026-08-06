@@ -1,7 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useEffect, useState } from 'react';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
@@ -57,10 +55,14 @@ function CheckoutSuccessContent() {
       <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/admin-dashboard-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500">
+        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white">
+            <Check className="w-16 h-16 mx-auto mb-2" />
+            <p className="text-xl font-bold">Checkout</p>
+          </div>
+        </div>
       </section>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green-600 mx-auto mb-4" />

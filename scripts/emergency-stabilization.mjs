@@ -3,7 +3,6 @@ import path from 'path';
 
 const rootDir = process.cwd();
 const targetDirs = ['app', 'components', 'lib'];
-const verifiedAsset = '/images/pages/admin-dashboard-hero.webp';
 
 function stabilize(dir) {
   const files = fs.readdirSync(dir);
@@ -19,10 +18,7 @@ function stabilize(dir) {
       let content = fs.readFileSync(fullPath, 'utf8');
       const original = content;
 
-      // Rule 1: Fix the broken hero images
-      content = content.replace(/\/images\/pages\/comp-home-hero[^'"]*\.(jpg|webp)/g, verifiedAsset);
-
-      // Rule 2: Audit Lucide Icons - replace potentially undefined icons with safe ones
+      // Rule 1: Audit Lucide Icons - replace potentially undefined icons with safe ones
       // This is a safety layer for the "Element type is invalid" crash
       if (content.includes('Facebook') || content.includes('Instagram') || content.includes('Youtube') || content.includes('Linkedin')) {
          // We check if they are imported from lucide-react

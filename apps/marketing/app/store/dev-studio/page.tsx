@@ -1,11 +1,10 @@
 export const dynamic = 'force-static';
 
 import { Metadata } from 'next';
-import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { 
 import { getAdminUrl } from '@/lib/config/admin-url';
+import { 
   Code, Bot, Workflow, Database, Cloud, Terminal, 
   Sparkles, ArrowRight, Play, Check, Zap, GitBranch, 
   Container, Activity, Box, Settings, Layers
@@ -76,16 +75,18 @@ export default function DevStudioPage() {
       </div>
 
       {/* Hero - Bright & Clean */}
-      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-slate-100">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <Image 
-            src="/images/pages/admin-dashboard-hero.webp" 
-            alt="Dev Studio" 
-            fill 
-            className="object-cover object-top"
-            priority
-          />
+      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-gradient-to-br from-cyan-600 via-teal-600 to-emerald-500">
+        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="grid grid-cols-4 gap-4 px-8">
+            {['Agent', 'Workflow', 'Container', 'Deploy'].map((item) => (
+              <div key={item} className="rounded-xl bg-white/20 backdrop-blur p-4 text-center">
+                <p className="text-white font-bold text-sm">{item}</p>
+                <p className="text-white/70 text-xs mt-1">Dev Studio</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* White Content Box */}

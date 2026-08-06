@@ -13,12 +13,18 @@ import { logger } from '@/lib/logger';
 const BASE = 'https://api-v2.onetcenter.org';
 const KEY = process.env.ONET_API_KEY ?? '';
 
+// Track if we've already logged the missing key warning to avoid log spam
+let keyMissingWarningLogged = false;
+
 // Cache TTL: 7 days (O*NET data updates quarterly)
 const REVALIDATE = 60 * 60 * 24 * 7;
 
 async function onetFetch<T>(path: string): Promise<T | null> {
   if (!KEY) {
-    logger.warn('[onet] ONET_API_KEY not set — skipping fetch');
+    if (!keyMissingWarningLogged) {
+      logger.warn('[onet] ONET_API_KEY not set — skipping fetch');
+      keyMissingWarningLogged = true;
+    }
     return null;
   }
   try {

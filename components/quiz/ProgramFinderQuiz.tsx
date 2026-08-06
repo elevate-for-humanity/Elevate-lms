@@ -41,7 +41,7 @@ const steps: QuizStep[] = [
       {
         id: 'healthcare',
         label: 'Healthcare',
-        image: '/images/pages/admin-dashboard-hero.webp',
+        image: '/images/pages/cna-clinical.jpg',
         description: 'Help people heal and stay healthy',
       },
       {
@@ -53,7 +53,7 @@ const steps: QuizStep[] = [
       {
         id: 'cdl',
         label: 'CDL / Trucking',
-        image: '/images/pages/hvac-technician.webp',
+        image: '/images/pages/cdl-truck-highway.webp',
         description: 'Hit the road and earn $50K+',
       },
       {

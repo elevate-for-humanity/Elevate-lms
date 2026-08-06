@@ -3,11 +3,11 @@ export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { 
 import { getAdminUrl } from '@/lib/config/admin-url';
+import { 
   BookOpen, Layout, Video, FileText, CheckCircle, 
   Clock, Users, Award, ArrowRight, Play, Sparkles,
-  Plus, GripVertical, Type, Image, MessageSquare, FileQuestion,
+  Plus, GripVertical, Type, Image as ImageIcon, MessageSquare, FileQuestion,
   PlayCircle, ChevronRight, Settings, BarChart2
 } from 'lucide-react';
 
@@ -25,7 +25,7 @@ const blockTypes = [
   { icon: FileText, label: 'Lesson', desc: 'Rich text content', color: 'bg-blue-100 text-blue-600' },
   { icon: FileQuestion, label: 'Quiz', desc: 'Multiple choice', color: 'bg-purple-100 text-purple-600' },
   { icon: MessageSquare, label: 'Discussion', desc: 'Social learning', color: 'bg-emerald-100 text-emerald-600' },
-  { icon: Image, label: 'Image', desc: 'Visual content', color: 'bg-orange-100 text-orange-600' },
+  { icon: ImageIcon, label: 'Image', desc: 'Visual content', color: 'bg-orange-100 text-orange-600' },
   { icon: Type, label: 'Text', desc: 'Plain or markdown', color: 'bg-slate-100 text-slate-600' },
 ];
 
@@ -77,16 +77,18 @@ export default function CourseBuilderPage() {
       </div>
 
       {/* Hero - Bright & Clean */}
-      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-slate-100">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <Image 
-            src="/images/pages/admin-dashboard-hero.webp" 
-            alt="Course Builder" 
-            fill 
-            className="object-cover object-top"
-            priority
-          />
+      <section className="relative min-h-[70vh] flex items-end overflow-hidden bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-500">
+        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="grid grid-cols-4 gap-4 px-8">
+            {['Lesson', 'Quiz', 'Video', 'Assessment'].map((item, i) => (
+              <div key={item} className="rounded-xl bg-white/20 backdrop-blur p-4 text-center">
+                <p className="text-white font-bold text-sm">{item}</p>
+                <p className="text-white/70 text-xs mt-1">Builder Block</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* White Content Box */}

@@ -1,7 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { useEffect, useState } from 'react';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
@@ -95,10 +93,14 @@ function SuccessContent() {
       <div className="min-h-screen bg-white flex items-center justify-center">
 
       {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/admin-dashboard-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
+      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden bg-gradient-to-br from-green-500 via-teal-500 to-cyan-500">
+        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-white">
+            <CheckCircle className="w-16 h-16 mx-auto mb-2" />
+            <p className="text-xl font-bold">Purchase Complete</p>
+          </div>
+        </div>
       </section>
         <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin" />
       </div>

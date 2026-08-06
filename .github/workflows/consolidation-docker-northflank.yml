@@ -9,7 +9,11 @@ on:
       - main
     paths:
       - 'Dockerfile'
+      - 'Dockerfile.admin'
+      - 'Dockerfile.lms'
       - 'apps/marketing/**'
+      - 'apps/admin/**'
+      - 'apps/lms/**'
       - 'packages/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -25,9 +29,22 @@ concurrency:
 
 jobs:
   docker-northflank:
-    name: Docker / Northflank compatibility
+    name: ${{ matrix.service }} Docker / Northflank
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: marketing
+            dockerfile: Dockerfile
+            default_port: 8080
+          - service: lms
+            dockerfile: Dockerfile.lms
+            default_port: 3000
+          - service: admin
+            dockerfile: Dockerfile.admin
+            default_port: 3000
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -48,54 +65,68 @@ jobs:
         run: |
           set -euo pipefail
           docker build \
+            -f "${{ matrix.dockerfile }}" \
             --build-arg NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org \
             --build-arg NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
             --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
             --build-arg GITHUB_SHA="${GITHUB_SHA}" \
+            --build-arg GIT_SHA="${GITHUB_SHA}" \
+            --build-arg NEXT_PUBLIC_GIT_SHA="${GITHUB_SHA}" \
             --build-arg BUILD_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            -t elevate-consolidation:${GITHUB_SHA} .
+            -t "elevate-${{ matrix.service }}:${GITHUB_SHA}" .
 
-      - name: Verify default container port
+      - name: Verify default service port
         shell: bash
         run: |
           set -euo pipefail
-          container_id=$(docker run -d \
-            --name elevate-default-port \
-            -e PORT=8080 \
-            -p 8080:8080 \
-            elevate-consolidation:${GITHUB_SHA})
-          trap 'docker logs elevate-default-port || true; docker rm -f elevate-default-port || true' EXIT
+          name="elevate-${{ matrix.service }}-default"
+          port="${{ matrix.default_port }}"
+          docker run -d \
+            --name "$name" \
+            -e PORT="$port" \
+            -e NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
+            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
+            -p "$port:$port" \
+            "elevate-${{ matrix.service }}:${GITHUB_SHA}"
+          trap 'docker logs "$name" || true; docker rm -f "$name" || true' EXIT
           for attempt in $(seq 1 24); do
-            if curl --fail --silent --show-error http://127.0.0.1:8080/api/version >/tmp/version.json; then
+            if curl --fail --silent --show-error "http://127.0.0.1:${port}/api/version" >/tmp/version.json; then
               cat /tmp/version.json
+              docker rm -f "$name" >/dev/null
+              trap - EXIT
               exit 0
             fi
             sleep 5
           done
-          echo 'Container did not become healthy on PORT=8080'
-          docker logs "${container_id}"
+          echo "${{ matrix.service }} did not become healthy on PORT=${port}"
+          docker logs "$name"
           exit 1
 
       - name: Verify Northflank-style injected port
         shell: bash
         run: |
           set -euo pipefail
-          docker rm -f elevate-default-port >/dev/null 2>&1 || true
-          container_id=$(docker run -d \
-            --name elevate-injected-port \
-            -e PORT=8090 \
-            -p 8090:8090 \
-            elevate-consolidation:${GITHUB_SHA})
-          trap 'docker logs elevate-injected-port || true; docker rm -f elevate-injected-port || true' EXIT
+          name="elevate-${{ matrix.service }}-injected"
+          port=8090
+          docker run -d \
+            --name "$name" \
+            -e PORT="$port" \
+            -e NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
+            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
+            -p "$port:$port" \
+            "elevate-${{ matrix.service }}:${GITHUB_SHA}"
+          trap 'docker logs "$name" || true; docker rm -f "$name" || true' EXIT
           for attempt in $(seq 1 24); do
-            if curl --fail --silent --show-error http://127.0.0.1:8090/api/version >/tmp/version-8090.json; then
-              cat /tmp/version-8090.json
+            if curl --fail --silent --show-error "http://127.0.0.1:${port}/api/version" >/tmp/version-injected.json; then
+              cat /tmp/version-injected.json
+              docker rm -f "$name" >/dev/null
+              trap - EXIT
               exit 0
             fi
             sleep 5
           done
-          echo 'Container did not honor injected PORT=8090'
-          docker logs "${container_id}"
+          echo "${{ matrix.service }} did not honor injected PORT=${port}"
+          docker logs "$name"
           exit 1

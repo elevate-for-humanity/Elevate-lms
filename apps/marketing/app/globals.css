@@ -235,10 +235,6 @@ body {
     height: auto;
   }
 
-  /* Focus-visible styles — only show on keyboard navigation, not mouse clicks */
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
   .theme {
     --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
     --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
@@ -1339,11 +1335,6 @@ html {
     max-width: 100%;
     page-break-inside: avoid;
   }
-}
-
-/* Enhanced focus styles for accessibility */
-  outline-offset: 2px;
-  border-radius: 4px;
 }
 
 /* Skip navigation removed per user request */

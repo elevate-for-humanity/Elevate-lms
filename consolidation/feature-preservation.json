@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "branch": "consolidation/unified-platform",
+  "canonicalRepository": "elevate-for-humanity/Elevate-lms",
+  "donorRepositories": ["elevateforhumanity/fix2"],
+  "policy": {
+    "preserveFeaturesBeforeDeletion": true,
+    "requireFeatureParity": true,
+    "requireBuildBeforeDeletion": true,
+    "requireTypecheckBeforeDeletion": true,
+    "requireRouteVerificationBeforeDeletion": true,
+    "requireSchemaAuditBeforeDeletion": true,
+    "requireRlsAuditBeforeDeletion": true,
+    "requireRollbackPath": true
+  },
+  "canonicalDomains": {
+    "marketing": {
+      "target": "apps/marketing",
+      "status": "canonical",
+      "preserve": ["public pages", "program catalog", "applications", "compliance", "employer and workforce content", "SEO", "storefront surfaces"]
+    },
+    "admin": {
+      "target": "apps/admin",
+      "status": "canonical",
+      "preserve": ["admin dashboard", "student management", "program management", "analytics", "reports", "course builder", "dev studio controls"]
+    },
+    "lms": {
+      "target": "apps/lms",
+      "status": "canonical",
+      "preserve": ["courses", "lessons", "progress", "quizzes", "certificates", "OJT", "student learning experience"]
+    },
+    "platformApi": {
+      "target": "apps/app",
+      "status": "shared-backend",
+      "preserve": ["API routes", "course builder APIs", "dev studio APIs", "auth dependent operations", "workflow integrations"]
+    },
+    "courseBuilder": {
+      "target": "scripts/course-builder + lib/course-builder + apps/admin/app/admin/course-builder",
+      "status": "consolidate",
+      "knownAudit": "docs/audits/COURSE-BUILDER-CONSOLIDATION-AUDIT.md",
+      "rule": "do not delete a generator, seed, media, import/export, validation, or partner integration until its behavior is represented by the canonical pipeline"
+    },
+    "devStudio": {
+      "target": "apps/admin/app/dev-studio + lib/devstudio",
+      "status": "consolidate",
+      "rule": "admin is the operational Dev Studio; marketing/store routes may remain only as product/landing surfaces; LMS route must redirect or delegate unless it provides unique authenticated capability"
+    },
+    "orchestrator": {
+      "target": "components/OrchestratorAdmin.tsx + lib/autopilot + canonical worker",
+      "status": "consolidate",
+      "requiredEnv": ["NEXT_PUBLIC_AUTOPILOT_ORCHESTRATOR_URL"],
+      "rule": "one supervisor; specialized workers may remain only when they expose unique capabilities through the supervisor registry"
+    },
+    "supabase": {
+      "target": "supabase/migrations + shared Supabase clients",
+      "status": "canonical",
+      "rule": "one authoritative schema history; duplicate migrations must be reconciled, never blindly deleted after application"
+    },
+    "cloudflare": {
+      "target": "canonical Workers/KV/R2/DNS configuration",
+      "status": "canonicalize",
+      "rule": "one environment naming scheme and one documented deployment path; preserve existing bindings until consumers are migrated"
+    },
+    "github": {
+      "target": "elevate-for-humanity/Elevate-lms",
+      "status": "canonical",
+      "rule": "all future production development lands here after donor parity is verified"
+    },
+    "documentation": {
+      "target": "README.md + docs/architecture + docs/operations",
+      "status": "consolidate-last",
+      "rule": "README and architecture docs must describe only the final verified system, not historical or aspirational states"
+    },
+    "pluginsAndIntegrations": {
+      "status": "preserve",
+      "rule": "existing working integrations are dependencies; consolidate wrappers and configuration around them without disconnecting providers"
+    }
+  },
+  "deletionGate": [
+    "inventory current and donor implementations",
+    "identify unique capabilities",
+    "merge unique capabilities into canonical implementation",
+    "redirect all imports/routes/callers",
+    "run targeted tests",
+    "run typecheck and production build",
+    "run schema/RLS/integrity checks where applicable",
+    "record rollback commit",
+    "only then delete obsolete implementation"
+  ]
+}

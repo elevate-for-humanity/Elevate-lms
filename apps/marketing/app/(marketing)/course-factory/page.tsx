@@ -7,8 +7,8 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { 
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   GraduationCap,
   Sparkles,
   BookOpen,
@@ -254,7 +254,7 @@ export default function CourseFactoryPage() {
             <div className="flex items-center gap-4">
               <a href={getAdminUrl("/studio")} className="text-slate-300 hover:text-white transition-colors hidden sm:block">
                 Open Builder
-              </Link>
+              </a>
               <Link 
                 href="/demo"
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2 rounded-lg font-medium transition-all"
@@ -307,7 +307,7 @@ export default function CourseFactoryPage() {
               >
                 <Play className="w-5 h-5" />
                 Try Demo Course
-              </Link>
+              </a>
             </div>
 
             {/* Stats */}

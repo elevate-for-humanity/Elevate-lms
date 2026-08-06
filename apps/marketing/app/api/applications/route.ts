@@ -152,6 +152,20 @@ async function _POST(req: Request) {
 
     const body = await req.json();
 
+    // Normalize all public application forms at this canonical boundary.
+    // Older forms use programInterest/fundingSource while newer program pages
+    // use program/programSlug/fundingType.
+    body.program = body.program || body.programInterest || body.programSlug || body.program_slug;
+    body.programSlug =
+      body.programSlug || body.program_slug || body.programInterest || body.program;
+    body.fundingType =
+      body.fundingType ||
+      body.funding_type ||
+      body.fundingInterest ||
+      body.fundingSource ||
+      null;
+    body.zip = body.zip || body.zipCode || body.postalCode || '';
+
     // Honeypot field for commodity bots.
     if (body.website && String(body.website).trim() !== '') {
       return NextResponse.json(
@@ -517,7 +531,7 @@ async function _POST(req: Request) {
     let passwordSetupLink: string | null = null;
 
     if (supabase) {
-      const programSlug = body.program_slug || body.preferredProgramId || '';
+      const programSlug = body.programSlug || body.preferredProgramId || '';
       const { data: programRow } = await supabase
         .from('programs')
         .select('title')
@@ -536,6 +550,8 @@ async function _POST(req: Request) {
         programName,
         programSlug,
         postLoginUrl: '/onboarding/learner',
+        enrollmentStatus: 'pending',
+        sendWelcomeEmail: false,
       });
 
       if (provision.error) {
@@ -753,7 +769,7 @@ async function _POST(req: Request) {
           type: "application_submitted",
           payload: {
             applicationId: data.id,
-            programSlug: body.program_slug || body.preferredProgramId || null,
+            programSlug: body.programSlug || body.preferredProgramId || null,
             email: body.email,
             firstName: body.firstName,
             lastName: body.lastName,
@@ -772,7 +788,7 @@ async function _POST(req: Request) {
         ok: true,
         id: data.id,
         email: data.email,
-        program: data.program_id,
+        program: data.program_interest ?? program,
         referenceNumber: referenceNumber,
         emailStatus,
         ...(duplicateWarning ? { duplicateWarning } : {}),

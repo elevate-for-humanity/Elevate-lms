@@ -6,16 +6,17 @@ import Link from 'next/link';
 
 interface IntakeFormInnerProps {
   programs: Array<{ id: string; title: string; slug: string }>;
+  initialProgram?: string;
 }
 
-export default function IntakeFormInner({ programs }: IntakeFormInnerProps) {
+export default function IntakeFormInner({ programs, initialProgram = '' }: IntakeFormInnerProps) {
   const router = useRouter();
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    programInterest: '',
+    programInterest: initialProgram,
     fundingInterest: '',
   });
   const [submitting, setSubmitting] = useState(false);
@@ -126,12 +127,13 @@ export default function IntakeFormInner({ programs }: IntakeFormInnerProps) {
 
           <div>
             <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
-              Phone Number
+              Phone Number *
             </label>
             <input
               type="tel"
               id="phone"
               name="phone"
+              required
               value={form.phone}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
@@ -141,11 +143,12 @@ export default function IntakeFormInner({ programs }: IntakeFormInnerProps) {
 
           <div>
             <label htmlFor="programInterest" className="block text-sm font-medium text-slate-700 mb-1">
-              Program of Interest
+              Program of Interest *
             </label>
             <select
               id="programInterest"
               name="programInterest"
+              required
               value={form.programInterest}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent bg-white"

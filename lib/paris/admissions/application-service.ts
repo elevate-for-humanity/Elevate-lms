@@ -128,10 +128,10 @@ export async function createApplication(input: CreateApplicationInput) {
   // Publish creation event
   await publishApplicationEvent({
     type: 'application.created',
-    applicationId: data.id,
+    applicationId: application.id,
   });
   
-  return data;
+  return application;
 }
 
 /**

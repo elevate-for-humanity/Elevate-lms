@@ -44,16 +44,37 @@ async function parseLegacyRequest(req: Request): Promise<{
 
   if (contentType.includes('application/json')) {
     const data = await req.json();
-    const name = (data.name || `${data.first_name || ''} ${data.last_name || ''}`).trim();
+    const name = (
+      data.name ||
+      `${data.firstName || data.first_name || ''} ${data.lastName || data.last_name || ''}`
+    ).trim();
     return {
       contentType,
       name,
       email: String(data.email || '').trim(),
       phone: String(data.phone || '').trim(),
-      program: String(data.program || data.program_interest || data.programSlug || 'general').trim(),
-      funding: data.funding || data.funding_type || data.fundingType || undefined,
+      program: String(
+        data.program ||
+          data.programInterest ||
+          data.program_interest ||
+          data.programSlug ||
+          data.program_slug ||
+          '',
+      ).trim(),
+      funding:
+        data.funding ||
+        data.fundingInterest ||
+        data.fundingSource ||
+        data.funding_type ||
+        data.fundingType ||
+        undefined,
       source: data.source || undefined,
-      pathwaySlug: data.pathway_slug || data.program_slug || undefined,
+      pathwaySlug:
+        data.pathway_slug ||
+        data.program_slug ||
+        data.programSlug ||
+        data.programInterest ||
+        undefined,
     };
   }
 
@@ -72,7 +93,7 @@ async function parseLegacyRequest(req: Request): Promise<{
       formData.get('program') ||
         formData.get('program_interest') ||
         formData.get('program_slug') ||
-        'general',
+        '',
     ).trim(),
     funding: String(formData.get('funding') || formData.get('funding_type') || '').trim() || undefined,
     source: String(formData.get('source') || '').trim() || undefined,
@@ -105,7 +126,7 @@ export async function POST(req: Request) {
       program,
       fundingType: funding || null,
       source: source || 'website',
-      programSlug: pathwaySlug || undefined,
+      programSlug: pathwaySlug || program,
     };
 
     const applicationsUrl = new URL('/api/applications', req.url);

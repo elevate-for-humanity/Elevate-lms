@@ -24,6 +24,10 @@ export interface ProvisionAccountInput {
   programSlug: string;
   /** URL the student lands on after setting their password */
   postLoginUrl?: string;
+  /** Application accounts remain pending until the approval service activates them. */
+  enrollmentStatus?: 'pending' | 'active';
+  /** The application endpoint sends its own status-specific confirmation email. */
+  sendWelcomeEmail?: boolean;
 }
 
 export interface ProvisionAccountResult {
@@ -40,7 +44,17 @@ const SITE_URL = () =>
 export async function provisionAccount(
   input: ProvisionAccountInput,
 ): Promise<ProvisionAccountResult> {
-  const { db, email, fullName, phone, programName, programSlug, postLoginUrl } = input;
+  const {
+    db,
+    email,
+    fullName,
+    phone,
+    programName,
+    programSlug,
+    postLoginUrl,
+    enrollmentStatus = 'active',
+    sendWelcomeEmail = true,
+  } = input;
   const normalizedEmail = email.toLowerCase().trim();
   const nameParts = fullName.trim().split(' ');
   const firstName = nameParts[0] ?? 'there';
@@ -62,25 +76,27 @@ export async function provisionAccount(
 
   if (existing?.id) {
     // Account already exists — send an enrollment confirmation email only
-    try {
-      const { sendEmail } = await import('@/lib/email/sendgrid');
-      await sendEmail({
-        to: normalizedEmail,
-        from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-        replyTo: 'elevate4humanityedu@gmail.com',
-        subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
-        html: buildWelcomeEmail({
-          firstName,
-          programName,
-          loginUrl,
-          dashboardUrl,
-          onboardingUrl,
-          isNewUser: false,
-          passwordSetUrl: null,
-        }),
-      });
-    } catch (err) {
-      logger.warn('[provision-account] Enrollment confirmation email failed (non-fatal)', err);
+    if (sendWelcomeEmail) {
+      try {
+        const { sendEmail } = await import('@/lib/email/sendgrid');
+        await sendEmail({
+          to: normalizedEmail,
+          from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+          replyTo: 'elevate4humanityedu@gmail.com',
+          subject: `You're enrolled in ${programName} — ${PLATFORM_DEFAULTS.orgName}`,
+          html: buildWelcomeEmail({
+            firstName,
+            programName,
+            loginUrl,
+            dashboardUrl,
+            onboardingUrl,
+            isNewUser: false,
+            passwordSetUrl: null,
+          }),
+        });
+      } catch (err) {
+        logger.warn('[provision-account] Enrollment confirmation email failed (non-fatal)', err);
+      }
     }
     return { userId: existing.id, isNewUser: false, passwordSetupLink: null };
   }
@@ -118,7 +134,7 @@ export async function provisionAccount(
     last_name: lastName,
     phone: phone ?? null,
     role: 'student',
-    enrollment_status: 'active',
+    enrollment_status: enrollmentStatus,
   });
 
   if (profileErr) {
@@ -149,25 +165,27 @@ export async function provisionAccount(
   }
 
   // ── 5. Send welcome + credentials email ───────────────────────────────────
-  try {
-    const { sendEmail } = await import('@/lib/email/sendgrid');
-    await sendEmail({
-      to: normalizedEmail,
-      from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
-      replyTo: 'elevate4humanityedu@gmail.com',
-      subject: `Welcome to ${programName} — Set your password to access your portal`,
-      html: buildWelcomeEmail({
-        firstName,
-        programName,
-        loginUrl,
-        dashboardUrl,
-        onboardingUrl,
-        isNewUser: true,
-        passwordSetUrl,
-      }),
-    });
-  } catch (err) {
-    logger.warn('[provision-account] Welcome email failed (non-fatal)', err);
+  if (sendWelcomeEmail) {
+    try {
+      const { sendEmail } = await import('@/lib/email/sendgrid');
+      await sendEmail({
+        to: normalizedEmail,
+        from: `${PLATFORM_DEFAULTS.orgName} <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+        replyTo: 'elevate4humanityedu@gmail.com',
+        subject: `Welcome to ${programName} — Set your password to access your portal`,
+        html: buildWelcomeEmail({
+          firstName,
+          programName,
+          loginUrl,
+          dashboardUrl,
+          onboardingUrl,
+          isNewUser: true,
+          passwordSetUrl,
+        }),
+      });
+    } catch (err) {
+      logger.warn('[provision-account] Welcome email failed (non-fatal)', err);
+    }
   }
 
   logger.info('[provision-account] Account provisioned', { userId, email: normalizedEmail });

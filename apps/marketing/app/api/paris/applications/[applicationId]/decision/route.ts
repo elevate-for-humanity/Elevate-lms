@@ -79,7 +79,7 @@ export async function POST(
     const { applicationId } = await context.params;
     const input = decisionSchema.parse(await request.json());
     
-    const application = await recordAdmissionsDecision(
+    const result = await recordAdmissionsDecision(
       applicationId,
       {
         decision: input.decision,
@@ -91,9 +91,9 @@ export async function POST(
     
     return NextResponse.json({
       success: true,
-      applicationId: application.id,
-      workflowStatus: application.workflow_status,
-      admissionsDecision: application.admissions_decision,
+      applicationId: result.applicationId,
+      workflowStatus: result.currentStatus,
+      admissionsDecision: input.decision,
     });
   } catch (error) {
     console.error('paris.decision.failed', {

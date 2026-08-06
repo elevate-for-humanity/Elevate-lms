@@ -48,13 +48,13 @@ export async function POST(
     
     const { applicationId } = await context.params;
     
-    const application = await submitApplication(applicationId, user.id);
+    const result = await submitApplication(applicationId, user.id);
     
     return NextResponse.json({
       success: true,
-      applicationId: application.id,
-      workflowStatus: application.workflow_status,
-      redirectTo: `/applicant/application/${application.id}`,
+      applicationId: result.applicationId,
+      workflowStatus: result.currentStatus,
+      redirectTo: `/applicant/application/${result.applicationId}`,
     });
   } catch (error) {
     console.error('paris.application.submit.failed', {

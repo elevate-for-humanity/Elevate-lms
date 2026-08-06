@@ -143,7 +143,7 @@ export default async function ApplyPage({
       <section id="application" className="py-10" aria-label="Application form">
         <div className="max-w-2xl mx-auto px-4">
           <ApplyPathGuide variant="hub" />
-          <IntakeFormInner programs={programs} />
+          <IntakeFormInner programs={programs} initialProgram={programSlug} />
         </div>
       </section>
 

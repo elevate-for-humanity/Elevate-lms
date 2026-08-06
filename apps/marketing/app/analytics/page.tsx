@@ -5,7 +5,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { getAdminUrl } from '@/lib/config/admin-url';
 import {
   Users,
   GraduationCap,
@@ -17,6 +16,7 @@ import {
   ArrowRight,
   ChevronRight,
 } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,11 +59,11 @@ export default async function AnalyticsPage() {
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
     supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
-    db
+    supabase
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'active'),
-    db
+    supabase
       .from('program_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed'),
@@ -72,7 +72,7 @@ export default async function AnalyticsPage() {
   ]);
 
   // Recent enrollments
-  const { data: recentEnrollments } = await db
+  const { data: recentEnrollments } = await supabase
     .from('program_enrollments')
     .select('id, status, created_at, programs(title)')
     .order('created_at', { ascending: false })
@@ -141,7 +141,7 @@ export default async function AnalyticsPage() {
             className="inline-flex items-center gap-1 text-sm font-semibold text-brand-red-600 hover:underline"
           >
             Full admin analytics <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </div>
 
         {/* Stats grid */}
@@ -166,7 +166,7 @@ export default async function AnalyticsPage() {
               className="text-sm text-brand-red-600 hover:underline flex items-center gap-1"
             >
               View all <ChevronRight className="w-3.5 h-3.5" />
-            </a>
+            </Link>
           </div>
           {!recentEnrollments || recentEnrollments.length === 0 ? (
             <div className="px-6 py-10 text-center text-slate-500 text-sm">No enrollments yet.</div>

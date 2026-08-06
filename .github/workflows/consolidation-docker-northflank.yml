@@ -1,0 +1,101 @@
+name: Consolidation Docker + Northflank Gate
+
+on:
+  push:
+    branches:
+      - consolidation/unified-platform
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Dockerfile'
+      - 'apps/marketing/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/consolidation-docker-northflank.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: consolidation-docker-northflank-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-northflank:
+    name: Docker / Northflank compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required build configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${NEXT_PUBLIC_SUPABASE_URL}" || { echo 'NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
+          test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" || { echo 'NEXT_PUBLIC_SUPABASE_ANON_KEY is not configured'; exit 1; }
+
+      - name: Build production container
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build \
+            --build-arg NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org \
+            --build-arg NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org \
+            --build-arg NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
+            --build-arg GITHUB_SHA="${GITHUB_SHA}" \
+            --build-arg BUILD_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            -t elevate-consolidation:${GITHUB_SHA} .
+
+      - name: Verify default container port
+        shell: bash
+        run: |
+          set -euo pipefail
+          container_id=$(docker run -d \
+            --name elevate-default-port \
+            -e PORT=8080 \
+            -p 8080:8080 \
+            elevate-consolidation:${GITHUB_SHA})
+          trap 'docker logs elevate-default-port || true; docker rm -f elevate-default-port || true' EXIT
+          for attempt in $(seq 1 24); do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/api/version >/tmp/version.json; then
+              cat /tmp/version.json
+              exit 0
+            fi
+            sleep 5
+          done
+          echo 'Container did not become healthy on PORT=8080'
+          docker logs "${container_id}"
+          exit 1
+
+      - name: Verify Northflank-style injected port
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker rm -f elevate-default-port >/dev/null 2>&1 || true
+          container_id=$(docker run -d \
+            --name elevate-injected-port \
+            -e PORT=8090 \
+            -p 8090:8090 \
+            elevate-consolidation:${GITHUB_SHA})
+          trap 'docker logs elevate-injected-port || true; docker rm -f elevate-injected-port || true' EXIT
+          for attempt in $(seq 1 24); do
+            if curl --fail --silent --show-error http://127.0.0.1:8090/api/version >/tmp/version-8090.json; then
+              cat /tmp/version-8090.json
+              exit 0
+            fi
+            sleep 5
+          done
+          echo 'Container did not honor injected PORT=8090'
+          docker logs "${container_id}"
+          exit 1

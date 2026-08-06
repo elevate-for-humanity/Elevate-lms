@@ -32,6 +32,7 @@ ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG GITHUB_SHA=unknown
+ARG BUILD_TIMESTAMP=unknown
 
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
@@ -42,6 +43,7 @@ ENV GITHUB_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_GIT_SHA=$GITHUB_SHA
 ENV NEXT_PUBLIC_BUILD_ID=$GITHUB_SHA
 ENV BUILD_ID=$GITHUB_SHA
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
 RUN pnpm --filter @elevate/marketing build
 
@@ -75,7 +77,8 @@ COPY --from=builder /app/apps/marketing/public ./apps/marketing/public
 
 EXPOSE 8080
 
+# Runtime-port-aware health check for Northflank and other container platforms.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -fsS http://127.0.0.1:8080/api/version || exit 1
+  CMD-SHELL curl -fsS "http://127.0.0.1:${PORT:-8080}/api/version" || exit 1
 
 CMD ["node", "--max-http-header-size=32768", "apps/marketing/server.js"]

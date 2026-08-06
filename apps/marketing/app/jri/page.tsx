@@ -118,9 +118,9 @@ export default function JRIPage() {
 
   const stats = [
     { value: 'Funded', label: 'Training Available', icon: GraduationCap },
-    { value: '85%', label: 'Placement Goal', icon: Briefcase },
+    { value: 'Career', label: 'Support Services', icon: Briefcase },
     { value: '6+', label: 'Career Programs', icon: TrendingUp },
-    { value: '24/7', label: 'Support', icon: Users },
+    { value: 'Authorized', label: 'JRI Provider', icon: Users },
   ];
 
   return (

@@ -343,20 +343,20 @@ export default async function PartnersPage() {
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-5xl font-black text-brand-blue-600 mb-2">50+</div>
-              <p className="text-gray-600">Active employer partners</p>
+              <div className="text-5xl font-black text-brand-blue-600 mb-2">Active</div>
+              <p className="text-gray-600">Employer partnerships</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black text-brand-blue-600 mb-2">85%</div>
-              <p className="text-gray-600">Candidate retention at 90 days</p>
+              <div className="text-5xl font-black text-brand-blue-600 mb-2">Career</div>
+              <p className="text-gray-600">Services support</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black text-brand-blue-600 mb-2">$0</div>
-              <p className="text-gray-600">Recruiting fees for employers</p>
+              <div className="text-5xl font-black text-brand-blue-600 mb-2">No Fees</div>
+              <p className="text-gray-600">Recruiting costs for partners</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black text-brand-blue-600 mb-2">2 weeks</div>
-              <p className="text-gray-600">Average time to first candidate</p>
+              <div className="text-5xl font-black text-brand-blue-600 mb-2">Connected</div>
+              <p className="text-gray-600">Hiring pipeline</p>
             </div>
           </div>
         </div>

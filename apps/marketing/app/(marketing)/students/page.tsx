@@ -142,9 +142,9 @@ const SUPPORT = [
 // FAQ
 const FAQS = [
   { question: 'How long does the entire journey take?', answer: 'It varies by program. Short certifications (OSHA 30, CPR) can be completed in weeks. Complete career programs typically take 3-9 months from application to job placement.' },
-  { question: 'What if I can\'t afford tuition?', answer: 'We accept WIOA funding, Vocational Rehabilitation, veterans benefits, employer sponsorships, and offer payment plans. 85% of our students receive some form of financial assistance.' },
+  { question: 'What if I can\'t afford tuition?', answer: 'We accept WIOA funding, Vocational Rehabilitation, veterans benefits, employer sponsorships, and offer payment plans. Our team helps determine what funding you may qualify for.' },
   { question: 'Do I need prior experience?', answer: 'No! Most of our programs are designed for beginners. Our AI assessment helps match you with programs suited to your current skill level and career goals.' },
-  { question: 'What support do I get after graduation?', answer: 'Lifetime career services. Resume help, interview coaching, employer connections, and job leads. We don\'t stop supporting you until you\'re employed.' },
+  { question: 'What support do I get after graduation?', answer: 'Career services support. Resume help, interview coaching, employer connections, and job leads. We don\'t stop supporting you until you\'re employed.' },
   { question: 'Are your credentials recognized nationally?', answer: 'Yes. Our credentials include EPA 608, OSHA 30, NHA certifications, and state licensing prep — all recognized by employers nationwide.' },
 ];
 

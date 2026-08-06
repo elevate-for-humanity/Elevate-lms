@@ -78,7 +78,7 @@ export default async function OfflinePage() {
                         d="M5 13l4 4L19 7"
                       />
                     </svg>
-                    <span>100% free training programs</span>
+                    <span>Funded training options available</span>
                   </li>
                   <li className="flex items-start">
                     <svg

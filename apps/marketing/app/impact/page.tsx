@@ -141,9 +141,9 @@ export default async function ImpactPage() {
     },
     {
       icon: Briefcase,
-      value: '85%',
-      label: 'Job Placement Rate',
-      sublabel: 'within 90 days',
+      value: 'Career',
+      label: 'Services',
+      sublabel: 'for graduates',
       color: 'text-red-600',
       bg: 'bg-red-50',
       border: 'border-red-100',

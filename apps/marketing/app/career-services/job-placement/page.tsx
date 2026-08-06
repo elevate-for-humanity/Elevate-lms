@@ -17,10 +17,10 @@ export default function JobPlacementPage() {
   ];
 
   const stats = [
-    { value: '85%', label: 'Placement Rate' },
-    { value: '200+', label: 'Employer Partners' },
-    { value: '1000+', label: 'Graduates Placed' },
-    { value: '30 days', label: 'Avg. Time to Hire' },
+    { value: 'Career', label: 'Services Available' },
+    { value: 'Active', label: 'Employer Network' },
+    { value: 'Ongoing', label: 'Graduate Support' },
+    { value: 'Connected', label: 'Hiring Partners' },
   ];
 
   return (

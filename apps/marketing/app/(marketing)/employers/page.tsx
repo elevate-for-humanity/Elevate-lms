@@ -132,10 +132,10 @@ const INDUSTRIES = [
 
 // Benefits
 const BENEFITS = [
-  { title: 'Pre-Certified Talent', description: 'Every graduate is certified and job-ready. No on-the-job training for basic certifications.', metric: '85% retention' },
-  { title: 'WIOA Funding', description: 'Offset training costs with workforce development funds. We handle the paperwork.', metric: 'Up to 100% covered' },
+  { title: 'Pre-Certified Talent', description: 'Graduates earn industry-recognized certifications. Career services support job search and employer connections.', metric: 'Credentialed candidates' },
+  { title: 'WIOA Funding', description: 'Offset training costs with workforce development funds. We handle the paperwork.', metric: 'Funding assistance' },
   { title: 'Custom Curriculum', description: 'Training aligned to YOUR standards, equipment, and processes.', metric: 'Tailored to you' },
-  { title: 'Apprenticeship Tax Credits', description: 'Claim up to $10,000 per apprentice in federal tax credits.', metric: '$10k per apprentice' },
+  { title: 'Apprenticeship Tax Credits', description: 'Employers may claim federal tax credits for registered apprentices.', metric: 'Tax credit eligible' },
 ];
 
 // FAQ

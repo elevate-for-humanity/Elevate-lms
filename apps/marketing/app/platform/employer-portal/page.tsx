@@ -123,20 +123,20 @@ export default function EmployerPortalPage() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <div>
-                <div className="text-4xl font-black">500+</div>
-                <div className="text-blue-100">Employer Partners</div>
+                <div className="text-4xl font-black">Active</div>
+                <div className="text-blue-100">Employer Network</div>
               </div>
               <div>
-                <div className="text-4xl font-black">85%</div>
-                <div className="text-blue-100">Placement Rate</div>
+                <div className="text-4xl font-black">Career</div>
+                <div className="text-blue-100">Placement Support</div>
               </div>
               <div>
-                <div className="text-4xl font-black">75%</div>
-                <div className="text-blue-100">OJT Reimbursement</div>
+                <div className="text-4xl font-black">OJT</div>
+                <div className="text-blue-100">Reimbursement Available</div>
               </div>
               <div>
-                <div className="text-4xl font-black">90%</div>
-                <div className="text-blue-100">Retention Rate</div>
+                <div className="text-4xl font-black">Ongoing</div>
+                <div className="text-blue-100">Graduate Support</div>
               </div>
             </div>
           </div>

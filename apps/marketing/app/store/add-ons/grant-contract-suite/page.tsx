@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import {
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   Upload, Search, ShieldCheck, PenTool, Download, ArrowRight, FileText, Briefcase, Sparkles,
 } from 'lucide-react';
 
@@ -60,7 +60,7 @@ export default function GrantContractSuitePage() {
             <a href={getAdminUrl("/compliance/automation")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open in Admin <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <Link href="/store/demo/admin"
               className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Try Demo
@@ -130,11 +130,11 @@ export default function GrantContractSuitePage() {
             <a href={getAdminUrl("/compliance/automation")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition-colors">
               Open Grant & Contract Suite <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <a href={getAdminUrl("/settings/organization-profile")}
               className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
               Set Up Org Profile First
-            </Link>
+            </a>
           </div>
         </div>
       </section>

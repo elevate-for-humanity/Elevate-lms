@@ -70,7 +70,7 @@ export default async function StaffCoursesPage() {
               className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-5 h-5" /> New Course
-            </Link>
+            </a>
           </div>
         </div>
 

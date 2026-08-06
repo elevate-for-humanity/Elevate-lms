@@ -46,7 +46,7 @@ export default function ProposalWritingPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={getAdminUrl("/grants/applications/new")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Start an Application <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -94,7 +94,7 @@ export default function ProposalWritingPage() {
         <div className="max-w-2xl mx-auto text-center">
           <a href={getAdminUrl("/grants/applications/new")} className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors">
             Start Writing a Grant Application <ArrowRight className="w-4 h-4" />
-          </Link>
+          </a>
         </div>
       </section>
     </div>

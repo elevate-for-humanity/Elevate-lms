@@ -197,7 +197,7 @@ export default async function StaffSkillsPage() {
             className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-50"
           >
             View Training Resources <ChevronRight className="w-4 h-4" />
-          </Link>
+          </a>
         </div>
       </div>
     </div>

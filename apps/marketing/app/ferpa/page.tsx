@@ -141,7 +141,7 @@ export default async function FERPAPortal() {
           <div className="mt-8 text-center">
             <a href={getAdminUrl("/dashboard")} className="text-brand-blue-600 hover:underline text-sm">
               ← Back to Admin Dashboard
-            </Link>
+            </a>
           </div>
         </div>
       </section>

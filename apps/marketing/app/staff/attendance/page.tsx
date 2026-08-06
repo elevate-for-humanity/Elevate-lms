@@ -67,12 +67,12 @@ export default async function StaffPortalAttendancePage() {
             className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
           >
             Take Attendance
-          </Link>
+          </a>
           <a href={getAdminUrl("/staff-portal/attendance/export")}
             className="border border-slate-300 px-4 py-2 rounded-lg hover:bg-white"
           >
             Export Report
-          </Link>
+          </a>
         </div>
 
         {/* Active Cohorts */}

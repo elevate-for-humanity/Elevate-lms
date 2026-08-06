@@ -291,7 +291,7 @@ export default function AddStudentPage() {
                 className="px-6 py-2 text-slate-900 hover:text-slate-900"
               >
                 Cancel
-              </Link>
+              </a>
               <button
                 type="submit"
                 className="flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"

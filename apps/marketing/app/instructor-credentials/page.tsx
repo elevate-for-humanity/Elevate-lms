@@ -5,8 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   Shield,
   GraduationCap,
   Building2,
@@ -430,7 +430,7 @@ export default function InstructorCredentialsPage() {
               className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition"
             >
               Instructional Framework
-            </Link>
+            </a>
             <Link
               href="/accreditation"
               className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-white transition"

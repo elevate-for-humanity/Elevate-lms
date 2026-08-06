@@ -5,8 +5,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import {
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   BookOpen,
   ArrowLeft,
   Save,
@@ -149,7 +149,7 @@ export default function CreateCoursePage() {
             className="inline-flex items-center gap-2 text-purple-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Courses
-          </Link>
+          </a>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
               <BookOpen className="w-8 h-8" />
@@ -371,7 +371,7 @@ export default function CreateCoursePage() {
               className="px-6 py-3 text-slate-700 hover:text-slate-900"
             >
               Cancel
-            </Link>
+            </a>
             <div className="flex gap-4">
               <button
                 type="button"

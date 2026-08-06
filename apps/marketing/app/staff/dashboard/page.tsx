@@ -187,7 +187,7 @@ export default async function StaffDashboard() {
               >
                 <div className="font-semibold">Generate Reports</div>
                 <div className="text-sm text-black">Access analytics and insights</div>
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -310,7 +310,7 @@ export default async function StaffDashboard() {
                   View all booth renters, payment status, and MOU
                 </div>
               </div>
-            </Link>
+            </a>
             <Link
               href="/booth-rental/apply"
               className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
@@ -337,43 +337,43 @@ export default async function StaffDashboard() {
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Students
-            </Link>
+            </a>
             <a href={getAdminUrl("/staff-portal/courses")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Courses
-            </Link>
+            </a>
             <a href={getAdminUrl("/staff-portal/campaigns")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Campaigns
-            </Link>
+            </a>
             <a href={getAdminUrl("/staff-portal/customer-service")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Customer Service
-            </Link>
+            </a>
             <a href={getAdminUrl("/staff-portal/dashboard")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Processes
-            </Link>
+            </a>
             <a href={getAdminUrl("/staff-portal/qa-checklist")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               QA Checklist
-            </Link>
+            </a>
             <a href={getAdminUrl("/staff-portal/training")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Training
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -410,7 +410,7 @@ export default async function StaffDashboard() {
                     Review and process incoming applications
                   </div>
                 </div>
-              </Link>
+              </a>
 
               {/* Employees */}
               <a href={getAdminUrl("/hr/employees")}
@@ -425,7 +425,7 @@ export default async function StaffDashboard() {
                     View and manage all staff records
                   </div>
                 </div>
-              </Link>
+              </a>
 
               {/* Payroll */}
               <a href={getAdminUrl("/hr/payroll")}
@@ -440,7 +440,7 @@ export default async function StaffDashboard() {
                     Run payroll and view pay history
                   </div>
                 </div>
-              </Link>
+              </a>
 
               {/* Time tracking */}
               <a href={getAdminUrl("/hr/time")}
@@ -455,7 +455,7 @@ export default async function StaffDashboard() {
                     Review staff hours and timesheets
                   </div>
                 </div>
-              </Link>
+              </a>
 
               {/* Leave */}
               <a href={getAdminUrl("/hr/leave")}
@@ -470,7 +470,7 @@ export default async function StaffDashboard() {
                     Approve or deny time-off requests
                   </div>
                 </div>
-              </Link>
+              </a>
 
               {/* Onboarding */}
               <Link

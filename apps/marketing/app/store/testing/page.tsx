@@ -103,7 +103,7 @@ export default function TestingCenterPage() {
                   <a href={getAdminUrl("/testing")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center">
                     Open Testing Dashboard
                     <ArrowRight className="w-5 h-5" />
-                  </Link>
+                  </a>
                   <Link href="#exams" className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg transition-colors text-center">
                     View Exam Options
                   </Link>

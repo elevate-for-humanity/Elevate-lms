@@ -371,7 +371,7 @@ export default async function StudentApplicationPage({
               className="text-brand-blue-600 hover:underline font-semibold text-sm"
             >
               Staff Application
-            </Link>
+            </a>
           </div>
         </div>
       </section>

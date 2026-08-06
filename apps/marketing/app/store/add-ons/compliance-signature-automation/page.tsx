@@ -48,10 +48,10 @@ export default function ComplianceSignaturePage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={getAdminUrl("/signatures")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Manage Signatures <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <a href={getAdminUrl("/mou")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               MOU Management
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -87,7 +87,7 @@ export default function ComplianceSignaturePage() {
         <div className="max-w-2xl mx-auto text-center">
           <a href={getAdminUrl("/compliance/automation")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
             Open Compliance Suite <ArrowRight className="w-4 h-4" />
-          </Link>
+          </a>
         </div>
       </section>
     </div>

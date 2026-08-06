@@ -51,10 +51,10 @@ export default function WorkforceGrantHubPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={getAdminUrl("/grants")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open Grants Dashboard <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <a href={getAdminUrl("/grants/opportunities")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Search Opportunities
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -104,10 +104,10 @@ export default function WorkforceGrantHubPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={getAdminUrl("/settings/organization-profile")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
               Set Up Org Profile <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <a href={getAdminUrl("/grants/opportunities")} className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
               Search Opportunities
-            </Link>
+            </a>
           </div>
         </div>
       </section>

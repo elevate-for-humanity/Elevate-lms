@@ -3,8 +3,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
-import {
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   Download,
   FileSpreadsheet,
   Calendar,
@@ -60,7 +60,7 @@ export default async function ExportAttendancePage() {
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Attendance
-          </Link>
+          </a>
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
               <Download className="w-8 h-8" />

@@ -82,7 +82,7 @@ export default function WorkflowStudioPage() {
                 <a href={getAdminUrl("/studio/workflows")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-red-700 transition-all hover:-translate-y-0.5">
                   Open Workflow Studio
                   <ArrowRight className="w-5 h-5" />
-                </Link>
+                </a>
                 <Link href="#templates" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
                   <Play className="w-5 h-5" />
                   View Templates
@@ -235,7 +235,7 @@ export default function WorkflowStudioPage() {
             <a href={getAdminUrl("/studio/workflows")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5">
               Open Workflow Studio
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
             <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 border border-slate-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-slate-800 transition-all">
               Start Free Trial
             </Link>

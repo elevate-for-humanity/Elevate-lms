@@ -61,7 +61,7 @@ export default async function CustomerServicePage() {
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back
-            </Link>
+            </a>
           </div>
         </div>
       </section>

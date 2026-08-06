@@ -32,7 +32,7 @@ export default async function StudentsPage() {
               <li>
                 <a href={getAdminUrl("/staff-portal")} className="hover:text-primary">
                   Staff Portal
-                </Link>
+                </a>
               </li>
               <li>/</li>
               <li className="text-slate-900 font-medium">Students</li>

@@ -118,7 +118,7 @@ export default function DevStudioPage() {
                   >
                     Open Dev Studio
                     <ArrowRight className="w-5 h-5" />
-                  </Link>
+                  </a>
                   <Link
                     href="/store/dev-studio#demo"
                     className="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg transition-colors text-center"
@@ -348,7 +348,7 @@ export default function DevStudioPage() {
             <a href={getAdminUrl("/studio")} className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
               Open Dev Studio Free
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
             <Link href="/contact?subject=Dev+Studio+Demo" className="inline-flex items-center gap-2 border border-slate-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-slate-800 transition-colors">
               Schedule Demo
             </Link>

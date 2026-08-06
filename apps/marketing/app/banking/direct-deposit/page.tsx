@@ -5,8 +5,8 @@ import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   Zap,
   Shield,
   Clock,
@@ -324,7 +324,7 @@ export default function DirectDepositPage() {
               className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+            </a>
             <Link
               href="/banking"
               className="bg-brand-green-600 hover:bg-brand-green-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"

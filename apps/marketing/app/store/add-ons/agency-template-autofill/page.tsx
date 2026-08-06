@@ -40,10 +40,10 @@ export default function AgencyAutofillPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={getAdminUrl("/contracts")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open Contracts <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <a href={getAdminUrl("/settings/organization-profile")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Set Up Org Profile
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -66,7 +66,7 @@ export default function AgencyAutofillPage() {
           <p className="text-slate-500 text-sm mb-6">Open the contracts module to upload your first template.</p>
           <a href={getAdminUrl("/contracts")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
             Upload a Template <ArrowRight className="w-4 h-4" />
-          </Link>
+          </a>
         </div>
       </section>
     </div>

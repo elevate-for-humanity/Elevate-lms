@@ -151,7 +151,7 @@ export default function TakeAttendancePage() {
         <div className="flex items-center gap-4 mb-6">
           <a href={getAdminUrl("/staff-portal/attendance")} className="text-slate-500 hover:text-slate-700">
             <ArrowLeft className="w-5 h-5" />
-          </Link>
+          </a>
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Take Attendance</h1>
             <p className="text-slate-500 text-sm">{today}</p>

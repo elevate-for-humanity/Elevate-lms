@@ -4,6 +4,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { PlayCircle, Clock, Award, BookOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,8 +81,7 @@ export default async function StaffTrainingPage() {
                 Complete training modules and earn completion certificates
               </p>
             </div>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <a href={getAdminUrl("/staff-portal/dashboard")}
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back to Dashboard

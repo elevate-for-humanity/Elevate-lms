@@ -57,8 +57,7 @@ export default async function QAChecklistPage() {
               <h1 className="text-3xl font-bold text-black">QA Checklist</h1>
               <p className="text-black mt-2">Daily and weekly quality assurance tasks</p>
             </div>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <Link href="/staff-portal/dashboard"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back

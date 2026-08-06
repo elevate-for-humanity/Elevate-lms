@@ -151,8 +151,7 @@ export default function QuizManagerClient({ course, initialQuizzes, courseId, on
           </p>
         </div>
         <div className="flex gap-3">
-          <Link
-            href="/admin/studio"
+          <Link href="/studio"
             className="px-4 py-2 border rounded-lg hover:bg-slate-50"
           >
             Back to Courses

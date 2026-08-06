@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { BookOpen, Search, FileText, Clock, TrendingUp } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   alternates: {
@@ -31,8 +32,7 @@ export default async function ProcessesPage() {
               <h1 className="text-3xl font-bold text-black">Process Documentation</h1>
               <p className="text-black mt-2">Step-by-step guides for all procedures</p>
             </div>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <a href={getAdminUrl("/staff-portal/dashboard")}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
               ← Back to Dashboard

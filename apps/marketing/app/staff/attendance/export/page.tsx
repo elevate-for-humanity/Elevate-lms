@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import {
+import { getAdminUrl } from '@/lib/config/admin-url';
   Download,
   FileSpreadsheet,
   Calendar,
@@ -54,8 +55,7 @@ export default async function ExportAttendancePage() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white">
         <div className="max-w-6xl mx-auto px-4 py-12">
-          <Link
-            href="/admin/staff-portal/attendance"
+          <a href={getAdminUrl("/staff-portal/attendance")}
             className="inline-flex items-center gap-2 text-emerald-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4" />

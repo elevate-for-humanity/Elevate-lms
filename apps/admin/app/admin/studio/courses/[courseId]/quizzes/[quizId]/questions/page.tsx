@@ -41,7 +41,7 @@ export default async function QuizQuestionsPage({
               </li>
               <li>/</li>
               <li>
-                <Link href="/admin/studio" className="hover:text-primary">
+                <Link href="/studio" className="hover:text-primary">
                   Course Builder
                 </Link>
               </li>

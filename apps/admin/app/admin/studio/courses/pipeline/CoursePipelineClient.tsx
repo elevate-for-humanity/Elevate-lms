@@ -248,7 +248,7 @@ export default function CoursePipelineClient({ programs }: { programs: Program[]
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <Link href="/courses" className="hover:text-slate-300 transition-colors">All Courses</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/studio" className="hover:text-slate-300 transition-colors">Blueprint Builder</Link>
+          <Link href="/studio" className="hover:text-slate-300 transition-colors">Blueprint Builder</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-300">Pipeline</span>
         </div>

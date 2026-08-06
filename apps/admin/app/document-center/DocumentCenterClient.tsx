@@ -355,7 +355,7 @@ export function DocumentCenterClient({
 
       <div className="mt-6 pt-4 border-t border-slate-100 flex gap-4 text-sm text-slate-500">
         <Link href="/documents/upload" className="hover:text-slate-700">→ Advanced upload</Link>
-        <Link href="/admin/studio" className="hover:text-slate-700">→ Media Studio</Link>
+        <Link href="/studio" className="hover:text-slate-700">→ Media Studio</Link>
         <Link href="/signatures" className="hover:text-slate-700">→ Signatures</Link>
       </div>
     </div>

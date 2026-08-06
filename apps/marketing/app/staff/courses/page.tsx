@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { BookOpen, Search, Plus } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'Courses | Staff Portal',
@@ -65,8 +66,7 @@ export default async function StaffCoursesPage() {
                 className="pl-10 pr-4 py-2 border rounded-lg"
               />
             </div>
-            <Link
-              href="/admin/staff-portal/courses/create"
+            <a href={getAdminUrl("/staff-portal/courses/create")}
               className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-5 h-5" /> New Course

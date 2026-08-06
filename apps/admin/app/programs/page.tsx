@@ -97,8 +97,7 @@ export default async function ProgramsPage() {
         </div>
 
         {/* AI Course Builder CTA */}
-        <Link
-          href="/admin/studio"
+        <Link href="/studio"
           className="flex items-center justify-between gap-4 rounded-2xl border border-brand-red-200 bg-gradient-to-r from-brand-red-50 to-white px-6 py-5 mb-6 hover:shadow-md transition-shadow group"
         >
           <div className="flex items-center gap-4">
@@ -140,7 +139,7 @@ export default async function ProgramsPage() {
               </div>
               <span className="text-slate-300 group-hover:text-slate-600 transition-colors">→</span>
             </Link>
-            <Link href="/admin/studio" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
+            <Link href="/studio" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
               <div>
                 <p className="font-semibold text-slate-900 text-sm">Program Builder</p>
                 <p className="text-xs text-slate-500 mt-0.5">Blueprint-driven course scaffolding</p>
@@ -154,7 +153,7 @@ export default async function ProgramsPage() {
               </div>
               <span className="text-slate-300 group-hover:text-slate-600 transition-colors">→</span>
             </Link>
-            <Link href="/admin/studio" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
+            <Link href="/studio" className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-5 py-4 hover:shadow-md transition-shadow group">
               <div>
                 <p className="font-semibold text-slate-900 text-sm">Curriculum</p>
                 <p className="text-xs text-slate-500 mt-0.5">Lessons, modules, and content</p>

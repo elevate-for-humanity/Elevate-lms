@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Workflow, ArrowRight, Play, CheckCircle, Zap, Users, Database, Bell, FileText, Settings } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'Workflow Studio',
@@ -78,7 +79,7 @@ export default function WorkflowStudioPage() {
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/admin/studio/workflows" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-red-700 transition-all hover:-translate-y-0.5">
+                <a href={getAdminUrl("/studio/workflows")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-red-700 transition-all hover:-translate-y-0.5">
                   Open Workflow Studio
                   <ArrowRight className="w-5 h-5" />
                 </Link>
@@ -231,7 +232,7 @@ export default function WorkflowStudioPage() {
             Start with pre-built templates or build your own workflow from scratch.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/admin/studio/workflows" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5">
+            <a href={getAdminUrl("/studio/workflows")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5">
               Open Workflow Studio
               <ArrowRight className="w-5 h-5" />
             </Link>

@@ -87,7 +87,7 @@ export default async function CourseImportPage() {
 
         <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
           <strong>Blueprint-driven courses</strong> are the canonical path for new programs.
-          Use the <Link href="/admin/studio" className="underline">Course Studio</Link> to build
+          Use the <Link href="/studio" className="underline">Course Studio</Link> to build
           from a blueprint instead of importing.
         </div>
       </div>

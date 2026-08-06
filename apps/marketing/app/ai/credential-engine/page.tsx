@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Award, Shield, CheckCircle, FileText, Clock, BarChart3, Globe, Download, Link2 } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'Credential Engine | Digital Certification & Verification',
@@ -72,7 +73,7 @@ export default function CredentialEnginePage() {
               Blockchain-verified credentials with instant employer verification.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/admin/credentials" className="px-8 py-4 bg-amber-600 rounded-lg font-semibold hover:bg-amber-500 transition">
+              <a href={getAdminUrl("/credentials")} className="px-8 py-4 bg-amber-600 rounded-lg font-semibold hover:bg-amber-500 transition">
                 Manage Credentials
               </Link>
               <Link href="/contact" className="px-8 py-4 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 transition">
@@ -168,7 +169,7 @@ export default function CredentialEnginePage() {
             Replace paper certificates with blockchain-verified digital credentials.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/admin/credentials" className="px-8 py-4 bg-white text-amber-600 rounded-lg font-semibold hover:bg-amber-50 transition">
+            <a href={getAdminUrl("/credentials")} className="px-8 py-4 bg-white text-amber-600 rounded-lg font-semibold hover:bg-amber-50 transition">
               Manage Credentials
             </Link>
             <Link href="/platform/enterprise" className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">

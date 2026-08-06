@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
+import { getAdminUrl } from '@/lib/config/admin-url';
   Code, Bot, Workflow, Database, Cloud, Terminal, 
   Sparkles, ArrowRight, Play, Check, Zap, GitBranch, 
   Container, Activity, Box, Settings, Layers
@@ -111,8 +112,7 @@ export default function DevStudioPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Link
-                    href="/admin/studio"
+                  <a href={getAdminUrl("/studio")}
                     className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center"
                   >
                     Open Dev Studio
@@ -344,7 +344,7 @@ export default function DevStudioPage() {
             Start with a free trial. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/admin/studio" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
+            <a href={getAdminUrl("/studio")} className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
               Open Dev Studio Free
               <ArrowRight className="w-5 h-5" />
             </Link>

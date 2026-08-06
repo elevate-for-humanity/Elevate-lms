@@ -31,8 +31,7 @@ export default async function ProcessesPage() {
               <h1 className="text-3xl font-bold text-black">Process Documentation</h1>
               <p className="text-black mt-2">Step-by-step guides for all procedures</p>
             </div>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <Link href="/staff-portal/dashboard"
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
               ← Back to Dashboard

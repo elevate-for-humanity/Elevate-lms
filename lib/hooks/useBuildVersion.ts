@@ -1,6 +1,6 @@
 /**
  * lib/hooks/useBuildVersion.ts
- * 
+ *
  * Prevents Server Action mismatches by tracking build version on client
  * and forcing reload when deployment happens during user session.
  */
@@ -10,19 +10,44 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 const BUILD_VERSION_KEY = 'elevate_build_version';
-const BUILD_TIMESTAMP_KEY = 'elevate_build_timestamp';
 const CHECK_INTERVAL_MS = 60_000; // Check every minute
 
 let checkIntervalId: ReturnType<typeof setInterval> | null = null;
+let consecutiveFailures = 0;
+const MAX_CONSECUTIVE_FAILURES = 3;
+
+/**
+ * Fetch with bounded retries — gives the endpoint a few chances before giving up.
+ * Prevents a request storm when the service is returning 503.
+ */
+async function fetchWithBoundedRetries(
+  url: string,
+  maxAttempts = 3,
+  retryDelayMs = 5000,
+): Promise<Response | null> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (response.ok) return response;
+    } catch {
+      // network error — retry below
+    }
+    if (attempt < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+    }
+  }
+  return null;
+}
 
 /**
  * Hook to prevent Server Action mismatches after deployment
- * 
+ *
  * HOW IT WORKS:
  * 1. On mount, store current build version in sessionStorage
  * 2. Periodically check API for build version changes
  * 3. If mismatch detected → reload page before Server Action fails
- * 
+ * 4. Stop polling after MAX_CONSECUTIVE_FAILURES consecutive failures
+ *
  * Usage:
  * ```tsx
  * // In your root layout or a provider
@@ -33,34 +58,41 @@ export function useBuildVersion() {
   const initialized = useRef(false);
 
   const checkForBuildMismatch = useCallback(async (): Promise<boolean> => {
-    try {
-      // Fetch current build version from server
-      const response = await fetch('/api/health/build-version', {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' },
-      });
-      
-      if (!response.ok) return false;
+    const response = await fetchWithBoundedRetries('/api/health/build-version');
+    if (!response) {
+      consecutiveFailures++;
+      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+        // Stop polling — service is unavailable
+        if (checkIntervalId) {
+          clearInterval(checkIntervalId);
+          checkIntervalId = null;
+        }
+      }
+      return false;
+    }
 
+    consecutiveFailures = 0; // Reset on success
+
+    try {
       const data = await response.json();
-      // Handle multiple field name formats across services
-      const serverVersion = data.buildVersion ?? data.commit ?? data.gitSha ?? null;
+      const serverVersion =
+        data.buildVersion ?? data.commit ?? data.gitSha ?? null;
       if (!serverVersion) return false;
 
       const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
-      
+
       if (storedVersion && storedVersion !== serverVersion) {
         console.info('[useBuildVersion] Build mismatch detected, reloading...', {
           stored: storedVersion,
           current: serverVersion,
         });
-        
+
         sessionStorage.setItem(BUILD_VERSION_KEY, serverVersion);
         window.location.reload();
         return true; // Will reload
       }
     } catch {
-      // Network error - ignore
+      // Malformed JSON — ignore
     }
     return false;
   }, []);
@@ -69,24 +101,21 @@ export function useBuildVersion() {
     if (initialized.current) return;
     initialized.current = true;
 
-    // Initial check on mount - store version if not set
     const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
-    
+
     checkForBuildMismatch().then((reloaded) => {
-      // If we didn't reload, store the current version
       if (!reloaded && !storedVersion) {
-        // Fetch and store the version
-        fetch('/api/health/build-version', { cache: 'no-store' })
-          .then(r => r.json())
+        fetchWithBoundedRetries('/api/health/build-version', 2, 2000)
+          .then(r => r?.json())
           .then((data) => {
-            const version = data?.buildVersion ?? data?.commit ?? data?.gitSha ?? null;
+            const version =
+              data?.buildVersion ?? data?.commit ?? data?.gitSha ?? null;
             if (version) sessionStorage.setItem(BUILD_VERSION_KEY, version);
           })
           .catch(() => {});
       }
     });
 
-    // Also check periodically (every minute) to catch long-lived sessions
     checkIntervalId = setInterval(checkForBuildMismatch, CHECK_INTERVAL_MS);
 
     return () => {
@@ -103,14 +132,15 @@ export function useBuildVersion() {
  */
 export function isStaleBuild(): boolean {
   if (typeof window === 'undefined') return false;
-  
+
   const storedVersion = sessionStorage.getItem(BUILD_VERSION_KEY);
-  // If no stored version, can't be stale
   if (!storedVersion) return false;
-  
-  const currentVersion = process.env.NEXT_PUBLIC_BUILD_VERSION || 
-                         process.env.NEXT_PUBLIC_DEPLOYMENT_ID || '';
-  
+
+  const currentVersion =
+    process.env.NEXT_PUBLIC_BUILD_VERSION ||
+    process.env.NEXT_PUBLIC_DEPLOYMENT_ID ||
+    '';
+
   return storedVersion !== currentVersion;
 }
 

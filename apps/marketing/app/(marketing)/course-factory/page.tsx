@@ -8,6 +8,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
+import { getAdminUrl } from '@/lib/config/admin-url';
   GraduationCap,
   Sparkles,
   BookOpen,
@@ -251,7 +252,7 @@ export default function CourseFactoryPage() {
               <Link href="#pricing" className="text-slate-300 hover:text-white transition-colors">Pricing</Link>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/admin/studio" className="text-slate-300 hover:text-white transition-colors hidden sm:block">
+              <a href={getAdminUrl("/studio")} className="text-slate-300 hover:text-white transition-colors hidden sm:block">
                 Open Builder
               </Link>
               <Link 
@@ -301,8 +302,7 @@ export default function CourseFactoryPage() {
                 Start Generating
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link 
-                href="/admin/studio"
+              <a href={getAdminUrl("/studio")}
                 className="flex items-center gap-2 border border-white/20 px-8 py-4 rounded-xl font-medium text-lg hover:bg-white/5 transition-all"
               >
                 <Play className="w-5 h-5" />

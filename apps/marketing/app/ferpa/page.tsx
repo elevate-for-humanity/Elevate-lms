@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { FileText, Shield, Users, ClipboardList, CheckCircle, Clock } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'FERPA Portal | Elevate for Humanity',
@@ -138,7 +139,7 @@ export default async function FERPAPortal() {
           </div>
           
           <div className="mt-8 text-center">
-            <Link href="/admin/dashboard" className="text-brand-blue-600 hover:underline text-sm">
+            <a href={getAdminUrl("/dashboard")} className="text-brand-blue-600 hover:underline text-sm">
               ← Back to Admin Dashboard
             </Link>
           </div>

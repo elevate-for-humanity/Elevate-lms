@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
+import { getAdminUrl } from '@/lib/config/admin-url';
   Users,
   GraduationCap,
   TrendingUp,
@@ -136,8 +137,7 @@ export default async function AnalyticsPage() {
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-slate-900">Platform Analytics</h1>
-          <Link
-            href="/admin/analytics"
+          <a href={getAdminUrl("/analytics")}
             className="inline-flex items-center gap-1 text-sm font-semibold text-brand-red-600 hover:underline"
           >
             Full admin analytics <ArrowRight className="w-4 h-4" />
@@ -162,8 +162,7 @@ export default async function AnalyticsPage() {
         <div className="bg-white rounded-xl border border-slate-200">
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
             <h2 className="font-bold text-slate-900">Recent Enrollments</h2>
-            <Link
-              href="/admin/enrollments"
+            <a href={getAdminUrl("/enrollments")}
               className="text-sm text-brand-red-600 hover:underline flex items-center gap-1"
             >
               View all <ChevronRight className="w-3.5 h-3.5" />

@@ -35,7 +35,7 @@ export default async function EnvManagerPage() {
             Dev Studio → Secrets
           </Link>
           . Container env:{' '}
-          <Link href="/admin/studio" className="text-brand-blue-600 underline">
+          <Link href="/studio" className="text-brand-blue-600 underline">
             Dev Studio → Environments
           </Link>
           .

@@ -7,8 +7,7 @@ export default function StaffPortalNotFound() {
         <div className="text-6xl font-black text-slate-700 mb-4">404</div>
         <h1 className="text-xl font-bold text-slate-900 mb-2">Page Not Found</h1>
         <p className="text-slate-700 mb-6">This staff page doesn't exist or has been moved.</p>
-        <Link
-          href="/admin/staff-portal"
+        <Link href="/staff-portal"
           className="inline-flex items-center justify-center px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium text-sm"
         >
           Back to Staff Portal

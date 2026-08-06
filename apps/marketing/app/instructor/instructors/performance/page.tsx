@@ -4,6 +4,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { ChevronRight, Users, BookOpen, Star, TrendingUp } from 'lucide-react';
 import InstructorPerformanceClient from './InstructorPerformanceClient';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
@@ -50,9 +51,9 @@ export default async function InstructorPerformancePage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       <div>
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 mb-3">
-          <Link href="/admin/dashboard" className="hover:text-slate-700">Admin</Link>
+          <a href={getAdminUrl("/dashboard")} className="hover:text-slate-700">Admin</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/admin/staff" className="hover:text-slate-700">Staff</Link>
+          <a href={getAdminUrl("/staff")} className="hover:text-slate-700">Staff</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-900 font-medium">Instructor Performance</span>
         </nav>

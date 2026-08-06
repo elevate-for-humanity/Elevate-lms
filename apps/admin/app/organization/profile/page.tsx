@@ -121,7 +121,7 @@ export default function OrganizationProfilePage() {
           <div className="bg-white rounded-xl border p-6">
             <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-3">
-              <a href="/admin/organization/edit" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
+              <a href="/organization/edit" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">
                 Edit Organization Details
               </a>
               <a href="/settings" className="block p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition">

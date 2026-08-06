@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ShieldCheck, Zap, FileText, ArrowRight } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
@@ -37,10 +38,10 @@ export default function AgencyAutofillPage() {
             Upload any agency template and fields map to your verified org profile automatically.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/contracts" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/contracts")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open Contracts <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/settings/organization-profile" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/settings/organization-profile")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Set Up Org Profile
             </Link>
           </div>
@@ -63,7 +64,7 @@ export default function AgencyAutofillPage() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-xl font-bold text-slate-900 mb-3">Included with your Elevate license</h2>
           <p className="text-slate-500 text-sm mb-6">Open the contracts module to upload your first template.</p>
-          <Link href="/admin/contracts" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
+          <a href={getAdminUrl("/contracts")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
             Upload a Template <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

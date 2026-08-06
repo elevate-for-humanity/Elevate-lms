@@ -352,7 +352,7 @@ export default function NewWorkflowPage() {
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-4xl mx-auto px-6 w-full">
             <div className="flex items-center gap-3 mb-2">
-              <Link href="/admin/studio/workflows" className="inline-flex items-center gap-1 text-xs text-indigo-200 hover:text-white transition-colors">
+              <Link href="/studio/workflows" className="inline-flex items-center gap-1 text-xs text-indigo-200 hover:text-white transition-colors">
                 <ArrowLeft className="w-3.5 h-3.5" /> Workflows
               </Link>
             </div>
@@ -530,8 +530,7 @@ export default function NewWorkflowPage() {
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? 'Saving…' : 'Create Workflow'}
           </button>
-          <Link
-            href="/admin/studio/workflows"
+          <Link href="/studio/workflows"
             className="px-5 py-2.5 text-sm text-slate-600 hover:text-slate-900 font-medium"
           >
             Cancel

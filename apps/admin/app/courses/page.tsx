@@ -85,8 +85,7 @@ export default async function CoursesPage() {
                 {courses.length} programs · {activeCourses} active · {totalStudents} total students
               </p>
             </div>
-            <Link
-              href="/admin/studio/courses/create"
+            <Link href="/studio/courses/create"
               className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
@@ -127,7 +126,7 @@ export default async function CoursesPage() {
               <BookOpen className="mx-auto h-12 w-12 text-slate-300" />
               <h3 className="mt-4 text-lg font-semibold text-slate-900">No courses yet</h3>
               <p className="mt-1 text-sm text-slate-500">Create your first program to get started.</p>
-              <Link href="/admin/studio/courses/create" className="mt-6 inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors">
+              <Link href="/studio/courses/create" className="mt-6 inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors">
                 <Plus className="w-4 h-4" /> Create Course
               </Link>
             </div>

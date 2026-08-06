@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/client';
 import { CheckCircle, XCircle, Clock, Save, ArrowLeft } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 
@@ -148,7 +149,7 @@ export default function TakeAttendancePage() {
 
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
-          <Link href="/admin/staff-portal/attendance" className="text-slate-500 hover:text-slate-700">
+          <a href={getAdminUrl("/staff-portal/attendance")} className="text-slate-500 hover:text-slate-700">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>

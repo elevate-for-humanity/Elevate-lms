@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PenTool, ArrowRight, FileText, Clock } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
@@ -45,10 +46,10 @@ export default function ComplianceSignaturePage() {
             and state contracts. Collect signatures, track countersignatures, full audit trail.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/signatures" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/signatures")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Manage Signatures <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/mou" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/mou")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               MOU Management
             </Link>
           </div>
@@ -84,7 +85,7 @@ export default function ComplianceSignaturePage() {
 
       <section className="py-12 px-4 bg-slate-50 border-t border-slate-200">
         <div className="max-w-2xl mx-auto text-center">
-          <Link href="/admin/compliance/automation" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
+          <a href={getAdminUrl("/compliance/automation")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
             Open Compliance Suite <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

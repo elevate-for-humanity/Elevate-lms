@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import { CheckCircle, Circle, Star, BookOpen, Award, ChevronRight, TrendingUp } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -192,8 +193,7 @@ export default async function StaffSkillsPage() {
           <p className="text-white text-sm mb-4">
             Ask your manager to verify your completed skills in the admin portal.
           </p>
-          <Link
-            href="/admin/staff-portal/training"
+          <a href={getAdminUrl("/staff-portal/training")}
             className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-brand-blue-50"
           >
             View Training Resources <ChevronRight className="w-4 h-4" />

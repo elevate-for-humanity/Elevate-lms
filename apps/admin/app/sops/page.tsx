@@ -31,7 +31,7 @@ export default function SOPsPage() {
             <h1 className="text-3xl font-bold text-slate-900">Standard Operating Procedures</h1>
             <p className="text-slate-700 mt-1">Manage and view all SOPs</p>
           </div>
-          <Link href="/admin/sops/new" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
+          <Link href="/sops/new" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2">
             <Plus className="w-5 h-5" /> New SOP
           </Link>
         </div>

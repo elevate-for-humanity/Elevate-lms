@@ -180,12 +180,12 @@ export default async function AIQualityPage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6">
           <h2 className="font-semibold text-slate-900 text-sm mb-4">AI Quality Actions</h2>
           <div className="grid grid-cols-3 gap-4">
-            <Link href="/admin/studio/agents" className="p-4 rounded-xl border border-slate-200 hover:border-blue-200 hover:bg-blue-50 transition-all">
+            <Link href="/studio/agents" className="p-4 rounded-xl border border-slate-200 hover:border-blue-200 hover:bg-blue-50 transition-all">
               <Brain className="w-6 h-6 text-blue-600 mb-2" />
               <p className="text-sm font-medium text-slate-700">Manage Agents</p>
               <p className="text-xs text-slate-400">Configure AI behavior</p>
             </Link>
-            <Link href="/admin/studio/workflows" className="p-4 rounded-xl border border-slate-200 hover:border-purple-200 hover:bg-purple-50 transition-all">
+            <Link href="/studio/workflows" className="p-4 rounded-xl border border-slate-200 hover:border-purple-200 hover:bg-purple-50 transition-all">
               <TrendingUp className="w-6 h-6 text-purple-600 mb-2" />
               <p className="text-sm font-medium text-slate-700">AI Workflows</p>
               <p className="text-xs text-slate-400">Orchestrate AI actions</p>

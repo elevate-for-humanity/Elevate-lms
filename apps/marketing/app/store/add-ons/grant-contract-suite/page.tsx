@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
+import { getAdminUrl } from '@/lib/config/admin-url';
   Upload, Search, ShieldCheck, PenTool, Download, ArrowRight, FileText, Briefcase, Sparkles,
 } from 'lucide-react';
 
@@ -56,7 +57,7 @@ export default function GrantContractSuitePage() {
             Review, sign, and export — all in one audited pipeline.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/compliance/automation"
+            <a href={getAdminUrl("/compliance/automation")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open in Admin <ArrowRight className="w-4 h-4" />
             </Link>
@@ -126,11 +127,11 @@ export default function GrantContractSuitePage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to automate your grant operations?</h2>
           <p className="text-slate-500 mb-8">Included with your Elevate platform license. Open the admin panel to get started.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/compliance/automation"
+            <a href={getAdminUrl("/compliance/automation")}
               className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition-colors">
               Open Grant & Contract Suite <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/settings/organization-profile"
+            <a href={getAdminUrl("/settings/organization-profile")}
               className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
               Set Up Org Profile First
             </Link>

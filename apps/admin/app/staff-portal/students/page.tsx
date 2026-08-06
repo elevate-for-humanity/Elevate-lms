@@ -29,7 +29,7 @@ export default async function StudentsPage() {
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
               <li>
-                <Link href="/admin/staff-portal" className="hover:text-primary">
+                <Link href="/staff-portal" className="hover:text-primary">
                   Staff Portal
                 </Link>
               </li>

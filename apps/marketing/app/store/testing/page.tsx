@@ -12,6 +12,7 @@ import { WORKKEYS_PRICING } from '@/lib/testing/providers/workkeys-pricing';
 import { EPA608_PRICING } from '@/lib/testing/providers/epa608-pricing';
 import { CAREERSAFE_PRICING } from '@/lib/testing/providers/careersafe-pricing';
 import { NRF_RISEUP_PRICING } from '@/lib/testing/providers/nrf-riseup';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'Testing Center',
@@ -99,7 +100,7 @@ export default function TestingCenterPage() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Link href="/admin/testing" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center">
+                  <a href={getAdminUrl("/testing")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center">
                     Open Testing Dashboard
                     <ArrowRight className="w-5 h-5" />
                   </Link>

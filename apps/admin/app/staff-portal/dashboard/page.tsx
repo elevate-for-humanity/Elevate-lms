@@ -361,8 +361,7 @@ export default async function StaffDashboard() {
             >
               Customer Service
             </Link>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <Link href="/staff-portal/dashboard"
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
@@ -486,8 +485,7 @@ export default async function StaffDashboard() {
               </Link>
 
               {/* Onboarding */}
-              <Link
-                href="/admin/staff-portal"
+              <Link href="/staff-portal"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">

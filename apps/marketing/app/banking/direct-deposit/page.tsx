@@ -6,6 +6,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
+import { getAdminUrl } from '@/lib/config/admin-url';
   Zap,
   Shield,
   Clock,
@@ -319,8 +320,7 @@ export default function DirectDepositPage() {
             Set up direct deposit and get your refund faster.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/admin/dashboard"
+            <a href={getAdminUrl("/dashboard")}
               className="bg-white hover:bg-white text-brand-green-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />

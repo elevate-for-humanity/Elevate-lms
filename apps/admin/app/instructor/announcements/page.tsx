@@ -35,7 +35,7 @@ export default async function InstructorAnnouncementsPage() {
             <MessageSquare className="w-7 h-7 text-brand-blue-600" />
             <h1 className="text-2xl font-extrabold text-slate-900">Announcements</h1>
           </div>
-          <Link href="/admin/announcements/new" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">
+          <Link href="/announcements/new" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition">
             <Plus className="w-4 h-4" /> New Announcement
           </Link>
         </div>

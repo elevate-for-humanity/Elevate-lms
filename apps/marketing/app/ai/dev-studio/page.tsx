@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Settings, GitBranch, Container, Zap, BarChart3, Shield, Code2, Rocket, Layers } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'Dev Studio | AI-Powered Development Platform',
@@ -74,7 +75,7 @@ export default function DevStudioPage() {
               deployments, AI workflows, and system operations from a unified platform.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/admin/studio" className="px-8 py-4 bg-blue-600 rounded-lg font-semibold hover:bg-blue-500 transition">
+              <a href={getAdminUrl("/studio")} className="px-8 py-4 bg-blue-600 rounded-lg font-semibold hover:bg-blue-500 transition">
                 Access Dev Studio
               </Link>
               <Link href="/contact" className="px-8 py-4 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 transition">
@@ -154,7 +155,7 @@ export default function DevStudioPage() {
             Give your team the development platform they deserve.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/admin/studio" className="px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
+            <a href={getAdminUrl("/studio")} className="px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">
               Access Dev Studio
             </Link>
             <Link href="/platform/enterprise" className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">

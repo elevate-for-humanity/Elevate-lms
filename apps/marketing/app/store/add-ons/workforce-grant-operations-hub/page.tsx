@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Briefcase, Search, ArrowRight, BarChart3, ShieldCheck, FileText, Users } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
@@ -48,10 +49,10 @@ export default function WorkforceGrantHubPage() {
             Search, apply, track, and report — all connected to your verified org profile.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/grants" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/grants")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Open Grants Dashboard <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/grants/opportunities" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/grants/opportunities")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors">
               Search Opportunities
             </Link>
           </div>
@@ -101,10 +102,10 @@ export default function WorkforceGrantHubPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-3">Included with your Elevate license</h2>
           <p className="text-slate-500 text-sm mb-6">Set up your org profile first — it powers all prefill across every module.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/settings/organization-profile" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
+            <a href={getAdminUrl("/settings/organization-profile")} className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition-colors">
               Set Up Org Profile <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/admin/grants/opportunities" className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
+            <a href={getAdminUrl("/grants/opportunities")} className="inline-flex items-center gap-2 px-6 py-3 border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
               Search Opportunities
             </Link>
           </div>

@@ -218,7 +218,7 @@ export default function WorkflowDetailClient({
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-6xl mx-auto px-6 w-full">
             <div className="flex items-center gap-3 mb-2">
-              <Link href="/admin/studio/workflows" className="inline-flex items-center gap-1 text-xs text-indigo-200 hover:text-white transition-colors">
+              <Link href="/studio/workflows" className="inline-flex items-center gap-1 text-xs text-indigo-200 hover:text-white transition-colors">
                 <ArrowLeft className="w-3.5 h-3.5" /> Workflows
               </Link>
               <span className="text-indigo-300">/</span>

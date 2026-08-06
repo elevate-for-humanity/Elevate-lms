@@ -18,6 +18,7 @@ import {
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -181,8 +182,7 @@ export default async function StaffDashboard() {
                 <div className="font-semibold">View Programs</div>
                 <div className="text-sm text-black">Browse available training programs</div>
               </Link>
-              <Link
-                href="/admin/reports"
+              <a href={getAdminUrl("/reports")}
                 className="block p-3 border rounded-lg hover:bg-slate-50 transition"
               >
                 <div className="font-semibold">Generate Reports</div>
@@ -298,8 +298,7 @@ export default async function StaffDashboard() {
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-black mb-4">Booth &amp; Suite Rentals</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Link
-              href="/admin/staff-portal/booth-renters"
+            <a href={getAdminUrl("/staff-portal/booth-renters")}
               className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
             >
               <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
@@ -333,50 +332,43 @@ export default async function StaffDashboard() {
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-black mb-4">Staff Tools</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link
-              href="/admin/staff-portal/students"
+            <a href={getAdminUrl("/staff-portal/students")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Students
             </Link>
-            <Link
-              href="/admin/staff-portal/courses"
+            <a href={getAdminUrl("/staff-portal/courses")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Courses
             </Link>
-            <Link
-              href="/admin/staff-portal/campaigns"
+            <a href={getAdminUrl("/staff-portal/campaigns")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Campaigns
             </Link>
-            <Link
-              href="/admin/staff-portal/customer-service"
+            <a href={getAdminUrl("/staff-portal/customer-service")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Customer Service
             </Link>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <a href={getAdminUrl("/staff-portal/dashboard")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               Processes
             </Link>
-            <Link
-              href="/admin/staff-portal/qa-checklist"
+            <a href={getAdminUrl("/staff-portal/qa-checklist")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
               QA Checklist
             </Link>
-            <Link
-              href="/admin/staff-portal/training"
+            <a href={getAdminUrl("/staff-portal/training")}
               aria-label="Link"
               className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
             >
@@ -406,8 +398,7 @@ export default async function StaffDashboard() {
                 </div>
               </Link>
 
-              <Link
-                href="/admin/applications"
+              <a href={getAdminUrl("/applications")}
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
@@ -422,8 +413,7 @@ export default async function StaffDashboard() {
               </Link>
 
               {/* Employees */}
-              <Link
-                href="/admin/hr/employees"
+              <a href={getAdminUrl("/hr/employees")}
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -438,8 +428,7 @@ export default async function StaffDashboard() {
               </Link>
 
               {/* Payroll */}
-              <Link
-                href="/admin/hr/payroll"
+              <a href={getAdminUrl("/hr/payroll")}
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -454,8 +443,7 @@ export default async function StaffDashboard() {
               </Link>
 
               {/* Time tracking */}
-              <Link
-                href="/admin/hr/time"
+              <a href={getAdminUrl("/hr/time")}
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -470,8 +458,7 @@ export default async function StaffDashboard() {
               </Link>
 
               {/* Leave */}
-              <Link
-                href="/admin/hr/leave"
+              <a href={getAdminUrl("/hr/leave")}
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">

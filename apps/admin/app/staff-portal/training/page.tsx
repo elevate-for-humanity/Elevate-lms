@@ -80,8 +80,7 @@ export default async function StaffTrainingPage() {
                 Complete training modules and earn completion certificates
               </p>
             </div>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <Link href="/staff-portal/dashboard"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back to Dashboard

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,14 +63,12 @@ export default async function StaffPortalAttendancePage() {
 
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-4 mb-6">
-          <Link
-            href="/admin/staff-portal/attendance/take"
+          <a href={getAdminUrl("/staff-portal/attendance/take")}
             className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
           >
             Take Attendance
           </Link>
-          <Link
-            href="/admin/staff-portal/attendance/export"
+          <a href={getAdminUrl("/staff-portal/attendance/export")}
             className="border border-slate-300 px-4 py-2 rounded-lg hover:bg-white"
           >
             Export Report

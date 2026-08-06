@@ -233,8 +233,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId, 
           <p className="text-slate-500 mt-1 text-sm">Manage lessons, videos, and materials</p>
         </div>
         <div className="flex gap-3 flex-wrap">
-          <Link
-            href="/admin/studio"
+          <Link href="/studio"
             className="px-4 py-2 border rounded-lg hover:bg-slate-50 text-sm"
           >
             ← Courses

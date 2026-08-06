@@ -191,8 +191,7 @@ export default async function CurriculumPage() {
             <p className="text-sm text-slate-500 mt-1">
               Run the curriculum generator or AI builder to seed lessons.
             </p>
-            <Link
-              href="/admin/studio"
+            <Link href="/studio"
               className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-blue-700 transition"
             >
               Open AI builder

@@ -122,8 +122,7 @@ export default async function CurriculumCourseEditorPage({
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
-            <Link
-              href="/admin/studio"
+            <Link href="/studio"
               className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-2"
             >
               <ArrowLeft className="w-4 h-4" />

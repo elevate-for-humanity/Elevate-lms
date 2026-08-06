@@ -278,8 +278,7 @@ export default async function OperationsPage() {
             <Inbox className="h-4 w-4 text-slate-500" />
             <h2 className="text-sm font-semibold text-slate-900">Workflow dead letters</h2>
             <span className="ml-auto text-xs text-slate-500">{dlTotalCount} total</span>
-            <Link
-              href="/admin/studio/workflows"
+            <Link href="/studio/workflows"
               className="ml-2 flex items-center gap-1 text-xs font-semibold text-brand-blue-600 hover:underline"
             >
               Workflows <ArrowRight className="h-3 w-3" />
@@ -303,8 +302,7 @@ export default async function OperationsPage() {
                       {new Date(r.created_at).toLocaleString()}
                     </span>
                     {r.workflow_id ? (
-                      <Link
-                        href="/admin/studio/workflows"
+                      <Link href="/studio/workflows"
                         className="ml-auto flex items-center gap-1 text-xs font-semibold text-amber-700 hover:underline"
                       >
                         <RotateCcw className="h-3 w-3" /> Open workflow

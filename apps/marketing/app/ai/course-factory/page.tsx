@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, Sparkles, FileText, CheckCircle, Clock, Award, Users, Zap, Video, FileQuestion, GraduationCap } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const metadata: Metadata = {
   title: 'Course Factory | AI-Powered Curriculum Generation',
@@ -79,7 +80,7 @@ export default function CourseFactoryPage() {
               in minutes. AI-powered lesson generation, quiz creation, and video scripting.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/admin/studio/courses/create" className="px-8 py-4 bg-emerald-600 rounded-lg font-semibold hover:bg-emerald-500 transition">
+              <a href={getAdminUrl("/studio/courses/create")} className="px-8 py-4 bg-emerald-600 rounded-lg font-semibold hover:bg-emerald-500 transition">
                 Create a Course
               </Link>
               <Link href="/contact" className="px-8 py-4 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 transition">
@@ -189,7 +190,7 @@ export default function CourseFactoryPage() {
             Create credential-aligned courses in minutes, not months.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/admin/studio/courses/create" className="px-8 py-4 bg-white text-emerald-600 rounded-lg font-semibold hover:bg-emerald-50 transition">
+            <a href={getAdminUrl("/studio/courses/create")} className="px-8 py-4 bg-white text-emerald-600 rounded-lg font-semibold hover:bg-emerald-50 transition">
               Create Your First Course
             </Link>
             <Link href="/ai/course-factory" className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">

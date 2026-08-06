@@ -512,7 +512,7 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
               <div className={`px-5 py-12 text-center ${embedded ? 'text-slate-500' : 'text-slate-500'}`}>
                 <Workflow className="mx-auto h-10 w-10 text-slate-300" />
                 <p className="mt-2 text-sm font-medium">No workflows{typeFilter !== 'all' ? ` in "${typeFilter}"` : ''}</p>
-                <Link href="/admin/studio/workflows/new" className="mt-3 inline-block text-sm font-semibold text-indigo-600 hover:underline">
+                <Link href="/studio/workflows/new" className="mt-3 inline-block text-sm font-semibold text-indigo-600 hover:underline">
                   Create the first one →
                 </Link>
               </div>

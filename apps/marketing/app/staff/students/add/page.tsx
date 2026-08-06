@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { User, Phone, Save } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { logger } from '@/lib/logger';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export default function AddStudentPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -286,8 +287,7 @@ export default function AddStudentPage() {
             </div>
 
             <div className="flex items-center justify-end gap-4 pt-4 border-t">
-              <Link
-                href="/admin/staff-portal/students"
+              <a href={getAdminUrl("/staff-portal/students")}
                 className="px-6 py-2 text-slate-900 hover:text-slate-900"
               >
                 Cancel

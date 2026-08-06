@@ -4,6 +4,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { CheckSquare, Square, Calendar, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,8 +58,7 @@ export default async function QAChecklistPage() {
               <h1 className="text-3xl font-bold text-black">QA Checklist</h1>
               <p className="text-black mt-2">Daily and weekly quality assurance tasks</p>
             </div>
-            <Link
-              href="/admin/staff-portal/dashboard"
+            <a href={getAdminUrl("/staff-portal/dashboard")}
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back

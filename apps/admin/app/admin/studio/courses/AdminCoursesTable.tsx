@@ -160,8 +160,7 @@ export function AdminCoursesTable({ courses }: { courses: AdminCourseOverview[] 
                     >
                       Edit
                     </Link>
-                    <Link
-                      href="/admin/studio"
+                    <Link href="/studio"
                       className="rounded border px-2.5 py-1.5 text-xs font-medium text-white bg-brand-red-600 hover:bg-brand-red-700 border-brand-red-600"
                     >
                       Live Builder

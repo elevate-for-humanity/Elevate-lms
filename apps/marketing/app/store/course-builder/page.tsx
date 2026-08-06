@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
+import { getAdminUrl } from '@/lib/config/admin-url';
   BookOpen, Layout, Video, FileText, CheckCircle, 
   Clock, Users, Award, ArrowRight, Play, Sparkles,
   Plus, GripVertical, Type, Image, MessageSquare, FileQuestion,
@@ -112,8 +113,7 @@ export default function CourseBuilderPage() {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Link
-                    href="/admin/courses/new"
+                  <a href={getAdminUrl("/courses/new")}
                     className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors text-center"
                   >
                     Create Your First Course
@@ -405,7 +405,7 @@ export default function CourseBuilderPage() {
             Free trial. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/admin/courses/new" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
+            <a href={getAdminUrl("/courses/new")} className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold px-8 py-4 rounded-xl hover:bg-slate-100 transition-colors">
               Create Your First Course
               <ArrowRight className="w-5 h-5" />
             </Link>

@@ -583,7 +583,7 @@ export default function ProgramManagerClient({
 
         <p className="text-xs text-slate-400 mt-3">
           Need a new course?{' '}
-          <Link href="/admin/studio" className="text-brand-blue-600 hover:underline">
+          <Link href="/studio" className="text-brand-blue-600 hover:underline">
             Generate one with AI →
           </Link>
         </p>

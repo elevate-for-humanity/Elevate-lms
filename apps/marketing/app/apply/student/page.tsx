@@ -9,6 +9,7 @@ import { resolveSlug } from '@/lib/program-registry';
 import { getProgramBySlug } from '@/data/programs/catalog';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hero as heroTokens } from '@/lib/page-design-tokens';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const revalidate = 600;
 
@@ -366,8 +367,7 @@ export default async function StudentApplicationPage({
             >
               Training Provider
             </Link>
-            <Link
-              href="/admin/staff-portal"
+            <a href={getAdminUrl("/staff-portal")}
               className="text-brand-blue-600 hover:underline font-semibold text-sm"
             >
               Staff Application

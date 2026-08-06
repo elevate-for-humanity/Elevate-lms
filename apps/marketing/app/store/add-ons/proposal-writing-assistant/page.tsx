@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Sparkles, ArrowRight, AlertTriangle } from 'lucide-react';
+import { getAdminUrl } from '@/lib/config/admin-url';
 
 export const dynamic = 'force-static';
 export const metadata: Metadata = {
@@ -43,7 +44,7 @@ export default function ProposalWritingPage() {
             Missing facts are flagged, never invented.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/admin/grants/applications/new" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
+            <a href={getAdminUrl("/grants/applications/new")} className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white font-semibold rounded-lg transition-colors">
               Start an Application <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -91,7 +92,7 @@ export default function ProposalWritingPage() {
 
       <section className="py-12 px-4">
         <div className="max-w-2xl mx-auto text-center">
-          <Link href="/admin/grants/applications/new" className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors">
+          <a href={getAdminUrl("/grants/applications/new")} className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-colors">
             Start Writing a Grant Application <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

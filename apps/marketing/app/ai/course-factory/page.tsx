@@ -82,7 +82,7 @@ export default function CourseFactoryPage() {
             <div className="flex flex-wrap gap-4">
               <a href={getAdminUrl("/studio/courses/create")} className="px-8 py-4 bg-emerald-600 rounded-lg font-semibold hover:bg-emerald-500 transition">
                 Create a Course
-              </Link>
+              </a>
               <Link href="/contact" className="px-8 py-4 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 transition">
                 Request Demo
               </Link>
@@ -192,7 +192,7 @@ export default function CourseFactoryPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <a href={getAdminUrl("/studio/courses/create")} className="px-8 py-4 bg-white text-emerald-600 rounded-lg font-semibold hover:bg-emerald-50 transition">
               Create Your First Course
-            </Link>
+            </a>
             <Link href="/ai/course-factory" className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">
               View Documentation
             </Link>

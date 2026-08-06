@@ -53,7 +53,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.funding,
     subItems: [
       { name: 'WIOA / WorkOne', href: ROUTES.fundingWIOA, isSectionLink: true },
-      { name: 'Workforce Ready Grant', href: ROUTES.fundingWIOA, isSectionLink: true },
+      { name: 'Workforce Ready Grant', href: '/funding/wrg', isSectionLink: true },
       { name: 'Job Ready Indy', href: ROUTES.fundingJobReadyIndy, isSectionLink: true },
       { name: 'Vocational Rehabilitation', href: ROUTES.fundingVocRehab, isSectionLink: true },
       { name: 'Scholarships', href: ROUTES.scholarships, isSectionLink: true },
@@ -70,7 +70,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
       { name: 'Sponsor an Apprentice', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
-      { name: 'Employer Portal', href: ROUTES.employers, isSectionLink: true },
+      { name: 'Employer Portal', href: ROUTES.employersPostJob, isSectionLink: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },
       { name: 'Request Demo', href: ROUTES.storeDemo, isSectionLink: true },
     ],
@@ -82,7 +82,6 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.about,
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
-      { name: 'Locations', href: ROUTES.aboutLocations, isSectionLink: true },
       { name: 'Success Stories', href: ROUTES.successStories, isSectionLink: true },
       { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },
       { name: 'Approvals', href: ROUTES.aboutApprovals, isSectionLink: true },

@@ -75,7 +75,7 @@ export default function CredentialEnginePage() {
             <div className="flex flex-wrap gap-4">
               <a href={getAdminUrl("/credentials")} className="px-8 py-4 bg-amber-600 rounded-lg font-semibold hover:bg-amber-500 transition">
                 Manage Credentials
-              </Link>
+              </a>
               <Link href="/contact" className="px-8 py-4 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 transition">
                 Request Demo
               </Link>
@@ -171,7 +171,7 @@ export default function CredentialEnginePage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <a href={getAdminUrl("/credentials")} className="px-8 py-4 bg-white text-amber-600 rounded-lg font-semibold hover:bg-amber-50 transition">
               Manage Credentials
-            </Link>
+            </a>
             <Link href="/platform/enterprise" className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">
               Enterprise Solutions
             </Link>

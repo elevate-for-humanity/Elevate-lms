@@ -1,0 +1,139 @@
+{
+  "plan": "unified-platform-consolidation",
+  "mode": "supervised",
+  "branch": "consolidation/unified-platform",
+  "rules": {
+    "neverWriteMainDirectly": true,
+    "neverDeleteBeforeParity": true,
+    "preserveWorkingIntegrations": true,
+    "preserveAppliedMigrationHistory": true,
+    "stopOnFailedGate": true,
+    "recordRollbackCommitBeforeDeletion": true
+  },
+  "waves": [
+    {
+      "id": "foundation",
+      "goal": "Make the supervisor and preservation controls reliable",
+      "tasks": [
+        "configure orchestrator endpoint from NEXT_PUBLIC_AUTOPILOT_ORCHESTRATOR_URL",
+        "inventory registered autopilots and unique capabilities",
+        "map plugin/integration dependencies",
+        "establish canonical repository and workspace boundaries",
+        "verify no production writes target main"
+      ],
+      "gate": ["typecheck", "orchestrator diagnostics", "feature-preservation manifest present"]
+    },
+    {
+      "id": "dev-studio",
+      "goal": "One operational Dev Studio",
+      "canonical": ["apps/admin/app/admin/studio", "lib/devstudio"],
+      "review": [
+        "apps/admin/app/dev-studio/page.tsx",
+        "apps/lms/app/ai/dev-studio/page.tsx",
+        "apps/marketing/app/ai/dev-studio/page.tsx",
+        "apps/marketing/app/store/dev-studio/page.tsx",
+        "apps/marketing/app/(marketing)/dev-studio/page.tsx",
+        "lib/paris/dev-studio.ts"
+      ],
+      "tasks": [
+        "classify each route as operational UI, authenticated delegate, marketing landing page, store product page, or obsolete duplicate",
+        "move unique operational capabilities into canonical admin studio",
+        "replace duplicate operational routes with redirects/delegation only after parity",
+        "preserve public/store landing pages when their purpose is marketing rather than operations",
+        "run dev-studio integration gate"
+      ],
+      "gate": ["dev studio route tests", "auth guard audit", "API integration gate", "build"]
+    },
+    {
+      "id": "course-builder",
+      "goal": "One course-building engine with one admin UI",
+      "canonical": [
+        "scripts/course-builder",
+        "lib/course-builder",
+        "apps/admin/app/admin/course-builder",
+        "apps/app/api/admin/course-builder"
+      ],
+      "referenceAudit": "docs/audits/COURSE-BUILDER-CONSOLIDATION-AUDIT.md",
+      "tasks": [
+        "inventory generators, seeds, validators, video generators, imports and exports",
+        "merge unique behavior into canonical pipeline",
+        "route AI write, quick add and lesson patch through canonical service layer",
+        "verify all existing program-specific generation behavior",
+        "remove obsolete scripts only after regression fixtures pass"
+      ],
+      "gate": ["course builder tests", "generated-course validation", "database insert/sync test", "build"]
+    },
+    {
+      "id": "supabase",
+      "goal": "One authoritative schema and client layer",
+      "canonical": ["supabase/migrations", "shared Supabase clients"],
+      "tasks": [
+        "retain immutable migration history that may already be applied",
+        "use reconciliation migrations for conflicting historical schemas",
+        "audit schema drift",
+        "audit RLS",
+        "consolidate duplicate client wrappers after caller migration",
+        "verify auth roles and tenant scoping"
+      ],
+      "gate": ["migration discipline audit", "schema drift audit", "RLS audit", "auth tests"]
+    },
+    {
+      "id": "product-surfaces",
+      "goal": "One Marketing app, one Admin app and one LMS app with clear ownership",
+      "canonical": {
+        "marketing": "apps/marketing",
+        "admin": "apps/admin",
+        "lms": "apps/lms",
+        "sharedApi": "apps/app"
+      },
+      "tasks": [
+        "move public-only pages to marketing ownership",
+        "move operator-only pages to admin ownership",
+        "move learner learning experiences to LMS ownership",
+        "keep shared APIs in the platform API app until safely extracted",
+        "replace cross-app duplicate pages with redirects or shared packages",
+        "deduplicate navigation and route aliases"
+      ],
+      "gate": ["critical route guard", "dead-link audit", "auth route tests", "marketing build", "admin build", "LMS build"]
+    },
+    {
+      "id": "infrastructure",
+      "goal": "One deployment and infrastructure model",
+      "tasks": [
+        "canonicalize Cloudflare Worker/KV/R2 binding names",
+        "verify DNS and SSL automation without changing working domains unnecessarily",
+        "consolidate duplicate Dockerfiles by deployed service purpose",
+        "verify GitHub CI and protected-branch workflow",
+        "preserve plugin credentials and provider integrations",
+        "remove stale deployment documentation only after active path is verified"
+      ],
+      "gate": ["environment audit", "deployment identity check", "post-deploy smoke specification"]
+    },
+    {
+      "id": "documentation",
+      "goal": "Make repository documentation describe the real unified product",
+      "tasks": [
+        "rewrite README from verified architecture",
+        "create one architecture document",
+        "create one deployment runbook",
+        "create one environment-variable reference without secrets",
+        "archive or remove contradictory readiness reports",
+        "mark open-source boundaries and licenses"
+      ],
+      "gate": ["README matches code", "no placeholder infrastructure URLs", "no contradictory production-readiness claims"]
+    },
+    {
+      "id": "final",
+      "goal": "Prove feature parity before merging to main",
+      "tasks": [
+        "compare donor feature inventory against canonical inventory",
+        "run typecheck lint tests and production builds",
+        "run route/link/media/integrity checks",
+        "run schema/RLS/auth/security gates",
+        "verify student, admin, employer, workforce, course-builder and Dev Studio journeys",
+        "produce final deletion ledger and rollback reference"
+      ],
+      "gate": ["all required checks green", "zero unclassified feature losses", "supervisor sign-off"]
+    }
+  ]
+}

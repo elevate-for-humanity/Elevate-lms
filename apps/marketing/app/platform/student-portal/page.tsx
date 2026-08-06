@@ -107,7 +107,7 @@ export default function StudentPortalPage() {
               <div className="relative hidden lg:block">
                 <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/images/pages/admin-dashboard-hero.webp"
+                    src="/images/pages/student-portal-page-1.webp"
                     alt="Student Portal Dashboard"
                     fill
                     className="object-cover"
@@ -190,7 +190,7 @@ export default function StudentPortalPage() {
               </div>
               <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/admin-dashboard-hero.webp"
+                  src="/images/pages/student-portal-page-3.webp"
                   alt="Student Dashboard"
                   fill
                   className="object-cover"
@@ -242,7 +242,7 @@ export default function StudentPortalPage() {
                     <div className="absolute inset-0 bg-white/10 rounded-[3rem] backdrop-blur" />
                     <div className="absolute inset-4 bg-slate-900 rounded-[2.5rem] overflow-hidden">
                       <Image
-                        src="/images/pages/admin-dashboard-hero.webp"
+                        src="/images/pages/student-portal-page-7.webp"
                         alt="Mobile App"
                         fill
                         className="object-cover"

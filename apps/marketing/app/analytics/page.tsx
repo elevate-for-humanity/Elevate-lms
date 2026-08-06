@@ -141,7 +141,7 @@ export default async function AnalyticsPage() {
             className="inline-flex items-center gap-1 text-sm font-semibold text-brand-red-600 hover:underline"
           >
             Full admin analytics <ArrowRight className="w-4 h-4" />
-          </Link>
+          </a>
         </div>
 
         {/* Stats grid */}
@@ -166,7 +166,7 @@ export default async function AnalyticsPage() {
               className="text-sm text-brand-red-600 hover:underline flex items-center gap-1"
             >
               View all <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
+            </a>
           </div>
           {!recentEnrollments || recentEnrollments.length === 0 ? (
             <div className="px-6 py-10 text-center text-slate-500 text-sm">No enrollments yet.</div>

@@ -366,7 +366,7 @@ export default function PrepaidCardPage() {
               className="bg-white hover:bg-white text-brand-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               File Your Taxes <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+            </a>
             <Link
               href="/banking"
               className="bg-brand-blue-600 hover:bg-brand-blue-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"

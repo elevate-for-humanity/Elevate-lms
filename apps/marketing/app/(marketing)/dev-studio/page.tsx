@@ -7,8 +7,8 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { 
 import { getAdminUrl } from '@/lib/config/admin-url';
+import {
   Code2,
   Terminal,
   Zap,
@@ -244,7 +244,7 @@ export default function DevStudioPage() {
             <div className="flex items-center gap-4">
               <a href={getAdminUrl("/studio")} className="text-slate-300 hover:text-white transition-colors hidden sm:block">
                 Open Studio
-              </Link>
+              </a>
               <Link 
                 href="/demo"
                 className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white px-5 py-2 rounded-lg font-medium transition-all"
@@ -297,7 +297,7 @@ export default function DevStudioPage() {
               >
                 <Play className="w-5 h-5" />
                 View Live Demo
-              </Link>
+              </a>
             </div>
 
             {/* Stats */}
@@ -621,7 +621,7 @@ export default function DevStudioPage() {
               className="flex items-center gap-2 border border-white/20 px-8 py-4 rounded-xl font-medium text-lg hover:bg-white/5 transition-all"
             >
               Open Dev Studio
-            </Link>
+            </a>
           </div>
         </div>
       </section>

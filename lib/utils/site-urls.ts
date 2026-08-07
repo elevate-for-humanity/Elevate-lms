@@ -1,47 +1,60 @@
 /**
  * Site URL Configuration
- * 
- * Single source of truth for all site URLs.
- * Use these instead of hardcoded values.
+ *
+ * Single source of truth for deployed Elevate service origins and common links.
+ * Do not hardcode production domains in components or route handlers.
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org';
-const LMS_URL = process.env.NEXT_PUBLIC_LMS_URL || `${SITE_URL}/lms`;
+function clean(value: string): string {
+  return value.replace(/\/$/, '');
+}
+
+const SITE_URL = clean(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org');
+const APP_URL = clean(
+  process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_LMS_URL ||
+    'https://app.elevateforhumanity.org',
+);
+const ADMIN_URL = clean(process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org');
 const CANONICAL_DOMAIN = process.env.NEXT_PUBLIC_CANONICAL_DOMAIN || 'www.elevateforhumanity.org';
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@elevateforhumanity.org';
 const INFO_EMAIL = process.env.NEXT_PUBLIC_INFO_EMAIL || 'info@elevateforhumanity.org';
 const FROM_EMAIL = process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS || 'noreply@elevateforhumanity.org';
+const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(317) 314-3757';
 
 export const siteUrls = {
-  // Main URLs
   site: SITE_URL,
-  www: `https://${CANONICAL_DOMAIN}`,
+  www: SITE_URL,
+  app: APP_URL,
+  lms: APP_URL,
   admin: ADMIN_URL,
-  lms: LMS_URL,
-  
-  // Paths
+
+  apply: `${SITE_URL}/apply`,
   enroll: `${SITE_URL}/enroll`,
-  login: `${SITE_URL}/login`,
-  dashboard: `${SITE_URL}/dashboard`,
+  login: `${APP_URL}/login`,
+  dashboard: `${APP_URL}/learner/dashboard`,
+  employerPortal: `${APP_URL}/employer`,
+  adminLogin: `${ADMIN_URL}/login`,
   adminDashboard: `${ADMIN_URL}/dashboard`,
-  
-  // Emails
+
   emails: {
     support: SUPPORT_EMAIL,
     info: INFO_EMAIL,
     from: FROM_EMAIL,
     fromName: process.env.NEXT_PUBLIC_EMAIL_FROM_NAME || 'Elevate for Humanity',
   },
-  
-  // Org
+
   org: {
     name: process.env.NEXT_PUBLIC_ORG_NAME || 'Elevate for Humanity',
-    legalName: process.env.NEXT_PUBLIC_ORG_LEGAL_NAME || 'Elevate for Humanity Technical and Career Institute',
-    phone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || '(317) 314-3757',
-    address: 'Indianapolis, Indiana',
-    cage: '0Q856',
+    legalName:
+      process.env.NEXT_PUBLIC_ORG_LEGAL_NAME ||
+      'Elevate for Humanity Technical and Career Institute',
+    phone: SUPPORT_PHONE,
+    address: process.env.NEXT_PUBLIC_ORG_LOCATION || 'Indianapolis, Indiana',
+    cage: process.env.NEXT_PUBLIC_CAGE_CODE || '0Q856',
   },
-};
+
+  canonicalDomain: CANONICAL_DOMAIN,
+} as const;
 
 export default siteUrls;

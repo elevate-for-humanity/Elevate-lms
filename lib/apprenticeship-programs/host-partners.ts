@@ -1,6 +1,9 @@
 /**
  * Featured host / training partners shown on marketing pages.
  * Update when new shops are approved in admin.
+ *
+ * This list is intentionally limited to currently approved public partners.
+ * Historical partner aliases may remain below for non-list references/audit history.
  */
 export type FeaturedHostPartner = {
   name: string;
@@ -12,13 +15,6 @@ export type FeaturedHostPartner = {
 };
 
 export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
-  {
-    name: 'Elevate Prestige Barber and Beauty Institute',
-    city: 'Indianapolis',
-    state: 'IN',
-    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
-    note: '6331 N Keystone Ave — barber & cosmetology apprenticeships and Prestige Elevation RTI.',
-  },
   {
     name: 'Kountry Kutz Barbershop',
     city: 'New Palestine',

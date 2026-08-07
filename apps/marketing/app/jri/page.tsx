@@ -1,401 +1,156 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ArrowRight, Briefcase, CheckCircle, GraduationCap, Phone, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import {
-  Users,
-  BookOpen,
-  ArrowRight,
-  Heart,
-  Briefcase,
-  GraduationCap,
-  TrendingUp,
-  Shield,
-  Clock,
-  DollarSign,
-  Phone,
-  MapPin,
-  CheckCircle,
-} from 'lucide-react';
+import { organization } from '@/lib/config/organization';
 
 export const metadata: Metadata = {
-  title: 'Job Ready Indy | Funded Career Training',
+  title: 'Job Ready Indy | Elevate for Humanity',
   description:
-    'Indiana Job Ready Indy program provides funded career training for justice-involved individuals. Get certified in healthcare, skilled trades, and more.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/jri',
-  },
+    'Elevate for Humanity is an approved Job Ready Indy provider supporting employability skills, workforce readiness, and connections to eligible career training and funding resources in Indianapolis.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/jri' },
 };
 
+const skills = [
+  'Communication',
+  'Professionalism',
+  'Self-management',
+  'Workplace skills',
+  'Career readiness',
+  'Employer expectations',
+];
+
+const nextSteps = [
+  {
+    title: 'Complete Job Ready Indy skills',
+    description:
+      'Participants complete employability-skill activities and workforce-readiness requirements through the approved Job Ready Indy pathway.',
+    icon: CheckCircle,
+  },
+  {
+    title: 'Review career pathways',
+    description:
+      'Elevate helps participants identify training options in healthcare, skilled trades, transportation, technology, business, and registered apprenticeship.',
+    icon: GraduationCap,
+  },
+  {
+    title: 'Review funding separately',
+    description:
+      'Occupational training funding is determined separately through the applicable workforce program, agency, eligibility rules, authorization, and available funding.',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Prepare for employment',
+    description:
+      'Career services can include resume preparation, interview practice, employer introductions, and other workforce-readiness support.',
+    icon: Briefcase,
+  },
+];
+
 export default function JRIPage() {
-  const eligibilityRequirements = [
-    'Currently on probation or parole in Indiana',
-    'Within 2 years of release from incarceration',
-    'Referred by a probation/parole officer or community corrections',
-    'Committed to completing the full training program',
-    'Willing to participate in wraparound support services',
-    'Legally authorized to work in the United States',
-  ];
-
-  const programBenefits = [
-    {
-      title: 'Fully Funded Training',
-      description:
-        'Tuition, books, supplies, uniforms, and certification exams covered for eligible participants.',
-      image: '/images/pages/funding-page-1.jpg',
-      alt: 'Funded workforce training program',
-    },
-    {
-      title: 'Career Counseling',
-      description: 'Work one-on-one with a dedicated career coach who understands your situation.',
-      image: '/images/pages/comp-pathway-classroom.webp',
-      alt: 'One-on-one career counseling session',
-    },
-    {
-      title: 'Job Placement',
-      description: 'We connect you with employers committed to second-chance hiring.',
-      image: '/images/pages/about-employer-partners.webp',
-      alt: 'Job placement and employer connections',
-    },
-    {
-      title: 'Support Services',
-      description: 'Transportation, childcare support, work clothing, and more.',
-      image: '/images/pages/comp-home-pathways-support.webp',
-      alt: 'Supportive services for workforce participants',
-    },
-    {
-      title: 'Flexible Scheduling',
-      description: 'Day and evening classes to work around your commitments.',
-      image: '/images/pages/comp-pathway-healthcare.webp',
-      alt: 'Flexible day and evening class scheduling',
-    },
-    {
-      title: 'Ongoing Mentorship',
-      description: 'Stay connected with mentors even after graduation.',
-      image: '/images/pages/mentorship-page-1.jpg',
-      alt: 'Ongoing mentorship after graduation',
-    },
-  ];
-
-  const availablePrograms = [
-    {
-      name: 'Certified Nursing Assistant (CNA)',
-      duration: '4-6 weeks',
-      salary: '$32,000 - $42,000/year',
-      description: 'Enter the healthcare field with state certification.',
-    },
-    {
-      name: 'HVAC Technician',
-      duration: '12-16 weeks',
-      salary: '$40,000 - $65,000/year',
-      description: 'Learn heating, ventilation, and air conditioning.',
-    },
-    {
-      name: 'Commercial Driver License (CDL)',
-      duration: '4-8 weeks',
-      salary: '$45,000 - $75,000/year',
-      description: 'Get your Class A CDL and start a trucking career.',
-    },
-    {
-      name: 'Barber Apprenticeship',
-      duration: '12-18 months',
-      salary: '$30,000 - $60,000/year',
-      description: 'Earn while you learn toward your Indiana barber license.',
-    },
-    {
-      name: 'Welding Certification',
-      duration: '10-14 weeks',
-      salary: '$38,000 - $55,000/year',
-      description: 'Learn MIG, TIG, and stick welding techniques.',
-    },
-    {
-      name: 'Forklift & Warehouse',
-      duration: '2-4 weeks',
-      salary: '$32,000 - $45,000/year',
-      description: 'Quick certification with immediate job opportunities.',
-    },
-  ];
-
-  const stats = [
-    { value: 'Funded', label: 'Training Available', icon: GraduationCap },
-    { value: 'Career', label: 'Support Services', icon: Briefcase },
-    { value: '6+', label: 'Career Programs', icon: TrendingUp },
-    { value: 'Authorized', label: 'JRI Provider', icon: Users },
-  ];
-
   return (
-    <div className="bg-white">
-      {' '}
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[{ label: 'Funding', href: '/funding' }, { label: 'Job Ready Indy' }]}
-          />
+    <main className="min-h-screen bg-white">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Workforce Services', href: '/funding' }, { label: 'Job Ready Indy' }]} />
         </div>
       </div>
-      {/* Hero Section */}
-      <section className="relative min-h-48 md:h-64 flex items-center overflow-hidden">
+
+      <section className="relative min-h-[300px] overflow-hidden bg-slate-950 text-white">
         <Image
           src="/images/pages/jri-hero.webp"
-          alt="Job Ready Indy Program participants"
+          alt="Workforce readiness training"
           fill
-          className="object-cover"
+          className="object-cover opacity-35"
           priority
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          sizes="100vw"
         />
-      </section>
-      {/* Stats Section */}
-      <section className="py-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => {
-              const IconComponent = stat.icon;
-              return (
-                <div key={index} className="text-center">
-                  <IconComponent className="w-8 h-8 text-brand-green-500 mx-auto mb-2" />
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-slate-500 text-sm">{stat.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-      {/* What is Job Ready Indy */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">What is the Job Ready Indy?</h2>
-            <p className="text-lg text-slate-600">
-              Job Ready Indy is an Indiana state-funded program designed to reduce recidivism by
-              investing in workforce training and support services. Instead of cycling people back
-              through the criminal justice system, Job Ready Indy helps build sustainable careers.
+        <div className="relative z-10 mx-auto max-w-6xl px-6 py-16 md:py-20">
+          <div className="max-w-3xl">
+            <span className="inline-flex rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-bold text-emerald-200 ring-1 ring-emerald-400/30">
+              Approved Job Ready Indy Provider
+            </span>
+            <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+              Job Ready Indy at Elevate for Humanity
+            </h1>
+            <p className="mt-5 text-lg leading-8 text-slate-200">
+              Elevate for Humanity supports Job Ready Indy employability-skill development and workforce readiness. Job Ready Indy participation and occupational training funding are separate determinations.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {programBenefits.map((benefit, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl border border-slate-200 overflow-hidden"
-              >
-                <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
-                  <Image
-                    src={benefit.image}
-                    alt={benefit.alt}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{benefit.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{benefit.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
-      {/* Eligibility */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">
-                Do You Qualify for Job Ready Indy?
-              </h2>
-              <p className="text-lg text-slate-600 mb-8">
-                Job Ready Indy funding is available to Indiana residents who meet the following
-                criteria.
-              </p>
 
-              <ul className="space-y-4">
-                {eligibilityRequirements.map((req, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <span className="text-slate-500 flex-shrink-0">•</span>
-                    <span className="text-slate-700">{req}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-yellow-800 text-sm">
-                  <strong>Note:</strong> Even if you don&apos;t meet all criteria, you may qualify
-                  for other funding programs like WIOA or SNAP E&T.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-              <h3 className="text-2xl font-bold text-slate-900 mb-6">Check Your Eligibility</h3>
-              <p className="text-slate-600 mb-6">
-                Not sure if you qualify? Our team can help determine your eligibility.
-              </p>
-              <div className="space-y-4">
-                <Link
-                  href="/apply?funding=jri"
-                  className="block w-full bg-brand-green-600 text-white text-center px-6 py-4 rounded-lg font-semibold hover:bg-brand-green-700 transition"
-                >
-                  Start Your Application
-                </Link>
-                <a
-                  href="/support"
-                  className="block w-full border-2 border-slate-300 text-slate-700 text-center px-6 py-4 rounded-lg font-semibold hover:bg-white transition"
-                >
-                  Contact Us: (317) 314-3757
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* Available Programs */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Job Ready Indy-Approved Training Programs
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Choose from high-demand career paths. All programs are fully funded through Job Ready
-              Indy.
+      <section className="mx-auto max-w-6xl px-6 py-14">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <h2 className="text-3xl font-black text-slate-950">What Job Ready Indy provides</h2>
+            <p className="mt-4 text-lg leading-8 text-slate-700">
+              Job Ready Indy focuses on the employability skills people need to enter and succeed in the workplace. Elevate uses the approved pathway to strengthen workforce readiness and connect participants with appropriate next steps.
             </p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              {skills.map((skill) => (
+                <div key={skill} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <CheckCircle className="h-5 w-5 flex-none text-emerald-700" />
+                  <span className="font-semibold text-slate-900">{skill}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {availablePrograms.map((program, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition"
-              >
-                <div className="flex items-center gap-2 mb-3">
-                  <BookOpen className="w-5 h-5 text-brand-green-600" />
-                  <span className="text-xs text-brand-green-600 font-semibold uppercase">
-                    Job Ready Indy Approved
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{program.name}</h3>
-                <p className="text-slate-600 text-sm mb-4">{program.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1 text-xs bg-white text-slate-700 px-2 py-1 rounded">
-                    <Clock className="w-3 h-3" />
-                    {program.duration}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-xs bg-brand-green-100 text-brand-green-700 px-2 py-1 rounded">
-                    <DollarSign className="w-3 h-3" />
-                    {program.salary}
-                  </span>
-                </div>
+          <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+            <h2 className="text-xl font-black text-slate-950">Funding clarification</h2>
+            <p className="mt-3 leading-7 text-slate-700">
+              Job Ready Indy approval does not mean every occupational program is automatically funded. Tuition and supportive-service funding may come from WIOA, Workforce Ready Grant, employer sponsorship, or another authorized source depending on the participant and program.
+            </p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Eligibility, authorization, covered costs, program availability, and funding amounts are determined by the responsible agency or funding source and may change.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-6xl px-6 py-14">
+          <h2 className="text-center text-3xl font-black text-slate-950">How Elevate supports the pathway</h2>
+          <div className="mt-9 grid gap-5 md:grid-cols-2">
+            {nextSteps.map(({ title, description, icon: Icon }) => (
+              <div key={title} className="rounded-2xl border border-slate-200 bg-white p-6">
+                <Icon className="h-7 w-7 text-brand-red-600" />
+                <h3 className="mt-4 text-xl font-bold text-slate-950">{title}</h3>
+                <p className="mt-2 leading-7 text-slate-700">{description}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="text-center mt-10">
-            <Link
-              href="/programs"
-              className="inline-flex items-center gap-2 text-brand-green-600 font-semibold hover:underline"
-            >
-              View All Programs <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
+      <section className="mx-auto max-w-5xl px-6 py-14">
+        <h2 className="text-3xl font-black text-slate-950">Career training options</h2>
+        <p className="mt-4 text-lg leading-8 text-slate-700">
+          Elevate offers and coordinates multiple career-training pathways. Program eligibility, duration, credentials, funding status, and training locations vary by program. Use the program catalog for current information rather than assuming a program is funded through Job Ready Indy.
+        </p>
+        <Link href="/programs" className="mt-6 inline-flex items-center gap-2 font-bold text-brand-red-700 hover:underline">
+          View current career programs <ArrowRight className="h-4 w-4" />
+        </Link>
       </section>
-      {/* FAQ */}
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">
-            Job Ready Indy Program FAQ
-          </h2>
-          <div className="space-y-4">
-            {[
-              {
-                q: 'What is Job Ready Indy funding?',
-                a: 'Job Ready Indy is Indiana state funding that provides free career training to justice-involved individuals. It covers tuition, materials, certifications, and supportive services.',
-              },
-              {
-                q: 'Do I qualify if I have a felony?',
-                a: 'Yes. Job Ready Indy is specifically designed for people with criminal records, including felonies. Your conviction type does not automatically disqualify you.',
-              },
-              {
-                q: 'How recent does my involvement need to be?',
-                a: 'Generally, you should have been released from incarceration or supervision within the past 3 years. Contact us to discuss your specific situation.',
-              },
-              {
-                q: 'What programs can I use Job Ready Indy for?',
-                a: 'Job Ready Indy covers approved training programs including healthcare (CNA), skilled trades (HVAC, welding), technology, CDL, and more. See the list above for current options.',
-              },
-              {
-                q: 'Is Job Ready Indy really free?',
-                a: 'Yes. Job Ready Indy covers 100% of training costs for eligible participants. There are no hidden fees or repayment requirements.',
-              },
-              {
-                q: 'How long does the application take?',
-                a: "The initial application takes about 10 minutes. Eligibility verification typically takes 1-2 weeks. You can start training as soon as you're approved.",
-              },
-              {
-                q: "What if I don't qualify for Job Ready Indy?",
-                a: 'You may still qualify for other funding programs like WIOA or SNAP E&T. Our team will help identify all available options for you.',
-              },
-              {
-                q: 'Will employers hire me with a record?',
-                a: 'Yes. Many employers actively hire our graduates. We work with employers who believe in second chances and understand the value of trained, motivated workers.',
-              },
-            ].map((faq, i) => (
-              <details key={i} className="bg-white rounded-xl overflow-hidden shadow-sm group">
-                <summary className="p-5 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
-                  {faq.q}
-                  <svg
-                    className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </summary>
-                <div className="px-5 pb-5 text-slate-600">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-      {/* CTA Section */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
-            Ready to Start Your New Chapter?
-          </h2>
-          <p className="text-xl text-white mb-8">
-            Your past does not define your future. Take the first step today.
+
+      <section className="bg-slate-950 text-white">
+        <div className="mx-auto max-w-5xl px-6 py-14 text-center">
+          <h2 className="text-3xl font-black">Need help choosing the right next step?</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-slate-300">
+            Elevate can review your career goal, current eligibility information, and available workforce pathways. Final eligibility and funding authorization remain with the responsible program or agency.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply?funding=jri"
-              className="inline-flex items-center justify-center bg-white text-brand-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white transition"
-            >
-              Apply Now
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/apply" className="rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white hover:bg-brand-red-700">
+              Start Application
             </Link>
-            <a
-              href="/support"
-              className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-green-700 transition"
-            >
-              <Phone className="mr-2 w-5 h-5" />
-              (317) 314-3757
+            <a href={`tel:${organization.phone.replace(/\D/g, '')}`} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-7 py-3 font-bold text-white hover:bg-white/10">
+              <Phone className="h-5 w-5" /> {organization.phone}
             </a>
           </div>
-          <p className="text-white text-sm mt-6">
-            <MapPin className="w-4 h-4 inline mr-1" />
-            Serving Indianapolis and surrounding Indiana counties
-          </p>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

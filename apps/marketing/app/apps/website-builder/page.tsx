@@ -3,12 +3,14 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { WebsiteBuilderApp } from './WebsiteBuilderApp';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Website Builder | Elevate Apps',
-  description: 'Build professional training provider websites.',
+  description: 'Create, edit, preview, and publish training-provider websites.',
+  robots: { index: false, follow: false },
 };
 
 export default async function WebsiteBuilderPage() {
@@ -21,12 +23,7 @@ export default async function WebsiteBuilderPage() {
     redirect('/login?redirect=/apps/website-builder&message=login-required');
   }
 
-  const { data: subscription } = await supabase
-    .from('user_app_subscriptions')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('app_slug', 'website-builder')
-    .maybeSingle();
+  const subscription = await syncIndividualAppSubscription(user.id, 'website-builder');
 
   if (!subscription) {
     redirect('/apps/website-builder/start-trial');
@@ -40,7 +37,7 @@ export default async function WebsiteBuilderPage() {
   }
 
   if (subscription.status !== 'trial' && subscription.status !== 'active') {
-    redirect(`/store/apps/website-builder?status=${subscription.status}`);
+    redirect(`/store/apps/website-builder?status=${encodeURIComponent(subscription.status || 'inactive')}`);
   }
 
   let trialDaysRemaining = 0;
@@ -49,7 +46,6 @@ export default async function WebsiteBuilderPage() {
     trialDaysRemaining = Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   }
 
-  // Fetch user's websites
   const { data: websites } = await supabase
     .from('user_websites')
     .select('*, pages:website_pages(count)')
@@ -58,10 +54,9 @@ export default async function WebsiteBuilderPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Apps', href: '/apps' }, { label: 'Website Builder' }]} />
+          <Breadcrumbs items={[{ label: 'Store', href: '/store/apps' }, { label: 'Website Builder' }]} />
         </div>
       </div>
       <WebsiteBuilderApp

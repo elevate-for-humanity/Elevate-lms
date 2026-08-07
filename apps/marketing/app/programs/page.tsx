@@ -1,321 +1,141 @@
 import Link from 'next/link';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import { Clock, Award, DollarSign, ChevronRight } from 'lucide-react';
+import { ArrowRight, Award, BriefcaseBusiness, Clock, DollarSign, ShieldCheck, Star } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import {
   buildProgramsListingMetadata,
-  formatPublicProgramsDisplay,
   getPublicProgramsPageData,
+  type ProgramsPageRow,
 } from '@/lib/programs/public-programs-page';
 import { getProgramCardImage } from '@/lib/images/programImages';
-import { resolveSiteImagePath } from '@/lib/images/site-image-paths';
-import { IMAGE_SIZES } from '@/lib/images/media-dimensions';
-import { card } from '@/lib/page-design-tokens';
-import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
 
-export const revalidate = 0; // always fresh - catalog should prefer DB state when available
-
+export const revalidate = 0;
 export async function generateMetadata(): Promise<Metadata> {
   return buildProgramsListingMetadata();
 }
 
-const PROGRAM_IMAGES: Record<string, string> = {
-  cna:'/images/pages/cna-nursing-real.webp',qma:'/images/pages/programs-cna-hero.webp',
-  'medical-assistant':'/images/pages/medical-assistant-real.webp',
-  'nha-phlebotomy':'/images/healthcare/hero-program-phlebotomy.jpg',
-  phlebotomy:'/images/healthcare/hero-program-phlebotomy.jpg',
-  'nha-patient-care-technician':'/images/healthcare/hero-program-patient-care.webp',
-  'nha-billing-coding':'/images/pages/medical-assistant-desk.webp',
-  'nha-pharmacy-technician':'/images/pages/pharmacy-technician.webp',
-  'pharmacy-technician':'/images/pages/pharmacy-tech.webp',
-  'nha-ekg-technician':'/images/healthcare/healthcare-professional-portrait-2.webp',
-  'nha-ehr':'/images/pages/medical-assistant-lab.webp',
-  'nha-medical-admin-assistant':'/images/pages/medical-assistant-desk.webp',
-  'dental-assistant':'/images/healthcare/video-thumbnail-dental-assistant.webp',
-  'cpr-first-aid':'/images/healthcare/cpr-certification-group.webp',
-  'chw-cert':'/images/pages/peer-recovery.webp',
-  'home-health-aide':'/images/healthcare/program-cna-training.webp',
-  'direct-support-professional':'/images/pages/healthcare-classroom.webp',
-  'dsp-training':'/images/pages/healthcare-classroom.webp',
-  'peer-recovery-specialist':'/images/pages/peer-recovery.webp',
-  'peer-support':'/images/pages/peer-recovery.webp',
-  'drug-alcohol-specimen-collector':'/images/healthcare/hero-program-phlebotomy.webp',
-  'sanitation-infection-control':'/images/pages/healthcare-hero.webp',
-  'hvac-technician':'/images/pages/hvac-technician.webp',
-  electrical:'/images/pages/electrical.webp',
-  plumbing:'/images/pages/plumbing-pipes.webp',
-  'cdl-training':'/images/pages/cdl-hero.webp',
-  welding:'/images/pages/welding-sparks.webp',
-  'building-services-technician':'/images/programs/efh-building-tech-card.jpg',
-  'building-maintenance-wrg':'/images/building-maintenance.webp',
-  'construction-trades-certification':'/images/pages/construction-trades.webp',
-  'automotive-technician':'/images/pages/skilled-trades-hero.webp',
-  'diesel-mechanic':'/images/pages/trades-classroom.webp',
-  'solar-panel-installation':'/images/pages/skilled-trades-sector.webp',
-  'manufacturing-technician':'/images/pages/trades-classroom.webp',
-  forklift:'/images/pages/trades-classroom.webp',
-  'barber-apprenticeship':'/images/beauty/hero-program-barber.webp',
-  'cosmetology-apprenticeship':'/images/pages/cosmetology-apprenticeship-hero.webp',
-  'esthetician-apprenticeship':'/images/beauty/esthetician.webp',
-  'nail-technician-apprenticeship':'/images/pages/nail-tech-hero.webp',
-  'culinary-apprenticeship':'/images/pages/healthcare-classroom.webp',
-  'youth-culinary-apprenticeship':'/images/pages/healthcare-classroom.webp',
-  'emt-apprenticeship':'/images/pages/healthcare-hero.webp',
-  'it-help-desk':'/images/pages/tech-classroom.webp',
-  'cybersecurity-analyst':'/images/pages/technology-sector.webp',
-  'data-analytics':'/images/pages/tech-classroom.webp',
-  'graphic-design':'/images/pages/tech-classroom.webp',
-  'cad-drafting':'/images/pages/tech-classroom.webp',
-  'web-development':'/images/pages/programs-tech-webdev-hero.webp',
-  bookkeeping:'/images/business/office-admin.webp',
-  'finance-bookkeeping-accounting':'/images/business/office-admin.webp',
-  'business-startup':'/images/programs/efh-business-startup-marketing-hero.jpg',
-  'business-administration':'/images/business/professional-2.jpg',
-  'administrative-assistant':'/images/business/office-admin.webp',
-  entrepreneurship:'/images/business/partnership-1.webp',
-  'real-estate-agent':'/images/business/collaboration-1.webp',
-  'insurance-agent':'/images/business/team-3.webp',
-  'customer-service-representative':'/images/business/team-4.webp',
-  'office-administration':'/images/business/office-admin.webp',
-  'project-management':'/images/business/collaboration-1.webp',
-  'servsafe-food-handler':'/images/pages/healthcare-classroom.webp',
-  'servsafe-manager':'/images/pages/healthcare-classroom.webp',
-  'guest-service-gold':'/images/pages/healthcare-classroom.webp',
-  servsuccess:'/images/pages/healthcare-classroom.webp',
-  'start-hospitality':'/images/pages/healthcare-classroom.webp',
-  'emergency-health-safety':'/images/pages/cpr-aed.webp',
-};
+function ProgramCard({ program }: { program: ProgramsPageRow }) {
+  const funded = program.funding_tier === 'workforce-funded';
+  const image = getProgramCardImage(program.slug);
 
-const CATEGORY_META: Record<string,{label:string;color:string;order:number}> = {
-  healthcare:       {label:'Healthcare',          color:'bg-blue-600',    order:1},
-  trades:           {label:'Skilled Trades',       color:'bg-orange-600',  order:2},
-  beauty:           {label:'Beauty & Cosmetology', color:'bg-pink-600',    order:3},
-  technology:       {label:'Technology',           color:'bg-indigo-600',  order:4},
-  business:         {label:'Business',             color:'bg-emerald-600', order:5},
-  apprenticeship:   {label:'Apprenticeships',      color:'bg-purple-600',  order:6},
-  hospitality:      {label:'Hospitality',          color:'bg-yellow-600',  order:7},
-  'social services':{label:'Social Services',      color:'bg-teal-600',    order:8},
-  special:          {label:'Workforce Readiness',  color:'bg-slate-600',   order:9},
-  // Fallback labels for raw DB category values that bypass normalizeCategory
-  transportation:  {label:'Transportation',       color:'bg-orange-600',  order:10},
-  'beauty wellness':{label:'Beauty & Wellness',  color:'bg-pink-600',    order:11},
-  sales:            {label:'Sales',               color:'bg-emerald-600', order:12},
-  professional:    {label:'Professional',       color:'bg-indigo-600',  order:13},
-  'culinary arts': {label:'Culinary Arts',       color:'bg-yellow-600',  order:14},
-};
+  return (
+    <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+      <Link href={`/programs/${program.slug}`} className="block">
+        <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+          <Image
+            src={image}
+            alt={`${program.title} training program`}
+            fill
+            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          <div className="absolute left-3 top-3 flex flex-wrap gap-2">
+            {funded ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700 px-3 py-1.5 text-sm font-extrabold text-white shadow">
+                <ShieldCheck className="h-4 w-4" /> Workforce Funded
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-sm font-extrabold text-white shadow">
+                <DollarSign className="h-4 w-4" /> Self-Pay
+              </span>
+            )}
+            {funded && program.top_jobs_stars ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-slate-900 shadow">
+                <Star className="h-4 w-4 fill-amber-400 text-amber-500" /> {program.top_jobs_stars}★ Top Jobs
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </Link>
 
-const SUPPRESSED = new Set([
-  // Duplicate slugs
-  'hvac-2024', // duplicate of hvac
-  'phlebotomy-technician-program', // duplicate of phlebotomy-technician
-  'barber-program', // duplicate of barber
-  // Obsolete umbrellas
-  'micro-programs',
-  'jri-introduction',
-  'jri',
-  // Apprenticeships not on ETPL
-  'culinary-apprenticeship',
-  'youth-culinary-apprenticeship',
-  // Suppress fragments that produce wrong category labels
-  'beauty-wellness',
-  'personal-services',
-]);
-
-type Prog = {slug:string;title:string;description:string|null;category:string;duration:string|null;credential:string|null;funding_eligible:boolean};
-
-function normalizeCategory(category?: string | null, sector?: string | null, programType?: string | null): string {
-  const raw = (category ?? '').trim().toLowerCase().replace(/\s+/g, ' ').trim();
-  const normalizedSector = (sector ?? '').trim().toLowerCase();
-
-  if (raw.includes('health') || raw.includes('medical') || raw.includes('care') || normalizedSector === 'healthcare') return 'healthcare';
-  if (raw.includes('trade') || raw.includes('welding') || raw.includes('electrical') || raw.includes('plumbing') || raw.includes('hvac') || raw.includes('construction') || raw.includes('cdl') || raw.includes('diesel') || raw.includes('fabrication') || raw.includes('transportation') || normalizedSector === 'skilled-trades') return 'trades';
-  if (raw.includes('beauty') || raw.includes('beauty & wellness') || raw.includes('beauty wellness') || raw.includes('cosmetology') || raw.includes('esthetic') || raw.includes('nail') || raw.includes('barber') || normalizedSector === 'personal-services') return 'beauty';
-  if (raw.includes('tech') || raw.includes('it ') || raw.includes('software') || raw.includes('cyber') || raw.includes('network') || raw.includes('web') || raw.includes('design') || raw.includes('data') || normalizedSector === 'technology') return 'technology';
-  if (raw.includes('business') || raw.includes('accounting') || raw.includes('project') || raw.includes('entrepreneur') || raw.includes('sales') || raw.includes('professional') || normalizedSector === 'business') return 'business';
-  if (raw.includes('hospitality') || raw.includes('culinary') || raw.includes('food') || raw.includes('tourism')) return 'hospitality';
-  if (raw.includes('social') || raw.includes('community') || raw.includes('peer') || raw.includes('support')) return 'social services';
-  if (programType === 'apprenticeship') return 'apprenticeship';
-  return raw || 'other';
+      <div className="p-5 sm:p-6">
+        <h3 className="text-xl font-extrabold leading-tight text-slate-950">
+          <Link href={`/programs/${program.slug}`} className="hover:text-brand-red-700">{program.title}</Link>
+        </h3>
+        {program.description ? <p className="mt-3 line-clamp-3 text-base leading-relaxed text-slate-600">{program.description}</p> : null}
+        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-600">
+          {program.duration ? <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" />{program.duration}</span> : null}
+          {program.credential ? <span className="inline-flex items-center gap-1.5"><Award className="h-4 w-4" />{program.credential}</span> : null}
+        </div>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+          <Link href={`/programs/${program.slug}`} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-base font-bold text-white hover:bg-slate-800">
+            View Program <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link href={`/apply?program=${program.slug}`} className={`inline-flex flex-1 items-center justify-center rounded-xl px-4 py-3 text-base font-bold ${funded ? 'bg-brand-red-600 text-white hover:bg-brand-red-700' : 'border border-slate-300 text-slate-900 hover:bg-slate-50'}`}>
+            {funded ? 'Start Funded Application' : 'Self-Pay Enrollment'}
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
 }
 
-const staticProgramFallback: Prog[] = Array.from(STATIC_PROGRAM_MAP.values())
-  .filter((program) => !SUPPRESSED.has(program.slug) && program.public_visible !== false && program.active !== false)
-  .map((program) => {
-    const hasFunding = Boolean(
-      program.funding?.wioa_eligible ||
-      program.funding?.wrg_eligible ||
-      program.funding?.fssa_eligible ||
-      program.fundingOptions?.some((option) => option === 'wioa' || option === 'wrg' || option === 'impact'),
-    );
-    return {
-      slug: program.slug,
-      title: program.title,
-      description: program.subtitle || program.metaDescription || null,
-      category: normalizeCategory(program.category, program.sector, program.programType),
-      duration: program.durationWeeks ? `${program.durationWeeks} week${program.durationWeeks === 1 ? '' : 's'}` : null,
-      credential: program.credentials?.[0]?.name ?? null,
-      funding_eligible: hasFunding,
-    };
-  })
-  .sort((a, b) => a.title.localeCompare(b.title));
-
 export default async function ProgramsPage() {
-  const { programs: catalogPrograms, catalogSource } = await getPublicProgramsPageData();
-  
-  // Deduplicate by slug — keep first occurrence of each slug
-  const seenSlugs = new Set<string>();
-  const programs: Prog[] = catalogPrograms.filter(p => {
-    if (seenSlugs.has(p.slug)) return false;
-    seenSlugs.add(p.slug);
-    return true;
-  });
-
-  const grouped:Record<string,Prog[]>={};
-  programs.forEach(p=>{if(!grouped[p.category])grouped[p.category]=[];grouped[p.category].push(p);});
-  const cats=Object.keys(grouped).sort((a,b)=>(CATEGORY_META[a]?.order??99)-(CATEGORY_META[b]?.order??99));
+  const { programs } = await getPublicProgramsPageData();
+  const funded = programs.filter((p) => p.funding_tier === 'workforce-funded');
+  const selfPay = programs.filter((p) => p.funding_tier === 'self-pay');
 
   return (
     <main className="min-h-screen bg-white">
-
-      {/* Hero */}
-      <section className="relative h-64 sm:h-80 w-full overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="(max-width: 768px) 100vw, 1200px" src="/images/programs-hero-vibrant.webp" alt={`${PLATFORM_DEFAULTS.orgName} programs`} fill className="object-cover object-center" priority  />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-        <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">{PLATFORM_DEFAULTS.orgName}</p>
-          <h1 className="text-3xl sm:text-5xl font-bold text-white leading-tight">Career Training Programs</h1>
-          <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            {formatPublicProgramsDisplay(programs.length)} — all credential-bearing. Duration, funding eligibility, and enrollment availability vary by program.
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            <Link href="/orientation/schedule" className="inline-flex items-center gap-2 rounded-lg bg-brand-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-red-700 transition-colors">
-              Schedule Free Orientation
-            </Link>
-            <Link href="/programs/catalog" className="inline-flex items-center gap-2 rounded-lg bg-white/10 border border-white/30 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition-colors">
-              Search Full Catalog
-            </Link>
+      <section className="relative min-h-[360px] overflow-hidden bg-slate-950">
+        <Image src="/images/programs-hero-vibrant.webp" alt="Elevate career training programs" fill priority className="object-cover opacity-55" sizes="100vw" />
+        <div className="absolute inset-0 bg-slate-950/45" />
+        <div className="relative mx-auto flex min-h-[360px] max-w-6xl items-center px-6 py-16">
+          <div className="max-w-3xl text-white">
+            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-orange-300">Career Training</p>
+            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-6xl">Choose the right program — and the right funding path.</h1>
+            <p className="mt-5 text-lg leading-relaxed text-white sm:text-xl">
+              {PLATFORM_DEFAULTS.orgName} separates verified workforce-funded programs from regular self-pay courses so applicants know exactly which enrollment process applies.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Category nav */}
-      <nav className="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 overflow-x-auto">
-          <ul className="flex gap-1 py-2 whitespace-nowrap">
-            <li><a href="#top" className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">All ({programs.length})</a></li>
-            {cats.map(cat=>(
-              <li key={cat}><a href={`#cat-${cat}`} className="inline-block px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors">
-                {CATEGORY_META[cat]?.label??cat} ({grouped[cat].length})
-              </a></li>
-            ))}
-          </ul>
+      <section className="border-b border-emerald-200 bg-emerald-50 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <p className="text-sm font-extrabold uppercase tracking-widest text-emerald-800">Verified Workforce-Funded Programs</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">ETPL + 3★ Top Jobs pathway</h2>
+              <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-700">
+                These programs meet Elevate&apos;s strict public funding rule: verified under 2Exclusive LLC-S on Indiana ETPL and a final Top Jobs rating of 3 stars or higher. WorkOne determines participant eligibility and must authorize WIOA or Workforce Ready Grant funding.
+              </p>
+            </div>
+            <a href={WORKONE_INDY_INTAKE_URL} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-3.5 text-base font-extrabold text-white hover:bg-emerald-800">
+              Schedule WorkOne Intake <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {funded.map((program) => <ProgramCard key={program.slug} program={program} />)}
+          </div>
+          {funded.length === 0 ? <p className="mt-8 rounded-xl bg-white p-6 text-slate-700">No programs are currently published in the verified funded registry.</p> : null}
         </div>
-      </nav>
+      </section>
 
-      {/* Funding banner */}
-      <div className="bg-brand-green-50 border-b border-brand-green-100">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-brand-green-800">
-          <span className="font-semibold">Funding may be available for eligible participants and approved programs.</span>
-          <span className="hidden sm:inline text-brand-green-300">·</span>
-          <span>WIOA Individual Training Account</span>
-          <span className="hidden sm:inline text-brand-green-300">·</span>
-          <span>Workforce Ready Grant</span>
-          <span className="hidden sm:inline text-brand-green-300">·</span>
-          <span>FSSA IMPACT / JRI Reentry</span>
-          <span className="hidden sm:inline text-brand-green-300">·</span>
-          <span>Payment Plans</span>
-          <Link href="/funding/how-it-works" className="ml-auto font-semibold underline hover:text-brand-green-900 whitespace-nowrap">Check eligibility →</Link>
-        </div>
-      </div>
-
-      {/* Sections */}
-      <div id="top" className="max-w-6xl mx-auto px-4 py-12 space-y-16">
-        {cats.map(cat=>{
-          const meta=CATEGORY_META[cat];
-          const list=[...grouped[cat]].sort((a,b)=>a.title.localeCompare(b.title));
-          return (
-            <section key={cat} id={`cat-${cat}`} className="scroll-mt-16">
-              <div className="flex items-center gap-3 mb-6 pb-3 border-b border-slate-100">
-                <div className={`w-1 h-8 rounded-full ${meta?.color??'bg-slate-400'}`} />
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{meta?.label??cat}</h2>
-                <span className="text-sm text-slate-400">{list.length} program{list.length!==1?'s':''}</span>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {list.map(p=>(
-                  <Link key={p.slug} href={`/programs/${p.slug}`}
-                    className="group flex flex-col rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg hover:border-slate-300 transition-all duration-200 bg-white">
-                    <div className={card.programImage}>
-                      <Image src={resolveSiteImagePath(PROGRAM_IMAGES[p.slug] ?? getProgramCardImage(p.slug))} alt={p.title} fill
-                        className={card.programImageFill}
-                        sizes={IMAGE_SIZES.programCard}  />
-                      <div className="absolute inset-0 bg-black/20" />
-                      {p.funding_eligible&&(
-                        <span className="absolute top-2 left-2 bg-brand-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow">WIOA Eligible</span>
-                      )}
-                    </div>
-                    <div className="flex flex-col flex-1 p-4">
-                      <h3 className="font-semibold text-slate-900 text-sm leading-snug group-hover:text-brand-red-600 transition-colors">{p.title}</h3>
-                      {p.description&&<p className="mt-1.5 text-xs text-slate-500 line-clamp-2 flex-1">{p.description}</p>}
-                      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-400">
-                        {p.duration&&<span className="flex items-center gap-1"><Clock className="w-3 h-3"/>{p.duration}</span>}
-                        {p.credential&&<span className="flex items-center gap-1"><Award className="w-3 h-3" aria-label="award"/>{p.credential}</span>}
-                        {p.funding_eligible&&!p.duration&&!p.credential&&<span className="flex items-center gap-1 text-brand-green-600"><DollarSign className="w-3 h-3"/>Funding available</span>}
-                      </div>
-                      <div className="mt-3 flex items-center gap-1 text-xs font-semibold text-brand-red-600 group-hover:gap-2 transition-all">
-                        View program <ChevronRight className="w-3.5 h-3.5"/>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          );
-        })}
-      </div>
-
-      {/* External Pathways - Google & Microsoft */}
-      <section className="py-12 border-t border-slate-100 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-xl font-extrabold text-slate-900 mb-1">External Certification Pathways</h2>
-          	              <p className="text-slate-500 text-sm mb-6">Training delivered by Google, Microsoft, Coursera, and LinkedIn Learning. Elevate provides enrollment support and funding-navigation assistance — credential issuance is managed by the respective providers.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { slug: 'google-it-support', title: 'Google IT Support Certificate', issuer: 'Google / Coursera', weeks: '3-6 months' },
-              { slug: 'google-cybersecurity', title: 'Google Cybersecurity Certificate', issuer: 'Google / Coursera', weeks: '6 months' },
-              { slug: 'google-data-analytics', title: 'Google Data Analytics Certificate', issuer: 'Google / Coursera', weeks: '6 months' },
-              { slug: 'google-project-management', title: 'Google Project Management Certificate', issuer: 'Google / Coursera', weeks: '6 months' },
-              { slug: 'microsoft-azure-fundamentals', title: 'Microsoft Azure Fundamentals (AZ-900)', issuer: 'Microsoft', weeks: '4-6 weeks' },
-              { slug: 'microsoft-365-fundamentals', title: 'Microsoft 365 Fundamentals (MS-900)', issuer: 'Microsoft', weeks: '4-6 weeks' },
-            ].map((p) => (
-              <Link key={p.slug} href={`/apply?program=${p.slug}`} className="bg-white rounded-xl border border-slate-200 p-5 hover:border-brand-green-400 hover:shadow-sm transition-all group">
-                <p className="font-bold text-slate-900 text-sm group-hover:text-brand-green-700 leading-snug">{p.title}</p>
-                <p className="text-slate-500 text-xs mt-1">{p.issuer} · {p.weeks}</p>
-                <p className="text-brand-red-600 text-xs font-semibold mt-3">Explore programs →</p>
-              </Link>
-            ))}
+      <section className="py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="max-w-3xl">
+            <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">Regular Courses</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Self-pay & payment-plan programs</h2>
+            <p className="mt-4 text-lg leading-relaxed text-slate-700">
+              Programs that are not verified in the ETPL + 3-star Top Jobs funded registry appear here as regular programs. They do not advertise WIOA or Workforce Ready Grant funding.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {selfPay.map((program) => <ProgramCard key={program.slug} program={program} />)}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-slate-900 text-white py-16">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold">Not sure where to start?</h2>
-          <p className="mt-3 text-slate-300 text-sm sm:text-base">
-            Schedule a free orientation. We&apos;ll match you to the right program, check your funding eligibility, and get you enrolled.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href="/orientation/schedule" className="rounded-lg bg-brand-red-600 px-8 py-3 font-semibold text-white hover:bg-brand-red-700 transition-colors">
-              Schedule Free Orientation
-            </Link>
-            <Link href="/contact" className="rounded-lg border border-white/30 px-8 py-3 font-semibold text-white hover:bg-white/10 transition-colors">
-              Talk to an Advisor
-            </Link>
-          </div>
+      <section className="bg-slate-950 py-14 text-white">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <BriefcaseBusiness className="mx-auto h-9 w-9 text-orange-300" />
+          <h2 className="mt-4 text-3xl font-black">Need help choosing?</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">Start the application and choose a program. The form will automatically show either the required WorkOne funded pathway or the regular self-pay pathway.</p>
+          <Link href="/apply" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 text-lg font-extrabold text-white hover:bg-brand-red-700">Start Application <ArrowRight className="h-5 w-5" /></Link>
         </div>
       </section>
     </main>

@@ -8,7 +8,6 @@ import { type NavItem } from '@/types/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
 
 export const NAV_ITEMS: NavItem[] = [
-  // ── 1. Programs ──────────────────────────────────────────────────────────────
   {
     id: 'programs',
     name: 'Programs',
@@ -29,7 +28,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
     ],
   },
-  // ── 2. Apprenticeships ────────────────────────────────────────────────────────
   {
     id: 'apprenticeships',
     name: 'Apprenticeships',
@@ -46,7 +44,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Employer Sponsorship', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
     ],
   },
-  // ── 3. Funding ──────────────────────────────────────────────────────────────
   {
     id: 'funding',
     name: 'Funding',
@@ -61,7 +58,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Check Eligibility', href: ROUTES.eligibility, isSectionLink: true },
     ],
   },
-  // ── 4. Employers ──────────────────────────────────────────────────────────────
   {
     id: 'employers',
     name: 'Employers',
@@ -70,12 +66,11 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
       { name: 'Sponsor an Apprentice', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
-      { name: 'Employer Portal', href: ROUTES.employersPostJob, isSectionLink: true },
+      { name: 'Employer Portal', href: ROUTES.employerPortal, isSectionLink: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },
       { name: 'Request Demo', href: ROUTES.storeDemo, isSectionLink: true },
     ],
   },
-  // ── 5. About ───────────────────────────────────────────────────────────────
   {
     id: 'about',
     name: 'About',

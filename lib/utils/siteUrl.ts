@@ -1,14 +1,12 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
- * Canonical URL helpers.
+ * Canonical URL helpers for the three-service production architecture.
  *
- * All URLs come from environment variables set in AWS SSM (/elevate/*).
- * No localhost fallbacks — missing vars in production are caught at call time.
+ * Marketing: www.elevateforhumanity.org
+ * LMS:       app.elevateforhumanity.org
+ * Admin:     admin.elevateforhumanity.org
  *
- * Required SSM parameters:
- *   /elevate/NEXT_PUBLIC_SITE_URL               https://www.elevateforhumanity.org
- *   /elevate/NEXT_PUBLIC_ADMIN_URL              https://admin.elevateforhumanity.org
- *   /elevate/NEXT_PUBLIC_COLLABORATION_WS_URL   wss://collab.elevateforhumanity.org
+ * Values may be overridden by environment variables in each deployment.
  */
 
 function requireUrl(name: string): string {
@@ -17,27 +15,40 @@ function requireUrl(name: string): string {
   return val.replace(/\/$/, '');
 }
 
-/** Public LMS / marketing site base URL (www). Prefer NEXT_PUBLIC_PUBLIC_SITE_URL on admin. */
+function rootDomain(): string {
+  return PLATFORM_DEFAULTS.canonicalDomain.replace(/^www\./, '');
+}
+
+/** Public Marketing site base URL. */
 export function getPublicSiteUrl(): string {
   const publicUrl = (process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || '').trim();
   if (publicUrl) return publicUrl.replace(/\/$/, '');
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || '').trim();
   if (siteUrl) return siteUrl.replace(/\/$/, '');
-  return `https://${PLATFORM_DEFAULTS.canonicalDomain}`;
+  return `https://www.${rootDomain()}`;
 }
 
-/** LMS app base URL — canonical public site (www), not the admin subdomain */
+/**
+ * Legacy site helper retained for callers that mean the public Marketing site.
+ * New cross-service code should prefer getPublicSiteUrl(), getLmsUrl(), or
+ * getAdminUrl() explicitly.
+ */
 export function getSiteUrl(): string {
-  const val = (process.env.NEXT_PUBLIC_SITE_URL || '').trim();
-  if (val) return val.replace(/\/$/, '');
-  return `https://${PLATFORM_DEFAULTS.canonicalDomain}`;
+  return getPublicSiteUrl();
 }
 
-/** Admin app base URL — https://admin.${PLATFORM_DEFAULTS.canonicalDomain} */
+/** LMS application base URL. */
+export function getLmsUrl(): string {
+  const url = (process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_LMS_URL || '').trim();
+  if (url) return url.replace(/\/$/, '');
+  return `https://app.${rootDomain()}`;
+}
+
+/** Admin application base URL. */
 export function getAdminUrl(): string {
   const url = (process.env.NEXT_PUBLIC_ADMIN_URL || '').trim();
   if (!url) {
-    return `https://admin.${PLATFORM_DEFAULTS.canonicalDomain.replace(/^www\./, '')}`;
+    return `https://admin.${rootDomain()}`;
   }
   try {
     const parsed = new URL(url);
@@ -53,7 +64,7 @@ export function getAdminUrl(): string {
   }
 }
 
-/** WebSocket URL for Yjs collaboration */
+/** WebSocket URL for Yjs collaboration. */
 export function getCollaborationWsUrl(): string {
   return requireUrl('NEXT_PUBLIC_COLLABORATION_WS_URL');
 }

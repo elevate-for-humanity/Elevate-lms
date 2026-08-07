@@ -54,6 +54,9 @@ export async function POST(request: NextRequest) {
   const stripe = getStripe();
   if (!stripe) return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
 
+  const admin = await getAdminClient();
+  if (!admin) return NextResponse.json({ error: 'Enrollment system temporarily unavailable.' }, { status: 503 });
+
   let body: {
     slug?: string;
     checkoutMode?: 'deposit' | 'full';
@@ -75,6 +78,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'This program does not have a self-pay price configured.' }, { status: 422 });
   }
 
+  const { data: programRow, error: programError } = await admin
+    .from('programs')
+    .select('id, slug, title')
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if (programError || !programRow?.id) {
+    return NextResponse.json(
+      { error: 'Program enrollment record is not configured. Contact admissions before paying.' },
+      { status: 422 },
+    );
+  }
+
   const checkoutMode = body.checkoutMode === 'deposit' ? 'deposit' : 'full';
   const requested = Math.round(Number(body.amountCents || 0));
   let chargeCents = pricing.tuitionCents;
@@ -82,10 +98,7 @@ export async function POST(request: NextRequest) {
   if (checkoutMode === 'deposit') {
     chargeCents = requested || pricing.depositMinCents;
     if (chargeCents < pricing.depositMinCents || chargeCents > pricing.tuitionCents) {
-      return NextResponse.json(
-        { error: 'Deposit amount is outside the allowed range.' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Deposit amount is outside the allowed range.' }, { status: 400 });
     }
   }
 
@@ -96,6 +109,30 @@ export async function POST(request: NextRequest) {
   const cancelUrl = body.cancelUrl?.startsWith(origin)
     ? body.cancelUrl
     : `${origin}/programs/${encodeURIComponent(slug)}`;
+
+  // Create an orphan-safe pending enrollment before Stripe checkout. The canonical
+  // webhook updates this exact row after payment, then account onboarding can link
+  // it to a user by email.
+  const { data: pendingEnrollment, error: pendingError } = await admin
+    .from('program_enrollments')
+    .insert({
+      program_id: programRow.id,
+      program_slug: slug,
+      user_id: null,
+      funding_source: 'self_pay',
+      status: 'checkout_pending',
+      payment_status: 'pending',
+      enrollment_state: 'payment_pending',
+      next_required_action: 'PAYMENT',
+      amount_paid_cents: 0,
+    })
+    .select('id')
+    .single();
+
+  if (pendingError || !pendingEnrollment?.id) {
+    logger.error('[program-checkout] Pending enrollment insert failed', pendingError?.message ?? 'unknown', { slug });
+    return NextResponse.json({ error: 'Unable to prepare enrollment checkout.' }, { status: 500 });
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -120,10 +157,13 @@ export async function POST(request: NextRequest) {
       cancel_url: cancelUrl,
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
-      client_reference_id: slug,
+      client_reference_id: pendingEnrollment.id,
       metadata: {
         kind: 'program_enrollment',
+        program_id: programRow.id,
         program_slug: slug,
+        existing_enrollment_id: pendingEnrollment.id,
+        funding_source: 'self_pay',
         checkout_mode: checkoutMode,
         tuition_cents: String(pricing.tuitionCents),
         amount_charged_cents: String(chargeCents),
@@ -131,9 +171,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (!session.url) return NextResponse.json({ error: 'Checkout session did not return a URL.' }, { status: 500 });
-    return NextResponse.json({ url: session.url, sessionId: session.id });
+    if (!session.url) throw new Error('Checkout session did not return a URL.');
+
+    await admin
+      .from('program_enrollments')
+      .update({ stripe_checkout_session_id: session.id, updated_at: new Date().toISOString() })
+      .eq('id', pendingEnrollment.id);
+
+    return NextResponse.json({ url: session.url, sessionId: session.id, enrollmentId: pendingEnrollment.id });
   } catch (error) {
+    await admin.from('program_enrollments').delete().eq('id', pendingEnrollment.id).eq('status', 'checkout_pending');
     logger.error(
       '[program-checkout] Stripe checkout session creation failed',
       error instanceof Error ? error : new Error(String(error)),

@@ -7,6 +7,13 @@ import { createClient } from '@/lib/supabase/client';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { siteUrls } from '@/lib/utils/site-urls';
+
+function absolutePortalDestination(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.startsWith('/admin/')) return `${siteUrls.admin}${path.replace(/^\/admin/, '')}`;
+  return `${siteUrls.app}${path.startsWith('/') ? path : `/${path}`}`;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,8 +41,8 @@ export default function LoginPage() {
       if (!data.user) throw new Error('Authentication completed without a user session.');
 
       if (safeRedirect) {
-        router.replace(safeRedirect);
-        router.refresh();
+        const destination = absolutePortalDestination(safeRedirect);
+        window.location.assign(destination);
         return;
       }
 
@@ -45,27 +52,21 @@ export default function LoginPage() {
         .eq('id', data.user.id)
         .maybeSingle();
 
-      const WWW = 'https://www.elevateforhumanity.org';
       let destination: string;
       if (!profile) {
-        destination = `${WWW}/onboarding/learner`;
+        destination = `${siteUrls.app}/onboarding/learner`;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
-        destination = `${WWW}/onboarding/employer`;
+        destination = `${siteUrls.app}/onboarding/employer`;
       } else {
-        // Apprentices are routed to their program portal based on portal_type.
-        // If portal_type is set (e.g. 'barber', 'cosmetology'), go to /portal/[portal_type].
-        // Otherwise fall back to role-based routing.
         const portalType = profile.portal_type;
         if (portalType && typeof portalType === 'string' && portalType.trim() !== '') {
-          destination = `${WWW}/portal/${portalType.trim()}`;
+          destination = `${siteUrls.app}/portal/${portalType.trim()}`;
         } else {
-          destination = `${WWW}${getRoleDestination(profile.role)}`;
+          destination = absolutePortalDestination(getRoleDestination(profile.role));
         }
       }
 
-      // Use window.location for a full page reload so server-side auth checks
-      // in portal pages can read the session cookie synced from localStorage.
-      window.location.href = destination;
+      window.location.assign(destination);
     } catch (caughtError) {
       const message = caughtError instanceof Error ? caughtError.message : 'Invalid email or password.';
       setError(message);
@@ -134,7 +135,7 @@ export default function LoginPage() {
         </p>
 
         <div className="mt-8 border-t border-slate-200 pt-6 text-center">
-          <a href="https://admin.elevateforhumanity.org/login" className="text-sm font-semibold text-slate-800 hover:underline">Staff and administrator login →</a>
+          <a href={siteUrls.adminLogin} className="text-sm font-semibold text-slate-800 hover:underline">Staff and administrator login →</a>
         </div>
       </section>
     </main>

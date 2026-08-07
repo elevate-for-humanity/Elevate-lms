@@ -62,6 +62,7 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
       'API access',
       'Dedicated support',
       'Multi-user access',
+      'Import existing sites',
     ],
   },
 ];
@@ -124,7 +125,7 @@ export const INDIVIDUAL_APP_CATALOG: Record<IndividualAppSlug, IndividualAppCata
     trialDays: 14,
     trialHref: '/apps/website-builder/start-trial',
     appHref: '/apps/website-builder',
-    importHref: '/import',
+    importHref: '/apps/website-builder/import',
     plans: WEBSITE_BUILDER_PLANS,
   },
   'sam-gov': {

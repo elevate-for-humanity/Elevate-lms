@@ -8,7 +8,11 @@ import {
 export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
   'barber': { hours: 2000, label: 'Barber Apprenticeship' },
   'barber-apprenticeship': { hours: 2000, label: 'Barber Apprenticeship' },
-  'cosmetology': { hours: 1500, label: 'Cosmetology Apprenticeship' },
+  // Keep the legacy program key for routing/database compatibility; display the
+  // registered occupation name in the Host Shop portal.
+  'cosmetology': { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  'cosmetology-apprenticeship': { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  'hairstylist': { hours: 1500, label: 'Hairstylist Apprenticeship' },
   'nail-tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
   'nail_tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
   'nail_technician': { hours: 450, label: 'Nail Technician Apprenticeship' },

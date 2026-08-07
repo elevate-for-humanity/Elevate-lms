@@ -19,14 +19,16 @@ export const SITE_STATS = {
   programsOffered: STATIC_PROGRAM_COUNT,
   programsOfferedDisplay: `${STATIC_PROGRAM_COUNT}+`,
 
-  // New-site posture: public outcome totals remain intentionally unpublished
-  // until verified reporting data is available.
+  // New-site posture: outcome totals remain intentionally unpublished until
+  // verified production reporting exists. Zero is a sentinel for components
+  // that require a numeric type; public renderers should display an em dash or
+  // capability language when a value is <= 0.
   studentsDisplay: '—',
   credentialsDisplay: '—',
   employerPartnersDisplay: '—',
   fundingSecuredDisplay: '—',
-  careerServicesSupportRate: null,
-  jobPlacementRate: null,
+  careerServicesSupportRate: 0,
+  jobPlacementRate: null as number | null,
 } as const;
 
 export const statLabel = {

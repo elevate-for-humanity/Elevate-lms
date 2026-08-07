@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { CheckCircle, ArrowRight, CreditCard } from 'lucide-react';
+import { CheckCircle, ArrowRight, CreditCard, PlusCircle } from 'lucide-react';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { createClient } from '@/lib/supabase/server';
+import { ADD_ON_MARKETPLACE, getBasePlan } from '@/lib/store/platform-pricing';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -44,40 +45,81 @@ export default async function SubscriptionSuccessPage({
     return <Failure message="This subscription has not been verified as completed for your account." />;
   }
 
-  const plan = session.metadata?.plan_id ?? 'platform';
+  const planId = session.metadata?.plan_id ?? '';
+  const plan = getBasePlan(planId);
+  const purchasedAddons = new Set((session.metadata?.addon_slugs || '').split(',').map((value) => value.trim()).filter(Boolean));
+  const planFeatures = new Set(plan?.features || []);
+
+  const recommendedAddons = ADD_ON_MARKETPLACE.filter((addon) => {
+    if (purchasedAddons.has(addon.slug)) return false;
+    if (addon.features.length > 0 && addon.features.every((feature) => planFeatures.has(feature))) return false;
+    return true;
+  }).slice(0, 6);
 
   return (
     <main className="min-h-[70vh] bg-slate-50 px-4 py-16">
-      <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-          <CheckCircle className="h-8 w-8 text-green-700" />
-        </div>
-        <h1 className="text-center text-3xl font-black text-slate-950">Subscription confirmed</h1>
-        <p className="mt-3 text-center text-slate-600">
-          Stripe confirmed your {plan} subscription. Your organization access is synchronized by the store webhook.
-        </p>
-
-        <div className="mt-8 rounded-xl bg-slate-50 p-5 text-sm text-slate-700">
-          <div className="flex items-center gap-2 font-semibold text-slate-900">
-            <CreditCard className="h-4 w-4" /> Billing reference
+      <div className="mx-auto max-w-4xl">
+        <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle className="h-8 w-8 text-green-700" />
           </div>
-          <p className="mt-2 break-all font-mono text-xs">{session.id}</p>
-        </div>
+          <h1 className="text-center text-3xl font-black text-slate-950">Subscription confirmed</h1>
+          <p className="mt-3 text-center text-slate-600">
+            Stripe confirmed your {plan?.name || planId || 'platform'} subscription. Your organization access is synchronized by the Store fulfillment flow.
+          </p>
 
-        <div className="mt-8 grid gap-3 sm:grid-cols-2">
-          <a
-            href="https://app.elevateforhumanity.org/login"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700"
-          >
-            Open Platform <ArrowRight className="h-4 w-4" />
-          </a>
-          <Link
-            href="/store/plans"
-            className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50"
-          >
-            View Plans
-          </Link>
-        </div>
+          <div className="mt-8 rounded-xl bg-slate-50 p-5 text-sm text-slate-700">
+            <div className="flex items-center gap-2 font-semibold text-slate-900">
+              <CreditCard className="h-4 w-4" /> Billing reference
+            </div>
+            <p className="mt-2 break-all font-mono text-xs">{session.id}</p>
+          </div>
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <a
+              href="https://app.elevateforhumanity.org/login"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700"
+            >
+              Open Platform <ArrowRight className="h-4 w-4" />
+            </a>
+            <Link
+              href="/store/plans"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50"
+            >
+              Manage plan options
+            </Link>
+            <Link
+              href="/store/apps"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50"
+            >
+              Search full Store
+            </Link>
+          </div>
+        </section>
+
+        {recommendedAddons.length > 0 && (
+          <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="flex items-center gap-3">
+              <PlusCircle className="h-6 w-6 text-brand-red-700" />
+              <div>
+                <h2 className="text-2xl font-black text-slate-950">Add more capability</h2>
+                <p className="mt-1 text-sm text-slate-600">These options are not already included in the plan you just purchased.</p>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {recommendedAddons.map((addon) => (
+                <article key={addon.slug} className="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                  <h3 className="font-black text-slate-900">{addon.name}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{addon.description}</p>
+                  <div className="mt-4 text-lg font-black text-slate-900">${addon.priceMonthly}/mo</div>
+                  <Link href={`/store/plans?addon=${encodeURIComponent(addon.slug)}`} className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-red-700 hover:underline">
+                    Add or compare <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );

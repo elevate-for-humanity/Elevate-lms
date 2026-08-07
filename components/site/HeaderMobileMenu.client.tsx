@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronDown, Menu, X, Lock, Phone } from 'lucide-react';
+import { ChevronDown, Menu, X, Lock, Phone, GraduationCap, Building2, Landmark, FlaskConical } from 'lucide-react';
 import SearchModal from './SearchModal.client';
 import LanguageSwitcher from './LanguageSwitcher.client';
 import {
@@ -74,20 +74,6 @@ function MobileSubLink({
 }) {
   if (subItem.isHeader) return null;
   const href = subItem.href ?? '#';
-
-  if (subItem.isSectionLink) {
-    return (
-      <MenuLink
-        href={href}
-        onNavigate={onNavigate}
-        className="flex items-center gap-1.5 py-2 min-h-[40px] text-sm font-semibold text-brand-red-600 hover:text-brand-red-700"
-      >
-        {subItem.isAuth && <Lock className="h-3.5 w-3.5 flex-shrink-0" aria-hidden="true" />}
-        <span className="break-words">{subItem.name}</span>
-      </MenuLink>
-    );
-  }
-
   const programSlug = itemId === 'programs' ? getProgramSlugFromHref(href) : null;
   const applyHref = programSlug ? programApplyLinks[programSlug] : undefined;
 
@@ -96,7 +82,9 @@ function MobileSubLink({
       <MenuLink
         href={href}
         onNavigate={onNavigate}
-        className="flex items-center gap-1.5 py-2 min-h-[40px] text-sm text-slate-700 hover:text-brand-blue-600"
+        className={`flex min-h-[40px] items-center gap-1.5 py-2 text-sm hover:text-brand-blue-600 ${
+          subItem.isSectionLink ? 'font-semibold text-slate-800' : 'text-slate-700'
+        }`}
       >
         {subItem.isAuth && <Lock className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" aria-hidden="true" />}
         <span className="break-words">{subItem.name}</span>
@@ -105,7 +93,7 @@ function MobileSubLink({
         <MenuLink
           href={applyHref}
           onNavigate={onNavigate}
-          className="block py-1.5 pl-6 min-h-[32px] text-xs font-medium text-brand-blue-700 hover:underline"
+          className="block min-h-[32px] py-1.5 pl-6 text-xs font-medium text-brand-blue-700 hover:underline"
         >
           Apply to {subItem.name}
         </MenuLink>
@@ -114,12 +102,20 @@ function MobileSubLink({
   );
 }
 
+const ENTRY_POINTS = [
+  { label: 'Student / Applicant', href: ROUTES.apply, icon: GraduationCap },
+  { label: 'Employer', href: ROUTES.employers, icon: Building2 },
+  { label: 'Workforce Agency', href: ROUTES.forAgencies, icon: Landmark },
+  { label: 'Testing Center', href: ROUTES.testing, icon: FlaskConical },
+] as const;
+
 export default function HeaderMobileMenu({ items, programApplyLinks = {} }: HeaderMobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const pathname = usePathname();
   const firstFocusRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const closeMenu = () => {
     setIsOpen(false);
@@ -134,24 +130,35 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
       return key;
     });
 
-  useEffect(() => closeMenu(), [pathname]);
+  useEffect(() => {
+    closeMenu();
+  }, [pathname]);
 
   useEffect(() => {
-    if (isOpen) requestAnimationFrame(() => firstFocusRef.current?.focus());
+    if (isOpen) {
+      requestAnimationFrame(() => firstFocusRef.current?.focus());
+    } else {
+      requestAnimationFrame(() => triggerRef.current?.focus());
+    }
   }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
+      document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       return;
     }
 
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeMenu();
     };
+
     document.addEventListener('keydown', handleEscape);
     return () => {
+      document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
       document.removeEventListener('keydown', handleEscape);
     };
@@ -159,43 +166,68 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
 
   const drawer = isOpen
     ? createPortal(
-        <>
-          <div className="fixed inset-0 bg-black/50 z-[9998]" onClick={closeMenu} aria-hidden="true" />
+        <div className="fixed inset-0 z-[10000] bg-slate-950/50 lg:hidden">
+          <button
+            className="absolute inset-0 h-full w-full cursor-default"
+            onClick={closeMenu}
+            aria-label="Close navigation"
+          />
+
           <div
-            className="fixed inset-y-0 right-0 w-[min(100vw,26rem)] bg-white z-[10000] flex flex-col shadow-2xl pt-[env(safe-area-inset-top)]"
+            id="mobile-site-navigation"
+            className="absolute inset-y-0 right-0 flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden bg-white shadow-2xl sm:w-[min(100vw,26rem)]"
             role="dialog"
             aria-modal="true"
-            aria-label="Main navigation"
             aria-labelledby="mobile-nav-title"
           >
-            <div className="flex h-14 items-center justify-between border-b border-slate-100 px-4 shrink-0">
-              <h2 className="font-semibold text-slate-900 text-base" id="mobile-nav-title">Menu</h2>
+            <div className="flex min-h-[60px] shrink-0 items-center justify-between border-b border-slate-100 bg-white px-4 pt-[env(safe-area-inset-top)]">
+              <h2 className="text-base font-semibold text-slate-900" id="mobile-nav-title">Menu</h2>
               <button
+                ref={firstFocusRef}
                 type="button"
                 onClick={closeMenu}
                 aria-label="Close navigation"
-                className="flex h-11 w-11 items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800"
               >
                 <X aria-hidden="true" className="h-5 w-5" />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto overscroll-contain px-3 py-2" aria-label="Site navigation">
-              {items.map((item, index) => {
+            <div className="shrink-0 border-b border-slate-100 bg-slate-50 px-3 py-3">
+              <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-wide text-slate-500">Choose your entry point</p>
+              <div className="grid grid-cols-2 gap-2">
+                {ENTRY_POINTS.map(({ label, href, icon: Icon }) => (
+                  <MenuLink
+                    key={label}
+                    href={href}
+                    onNavigate={closeMenu}
+                    className="flex min-h-[52px] items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:border-brand-blue-300 hover:text-brand-blue-700"
+                  >
+                    <Icon className="h-4 w-4 flex-none" aria-hidden="true" />
+                    <span>{label}</span>
+                  </MenuLink>
+                ))}
+              </div>
+            </div>
+
+            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-white px-3 py-2" aria-label="Site navigation">
+              {items.map((item) => {
                 const sectionKey = item.id ?? item.name;
                 const hasSubItems = Boolean(item.subItems?.length);
                 const sectionOpen = expandedSection === sectionKey;
-                const columns = hasSubItems ? Object.values(groupNavSubItemsByHeader(item.subItems!)) : [];
-                const useCategoryAccordions = columns.length > 1;
+                const groups = hasSubItems ? Object.values(groupNavSubItemsByHeader(item.subItems!)) : [];
+                const useCategoryAccordions = groups.length > 1;
+                const hasChildWithParentHref = Boolean(
+                  item.href && item.subItems?.some((subItem) => subItem.href === item.href),
+                );
 
                 return (
                   <section key={sectionKey} className="border-b border-slate-100 last:border-0">
                     {hasSubItems ? (
                       <button
-                        ref={index === 0 ? firstFocusRef : undefined}
                         type="button"
                         onClick={() => toggleSection(sectionKey)}
-                        className="flex w-full items-center justify-between py-2.5 min-h-[44px] text-left text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                        className="flex min-h-[48px] w-full items-center justify-between py-3 text-left text-base font-semibold text-slate-900 hover:text-brand-blue-600"
                         aria-expanded={sectionOpen}
                         aria-controls={`mobile-section-${sectionKey}`}
                       >
@@ -209,63 +241,78 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                       <MenuLink
                         href={item.href}
                         onNavigate={closeMenu}
-                        className="flex py-2.5 min-h-[44px] text-base font-semibold text-slate-900 hover:text-brand-blue-600"
+                        className="flex min-h-[48px] items-center py-3 text-base font-semibold text-slate-900 hover:text-brand-blue-600"
                       >
                         {item.name}
                       </MenuLink>
-                    ) : (
-                      <p className="py-2.5 min-h-[44px] text-base font-semibold text-slate-900">{item.name}</p>
-                    )}
+                    ) : null}
 
                     {hasSubItems && sectionOpen ? (
-                      <div id={`mobile-section-${sectionKey}`} className="pt-2 pb-3 pl-4 border-l-2 border-brand-red-200">
-                        {item.href ? (
+                      <div id={`mobile-section-${sectionKey}`} className="border-l-2 border-brand-red-200 pb-3 pl-4 pt-1">
+                        {item.href && !hasChildWithParentHref ? (
                           <MenuLink
                             href={item.href}
                             onNavigate={closeMenu}
-                            className="block py-1.5 min-h-[40px] text-sm font-bold text-brand-red-600 hover:text-brand-red-700"
+                            className="block min-h-[40px] py-2 text-sm font-bold text-brand-red-600 hover:text-brand-red-700"
                           >
                             View all {item.name} →
                           </MenuLink>
                         ) : null}
 
                         {useCategoryAccordions
-                          ? columns
-                              .filter((column) => column.some((entry) => !entry?.isHeader))
-                              .map((column, columnIndex) => {
-                                const categoryKey = `${sectionKey}::${columnIndex}`;
+                          ? groups
+                              .filter((group) => group.some((entry) => !entry?.isHeader))
+                              .map((group, groupIndex) => {
+                                const categoryKey = `${sectionKey}::${groupIndex}`;
                                 const categoryOpen = expandedCategory === categoryKey;
-                                const label = getNavCategoryLabel(column);
-                                const categoryHeader = column.find((entry) => entry.isHeader);
+                                const label = getNavCategoryLabel(group);
+                                const categoryHeader = group.find((entry) => entry.isHeader);
+
+                                if (!label) {
+                                  return (
+                                    <div key={categoryKey}>
+                                      {group.map((subItem) =>
+                                        subItem.isHeader ? null : (
+                                          <MobileSubLink
+                                            key={`${subItem.name}-${subItem.href ?? 'nohref'}`}
+                                            subItem={subItem}
+                                            itemId={item.id}
+                                            programApplyLinks={programApplyLinks}
+                                            onNavigate={closeMenu}
+                                          />
+                                        ),
+                                      )}
+                                    </div>
+                                  );
+                                }
 
                                 return (
                                   <div key={categoryKey} className="mt-1 first:mt-0">
                                     <button
                                       type="button"
                                       onClick={() => setExpandedCategory(categoryOpen ? null : categoryKey)}
-                                      className="flex w-full min-h-[40px] items-center justify-between py-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
-                                      aria-label={`${categoryOpen ? 'Collapse' : 'Expand'} ${label}`}
+                                      className="flex min-h-[40px] w-full items-center justify-between py-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
                                       aria-expanded={categoryOpen}
                                     >
-                                      <span className="break-words leading-tight text-left">{label}</span>
+                                      <span className="break-words text-left leading-tight">{label}</span>
                                       <ChevronDown
-                                        className={`h-3.5 w-3.5 flex-none text-brand-red-400 transition-transform duration-200 ml-2 ${categoryOpen ? 'rotate-180' : ''}`}
+                                        className={`ml-2 h-3.5 w-3.5 flex-none text-brand-red-400 transition-transform duration-200 ${categoryOpen ? 'rotate-180' : ''}`}
                                         aria-hidden="true"
                                       />
                                     </button>
 
                                     {categoryOpen ? (
-                                      <div className="pl-3 border-l border-brand-red-200">
+                                      <div className="border-l border-brand-red-200 pl-3">
                                         {categoryHeader?.href ? (
                                           <MenuLink
                                             href={categoryHeader.href}
                                             onNavigate={closeMenu}
-                                            className="block py-1 min-h-[32px] text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
+                                            className="block min-h-[32px] py-1 text-xs font-bold uppercase tracking-wide text-brand-red-600 hover:text-brand-red-700"
                                           >
                                             {categoryHeader.name.replace(/—/g, '').trim()}
                                           </MenuLink>
                                         ) : null}
-                                        {column.map((subItem) =>
+                                        {group.map((subItem) =>
                                           subItem.isHeader ? null : (
                                             <MobileSubLink
                                               key={`${subItem.name}-${subItem.href ?? 'nohref'}`}
@@ -293,7 +340,7 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
                                     {subItem.name.replace(/—/g, '').trim()}
                                   </MenuLink>
                                 ) : (
-                                  <p key={subItem.name} className="pt-2 pb-0.5 text-xs font-bold uppercase tracking-wide text-brand-red-600 break-words">
+                                  <p key={subItem.name} className="pb-0.5 pt-2 text-xs font-bold uppercase tracking-wide text-brand-red-600">
                                     {subItem.name.replace(/—/g, '').trim()}
                                   </p>
                                 )
@@ -314,19 +361,19 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               })}
             </nav>
 
-            <div className="border-t border-slate-200 p-4 bg-white shrink-0 pb-[env(safe-area-inset-bottom)]">
-              <div className="flex gap-2 mb-3">
+            <div className="shrink-0 border-t border-slate-200 bg-white p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              <div className="mb-3 flex gap-2">
                 <MenuLink
                   href={ROUTES.apply}
                   onNavigate={closeMenu}
-                  className="flex-1 flex items-center justify-center py-3 min-h-[44px] bg-brand-red-600 text-white rounded-lg font-semibold text-sm hover:bg-brand-red-700"
+                  className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg bg-brand-red-600 py-3 text-sm font-semibold text-white hover:bg-brand-red-700"
                 >
                   Apply Now
                 </MenuLink>
                 <MenuLink
                   href={ROUTES.login}
                   onNavigate={closeMenu}
-                  className="flex-1 flex items-center justify-center gap-1.5 py-3 min-h-[44px] border border-slate-300 text-slate-800 rounded-lg font-semibold text-sm hover:bg-slate-50"
+                  className="flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-300 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50"
                 >
                   <Lock className="h-4 w-4" aria-hidden="true" />
                   Sign In
@@ -334,26 +381,27 @@ export default function HeaderMobileMenu({ items, programApplyLinks = {} }: Head
               </div>
               <a
                 href={phoneHref(siteUrls.org.phone)}
-                className="flex items-center justify-center gap-1.5 py-3 min-h-[44px] text-sm font-medium text-slate-500 hover:text-brand-blue-600"
+                className="flex min-h-[44px] items-center justify-center gap-1.5 py-3 text-sm font-medium text-slate-500 hover:text-brand-blue-600"
               >
                 <Phone className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                 {siteUrls.org.phone}
               </a>
             </div>
           </div>
-        </>,
+        </div>,
         document.body,
       )
     : null;
 
   return (
-    <div className="flex flex-row flex-nowrap items-center justify-end gap-0.5 shrink-0">
+    <div className="flex shrink-0 flex-row flex-nowrap items-center justify-end gap-0.5">
       <SearchModal />
       <LanguageSwitcher compact />
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
         aria-controls="mobile-site-navigation"

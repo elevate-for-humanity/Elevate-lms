@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, ExternalLink, Pencil, Globe2 } from 'lucide-react';
+import { Plus, ExternalLink, Pencil, Globe2, Upload, Sparkles } from 'lucide-react';
+import { ParisWebsiteInterview } from '@/components/store/ParisWebsiteInterview';
 
 type WebsiteRow = {
   id: string;
@@ -56,20 +57,22 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Elevate Apps</p>
-            <h1 className="mt-1 text-3xl font-black text-slate-900">Website Builder</h1>
+            <h1 className="mt-1 text-3xl font-black text-slate-900">AI Website Builder</h1>
             <p className="mt-2 max-w-2xl text-slate-600">
-              Create, edit, preview, and publish your training-provider website from one workspace.
+              Build with PARIS, import an existing website, or start manually. Then edit, preview and publish from one workspace.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={createWebsite}
-            disabled={creating}
-            className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700 disabled:opacity-60"
-          >
-            <Plus className="h-5 w-5" />
-            {creating ? 'Creating…' : 'New Website'}
-          </button>
+          {websites.length > 0 ? (
+            <button
+              type="button"
+              onClick={createWebsite}
+              disabled={creating}
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700 disabled:opacity-60"
+            >
+              <Plus className="h-5 w-5" />
+              {creating ? 'Creating…' : 'New Website'}
+            </button>
+          ) : null}
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -89,16 +92,25 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
         {error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">{error}</div>}
 
         {websites.length === 0 ? (
-          <section className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-            <Globe2 className="mx-auto h-10 w-10 text-slate-400" />
-            <h2 className="mt-4 text-xl font-black text-slate-900">Create your first website</h2>
-            <p className="mx-auto mt-2 max-w-lg text-slate-600">
-              Start with Elevate's default training-provider structure, then edit your branding, homepage content, SEO, and publishing subdomain.
-            </p>
-            <button type="button" onClick={createWebsite} disabled={creating} className="mt-6 rounded-xl bg-slate-900 px-6 py-3 font-bold text-white disabled:opacity-60">
-              {creating ? 'Creating…' : 'Create Website'}
-            </button>
-          </section>
+          <div className="mt-8 space-y-6">
+            <ParisWebsiteInterview onCreated={(website) => setWebsites((current) => [website, ...current])} />
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <Link href="/import" className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-brand-red-300 hover:shadow-md">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Upload className="h-5 w-5" /></div>
+                <h2 className="mt-4 text-xl font-black text-slate-950">Import an existing website</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Bring an existing site into the Elevate builder, then redesign and manage it from your account.</p>
+                <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start import →</span>
+              </Link>
+
+              <button type="button" onClick={createWebsite} disabled={creating} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-slate-300 hover:shadow-md disabled:opacity-60">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-800"><Globe2 className="h-5 w-5" /></div>
+                <h2 className="mt-4 text-xl font-black text-slate-950">Start manually</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Open a clean starter website and edit the branding, homepage, SEO and publishing settings yourself.</p>
+                <span className="mt-5 inline-flex font-black text-slate-950">{creating ? 'Creating…' : 'Create blank starter →'}</span>
+              </button>
+            </div>
+          </div>
         ) : (
           <section className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {websites.map((site) => {
@@ -137,12 +149,19 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
           </section>
         )}
 
-        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
-          <h2 className="text-lg font-black text-slate-900">Need more sites or advanced capacity?</h2>
-          <p className="mt-2 text-sm text-slate-600">Compare Website Builder plans and organization-level platform options in the Store.</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link href="/store/apps/website-builder" className="font-bold text-brand-red-700 hover:underline">Website Builder plans</Link>
-            <Link href="/store/plans" className="font-bold text-brand-red-700 hover:underline">Platform plans</Link>
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-6">
+            <div className="flex items-center gap-2 text-brand-red-700"><Sparkles className="h-5 w-5" /><h2 className="text-lg font-black">Upgrade your AI team</h2></div>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Add PARIS for sales and intake, ELLIE for support, LIZZY for operations, and ZORA for compliance as your organization grows.</p>
+            <Link href="/store#marketplace" className="mt-4 inline-flex font-black text-brand-red-700 hover:underline">Explore AI assistants →</Link>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            <h2 className="text-lg font-black text-slate-900">Need more sites or advanced capacity?</h2>
+            <p className="mt-2 text-sm text-slate-600">Compare Website Builder plans and organization-level platform options in the Store.</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link href="/store/apps/website-builder" className="font-bold text-brand-red-700 hover:underline">Website Builder plans</Link>
+              <Link href="/store/plans" className="font-bold text-brand-red-700 hover:underline">Platform plans</Link>
+            </div>
           </div>
         </div>
       </div>

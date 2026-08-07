@@ -1,36 +1,78 @@
 /**
- * Canonical SaaS feature and add-on catalog (Phase 1).
- * DB source of truth after migration 20260702000017; code mirrors for offline/fallback.
+ * SaaS feature and add-on catalog.
+ *
+ * Canonical capability strings come from lib/platform/features.ts. Legacy DB
+ * values are normalized here so older rows continue to unlock the same feature.
  */
 
+import { PlatformFeature, type PlatformFeatureKey } from '@/lib/platform/features';
+
 export const FEATURES = {
-  CRM: 'crm',
-  WEBSITE: 'website',
-  BOOKINGS: 'bookings',
-  FORMS: 'forms',
-  EMAIL_MARKETING: 'email_marketing',
-  AI_BASIC: 'ai_basic',
-  AI: 'ai',
-  SMS: 'sms',
-  AUTOMATION: 'automation',
-  INVOICING: 'invoicing',
-  LEAD_FUNNELS: 'lead_funnels',
-  CLIENT_PORTAL: 'client_portal',
-  LMS: 'lms',
-  CERTIFICATES: 'certificates',
-  WORKFLOW_AUTOMATION: 'workflow_automation',
-  REPORTING: 'reporting',
-  CUSTOM_BRANDING: 'custom_branding',
-  STUDENT_MANAGEMENT: 'student_management',
-  WORKFORCE: 'workforce',
-  APPRENTICESHIP: 'apprenticeship',
-  EMPLOYER_PORTAL: 'employer_portal',
-  TESTING_CENTER: 'testing_center',
-  WHITE_LABEL_MOBILE: 'white_label_mobile',
-  API_ACCESS: 'api_access',
+  CRM: PlatformFeature.CRM,
+  WEBSITE: PlatformFeature.WEBSITE,
+  WEBSITE_BUILDER: PlatformFeature.WEBSITE_BUILDER,
+  WEBSITE_IMPORT: PlatformFeature.WEBSITE_IMPORT,
+  CUSTOM_DOMAIN: PlatformFeature.CUSTOM_DOMAIN,
+  BOOKINGS: PlatformFeature.BOOKING,
+  FORMS: PlatformFeature.FORMS,
+  EMAIL_MARKETING: PlatformFeature.EMAIL_MARKETING,
+  AI_BASIC: PlatformFeature.AI_BASIC,
+  AI: PlatformFeature.AI_ADVANCED,
+  AI_PARIS: PlatformFeature.AI_PARIS,
+  AI_ELLIE: PlatformFeature.AI_ELLIE,
+  AI_LIZZY: PlatformFeature.AI_LIZZY,
+  AI_ZORA: PlatformFeature.AI_ZORA,
+  AI_ORCHESTRATOR: PlatformFeature.AI_ORCHESTRATOR,
+  AI_VOICE: PlatformFeature.AI_VOICE,
+  SMS: PlatformFeature.SMS,
+  AUTOMATION: PlatformFeature.AUTOMATIONS,
+  INVOICING: PlatformFeature.INVOICING,
+  LEAD_FUNNELS: PlatformFeature.LEAD_FUNNELS,
+  CLIENT_PORTAL: PlatformFeature.CLIENT_PORTAL,
+  ANALYTICS: PlatformFeature.ANALYTICS,
+  SEO_AUTOPILOT: PlatformFeature.SEO_AUTOPILOT,
+  MARKETING_AUTOPILOT: PlatformFeature.MARKETING_AUTOPILOT,
+  LMS: PlatformFeature.LMS,
+  COURSE_BUILDER: PlatformFeature.COURSE_BUILDER,
+  COURSE_FACTORY: PlatformFeature.COURSE_FACTORY,
+  CERTIFICATES: PlatformFeature.CERTIFICATES,
+  CREDENTIALS: PlatformFeature.CREDENTIALS,
+  STUDENT_MANAGEMENT: PlatformFeature.STUDENT_MANAGEMENT,
+  INSTRUCTOR_TOOLS: PlatformFeature.INSTRUCTOR_TOOLS,
+  MEDIA_STUDIO: PlatformFeature.MEDIA_STUDIO,
+  WORKFLOW_AUTOMATION: PlatformFeature.WORKFLOW_AUTOMATION,
+  REPORTING: PlatformFeature.REPORTING,
+  CUSTOM_BRANDING: PlatformFeature.CUSTOM_BRANDING,
+  WORKFORCE: PlatformFeature.WORKFORCE,
+  APPRENTICESHIP: PlatformFeature.APPRENTICESHIP,
+  EMPLOYER_PORTAL: PlatformFeature.EMPLOYER_PORTAL,
+  TESTING_CENTER: PlatformFeature.TESTING_CENTER,
+  COMPLIANCE: PlatformFeature.COMPLIANCE,
+  SAM_GOV_MANAGER: PlatformFeature.SAM_GOV_MANAGER,
+  GRANTS_DISCOVERY: PlatformFeature.GRANTS_DISCOVERY,
+  WHITE_LABEL_MOBILE: PlatformFeature.WHITE_LABEL_MOBILE,
+  API_ACCESS: PlatformFeature.API_ACCESS,
+  DEV_STUDIO: PlatformFeature.DEV_STUDIO,
+  DEPLOYMENT_AUTOPILOT: PlatformFeature.DEPLOYMENT_AUTOPILOT,
+  CONTAINER_MANAGEMENT: PlatformFeature.CONTAINER_MANAGEMENT,
 } as const;
 
-export type FeatureCode = (typeof FEATURES)[keyof typeof FEATURES];
+export type FeatureCode = PlatformFeatureKey;
+
+const LEGACY_FEATURE_ALIASES: Record<string, FeatureCode> = {
+  bookings: PlatformFeature.BOOKING,
+  booking: PlatformFeature.BOOKING,
+  automation: PlatformFeature.AUTOMATIONS,
+  automations: PlatformFeature.AUTOMATIONS,
+  ai: PlatformFeature.AI_ADVANCED,
+};
+
+export function normalizeFeatureCode(code: string): FeatureCode | null {
+  const normalized = LEGACY_FEATURE_ALIASES[code] ?? code;
+  return (Object.values(PlatformFeature) as string[]).includes(normalized)
+    ? (normalized as FeatureCode)
+    : null;
+}
 
 /** Monthly add-on prices (USD) — mirror saas_addon_catalog seed */
 export const ADDONS = {

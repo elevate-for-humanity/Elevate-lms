@@ -49,9 +49,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Billing service unavailable' }, { status: 503 });
   }
 
-  // Platform subscriptions are organization subscriptions. The public trial flow
-  // creates an organization with contact_email, so use that canonical relationship
-  // instead of trusting a tenant id supplied by the browser.
   const { data: organization, error: orgError } = await admin
     .from('organizations')
     .select('id, name, contact_email')
@@ -127,7 +124,7 @@ export async function POST(request: NextRequest) {
     client_reference_id: user.id,
     metadata,
     subscription_data: { metadata },
-    success_url: `${SITE_URL}/store/success?type=subscription&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${SITE_URL}/store/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${SITE_URL}/store/plans?checkout=cancelled`,
   });
 

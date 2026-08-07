@@ -1,356 +1,48 @@
 'use client';
 
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { 
-  ArrowLeft, 
-  Briefcase, 
-  Users, 
-  FileText, 
-  Search,
-  MapPin,
-  Clock,
-  CheckCircle,
-  Star,
-  MessageCircle,
-  Plus
-} from 'lucide-react';
-
-// Demo data
-const jobPostings = [
-  {
-    id: 1,
-    title: 'Licensed Barber',
-    location: 'Indianapolis, IN',
-    type: 'Full-time',
-    salary: '$45,000 - $65,000',
-    applicants: 12,
-    posted: '3 days ago',
-    status: 'active',
-  },
-  {
-    id: 2,
-    title: 'HVAC Technician',
-    location: 'Carmel, IN',
-    type: 'Full-time',
-    salary: '$50,000 - $70,000',
-    applicants: 8,
-    posted: '1 week ago',
-    status: 'active',
-  },
-];
+import { ArrowLeft, Briefcase, MessageCircle, Search, Users } from 'lucide-react';
 
 const candidates = [
-  {
-    id: 1,
-    name: 'Marcus Johnson',
-    program: 'Barber Apprenticeship',
-    completionDate: 'Jan 2025',
-    skills: ['Fades', 'Beard Trimming', 'Customer Service'],
-    rating: 4.8,
-    image: '/images/testimonials/student-marcus.jpg',
-    status: 'Available',
-  },
-  {
-    id: 2,
-    name: 'Sarah Williams',
-    program: 'HVAC Technician',
-    completionDate: 'Dec 2024',
-    skills: ['Installation', 'Repair', 'EPA Certified'],
-    rating: 4.9,
-    image: '/images/testimonials/testimonial-medical-assistant.jpg',
-    status: 'Available',
-  },
-  {
-    id: 3,
-    name: 'David Chen',
-    program: 'CNA Certification',
-    completionDate: 'Nov 2024',
-    skills: ['Patient Care', 'Vital Signs', 'CPR Certified'],
-    rating: 4.7,
-    image: '/images/testimonials/student-david.jpg',
-    status: 'Interviewing',
-  },
+  { name: 'Marcus Sample', program: 'Barber Apprenticeship', skills: ['Fades', 'Customer Service'] },
+  { name: 'Sarah Sample', program: 'HVAC Technician', skills: ['EPA 608', 'Diagnostics'] },
+  { name: 'David Sample', program: 'Medical Assistant', skills: ['Patient Care', 'CPR'] },
 ];
 
 export default function EmployerDemoPage() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [tab, setTab] = useState<'dashboard' | 'jobs' | 'candidates' | 'messages'>('dashboard');
+  const [query, setQuery] = useState('');
+  const [jobs, setJobs] = useState(['Licensed Barber', 'HVAC Technician']);
+  const [notice, setNotice] = useState('');
+  const matches = useMemo(() => candidates.filter((c) => `${c.name} ${c.program} ${c.skills.join(' ')}`.toLowerCase().includes(query.toLowerCase())), [query]);
+  const simulate = (message: string) => { setNotice(message); window.setTimeout(() => setNotice(''), 2400); };
 
   return (
-    <div className="min-h-screen bg-slate-100">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Employer" }]} />
-      </div>
-{/* Demo Header */}
-      <div className="bg-brand-green-600 text-white py-2 px-4 text-center text-sm">
-        <span className="font-bold">DEMO MODE</span> - This is a preview of the employer portal. 
-        <Link href="/store/licenses" className="underline ml-2">Get the full platform →</Link>
-      </div>
-
-      {/* Employer Header */}
-      <header className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <Link href="/store/demo" className="text-slate-500 hover:text-slate-700">
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand-green-600 rounded-lg flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold">Acme Staffing Co.</div>
-                  <div className="text-sm text-slate-500">Employer Partner</div>
-                </div>
-              </div>
-            </div>
-            
-            <button className="bg-brand-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-green-700 flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Post a Job
-            </button>
-          </div>
+    <main className="min-h-screen bg-slate-100">
+      <header className="sticky top-0 z-40 bg-emerald-800 text-white shadow">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
+          <div className="flex items-center gap-3"><Link href="/store/demos" className="rounded-lg p-2 hover:bg-white/10" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link><div><p className="text-xs font-bold uppercase tracking-wider text-emerald-200">Sample data · Demo mode</p><h1 className="font-black">Employer Portal</h1></div></div>
+          <Link href="/store/trial" className="rounded-lg bg-white px-4 py-2 text-sm font-bold text-emerald-900">Start Trial</Link>
         </div>
       </header>
+      {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
-      {/* Navigation Tabs */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex gap-6">
-            {[
-              { id: 'dashboard', label: 'Dashboard', icon: Briefcase },
-              { id: 'jobs', label: 'My Jobs', icon: FileText },
-              { id: 'candidates', label: 'Browse Candidates', icon: Users },
-              { id: 'messages', label: 'Messages', icon: MessageCircle },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 py-4 border-b-2 font-medium transition ${
-                  activeTab === tab.id
-                    ? 'border-brand-green-600 text-brand-green-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <nav className="mb-6 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2">
+          {[
+            ['dashboard','Dashboard',Briefcase],['jobs','Jobs',Briefcase],['candidates','Candidates',Users],['messages','Messages',MessageCircle],
+          ].map(([id,label,Icon]: any) => <button key={id} onClick={() => setTab(id)} className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold ${tab === id ? 'bg-emerald-700 text-white' : 'text-slate-700 hover:bg-slate-100'}`}><Icon className="h-4 w-4" />{label}</button>)}
+        </nav>
+
+        {tab === 'dashboard' && <section className="grid gap-5 md:grid-cols-3">{[['Active jobs',jobs.length],['Sample candidates',candidates.length],['Interviews','2']].map(([label,value]) => <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-6"><p className="text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-sm text-slate-600">{label}</p></div>)}</section>}
+
+        {tab === 'jobs' && <section className="rounded-2xl border border-slate-200 bg-white p-6"><div className="flex items-center justify-between gap-3"><div><h2 className="text-xl font-black">Sample job postings</h2><p className="text-sm text-slate-500">Adding or editing here only changes this demo session.</p></div><button onClick={() => setJobs((current) => [...current, `Sample Job ${current.length + 1}`])} className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white">Post sample job</button></div><div className="mt-5 space-y-3">{jobs.map((job, index) => <div key={`${job}-${index}`} className="flex items-center justify-between rounded-xl border border-slate-200 p-4"><div><p className="font-bold">{job}</p><p className="text-sm text-slate-500">Indianapolis, IN · Demo posting</p></div><div className="flex gap-2"><button onClick={() => simulate(`Opened applicants for ${job}`)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">Applicants</button><button onClick={() => simulate(`Demo editor opened for ${job}`)} className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-bold text-white">Edit</button></div></div>)}</div></section>}
+
+        {tab === 'candidates' && <section className="rounded-2xl border border-slate-200 bg-white p-6"><label className="relative block"><Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search sample candidates" className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-3" /></label><div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">{matches.map((candidate) => <article key={candidate.name} className="rounded-xl border border-slate-200 p-5"><h3 className="font-black">{candidate.name}</h3><p className="mt-1 text-sm text-slate-500">{candidate.program}</p><div className="mt-3 flex flex-wrap gap-1">{candidate.skills.map((skill) => <span key={skill} className="rounded-full bg-slate-100 px-2 py-1 text-xs">{skill}</span>)}</div><button onClick={() => simulate(`Opened sample profile: ${candidate.name}`)} className="mt-5 w-full rounded-lg bg-emerald-700 py-2 text-sm font-bold text-white">View profile</button></article>)}</div></section>}
+
+        {tab === 'messages' && <section className="rounded-2xl border border-slate-200 bg-white p-8 text-center"><MessageCircle className="mx-auto h-10 w-10 text-slate-300" /><h2 className="mt-3 text-xl font-black">Messaging demo</h2><p className="mt-2 text-slate-500">Compose a simulated employer message without contacting a real person.</p><button onClick={() => simulate('Demo message composed — nothing was sent')} className="mt-5 rounded-lg bg-emerald-700 px-5 py-2.5 font-bold text-white">Compose sample message</button></section>}
       </div>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {activeTab === 'dashboard' && (
-          <div className="space-y-6">
-            {/* Stats */}
-            <div className="grid md:grid-cols-4 gap-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-brand-green-600">2</div>
-                <div className="text-slate-600">Active Jobs</div>
-              </div>
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-blue-600">20</div>
-                <div className="text-slate-600">Total Applicants</div>
-              </div>
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-blue-600">5</div>
-                <div className="text-slate-600">Interviews Scheduled</div>
-              </div>
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-orange-600">3</div>
-                <div className="text-slate-600">Hires This Month</div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="grid lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h2 className="text-lg font-bold mb-4">Active Job Postings</h2>
-                <div className="space-y-4">
-                  {jobPostings.map((job) => (
-                    <div key={job.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                      <div>
-                        <h3 className="font-semibold">{job.title}</h3>
-                        <p className="text-sm text-slate-500">{job.location} • {job.type}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-semibold text-brand-green-600">{job.applicants} applicants</div>
-                        <div className="text-sm text-slate-500">{job.posted}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <h2 className="text-lg font-bold mb-4">Top Candidates</h2>
-                <div className="space-y-4">
-                  {candidates.slice(0, 3).map((candidate) => (
-                    <div key={candidate.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                        <Image sizes="100vw" src={candidate.image} alt={candidate.name} fill className="object-cover" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{candidate.name}</h3>
-                        <p className="text-sm text-slate-500">{candidate.program}</p>
-                      </div>
-                      <div className="flex items-center gap-1 text-yellow-500">
-                        <Star className="w-4 h-4 fill-current" />
-                        <span className="font-medium">{candidate.rating}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'jobs' && (
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold">My Job Postings</h2>
-              <button className="bg-brand-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-green-700 flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                Post New Job
-              </button>
-            </div>
-            <div className="space-y-4">
-              {jobPostings.map((job) => (
-                <div key={job.id} className="border rounded-lg p-6 hover:shadow-md transition">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-lg font-bold">{job.title}</h3>
-                      <div className="flex items-center gap-4 text-sm text-slate-500 mt-2">
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {job.location}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {job.type}
-                        </span>
-                      </div>
-                      <p className="text-brand-green-600 font-semibold mt-2">{job.salary}</p>
-                    </div>
-                    <span className="px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full text-sm font-medium">
-                      {job.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                    <span className="text-sm text-slate-500">{job.applicants} applicants • Posted {job.posted}</span>
-                    <div className="flex gap-2">
-                      <button className="px-4 py-2 border rounded-lg font-medium hover:bg-slate-50">
-                        View Applicants
-                      </button>
-                      <button className="px-4 py-2 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700">
-                        Edit
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'candidates' && (
-          <div className="space-y-6">
-            {/* Search */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search candidates by skill, program, or name..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg"
-                  />
-                </div>
-                <button className="px-6 py-3 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700">
-                  Search
-                </button>
-              </div>
-            </div>
-
-            {/* Candidates Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {candidates.map((candidate) => (
-                <div key={candidate.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition">
-                  <div className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                        <Image sizes="100vw" src={candidate.image} alt={candidate.name} fill className="object-cover" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg">{candidate.name}</h3>
-                        <p className="text-sm text-slate-500">{candidate.program}</p>
-                        <div className="flex items-center gap-1 text-yellow-500 mt-1">
-                          <Star className="w-4 h-4 fill-current" />
-                          <span className="font-medium">{candidate.rating}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <div className="text-sm text-slate-500 mb-2">Skills</div>
-                      <div className="flex flex-wrap gap-2">
-                        {candidate.skills.map((skill, i) => (
-                          <span key={i} className="px-2 py-1 bg-slate-100 rounded text-sm">
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <span className={`px-2 py-1 rounded text-sm font-medium ${
-                        candidate.status === 'Available' 
-                          ? 'bg-brand-green-100 text-brand-green-700' 
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        {candidate.status}
-                      </span>
-                      <button className="text-brand-green-600 font-medium hover:underline">
-                        View Profile
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'messages' && (
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold mb-6">Messages</h2>
-            <div className="text-center py-12 text-slate-500">
-              <MessageCircle className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-              <p>No messages yet. Start connecting with candidates!</p>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* CTA Footer */}
-      <div className="bg-slate-900 text-white py-8 mt-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-3">Want this employer portal?</h2>
-          <p className="text-slate-300 mb-6">The employer portal is included with Enterprise licenses.</p>
-          <Link 
-            href="/store/licenses" 
-            className="inline-block bg-orange-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-orange-700"
-          >
-            View Platform Licenses
-          </Link>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }

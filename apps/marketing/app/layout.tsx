@@ -16,6 +16,7 @@ import { ChunkRecovery } from '@/components/system/ChunkRecovery';
 import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
+import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
@@ -31,7 +32,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Force dynamic rendering to avoid static generation issues
+// Keep current rendering semantics until the route-by-route cache audit proves
+// which public pages are safe to move to static/ISR rendering.
 export const dynamic = 'force-dynamic';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -44,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
         <ChunkRecovery />
+        <GoogleAnalytics />
         <I18nProvider>
           <Header />
           <main className="site-main pt-[60px]">{children}</main>

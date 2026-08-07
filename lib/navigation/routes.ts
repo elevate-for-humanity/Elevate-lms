@@ -11,8 +11,9 @@ const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhuman
 const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
 
 export const ROUTES = {
-  // Home
+  // Home / intake
   home: '/',
+  apply: '/apply',
 
   // Authentication / portals
   login: `${APP_URL}/login`,

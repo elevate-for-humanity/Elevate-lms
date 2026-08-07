@@ -70,8 +70,8 @@ RUN apk add --no-cache curl \
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
 
-# The standalone launcher runs from /app/server.js, so public assets must exist
-# at /app/public. Keep the app-relative copy as well for monorepo standalone
+# The standalone launcher runs from /app, so public assets must exist at
+# /app/public. Keep the app-relative copy as well for monorepo standalone
 # layouts that resolve assets from /app/apps/admin.
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
@@ -81,10 +81,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/pu
 RUN test -f /app/public/sw-admin.js \
     && test -f /app/apps/admin/public/sw-admin.js
 
+# apps/admin/server.js is intentionally CommonJS. The standalone output root
+# package.json declares "type": "module", so a .js launcher crashes with
+# `require is not defined`. Preserve the launcher as .cjs in the runtime image.
 RUN if [ -f /app/apps/admin/server.js ]; then \
-      cp /app/apps/admin/server.js /app/server.js; \
+      cp /app/apps/admin/server.js /app/server.cjs; \
     elif [ -f /app/server.js ]; then \
-      true; \
+      cp /app/server.js /app/server.cjs; \
     else \
       echo "ERROR: No runnable server.js in runtime image"; \
       find /app -maxdepth 5 -name "server.js" -print; \
@@ -98,4 +101,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/version" || exit 1
 
-CMD ["node", "--max-old-space-size=4096", "server.js"]
+CMD ["node", "--max-old-space-size=4096", "server.cjs"]

@@ -2,22 +2,12 @@
 // __CACHE_VERSION__ replaced at build time by scripts/stamp-sw.mjs.
 const CACHE_VERSION = '__CACHE_VERSION__';
 
-// Cache names — prefixed with domain so each app gets unique caches.
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
-const OFFLINE_URL = '/offline.html';
 
-// Critical path assets precached on install.
-// Uses Promise.allSettled so a missing icon does not block SW activation.
-const PRECACHE_ASSETS = [
-  '/',
-  '/offline.html',
-  '/manifest-marketing.json',
-];
+const PRECACHE_ASSETS = ['/', '/offline.html', '/manifest-marketing.json'];
 
-// Patterns for caching strategies.
 const CACHE_STRATEGIES = {
-  // Always hit the network — never cache.
   noCache: [
     /\/api\//,
     /\/login/,
@@ -26,30 +16,52 @@ const CACHE_STRATEGIES = {
     /supabase/,
     /analytics/,
     /gtag/,
+    /\.(mp4|webm|mov|m4v|mp3|m4a|wav|ogg|aac)$/i,
   ],
-  // Next.js chunks — always network so stale chunks never break the app.
   nextChunks: [/\/_next\/static\//, /\/_next\/data\//],
-  // Cache-first for fonts and images only.
-  static: [/\.(woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
-  // Stale-while-revalidate for public API data.
+  static: [/\.(woff2?|ttf|eot)$/i, /\/images\//, /\/icons\//],
   staleWhileRevalidate: [/\/api\/public\//],
 };
 
-// Install — precache critical assets.
+function matchesPattern(url, patterns) {
+  return patterns.some((pattern) => pattern.test(url));
+}
+
+function isCacheableResponse(response) {
+  return Boolean(
+    response &&
+      response.status === 200 &&
+      response.ok &&
+      !response.redirected &&
+      response.type !== 'opaqueredirect',
+  );
+}
+
+async function safeCachePut(cache, request, response) {
+  if (!isCacheableResponse(response)) return;
+  try {
+    await cache.put(request, response.clone());
+  } catch (error) {
+    console.warn('[SW-marketing] Cache put skipped:', error?.message || String(error));
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(STATIC_CACHE);
       const results = await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
-          const req = new Request(asset, { cache: 'reload' });
+          const req = new Request(asset, { cache: 'reload', redirect: 'follow' });
           const res = await fetch(req);
-          if (!res.ok) throw new Error(`Precache failed: ${asset} HTTP ${res.status}`);
-          await cache.put(req, res);
+          if (!isCacheableResponse(res)) {
+            throw new Error(`Precache skipped: ${asset} HTTP ${res.status}`);
+          }
+          await safeCachePut(cache, req, res);
         }),
       );
       const failures = results.filter((r) => r.status === 'rejected');
-      if (failures.length > 0) {
+      if (failures.length) {
         console.warn('[SW-marketing] Optional precache failures:', failures.length);
       }
       await self.skipWaiting();
@@ -57,7 +69,6 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate — evict all old elevate-marketing caches from previous deployments.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
@@ -72,16 +83,12 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-function matchesPattern(url, patterns) {
-  return patterns.some((pattern) => pattern.test(url));
-}
-
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   const fetchPromise = fetch(request)
-    .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+    .then(async (response) => {
+      await safeCachePut(cache, request, response);
       return response;
     })
     .catch(() => null);
@@ -91,9 +98,9 @@ async function staleWhileRevalidate(request, cacheName) {
 async function networkFirst(request, cacheName) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (isCacheableResponse(response)) {
       const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
+      await safeCachePut(cache, request, response);
     }
     return response;
   } catch {
@@ -101,37 +108,27 @@ async function networkFirst(request, cacheName) {
   }
 }
 
-// Fetch — smart caching based on request type.
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
   if (request.method !== 'GET') return;
   if (url.origin !== self.location.origin) return;
+
+  // Let the browser handle page navigations and redirects directly.
+  // This prevents redirected navigation requests such as /host-shop from
+  // failing because of a service-worker Request redirect mode mismatch.
+  if (request.mode === 'navigate') return;
+
+  // Range requests return HTTP 206 and cannot be written to Cache Storage.
+  // Let the browser/network handle them directly.
+  if (request.headers.has('range')) return;
+
   if (matchesPattern(request.url, CACHE_STRATEGIES.noCache)) return;
 
-  // Never serve stale Next.js chunks.
+  // Never cache or serve stale Next.js build assets.
   if (matchesPattern(request.url, CACHE_STRATEGIES.nextChunks)) {
-    event.respondWith(fetch(request, { cache: 'no-store' }));
-    return;
-  }
-
-  // Navigations — always network-first.
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      (async () => {
-        try {
-          return await fetch(request, { cache: 'no-store', redirect: 'follow' });
-        } catch {
-          const cached = await caches.match(request);
-          if (cached) return cached;
-          return new Response('Elevate for Humanity is temporarily unavailable.', {
-            status: 503,
-            headers: { 'Content-Type': 'text/plain' },
-          });
-        }
-      })(),
-    );
+    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }));
     return;
   }
 
@@ -152,13 +149,15 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Message — cache management commands.
 self.addEventListener('message', (event) => {
   const { type } = event.data || {};
   if (type === 'SKIP_WAITING') self.skipWaiting();
   if (type === 'GET_CACHE_SIZE') {
-    caches.open(STATIC_CACHE).then((c) => c.keys()).then((keys) => {
-      event.source.postMessage({ type: 'CACHE_SIZE', payload: { static: keys.length } });
-    });
+    caches
+      .open(STATIC_CACHE)
+      .then((c) => c.keys())
+      .then((keys) => {
+        event.source?.postMessage({ type: 'CACHE_SIZE', payload: { static: keys.length } });
+      });
   }
 });

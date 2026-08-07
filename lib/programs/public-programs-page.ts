@@ -1,6 +1,5 @@
 /**
  * Shared server data for /programs — single source for page HTML, RSC payload, and metadata.
- * Never rely on client hydration for program count or listing.
  */
 
 import type { Metadata } from 'next';
@@ -11,47 +10,26 @@ import {
   loadPublishedProgramsListing,
   type ProgramsListingItem,
 } from '@/lib/programs/load-program-catalog';
+import {
+  getProgramFundingTier,
+  getPublicFundingLabels,
+  getVerifiedProgramFunding,
+  isStrictWorkforceFundedProgram,
+} from '@/lib/programs/funding-registry';
 
-/** Slugs hidden from the public /programs grid (legacy duplicates, drafts). */
-// Aliases for backward compatibility
 export const buildProgramsCatalogMetadata = buildProgramsListingMetadata;
 export const getPublicProgramsCatalogPage = getPublicProgramsPageData;
 export type PublicCatalogProgram = ProgramsPageRow;
 
 export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
-  'cna-training',
-  'hvac',
-  'hvac-technician-program',
-  'hvac-2024',
-  'medical-assistant-program',
-  'phlebotomy-technician',
-  'phlebotomy-technician-program',
-  'barber',
-  'barber-program',
-  'cosmetology',
-  'nail-technician',
-  'cpr-cert',
-  'health-safety',
-  'forklift-operator',
-  'tax-prep',
-  'it-support',
-  'it-support-specialist',
-  'cybersecurity',
-  'bookkeeping-fundamentals',
-  'entrepreneurship-small-business',
-  'peer-recovery-specialist-jri',
-  'ai-advanced-project-management-1774494313718',
-  'ai-forklift-safety-certification-1774495387731',
-  'jri-badge-1-mindsets',
-  'jri-badge-2-self-management',
-  'jri-badge-3-learning-strategies',
-  'jri-badge-4-social-skills',
-  'jri-badge-5-workplace-skills',
-  'jri-badge-6-launch-a-career',
-  'jri-introduction',
-  'jri',
-  'micro-programs',
-  'emergency-health-safety',
+  'cna-training','hvac','hvac-technician-program','hvac-2024','medical-assistant-program',
+  'phlebotomy-technician','phlebotomy-technician-program','barber','barber-program','cosmetology',
+  'nail-technician','cpr-cert','health-safety','forklift-operator','tax-prep','it-support',
+  'it-support-specialist','cybersecurity','bookkeeping-fundamentals','entrepreneurship-small-business',
+  'peer-recovery-specialist-jri','ai-advanced-project-management-1774494313718',
+  'ai-forklift-safety-certification-1774495387731','jri-badge-1-mindsets','jri-badge-2-self-management',
+  'jri-badge-3-learning-strategies','jri-badge-4-social-skills','jri-badge-5-workplace-skills',
+  'jri-badge-6-launch-a-career','jri-introduction','jri','micro-programs','emergency-health-safety',
   'nha-medical-assistant',
 ]);
 
@@ -63,6 +41,9 @@ export type ProgramsPageRow = {
   duration: string | null;
   credential: string | null;
   funding_eligible: boolean;
+  funding_tier: 'workforce-funded' | 'self-pay';
+  funding_labels: string[];
+  top_jobs_stars: number | null;
 };
 
 export type PublicProgramsPageData = {
@@ -72,18 +53,23 @@ export type PublicProgramsPageData = {
 };
 
 function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
-  return listing.map((p) => ({
-    slug: p.slug,
-    title: p.title,
-    description: p.description,
-    category: p.sectionKey,
-    duration: p.duration,
-    credential: p.credential,
-    funding_eligible: p.funding_eligible,
-  }));
+  return listing.map((p) => {
+    const verified = getVerifiedProgramFunding(p.slug);
+    return {
+      slug: p.slug,
+      title: p.title,
+      description: p.description,
+      category: p.sectionKey,
+      duration: p.duration,
+      credential: p.credential,
+      funding_eligible: isStrictWorkforceFundedProgram(p.slug),
+      funding_tier: getProgramFundingTier(p.slug),
+      funding_labels: getPublicFundingLabels(p.slug),
+      top_jobs_stars: verified?.topJobsStars ?? null,
+    };
+  });
 }
 
-/** Canonical SSR loader for /programs. */
 export async function getPublicProgramsPageData(): Promise<PublicProgramsPageData> {
   const db = createPublicClient();
   const { programs: listing, source } = await loadPublishedProgramsListing(db, {
@@ -92,15 +78,9 @@ export async function getPublicProgramsPageData(): Promise<PublicProgramsPageDat
   });
 
   const programs = mapListingToRows(listing);
-
-  return {
-    programs,
-    programCount: programs.length,
-    catalogSource: source,
-  };
+  return { programs, programCount: programs.length, catalogSource: source };
 }
 
-/** Hero/metadata count — use SITE_STATS floor when listing is unexpectedly empty. */
 export function resolvePublicProgramCount(programCount: number): number {
   if (programCount > 0) return programCount;
   return SITE_STATS.programsOffered;
@@ -109,28 +89,23 @@ export function resolvePublicProgramCount(programCount: number): number {
 export async function buildProgramsListingMetadata(): Promise<Metadata> {
   const { programCount } = await getPublicProgramsPageData();
   const count = resolvePublicProgramCount(programCount);
-  // Use { absolute: ... } to bypass root layout template and prevent doubled site name
+  const description = `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. Verified workforce-funded programs are identified separately from regular self-pay courses.`;
   return {
     title: { absolute: 'Career Training Programs | Elevate for Humanity' },
-    description: `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
+    description,
     alternates: { canonical: `${PLATFORM_DEFAULTS.siteUrl.replace(/\/$/, '')}/programs` },
     openGraph: {
       title: 'Career Training Programs | Elevate for Humanity',
-      description: `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
+      description,
       url: `${PLATFORM_DEFAULTS.siteUrl.replace(/\/$/, '')}/programs`,
       siteName: PLATFORM_DEFAULTS.orgName,
       type: 'website',
       locale: 'en_US',
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Career Training Programs | Elevate for Humanity',
-      description: `${count} career training programs in healthcare, skilled trades, technology, beauty, and business. WIOA and Workforce Ready Grant funding available.`,
-    },
+    twitter: { card: 'summary_large_image', title: 'Career Training Programs | Elevate for Humanity', description },
   };
 }
 
-/** Format program count for display: 1 → "1 program", 25 → "25 programs" */
 export function formatPublicProgramsDisplay(count: number): string {
   return count === 1 ? '1 program' : `${count} programs`;
 }

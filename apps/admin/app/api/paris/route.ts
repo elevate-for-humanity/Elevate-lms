@@ -1,9 +1,6 @@
 /**
- * PARIS — Zero Obstacles, Ready Advisors
- * AI Career Guidance Interview Agent
- * 
- * This route handles the career guidance interview conversation.
- * It uses the existing AI orchestrator with 'career_guidance_interview' task type.
+ * PARIS — internal Admin career/admissions guidance route.
+ * Public prospect chat lives on Marketing; this Admin endpoint requires auth.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,6 +8,7 @@ import { executeAiTask } from '@/lib/ai/execute-ai-task';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiAuthGuard } from '@/lib/admin/guards';
 import type { ChatMessage } from '@/lib/ai/types';
 import { logger } from '@/lib/logger';
 
@@ -18,84 +16,57 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-// POST /api/paris — Send a message to Zora
 async function _POST(req: NextRequest) {
   try {
-    // Rate limiting
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
 
-    const { 
-      message, 
-      history = [], 
-      sessionId,
-      userId 
-    } = await req.json();
+    const auth = await apiAuthGuard(req);
+    if (auth.error) return auth.error;
+
+    const { message, history = [], sessionId } = await req.json();
 
     if (!message || typeof message !== 'string') {
-      return NextResponse.json(
-        { error: 'message is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'message is required' }, { status: 400 });
     }
-
     if (message.length > 2000) {
-      return NextResponse.json(
-        { error: 'Message too long (max 2000 characters)' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Message too long (max 2000 characters)' }, { status: 400 });
     }
 
-    // Get user context if authenticated
-    let contextUserId = userId;
+    const contextUserId = auth.user.id;
     let userContext = '';
-    
     try {
       const supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        contextUserId = user.id;
-        
-        // Fetch user profile for context
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name, email')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile) {
-          userContext = `The student's name is ${profile.full_name ?? 'Unknown'}.`;
-        }
-      }
-    } catch (e) {
-      // Non-authenticated users are fine - they can still chat
-      logger.debug('[paris] Could not fetch user context', { error: e });
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, email, role')
+        .eq('id', contextUserId)
+        .maybeSingle();
+      if (profile) userContext = `Authenticated staff user: ${profile.full_name ?? profile.email ?? contextUserId}.`;
+    } catch (error) {
+      logger.debug('[paris] Could not load staff profile context', { error: String(error) });
     }
 
-    // Build conversation history for context
-    const conversationHistory: ChatMessage[] = history.map((h: { role: string; content: string }) => ({
-      role: h.role as 'user' | 'assistant',
-      content: h.content,
-    }));
+    const conversationHistory: ChatMessage[] = Array.isArray(history)
+      ? history
+          .filter((item: any) => item && ['user', 'assistant'].includes(item.role) && typeof item.content === 'string')
+          .slice(-20)
+          .map((item: any) => ({ role: item.role, content: item.content.slice(0, 4000) }))
+      : [];
 
-    // Add user context to the message
-    const enrichedMessage = userContext 
-      ? `${userContext} ${message}`
-      : message;
+    const enrichedMessage = `${userContext}\nYou are PARIS, supporting admissions and career guidance. Do not invent approvals, funding eligibility, enrollment status, prices or program facts.\n\n${message}`;
 
-    // Call the AI orchestrator with career_guidance_interview task
     const result = await executeAiTask({
-      task: 'career_guidance_interview',
+      task: 'career_counseling',
       prompt: enrichedMessage,
       context: {
         history: conversationHistory,
         userId: contextUserId,
-        sessionId: sessionId,
+        sessionId,
       },
     });
 
-    // Log the interaction
-    logger.info('[paris] Career guidance message processed', {
+    logger.info('[paris] Admin guidance message processed', {
       userId: contextUserId,
       sessionId,
       messageLength: message.length,
@@ -105,16 +76,14 @@ async function _POST(req: NextRequest) {
 
     return NextResponse.json({
       response: result.content,
-      sessionId: sessionId,
+      sessionId,
       provider: result.provider,
     });
-
   } catch (error) {
-    logger.error('[paris] Career guidance error', undefined, { error });
-    
+    logger.error('[paris] Admin guidance error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Something went wrong. Please try again or contact support@elevateforhumanity.org' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

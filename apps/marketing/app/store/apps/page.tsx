@@ -1,183 +1,61 @@
+import type { Metadata } from 'next';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import CommerceCatalogClient from '@/components/store/CommerceCatalogClient';
+import { COMMERCE_CATALOG } from '@/lib/store/commerce-catalog';
+
 export const dynamic = 'force-static';
 
-
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import Link from 'next/link';
-import { Star, ShoppingCart, Building2, DollarSign, Layout } from 'lucide-react';
-
 export const metadata: Metadata = {
-  title: 'Apps & Tools',
-  description: 'Discover apps and tools for workforce development, government contracting, grant management, and training provider websites.',
-  keywords: ['workforce apps', 'SAM.gov', 'grants management', 'website builder', 'training provider tools'],
-  openGraph: {
-    title: 'Apps & Tools',
-    description: 'Discover apps and tools for workforce development and training providers.',
-    type: 'website',
-  },
+  title: 'Software, Apps & Add-Ons | Elevate Store',
+  description:
+    'Search Elevate software, Website Builder, AI assistants, LMS tools, testing, workforce, apprenticeship, government-contracting, grants, operations, and enterprise products.',
+  keywords: [
+    'workforce software',
+    'website builder',
+    'AI assistants',
+    'LMS',
+    'course builder',
+    'testing center software',
+    'apprenticeship software',
+    'workforce development software',
+    'SAM.gov manager',
+    'grant management software',
+  ],
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/apps',
   },
-};
-
-const apps = [
-  {
-    slug: 'website-builder',
-    name: 'Website Builder for Training Providers',
-    description: 'Build professional training websites with LMS integration, enrollment forms, and SEO tools.',
-    icon: Layout,
-    color: 'blue',
-    rating: 4.9,
-    price: 79,
-    category: 'Website',
-    demo: true,
+  openGraph: {
+    title: 'Software, Apps & Add-Ons | Elevate Store',
+    description:
+      'Search the Elevate commerce catalog across platform plans, apps, AI, education, workforce, operations, and enterprise tools.',
+    url: 'https://www.elevateforhumanity.org/store/apps',
+    type: 'website',
   },
-  {
-    slug: 'grants',
-    name: 'Grants Discovery & Management',
-    description: 'Find and manage federal, state, and foundation grants with AI-powered matching and tracking.',
-    icon: DollarSign,
-    color: 'green',
-    rating: 4.8,
-    price: 199,
-    category: 'Funding',
-    demo: true,
-  },
-  {
-    slug: 'sam-gov',
-    name: 'SAM.gov Registration & Compliance',
-    description: 'Streamline federal contractor registration and maintain SAM.gov compliance with automated tools.',
-    icon: Building2,
-    color: 'blue',
-    rating: 4.9,
-    price: 149,
-    category: 'Government',
-    demo: true,
-  },
-  {
-    slug: 'ai-studio',
-    name: 'AI Course Studio',
-    description: 'Create courses with AI. Auto-generate curriculum, quizzes, and content from any document.',
-    icon: DollarSign,
-    color: 'purple',
-    rating: 4.9,
-    price: 299,
-    category: 'AI Tools',
-    demo: true,
-  },
-  {
-    slug: 'ai-team',
-    name: 'AI Team Assistants',
-    description: 'AI assistants for every role - admissions, compliance, career services, and instructors.',
-    icon: DollarSign,
-    color: 'purple',
-    rating: 4.8,
-    price: 199,
-    category: 'AI Tools',
-    demo: true,
-  },
-  {
-    slug: 'add-ons/proposal-writing-assistant',
-    name: 'AI Proposal Writer',
-    description: 'Write winning grant proposals and RFP responses with AI powered by your organization data.',
-    icon: DollarSign,
-    color: 'green',
-    rating: 4.7,
-    price: 149,
-    category: 'AI Tools',
-    demo: true,
-  },
-];
-
-const colorClasses: Record<string, { bg: string; text: string; badge: string }> = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', badge: 'bg-blue-600' },
-  green: { bg: 'bg-green-100', text: 'text-green-600', badge: 'bg-green-600' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600', badge: 'bg-purple-600' },
 };
 
 export default function AppsPage() {
-
   return (
-    <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Apps" }]} />
+    <main className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Software & Apps' }]} />
       </div>
-{/* Hero */}
-      <section className="text-slate-900 py-16 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Apps & Tools</h1>
-          <p className="text-xl text-slate-700 max-w-2xl mx-auto">
-            Powerful tools for workforce development, government contracting, and training provider operations.
+
+      <section className="border-y border-slate-200 bg-white px-4 py-14">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-brand-red-700">Elevate Store</p>
+          <h1 className="text-4xl font-black text-slate-900 md:text-5xl">Search the Full Platform Catalog</h1>
+          <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-600">
+            Find platform plans, standalone apps, add-ons, AI tools, education technology, workforce modules,
+            operations tools, and enterprise licensing from one authoritative catalog.
           </p>
         </div>
       </section>
 
-      {/* Apps Grid */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {apps.map((app) => {
-              const colors = colorClasses[app.color as keyof typeof colorClasses];
-              return (
-                <div key={app.slug} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center`}>
-                        <app.icon className={`w-7 h-7 ${colors.text}`} />
-                      </div>
-                      <span className={`${colors.badge} text-slate-900 text-xs font-bold px-3 py-1 rounded-full`}>
-                        {app.category}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{app.name}</h3>
-                    <p className="text-slate-700 text-sm mb-4">{app.description}</p>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="flex items-center">
-                        {[1,2,3,4,5].map(i => (
-                          <Star key={i} className={`w-4 h-4 ${i <= Math.floor(app.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-slate-700'}`} />
-                        ))}
-                      </div>
-                      <span className="text-sm text-slate-700">{app.rating} rating</span>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                      <div>
-                        <span className="text-2xl font-bold">${app.price}</span>
-                        <span className="text-slate-700">/mo</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <Link
-                          href={`/store/apps/${app.slug}`}
-                          className="px-4 py-2 text-sm font-medium text-slate-900 hover:text-slate-900 transition-colors"
-                        >
-                          Details
-                        </Link>
-                        <Link
-                          href={`/store/cart?add=${app.slug}-pro`}
-                          className={`inline-flex items-center gap-1 ${colors.badge} text-slate-900 px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity`}
-                        >
-                          <ShoppingCart className="w-4 h-4" />
-                          Add
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      <section className="px-4 py-12">
+        <div className="mx-auto max-w-7xl">
+          <CommerceCatalogClient items={COMMERCE_CATALOG} />
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Need a Custom Solution?</h2>
-          <p className="text-slate-700 mb-8">Contact us for enterprise pricing and custom integrations.</p>
-          <Link href="/contact" className="bg-white hover:bg-slate-800 text-slate-900 px-8 py-4 rounded-lg font-bold">
-            Contact Sales
-          </Link>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

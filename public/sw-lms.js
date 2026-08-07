@@ -11,7 +11,7 @@ const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
   '/',
-  '/offline.html',
+  OFFLINE_URL,
   '/manifest-lms.json',
   `${CDN}/icons/admin-192.png`,
   `${CDN}/icons/admin-512.png`,
@@ -30,7 +30,6 @@ const CACHE_STRATEGIES = {
   nextChunks: [/\/_next\/static\//, /\/_next\/data\//],
   static: [/\.(woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
   staleWhileRevalidate: [/\/api\/public\//],
-  // Course content — network-first with offline fallback.
   networkFirst: [/\/courses\//, /\/programs\//, /\/lms\//],
 };
 
@@ -119,6 +118,8 @@ self.addEventListener('fetch', (event) => {
         } catch {
           const cached = await caches.match(request);
           if (cached) return cached;
+          const offline = await caches.match(OFFLINE_URL);
+          if (offline) return offline;
           return new Response('LMS is temporarily unavailable.', {
             status: 503,
             headers: { 'Content-Type': 'text/plain' },
@@ -141,14 +142,15 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    responsePromise.then((response) => {
+    responsePromise.then(async (response) => {
       if (response) return response;
+      const offline = await caches.match(OFFLINE_URL);
+      if (offline && request.destination === 'document') return offline;
       return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
     }),
   );
 });
 
-// Message — course cache management and skip waiting.
 self.addEventListener('message', (event) => {
   const { type, payload } = event.data || {};
 
@@ -156,7 +158,6 @@ self.addEventListener('message', (event) => {
     case 'CACHE_COURSE':
       if (payload?.urls) {
         caches.open(COURSE_CACHE).then((cache) => {
-          // Use Promise.allSettled so one failed URL does not reject the whole batch.
           Promise.allSettled(
             payload.urls.map((url) => fetch(url, { cache: 'reload' }).then((r) => r.ok && cache.put(url, r))),
           );
@@ -187,7 +188,6 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// Background sync for offline enrollment and apprentice hours.
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-enrollment') event.waitUntil(syncEnrollmentData());
   if (event.tag === 'sync-hours') event.waitUntil(syncHoursData());
@@ -239,7 +239,6 @@ function getAllFromStore(store) {
   });
 }
 
-// Push notifications.
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 

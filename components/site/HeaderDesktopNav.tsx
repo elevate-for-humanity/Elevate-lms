@@ -4,13 +4,17 @@ import Link from 'next/link';
 import type { NavItem } from '@/types/navigation';
 
 /**
- * Desktop navigation intentionally stays simple and static.
- * Mobile owns the expandable category experience; desktop shows one clean row
- * of canonical top-level destinations with no horizontal scroll or mega-menu.
+ * Desktop navigation stays a single horizontal row. Inline layout guards are
+ * intentional here so broad/global nav CSS cannot collapse the desktop header
+ * into the mobile vertical pattern.
  */
 export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   return (
-    <nav aria-label="Main navigation" className="flex items-center justify-center gap-1 whitespace-nowrap">
+    <nav
+      aria-label="Main navigation"
+      className="items-center justify-center gap-1 whitespace-nowrap"
+      style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' }}
+    >
       {items.map((item) => {
         if (!item.href) return null;
 

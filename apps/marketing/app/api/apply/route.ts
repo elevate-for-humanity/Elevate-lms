@@ -2,6 +2,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { POST as submitApplication } from '../applications/route';
 import {
   WORKONE_INDY_INTAKE_URL,
   getVerifiedProgramFunding,
@@ -124,12 +125,20 @@ export async function POST(req: Request) {
       workOneAppointmentUrl: workforceFunded ? WORKONE_INDY_INTAKE_URL : null,
     };
 
-    const applicationsUrl = new URL('/api/applications', req.url);
-    const upstream = await fetch(applicationsUrl.toString(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    const canonicalUrl = new URL('/api/applications', req.url);
+    const canonicalHeaders = new Headers({ 'Content-Type': 'application/json' });
+    const origin = req.headers.get('origin');
+    if (origin) canonicalHeaders.set('Origin', origin);
+    const idempotencyKey = req.headers.get('idempotency-key');
+    if (idempotencyKey) canonicalHeaders.set('Idempotency-Key', idempotencyKey);
+
+    const upstream = await submitApplication(
+      new Request(canonicalUrl, {
+        method: 'POST',
+        headers: canonicalHeaders,
+        body: JSON.stringify(payload),
+      }),
+    );
 
     const upstreamJson = await upstream.json().catch(() => ({}));
 

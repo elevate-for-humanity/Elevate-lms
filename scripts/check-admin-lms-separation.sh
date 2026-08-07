@@ -54,17 +54,18 @@ if grep -q 'verify-health-checks.ts"$' "$LMS_WF" || grep -q 'verify-health-check
 fi
 pass "Northflank deploy workflow split looks correct"
 
-# 3) Keep one canonical admin dashboard entry.
-ADMIN_LANDING="apps/admin/app/admin/page.tsx"
+# 3) Keep one canonical admin dashboard implementation.
+# The Admin app is mounted on the admin origin, so its canonical dashboard URL
+# is /dashboard. Do not force a second /admin/dashboard namespace into the app.
+ADMIN_DASHBOARD="apps/admin/app/dashboard/page.tsx"
 ADMIN_DASH_ENH="apps/admin/app/admin/dashboard-enhanced/page.tsx"
 ADMIN_LMS_DASH="apps/admin/app/admin/lms-dashboard/page.tsx"
 
-[[ -f "$ADMIN_LANDING" ]] || fail "$ADMIN_LANDING missing"
-grep -q "redirect('/admin/dashboard')" "$ADMIN_LANDING" || fail "$ADMIN_LANDING must redirect to /admin/dashboard"
+[[ -f "$ADMIN_DASHBOARD" ]] || fail "$ADMIN_DASHBOARD missing; /dashboard is the canonical Admin dashboard"
 for f in "$ADMIN_DASH_ENH" "$ADMIN_LMS_DASH"; do
-  [[ ! -f "$f" ]] || fail "$f should be removed; use /admin/dashboard directly"
+  [[ ! -f "$f" ]] || fail "$f should be removed after feature parity; use /dashboard"
 done
-pass "Admin dashboard route tree is consolidated"
+pass "Admin dashboard implementation is canonical at /dashboard"
 
 # 4) Legacy admin applicants nav entry should not exist.
 if grep -q "href: '/admin/applicants'" components/admin/AdminNav.tsx; then

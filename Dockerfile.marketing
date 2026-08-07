@@ -103,6 +103,8 @@ COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./app
 # Refuse to publish an image that cannot prove its PWA assets and build identity.
 RUN test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \
+    test -f /app/public/manifest-marketing.json && \
+    test -f /app/apps/marketing/public/manifest-marketing.json && \
     test -f /app/apps/marketing/server.js && \
     (test -f /app/public/sw.js || test -f /app/public/sw-marketing.js) && \
     echo "Marketing runtime assets verified"

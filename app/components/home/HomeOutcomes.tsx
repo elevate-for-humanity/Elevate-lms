@@ -1,126 +1,82 @@
 import Link from 'next/link';
-import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
-import { CheckCircle, TrendingUp, Users, Award, ArrowRight } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, GraduationCap, Handshake, ShieldCheck } from 'lucide-react';
 
-const OUTCOME_STATS = [
-  { value: '2,500+', label: 'Students Trained', icon: '👨‍🎓' },
-  { value: '94%', label: 'Completion Rate', icon: '🎯' },
-  { value: '87%', label: 'Job Placement', icon: '💼' },
-  { value: '$28K', label: 'Avg. Starting Pay', icon: '💰' },
-];
-
-const TESTIMONIALS = [
+const CAPABILITIES = [
   {
-    quote: "I went from working at a gas station to a Medical Assistant in just 6 months. The funding covered everything.",
-    name: "Maria S.",
-    role: "Medical Assistant",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
-    program: "Healthcare",
+    title: 'Career Training',
+    description:
+      'Career and technical education pathways designed around industry credentials, occupational skills, and practical training.',
+    icon: GraduationCap,
   },
   {
-    quote: "The apprenticeship program gave me real-world experience while I learned. Now I run my own shop.",
-    name: "James W.",
-    role: "Licensed Barber",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    program: "Beauty",
+    title: 'Funding Navigation',
+    description:
+      'Support identifying applicable workforce funding pathways, including WIOA, Workforce Ready Grant, Job Ready Indy, and other approved sources when available.',
+    icon: ShieldCheck,
   },
   {
-    quote: "WIOA paid for my entire HVAC certification. I'm making $65K now with room to grow.",
-    name: "David R.",
-    role: "HVAC Technician",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-    program: "Trades",
+    title: 'Employer Connections',
+    description:
+      'Employer engagement, work-based learning coordination, apprenticeship support, and career-services assistance.',
+    icon: Handshake,
+  },
+  {
+    title: 'Career Services',
+    description:
+      'Resume support, interview preparation, job-search guidance, credential preparation, and transition-to-employment assistance.',
+    icon: BriefcaseBusiness,
   },
 ];
 
 export async function HomeOutcomes() {
   return (
-    <section className="py-20 bg-slate-900 relative overflow-hidden">
-      {/* Background Effects */}
+    <section className="relative overflow-hidden bg-slate-900 py-20">
       <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-red-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl" />
+        <div className="absolute left-1/4 top-0 h-96 w-96 rounded-full bg-brand-red-600/20 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1 bg-white/10 text-white text-sm font-semibold rounded-full mb-4">
-            ✨ REAL RESULTS
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-14 text-center">
+          <span className="mb-4 inline-block rounded-full bg-white/10 px-4 py-1 text-sm font-semibold text-white">
+            WORKFORCE PATHWAYS
           </span>
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Transformations That
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
-              {' '}Matter
-            </span>
+          <h2 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
+            Training, Funding, Credentials, and Career Support
           </h2>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Real stories from real students who changed their lives through Elevate workforce training.
+          <p className="mx-auto max-w-3xl text-lg leading-8 text-slate-300">
+            Elevate for Humanity is building a connected workforce-development experience that helps participants move from application and funding review into training, credential preparation, apprenticeship or work-based learning, and career services.
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          {OUTCOME_STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 text-center hover:bg-white/15 transition-all duration-300"
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {CAPABILITIES.map(({ title, description, icon: Icon }) => (
+            <article
+              key={title}
+              className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm"
             >
-              <div className="text-4xl mb-2">{stat.icon}</div>
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-slate-400">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Success Stories */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {TESTIMONIALS.map((testimonial) => (
-            <div
-              key={testimonial.name}
-              className="bg-white rounded-2xl p-6 shadow-xl"
-            >
-              {/* Quote Icon */}
-              <div className="text-brand-red-600 text-5xl font-serif mb-4">"</div>
-              
-              {/* Quote */}
-              <p className="text-slate-700 mb-6 leading-relaxed">
-                {testimonial.quote}
-              </p>
-
-              {/* Author */}
-              <div className="flex items-center gap-4 pt-4 border-t border-slate-100">
-                <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                  <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <div className="font-bold text-slate-900">{testimonial.name}</div>
-                  <div className="text-sm text-slate-500">{testimonial.role}</div>
-                </div>
-                <div className="ml-auto">
-                  <span className="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded">
-                    {testimonial.program}
-                  </span>
-                </div>
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
+                <Icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
-            </div>
+              <h3 className="text-xl font-bold text-white">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-300">{description}</p>
+            </article>
           ))}
         </div>
 
-        {/* CTA */}
-        <div className="mt-16 text-center">
+        <div className="mx-auto mt-10 max-w-3xl rounded-xl border border-slate-700 bg-slate-950/60 p-5 text-center">
+          <p className="text-sm leading-6 text-slate-300">
+            As a newer platform, Elevate does not publish placement, completion, wage, or participant-volume claims unless those figures are supported by verified reporting data and a defined reporting period.
+          </p>
+        </div>
+
+        <div className="mt-10 text-center">
           <Link
-            href="/success-stories"
-            className="inline-flex items-center gap-2 text-white hover:text-green-400 font-semibold transition-colors mb-8"
+            href="/programs"
+            className="inline-flex items-center gap-2 font-semibold text-white transition-colors hover:text-green-400"
           >
-            <span>Read More Success Stories</span>
-            <ArrowRight className="w-4 h-4" />
+            Explore Career Programs
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

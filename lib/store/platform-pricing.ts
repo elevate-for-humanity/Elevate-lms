@@ -29,7 +29,6 @@ export interface AddOnDefinition {
   description: string;
   features: PlatformFeatureKey[];
   bullets: string[];
-  /** Usage-based note shown in UI */
   usageNote?: string;
 }
 
@@ -136,11 +135,66 @@ export const BASE_PLANS: Record<BasePlanId, BasePlanDefinition> = {
 export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
   {
     slug: 'ai-addon',
-    name: 'AI Add-On',
+    name: 'AI Power Pack',
     priceMonthly: 19,
-    description: 'Advanced AI assistant, content, and chat widget.',
+    description: 'Advanced AI content generation and embedded chat tools.',
     features: [PlatformFeature.AI_ADVANCED, PlatformFeature.AI_CONTENT, PlatformFeature.AI_CHAT_WIDGET],
-    bullets: ['Advanced AI assistant', 'AI content generation', 'AI chat widget'],
+    bullets: ['Advanced AI generation', 'AI content tools', 'AI chat widget'],
+  },
+  {
+    slug: 'paris-assistant',
+    name: 'PARIS Sales & Intake Assistant',
+    priceMonthly: 19,
+    description: 'Conversational lead qualification, intake, interviews and admissions support.',
+    features: [PlatformFeature.AI_PARIS],
+    bullets: ['Lead qualification', 'Conversational intake', 'Interview workflows', 'Sales and admissions guidance'],
+  },
+  {
+    slug: 'ellie-assistant',
+    name: 'ELLIE Learning & Support Assistant',
+    priceMonthly: 19,
+    description: 'Student, learner and customer support with course and enrollment guidance.',
+    features: [PlatformFeature.AI_ELLIE],
+    bullets: ['Learner support', 'Course guidance', 'Enrollment help', 'Knowledge assistance'],
+  },
+  {
+    slug: 'lizzy-assistant',
+    name: 'LIZZY Operations Assistant',
+    priceMonthly: 29,
+    description: 'Administrative operations, documents, queues and workflow assistance.',
+    features: [PlatformFeature.AI_LIZZY],
+    bullets: ['Operations support', 'Document assistance', 'Administrative queues', 'Workflow guidance'],
+  },
+  {
+    slug: 'zora-assistant',
+    name: 'ZORA Compliance Assistant',
+    priceMonthly: 29,
+    description: 'Compliance review, workforce documentation and audit assistance.',
+    features: [PlatformFeature.AI_ZORA],
+    bullets: ['Compliance review', 'WIOA/workforce support', 'Credential checks', 'Audit assistance'],
+  },
+  {
+    slug: 'ai-team',
+    name: 'AI Business Team',
+    priceMonthly: 79,
+    description: 'PARIS, ELLIE, LIZZY and ZORA with shared AI orchestration.',
+    features: [
+      PlatformFeature.AI_PARIS,
+      PlatformFeature.AI_ELLIE,
+      PlatformFeature.AI_LIZZY,
+      PlatformFeature.AI_ZORA,
+      PlatformFeature.AI_ORCHESTRATOR,
+    ],
+    bullets: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA', 'Cross-agent task routing'],
+  },
+  {
+    slug: 'ai-voice',
+    name: 'AI Voice',
+    priceMonthly: 15,
+    description: 'Voice input and spoken assistant responses for supported AI experiences.',
+    features: [PlatformFeature.AI_VOICE],
+    bullets: ['Speech input', 'Spoken responses', 'Hands-free guided experiences'],
+    usageNote: 'Provider usage limits may apply',
   },
   {
     slug: 'text-messaging',
@@ -158,6 +212,22 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     description: 'Courses, certificates, and student tracking.',
     features: [PlatformFeature.LMS, PlatformFeature.CERTIFICATES],
     bullets: ['Unlimited courses', 'Certificates', 'Student tracking'],
+  },
+  {
+    slug: 'course-builder',
+    name: 'Course Builder',
+    priceMonthly: 29,
+    description: 'Build and manage structured courses, lessons and curriculum.',
+    features: [PlatformFeature.COURSE_BUILDER],
+    bullets: ['Course structures', 'Lesson management', 'Curriculum workflows'],
+  },
+  {
+    slug: 'ai-course-factory',
+    name: 'AI Course Factory',
+    priceMonthly: 49,
+    description: 'Generate course blueprints, lessons and assessments with AI.',
+    features: [PlatformFeature.COURSE_FACTORY, PlatformFeature.COURSE_BUILDER, PlatformFeature.AI_CONTENT],
+    bullets: ['AI blueprints', 'Lesson generation', 'Assessment generation', 'Course Builder access'],
   },
   {
     slug: 'student-management',

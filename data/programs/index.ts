@@ -2,11 +2,12 @@
  * Static program data registry.
  *
  * Maps slug -> ProgramSchema for all programs that have a static data file.
- * Used by app/programs/[slug]/page.tsx to serve these programs without
- * a separate page.tsx per program (reduces webpack entry points by 22).
+ * Public reads are normalized through getStaticProgram() so stale funding flags
+ * inside old program files cannot leak into the website.
  */
 
-import type { ProgramSchema } from '@/lib/programs/program-schema';
+import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
+import { getVerifiedProgramFunding, isStrictWorkforceFundedProgram } from '@/lib/programs/funding-registry';
 import { BOOKKEEPING } from './bookkeeping';
 import { BUSINESS_ADMIN } from './business-administration';
 import { CAD_DRAFTING } from './cad-drafting';
@@ -43,50 +44,74 @@ import { TECHNOLOGY } from './technology';
 import { QMA } from './qma';
 
 const STATIC_PROGRAMS: ProgramSchema[] = [
-  // Programs with dedicated page.tsx - registered here for [slug] fallback and sitemap
-  BARBER_APPRENTICESHIP,
-  HVAC_TECHNICIAN,
-  CDL_TRAINING,
-  MEDICAL_ASSISTANT,
-  COSMETOLOGY,
-  CNA,
-  ESTHETICIAN,
-  NAIL_TECH,
-  CULINARY,
-  SANITATION,
-  PEER_RECOVERY,
-  // Programs served via [slug]/page.tsx dynamic renderer
-  QMA,
-  PHLEBOTOMY,
-  HOSPITALITY,
-  TECHNOLOGY,
-  BOOKKEEPING,
-  BUSINESS_ADMIN,
-  CAD_DRAFTING,
-  CONSTRUCTION_TRADES,
-  CPR_FIRST_AID,
-  CYBERSECURITY_ANALYST,
-  DIESEL_MECHANIC,
-  EMERGENCY_HEALTH_SAFETY,
-  ENTREPRENEURSHIP,
-  GRAPHIC_DESIGN,
-  HOME_HEALTH_AIDE,
-  IT_HELP_DESK,
-  NETWORK_ADMIN,
-  NETWORK_SUPPORT,
-  OFFICE_ADMINISTRATION,
-  PHARMACY_TECHNICIAN,
-  PROJECT_MANAGEMENT,
-  SOFTWARE_DEV,
+  BARBER_APPRENTICESHIP, HVAC_TECHNICIAN, CDL_TRAINING, MEDICAL_ASSISTANT,
+  COSMETOLOGY, CNA, ESTHETICIAN, NAIL_TECH, CULINARY, SANITATION, PEER_RECOVERY,
+  QMA, PHLEBOTOMY, HOSPITALITY, TECHNOLOGY, BOOKKEEPING, BUSINESS_ADMIN,
+  CAD_DRAFTING, CONSTRUCTION_TRADES, CPR_FIRST_AID, CYBERSECURITY_ANALYST,
+  DIESEL_MECHANIC, EMERGENCY_HEALTH_SAFETY, ENTREPRENEURSHIP, GRAPHIC_DESIGN,
+  HOME_HEALTH_AIDE, IT_HELP_DESK, NETWORK_ADMIN, NETWORK_SUPPORT,
+  OFFICE_ADMINISTRATION, PHARMACY_TECHNICIAN, PROJECT_MANAGEMENT, SOFTWARE_DEV,
   WEB_DEVELOPMENT,
 ];
 
-/** Slug-keyed map for O(1) lookup. */
 export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(
   STATIC_PROGRAMS.map((p) => [p.slug, p]),
 );
 
-/** Returns the static ProgramSchema for a slug, or undefined if not found. */
+function hasNumericSelfPayPrice(program: ProgramSchema): boolean {
+  const amount = Number(String(program.selfPayCost || '').replace(/[^0-9.]/g, ''));
+  return Number.isFinite(amount) && amount > 0;
+}
+
+/**
+ * Public-safe ProgramSchema.
+ *
+ * Funding rule:
+ * - WIOA/WRG only when the strict 2Exclusive ETPL + 3-star Top Jobs registry says yes.
+ * - Everything else is presented as regular/self-pay.
+ *
+ * Payment rule:
+ * - Every program with a numeric self-pay price gets the canonical Stripe checkout
+ *   route, calculator, promotion-code field, and eligible BNPL methods.
+ */
+function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
+  const verified = getVerifiedProgramFunding(program.slug);
+  const workforceFunded = isStrictWorkforceFundedProgram(program.slug);
+  const fundingOptions: FundingType[] = ['self_pay'];
+  if (workforceFunded && verified?.wioaEligible) fundingOptions.unshift('wioa');
+  if (workforceFunded && verified?.wrgEligible) fundingOptions.unshift('wrg');
+
+  return {
+    ...program,
+    isSelfPay: !workforceFunded,
+    fundingOptions,
+    fundingStatement: workforceFunded
+      ? 'Verified workforce-funded pathway. WorkOne determines participant eligibility and must authorize WIOA or Workforce Ready Grant funding before funded enrollment. Self-pay remains available.'
+      : 'Regular self-pay program. This program is not currently advertised as WIOA or Workforce Ready Grant eligible under Elevate’s strict 2Exclusive ETPL + 3-star Top Jobs verification rule.',
+    badge: workforceFunded ? 'Verified Workforce-Funded' : 'Self-Pay Program',
+    badgeColor: workforceFunded ? 'green' : 'blue',
+    funding: {
+      ...(program.funding ?? {
+        fssa_eligible: false,
+        wioa_eligible: false,
+        wrg_eligible: false,
+      }),
+      fssa_eligible: false,
+      wioa_eligible: Boolean(workforceFunded && verified?.wioaEligible),
+      wrg_eligible: Boolean(workforceFunded && verified?.wrgEligible),
+      etpl_approved: Boolean(verified?.etplListedFor2Exclusive),
+      jobReadyIndyEligible: false,
+      fundingNotes: verified?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
+    },
+    enrollmentTracks: undefined,
+    cta: {
+      ...program.cta,
+      stripeCheckoutHref: hasNumericSelfPayPrice(program) ? '/api/checkout/program' : program.cta.stripeCheckoutHref,
+    },
+  };
+}
+
 export function getStaticProgram(slug: string): ProgramSchema | undefined {
-  return STATIC_PROGRAM_MAP.get(slug);
+  const program = STATIC_PROGRAM_MAP.get(slug);
+  return program ? normalizePublicProgram(program) : undefined;
 }

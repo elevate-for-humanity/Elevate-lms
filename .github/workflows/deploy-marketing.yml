@@ -30,12 +30,9 @@ on:
         default: ''
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
+  actions: read
 
-# FIX #1: Use separate concurrency group - marketing deploys INDEPENDENTLY
-# FIX #2: cancel-in-progress: true — cancels old queued/in-progress runs so only the
-# latest push deploys. Prevents multiple containers building for stale commits.
 concurrency:
   group: northflank-marketing-deploy
   cancel-in-progress: true
@@ -52,9 +49,7 @@ jobs:
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
-      # Force fresh build to ensure new SHA is always built
       FORCE_FRESH_BUILD: 'true'
-      # FIX: Use actual branch from PR (github.head_ref) not hardcoded main
       DEPLOY_BRANCH: main
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -65,18 +60,21 @@ jobs:
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
 
     steps:
-      - name: Checkout
+      - name: Checkout exact commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
           fetch-depth: 1
           clean: true
 
-      # FIX: Set GITHUB_SHA env var so trigger-build.ts can read it
       - name: Set build environment variables
         run: |
-          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
-          echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "GITHUB_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "GIT_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_GIT_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_BUILD_ID=marketing-${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "BUILD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
 
       - name: Verify source commit SHA
         run: |
@@ -87,20 +85,20 @@ jobs:
           echo "Actual SHA:   $ACTUAL_SHA"
           test "$ACTUAL_SHA" = "$EXPECTED_SHA"
           test "$(git status --porcelain)" = ""
-          echo "GITHUB_SHA env var: $GITHUB_SHA"
           echo "SHA verification passed"
 
-      # Generate version.json for runtime reference (GitHub Actions only)
       - name: Generate version file
         run: |
-          cat > public/version.json <<'VERSIONEOF'
-          {
-            "service": "marketing",
-            "commit": "${{ github.sha }}",
-            "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          }
-          VERSIONEOF
-          echo "Generated version.json with SHA: ${{ github.sha }}"
+          node - <<'NODE'
+          const fs = require('fs');
+          const payload = {
+            service: 'marketing',
+            commit: process.env.GITHUB_SHA,
+            builtAt: process.env.BUILD_TIMESTAMP,
+          };
+          fs.writeFileSync('public/version.json', JSON.stringify(payload, null, 2) + '\n');
+          NODE
+          cat public/version.json
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -111,29 +109,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          # FIX #3: Cache pnpm store for faster builds
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # PHASE 4: Standardize Northflank preparation
       - name: Verify required Marketing secrets
         run: |
           set -euo pipefail
-
-          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || {
-            echo "NEXT_PUBLIC_SUPABASE_URL GitHub secret is missing"
-            exit 1
-          }
-
-          test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" || {
-            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY GitHub secret is missing"
-            exit 1
-          }
-
-          echo "Supabase URL is configured"
-          echo "Supabase anonymous key is configured"
+          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo "NEXT_PUBLIC_SUPABASE_URL GitHub secret is missing"; exit 1; }
+          test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" || { echo "NEXT_PUBLIC_SUPABASE_ANON_KEY GitHub secret is missing"; exit 1; }
+          test -n "${NORTHFLANK_API_TOKEN:-}" || { echo "NORTHFLANK_API_TOKEN GitHub secret is missing"; exit 1; }
+          echo "Required Marketing secrets are configured"
 
       - name: Configure Northflank Marketing service
         run: pnpm tsx scripts/northflank/configure-marketing.ts --execute
@@ -141,15 +128,16 @@ jobs:
       - name: Patch Marketing build ephemeral storage
         run: NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts elevate-marketing --execute
 
-      # Note: Ensure elevate-marketing service is set to "external-git" build mode
-      # with Dockerfile path /Dockerfile.marketing in Northflank dashboard before running
-      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
-      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
-      # trigger-build.ts checks for existing builds by SHA and skips duplicates.
-
       - name: Trigger Marketing build
         id: trigger_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
+
+      - name: Require a concrete Northflank build id
+        run: |
+          set -euo pipefail
+          BUILD_ID="${{ steps.trigger_build.outputs.build_id }}"
+          test -n "$BUILD_ID" || { echo "Northflank trigger returned no build_id"; exit 1; }
+          echo "Northflank build id: $BUILD_ID"
 
       - name: Wait for Marketing build to complete
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.trigger_build.outputs.build_id }}" --timeout-ms 3600000
@@ -171,85 +159,44 @@ jobs:
       - name: Wait for Marketing deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 3600000
 
-      # FIX #5: Verify deployed SHA matches expected
-      - name: Verify Deployed SHA
+      - name: Verify Northflank deployment SHA
         run: |
-          echo "=========================================="
-          echo "SHA VERIFICATION"
-          echo "=========================================="
-          echo "Expected SHA: ${{ github.sha }}"
-          echo "Waiting for deployment to propagate..."
-          sleep 30
-          
-          # Use the verify-sha script to check Northflank API (FAIL on mismatch)
+          set -euo pipefail
           pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
-          
-          echo "SHA verification from Northflank API passed!"
 
-      # FIX #4: Better smoke test - checks actual page content
-      - name: Smoke Marketing (www) - Full Validation
+      - name: Smoke Marketing and require exact live SHA
         run: |
           set -euo pipefail
           EXPECTED_SHA="${{ github.sha }}"
           MAX_RETRIES=30
           RETRY_INTERVAL=20
-          
-          echo "=========================================="
-          echo "SMOKE TEST"
-          echo "=========================================="
-          echo "Expected SHA: $EXPECTED_SHA"
-          
+
+          echo "Expected live SHA: $EXPECTED_SHA"
+
           for i in $(seq 1 $MAX_RETRIES); do
-            # Check health endpoint (use /api/health which returns proper status)
-            status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
-            body=$(cat /tmp/www-health.json 2>/dev/null || true)
-            
-            # Accept either "ok":true or "status":"ok" or "status":"healthy"
-            if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
-              echo "✓ Health check passed (HTTP $status)"
-              
-              # Check build ID in headers (best effort - may not be available)
-              build_id=$(curl -sk --max-time 10 -I https://www.elevateforhumanity.org/ 2>/dev/null | grep -i "x-build-id" | head -1 || true)
-              if [ -n "$build_id" ]; then
-                echo "Build ID: $build_id"
-                # Check for dev build
-                if echo "$build_id" | grep -qi "dev"; then
-                  echo "❌ ERROR: Site is still showing DEV build!"
-                  exit 1
-                fi
-              fi
-              
-              # Check page loads
-              page_status=$(curl -sk --max-time 10 -o /tmp/www-page.html -w "%{http_code}" https://www.elevateforhumanity.org/ || true)
-              if [ "$page_status" = "200" ]; then
-                echo "✓ Homepage loads (HTTP $page_status)"
-                
-                # Verify page has expected content
-                if grep -q "Elevate" /tmp/www-page.html 2>/dev/null; then
-                  echo "✓ Page content verified"
-                  echo ""
-                  echo "=========================================="
-                  echo "✅ MARKETING (WWW) DEPLOYMENT SUCCESSFUL"
-                  echo "=========================================="
-                  exit 0
-                else
-                  echo "⚠️  Page loaded but content doesn't match expected"
-                fi
-              fi
+            health_status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
+            version_status=$(curl -sk --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
+            page_status=$(curl -sk --max-time 10 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
+
+            LIVE_SHA="$(node -e "try{const d=require('/tmp/www-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
+
+            echo "Attempt $i/$MAX_RETRIES: health=$health_status version=$version_status page=$page_status live_sha=${LIVE_SHA:-missing}"
+
+            if [ "$health_status" = "200" ] \
+              && [ "$version_status" = "200" ] \
+              && [ "$page_status" = "200" ] \
+              && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
+              && grep -q "Elevate" /tmp/www-page.html; then
+              echo "MARKETING DEPLOYMENT VERIFIED: live SHA matches $EXPECTED_SHA"
+              exit 0
             fi
-            
-            echo "Attempt $i/$MAX_RETRIES: Not ready. HTTP $status. Retrying in ${RETRY_INTERVAL}s..."
-            sleep $RETRY_INTERVAL
+
+            sleep "$RETRY_INTERVAL"
           done
-          
-          echo ""
-          echo "=========================================="
-          echo "❌ DEPLOYMENT FAILED"
-          echo "=========================================="
-          echo "Last health response: $body"
-          echo ""
-          echo "Possible causes:"
-          echo "  1. Northflank is returning OLD/dev build"
-          echo "  2. DNS/proxy is caching old responses"
-          echo "  3. Health check endpoint is not configured"
+
+          echo "DEPLOYMENT FAILED: live site did not converge to expected SHA $EXPECTED_SHA"
+          echo "Last health response:"
+          cat /tmp/www-health.json 2>/dev/null || true
+          echo "Last version response:"
+          cat /tmp/www-version.json 2>/dev/null || true
           exit 1

@@ -1,219 +1,52 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Building2, Users, DollarSign, CheckCircle2, ArrowRight, Briefcase, GraduationCap, Shield, Clock } from 'lucide-react';
+
+const EMPLOYER_PORTAL = 'https://app.elevateforhumanity.org/employer';
 
 export const metadata: Metadata = {
-  title: 'Post a Job | Employer Partnerships',
-  description: 'Post jobs and connect with trained talent from our workforce programs. Build your apprenticeship pipeline and access WIOA employer services.',
+  title: 'Post a Job | Elevate for Humanity',
+  description: 'Employer entry point for posting jobs, hiring trained candidates, and apprenticeship partnerships.',
 };
 
 export default function EmployerPostJobPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-purple-900 via-purple-800 to-purple-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="text-purple-200 font-semibold mb-3 tracking-wide uppercase text-sm">For Employers</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Build Your Talent Pipeline
-            </h1>
-            <p className="text-xl text-purple-100 leading-relaxed">
-              Connect with pre-screened, trained candidates ready to work. Access apprenticeship programs, 
-              WIOA employer services, and tax credits for hiring.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
-            Why Partner With Elevate for Humanity?
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Users className="w-7 h-7 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Pre-Screened Talent</h3>
-              <p className="text-slate-600 text-sm">
-                Candidates are pre-assessed for work readiness, skills, and career goals.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <GraduationCap className="w-7 h-7 text-green-600" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Apprenticeship Programs</h3>
-              <p className="text-slate-600 text-sm">
-                DOL-registered apprenticeships in barbering, cosmetology, and more.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-7 h-7 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Tax Credits</h3>
-              <p className="text-slate-600 text-sm">
-                Access Work Opportunity Tax Credits (WOTC) and other employer incentives.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
-              <div className="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-7 h-7 text-orange-600" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Free Employer Services</h3>
-              <p className="text-slate-600 text-sm">
-                WIOA provides free recruiting, screening, and job matching services.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Hiring Options */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
-            Choose Your Hiring Path
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            
-            {/* Post a Job */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
-              <div className="flex items-center gap-3 mb-4">
-                <Briefcase className="w-8 h-8 text-blue-600" />
-                <h3 className="text-xl font-bold text-slate-900">Post a Job Opening</h3>
-              </div>
-              <p className="text-slate-600 mb-6">
-                Submit your job posting and we&apos;ll connect you with qualified candidates from our training programs and job seeker network.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Free job posting
-                </li>
-                <li className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Candidate matching
-                </li>
-                <li className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Direct referrals to your team
-                </li>
-              </ul>
-              <Link
-                href="/employer/register"
-                className="block w-full text-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Post a Job
-              </Link>
-            </div>
-
-            {/* Host Shop / Apprenticeship */}
-            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-8 border border-purple-200">
-              <div className="flex items-center gap-3 mb-4">
-                <Building2 className="w-8 h-8 text-purple-600" />
-                <h3 className="text-xl font-bold text-slate-900">Become a Host Shop</h3>
-              </div>
-              <p className="text-slate-600 mb-6">
-                Host apprenticeship apprentices in your barbershop or salon. Earn while you train the next generation.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Free apprentice matching
-                </li>
-                <li className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Instructor training provided
-                </li>
-                <li className="flex items-center gap-2 text-slate-700">
-                  <CheckCircle2 className="w-5 h-5 text-green-600" />
-                  Compliance support
-                </li>
-              </ul>
-              <Link
-                href="/partners/host-shops"
-                className="block w-full text-center bg-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                Become a Host Shop
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Employer Services */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">
-              Free WIOA Employer Services
-            </h2>
-            <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
-              As an eligible employer, you may receive these services at no cost through our workforce partnerships:
-            </p>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex gap-4">
-                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-bold text-slate-900">Pre-Screening & Skills Assessment</h4>
-                  <p className="text-slate-600 text-sm">We assess candidates&apos; skills, work history, and readiness before referring them.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-bold text-slate-900">On-the-Job Training Reimbursement</h4>
-                  <p className="text-slate-600 text-sm">Get reimbursed for training costs when you hire and train eligible workers.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-bold text-slate-900">Work Opportunity Tax Credit (WOTC)</h4>
-                  <p className="text-slate-600 text-sm">Claim federal tax credits up to $9,600 per hired veteran or $2,400 for other eligible workers.</p>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                <div>
-                  <h4 className="font-bold text-slate-900">Apprenticeship Support</h4>
-                  <p className="text-slate-600 text-sm">We handle apprentice registration, reporting, and compliance so you can focus on training.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact CTA */}
-      <section className="py-16 bg-gradient-to-br from-purple-900 to-purple-800 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Clock className="w-12 h-12 mx-auto mb-4 text-purple-300" />
-          <h2 className="text-3xl font-bold mb-4">Ready to Build Your Talent Pipeline?</h2>
-          <p className="text-xl text-purple-200 mb-8">
-            Let&apos;s discuss your hiring needs and find the right talent for your team.
+    <main className="min-h-screen bg-white">
+      <section className="bg-slate-950 px-4 py-20 text-white">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-3 text-sm font-bold uppercase tracking-widest text-brand-red-300">Employers</p>
+          <h1 className="text-4xl font-black md:text-6xl">Post a Job & Build Your Talent Pipeline</h1>
+          <p className="mt-6 max-w-3xl text-lg text-slate-200">
+            Employers can use the Elevate employer portal to manage job opportunities, candidate connections, and apprenticeship participation.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-white text-purple-900 font-bold py-4 px-8 rounded-lg hover:bg-purple-100"
-            >
-              Contact Our Employer Team <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/employer/register"
-              className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white font-bold py-4 px-8 rounded-lg hover:bg-white/10"
-            >
-              Register as Employer
-            </Link>
-          </div>
         </div>
       </section>
-    </div>
+
+      <section className="px-4 py-14">
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+          <article className="rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-950">Post a Job</h2>
+            <p className="mt-3 text-slate-600">Sign in to the employer portal to create or manage hiring opportunities.</p>
+            <a href={EMPLOYER_PORTAL} className="mt-5 inline-flex font-bold text-brand-blue-700 hover:underline">Open Employer Portal →</a>
+          </article>
+          <article className="rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-950">Hire Graduates</h2>
+            <p className="mt-3 text-slate-600">Review Elevate's employer partnership and talent-pipeline information.</p>
+            <Link href="/hire-graduates" className="mt-5 inline-flex font-bold text-brand-blue-700 hover:underline">Hire Graduates →</Link>
+          </article>
+          <article className="rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-950">Host an Apprentice</h2>
+            <p className="mt-3 text-slate-600">Learn how a licensed business can participate as a barber or beauty apprenticeship host shop.</p>
+            <Link href="/partners/barber-host-shop" className="mt-5 inline-flex font-bold text-brand-blue-700 hover:underline">Host Shop Information →</Link>
+          </article>
+        </div>
+      </section>
+
+      <section className="border-t bg-slate-50 px-4 py-12">
+        <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row">
+          <a href={EMPLOYER_PORTAL} className="rounded-xl bg-brand-red-600 px-6 py-3 text-center font-bold text-white hover:bg-brand-red-700">Employer Portal</a>
+          <Link href="/contact" className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-center font-bold text-slate-900 hover:bg-slate-100">Contact Employer Team</Link>
+        </div>
+      </section>
+    </main>
   );
 }

@@ -18,8 +18,22 @@ export const ROUTES = {
   // Authentication / portals
   login: `${APP_URL}/login`,
   studentPortal: `${APP_URL}/learner/dashboard`,
-  employerPortal: `${APP_URL}/employer`,
+  lmsPortal: `${APP_URL}/lms/dashboard`,
+  employerPortal: `${APP_URL}/employer/dashboard`,
+  apprenticePortal: `${APP_URL}/apprentice`,
+  parentPortal: `${APP_URL}/parent-portal/dashboard`,
+  workforcePortal: `${APP_URL}/workforce/dashboard`,
+  hostShopPortal: `${APP_URL}/host-shop/dashboard`,
+  cosmetologyHostShopPortal: `${APP_URL}/cosmetology-host-shop/dashboard`,
+  partnerPortal: `${APP_URL}/partner/dashboard`,
+  adminPortal: `${ADMIN_URL}/admin/dashboard`,
+  instructorPortal: `${ADMIN_URL}/admin/instructor/dashboard`,
+  staffPortal: `${ADMIN_URL}/admin/staff-portal/dashboard`,
   adminLogin: `${ADMIN_URL}/login`,
+  caseManagerPortal: '/case-manager/dashboard',
+  providerPortal: '/provider/dashboard',
+  programHolderPortal: '/program-holder/dashboard',
+  workforceBoardPortal: '/workforce-board/dashboard',
 
   // Programs
   programs: '/programs',
@@ -55,7 +69,7 @@ export const ROUTES = {
   // Employers
   employers: '/employer',
   employersHireGraduates: '/hire-graduates',
-  employersPostJob: `${APP_URL}/employer`,
+  employersPostJob: `${APP_URL}/employer/dashboard`,
   forAgencies: '/for-agencies',
 
   // About
@@ -69,6 +83,7 @@ export const ROUTES = {
   contact: '/contact',
 
   // Store / Trials
+  store: '/store',
   storeDemo: '/store/demo',
 } as const;
 

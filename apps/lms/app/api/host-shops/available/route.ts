@@ -9,103 +9,104 @@ function createServiceClient() {
   return createSupabaseClient(url, key);
 }
 
+const BEAUTY_PROGRAM_TERMS = [
+  'barber',
+  'cosmetology',
+  'hairstylist',
+  'esthetician',
+  'nail',
+  'manicurist',
+];
+
+function isBeautyHostShop(programType: string | null, programs: unknown): boolean {
+  const haystack = `${programType ?? ''} ${JSON.stringify(programs ?? [])}`.toLowerCase();
+  return BEAUTY_PROGRAM_TERMS.some((term) => haystack.includes(term));
+}
+
+function programLabels(programType: string | null, programs: unknown): string[] {
+  const haystack = `${programType ?? ''} ${JSON.stringify(programs ?? [])}`.toLowerCase();
+  const labels: string[] = [];
+
+  if (haystack.includes('barber')) labels.push('Barber');
+  if (haystack.includes('cosmetology') || haystack.includes('hairstylist')) labels.push('Hairstylist');
+  if (haystack.includes('esthetician')) labels.push('Esthetician');
+  if (haystack.includes('nail') || haystack.includes('manicurist')) labels.push('Manicurist');
+
+  return Array.from(new Set(labels));
+}
+
 export async function GET(request: NextRequest) {
   const supabase = createServiceClient();
   const { searchParams } = new URL(request.url);
-  const city = searchParams.get('city');
-  const search = searchParams.get('search');
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '12');
-  const offset = (page - 1) * limit;
+  const city = searchParams.get('city')?.trim();
+  const search = searchParams.get('search')?.trim().toLowerCase();
+  const program = searchParams.get('program')?.trim().toLowerCase();
 
-  let query = supabase
-    .from('host_shops')
-    .select(`
-      id, name, business_name, address_line1, city, state, zip_code, phone, email,
-      owner_name, owner_phone, owner_email,
-      services, specializations,
-      years_experience, mentor_count,
-      is_accepting_apprentices, max_apprentices, current_apprentice_count,
-      availability_notes, active_days, open_time, close_time,
-      image_url, rating, review_count, shop_status, created_at,
-      description
-    `, { count: 'exact' })
-    .eq('shop_status', 'active')
-    .eq('is_accepting_apprentices', true)
-    .order('rating', { ascending: false, nullsFirst: false })
-    .order('created_at', { ascending: false });
-
-  if (city) {
-    query = query.ilike('city', `%${city}%`);
-  }
-
-  if (search) {
-    query = query.or(`name.ilike.%${search}%,business_name.ilike.%${search}%,owner_name.ilike.%${search}%`);
-  }
-
-  const from = offset;
-  const to = offset + limit - 1;
-  query = query.range(from, to);
-
-  const { data: shops, error, count } = await query;
+  const { data, error } = await supabase
+    .from('partners')
+    .select(
+      'id,name,shop_name,owner_name,phone,address_line1,address_line2,city,state,zip,website,website_url,license_number,program_type,programs,approval_status,status,is_active,featured,contact_email',
+    )
+    .eq('approval_status', 'approved')
+    .eq('status', 'active')
+    .eq('is_active', true)
+    .order('featured', { ascending: false })
+    .order('name', { ascending: true });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const formatted = (shops || []).map(shop => ({
-    id: shop.id,
-    name: shop.name || shop.business_name || 'Host Shop',
-    address: shop.address_line1 || '',
-    city: shop.city,
-    state: shop.state,
-    zip_code: shop.zip_code,
-    phone: shop.phone,
-    email: shop.email,
-    owner_name: shop.owner_name,
-    owner_phone: shop.owner_phone,
-    owner_email: shop.owner_email,
-    services: shop.services || [],
-    specializations: shop.specializations || [],
-    years_experience: shop.years_experience,
-    mentor_count: shop.mentor_count,
-    spots_available: Math.max(0, (shop.max_apprentices || 5) - (shop.current_apprentice_count || 0)),
-    availability_notes: shop.availability_notes,
-    active_days: (shop.active_days || []).map(d => dayName(d)),
-    hours: shop.open_time && shop.close_time
-      ? `${formatTime(shop.open_time)} - ${formatTime(shop.close_time)}`
-      : null,
-    image_url: shop.image_url,
-    rating: shop.rating ? parseFloat(String(shop.rating)) : null,
-    review_count: shop.review_count || 0,
-    description: shop.description,
-    created_at: shop.created_at,
-  })).filter(shop => shop.spots_available > 0);
+  const shops = (data ?? [])
+    .filter((row) => isBeautyHostShop(row.program_type, row.programs))
+    .map((row) => {
+      const plans = programLabels(row.program_type, row.programs);
+      const fullAddress = [row.address_line1, row.address_line2, row.city, row.state, row.zip]
+        .filter(Boolean)
+        .join(', ');
+      const publicEmail =
+        row.contact_email && !row.contact_email.startsWith('pending-contact+')
+          ? row.contact_email
+          : null;
 
-  return NextResponse.json({
-    shops: formatted,
-    pagination: {
-      page,
-      limit,
-      total: count || 0,
-      pages: Math.ceil((count || 0) / limit),
-    },
-  });
-}
+      return {
+        id: row.id,
+        name: row.shop_name || row.name || 'Host Shop',
+        owner_name: row.owner_name,
+        address: row.address_line1 || '',
+        address_line2: row.address_line2 || '',
+        city: row.city || '',
+        state: row.state || '',
+        zip_code: row.zip || '',
+        full_address: fullAddress,
+        phone: row.phone || null,
+        email: publicEmail,
+        website: row.website_url || row.website || null,
+        license_number: row.license_number || null,
+        apprenticeship_plans: plans,
+        approval_status: row.approval_status,
+        featured: Boolean(row.featured),
+        google_maps_url: fullAddress
+          ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+          : null,
+        google_maps_embed_url: fullAddress
+          ? `https://www.google.com/maps?q=${encodeURIComponent(fullAddress)}&output=embed`
+          : null,
+      };
+    })
+    .filter((shop) => {
+      if (city && shop.city.toLowerCase() !== city.toLowerCase()) return false;
+      if (program && !shop.apprenticeship_plans.some((p) => p.toLowerCase() === program)) return false;
+      if (
+        search &&
+        !`${shop.name} ${shop.owner_name ?? ''} ${shop.full_address} ${shop.apprenticeship_plans.join(' ')}`
+          .toLowerCase()
+          .includes(search)
+      ) {
+        return false;
+      }
+      return true;
+    });
 
-function formatTime(time: string): string {
-  if (!time) return '';
-  const [h, m] = time.split(':');
-  const hour = parseInt(h);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 || 12;
-  return `${hour12}:${m} ${ampm}`;
-}
-
-function dayName(abbrev: string): string {
-  const days: Record<string, string> = {
-    mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday',
-    thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday',
-  };
-  return days[abbrev] || abbrev;
+  return NextResponse.json({ shops, total: shops.length });
 }

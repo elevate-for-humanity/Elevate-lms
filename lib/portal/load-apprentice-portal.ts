@@ -25,7 +25,7 @@ export type ApprenticePortalBilling = {
 };
 
 export async function loadApprenticePortalData(programSlug: string) {
-  const config: ApprenticePortalConfig =
+  const baseConfig: ApprenticePortalConfig =
     APPRENTICE_PORTAL_CONFIGS[programSlug] ??
     ({
       programSlug,
@@ -39,6 +39,15 @@ export async function loadApprenticePortalData(programSlug: string) {
       requiredRti: 0,
       portalPath: '/portal/apprentice',
     } as ApprenticePortalConfig);
+
+  // Keep the existing technical slug/routes for backward compatibility, while
+  // presenting the registered occupation name used by the apprenticeship program.
+  // Regulatory hour/competency values remain governed by the applicable Appendix A,
+  // not by this display-label mapping.
+  const config: ApprenticePortalConfig =
+    programSlug === 'cosmetology-apprenticeship'
+      ? { ...baseConfig, label: 'Hairstylist Apprenticeship' }
+      : baseConfig;
 
   const supabase = await createClient();
   const {

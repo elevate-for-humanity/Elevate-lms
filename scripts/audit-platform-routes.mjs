@@ -69,6 +69,17 @@ function classify(source) {
   return { redirect, placeholder, client, dynamic, metadata };
 }
 
+function groupBy(items, keyFn) {
+  const groups = new Map();
+  for (const item of items) {
+    const key = keyFn(item);
+    const group = groups.get(key);
+    if (group) group.push(item);
+    else groups.set(key, [item]);
+  }
+  return groups;
+}
+
 const routes = [];
 for (const app of APPS) {
   const absRoot = path.join(ROOT, app.root);
@@ -89,11 +100,11 @@ for (const app of APPS) {
 
 routes.sort((a, b) => a.app.localeCompare(b.app) || a.route.localeCompare(b.route));
 
-const exactDuplicates = [...Map.groupBy(routes, (r) => r.hash).values()]
+const exactDuplicates = [...groupBy(routes, (r) => r.hash).values()]
   .filter((group) => group.length > 1)
   .map((group) => group.map(({ app, route, file }) => ({ app, route, file })));
 
-const leafDuplicates = [...Map.groupBy(routes.filter((r) => r.leaf !== '/'), (r) => r.leaf).entries()]
+const leafDuplicates = [...groupBy(routes.filter((r) => r.leaf !== '/'), (r) => r.leaf).entries()]
   .filter(([, group]) => group.length > 1)
   .map(([leaf, group]) => ({
     leaf,

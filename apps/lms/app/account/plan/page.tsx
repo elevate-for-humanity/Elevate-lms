@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { AccountBillingShell, UpgradeCta } from '@/components/billing/AccountBillingShell';
+import { CapabilityUpgradeGrid } from '@/components/billing/CapabilityUpgradeGrid';
 import { getAccountOrganizationId } from '@/lib/account/organization-context';
 
 export const dynamic = 'force-dynamic';
@@ -14,9 +15,7 @@ export const metadata = {
 
 export default async function AccountPlanPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/account/plan');
 
   const orgId = await getAccountOrganizationId();
@@ -36,46 +35,31 @@ export default async function AccountPlanPage() {
 
   return (
     <AccountBillingShell title="Your plan">
-      <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-white p-6 space-y-4">
         <div>
           <p className="text-sm text-slate-500">Current plan</p>
-          <p className="text-xl font-bold text-slate-900">
-            {entitlements.planName ?? 'No active subscription'}
-          </p>
-          {entitlements.status && (
-            <p className="text-sm text-slate-600 capitalize">Status: {entitlements.status}</p>
-          )}
+          <p className="text-xl font-bold text-slate-900">{entitlements.planName ?? 'No active subscription'}</p>
+          {entitlements.status && <p className="text-sm capitalize text-slate-600">Status: {entitlements.status}</p>}
         </div>
         {entitlements.currentPeriodEnd && (
-          <p className="text-sm text-slate-600">
-            Renews / period ends:{' '}
-            {new Date(entitlements.currentPeriodEnd).toLocaleDateString()}
-          </p>
+          <p className="text-sm text-slate-600">Renews / period ends: {new Date(entitlements.currentPeriodEnd).toLocaleDateString()}</p>
         )}
         <div>
-          <p className="text-sm font-semibold text-slate-900 mb-2">Included features</p>
+          <p className="mb-2 text-sm font-semibold text-slate-900">Included features</p>
           <ul className="flex flex-wrap gap-2">
-            {entitlements.features.map((f) => (
-              <li
-                key={f}
-                className="text-xs font-mono bg-slate-100 text-slate-700 px-2 py-1 rounded"
-              >
-                {f}
-              </li>
+            {entitlements.features.map((feature) => (
+              <li key={feature} className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">{feature}</li>
             ))}
           </ul>
-          {!entitlements.features.length && (
-            <p className="text-sm text-slate-500">Subscribe to unlock features.</p>
-          )}
+          {!entitlements.features.length && <p className="text-sm text-slate-500">Subscribe to unlock features.</p>}
         </div>
         <div className="text-sm text-slate-600">
-          <p>
-            Users: {entitlements.limits.users ?? '—'} · Contacts:{' '}
-            {entitlements.limits.contacts ?? 'unlimited'}
-          </p>
+          <p>Users: {entitlements.limits.users ?? '—'} · Contacts: {entitlements.limits.contacts ?? 'unlimited'}</p>
         </div>
         <UpgradeCta />
       </div>
+
+      <CapabilityUpgradeGrid ownedFeatures={entitlements.features} />
     </AccountBillingShell>
   );
 }

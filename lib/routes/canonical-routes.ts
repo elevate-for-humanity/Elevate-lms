@@ -10,73 +10,70 @@ export const legacyAliasLookup = new Map(
 );
 
 // ── Admin canonical routes ────────────────────────────────────────────────────
-// Single source of truth for all admin navigation, redirects, and workflows.
-// ALL nav items, redirects, and action hrefs must reference these constants.
-// Never hardcode /admin/* paths — import from here.
+// Single source of truth for Admin navigation and workflows.
+// Business workspaces use their real root routes. Dev Studio intentionally lives
+// under /admin/studio because it is the protected platform control plane.
 
 export const ADMIN = {
   // ── Operational ──────────────────────────────────────────────────────────
-  MISSION_CONTROL:    '/admin/dashboard',
-  OPERATIONS:         '/admin/operations',
-  COMMAND_CENTER:     '/admin/dashboard',
+  MISSION_CONTROL:    '/dashboard',
+  OPERATIONS:         '/operations',
+  COMMAND_CENTER:     '/dashboard',
 
   // ── People ───────────────────────────────────────────────────────────────
-  STUDENTS:           '/admin/students',
-  APPLICATIONS:       '/admin/applications',
-  ENROLLMENTS:        '/admin/enrollments',
-  AT_RISK:            '/admin/students?filter=at-risk',
+  STUDENTS:           '/students',
+  APPLICATIONS:       '/applications',
+  ENROLLMENTS:        '/enrollments',
+  AT_RISK:            '/students?filter=at-risk',
   IMPERSONATE:        '/admin/impersonate',
 
   // ── Programs & Courses ───────────────────────────────────────────────────
-  PROGRAMS:           '/admin/programs',
-  COURSES:            '/admin/courses',
+  PROGRAMS:           '/programs',
+  COURSES:            '/courses',
   COURSE_PIPELINE:    '/admin/studio',
   COURSE_BUILDER:     '/admin/studio',
   CURRICULUM:         '/admin/studio',
 
-  // ── AI ───────────────────────────────────────────────────────────────────
+  // ── AI / platform control ────────────────────────────────────────────────
   AI_STUDIO:          '/admin/studio',
-  AI_CONSOLE:         '/admin/studio',         // alias → ai-studio
-  DEV_STUDIO:         '/admin/dashboard', // legacy name → dashboard command center
+  AI_CONSOLE:         '/admin/studio',
+  DEV_STUDIO:         '/admin/studio',
 
   // ── Finance ──────────────────────────────────────────────────────────────
-  FUNDING:            '/admin/funding',
-  PAYMENTS:           '/admin/payments',
-  CERTIFICATES:       '/admin/certificates',
-  WIOA:               '/admin/wioa',
+  FUNDING:            '/funding',
+  PAYMENTS:           '/payments',
+  CERTIFICATES:       '/certificates',
+  WIOA:               '/wioa',
 
   // ── Compliance ───────────────────────────────────────────────────────────
-  COMPLIANCE:         '/admin/compliance',
-  AUDIT_LOGS:         '/admin/audit-logs',
-  DOCUMENTS:          '/admin/documents',
-  DOCUMENT_CENTER:    '/admin/document-center',
-  GOVERNANCE:         '/admin/governance',
+  COMPLIANCE:         '/compliance',
+  AUDIT_LOGS:         '/audit-logs',
+  DOCUMENTS:          '/documents',
+  DOCUMENT_CENTER:    '/documents',
+  GOVERNANCE:         '/governance',
 
   // ── Analytics ────────────────────────────────────────────────────────────
-  ANALYTICS:          '/admin/analytics',
-  REPORTS:            '/admin/reports',
+  ANALYTICS:          '/analytics',
+  REPORTS:            '/reports',
 
   // ── System ───────────────────────────────────────────────────────────────
-  SETTINGS:           '/admin/settings',
-  SYSTEM_HEALTH:      '/admin/system-health',
-  SNAPSHOTS:          '/admin/snapshots',
-  AUTOMATION:         '/admin/workflows',
-  MONITORING:         '/admin/monitoring',
+  SETTINGS:           '/settings',
+  SYSTEM_HEALTH:      '/system-health',
+  SNAPSHOTS:          '/snapshots',
+  AUTOMATION:         '/admin/studio/workflows',
+  MONITORING:         '/monitoring',
 
-  // ── Partners ─────────────────────────────────────────────────────────────
-  PARTNERS:           '/admin/partners',
-  EMPLOYERS:          '/admin/employers',
-  CRM:                '/admin/crm',
+  // ── Partners / growth ────────────────────────────────────────────────────
+  PARTNERS:           '/partners',
+  EMPLOYERS:          '/employers',
+  CRM:                '/crm',
 } as const;
 
 export type AdminRoute = typeof ADMIN[keyof typeof ADMIN];
 
 /** Resolve a potentially-aliased admin path to its canonical destination. */
 export function resolveAdminRoute(path: string): string {
-  // Check legacy alias map first
   const legacy = legacyAliasLookup.get(path);
   if (legacy) return legacy;
-  // Return as-is if already canonical
   return path;
 }
-

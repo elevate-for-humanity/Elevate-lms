@@ -2,21 +2,14 @@
 
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { siteUrls } from '@/lib/utils/site-urls';
-
-function absolutePortalDestination(path: string): string {
-  if (/^https?:\/\//i.test(path)) return path;
-  if (path.startsWith('/admin/')) return `${siteUrls.admin}${path.replace(/^\/admin/, '')}`;
-  return `${siteUrls.app}${path.startsWith('/') ? path : `/${path}`}`;
-}
+import { absoluteRoleDestination } from '@/lib/auth/absolute-role-destination';
 
 export default function LoginPage() {
-  const router = useRouter();
   const searchParams = useSafeSearchParams();
   const requestedRedirect = searchParams.get('next') || searchParams.get('redirect') || '';
   const safeRedirect = validateRedirect(requestedRedirect, '');
@@ -41,8 +34,7 @@ export default function LoginPage() {
       if (!data.user) throw new Error('Authentication completed without a user session.');
 
       if (safeRedirect) {
-        const destination = absolutePortalDestination(safeRedirect);
-        window.location.assign(destination);
+        window.location.assign(absoluteRoleDestination(safeRedirect));
         return;
       }
 
@@ -57,13 +49,16 @@ export default function LoginPage() {
         destination = `${siteUrls.app}/onboarding/learner`;
       } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
+      } else if (
+        profile.role === 'student' &&
+        typeof profile.portal_type === 'string' &&
+        profile.portal_type.trim() !== ''
+      ) {
+        // Program portals are learner-specific. Never let a stale portal_type
+        // override an admin, staff, instructor, employer, or partner role.
+        destination = `${siteUrls.app}/portal/${profile.portal_type.trim()}`;
       } else {
-        const portalType = profile.portal_type;
-        if (portalType && typeof portalType === 'string' && portalType.trim() !== '') {
-          destination = `${siteUrls.app}/portal/${portalType.trim()}`;
-        } else {
-          destination = absolutePortalDestination(getRoleDestination(profile.role));
-        }
+        destination = absoluteRoleDestination(getRoleDestination(profile.role));
       }
 
       window.location.assign(destination);

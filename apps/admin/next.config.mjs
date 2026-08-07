@@ -4,9 +4,6 @@
  * Standalone Next.js app for admin/instructor/staff/internal APIs.
  * Shared code (lib/, components/, types/) lives at the repo root and is
  * imported via the @/* path alias which resolves to ../../*.
- *
- * Route scope: ~675 routes (admin, instructor, staff, analytics, cron,
- * reports, export, audit) â€” down from 2,706 in the monolith.
  */
 
 import path from 'path';
@@ -23,27 +20,22 @@ const useStandaloneOutput =
 const adminConfig = {
   ...(useStandaloneOutput ? { output: 'standalone' } : {}),
 
-  // Deterministic build ID — never use Date.now(), Math.random(), or random UUID.
-  // Must match: admin-${GIT_SHA} format for Dockerfile verification
   generateBuildId: async () => {
     const sha = resolveCommitSha(process.env);
     return sha === 'local-development' ? 'admin-local-dev' : `admin-${sha}`;
   },
 
-  // Bake deterministic build identity into client bundles at build time.
   env: {
     NEXT_PUBLIC_GIT_SHA: resolveCommitSha(process.env),
     NEXT_PUBLIC_BUILD_ID: `admin-${resolveCommitSha(process.env)}`,
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
-  typescript: { 
-    // TODO: Set to false after fixing all TypeScript errors in apps/admin
-    ignoreBuildErrors: true, 
+  typescript: {
+    ignoreBuildErrors: true,
   },
-  eslint: { 
-    // TODO: Set to ignoreDuringBuilds: false after fixing all ESLint errors
-    ignoreDuringBuilds: true, 
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 
   experimental: {
@@ -53,26 +45,18 @@ const adminConfig = {
     parallelServerBuildTraces: false,
   },
 
-  // edge-tts ships index.ts as its entry (uncompiled TS) â€” same as root LMS config.
   transpilePackages: ['edge-tts'],
 
-  // Resolve @/* to repo root so shared lib/, components/, types/ work
   webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
-    // For standalone server.js, resolve @/lib/* to TypeScript files for bundling
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
       config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
     }
-    // Keep peak memory stable during admin builds on low-RAM runners.
     config.parallelism = 1;
-    // Northflank's allowed ephemeral build storage is not large enough for
-    // Next's production webpack filesystem cache on this repo.
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') {
       config.cache = false;
     }
-    // Browser polyfill for @webcontainer/api and other Node.js modules
-    // Use config.compiler.webpack (Next.js exposes webpack internals here)
     if (!isServer) {
       const webpack = config.compiler?.webpack;
       if (webpack?.ProvidePlugin) {
@@ -81,71 +65,52 @@ const adminConfig = {
           new webpack.ProvidePlugin({
             Buffer: ['buffer', 'Buffer'],
             buffer: 'buffer',
-          })
+          }),
         );
       }
     }
     return config;
   },
 
-  // Canonical route redirects â€” legacy aliases forward to canonical paths
   async redirects() {
     return [
-      // Marketing pages -> main site
+      // Public Marketing-only pages that have no Admin implementation.
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
-      { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: false },
       { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },
       { source: '/contact', destination: 'https://www.elevateforhumanity.org/contact', permanent: false },
-      { source: '/funding', destination: 'https://www.elevateforhumanity.org/funding', permanent: false },
       { source: '/testing', destination: 'https://www.elevateforhumanity.org/testing', permanent: false },
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: false },
-      // â”€â”€ Lizzy control plane (retired dev-studio / ai-console admin routes) â”€â”€
-      // Do NOT redirect /admin/dashboard â†’ itself (infinite loop).
-      { source: '/admin/ai-console', destination: '/dashboard', permanent: true },
-      { source: '/admin/ai-console/:path*', destination: '/dashboard', permanent: true },
-      { source: '/admin/ai-studio', destination: '/dashboard', permanent: true },
-      { source: '/admin/ai-studio/:path*', destination: '/dashboard', permanent: true },
+
+      // Retired Admin aliases. Do not redirect real Admin business routes or Studio.
+      { source: '/admin/ai-console', destination: '/admin/studio', permanent: true },
+      { source: '/admin/ai-console/:path*', destination: '/admin/studio', permanent: true },
+      { source: '/admin/ai-studio', destination: '/admin/studio', permanent: true },
+      { source: '/admin/ai-studio/:path*', destination: '/admin/studio', permanent: true },
       { source: '/admin/command-center', destination: '/mission-control', permanent: true },
       { source: '/admin/instructors', destination: '/instructor', permanent: true },
       { source: '/admin/performance-dashboard', destination: '/reports', permanent: true },
       { source: '/admin/analytics-dashboard', destination: '/analytics', permanent: true },
       { source: '/admin/payments', destination: '/integrations/stripe', permanent: true },
       { source: '/admin/security', destination: '/settings/security', permanent: true },
-      // â”€â”€ Studio consolidation â€” all legacy course/quiz/video/AI surfaces â†’ studio â”€â”€
-      { source: '/admin/quizzes', destination: '/dev-studio', permanent: true },
-      { source: '/admin/quizzes/:path*', destination: '/dev-studio/:path*', permanent: true },
-      { source: '/admin/copilot', destination: '/dev-studio', permanent: true },
-      { source: '/admin/copilot/:path*', destination: '/dev-studio/:path*', permanent: true },
-      { source: '/admin/video-manager', destination: '/dev-studio', permanent: true },
-      { source: '/admin/video-manager/:path*', destination: '/dev-studio/:path*', permanent: true },
-      // Dev Studio is at /admin/admin/studio (real page) — no redirect needed
-      // course-builder redirects removed - page now exists at /admin/course-builder
-      // document-center â†’ documents (canonical)
-      {
-        source: '/admin/document-center',
-        destination: '/documents',
-        permanent: true,
-      },
-      {
-        source: '/admin/document-center/:path*',
-        destination: '/documents/:path*',
-        permanent: true,
-      },
-      // submissions/org â†’ settings/organization-profile (canonical)
-      {
-        source: '/admin/submissions/org',
-        destination: '/settings/organization-profile',
-        permanent: false,
-      },
-      // ── Canonical /admin/* → /* redirects ──────────────────────────────────
-      // Admin app pages live at /dashboard, /programs, /students, etc.
-      // (NOT /admin/dashboard). These catch legacy marketing nav links.
+
+      // Legacy Studio tools converge on the real /admin/studio control plane.
+      { source: '/admin/quizzes', destination: '/admin/studio', permanent: true },
+      { source: '/admin/quizzes/:path*', destination: '/admin/studio', permanent: true },
+      { source: '/admin/copilot', destination: '/admin/studio', permanent: true },
+      { source: '/admin/copilot/:path*', destination: '/admin/studio', permanent: true },
+      { source: '/admin/video-manager', destination: '/admin/studio', permanent: true },
+      { source: '/admin/video-manager/:path*', destination: '/admin/studio', permanent: true },
+
+      { source: '/admin/document-center', destination: '/documents', permanent: true },
+      { source: '/admin/document-center/:path*', destination: '/documents/:path*', permanent: true },
+      { source: '/admin/submissions/org', destination: '/settings/organization-profile', permanent: false },
+
+      // Legacy duplicate business URLs resolve to the one real implementation.
       { source: '/admin/dashboard', destination: '/dashboard', permanent: true },
       { source: '/admin/programs', destination: '/programs', permanent: true },
       { source: '/admin/students', destination: '/students', permanent: true },
       { source: '/admin/applications', destination: '/applications', permanent: true },
-      { source: '/admin/studio', destination: '/studio', permanent: true },
       { source: '/admin/credentials', destination: '/credentials', permanent: true },
       { source: '/admin/staff', destination: '/staff', permanent: true },
       { source: '/admin/reports', destination: '/reports', permanent: true },
@@ -161,8 +126,6 @@ const adminConfig = {
       { source: '/admin/grants/opportunities', destination: '/grants', permanent: true },
       { source: '/admin/settings/organization-profile', destination: '/settings/organization-profile', permanent: true },
       { source: '/admin/courses/new', destination: '/courses', permanent: true },
-      { source: '/admin/studio/courses/create', destination: '/studio', permanent: true },
-      { source: '/admin/studio/workflows', destination: '/studio', permanent: true },
       { source: '/admin/governance/data', destination: '/governance', permanent: true },
       { source: '/admin/signatures', destination: '/signatures', permanent: true },
       { source: '/admin/mou', destination: '/mou', permanent: true },
@@ -172,30 +135,25 @@ const adminConfig = {
       { source: '/admin/hr/leave', destination: '/hr', permanent: true },
       { source: '/admin/instructor-credentials', destination: '/instructor-credentials', permanent: true },
       { source: '/admin/enrollment', destination: '/enrollments', permanent: true },
-      { source: '/admin/website-editor', destination: '/studio', permanent: true },
-      { source: '/admin/course-builder', destination: '/courses', permanent: true },
+      { source: '/admin/website-editor', destination: '/admin/studio', permanent: true },
+      { source: '/admin/course-builder', destination: '/admin/studio', permanent: true },
       { source: '/admin/booth-renters', destination: '/staff-portal', permanent: true },
       { source: '/admin/campaigns', destination: '/communications', permanent: true },
     ];
   },
 
-  // Standalone output â€” trace files from repo root so shared lib/ etc. are included
   outputFileTracingRoot: ROOT,
 
-  // Same monorepo-wide excludes as LMS â€” keeps playwright/puppeteer/three/etc.
-  // out of standalone. Admin keeps Remotion (see lmsOnly excludes in shared module).
   outputFileTracingExcludes: {
     '*': sharedStandaloneTraceExcludes,
   },
 
-  // Force-include critical server-side files in standalone output
   outputFileTracingIncludes: {
     '/api/**': ['lib/logger.ts'],
     '/admin/**': ['lib/logger.ts'],
   },
 
   serverExternalPackages: [
-    // Remotion â€” /api/admin/generate-lesson-videos (dynamic import of remotion-render)
     'remotion',
     '@remotion/bundler',
     '@remotion/renderer',
@@ -204,7 +162,6 @@ const adminConfig = {
     '@rspack/binding',
     '@rspack/binding-linux-x64-gnu',
     'esbuild',
-    // Sentry + OpenTelemetry â€” dynamic require() patterns break webpack
     '@sentry/nextjs',
     '@sentry/node',
     '@sentry/node-core',
@@ -217,10 +174,7 @@ const adminConfig = {
     '@opentelemetry/semantic-conventions',
     'sharp',
     'fontkit',
-    // edge-tts: transpilePackages only (conflicts if also listed here)
-    // ws â€” custom server.js only
     'ws',
-    // Document OCR / extract admin APIs
     'tesseract.js',
     'tesseract.js-core',
     'pdf-parse',

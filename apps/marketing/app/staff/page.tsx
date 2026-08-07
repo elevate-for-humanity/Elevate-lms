@@ -6,6 +6,7 @@ import { requireStaffPortalAccess } from '@/lib/staff-portal/access';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { siteUrls } from '@/lib/utils/site-urls';
 import {
   Users,
   ClipboardList,
@@ -32,7 +33,6 @@ export default async function StaffPortalLanding() {
   const { user } = await requireStaffPortalAccess();
   const supabase = await createClient();
 
-  // Fetch completion state if logged in
   let payrollDone = false;
   let handbookDone = false;
   let skillsCount = 0;
@@ -53,22 +53,12 @@ export default async function StaffPortalLanding() {
 
   const quickLinks = [
     { label: 'Students', href: '/staff/students', icon: Users, desc: 'Manage enrollments' },
-    {
-      label: 'Attendance',
-      href: '/staff/attendance',
-      icon: ClipboardList,
-      desc: 'Record & export',
-    },
+    { label: 'Attendance', href: '/staff/attendance', icon: ClipboardList, desc: 'Record & export' },
     { label: 'Reports', href: '/staff/reports', icon: BarChart2, desc: 'Progress & outcomes' },
     { label: 'Scheduling', href: '/staff/scheduling', icon: Calendar, desc: 'Classes & sessions' },
     { label: 'Documents', href: '/employee/documents', icon: FileText, desc: 'Forms & uploads' },
     { label: 'My Payroll', href: '/employee/payroll', icon: DollarSign, desc: 'Pay stubs & W-2' },
-    {
-      label: 'Handbook',
-      href: '/employee/handbook',
-      icon: BookOpen,
-      desc: 'Policies & procedures',
-    },
+    { label: 'Handbook', href: '/employee/handbook', icon: BookOpen, desc: 'Policies & procedures' },
     { label: 'My Skills', href: '/staff/skills', icon: Star, desc: 'Track competencies' },
     { label: 'Interviews', href: '/careers', icon: Video, desc: 'Hiring pipeline' },
     { label: 'Settings', href: '/staff/settings', icon: Settings, desc: 'Preferences' },
@@ -90,11 +80,10 @@ export default async function StaffPortalLanding() {
         </div>
       </div>
 
-      {/* Hero */}
       <section className="relative h-[220px] sm:h-[260px]">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+        <Image
+          placeholder="blur"
+          blurDataURL={blurDataURL}
           src="/images/pages/admin/staff-portal-page-1.webp"
           alt="Staff Portal"
           fill
@@ -104,9 +93,7 @@ export default async function StaffPortalLanding() {
         />
         <div className="absolute inset-0 flex flex-col justify-end pb-8 px-6 max-w-6xl mx-auto w-full">
           <h1 className="text-3xl font-bold text-slate-900 mb-1">
-            {user && profile?.full_name
-              ? `Welcome, ${profile.full_name.split(' ')[0]}`
-              : 'Staff Portal'}
+            {user && profile?.full_name ? `Welcome, ${profile.full_name.split(' ')[0]}` : 'Staff Portal'}
           </h1>
           <p className="text-slate-600 text-sm">
             {PLATFORM_DEFAULTS.orgName} · Staff &amp; Instructor Tools
@@ -115,38 +102,26 @@ export default async function StaffPortalLanding() {
       </section>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Onboarding progress (only if logged in and not complete) */}
         {user && onboardingComplete < onboardingItems.length && (
           <div className="bg-white rounded-xl border mb-8 overflow-hidden">
             <div className="px-6 py-4 border-b flex items-center justify-between">
               <div>
                 <h2 className="font-bold text-slate-900">Complete Your Onboarding</h2>
-                <p className="text-xs text-slate-500">
-                  {onboardingComplete}/{onboardingItems.length} steps done
-                </p>
+                <p className="text-xs text-slate-500">{onboardingComplete}/{onboardingItems.length} steps done</p>
               </div>
-              <Link
-                href="/onboarding/staff"
-                className="text-sm text-brand-blue-600 hover:underline font-medium flex items-center gap-1"
-              >
+              <Link href="/onboarding/staff" className="text-sm text-brand-blue-600 hover:underline font-medium flex items-center gap-1">
                 View All <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
             <div className="divide-y">
               {onboardingItems.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className="flex items-center gap-4 px-6 py-3.5 hover:bg-white transition"
-                >
+                <Link key={item.label} href={item.href} className="flex items-center gap-4 px-6 py-3.5 hover:bg-white transition">
                   {item.done ? (
                     <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
                   ) : (
                     <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
                   )}
-                  <span
-                    className={`text-sm font-medium flex-1 ${item.done ? 'text-slate-400 line-through' : 'text-slate-800'}`}
-                  >
+                  <span className={`text-sm font-medium flex-1 ${item.done ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
                     {item.label}
                   </span>
                   {!item.done && <ChevronRight className="w-4 h-4 text-slate-300" />}
@@ -156,47 +131,30 @@ export default async function StaffPortalLanding() {
           </div>
         )}
 
-        {/* Quick links grid */}
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
-          Quick Access
-        </h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Quick Access</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8">
           {quickLinks.map(({ label, href, icon: Icon, desc }) => (
-            <Link
-              key={href}
-              href={href}
-              className="bg-white rounded-xl border p-4 flex flex-col items-center text-center hover:border-brand-blue-300 hover:bg-brand-blue-50 transition group"
-            >
+            <Link key={href} href={href} className="bg-white rounded-xl border p-4 flex flex-col items-center text-center hover:border-brand-blue-300 hover:bg-brand-blue-50 transition group">
               <div className="w-10 h-10 bg-white group-hover:bg-brand-blue-100 rounded-xl flex items-center justify-center mb-2 transition">
                 <Icon className="w-5 h-5 text-slate-500 group-hover:text-brand-blue-600" />
               </div>
-              <p className="text-sm font-semibold text-slate-800 group-hover:text-brand-blue-700">
-                {label}
-              </p>
+              <p className="text-sm font-semibold text-slate-800 group-hover:text-brand-blue-700">{label}</p>
               <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
             </Link>
           ))}
         </div>
 
-        {/* Not logged in CTA */}
         {!user && (
           <div className="bg-white rounded-xl border p-8 text-center">
             <h2 className="text-xl font-bold text-slate-900 mb-2">Sign In to Access Staff Tools</h2>
             <p className="text-slate-500 mb-6">
-              Your dashboard, payroll, handbook, and student management tools are available after
-              signing in.
+              Your dashboard, payroll, handbook, and student management tools are available after signing in.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <Link
-                href="/admin-login"
-                className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-xl hover:bg-brand-blue-700"
-              >
+              <a href={siteUrls.adminLogin} className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-xl hover:bg-brand-blue-700">
                 Sign In
-              </Link>
-              <Link
-                href="/onboarding/staff"
-                className="px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200"
-              >
+              </a>
+              <Link href="/onboarding/staff" className="px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200">
                 New Staff Onboarding
               </Link>
             </div>

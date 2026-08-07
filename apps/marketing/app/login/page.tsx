@@ -1,33 +1,26 @@
 'use client';
 
-// Static shell — no server data needed. Served from CDN, no cold start.
-
 import React from 'react';
-
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
 import Image from 'next/image';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
+import { absoluteRoleDestination } from '@/lib/auth/absolute-role-destination';
+import { siteUrls } from '@/lib/utils/site-urls';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
   const searchParams = useSafeSearchParams();
-  // Support both 'next' and 'redirect' params for backward compatibility
   const rawNext = searchParams.get('next') || searchParams.get('redirect') || '';
   const next = validateRedirect(rawNext, '');
   const reason = searchParams.get('reason');
 
-  // The middleware cannot write session cookies, so it cannot call signOut().
-  // When it detects an idle timeout it redirects here with ?reason=idle.
-  // We complete the signOut client-side where the cookie write actually works.
   useEffect(() => {
     if (reason === 'idle') {
       const supabase = createClient();
@@ -42,54 +35,45 @@ function LoginForm() {
 
     try {
       const supabase = createClient();
-
       const { data, error }: any = await supabase.auth.signInWithPassword({
         email: email.trim(),
-        password, // never trim passwords — leading/trailing spaces are valid
+        password,
       });
 
       if (error) throw error;
-
       if (!data?.user) throw new Error('Login succeeded but no user returned');
 
-      // Fetch profile — role + onboarding + enrollment status drive routing
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('role, onboarding_completed, enrollment_status')
+        .select('role, onboarding_completed')
         .eq('id', data.user.id)
         .maybeSingle();
 
       if (profileError) {
-        // profile fetch failed — non-fatal, user still authenticated
         setError('Unable to load your profile. Please try again or contact support.');
         setLoading(false);
         return;
       }
 
       if (!profile) {
-        // Profile row missing — send to onboarding to create one
-        router.push('/onboarding/learner');
+        window.location.assign(`${siteUrls.app}/onboarding/learner`);
         return;
       }
 
-      // Explicit redirect param takes priority
       if (next) {
-        router.push(next);
+        window.location.assign(absoluteRoleDestination(next));
         return;
       }
 
       const role = profile.role;
       const onboardingDone = profile.onboarding_completed === true;
 
-      // Employer: gate on onboarding before dashboard. All other roles:
-      // canonical destination from lib/auth/role-destinations.ts.
       if (role === 'employer' && !onboardingDone) {
-        router.push('/onboarding/employer');
+        window.location.assign(`${siteUrls.app}/onboarding/employer`);
       } else {
-        router.push(getRoleDestination(role));
+        window.location.assign(absoluteRoleDestination(getRoleDestination(role)));
       }
     } catch (err: any) {
-      // Supabase error objects have non-enumerable properties — extract explicitly
       const msg = err?.message || err?.error_description || err?.msg || 'Invalid email or password';
       setError(msg);
     } finally {
@@ -99,7 +83,6 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Banner */}
       <section className="relative h-[200px] w-full overflow-hidden">
         <Image
           src="/images/pages/login-page-1.webp"
@@ -112,7 +95,6 @@ function LoginForm() {
         />
       </section>
 
-      {/* Login Form */}
       <section className="py-12 relative z-10">
         <div className="max-w-md mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg p-8">
@@ -122,28 +104,20 @@ function LoginForm() {
             </p>
 
             {reason === 'idle' && !error && (
-              <div
-                className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm"
-                role="alert"
-              >
+              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm" role="alert">
                 Your session expired due to inactivity. Please sign in again.
               </div>
             )}
 
             {error && (
-              <div
-                className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm"
-                role="alert"
-              >
+              <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg text-brand-red-800 text-sm" role="alert">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleLogin} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
-                  Email Address
-                </label>
+                <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">Email Address</label>
                 <input
                   type="email"
                   id="email"
@@ -156,9 +130,7 @@ function LoginForm() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-black mb-2">
-                  Password
-                </label>
+                <label htmlFor="password" className="block text-sm font-semibold text-black mb-2">Password</label>
                 <input
                   type="password"
                   id="password"
@@ -171,12 +143,7 @@ function LoginForm() {
               </div>
 
               <div className="flex items-center justify-end text-sm">
-                <Link
-                  href="/reset-password"
-                  className="text-brand-blue-600 hover:text-brand-blue-700"
-                >
-                  Forgot password?
-                </Link>
+                <Link href="/reset-password" className="text-brand-blue-600 hover:text-brand-blue-700">Forgot password?</Link>
               </div>
 
               <button
@@ -189,7 +156,7 @@ function LoginForm() {
             </form>
 
             <div className="mt-6 text-center text-sm text-black">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link
                 href={`/signup${next ? `?redirect=${encodeURIComponent(next)}` : ''}`}
                 className="text-brand-blue-600 font-semibold hover:text-brand-blue-700"
@@ -204,10 +171,10 @@ function LoginForm() {
                 {[
                   { label: 'Student Portal', dest: '/learner/dashboard' },
                   { label: 'Program Holder', dest: '/program-holder/dashboard' },
-                  { label: 'Instructor', dest: '/instructor/dashboard' },
+                  { label: 'Instructor', dest: '/admin/instructor/dashboard' },
                   { label: 'Employer', dest: '/employer/dashboard' },
                   { label: 'Partner Portal', dest: '/partner/dashboard' },
-                  { label: 'Staff Portal', dest: '/staff-portal/dashboard' },
+                  { label: 'Staff Portal', dest: '/admin/staff-portal/dashboard' },
                   { label: 'Mentor', dest: '/mentor/dashboard' },
                   { label: 'Case Manager', dest: '/case-manager/dashboard' },
                   { label: 'Workforce Board', dest: '/workforce-board/dashboard' },
@@ -223,9 +190,8 @@ function LoginForm() {
                     {item.label}
                   </Link>
                 ))}
-                {/* Admin portal lives on admin.elevateforhumanity.org — never on the LMS */}
                 <a
-                  href="https://admin.elevateforhumanity.org/login"
+                  href={siteUrls.adminLogin}
                   className="text-center px-4 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-all text-sm font-semibold min-h-[44px] inline-flex items-center justify-center col-span-2"
                 >
                   Admin Portal →
@@ -237,13 +203,11 @@ function LoginForm() {
           <div className="mt-6 text-center text-sm text-black">
             <p>
               Need help?{' '}
-              <a href="tel:+13173143757" className="text-brand-blue-600 font-semibold">
-                (317) 314-3757
+              <a href={`tel:${siteUrls.org.phone.replace(/[^+\d]/g, '')}`} className="text-brand-blue-600 font-semibold">
+                {siteUrls.org.phone}
               </a>{' '}
               or{' '}
-              <Link href="/support" className="text-brand-blue-600 font-semibold">
-                support center
-              </Link>
+              <Link href="/support" className="text-brand-blue-600 font-semibold">support center</Link>
             </p>
           </div>
         </div>
@@ -252,22 +216,6 @@ function LoginForm() {
   );
 }
 
-function LoginSkeleton() {
-  return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="w-full max-w-md space-y-4 animate-pulse">
-        <div className="h-8 bg-slate-100 rounded-lg w-48 mx-auto" />
-        <div className="h-4 bg-slate-100 rounded w-64 mx-auto" />
-        <div className="h-12 bg-slate-100 rounded-xl mt-6" />
-        <div className="h-12 bg-slate-100 rounded-xl" />
-        <div className="h-12 bg-slate-200 rounded-xl" />
-      </div>
-    </div>
-  );
-}
-
 export default function LoginPage() {
-  return (
-          <LoginForm />
-  );
+  return <LoginForm />;
 }

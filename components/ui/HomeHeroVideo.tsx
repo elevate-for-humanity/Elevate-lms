@@ -74,12 +74,11 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           <video
             ref={videoRef}
             src={videoSrc}
-            poster={banner.posterImage}
             autoPlay
             loop
             muted={isMuted}
             playsInline
-            preload="metadata"
+            preload="auto"
             onError={() => {
               setVideoFailed(true);
               setIsPlaying(false);

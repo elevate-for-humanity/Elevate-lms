@@ -2,170 +2,57 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, Video, FileText, Award, Clock, CheckCircle, ArrowLeft, Play } from 'lucide-react';
+import { ArrowLeft, Award, BookOpen, CheckCircle, Clock, Play } from 'lucide-react';
+
+const courses = [
+  { id: 'barber', title: 'Barber Fundamentals', progress: 65, duration: '15 weeks' },
+  { id: 'hvac', title: 'HVAC Technician', progress: 30, duration: '12 weeks' },
+];
 
 export default function StudentDemoPage() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [completed, setCompleted] = useState<Record<string, boolean>>({});
+  const [notice, setNotice] = useState('');
+  const selected = courses.find((course) => course.id === selectedCourse);
 
-  const demoCourses = [
-    {
-      id: 'barber-101',
-      title: 'Barber Fundamentals',
-      progress: 65,
-      lessons: 12,
-      completed: 8,
-      duration: '15 weeks',
-      image: '/images/barber-hero.webp',
-    },
-    {
-      id: 'hvac-basics',
-      title: 'HVAC Technician Training',
-      progress: 30,
-      lessons: 20,
-      completed: 6,
-      duration: '16 weeks',
-      image: '/images/hvac-hero.webp',
-    },
-  ];
+  const startLesson = (lesson: number) => {
+    const key = `${selectedCourse}-${lesson}`;
+    setCompleted((current) => ({ ...current, [key]: true }));
+    setNotice(`Sample lesson ${lesson} completed in demo mode`);
+    window.setTimeout(() => setNotice(''), 2200);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-blue-600 text-white py-6 sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/store/demo" className="hover:bg-blue-700 p-2 rounded-lg transition">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <div className="text-xs text-blue-200">DEMO MODE</div>
-              <div className="font-bold">Student Portal</div>
-            </div>
-          </div>
-          <Link
-            href="/store/licenses"
-            className="bg-white text-blue-600 px-6 py-2 rounded-lg font-bold hover:bg-blue-50 transition"
-          >
-            Purchase License
-          </Link>
+    <main className="min-h-screen bg-slate-100">
+      <header className="sticky top-0 z-40 bg-blue-700 text-white shadow">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
+          <div className="flex items-center gap-3"><Link href="/store/demos" className="rounded-lg p-2 hover:bg-white/10" aria-label="Back"><ArrowLeft className="h-5 w-5" /></Link><div><p className="text-xs font-bold uppercase tracking-wider text-blue-200">Sample data · Demo mode</p><h1 className="font-black">Student Portal</h1></div></div>
+          <Link href="/store/trial" className="rounded-lg bg-white px-4 py-2 text-sm font-bold text-blue-700">Start Trial</Link>
         </div>
-      </div>
+      </header>
+      {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-2xl font-bold text-blue-600">JD</span>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Welcome back, John Doe</h1>
-              <p className="text-slate-600">Demo Student Account</p>
-            </div>
-          </div>
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-7">
+          <div className="flex items-center gap-4"><div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 font-black text-blue-700">JD</div><div><h2 className="text-2xl font-black">Demo Learner</h2><p className="text-slate-500">Interactive sample account</p></div></div>
+        </section>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-lg p-6">
-              <div className="text-3xl font-bold text-blue-600 mb-2">2</div>
-              <div className="text-sm text-slate-700">Active Courses</div>
+        {!selected ? (
+          <section>
+            <h2 className="mb-5 text-2xl font-black text-slate-950">My sample courses</h2>
+            <div className="grid gap-5 md:grid-cols-2">
+              {courses.map((course) => <article key={course.id} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-start justify-between gap-3"><div><BookOpen className="h-6 w-6 text-blue-600" /><h3 className="mt-3 text-xl font-black">{course.title}</h3></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold">{course.progress}%</span></div><div className="mt-4 flex items-center gap-2 text-sm text-slate-500"><Clock className="h-4 w-4" />{course.duration}</div><div className="mt-4 h-2 rounded-full bg-slate-200"><div className="h-2 rounded-full bg-blue-600" style={{ width: `${course.progress}%` }} /></div><button onClick={() => setSelectedCourse(course.id)} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-700 py-3 font-bold text-white"><Play className="h-4 w-4" />Continue learning</button></article>)}
             </div>
-            <div className="bg-brand-green-50 rounded-lg p-6">
-              <div className="text-3xl font-bold text-brand-green-600 mb-2">14</div>
-              <div className="text-sm text-slate-700">Lessons Completed</div>
-            </div>
-            <div className="bg-purple-50 rounded-lg p-6">
-              <div className="text-3xl font-bold text-purple-600 mb-2">48%</div>
-              <div className="text-sm text-slate-700">Overall Progress</div>
-            </div>
-          </div>
-        </div>
-
-        <h2 className="text-2xl font-bold mb-6">My Courses</h2>
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {demoCourses.map((course) => (
-            <div key={course.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
-              <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Play className="w-16 h-16 text-white opacity-80" />
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">{course.title}</h3>
-                <div className="flex items-center gap-4 text-sm text-slate-600 mb-4">
-                  <span className="flex items-center gap-1">
-                    <BookOpen className="w-4 h-4" />
-                    {course.lessons} lessons
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {course.duration}
-                  </span>
-                </div>
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-600">Progress</span>
-                    <span className="font-bold text-blue-600">{course.progress}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all"
-                      style={{ width: `${course.progress}%` }}
-                    />
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedCourse(course.id)}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
-                >
-                  Continue Learning
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {selectedCourse && (
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Course Content</h2>
-              <button
-                onClick={() => setSelectedCourse(null)}
-                className="text-slate-600 hover:text-slate-900"
-              >
-                Close
-              </button>
-            </div>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((lesson) => (
-                <div key={lesson} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-slate-50 transition">
-                  <div className="w-10 h-10 bg-brand-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-brand-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-bold">Lesson {lesson}: Introduction to Tools</div>
-                    <div className="text-sm text-slate-600">15 minutes · Video + Quiz</div>
-                  </div>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                    Start
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
+          </section>
+        ) : (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 className="text-2xl font-black">{selected.title}</h2><p className="text-sm text-slate-500">Five interactive sample lessons</p></div><button onClick={() => setSelectedCourse(null)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to courses</button></div>
+            <div className="mt-6 space-y-3">{[1,2,3,4,5].map((lesson) => { const done = completed[`${selected.id}-${lesson}`]; return <div key={lesson} className="flex flex-col justify-between gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center"><div className="flex items-center gap-3">{done ? <CheckCircle className="h-6 w-6 text-green-600" /> : <Play className="h-6 w-6 text-blue-600" />}<div><p className="font-bold">Lesson {lesson}: Sample learning activity</p><p className="text-sm text-slate-500">Video + knowledge check · demo only</p></div></div><button onClick={() => startLesson(lesson)} className={`rounded-lg px-4 py-2 text-sm font-bold ${done ? 'bg-green-100 text-green-800' : 'bg-blue-700 text-white'}`}>{done ? 'Replay sample' : 'Start lesson'}</button></div>; })}</div>
+          </section>
         )}
 
-        <div className="mt-8 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-8 text-center">
-          <Award aria-label="award" className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold mb-2">This is a Demo</h3>
-          <p className="text-slate-700 mb-6 max-w-2xl mx-auto">
-            You're experiencing the student portal with sample data. The full platform includes video lessons, SCORM courses, quizzes, certificates, and more.
-          </p>
-          <Link
-            href="/store/licenses"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
-          >
-            Get Full Access
-          </Link>
-        </div>
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-7 text-center"><Award className="mx-auto h-10 w-10 text-amber-500" /><h2 className="mt-3 text-xl font-black">Demo only</h2><p className="mx-auto mt-2 max-w-xl text-slate-600">Lesson completion on this page is local to your browser session and never changes a real learner record.</p></section>
       </div>
-    </div>
+    </main>
   );
 }

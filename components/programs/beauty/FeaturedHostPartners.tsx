@@ -11,9 +11,8 @@ export default function FeaturedHostPartners() {
           Approved host barbershops &amp; training partners
         </h2>
         <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto text-sm">
-          Including {PARTNER_BRAND_ALIASES.prestigeInstitute},{' '}
-          {PARTNER_BRAND_ALIASES.kountryKutz}, {PARTNER_BRAND_ALIASES.corinneStyles} in Sullivan,
-          and other DOL-registered Indiana host shops.
+          Including {PARTNER_BRAND_ALIASES.kountryKutz}, {PARTNER_BRAND_ALIASES.corinneStyles} in Sullivan,
+          and other currently approved Indiana host shops.
         </p>
         <div className="grid sm:grid-cols-2 gap-4">
           {FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => (

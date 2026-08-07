@@ -63,6 +63,9 @@ RUN apk add --no-cache curl \
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/.next/static ./apps/lms/.next/static
+# Shared root public contains the canonical domain PWA assets (manifest-lms.json,
+# sw-lms.js, offline.html, icons). Copy it first, then overlay app-specific assets.
+COPY --from=builder --chown=nextjs:nodejs /app/public ./apps/lms/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/lms/public ./apps/lms/public
 
 RUN if [ -f "./apps/lms/server.js" ]; then \

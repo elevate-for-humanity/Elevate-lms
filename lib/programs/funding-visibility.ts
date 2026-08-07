@@ -1,96 +1,70 @@
-import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
+import type { ProgramSchema } from '@/lib/programs/program-schema';
+import {
+  getPublicFundingLabels,
+  getVerifiedProgramFunding,
+  isStrictWorkforceFundedProgram,
+} from '@/lib/programs/funding-registry';
 
 export type ProgramFundingStatus = {
-  /** WIOA Individual Training Account pathway */
   isWioaFundable: boolean;
-  /** Indiana Workforce Ready Grant */
   isWrgFundable: boolean;
-  /** Listed on Indiana ETPL */
   isEtplListed: boolean;
-  /** FSSA IMPACT / SNAP E&T */
   isImpactFundable: boolean;
-  /** Employer-sponsored apprenticeship */
   isEmployerFunded: boolean;
-  /** Show Indiana Career Connect + WorkOne intake steps */
   showWorkforceFundingProcess: boolean;
-  /** Human-readable funding source labels for chips */
   fundingSourceLabels: string[];
-  /** Short badge line for hero / funding header */
   fundabilityHeadline: string;
-  /** One sentence explaining fundability */
   fundabilitySummary: string;
 };
 
-function hasFundingOption(program: ProgramSchema, option: FundingType): boolean {
-  return program.fundingOptions?.includes(option) ?? false;
-}
-
-function etplFromCompliance(program: ProgramSchema): boolean {
-  return (
-    program.complianceAlignment?.some((row) => {
-      const text = `${row.standard} ${row.description ?? ''}`;
-      if (/not\s+on\s+(the\s+)?indiana\s+etpl/i.test(text)) return false;
-      return /etpl\s*(program|listed|approved|#)/i.test(text) || /indiana\s+etpl\s*#/i.test(text);
-    }) ?? false
-  );
-}
-
 /**
- * Resolve whether a program is workforce-fundable and which sources apply.
- * Uses both agency flags (`funding`) and UI/runtime flags (`fundingOptions`).
+ * Public funding resolver.
+ *
+ * IMPORTANT: legacy fundingOptions, database marketing flags, and descriptive
+ * compliance text do NOT make a program publicly WIOA/WRG eligible. Public
+ * workforce-funding status comes only from the strict verified registry.
  */
 export function resolveProgramFundingStatus(program: ProgramSchema): ProgramFundingStatus {
-  const isWioaFundable =
-    program.funding?.wioa_eligible === true || hasFundingOption(program, 'wioa');
-  const isWrgFundable =
-    program.funding?.wrg_eligible === true || hasFundingOption(program, 'wrg');
-  const isEtplListed =
-    program.funding?.etpl_approved === true ||
-    (program.funding?.etpl_approved !== false && etplFromCompliance(program));
-  const isImpactFundable =
-    program.funding?.fssa_eligible === true || hasFundingOption(program, 'impact');
-  const isEmployerFunded = hasFundingOption(program, 'employer_paid');
+  const verified = getVerifiedProgramFunding(program.slug);
+  const showWorkforceFundingProcess = isStrictWorkforceFundedProgram(program.slug);
 
-  const showWorkforceFundingProcess = isWioaFundable || isWrgFundable || isEtplListed;
+  const isEtplListed = verified?.etplListedFor2Exclusive === true;
+  const isWioaFundable = showWorkforceFundingProcess && verified?.wioaEligible === true;
+  const isWrgFundable = showWorkforceFundingProcess && verified?.wrgEligible === true;
 
-  const fundingSourceLabels: string[] = [];
-  if (isEtplListed) fundingSourceLabels.push('Indiana ETPL');
-  if (isWioaFundable) fundingSourceLabels.push('WIOA');
-  if (isWrgFundable) fundingSourceLabels.push('Workforce Ready Grant');
-  if (isImpactFundable) fundingSourceLabels.push('FSSA IMPACT');
-  if (isEmployerFunded) fundingSourceLabels.push('Employer-Sponsored');
+  // Non-WIOA sources remain independent, but do not alter the public WIOA/WRG track.
+  const isImpactFundable = program.funding?.fssa_eligible === true;
+  const isEmployerFunded = program.fundingOptions?.includes('employer_paid') ?? false;
 
-  let fundabilityHeadline: string;
-  let fundabilitySummary: string;
+  const fundingSourceLabels = showWorkforceFundingProcess
+    ? getPublicFundingLabels(program.slug)
+    : ['Self-Pay'];
 
   if (showWorkforceFundingProcess) {
-    fundabilityHeadline = isEtplListed
-      ? 'ETPL-listed — workforce funding may cover tuition'
-      : 'Workforce funding may be available';
-    fundabilitySummary =
-      program.funding?.fundingNotes?.trim() ||
-      program.fundingStatement?.trim() ||
-      'Eligible Indiana residents may qualify for $0 tuition through WIOA or the Workforce Ready Grant. Eligibility is determined at WorkOne — not by Elevate.';
-  } else if (isImpactFundable) {
-    fundabilityHeadline = 'FSSA IMPACT funding may be available';
-    fundabilitySummary =
-      'Indiana SNAP or TANF recipients may qualify for no-cost training through FSSA IMPACT. You must be referred by your FSSA case worker — not through WorkOne WIOA intake.';
-  } else {
-    fundabilityHeadline = 'Self-pay and payment plans available';
-    fundabilitySummary =
-      program.fundingStatement?.trim() ||
-      'This program is not listed for WIOA Individual Training Accounts. Self-pay enrollment, payment plans, and BNPL options are available.';
+    return {
+      isWioaFundable,
+      isWrgFundable,
+      isEtplListed,
+      isImpactFundable,
+      isEmployerFunded,
+      showWorkforceFundingProcess,
+      fundingSourceLabels,
+      fundabilityHeadline: 'Workforce-funded pathway — WorkOne intake required',
+      fundabilitySummary:
+        'This program is in Elevate’s verified workforce-funded registry. WIOA/Workforce Ready Grant eligibility and authorization are determined by WorkOne or the responsible funding agency. A WorkOne intake appointment is required before funded enrollment can be completed.',
+    };
   }
 
   return {
-    isWioaFundable,
-    isWrgFundable,
+    isWioaFundable: false,
+    isWrgFundable: false,
     isEtplListed,
     isImpactFundable,
     isEmployerFunded,
-    showWorkforceFundingProcess,
+    showWorkforceFundingProcess: false,
     fundingSourceLabels,
-    fundabilityHeadline,
-    fundabilitySummary,
+    fundabilityHeadline: 'Regular program — self-pay enrollment',
+    fundabilitySummary:
+      'This program is not currently presented as a WIOA/Workforce Ready Grant program under Elevate’s strict ETPL + Top Jobs verification rule. Self-pay and available payment-plan options apply unless Elevate publishes a verified funding update.',
   };
 }

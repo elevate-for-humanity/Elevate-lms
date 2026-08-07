@@ -1,37 +1,32 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-// Central contact information for Elevate for Humanity
-// Update these values with your actual contact details
 
+// Canonical public contact information for Elevate for Humanity.
+// Public pages should import from this module instead of hardcoding contact data.
 export const CONTACT_INFO = {
-  // Phone
   phone: {
-    display: PLATFORM_DEFAULTS.supportPhone, // How it appears on the site
-    tel: '+13173143757', // For tel: links (no spaces, dashes, or parentheses)
+    display: PLATFORM_DEFAULTS.supportPhone,
+    tel: '+13173143757',
   },
 
-  // Email - Hidden behind contact form (not displayed publicly)
   email: {
-    general: 'info@elevateforhumanity.org', // Used by contact form only
-    support: 'info@elevateforhumanity.org', // Used by contact form only
-    partnerships: 'info@elevateforhumanity.org', // Used by contact form only
+    general: 'info@elevateforhumanity.org',
+    support: 'info@elevateforhumanity.org',
+    partnerships: 'info@elevateforhumanity.org',
   },
 
-  // Address
   address: {
-    street: '120 E Market St Suite 930',
+    street: '120 E Market St, Suite 930',
     city: 'Indianapolis',
     state: 'IN',
     zip: '46204',
-    full: '120 E Market St Suite 930, Indianapolis, IN 46204',
+    full: '120 E Market St, Suite 930, Indianapolis, IN 46204',
   },
 
-  // Hours
   hours: {
     office: 'Monday-Friday, 9:00 AM - 5:00 PM EST',
     aiReceptionist: '24/7 - Always Available',
   },
 
-  // Social Media
   social: {
     facebook: 'https://www.facebook.com/profile.php?id=61571046346179',
     instagram: 'https://instagram.com/elevateforhumanity',
@@ -39,12 +34,10 @@ export const CONTACT_INFO = {
   },
 };
 
-// Helper function to format phone for display
 export function formatPhone(phone: string): string {
   return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
 }
 
-// Helper function to create tel: link
 export function getTelLink(phone: string): string {
   return `tel:${phone.replace(/\D/g, '')}`;
 }

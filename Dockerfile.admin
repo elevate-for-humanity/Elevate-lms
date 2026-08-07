@@ -35,9 +35,15 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/apps/admin/node_modules ./apps/admin/node_modules
 COPY . .
 
+# Stamp the admin service worker with the current deployment SHA before build.
+RUN node scripts/stamp-sw.mjs
+RUN ! grep -q '__CACHE_VERSION__' /app/public/sw-admin.js || \
+    (echo "ERROR: __CACHE_VERSION__ still present in sw-admin.js" && exit 1)
+
 RUN pnpm --filter @elevate/admin build
 RUN test -d /app/apps/admin/.next
 RUN test -f /app/apps/admin/.next/BUILD_ID
+RUN test -f /app/public/sw-admin.js
 
 FROM node:22-alpine AS runner
 
@@ -63,8 +69,17 @@ RUN apk add --no-cache curl \
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
+
+# The standalone launcher runs from /app/server.js, so public assets must exist
+# at /app/public. Keep the app-relative copy as well for monorepo standalone
+# layouts that resolve assets from /app/apps/admin.
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/public ./apps/admin/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
+
+RUN test -f /app/public/sw-admin.js \
+    && test -f /app/apps/admin/public/sw-admin.js
 
 RUN if [ -f /app/apps/admin/server.js ]; then \
       cp /app/apps/admin/server.js /app/server.js; \

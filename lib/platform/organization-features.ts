@@ -1,6 +1,8 @@
 import type { SupabaseClient } from '@/lib/supabase';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
+  ADDON_FEATURE_FALLBACK,
+  FEATURES,
   PLAN_FEATURE_FALLBACK,
   PLAN_LIMITS_FALLBACK,
   normalizeAddonCode,
@@ -31,27 +33,37 @@ export class FeatureUpgradeRequiredError extends Error {
   }
 }
 
-function addNormalizedFeature(set: Set<FeatureCode>, raw: string | null | undefined) {
+function addFeature(featureSet: Set<FeatureCode>, raw: string | null | undefined) {
   if (!raw) return;
   const normalized = normalizeFeatureCode(raw);
-  if (normalized) set.add(normalized);
+  if (normalized) featureSet.add(normalized);
+}
+
+function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
+  for (const feature of ADDON_FEATURE_FALLBACK[addonCode] ?? []) {
+    featureSet.add(feature);
+  }
 }
 
 /**
  * Load merged feature codes for an organization (tenant).
- * DB, fallback plans, add-ons and legacy licenses all normalize to the same
- * canonical PlatformFeature strings before feature gates evaluate them.
+ * DB plan/add-on definitions are preferred; code-side fallbacks keep recently
+ * introduced capabilities usable during catalog migration/deployment windows.
  */
 export async function getOrganizationFeatures(
   organizationId: string,
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const supabase = client ?? (await requireAdminClient());
-  if (!supabase) return emptyEntitlements(organizationId);
+  if (!supabase) {
+    return emptyEntitlements(organizationId);
+  }
 
   const { data: orgSub } = await supabase
     .from('organization_subscriptions')
-    .select('status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )')
+    .select(
+      'status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )',
+    )
     .eq('organization_id', organizationId)
     .maybeSingle();
 
@@ -59,6 +71,7 @@ export async function getOrganizationFeatures(
   const planRow = Array.isArray(planJoin) ? planJoin[0] : planJoin;
   const planSlug = planRow?.slug ?? null;
   const planId = orgSub?.plan_id as string | undefined;
+
   const featureSet = new Set<FeatureCode>();
 
   if (planId) {
@@ -67,15 +80,17 @@ export async function getOrganizationFeatures(
       .select('features ( code )')
       .eq('plan_id', planId);
 
-    for (const row of planFeatureRows ?? []) {
-      const joined = row.features as { code: string } | { code: string }[] | null;
-      const values = Array.isArray(joined) ? joined : joined ? [joined] : [];
-      for (const value of values) addNormalizedFeature(featureSet, value?.code);
+    if (planFeatureRows?.length) {
+      for (const row of planFeatureRows) {
+        const f = row.features as { code: string } | { code: string }[] | null;
+        const codes = Array.isArray(f) ? f : f ? [f] : [];
+        for (const c of codes) addFeature(featureSet, c?.code);
+      }
     }
   }
 
   if (featureSet.size === 0 && planSlug && planSlug in PLAN_FEATURE_FALLBACK) {
-    PLAN_FEATURE_FALLBACK[planSlug].forEach((code) => featureSet.add(code));
+    PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
   }
 
   const { data: addonRows } = await supabase
@@ -86,9 +101,12 @@ export async function getOrganizationFeatures(
 
   const activeAddonCodes: string[] = [];
   for (const row of addonRows ?? []) {
-    activeAddonCodes.push(row.addon_code);
-    const catalog = row.saas_addon_catalog as { feature_codes: string[] } | null;
-    for (const raw of catalog?.feature_codes ?? []) addNormalizedFeature(featureSet, raw);
+    const addonCode = normalizeAddonCode(row.addon_code);
+    activeAddonCodes.push(addonCode);
+    const cat = row.saas_addon_catalog as { feature_codes: string[] } | null;
+    const dbFeatureCodes = cat?.feature_codes ?? [];
+    for (const code of dbFeatureCodes) addFeature(featureSet, code);
+    if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);
   }
 
   const { data: legacyAddons } = await supabase
@@ -97,15 +115,17 @@ export async function getOrganizationFeatures(
     .eq('tenant_id', organizationId)
     .eq('status', 'active');
 
-  for (const legacy of legacyAddons ?? []) {
-    const code = normalizeAddonCode(legacy.addon_slug);
+  for (const leg of legacyAddons ?? []) {
+    const code = normalizeAddonCode(leg.addon_slug);
     if (!activeAddonCodes.includes(code)) activeAddonCodes.push(code);
-    const { data: catalog } = await supabase
+    const { data: cat } = await supabase
       .from('saas_addon_catalog')
       .select('feature_codes')
       .eq('code', code)
       .maybeSingle();
-    for (const raw of catalog?.feature_codes ?? []) addNormalizedFeature(featureSet, raw);
+    const dbFeatureCodes = cat?.feature_codes ?? [];
+    for (const c of dbFeatureCodes) addFeature(featureSet, c);
+    if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
   }
 
   if (featureSet.size === 0) {
@@ -115,14 +135,12 @@ export async function getOrganizationFeatures(
       .eq('tenant_id', organizationId)
       .eq('status', 'active')
       .maybeSingle();
-    for (const raw of (license?.features as string[]) ?? []) addNormalizedFeature(featureSet, raw);
+    for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
   }
 
   const limits: PlanLimits =
     (planRow?.limits as PlanLimits) ??
-    (planSlug && PLAN_LIMITS_FALLBACK[planSlug]
-      ? PLAN_LIMITS_FALLBACK[planSlug]
-      : { users: 1 });
+    (planSlug && PLAN_LIMITS_FALLBACK[planSlug] ? PLAN_LIMITS_FALLBACK[planSlug] : { users: 1 });
 
   return {
     organizationId,
@@ -153,8 +171,9 @@ export function organizationHasFeature(
   entitlements: OrganizationEntitlements,
   feature: string,
 ): boolean {
-  const normalized = normalizeFeatureCode(feature);
-  return normalized ? entitlements.features.includes(normalized) : false;
+  const requested = normalizeFeatureCode(feature);
+  if (!requested) return false;
+  return entitlements.features.includes(requested);
 }
 
 export async function requireFeature(

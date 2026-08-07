@@ -36,6 +36,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/store/apps/website-builder',
     '/store/apps/sam-gov',
     '/store/apps/grants',
+    '/store/ai-assistants',
     '/store/course-builder',
     '/store/dev-studio',
     '/store/ai-studio',

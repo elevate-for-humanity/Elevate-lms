@@ -66,9 +66,6 @@ FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Pass build identity from builder stage into the runtime container.
-# Without these, the health endpoint returns GIT_SHA="unknown" and the
-# GitHub Actions deployment pipeline hangs forever waiting for the SHA to match.
 ARG GITHUB_SHA
 ARG GIT_SHA
 ARG NEXT_PUBLIC_GIT_SHA
@@ -96,13 +93,17 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
+# Root public holds the canonical domain PWA assets. Copy it first, then overlay
+# Marketing-specific public files so the installed PWA receives its manifest,
+# service worker, offline page, and shared icons in the runtime image.
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/public \
+    ./apps/marketing/public/
+
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/public \
     ./apps/marketing/public/
 
-# Fix: Next.js standalone output inherits "type":"module" from the monorepo
-# root package.json, but server.js is compiled as CommonJS. Remove it so
-# Node.js treats server.js as CommonJS (no require/import mismatch).
 RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true
 
 USER nextjs

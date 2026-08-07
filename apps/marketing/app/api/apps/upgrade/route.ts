@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         quantity: 1,
       },
     ],
-    success_url: `${SITE_URL}/store/apps/${catalog.slug}?subscription=success&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${SITE_URL}/store/apps/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${SITE_URL}/store/apps/${catalog.slug}?checkout=cancelled`,
   });
 

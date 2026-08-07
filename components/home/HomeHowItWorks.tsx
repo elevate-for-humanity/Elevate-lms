@@ -1,135 +1,102 @@
-/**
- * HomeHowItWorks
- *
- * Operational continuity flow: Apply → Funding → Training →
- * Apprenticeship → Credential → Employment.
- * Photo cards replace icon badges — each step has a real image.
- */
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import { card, layout } from '@/lib/page-design-tokens';
 
 const STEPS = [
   {
     n: '01',
     label: 'Apply',
-    detail: 'Complete a short application. No cost, no commitment.',
+    detail: 'Start with a short application so we know your program interest and next step.',
     href: '/apply',
     img: '/images/pages/apply-page-1.jpg',
     imgAlt: 'Student completing application',
-    accent: 'border-brand-red-500',
   },
   {
     n: '02',
-    label: 'Funding Review',
-    detail: 'We check WIOA, Workforce Ready Grant, and other sources. Eligibility varies by participant and program.',
+    label: 'Review Funding',
+    detail: 'Explore potential workforce funding and eligibility requirements before enrollment.',
     href: '/check-eligibility',
     img: '/images/pages/funding-impact-1.webp',
     imgAlt: 'Funding advisor reviewing eligibility with student',
-    accent: 'border-amber-500',
   },
   {
     n: '03',
-    label: 'Training',
-    detail: 'Instructor-led, credential-aligned coursework with AI-powered support.',
+    label: 'Train',
+    detail: 'Complete credential-aligned instruction and required hands-on learning.',
     href: '/programs',
     img: '/images/pages/comp-pathway-classroom.webp',
     imgAlt: 'Students in workforce training classroom',
-    accent: 'border-blue-500',
   },
   {
     n: '04',
-    label: 'Apprenticeship',
-    detail: 'DOL-registered OJT with employer partners. Hours tracked, wages paid.',
+    label: 'Work & Learn',
+    detail: 'Eligible apprenticeship pathways combine structured training with employer-based learning.',
     href: '/apprenticeships',
     img: '/images/pages/apprenticeship-hero.webp',
     imgAlt: 'Apprentice working on-site with employer supervisor',
-    accent: 'border-emerald-500',
   },
   {
     n: '05',
-    label: 'Credential',
-    detail: 'Industry-recognized certification. Publicly verifiable on our platform.',
+    label: 'Earn Credentials',
+    detail: 'Prepare for the credential, certification, or license requirement connected to your pathway.',
     href: '/credentials',
     img: '/images/pages/certifications-page-1.webp',
-    imgAlt: 'Graduate receiving industry credential certificate',
-    accent: 'border-purple-500',
+    imgAlt: 'Career credential certificate',
   },
   {
     n: '06',
-    label: 'Employment',
-    detail: 'Job placement support, employer connections, and career advancement.',
+    label: 'Move Forward',
+    detail: 'Use career services, employer connections, and work-based learning support as you advance.',
     href: '/employment-support',
     img: '/images/pages/employment-support-page-1.webp',
-    imgAlt: 'Graduate starting new career with employer',
-    accent: 'border-brand-green-500',
+    imgAlt: 'Career advancement and employer connection',
   },
-];
+] as const;
 
 export function HomeHowItWorks() {
   return (
-    <section
-      className={`bg-slate-950 ${layout.sectionTight} px-4`}
-      aria-labelledby="how-it-works-heading"
-    >
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-brand-red-400 text-xs font-bold uppercase tracking-widest mb-3">
-            The Elevate Pathway
-          </p>
-          <h2
-            id="how-it-works-heading"
-            className="text-2xl sm:text-3xl font-extrabold text-white mb-3"
-          >
-            One system. End-to-end.
+    <section className="bg-slate-950 px-4 py-16 sm:py-20" aria-labelledby="how-it-works-heading">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 max-w-3xl">
+          <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-orange-300">The Elevate Pathway</p>
+          <h2 id="how-it-works-heading" className="text-3xl font-black tracking-tight text-white sm:text-4xl">
+            Know what happens next.
           </h2>
-          <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
-            From first application to first paycheck — every step is tracked and supported through the appropriate program and funding workflow.
+          <p className="mt-4 text-lg leading-8 text-slate-200">
+            A clear journey from application through training, credentials, and career advancement—without making people guess where to go next.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {STEPS.map((step) => (
-            <Link
-              key={step.n}
-              href={step.href}
-              className={`group relative flex flex-col rounded-2xl overflow-hidden bg-slate-900 border-t-4 ${step.accent} hover:ring-1 hover:ring-slate-600 transition-all hover:-translate-y-0.5`}
-            >
-              <div className={card.programImage}>
+            <Link key={step.n} href={step.href} className="group overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 transition hover:-translate-y-1 hover:border-slate-500 hover:shadow-2xl">
+              <div className="relative aspect-[4/3] overflow-hidden">
                 <Image
                   src={step.img}
                   alt={step.imgAlt}
                   fill
-                  className={card.programImageFill}
+                  className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   loading="lazy"
-                  placeholder="empty"
                 />
-                <span className="absolute top-2 left-2 text-[10px] font-black text-white bg-slate-900/60 px-1.5 py-0.5 rounded-md">
+                <span className="absolute left-4 top-4 rounded-full bg-slate-950/85 px-3 py-1.5 text-sm font-black text-white backdrop-blur-sm">
                   {step.n}
                 </span>
               </div>
-
-              <div className="p-3">
-                <p className="text-sm font-extrabold text-white leading-tight mb-1">
-                  {step.label}
-                </p>
-                <p className="text-xs text-slate-400 leading-snug">
-                  {step.detail}
-                </p>
+              <div className="p-6">
+                <h3 className="text-2xl font-black text-white">{step.label}</h3>
+                <p className="mt-3 text-base leading-7 text-slate-300">{step.detail}</p>
+                <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-orange-300">
+                  Learn more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
               </div>
             </Link>
           ))}
         </div>
 
-        <div className="text-center">
-          <Link
-            href="/how-it-works"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-xs font-semibold transition-colors"
-          >
-            See the full process <ArrowRight className="w-3 h-3" />
+        <div className="mt-10">
+          <Link href="/how-it-works" className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-4 text-base font-extrabold text-slate-950 hover:bg-slate-100">
+            See the Full Process <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </div>

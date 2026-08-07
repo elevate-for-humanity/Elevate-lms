@@ -24,7 +24,7 @@ const STEPS = [
   {
     n: '02',
     label: 'Funding Review',
-    detail: 'We check WIOA, Workforce Ready Grant, and other sources. Most qualify.',
+    detail: 'We check WIOA, Workforce Ready Grant, and other sources. Eligibility varies by participant and program.',
     href: '/check-eligibility',
     img: '/images/pages/funding-impact-1.webp',
     imgAlt: 'Funding advisor reviewing eligibility with student',
@@ -86,20 +86,17 @@ export function HomeHowItWorks() {
             One system. End-to-end.
           </h2>
           <p className="text-slate-400 text-sm max-w-xl mx-auto leading-relaxed">
-            From first application to first paycheck — every step is tracked, funded, and
-            supported. No gaps, no handoffs to nowhere.
+            From first application to first paycheck — every step is tracked and supported through the appropriate program and funding workflow.
           </p>
         </div>
 
-        {/* Step grid — 2×3 on desktop so photos stay readable */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-          {STEPS.map((step, i) => (
+          {STEPS.map((step) => (
             <Link
               key={step.n}
               href={step.href}
               className={`group relative flex flex-col rounded-2xl overflow-hidden bg-slate-900 border-t-4 ${step.accent} hover:ring-1 hover:ring-slate-600 transition-all hover:-translate-y-0.5`}
             >
-              {/* Photo */}
               <div className={card.programImage}>
                 <Image
                   src={step.img}
@@ -107,7 +104,7 @@ export function HomeHowItWorks() {
                   fill
                   className={card.programImageFill}
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  loading={i < 2 ? 'eager' : 'lazy'}
+                  loading="lazy"
                   placeholder="empty"
                 />
                 <span className="absolute top-2 left-2 text-[10px] font-black text-white bg-slate-900/60 px-1.5 py-0.5 rounded-md">
@@ -115,7 +112,6 @@ export function HomeHowItWorks() {
                 </span>
               </div>
 
-              {/* Label */}
               <div className="p-3">
                 <p className="text-sm font-extrabold text-white leading-tight mb-1">
                   {step.label}
@@ -124,8 +120,6 @@ export function HomeHowItWorks() {
                   {step.detail}
                 </p>
               </div>
-
-              {/* Connector arrow (desktop only) */}
             </Link>
           ))}
         </div>

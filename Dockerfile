@@ -79,6 +79,6 @@ EXPOSE 8080
 
 # Runtime-port-aware health check for Northflank and other container platforms.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD-SHELL curl -fsS "http://127.0.0.1:${PORT:-8080}/api/version" || exit 1
+  CMD curl -fsS "http://127.0.0.1:${PORT:-8080}/api/version" || exit 1
 
 CMD ["node", "--max-http-header-size=32768", "apps/marketing/server.js"]

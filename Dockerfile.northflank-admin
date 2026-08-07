@@ -17,20 +17,15 @@ ARG BUILD_TIMESTAMP=unknown
 # =============================================================================
 FROM node:22-bookworm-slim AS base
 
-
 ARG PNPM_VERSION=10.28.2
-
 
 ENV CI=true \
     NEXT_TELEMETRY_DISABLED=1
-
 
 RUN corepack enable \
     && corepack prepare "pnpm@${PNPM_VERSION}" --activate \
     && test "$(corepack pnpm --version)" = "${PNPM_VERSION}"
 
-
-# Install native build toolchain + font/image processing libraries
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -46,34 +41,17 @@ RUN apt-get update \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-
 WORKDIR /workspace
-
-
-# Cache invalidation marker — changes when Dockerfile content changes
 RUN echo "nf-cache-invalidate-admin-2026-08-04-gitsha-fix"
 
 # =============================================================================
 # STAGE 2: Dependencies
 # =============================================================================
 FROM base AS dependencies
-
-
-# Cache invalidation marker — must change to force rebuild with correct pnpm version
 RUN echo "nf-deps-2026-08-04-gitsha-fix"
-
-
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
-
-
-# Copy actual packages directory (preserves structure: db, shared, ui)
 COPY packages ./packages
-
-
-# Note: --mount=type=cache is NOT used here because Northflank's no_cache:true does
-# not invalidate BuildKit mount caches. Using the standard build cache which is
-# properly invalidated by no_cache:true and Dockerfile content changes.
 RUN set -eux; \
     echo "PATH=${PATH}"; \
     echo "Corepack version:"; \
@@ -91,26 +69,19 @@ RUN set -eux; \
     echo "Confirming install command supports frozen lockfiles:"; \
     corepack pnpm install --help | grep -E -- 'frozen-lockfile|lockfile'; \
     echo "Installing workspace dependencies:"; \
-    corepack pnpm install \
-      --frozen-lockfile \
-      --strict-peer-dependencies=false
+    corepack pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 # =============================================================================
 # STAGE 3: Builder
 # =============================================================================
 FROM base AS builder
-
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_ADMIN_URL
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-
 ARG GIT_SHA=local-build
 ARG BUILD_TIMESTAMP
-
-# Validate GIT_SHA when a production SHA is supplied.
-# Local builds may use the default value "local-build".
 RUN set -eux; \
     echo "Validating GIT_SHA=${GIT_SHA}"; \
     if [ "${GIT_SHA}" = "local-build" ]; then \
@@ -118,34 +89,24 @@ RUN set -eux; \
     elif echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; then \
       echo "GIT_SHA validated: ${GIT_SHA}"; \
     else \
-      echo "ERROR: Invalid GIT_SHA: ${GIT_SHA}" >&2; \
-      exit 1; \
+      echo "ERROR: Invalid GIT_SHA: ${GIT_SHA}" >&2; exit 1; \
     fi
-
 ENV NODE_ENV=production
 ENV CI=true
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 ENV NEXT_STANDALONE_OUTPUT=1
-
 ENV NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://www.elevateforhumanity.org}"
 ENV NEXT_PUBLIC_ADMIN_URL="${NEXT_PUBLIC_ADMIN_URL:-https://admin.elevateforhumanity.org}"
 ENV NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-https://app.elevateforhumanity.org}"
 ENV NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}"
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
-
 ENV GIT_SHA="${GIT_SHA}"
 ENV GITHUB_SHA="${GIT_SHA}"
 ENV NEXT_PUBLIC_GIT_SHA="${GIT_SHA}"
 ENV NEXT_PUBLIC_BUILD_ID="elevate-${GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
-
-# Copy installed dependencies first
 COPY --from=dependencies /workspace/node_modules ./node_modules
-
-# Copy the full repository source afterward
 COPY . .
-
-# Verify required build arguments are present (fail-fast before expensive build)
 RUN echo "Verifying build arguments..." && \
     echo "NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-MISSING}" && \
     echo "NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-MISSING}" && \
@@ -156,84 +117,34 @@ RUN echo "Verifying build arguments..." && \
     (test -n "$NEXT_PUBLIC_SUPABASE_URL" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_URL is not set" && exit 1)) && \
     (test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set" && exit 1)) && \
     echo "All required build arguments verified."
-
-# Build Admin app
 RUN pnpm --filter @elevate/admin build
-
-# =============================================================================
-# VERIFICATION: Builder stage
-# =============================================================================
-# GIT_SHA already declared above with default. Do not redeclare here.
-
 RUN set -eux; \
-    echo "=== ADMIN BUILD VERIFICATION ==="; \
-    \
     ADMIN_NEXT_DIR="/workspace/apps/admin/.next"; \
     BUILD_ID_FILE="${ADMIN_NEXT_DIR}/BUILD_ID"; \
     SERVER_FILE="${ADMIN_NEXT_DIR}/standalone/apps/admin/server.js"; \
-    \
-    echo "Checking standalone output..."; \
     test -d "${ADMIN_NEXT_DIR}/standalone"; \
-    echo "✓ Standalone directory exists"; \
-    \
-    echo "Checking static assets..."; \
     test -d "${ADMIN_NEXT_DIR}/static"; \
-    echo "✓ Static directory exists"; \
-    \
-    echo "Checking BUILD_ID file..."; \
     test -f "${BUILD_ID_FILE}"; \
-    echo "✓ BUILD_ID exists"; \
-    \
-    echo "Checking standalone server entrypoint..."; \
     test -f "${SERVER_FILE}"; \
-    echo "✓ server.js exists at apps/admin/server.js"; \
-    \
     test -n "${GIT_SHA}"; \
     test "${GIT_SHA}" != "unknown"; \
     echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
-    \
     ACTUAL_BUILD_ID="$(tr -d '\r\n' < "${BUILD_ID_FILE}")"; \
     ACTUAL_SHA="${ACTUAL_BUILD_ID#admin-}"; \
     EXPECTED_PREFIX="$(printf '%s' "${GIT_SHA}" | cut -c1-"${#ACTUAL_SHA}")"; \
-    \
-    echo "Full GIT_SHA: ${GIT_SHA}"; \
-    echo "Actual BUILD_ID: ${ACTUAL_BUILD_ID}"; \
-    echo "Build SHA portion: ${ACTUAL_SHA}"; \
-    echo "Expected SHA prefix: ${EXPECTED_PREFIX}"; \
-    \
     echo "${ACTUAL_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
-    \
-    test "${ACTUAL_SHA}" = "${EXPECTED_PREFIX}" \
-      || { \
-        echo "ERROR: BUILD_ID does not match the deployed GIT_SHA"; \
-        echo "Full GIT_SHA: ${GIT_SHA}"; \
-        echo "Actual BUILD_ID: ${ACTUAL_BUILD_ID}"; \
-        echo "Expected prefix: ${EXPECTED_PREFIX}"; \
-        exit 1; \
-      }; \
-    \
-    echo "✓ BUILD_ID matches deployed GIT_SHA"; \
-    echo "=== ADMIN BUILD VERIFICATION COMPLETE ==="
-
-# =============================================================================
-# NATIVE MODULE VERIFICATION: Fail build if native modules unavailable
-# =============================================================================
-RUN pnpm --filter @elevate/admin exec node \
-    ../../scripts/check-native-modules.cjs
+    test "${ACTUAL_SHA}" = "${EXPECTED_PREFIX}"
+RUN pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
 # =============================================================================
 # STAGE 4: Runtime
 # =============================================================================
 FROM node:22-bookworm-slim AS runner
-
-# GIT_SHA and BUILD_TIMESTAMP must be passed as --build-arg from CI/CD
 ARG GIT_SHA
 ARG BUILD_TIMESTAMP
-
 LABEL org.opencontainers.image.title="Elevate Admin"
 LABEL org.opencontainers.image.revision="${GIT_SHA}"
 LABEL org.opencontainers.image.created="${BUILD_TIMESTAMP}"
-
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
@@ -244,72 +155,37 @@ ENV GITHUB_SHA="${GIT_SHA}"
 ENV NEXT_PUBLIC_GIT_SHA="${GIT_SHA}"
 ENV NEXT_PUBLIC_BUILD_ID="elevate-${GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
-
 WORKDIR /app
-
-# Runtime font and image libraries + curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    fontconfig \
-    libfontconfig1 \
-    libfreetype6 \
-    libjpeg62-turbo \
-    libpng16-16 \
-    libwebp7 && \
+    ca-certificates curl fontconfig libfontconfig1 libfreetype6 libjpeg62-turbo libpng16-16 libwebp7 && \
     rm -rf /var/lib/apt/lists/*
-
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home nextjs
-
-# Copy standalone build (preserves apps/admin/ directory structure)
-# server.js will be at /app/apps/admin/server.js
-COPY --from=builder --chown=nextjs:nodejs \
-    /workspace/apps/admin/.next/standalone/ \
-    /app/
-
-# Static assets
-COPY --from=builder --chown=nextjs:nodejs \
-    /workspace/apps/admin/.next/static/ \
-    /app/apps/admin/.next/static/
-
-COPY --from=builder --chown=nextjs:nodejs \
-    /workspace/apps/admin/public/ \
-    /app/apps/admin/public/
-
-# Copy node_modules for native module access (sharp, canvas, fontkit, pdfkit)
-# The standalone output does not include native modules — copy the full tree
-COPY --from=builder --chown=nextjs:nodejs \
-    /workspace/node_modules \
-    /app/node_modules
-
-# =============================================================================
-# VERIFICATION: Runtime stage
-# =============================================================================
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
 RUN set -eux; \
-    echo "=== RUNTIME VERIFICATION ==="; \
-    test -f /app/apps/admin/server.js && echo "✓ server.js at /app/apps/admin/server.js"; \
-    test -d /app/apps/admin/.next/static && echo "✓ Static dir exists"; \
-    test -d /app/apps/admin/public && echo "✓ Public dir exists"; \
-    test -d /app/node_modules/sharp && echo "✓ sharp in node_modules"; \
-    test -d /app/node_modules/@napi-rs/canvas && echo "✓ @napi-rs/canvas in node_modules"; \
-    test -d /app/node_modules/fontkit && echo "✓ fontkit in node_modules"; \
-    test -d /app/node_modules/pdfkit && echo "✓ pdfkit in node_modules"; \
-    echo "=== RUNTIME VERIFICATION PASSED ==="
-
+    test -f /app/apps/admin/server.js; \
+    test -d /app/apps/admin/.next/static; \
+    test -d /app/apps/admin/public; \
+    test -d /app/node_modules/sharp; \
+    test -d /app/node_modules/@napi-rs/canvas; \
+    test -d /app/node_modules/fontkit; \
+    test -d /app/node_modules/pdfkit
 USER nextjs
-
 EXPOSE 3000
 
-# Readiness probe: /api/health/native returns 200 only when all native modules load
+# Canonical lightweight container health contract. Deeper native/dependency
+# checks remain available through Admin diagnostics, but orchestration probes
+# must use /api/ping so they do not couple container liveness to optional tools.
 HEALTHCHECK \
     --interval=30s \
     --timeout=10s \
     --start-period=90s \
     --retries=5 \
     CMD curl --fail --silent --show-error \
-        http://127.0.0.1:3000/api/health/native \
+        http://127.0.0.1:3000/api/ping \
         >/dev/null || exit 1
 
-# Start from the correct location (apps/admin/)
 CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
+import HeaderDesktopMenu from './HeaderDesktopMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
@@ -27,13 +28,11 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Regular desktop navigation. Tablets and smaller use the hamburger so
-            the center row never compresses, scrolls, or disappears. */}
         <div className="hidden lg:flex justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
-        <div className="flex items-center justify-end flex-shrink-0 min-w-0">
+        <div className="flex items-center justify-end gap-2 flex-shrink-0 min-w-0">
           <div className="hidden lg:flex items-center gap-2">
             <Link
               href={ROUTES.login}
@@ -47,6 +46,7 @@ export default function Header() {
             >
               Apply
             </Link>
+            <HeaderDesktopMenu items={NAV_ITEMS} />
           </div>
 
           <div className="lg:hidden flex items-center gap-1">

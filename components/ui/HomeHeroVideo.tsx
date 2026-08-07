@@ -1,17 +1,7 @@
 'use client';
 
-/**
- * HomeHeroVideo — full-width hero video for marketing pages.
- *
- * Rules (non-negotiable):
- * - No gradient overlays on the video frame.
- * - No headline, subheadline, paragraph, or CTA on top of the video.
- * - All primary messaging renders in the below-video content slot.
- * - Only allowed on-video elements: sound control, micro-label (2-4 words max).
- */
-
 import { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, ArrowRight } from 'lucide-react';
 
 export interface HeroBanner {
   pageKey: string;
@@ -43,34 +33,17 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
   const videoSrc = banner.videoSrcMobile || banner.videoSrcDesktop;
   const showVideo = Boolean(videoSrc) && !videoFailed;
-  const narrationText =
-    banner.transcript?.trim() ||
-    `${banner.belowHeroHeadline}. ${banner.belowHeroSubheadline}`.trim();
+  const narrationText = banner.transcript?.trim() || `${banner.belowHeroHeadline}. ${banner.belowHeroSubheadline}`.trim();
 
   useEffect(() => {
     setVideoFailed(false);
-    if (videoRef.current && videoSrc) {
-      videoRef.current.play().catch(() => {});
-    }
+    if (videoRef.current && videoSrc) videoRef.current.play().catch(() => {});
   }, [videoSrc]);
 
-  useEffect(() => {
-    return () => {
-      audioRef.current?.pause();
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    setIsNarrating(false);
+  useEffect(() => () => {
     audioRef.current?.pause();
-    if (audioRef.current) audioRef.current.currentTime = 0;
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-  }, [banner.pageKey]);
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+  }, []);
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -84,28 +57,15 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
     setIsNarrating(false);
   };
 
   const speakWithBrowserTts = () => {
-    if (
-      typeof window === 'undefined' ||
-      !('speechSynthesis' in window) ||
-      typeof SpeechSynthesisUtterance === 'undefined' ||
-      !narrationText
-    ) {
-      setIsNarrating(false);
-      return;
-    }
-
+    if (typeof window === 'undefined' || !('speechSynthesis' in window) || !narrationText) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(narrationText);
     utterance.rate = 0.96;
-    utterance.pitch = 1;
-    utterance.volume = 1;
     utterance.onend = () => setIsNarrating(false);
     utterance.onerror = () => setIsNarrating(false);
     setIsNarrating(true);
@@ -113,15 +73,8 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   };
 
   const toggleNarration = async () => {
-    if (isNarrating) {
-      stopNarration();
-      return;
-    }
-
-    // Keep the cinematic video itself muted. Narration is a separate audio track
-    // so the sound control behaves consistently even when the MP4 has no audio.
+    if (isNarrating) return stopNarration();
     if (videoRef.current) videoRef.current.muted = true;
-
     if (banner.voiceoverSrc && audioRef.current) {
       try {
         audioRef.current.currentTime = 0;
@@ -129,29 +82,21 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
         await audioRef.current.play();
         return;
       } catch {
-        // Missing/blocked voiceover files fall back to browser text-to-speech.
         setIsNarrating(false);
       }
     }
-
     speakWithBrowserTts();
   };
 
   return (
-    <div className="w-full">
-      {banner.voiceoverSrc && (
-        <audio
-          ref={audioRef}
-          src={banner.voiceoverSrc}
-          preload="metadata"
-          onEnded={() => setIsNarrating(false)}
-          onError={() => setIsNarrating(false)}
-        />
-      )}
+    <div className="w-full bg-white">
+      {banner.voiceoverSrc ? (
+        <audio ref={audioRef} src={banner.voiceoverSrc} preload="metadata" onEnded={() => setIsNarrating(false)} />
+      ) : null}
 
       <section
-        className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(300px, 38vw, 520px)' }}
+        className="relative w-full overflow-hidden bg-slate-950"
+        style={{ height: 'clamp(340px, 46vw, 620px)' }}
         aria-label={banner.analyticsName ? `${banner.analyticsName} hero` : 'Hero'}
       >
         {showVideo ? (
@@ -162,7 +107,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             onError={() => {
               setVideoFailed(true);
               setIsPlaying(false);
@@ -170,96 +115,67 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : banner.posterImage ? (
-          <img
-            src={banner.posterImage}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
+          <img src={banner.posterImage} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
         ) : null}
 
-        {banner.microLabel && (
-          <div className="absolute bottom-4 left-4 z-20">
-            <span className="text-xs font-semibold uppercase tracking-widest text-white">
-              {banner.microLabel}
-            </span>
+        {banner.microLabel ? (
+          <div className="absolute bottom-5 left-5 z-20 rounded-full bg-slate-950/75 px-4 py-2 backdrop-blur-sm">
+            <span className="text-sm font-extrabold uppercase tracking-wider text-white">{banner.microLabel}</span>
           </div>
-        )}
+        ) : null}
 
-        <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
-          {showVideo && (
-            <button
-              type="button"
-              onClick={togglePlay}
-              className="rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
-              aria-label={isPlaying ? 'Pause video' : 'Play video'}
-            >
+        <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2">
+          {showVideo ? (
+            <button type="button" onClick={togglePlay} className="rounded-full bg-slate-950/70 p-3 text-white backdrop-blur-sm" aria-label={isPlaying ? 'Pause video' : 'Play video'}>
               {isPlaying ? (
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                  <rect x="6" y="4" width="4" height="16" />
-                  <rect x="14" y="4" width="4" height="16" />
-                </svg>
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
               ) : (
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
               )}
             </button>
-          )}
-          <button
-            type="button"
-            onClick={toggleNarration}
-            className="rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition hover:bg-black/60"
-            aria-label={isNarrating ? 'Stop narration' : 'Play narration'}
-            title={isNarrating ? 'Stop narration' : 'Play narration'}
-          >
-            {isNarrating ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          ) : null}
+          <button type="button" onClick={toggleNarration} className="rounded-full bg-slate-950/70 p-3 text-white backdrop-blur-sm" aria-label={isNarrating ? 'Stop narration' : 'Play narration'}>
+            {isNarrating ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
         </div>
       </section>
 
-      <section className="border-b border-slate-100 py-8 sm:py-14">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          {banner.eyebrow && (
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-red-500 opacity-90 sm:text-sm">
-              {banner.eyebrow}
-            </p>
-          )}
-          <h1
-            className="mb-3 text-2xl font-extrabold leading-tight text-slate-900 sm:mb-4 sm:text-4xl lg:text-5xl"
-            style={{ textWrap: 'balance' }}
-          >
-            {banner.belowHeroHeadline}
-          </h1>
-          <p className="mb-6 max-w-2xl text-base leading-relaxed text-slate-700 sm:mb-8 sm:text-lg">
-            {banner.belowHeroSubheadline}
-          </p>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <a
-              href={banner.primaryCta.href}
-              className="rounded-lg bg-brand-red-600 px-7 py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-brand-red-700"
-            >
-              {banner.primaryCta.label}
-            </a>
-            {banner.secondaryCta && (
-              <a
-                href={banner.secondaryCta.href}
-                className="rounded-lg border border-slate-300 px-7 py-3.5 text-center text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
-              >
-                {banner.secondaryCta.label}
+      <section className="border-b border-slate-200 bg-white py-10 sm:py-16">
+        <div className="mx-auto max-w-6xl px-5 sm:px-6">
+          <div className="grid gap-8 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
+            <div>
+              {banner.eyebrow ? (
+                <p className="mb-4 text-sm font-extrabold uppercase tracking-[0.16em] text-brand-red-700">{banner.eyebrow}</p>
+              ) : null}
+              <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+                {banner.belowHeroHeadline}
+              </h1>
+              <p className="mt-5 max-w-3xl text-xl font-medium leading-8 text-slate-800 sm:text-2xl sm:leading-9">
+                {banner.belowHeroSubheadline}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <a href={banner.primaryCta.href} className="inline-flex min-h-[56px] items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-4 text-lg font-extrabold text-white shadow-sm transition hover:bg-brand-red-700">
+                {banner.primaryCta.label} <ArrowRight className="h-5 w-5" />
               </a>
-            )}
+              {banner.secondaryCta ? (
+                <a href={banner.secondaryCta.href} className="inline-flex min-h-[56px] items-center justify-center rounded-xl border-2 border-slate-300 px-7 py-4 text-lg font-extrabold text-slate-900 transition hover:border-slate-400 hover:bg-slate-50">
+                  {banner.secondaryCta.label}
+                </a>
+              ) : null}
+            </div>
           </div>
-          {banner.trustIndicators && banner.trustIndicators.length > 0 && (
-            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-1.5">
+
+          {banner.trustIndicators?.length ? (
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {banner.trustIndicators.map((indicator) => (
-                <li key={indicator} className="flex items-center gap-1.5 text-sm font-medium text-slate-900">
-                  <span className="h-1 w-1 flex-shrink-0 rounded-full bg-brand-red-400" />
+                <li key={indicator} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-bold text-slate-900">
                   {indicator}
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </div>
       </section>
     </div>

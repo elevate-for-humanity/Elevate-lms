@@ -29,15 +29,13 @@ export default function Header() {
           className="flex items-center gap-2 flex-shrink-0 min-w-0"
           aria-label={`${PLATFORM_DEFAULTS.orgName} home`}
         >
-          <LogoImage alt="Elevate" width={40} height={60} className="w-auto h-9" priority />
+          <LogoImage alt="Elevate" width={40} height={60} className="w-auto h-9" />
           <span className="font-bold text-[15px] text-slate-900 tracking-tight truncate whitespace-nowrap">
             Elevate
           </span>
         </Link>
 
-        {/* Use the desktop navigation only when there is enough horizontal room.
-            At md/tablet widths the previous layout compressed the center column
-            between the brand and CTA controls, which could make the nav appear blank. */}
+        {/* Use the desktop navigation only when there is enough horizontal room. */}
         <div className="hidden lg:flex justify-center min-w-0 overflow-visible">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>

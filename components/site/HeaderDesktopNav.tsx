@@ -32,14 +32,13 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
     };
   }, [openId]);
 
-  const toggle = (id: string) =>
-    setOpenId((prev) => (prev === id ? null : id));
+  const toggle = (id: string) => setOpenId((prev) => (prev === id ? null : id));
 
   return (
     <nav
       ref={navRef}
       aria-label="Main navigation"
-      className="flex items-center gap-0.5 whitespace-nowrap overflow-x-auto scrollbar-hide -mx-2 px-2"
+      className="flex items-center gap-0.5 whitespace-nowrap overflow-visible -mx-2 px-2"
     >
       {items.map((item) => {
         const hasSubItems = Boolean(item.subItems?.length);
@@ -76,10 +75,8 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
                 id={dropdownId}
                 role="menu"
                 aria-labelledby={btnId}
-                className={`absolute top-full pt-2 z-50 transition-all duration-150 ease-out ${
-                  isOpen
-                    ? 'visible opacity-100 translate-y-0'
-                    : 'invisible opacity-0 -translate-y-1'
+                className={`absolute top-full pt-2 z-[10000] transition-all duration-150 ease-out ${
+                  isOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-1'
                 } ${alignRight ? 'left-auto right-0' : 'left-0'}`}
               >
                 <div
@@ -115,7 +112,9 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
                                 ? { target: '_blank', rel: 'noopener noreferrer' }
                                 : {})}
                             >
-                              {sub.isAuth && <Lock className="h-3 w-3 flex-shrink-0 text-slate-400" aria-hidden="true" />}
+                              {sub.isAuth && (
+                                <Lock className="h-3 w-3 flex-shrink-0 text-slate-400" aria-hidden="true" />
+                              )}
                               {sub.name}
                             </Link>
                           ))}

@@ -6,17 +6,16 @@ import * as cheerio from 'cheerio';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAuth } from '@/lib/api/requireAuth';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { createClient } from '@/lib/supabase/server';
+import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
+import { FEATURES } from '@/lib/platform/feature-catalog';
 
 /**
  * POST /api/ai/import-site
  *
- * Imports an existing website and recreates it on Elevate LMS platform.
- *
- * Flow:
- * 1. Scrape the provided URL
- * 2. Extract content, colors, structure
- * 3. AI analyzes and maps to our templates
- * 4. Generate config that recreates their site
+ * Imports an existing public website and recreates its content/configuration on
+ * Elevate. Website import is a Professional/Enterprise Website Builder feature
+ * or an organization-level WEBSITE_IMPORT entitlement.
  */
 async function _POST(request: NextRequest) {
   try {
@@ -24,7 +23,42 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const auth = await requireAuth(request);
-    if (auth instanceof NextResponse) return auth;
+    if (auth.error) return auth.error;
+    if (!auth.userId || auth.userId === 'service-role') {
+      return NextResponse.json({ error: 'User authentication required' }, { status: 401 });
+    }
+
+    const supabase = await createClient();
+    const { data: appSub } = await supabase
+      .from('user_app_subscriptions')
+      .select('plan, status, trial_ends_at')
+      .eq('user_id', auth.userId)
+      .eq('app_slug', 'website-builder')
+      .maybeSingle();
+
+    const trialIsCurrent =
+      appSub?.status !== 'trial' ||
+      !appSub?.trial_ends_at ||
+      new Date(appSub.trial_ends_at).getTime() >= Date.now();
+    const individualImportAllowed =
+      !!appSub &&
+      ['trial', 'active'].includes(appSub.status || '') &&
+      trialIsCurrent &&
+      ['professional', 'enterprise'].includes(appSub.plan || '');
+
+    if (!individualImportAllowed) {
+      const organizationAccess = await requireFeatureForAuth(request, FEATURES.WEBSITE_IMPORT);
+      if (organizationAccess instanceof NextResponse) {
+        return NextResponse.json(
+          {
+            error: 'Website import requires Website Builder Professional/Enterprise or the Website Import add-on.',
+            upgradeUrl: '/store/apps/website-builder',
+            feature: FEATURES.WEBSITE_IMPORT,
+          },
+          { status: 403 },
+        );
+      }
+    }
 
     const body = await request.json();
     const { url, includePages = ['/', '/about', '/programs', '/contact'] } = body;
@@ -33,15 +67,17 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL required' }, { status: 400 });
     }
 
-    // Validate URL
     let parsedUrl: URL;
     try {
       parsedUrl = new URL(url);
-    } catch {
-      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+      assertSafePublicUrl(parsedUrl);
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Invalid URL' },
+        { status: 400 },
+      );
     }
 
-    // Scrape the main page
     const scrapedData = await scrapeSite(parsedUrl.origin, includePages);
 
     if (!scrapedData.success) {
@@ -51,10 +87,7 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Use AI to analyze and generate config
     const siteConfig = await analyzeAndGenerateConfig(scrapedData);
-
-    // Generate preview ID
     const previewId = `import_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
     return NextResponse.json({
@@ -81,6 +114,34 @@ async function _POST(request: NextRequest) {
   } catch (error) {
     logger.error('Import error', normalizeError(error, 'Import failed'), getErrorContext(error));
     return NextResponse.json({ error: 'Failed to import site' }, { status: 500 });
+  }
+}
+
+function assertSafePublicUrl(url: URL) {
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('Only public http/https websites can be imported');
+  }
+
+  const host = url.hostname.toLowerCase();
+  const blockedHosts = new Set(['localhost', '0.0.0.0', '127.0.0.1', '::1']);
+  if (blockedHosts.has(host) || host.endsWith('.local') || host.endsWith('.internal')) {
+    throw new Error('Private or local network URLs cannot be imported');
+  }
+
+  // Reject common private/link-local IPv4 ranges before any server-side fetch.
+  const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4) {
+    const octets = ipv4.slice(1).map(Number);
+    if (octets.some((octet) => octet < 0 || octet > 255)) throw new Error('Invalid IP address');
+    const [a, b] = octets;
+    const privateRange =
+      a === 10 ||
+      a === 127 ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      a === 0;
+    if (privateRange) throw new Error('Private or local network URLs cannot be imported');
   }
 }
 
@@ -124,11 +185,11 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
   };
 
   try {
-    // Fetch main page
     const mainResponse = await fetch(baseUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; ElevateLMS-Importer/1.0)',
       },
+      redirect: 'follow',
     });
 
     if (!mainResponse.ok) {
@@ -139,20 +200,17 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
     const html = await mainResponse.text();
     const $ = cheerio.load(html);
 
-    // Extract basic info
     result.title = $('title').text().trim() || $('h1').first().text().trim();
     result.description =
       $('meta[name="description"]').attr('content') ||
       $('meta[property="og:description"]').attr('content') ||
       $('p').first().text().trim().slice(0, 200);
 
-    // Extract logo
     result.logo = $('img[alt*="logo" i], img[class*="logo" i], header img').first().attr('src');
     if (result.logo && !result.logo.startsWith('http')) {
       result.logo = new URL(result.logo, baseUrl).href;
     }
 
-    // Extract navigation
     $('nav a, header a, .nav a, .menu a, .navigation a').each((_, el) => {
       const href = $(el).attr('href');
       const label = $(el).text().trim();
@@ -160,12 +218,10 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
         result.navigation.push({ label, href });
       }
     });
-    // Dedupe navigation
     result.navigation = result.navigation
       .filter((item, index, self) => index === self.findIndex((t) => t.label === item.label))
       .slice(0, 8);
 
-    // Extract colors from inline styles and stylesheets
     const colorRegex = /#[0-9A-Fa-f]{6}|#[0-9A-Fa-f]{3}|rgb\([^)]+\)|rgba\([^)]+\)/g;
     const styleContent =
       $('style').text() +
@@ -177,19 +233,15 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
     const foundColors = styleContent.match(colorRegex) || [];
     result.colors = [...new Set(foundColors)].slice(0, 10);
 
-    // Extract images
     $('img').each((_, el) => {
       let src = $(el).attr('src') || $(el).attr('data-src');
       if (src) {
-        if (!src.startsWith('http')) {
-          src = new URL(src, baseUrl).href;
-        }
+        if (!src.startsWith('http')) src = new URL(src, baseUrl).href;
         result.images.push(src);
       }
     });
     result.images = [...new Set(result.images)].slice(0, 20);
 
-    // Extract potential programs/courses/services
     $('h2, h3, .card-title, .program-title, .course-title, .service-title').each((_, el) => {
       const name = $(el).text().trim();
       const description =
@@ -200,20 +252,21 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
     });
     result.programs = result.programs.slice(0, 10);
 
-    // Extract contact info
     const emailMatch = html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
     if (emailMatch) result.contactInfo.email = emailMatch[0];
 
     const phoneMatch = html.match(/(\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
     if (phoneMatch) result.contactInfo.phone = phoneMatch[0];
 
-    // Scrape additional pages
     for (const pagePath of pages.slice(1, 5)) {
-      // Limit to 5 pages
       try {
-        const pageUrl = new URL(pagePath, baseUrl).href;
-        const pageResponse = await fetch(pageUrl, {
+        const pageUrl = new URL(pagePath, baseUrl);
+        if (pageUrl.origin !== new URL(baseUrl).origin) continue;
+        assertSafePublicUrl(pageUrl);
+
+        const pageResponse = await fetch(pageUrl.href, {
           headers: { 'User-Agent': 'Mozilla/5.0 (compatible; ElevateLMS-Importer/1.0)' },
+          redirect: 'follow',
         });
 
         if (pageResponse.ok) {
@@ -221,7 +274,7 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
           const page$ = cheerio.load(pageHtml);
 
           result.pages.push({
-            url: pageUrl,
+            url: pageUrl.href,
             title: page$('title').text().trim() || page$('h1').first().text().trim(),
             headings: page$('h1, h2, h3')
               .map((_, el) => page$(el).text().trim())
@@ -239,41 +292,20 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
           });
         }
       } catch (err) {
-        logger.error('Unhandled error', err instanceof Error ? err : undefined);
+        logger.error('Website import subpage failed', err instanceof Error ? err : undefined);
       }
     }
 
     result.success = true;
     return result;
-  } catch (error) {
+  } catch {
     result.error = 'Scraping failed';
     return result;
   }
 }
 
 async function analyzeAndGenerateConfig(scrapedData: ScrapedData) {
-  const prompt = `You are a website migration expert. Analyze this scraped website data and generate a configuration to recreate it on our LMS platform.
-
-Scraped Data:
-- Title: ${scrapedData.title}
-- Description: ${scrapedData.description}
-- Navigation: ${JSON.stringify(scrapedData.navigation)}
-- Colors found: ${scrapedData.colors.join(', ')}
-- Programs/Services: ${JSON.stringify(scrapedData.programs.slice(0, 5))}
-- Contact: ${JSON.stringify(scrapedData.contactInfo)}
-- Page titles: ${scrapedData.pages.map((p) => p.title).join(', ')}
-
-Generate a JSON config with:
-1. branding: { primaryColor (pick from their colors or suggest), secondaryColor, accentColor, logoText (from title), tagline }
-2. homepage: { heroTitle, heroSubtitle, heroCtaText, features (array of 3 based on their content) }
-3. programs: Array of their programs/services mapped to { name, description, duration (estimate), level }
-4. navigation: Clean up their nav items { label, href }
-5. footer: { description, contactEmail }
-6. seo: { title, description, keywords }
-7. template: Recommend one of: "modern", "professional", "bold", "warm", "academic", "industrial"
-
-Keep their branding voice and content. Make it feel like THEIR site, just on our platform.
-Return ONLY valid JSON.`;
+  const prompt = `You are a website migration expert. Analyze this scraped website data and generate a configuration to recreate it on our platform.\n\nScraped Data:\n- Title: ${scrapedData.title}\n- Description: ${scrapedData.description}\n- Navigation: ${JSON.stringify(scrapedData.navigation)}\n- Colors found: ${scrapedData.colors.join(', ')}\n- Programs/Services: ${JSON.stringify(scrapedData.programs.slice(0, 5))}\n- Contact: ${JSON.stringify(scrapedData.contactInfo)}\n- Page titles: ${scrapedData.pages.map((p) => p.title).join(', ')}\n\nGenerate a JSON config with:\n1. branding: { primaryColor, secondaryColor, accentColor, logoText, tagline }\n2. homepage: { heroTitle, heroSubtitle, heroCtaText, features }\n3. programs: Array of programs/services mapped to { name, description, duration, level }\n4. navigation: { label, href } items\n5. footer: { description, contactEmail }\n6. seo: { title, description, keywords }\n7. template: one of modern, professional, bold, warm, academic, industrial\n\nPreserve the source business voice and facts. Do not invent licenses, accreditations, testimonials, ratings, outcomes, addresses or legal claims. Return ONLY valid JSON.`;
 
   try {
     const completion = await aiChat({
@@ -289,8 +321,7 @@ Return ONLY valid JSON.`;
     const responseText = completion.content || '';
     const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
     return JSON.parse(jsonStr);
-  } catch (error) {
-    // Return default config based on scraped data
+  } catch {
     return {
       branding: {
         primaryColor: scrapedData.colors[0] || '#1e40af',
@@ -304,29 +335,30 @@ Return ONLY valid JSON.`;
         heroSubtitle: scrapedData.description,
         heroCtaText: 'Get Started',
         features: [
-          { title: 'Quality Training', description: 'Industry-recognized programs' },
-          { title: 'Expert Support', description: 'Dedicated instructors' },
-          { title: 'Career Success', description: 'Job placement assistance' },
+          { title: 'Services', description: 'Explore available services and programs.' },
+          { title: 'Support', description: 'Connect with the organization for help and next steps.' },
+          { title: 'Get Started', description: 'Use the website call to action to begin.' },
         ],
       },
       programs: scrapedData.programs.slice(0, 6).map((p) => ({
         name: p.name,
-        description: p.description || 'Professional training program',
-        duration: '8 weeks',
-        level: 'All Levels',
+        description: p.description || '',
+        duration: '',
+        level: '',
       })),
       navigation: scrapedData.navigation.slice(0, 6),
       footer: {
         description: scrapedData.description.slice(0, 150),
-        contactEmail: scrapedData.contactInfo.email || 'info@elevateforhumanity.org',
+        contactEmail: scrapedData.contactInfo.email || '',
       },
       seo: {
         title: scrapedData.title,
         description: scrapedData.description,
-        keywords: ['training', 'education', 'professional development'],
+        keywords: [],
       },
       template: 'professional',
     };
   }
 }
+
 export const POST = withApiAudit('/api/ai/import-site', _POST);

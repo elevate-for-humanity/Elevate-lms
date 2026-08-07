@@ -15,6 +15,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
+const TESTING_TYPES = new Set(['testing_fee', 'testing_enforcement']);
+
 export async function POST(request: NextRequest) {
   try {
     await hydrateProcessEnv().catch(() => {});
@@ -39,18 +41,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 });
     }
 
-    if (event.type !== 'checkout.session.completed') {
+    // A Checkout Session can complete before a delayed/BNPL payment settles.
+    // Never provision an exam until Stripe reports payment_status=paid or emits
+    // checkout.session.async_payment_succeeded.
+    if (
+      event.type !== 'checkout.session.completed' &&
+      event.type !== 'checkout.session.async_payment_succeeded' &&
+      event.type !== 'checkout.session.async_payment_failed'
+    ) {
       return NextResponse.json({ received: true, ignored: event.type });
     }
 
     const session = event.data.object as Stripe.Checkout.Session;
-    if (!['testing_fee', 'testing_enforcement'].includes(session.metadata?.payment_type ?? '')) {
+    if (!TESTING_TYPES.has(session.metadata?.payment_type ?? '')) {
       return NextResponse.json({ received: true, ignored: 'non_testing_session' });
+    }
+
+    if (event.type === 'checkout.session.async_payment_failed') {
+      logger.warn('[testing-webhook] Delayed testing payment failed', {
+        sessionId: session.id,
+        paymentType: session.metadata?.payment_type,
+      });
+      return NextResponse.json({ received: true, payment_failed: true });
+    }
+
+    if (event.type === 'checkout.session.completed' && session.payment_status !== 'paid') {
+      return NextResponse.json({ received: true, awaiting_payment: true });
     }
 
     const db = await requireAdminClient();
     await handleTestingCheckoutSession(session, db);
-    return NextResponse.json({ received: true });
+    return NextResponse.json({ received: true, provisioned: true });
   } catch (error) {
     // Stripe should retry genuine processing failures.
     logger.error('[testing-webhook] Processing failed', error);

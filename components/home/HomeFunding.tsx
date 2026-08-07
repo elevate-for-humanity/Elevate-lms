@@ -1,135 +1,76 @@
-/**
- * HomeFunding
- *
- * Funding accessibility section - WIOA, Workforce Ready Grant,
- * employer reimbursement, payment assistance.
- * Funding eligibility varies by program and participant.
- */
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, BadgeDollarSign, BriefcaseBusiness, GraduationCap, Landmark } from 'lucide-react';
 
 const FUNDING_SOURCES = [
   {
     name: 'WIOA',
-    full: 'Workforce Innovation & Opportunity Act',
-    desc: 'Federal funding for eligible job seekers. May cover tuition, books, and exam fees for approved programs.',
-    badge: 'Federal',
-    badgeColor: 'bg-blue-100 text-blue-700',
+    desc: 'Workforce funding may be available for eligible participants in approved training programs.',
+    icon: Landmark,
   },
   {
     name: 'Workforce Ready Grant',
-    full: 'Indiana Next Level Jobs',
-    desc: 'State grant for qualifying credentials. No repayment required.',
-    badge: 'Indiana',
-    badgeColor: 'bg-amber-100 text-amber-700',
+    desc: 'Indiana funding may support qualifying high-demand credentials for eligible participants.',
+    icon: GraduationCap,
   },
   {
-    name: 'Job Ready Indy',
-    full: 'Marion County Workforce Initiative',
-    desc: 'Local funding for Indianapolis-area residents in priority sectors.',
-    badge: 'Local',
-    badgeColor: 'bg-purple-100 text-purple-700',
+    name: 'Employer & OJT Support',
+    desc: 'Eligible employer-based training arrangements may include wage reimbursement or work-based learning support.',
+    icon: BriefcaseBusiness,
   },
   {
-    name: 'OJT Reimbursement',
-    full: 'On-the-Job Training',
-    desc: 'Employers receive up to 50% wage reimbursement during apprenticeship.',
-    badge: 'Employer',
-    badgeColor: 'bg-slate-100 text-slate-700',
+    name: 'Self-Pay Options',
+    desc: 'Payment options may be available when public funding does not apply.',
+    icon: BadgeDollarSign,
   },
-  {
-    name: 'Payment Plans',
-    full: 'Self-Pay Assistance',
-    desc: 'Flexible payment options for those who don\'t qualify for grant funding.',
-    badge: 'Self-Pay',
-    badgeColor: 'bg-rose-100 text-rose-700',
-  },
-];
+] as const;
 
 export function HomeFunding() {
   return (
-    <section
-      className="bg-white py-16 px-4 border-t border-slate-100"
-      aria-labelledby="funding-heading"
-    >
-      <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left: copy */}
+    <section className="border-t border-slate-100 bg-white px-4 py-16 sm:py-20" aria-labelledby="funding-heading">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="relative min-h-[360px] overflow-hidden rounded-3xl sm:min-h-[460px]">
+            <Image
+              src="/images/pages/funding-hero.webp"
+              alt="Funding advisor helping a student review training options"
+              fill
+              className="object-cover object-center"
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              loading="lazy"
+            />
+            <div className="absolute bottom-5 left-5 right-5 rounded-2xl bg-white/95 p-5 shadow-xl backdrop-blur-sm">
+              <p className="text-lg font-black text-slate-950">Start with eligibility, not assumptions.</p>
+              <p className="mt-1 text-base leading-7 text-slate-700">Funding depends on the participant, program, region, authorization, and available funding.</p>
+            </div>
+          </div>
+
           <div>
-            <p className="text-brand-red-600 text-xs font-bold uppercase tracking-widest mb-3">
-              Funding & Support
-            </p>
-            <h2
-              id="funding-heading"
-              className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-4"
-            >
-              Funding options for eligible participants.
+            <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Funding Navigation</p>
+            <h2 id="funding-heading" className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              Understand your options before you enroll.
             </h2>
-            <p className="text-slate-600 text-sm leading-relaxed mb-6 max-w-lg">
-              WIOA, Indiana Workforce Ready Grant, and employer programs may help cover tuition, books, and exam fees. Eligibility varies by program and participant. We help navigate the process — contact admissions or your local WorkOne office to confirm options.
+            <p className="mt-4 text-lg leading-8 text-slate-700">
+              Elevate helps applicants identify potential workforce funding pathways and understand the next steps required by the responsible agency or funding source.
             </p>
 
-            {/* Funding source grid */}
-            <div className="grid sm:grid-cols-2 gap-3 mb-8">
-              {FUNDING_SOURCES.map((f) => (
-                <div
-                  key={f.name}
-                  className="flex flex-col gap-1.5 p-3.5 rounded-xl bg-slate-50 border border-slate-100"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 text-xs">{f.name}</span>
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${f.badgeColor}`}>
-                      {f.badge}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 leading-snug">{f.desc}</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {FUNDING_SOURCES.map(({ name, desc, icon: Icon }) => (
+                <div key={name} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                  <Icon className="h-6 w-6 text-brand-red-700" aria-hidden="true" />
+                  <h3 className="mt-3 text-lg font-black text-slate-950">{name}</h3>
+                  <p className="mt-2 text-base leading-7 text-slate-700">{desc}</p>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/check-eligibility"
-                className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors"
-              >
-                Check My Eligibility <ArrowRight className="w-4 h-4" />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href="/check-eligibility" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-4 text-base font-extrabold text-white hover:bg-brand-red-700">
+                Check Eligibility <ArrowRight className="h-5 w-5" />
               </Link>
-              <Link
-                href="/funding"
-                className="inline-flex items-center justify-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-700 font-semibold text-sm px-6 py-3 rounded-lg transition-colors"
-              >
-                Learn about funding options
+              <Link href="/funding" className="inline-flex items-center justify-center rounded-xl border-2 border-slate-300 px-7 py-4 text-base font-extrabold text-slate-900 hover:bg-slate-50">
+                View Funding Options
               </Link>
-            </div>
-
-            <p className="mt-4 text-xs text-slate-600">
-              Eligibility varies by program and funding source. Check in 2 minutes - no commitment.
-            </p>
-          </div>
-
-          {/* Right: image */}
-          <div className="relative h-40 sm:h-48 lg:h-52 rounded-2xl overflow-hidden">
-            <Image
-              src="/images/pages/funding-hero.webp"
-              alt="Funding advisor helping a student navigate WIOA eligibility"
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              loading="lazy"
-              placeholder="empty"
-            />
-            {/* Overlay callout */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                <p className="text-xs font-bold text-slate-900 mb-0.5">
-                  Free eligibility check
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  Takes 2 minutes. No commitment. We&apos;ll tell you exactly what you qualify for.
-                </p>
-              </div>
             </div>
           </div>
         </div>

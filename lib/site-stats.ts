@@ -2,8 +2,13 @@
  * lib/site-stats.ts
  *
  * Single source of truth for public-facing marketing statistics.
- * Align counts with lib/programs/public-program-list.ts (DB or static catalog).
- * Do not claim guaranteed job placement — use placement-support language.
+ *
+ * IMPORTANT:
+ * - Do not publish estimated or aspirational student outcomes.
+ * - Do not publish placement, completion, salary, employer-count, or funding
+ *   totals unless they are backed by production data and an approved reporting
+ *   methodology.
+ * - Program count may be derived from the active public catalog.
  */
 
 import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
@@ -11,21 +16,22 @@ import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
 const STATIC_PROGRAM_COUNT = STATIC_PROGRAM_MAP.size;
 
 export const SITE_STATS = {
-  studentsDisplay: 'Many',
-  careerServicesSupportRate: 94,
   programsOffered: STATIC_PROGRAM_COUNT,
   programsOfferedDisplay: `${STATIC_PROGRAM_COUNT}+`,
-  statesServed: 5,
+
+  // New-site posture: public outcome totals remain intentionally unpublished
+  // until verified reporting data is available.
+  studentsDisplay: '—',
   credentialsDisplay: '—',
   employerPartnersDisplay: '—',
   fundingSecuredDisplay: '—',
-  /** @deprecated Use careerServicesSupportRate */
-  jobPlacementRate: 94,
+  careerServicesSupportRate: null,
+  jobPlacementRate: null,
 } as const;
 
 export const statLabel = {
   students: SITE_STATS.studentsDisplay,
-  placement: `${SITE_STATS.careerServicesSupportRate}%`,
+  placement: 'Career support available',
   programs: SITE_STATS.programsOfferedDisplay,
   credentials: SITE_STATS.credentialsDisplay,
   employers: SITE_STATS.employerPartnersDisplay,
@@ -33,7 +39,7 @@ export const statLabel = {
 } as const;
 
 /**
- * Format programs display for careers page
+ * Format programs display for careers page.
  */
 export function formatProgramsDisplay(programs: Array<{ title: string }>): string {
   if (!programs || programs.length === 0) return 'various programs';

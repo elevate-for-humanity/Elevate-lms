@@ -1,17 +1,25 @@
 /**
- * Canonical Route Constants — single source of truth for all navigation routes.
+ * Canonical Route Constants — single source of truth for navigation.
  *
- * Usage:
- *   import { ROUTES } from '@/lib/navigation/routes';
- *   href={ROUTES.programs}
- *
- * These routes must match actual Next.js page files in apps/marketing/app/.
- * If a route returns 404, either create the page or update the constant.
+ * Marketing routes remain relative to www.elevateforhumanity.org.
+ * Authenticated portal routes use the deployed app/admin origins so navigation
+ * remains correct when Marketing, LMS, and Admin run as separate Northflank
+ * services.
  */
 
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhumanity.org').replace(/\/$/, '');
+const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
+
 export const ROUTES = {
-  // Home
+  // Home / intake
   home: '/',
+  apply: '/apply',
+
+  // Authentication / portals
+  login: `${APP_URL}/login`,
+  studentPortal: `${APP_URL}/learner/dashboard`,
+  employerPortal: `${APP_URL}/employer`,
+  adminLogin: `${ADMIN_URL}/login`,
 
   // Programs
   programs: '/programs',
@@ -32,32 +40,30 @@ export const ROUTES = {
 
   // Apprenticeships
   apprenticeships: '/apprenticeships',
-  apprenticeshipsHowItWorks: '/how-it-works', // '/apprenticeships/how-it-works' doesn't exist; use /how-it-works
+  apprenticeshipsHowItWorks: '/how-it-works',
   apprenticeshipsHostShop: '/apprenticeships/host-shop',
-
-  // Key apprenticeship route (was /apprenticeships/sponsor — now correct)
   apprenticeshipSponsor: '/apprenticeship-sponsor',
 
   // Funding
   funding: '/funding',
   fundingWIOA: '/funding/wioa',
   fundingJobReadyIndy: '/funding/job-ready-indy',
-  fundingVocRehab: '/funding/state-programs',  // /funding/voc-rehab doesn't exist; use state-programs
+  fundingVocRehab: '/funding/state-programs',
   scholarships: '/scholarships',
   eligibility: '/eligibility/quiz',
 
   // Employers
-  employers: '/employer',           // /employer page exists; /employers doesn't
+  employers: '/employer',
   employersHireGraduates: '/hire-graduates',
-  employersPostJob: '/employers/post-job',  // /employers/post-job exists
+  employersPostJob: '/employers/post-job',
   forAgencies: '/for-agencies',
 
   // About
   about: '/about',
-  aboutLocations: '/about',               // /about/locations doesn't exist; use /about
-  aboutApprovals: '/approvals',          // page is /approvals not /about/approvals
+  aboutLocations: '/about',
+  aboutApprovals: '/approvals',
   successStories: '/success-stories',
-  testing: '/testing',                   // /testing/testing-center doesn't exist; use /testing
+  testing: '/testing',
   blog: '/blog',
   faq: '/faq',
   contact: '/contact',

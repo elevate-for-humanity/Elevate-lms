@@ -1,0 +1,81 @@
+name: Unified Platform Consolidation Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'packages/**'
+      - 'supabase/**'
+      - 'consolidation/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/consolidation-gate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: consolidation-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-safety:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'consolidation/unified-platform'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.11.1'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate consolidation manifests
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('consolidation/feature-preservation.json','utf8')); JSON.parse(require('fs').readFileSync('consolidation/supervisor-tasks.json','utf8')); console.log('Consolidation manifests valid')"
+
+      - name: Guard navigation service URLs
+        run: node scripts/check-navigation-hardcoding.mjs
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Guard client/server boundaries
+        run: |
+          if [ -f scripts/check-client-node-globals.mjs ]; then
+            node scripts/check-client-node-globals.mjs
+          fi
+
+      - name: Redirect conflict check
+        run: |
+          if [ -f scripts/check-redirect-conflicts.mjs ]; then
+            node scripts/check-redirect-conflicts.mjs
+          fi
+
+      - name: Confirm protected consolidation policy
+        run: |
+          test "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" = "consolidation/unified-platform" || {
+            echo "This gate is intended for the consolidation branch only";
+            exit 1;
+          }
+          echo "Static consolidation safety gate passed"

@@ -5,7 +5,7 @@
  * Steps:
  * 1. Find or create auth user + profile
  * 2. Create program_enrollments (enrollment_state: 'active')
- * 3. Create training_enrollments for all active courses in the program
+ * 3. Create course_enrollments for all active LMS courses in the program
  * 4. Update application status to 'approved'
  * 5. Update profile enrollment_status to 'active'
  */
@@ -23,12 +23,7 @@ export interface ApproveApplicationInput {
   applicationId: string;
   programId?: string | null;
   fundingType?: string | null;
-  /** Role to assign to the created/updated profile. Defaults to 'student'. */
   role?: string;
-  /**
-   * Skip the Stripe/funding payment gate. Set to true for admin-initiated
-   * approvals where the admin is manually overriding payment verification.
-   */
   bypassPaymentGate?: boolean;
 }
 
@@ -36,9 +31,7 @@ export interface ApproveApplicationResult {
   success: boolean;
   userId?: string;
   enrollmentId?: string | null;
-  /** Password setup link for new users — null if user already existed */
   passwordSetupLink?: string | null;
-  /** Temporary password for new accounts — null if user already existed */
   tempPassword?: string | null;
   error?: string;
 }
@@ -48,68 +41,30 @@ export async function approveApplication(
   input: ApproveApplicationInput,
 ): Promise<ApproveApplicationResult> {
   const { applicationId, programId, role: assignedRole = 'student' } = input;
-  // fundingType from the caller takes precedence; fall back to what the student
-  // selected on the application (verified by WorkOne where required).
   let fundingType = input.fundingType;
 
-  // Load application
   const { data: app, error: appError } = await db
     .from('applications')
     .select('*')
     .eq('id', applicationId)
     .maybeSingle();
 
-  if (appError || !app) {
-    return { success: false, error: 'Application not found' };
-  }
+  if (appError || !app) return { success: false, error: 'Application not found' };
+  if (app.status === 'approved') return { success: true, userId: app.user_id, error: 'Already approved' };
 
-  if (app.status === 'approved') {
-    return { success: true, userId: app.user_id, error: 'Already approved' };
-  }
-
-  // Block approval of WorkOne-pending applications until external confirmation is on record.
-  // Staff must update has_workone_approval = true (and optionally workone_approval_ref)
-  // before approving. This prevents enrolling students whose WIOA eligibility is unconfirmed.
   if (app.status === 'pending_workone' && !app.has_workone_approval) {
-    return {
-      success: false,
-      error:
-        'This application is pending WorkOne eligibility confirmation. Update has_workone_approval before approving.',
-    };
+    return { success: false, error: 'This application is pending WorkOne eligibility confirmation. Update has_workone_approval before approving.' };
   }
 
-  // PAYMENT GATE — enrollment requires Stripe payment OR verified funding.
-  // This is the canonical enforcement point. No enrollment is created without one of:
-  //   1. A paid Stripe session in stripe_sessions_staging
-  //   2. funding_verified = true on the application (WIOA/WorkOne/EmployIndy confirmed)
-  //   3. WorkOne approval on file (has_workone_approval = true)
-  //   4. Source is 'stripe_repair' (reconciliation — Stripe session verified separately)
-  //   5. bypassPaymentGate = true (admin manual override — audited separately)
   const isRepair = (input as any).source === 'stripe_repair';
-
-  // Non-self-pay funding types bypass the payment gate — they go through
-  // WIOA, Workforce Ready Grant, employer sponsorship, or are pending review.
-  const NON_SELF_PAY = [
-    'wioa',
-    'wrg',
-    'employer',
-    'unsure',
-    'workforce',
-    'grant',
-    'scholarship',
-    'dol',
-    'apprenticeship',
-  ];
+  const NON_SELF_PAY = ['wioa','wrg','employer','unsure','workforce','grant','scholarship','dol','apprenticeship'];
   const appFundingType = (app.funding_type || app.funding_source || '').toLowerCase();
   const isFundedPath = NON_SELF_PAY.some((f) => appFundingType.includes(f));
-
   const skipGate = isRepair || input.bypassPaymentGate === true || isFundedPath;
 
   if (!skipGate) {
     const hasFundingVerified = app.funding_verified === true || app.has_workone_approval === true;
-
     if (!hasFundingVerified) {
-      // Check stripe_sessions_staging for a paid session
       const { data: stripeSession } = await db
         .from('stripe_sessions_staging')
         .select('session_id')
@@ -117,309 +72,139 @@ export async function approveApplication(
         .eq('payment_status', 'paid')
         .limit(1)
         .maybeSingle();
-
       if (!stripeSession) {
-        return {
-          success: false,
-          error:
-            'PAYMENT_NOT_VERIFIED: No paid Stripe session and no verified funding on file. Enrollment requires payment or approved funding before access is granted.',
-        };
+        return { success: false, error: 'PAYMENT_NOT_VERIFIED: No paid Stripe session and no verified funding on file. Enrollment requires payment or approved funding before access is granted.' };
       }
     }
   }
 
   const email = (app.email || '').trim().toLowerCase();
-  if (!email) {
-    return { success: false, error: 'Application has no email' };
-  }
+  if (!email) return { success: false, error: 'Application has no email' };
 
-  // Step 1: Find or create user
   let userId: string | null = null;
   let isNewUser = false;
   let tempPassword: string | null = null;
   let passwordSetupLink: string | null = null;
 
-  // Check profiles first (fast, indexed)
-  const { data: existingProfile } = await db
-    .from('profiles')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle();
+  const { data: existingProfile } = await db.from('profiles').select('id').eq('email', email).maybeSingle();
 
   if (existingProfile) {
     userId = existingProfile.id;
   } else {
-    // Check auth users
     const { data: listUsers } = await db.auth.admin.listUsers({ page: 1, perPage: 100 });
     const existingUser = listUsers?.users?.find((u: { email?: string; id: string }) => u.email?.toLowerCase() === email);
-
     if (existingUser) {
       userId = existingUser.id;
     } else {
-      // Create new auth user with a cryptographically random temp password.
-      // Math.random() is predictable — use randomBytes instead.
       tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
       const { data: newUser, error: createError } = await db.auth.admin.createUser({
         email,
         password: tempPassword,
         email_confirm: true,
-        user_metadata: {
-          full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
-          role: 'student',
-          must_change_password: true,
-        },
+        user_metadata: { full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(), role: 'student', must_change_password: true },
       });
-
       if (createError || !newUser?.user) {
         logger.error('[approve] Failed to create user', createError ?? undefined, { email });
         return { success: false, error: 'Failed to create user account' };
       }
       userId = newUser.user.id;
       isNewUser = true;
-
-      // Generate a one-time recovery link so the student sets their own password.
-      // Never email the tempPassword — it is only used as the initial auth credential.
       const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl).trim();
       const { data: linkData, error: linkError } = await db.auth.admin.generateLink({
-        type: 'recovery',
-        email,
-        options: { redirectTo: `${siteUrl}/auth/callback?redirect=/onboarding/learner` },
+        type: 'recovery', email, options: { redirectTo: `${siteUrl}/auth/callback?redirect=/onboarding/learner` },
       });
-      if (!linkError && linkData?.properties?.action_link) {
-        passwordSetupLink = linkData.properties.action_link;
-      } else {
-        logger.warn('[approve] generateLink failed — student will use forgot-password flow', linkError ?? undefined);
-      }
+      if (!linkError && linkData?.properties?.action_link) passwordSetupLink = linkData.properties.action_link;
+      else logger.warn('[approve] generateLink failed — student will use forgot-password flow', linkError ?? undefined);
     }
 
-    // Ensure profile exists for newly created user
-    await db.from('profiles').upsert(
-      {
-        id: userId,
-        email,
-        first_name: app.first_name,
-        last_name: app.last_name,
-        full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
-        phone: app.phone,
-        role: assignedRole,
-      },
-      { onConflict: 'id' },
-    );
+    await db.from('profiles').upsert({
+      id: userId, email, first_name: app.first_name, last_name: app.last_name,
+      full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(), phone: app.phone, role: assignedRole,
+    }, { onConflict: 'id' });
   }
 
-  // Profile already existed — update role if a non-default role was assigned
-  if (existingProfile && assignedRole !== 'student') {
-    await db.from('profiles').update({ role: assignedRole }).eq('id', userId);
-  }
+  if (existingProfile && assignedRole !== 'student') await db.from('profiles').update({ role: assignedRole }).eq('id', userId);
+  if (!fundingType) fundingType = app.requested_funding_source || 'pending';
 
-  // Resolve funding source: caller override → application's requested source → 'pending'
-  if (!fundingType) {
-    fundingType = app.requested_funding_source || 'pending';
-  }
-
-  // Step 2: Create program_enrollments (students only)
   const resolvedProgramId = programId || app.program_id || null;
   let enrollmentId: string | null = null;
 
   if (assignedRole === 'student' && resolvedProgramId) {
-    // Resolve course_id so the learner dashboard routes to the LMS, not the marketing page.
     let programSlug = app.program_slug ?? app.pathway_slug ?? null;
-
-    // If program_slug is null but we have a program_id, look up the slug from the programs table.
-    // This prevents the upsert conflict key (user_id, program_slug) from silently failing
-    // when program_slug is null — NULL != NULL in SQL unique constraints.
-    if (!programSlug && resolvedProgramId) {
-      const { data: programRow } = await db
-        .from('programs')
-        .select('slug')
-        .eq('id', resolvedProgramId)
-        .maybeSingle();
+    if (!programSlug) {
+      const { data: programRow } = await db.from('programs').select('slug').eq('id', resolvedProgramId).maybeSingle();
       if (programRow?.slug) {
         programSlug = programRow.slug;
-        // Backfill the application so future runs don't hit this path
-        await db
-          .from('applications')
-          .update({ program_slug: programSlug })
-          .eq('id', applicationId);
+        await db.from('applications').update({ program_slug: programSlug }).eq('id', applicationId);
       }
     }
 
-    // Static fallback — runtime DB resolution happens in the LMS routing layer.
     const resolvedCourseId = programSlug ? resolveCourseId(programSlug) : null;
+    const { data: pe, error: peErr } = await db.from('program_enrollments').upsert({
+      user_id: userId, program_id: resolvedProgramId, program_slug: programSlug, email,
+      full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(), amount_paid_cents: 0,
+      funding_source: fundingType || 'pending', status: 'active', enrollment_state: 'active',
+      funding_verified: false, payout_status: 'pending', at_risk: false,
+      ...(resolvedCourseId ? { course_id: resolvedCourseId } : {}),
+    }, { onConflict: 'user_id,program_slug', ignoreDuplicates: false }).select('id').maybeSingle();
 
-    const { data: pe, error: peErr } = await db
-      .from('program_enrollments')
-      .upsert(
-        {
-          user_id: userId,
-          program_id: resolvedProgramId,
-          program_slug: programSlug,
-          email,
-          full_name: `${app.first_name || ''} ${app.last_name || ''}`.trim(),
-          amount_paid_cents: 0,
-          funding_source: fundingType || 'pending',
-          status: 'active',
-          enrollment_state: 'active',
-          funding_verified: false, // NOT NULL
-          payout_status: 'pending', // NOT NULL
-          at_risk: false, // NOT NULL
-          ...(resolvedCourseId ? { course_id: resolvedCourseId } : {}),
-        },
-        { onConflict: 'user_id,program_slug', ignoreDuplicates: false },
-      )
-      .select('id')
-      .maybeSingle();
-
-    if (peErr) {
-      logger.error('[approve] program_enrollments upsert failed', new Error(peErr.message), {
-        userId,
-        resolvedProgramId,
-      });
-    }
-
+    if (peErr) logger.error('[approve] program_enrollments upsert failed', new Error(peErr.message), { userId, resolvedProgramId });
     enrollmentId = pe?.id || null;
 
-    // Cache portal_type on the profile so post-login routing is a single lookup
-    if (userId && resolvedProgramId) {
-      await cachePortalTypeForEnrollment(db, userId, resolvedProgramId);
-    }
+    if (userId) await cachePortalTypeForEnrollment(db, userId, resolvedProgramId);
 
-    // Step 3: Create training_enrollments for all active courses
-    const { data: courses } = await db
-      .from('lms_courses')
-      .select('id')
-      .eq('program_id', resolvedProgramId)
-      .eq('is_active', true);
-
-    if (courses && courses.length > 0) {
-      await db.from('program_enrollments').upsert(
-        courses.map((c: { id: string }) => ({
-          user_id: userId,
-          course_id: c.id,
-          status: 'active',
-          progress: 0,
-          enrolled_at: new Date().toISOString(),
-        })),
-        { onConflict: 'user_id,course_id', ignoreDuplicates: true },
-      );
+    // Canonical LMS access table. The DB trigger installed by
+    // 20260806200400_sync_active_program_enrollments_to_course_access.sql also
+    // enforces this invariant for any other writer of program_enrollments.
+    const { data: courses } = await db.from('lms_courses').select('id').eq('program_id', resolvedProgramId).eq('is_active', true);
+    if (courses?.length) {
+      for (const course of courses as Array<{ id: string }>) {
+        const { data: existingCourseEnrollment } = await db.from('course_enrollments')
+          .select('id').eq('student_id', userId).eq('course_id', course.id).maybeSingle();
+        if (!existingCourseEnrollment) {
+          const { error: courseEnrollmentError } = await db.from('course_enrollments').insert({
+            student_id: userId, course_id: course.id, status: 'active', progress: '0',
+          });
+          if (courseEnrollmentError) logger.error('[approve] course_enrollments insert failed', new Error(courseEnrollmentError.message), { userId, courseId: course.id });
+        }
+      }
     }
   }
 
-  // Step 4: Update application status
-  await db
-    .from('applications')
-    .update({
-      status: 'approved',
-      user_id: userId,
-      program_id: resolvedProgramId,
-      eligibility_status: 'verified',
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', applicationId);
+  await db.from('applications').update({
+    status: 'approved', user_id: userId, program_id: resolvedProgramId,
+    eligibility_status: 'verified', updated_at: new Date().toISOString(),
+  }).eq('id', applicationId);
 
-  // Step 5: Update profile enrollment_status (students only)
-  if (assignedRole === 'student') {
-    await db.from('profiles').update({ enrollment_status: 'active' }).eq('id', userId);
-  }
+  if (assignedRole === 'student') await db.from('profiles').update({ enrollment_status: 'active' }).eq('id', userId);
 
-  // Step 5b: Create digital binder for the enrollment (idempotent)
   if (userId && enrollmentId) {
-    const binderResult = await ensureDigitalBinder({
-      db,
-      userId,
-      enrollmentId,
-    });
-    if (binderResult.binderId) {
-      logger.info("[approve] Digital binder created", { enrollmentId, binderId: binderResult.binderId });
-    }
+    const binderResult = await ensureDigitalBinder({ db, userId, enrollmentId });
+    if (binderResult.binderId) logger.info('[approve] Digital binder created', { enrollmentId, binderId: binderResult.binderId });
   }
 
-  // ── Partner routing ──────────────────────────────────────────────────────
-  // CNA uses the full atomic RPC: financial gate + compliance gate +
-  // state-machine transitions + training_enrollments + partner_enrollments +
-  // cmi_students + audit log, all in one transaction with FOR UPDATE row lock.
-  // NHA and future partners fall through to the application-layer path.
   const ATOMIC_SLUGS = new Set(['cna']);
-
   if (ATOMIC_SLUGS.has(app.program_slug ?? '')) {
-    const { data: atomicResult, error: atomicErr } = await db.rpc(
-      'approve_application_and_grant_access_atomic',
-      {
-        p_application_id: applicationId,
-        p_actor_user_id: userId,
-      },
-    );
-
+    const { data: atomicResult, error: atomicErr } = await db.rpc('approve_application_and_grant_access_atomic', { p_application_id: applicationId, p_actor_user_id: userId });
     if (atomicErr) {
-      // RPC missing from DB (migration not yet applied) — fall through to
-      // application-layer path so non-atomic approval still completes.
-      // Apply supabase/migrations/20260503000011_approval_hardening.sql in
-      // Supabase Dashboard to restore the atomic path for CNA.
-      if (
-        atomicErr.message.includes('Could not find the function') ||
-        atomicErr.message.includes('schema cache')
-      ) {
-        logger.warn('[approve] atomic RPC not found — falling back to application-layer path', {
-          applicationId,
-          slug: app.program_slug,
-          hint: 'Apply migration 20260503000011_approval_hardening.sql in Supabase Dashboard',
-        });
+      if (atomicErr.message.includes('Could not find the function') || atomicErr.message.includes('schema cache')) {
+        logger.warn('[approve] atomic RPC not found — falling back to application-layer path', { applicationId, slug: app.program_slug });
         await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
-      } else {
-        throw new Error(`Atomic approval failed (${app.program_slug}): ${atomicErr.message}`);
-      }
-    } else {
-      if (atomicResult?.status === 'blocked') {
-        return {
-          success: false,
-          error: `Approval blocked: ${(atomicResult.blockers as string[]).join(', ')}`,
-        };
-      }
-
-      logger.info('[approve] atomic approval complete', {
-        applicationId,
-        userId,
-        result: atomicResult,
-      });
+      } else throw new Error(`Atomic approval failed (${app.program_slug}): ${atomicErr.message}`);
+    } else if (atomicResult?.status === 'blocked') {
+      return { success: false, error: `Approval blocked: ${(atomicResult.blockers as string[]).join(', ')}` };
     }
   } else {
-    // NHA and non-partner programs — application-layer idempotent path
     await attachPartnerRouting({ db, application: { ...app, user_id: userId } });
   }
 
-  // tempPassword is set above when a new account is created.
-  // It is passed to the onboarding email so the student can log in immediately.
-  // They are prompted to change it during onboarding.
-
-  // Update CRM lead to converted (non-fatal)
   try {
-    await db
-      .from('crm_leads')
-      .update({
-        stage: 'converted',
-        status: 'won',
-        profile_id: userId ?? null,
-        enrollment_id: enrollmentId ?? null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('application_id', applicationId);
-
-    await db
-      .from('follow_up_reminders')
-      .update({ status: 'completed' })
-      .eq('application_id', applicationId)
-      .eq('status', 'pending');
+    await db.from('crm_leads').update({ stage: 'converted', status: 'won', profile_id: userId ?? null, enrollment_id: enrollmentId ?? null, updated_at: new Date().toISOString() }).eq('application_id', applicationId);
+    await db.from('follow_up_reminders').update({ status: 'completed' }).eq('application_id', applicationId).eq('status', 'pending');
   } catch (crmErr) {
     logger.warn('[approve] CRM lead update failed (non-fatal)', crmErr);
   }
 
-  logger.info('[approve] Application approved', {
-    applicationId,
-    userId,
-    programId: resolvedProgramId,
-    enrollmentId,
-    isNewUser,
-  });
-
+  logger.info('[approve] Application approved', { applicationId, userId, programId: resolvedProgramId, enrollmentId, isNewUser });
   return { success: true, userId: userId!, enrollmentId, passwordSetupLink, tempPassword: null };
 }

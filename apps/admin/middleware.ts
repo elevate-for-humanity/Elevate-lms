@@ -49,8 +49,6 @@ export async function middleware(req: NextRequest) {
 
   if (!isProtected) return NextResponse.next();
 
-  // Auth check - runs in middleware to avoid layout redirect loops
-  // Using @supabase/ssr for Edge Runtime compatibility
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -60,7 +58,7 @@ export async function middleware(req: NextRequest) {
           return req.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             req.cookies.set(name, value);
           });
         },
@@ -76,7 +74,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Check role from public.profiles
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -85,6 +82,16 @@ export async function middleware(req: NextRequest) {
 
   const validRoles = ['admin', 'instructor', 'staff', 'super_admin'];
   if (!profile?.role || !validRoles.includes(profile.role)) {
+    return NextResponse.redirect(new URL('/unauthorized', req.url));
+  }
+
+  const isDevStudioRoute =
+    pathname.startsWith('/admin/studio') ||
+    pathname.startsWith('/admin/dev-studio') ||
+    pathname.startsWith('/dev-studio') ||
+    pathname.startsWith('/api/devstudio');
+
+  if (isDevStudioRoute && !['admin', 'super_admin'].includes(profile.role)) {
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
 

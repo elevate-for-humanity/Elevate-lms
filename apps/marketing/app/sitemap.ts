@@ -2,36 +2,72 @@ import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.elevateforhumanity.org';
-  
-  const staticPages = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 1.0 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/programs`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${baseUrl}/apprenticeships`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${baseUrl}/testing`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },
-    { url: `${baseUrl}/funding`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 },
-    { url: `${baseUrl}/store`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 },
-    { url: `${baseUrl}/eligibility`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/apply`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.9 },
-    { url: `${baseUrl}/verify`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/platform`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/platform/sponsors`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/partners`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/employer`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/compliance`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/federal-compliance`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/onboarding`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/career-training`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
-    { url: `${baseUrl}/community-services`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/demos`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.7 },
-    { url: `${baseUrl}/demos/vr-funding`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.8 },
+  const now = new Date();
+
+  const staticPages: MetadataRoute.Sitemap = [
+    { url: baseUrl, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
+    { url: `${baseUrl}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/programs`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/apprenticeships`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/testing`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/funding`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${baseUrl}/eligibility`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/apply`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${baseUrl}/verify`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/platform`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/platform/sponsors`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/partners`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/employer`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/compliance`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/federal-compliance`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/onboarding`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/career-training`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/community-services`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/demos`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/demos/vr-funding`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${baseUrl}/ai`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
   ];
 
+  const storeRoutes = [
+    '/store',
+    '/store/plans',
+    '/store/apps',
+    '/store/apps/website-builder',
+    '/store/apps/sam-gov',
+    '/store/apps/grants',
+    '/store/course-builder',
+    '/store/dev-studio',
+    '/store/ai-studio',
+    '/store/testing',
+    '/store/licenses',
+    '/store/licensing',
+    '/store/licenses/managed-platform',
+    '/store/demos',
+    '/store/trial',
+    '/store/courses',
+    '/store/courses/hvac-technician-course-license',
+    '/store/digital',
+    '/store/compliance',
+    '/store/compliance/wioa',
+    '/store/compliance/wcag',
+    '/store/integrations',
+    '/store/workflow-studio',
+    '/store/deployment',
+    '/store/guides',
+    '/store/guides/licensing',
+    '/store/guides/capital-readiness',
+  ];
+
+  const storeSitemap: MetadataRoute.Sitemap = storeRoutes.map((route, index) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: index === 0 ? 0.95 : route.startsWith('/store/apps/') ? 0.85 : 0.8,
+  }));
+
   const programPages = [
-    // Catalog — redirect page
     { slug: 'programs/catalog', priority: 0.9 },
-    // Healthcare — dedicated + dynamic
     { slug: 'programs/healthcare', priority: 0.9 },
     { slug: 'programs/cna', priority: 0.9 },
     { slug: 'programs/medical-assistant', priority: 0.8 },
@@ -39,29 +75,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { slug: 'programs/qma', priority: 0.8 },
     { slug: 'programs/peer-recovery-specialist', priority: 0.8 },
     { slug: 'programs/cpr-first-aid', priority: 0.8 },
-    // Trades — dedicated + dynamic
     { slug: 'programs/hvac-technician', priority: 0.9 },
     { slug: 'programs/skilled-trades', priority: 0.8 },
     { slug: 'programs/cdl-training', priority: 0.9 },
     { slug: 'programs/electrical', priority: 0.7 },
     { slug: 'programs/plumbing', priority: 0.7 },
-    // Beauty
     { slug: 'programs/barber-apprenticeship', priority: 0.9 },
     { slug: 'programs/cosmetology-apprenticeship', priority: 0.8 },
     { slug: 'programs/esthetician-apprenticeship', priority: 0.8 },
     { slug: 'programs/nail-technician-apprenticeship', priority: 0.7 },
-    // Technology — single hub page for all tech programs
     { slug: 'programs/technology', priority: 0.8 },
-    // Business — single hub page for all business programs
     { slug: 'programs/business', priority: 0.8 },
   ];
 
-  const programSitemap = programPages.map(page => ({
+  const programSitemap: MetadataRoute.Sitemap = programPages.map((page) => ({
     url: `${baseUrl}/${page.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
+    lastModified: now,
+    changeFrequency: 'weekly',
     priority: page.priority,
   }));
 
-  return [...staticPages, ...programSitemap];
+  return [...staticPages, ...storeSitemap, ...programSitemap];
 }

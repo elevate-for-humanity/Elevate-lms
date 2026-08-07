@@ -3,16 +3,15 @@
 /**
  * PaymentPlanCalculator
  *
- * Fetches pricing from /api/programs/pricing?slug=<slug> (DB-driven).
- * Learner adjusts deposit with a slider — weekly payment updates live.
- * Shows Stripe deposit/full-pay CTAs from DB, not hardcoded.
- *
- * Formula:
- *   weekly = ceil((tuition - deposit) / payment_weeks)
+ * Public calculator backed by /api/programs/pricing. Every program with a
+ * published self-pay price receives a calculator, even when no DB pricing row
+ * exists. Checkout is created server-side so the selected deposit amount,
+ * promotion-code box, metadata, BNPL availability, and webhook processing stay
+ * consistent.
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { CreditCard, Loader2, AlertCircle, ChevronDown, ChevronUp, Tag } from 'lucide-react';
 import { BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 
 interface ProgramPricing {
@@ -26,198 +25,150 @@ interface ProgramPricing {
   stripe_deposit_url: string | null;
   stripe_full_url: string | null;
   notes: string | null;
+  source?: string;
 }
 
 interface Props {
   programSlug: string;
-  /** Override Stripe URLs if already known (avoids extra fetch) */
   stripeDepositUrl?: string;
   stripeFullUrl?: string;
 }
 
 function fmt(cents: number) {
   return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0,
   }).format(cents / 100);
 }
 
-export default function PaymentPlanCalculator({ programSlug, stripeDepositUrl, stripeFullUrl }: Props) {
+export default function PaymentPlanCalculator({ programSlug }: Props) {
   const [pricing, setPricing] = useState<ProgramPricing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [depositCents, setDepositCents] = useState(0);
   const [showSchedule, setShowSchedule] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<'deposit' | 'full' | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/programs/pricing?slug=${programSlug}`)
-      .then((r) => r.json())
+    setError('');
+    fetch(`/api/programs/pricing?slug=${encodeURIComponent(programSlug)}`)
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok || data.error) throw new Error(data.error || 'Pricing unavailable');
+        return data;
+      })
       .then((data) => {
-        if (data.error) { setError(data.error); return; }
         setPricing(data);
         setDepositCents(data.deposit_default_cents);
       })
-      .catch(() => setError('Could not load pricing'))
+      .catch((e) => setError(e instanceof Error ? e.message : 'Could not load pricing'))
       .finally(() => setLoading(false));
   }, [programSlug]);
 
-  const weeklyPayment = useCallback(() => {
+  const periodicPayment = useCallback(() => {
     if (!pricing) return 0;
     const remaining = Math.max(0, pricing.tuition_cents - depositCents);
-    return Math.ceil(remaining / pricing.payment_weeks);
+    return Math.ceil(remaining / Math.max(1, pricing.payment_weeks));
   }, [pricing, depositCents]);
 
-  const totalWeeks = pricing?.payment_weeks ?? 0;
-  const weekly = weeklyPayment();
-  const depositUrl = stripeDepositUrl ?? pricing?.stripe_deposit_url ?? null;
-  const fullUrl = stripeFullUrl ?? pricing?.stripe_full_url ?? null;
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center gap-2 py-10 text-slate-400 text-sm">
-        <Loader2 className="w-4 h-4 animate-spin" /> Loading payment options…
-      </div>
-    );
-  }
-
-  if (error || !pricing) {
-    return (
-      <div className="flex items-center gap-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm">
-        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-        {error || 'Pricing unavailable — contact us for details.'}
-      </div>
-    );
-  }
-
-  const minDeposit = pricing.deposit_min_cents;
-  const maxDeposit = pricing.tuition_cents; // pay in full = max slider
-  const remaining = Math.max(0, pricing.tuition_cents - depositCents);
-  const payingInFull = depositCents >= pricing.tuition_cents;
-
-  // Build amortization schedule for display
-  const schedule: { period: number; amount: number }[] = [];
-  if (!payingInFull) {
-    let balance = remaining;
-    for (let i = 1; i <= totalWeeks; i++) {
-      const payment = Math.min(weekly, balance);
-      if (payment <= 0) break;
-      schedule.push({ period: i, amount: payment });
-      balance -= payment;
+  async function startCheckout(mode: 'deposit' | 'full') {
+    if (!pricing || checkoutLoading) return;
+    setCheckoutLoading(mode);
+    setError('');
+    try {
+      const res = await fetch('/api/checkout/program', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug: programSlug,
+          checkoutMode: mode,
+          amountCents: mode === 'deposit' ? depositCents : pricing.tuition_cents,
+          successUrl: `${window.location.origin}/programs/${programSlug}/enrollment-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}/programs/${programSlug}`,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || 'Unable to start checkout');
+      window.location.href = data.url;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unable to start checkout');
+      setCheckoutLoading(null);
     }
   }
 
+  if (loading) {
+    return <div className="flex items-center justify-center gap-2 py-10 text-slate-500 text-base"><Loader2 className="w-5 h-5 animate-spin" /> Loading payment options…</div>;
+  }
+
+  if (error && !pricing) {
+    return <div className="flex items-center gap-2 text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-4 text-base"><AlertCircle className="w-5 h-5 flex-shrink-0" />{error}</div>;
+  }
+
+  if (!pricing) return null;
+
+  const minDeposit = pricing.deposit_min_cents;
+  const maxDeposit = pricing.tuition_cents;
+  const remaining = Math.max(0, pricing.tuition_cents - depositCents);
+  const payingInFull = depositCents >= pricing.tuition_cents;
+  const payment = periodicPayment();
+  const schedule: { period: number; amount: number }[] = [];
+  if (!payingInFull) {
+    let balance = remaining;
+    for (let i = 1; i <= pricing.payment_weeks; i++) {
+      const amount = Math.min(payment, balance);
+      if (amount <= 0) break;
+      schedule.push({ period: i, amount });
+      balance -= amount;
+    }
+  }
+
+  const frequencyLabel = pricing.payment_frequency === 'weekly' ? 'Weekly' : pricing.payment_frequency === 'biweekly' ? 'Biweekly' : 'Monthly';
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-      {/* Header */}
-      <div className="bg-slate-900 px-5 py-4">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">
-          Payment Calculator
-        </p>
-        <p className="text-white font-bold text-base">{pricing.program_name}</p>
-        <p className="text-slate-400 text-xs mt-0.5">Total tuition: {fmt(pricing.tuition_cents)}</p>
+      <div className="bg-slate-900 px-5 py-5">
+        <p className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-1">Payment Calculator</p>
+        <p className="text-white font-extrabold text-xl">{pricing.program_name}</p>
+        <p className="text-slate-300 text-sm mt-1">Published self-pay tuition: {fmt(pricing.tuition_cents)}</p>
       </div>
 
-      <div className="p-5 space-y-6">
-        {/* Deposit slider */}
+      <div className="p-5 sm:p-6 space-y-6">
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-bold text-slate-800">
-              Your deposit today
-            </label>
-            <span className="text-lg font-extrabold text-slate-900">{fmt(depositCents)}</span>
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <label className="text-base font-bold text-slate-800">Choose a deposit</label>
+            <span className="text-xl font-extrabold text-slate-950">{fmt(depositCents)}</span>
           </div>
-
-          <input
-            type="range"
-            min={minDeposit}
-            max={maxDeposit}
-            step={100}  /* $1 increments */
-            value={depositCents}
-            onChange={(e) => setDepositCents(Number(e.target.value))}
-            className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900"
-          />
-
-          <div className="flex justify-between text-xs text-slate-400 mt-1">
-            <span>Min {fmt(minDeposit)}</span>
-            <span>Pay in full {fmt(pricing.tuition_cents)}</span>
-          </div>
+          <input type="range" min={minDeposit} max={maxDeposit} step={100} value={depositCents} onChange={(e) => setDepositCents(Number(e.target.value))} className="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer accent-slate-900" />
+          <div className="flex justify-between text-sm text-slate-500 mt-2"><span>Minimum {fmt(minDeposit)}</span><span>Full tuition {fmt(pricing.tuition_cents)}</span></div>
         </div>
 
-        {/* Result */}
         {payingInFull ? (
-          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-4 text-center">
-            <p className="text-brand-green-800 font-bold text-lg">Pay in Full — {fmt(pricing.tuition_cents)}</p>
-            <p className="text-brand-green-700 text-sm mt-1">No weekly payments. Enroll immediately.</p>
+          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-5 text-center">
+            <p className="text-brand-green-900 font-extrabold text-xl">Pay in full — {fmt(pricing.tuition_cents)}</p>
+            <p className="text-brand-green-800 text-base mt-1">No remaining program balance after this payment.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="bg-slate-50 rounded-xl p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Deposit</p>
-              <p className="text-xl font-extrabold text-slate-900">{fmt(depositCents)}</p>
-              <p className="text-xs text-slate-400">due today</p>
-            </div>
-            <div className="bg-brand-red-50 rounded-xl p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">
-                {pricing.payment_frequency === 'weekly' ? 'Weekly' : pricing.payment_frequency === 'biweekly' ? 'Biweekly' : 'Monthly'}
-              </p>
-              <p className="text-xl font-extrabold text-slate-900">{fmt(weekly)}</p>
-              <p className="text-xs text-slate-400">per payment</p>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Duration</p>
-              <p className="text-xl font-extrabold text-slate-900">{schedule.length}</p>
-              <p className="text-xs text-slate-400">payments</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+            <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Deposit</p><p className="text-2xl font-extrabold text-slate-950 mt-1">{fmt(depositCents)}</p><p className="text-sm text-slate-500">today</p></div>
+            <div className="bg-brand-red-50 rounded-xl p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">{frequencyLabel}</p><p className="text-2xl font-extrabold text-slate-950 mt-1">{fmt(payment)}</p><p className="text-sm text-slate-500">estimated</p></div>
+            <div className="bg-slate-50 rounded-xl p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Payments</p><p className="text-2xl font-extrabold text-slate-950 mt-1">{schedule.length}</p><p className="text-sm text-slate-500">estimated</p></div>
           </div>
         )}
 
-        <p className="text-xs text-slate-400 text-center -mt-2">
-          Remaining balance: {fmt(remaining)} over {schedule.length} {pricing.payment_frequency} payments
-        </p>
-
-        {/* Payment schedule toggle */}
         {!payingInFull && schedule.length > 0 && (
           <div>
-            <button
-              onClick={() => setShowSchedule(!showSchedule)}
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              {showSchedule ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-              {showSchedule ? 'Hide' : 'Show'} full payment schedule
+            <button type="button" onClick={() => setShowSchedule(!showSchedule)} className="flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950">
+              {showSchedule ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}{showSchedule ? 'Hide' : 'Show'} estimated schedule
             </button>
-
             {showSchedule && (
-              <div className="mt-3 max-h-48 overflow-y-auto rounded-xl border border-slate-100">
-                <table className="w-full text-xs">
-                  <thead className="bg-slate-50 sticky top-0">
-                    <tr>
-                      <th className="text-left px-3 py-2 text-slate-500 font-semibold">Payment</th>
-                      <th className="text-right px-3 py-2 text-slate-500 font-semibold">Amount</th>
-                      <th className="text-right px-3 py-2 text-slate-500 font-semibold">Balance</th>
-                    </tr>
-                  </thead>
+              <div className="mt-3 max-h-56 overflow-y-auto rounded-xl border border-slate-200">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-50 sticky top-0"><tr><th className="text-left px-3 py-2">Payment</th><th className="text-right px-3 py-2">Amount</th><th className="text-right px-3 py-2">Balance</th></tr></thead>
                   <tbody>
-                    {/* Deposit row */}
-                    <tr className="border-t border-slate-100 bg-slate-50">
-                      <td className="px-3 py-2 font-semibold text-slate-700">Deposit (today)</td>
-                      <td className="px-3 py-2 text-right font-semibold text-slate-900">{fmt(depositCents)}</td>
-                      <td className="px-3 py-2 text-right text-slate-500">{fmt(remaining)}</td>
-                    </tr>
-                    {/* Weekly rows */}
+                    <tr className="border-t bg-slate-50"><td className="px-3 py-2 font-semibold">Deposit</td><td className="px-3 py-2 text-right font-semibold">{fmt(depositCents)}</td><td className="px-3 py-2 text-right">{fmt(remaining)}</td></tr>
                     {schedule.map((row, i) => {
-                      const balanceAfter = remaining - schedule.slice(0, i + 1).reduce((s, r) => s + r.amount, 0);
-                      return (
-                        <tr key={row.period} className="border-t border-slate-100 hover:bg-slate-50">
-                          <td className="px-3 py-1.5 text-slate-600">
-                            {pricing.payment_frequency === 'weekly' ? 'Week' : pricing.payment_frequency === 'biweekly' ? 'Biweek' : 'Month'} {row.period}
-                          </td>
-                          <td className="px-3 py-1.5 text-right text-slate-900">{fmt(row.amount)}</td>
-                          <td className="px-3 py-1.5 text-right text-slate-400">{fmt(Math.max(0, balanceAfter))}</td>
-                        </tr>
-                      );
+                      const balanceAfter = remaining - schedule.slice(0, i + 1).reduce((sum, r) => sum + r.amount, 0);
+                      return <tr key={row.period} className="border-t"><td className="px-3 py-2">{frequencyLabel} {row.period}</td><td className="px-3 py-2 text-right">{fmt(row.amount)}</td><td className="px-3 py-2 text-right text-slate-500">{fmt(Math.max(0, balanceAfter))}</td></tr>;
                     })}
                   </tbody>
                 </table>
@@ -226,30 +177,25 @@ export default function PaymentPlanCalculator({ programSlug, stripeDepositUrl, s
           </div>
         )}
 
-        {/* CTAs */}
-        <div className="space-y-2 pt-2 border-t border-slate-100">
-          {!payingInFull && depositUrl && (
-            <a
-              href={`${depositUrl}`}
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-colors"
-            >
-              <CreditCard className="w-4 h-4" />
-              Pay {fmt(depositCents)} Deposit — Start Today
-            </a>
-          )}
-          {fullUrl && (
-            <a
-              href={fullUrl}
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-brand-red-600 text-white text-sm font-bold hover:bg-brand-red-700 transition-colors"
-            >
-              <CreditCard className="w-4 h-4" />
-              Pay {fmt(pricing.tuition_cents)} in Full
-            </a>
-          )}
-          <p className="text-xs text-slate-400 text-center">
-            {BNPL_PROVIDER_NAMES} accepted at checkout
-          </p>
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <div className="flex items-start gap-2"><Tag className="w-5 h-5 text-blue-700 mt-0.5" /><div><p className="font-bold text-blue-950">Have a coupon or promotion code?</p><p className="text-sm leading-relaxed text-blue-800 mt-1">Stripe Checkout will display the promotion-code box before payment. Only active codes configured in Elevate&apos;s Stripe account will be accepted.</p></div></div>
         </div>
+
+        <div className="space-y-3 pt-2 border-t border-slate-100">
+          {!payingInFull && (
+            <button type="button" onClick={() => startCheckout('deposit')} disabled={checkoutLoading !== null} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-slate-950 text-white text-base font-extrabold hover:bg-slate-800 disabled:opacity-60">
+              {checkoutLoading === 'deposit' ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />} Pay {fmt(depositCents)} Deposit
+            </button>
+          )}
+          <button type="button" onClick={() => startCheckout('full')} disabled={checkoutLoading !== null} className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-brand-red-600 text-white text-base font-extrabold hover:bg-brand-red-700 disabled:opacity-60">
+            {checkoutLoading === 'full' ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />} Pay {fmt(pricing.tuition_cents)} in Full
+          </button>
+          <p className="text-sm text-slate-600 text-center">{BNPL_PROVIDER_NAMES} may appear when the transaction is eligible and enabled in Stripe.</p>
+          <p className="text-xs leading-relaxed text-slate-500 text-center">Calculator amounts are estimates for planning. Third-party BNPL approval, installment amount, fees, eligibility, and repayment terms are determined by the payment provider at checkout.</p>
+        </div>
+
+        {error && <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />{error}</div>}
+        {pricing.notes && <p className="text-xs leading-relaxed text-slate-500">{pricing.notes}</p>}
       </div>
     </div>
   );

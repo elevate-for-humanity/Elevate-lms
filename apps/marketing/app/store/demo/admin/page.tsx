@@ -1,278 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Users, BookOpen, DollarSign, TrendingUp, ArrowLeft, Download, FileText, BarChart } from 'lucide-react';
+import { ArrowLeft, BarChart3, BookOpen, FileText, Search, Users } from 'lucide-react';
+
+const students = [
+  { name: 'Jordan Sample', program: 'Barber Apprenticeship', status: 'Active', progress: 65 },
+  { name: 'Maria Sample', program: 'HVAC Technician', status: 'Active', progress: 42 },
+  { name: 'Alex Sample', program: 'Medical Assistant', status: 'Review', progress: 18 },
+];
 
 export default function AdminDemoPage() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [tab, setTab] = useState<'overview' | 'students' | 'courses' | 'compliance'>('overview');
+  const [query, setQuery] = useState('');
+  const [notice, setNotice] = useState('');
+  const filtered = useMemo(() => students.filter((s) => `${s.name} ${s.program}`.toLowerCase().includes(query.toLowerCase())), [query]);
+
+  const simulate = (message: string) => {
+    setNotice(message);
+    window.setTimeout(() => setNotice(''), 2600);
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="bg-slate-900 text-white py-6 sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/store/demo" className="hover:bg-slate-800 p-2 rounded-lg transition">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <div className="text-xs text-slate-400">DEMO MODE</div>
-              <div className="font-bold">Admin Dashboard</div>
-            </div>
-          </div>
-          <Link
-            href=""
-            className="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-800 transition text-sm"
-          >
-            Beauty schools
-          </Link>
-          <Link
-            href="/store/licenses"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
-          >
-            Purchase License
-          </Link>
+    <main className="min-h-screen bg-slate-100">
+      <header className="sticky top-0 z-40 bg-slate-950 text-white shadow">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
+          <div className="flex items-center gap-3"><Link href="/store/demos" aria-label="Back to demos" className="rounded-lg p-2 hover:bg-white/10"><ArrowLeft className="h-5 w-5" /></Link><div><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Sample data · Demo mode</p><h1 className="font-black">Admin Dashboard</h1></div></div>
+          <Link href="/store/trial" className="rounded-lg bg-brand-red-600 px-4 py-2 text-sm font-bold hover:bg-brand-red-700">Start Trial</Link>
         </div>
+      </header>
+
+      {notice && <div className="fixed right-4 top-24 z-50 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white shadow-xl">{notice}</div>}
+
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <nav className="mb-6 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-white p-2">
+          {[
+            ['overview', 'Overview', BarChart3], ['students', 'Students', Users], ['courses', 'Courses', BookOpen], ['compliance', 'Compliance', FileText],
+          ].map(([id, label, Icon]: any) => <button key={id} onClick={() => setTab(id)} className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-bold ${tab === id ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'}`}><Icon className="h-4 w-4" />{label}</button>)}
+        </nav>
+
+        {tab === 'overview' && <section className="grid gap-5 md:grid-cols-3">{[['Active learners','24'],['Applications to review','7'],['Programs','6']].map(([label,value]) => <div key={label} className="rounded-2xl border border-slate-200 bg-white p-6"><p className="text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-sm text-slate-600">{label}</p></div>)}</section>}
+
+        {tab === 'students' && <section className="rounded-2xl border border-slate-200 bg-white p-6"><div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row"><div><h2 className="text-xl font-black">Student management</h2><p className="text-sm text-slate-500">Search and open sample learner records.</p></div><button onClick={() => simulate('Demo: add-student workflow opened')} className="rounded-lg bg-brand-red-600 px-4 py-2 text-sm font-bold text-white">Add sample student</button></div><label className="relative block"><Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search sample learners" className="w-full rounded-lg border border-slate-300 py-2.5 pl-10 pr-3" /></label><div className="mt-4 space-y-3">{filtered.map((s) => <button key={s.name} onClick={() => simulate(`Opened sample record: ${s.name}`)} className="flex w-full items-center justify-between rounded-xl border border-slate-200 p-4 text-left hover:bg-slate-50"><div><p className="font-bold">{s.name}</p><p className="text-sm text-slate-500">{s.program}</p></div><div className="text-right"><p className="text-sm font-bold">{s.progress}%</p><p className="text-xs text-slate-500">{s.status}</p></div></button>)}</div></section>}
+
+        {tab === 'courses' && <section className="grid gap-4 md:grid-cols-2">{['Barber Apprenticeship','HVAC Technician','Medical Assistant','CNA'].map((course) => <div key={course} className="rounded-2xl border border-slate-200 bg-white p-6"><h2 className="font-black">{course}</h2><p className="mt-2 text-sm text-slate-500">Sample course configuration</p><div className="mt-5 flex gap-2"><button onClick={() => simulate(`Demo editor opened: ${course}`)} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white">Edit</button><button onClick={() => simulate(`Demo preview opened: ${course}`)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Preview</button></div></div>)}</section>}
+
+        {tab === 'compliance' && <section className="rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-black">Compliance reporting demo</h2><p className="mt-2 text-slate-600">These buttons simulate report generation; no real participant data is used.</p><div className="mt-6 grid gap-3 sm:grid-cols-2">{['WIOA data review','Enrollment summary','Apprenticeship hours','Audit checklist'].map((report) => <button key={report} onClick={() => simulate(`Generated sample report: ${report}`)} className="rounded-xl border border-slate-200 p-4 text-left font-bold hover:bg-slate-50">{report}</button>)}</div></section>}
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow-lg mb-8">
-          <div className="border-b">
-            <div className="flex gap-4 px-6">
-              {[
-                { id: 'overview', label: 'Overview', icon: BarChart },
-                { id: 'students', label: 'Students', icon: Users },
-                { id: 'courses', label: 'Courses', icon: BookOpen },
-                { id: 'compliance', label: 'Compliance', icon: FileText },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-4 font-semibold border-b-2 transition ${
-                    activeTab === tab.id
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <tab.icon className="w-5 h-5" />
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="p-6">
-            {activeTab === 'overview' && (
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Platform Overview</h2>
-                <div className="grid md:grid-cols-4 gap-6 mb-8">
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    <Users className="w-8 h-8 text-blue-600 mb-3" />
-                    <div className="text-3xl font-bold text-blue-600 mb-1">247</div>
-                    <div className="text-sm text-slate-700">Active Students</div>
-                  </div>
-                  <div className="bg-brand-green-50 rounded-lg p-6">
-                    <BookOpen className="w-8 h-8 text-brand-green-600 mb-3" />
-                    <div className="text-3xl font-bold text-brand-green-600 mb-1">18</div>
-                    <div className="text-sm text-slate-700">Active Courses</div>
-                  </div>
-                  <div className="bg-purple-50 rounded-lg p-6">
-                    <TrendingUp className="w-8 h-8 text-purple-600 mb-3" />
-                    <div className="text-3xl font-bold text-purple-600 mb-1">89%</div>
-                    <div className="text-sm text-slate-700">Completion Rate</div>
-                  </div>
-                  <div className="bg-orange-50 rounded-lg p-6">
-                    <DollarSign className="w-8 h-8 text-orange-600 mb-3" />
-                    <div className="text-3xl font-bold text-orange-600 mb-1">$1.2M</div>
-                    <div className="text-sm text-slate-700">Grant Funding</div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 rounded-lg p-6">
-                  <h3 className="font-bold mb-4">Recent Activity</h3>
-                  <div className="space-y-3">
-                    {[
-                      { action: 'New enrollment', student: 'Sarah Johnson', course: 'HVAC Technician', time: '5 min ago' },
-                      { action: 'Course completed', student: 'Mike Davis', course: 'Barber Apprenticeship', time: '1 hour ago' },
-                      { action: 'Certificate issued', student: 'Lisa Chen', course: 'CNA Certification', time: '2 hours ago' },
-                    ].map((activity, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-lg">
-                        <div>
-                          <div className="font-semibold">{activity.action}</div>
-                          <div className="text-sm text-slate-600">
-                            {activity.student} · {activity.course}
-                          </div>
-                        </div>
-                        <div className="text-sm text-slate-500">{activity.time}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'students' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">Student Management</h2>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                    Add Student
-                  </button>
-                </div>
-                <div className="bg-white border rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-slate-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Program</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Progress</th>
-                        <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {[
-                        { name: 'John Smith', program: 'Barber Apprenticeship', progress: 75, status: 'Active' },
-                        { name: 'Maria Garcia', program: 'HVAC Technician', progress: 45, status: 'Active' },
-                        { name: 'David Lee', program: 'CNA Certification', progress: 90, status: 'Active' },
-                      ].map((student, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50">
-                          <td className="px-6 py-4 font-semibold">{student.name}</td>
-                          <td className="px-6 py-4 text-slate-600">{student.program}</td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <div className="w-24 bg-slate-200 rounded-full h-2">
-                                <div
-                                  className="bg-blue-600 h-2 rounded-full"
-                                  style={{ width: `${student.progress}%` }}
-                                />
-                              </div>
-                              <span className="text-sm font-semibold">{student.progress}%</span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="px-3 py-2 bg-brand-green-100 text-brand-green-800 rounded-full text-sm font-semibold">
-                              {student.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'courses' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold">Course Management</h2>
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                    Create Course
-                  </button>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {[
-                    { title: 'Barber Apprenticeship', students: 45, lessons: 12, published: true },
-                    { title: 'HVAC Technician Training', students: 38, lessons: 20, published: true },
-                    { title: 'CNA Certification', students: 52, lessons: 15, published: true },
-                  ].map((course, idx) => (
-                    <div key={idx} className="bg-white border rounded-lg p-6 hover:shadow-lg transition">
-                      <h3 className="text-xl font-bold mb-3">{course.title}</h3>
-                      <div className="flex gap-4 text-sm text-slate-600 mb-4">
-                        <span>{course.students} students</span>
-                        <span>·</span>
-                        <span>{course.lessons} lessons</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                          Edit
-                        </button>
-                        <button className="px-4 bg-slate-100 text-slate-700 py-2 rounded-lg font-bold hover:bg-slate-200 transition">
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'compliance' && (
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Compliance & Reporting</h2>
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                  <div className="bg-brand-green-50 border-2 border-brand-green-200 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold">WIOA Compliance</h3>
-                      <span className="px-3 py-2 bg-brand-green-600 text-white rounded-full text-sm font-bold">
-                        Compliant
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-700 mb-4">
-                      All required data elements captured. Ready for quarterly reporting.
-                    </p>
-                    <button className="flex items-center gap-2 text-brand-green-600 font-semibold hover:text-brand-green-700">
-                      <Download className="w-4 h-4" />
-                      Export Report
-                    </button>
-                  </div>
-
-                  <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold">FERPA Protection</h3>
-                      <span className="px-3 py-2 bg-blue-600 text-white rounded-full text-sm font-bold">
-                        Active
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-700 mb-4">
-                      Student data encrypted and access-controlled per FERPA requirements.
-                    </p>
-                    <button className="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700">
-                      <FileText className="w-4 h-4" />
-                      View Audit Log
-                    </button>
-                  </div>
-                </div>
-
-                <div className="bg-white border rounded-lg p-6">
-                  <h3 className="font-bold mb-4">Available Reports</h3>
-                  <div className="space-y-3">
-                    {[
-                      'WIOA Quarterly Performance Report',
-                      'Grant Outcome Metrics',
-                      'Student Enrollment Summary',
-                      'Completion and Placement Rates',
-                      'Financial Aid Disbursement',
-                    ].map((report, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                        <span className="font-semibold">{report}</span>
-                        <button className="flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700">
-                          <Download className="w-4 h-4" />
-                          Download
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-8 text-center">
-          <FileText className="w-16 h-16 text-purple-600 mx-auto mb-4" />
-          <h3 className="text-2xl font-bold mb-2">This is a Demo</h3>
-          <p className="text-slate-700 mb-6 max-w-2xl mx-auto">
-            You're viewing the admin dashboard with sample data. The full platform includes user management, advanced analytics, API access, and white-label customization.
-          </p>
-          <Link
-            href="/store/licenses"
-            className="inline-flex items-center gap-2 bg-purple-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-purple-700 transition"
-          >
-            Get Full Access
-          </Link>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }

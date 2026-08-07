@@ -1,0 +1,59 @@
+// Stripe testing webhook endpoint registered in the live Stripe account.
+import type Stripe from 'stripe';
+import { NextRequest, NextResponse } from 'next/server';
+import { getStripe } from '@/lib/stripe/client';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import {
+  constructStripeEventWithAnySecret,
+  getCanonicalStripeWebhookSecrets,
+} from '@/lib/stripe/construct-webhook-event';
+import { handleTestingCheckoutSession } from '@/lib/stripe/handlers/testing-checkout-completed';
+import { logger } from '@/lib/logger';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
+
+export async function POST(request: NextRequest) {
+  try {
+    await hydrateProcessEnv().catch(() => {});
+    const stripe = getStripe();
+    if (!stripe) return NextResponse.json({ received: true, warning: 'stripe_not_configured' });
+
+    const signature = request.headers.get('stripe-signature');
+    if (!signature) return NextResponse.json({ error: 'Missing Stripe signature.' }, { status: 400 });
+
+    const secrets = getCanonicalStripeWebhookSecrets();
+    if (!secrets.length) {
+      logger.error('[testing-webhook] No Stripe signing secret configured');
+      return NextResponse.json({ received: true, warning: 'webhook_secret_missing' });
+    }
+
+    const rawBody = await request.text();
+    let event: Stripe.Event;
+    try {
+      event = constructStripeEventWithAnySecret(stripe, rawBody, signature, secrets);
+    } catch (error) {
+      logger.error('[testing-webhook] Signature verification failed', error);
+      return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 });
+    }
+
+    if (event.type !== 'checkout.session.completed') {
+      return NextResponse.json({ received: true, ignored: event.type });
+    }
+
+    const session = event.data.object as Stripe.Checkout.Session;
+    if (!['testing_fee', 'testing_enforcement'].includes(session.metadata?.payment_type ?? '')) {
+      return NextResponse.json({ received: true, ignored: 'non_testing_session' });
+    }
+
+    const db = await requireAdminClient();
+    await handleTestingCheckoutSession(session, db);
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    // Stripe should retry genuine processing failures.
+    logger.error('[testing-webhook] Processing failed', error);
+    return NextResponse.json({ error: 'Webhook processing failed.' }, { status: 500 });
+  }
+}

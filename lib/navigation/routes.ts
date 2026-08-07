@@ -30,8 +30,6 @@ export const ROUTES = {
   programsPhlebotomy: '/programs/phlebotomy',
   programsHVAC: '/programs/hvac-technician',
   programsCDL: '/programs/cdl-training',
-  // The former /barber-and-beauty-apprenticeships route is not deployed.
-  // Use the canonical program catalog, which contains the beauty/cosmetology programs.
   programsBeauty: '/programs',
   programsBarber: '/programs/barber-apprenticeship',
   programsCosmetology: '/programs/cosmetology-apprenticeship',
@@ -43,14 +41,13 @@ export const ROUTES = {
   // Apprenticeships
   apprenticeships: '/apprenticeships',
   apprenticeshipsHowItWorks: '/how-it-works',
-  // Canonical host-shop landing/application flow.
   apprenticeshipsHostShop: '/partners/barber-host-shop',
   apprenticeshipSponsor: '/apprenticeship-sponsor',
 
   // Funding
   funding: '/funding',
   fundingWIOA: '/funding/wioa',
-  fundingJobReadyIndy: '/funding/job-ready-indy',
+  fundingJobReadyIndy: '/jri',
   fundingVocRehab: '/funding/state-programs',
   scholarships: '/scholarships',
   eligibility: '/eligibility/quiz',
@@ -58,8 +55,6 @@ export const ROUTES = {
   // Employers
   employers: '/employer',
   employersHireGraduates: '/hire-graduates',
-  // Job posting is an authenticated employer capability. Route users to the
-  // deployed employer workspace instead of the missing public /employers/post-job page.
   employersPostJob: `${APP_URL}/employer`,
   forAgencies: '/for-agencies',
 

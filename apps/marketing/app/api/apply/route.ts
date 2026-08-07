@@ -2,6 +2,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { POST as submitApplication } from '../applications/route';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -129,12 +130,24 @@ export async function POST(req: Request) {
       programSlug: pathwaySlug || program,
     };
 
-    const applicationsUrl = new URL('/api/applications', req.url);
-    const upstream = await fetch(applicationsUrl.toString(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    // Keep /api/apply as a compatibility boundary, but use the canonical
+    // application handler directly. Do not self-fetch through the public
+    // hostname/proxy: that can fail in production containers and creates two
+    // network paths for one application workflow.
+    const canonicalUrl = new URL('/api/applications', req.url);
+    const canonicalHeaders = new Headers({ 'Content-Type': 'application/json' });
+    const origin = req.headers.get('origin');
+    if (origin) canonicalHeaders.set('Origin', origin);
+    const idempotencyKey = req.headers.get('idempotency-key');
+    if (idempotencyKey) canonicalHeaders.set('Idempotency-Key', idempotencyKey);
+
+    const upstream = await submitApplication(
+      new Request(canonicalUrl, {
+        method: 'POST',
+        headers: canonicalHeaders,
+        body: JSON.stringify(payload),
+      }),
+    );
 
     const upstreamJson = await upstream.json().catch(() => ({}));
 
@@ -161,7 +174,9 @@ export async function POST(req: Request) {
     }
     return NextResponse.redirect(dest, { status: 303 });
   } catch (error) {
-    logger.error('Apply compatibility route error', { error: error instanceof Error ? error.message : String(error) });
+    logger.error('Apply compatibility route error', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Submission failed. Please call 317-314-3757.' },
       { status: 500 },

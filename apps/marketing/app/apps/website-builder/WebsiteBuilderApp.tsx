@@ -96,10 +96,10 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
             <ParisWebsiteInterview onCreated={(website) => setWebsites((current) => [website, ...current])} />
 
             <div className="grid gap-5 md:grid-cols-2">
-              <Link href="/import" className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-brand-red-300 hover:shadow-md">
+              <Link href="/apps/website-builder/import" className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-brand-red-300 hover:shadow-md">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Upload className="h-5 w-5" /></div>
                 <h2 className="mt-4 text-xl font-black text-slate-950">Import an existing website</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">Bring an existing site into the Elevate builder, then redesign and manage it from your account.</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">Bring a public site into the Elevate builder, let AI map its content and branding, then review everything before publishing.</p>
                 <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start import →</span>
               </Link>
 

@@ -51,6 +51,9 @@ jobs:
         run: |
           node -e "JSON.parse(require('fs').readFileSync('consolidation/feature-preservation.json','utf8')); JSON.parse(require('fs').readFileSync('consolidation/supervisor-tasks.json','utf8')); console.log('Consolidation manifests valid')"
 
+      - name: Guard navigation service URLs
+        run: node scripts/check-navigation-hardcoding.mjs
+
       - name: Typecheck
         run: pnpm typecheck
 

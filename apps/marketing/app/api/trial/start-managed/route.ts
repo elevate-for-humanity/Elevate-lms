@@ -1,327 +1,199 @@
 // PUBLIC ROUTE: managed trial start form
-import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { strictRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { logger } from '@/lib/logger';
 
-const TRIAL_DURATION_DAYS = 14;
+const TRIAL_DAYS = 14;
+const fallbackLimiter = new Map<string, { count: number; reset: number }>();
 
-// In-memory fallback when Upstash Redis is not configured
-const rateLimitFallback = new Map<string, { count: number; resetAt: number }>();
-
-async function checkTrialRateLimit(email: string): Promise<boolean> {
-  // Prefer Upstash Redis (persistent across serverless instances)
-  const limiter = strictRateLimit.get();
-  if (limiter) {
-    const result = await limiter.limit('trial:' + email);
-    return result.success;
-  }
-
-  // Fallback: in-memory (per-process only)
-  const now = Date.now();
-  const entry = rateLimitFallback.get(email);
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitFallback.set(email, { count: 1, resetAt: now + 60 * 60 * 1000 });
-    return true;
-  }
-
-  if (entry.count >= 3) {
-    return false;
-  }
-
-  entry.count++;
-  return true;
-}
-
-async function getSupabaseAdmin() {
-  return await getAdminClient();
-}
-
-function validateEmail(email: string): boolean {
+function emailValid(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 30);
+function slugify(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'organization';
 }
 
-
-async function sendTrialWelcomeEmail(
-  email: string,
-  orgName: string,
-  subdomain: string,
-  dashboardUrl: string,
-  publicSiteUrl: string,
-  correlationId: string,
-) {
-  const sendgridKey = process.env.SENDGRID_API_KEY;
-  if (!sendgridKey) {
-    logger.warn(
-      '[trial] ' + correlationId + ' - SENDGRID_API_KEY not configured, skipping welcome email',
-    );
-    return;
+async function allowed(email: string) {
+  const limiter = strictRateLimit.get();
+  if (limiter) return (await limiter.limit(`trial:${email}`)).success;
+  const now = Date.now();
+  const current = fallbackLimiter.get(email);
+  if (!current || current.reset < now) {
+    fallbackLimiter.set(email, { count: 1, reset: now + 60 * 60 * 1000 });
+    return true;
   }
+  if (current.count >= 3) return false;
+  current.count += 1;
+  return true;
+}
 
+async function sendWelcome(params: {
+  email: string;
+  orgName: string;
+  loginUrl: string;
+  publicPreviewUrl: string;
+  trialEndsAt: string;
+  reference: string;
+}) {
   await resend.emails.send({
-    from: 'Elevate LMS <' + PLATFORM_DEFAULTS.emailFromAddress + '>',
-    to: email,
-    subject: 'Your 14-day trial is ready - ' + orgName,
-    headers: { 'X-Correlation-ID': correlationId },
-    html: '<h1>Your trial is live.</h1>' +
-      '<p>Organization: <strong>' + orgName + '</strong></p>' +
-      '<p><a href="' + dashboardUrl + '" style="display:inline-block;padding:12px 24px;background:#dc2626;color:#fff;font-weight:bold;text-decoration:none;border-radius:6px;">Open Your Dashboard</a></p>' +
-      '<p>Your public site: <a href="' + publicSiteUrl + '">' + publicSiteUrl + '</a></p>' +
-      '<h2>What to do now:</h2>' +
-      '<ol>' +
-        '<li>Visit your public site and share it with your team</li>' +
-        '<li>Log in to the admin dashboard to add programs and courses</li>' +
-        '<li>Customize your site in Website Builder</li>' +
-        '<li>Invite instructors and test enrollment</li>' +
-      '</ol>' +
-      '<p>Your trial runs for 14 days with full platform access. No credit card required.</p>' +
-      '<p>Questions? Reply to this email or visit <a href="' + PLATFORM_DEFAULTS.siteUrl + '/contact">our contact page</a>.</p>',
+    from: `Elevate LMS <${PLATFORM_DEFAULTS.emailFromAddress}>`,
+    to: params.email,
+    subject: `Your 14-day Elevate platform trial — ${params.orgName}`,
+    html: `
+      <h1>Your organization trial is ready.</h1>
+      <p><strong>${params.orgName}</strong></p>
+      <p><a href="${params.loginUrl}" style="display:inline-block;padding:12px 20px;background:#dc2626;color:#fff;text-decoration:none;border-radius:8px;font-weight:700">Sign in to your workspace</a></p>
+      <p>Public preview: <a href="${params.publicPreviewUrl}">${params.publicPreviewUrl}</a></p>
+      <p>Trial ends: ${new Date(params.trialEndsAt).toLocaleDateString('en-US')}</p>
+      <p>This sign-in link is intended for the email address used to create the trial. If it expires, use the normal platform login to request a new link.</p>
+      <p>Reference: ${params.reference}</p>
+    `,
   });
 }
 
-/**
- * POST /api/trial/start-managed
- *
- * Public self-service endpoint. Creates a 14-day managed platform trial.
- * No auth required - rate-limited by email.
- *
- * Body: { orgName, adminName, adminEmail }
- * Returns: { ok, tenantUrl, subdomain, trialEndsAt, correlationId }
- */
 async function _POST(request: NextRequest) {
   await hydrateProcessEnv();
-
-  // Correlation ID for tracing failures across client ↔ server
-  const correlationId = 'trial_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  const reference = `trial_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
   try {
     const body = await request.json();
-    const { orgName, adminName, adminEmail, websiteMode, existingUrl, programs } = body;
+    const orgName = typeof body.orgName === 'string' ? body.orgName.trim() : '';
+    const adminName = typeof body.adminName === 'string' ? body.adminName.trim() : '';
+    const email = typeof body.adminEmail === 'string' ? body.adminEmail.trim().toLowerCase() : '';
+    const websiteMode = body.websiteMode === 'existing' ? 'existing_site' : 'new_site';
+    const existingUrl = typeof body.existingUrl === 'string' ? body.existingUrl.trim() : '';
+    const programs = typeof body.programs === 'string' ? body.programs.trim() : '';
 
-    // Validate required fields
-    if (!orgName || !adminName || !adminEmail) {
-      return NextResponse.json(
-        { error: 'orgName, adminName, and adminEmail are required', correlationId },
-        { status: 400 },
-      );
+    if (orgName.length < 2 || orgName.length > 100 || adminName.length < 2 || !emailValid(email)) {
+      return NextResponse.json({ error: 'Valid organization name, administrator name, and email are required.', correlationId: reference }, { status: 400 });
+    }
+    if (!(await allowed(email))) {
+      return NextResponse.json({ error: 'Too many trial requests. Please try again later.', correlationId: reference }, { status: 429 });
     }
 
-    if (typeof orgName !== 'string' || orgName.trim().length < 2 || orgName.trim().length > 100) {
-      return NextResponse.json(
-        { error: 'orgName must be 2-100 characters', correlationId },
-        { status: 400 },
-      );
-    }
+    const db = await getAdminClient();
+    if (!db) return NextResponse.json({ error: 'Trial service is unavailable.', correlationId: reference }, { status: 503 });
 
-    if (typeof adminName !== 'string' || adminName.trim().length < 2) {
-      return NextResponse.json(
-        { error: 'adminName must be at least 2 characters', correlationId },
-        { status: 400 },
-      );
-    }
+    let { data: organization } = await db.from('organizations').select('id, name, slug, contact_email').eq('contact_email', email).maybeSingle();
+    let createdOrganization = false;
 
-    const email = adminEmail.trim().toLowerCase();
-    if (!validateEmail(email)) {
-      return NextResponse.json({ error: 'Invalid email address', correlationId }, { status: 400 });
-    }
+    if (!organization) {
+      let slug = slugify(orgName);
+      const reserved = new Set(['www','app','api','admin','dashboard','mail','support','help','docs','demo']);
+      if (reserved.has(slug)) slug = `${slug}-org`;
+      const { data: sameSlug } = await db.from('organizations').select('id').eq('slug', slug).maybeSingle();
+      if (sameSlug) slug = `${slug}-${Date.now().toString(36).slice(-4)}`;
 
-    // Rate limit (Upstash Redis if available, in-memory fallback)
-    if (!(await checkTrialRateLimit(email))) {
-      return NextResponse.json(
-        { error: 'Too many trial requests. Please try again later.', correlationId },
-        { status: 429 },
-      );
-    }
-
-    const supabase = await getSupabaseAdmin();
-    if (!supabase) {
-      logger.error('[trial] ' + correlationId + ' - Supabase not configured');
-      return NextResponse.json({ error: 'Service unavailable', correlationId }, { status: 503 });
-    }
-
-    // Check if org with this email already exists
-    const { data: existingOrg } = await supabase
-      .from('organizations')
-      .select('id, slug')
-      .eq('contact_email', email)
-      .maybeSingle();
-
-    if (existingOrg) {
-      return NextResponse.json(
-        {
-          error: 'A trial already exists for this email address',
-          tenantUrl: 'https://' + existingOrg.slug + '.app.elevateforhumanity.org/admin',
-          subdomain: existingOrg.slug,
-        },
-        { status: 409 },
-      );
-    }
-
-    // Generate subdomain
-    let subdomain = slugify(orgName.trim());
-    const { data: slugTaken } = await supabase
-      .from('organizations')
-      .select('id')
-      .eq('slug', subdomain)
-      .maybeSingle();
-
-    if (slugTaken) {
-      subdomain = subdomain + '-' + Date.now().toString(36).slice(-4);
-    }
-
-    // Reserved subdomains
-    const reserved = [
-      'www',
-      'app',
-      'api',
-      'admin',
-      'dashboard',
-      'mail',
-      'support',
-      'help',
-      'docs',
-      'demo',
-    ];
-    if (reserved.includes(subdomain)) {
-      subdomain = subdomain + '-org';
-    }
-
-    // Create organization
-    const { data: org, error: orgError } = await supabase
-      .from('organizations')
-      .insert({
-        name: orgName.trim(),
-        slug: subdomain,
+      const created = await db.from('organizations').insert({
+        name: orgName,
+        slug,
         type: 'training_provider',
         status: 'active',
-        contact_name: adminName.trim(),
+        contact_name: adminName,
         contact_email: email,
-        domain: subdomain + '.app.elevateforhumanity.org',
-      })
-      .select()
-      .maybeSingle();
+        domain: `${slug}.app.elevateforhumanity.org`,
+        ...(existingUrl ? { website_url: existingUrl } : {}),
+        ...(programs ? { notes: `Programs: ${programs}` } : {}),
+      }).select('id, name, slug, contact_email').single();
 
-    if (orgError || !org) {
-      const detail = orgError
-        ? (orgError as { message?: string }).message ?? JSON.stringify(orgError)
-        : 'insert returned no row (RLS or trigger blocked read-back)';
-      logger.error('[trial] ' + correlationId + ' - Org creation error: ' + detail, orgError instanceof Error ? orgError : new Error(detail));
-      return NextResponse.json(
-        { error: 'Failed to create organization', correlationId },
-        { status: 500 },
-      );
+      if (created.error || !created.data) {
+        logger.error('[trial] organization creation failed', created.error as any, { reference });
+        return NextResponse.json({ error: 'Failed to create organization.', correlationId: reference }, { status: 500 });
+      }
+      organization = created.data;
+      createdOrganization = true;
     }
 
-    // Create trial license (managed_licenses table, separate from white-label licenses)
-    const trialEndsAt = new Date();
-    trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
+    const trialEnds = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-    const { data: license, error: licenseError } = await supabase
-      .from('managed_licenses')
-      .insert({
-        organization_id: org.id,
+    const { data: existingLicense } = await db.from('managed_licenses').select('id, trial_ends_at, status').eq('organization_id', organization.id).maybeSingle();
+    let trialEndsAt = existingLicense?.trial_ends_at || trialEnds;
+
+    if (!existingLicense) {
+      const license = await db.from('managed_licenses').insert({
+        organization_id: organization.id,
         status: 'active',
         tier: 'trial',
         plan_id: 'managed-trial',
         trial_started_at: new Date().toISOString(),
-        trial_ends_at: trialEndsAt.toISOString(),
-        expires_at: trialEndsAt.toISOString(),
-      })
-      .select()
-      .maybeSingle();
+        trial_ends_at: trialEnds,
+        expires_at: trialEnds,
+      }).select('id').single();
 
-    if (licenseError || !license) {
-      const detail = licenseError
-        ? (licenseError as { message?: string }).message ?? JSON.stringify(licenseError)
-        : 'insert returned no row (RLS or trigger blocked read-back)';
-      logger.error('[trial] ' + correlationId + ' - License creation error: ' + detail, licenseError instanceof Error ? licenseError : new Error(detail));
-      // Rollback org
-      await supabase.from('organizations').delete().eq('id', org.id);
-      return NextResponse.json(
-        { error: 'Failed to create trial license', correlationId },
-        { status: 500 },
-      );
+      if (license.error) {
+        if (createdOrganization) await db.from('organizations').delete().eq('id', organization.id);
+        logger.error('[trial] license creation failed', license.error as any, { reference });
+        return NextResponse.json({ error: 'Failed to create trial license.', correlationId: reference }, { status: 500 });
+      }
     }
 
-    // Resolve connection mode from websiteMode field
-    const connectionMode: 'new_site' | 'existing_site' | 'api_embed' =
-      websiteMode === 'existing' ? 'existing_site' : 'new_site';
+    const dashboardUrl = `https://${organization.slug}.app.elevateforhumanity.org/admin`;
+    const publicPreviewUrl = `https://${organization.slug}.app.elevateforhumanity.org`;
+    const fallbackLogin = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(dashboardUrl)}`;
+    let loginUrl = fallbackLogin;
 
-    // Log provisioning event
-    await supabase
-      .from('license_events')
-      .insert({
-        license_id: license.id,
-        organization_id: org.id,
-        event_type: 'trial_self_service_start',
-        event_data: {
-          correlation_id: correlationId,
-          plan_id: 'managed-trial',
-          subdomain,
-          admin_email: email,
-          source: 'public_trial_form',
-          connection_mode: connectionMode,
-          existing_url: existingUrl || null,
-          programs: programs || null,
-        },
-      })
-      .then(()=>{}, ()=>{}); // Non-critical
-
-    // Store extra intake fields on the org record if columns exist (best-effort)
-    if (existingUrl || programs) {
-      await supabase
-        .from('organizations')
-        .update({
-          ...(existingUrl ? { website_url: existingUrl } : {}),
-          ...(programs ? { notes: 'Programs: ' + programs } : {}),
-        })
-        .eq('id', org.id)
-        .then(()=>{}, ()=>{});
-    }
-
-    const dashboardUrl = 'https://' + subdomain + '.app.elevateforhumanity.org/admin';
-    const publicPreviewUrl = 'https://' + subdomain + '.app.elevateforhumanity.org';
-
-    // Send welcome email
+    // Generate a genuine one-time magic link. Passing metadata lets profile-sync
+    // triggers preserve organization context on first sign-in where supported.
     try {
-      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, publicPreviewUrl, correlationId);
-    } catch (emailError) {
-      logger.error('[trial] ' + correlationId + ' - Failed to send welcome email:', emailError);
-      // Don't fail - trial is created
+      const generated: any = await db.auth.admin.generateLink({
+        type: 'magiclink',
+        email,
+        options: {
+          redirectTo: dashboardUrl,
+          data: { full_name: adminName, role: 'org_admin', organization_id: organization.id },
+        },
+      });
+      const actionLink = generated?.data?.properties?.action_link;
+      const authUser = generated?.data?.user;
+      if (actionLink) loginUrl = actionLink;
+
+      if (authUser?.id) {
+        // Best effort only: deployments differ on optional profile columns.
+        await db.from('profiles').upsert({
+          id: authUser.id,
+          email,
+          full_name: adminName,
+          role: 'org_admin',
+          organization_id: organization.id,
+        }, { onConflict: 'id' }).then(() => undefined, () => undefined);
+      }
+    } catch (authErr) {
+      logger.warn('[trial] magic-link generation failed; using login page fallback', authErr as Error, { reference });
+    }
+
+    await db.from('license_events').insert({
+      organization_id: organization.id,
+      event_type: createdOrganization ? 'trial_self_service_start' : 'trial_self_service_reopen',
+      event_data: { correlation_id: reference, admin_email: email, connection_mode: websiteMode, existing_url: existingUrl || null, programs: programs || null },
+    }).then(() => undefined, () => undefined);
+
+    try {
+      await sendWelcome({ email, orgName: organization.name || orgName, loginUrl, publicPreviewUrl, trialEndsAt, reference });
+    } catch (mailErr) {
+      logger.warn('[trial] welcome email failed', mailErr as Error, { reference });
     }
 
     return NextResponse.json({
       ok: true,
       tenantUrl: dashboardUrl,
       publicPreviewUrl,
-      subdomain,
-      trialEndsAt: trialEndsAt.toISOString(),
-      correlationId,
-      connectionMode,
-      message: 'Trial created. Check ' + email + ' for login instructions.',
+      subdomain: organization.slug,
+      trialEndsAt,
+      correlationId: reference,
+      connectionMode: websiteMode,
+      message: 'Trial workspace created.',
     });
   } catch (error) {
-    const errMsg = error instanceof Error ? error.message : JSON.stringify(error);
-    logger.error(
-      '[trial] ' + correlationId + ' - Unexpected error: ' + errMsg,
-      error instanceof Error ? error : new Error(errMsg),
-    );
-    return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
+    logger.error('[trial] unexpected error', error as Error, { reference });
+    return NextResponse.json({ error: 'Internal server error', correlationId: reference }, { status: 500 });
   }
 }
+
 export const POST = withRuntime(withApiAudit('/api/trial/start-managed', _POST));

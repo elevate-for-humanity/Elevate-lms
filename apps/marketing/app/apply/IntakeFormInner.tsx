@@ -1,11 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ExternalLink, CheckCircle2, DollarSign } from 'lucide-react';
+import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
+
+interface ProgramOption {
+  id: string;
+  title: string;
+  slug: string;
+  fundingTier: 'workforce-funded' | 'self-pay';
+  wioaEligible: boolean;
+  wrgEligible: boolean;
+  topJobsStars: number | null;
+}
 
 interface IntakeFormInnerProps {
-  programs: Array<{ id: string; title: string; slug: string }>;
+  programs: ProgramOption[];
   initialProgram?: string;
 }
 
@@ -18,39 +30,58 @@ export default function IntakeFormInner({ programs, initialProgram = '' }: Intak
     phone: '',
     programInterest: initialProgram,
     fundingInterest: '',
+    workOneAppointmentConfirmed: false,
   });
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<{
-    success: boolean;
-    message?: string;
-    error?: string;
-  } | null>(null);
+  const [result, setResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const selectedProgram = useMemo(
+    () => programs.find((program) => program.slug === form.programInterest) ?? null,
+    [form.programInterest, programs],
+  );
+  const fundedTrack = selectedProgram?.fundingTier === 'workforce-funded';
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    const { name, value, type } = e.target;
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'programInterest' ? { fundingInterest: '', workOneAppointmentConfirmed: false } : {}),
+    }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitting(true);
     setResult(null);
 
+    if (fundedTrack && !form.workOneAppointmentConfirmed) {
+      setResult({
+        success: false,
+        error: 'Schedule your WorkOne intake appointment and confirm that step before submitting a funded-program application.',
+      });
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const res = await fetch('/api/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          fundingTrack: fundedTrack ? 'workforce-funded' : 'self-pay',
+          workOneAppointmentUrl: fundedTrack ? WORKONE_INDY_INTAKE_URL : null,
+        }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
-        setResult({ success: true, message: 'Application received! Check your email for next steps.' });
-        const ref = data.referenceNumber || '';
-        const prog = data.program || '';
+        setResult({ success: true, message: 'Application received. Check your email for next steps.' });
         const q = new URLSearchParams();
-        if (ref) q.set('ref', ref);
-        if (prog) q.set('program', prog);
-        const suffix = q.toString() ? '?' + q.toString() : '';
-        setTimeout(() => router.push('/apply/success' + suffix), 1500);
+        if (data.referenceNumber) q.set('ref', data.referenceNumber);
+        if (data.program) q.set('program', data.program);
+        q.set('track', fundedTrack ? 'workforce-funded' : 'self-pay');
+        setTimeout(() => router.push(`/apply/success?${q.toString()}`), 1200);
       } else {
         setResult({ success: false, error: data.error || 'Something went wrong. Please try again.' });
       }
@@ -62,146 +93,106 @@ export default function IntakeFormInner({ programs, initialProgram = '' }: Intak
   }
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6">
-      {result?.success ? (
-        <div className="text-center py-8">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+    <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="firstName" className="block text-base font-semibold text-slate-800 mb-2">First Name *</label>
+            <input id="firstName" name="firstName" required value={form.firstName} onChange={handleChange} className="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-red-500" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Application Received!</h3>
-          <p className="text-slate-600 mb-4">{result.message}</p>
-          <p className="text-sm text-slate-500">Redirecting...</p>
+          <div>
+            <label htmlFor="lastName" className="block text-base font-semibold text-slate-800 mb-2">Last Name *</label>
+            <input id="lastName" name="lastName" required value={form.lastName} onChange={handleChange} className="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-red-500" />
+          </div>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 mb-1">
-                First Name *
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                name="firstName"
-                required
-                value={form.firstName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
-                placeholder="Jane"
-              />
-            </div>
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 mb-1">
-                Last Name *
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                name="lastName"
-                required
-                value={form.lastName}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
-                placeholder="Smith"
-              />
-            </div>
-          </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
-              Email Address *
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              value={form.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
-              placeholder="jane.smith@email.com"
-            />
-          </div>
+        <div>
+          <label htmlFor="email" className="block text-base font-semibold text-slate-800 mb-2">Email Address *</label>
+          <input type="email" id="email" name="email" required value={form.email} onChange={handleChange} className="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-red-500" />
+        </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-slate-700 mb-1">
-              Phone Number *
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              required
-              value={form.phone}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
-              placeholder="(317) 314-3757"
-            />
-          </div>
+        <div>
+          <label htmlFor="phone" className="block text-base font-semibold text-slate-800 mb-2">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" required value={form.phone} onChange={handleChange} className="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-red-500" placeholder="(317) 314-3757" />
+        </div>
 
-          <div>
-            <label htmlFor="programInterest" className="block text-sm font-medium text-slate-700 mb-1">
-              Program of Interest *
-            </label>
-            <select
-              id="programInterest"
-              name="programInterest"
-              required
-              value={form.programInterest}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent bg-white"
-            >
-              <option value="">Select a program</option>
-              {programs.map(p => (
+        <div>
+          <label htmlFor="programInterest" className="block text-base font-semibold text-slate-800 mb-2">Program of Interest *</label>
+          <select id="programInterest" name="programInterest" required value={form.programInterest} onChange={handleChange} className="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-brand-red-500">
+            <option value="">Select a program</option>
+            <optgroup label="Workforce-funded programs">
+              {programs.filter((p) => p.fundingTier === 'workforce-funded').map((p) => (
+                <option key={p.id} value={p.slug}>{p.title}{p.topJobsStars ? ` · ${p.topJobsStars}★ Top Jobs` : ''}</option>
+              ))}
+            </optgroup>
+            <optgroup label="Regular / self-pay programs">
+              {programs.filter((p) => p.fundingTier === 'self-pay').map((p) => (
                 <option key={p.id} value={p.slug}>{p.title}</option>
               ))}
-            </select>
-          </div>
+            </optgroup>
+          </select>
+        </div>
 
-          <div>
-            <label htmlFor="fundingInterest" className="block text-sm font-medium text-slate-700 mb-1">
-              How do you plan to pay?
-            </label>
-            <select
-              id="fundingInterest"
-              name="fundingInterest"
-              value={form.fundingInterest}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent bg-white"
-            >
-              <option value="">Select an option</option>
-              <option value="wioa">WIOA / WorkOne funding</option>
-              <option value="wrg">Workforce Ready Grant</option>
-              <option value="employ_indy">EmployIndy (Marion County)</option>
-              <option value="employer_sponsored">Employer sponsored</option>
-              <option value="self_pay">Self-pay / Payment plan</option>
-              <option value="other">Other / Not sure yet</option>
-            </select>
-          </div>
-
-          {result?.error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {result.error}
+        {selectedProgram && fundedTrack ? (
+          <div className="rounded-2xl border-2 border-brand-green-300 bg-brand-green-50 p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-brand-green-700" />
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-950">WorkOne intake is required</h3>
+                <p className="mt-2 text-base leading-relaxed text-slate-700">
+                  This program is in Elevate&apos;s verified workforce-funded track. Funding is not approved by Elevate. WorkOne must determine eligibility and authorize WIOA or Workforce Ready Grant funding before funded enrollment is completed.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {selectedProgram.wioaEligible && <span className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-brand-green-800 border border-brand-green-200">WIOA</span>}
+                  {selectedProgram.wrgEligible && <span className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-brand-green-800 border border-brand-green-200">Workforce Ready Grant</span>}
+                  {selectedProgram.topJobsStars && <span className="rounded-full bg-white px-3 py-1.5 text-sm font-bold text-slate-800 border border-slate-200">Top Jobs: {selectedProgram.topJobsStars}★</span>}
+                </div>
+                <a href={WORKONE_INDY_INTAKE_URL} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-base font-bold text-white hover:bg-brand-red-700">
+                  Schedule WorkOne Intake <ExternalLink className="h-4 w-4" />
+                </a>
+                <label className="mt-5 flex items-start gap-3 rounded-xl bg-white p-4 border border-brand-green-200">
+                  <input type="checkbox" name="workOneAppointmentConfirmed" checked={form.workOneAppointmentConfirmed} onChange={handleChange} required className="mt-1 h-5 w-5" />
+                  <span className="text-base font-semibold text-slate-800">I scheduled or already have my required WorkOne intake appointment.</span>
+                </label>
+              </div>
             </div>
-          )}
+          </div>
+        ) : selectedProgram ? (
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <DollarSign className="mt-0.5 h-6 w-6 shrink-0 text-slate-700" />
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-950">Regular / self-pay program</h3>
+                <p className="mt-2 text-base leading-relaxed text-slate-700">
+                  This program is not currently in Elevate&apos;s verified WIOA/Workforce Ready Grant track under the ETPL + Top Jobs rule. Self-pay and available payment-plan options apply.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-400 text-white font-bold py-4 rounded-xl transition-colors"
-          >
-            {submitting ? 'Submitting...' : 'Check My Eligibility'}
-          </button>
+        <div>
+          <label htmlFor="fundingInterest" className="block text-base font-semibold text-slate-800 mb-2">Payment / funding path *</label>
+          <select id="fundingInterest" name="fundingInterest" required value={form.fundingInterest} onChange={handleChange} className="w-full px-4 py-3.5 text-base border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-brand-red-500">
+            <option value="">Select an option</option>
+            {fundedTrack && selectedProgram?.wioaEligible && <option value="wioa">WIOA / WorkOne funding</option>}
+            {fundedTrack && selectedProgram?.wrgEligible && <option value="wrg">Workforce Ready Grant</option>}
+            {!fundedTrack && <option value="self_pay">Self-pay / Payment plan</option>}
+            <option value="employer_sponsored">Employer sponsored</option>
+            <option value="other">Other / Need guidance</option>
+          </select>
+        </div>
 
-          <p className="text-xs text-slate-500 text-center">
-            By submitting, you agree to our{' '}
-            <Link href="/privacy" className="text-brand-red-600 hover:underline">Privacy Policy</Link>.
-            No commitment required.
-          </p>
-        </form>
-      )}
+        {result?.error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-base">{result.error}</div>}
+
+        <button type="submit" disabled={submitting || !selectedProgram} className="w-full bg-brand-red-600 hover:bg-brand-red-700 disabled:bg-slate-400 text-white text-lg font-extrabold py-4 rounded-xl transition-colors">
+          {submitting ? 'Submitting...' : fundedTrack ? 'Continue Funded Application' : 'Continue Self-Pay Application'}
+        </button>
+
+        <p className="text-sm text-slate-500 text-center">
+          By submitting, you agree to our <Link href="/privacy" className="text-brand-red-700 font-semibold hover:underline">Privacy Policy</Link>. Funding is never guaranteed and must be authorized by the responsible agency.
+        </p>
+      </form>
     </div>
   );
 }

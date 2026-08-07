@@ -15,11 +15,7 @@ const PUBLIC_PATHS = [
   '/api/ping',
   '/auth/confirm',
   '/auth/reset-password',
-  '/admin/studio',
-  '/admin/dev-studio',
   '/admin/install',
-  '/admin/course-builder',
-  '/admin/cfd-studio',
 ];
 
 export async function middleware(req: NextRequest) {
@@ -35,22 +31,17 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Explicitly allow course-builder and cfd-studio before IP check
-  if (
-    pathname.startsWith('/admin/course-builder') ||
-    pathname.startsWith('/cfd-studio')
-  ) {
-    return NextResponse.next();
-  }
-
   // Check IP guard first
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
-  // Only gate protected namespaces.
+  // Gate all operational Admin surfaces, including the top-level dashboard.
   const isProtected =
     pathname === '/' ||
+    pathname === '/dashboard' ||
+    pathname.startsWith('/dashboard/') ||
     pathname.startsWith('/admin') ||
+    pathname.startsWith('/dev-studio') ||
     pathname.startsWith('/api/admin') ||
     pathname.startsWith('/api/staff') ||
     pathname.startsWith('/api/devstudio') ||

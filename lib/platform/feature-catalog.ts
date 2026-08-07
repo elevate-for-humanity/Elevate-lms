@@ -74,10 +74,18 @@ export function normalizeFeatureCode(code: string): FeatureCode | null {
     : null;
 }
 
-/** Monthly add-on prices (USD) — mirror saas_addon_catalog seed */
+/** Monthly add-on prices (USD) — mirror Store pricing and DB seed. */
 export const ADDONS = {
   LMS: 29,
   AI_ASSISTANT: 19,
+  PARIS_ASSISTANT: 19,
+  ELLIE_ASSISTANT: 19,
+  LIZZY_ASSISTANT: 29,
+  ZORA_ASSISTANT: 29,
+  AI_TEAM: 79,
+  AI_VOICE: 15,
+  COURSE_BUILDER: 29,
+  AI_COURSE_FACTORY: 49,
   SMS: 15,
   STUDENT_MANAGEMENT: 49,
   WORKFORCE_DEVELOPMENT: 99,
@@ -90,10 +98,18 @@ export const ADDONS = {
   ADDITIONAL_STORAGE_100GB: 10,
 } as const;
 
-/** Checkout slug (store) → DB addon code */
+/** Checkout slug (store) → DB addon code. */
 export const ADDON_SLUG_TO_CATALOG_CODE: Record<string, string> = {
   'ai-addon': 'ai-assistant',
+  'paris-assistant': 'paris-assistant',
+  'ellie-assistant': 'ellie-assistant',
+  'lizzy-assistant': 'lizzy-assistant',
+  'zora-assistant': 'zora-assistant',
+  'ai-team': 'ai-team',
+  'ai-voice': 'ai-voice',
   'online-courses-lms': 'lms',
+  'course-builder': 'course-builder',
+  'ai-course-factory': 'ai-course-factory',
   'text-messaging': 'sms',
   'student-management': 'student-management',
   'workforce-development': 'workforce-development',
@@ -104,6 +120,37 @@ export const ADDON_SLUG_TO_CATALOG_CODE: Record<string, string> = {
   'additional-user': 'additional-user',
   'additional-location': 'additional-location',
   'additional-storage': 'additional-storage',
+};
+
+/**
+ * Code-side entitlement fallback. This keeps newly introduced add-ons usable
+ * immediately even if a database catalog migration is delayed. DB feature_codes
+ * still win when present.
+ */
+export const ADDON_FEATURE_FALLBACK: Record<string, FeatureCode[]> = {
+  'ai-assistant': [PlatformFeature.AI_ADVANCED, PlatformFeature.AI_CONTENT, PlatformFeature.AI_CHAT_WIDGET],
+  'paris-assistant': [PlatformFeature.AI_PARIS],
+  'ellie-assistant': [PlatformFeature.AI_ELLIE],
+  'lizzy-assistant': [PlatformFeature.AI_LIZZY],
+  'zora-assistant': [PlatformFeature.AI_ZORA],
+  'ai-team': [
+    PlatformFeature.AI_PARIS,
+    PlatformFeature.AI_ELLIE,
+    PlatformFeature.AI_LIZZY,
+    PlatformFeature.AI_ZORA,
+    PlatformFeature.AI_ORCHESTRATOR,
+  ],
+  'ai-voice': [PlatformFeature.AI_VOICE],
+  lms: [PlatformFeature.LMS, PlatformFeature.CERTIFICATES],
+  'course-builder': [PlatformFeature.COURSE_BUILDER],
+  'ai-course-factory': [PlatformFeature.COURSE_FACTORY, PlatformFeature.COURSE_BUILDER, PlatformFeature.AI_CONTENT],
+  sms: [PlatformFeature.SMS],
+  'student-management': [PlatformFeature.STUDENT_MANAGEMENT],
+  'workforce-development': [PlatformFeature.WORKFORCE],
+  'apprenticeship-management': [PlatformFeature.APPRENTICESHIP],
+  'employer-portal': [PlatformFeature.EMPLOYER_PORTAL],
+  'testing-center': [PlatformFeature.TESTING_CENTER],
+  'white-label-mobile': [PlatformFeature.WHITE_LABEL_MOBILE],
 };
 
 export function normalizeAddonCode(slugOrCode: string): string {

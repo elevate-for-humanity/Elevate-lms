@@ -1,164 +1,255 @@
 #!/usr/bin/env node
 /**
- * Audit internal hrefs across app/ and component directories.
- * Reports links that don't resolve to a compiled route, redirect, or known external.
+ * Monorepo internal-route audit.
+ *
+ * Validates literal internal href/router navigation in the deployed Next.js apps
+ * against routes that actually exist in each app directory. This intentionally
+ * does not depend on the legacy root .next manifest, which missed routes under
+ * apps/marketing, apps/lms, and apps/admin.
  */
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..');
 
-// ── Load compiled routes ──────────────────────────────────────────────────────
-const manifestPath = path.join(root, '.next/server/app-paths-manifest.json');
-if (!fs.existsSync(manifestPath)) {
-  console.error('No manifest found — run pnpm next build first');
-  process.exit(1);
+const APPS = [
+  {
+    name: 'marketing',
+    appDir: 'apps/marketing/app',
+    scanDirs: [
+      'apps/marketing/app',
+      'components/site',
+      'components/marketing',
+      'components/home',
+      'components/layout',
+      'components/site-footer',
+    ],
+  },
+  {
+    name: 'lms',
+    appDir: 'apps/lms/app',
+    scanDirs: ['apps/lms/app', 'apps/lms/components'],
+  },
+  {
+    name: 'admin',
+    appDir: 'apps/admin/app',
+    scanDirs: ['apps/admin/app', 'apps/admin/components', 'components/admin', 'components/studio'],
+  },
+  {
+    name: 'portal',
+    appDir: 'apps/app',
+    scanDirs: ['apps/app'],
+  },
+];
+
+const PAGE_FILES = new Set(['page.tsx', 'page.ts', 'page.jsx', 'page.js']);
+const METADATA_ROUTE_FILES = new Set([
+  'robots.ts', 'robots.js', 'sitemap.ts', 'sitemap.js',
+  'manifest.ts', 'manifest.js', 'favicon.ico',
+]);
+const SOURCE_EXT = /\.(tsx|ts|jsx|js)$/;
+const STATIC_EXT = /\.(png|jpg|jpeg|gif|svg|ico|webp|avif|pdf|mp4|webm|mp3|wav|woff|woff2|ttf|eot|css|js|json|xml|txt)$/i;
+const SKIP_PREFIXES = ['/api/', '/_next/', '/images/', '/img/', '/icons/', '/fonts/', '/static/', '/public/'];
+
+function exists(rel) {
+  return fs.existsSync(path.join(ROOT, rel));
 }
-const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-const compiled = new Set(
-  Object.keys(manifest).map((k) => k.replace(/\/page$/, '').replace(/\([^)]*\)\//g, '') || '/'),
-);
 
-// ── Load redirect sources from next.config.mjs ────────────────────────────────
-const nextCfg = fs.readFileSync(path.join(root, 'next.config.mjs'), 'utf8');
-const redirectSources = new Set();
-const srcPattern = /source:\s*['"]([/][^'"]+)['"]/g;
-let m;
-while ((m = srcPattern.exec(nextCfg)) !== null) {
-  redirectSources.add(m[1].replace(/\/:path\*$/, '').replace(/\/:[^/]+/g, '/:param'));
+function normalizeRouteSegment(segment) {
+  // Route groups and parallel slots do not appear in the URL.
+  if ((segment.startsWith('(') && segment.endsWith(')')) || segment.startsWith('@')) return '';
+  // Intercepting-route markers are filesystem syntax, not URL syntax.
+  return segment.replace(/^\(\.\.\.\)/, '').replace(/^\(\.\.\)/, '').replace(/^\(\.\)/, '');
 }
 
-
-const toml = '';
-const tomlFrom = /from\s*=\s*"([/][^"]+)"/g;
-while ((m = tomlFrom.exec(toml)) !== null) {
-  redirectSources.add(m[1].replace(/\/\*$/, '').replace(/\/:[^/]+/g, '/:param'));
+function routeFromPage(appAbs, fileAbs) {
+  const relDir = path.relative(appAbs, path.dirname(fileAbs));
+  if (!relDir || relDir === '.') return '/';
+  const segments = relDir
+    .split(path.sep)
+    .map(normalizeRouteSegment)
+    .filter(Boolean);
+  return '/' + segments.join('/');
 }
 
-function routeExists(href) {
-  const base = href.split('?')[0].split('#')[0];
-  if (compiled.has(base)) return true;
-  // Dynamic segment prefix match
-  for (const r of compiled) {
-    if (r.includes('[')) {
-      const prefix = r.replace(/\/\[[^\]]+\].*$/, '');
-      if (prefix && base.startsWith(prefix + '/')) return true;
+function collectRoutes(appDir) {
+  const appAbs = path.join(ROOT, appDir);
+  const routes = new Set(['/']);
+  if (!fs.existsSync(appAbs)) return routes;
+
+  function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name.startsWith('_')) continue;
+        walk(full);
+        continue;
+      }
+      if (PAGE_FILES.has(entry.name)) routes.add(routeFromPage(appAbs, full));
+      if (METADATA_ROUTE_FILES.has(entry.name)) {
+        if (entry.name.startsWith('robots.')) routes.add('/robots.txt');
+        if (entry.name.startsWith('sitemap.')) routes.add('/sitemap.xml');
+        if (entry.name.startsWith('manifest.')) routes.add('/manifest.webmanifest');
+        if (entry.name === 'favicon.ico') routes.add('/favicon.ico');
+      }
     }
   }
-  // Redirect coverage
-  for (const src of redirectSources) {
-    if (base === src || base.startsWith(src + '/')) return true;
+
+  walk(appAbs);
+  return routes;
+}
+
+function routeMatches(routes, href) {
+  const base = href.split('?')[0].split('#')[0] || '/';
+  if (routes.has(base)) return true;
+
+  for (const route of routes) {
+    if (!route.includes('[')) continue;
+    const routeParts = route.split('/').filter(Boolean);
+    const hrefParts = base.split('/').filter(Boolean);
+
+    let ri = 0;
+    let hi = 0;
+    let ok = true;
+    while (ri < routeParts.length) {
+      const rp = routeParts[ri];
+      if (rp.startsWith('[[...') || rp.startsWith('[...')) {
+        hi = hrefParts.length;
+        ri = routeParts.length;
+        break;
+      }
+      if (hi >= hrefParts.length) {
+        ok = false;
+        break;
+      }
+      if (!(rp.startsWith('[') && rp.endsWith(']')) && rp !== hrefParts[hi]) {
+        ok = false;
+        break;
+      }
+      ri += 1;
+      hi += 1;
+    }
+    if (ok && ri === routeParts.length && hi === hrefParts.length) return true;
   }
   return false;
 }
 
-const SKIP_PREFIXES = [
-  '/api/',
-  '/_next',
-  '/images/',
-  '/img/',
-  '/icons/',
-  '/fonts/',
-  '/favicon',
-  '/robots',
-  '/sitemap',
-  '/public/',
-  '/static/',
-  // Static file extensions served from public/
+function collectRedirectSources() {
+  const sources = new Set();
+  const configCandidates = [
+    'next.config.mjs', 'next.config.js',
+    'apps/marketing/next.config.mjs', 'apps/marketing/next.config.js',
+    'apps/lms/next.config.mjs', 'apps/lms/next.config.js',
+    'apps/admin/next.config.mjs', 'apps/admin/next.config.js',
+    'apps/app/next.config.mjs', 'apps/app/next.config.js',
+  ];
+  const pattern = /source:\s*['"]([/][^'"]+)['"]/g;
+  for (const rel of configCandidates) {
+    if (!exists(rel)) continue;
+    const src = fs.readFileSync(path.join(ROOT, rel), 'utf8');
+    let match;
+    while ((match = pattern.exec(src)) !== null) sources.add(match[1]);
+  }
+  return sources;
+}
+
+const REDIRECTS = collectRedirectSources();
+
+function redirectMatches(href) {
+  const base = href.split('?')[0].split('#')[0];
+  for (const source of REDIRECTS) {
+    const normalized = source.replace(/:\w+\*/g, '').replace(/:\w+/g, ':param');
+    if (normalized.includes(':param')) {
+      const prefix = normalized.split('/:param')[0];
+      if (base.startsWith(prefix + '/')) return true;
+    } else if (source.endsWith('/:path*')) {
+      const prefix = source.slice(0, -7);
+      if (base === prefix || base.startsWith(prefix + '/')) return true;
+    } else if (base === source) {
+      return true;
+    }
+  }
+  return false;
+}
+
+const hrefPatterns = [
+  /href\s*=\s*["'`](\/[a-zA-Z0-9][^"'`\s>]*)/g,
+  /router\.(?:push|replace)\(\s*["'`](\/[a-zA-Z0-9][^"'`\s]*)/g,
+  /window\.location\.(?:href|assign|replace)\s*(?:=|\()\s*["'`](\/[a-zA-Z0-9][^"'`\s)]*)/g,
 ];
 
-// Static file extensions — not routes
-const STATIC_EXT =
-  /\.(png|jpg|jpeg|gif|svg|ico|webp|pdf|mp4|mp3|woff|woff2|ttf|eot|css|js|json|xml|txt)$/i;
+function shouldSkip(href) {
+  if (!href || href === '/') return true;
+  const base = href.split('?')[0].split('#')[0];
+  if (!base || base === '/') return true;
+  if (SKIP_PREFIXES.some((p) => base.startsWith(p))) return true;
+  if (STATIC_EXT.test(base)) return true;
+  if (base.includes('${') || base.includes('{') || base.includes('[')) return true;
+  return false;
+}
 
-const hrefRe = /href=["'`](\/[a-z0-9][^"'`\s>]*)/gi;
-const pushRe = /router\.(?:push|replace)\(["'`](\/[a-z0-9][^"'`\s]*)/gi;
-
-const broken = [];
-const seen = new Set();
-
-function scanFile(filePath) {
+function scanFile(fileAbs, app, routes, broken, seen) {
   let src;
   try {
-    src = fs.readFileSync(filePath, 'utf8');
-  } catch (e) {
+    src = fs.readFileSync(fileAbs, 'utf8');
+  } catch {
     return;
   }
   const lines = src.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    for (const re of [hrefRe, pushRe]) {
-      re.lastIndex = 0;
+  for (let i = 0; i < lines.length; i += 1) {
+    for (const pattern of hrefPatterns) {
+      pattern.lastIndex = 0;
       let match;
-      while ((match = re.exec(line)) !== null) {
-        const raw = match[1];
-        const href = raw.split('?')[0].split('#')[0];
-        if (SKIP_PREFIXES.some((p) => href.startsWith(p))) continue;
-        if (STATIC_EXT.test(href)) continue;
-        if (href.includes('[') || href.includes('{') || href.includes('$')) continue;
-        if (href.length < 2) continue;
-        const key = filePath + ':' + href;
+      while ((match = pattern.exec(lines[i])) !== null) {
+        const href = match[1];
+        if (shouldSkip(href)) continue;
+        const key = `${app.name}:${path.relative(ROOT, fileAbs)}:${href}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        if (!routeExists(href)) {
-          broken.push({ file: filePath.replace(root + '/', ''), line: i + 1, href });
+        if (!routeMatches(routes, href) && !redirectMatches(href)) {
+          broken.push({ app: app.name, file: path.relative(ROOT, fileAbs), line: i + 1, href });
         }
       }
     }
   }
 }
 
-// Load quarantine allowlist — only scan Netlify-compiled app dirs
-const quarantineSrc = fs.readFileSync(
-  path.join(root, 'scripts/check-internal-links.mjs'),
-  'utf8',
-);
-const allowedMatch = quarantineSrc.match(/const ALLOWED_TOP_LEVEL\s*=\s*new Set\(\[([^\]]+)\]\)/s);
-const ALLOWED_TOP_LEVEL = allowedMatch
-  ? new Set(allowedMatch[1].match(/'([^']+)'/g).map((s) => s.replace(/'/g, '')))
-  : null;
-
-function walk(dir, isAppRoot = false) {
-  if (!fs.existsSync(dir)) return;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
+function walkScan(relDir, callback) {
+  const abs = path.join(ROOT, relDir);
+  if (!fs.existsSync(abs)) return;
+  for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+    const full = path.join(abs, entry.name);
     if (entry.isDirectory()) {
-      // At the app/ root level, skip quarantined directories
-      if (isAppRoot && ALLOWED_TOP_LEVEL && !ALLOWED_TOP_LEVEL.has(entry.name)) {
-        // Also allow route groups (parenthesized) and special dirs
-        if (!entry.name.startsWith('(') && !entry.name.startsWith('_')) continue;
-      }
-      // Skip Railway-only double-underscore subdirectories (not compiled on Netlify)
-      if (entry.name.startsWith('__')) continue;
-      walk(full, false);
-    } else if (/\.(tsx|ts|jsx|js)$/.test(entry.name)) {
-      scanFile(full);
+      if (['node_modules', '.next', '.git'].includes(entry.name)) continue;
+      walkScan(path.relative(ROOT, full), callback);
+    } else if (SOURCE_EXT.test(entry.name)) {
+      callback(full);
     }
   }
 }
 
-walk(path.join(root, 'app'), true);
-walk(path.join(root, 'components/site'));
-walk(path.join(root, 'components/marketing'));
-walk(path.join(root, 'components/layout'));
+const broken = [];
+const seen = new Set();
+
+for (const app of APPS) {
+  if (!exists(app.appDir)) continue;
+  const routes = collectRoutes(app.appDir);
+  for (const dir of app.scanDirs) {
+    walkScan(dir, (file) => scanFile(file, app, routes, broken, seen));
+  }
+  console.log(`✓ ${app.name}: ${routes.size} filesystem routes indexed`);
+}
 
 if (!broken.length) {
-  console.log('✅ Zero broken internal links');
+  console.log('✅ Zero unresolved literal internal links across deployed monorepo apps');
   process.exit(0);
 }
 
-const byFile = {};
-for (const b of broken) {
-  (byFile[b.file] = byFile[b.file] || []).push(b);
-}
-
-console.log(`❌ BROKEN LINKS: ${broken.length} across ${Object.keys(byFile).length} files\n`);
-for (const [file, items] of Object.entries(byFile).sort()) {
-  console.log(file);
-  for (const { line, href } of items) {
-    console.log('  L' + String(line).padEnd(5), href);
-  }
+console.error(`❌ BROKEN LINKS: ${broken.length}`);
+for (const item of broken) {
+  console.error(`[${item.app}] ${item.file}:${item.line}  ${item.href}`);
 }
 process.exit(1);

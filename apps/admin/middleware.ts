@@ -44,6 +44,8 @@ export async function middleware(req: NextRequest) {
     pathname === '/' ||
     pathname === '/dashboard' ||
     pathname.startsWith('/dashboard/') ||
+    pathname === '/studio' ||
+    pathname.startsWith('/studio/') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/staff-portal') ||
     pathname.startsWith('/instructor') ||
@@ -102,6 +104,8 @@ export async function middleware(req: NextRequest) {
   }
 
   const isDevStudioRoute =
+    pathname === '/studio' ||
+    pathname.startsWith('/studio/') ||
     pathname.startsWith('/admin/studio') ||
     pathname.startsWith('/admin/dev-studio') ||
     pathname.startsWith('/dev-studio') ||

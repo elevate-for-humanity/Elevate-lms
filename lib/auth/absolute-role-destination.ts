@@ -1,21 +1,52 @@
 import { siteUrls } from '@/lib/utils/site-urls';
 
+const ADMIN_PATH_PREFIXES = [
+  '/dashboard',
+  '/staff-portal',
+  '/instructor',
+  '/testing-center',
+  '/applications',
+  '/students',
+  '/programs',
+  '/funding',
+  '/crm',
+  '/compliance',
+  '/studio',
+  '/settings',
+  '/integrations',
+  '/operations',
+  '/system-health',
+] as const;
+
+const MARKETING_PATH_PREFIXES = [
+  '/case-manager',
+  '/workforce-board',
+  '/program-holder',
+  '/provider',
+  '/creator',
+] as const;
+
+function matches(path: string, prefix: string): boolean {
+  return path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`);
+}
+
 /**
- * Convert a canonical role destination into the correct deployed application URL.
- *
- * Role destinations intentionally encode admin routes with an /admin prefix so
- * authentication code can distinguish the Admin application from the LMS.
- * The Admin application's actual pathname omits that prefix (for example,
- * /admin/dashboard -> https://admin.elevateforhumanity.org/dashboard).
- * All other role destinations belong to the LMS/application origin.
+ * Convert a canonical role destination into its deployed application URL.
+ * Admin paths are their real root paths on the Admin hostname; no synthetic
+ * /admin prefix is used anywhere in the role-routing contract.
  */
 export function absoluteRoleDestination(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
 
-  if (path === '/admin') return siteUrls.admin;
-  if (path.startsWith('/admin/')) {
-    return `${siteUrls.admin}${path.slice('/admin'.length)}`;
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+
+  if (ADMIN_PATH_PREFIXES.some((prefix) => matches(normalized, prefix))) {
+    return `${siteUrls.admin}${normalized}`;
   }
 
-  return `${siteUrls.app}${path.startsWith('/') ? path : `/${path}`}`;
+  if (MARKETING_PATH_PREFIXES.some((prefix) => matches(normalized, prefix))) {
+    return `${siteUrls.marketing}${normalized}`;
+  }
+
+  return `${siteUrls.app}${normalized}`;
 }

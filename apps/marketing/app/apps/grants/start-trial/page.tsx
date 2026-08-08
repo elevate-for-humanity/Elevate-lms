@@ -19,7 +19,7 @@ async function startTrial() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/grants/start-trial');
 
-  const result = await startAppTrial(user.id, 'grants');
+  const result = await startAppTrial(user.id, 'grants', supabase);
   if (result.status === 'exists') redirect('/apps/grants');
   if (result.status === 'error') redirect('/apps/grants/start-trial?error=failed');
   redirect('/apps/grants?welcome=true');
@@ -30,7 +30,6 @@ export default async function StartTrialPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/grants/start-trial');
 
-  // Redirect if already subscribed — check via API to avoid duplicating DB logic
   const { data: existing } = await supabase
     .from('user_app_subscriptions')
     .select('id')

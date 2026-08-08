@@ -19,7 +19,7 @@ export const CULINARY: ProgramSchema = {
   schedule: 'Full-time, varies by kitchen (30–40 hrs/week)',
   cohortSize: '2–4 apprentices per kitchen',
   fundingStatement: 'Earn while you learn — paid apprenticeship',
-  selfPayCost: '$0 (apprenticeship model)',
+  selfPayCost: 'Contact advisor for current tuition',
   badge: 'Earn & Learn',
   badgeColor: 'purple',
   credentials: [

@@ -1,8 +1,8 @@
 -- Ensure the canonical barber apprenticeship course row exists.
 --
--- All barber migrations reference course ID 3fb5ce19-1cde-434c-a8c6-f138d7d7aa17
--- but no migration ever inserted it. The admin course builder returns 404 because
--- the courses table query returns null for this ID.
+-- All barber migrations reference course ID 3fb5ce19-1cde-434c-a8c6-f138d7d7aa17.
+-- This row represents the LMS Related Technical Instruction course only.
+-- Registered completion requires 144 RTI hours plus 2,000 OJL hours tracked separately.
 --
 -- Safe to re-run: INSERT ... ON CONFLICT DO NOTHING.
 
@@ -20,7 +20,7 @@ VALUES (
   '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
   'Prestige Elevation Barber Curriculum',
   'barber-apprenticeship',
-  'Prestige Elevation Barber Curriculum — 500 hours RTI + 1,500 hours OJT. Indiana DOL barber apprenticeship pathway.',
+  'Prestige Elevation Barber Curriculum — 144 hours of Related Technical Instruction (RTI) delivered through the LMS as part of the registered Barber Apprenticeship. Apprentices must separately complete 2,000 approved hours of supervised On-the-Job Learning (OJL) at an approved host shop, along with required competencies and completion documentation.',
   'published',
   true,
   now(),
@@ -28,12 +28,13 @@ VALUES (
 )
 ON CONFLICT (id) DO UPDATE
   SET
-    title      = EXCLUDED.title,
-    slug       = EXCLUDED.slug,
-    status     = 'published',
-    is_active  = true,
-    updated_at = now()
+    title       = EXCLUDED.title,
+    slug        = EXCLUDED.slug,
+    description = EXCLUDED.description,
+    status      = 'published',
+    is_active   = true,
+    updated_at  = now()
   WHERE public.courses.status = 'archived';
 
 -- Verify:
--- SELECT id, title, slug, status FROM public.courses WHERE id = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';
+-- SELECT id, title, slug, description, status FROM public.courses WHERE id = '3fb5ce19-1cde-434c-a8c6-f138d7d7aa17';

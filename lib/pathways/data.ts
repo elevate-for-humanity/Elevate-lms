@@ -1,3 +1,5 @@
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+
 export type PathwayFunding =
   | 'WIOA Adult/DW'
   | 'WIOA Youth'
@@ -36,6 +38,8 @@ export type Pathway = {
   stages: PathwayStage[];
 };
 
+const BARBER = RAPIDS_CONFIG.programs.barber;
+
 export const PATHWAYS: Pathway[] = [
   {
     slug: 'cna',
@@ -47,87 +51,57 @@ export const PATHWAYS: Pathway[] = [
     location: 'Indianapolis, IN',
     outcomes: ['Certified Nursing Assistant', 'Patient Care Technician'],
     credential: 'CNA Certification',
-    credentialIssuer: 'Indiana State Dept. of Health (ISDH)',
+    credentialIssuer: 'Indiana Department of Health',
     ctaHref: '/programs/cna',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description:
-          'Indiana Career Connect registration, WorkOne appointment, WIOA/JRI eligibility determination.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Classroom & Clinical Training',
-        description:
-          'Patient care fundamentals, vital signs, infection control, mobility techniques, medical terminology. Clinical rotation at a healthcare facility.',
-        duration: '4–6 weeks',
-      },
-      {
-        stage: 3,
-        title: 'State CNA Exam',
-        description: 'Indiana CNA certification exam (written + skills). Issued by Indiana ISDH.',
-        duration: 'Exam day',
-      },
-      {
-        stage: 4,
-        title: 'Job Placement',
-        description:
-          'Resume building, interview prep, and direct referrals to hospitals, nursing homes, and home health agencies in Central Indiana.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'Credential stacking: CNA → Medical Assistant → LPN → RN pathway. Continued LMS access for upskilling.',
-      },
+      { stage: 1, title: 'Eligibility Screening', description: 'Complete applicable intake, workforce-agency, and funding eligibility steps.', duration: 'Varies' },
+      { stage: 2, title: 'Classroom & Clinical Training', description: 'Complete assigned classroom, skills-lab, and clinical requirements.', duration: 'Program schedule' },
+      { stage: 3, title: 'Certification Exam', description: 'Complete the current Indiana CNA testing requirements.', duration: 'Exam schedule' },
+      { stage: 4, title: 'Career Services', description: 'Use resume, interview, and employer-connection support.' },
+      { stage: 5, title: 'Advancement', description: 'Continue into stackable healthcare credentials where appropriate.' },
     ],
   },
   {
-    slug: 'barber-apprenticeship',
-    title: 'Barber Apprenticeship',
+    slug: BARBER.slug,
+    title: BARBER.name,
     industry: 'Cosmetology',
-    format: 'In-Person',
+    format: 'Hybrid',
     funding: ['State Grant', 'Employer-Sponsored', 'Self-Pay'],
-    duration: '~18 months (1,500 OJT hours)',
-    location: 'Indianapolis, IN',
-    outcomes: ['Registered Barber Apprentice', 'Licensed Barber', 'Shop Owner'],
-    credential: 'Indiana Barber License',
-    credentialIssuer: 'Indiana Professional Licensing Agency (PLA) / USDOL RAPIDS',
+    duration: `Approximately ${Math.ceil(BARBER.totalHours / 40)} OJL weeks at 40 hours/week, plus ${BARBER.relatedInstructionHours} RTI hours`,
+    location: 'Approved participating host shop',
+    outcomes: ['Registered Barber Apprentice', 'Registered Apprenticeship Program Completer', 'Indiana Barber License pathway'],
+    credential: 'Registered Apprenticeship Certificate of Completion / Indiana Barber License pathway',
+    credentialIssuer: 'U.S. Department of Labor / Indiana Professional Licensing Agency',
     ctaHref: '/programs/barber-apprenticeship',
     stages: [
       {
         stage: 1,
         title: 'Application & Intake',
-        description:
-          'Apprentice application, background check, shop placement matching. Elevate handles USDOL and RAPIDS registration.',
-        duration: '1–2 weeks',
+        description: 'Complete apprentice enrollment, required documentation, and host-shop placement/onboarding.',
+        duration: 'Varies by placement and documentation',
       },
       {
         stage: 2,
-        title: 'On-the-Job Training',
-        description:
-          '2,000 hours of supervised training at a host barbershop (1,500 OJT + 500 RTI). Apprentices are paid during training.',
-        duration: '~18 months',
+        title: 'On-the-Job Learning',
+        description: `Complete ${BARBER.totalHours.toLocaleString()} approved supervised OJL hours at an approved host shop while completing ${BARBER.relatedInstructionHours} hours of Related Technical Instruction through the assigned LMS coursework.`,
+        duration: `Approximately ${Math.ceil(BARBER.totalHours / 40)} OJL weeks at the standard 40-hour schedule`,
       },
       {
         stage: 3,
-        title: 'State Board Exam',
-        description: 'Indiana PLA barber exam. Exam prep materials and practice tests provided.',
-        duration: 'Exam day',
+        title: 'Program Completion',
+        description: 'Complete registered competencies, OJL, RTI, and required completion documentation.',
+        duration: 'After all requirements are satisfied',
       },
       {
         stage: 4,
-        title: 'Licensure & Employment',
-        description:
-          'Indiana barber license issued. Work independently, join a shop, or open your own business.',
+        title: 'Indiana Licensing Process',
+        description: 'Submit the current Indiana licensing application and complete the examination or other requirements applicable at the time of application.',
+        duration: 'State processing/exam schedule',
       },
       {
         stage: 5,
-        title: 'Advancement',
-        description:
-          'Shop ownership pathway, instructor certification, cosmetology cross-licensing.',
+        title: 'Career Advancement',
+        description: 'Continue as a licensed barber, advance in shop operations, or pursue business ownership subject to applicable licensing requirements.',
       },
     ],
   },
@@ -137,46 +111,18 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Skilled Trades',
     format: 'Hybrid',
     funding: ['WIOA Adult/DW', 'WRG', 'Employer-Sponsored'],
-    duration: '8–16 weeks',
+    duration: 'See current program schedule',
     location: 'Indianapolis, IN',
-    outcomes: ['HVAC Installer', 'Maintenance Technician', 'Refrigeration Tech'],
-    credential: 'EPA 608 Certification + OSHA 10',
-    credentialIssuer: 'EPA / OSHA',
+    outcomes: ['HVAC Installer', 'Maintenance Technician', 'Refrigeration Technician'],
+    credential: 'EPA 608 pathway and program credentials',
+    credentialIssuer: 'Applicable credentialing bodies',
     ctaHref: '/programs/hvac-technician',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description:
-          'Indiana Career Connect registration, WorkOne appointment, WIOA/WRG eligibility.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Technical Training',
-        description:
-          'Safety protocols, OSHA standards, tool operation, blueprint reading, code compliance, troubleshooting, and diagnostics.',
-        duration: '8–16 weeks',
-      },
-      {
-        stage: 3,
-        title: 'Certification Exams',
-        description:
-          'EPA 608 (Universal) for refrigerant handling. OSHA 10-hour safety certification.',
-        duration: '1–2 days',
-      },
-      {
-        stage: 4,
-        title: 'Employer Placement',
-        description:
-          'Direct connections to HVAC contractors, property management companies, and commercial maintenance employers.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'OSHA 30, NATE certification, journeyman electrician pathway, HVAC contractor license.',
-      },
+      { stage: 1, title: 'Eligibility Screening', description: 'Complete applicable intake and funding eligibility steps.', duration: 'Varies' },
+      { stage: 2, title: 'Technical Training', description: 'Complete assigned HVAC safety, systems, tools, installation, maintenance, and diagnostic training.', duration: 'Program schedule' },
+      { stage: 3, title: 'Credential Testing', description: 'Complete the credential examinations assigned to the current program.', duration: 'Testing schedule' },
+      { stage: 4, title: 'Employer Placement', description: 'Use employer-connection and career-services support.' },
+      { stage: 5, title: 'Advancement', description: 'Pursue advanced HVAC and skilled-trades credentials as appropriate.' },
     ],
   },
   {
@@ -185,46 +131,18 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Transportation',
     format: 'In-Person',
     funding: ['WIOA Adult/DW', 'WRG', 'Self-Pay'],
-    duration: '4–6 weeks (160+ hours)',
-    location: 'Indianapolis, IN',
-    outcomes: ['OTR Driver ($50K+ first year)', 'Local Delivery Driver', 'Bus Operator'],
-    credential: 'CDL Class A or Class B',
-    credentialIssuer: 'Indiana BMV',
+    duration: 'See current program schedule',
+    location: 'Indiana',
+    outcomes: ['Commercial Driver', 'Local/Regional Driver', 'Transportation Career Pathway'],
+    credential: 'CDL Class A or Class B pathway',
+    credentialIssuer: 'Indiana Bureau of Motor Vehicles',
     ctaHref: '/programs/cdl-training',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description:
-          'Indiana Career Connect registration, WorkOne appointment, WIOA eligibility, DOT physical and drug screen.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Classroom & Behind-the-Wheel',
-        description:
-          '160+ hours of classroom instruction and supervised road driving. Pre-trip inspection, backing maneuvers, road skills.',
-        duration: '4–6 weeks',
-      },
-      {
-        stage: 3,
-        title: 'BMV Skills Test',
-        description:
-          'Indiana BMV CDL skills test (pre-trip, basic controls, road test). Class A or Class B.',
-        duration: 'Test day',
-      },
-      {
-        stage: 4,
-        title: 'Employer Placement',
-        description:
-          'Direct connections to trucking companies, logistics firms, and transit agencies. Many employers offer sign-on bonuses.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'Hazmat endorsement, tanker endorsement, owner-operator pathway, fleet management.',
-      },
+      { stage: 1, title: 'Eligibility & Entry Requirements', description: 'Complete program, DOT, funding, and permit requirements that apply.', duration: 'Varies' },
+      { stage: 2, title: 'Classroom & Behind-the-Wheel', description: 'Complete assigned theory, range, and supervised road training.', duration: 'Program schedule' },
+      { stage: 3, title: 'Skills Test', description: 'Complete the applicable Indiana CDL testing requirements.', duration: 'Testing schedule' },
+      { stage: 4, title: 'Employer Placement', description: 'Use transportation-employer and career-services connections.' },
+      { stage: 5, title: 'Advancement', description: 'Pursue endorsements and advanced transportation roles as appropriate.' },
     ],
   },
   {
@@ -233,45 +151,18 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Technology',
     format: 'In-Person',
     funding: ['WIOA Adult/DW', 'JRI', 'Self-Pay'],
-    duration: '8 weeks',
+    duration: 'See current program schedule',
     location: 'Indianapolis Training Center',
-    outcomes: ['IT Support Specialist ($40K–$85K)', 'Help Desk Technician'],
-    credential: 'Certiport IT Specialist — Device Configuration',
-    credentialIssuer: 'Certiport',
+    outcomes: ['IT Support Specialist', 'Help Desk Technician'],
+    credential: 'Assigned IT credential pathway',
+    credentialIssuer: 'Applicable credentialing body',
     ctaHref: '/programs/it-help-desk',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description: 'Indiana Career Connect registration, WIOA/JRI eligibility determination.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Technical Training',
-        description:
-          'Hardware/software troubleshooting, network configuration, operating systems (Windows, Linux, macOS), cloud computing basics.',
-        duration: '8 weeks',
-      },
-      {
-        stage: 3,
-        title: 'Certiport Exam',
-        description:
-          'Certiport IT Specialist — Device Configuration & Management exam on-site. Practice tests included.',
-        duration: '1 day',
-      },
-      {
-        stage: 4,
-        title: 'Job Placement',
-        description:
-          'Resume building, interview prep, and connections to IT service providers, tech companies, and enterprise help desks.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'IT Specialist — Networking → Cybersecurity pathway. Network admin, cybersecurity analyst roles.',
-      },
+      { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
+      { stage: 2, title: 'Technical Training', description: 'Complete assigned hardware, software, operating-system, networking, and support coursework.', duration: 'Program schedule' },
+      { stage: 3, title: 'Credential Exam', description: 'Complete the credential exam assigned to the current program.', duration: 'Testing schedule' },
+      { stage: 4, title: 'Job Placement', description: 'Use resume, interview, and employer-connection support.' },
+      { stage: 5, title: 'Advancement', description: 'Continue into networking, security, cloud, or other stackable IT pathways.' },
     ],
   },
   {
@@ -280,45 +171,18 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Technology',
     format: 'In-Person',
     funding: ['WIOA Adult/DW', 'JRI', 'Self-Pay'],
-    duration: '12 weeks',
+    duration: 'See current program schedule',
     location: 'Indianapolis Training Center',
-    outcomes: ['Cybersecurity Analyst', 'Security Operations Center Analyst'],
-    credential: 'Certiport IT Specialist — Cybersecurity',
-    credentialIssuer: 'Certiport',
+    outcomes: ['Cybersecurity Analyst', 'Security Operations Role'],
+    credential: 'Assigned cybersecurity credential pathway',
+    credentialIssuer: 'Applicable credentialing body',
     ctaHref: '/programs/cybersecurity-analyst',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description: 'Indiana Career Connect registration, WIOA/JRI eligibility.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Security Training',
-        description:
-          'Network security, threat analysis, vulnerability assessment, incident response, cryptography, compliance frameworks.',
-        duration: '12 weeks',
-      },
-      {
-        stage: 3,
-        title: 'Certiport Exam',
-        description:
-          'Certiport IT Specialist — Cybersecurity exam on-site. Practice tests included.',
-        duration: '1 day',
-      },
-      {
-        stage: 4,
-        title: 'Job Placement',
-        description:
-          'Connections to cybersecurity firms, managed security service providers, and enterprise security teams.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'Advanced cybersecurity roles: penetration tester, security architect, CISO pathway.',
-      },
+      { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
+      { stage: 2, title: 'Security Training', description: 'Complete assigned security, threat, vulnerability, incident-response, and compliance coursework.', duration: 'Program schedule' },
+      { stage: 3, title: 'Credential Exam', description: 'Complete the credential exam assigned to the current program.', duration: 'Testing schedule' },
+      { stage: 4, title: 'Job Placement', description: 'Use resume, interview, and employer-connection support.' },
+      { stage: 5, title: 'Advancement', description: 'Continue into more advanced cybersecurity roles and credentials.' },
     ],
   },
   {
@@ -327,45 +191,18 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Skilled Trades',
     format: 'In-Person',
     funding: ['WIOA Adult/DW', 'WRG', 'Employer-Sponsored'],
-    duration: '8–12 weeks',
+    duration: 'See current program schedule',
     location: 'Indianapolis, IN',
-    outcomes: ['Welder', 'Fabricator', 'Pipe Fitter'],
-    credential: 'OSHA 10 + AWS Welding Certification',
-    credentialIssuer: 'OSHA / AWS',
+    outcomes: ['Welder', 'Fabricator', 'Manufacturing/Construction Pathway'],
+    credential: 'Assigned welding/safety credential pathway',
+    credentialIssuer: 'Applicable credentialing bodies',
     ctaHref: '/programs/welding',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description:
-          'Indiana Career Connect registration, WorkOne appointment, WIOA/WRG eligibility.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Welding Training',
-        description:
-          'MIG, TIG, stick welding. Blueprint reading, safety protocols, metal fabrication, and shop professionalism.',
-        duration: '8–12 weeks',
-      },
-      {
-        stage: 3,
-        title: 'Certification',
-        description: 'OSHA 10-hour safety. AWS welding certification testing.',
-        duration: '1–2 days',
-      },
-      {
-        stage: 4,
-        title: 'Employer Placement',
-        description:
-          'Connections to manufacturing plants, construction firms, and fabrication shops.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'AWS advanced certifications, pipe welding specialization, welding inspector pathway.',
-      },
+      { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
+      { stage: 2, title: 'Welding Training', description: 'Complete assigned safety, welding-process, blueprint, fabrication, and shop training.', duration: 'Program schedule' },
+      { stage: 3, title: 'Credential Assessment', description: 'Complete assigned program credential assessments.', duration: 'Testing schedule' },
+      { stage: 4, title: 'Employer Placement', description: 'Use employer-connection and career-services support.' },
+      { stage: 5, title: 'Advancement', description: 'Pursue advanced welding processes and credentials as appropriate.' },
     ],
   },
   {
@@ -374,45 +211,18 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Skilled Trades',
     format: 'Hybrid',
     funding: ['WIOA Adult/DW', 'WRG', 'Employer-Sponsored'],
-    duration: '8–16 weeks',
+    duration: 'See current program schedule',
     location: 'Indianapolis, IN',
-    outcomes: ['Electrician Helper', 'Electrical Apprentice', 'Maintenance Electrician'],
-    credential: 'OSHA 10 + NCCER Electrical Level 1',
-    credentialIssuer: 'OSHA / NCCER',
+    outcomes: ['Electrical Helper', 'Electrical Apprentice', 'Maintenance Electrical Pathway'],
+    credential: 'Assigned electrical/safety credential pathway',
+    credentialIssuer: 'Applicable credentialing bodies',
     ctaHref: '/programs/electrical',
     stages: [
-      {
-        stage: 1,
-        title: 'Eligibility Screening',
-        description:
-          'Indiana Career Connect registration, WorkOne appointment, WIOA/WRG eligibility.',
-        duration: '1–2 weeks',
-      },
-      {
-        stage: 2,
-        title: 'Electrical Training',
-        description:
-          'Electrical theory, NEC code, residential/commercial wiring, conduit bending, troubleshooting, safety protocols.',
-        duration: '8–16 weeks',
-      },
-      {
-        stage: 3,
-        title: 'Certification',
-        description: 'OSHA 10-hour safety. NCCER Electrical Level 1 assessment.',
-        duration: '1–2 days',
-      },
-      {
-        stage: 4,
-        title: 'Employer Placement',
-        description:
-          'Connections to electrical contractors, construction companies, and property management firms.',
-      },
-      {
-        stage: 5,
-        title: 'Advancement',
-        description:
-          'Electrical apprenticeship (4-year), journeyman license, master electrician, contractor license.',
-      },
+      { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
+      { stage: 2, title: 'Electrical Training', description: 'Complete assigned theory, code, wiring, conduit, troubleshooting, and safety training.', duration: 'Program schedule' },
+      { stage: 3, title: 'Credential Assessment', description: 'Complete assigned program credential assessments.', duration: 'Testing schedule' },
+      { stage: 4, title: 'Employer Placement', description: 'Use employer-connection and career-services support.' },
+      { stage: 5, title: 'Advancement', description: 'Continue into registered apprenticeship or advanced electrical pathways as appropriate.' },
     ],
   },
 ];

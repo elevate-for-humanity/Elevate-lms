@@ -1,12 +1,14 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 /**
  * CANONICAL PROGRAM DATA - Single Source of Truth
  *
  * All program pages MUST pull from this file.
  * Do not hardcode program hours, durations, or credentials elsewhere.
  *
- * Last verified: January 2026
+ * Apprenticeship registration details are sourced from RAPIDS_CONFIG where
+ * available so Marketing, LMS, Admin, documents, and reporting cannot drift.
  */
+
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 
 export interface ProgramData {
   slug: string;
@@ -31,36 +33,39 @@ export interface ProgramData {
   rapidsCodes?: string[];
 }
 
-// Standard administrator statement - use verbatim on all apprenticeship pages
 export const ADMINISTRATOR_STATEMENT =
   'Elevate for Humanity serves as the Program Administrator for registered apprenticeship pathways, coordinating training, employer participation, and funding access.';
 
-// State variation disclaimer - use when hour requirements may vary
 export const STATE_VARIATION_DISCLAIMER =
   'Hour requirements may vary by state. Elevate for Humanity administers the pathway shown where required.';
 
+const BARBER_RAPIDS = RAPIDS_CONFIG.programs.barber;
+
 export const PROGRAMS: Record<string, ProgramData> = {
   'barber-apprenticeship': {
-    slug: 'barber-apprenticeship',
-    name: 'Barber Apprenticeship',
+    slug: BARBER_RAPIDS.slug,
+    name: BARBER_RAPIDS.name,
     shortName: 'Barber',
-    totalHours: 2000,
-    relatedInstructionHours: 144,
-    ojtHours: 1856,
-    durationRange: '15-24 months',
-    durationMonths: { min: 15, max: 24 },
+    // RAPIDS time-based requirement: 2,000 supervised OJL hours. RTI is a
+    // separate 144-hour requirement and must not be subtracted from OJL.
+    totalHours: BARBER_RAPIDS.totalHours,
+    relatedInstructionHours: BARBER_RAPIDS.relatedInstructionHours,
+    ojtHours: BARBER_RAPIDS.totalHours,
+    durationRange: 'Approximately 50 weeks at 40 OJL hours/week, subject to approved schedule and progress',
+    durationMonths: { min: 12, max: 24 },
     credential: 'Indiana Barber License',
-    credentialFull: 'Indiana Registered Barber License (State Board Certified)',
-    administrator: 'Elevate for Humanity Career & Technical Institute',
+    credentialFull: 'Indiana Barber License following completion and state licensing requirements',
+    administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
     fundingOptions: ['WIOA', 'Workforce Ready Grant', 'JRI', 'Employer Sponsorship', 'Self-Pay'],
-    startingWage: '$10-12/hour + tips',
-    wageRange: '$10-18/hour during training',
-    careerOutcomeRange: '$35,000-$65,000+/year',
-    stateRequirements: 'Indiana requires 2,000 hours of training for barber licensure.',
+    startingWage: 'Varies by host shop and wage schedule',
+    wageRange: 'Varies by participating employer and registered wage progression',
+    careerOutcomeRange: 'Varies by employer, experience, location, and business model',
+    stateRequirements:
+      'Registered Apprenticeship completion requires the approved program standards. Indiana licensing requirements and examination requirements also apply.',
     category: 'apprenticeship',
     isRegisteredApprenticeship: true,
-    rapidsCodes: ['0626CB'],
+    rapidsCodes: [RAPIDS_CONFIG.registrationId],
   },
 
   'cosmetology-apprenticeship': {
@@ -153,7 +158,6 @@ export const PROGRAMS: Record<string, ProgramData> = {
   },
 };
 
-// Helper functions
 export function getProgram(slug: string): ProgramData | undefined {
   return PROGRAMS[slug];
 }
@@ -171,15 +175,13 @@ export function formatHours(hours: number): string {
 }
 
 export function formatHoursWithDuration(program: ProgramData): string {
-  return `${formatHours(program.totalHours)} hours (${program.durationRange})`;
+  return `${formatHours(program.totalHours)} OJL hours (${program.durationRange})`;
 }
 
-// Get all apprenticeship programs
 export function getApprenticeshipPrograms(): ProgramData[] {
   return Object.values(PROGRAMS).filter((p) => p.category === 'apprenticeship');
 }
 
-// Validate that a page is using correct hours
 export function validateProgramHours(slug: string, displayedHours: number): boolean {
   const program = PROGRAMS[slug];
   if (!program) return false;

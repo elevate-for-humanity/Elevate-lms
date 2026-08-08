@@ -1,44 +1,45 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  BookOpen,
-  LayoutDashboard,
   Award,
-  Menu,
-  X,
-  Calendar,
-  MessageSquare,
-  TrendingUp,
-  ClipboardCheck,
-  Settings,
-  LogOut,
+  Bell,
+  BookOpen,
+  Bot,
+  CalendarDays,
   ChevronLeft,
+  ClipboardCheck,
+  FileText,
+  Folder,
   GraduationCap,
   HelpCircle,
+  Home,
+  LogOut,
+  Menu,
+  MessageSquare,
   Play,
-  Target,
-  Users,
-  ChevronRight,
-  FileText,
-  Zap,
-  Folder,
-  Bell,
   Scissors,
+  Settings,
+  Target,
+  TrendingUp,
+  Trophy,
+  Users,
+  X,
+  Zap,
 } from 'lucide-react';
 import { NotificationBell } from './NotificationBell';
 import { createClient } from '@/lib/supabase/client';
 
 const PORTAL_TYPE_TO_PATH: Record<string, string> = {
-  barber:       '/portal/barber',
-  cosmetology:  '/portal/cosmetology',
-  esthetician:  '/portal/esthetician',
+  barber: '/portal/barber',
+  cosmetology: '/portal/cosmetology',
+  esthetician: '/portal/esthetician',
   'nail-technician': '/portal/nail-technician',
-  culinary:     '/portal/culinary',
-  electrical:   '/portal/electrical',
-  plumbing:     '/portal/plumbing',
+  culinary: '/portal/culinary',
+  electrical: '/portal/electrical',
+  plumbing: '/portal/plumbing',
 };
 
 interface LMSSidebarProps {
@@ -55,75 +56,58 @@ interface LMSSidebarProps {
   unreadMessages?: number;
 }
 
-// MY LEARNING — core learner workflow
-const learningItems = [
-  { href: '/lms/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/lms/courses', label: 'My Programs', icon: BookOpen },
+type NavItem = { href: string; label: string; icon: typeof Home };
+
+const primaryItems: NavItem[] = [
+  { href: '/lms/dashboard', label: 'Home', icon: Home },
+  { href: '/lms/community', label: 'Community', icon: Users },
+  { href: '/lms/courses', label: 'Learn', icon: BookOpen },
+  { href: '/lms/events', label: 'Events', icon: CalendarDays },
   { href: '/lms/progress', label: 'Progress', icon: TrendingUp },
+  { href: '/account/ai-team', label: 'AI Team', icon: Bot },
+];
+
+const courseworkItems: NavItem[] = [
+  { href: '/lms/achievements', label: 'Achievements', icon: Trophy },
   { href: '/lms/certificates', label: 'Certificates', icon: Award },
   { href: '/lms/grades', label: 'Grades', icon: ClipboardCheck },
   { href: '/lms/learning-paths', label: 'Learning Paths', icon: Play },
-];
-
-// PRACTICE — assessments and work
-const practiceItems = [
   { href: '/lms/assignments', label: 'Assignments', icon: Target },
   { href: '/lms/quizzes', label: 'Quizzes', icon: Zap },
   { href: '/lms/peer-review', label: 'Peer Review', icon: Users },
 ];
 
-// COMMUNICATION — learner communication tools
-const communityItems = [
+const communicationItems: NavItem[] = [
   { href: '/lms/messages', label: 'Messages', icon: MessageSquare },
 ];
 
-// TOOLS — utilities
-const toolItems = [
-  { href: '/lms/calendar', label: 'Calendar', icon: Calendar },
+const toolItems: NavItem[] = [
+  { href: '/lms/calendar', label: 'Full Calendar', icon: CalendarDays },
   { href: '/lms/files', label: 'Files', icon: Folder },
   { href: '/lms/library', label: 'Library', icon: BookOpen },
   { href: '/lms/notifications', label: 'Notifications', icon: Bell },
   { href: '/lms/payments', label: 'Payments', icon: FileText },
 ];
 
-// Kept for badge logic
-const navItems = [...learningItems, ...practiceItems, ...communityItems, ...toolItems];
-
-const bottomItems = [
+const bottomItems: NavItem[] = [
   { href: '/lms/support', label: 'Get Help', icon: HelpCircle },
   { href: '/lms/settings', label: 'Settings', icon: Settings },
 ];
 
-export function LMSSidebar({
-  user,
-  profile,
-  courseCount = 0,
-  unreadMessages = 0,
-}: LMSSidebarProps) {
+export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 }: LMSSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
+  const isActive = (href: string) => pathname === href || pathname?.startsWith(`${href}/`);
+  const userInitials = profile?.first_name && profile?.last_name
+    ? `${profile.first_name[0]}${profile.last_name[0]}`
+    : profile?.full_name
+      ? profile.full_name.split(' ').map((part) => part[0]).join('').slice(0, 2)
+      : (user.email?.[0] ?? 'U').toUpperCase();
+  const userName = profile?.full_name || (profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : user.email?.split('@')[0] ?? 'Student');
 
-  const userInitials =
-    profile?.first_name && profile?.last_name
-      ? `${profile.first_name[0]}${profile.last_name[0]}`
-      : profile?.full_name
-        ? profile.full_name
-            .split(' ')
-            .map((n: string) => n[0])
-            .join('')
-            .slice(0, 2)
-        : (user.email?.[0] ?? 'U').toUpperCase();
-
-  const userName =
-    profile?.full_name ||
-    (profile?.first_name && profile?.last_name
-      ? `${profile.first_name} ${profile.last_name}`
-      : (user.email?.split('@')[0] ?? 'Student'));
-
-  const getBadge = (href: string) => {
+  const badgeFor = (href: string) => {
     if (href === '/lms/courses' && courseCount > 0) return courseCount;
     if (href === '/lms/messages' && unreadMessages > 0) return unreadMessages;
     return undefined;
@@ -135,212 +119,56 @@ export function LMSSidebar({
     window.location.href = '/login';
   }
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full">
-      {/* Brand */}
-      <div className="flex items-center justify-between px-4 h-16 border-b border-slate-800 flex-shrink-0">
-        <Link href="/lms/dashboard" className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 bg-brand-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-            <GraduationCap aria-label="graduationcap" className="w-5 h-5 text-white" />
-          </div>
-          {!collapsed && (
-            <span className="font-black text-white text-sm tracking-tight truncate">
-              Elevate LMS
-            </span>
-          )}
-        </Link>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="hidden lg:flex items-center justify-center w-7 h-7 rounded-md hover:bg-slate-800 text-slate-400 hover:text-white transition-colors flex-shrink-0"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          <ChevronLeft
-            className={`w-4 h-4 transition-transform ${collapsed ? 'rotate-180' : ''}`}
-          />
-        </button>
-      </div>
-
-      {/* User card */}
-      <div
-        className={`px-4 py-4 border-b border-slate-800 flex-shrink-0 ${collapsed ? 'px-2' : ''}`}
+  const NavLink = ({ item }: { item: NavItem }) => {
+    const active = isActive(item.href);
+    const badge = badgeFor(item.href);
+    const Icon = item.icon;
+    return (
+      <Link
+        href={item.href}
+        onClick={() => setMobileOpen(false)}
+        className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? 'bg-brand-blue-600 text-white shadow-sm' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}
       >
-        <div className="flex items-center gap-3">
-          {profile?.avatar_url ? (
-            // IMAGE-CONTRACT: allow raw img because avatar_url is a user-supplied external URL incompatible with next/image domain config
-            <img
-              src={profile.avatar_url}
-              alt={userName}
-              className="w-9 h-9 rounded-full object-cover flex-shrink-0 ring-2 ring-slate-700"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-brand-blue-600 flex items-center justify-center text-sm font-black text-white flex-shrink-0">
-              {userInitials}
-            </div>
-          )}
-          {!collapsed && (
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-white truncate">{userName}</p>
-              <p className="text-xs text-slate-400 truncate capitalize">
-                {profile?.role ?? 'Student'}
-              </p>
-            </div>
-          )}
-          {!collapsed && (
-            <div className="flex-shrink-0">
-              <NotificationBell />
-            </div>
-          )}
-        </div>
+        <Icon className="h-4 w-4 flex-shrink-0" />
+        {!collapsed && <><span className="flex-1 truncate">{item.label}</span>{badge !== undefined && <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[10px] font-black">{badge}</span>}</>}
+      </Link>
+    );
+  };
+
+  const Section = ({ label, items }: { label: string; items: NavItem[] }) => (
+    <div className="mb-4">
+      {!collapsed && <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">{label}</p>}
+      {items.map((item) => <NavLink key={item.href} item={item} />)}
+    </div>
+  );
+
+  const sidebarContent = (
+    <div className="flex h-full flex-col">
+      <div className="flex h-16 flex-shrink-0 items-center justify-between border-b border-slate-800 px-4">
+        <Link href="/lms/dashboard" className="flex min-w-0 items-center gap-2.5"><div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-brand-blue-600"><GraduationCap className="h-5 w-5 text-white" /></div>{!collapsed && <span className="truncate text-sm font-black tracking-tight text-white">Elevate</span>}</Link>
+        <button onClick={() => setCollapsed(!collapsed)} className="hidden h-7 w-7 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-white lg:flex" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><ChevronLeft className={`h-4 w-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} /></button>
       </div>
 
-      {/* Nav */}
-      <nav aria-label="LMS sidebar navigation" className="flex-1 overflow-y-auto py-3 px-2">
-        {/* Apprenticeship portal shortcut — shown only for enrolled apprentices */}
-        {profile?.portal_type && PORTAL_TYPE_TO_PATH[profile.portal_type] && (
-          <div className="mb-4">
-            {!collapsed && (
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 mb-1">
-                Apprenticeship
-              </p>
-            )}
-            <Link
-              href={PORTAL_TYPE_TO_PATH[profile.portal_type]}
-              onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group mb-0.5 ${
-                pathname?.startsWith('/portal/')
-                  ? 'bg-brand-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              <Scissors className={`w-4 h-4 flex-shrink-0 ${pathname?.startsWith('/portal/') ? 'text-white' : 'text-slate-500 group-hover:text-white'}`} />
-              {!collapsed && <span className="flex-1 truncate">My Dashboard</span>}
-            </Link>
-          </div>
-        )}
-        {[
-          { label: 'My Learning', items: learningItems },
-          { label: 'Practice', items: practiceItems },
-          { label: 'Community', items: communityItems },
-          { label: 'Tools', items: toolItems },
-        ].map(({ label: sectionLabel, items }) => (
-          <div key={sectionLabel} className="mb-4">
-            {!collapsed && (
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 px-3 mb-1">
-                {sectionLabel}
-              </p>
-            )}
-            {items.map(({ href, label, icon: Icon }) => {
-              const active = isActive(href);
-              const badge = getBadge(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group mb-0.5 ${
-                    active
-                      ? 'bg-brand-blue-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  <Icon
-                    className={`w-4 h-4 flex-shrink-0 ${active ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
-                  />
-                  {!collapsed && (
-                    <>
-                      <span className="flex-1 truncate">{label}</span>
-                      {badge !== undefined && (
-                        <span
-                          className={`text-[10px] font-black px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                            active ? 'bg-white/20 text-white' : 'bg-brand-blue-600 text-white'
-                          }`}
-                        >
-                          {badge}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-        ))}
+      <div className={`flex-shrink-0 border-b border-slate-800 px-4 py-4 ${collapsed ? 'px-2' : ''}`}><div className="flex items-center gap-3">{profile?.avatar_url ? <img src={profile.avatar_url} alt={userName} className="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-2 ring-slate-700" /> : <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">{userInitials}</div>}{!collapsed && <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-white">{userName}</p><p className="truncate text-xs capitalize text-slate-400">{profile?.role ?? 'Student'}</p></div>}{!collapsed && <NotificationBell />}</div></div>
+
+      <nav aria-label="LMS navigation" className="flex-1 overflow-y-auto px-2 py-3">
+        {profile?.portal_type && PORTAL_TYPE_TO_PATH[profile.portal_type] && <div className="mb-4">{!collapsed && <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">Apprenticeship</p>}<Link href={PORTAL_TYPE_TO_PATH[profile.portal_type]} onClick={() => setMobileOpen(false)} className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${pathname?.startsWith('/portal/') ? 'bg-brand-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Scissors className="h-4 w-4" />{!collapsed && <span>My Apprenticeship</span>}</Link></div>}
+        <Section label="Start here" items={primaryItems} />
+        <Section label="Coursework" items={courseworkItems} />
+        <Section label="Communication" items={communicationItems} />
+        <Section label="Tools" items={toolItems} />
       </nav>
 
-      {/* Bottom items */}
-      <div className="px-2 py-3 border-t border-slate-800 space-y-0.5 flex-shrink-0">
-        {bottomItems.map(({ href, label, icon: Icon }) => {
-          const active = isActive(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
-                active
-                  ? 'bg-slate-800 text-white'
-                  : 'text-slate-500 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              {!collapsed && <span className="truncate">{label}</span>}
-            </Link>
-          );
-        })}
-        <button
-          onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-500 hover:text-red-400 hover:bg-slate-800 transition-all group"
-        >
-          <LogOut className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
-      </div>
+      <div className="flex-shrink-0 space-y-0.5 border-t border-slate-800 px-2 py-3">{bottomItems.map((item) => <NavLink key={item.href} item={item} />)}<button onClick={handleSignOut} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-500 transition hover:bg-slate-800 hover:text-red-400"><LogOut className="h-4 w-4" />{!collapsed && <span>Sign Out</span>}</button></div>
     </div>
   );
 
   return (
     <>
-      {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 h-14 flex items-center justify-between px-4">
-        <Link href="/lms/dashboard" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-brand-blue-600 rounded-lg flex items-center justify-center">
-            <GraduationCap aria-label="graduationcap" className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-black text-white text-sm">Elevate LMS</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <NotificationBell />
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-30 bg-black/60 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      {/* Mobile drawer */}
-      <div
-        className={`lg:hidden fixed top-14 left-0 bottom-0 z-40 w-72 bg-slate-900 transform transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
-      >
-        {sidebarContent}
-      </div>
-
-      {/* Desktop sidebar */}
-      <div
-        className={`hidden lg:flex flex-col fixed top-0 left-0 bottom-0 z-30 bg-slate-900 border-r border-slate-800 transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'}`}
-      >
-        {sidebarContent}
-      </div>
+      <div className="fixed left-0 right-0 top-0 z-40 flex h-14 items-center justify-between border-b border-slate-800 bg-slate-900 px-4 lg:hidden"><Link href="/lms/dashboard" className="flex items-center gap-2"><div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-blue-600"><GraduationCap className="h-4 w-4 text-white" /></div><span className="text-sm font-black text-white">Elevate</span></Link><div className="flex items-center gap-2"><NotificationBell /><button onClick={() => setMobileOpen(!mobileOpen)} className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white" aria-label="Toggle menu">{mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button></div></div>
+      {mobileOpen && <div className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} />}
+      <div className={`fixed bottom-0 left-0 top-14 z-40 w-72 transform bg-slate-900 transition-transform duration-300 lg:hidden ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>{sidebarContent}</div>
+      <div className={`fixed bottom-0 left-0 top-0 z-30 hidden flex-col border-r border-slate-800 bg-slate-900 transition-all duration-300 lg:flex ${collapsed ? 'w-16' : 'w-64'}`}>{sidebarContent}</div>
     </>
   );
 }

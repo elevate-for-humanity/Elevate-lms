@@ -36,7 +36,7 @@ export interface StudioWorkspaceDefinition {
 export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'ai', label: 'AI Studio', description: 'PARIS, Lizzy and specialized AI agents.', permission: 'studio.ai.use', route: '/paris', healthEndpoint: '/api/admin/dev-studio/ai/health' },
   { id: 'courses', label: 'Course Builder', description: 'Courses, lessons, assessments and credentials.', permission: 'studio.courses.manage', route: '/course-builder', healthEndpoint: '/api/admin/dev-studio/courses/health' },
-  { id: 'content', label: 'Content Studio', description: 'Generate and manage reviewed content.', permission: 'studio.content.manage', route: '/paris', healthEndpoint: '/api/admin/dev-studio/content/health' },
+  { id: 'content', label: 'Content Studio', description: 'Generate and manage reviewed content.', permission: 'studio.content.manage', route: '/studio/content', healthEndpoint: '/api/admin/dev-studio/content/health' },
   { id: 'media', label: 'Media Studio', description: 'Organization-scoped media and documents.', permission: 'studio.media.manage', route: '/studio/media', healthEndpoint: '/api/admin/dev-studio/media/health' },
   { id: 'workflows', label: 'Workflow Designer', description: 'Build versioned visual automations.', permission: 'studio.workflows.manage', route: '/studio/workflows', healthEndpoint: '/api/admin/dev-studio/workflows/health' },
   { id: 'repository', label: 'Repository Graph', description: 'Explore files, dependencies and code relationships.', permission: 'studio.repository.view', route: '/studio/repository', healthEndpoint: '/api/admin/dev-studio/repository/health' },

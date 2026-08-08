@@ -1,28 +1,24 @@
 /**
  * Admin Users API
- * Server-only endpoint using service-role key
- * Requires admin authentication
+ * Server-only endpoint using the canonical Supabase admin client.
  */
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
-
-// Lazy initialization - create client inside request handlers, not at module scope
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+export const runtime = 'nodejs';
 
 const handleGet: AuthHandler = async (req) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const url = new URL(req.url);
-  const page = parseInt(url.searchParams.get('page') ?? '1');
-  const limit = parseInt(url.searchParams.get('limit') ?? '20');
+  const requestedPage = Number.parseInt(url.searchParams.get('page') ?? '1', 10);
+  const requestedLimit = Number.parseInt(url.searchParams.get('limit') ?? '20', 10);
+  const page = Number.isFinite(requestedPage) ? Math.max(1, requestedPage) : 1;
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(100, Math.max(1, requestedLimit))
+    : 20;
   const offset = (page - 1) * limit;
 
   const { data: users, error, count } = await supabase
@@ -40,17 +36,23 @@ const handleGet: AuthHandler = async (req) => {
     total: count ?? 0,
     page,
     limit,
-    service: 'admin'
+    service: 'admin',
   });
 };
 
 const handlePost: AuthHandler = async (req) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const body = await req.json();
+  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+  const password = typeof body.password === 'string' ? body.password : '';
+
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+  }
 
   const { data: user, error } = await supabase.auth.admin.createUser({
-    email: body.email,
-    password: body.password,
+    email,
+    password,
     email_confirm: true,
     user_metadata: body.metadata ?? {},
   });
@@ -62,6 +64,5 @@ const handlePost: AuthHandler = async (req) => {
   return NextResponse.json({ user: user.user }, { status: 201 });
 };
 
-// Wrap handlers with admin authentication
-export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin'] });
-export const POST = withAuth(handlePost, { roles: ['admin', 'super_admin'] });
+export const GET = withAuth(handleGet, { roles: ['admin'] });
+export const POST = withAuth(handlePost, { roles: ['admin'] });

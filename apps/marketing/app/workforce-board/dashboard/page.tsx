@@ -2,43 +2,50 @@ import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Users, Award, TrendingUp, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Users, Award, TrendingUp, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Workforce Board Dashboard',
   description: 'Oversight dashboard for workforce development boards.',
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = 'force-dynamic';
 
-/**
- * WORKFORCE BOARD DASHBOARD
- */
 export default async function WorkforceBoardDashboard() {
-  const { user, profile } = await requireRole([
-    'workforce_board',
-    'admin',
-    'super_admin',
-    'org_admin',
-  ]);
-
+  const { profile } = await requireRole(['workforce_board', 'admin', 'org_admin']);
   const supabase = await createClient();
 
-  const [enrollmentsResult, completionsResult, activeResult, programsResult, providersResult] =
-    await Promise.all([
-      supabase.from('program_enrollments').select('*', { count: 'exact', head: true }),
-      supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-      supabase.from('program_enrollments').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('programs').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('partner_lms_providers').select('*', { count: 'exact', head: true }),
-    ]);
+  const [
+    enrollmentsResult,
+    completionsResult,
+    activeResult,
+    programsResult,
+    providersResult,
+    certificatesResult,
+  ] = await Promise.all([
+    supabase.from('program_enrollments').select('id', { count: 'exact', head: true }),
+    supabase
+      .from('program_enrollments')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'completed'),
+    supabase
+      .from('program_enrollments')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'active'),
+    supabase.from('programs').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('partner_lms_providers').select('id', { count: 'exact', head: true }),
+    supabase.from('certificates').select('id', { count: 'exact', head: true }),
+  ]);
 
   const totalEnrollments = enrollmentsResult.count || 0;
   const completedEnrollments = completionsResult.count || 0;
   const activeEnrollments = activeResult.count || 0;
   const activePrograms = programsResult.count || 0;
   const trainingProviders = providersResult.count || 0;
-  const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
+  const credentialCount = certificatesResult.count || 0;
+  const completionRate =
+    totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
 
   const { data: rawRecentEnrollments } = await supabase
     .from('program_enrollments')
@@ -46,7 +53,9 @@ export default async function WorkforceBoardDashboard() {
     .order('created_at', { ascending: false })
     .limit(5);
 
-  const wfUserIds = [...new Set((rawRecentEnrollments || []).map((e: any) => e.user_id).filter(Boolean))];
+  const wfUserIds = [
+    ...new Set((rawRecentEnrollments || []).map((e: any) => e.user_id).filter(Boolean)),
+  ];
   const { data: wfProfiles } = wfUserIds.length
     ? await supabase.from('profiles').select('id, full_name').in('id', wfUserIds)
     : { data: [] };
@@ -56,27 +65,27 @@ export default async function WorkforceBoardDashboard() {
     profiles: wfProfileMap[e.user_id] ?? null,
   }));
 
-  const { data: certificatesIssued } = await supabase.from('certificates').select('id', { count: 'exact', head: true });
-  const credentialCount = certificatesIssued?.length ?? 0;
-
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
       <section className="bg-white border-b border-slate-200 py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Workforce Board Dashboard</h1>
-              <p className="text-sm text-slate-500 mt-1">Welcome back, {profile?.full_name || 'Admin'}</p>
+              <p className="text-sm text-slate-500 mt-1">
+                Welcome back, {profile?.full_name || 'Workforce Partner'}
+              </p>
             </div>
-            <Link href="/workforce-board/employment" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors">
+            <Link
+              href="/workforce-board/employment"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
+            >
               View Job Board <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -125,10 +134,12 @@ export default async function WorkforceBoardDashboard() {
               </div>
             </div>
           </div>
+          <div className="mt-4 text-xs text-slate-500">
+            {activeEnrollments} active enrollments · {activePrograms} active programs · {trainingProviders} training providers
+          </div>
         </div>
       </section>
 
-      {/* Recent Activity */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Recent Enrollments</h2>
@@ -138,10 +149,22 @@ export default async function WorkforceBoardDashboard() {
                 {recentEnrollments.map((enrollment: any) => (
                   <div key={enrollment.id} className="p-4 flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-slate-900">{enrollment.profiles?.full_name || 'Participant'}</p>
-                      <p className="text-sm text-slate-500">{enrollment.programs?.title || 'Program'}</p>
+                      <p className="font-medium text-slate-900">
+                        {enrollment.profiles?.full_name || 'Participant'}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        {enrollment.programs?.title || 'Program'}
+                      </p>
                     </div>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${enrollment.status === 'completed' ? 'bg-green-100 text-green-700' : enrollment.status === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'}`}>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        enrollment.status === 'completed'
+                          ? 'bg-green-100 text-green-700'
+                          : enrollment.status === 'active'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
                       {enrollment.status}
                     </span>
                   </div>
@@ -157,7 +180,6 @@ export default async function WorkforceBoardDashboard() {
         </div>
       </section>
 
-      {/* Quick Links */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h2>

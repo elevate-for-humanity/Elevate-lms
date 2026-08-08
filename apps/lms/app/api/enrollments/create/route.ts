@@ -1,12 +1,12 @@
 /**
  * POST /api/enrollments/create
  *
- * @deprecated Use /api/enrollments/create-enforced for program enrollments
+ * CANONICAL COURSE-ONLY ENROLLMENT ENDPOINT.
  *
- * This endpoint handles COURSE-ONLY enrollments (individual courses).
- * For PROGRAM enrollments (workforce, apprenticeships), use:
- * - /api/enroll/apply - Public application flow
- * - /api/enrollments/create-enforced - Authenticated with intake validation
+ * This endpoint handles individual course enrollments. It intentionally does
+ * not create workforce/apprenticeship program enrollments. Program enrollment
+ * requires completed intake and a funding pathway and is owned by:
+ * - /api/enrollments/create-enforced
  *
  * Request body:
  * - courseId: string (required) - Course UUID
@@ -44,19 +44,17 @@ async function _POST(request: NextRequest) {
     const body = await request.json();
     const { courseId, programId, fundingSource, idempotencyKey } = body;
 
-    // Redirect program enrollments to enforced endpoint
     if (programId) {
-      logger.warn('Deprecated: programId sent to /api/enrollments/create', {
+      logger.warn('Program enrollment sent to course-only endpoint', {
         userId: user.id,
         programId,
         requestId,
       });
       return NextResponse.json(
         {
-          error:
-            'For program enrollments, use /api/enrollments/create-enforced or /api/enroll/apply',
-          deprecated: true,
-          redirectTo: '/api/enrollments/create-enforced',
+          error: 'Program enrollments must use /api/enrollments/create-enforced',
+          code: 'PROGRAM_ENROLLMENT_ROUTE_REQUIRED',
+          canonicalRoute: '/api/enrollments/create-enforced',
         },
         { status: 400 },
       );
@@ -68,7 +66,6 @@ async function _POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Idempotency check (graceful if table doesn't exist)
     if (idempotencyKey) {
       try {
         const { data: existingByKey } = await supabase
@@ -86,7 +83,6 @@ async function _POST(request: NextRequest) {
           });
         }
       } catch (idempotencyError) {
-        // Table might not exist yet - continue without idempotency
         logger.warn('Idempotency check failed (continuing):', {
           error: idempotencyError,
           requestId,
@@ -94,7 +90,6 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    // Validate course exists and is available — canonical courses table only
     const { data: course, error: courseError } = await supabase
       .from('courses')
       .select('id, title, status, is_active')
@@ -113,9 +108,6 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Course is not published' }, { status: 400 });
     }
 
-    // Resolve latest published version — students are locked to this forever.
-    // Non-fatal: if the RPC doesn't exist or fails, courseVersionId is null and
-    // the enrollment is created without a version lock (acceptable fallback).
     let courseVersionId: string | null = null;
     try {
       const { data: courseVersion } = await supabase.rpc('get_latest_published_version', {
@@ -123,10 +115,9 @@ async function _POST(request: NextRequest) {
       });
       courseVersionId = courseVersion?.id ?? null;
     } catch {
-      // RPC may not be deployed in all environments — continue without version lock
+      // Backward-compatible fallback while all environments receive version RPC.
     }
 
-    // Check existing enrollment
     const { data: existing } = await supabase
       .from('program_enrollments')
       .select('user_id, course_id, status')
@@ -143,13 +134,9 @@ async function _POST(request: NextRequest) {
         });
       }
 
-      // Reactivate expired/withdrawn enrollment
       const { data: reactivated, error: reactivateError } = await supabase
         .from('program_enrollments')
-        .update({
-          status: 'active',
-          started_at: new Date().toISOString(),
-        })
+        .update({ status: 'active', started_at: new Date().toISOString() })
         .eq('user_id', user.id)
         .eq('course_id', courseId)
         .select()
@@ -163,14 +150,9 @@ async function _POST(request: NextRequest) {
         return NextResponse.json({ error: 'Failed to reactivate enrollment' }, { status: 500 });
       }
 
-      return NextResponse.json({
-        success: true,
-        enrollment: reactivated,
-        reactivated: true,
-      });
+      return NextResponse.json({ success: true, enrollment: reactivated, reactivated: true });
     }
 
-    // Create new enrollment — locked to current published version
     const { data: enrollment, error } = await supabase
       .from('program_enrollments')
       .insert({
@@ -194,33 +176,21 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create enrollment' }, { status: 500 });
     }
 
-    // Record idempotency key if provided (graceful if table doesn't exist)
     if (idempotencyKey) {
       void Promise.resolve(
         supabase.from('enrollment_idempotency').insert({
           idempotency_key: idempotencyKey,
-          enrollment_id: `${user.id}_${courseId}`,
+          enrollment_id: enrollment?.id || `${user.id}_${courseId}`,
           user_id: user.id,
         }),
       )
-        .then(() => {
-          logger.info('Idempotency key recorded', { idempotencyKey, requestId });
-        })
-        .catch(() => {
-          logger.warn('Failed to record idempotency key (table may not exist)');
-        });
+        .then(() => logger.info('Idempotency key recorded', { idempotencyKey, requestId }))
+        .catch(() => logger.warn('Failed to record idempotency key (table may not exist)'));
     }
 
-    logger.info('Course enrollment created', {
-      userId: user.id,
-      courseId,
-      requestId,
-    });
+    logger.info('Course enrollment created', { userId: user.id, courseId, requestId });
 
-    return NextResponse.json({
-      success: true,
-      enrollment,
-    });
+    return NextResponse.json({ success: true, enrollment });
   } catch (error: any) {
     logger.error('Enrollment API error', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

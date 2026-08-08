@@ -85,34 +85,36 @@ const PROGRAMS = [
 
 const STEP_LABELS = ['Contact', 'Program', 'Funding', 'Background', 'Review'];
 
-async function postApplication(payload: Record<string, unknown>) {
-  const endpoints = ['/api/applications', '/api/apply'];
-  let lastError: unknown = null;
-
-  for (const endpoint of endpoints) {
-    try {
-      const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 20000);
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        credentials: 'same-origin',
-        cache: 'no-store',
-        signal: controller.signal,
-        body: JSON.stringify(payload),
-      });
-      window.clearTimeout(timeout);
-      const data = (await res.json().catch(() => ({}))) as ApiResult;
-      return { res, data };
-    } catch (error) {
-      lastError = error;
-    }
+function createSubmissionKey(): string {
+  try {
+    return globalThis.crypto.randomUUID();
+  } catch {
+    return `student-apply-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   }
+}
 
-  throw lastError instanceof Error ? lastError : new Error('Application service unavailable');
+async function postApplication(payload: Record<string, unknown>, idempotencyKey: string) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 20000);
+
+  try {
+    const res = await fetch('/api/applications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        'X-Idempotency-Key': idempotencyKey,
+      },
+      credentials: 'same-origin',
+      cache: 'no-store',
+      signal: controller.signal,
+      body: JSON.stringify(payload),
+    });
+    const data = (await res.json().catch(() => ({}))) as ApiResult;
+    return { res, data };
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 function createEmptyForm(initialProgram: string): StudentForm {
@@ -158,6 +160,7 @@ function createEmptyForm(initialProgram: string): StudentForm {
 export default function StudentApplicationForm({ initialProgram = '' }: StudentApplicationFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<StudentForm>(() => createEmptyForm(initialProgram));
+  const [submissionKey] = useState(createSubmissionKey);
   const [step, setStep] = useState(1);
   const [showResume, setShowResume] = useState(false);
   const [workOneAcknowledged, setWorkOneAcknowledged] = useState(false);
@@ -344,7 +347,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
         });
       }
 
-      const { res, data } = await postApplication(payload);
+      const { res, data } = await postApplication(payload, submissionKey);
       if (res.ok && (data.ok ?? data.success ?? true)) {
         clearDraft();
         const duplicateWarning = data.duplicateWarning || undefined;

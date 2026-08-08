@@ -226,6 +226,18 @@ async function patchWithZeroDowntimeStrategy(
     });
     return { response, rolloutMode: 'custom' };
   } catch (customError) {
+    // Marketing must never fall back to a rollout mode whose availability
+    // semantics are not explicit. With a single steady instance, any strategy
+    // that can remove the old pod before the replacement is ready can expose
+    // "no healthy upstream". Fail closed instead of accepting that risk.
+    if (service.role === 'marketing') {
+      throw new Error(
+        `Northflank rejected the required Marketing zero-downtime strategy ` +
+          `(maxSurge=1,maxUnavailable=0). Refusing deployment rather than risking 503/no healthy upstream. ` +
+          `${customError instanceof Error ? customError.message : String(customError)}`,
+      );
+    }
+
     console.warn(
       `[rollout-retry] ${service.id}: custom maxSurge/maxUnavailable strategy rejected; trying rollout-steady. ` +
         `${customError instanceof Error ? customError.message : String(customError)}`,
@@ -286,10 +298,15 @@ async function configureService(
     );
   }
 
+  const availabilitySummary =
+    appliedRolloutMode === 'custom'
+      ? 'maxUnavailable=0 maxSurge=1'
+      : 'rollout-steady';
+
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
       `port=${RUNTIME_PORT} instances=${DESIRED_INSTANCES} rollout=${appliedRolloutMode} ` +
-      `maxUnavailable=0 maxSurge=1 health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ` +
+      `${availabilitySummary} health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ` +
       `ci=github-actions buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
       `ephemeralMB=${appliedEphemeralMb}`,
   );

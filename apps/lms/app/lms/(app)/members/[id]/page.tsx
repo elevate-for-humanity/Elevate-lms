@@ -15,7 +15,7 @@ export default async function MemberProfilePage({ params }: { params: Promise<{ 
 
   const { data: member } = await supabase
     .from('profiles')
-    .select('id, full_name, avatar_url, role, bio')
+    .select('id, full_name, avatar_url, role')
     .eq('id', id)
     .maybeSingle();
 
@@ -33,7 +33,6 @@ export default async function MemberProfilePage({ params }: { params: Promise<{ 
             <div className="min-w-0 flex-1">
               <h1 className="text-3xl font-black text-slate-900">{member.full_name ?? 'Elevate Member'}</h1>
               <p className="mt-1 capitalize text-slate-500">{member.role ?? 'student'}</p>
-              {member.bio && <p className="mt-4 whitespace-pre-wrap text-slate-700">{member.bio}</p>}
             </div>
           </div>
           {member.id !== user.id && (

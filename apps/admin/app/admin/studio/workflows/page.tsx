@@ -1,9 +1,16 @@
-import { Metadata } from 'next';
-import WorkflowsClient from './WorkflowsClient';
+'use client';
 
-export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Workflows | Dev Studio' };
+import nextDynamic from 'next/dynamic';
 
-export default async function WorkflowsPage() {
+const WorkflowsClient = nextDynamic(() => import('./WorkflowsClient'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex min-h-[50vh] items-center justify-center bg-white">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600" />
+    </div>
+  ),
+});
+
+export default function WorkflowsPage() {
   return <WorkflowsClient />;
 }

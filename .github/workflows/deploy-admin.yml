@@ -16,7 +16,6 @@ on:
       - 'proxy.ts'
       - 'Dockerfile.admin'
       - 'Dockerfile.northflank-admin'
-      - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
       - 'package.json'
       - 'pnpm-workspace.yaml'
@@ -103,10 +102,8 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Configure Northflank admin service only
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
-
-      - name: Patch admin build ephemeral storage
-        run: pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
       - name: Verify admin health checks
         if: github.event_name != 'workflow_dispatch'
@@ -114,7 +111,7 @@ jobs:
 
       # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
       # auto-build in addition to trigger-build.ts, causing multiple containers to build.
-      # trigger-build.ts checks for existing builds by SHA and skips duplicates.
+      # trigger-build.ts makes one POST /build call and does not PATCH service config.
 
       - name: Trigger admin build
         id: trigger_admin_build

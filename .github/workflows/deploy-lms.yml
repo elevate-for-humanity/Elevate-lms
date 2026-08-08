@@ -14,6 +14,8 @@ on:
       - 'components/lms/**'
       - 'components/portal/**'
       - 'components/auth/**'
+      - 'components/SocialLearningCommunity.tsx'
+      - 'components/careers/**'
       - 'packages/shared-utils/**'
       - 'Dockerfile.lms'
       - 'Dockerfile.northflank-lms'
@@ -35,9 +37,6 @@ on:
 permissions:
   contents: read
 
-# FIXED: Use separate concurrency group - LMS deploys INDEPENDENTLY
-# cancel-in-progress: true — cancels old queued/in-progress runs so only the
-# latest push deploys. Prevents multiple containers building for stale commits.
 concurrency:
   group: northflank-lms-deploy
   cancel-in-progress: true
@@ -46,9 +45,7 @@ jobs:
   deploy-lms:
     name: Build and deploy LMS on Northflank
     runs-on: ubuntu-latest
-    # Wait for CI/CD Pipeline to complete and upload artifacts first
     needs: []
-    # Set to: needs: [ci-cd-pipeline-id] once CI/CD is fixed to upload artifacts
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
@@ -124,13 +121,6 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
 
-      # Skip pre-build health check - containers may be down during fresh deployment
-      # Health check happens AFTER deployment in "Smoke LMS" step
-
-      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
-      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
-      # trigger-build.ts makes one POST /build call and does not PATCH service config.
-
       - name: Trigger LMS build
         id: trigger_lms_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_LMS_SERVICE_ID"
@@ -158,9 +148,7 @@ jobs:
       - name: Verify deployed SHA matches main
         env:
           EXPECTED_SHA: ${{ github.sha }}
-        run: |
-          # If deploy is stale due to concurrent workflows, trust SUCCESS/COMPLETED status
-          pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-lms --trust-deploy-status
+        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-lms --trust-deploy-status
 
       - name: Smoke LMS
         run: |

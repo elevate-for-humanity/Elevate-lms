@@ -19,7 +19,7 @@ async function startTrial() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/website-builder/start-trial');
 
-  const result = await startAppTrial(user.id, 'website-builder');
+  const result = await startAppTrial(user.id, 'website-builder', supabase);
   if (result.status === 'exists') redirect('/apps/website-builder');
   if (result.status === 'error') redirect('/apps/website-builder/start-trial?error=failed');
   redirect('/apps/website-builder?welcome=true');
@@ -76,9 +76,7 @@ export default async function StartTrialPage({
 
           {errorParam === 'failed' && (
             <div className="mb-6 rounded-lg border border-brand-red-200 bg-brand-red-50 px-4 py-3 text-sm text-brand-red-800">
-              We could not start your trial. An admin may need to run migration{' '}
-              <code className="text-xs">20260702000015_individual_app_subscriptions.sql</code> in Supabase,
-              then try again.
+              We could not start your trial. Please try again. If the problem continues, contact support.
             </div>
           )}
 

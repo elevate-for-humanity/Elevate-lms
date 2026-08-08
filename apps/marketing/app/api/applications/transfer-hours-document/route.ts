@@ -37,15 +37,15 @@ async function findExistingApplication(
 ) {
   if (!db) return null;
 
-  const base = db
+  const normalized = await db
     .from('applications')
     .select('id')
     .eq('program_interest', program)
+    .eq('normalized_email', normalizedEmail)
     .not('status', 'in', '("rejected","withdrawn","duplicate")')
     .order('created_at', { ascending: false })
-    .limit(1);
-
-  const normalized = await base.eq('normalized_email', normalizedEmail).maybeSingle();
+    .limit(1)
+    .maybeSingle();
   if (!normalized.error && normalized.data?.id) return normalized.data;
 
   const fallback = await db
@@ -89,7 +89,8 @@ async function ensureReviewQueueItem(
     status: 'open',
     metadata: {
       application_id: applicationId,
-      document_type: 'transfer_hours_evidence',
+      document_type: 'transcript',
+      evidence_type: 'transfer_hours',
       hours_claimed: hoursClaimed,
     },
   });
@@ -164,7 +165,7 @@ export async function POST(req: Request) {
       .insert({
         user_id: null,
         application_id: applicationId,
-        document_type: 'transfer_hours_evidence',
+        document_type: 'transcript',
         file_name: file.name,
         file_size: file.size,
         file_size_bytes: file.size,
@@ -174,8 +175,8 @@ export async function POST(req: Request) {
         status: 'pending_review',
         verification_status: 'pending',
         verified: false,
-        owner_type: applicationId ? 'application' : 'pending_application',
-        owner_id: applicationId,
+        owner_type: null,
+        owner_id: null,
         metadata: {
           normalized_email: normalizedEmail,
           program_slug: program,

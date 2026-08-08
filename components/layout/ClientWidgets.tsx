@@ -7,54 +7,43 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 
-// Loading placeholder - simple div to prevent null component errors
 const LoadingDiv = () => <div className="hidden" />;
 
-// Lazy load sticky mobile CTA - shows on program pages
 const StickyMobileCTA = dynamic(
   () => import('@/components/programs/StickyMobileCTA').then((mod) => mod.default || mod.StickyMobileCTA || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// Mobile bottom navigation for authenticated users
 const BottomNav = dynamic(
   () => import('@/components/BottomNav').then((mod) => mod.BottomNav || mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// Scroll unlock failsafe on route changes
 const ScrollUnlocker = dynamic(
   () => import('@/components/ScrollUnlocker').then((mod) => mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// Version guard - auto-refresh on stale deployments
 const VersionGuard = dynamic(
   () => import('@/components/VersionGuard').then((mod) => mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// Security monitor - tracks suspicious client-side activity
 const SecurityMonitor = dynamic(
   () => import('@/components/SecurityMonitor').then((mod) => mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// Offline indicator - shows when user loses connectivity
 const OfflineIndicator = dynamic(
   () => import('@/components/offline-indicator').then((mod) => mod.OfflineIndicator || mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// Sentry error monitoring init
 const SentryInit = dynamic(
   () => import('@/components/sentry-init').then((mod) => mod.default || mod),
   { ssr: false, loading: LoadingDiv }
 );
 
-// GlobalAvatar removed — inline video section was appearing unexpectedly on portal pages
-
-// Toast notifications — use a client wrapper to avoid SSR issues with react-hot-toast
 const Toaster = dynamic(
   () => import('@/components/ToasterWrapper').then((m) => m.default || m),
   { ssr: false, loading: LoadingDiv }
@@ -65,24 +54,22 @@ const SearchDialog = dynamic(
   { ssr: false, loading: LoadingDiv }
 );
 
-// Avatar is now added to each page individually via PageAvatar component
-// This ensures proper positioning under hero banners
-
 export default function ClientWidgets() {
   const [showDeferredWidgets, setShowDeferredWidgets] = useState(false);
   const pathname = usePathname();
 
-  // Show sticky CTA on program pages, apply page, and inquiry page
   const showStickyCTA =
     pathname?.startsWith('/programs/') ||
     pathname === '/apply' ||
     pathname === '/inquiry' ||
     pathname?.startsWith('/forms/');
 
-  // Show bottom nav on authenticated app pages
+  // The learner mobile shell follows the same six core destinations as LMS desktop:
+  // Home, Community, Learn, Events, Progress, AI Team.
   const showBottomNav =
     pathname?.startsWith('/lms') ||
     pathname?.startsWith('/learner/dashboard') ||
+    pathname?.startsWith('/account/ai-team') ||
     pathname?.startsWith('/achievements') ||
     pathname?.startsWith('/leaderboard') ||
     pathname?.startsWith('/profile') ||
@@ -100,28 +87,18 @@ export default function ClientWidgets() {
     pathname?.startsWith('/staff-portal');
 
   useEffect(() => {
-    // Load deferred widgets after 4 seconds — keeps initial paint fast
     const deferredTimer = setTimeout(() => setShowDeferredWidgets(true), 4000);
     return () => clearTimeout(deferredTimer);
   }, []);
 
   return (
     <>
-      {/* Toast notifications */}
       <Toaster />
-
-      {/* Immediate: scroll unlock + version guard + sentry */}
       <ScrollUnlocker />
       <VersionGuard />
       <SentryInit />
-
-      {/* Sticky Mobile CTA - Apply/Contact buttons on program pages */}
       {showStickyCTA && <StickyMobileCTA />}
-
-      {/* Mobile bottom nav for authenticated pages */}
       {showBottomNav && <BottomNav />}
-
-      {/* Deferred widgets - load after initial paint */}
       {showDeferredWidgets && (
         <>
           <SearchDialog />

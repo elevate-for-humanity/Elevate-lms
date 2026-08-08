@@ -1,22 +1,32 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { getRoleDestination } from '@/lib/auth/role-destinations';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { siteUrls } from '@/lib/utils/site-urls';
 import { absoluteRoleDestination } from '@/lib/auth/absolute-role-destination';
+import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
+import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
 export default function LoginPage() {
   const searchParams = useSafeSearchParams();
   const requestedRedirect = searchParams.get('next') || searchParams.get('redirect') || '';
   const safeRedirect = validateRedirect(requestedRedirect, '');
+  const reason = searchParams.get('reason');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Restore the May behavior: an idle-timeout redirect must actually clear the
+  // Supabase browser session before the user signs in again.
+  useEffect(() => {
+    if (reason !== 'idle') return;
+    const supabase = createClient();
+    void supabase.auth.signOut();
+  }, [reason]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,27 +48,50 @@ export default function LoginPage() {
         return;
       }
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, portal_type, onboarding_completed')
         .eq('id', data.user.id)
         .maybeSingle();
 
-      let destination: string;
+      if (profileError) {
+        throw new Error('Unable to load your profile. Please try again or contact support.');
+      }
+
       if (!profile) {
-        destination = `${siteUrls.app}/onboarding/learner`;
-      } else if (profile.role === 'employer' && profile.onboarding_completed !== true) {
+        window.location.assign(`${siteUrls.app}/onboarding/learner`);
+        return;
+      }
+
+      const { data: roleRows } = await supabase
+        .from('user_roles')
+        .select('roles(name)')
+        .eq('user_id', data.user.id);
+
+      const secondaryRoles = (roleRows ?? [])
+        .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
+        .filter((role): role is string => typeof role === 'string');
+      const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles].filter(Boolean))) as string[];
+
+      let destination: string;
+
+      if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
+      } else if (effectiveRoles.some((role) => ['apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(role))) {
+        // Resolve the apprentice's actual occupation/program portal. Never hard-code barber.
+        destination = await resolveStudentHomePath(
+          supabase,
+          data.user.id,
+          typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
+        );
       } else if (
         profile.role === 'student' &&
         typeof profile.portal_type === 'string' &&
         profile.portal_type.trim() !== ''
       ) {
-        // Program portals are learner-specific. Never let a stale portal_type
-        // override an admin, staff, instructor, employer, or partner role.
         destination = `${siteUrls.app}/portal/${profile.portal_type.trim()}`;
       } else {
-        destination = absoluteRoleDestination(getRoleDestination(profile.role));
+        destination = resolveDashboardUrl(profile.role, effectiveRoles);
       }
 
       window.location.assign(destination);
@@ -69,6 +102,10 @@ export default function LoginPage() {
     }
   }
 
+  const signupHref = safeRedirect
+    ? `/signup?redirect=${encodeURIComponent(safeRedirect)}`
+    : '/signup';
+
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-12">
       <section className="mx-auto w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
@@ -77,6 +114,12 @@ export default function LoginPage() {
           <h1 className="mt-2 text-3xl font-bold text-slate-950">Student and Partner Login</h1>
           <p className="mt-3 text-sm text-slate-600">Access courses, progress, credentials, apprenticeship records, and portal tools.</p>
         </div>
+
+        {reason === 'idle' && !error ? (
+          <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            Your session expired due to inactivity. Please sign in again.
+          </div>
+        ) : null}
 
         {error ? (
           <div role="alert" className="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
@@ -126,7 +169,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-slate-600">
           Need an account?{' '}
-          <Link href="/signup" className="font-semibold text-blue-700 hover:underline">Create one</Link>
+          <Link href={signupHref} className="font-semibold text-blue-700 hover:underline">Create one</Link>
         </p>
 
         <div className="mt-8 border-t border-slate-200 pt-6 text-center">

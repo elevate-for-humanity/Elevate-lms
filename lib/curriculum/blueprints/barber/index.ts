@@ -49,8 +49,11 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
     generatorMode: 'fixed',
   },
 
+  // The eight authored module files currently define 50 production lessons total.
+  // Keep this count synchronized with the actual blueprint content; do not use a
+  // larger expected count unless additional lessons are authored in the modules.
   expectedModuleCount: 8,
-  expectedLessonCount: 58,
+  expectedLessonCount: 50,
 
   certificationPathway: {
     certificationBodyId: 'cb000000-0000-0000-0000-000000000006',

@@ -64,7 +64,7 @@ const primaryItems: NavItem[] = [
   { href: '/lms/courses', label: 'Learn', icon: BookOpen },
   { href: '/lms/events', label: 'Events', icon: CalendarDays },
   { href: '/lms/progress', label: 'Progress', icon: TrendingUp },
-  { href: '/account/ai-team', label: 'AI Team', icon: Bot },
+  { href: '/lms/ai-team', label: 'AI Team', icon: Bot },
 ];
 
 const courseworkItems: NavItem[] = [

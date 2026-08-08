@@ -2,7 +2,7 @@ import 'server-only';
 
 const API_BASE = 'https://api.northflank.com/v1';
 
-export type NorthflankServiceKey = 'lms' | 'admin';
+export type NorthflankServiceKey = 'marketing' | 'lms' | 'admin';
 
 export type NorthflankServiceSummary = {
   id: string;
@@ -21,13 +21,22 @@ export function getNorthflankSecretGroupId(): string {
   return process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
 }
 
+/** Canonical production service map. Keep this aligned with service-targets.ts. */
 export function getNorthflankServices(): NorthflankServiceSummary[] {
   return [
     {
+      key: 'marketing',
+      id: process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing',
+      label: 'Marketing / Public Site',
+      url: process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+      healthPath: '/api/ping',
+      color: 'green',
+    },
+    {
       key: 'lms',
       id: process.env.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms',
-      label: 'LMS (Main Site)',
-      url: process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+      label: 'LMS / Student App',
+      url: process.env.NEXT_PUBLIC_LMS_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
       healthPath: '/api/ping',
       color: 'blue',
     },
@@ -35,7 +44,7 @@ export function getNorthflankServices(): NorthflankServiceSummary[] {
       key: 'admin',
       id: process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin',
       label: 'Admin Dashboard',
-      url: process.env.NEXT_PUBLIC_ADMIN_URL || '',
+      url: process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
       healthPath: '/api/ping',
       color: 'purple',
     },
@@ -43,26 +52,20 @@ export function getNorthflankServices(): NorthflankServiceSummary[] {
 }
 
 function getNorthflankToken(): string {
-  const token = process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY || process.env.NF_API_TOKEN;
-  if (!token) {
-    throw new Error('Northflank API token is not configured');
-  }
+  const token =
+    process.env.NORTHFLANK_API_TOKEN ||
+    process.env.NORTHFLANK_API_KEY ||
+    process.env.NF_API_TOKEN;
+  if (!token) throw new Error('Northflank API token is not configured');
   return token;
 }
 
-function getNorthflankTeamId(): string | null {
+function getNorthflankTeamId(): string {
   return process.env.NORTHFLANK_TEAM_ID || 'elevates-team';
 }
 
 function projectPath(projectId: string, suffix: string): string {
-  const teamId = getNorthflankTeamId();
-  if (teamId) return `/teams/${teamId}/projects/${projectId}${suffix}`;
-  return `/projects/${projectId}${suffix}`;
-}
-
-function secretPath(suffix: string): string {
-  // Secrets are project-level - just return the suffix, northflankFetch adds /projects/{projectId}
-  return suffix;
+  return `/teams/${getNorthflankTeamId()}/projects/${projectId}${suffix}`;
 }
 
 export async function northflankFetch<T = unknown>(
@@ -107,10 +110,17 @@ export async function triggerNorthflankBuild(projectId: string, serviceId: strin
 
 function extractVariables(secretGroup: Record<string, unknown>): Record<string, string> {
   const secrets = secretGroup.secrets as { variables?: Record<string, string> } | undefined;
-  const variables = secrets?.variables ?? (secretGroup.variables as Record<string, string> | undefined) ?? {};
+  const variables =
+    secrets?.variables ??
+    (secretGroup.variables as Record<string, string> | undefined) ??
+    {};
   return { ...variables };
 }
 
+/**
+ * Update a shared production secret without changing which services receive it.
+ * All three production services remain attached every time this function writes.
+ */
 export async function upsertNorthflankSecretVariable(
   projectId: string,
   key: string,
@@ -128,7 +138,7 @@ export async function upsertNorthflankSecretVariable(
       method: 'POST',
       body: JSON.stringify({
         name: groupId,
-        description: 'Elevate production env',
+        description: 'Elevate shared production secrets/config',
         priority: 10,
         type: 'secret',
         secretType: 'environment',
@@ -144,11 +154,16 @@ export async function upsertNorthflankSecretVariable(
 
   variables[key] = value;
 
+  // Never allow the shared secret editor to mutate infrastructure-owned keys.
+  for (const infraKey of ['PORT', 'HOSTNAME', 'NODE_ENV', 'SERVICE_ROLE', 'SERVICE_NAME']) {
+    delete variables[infraKey];
+  }
+
   await northflankFetch(projectId, `/secrets/${groupId}`, {
     method: 'POST',
     body: JSON.stringify({
       name: groupId,
-      description: 'Elevate production env',
+      description: 'Elevate shared production secrets/config',
       priority: 10,
       type: 'secret',
       secretType: 'environment',
@@ -165,5 +180,10 @@ export async function upsertNorthflankSecretVariable(
 }
 
 export function isNorthflankReady(): boolean {
-  return Boolean(getNorthflankProjectId() && (process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY || process.env.NF_API_TOKEN));
+  return Boolean(
+    getNorthflankProjectId() &&
+      (process.env.NORTHFLANK_API_TOKEN ||
+        process.env.NORTHFLANK_API_KEY ||
+        process.env.NF_API_TOKEN),
+  );
 }

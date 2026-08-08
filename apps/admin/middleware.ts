@@ -17,7 +17,6 @@ const PUBLIC_PATHS = [
 ];
 
 const ADMIN_PORTAL_ROLES = [
-  'super_admin',
   'admin',
   'staff',
   'org_admin',
@@ -71,7 +70,7 @@ export async function middleware(req: NextRequest) {
           });
         },
       },
-    }
+    },
   );
 
   const { data: { user }, error } = await supabase.auth.getUser();
@@ -108,7 +107,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/dev-studio') ||
     pathname.startsWith('/api/devstudio');
 
-  if (isDevStudioRoute && !effectiveRoles.some((role) => ['admin', 'super_admin'].includes(role))) {
+  if (isDevStudioRoute && !effectiveRoles.includes('admin')) {
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
 

@@ -1,7 +1,8 @@
-import { redirect } from 'next/navigation';
+import CollaborationClient from './CollaborationClient';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export default function StudioCollaborationPage() {
-  redirect('/studio/workflows');
+  return <CollaborationClient />;
 }

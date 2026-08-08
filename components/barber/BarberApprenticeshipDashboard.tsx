@@ -26,9 +26,6 @@ import {
 import type { BarberDashboardData } from '@/lib/barber/load-barber-dashboard';
 import { PRESTIGE_BARBER_BRAND } from '@/lib/barber/branding';
 
-const REQUIRED_OJL = 1500;
-const REQUIRED_RTI = 500;
-
 const NAV_TABS = [
   { id: 'dashboard', label: 'Dashboard', href: '/portal/barber' },
   { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
@@ -51,10 +48,12 @@ export function BarberApprenticeshipDashboard({
   stats,
   lms,
 }: Props) {
+  const requiredOjl = stats.ojlRequired;
+  const requiredRti = stats.rtiRequired;
   const totalOjl = hours.ojl + hours.transferredOjl;
   const totalRti = hours.rti + hours.transferredRti;
-  const ojlPercent = Math.min((totalOjl / REQUIRED_OJL) * 100, 100);
-  const rtiPercent = Math.min((totalRti / REQUIRED_RTI) * 100, 100);
+  const ojlPercent = Math.min((totalOjl / requiredOjl) * 100, 100);
+  const rtiPercent = Math.min((totalRti / requiredRti) * 100, 100);
 
   const hasSubscription = !!enrollment?.stripe_subscription_id;
   const subStatus = enrollment?.stripe_subscription_status ?? null;
@@ -99,9 +98,9 @@ export function BarberApprenticeshipDashboard({
 
   const heroStats = [
     { icon: GraduationCap, value: String(stats.rtiLessonsCompleted), label: 'RTI lessons done', sub: `of ${stats.rtiLessonsTotal}` },
-    { icon: CheckCircle2, value: `${stats.overallProgressPercent}%`, label: 'Program progress', sub: 'OJT + RTI hours' },
+    { icon: CheckCircle2, value: `${stats.overallProgressPercent}%`, label: 'Program progress', sub: 'OJL + RTI requirements' },
     { icon: Star, value: String(stats.certificationsEarned), label: 'Credentials', sub: 'earned' },
-    { icon: TrendingUp, value: String(stats.weeksRemaining), label: 'Weeks remaining', sub: 'at current pace' },
+    { icon: TrendingUp, value: String(stats.weeksRemaining), label: 'OJL weeks remaining', sub: 'at 40 hrs/week' },
   ];
 
   return (
@@ -131,7 +130,7 @@ export function BarberApprenticeshipDashboard({
                 <span className="text-amber-400">YOUR FUTURE</span>
               </h1>
               <p className="mt-3 text-sm text-zinc-300 max-w-lg">
-                {PRESTIGE_BARBER_BRAND.motto} Track OJT at your host shop and RTI in Elevate LMS.
+                {PRESTIGE_BARBER_BRAND.motto} Track OJL at your host shop and RTI in Elevate LMS.
                 {shopName ? (
                   <span className="block mt-1 text-amber-300/90">
                     Host shop: <span className="font-medium">{shopName}</span>
@@ -140,10 +139,9 @@ export function BarberApprenticeshipDashboard({
               </p>
             </div>
             <div className="relative w-full lg:w-72 h-44 lg:h-auto min-h-[11rem] rounded-xl overflow-hidden border border-amber-500/20">
-// IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback)
               <Image
                 src="/images/heroes/hero-homepage.webp"
-                alt=""
+                alt="Barber apprenticeship training"
                 fill
                 className="object-cover"
                 sizes="288px"
@@ -236,7 +234,7 @@ export function BarberApprenticeshipDashboard({
               <div>
                 <p className="font-semibold text-red-800 text-sm">Payment action required</p>
                 <p className="text-red-700 text-xs mt-0.5">
-                  Keep your card on file so weekly tuition and program access stay active.
+                  Keep your card on file so billing and paid program access remain active.
                 </p>
               </div>
             </div>
@@ -269,7 +267,8 @@ export function BarberApprenticeshipDashboard({
                 <h2 className="text-lg font-bold text-slate-900">{lms.title}</h2>
                 <p className="text-sm text-slate-600 mt-2 flex-1">
                   {stats.rtiLessonsTotal} lessons · video, reading, practice quizzes, and module
-                  checkpoints. Completes your 500 RTI hours toward the 2,000-hour apprenticeship.
+                  checkpoints supporting the {requiredRti.toLocaleString()}-hour RTI requirement.
+                  RTI is tracked separately from the {requiredOjl.toLocaleString()}-hour OJL requirement.
                 </p>
                 <div className="mt-4">
                   <div className="flex justify-between text-xs text-slate-500 mb-1">
@@ -334,13 +333,16 @@ export function BarberApprenticeshipDashboard({
 
         {/* Hours */}
         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-900 mb-4">Hour progress (2,000 required)</h2>
+          <h2 className="text-sm font-semibold text-slate-900 mb-1">Registered hour progress</h2>
+          <p className="text-xs text-slate-500 mb-4">
+            {requiredOjl.toLocaleString()} OJL hours and {requiredRti.toLocaleString()} RTI hours are separate completion requirements.
+          </p>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="font-medium text-slate-700">On-the-job (OJT)</span>
+                <span className="font-medium text-slate-700">On-the-job learning (OJL)</span>
                 <span className="font-bold">
-                  {totalOjl.toLocaleString()} / {REQUIRED_OJL.toLocaleString()}
+                  {totalOjl.toLocaleString()} / {requiredOjl.toLocaleString()}
                 </span>
               </div>
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -351,7 +353,7 @@ export function BarberApprenticeshipDashboard({
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium text-slate-700">Related instruction (RTI)</span>
                 <span className="font-bold">
-                  {totalRti.toLocaleString()} / {REQUIRED_RTI.toLocaleString()}
+                  {totalRti.toLocaleString()} / {requiredRti.toLocaleString()}
                 </span>
               </div>
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -365,7 +367,7 @@ export function BarberApprenticeshipDashboard({
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[
             { href: '/apprentice/timeclock', label: 'Clock in / out', sub: 'GPS timeclock', icon: Clock, primary: true },
-            { href: '/apprentice/hours/log', label: 'Log hours', sub: 'Manual OJT / RTI', icon: CalendarDays },
+            { href: '/apprentice/hours/log', label: 'Log hours', sub: 'Manual OJL / RTI', icon: CalendarDays },
             { href: '/apprentice/competencies/log', label: 'Log service', sub: 'WPS competency', icon: Award },
             { href: '/apprentice/documents', label: 'Documents', sub: 'Upload & status', icon: FileText },
             { href: '/apprentice/state-board', label: 'State board prep', sub: 'Exam resources', icon: GraduationCap },

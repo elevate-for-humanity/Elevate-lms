@@ -19,7 +19,6 @@ on:
       - 'tailwind.config.js'
       - 'tsconfig.json'
       - 'Dockerfile.marketing'
-      - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
       - 'package.json'
       - 'pnpm-workspace.yaml'
@@ -151,10 +150,8 @@ jobs:
         run: pnpm tsx scripts/northflank/sync-env.ts --execute
 
       - name: Configure Northflank Marketing service
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
-
-      - name: Patch Marketing build ephemeral storage
-        run: NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
 
       - name: Trigger Marketing build
         id: trigger_build

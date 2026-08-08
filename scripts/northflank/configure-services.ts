@@ -135,6 +135,16 @@ const healthChecks = [
     failureThreshold: 3,
     successThreshold: 1,
   },
+  {
+    protocol: 'HTTP',
+    type: 'livenessProbe',
+    path: '/api/ping',
+    port: RUNTIME_PORT,
+    initialDelaySeconds: 120,
+    periodSeconds: 30,
+    timeoutSeconds: 10,
+    failureThreshold: 3,
+  },
 ];
 
 const billing = {
@@ -154,7 +164,7 @@ async function configureService(
   for (const storageMb of storageAllowanceCandidates(requestedEphemeralMb)) {
     const patch = {
       billing,
-      disabledCI: false,
+      disabledCI: true,
       ports: [
         {
           name: 'site',
@@ -211,7 +221,7 @@ async function configureService(
 
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
-      `port=${RUNTIME_PORT} health=/api/ping,/api/health ` +
+      `port=${RUNTIME_PORT} health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ci=github-actions ` +
       `buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
       `ephemeralMB=${appliedEphemeralMb}`,
   );
@@ -239,7 +249,7 @@ async function main() {
   if (dryRun) {
     for (const service of services) {
       console.info(
-        `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, health=/api/ping,/api/health`,
+        `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ci=github-actions`,
       );
     }
     return;

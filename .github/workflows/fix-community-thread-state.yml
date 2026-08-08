@@ -1,0 +1,119 @@
+name: Fix Community Thread State
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-community-thread-state.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.event.head_commit.message != 'fix(community): preserve open threads after mutations'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch thread refresh behavior
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('components/SocialLearningCommunity.tsx')
+          text = path.read_text()
+
+          old_comments = """  async function loadComments(postId: string) {
+    if (expandedPostId === postId) { setExpandedPostId(null); return; }
+    const { data, error: commentsError } = await supabase.from('community_post_comments').select('id,post_id,user_id,content,created_at').eq('post_id', postId).order('created_at', { ascending: true });
+    if (commentsError) { setError(commentsError.message); return; }
+    setComments((current) => ({ ...current, [postId]: (data ?? []) as CommentRow[] }));
+    setExpandedPostId(postId);
+  }
+"""
+          new_comments = """  async function refreshComments(postId: string) {
+    const { data, error: commentsError } = await supabase.from('community_post_comments').select('id,post_id,user_id,content,created_at').eq('post_id', postId).order('created_at', { ascending: true });
+    if (commentsError) { setError(commentsError.message); return false; }
+    setComments((current) => ({ ...current, [postId]: (data ?? []) as CommentRow[] }));
+    return true;
+  }
+
+  async function toggleComments(postId: string) {
+    if (expandedPostId === postId) { setExpandedPostId(null); return; }
+    if (await refreshComments(postId)) setExpandedPostId(postId);
+  }
+"""
+
+          old_replies = """  async function loadReplies(topicId: string) {
+    if (expandedTopicId === topicId) { setExpandedTopicId(null); return; }
+    const [{ data: replyRows, error: replyError }, { data: votes }] = await Promise.all([
+      supabase.from('forum_replies').select('id,topic_id,author_id,content,upvotes,created_at').eq('topic_id', topicId).order('created_at', { ascending: true }),
+      supabase.from('forum_upvotes').select('reply_id').eq('user_id', userId),
+    ]);
+    if (replyError) { setError(replyError.message); return; }
+    setReplies((current) => ({ ...current, [topicId]: (replyRows ?? []) as ForumReply[] }));
+    setUpvotedReplyIds(new Set((votes ?? []).map((v: any) => v.reply_id)));
+    setExpandedTopicId(topicId);
+  }
+"""
+          new_replies = """  async function refreshReplies(topicId: string) {
+    const [{ data: replyRows, error: replyError }, { data: votes }] = await Promise.all([
+      supabase.from('forum_replies').select('id,topic_id,author_id,content,upvotes,created_at').eq('topic_id', topicId).order('created_at', { ascending: true }),
+      supabase.from('forum_upvotes').select('reply_id').eq('user_id', userId),
+    ]);
+    if (replyError) { setError(replyError.message); return false; }
+    setReplies((current) => ({ ...current, [topicId]: (replyRows ?? []) as ForumReply[] }));
+    setUpvotedReplyIds(new Set((votes ?? []).map((v: any) => v.reply_id)));
+    return true;
+  }
+
+  async function toggleReplies(topicId: string) {
+    if (expandedTopicId === topicId) { setExpandedTopicId(null); return; }
+    if (await refreshReplies(topicId)) setExpandedTopicId(topicId);
+  }
+"""
+
+          replacements = [
+            (old_comments, new_comments),
+            ("await loadComments(postId);", "await refreshComments(postId);"),
+            ("await loadComments(comment.post_id);", "await refreshComments(comment.post_id);"),
+            ("onClick={() => loadComments(post.id)}", "onClick={() => toggleComments(post.id)}"),
+            (old_replies, new_replies),
+            ("await loadReplies(topicId);", "await refreshReplies(topicId);"),
+            ("if (expandedTopicId) await loadReplies(expandedTopicId);", "if (expandedTopicId) await refreshReplies(expandedTopicId);"),
+            ("onClick={() => loadReplies(topic.id)}", "onClick={() => toggleReplies(topic.id)}"),
+          ]
+
+          for old, new in replacements:
+            if old not in text:
+              raise SystemExit(f'Expected source pattern not found: {old[:100]!r}')
+            text = text.replace(old, new)
+
+          # Guard the intended UX contract before committing.
+          required = [
+            'async function refreshComments(postId: string)',
+            'async function toggleComments(postId: string)',
+            'await refreshComments(postId);',
+            'onClick={() => toggleComments(post.id)}',
+            'async function refreshReplies(topicId: string)',
+            'async function toggleReplies(topicId: string)',
+            'await refreshReplies(topicId);',
+            'if (expandedTopicId) await refreshReplies(expandedTopicId);',
+            'onClick={() => toggleReplies(topic.id)}',
+          ]
+          missing = [item for item in required if item not in text]
+          if missing:
+            raise SystemExit(f'Patch verification failed: {missing}')
+
+          path.write_text(text)
+      - name: Remove one-time workflow
+        run: rm .github/workflows/fix-community-thread-state.yml
+      - name: Commit fix
+        run: |
+          git config user.name "Elevate Autopilot"
+          git config user.email "actions@users.noreply.github.com"
+          git add components/SocialLearningCommunity.tsx .github/workflows/fix-community-thread-state.yml
+          git commit -m "fix(community): preserve open threads after mutations"
+          git push origin HEAD:main

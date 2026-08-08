@@ -8,17 +8,18 @@ import { PlansPageClient } from './PlansPageClient';
 export const metadata: Metadata = {
   title: 'Plans & Add-Ons',
   description:
-    'Solo, Business, and Professional plans from $29/month. Add LMS, workforce, apprenticeship, and AI modules à la carte.',
+    'Solo, Business, and Professional plans from $29/month. Add AI assistants, LMS, course building, workforce, apprenticeship, testing, and business modules à la carte.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/plans' },
 };
 
 export default async function StorePlansPage({
   searchParams,
 }: {
-  searchParams: Promise<{ vertical?: string }>;
+  searchParams: Promise<{ vertical?: string; addon?: string }>;
 }) {
   const params = await searchParams;
   const vertical = params.vertical;
+  const initialAddon = typeof params.addon === 'string' ? params.addon : undefined;
 
   return (
     <div className="min-h-screen bg-white">
@@ -32,20 +33,16 @@ export default async function StorePlansPage({
       </div>
 
       <section className="py-12 px-4 text-center border-b border-slate-200">
-        <h1 className="text-4xl font-bold text-slate-900 mb-4">Simple plans. Powerful add-ons.</h1>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
-          One entry point for barbers, spas, and training providers. Subscribe to a base plan, then
-          turn on only the modules you need.
+        <h1 className="text-4xl font-bold text-slate-900 mb-4">Start simple. Add power as you grow.</h1>
+        <p className="text-lg text-slate-600 max-w-3xl mx-auto mb-6">
+          Begin with a base plan, then add specialized AI assistants, Website Builder capacity, LMS, Course Builder, workforce, apprenticeship, employer and testing tools as your organization needs them.
         </p>
-        <Link
-          href="/store/trial"
-          className="text-brand-blue-600 font-semibold hover:underline"
-        >
-          Prefer a 14-day org trial first? Start here →
+        <Link href="/store/trial" className="text-brand-blue-600 font-semibold hover:underline">
+          Prefer a 14-day organization trial first? Start here →
         </Link>
       </section>
 
-      <PlansPageClient vertical={vertical} />
+      <PlansPageClient vertical={vertical} initialAddon={initialAddon} />
     </div>
   );
 }

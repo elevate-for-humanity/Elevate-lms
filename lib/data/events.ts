@@ -1,11 +1,6 @@
 /**
  * Shared events data layer.
  * All event-related pages query through here — no duplicate Supabase calls in page files.
- *
- * Table: events
- * Columns used: id, title, event_type, description, start_date, end_date,
- *               location, virtual_link, is_virtual, max_attendees,
- *               registration_required, is_active, slug
  */
 
 import { createPublicClient } from '@/lib/supabase/public';
@@ -29,11 +24,8 @@ export interface ElevateEvent {
 }
 
 export type EventFilter = {
-  /** Filter to specific event_type values. Omit for all types. */
   types?: string[];
-  /** Only return events starting on or after this ISO string. Defaults to now. */
   from?: string;
-  /** Only return past events (start_date < now). */
   past?: boolean;
   limit?: number;
 };
@@ -43,19 +35,16 @@ const SELECT_COLS =
 
 async function getDb() {
   try {
-    const db = createPublicClient();
-    if (admin) return admin;
+    return createPublicClient();
   } catch {
-    // Admin client unavailable (missing env vars) — fall through to server client
-  }
-  try {
-    return await createClient();
-  } catch {
-    return null;
+    try {
+      return await createClient();
+    } catch {
+      return null;
+    }
   }
 }
 
-/** Fetch upcoming events, optionally filtered by type. */
 export async function getUpcomingEvents(filter: EventFilter = {}): Promise<ElevateEvent[]> {
   const db = await getDb();
   if (!db) return [];
@@ -68,19 +57,16 @@ export async function getUpcomingEvents(filter: EventFilter = {}): Promise<Eleva
     .order('start_date', { ascending: true })
     .limit(filter.limit ?? 20);
 
-  if (filter.types?.length) {
-    q = q.in('event_type', filter.types);
-  }
+  if (filter.types?.length) q = q.in('event_type', filter.types);
 
   const { data, error } = await q;
   if (error) {
-    logger.error('[events] getUpcomingEvents error:', error.message);
+    logger.error('[events] getUpcomingEvents error', undefined, { message: error.message });
     return [];
   }
   return (data ?? []) as ElevateEvent[];
 }
 
-/** Fetch past events, optionally filtered by type. */
 export async function getPastEvents(filter: EventFilter = {}): Promise<ElevateEvent[]> {
   const db = await getDb();
   if (!db) return [];
@@ -93,37 +79,37 @@ export async function getPastEvents(filter: EventFilter = {}): Promise<ElevateEv
     .order('start_date', { ascending: false })
     .limit(filter.limit ?? 6);
 
-  if (filter.types?.length) {
-    q = q.in('event_type', filter.types);
-  }
+  if (filter.types?.length) q = q.in('event_type', filter.types);
 
   const { data, error } = await q;
   if (error) {
-    logger.error('[events] getPastEvents error:', error.message);
+    logger.error('[events] getPastEvents error', undefined, { message: error.message });
     return [];
   }
   return (data ?? []) as ElevateEvent[];
 }
 
-/** Fetch a single event by id or slug. */
 export async function getEvent(idOrSlug: string): Promise<ElevateEvent | null> {
   const db = await getDb();
   if (!db) return null;
+
+  const idQuery = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug)
+    ? `id.eq.${idOrSlug},slug.eq.${idOrSlug}`
+    : `slug.eq.${idOrSlug}`;
+
   const { data, error } = await db
     .from('events')
     .select(SELECT_COLS)
-    .or(`id.eq.${idOrSlug},slug.eq.${idOrSlug}`)
+    .or(idQuery)
     .eq('is_active', true)
     .maybeSingle();
 
   if (error) {
-    logger.error('[events] getEvent error:', error.message);
+    logger.error('[events] getEvent error', undefined, { message: error.message, idOrSlug });
     return null;
   }
   return data as ElevateEvent | null;
 }
-
-// ── Formatting helpers ────────────────────────────────────────────────────────
 
 export function formatEventDate(start: string, end?: string | null): string {
   const s = new Date(start);
@@ -138,7 +124,6 @@ export function formatEventDate(start: string, end?: string | null): string {
   const startStr = s.toLocaleString('en-US', opts);
   if (!end) return startStr;
   const e = new Date(end);
-  // Same day — show only end time
   if (s.toDateString() === e.toDateString()) {
     return `${startStr} – ${e.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
   }

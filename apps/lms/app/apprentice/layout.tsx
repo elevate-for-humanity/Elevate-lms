@@ -15,33 +15,35 @@ export const metadata: Metadata = {
 };
 export const dynamic = 'force-dynamic';
 
-// Only require login - no role restrictions
-
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  const h = await headers();
+  const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
+
   if (!user) {
-    const h = await headers();
-    const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
     redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, role, full_name, first_name, last_name, avatar_url')
     .eq('id', user.id)
     .maybeSingle();
 
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
-  const nav = resolveApprenticeNavConfig(programSlug);
+  const privileged = ['admin', 'super_admin', 'staff'].includes(String(profile?.role || ''));
 
-  const h = await headers();
-  const pathname = h.get('x-pathname') || (await cookies()).get('__efh_pathname')?.value || '/apprentice';
-  const breadcrumbs = generateBreadcrumbs(pathname).map(crumb => {
-    if (crumb.label === 'Apprentice') {
-      return { label: 'Apprentice Portal', href: crumb.href };
-    }
+  // Authentication alone is not sufficient. A normal learner must have an
+  // active/recognized apprenticeship assignment before entering this portal.
+  if (!privileged && !programSlug) {
+    redirect('/learner/dashboard?notice=apprentice-access-required');
+  }
+
+  const nav = resolveApprenticeNavConfig(programSlug);
+  const breadcrumbs = generateBreadcrumbs(pathname).map((crumb) => {
+    if (crumb.label === 'Apprentice') return { label: 'Apprentice Portal', href: crumb.href };
     return crumb;
   });
 

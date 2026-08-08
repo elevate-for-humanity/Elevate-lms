@@ -6,32 +6,25 @@ import { getApprovedHoursByType } from '@/lib/hours/get-approved-hours';
 import { getNextRequiredAction } from '@/lib/enrollment/gate';
 import { BARBER_COURSE_ID, BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
 import { PRESTIGE_ELEVATION_BARBER_CURRICULUM, BARBER_LMS_COURSE_PATH } from '@/lib/barber/branding';
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 
 /**
- * Barber Apprenticeship RTI (Related Technical Instruction) Configuration
- * 
- * DOL Registered Apprenticeship: RAPIDS Code 0030CB
- * Registration: 2025-IN-132301
- * 
- * PROGRAM REQUIREMENTS (per DOL Standards):
- *   - Total Training Hours: 2,000 hours (including RTI)
- *   - RTI Hours: 260 hours (required Related Technical Instruction)
- *   - OJT Hours: 1,740 hours (2,000 - 260)
- *   - Competencies: 14
- * 
- * RTI Curriculum (260 hours total):
- *   - Barbering History & Professional Development: 10 hours
- *   - Anatomy, Physiology & Skin/Nail Disorders: 10 hours
- *   - Hair & Scalp Theory, Disorders, and Treatments: 60 hours
- *   - Infection Control & Bloodborne Pathogens (OSHA): 60 hours
- *   - Hair Cutting Theory, Tool Safety, and Techniques: 40 hours
- *   - State Board Laws, Rules, and Regulations: 60 hours
- *   - Business Practices: 10 hours
- *   - Preparation for State Licensing Examination: 10 hours
+ * Barber Registered Apprenticeship requirements.
+ *
+ * RAPIDS_CONFIG is the authoritative repository source for sponsor/program
+ * registration data. Do not duplicate or subtract RTI from OJL here.
+ *
+ * Registered program requirement:
+ *   - 2,000 hours of supervised on-the-job learning (OJL)
+ *   - 144 hours of related technical instruction (RTI)
+ *
+ * RTI is tracked separately from OJL. It is not subtracted from the 2,000 OJL
+ * requirement. Transfer hours remain progress credit only and must be approved.
  */
-
-const REQUIRED_OJL = 1740; // 2,000 total - 260 RTI = 1,740 OJT
-const REQUIRED_RTI = 260; // DOL minimum required RTI hours
+const BARBER_RAPIDS = RAPIDS_CONFIG.programs.barber;
+const REQUIRED_OJL = BARBER_RAPIDS.totalHours;
+const REQUIRED_RTI = BARBER_RAPIDS.relatedInstructionHours;
+const STANDARD_OJL_HOURS_PER_WEEK = 40;
 
 export type BarberDashboardData = {
   firstName: string;
@@ -52,6 +45,8 @@ export type BarberDashboardData = {
   nextAction: { label: string; href: string; description: string };
   stats: {
     overallProgressPercent: number;
+    ojlRequired: number;
+    rtiRequired: number;
     rtiLessonsCompleted: number;
     rtiLessonsTotal: number;
     courseProgressPercent: number;
@@ -99,7 +94,7 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
 
   if (
     profileRes.data?.role &&
-    !['student', 'admin', 'staff', 'instructor'].includes(profileRes.data.role)
+    !['student', 'apprentice', 'admin', 'staff', 'instructor'].includes(profileRes.data.role)
   ) {
     redirect('/unauthorized');
   }
@@ -123,14 +118,24 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
   const firstName = profileRes.data?.full_name?.split(' ')[0] ?? 'Apprentice';
   const fullName = profileRes.data?.full_name ?? 'Apprentice';
 
-  // Include transferred hours in totals
   const totalOjl = hours.ojl + hours.transferredOjl;
   const totalRti = hours.rti + hours.transferredRti;
-  const totalHours = totalOjl + totalRti;
+
+  // OJL and RTI are independent RAPIDS requirements. Cap each requirement
+  // separately so overage in one bucket cannot compensate for missing hours in
+  // the other.
+  const creditedOjl = Math.min(totalOjl, REQUIRED_OJL);
+  const creditedRti = Math.min(totalRti, REQUIRED_RTI);
   const totalRequired = REQUIRED_OJL + REQUIRED_RTI;
-  const overallProgressPercent =
-    totalRequired > 0 ? Math.min(100, Math.round((totalHours / totalRequired) * 100)) : 0;
-  const weeksRemaining = Math.max(0, Math.ceil((totalRequired - totalHours) / 40));
+  const overallProgressPercent = Math.min(
+    100,
+    Math.round(((creditedOjl + creditedRti) / totalRequired) * 100),
+  );
+
+  // Weekly employment planning is based on OJL only. RTI is completed through
+  // the assigned course and is not treated as 40-hour workweeks.
+  const ojlRemaining = Math.max(0, REQUIRED_OJL - creditedOjl);
+  const weeksRemaining = Math.ceil(ojlRemaining / STANDARD_OJL_HOURS_PER_WEEK);
 
   const { data: lessons } = await queryDb
     .from('course_lessons')
@@ -148,7 +153,7 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
       .eq('completed', true);
     rtiLessonsCompleted = count ?? 0;
   }
-  const rtiLessonsTotal = lessonIds.length > 0 ? lessonIds.length : 50;
+  const rtiLessonsTotal = lessonIds.length;
 
   const { count: certCount } = await queryDb
     .from('program_completion_certificates')
@@ -196,6 +201,8 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
     nextAction,
     stats: {
       overallProgressPercent,
+      ojlRequired: REQUIRED_OJL,
+      rtiRequired: REQUIRED_RTI,
       rtiLessonsCompleted,
       rtiLessonsTotal,
       courseProgressPercent,

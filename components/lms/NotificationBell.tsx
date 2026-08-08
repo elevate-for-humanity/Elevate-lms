@@ -1,234 +1,118 @@
 'use client';
 
-import React from 'react';
-
-import { useState, useEffect, useCallback } from 'react';
-import { Bell, BookOpen, Award, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { AtSign, Award, Bell, BookOpen, Heart, MessageSquare, UserPlus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import {
-  subscribeToNotifications,
-  markNotificationRead,
-  markAllNotificationsRead,
-} from '@/lib/realtime/notifications';
 
-interface Notification {
+type BellNotification = {
+  key: string;
   id: string;
-  type: 'course' | 'certificate' | 'message' | 'system';
+  source: 'core' | 'community';
+  type: string;
   title: string;
   message: string;
-  time: string;
-  read: boolean;
-}
-
-// Supabase notification payload
-interface NotificationPayload {
-  id?: string;
-  type?: string;
-  title?: string;
-  message?: string;
-}
+  href: string | null;
+  createdAt: string;
+  readAt: string | null;
+};
 
 export function NotificationBell() {
+  const supabase = useMemo(() => createClient(), []);
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<BellNotification[]>([]);
 
   const fetchNotifications = useCallback(async () => {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setNotifications([]); return; }
 
-    if (!user) return;
+    const [core, community] = await Promise.all([
+      supabase.from('notifications').select('id,type,title,message,action_url,read_at,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(15),
+      supabase.from('community_notifications').select('id,type,title,message,href,read_at,created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(15),
+    ]);
 
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(10);
+    const combined: BellNotification[] = [
+      ...(core.data ?? []).map((n: any) => ({ key: `core-${n.id}`, id: n.id, source: 'core' as const, type: n.type ?? 'system', title: n.title ?? 'Notification', message: n.message ?? '', href: n.action_url ?? null, createdAt: n.created_at, readAt: n.read_at ?? null })),
+      ...(community.data ?? []).map((n: any) => ({ key: `community-${n.id}`, id: n.id, source: 'community' as const, type: n.type ?? 'system', title: n.title ?? 'Community activity', message: n.message ?? '', href: n.href ?? '/lms/community', createdAt: n.created_at, readAt: n.read_at ?? null })),
+    ];
+    combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    setNotifications(combined.slice(0, 20));
+  }, [supabase]);
 
-    if (data) {
-      setNotifications(
-        data.map((n) => ({
-          id: n.id,
-          type: n.type,
-          title: n.title,
-          message: n.message,
-          time: getTimeAgo(n.created_at),
-          read: n.read,
-        })),
-      );
-    }
-  }, []);
+  useEffect(() => { void fetchNotifications(); }, [fetchNotifications]);
 
   useEffect(() => {
-    void fetchNotifications();
-
-    // Subscribe to realtime notifications
-    const supabase = createClient();
-    let unsubscribe: (() => void) | undefined;
-
-    supabase.auth.getUser().then(({ data: { user } }): void => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    void supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
-      const unsub = subscribeToNotifications(user.id, (payload: NotificationPayload) => {
-        setNotifications((prev) => [
-          {
-            id: payload.id || `notif-${Date.now()}`,
-            type: (payload.type as Notification['type']) || 'system',
-            title: payload.title || 'New notification',
-            message: payload.message || '',
-            time: 'Just now',
-            read: false,
-          },
-          ...prev,
-        ]);
-      });
-      unsubscribe = unsub;
+      channel = supabase
+        .channel(`lms-notifications-${user.id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, () => { void fetchNotifications(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'community_notifications', filter: `user_id=eq.${user.id}` }, () => { void fetchNotifications(); })
+        .subscribe();
     });
+    return () => { if (channel) void supabase.removeChannel(channel); };
+  }, [fetchNotifications, supabase]);
 
-    return () => {
-      unsubscribe?.();
-    };
-  }, [fetchNotifications]);
+  const unreadCount = notifications.filter((n) => !n.readAt).length;
 
-  const getTimeAgo = (date: string) => {
-    const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    if (seconds < 60) return 'Just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    return `${Math.floor(seconds / 86400)} days ago`;
-  };
+  async function markAsRead(notification: BellNotification) {
+    if (notification.readAt) return;
+    const table = notification.source === 'community' ? 'community_notifications' : 'notifications';
+    const now = new Date().toISOString();
+    const { error } = await supabase.from(table).update({ read_at: now }).eq('id', notification.id);
+    if (!error) setNotifications((current) => current.map((n) => n.key === notification.key ? { ...n, readAt: now } : n));
+  }
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAsRead = async (id: string) => {
-    await markNotificationRead(id);
-    setNotifications(notifications.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  };
-
-  const markAllAsRead = async () => {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  async function markAllAsRead() {
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    await markAllNotificationsRead(user.id);
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
-  };
-
-  const deleteNotification = async (id: string) => {
-    const supabase = createClient();
-    await supabase.from('notifications').delete().eq('id', id);
-
-    setNotifications(notifications.filter((n) => n.id !== id));
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'course':
-        return <BookOpen className="w-5 h-5 text-brand-blue-600" />;
-      case 'certificate':
-        return <Award aria-label="award" className="w-5 h-5 text-brand-orange-600" />;
-      case 'message':
-        return <Bell className="w-5 h-5 text-brand-green-600" />;
-      default:
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
-    }
-  };
+    const now = new Date().toISOString();
+    await Promise.all([
+      supabase.from('notifications').update({ read_at: now }).eq('user_id', user.id).is('read_at', null),
+      supabase.from('community_notifications').update({ read_at: now }).eq('user_id', user.id).is('read_at', null),
+    ]);
+    setNotifications((current) => current.map((n) => ({ ...n, readAt: n.readAt ?? now })));
+  }
 
   return (
     <div className="relative">
-      {/* Bell Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 hover:bg-slate-100 rounded-lg transition"
-      >
-        <Bell className="w-6 h-6 text-black" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-brand-orange-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-            {unreadCount}
-          </span>
-        )}
+      <button onClick={() => { setIsOpen((open) => !open); void fetchNotifications(); }} className="relative rounded-lg p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}>
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-orange-600 px-1 text-[10px] font-black text-white">{unreadCount > 99 ? '99+' : unreadCount}</span>}
       </button>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <>
-          {/* Mobile Overlay */}
-          <div className="fixed inset-0 z-40 md:hidden" onClick={() => setIsOpen(false)} />
-
-          {/* Notification Panel */}
-          <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-lg shadow-xl border border-slate-200 z-50">
-            {/* Header */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-              <h3 className="font-bold text-lg">Notifications</h3>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-                >
-                  Mark all as read
-                </button>
-              )}
-            </div>
-
-            {/* Notifications List */}
-            <div className="max-h-96 overflow-y-auto">
-              {notifications.length > 0 ? (
-                notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 border-b border-slate-100 hover:bg-slate-50 transition ${
-                      !notification.read ? 'bg-brand-blue-50' : ''
-                    }`}
-                  >
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 mt-1">{getIcon(notification.type)}</div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="font-semibold text-sm text-black">{notification.title}</h4>
-                          <button
-                            onClick={() => deleteNotification(notification.id)}
-                            className="flex-shrink-0 text-slate-400 hover:text-black"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <p className="text-sm text-black mt-1">{notification.message}</p>
-                        <div className="flex items-center gap-3 mt-2">
-                          <span className="text-xs text-slate-500">{notification.time}</span>
-                          {!notification.read && (
-                            <button
-                              onClick={() => markAsRead(notification.id)}
-                              className="text-xs text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-                            >
-                              Mark as read
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 text-center">
-                  <Bell className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-black">No notifications</p>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            {notifications.length > 0 && (
-              <div className="p-3 border-t border-slate-200 text-center">
-                <button className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold">
-                  View All Notifications
-                </button>
-              </div>
-            )}
+      {isOpen && <>
+        <button className="fixed inset-0 z-40 cursor-default" aria-label="Close notifications" onClick={() => setIsOpen(false)} />
+        <div className="absolute right-0 z-50 mt-2 w-96 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+          <div className="flex items-center justify-between border-b border-slate-200 p-4"><div><h3 className="font-black text-slate-900">Notifications</h3><p className="text-xs text-slate-500">Learning and community activity</p></div>{unreadCount > 0 && <button onClick={markAllAsRead} className="text-xs font-black text-brand-blue-600 hover:underline">Mark all read</button>}</div>
+          <div className="max-h-[28rem] overflow-y-auto">
+            {notifications.length ? notifications.map((notification) => {
+              const content = <div className={`flex gap-3 border-b border-slate-100 p-4 transition hover:bg-slate-50 ${notification.readAt ? '' : 'bg-brand-blue-50/70'}`}><div className="mt-0.5 rounded-lg bg-slate-100 p-2">{iconFor(notification.type)}</div><div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-2"><p className="text-sm font-black text-slate-900">{notification.title}</p><span className="flex-shrink-0 text-[11px] text-slate-400">{timeAgo(notification.createdAt)}</span></div>{notification.message && <p className="mt-1 line-clamp-2 text-sm text-slate-600">{notification.message}</p>}<div className="mt-2 flex items-center gap-3"><span className="text-[10px] font-black uppercase tracking-wide text-slate-400">{notification.source === 'community' ? 'Community' : 'Elevate'}</span>{!notification.readAt && <button onClick={(event) => { event.preventDefault(); event.stopPropagation(); void markAsRead(notification); }} className="text-[11px] font-black text-brand-blue-600">Mark read</button>}</div></div></div>;
+              return notification.href ? <Link key={notification.key} href={notification.href} onClick={() => { void markAsRead(notification); setIsOpen(false); }}>{content}</Link> : <div key={notification.key}>{content}</div>;
+            }) : <div className="p-10 text-center"><Bell className="mx-auto h-10 w-10 text-slate-300" /><p className="mt-3 font-bold text-slate-700">No notifications yet.</p></div>}
           </div>
-        </>
-      )}
+          <Link href="/lms/notifications" onClick={() => setIsOpen(false)} className="block border-t border-slate-200 p-3 text-center text-sm font-black text-brand-blue-600 hover:bg-slate-50">View all notifications</Link>
+        </div>
+      </>}
     </div>
   );
+}
+
+function iconFor(type: string) {
+  if (type === 'course' || type === 'assignment') return <BookOpen className="h-4 w-4 text-brand-blue-600" />;
+  if (type === 'certificate') return <Award className="h-4 w-4 text-brand-orange-600" />;
+  if (type === 'message' || type === 'comment') return <MessageSquare className="h-4 w-4 text-brand-green-600" />;
+  if (type === 'like') return <Heart className="h-4 w-4 text-red-500" />;
+  if (type === 'follow') return <UserPlus className="h-4 w-4 text-purple-600" />;
+  if (type === 'mention') return <AtSign className="h-4 w-4 text-cyan-600" />;
+  return <Bell className="h-4 w-4 text-slate-500" />;
+}
+
+function timeAgo(value: string) {
+  const seconds = Math.max(1, Math.floor((Date.now() - new Date(value).getTime()) / 1000));
+  if (seconds < 60) return 'now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h`;
+  return `${Math.floor(seconds / 86400)}d`;
 }

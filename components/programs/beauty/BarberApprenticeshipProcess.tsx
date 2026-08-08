@@ -1,34 +1,37 @@
 import Link from 'next/link';
-
-const STEPS = [
-  {
-    title: 'Apply (free)',
-    detail:
-      'Submit the apprentice application. There is no tuition charge at this step — we review readiness and funding options with you.',
-  },
-  {
-    title: 'Host shop match',
-    detail:
-      'We place you with a licensed Indiana barbershop for on-the-job training (OJT). You earn wages while you learn in the chair.',
-  },
-  {
-    title: 'RTI + daily theory',
-    detail:
-      'Complete Related Technical Instruction online (500 hours). Pass the daily theory quiz (70% minimum) before OJT hours count for credit.',
-  },
-  {
-    title: '2,000 hours & checkpoints',
-    detail:
-      'Track 1,500 OJT hours at your host shop plus 500 RTI hours. Supervisors sign off competencies as you progress through each module.',
-  },
-  {
-    title: 'State exam & license',
-    detail:
-      'When hours and RTI are complete, sit for the Indiana Barber License written and practical exams. Graduate with a DOL apprenticeship certificate.',
-  },
-] as const;
+import { getProgram } from '@/lib/programs/canonical-data';
 
 export default function BarberApprenticeshipProcess() {
+  const program = getProgram('barber-apprenticeship');
+  const ojlHours = program?.ojtHours ?? 2000;
+  const rtiHours = program?.relatedInstructionHours ?? 144;
+
+  const steps = [
+    {
+      title: 'Apply (free)',
+      detail:
+        'Submit the apprentice application. There is no tuition charge at this step — we review readiness, host-shop status, transfer-hour evidence, and funding options with you.',
+    },
+    {
+      title: 'Host shop match',
+      detail:
+        'Train with an approved licensed Indiana barbershop under licensed supervision. The employer provides supervised on-the-job learning and follows the registered wage progression and program standards.',
+    },
+    {
+      title: 'Complete Related Technical Instruction',
+      detail: `Complete ${rtiHours.toLocaleString()} hours of Related Technical Instruction (RTI) through the approved instructional pathway. RTI is separate from supervised OJL hours.`,
+    },
+    {
+      title: `${ojlHours.toLocaleString()} supervised OJL hours`,
+      detail: `Track ${ojlHours.toLocaleString()} supervised on-the-job learning hours at the approved host shop. Supervisors verify hours and competencies as you progress.`,
+    },
+    {
+      title: 'Completion & licensing pathway',
+      detail:
+        'After registered-apprenticeship requirements are completed and verified, complete any applicable Indiana licensing and examination requirements. Registered apprenticeship completion and state licensure are separate compliance checkpoints.',
+    },
+  ] as const;
+
   return (
     <section className="py-12 border-t border-slate-100 bg-white" id="how-it-works">
       <div className="max-w-5xl mx-auto px-4">
@@ -36,15 +39,16 @@ export default function BarberApprenticeshipProcess() {
           How it works
         </p>
         <h2 className="text-2xl font-extrabold text-slate-900 mb-2">
-          From application to licensed barber
+          From application through registered apprenticeship completion
         </h2>
         <p className="text-slate-600 text-sm leading-relaxed max-w-3xl mb-8">
-          This is a <strong>52-week DOL registered apprenticeship</strong> — not a short course.
-          You train on the shop floor, study online, and move toward Indiana licensure with a
-          clear step-by-step path.
+          This is a DOL registered apprenticeship, not a short course. The registered program
+          requires <strong>{ojlHours.toLocaleString()} supervised OJL hours</strong> plus{' '}
+          <strong>{rtiHours.toLocaleString()} RTI hours</strong>. Scheduling and completion time
+          depend on approved work hours, progress, transfer-hour determinations, and program status.
         </p>
         <ol className="space-y-4">
-          {STEPS.map((step, index) => (
+          {steps.map((step, index) => (
             <li
               key={step.title}
               className="flex gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5"
@@ -60,16 +64,16 @@ export default function BarberApprenticeshipProcess() {
           ))}
         </ol>
         <p className="mt-6 text-sm text-slate-600">
-          Self-pay tuition is <strong>$4,980</strong> when workforce funding does not apply — use the{' '}
+          Published self-pay program cost is <strong>$4,980</strong> when approved workforce or employer funding does not apply — use the{' '}
           <Link href="#payment-calculator" className="font-semibold text-brand-blue-600 hover:underline">
             payment calculator
           </Link>{' '}
-          below for deposit and weekly plan options, or{' '}
+          for available plan options, or{' '}
           <Link
             href="/programs/barber-apprenticeship/payment/bnpl"
             className="font-semibold text-brand-blue-600 hover:underline"
           >
-            compare BNPL providers
+            compare available payment providers
           </Link>
           .
         </p>

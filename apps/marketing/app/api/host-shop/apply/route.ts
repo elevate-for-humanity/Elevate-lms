@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const businessName = clean(body.businessName, 255);
+    const businessName = clean(body.businessName || body.dbaName || body.legalBusinessName, 255);
     const legalBusinessName = clean(body.legalBusinessName || body.businessName, 255);
     const dbaName = clean(body.dbaName, 255);
     const ownerName = clean(body.ownerName, 255);

@@ -5,7 +5,6 @@
 
 import { getRoleDestination, type UserRole } from '@/lib/auth/role-destinations';
 
-/** Returns the canonical dashboard path for a role. */
 export function getDashboardForRole(role: UserRole | string | null | undefined): string {
   if (!role) return '/lms/dashboard';
   return getRoleDestination(role as UserRole);
@@ -21,7 +20,6 @@ export function resolvePostLoginDestination(
 
 export const ADMIN_ROLES: ReadonlyArray<string> = [
   'admin',
-  'super_admin',
   'staff',
   'org_admin',
 ];
@@ -39,14 +37,13 @@ export function isInstructorRole(role: string | null | undefined): boolean {
   return INSTRUCTOR_ROLES.includes(role ?? '');
 }
 
-/** Normalize a post-auth destination URL to a safe internal path. */
 export function normalizePostAuthDestination(url: string, defaultRole: string): string {
   let path = url;
   try {
     const parsed = new URL(url);
     path = parsed.pathname + parsed.search;
   } catch {
-    // Already a path
+    // Already a path.
   }
   if (!path.startsWith('/')) path = '/' + path;
   if (path.startsWith('http')) return getDashboardForRole(defaultRole);

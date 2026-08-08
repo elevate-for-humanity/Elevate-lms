@@ -1,250 +1,196 @@
 // lib/auth/route-guards.ts
-// Unified route guards for all authenticated routes
+// Canonical route guards for authenticated portals.
 
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
-import type { UserRole } from '@/lib/navigation/navigation-config';
+import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
-// Allowed roles for each portal
-const PORTAL_ROLE_MAP: Record<string, UserRole[]> = {
-  '/admin': ['admin'],
-  '/lms': ['admin', 'student', 'partner', 'program_holder', 'instructor', 'apprentice'],
-  '/apprentice': ['admin', 'apprentice', 'instructor'],
-  '/instructor': ['admin', 'instructor'],
-  '/employer': ['admin', 'employer'],
-  '/partner': ['admin', 'partner'],
-  '/staff-portal': ['admin', 'staff'],
-  '/case-manager': ['admin', 'case_manager'],
-  '/sponsor': ['admin', 'sponsor'],
-  '/host-shop': ['admin', 'host_shop'],
-  '/workforce': ['admin', 'workforce'],
-  '/workforce-board': ['admin', 'employer'],
-  '/provider': ['admin', 'provider'],
-  '/program-holder': ['admin', 'program_holder', 'partner'],
-  '/student-portal': ['admin', 'student'],
-  '/student': ['admin', 'student'],
-  '/learner': ['admin', 'student'],
+const PORTAL_ROLE_MAP: Record<string, string[]> = {
+  '/admin': ['admin', 'super_admin', 'org_admin', 'staff', 'instructor', 'test_admin', 'proctor'],
+  '/lms': ['admin', 'super_admin', 'student', 'program_holder', 'instructor', 'apprentice', 'grant_client'],
+  '/apprentice': ['admin', 'super_admin', 'apprentice', 'instructor'],
+  '/portal': ['admin', 'super_admin', 'student', 'apprentice'],
+  '/instructor': ['admin', 'super_admin', 'instructor'],
+  '/employer': ['admin', 'super_admin', 'employer', 'sponsor', 'org_admin'],
+  '/staff-portal': ['admin', 'super_admin', 'staff', 'case_manager'],
+  '/case-manager': ['admin', 'super_admin', 'staff', 'case_manager'],
+  '/host-shop': ['admin', 'super_admin', 'staff', 'host_shop', 'host_shop_admin', 'partner'],
+  '/workforce': ['admin', 'super_admin', 'staff', 'workforce', 'workforce_partner'],
+  '/workforce-board': ['admin', 'super_admin', 'staff', 'case_manager', 'workforce_board', 'workforce_board_admin'],
+  '/provider': ['admin', 'super_admin', 'provider', 'provider_admin'],
+  '/program-holder': ['admin', 'super_admin', 'program_holder'],
+  '/proctor': ['admin', 'super_admin', 'test_admin', 'proctor'],
 };
 
-// Route to redirect to after login
 const ROUTE_REDIRECTS: Record<string, string> = {
-  '/admin': '/admin/dashboard',
+  '/admin': '/dashboard',
   '/lms': '/lms/dashboard',
   '/apprentice': '/apprentice',
+  '/portal': '/lms/dashboard',
   '/instructor': '/instructor/dashboard',
   '/employer': '/employer/dashboard',
-  '/partner': '/partner/dashboard',
   '/staff-portal': '/staff-portal/dashboard',
   '/case-manager': '/case-manager/dashboard',
-  '/sponsor': '/sponsor/dashboard',
   '/host-shop': '/host-shop/dashboard',
   '/workforce': '/workforce/dashboard',
   '/workforce-board': '/workforce-board/dashboard',
   '/provider': '/provider/dashboard',
   '/program-holder': '/program-holder/dashboard',
-  '/student-portal': '/student-portal/dashboard',
-  '/student': '/learner/dashboard',
-  '/learner': '/learner/dashboard',
+  '/proctor': '/testing-center',
 };
 
-// Unauthorized redirect per role
-const UNAUTHORIZED_REDIRECTS: Record<string, string> = {
-  admin: '/admin/dashboard',
-  student: '/lms/dashboard',
-  apprentice: '/apprentice',
-  instructor: '/instructor/dashboard',
-  employer: '/employer/dashboard',
-  partner: '/partner/dashboard',
-  staff: '/staff-portal/dashboard',
-  case_manager: '/case-manager/dashboard',
-  sponsor: '/sponsor/dashboard',
-  host_shop: '/host-shop/dashboard',
-  workforce: '/workforce/dashboard',
-  workforce_board: '/workforce-board/dashboard',
-  provider: '/provider/dashboard',
-  program_holder: '/program-holder/dashboard',
-};
-
-// Billing-exempt routes (don't redirect if subscription is suspended)
 const BILLING_EXEMPT_PREFIXES = [
   '/billing-required',
   '/apprentice/billing',
-  '/student-portal/billing',
   '/lms/billing',
 ];
 
-/**
- * Get the base path from the current pathname
- */
 export function getBasePath(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length === 0) return '/';
   return '/' + segments[0];
 }
 
-/**
- * Check if the current path is billing-exempt
- */
 export function isBillingExempt(pathname: string): boolean {
   return BILLING_EXEMPT_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-/**
- * Get redirect URL for a role
- */
-export function getRedirectForRole(role: string | null | undefined): string {
-  if (!role) return '/login';
-  return UNAUTHORIZED_REDIRECTS[role] || '/';
+export function normalizeRole(role: string): string {
+  const roleMap: Record<string, string> = {
+    admin: 'admin',
+    super_admin: 'super_admin',
+    org_admin: 'org_admin',
+    student: 'student',
+    apprentice: 'apprentice',
+    barber_apprentice: 'apprentice',
+    cosmetology_apprentice: 'apprentice',
+    instructor: 'instructor',
+    employer: 'employer',
+    sponsor: 'sponsor',
+    partner: 'partner',
+    host_shop: 'host_shop',
+    host_shop_admin: 'host_shop_admin',
+    staff: 'staff',
+    case_manager: 'case_manager',
+    workforce: 'workforce',
+    workforce_partner: 'workforce_partner',
+    workforce_board: 'workforce_board',
+    workforce_board_admin: 'workforce_board_admin',
+    program_holder: 'program_holder',
+    provider: 'provider',
+    provider_admin: 'provider_admin',
+    test_admin: 'test_admin',
+    proctor: 'proctor',
+  };
+  return roleMap[role] || role;
 }
 
-/**
- * Get redirect URL after login based on requested path
- */
+export function getRedirectForRole(role: string | null | undefined): string {
+  if (!role) return '/login';
+  return resolveDashboardUrl(role);
+}
+
 export function getLoginRedirect(pathname: string): string {
   const basePath = getBasePath(pathname);
   return ROUTE_REDIRECTS[basePath] || '/lms/dashboard';
 }
 
-/**
- * Check if a role can access a portal
- */
 export function canAccessPortal(role: string | null | undefined, pathname: string): boolean {
   if (!role) return false;
-  
   const basePath = getBasePath(pathname);
   const allowedRoles = PORTAL_ROLE_MAP[basePath];
-  
-  if (!allowedRoles) return true; // Unknown portal, allow access
-  
-  // Map database role names to our role types
-  const normalizedRole = normalizeRole(role);
-  return allowedRoles.includes(normalizedRole as UserRole);
+  if (!allowedRoles) return true;
+  return allowedRoles.includes(normalizeRole(role));
 }
 
-/**
- * Normalize role names from database to our types
- */
-export function normalizeRole(role: string): string {
-  const roleMap: Record<string, string> = {
-    admin: 'admin',
-    student: 'student',
-    apprentice: 'apprentice',
-    instructor: 'instructor',
-    employer: 'employer',
-    partner: 'partner',
-    staff: 'staff',
-    case_manager: 'case_manager',
-    sponsor: 'sponsor',
-    host_shop: 'host_shop',
-    workforce: 'workforce',
-    workforce_board: 'workforce_board',
-    program_holder: 'program_holder',
-    program_holder_staff: 'partner',
-    provider: 'provider',
-    super_admin: 'super_admin',
-  };
-  
-  return roleMap[role] || role;
-}
-
-
-/**
- * Resolve the current request pathname for post-login redirect.
- * In standalone Node.js deployments, Edge middleware custom headers are not
- * reliably propagated to server components, so a cookie is used as fallback.
- */
 async function resolveCurrentPath(): Promise<string> {
   const headersList = await headers();
   const raw = headersList.get('x-pathname') || '';
   if (raw) {
     try {
-      const u = new URL(raw, 'http://localhost');
-      return u.pathname + (u.search || '');
+      const url = new URL(raw, 'http://localhost');
+      return url.pathname + (url.search || '');
     } catch {
       // fall through to cookie
     }
   }
-  // Cookie fallback for standalone Node.js runtimes
+
   try {
     const cookieStore = await cookies();
     const cookie = cookieStore.get('__efh_pathname');
     if (cookie?.value) return cookie.value;
   } catch {
-    // cookies() throws during static prerender
+    // cookies() can throw during static prerender
   }
   return '/';
 }
 
-/**
- * Require authentication - redirects to login if not authenticated
- */
+async function loadEffectiveRoles(userId: string): Promise<{ profile: any; effectiveRoles: string[] }> {
+  const { createClient } = await import('@/lib/supabase/server');
+  const supabase = await createClient();
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .maybeSingle();
+
+  const { data: roleRows } = await supabase
+    .from('user_roles')
+    .select('roles(name)')
+    .eq('user_id', userId);
+
+  const secondaryRoles = (roleRows ?? [])
+    .map((row: any) => row.roles?.name)
+    .filter((role: unknown): role is string => typeof role === 'string');
+
+  return {
+    profile,
+    effectiveRoles: Array.from(new Set([profile?.role, ...secondaryRoles].filter(Boolean))) as string[],
+  };
+}
+
 export async function requireAuth() {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
-  
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-  
+  const { data: { user }, error } = await supabase.auth.getUser();
+
   if (error || !user) {
     const pathname = await resolveCurrentPath();
     redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
   }
-  
+
   return user;
 }
 
-/**
- * Require specific roles - redirects to unauthorized if role not allowed
- */
 export async function requireRoles(allowedRoles: string[]) {
   const user = await requireAuth();
-  
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
-  
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  
-  const normalizedRole = normalizeRole(profile?.role || '');
-  
-  if (!allowedRoles.includes(normalizedRole)) {
+  const { profile, effectiveRoles } = await loadEffectiveRoles(user.id);
+  const normalizedAllowed = allowedRoles.map(normalizeRole);
+
+  if (!effectiveRoles.map(normalizeRole).some((role) => normalizedAllowed.includes(role))) {
     redirect('/unauthorized');
   }
-  
-  return { user, profile };
+
+  return { user, profile, effectiveRoles };
 }
 
-/**
- * Require portal access based on current pathname
- */
 export async function requirePortalAccess() {
   const user = await requireAuth();
-  
   const pathname = await resolveCurrentPath();
-  
-  const { createClient } = await import('@/lib/supabase/server');
-  const supabase = await createClient();
-  
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-  
-  if (!canAccessPortal(profile?.role, pathname)) {
-    redirect(getRedirectForRole(profile?.role));
+  const { profile, effectiveRoles } = await loadEffectiveRoles(user.id);
+  const basePath = getBasePath(pathname);
+  const allowedRoles = PORTAL_ROLE_MAP[basePath];
+  const canAccess = !allowedRoles || effectiveRoles.map(normalizeRole).some((role) => allowedRoles.includes(role));
+
+  if (!canAccess) {
+    redirect(resolveDashboardUrl(profile?.role, effectiveRoles));
   }
-  
-  // Check billing status for apprentices
+
   const { getAdminClient } = await import('@/lib/supabase/admin');
   const db = await getAdminClient();
-  
-  if (db && !isBillingExempt(pathname)) {
+
+  if (db && !isBillingExempt(pathname) && effectiveRoles.map(normalizeRole).includes('apprentice')) {
     const { data: barberSub } = await db
       .from('barber_subscriptions')
       .select('payment_status, suspension_deadline')
@@ -252,47 +198,29 @@ export async function requirePortalAccess() {
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
-    
+
     const isSuspended =
       barberSub?.payment_status === 'suspended' ||
       (barberSub?.payment_status === 'past_due' &&
         !!barberSub.suspension_deadline &&
         new Date(barberSub.suspension_deadline) < new Date());
-    
-    if (isSuspended) {
-      redirect('/billing-required?reason=payment_failed');
-    }
+
+    if (isSuspended) redirect('/billing-required?reason=payment_failed');
   }
-  
-  return { user, profile };
+
+  return { user, profile, effectiveRoles };
 }
 
-/**
- * Check if user is authenticated (does not redirect)
- */
 export async function checkAuth() {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
-  
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
-  
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-  
-  return { user, profile };
+
+  const { profile, effectiveRoles } = await loadEffectiveRoles(user.id);
+  return { user, profile, effectiveRoles };
 }
 
-/**
- * Get role-based dashboard URL
- */
 export function getDashboardForRole(role: string | null | undefined): string {
-  if (!role) return '/lms/dashboard';
-  return ROUTE_REDIRECTS[`/${normalizeRole(role).replace('_', '-')}`] || '/lms/dashboard';
+  return resolveDashboardUrl(role);
 }

@@ -4,10 +4,8 @@ import { createServerClient } from '@supabase/ssr';
 
 /**
  * Admin Middleware - handles auth BEFORE pages render to avoid redirect loops.
- * Uses @supabase/ssr for Edge Runtime compatibility.
  */
 
-// Paths that never require auth
 const PUBLIC_PATHS = [
   '/login',
   '/unauthorized',
@@ -18,10 +16,19 @@ const PUBLIC_PATHS = [
   '/admin/install',
 ];
 
+const ADMIN_PORTAL_ROLES = [
+  'super_admin',
+  'admin',
+  'staff',
+  'org_admin',
+  'instructor',
+  'test_admin',
+  'proctor',
+];
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Always allow public paths and static files
   if (
     PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith('/_next') ||
@@ -31,16 +38,17 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check IP guard first
   const ipBlocked = checkAdminIP(req);
   if (ipBlocked) return ipBlocked;
 
-  // Gate all operational Admin surfaces, including the top-level dashboard.
   const isProtected =
     pathname === '/' ||
     pathname === '/dashboard' ||
     pathname.startsWith('/dashboard/') ||
     pathname.startsWith('/admin') ||
+    pathname.startsWith('/staff-portal') ||
+    pathname.startsWith('/instructor') ||
+    pathname.startsWith('/testing-center') ||
     pathname.startsWith('/dev-studio') ||
     pathname.startsWith('/api/admin') ||
     pathname.startsWith('/api/staff') ||
@@ -80,8 +88,17 @@ export async function middleware(req: NextRequest) {
     .eq('id', user.id)
     .maybeSingle();
 
-  const validRoles = ['admin', 'instructor', 'staff', 'super_admin'];
-  if (!profile?.role || !validRoles.includes(profile.role)) {
+  const { data: roleRows } = await supabase
+    .from('user_roles')
+    .select('roles(name)')
+    .eq('user_id', user.id);
+
+  const secondaryRoles = (roleRows ?? [])
+    .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
+    .filter((role): role is string => typeof role === 'string');
+  const effectiveRoles = Array.from(new Set([profile?.role, ...secondaryRoles].filter(Boolean))) as string[];
+
+  if (!effectiveRoles.some((role) => ADMIN_PORTAL_ROLES.includes(role))) {
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
 
@@ -91,7 +108,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/dev-studio') ||
     pathname.startsWith('/api/devstudio');
 
-  if (isDevStudioRoute && !['admin', 'super_admin'].includes(profile.role)) {
+  if (isDevStudioRoute && !effectiveRoles.some((role) => ['admin', 'super_admin'].includes(role))) {
     return NextResponse.redirect(new URL('/unauthorized', req.url));
   }
 

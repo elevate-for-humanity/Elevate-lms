@@ -2,21 +2,37 @@
 
 import { useState } from 'react';
 import { submitStudentApplication } from '@/apps/marketing/app/apply/actions';
+import type { FundingType } from '@/lib/programs/program-schema';
 
 interface Props {
   programSlug: string;
   programTitle: string;
+  fundingOptions?: FundingType[];
 }
 
-const FUNDING_OPTIONS = [
-  { value: 'wioa', label: 'WIOA / WorkOne' },
-  { value: 'wrg', label: 'Workforce Ready Grant' },
+const STANDARD_PAYMENT_OPTIONS = [
   { value: 'employer', label: 'Employer Sponsored' },
   { value: 'self-pay', label: 'Self-Pay' },
   { value: 'unsure', label: 'Not Sure Yet' },
 ];
 
-export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
+export function getProgramPaymentOptions(fundingOptions: FundingType[] = []) {
+  return [
+    ...(fundingOptions.includes('wioa') ? [{ value: 'wioa', label: 'WIOA / WorkOne' }] : []),
+    ...(fundingOptions.includes('wrg') ? [{ value: 'wrg', label: 'Workforce Ready Grant' }] : []),
+    ...STANDARD_PAYMENT_OPTIONS,
+  ];
+}
+
+export default function ProgramApplyForm({
+  programSlug,
+  programTitle,
+  fundingOptions = [],
+}: Props) {
+  const paymentOptions = getProgramPaymentOptions(fundingOptions);
+  const hasWorkforceFunding = fundingOptions.some(
+    (option) => option === 'wioa' || option === 'wrg',
+  );
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -29,7 +45,9 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+  ) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
@@ -69,7 +87,8 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
         <h3 className="text-xl font-bold text-brand-green-800 mb-2">Application Received!</h3>
         <p className="text-brand-green-700">
           Thank you for applying to <strong>{programTitle}</strong>. An enrollment advisor will
-          contact you within 1 business day to discuss next steps and funding options.
+          contact you within 1 business day to discuss next steps and{' '}
+          {hasWorkforceFunding ? 'funding review' : 'enrollment options'}.
         </p>
       </div>
     );
@@ -79,7 +98,10 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor={`${programSlug}-firstName`} className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor={`${programSlug}-firstName`}
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             First Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -93,7 +115,10 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
           />
         </div>
         <div>
-          <label htmlFor={`${programSlug}-lastName`} className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor={`${programSlug}-lastName`}
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Last Name <span className="text-red-500">*</span>
           </label>
           <input
@@ -110,7 +135,10 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor={`${programSlug}-email`} className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor={`${programSlug}-email`}
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Email Address <span className="text-red-500">*</span>
           </label>
           <input
@@ -124,7 +152,10 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
           />
         </div>
         <div>
-          <label htmlFor={`${programSlug}-phone`} className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor={`${programSlug}-phone`}
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             Phone Number <span className="text-red-500">*</span>
           </label>
           <input
@@ -141,7 +172,10 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor={`${programSlug}-zipCode`} className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor={`${programSlug}-zipCode`}
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             ZIP Code
           </label>
           <input
@@ -156,7 +190,10 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
           />
         </div>
         <div>
-          <label htmlFor={`${programSlug}-funding`} className="block text-sm font-medium text-slate-700 mb-1">
+          <label
+            htmlFor={`${programSlug}-funding`}
+            className="block text-sm font-medium text-slate-700 mb-1"
+          >
             How do you plan to pay?
           </label>
           <select
@@ -167,15 +204,20 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-red-500"
           >
             <option value="">Select an option</option>
-            {FUNDING_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+            {paymentOptions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
       <div>
-        <label htmlFor={`${programSlug}-goals`} className="block text-sm font-medium text-slate-700 mb-1">
+        <label
+          htmlFor={`${programSlug}-goals`}
+          className="block text-sm font-medium text-slate-700 mb-1"
+        >
           Why are you interested in this program?
         </label>
         <textarea
@@ -189,9 +231,7 @@ export default function ProgramApplyForm({ programSlug, programTitle }: Props) {
         />
       </div>
 
-      {status === 'error' && (
-        <p className="text-sm text-red-600">{errorMsg}</p>
-      )}
+      {status === 'error' && <p className="text-sm text-red-600">{errorMsg}</p>}
 
       <button
         type="submit"

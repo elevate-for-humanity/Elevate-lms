@@ -119,8 +119,10 @@ export default function ProgramDetailPage({
   const pathwaySteps = [
     {
       step: 'Step 1',
-      title: 'Eligibility & Intake',
-      detail: 'Program selection, readiness review, and the correct enrollment path.',
+      title: isWorkforceFunded ? 'Eligibility & Intake' : 'Enrollment & Intake',
+      detail: isWorkforceFunded
+        ? 'Program selection, readiness review, and the correct funding or self-pay path.'
+        : 'Program selection, readiness review, and the published self-pay enrollment path.',
     },
     {
       step: 'Step 2',
@@ -438,9 +440,13 @@ export default function ProgramDetailPage({
       {/* 5-STEP WORKFORCE PATHWAY */}
       <section className="py-12 bg-slate-50 border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Full Workforce Pathway</h2>
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">
+            {isWorkforceFunded ? 'Full Workforce Pathway' : 'Full Career Pathway'}
+          </h2>
           <p className="text-slate-600 text-sm mb-8">
-            Built for agency deployment: intake to wage outcome in one system.
+            {isWorkforceFunded
+              ? 'Built for agency deployment: intake to wage outcome in one system.'
+              : 'A clear path from enrollment through training, credential, and career support.'}
           </p>
           <div className="grid gap-3 md:grid-cols-5">
             {pathwaySteps.map((item) => (
@@ -834,7 +840,9 @@ export default function ProgramDetailPage({
               </p>
               <ul className="space-y-2 text-sm text-slate-700">
                 {[
-                  'Intake profile maps learner goals, schedule, and funding pathway.',
+                  isWorkforceFunded
+                    ? 'Intake profile maps learner goals, schedule, and funding pathway.'
+                    : 'Intake profile maps learner goals, schedule, and enrollment pathway.',
                   'Training milestones and credentials are tracked to completion.',
                   'Employer introductions are prioritized for interview-ready graduates.',
                   'Placement support continues through first wage outcome reporting window.',
@@ -865,7 +873,11 @@ export default function ProgramDetailPage({
               day
             </p>
           </div>
-          <ProgramApplyForm programSlug={p.slug} programTitle={p.title} />
+          <ProgramApplyForm
+            programSlug={p.slug}
+            programTitle={p.title}
+            fundingOptions={publicFundingOptions}
+          />
         </div>
       </section>
 

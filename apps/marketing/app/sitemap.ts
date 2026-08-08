@@ -1,38 +1,67 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.elevateforhumanity.org';
   const now = new Date();
 
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${baseUrl}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/programs`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/apprenticeships`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/testing`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${baseUrl}/funding`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${baseUrl}/eligibility`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/apply`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${baseUrl}/verify`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/platform`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/platform/sponsors`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/partners`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/employer`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/compliance`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/federal-compliance`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/onboarding`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/career-training`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/community-services`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/demos`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${baseUrl}/demos/vr-funding`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${baseUrl}/ai`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+  const coreRoutes: Array<{
+    path: string;
+    changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
+    priority: number;
+  }> = [
+    { path: '/', changeFrequency: 'weekly', priority: 1 },
+    { path: '/programs', changeFrequency: 'weekly', priority: 0.95 },
+    { path: '/apply', changeFrequency: 'monthly', priority: 0.95 },
+    { path: '/host-shop', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/host-shop/apply', changeFrequency: 'monthly', priority: 0.85 },
+    { path: '/apprenticeships', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/testing', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/funding', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/funding/wioa', changeFrequency: 'monthly', priority: 0.85 },
+    { path: '/funding/wrg', changeFrequency: 'monthly', priority: 0.85 },
+    { path: '/jri', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/scholarships', changeFrequency: 'monthly', priority: 0.75 },
+    { path: '/eligibility/quiz', changeFrequency: 'monthly', priority: 0.85 },
+    { path: '/tuition-fees', changeFrequency: 'weekly', priority: 0.85 },
+    { path: '/about', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/approvals', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/contact', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
+    { path: '/faq', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/privacy', changeFrequency: 'yearly', priority: 0.5 },
+    { path: '/legal', changeFrequency: 'yearly', priority: 0.55 },
+    { path: '/accessibility', changeFrequency: 'yearly', priority: 0.55 },
+    { path: '/federal-compliance', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/compliance/center', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/partners', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/employer', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/for-agencies', changeFrequency: 'monthly', priority: 0.75 },
+    { path: '/store', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/store/demo', changeFrequency: 'weekly', priority: 0.85 },
+    { path: '/store/plans', changeFrequency: 'weekly', priority: 0.85 },
+    { path: '/store/trial', changeFrequency: 'weekly', priority: 0.85 },
   ];
 
-  const storeRoutes = [
-    '/store',
-    '/store/plans',
-    '/store/apps',
+  const programRoutes = [
+    '/programs/healthcare',
+    '/programs/cna',
+    '/programs/medical-assistant',
+    '/programs/phlebotomy',
+    '/programs/qma',
+    '/programs/hvac-technician',
+    '/programs/skilled-trades',
+    '/programs/cdl-training',
+    '/programs/barber-apprenticeship',
+    '/programs/barber-apprenticeship/apply',
+    '/programs/barber-apprenticeship/request-info',
+    '/programs/cosmetology-apprenticeship',
+    '/programs/esthetician-apprenticeship',
+    '/programs/nail-technician-apprenticeship',
+    '/programs/technology',
+    '/programs/business',
+  ];
+
+  const appStoreRoutes = [
     '/store/apps/website-builder',
     '/store/apps/sam-gov',
     '/store/apps/grants',
@@ -41,60 +70,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/store/dev-studio',
     '/store/ai-studio',
     '/store/testing',
-    '/store/licenses',
-    '/store/licensing',
-    '/store/licenses/managed-platform',
-    '/store/demos',
-    '/store/trial',
-    '/store/courses',
-    '/store/courses/hvac-technician-course-license',
-    '/store/digital',
-    '/store/compliance',
-    '/store/compliance/wioa',
-    '/store/compliance/wcag',
-    '/store/integrations',
-    '/store/workflow-studio',
-    '/store/deployment',
-    '/store/guides',
-    '/store/guides/licensing',
-    '/store/guides/capital-readiness',
   ];
 
-  const storeSitemap: MetadataRoute.Sitemap = storeRoutes.map((route, index) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: index === 0 ? 0.95 : route.startsWith('/store/apps/') ? 0.85 : 0.8,
-  }));
-
-  const programPages = [
-    { slug: 'programs/catalog', priority: 0.9 },
-    { slug: 'programs/healthcare', priority: 0.9 },
-    { slug: 'programs/cna', priority: 0.9 },
-    { slug: 'programs/medical-assistant', priority: 0.8 },
-    { slug: 'programs/phlebotomy', priority: 0.8 },
-    { slug: 'programs/qma', priority: 0.8 },
-    { slug: 'programs/peer-recovery-specialist', priority: 0.8 },
-    { slug: 'programs/cpr-first-aid', priority: 0.8 },
-    { slug: 'programs/hvac-technician', priority: 0.9 },
-    { slug: 'programs/skilled-trades', priority: 0.8 },
-    { slug: 'programs/cdl-training', priority: 0.9 },
-    { slug: 'programs/electrical', priority: 0.7 },
-    { slug: 'programs/plumbing', priority: 0.7 },
-    { slug: 'programs/barber-apprenticeship', priority: 0.9 },
-    { slug: 'programs/cosmetology-apprenticeship', priority: 0.8 },
-    { slug: 'programs/esthetician-apprenticeship', priority: 0.8 },
-    { slug: 'programs/nail-technician-apprenticeship', priority: 0.7 },
-    { slug: 'programs/technology', priority: 0.8 },
-    { slug: 'programs/business', priority: 0.8 },
+  return [
+    ...coreRoutes.map(({ path, changeFrequency, priority }) => ({
+      url: `${baseUrl}${path === '/' ? '' : path}`,
+      lastModified: now,
+      changeFrequency,
+      priority,
+    })),
+    ...programRoutes.map((path) => ({
+      url: `${baseUrl}${path}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: path.includes('barber-apprenticeship') ? 0.9 : 0.8,
+    })),
+    ...appStoreRoutes.map((path) => ({
+      url: `${baseUrl}${path}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    })),
   ];
-
-  const programSitemap: MetadataRoute.Sitemap = programPages.map((page) => ({
-    url: `${baseUrl}/${page.slug}`,
-    lastModified: now,
-    changeFrequency: 'weekly',
-    priority: page.priority,
-  }));
-
-  return [...staticPages, ...storeSitemap, ...programSitemap];
 }

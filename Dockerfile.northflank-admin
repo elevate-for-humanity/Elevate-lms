@@ -42,7 +42,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
-RUN echo "nf-cache-invalidate-admin-2026-08-08-nf-git-sha"
+RUN echo "nf-cache-invalidate-admin-2026-08-08-devstudio-import-repair"
 
 # =============================================================================
 # STAGE 2: Dependencies

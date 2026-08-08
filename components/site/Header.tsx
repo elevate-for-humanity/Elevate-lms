@@ -13,44 +13,46 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export default function Header() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 h-[68px] bg-white z-[9999] shadow-sm border-b border-slate-200"
+      className="fixed inset-x-0 top-0 z-[9999] h-[68px] border-b border-slate-200 bg-white shadow-sm"
       role="banner"
     >
-      <div className="max-w-screen-2xl mx-auto w-full h-full px-4 xl:px-8 grid grid-cols-[auto_1fr_auto] items-center gap-3 xl:gap-6">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_1fr_auto] items-center gap-2 px-3 md:gap-4 md:px-4 xl:gap-6 xl:px-8">
         <Link
           href="/"
-          className="flex items-center gap-2.5 flex-shrink-0 min-w-0"
+          className="flex min-w-0 flex-shrink-0 items-center gap-2.5"
           aria-label={`${PLATFORM_DEFAULTS.orgName} home`}
         >
-          <LogoImage alt="Elevate" width={44} height={56} className="w-auto h-10" />
-          <span className="font-extrabold text-base text-slate-950 tracking-tight whitespace-nowrap">
+          <LogoImage alt="Elevate" width={44} height={56} className="h-10 w-auto" />
+          <span className="hidden whitespace-nowrap text-base font-extrabold tracking-tight text-slate-950 sm:inline">
             Elevate
           </span>
         </Link>
 
-        <div className="hidden lg:flex justify-center min-w-0 overflow-visible">
+        {/* Desktop/tablet navigation. Mobile menu is never rendered in this region. */}
+        <div className="hidden min-w-0 justify-center overflow-visible md:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
-        <div className="flex items-center justify-end gap-2 flex-shrink-0 min-w-0">
-          <div className="hidden lg:flex items-center gap-2">
+        <div className="flex min-w-0 flex-shrink-0 items-center justify-end gap-2">
+          <div className="hidden items-center gap-1 md:flex xl:gap-2">
             <Link
               href={ROUTES.login}
-              className="text-base font-semibold text-slate-700 hover:text-slate-950 px-3 py-2"
+              className="whitespace-nowrap px-2 py-2 text-sm font-semibold text-slate-800 hover:text-slate-950 xl:px-3 xl:text-base"
             >
               Sign In
             </Link>
             <Link
               href={ROUTES.apply}
-              className="text-base bg-brand-red-600 hover:bg-brand-red-700 text-white px-5 py-2.5 rounded-lg font-bold"
+              className="whitespace-nowrap rounded-lg bg-brand-red-600 px-3 py-2 text-sm font-bold text-white hover:bg-brand-red-700 xl:px-5 xl:py-2.5 xl:text-base"
             >
               Apply
             </Link>
             <HeaderDesktopMenu items={NAV_ITEMS} />
           </div>
 
-          <div className="lg:hidden flex items-center gap-1">
-            <span className="hidden sm:inline text-sm font-bold text-slate-700" aria-hidden="true">
+          {/* Mobile only. This cannot coexist with the desktop controls. */}
+          <div className="flex items-center gap-1 md:hidden">
+            <span className="hidden text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu
             </span>
             <HeaderMobileMenu items={NAV_ITEMS} />

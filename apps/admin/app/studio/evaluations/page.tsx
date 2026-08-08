@@ -1,7 +1,12 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-export const dynamic = 'force-dynamic';
+import nextDynamic from 'next/dynamic';
+
+const EvaluationStudioPanel = nextDynamic(() => import('@/components/studio/EvaluationStudioPanel'), {
+  ssr: false,
+  loading: () => <div className="flex min-h-[50vh] items-center justify-center bg-slate-950 text-slate-300">Loading Evaluation Studio…</div>,
+});
 
 export default function StudioEvaluationsPage() {
-  redirect('/studio?tab=evaluations');
+  return <EvaluationStudioPanel />;
 }

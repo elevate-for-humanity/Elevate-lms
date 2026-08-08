@@ -1,21 +1,10 @@
 #!/usr/bin/env tsx
 /**
- * Sync environment variables to a Northflank project secret group.
+ * Sync shared production secrets/config to the Northflank project secret group.
  *
- * Sources (merged, later wins):
- *   1. JSON file (--file exports/northflank-env.production.json)
- *   2. Current process.env for keys in env-keys-manifest.txt
- *   3. Static production defaults below
- *
- * Usage:
- *   npx tsx scripts/northflank/sync-env.ts --dry-run
- *   npx tsx scripts/northflank/sync-env.ts --execute
- *   npx tsx scripts/northflank/sync-env.ts --file exports/northflank-env.production.json --execute
- *
- * Env:
- *   NORTHFLANK_API_TOKEN, NORTHFLANK_PROJECT_ID
- *   NORTHFLANK_LMS_SERVICE_ID, NORTHFLANK_ADMIN_SERVICE_ID,
- *   NORTHFLANK_MARKETING_SERVICE_ID (optional overrides)
+ * Infrastructure/runtime shape (PORT, HOSTNAME, SERVICE_ROLE, Dockerfile,
+ * health checks) is intentionally owned by configure-services.ts so a shared
+ * secret sync cannot change how containers listen or route.
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -28,16 +17,11 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const MANIFEST = join(__dir, 'env-keys-manifest.txt');
 
 const STATIC_ENV: Record<string, string> = {
-  NODE_ENV: 'production',
-  HOSTNAME: '0.0.0.0',
-  // All Northflank production services expose Next.js on 3000 and all health
-  // probes target 3000. Do not override this shared runtime value to 8080.
-  PORT: '3000',
-  NEXT_TELEMETRY_DISABLED: '1',
   SUPABASE_PROJECT_REF: 'cuxzzpsyufcewtmicszk',
   NEXT_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
   NEXT_PUBLIC_CANONICAL_DOMAIN: 'www.elevateforhumanity.org',
   NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
+  NEXT_PUBLIC_APP_URL: 'https://app.elevateforhumanity.org',
   NEXT_PUBLIC_LMS_URL: 'https://app.elevateforhumanity.org',
   NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
   NEXT_PUBLIC_ORG_NAME: 'Elevate for Humanity',
@@ -47,12 +31,20 @@ const STATIC_ENV: Record<string, string> = {
   NEXT_PUBLIC_EMAIL_FROM_NAME: 'Elevate for Humanity',
   NEXT_PUBLIC_EMAIL_FROM_ADDRESS: 'noreply@elevateforhumanity.org',
   NEXT_PUBLIC_CERT_HOLDER: 'Elevate for Humanity',
-  // SERVICE_ROLE is set per-service in configure-services.ts — do not put it in shared secrets.
   DEVSTUDIO_DEVCONTAINER_MODE: 'github-only',
   COURSE_VIDEO_STORAGE_BACKEND: 'auto',
   COURSE_VIDEO_R2_MIN_BYTES: '5242880',
   REMOTION_RELEASE_BUNDLE_AFTER_RENDER: 'true',
 };
+
+const INFRA_KEYS = new Set([
+  'PORT',
+  'HOSTNAME',
+  'NODE_ENV',
+  'NEXT_TELEMETRY_DISABLED',
+  'SERVICE_ROLE',
+  'SERVICE_NAME',
+]);
 
 function loadManifestKeys(): string[] {
   return readFileSync(MANIFEST, 'utf8')
@@ -64,6 +56,7 @@ function loadManifestKeys(): string[] {
 function loadFromProcessEnv(keys: string[]): Record<string, string> {
   const out: Record<string, string> = {};
   for (const k of keys) {
+    if (INFRA_KEYS.has(k)) continue;
     const v = process.env[k];
     if (v !== undefined && v !== '') out[k] = v;
   }
@@ -72,7 +65,9 @@ function loadFromProcessEnv(keys: string[]): Record<string, string> {
 
 function loadFromFile(path: string): Record<string, string> {
   if (!existsSync(path)) throw new Error(`File not found: ${path}`);
-  return JSON.parse(readFileSync(path, 'utf8')) as Record<string, string>;
+  const parsed = JSON.parse(readFileSync(path, 'utf8')) as Record<string, string>;
+  for (const key of INFRA_KEYS) delete parsed[key];
+  return parsed;
 }
 
 function parseArgs() {
@@ -96,20 +91,19 @@ async function findOrCreateSecretGroup(
     console.log(`Creating secret group: ${secretId}`);
   }
 
-  const restrictions =
-    serviceIds.length > 0
-      ? {
-          restricted: true,
-          nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
-          tagMatchCondition: 'or' as const,
-        }
-      : { restricted: false };
+  const restrictions = serviceIds.length > 0
+    ? {
+        restricted: true,
+        nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
+        tagMatchCondition: 'or' as const,
+      }
+    : { restricted: false };
 
   await nfFetch(projectApiPath(projectId, '/secrets'), {
     method: 'POST',
     body: JSON.stringify({
       name: secretId,
-      description: 'Elevate production env',
+      description: 'Elevate shared production secrets/config',
       priority: 10,
       type: 'secret',
       secretType: 'environment',
@@ -123,27 +117,16 @@ async function findOrCreateSecretGroup(
 async function main() {
   const { dryRun, file, secretId } = parseArgs();
   const projectId = resolveProjectId();
-  if (!projectId) {
-    console.error('Set NORTHFLANK_PROJECT_ID (run: npx tsx scripts/northflank/audit.ts)');
-    process.exit(1);
-  }
+  if (!projectId) throw new Error('Set NORTHFLANK_PROJECT_ID');
 
   const keys = loadManifestKeys();
   let variables: Record<string, string> = { ...STATIC_ENV };
 
-  if (file) {
-    variables = { ...variables, ...loadFromFile(file) };
-  }
+  if (file) variables = { ...variables, ...loadFromFile(file) };
   variables = { ...variables, ...loadFromProcessEnv(keys) };
   variables = dedupeSecretVariables(variables);
+  for (const key of INFRA_KEYS) delete variables[key];
 
-  // Runtime must stay aligned with the three Northflank health probes and Docker
-  // images. Refuse a production sync that would silently move the app to another port.
-  if (variables.PORT && variables.PORT !== '3000') {
-    throw new Error(`Refusing to sync PORT=${variables.PORT}; production services require PORT=3000`);
-  }
-
-  const missing = keys.filter((k) => !variables[k] && k.startsWith('NEXT_PUBLIC_'));
   const missingCritical = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
@@ -151,21 +134,18 @@ async function main() {
     'NEXTAUTH_SECRET',
     'STRIPE_SECRET_KEY',
     'SENDGRID_API_KEY',
-  ].filter((k) => !variables[k]);
+  ].filter((k) => !variables[k]?.trim());
 
   console.log(dryRun ? '=== DRY RUN ===' : '=== EXECUTE ===');
   console.log(`Project: ${projectId}`);
   console.log(`Variables to sync: ${Object.keys(variables).length}`);
+  console.log(`Infrastructure keys excluded: ${[...INFRA_KEYS].join(', ')}`);
+
   if (missingCritical.length) {
-    console.warn('\nMissing CRITICAL keys (add to Cursor secrets or --file):');
-    missingCritical.forEach((k) => console.warn(`  - ${k}`));
-  }
-  if (missing.length) {
-    console.warn(`\nMissing ${missing.length} NEXT_PUBLIC_* keys from manifest (optional for some features).`);
+    console.warn(`Missing CRITICAL keys: ${missingCritical.join(', ')}`);
   }
 
   if (dryRun) {
-    console.log('\nSample keys (names only):', Object.keys(variables).sort().slice(0, 20).join(', '), '...');
     process.exit(missingCritical.length ? 1 : 0);
   }
 
@@ -175,31 +155,23 @@ async function main() {
     );
   }
 
-  const lmsId = resolveLmsServiceId();
+  const lmsId = resolveLmsServiceId() || 'elevate-lms';
   const adminId = resolveAdminServiceId() || 'elevate-admin';
   const marketingId = process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing';
-
-  // Shared production secrets are required by all three production services.
-  // Marketing needs SUPABASE_SERVICE_ROLE_KEY for public server-side workflows
-  // such as /api/trial/start-managed; excluding it causes deterministic 503s.
-  const serviceIds = [...new Set([lmsId, adminId, marketingId].filter(Boolean) as string[])];
+  const serviceIds = [...new Set([marketingId, lmsId, adminId])];
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);
-
-  const restrictions =
-    serviceIds.length > 0
-      ? {
-          restricted: true,
-          nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
-          tagMatchCondition: 'or' as const,
-        }
-      : { restricted: false };
+  const restrictions = {
+    restricted: true,
+    nfObjects: serviceIds.map((id) => ({ id, type: 'service' as const })),
+    tagMatchCondition: 'or' as const,
+  };
 
   await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`), {
     method: 'POST',
     body: JSON.stringify({
       name: groupId,
-      description: 'Elevate production env',
+      description: 'Elevate shared production secrets/config',
       priority: 10,
       type: 'secret',
       secretType: 'environment',
@@ -208,9 +180,8 @@ async function main() {
     }),
   });
 
-  console.log(`\nUpdated secret group "${groupId}" with ${Object.keys(variables).length} variables.`);
+  console.log(`Updated secret group "${groupId}" with ${Object.keys(variables).length} variables.`);
   console.log(`Attached to services: ${serviceIds.join(', ')}`);
-  console.log('Redeploy Marketing, LMS, and Admin services in Northflank to pick up changes.');
 }
 
 main().catch((e) => {

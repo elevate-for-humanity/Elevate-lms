@@ -8,9 +8,9 @@
  *   - elevate-admin     -> /Dockerfile.northflank-admin
  *
  * This file owns infrastructure/runtime shape: Dockerfile, public port,
- * service role, runtime port, health probes, billing, and build storage.
- * Privileged credentials are managed separately by sync-env.ts through the
- * shared elevate-production-env secret group.
+ * service role, runtime port, zero-downtime rollout strategy, health probes,
+ * billing, and build storage. Privileged credentials are managed separately
+ * by sync-env.ts through the shared elevate-production-env secret group.
  */
 
 import {
@@ -30,7 +30,10 @@ type ServiceConfig = {
   dockerfile: string;
 };
 
+type RolloutMode = 'custom' | 'rollout-steady';
+
 const RUNTIME_PORT = 3000;
+const DESIRED_INSTANCES = 1;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [
   {
@@ -113,25 +116,51 @@ function runtimeEnvironmentFor(service: ServiceConfig): Record<string, string> {
   };
 }
 
+function deploymentFor(mode: RolloutMode) {
+  const strategy =
+    mode === 'custom'
+      ? {
+          type: 'custom',
+          settings: {
+            // Single-instance production still gets a second temporary pod.
+            // The existing healthy pod cannot be removed until the new pod is ready.
+            maxSurge: 1,
+            maxUnavailable: 0,
+          },
+        }
+      : {
+          type: 'rollout-steady',
+        };
+
+  return {
+    type: 'deployment',
+    instances: DESIRED_INSTANCES,
+    docker: { configType: 'default' },
+    strategy,
+    // Allow in-flight requests to drain after the replacement is ready.
+    gracePeriodSeconds: 60,
+  };
+}
+
 const healthChecks = [
   {
     protocol: 'HTTP',
     type: 'startupProbe',
     path: '/api/ping',
     port: RUNTIME_PORT,
-    initialDelaySeconds: 60,
-    periodSeconds: 10,
-    timeoutSeconds: 10,
-    failureThreshold: 12,
+    initialDelaySeconds: 15,
+    periodSeconds: 5,
+    timeoutSeconds: 5,
+    failureThreshold: 24,
   },
   {
     protocol: 'HTTP',
     type: 'readinessProbe',
     path: '/api/health',
     port: RUNTIME_PORT,
-    initialDelaySeconds: 30,
-    periodSeconds: 10,
-    timeoutSeconds: 10,
+    initialDelaySeconds: 5,
+    periodSeconds: 5,
+    timeoutSeconds: 5,
     failureThreshold: 3,
     successThreshold: 1,
   },
@@ -140,9 +169,9 @@ const healthChecks = [
     type: 'livenessProbe',
     path: '/api/ping',
     port: RUNTIME_PORT,
-    initialDelaySeconds: 120,
+    initialDelaySeconds: 60,
     periodSeconds: 30,
-    timeoutSeconds: 10,
+    timeoutSeconds: 5,
     failureThreshold: 3,
   },
 ];
@@ -152,49 +181,87 @@ const billing = {
   buildPlan: process.env.NORTHFLANK_BUILD_PLAN || 'nf-compute-800-32',
 };
 
+function buildPatch(service: ServiceConfig, storageMb: number, rolloutMode: RolloutMode) {
+  return {
+    billing,
+    disabledCI: true,
+    deployment: deploymentFor(rolloutMode),
+    ports: [
+      {
+        name: 'site',
+        internalPort: RUNTIME_PORT,
+        protocol: 'HTTP',
+        public: true,
+      },
+    ],
+    runtimeEnvironment: runtimeEnvironmentFor(service),
+    buildArguments: requirePublicBuildArgs(),
+    healthChecks,
+    buildSettings: {
+      storage: { ephemeralStorage: { storageSize: storageMb } },
+      dockerfile: {
+        buildEngine: 'buildkit',
+        dockerFilePath: service.dockerfile,
+        dockerWorkDir: '/',
+        buildkit: { useCache: false, cacheStorageSize: 0 },
+      },
+    },
+    buildConfiguration: {
+      storage: { ephemeralStorage: { storageSize: storageMb } },
+    },
+  };
+}
+
+async function patchWithZeroDowntimeStrategy(
+  projectId: string,
+  service: ServiceConfig,
+  storageMb: number,
+): Promise<{ response: Record<string, any>; rolloutMode: RolloutMode }> {
+  const path = combinedServicePatchPath(projectId, service.id);
+
+  try {
+    const response = await nfFetch<Record<string, any>>(path, {
+      method: 'PATCH',
+      body: JSON.stringify(buildPatch(service, storageMb, 'custom')),
+    });
+    return { response, rolloutMode: 'custom' };
+  } catch (customError) {
+    console.warn(
+      `[rollout-retry] ${service.id}: custom maxSurge/maxUnavailable strategy rejected; trying rollout-steady. ` +
+        `${customError instanceof Error ? customError.message : String(customError)}`,
+    );
+
+    try {
+      const response = await nfFetch<Record<string, any>>(path, {
+        method: 'PATCH',
+        body: JSON.stringify(buildPatch(service, storageMb, 'rollout-steady')),
+      });
+      return { response, rolloutMode: 'rollout-steady' };
+    } catch (steadyError) {
+      throw new Error(
+        `Northflank refused both zero-downtime rollout strategies for ${service.id}. ` +
+          `Refusing to continue with a recreate deployment that can cause 503/no healthy upstream. ` +
+          `custom=${customError instanceof Error ? customError.message : String(customError)}; ` +
+          `rollout-steady=${steadyError instanceof Error ? steadyError.message : String(steadyError)}`,
+      );
+    }
+  }
+}
+
 async function configureService(
   projectId: string,
   service: ServiceConfig,
   requestedEphemeralMb: number,
 ) {
-  const buildArguments = requirePublicBuildArgs();
   let response: Record<string, any> | undefined;
   let appliedEphemeralMb = requestedEphemeralMb;
+  let appliedRolloutMode: RolloutMode | undefined;
 
   for (const storageMb of storageAllowanceCandidates(requestedEphemeralMb)) {
-    const patch = {
-      billing,
-      disabledCI: true,
-      ports: [
-        {
-          name: 'site',
-          internalPort: RUNTIME_PORT,
-          protocol: 'HTTP',
-          public: true,
-        },
-      ],
-      runtimeEnvironment: runtimeEnvironmentFor(service),
-      buildArguments,
-      healthChecks,
-      buildSettings: {
-        storage: { ephemeralStorage: { storageSize: storageMb } },
-        dockerfile: {
-          buildEngine: 'buildkit',
-          dockerFilePath: service.dockerfile,
-          dockerWorkDir: '/',
-          buildkit: { useCache: false, cacheStorageSize: 0 },
-        },
-      },
-      buildConfiguration: {
-        storage: { ephemeralStorage: { storageSize: storageMb } },
-      },
-    };
-
     try {
-      response = await nfFetch<Record<string, any>>(
-        combinedServicePatchPath(projectId, service.id),
-        { method: 'PATCH', body: JSON.stringify(patch) },
-      );
+      const patched = await patchWithZeroDowntimeStrategy(projectId, service, storageMb);
+      response = patched.response;
+      appliedRolloutMode = patched.rolloutMode;
       appliedEphemeralMb = storageMb;
       break;
     } catch (error) {
@@ -204,7 +271,7 @@ async function configureService(
     }
   }
 
-  if (!response) throw new Error(`Failed to patch ${service.id}`);
+  if (!response || !appliedRolloutMode) throw new Error(`Failed to patch ${service.id}`);
 
   try {
     await nfFetch(projectApiPath(projectId, `/services/${service.id}/build-options`), {
@@ -221,8 +288,9 @@ async function configureService(
 
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
-      `port=${RUNTIME_PORT} health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ci=github-actions ` +
-      `buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
+      `port=${RUNTIME_PORT} instances=${DESIRED_INSTANCES} rollout=${appliedRolloutMode} ` +
+      `maxUnavailable=0 maxSurge=1 health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ` +
+      `ci=github-actions buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
       `ephemeralMB=${appliedEphemeralMb}`,
   );
 }
@@ -249,7 +317,8 @@ async function main() {
   if (dryRun) {
     for (const service of services) {
       console.info(
-        `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ci=github-actions`,
+        `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
+          `rollout=custom(maxSurge=1,maxUnavailable=0), health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
       );
     }
     return;
@@ -259,7 +328,7 @@ async function main() {
     await configureService(projectId, service, requestedEphemeralMb);
   }
 
-  console.info('Northflank configuration applied to all requested production services.');
+  console.info('Northflank zero-downtime configuration applied to all requested production services.');
 }
 
 main().catch((error) => {

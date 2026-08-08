@@ -10,6 +10,7 @@ on:
       - 'packages/**'
       - 'components/admin/**'
       - 'public/**'
+      - 'scripts/northflank/**'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -71,13 +72,11 @@ jobs:
           echo "Actual SHA:   $ACTUAL_SHA"
           test "$ACTUAL_SHA" = "$EXPECTED_SHA"
           test "$(git status --porcelain)" = ""
-          echo "SHA verification passed"
 
       - name: Set build environment variables
         run: |
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
           echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
-          echo "Set GITHUB_SHA=${{ github.sha }} for trigger-build.ts"
 
       - name: Generate version file
         run: |
@@ -91,6 +90,8 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -101,12 +102,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Configure Northflank admin service only
-        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
+      # Enforce runtime shape before deployment. This is a service PATCH, not a
+      # second image build, and prevents successful images from landing behind
+      # stale ports/probes/rollout settings.
+      - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
-      - name: Verify admin health checks
-        if: github.event_name != 'workflow_dispatch'
+      - name: Verify Admin health-check contract
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       - name: Trigger admin build
@@ -133,25 +135,41 @@ jobs:
       - name: Wait for admin deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 1200000
 
-      - name: Smoke admin
+      - name: Smoke Admin liveness and readiness
         run: |
           set -euo pipefail
           for i in $(seq 1 20); do
-            status=$(curl -sk --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
-            body=$(cat /tmp/admin-health.json 2>/dev/null || true)
-            if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
-              echo "Admin liveness passed."
+            ping_status=$(curl -sk --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
+            health_status=$(curl -sk --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/health || true)
+            ping_body=$(cat /tmp/admin-ping.json 2>/dev/null || true)
+            health_body=$(cat /tmp/admin-health.json 2>/dev/null || true)
+            if [ "$ping_status" = "200" ] && [ "$health_status" = "200" ] \
+              && echo "$ping_body" | grep -q '"ok":true' \
+              && echo "$health_body" | grep -q '"ready":true'; then
+              echo "Admin liveness and readiness passed."
               exit 0
             fi
-            echo "Admin liveness not ready yet: HTTP ${status}. Retry ${i}/20."
+            echo "Admin not ready: ping=${ping_status} health=${health_status}. Retry ${i}/20."
             sleep 15
           done
-          echo "Admin liveness failed after deploy."
+          echo "Admin health contract failed after deploy."
+          cat /tmp/admin-ping.json 2>/dev/null || true
           cat /tmp/admin-health.json 2>/dev/null || true
           exit 1
 
       - name: Verify deployed SHA matches main
         env:
           EXPECTED_SHA: ${{ github.sha }}
+        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
+
+      - name: Smoke canonical Admin routes
         run: |
-          pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
+          set -euo pipefail
+          for route in /dashboard /studio /course-builder /instructor/dashboard; do
+            status=$(curl -sk --max-time 15 -o /tmp/admin-route.html -w "%{http_code}" \
+              "https://admin.elevateforhumanity.org${route}" || true)
+            case "$status" in
+              2*|3*) echo "${route} served HTTP ${status}." ;;
+              *) echo "${route} failed HTTP ${status}."; cat /tmp/admin-route.html || true; exit 1 ;;
+            esac
+          done

@@ -32,8 +32,8 @@ export default function ApplyPathGuide({ variant }: { variant: Variant }) {
         >
           <p className="font-semibold text-slate-900 mb-1">Full student application (~10 min)</p>
           <p className="text-slate-600 mb-3">
-            Best when you know your program and want enrollment details, eligibility, and document
-            upload in one flow.
+            Best when you know your program and want to provide enrollment, funding, background,
+            support-needs, and apprenticeship transfer-hour evidence when applicable.
           </p>
           {!isHub ? (
             <span className="text-brand-red-600 font-semibold">You are here</span>
@@ -46,8 +46,8 @@ export default function ApplyPathGuide({ variant }: { variant: Variant }) {
       </div>
       <p className="text-xs text-slate-500 mt-4">
         Apprenticeship programs (barber, cosmetology, esthetician, nail) may also use dedicated apply
-        pages linked from each program. Payment plans and deposits use Stripe — card, ACH, or BNPL
-        where offered on the program checkout page.
+        pages linked from each program. Required program-specific documents are collected in the
+        applicable application or onboarding step and routed to review before credit or approval is granted.
       </p>
     </div>
   );

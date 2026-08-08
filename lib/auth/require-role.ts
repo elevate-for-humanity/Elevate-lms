@@ -114,7 +114,8 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (profile?.role === requiredRole || profile?.role === 'admin' || profile?.role === 'super_admin') {
+  // Admin is the single platform-wide privileged role.
+  if (profile?.role === requiredRole || profile?.role === 'admin') {
     return true;
   }
 

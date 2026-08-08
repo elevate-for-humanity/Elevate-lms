@@ -50,7 +50,6 @@ export function SystemHealthPanel({ health }: Props) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
         <h2 className="text-base font-bold text-slate-900">System Health</h2>
         <div className="flex items-center gap-2">
@@ -73,13 +72,12 @@ export function SystemHealthPanel({ health }: Props) {
       </div>
 
       <div className="px-6 py-4">
-        {/* Status grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
           {[
             {
               label: "Stripe Webhook",
               ok: health.stripeWebhookOk,
-              href: "/admin/integrations/stripe",
+              href: "/integrations/stripe",
             },
             {
               label: "Stripe Issuing",
@@ -90,31 +88,31 @@ export function SystemHealthPanel({ health }: Props) {
             {
               label: "Build Env",
               ok: health.buildEnvOk,
-              href: "/admin/integrations/env-manager",
+              href: "/integrations/env-manager",
             },
             {
               label: "Stale Jobs",
               ok: health.staleJobs === 0,
               value: health.staleJobs > 0 ? `${health.staleJobs} stuck` : "Clear",
-              href: "/admin/operations",
+              href: "/operations",
             },
             {
               label: "Missing Docs",
               ok: health.missingDocuments === 0,
               value: health.missingDocuments > 0 ? `${health.missingDocuments} missing` : "Clear",
-              href: "/admin/program-holder-documents",
+              href: "/program-holder-documents",
             },
             {
               label: "Certifications",
               ok: health.missingCertifications === 0,
               value: health.missingCertifications > 0 ? `${health.missingCertifications} pending` : "Clear",
-              href: "/admin/certificates",
+              href: "/certificates",
             },
             {
               label: "Compliance Flags",
               ok: health.unresolvedFlags === 0,
               value: health.unresolvedFlags > 0 ? `${health.unresolvedFlags} open` : "Clear",
-              href: "/admin/compliance",
+              href: "/compliance",
             },
           ].map(({ label, ok, value, href }) => (
             <Link
@@ -139,7 +137,6 @@ export function SystemHealthPanel({ health }: Props) {
           ))}
         </div>
 
-        {/* Alert list */}
         {alerts.length > 0 && (
           <div className="space-y-2">
             {alerts.map((alert, i) => {
@@ -169,7 +166,7 @@ export function SystemHealthPanel({ health }: Props) {
         )}
 
         {isOk && (
-          <p className="text-xs text-slate-400 text-center py-2">
+          <p className="text-xs text-slate-500 text-center py-2">
             No active alerts. All checks passed.
           </p>
         )}

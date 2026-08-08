@@ -11,36 +11,36 @@ export default async function IntegrationSettingsPage() {
 
   const integrations = [
     {
-      title: 'Environment Variables',
-      description: 'Manage integration keys, API tokens, and service configuration',
-      href: '/admin/integrations/env-manager',
+      title: 'Environment Manager',
+      description: 'Review runtime/configuration status and manage non-secret platform settings',
+      href: '/integrations/env-manager',
     },
     {
-      title: 'Platform Secrets',
-      description: 'Encrypted secrets store — API keys loaded at runtime by lib/secrets.ts',
-      href: '/admin/settings/integrations',
+      title: 'Integration Status',
+      description: 'Review external service connections and required runtime variables',
+      href: '/integrations',
     },
     {
-      title: 'Northflank Containers',
-      description: 'Push environment variables to the LMS and admin container services',
-      href: '/admin/integrations/env-manager',
+      title: 'Dev Studio',
+      description: 'Manage builder tools and internal platform workflows',
+      href: '/admin/studio',
     },
     {
       title: 'Social Media Accounts',
-      description: 'Connect Facebook, Instagram, YouTube, and Twitter/X accounts',
-      href: '/admin/settings/social-media',
+      description: 'Connect supported social-media integrations',
+      href: '/settings/social-media',
     },
   ];
 
   return (
     <div className="w-full space-y-6 px-6 py-6">
       <div>
-        <p className="text-sm font-medium text-slate-500">
-          <Link href="/settings" className="hover:text-slate-700">Settings</Link> / Integrations
+        <p className="text-sm font-medium text-slate-700">
+          <Link href="/settings" className="hover:text-slate-950">Settings</Link> / Integrations
         </p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">Integrations & Webhooks</h1>
-        <p className="text-slate-500">
-          External service connections and API configuration.
+        <h1 className="text-3xl font-bold tracking-tight text-slate-950">Integrations &amp; Webhooks</h1>
+        <p className="text-slate-700">
+          External service connections, runtime configuration, and platform integration status.
         </p>
       </div>
 
@@ -49,24 +49,23 @@ export default async function IntegrationSettingsPage() {
           <Link
             key={item.title}
             href={item.href}
-            className="flex items-center justify-between p-5 rounded-xl border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition-all group"
+            className="group flex items-center justify-between rounded-xl border border-slate-200 p-5 transition-all hover:border-brand-blue-300 hover:shadow-sm"
           >
             <div>
-              <p className="text-sm font-medium text-slate-900">{item.title}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>
+              <p className="text-sm font-bold text-slate-950">{item.title}</p>
+              <p className="mt-0.5 text-xs font-medium text-slate-700">{item.description}</p>
             </div>
-            <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-brand-blue-500 transition-colors" />
+            <ArrowRight className="h-4 w-4 text-slate-500 transition-colors group-hover:text-brand-blue-700" />
           </Link>
         ))}
       </div>
 
       <div className="max-w-xl rounded-xl border border-amber-200 bg-amber-50 p-5">
-        <p className="text-sm font-medium text-amber-900 mb-2">Configuration hierarchy</p>
-        <div className="text-xs text-amber-800 space-y-1">
-          <p><strong>platform_secrets</strong> (Dev Studio → Secrets) — encrypted, highest priority at runtime</p>
-          <p><strong>app_secrets</strong> (Dev Studio → Container env) — development environment secrets</p>
-          <p><strong>platform_settings</strong> (Env Manager) — plaintext config keys, integration settings</p>
-          <p><strong>process.env</strong> (Northflank runtime env / .env.local) — base layer, lowest priority</p>
+        <p className="mb-2 text-sm font-bold text-amber-950">Configuration rule</p>
+        <div className="space-y-1 text-xs font-medium leading-5 text-amber-950">
+          <p><strong>Production secret keys</strong> — configure on the Northflank service that consumes them, then redeploy that service if a fresh runtime is required.</p>
+          <p><strong>platform_settings</strong> — non-secret application configuration only; values are stored as plaintext database settings.</p>
+          <p><strong>process.env</strong> — runtime environment injected into the dedicated Admin, LMS, or Marketing container.</p>
         </div>
       </div>
     </div>

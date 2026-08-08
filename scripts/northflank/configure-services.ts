@@ -7,9 +7,10 @@
  *   - elevate-lms       -> /Dockerfile.northflank-lms
  *   - elevate-admin     -> /Dockerfile.northflank-admin
  *
- * Runtime secrets are managed by scripts/northflank/sync-env.ts through the
- * shared elevate-production-env secret group. This configurator deliberately
- * does not overwrite runtimeEnvironment values.
+ * This file owns infrastructure/runtime shape: Dockerfile, public port,
+ * service role, runtime port, health probes, billing, and build storage.
+ * Privileged credentials are managed separately by sync-env.ts through the
+ * shared elevate-production-env secret group.
  */
 
 import {
@@ -22,11 +23,14 @@ import {
 } from './lib';
 import { resolveTargetServiceIds } from './service-targets';
 
+type ServiceRole = 'marketing' | 'lms' | 'admin';
 type ServiceConfig = {
-  role: 'marketing' | 'lms' | 'admin';
+  role: ServiceRole;
   id: string;
   dockerfile: string;
 };
+
+const RUNTIME_PORT = 3000;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [
   {
@@ -98,12 +102,23 @@ function requirePublicBuildArgs(): Record<string, string> {
   };
 }
 
+function runtimeEnvironmentFor(service: ServiceConfig): Record<string, string> {
+  return {
+    SERVICE_ROLE: service.role,
+    SERVICE_NAME: service.id,
+    PORT: String(RUNTIME_PORT),
+    HOSTNAME: '0.0.0.0',
+    NODE_ENV: 'production',
+    NEXT_TELEMETRY_DISABLED: '1',
+  };
+}
+
 const healthChecks = [
   {
     protocol: 'HTTP',
     type: 'startupProbe',
     path: '/api/ping',
-    port: 3000,
+    port: RUNTIME_PORT,
     initialDelaySeconds: 60,
     periodSeconds: 10,
     timeoutSeconds: 10,
@@ -113,7 +128,7 @@ const healthChecks = [
     protocol: 'HTTP',
     type: 'readinessProbe',
     path: '/api/health',
-    port: 3000,
+    port: RUNTIME_PORT,
     initialDelaySeconds: 30,
     periodSeconds: 10,
     timeoutSeconds: 10,
@@ -139,6 +154,16 @@ async function configureService(
   for (const storageMb of storageAllowanceCandidates(requestedEphemeralMb)) {
     const patch = {
       billing,
+      disabledCI: false,
+      ports: [
+        {
+          name: 'site',
+          internalPort: RUNTIME_PORT,
+          protocol: 'HTTP',
+          public: true,
+        },
+      ],
+      runtimeEnvironment: runtimeEnvironmentFor(service),
       buildArguments,
       healthChecks,
       buildSettings: {
@@ -186,6 +211,7 @@ async function configureService(
 
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
+      `port=${RUNTIME_PORT} health=/api/ping,/api/health ` +
       `buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
       `ephemeralMB=${appliedEphemeralMb}`,
   );
@@ -213,7 +239,7 @@ async function main() {
   if (dryRun) {
     for (const service of services) {
       console.info(
-        `[dry-run] ${service.id} -> ${service.dockerfile}, health=/api/ping,/api/health`,
+        `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, health=/api/ping,/api/health`,
       );
     }
     return;

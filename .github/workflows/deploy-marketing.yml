@@ -10,6 +10,8 @@ on:
       - 'components/marketing/**'
       - 'components/site/**'
       - 'lib/navigation/**'
+      - 'lib/secrets.ts'
+      - 'lib/supabase/**'
       - 'public/sw.js'
       - 'public/manifest.webmanifest'
       - 'middleware.ts'
@@ -42,20 +44,34 @@ env:
 
 jobs:
   deploy-marketing:
-    name: Build and deploy Marketing (www) on Northflank
+    name: Sync env, build, and deploy Marketing (www) on Northflank
     runs-on: ubuntu-latest
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_MARKETING_SERVICE_ID: ${{ secrets.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing' }}
+      NORTHFLANK_LMS_SERVICE_ID: ${{ secrets.NORTHFLANK_LMS_SERVICE_ID || 'elevate-lms' }}
+      NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
+      NORTHFLANK_SECRET_GROUP_ID: ${{ secrets.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env' }}
       FORCE_FRESH_BUILD: 'true'
       DEPLOY_BRANCH: main
+
+      # Shared production runtime secrets. sync-env.ts attaches the resulting
+      # secret group to Marketing, LMS, and Admin together.
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+      NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+      NEXT_PUBLIC_LMS_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
 
@@ -114,19 +130,31 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Verify required Marketing secrets
+      - name: Verify shared production secrets
         run: |
           set -euo pipefail
-          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo "NEXT_PUBLIC_SUPABASE_URL GitHub secret is missing"; exit 1; }
-          test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" || { echo "NEXT_PUBLIC_SUPABASE_ANON_KEY GitHub secret is missing"; exit 1; }
-          test -n "${NORTHFLANK_API_TOKEN:-}" || { echo "NORTHFLANK_API_TOKEN GitHub secret is missing"; exit 1; }
-          echo "Required Marketing secrets are configured"
+          required=(
+            NORTHFLANK_API_TOKEN
+            NEXT_PUBLIC_SUPABASE_URL
+            NEXT_PUBLIC_SUPABASE_ANON_KEY
+            SUPABASE_SERVICE_ROLE_KEY
+            NEXTAUTH_SECRET
+            STRIPE_SECRET_KEY
+            SENDGRID_API_KEY
+          )
+          for name in "${required[@]}"; do
+            test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }
+          done
+          echo "Shared production secrets are configured"
+
+      - name: Sync production env to Marketing + LMS + Admin
+        run: pnpm tsx scripts/northflank/sync-env.ts --execute
 
       - name: Configure Northflank Marketing service
-        run: pnpm tsx scripts/northflank/configure-marketing.ts --execute
+        run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
 
       - name: Patch Marketing build ephemeral storage
-        run: NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts elevate-marketing --execute
+        run: NORTHFLANK_EPHEMERAL_STORAGE_MB=32768 pnpm tsx scripts/northflank/patch-ephemeral-storage.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
 
       - name: Trigger Marketing build
         id: trigger_build
@@ -200,3 +228,19 @@ jobs:
           echo "Last version response:"
           cat /tmp/www-version.json 2>/dev/null || true
           exit 1
+
+      - name: Verify trial API is no longer infrastructure-unavailable
+        run: |
+          set -euo pipefail
+          # Invalid input should produce 400. A 503 here means Marketing still lacks
+          # the privileged Supabase runtime dependency required by the trial flow.
+          status=$(curl -sk --max-time 15 \
+            -o /tmp/trial-check.json \
+            -w "%{http_code}" \
+            -X POST \
+            -H 'content-type: application/json' \
+            --data '{"orgName":"x","adminName":"x","adminEmail":"invalid"}' \
+            https://www.elevateforhumanity.org/api/trial/start-managed || true)
+          echo "Trial API validation probe HTTP $status"
+          cat /tmp/trial-check.json || true
+          test "$status" = "400"

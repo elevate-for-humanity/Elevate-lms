@@ -16,6 +16,41 @@ type SubmissionResult = {
   warning?: string;
 };
 
+type ApiResult = Record<string, any>;
+
+async function postApplication(payload: Record<string, unknown>) {
+  const endpoints = ['/api/applications', '/api/apply'];
+  let lastError: unknown = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 20000);
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        credentials: 'same-origin',
+        cache: 'no-store',
+        signal: controller.signal,
+        body: JSON.stringify(payload),
+      });
+      window.clearTimeout(timeout);
+      const data = (await res.json().catch(() => ({}))) as ApiResult;
+
+      // A real HTTP response means the network path worked. Return it even when
+      // validation failed so the applicant receives the server's useful message.
+      return { res, data };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Application service unavailable');
+}
+
 export default function StudentApplicationForm({ initialProgram = '' }: StudentApplicationFormProps) {
   const router = useRouter();
   const [form, setForm] = useState({
@@ -53,35 +88,36 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
     if (requiresWorkOne && !workOneAcknowledged) {
       setResult({
         success: false,
-        error: 'WIOA and Workforce Ready Grant applicants must schedule or begin the WorkOne intake step before submitting this funded application.',
+        error:
+          'WIOA and Workforce Ready Grant applicants must schedule or begin the WorkOne intake step before submitting this funded application.',
       });
       return;
     }
 
     setSubmitting(true);
 
+    const payload = {
+      ...form,
+      fundingType: form.fundingSource || undefined,
+      funding: form.fundingSource || undefined,
+      zip: form.zipCode || undefined,
+      workoneIntakeCompleted: requiresWorkOne ? 'scheduled_or_in_process' : undefined,
+      workOneAppointmentConfirmed: requiresWorkOne ? workOneAcknowledged : false,
+      workoneChecklist: requiresWorkOne
+        ? ['WorkOne intake appointment scheduled or intake process started']
+        : undefined,
+      workOneAppointmentUrl: requiresWorkOne ? WORKONE_INTAKE_URL : undefined,
+      source: 'student-application',
+    };
+
     try {
-      const res = await fetch('/api/applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...form,
-          fundingType: form.fundingSource || undefined,
-          zip: form.zipCode || undefined,
-          workoneIntakeCompleted: requiresWorkOne ? 'scheduled_or_in_process' : undefined,
-          workoneChecklist: requiresWorkOne
-            ? ['WorkOne intake appointment scheduled or intake process started']
-            : undefined,
-          workOneAppointmentUrl: requiresWorkOne ? WORKONE_INTAKE_URL : undefined,
-          source: 'student-application',
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.ok) {
+      const { res, data } = await postApplication(payload);
+      if (res.ok && (data.ok ?? data.success ?? true)) {
         const duplicateWarning = data.duplicateWarning || undefined;
         setResult({
           success: true,
-          message: 'Application submitted successfully. Your reference number has been created and the application is now in the review workflow.',
+          message:
+            'Application submitted successfully. Your application is now in the review workflow.',
           ...(duplicateWarning ? { warning: duplicateWarning } : {}),
         });
         const ref = data.referenceNumber || '';
@@ -90,12 +126,21 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
         if (ref) q.set('ref', ref);
         if (prog) q.set('program', prog);
         const suffix = q.toString() ? `?${q.toString()}` : '';
-        setTimeout(() => router.push(`/apply/success${suffix}`), 1500);
+        setTimeout(() => router.push(`/apply/success${suffix}`), 1200);
       } else {
-        setResult({ success: false, error: data.error || 'The application could not be submitted. Please review the form and try again.' });
+        setResult({
+          success: false,
+          error:
+            data.error ||
+            'The application could not be submitted. Please review the form and try again.',
+        });
       }
     } catch {
-      setResult({ success: false, error: 'Network error. Your application was not confirmed. Please try again.' });
+      setResult({
+        success: false,
+        error:
+          'The application service could not be reached. Please try again. If the issue continues, call (317) 314-3757.',
+      });
     } finally {
       setSubmitting(false);
     }
@@ -116,7 +161,8 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
     { value: 'other', label: 'Other / Not sure yet' },
   ];
 
-  const fieldClass = 'w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 focus:border-transparent focus:ring-2 focus:ring-brand-red-500';
+  const fieldClass =
+    'w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-slate-950 focus:border-transparent focus:ring-2 focus:ring-brand-red-500';
   const labelClass = 'mb-1 block text-sm font-bold text-slate-900';
 
   return (
@@ -124,18 +170,26 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
       {result?.success ? (
         <div className="py-12 text-center">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-            <svg className="h-10 w-10 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="h-10 w-10 text-green-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           <h3 className="mb-3 text-2xl font-bold text-slate-950">Application Submitted</h3>
-          <p className="mb-2 text-base text-slate-700">{result.message}</p>
+          <p className="mb-2 text-base text-slate-800">{result.message}</p>
           {result.warning && (
             <div className="mx-auto mt-4 max-w-md rounded-lg border border-amber-300 bg-amber-50 p-3 text-left">
-              <p className="text-sm text-amber-950"><strong>Note:</strong> {result.warning}</p>
+              <p className="text-sm text-amber-950">
+                <strong>Note:</strong> {result.warning}
+              </p>
             </div>
           )}
-          <p className="mt-3 text-sm font-medium text-slate-700">Opening your confirmation page…</p>
+          <p className="mt-3 text-sm font-semibold text-slate-800">Opening your confirmation page…</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -185,10 +239,10 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
           {requiresWorkOne && (
             <section className="rounded-xl border-2 border-amber-300 bg-amber-50 p-5" aria-labelledby="workone-required-heading">
               <h3 id="workone-required-heading" className="text-lg font-black text-amber-950">WorkOne intake is required for this funding path</h3>
-              <p className="mt-2 text-sm leading-6 text-amber-950">Before Elevate can treat this as a WIOA/Workforce Ready Grant-funded application, schedule or begin your WorkOne intake. Funding is not guaranteed by submitting this form.</p>
+              <p className="mt-2 text-sm font-medium leading-6 text-amber-950">Before Elevate can treat this as a WIOA/Workforce Ready Grant-funded application, schedule or begin your WorkOne intake. Funding is not guaranteed by submitting this form.</p>
               <a href={WORKONE_INTAKE_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-extrabold text-white hover:bg-slate-800">Schedule WorkOne Intake</a>
-              <label className="mt-4 flex items-start gap-3 text-sm font-semibold text-amber-950">
-                <input type="checkbox" checked={workOneAcknowledged} onChange={(event) => setWorkOneAcknowledged(event.target.checked)} className="mt-1 h-4 w-4 shrink-0" />
+              <label className="mt-4 flex items-start gap-3 text-sm font-bold text-amber-950">
+                <input type="checkbox" checked={workOneAcknowledged} onChange={(event) => setWorkOneAcknowledged(event.target.checked)} className="mt-1 h-5 w-5 shrink-0" />
                 <span>I have scheduled the WorkOne intake appointment or I am already working with WorkOne on this funding request.</span>
               </label>
             </section>
@@ -219,13 +273,15 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
             <textarea id="goals" name="goals" value={form.goals} onChange={handleChange} rows={3} className={fieldClass} />
           </div>
 
-          {result?.error && <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{result.error}</div>}
+          {result?.error && <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-950">{result.error}</div>}
 
-          <button type="submit" disabled={submitting || (requiresWorkOne && !workOneAcknowledged)} className="w-full rounded-xl bg-brand-red-600 py-4 text-base font-extrabold text-white transition-colors hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-400">
-            {submitting ? 'Submitting…' : 'Submit Application'}
-          </button>
+          <div className="sticky bottom-3 z-10 rounded-2xl bg-white/95 p-2 shadow-lg ring-1 ring-slate-200 backdrop-blur-sm sm:static sm:bg-transparent sm:p-0 sm:shadow-none sm:ring-0">
+            <button type="submit" disabled={submitting} className="w-full rounded-xl bg-brand-red-600 py-4 text-base font-extrabold text-white transition-colors hover:bg-brand-red-700 disabled:cursor-wait disabled:bg-slate-700">
+              {submitting ? 'Submitting…' : 'Submit Application'}
+            </button>
+          </div>
 
-          <p className="text-center text-sm leading-6 text-slate-700">By submitting, you agree to the Privacy Policy. Submission does not guarantee admission or public funding.</p>
+          <p className="text-center text-sm font-medium leading-6 text-slate-800">By submitting, you agree to the Privacy Policy. Submission does not guarantee admission or public funding.</p>
         </form>
       )}
     </div>

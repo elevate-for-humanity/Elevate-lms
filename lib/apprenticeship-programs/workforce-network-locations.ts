@@ -32,18 +32,6 @@ export const BARBER_WORKFORCE_NETWORK_PINS: NetworkMapPin[] = [
     href: '/contact',
   },
   {
-    id: 'prestige-keystone',
-    kind: 'host_shop',
-    name: 'Elevate Prestige Barber and Beauty Institute',
-    address: '6331 N Keystone Ave',
-    city: 'Indianapolis',
-    state: 'IN',
-    zip: '46220',
-    lat: 39.921,
-    lng: -86.125,
-    programs: ['barber-apprenticeship', 'cosmetology-apprenticeship'],
-  },
-  {
     id: 'kountry-kutz',
     kind: 'host_shop',
     name: 'Kountry Kutz Barbershop',

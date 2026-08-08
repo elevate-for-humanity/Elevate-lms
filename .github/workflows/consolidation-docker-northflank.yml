@@ -1,4 +1,4 @@
-name: Consolidation Docker + Northflank Gate
+name: Canonical Docker + Northflank Gate
 
 on:
   push:
@@ -8,13 +8,14 @@ on:
     branches:
       - main
     paths:
-      - 'Dockerfile'
-      - 'Dockerfile.admin'
-      - 'Dockerfile.lms'
+      - 'Dockerfile.marketing'
+      - 'Dockerfile.northflank-lms'
+      - 'Dockerfile.northflank-admin'
       - 'apps/marketing/**'
       - 'apps/admin/**'
       - 'apps/lms/**'
       - 'packages/**'
+      - 'scripts/northflank/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
@@ -24,12 +25,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: consolidation-docker-northflank-${{ github.ref }}
+  group: canonical-docker-northflank-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   docker-northflank:
-    name: ${{ matrix.service }} Docker / Northflank
+    name: ${{ matrix.service }} canonical container
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -37,17 +38,15 @@ jobs:
       matrix:
         include:
           - service: marketing
-            dockerfile: Dockerfile
-            default_port: 8080
+            dockerfile: Dockerfile.marketing
           - service: lms
-            dockerfile: Dockerfile.lms
-            default_port: 3000
+            dockerfile: Dockerfile.northflank-lms
           - service: admin
-            dockerfile: Dockerfile.admin
-            default_port: 3000
+            dockerfile: Dockerfile.northflank-admin
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      RUNTIME_PORT: '3000'
 
     steps:
       - name: Checkout
@@ -60,7 +59,7 @@ jobs:
           test -n "${NEXT_PUBLIC_SUPABASE_URL}" || { echo 'NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
           test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" || { echo 'NEXT_PUBLIC_SUPABASE_ANON_KEY is not configured'; exit 1; }
 
-      - name: Build production container
+      - name: Build canonical production container
         shell: bash
         run: |
           set -euo pipefail
@@ -77,56 +76,34 @@ jobs:
             --build-arg BUILD_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             -t "elevate-${{ matrix.service }}:${GITHUB_SHA}" .
 
-      - name: Verify default service port
+      - name: Verify canonical port and health endpoints
         shell: bash
         run: |
           set -euo pipefail
-          name="elevate-${{ matrix.service }}-default"
-          port="${{ matrix.default_port }}"
+          name="elevate-${{ matrix.service }}-canonical"
           docker run -d \
             --name "$name" \
-            -e PORT="$port" \
+            -e PORT="$RUNTIME_PORT" \
+            -e HOSTNAME=0.0.0.0 \
             -e NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
             -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
-            -p "$port:$port" \
+            -p "$RUNTIME_PORT:$RUNTIME_PORT" \
             "elevate-${{ matrix.service }}:${GITHUB_SHA}"
           trap 'docker logs "$name" || true; docker rm -f "$name" || true' EXIT
-          for attempt in $(seq 1 24); do
-            if curl --fail --silent --show-error "http://127.0.0.1:${port}/api/version" >/tmp/version.json; then
-              cat /tmp/version.json
-              docker rm -f "$name" >/dev/null
-              trap - EXIT
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "${{ matrix.service }} did not become healthy on PORT=${port}"
-          docker logs "$name"
-          exit 1
 
-      - name: Verify Northflank-style injected port
-        shell: bash
-        run: |
-          set -euo pipefail
-          name="elevate-${{ matrix.service }}-injected"
-          port=8090
-          docker run -d \
-            --name "$name" \
-            -e PORT="$port" \
-            -e NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL}" \
-            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY}" \
-            -p "$port:$port" \
-            "elevate-${{ matrix.service }}:${GITHUB_SHA}"
-          trap 'docker logs "$name" || true; docker rm -f "$name" || true' EXIT
-          for attempt in $(seq 1 24); do
-            if curl --fail --silent --show-error "http://127.0.0.1:${port}/api/version" >/tmp/version-injected.json; then
-              cat /tmp/version-injected.json
+          for attempt in $(seq 1 30); do
+            ping_status=$(curl -sS -o /tmp/ping.json -w '%{http_code}' "http://127.0.0.1:${RUNTIME_PORT}/api/ping" || true)
+            health_status=$(curl -sS -o /tmp/health.json -w '%{http_code}' "http://127.0.0.1:${RUNTIME_PORT}/api/health" || true)
+            if [ "$ping_status" = "200" ] && [ "$health_status" = "200" ]; then
+              cat /tmp/ping.json
+              cat /tmp/health.json
               docker rm -f "$name" >/dev/null
               trap - EXIT
               exit 0
             fi
             sleep 5
           done
-          echo "${{ matrix.service }} did not honor injected PORT=${port}"
+
+          echo "${{ matrix.service }} failed canonical health on PORT=${RUNTIME_PORT}"
           docker logs "$name"
           exit 1

@@ -21,8 +21,7 @@ ALTER TABLE public.badge_definitions
   ADD COLUMN IF NOT EXISTS key text;
 
 CREATE UNIQUE INDEX IF NOT EXISTS badge_definitions_key_unique
-  ON public.badge_definitions (key)
-  WHERE key IS NOT NULL;
+  ON public.badge_definitions (key);
 
 INSERT INTO public.badge_definitions (
   id, key, name, description, icon_url, badge_type, criteria,

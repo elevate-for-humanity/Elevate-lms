@@ -7,33 +7,21 @@ import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Conversation | Elevate LMS', robots: { index: false, follow: false } };
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 async function sendMessage(formData: FormData) {
   'use server';
   const recipientId = String(formData.get('recipient_id') ?? '');
   const content = String(formData.get('content') ?? '').trim();
-  if (!recipientId || !content || content.length > 5000) return;
+  if (!UUID_RE.test(recipientId) || !content || content.length > 5000) return;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/lms/messages/${recipientId}`);
   if (recipientId === user.id) return;
 
-  const { data: recipient } = await supabase
-    .from('profiles')
-    .select('id,community_visible,community_allow_messages')
-    .eq('id', recipientId)
-    .maybeSingle();
-
-  const { data: prior } = await supabase
-    .from('messages')
-    .select('id')
-    .or(`and(sender_id.eq.${user.id},recipient_id.eq.${recipientId}),and(sender_id.eq.${recipientId},recipient_id.eq.${user.id})`)
-    .limit(1);
-
-  const existingConversation = !!prior?.length;
-  if (!recipient || (!existingConversation && (!recipient.community_visible || !recipient.community_allow_messages))) return;
-
+  // The database INSERT policy calls can_start_community_message(), so a forged
+  // client request cannot bypass visibility/contact rules.
   const { error } = await supabase.from('messages').insert({ sender_id: user.id, recipient_id: recipientId, content });
   if (error) return;
 
@@ -44,33 +32,34 @@ async function sendMessage(formData: FormData) {
 
 export default async function ConversationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  if (!UUID_RE.test(id)) redirect('/lms/messages');
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/lms/messages/${id}`);
   if (id === user.id) redirect('/lms/messages');
 
-  const { data: participant } = await supabase
-    .from('profiles')
-    .select('id,full_name,avatar_url,community_visible,community_allow_messages')
-    .eq('id', id)
-    .maybeSingle();
+  const [{ data: memberRows }, { data: rows }] = await Promise.all([
+    supabase.rpc('get_community_member', { p_member_id: id }),
+    supabase
+      .from('messages')
+      .select('id,sender_id,recipient_id,content,created_at,read_at')
+      .or(`and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id})`)
+      .order('created_at', { ascending: true })
+      .limit(250),
+  ]);
 
-  const { data: rows } = await supabase
-    .from('messages')
-    .select('id,sender_id,recipient_id,content,created_at,read_at')
-    .or(`and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id})`)
-    .order('created_at', { ascending: true })
-    .limit(250);
-
+  const participant = memberRows?.[0] ?? null;
   const messages = rows ?? [];
   const existingConversation = messages.length > 0;
-  const mayStart = !!participant && participant.community_visible && participant.community_allow_messages;
-  if (!existingConversation && !mayStart) {
+
+  // An existing conversation remains readable even if a member later leaves the
+  // directory. Starting a new conversation requires the safe contact policy.
+  if (!existingConversation && !participant?.community_allow_messages) {
     return <main className="mx-auto max-w-3xl px-4 py-8"><Link href="/lms/messages" className="inline-flex items-center gap-2 text-sm font-bold text-slate-600"><ArrowLeft className="h-4 w-4" />Messages</Link><div className="mt-6 rounded-2xl border border-slate-200 bg-white p-10 text-center text-slate-600">This member is not accepting new community messages.</div></main>;
   }
 
-  const unreadIds = messages.filter((m: any) => m.recipient_id === user.id && !m.read_at).map((m: any) => m.id);
-  if (unreadIds.length) await supabase.from('messages').update({ read_at: new Date().toISOString() }).in('id', unreadIds).eq('recipient_id', user.id);
+  await supabase.rpc('mark_community_messages_read', { p_other_user: id });
 
   return (
     <main className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-4xl flex-col px-4 py-6 md:px-6">

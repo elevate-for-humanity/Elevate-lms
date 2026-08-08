@@ -1,4 +1,4 @@
-﻿# Dockerfile.northflank-lms
+# Dockerfile.northflank-lms
 # Builds and serves the LMS application (apps/lms/)
 # Serves app.elevateforhumanity.org
 #
@@ -6,21 +6,23 @@
 #   - Build type: Dockerfile
 #   - Dockerfile path: /Dockerfile.northflank-lms
 #   - Build context: /
-
-# Build args available across ALL stages.
-# GIT_SHA must be a real full SHA — no default allowed in production.
-# CI/CD MUST pass: --build-arg GIT_SHA=$(git rev-parse HEAD)
-ARG GITHUB_SHA
-ARG GIT_SHA
-ARG BUILD_TIMESTAMP
+#   - Public port: 3000
+#
+# Northflank injects NF_GIT_SHA for Git builds. This Dockerfile uses that
+# canonical SHA for Next.js build identity so production builds do not depend
+# on manually maintained GIT_SHA/GITHUB_SHA arguments.
+ARG NF_GIT_SHA
+ARG BUILD_TIMESTAMP=unknown
 ARG BUILD_ID
 
 FROM node:22-bookworm AS builder
 
-# Cache invalidation marker - fixed githubsha args matching trigger-build.ts
-RUN echo "nf-cache-invalidate-lms-2026-07-20-v6-arg-before-from"
+ARG NF_GIT_SHA
+ARG BUILD_TIMESTAMP
+ARG BUILD_ID
 
-# Install system deps for native modules (sharp, canvas, pdf)
+RUN echo "nf-cache-invalidate-lms-2026-08-08-nf-git-sha"
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -34,16 +36,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-# Use pnpm@10.28.2 to match lockfileVersion 9.0 (pnpm 10.x format)
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
 WORKDIR /app
 
-# Copy manifests and source
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/admin/package.json apps/admin/package.json
+COPY apps/lms/package.json apps/lms/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json
@@ -51,57 +51,50 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-# Increased memory for native module stability
 ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=LMS
 ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
-# Install dependencies with strict peer checking disabled for compatibility
 RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
 
-# Build Next.js LMS app - ARG declarations must come BEFORE ENV usage
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
 ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG SUPABASE_SERVICE_ROLE_KEY
-ARG GITHUB_SHA
-ARG GIT_SHA
+ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
 
-# Strict SHA validation — fail immediately if unknown or all zeros.
-RUN echo "Validating GIT_SHA=${GIT_SHA} / GITHUB_SHA=${GITHUB_SHA}" && \
-    SHA="${GIT_SHA:-${GITHUB_SHA}}"; \
-    (test -n "$$SHA" || (echo "ERROR: Neither GIT_SHA nor GITHUB_SHA is set" && exit 1)) && \
-    (echo "$$SHA" | grep -qE '^[a-f0-9]{7,40}$' || (echo "ERROR: SHA must be 7-40 hex characters, got '$$SHA'" && exit 1)) && \
-    (echo "$$SHA" | grep -qv '^0*$' || (echo "ERROR: SHA cannot be all zeros" && exit 1)) && \
-    echo "SHA validated: $$SHA"
+RUN echo "Validating NF_GIT_SHA=${NF_GIT_SHA}" && \
+    test -n "${NF_GIT_SHA}" && \
+    echo "${NF_GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
+    echo "${NF_GIT_SHA}" | grep -qv '^0*$' && \
+    echo "Northflank SHA validated: ${NF_GIT_SHA}"
 
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
-ENV BUILD_ID=${BUILD_ID}
-ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
-ENV NEXT_PUBLIC_BUILD_ID="elevate-${GITHUB_SHA}"
-ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
-ENV NEXT_PUBLIC_COMMIT_SHA=${GITHUB_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV NF_GIT_SHA=$NF_GIT_SHA
+ENV GIT_SHA=$NF_GIT_SHA
+ENV GITHUB_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
+ENV NEXT_PUBLIC_BUILD_VERSION=$NF_GIT_SHA
+ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
+ENV BUILD_ID=$BUILD_ID
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
-# Verify build args
-RUN echo "LMS Build SHA: ${GITHUB_SHA}" && echo "LMS Build Timestamp: ${BUILD_TIMESTAMP}" && \
-    echo "NEXT_PUBLIC_BUILD_ID: elevate-${GITHUB_SHA}"
+RUN echo "LMS Build SHA: ${NF_GIT_SHA}" && \
+    echo "LMS Build Timestamp: ${BUILD_TIMESTAMP}" && \
+    echo "NEXT_PUBLIC_BUILD_ID: elevate-${NF_GIT_SHA}"
 
 RUN pnpm run build:lms:compile --no-lint
 
-# INSPECTION: Show standalone directory structure to verify correct CMD
-# This MUST fail the build if standalone is not created properly
 RUN echo "=== STANDALONE STRUCTURE ===" && \
     if [ -d "/app/apps/lms/.next/standalone" ]; then \
         find /app/apps/lms/.next/standalone -maxdepth 4 -type f | sort; \
@@ -110,14 +103,11 @@ RUN echo "=== STANDALONE STRUCTURE ===" && \
     else \
         echo "ERROR: No standalone directory found!"; \
         echo "Expected at: /app/apps/lms/.next/standalone"; \
-        echo "Next.js standalone build may have failed."; \
         exit 1; \
     fi
 
-# --- runtime stage ---
-FROM node:22-bookworm-slim
+FROM node:22-bookworm-slim AS runner
 
-# Install runtime deps for native modules
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
@@ -130,65 +120,46 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     librsvg2-common \
     && rm -rf /var/lib/apt/lists/*
 
-# ARG declarations must come BEFORE ENV usage in each stage
-ARG GITHUB_SHA
-ARG GIT_SHA
+ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
-ENV NODE_OPTIONS=--max-old-space-size=8192 --gc-interval=100
-ENV GITHUB_SHA=${GITHUB_SHA}
-ENV GIT_SHA=${GIT_SHA:-${GITHUB_SHA}}
-ENV BUILD_ID=${BUILD_ID}
-ENV NEXT_PUBLIC_GIT_SHA=${GITHUB_SHA}
-ENV NEXT_PUBLIC_BUILD_ID="elevate-${GITHUB_SHA}"
-ENV NEXT_PUBLIC_BUILD_VERSION=${GITHUB_SHA}
-ENV NEXT_PUBLIC_COMMIT_SHA=${GITHUB_SHA}
-ENV BUILD_TIMESTAMP=${BUILD_TIMESTAMP}
+ENV NODE_OPTIONS="--max-old-space-size=8192 --gc-interval=100"
+ENV NF_GIT_SHA=$NF_GIT_SHA
+ENV GIT_SHA=$NF_GIT_SHA
+ENV GITHUB_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
+ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
+ENV NEXT_PUBLIC_BUILD_VERSION=$NF_GIT_SHA
+ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
+ENV BUILD_ID=$BUILD_ID
+ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 
 WORKDIR /app
 
-# Copy standalone build artifacts
-# The Next.js standalone output creates server.js that handles all routes
-# CRITICAL: This copies CONTENTS of standalone/ to /app/, so server.js ends up at /app/server.js
 COPY --from=builder /app/apps/lms/.next/standalone ./
 
-# Verify standalone server.js exists at expected location BEFORE copying other files
 RUN echo "=== RUNTIME VERIFICATION ===" && \
     if [ -f "/app/server.js" ]; then \
-        echo "✅ Standalone server.js found at /app/server.js"; \
-        ls -la /app/server.js; \
+        echo "Standalone server.js found at /app/server.js"; \
+    elif [ -f "/app/apps/lms/server.js" ]; then \
+        echo "Standalone server.js found at /app/apps/lms/server.js"; \
     else \
-        echo "ERROR: server.js not found at /app/server.js"; \
-        echo "Contents of /app:"; \
-        ls -la /app/; \
-        echo "Standalone directory exists:"; \
-        ls -la /app/apps/lms/.next/standalone/ 2>/dev/null || echo "Source directory not found"; \
+        echo "ERROR: no runnable standalone server.js found"; \
+        find /app -maxdepth 5 -name server.js -print; \
         exit 1; \
     fi
 
-COPY --from=builder /app/apps/lms/.next/static ./.next/static
-COPY --from=builder /app/apps/lms/.next/server ./.next/server
-COPY --from=builder /app/apps/lms/public ./public
-
-# Copy full node_modules from builder (preserves pnpm symlinks)
-COPY --from=builder /app/node_modules ./node_modules
-
-# Final verification before exposing port
-RUN echo "=== FINAL IMAGE VERIFICATION ===" && \
-    test -f /app/server.js && echo "✅ Final: server.js exists" && \
-    test -d /app/.next/static && echo "✅ Final: .next/static exists" && \
-    test -d /app/node_modules && echo "✅ Final: node_modules exists" && \
-    echo "Image is ready for deployment"
+COPY --from=builder /app/apps/lms/.next/static ./apps/lms/.next/static
+COPY --from=builder /app/apps/lms/public ./apps/lms/public
 
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -sf http://127.0.0.1:3000/api/ping || exit 1
+  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
 
-# Use standalone server.js from /app/ (NOT apps/lms/server.js which is dev custom server)
-# The standalone output contains a production-ready server that handles all Next.js routes
-CMD ["node", "--max-http-header-size=32768", "server.js"]
+CMD ["sh", "-c", "if [ -f /app/apps/lms/server.js ]; then exec node --max-http-header-size=32768 /app/apps/lms/server.js; else exec node --max-http-header-size=32768 /app/server.js; fi"]

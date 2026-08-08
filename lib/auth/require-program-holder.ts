@@ -1,39 +1,25 @@
 import { createClient } from '@/lib/supabase/server';
-import { getAdminClient } from '@/lib/supabase/admin';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 
 export interface ProgramHolderContext {
   user: { id: string; email?: string };
   profile: { id: string; role: string; full_name?: string; program_holder_id: string | null };
   holderId: string;
-  /** tenant_id from profiles — used to scope payroll_runs and other tenant-isolated tables */
   tenantId: string | null;
-  /** IDs of programs this holder can access (via program_holder_programs) */
   programIds: string[];
-  /** Supabase client (admin if available, else user client) */
   db: any;
 }
 
 /**
- * Authenticate a program_holder user and resolve their accessible programs.
- *
- * Ownership path (matches live DB):
- *   profiles.program_holder_id → program_holders.id
- *     → program_holder_programs.program_holder_id → program_id
- *     → programs.id
- *
- * Redirects to /login if unauthenticated, /unauthorized if wrong role,
- * /program-holder if no program_holder_id is set on their profile.
+ * Authenticate a program-holder user and resolve their accessible programs.
+ * Uses only canonical Program Holder routes; no Partner/Host-Shop aliases.
  */
 export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   const supabase = await createClient();
-  const _admin = await requireAdminClient();
-  const db = _admin;
-  if (!db) throw new Error('Admin client failed to initialize');
+  const db = await requireAdminClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login?redirect=/program-holder/dashboard');
@@ -51,11 +37,9 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
 
   const holderId = profile.program_holder_id;
   if (!holderId) {
-    // Profile exists but no program_holders linkage yet (pending approval)
     redirect('/program-holder?error=pending-approval');
   }
 
-  // Gate: check MOU signed + account active before allowing dashboard access
   const { data: holder } = await db
     .from('program_holders')
     .select('status, mou_signed, approved_at, payout_status')
@@ -66,20 +50,14 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
     redirect('/program-holder?error=pending-approval');
   }
 
-  // Not yet approved — send to onboarding
-  // 'approved' and 'active' are both valid post-approval states.
-  // 'approved' means admin approved but MOU not yet signed.
-  // 'active' means MOU signed and fully onboarded.
   if (!['approved', 'active'].includes(holder.status) || !holder.approved_at) {
     redirect('/program-holder/onboarding?status=pending-approval');
   }
 
-  // MOU not signed — send to MOU page
   if (!holder.mou_signed) {
-    redirect('/program-holder/mou?required=true');
+    redirect('/program-holder/sign-mou?required=true');
   }
 
-  // Get programs via the association table
   const { data: associations } = await db
     .from('program_holder_programs')
     .select('program_id')
@@ -98,23 +76,16 @@ export async function requireProgramHolder(): Promise<ProgramHolderContext> {
   };
 }
 
-/**
- * Validate that a specific programId belongs to the current program holder.
- * Use in /programs/[programId]/* routes.
- */
 export async function requireProgramAccess(programId: string): Promise<ProgramHolderContext> {
   const ctx = await requireProgramHolder();
 
   if (!ctx.programIds.includes(programId)) {
-    redirect('/program-holder/programs?error=access-denied');
+    redirect('/program-holder/dashboard?error=access-denied');
   }
 
   return ctx;
 }
 
-/**
- * Lightweight version for API routes (no redirect, returns null on failure).
- */
 export async function getProgramHolderContext(db: any, userId: string) {
   const { data: profile } = await db
     .from('profiles')

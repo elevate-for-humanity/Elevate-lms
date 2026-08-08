@@ -19,7 +19,7 @@ async function startTrial() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/apps/sam-gov/start-trial');
 
-  const result = await startAppTrial(user.id, 'sam-gov');
+  const result = await startAppTrial(user.id, 'sam-gov', supabase);
   if (result.status === 'exists') redirect('/apps/sam-gov');
   if (result.status === 'error') redirect('/apps/sam-gov/start-trial?error=failed');
   redirect('/apps/sam-gov?welcome=true');

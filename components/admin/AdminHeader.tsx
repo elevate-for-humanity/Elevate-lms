@@ -21,7 +21,7 @@ const NAV_ITEMS = [
   { label: 'Partners', href: '/partners', icon: Handshake },
   { label: 'Marketing', href: '/crm', icon: Megaphone },
   { label: 'Compliance', href: '/compliance', icon: ShieldCheck },
-  { label: 'Dev Studio', href: '/admin/studio', icon: Bot }, // points to admin/studio/page.tsx (inside admin/ route group)
+  { label: 'Dev Studio', href: '/studio', icon: Bot },
 ];
 
 function LanguageSwitcher() {
@@ -103,11 +103,9 @@ export default function AdminHeader() {
 
   return (
     <>
-      {/* Top Bar */}
       <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
-            {/* Logo */}
             <div className="flex items-center gap-3">
               <Link href="/dashboard" className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
@@ -120,7 +118,6 @@ export default function AdminHeader() {
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
             <nav className="hidden xl:flex items-center gap-0.5">
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
@@ -142,9 +139,7 @@ export default function AdminHeader() {
               })}
             </nav>
 
-            {/* Right Side */}
             <div className="flex items-center gap-0.5">
-              {/* Search */}
               {searchOpen ? (
                 <form onSubmit={handleSearch} className="flex items-center gap-2 bg-white/10 rounded-md px-2 py-1">
                   <input
@@ -172,16 +167,13 @@ export default function AdminHeader() {
                 </button>
               )}
 
-              {/* Language */}
               <LanguageSwitcher />
               
-              {/* Notifications */}
               <button className="p-2 rounded-md hover:bg-white/10 transition-colors relative">
                 <Bell className="w-4 h-4" />
                 <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full" />
               </button>
 
-              {/* Profile */}
               <div className="relative">
                 <button 
                   onClick={() => setProfileOpen(!profileOpen)}
@@ -212,7 +204,6 @@ export default function AdminHeader() {
                 )}
               </div>
 
-              {/* Mobile Nav Toggle */}
               <button 
                 onClick={() => setNavExpanded(!navExpanded)}
                 className="xl:hidden p-2 rounded-md hover:bg-white/10 transition-colors"
@@ -224,7 +215,6 @@ export default function AdminHeader() {
           </div>
         </div>
 
-        {/* Horizontal Mobile Nav - Scrollable */}
         <div className={`xl:hidden border-t border-slate-800 overflow-hidden transition-all duration-300 ${navExpanded ? 'max-h-96' : 'max-h-0'}`}>
           <div className="px-4 py-3">
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">

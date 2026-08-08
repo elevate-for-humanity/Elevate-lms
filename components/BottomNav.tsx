@@ -8,7 +8,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { icon: Home, label: 'Home', href: '/learner/dashboard' },
+    { icon: Home, label: 'Home', href: '/lms/dashboard' },
     { icon: BookOpen, label: 'Programs', href: '/lms/programs' },
     { icon: Users, label: 'Groups', href: '/study-groups' },
     { icon: Award, label: 'Awards', href: '/achievements' },
@@ -44,5 +44,4 @@ export function BottomNav() {
   );
 }
 
-// Default export for next/dynamic
 export default BottomNav;

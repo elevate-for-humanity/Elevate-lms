@@ -2,11 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { ADD_ON_MARKETPLACE } from '@/lib/store/platform-pricing';
 import { PlatformBasePlansSection } from '@/components/store/PlatformBasePlansSection';
 import { AddOnMarketplaceSection } from '@/components/store/AddOnMarketplaceSection';
 
-export function PlansPageClient() {
-  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+export function PlansPageClient({
+  initialAddon,
+}: {
+  vertical?: string;
+  initialAddon?: string;
+}) {
+  const validInitialAddon = initialAddon && ADD_ON_MARKETPLACE.some((addon) => addon.slug === initialAddon)
+    ? initialAddon
+    : undefined;
+  const [selectedAddons, setSelectedAddons] = useState<string[]>(validInitialAddon ? [validInitialAddon] : []);
 
   const toggleAddon = (slug: string) => {
     setSelectedAddons((prev) =>
@@ -19,7 +28,7 @@ export function PlansPageClient() {
       <PlatformBasePlansSection
         selectedAddonSlugs={selectedAddons}
         headline="Base plans"
-        subheadline="Start simple. Add workforce, LMS, and apprenticeship modules when you are ready."
+        subheadline="Start with the essentials. Add AI assistants and business, education, workforce or testing modules as you grow."
       />
       <AddOnMarketplaceSection selectedSlugs={selectedAddons} onToggle={toggleAddon} />
       <section className="py-12 px-4 border-t border-slate-200">

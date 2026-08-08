@@ -52,10 +52,10 @@ export const ROUTES = {
   programsIT: '/programs/it-help-desk',
   programsTechnology: '/programs/technology',
 
-  // Apprenticeships
+  // Apprenticeships / host shops
   apprenticeships: '/apprenticeships',
   apprenticeshipsHowItWorks: '/how-it-works',
-  apprenticeshipsHostShop: '/partners/barber-host-shop',
+  apprenticeshipsHostShop: '/host-shop',
   apprenticeshipSponsor: '/apprenticeship-sponsor',
 
   // Funding

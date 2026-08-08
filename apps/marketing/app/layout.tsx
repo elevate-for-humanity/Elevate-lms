@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleAnalytics />
         <I18nProvider>
           <Header />
-          <main className="site-main pt-[60px]">{children}</main>
+          <main className="site-main pt-[68px]">{children}</main>
           <SiteFooter />
         </I18nProvider>
       </body>

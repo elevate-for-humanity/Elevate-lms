@@ -1,35 +1,35 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 export const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
 
+const RAPIDS = RAPIDS_CONFIG.programs.barber;
+const OJL_HOURS = RAPIDS.totalHours;
+const RTI_HOURS = RAPIDS.relatedInstructionHours;
+
 export const QUICK_STATS = [
-  { val: '2,000', label: 'Total Hours (1,500 OJT + 260 RTI)' },
-  { val: '15 Months', label: 'Program Duration' },
-  { val: '$4,980', label: 'Total Cost' },
-  { val: '3', label: 'Credentials Earned' },
+  { val: OJL_HOURS.toLocaleString(), label: `OJL Hours + ${RTI_HOURS} RTI` },
+  { val: '40 hrs/wk', label: 'Standard OJL Schedule' },
+  { val: `$${BARBER_PRICING.fullPrice.toLocaleString()}`, label: 'Self-Pay Tuition' },
+  { val: '3', label: 'Completion / Career Credentials' },
 ];
 
 export const COMPETENCIES = [
-  // Sanitation & Safety
   'Tool disinfection procedures',
   'Workstation sanitation standards',
   'PPE and hygiene practices',
   'Chemical handling and safety',
-  // Technical Barbering
   'Clipper handling and guard usage',
   'Fading and blending techniques',
   'Tapering and line-ups',
   'Shear cutting fundamentals',
-  // Razor & Shaving
   'Straight razor safety',
   'Beard shaping and lining',
   'Skin protection and sanitation',
-  // Client Services
   'Client consultation',
   'Communication and professionalism',
   'Time management and service efficiency',
-  // Shop Operations
   'Equipment setup and breakdown',
   'Shop sanitation maintenance',
   'Appointment flow and customer service',
@@ -37,59 +37,70 @@ export const COMPETENCIES = [
 ];
 
 export const CREDENTIALS = [
-  { name: 'Rise Up', type: 'Certificate' as const, issuer: 'Licensed credential partner' },
-  { name: 'Rise Up', type: 'Certificate' as const, issuer: 'Licensed credential partner' },
-  { name: 'Registered Barber License', type: 'Licensure' as const, issuer: 'Indiana Professional Licensing Agency' },
+  {
+    name: 'DOL Registered Apprenticeship Certificate of Completion',
+    type: 'Certificate' as const,
+    issuer: 'U.S. Department of Labor',
+  },
+  {
+    name: 'Barbershop Business Management Certificate',
+    type: 'Certificate' as const,
+    issuer: 'Elevate for Humanity',
+  },
+  {
+    name: 'Indiana Barber License',
+    type: 'Licensure' as const,
+    issuer: 'Indiana Professional Licensing Agency',
+  },
 ];
 
 export const CURRICULUM = [
   { title: 'Haircutting Techniques', description: 'Fades, tapers, lineups, and precision cutting under licensed supervision in a real shop environment.' },
   { title: 'Clipper & Shear Mastery', description: 'Tool selection, maintenance, guard systems, and advanced clipper-over-comb and shear techniques.' },
-  { title: 'Sanitation & Safety', description: 'Indiana State Board sanitation standards, chemical safety, bloodborne pathogen protocols, and workstation compliance.' },
-  { title: 'Shaving & Beard Grooming', description: 'Straight razor safety, beard shaping, lining, skin protection, and hot towel service techniques.' },
-  { title: 'Client Services & Professionalism', description: 'Client consultation, communication, time management, and building a repeat client base.' },
-  { title: 'Shop Operations & Business', description: 'Booth rental basics, appointment management, business licensing, and shop ownership preparation.' },
-  { title: 'License Exam Preparation', description: 'Indiana barber license exam prep including written test review, practical exam practice, and State Board requirements.' },
-  { title: 'Competency Evaluations', description: 'Monthly rubric-based assessments, tri-party verification (RTI + Employer + Program), and documented skill progression.' },
+  { title: 'Sanitation & Safety', description: 'Sanitation standards, chemical safety, bloodborne-pathogen precautions, and workstation compliance.' },
+  { title: 'Shaving & Beard Grooming', description: 'Straight razor safety, beard shaping, lining, skin protection, and hot-towel service techniques.' },
+  { title: 'Client Services & Professionalism', description: 'Client consultation, communication, time management, and repeat-client service.' },
+  { title: 'Shop Operations & Business', description: 'Booking, pricing, business fundamentals, and shop-operations preparation.' },
+  { title: 'License Exam Preparation', description: 'Indiana barber licensing-exam preparation and completion-document review.' },
+  { title: 'Competency Evaluations', description: 'Documented employer/program competency review throughout OJL.' },
 ];
 
 export const CAREERS = [
-  { title: 'Licensed Barber', salary: '$30K-$50K', demand: 'High demand' },
-  { title: 'Senior Barber / Stylist', salary: '$50K-$70K', demand: 'Experience-based' },
-  { title: 'Shop Manager', salary: '$45K-$65K', demand: 'Leadership path' },
-  { title: 'Shop Owner', salary: '$60K-$120K+', demand: 'Entrepreneurship' },
+  { title: 'Licensed Barber', salary: 'Market dependent', demand: 'Current-market dependent' },
+  { title: 'Senior Barber / Stylist', salary: 'Market dependent', demand: 'Experience-based' },
+  { title: 'Shop Manager', salary: 'Market dependent', demand: 'Leadership path' },
+  { title: 'Shop Owner', salary: 'Business-performance dependent', demand: 'Entrepreneurship' },
 ];
 
 export const ENROLLMENT_STEPS = [
-  { title: 'Complete Intake', description: 'Submit the funding and eligibility intake form online. Answer questions about your background, work history, and payment preferences. No documents needed at this stage.' },
-  { title: 'Get Matched', description: 'Our team pairs you with a licensed barber instructor at a partner barbershop near you. Meet your instructor, tour the shop, and agree on a training schedule and employment model.' },
-  { title: 'Earn While You Learn', description: 'Complete 1,500 on-the-job training hours at the shop plus 260 hours of Related Technical Instruction (RTI). Training models include hourly paid, booth-based, or hybrid arrangements depending on the partner shop.' },
-  { title: 'Get Licensed', description: 'After completing all required hours and coursework, sit for the Indiana State Board barber exam. We provide exam prep materials and practice tests. Pass and receive your Indiana barber license.' },
+  { title: 'Complete Intake', description: 'Submit the application and funding information. Inquiry and enrollment are separate workflows.' },
+  { title: 'Get Matched', description: 'Complete host-shop matching or verify your existing approved shop placement before OJL begins.' },
+  { title: 'Earn & Learn', description: `Complete ${OJL_HOURS.toLocaleString()} approved supervised OJL hours and ${RTI_HOURS} RTI hours while your progress is tracked in the platform.` },
+  { title: 'Complete & Apply for Licensure', description: 'Finish registered-program requirements, receive completion documentation, then complete the current Indiana licensing and examination process.' },
 ];
 
 export const ELIGIBILITY = [
-  'At least 16 years old with a valid government-issued ID',
-  'No prior barbering experience required',
-  'High school diploma or GED preferred but not mandatory for all payment options',
-  'Ability to stand for extended periods and perform repetitive hand motions',
-  'Pass background check (required by some partner shops)',
+  'Meet program, employment, and current state/federal eligibility requirements',
+  'Complete required identity and onboarding documentation',
+  'Have or obtain an approved participating host-shop placement',
+  'Be able to perform the essential functions of training with reasonable accommodation where applicable',
 ];
 
 export const PARTNER_REQUIREMENTS = [
-  'Active and valid Indiana barbershop license in good standing',
-  'At least one licensed barber available for supervision with 2+ years experience',
-  'Workers\' compensation insurance',
-  'Physical shop location in Indiana',
-  'Commitment to structured OJT training and monthly evaluations',
-  'Compliance with sanitation and workplace training standards',
-  'Signed Memorandum of Understanding (MOU) before placement begins',
+  'Active Indiana shop/business licensing required for the hosted occupation',
+  'Qualified licensed supervisor or mentor available for oversight',
+  'Required insurance and employment coverage',
+  'Physical training location approved for the apprenticeship',
+  'Commitment to structured OJL and competency verification',
+  'Compliance with workplace, sanitation, and program requirements',
+  'Signed Memorandum of Understanding (MOU) before activation',
 ];
 
 export const PARTNER_BENEFITS = [
-  'Access to trained apprentices gaining real shop experience',
-  'Workforce development participation and recognition',
-  'Increased shop visibility as an approved training site',
-  'Structured evaluation tools and support from program oversight',
-  'First pick of trained talent upon program completion',
-  'Zero paperwork burden — Elevate handles compliance and documentation',
+  'Access to apprenticeship candidates matched to approved sites',
+  'Digital OJL-hour and competency tracking',
+  'Program administration and compliance support',
+  'Host-shop onboarding documents and MOU workflow',
+  'Visibility into assigned apprentice progress',
+  'Centralized records instead of duplicate paper processes',
 ];

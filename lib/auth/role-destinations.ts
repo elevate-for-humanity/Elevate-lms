@@ -1,20 +1,9 @@
 /**
  * Canonical post-authentication destination by role.
  *
- * This is the single source of truth for where each role lands after:
- *   - login
- *   - signup / onboarding completion
- *   - payment success
- *   - email CTAs
- *   - protected-route fallback
- *   - /dashboard role-router
- *   - /api/auth/landing
- *
- * Rules:
- *   - Never hardcode a destination path outside this file.
- *   - Import getRoleDestination() wherever a post-auth redirect is needed.
- *   - The `redirect` query param always takes priority over the role default
- *     (validated via lib/auth/validate-redirect.ts before use).
+ * This compact path map is used by code that still needs a relative role destination.
+ * Cross-domain login routing should prefer lib/routing/dashboard-resolver.ts.
+ * No legacy portal aliases belong here.
  */
 
 export type UserRole =
@@ -27,6 +16,8 @@ export type UserRole =
   | 'program_holder'
   | 'delegate'
   | 'partner'
+  | 'host_shop'
+  | 'host_shop_admin'
   | 'sponsor'
   | 'employer'
   | 'creator'
@@ -35,66 +26,43 @@ export type UserRole =
   | 'provider_admin'
   | 'grant_client'
   | 'apprentice'
+  | 'test_admin'
+  | 'proctor';
 
-/**
- * Maps every role to its canonical post-auth landing page.
- * Roles not listed here fall through to the student default.
- *
- * Each role lands directly on their operational portal so the first
- * screen they see is immediately relevant to their job.
- * /my-dashboard remains the hub they can always navigate back to.
- */
 export const ROLE_DESTINATIONS: Record<string, string> = {
-  // ── Platform admins ───────────────────────────────────────────────
-  // Admin roles always land on the admin app, never the LMS
   super_admin: '/admin/dashboard',
   admin: '/admin/dashboard',
   org_admin: '/admin/dashboard',
-
-  // ── Internal Elevate staff ────────────────────────────────────────
   staff: '/admin/staff-portal/dashboard',
-
-  // ── Education staff ───────────────────────────────────────────────
   instructor: '/admin/instructor/dashboard',
-  creator: '/creator/products',
 
-  // ── Workforce / case management ───────────────────────────────────
+  creator: '/creator/products',
   case_manager: '/case-manager/dashboard',
   workforce_board: '/workforce-board/dashboard',
-
-  // ── Program administration ────────────────────────────────────────
   program_holder: '/program-holder/dashboard',
   provider_admin: '/provider/dashboard',
-  sponsor: '/employer/dashboard', // DOL apprenticeship sponsors — approve hours, manage apprenticeships
 
-  // ── Employer & industry partners ─────────────────────────────────
+  sponsor: '/employer/dashboard',
   employer: '/employer/dashboard',
-  partner: '/partner/dashboard', // smart-routes to /partner/attendance
 
-  // ── Learners ──────────────────────────────────────────────────────
-  student: '/learner/dashboard',
+  // Partner was an old Host Shop alias. Do not route users back into /partner/*.
+  partner: '/host-shop/dashboard',
+  host_shop: '/host-shop/dashboard',
+  host_shop_admin: '/host-shop/dashboard',
 
-  // ── Apprentices ──────────────────────────────────────────────────
-  // Apprentices are enrolled in a program and should land on their program portal.
-  // The ApprenticeLoginForm calls resolveStudentHomePath which resolves the exact
-  // portal (/portal/barber, /portal/cosmetology, etc.) based on program enrollment.
-  // Direct role-based routing falls back to /apprentice if no program portal matches.
-  apprentice: '/portal/barber',
+  // Standard learners use the actual LMS dashboard, not /learner/dashboard redirect shells.
+  student: '/lms/dashboard',
+  delegate: '/lms/dashboard',
+  grant_client: '/lms/dashboard',
 
-  // ── Family ────────────────────────────────────────────────────────
-  // parent role handled via /parent-portal — no requireRole yet, falls through
-  delegate: '/learner/dashboard', // delegate portal not yet built — falls back to learner dashboard
+  // Exact occupation portal is resolved by resolveStudentHomePath during login.
+  apprentice: '/apprentice',
 
-
-  // ── Grant clients ─────────────────────────────────────────────────
-  grant_client: '/lms/dashboard', // grant-funded learner — lands in LMS, not public grants page
+  test_admin: '/admin/testing-center',
+  proctor: '/admin/testing-center',
 };
 
-/**
- * Returns the canonical post-auth destination for a given role.
- * Falls back to /learner/dashboard for unknown roles.
- */
 export function getRoleDestination(role: string | null | undefined): string {
-  if (!role) return '/learner/dashboard';
-  return ROLE_DESTINATIONS[role] ?? '/learner/dashboard';
+  if (!role) return '/lms/dashboard';
+  return ROLE_DESTINATIONS[role] ?? '/lms/dashboard';
 }

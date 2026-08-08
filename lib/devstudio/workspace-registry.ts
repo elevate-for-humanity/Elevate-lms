@@ -19,7 +19,6 @@ export type StudioWorkspaceId =
   | 'evaluations'
   | 'collaboration'
   | 'cfd'
-  | 'plugins'
   | 'memory'
   | 'health'
   | 'settings';
@@ -45,9 +44,8 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'deployments', label: 'Deployments', description: 'Build, deploy, verify and roll back services.', permission: 'studio.deployments.manage', route: '/studio/deployments', healthEndpoint: '/api/admin/dev-studio/deployments/health' },
   { id: 'containers', label: 'Containers', description: 'Manage isolated execution environments.', permission: 'studio.containers.manage', route: '/studio/containers', healthEndpoint: '/api/admin/dev-studio/containers/health' },
   { id: 'evaluations', label: 'Evaluation Center', description: 'Evidence-based platform and AI evaluation.', permission: 'studio.evaluations.manage', route: '/studio/evaluations', healthEndpoint: '/api/admin/dev-studio/evaluations/health' },
-  { id: 'collaboration', label: 'Collaboration', description: 'Presence, comments and shared editing.', permission: 'studio.collaboration.use', route: '/studio/collaboration', healthEndpoint: '/api/admin/dev-studio/collaboration/health' },
+  { id: 'collaboration', label: 'Collaboration', description: 'Comments and shared review context backed by Studio data.', permission: 'studio.collaboration.use', route: '/studio/collaboration', healthEndpoint: '/api/admin/dev-studio/collaboration/health' },
   { id: 'cfd', label: 'CFD Studio', description: 'OpenFOAM project configuration and execution.', permission: 'studio.cfd.manage', route: '/studio/cfd', healthEndpoint: '/api/admin/dev-studio/cfd/health', featureFlag: 'CFD_ENABLED' },
-  { id: 'plugins', label: 'Plugins', description: 'Install and manage approved platform extensions.', permission: 'studio.plugins.manage', route: '/studio/plugins', healthEndpoint: '/api/admin/dev-studio/plugins/health' },
   { id: 'memory', label: 'AI Memory', description: 'Search and manage governed organizational memory.', permission: 'studio.memory.manage', route: '/studio/memory', healthEndpoint: '/api/admin/dev-studio/memory/health' },
   { id: 'health', label: 'System Health', description: 'Capability status and configuration checks.', permission: 'studio.health.view', route: '/studio/health', healthEndpoint: '/api/devstudio/health' },
   { id: 'settings', label: 'Settings', description: 'Providers, features and Studio permissions.', permission: 'studio.settings.manage', route: '/studio/settings', healthEndpoint: '/api/admin/dev-studio/settings/health' },

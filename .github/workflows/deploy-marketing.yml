@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'apps/marketing/**'
-      - 'apps/lms/app/lms/**'
       - 'components/marketing/**'
       - 'components/site/**'
       - 'lib/navigation/**'
@@ -43,7 +42,7 @@ env:
 
 jobs:
   deploy-marketing:
-    name: Sync env, build, and deploy Marketing (www) on Northflank
+    name: Build and deploy Marketing (www) on Northflank
     runs-on: ubuntu-latest
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
@@ -56,8 +55,6 @@ jobs:
       FORCE_FRESH_BUILD: 'true'
       DEPLOY_BRANCH: main
 
-      # Shared production runtime secrets. sync-env.ts attaches the resulting
-      # secret group to Marketing, LMS, and Admin together.
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -129,13 +126,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Verify shared production secrets
+      - name: Verify production deployment credentials
         run: |
           set -euo pipefail
           required=(
             NORTHFLANK_API_TOKEN
             NEXT_PUBLIC_SUPABASE_URL
             NEXT_PUBLIC_SUPABASE_ANON_KEY
+          )
+          for name in "${required[@]}"; do
+            test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }
+          done
+          echo "Marketing deployment credentials are configured"
+
+      # Shared secret groups are runtime infrastructure. Do not rewrite them on
+      # every code push because Northflank can restart every attached service
+      # when a secret group changes. Sync only during an explicit infrastructure
+      # apply/recovery run.
+      - name: Verify shared production secrets for infrastructure apply
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
+        run: |
+          set -euo pipefail
+          required=(
             SUPABASE_SERVICE_ROLE_KEY
             NEXTAUTH_SECRET
             STRIPE_SECRET_KEY
@@ -147,18 +159,40 @@ jobs:
           echo "Shared production secrets are configured"
 
       - name: Sync production env to Marketing + LMS + Admin
+        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
         run: pnpm tsx scripts/northflank/sync-env.ts --execute
 
-      # Routine code deploys must not mutate service configuration.
+      # Canonical config sets disabledCI=true so Northflank does not also create
+      # native Git builds for every repository push. GitHub Actions is the only
+      # routine deployment controller.
       - name: Configure Northflank Marketing service
         if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
 
+      # A burst of commits can leave an older workflow alive long enough to
+      # trigger a Northflank build. Refuse to start a build unless this workflow
+      # still represents the current main SHA.
+      - name: Confirm this is still the latest main commit
+        id: latest_before_build
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main --depth=1
+          LATEST_SHA="$(git rev-parse origin/main)"
+          if [ "$LATEST_SHA" = "${{ github.sha }}" ]; then
+            echo "is_latest=true" >> "$GITHUB_OUTPUT"
+            echo "This workflow is still current: $LATEST_SHA"
+          else
+            echo "is_latest=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping stale Marketing deployment. workflow=${{ github.sha }} latest=$LATEST_SHA"
+          fi
+
       - name: Trigger Marketing build
+        if: steps.latest_before_build.outputs.is_latest == 'true'
         id: trigger_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
 
       - name: Require a concrete Northflank build id
+        if: steps.latest_before_build.outputs.is_latest == 'true'
         run: |
           set -euo pipefail
           BUILD_ID="${{ steps.trigger_build.outputs.build_id }}"
@@ -166,16 +200,36 @@ jobs:
           echo "Northflank build id: $BUILD_ID"
 
       - name: Wait for Marketing build to complete
+        if: steps.latest_before_build.outputs.is_latest == 'true'
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.trigger_build.outputs.build_id }}" --timeout-ms 3600000
 
       - name: Verify exact Marketing build succeeded
+        if: steps.latest_before_build.outputs.is_latest == 'true'
         run: |
           pnpm tsx scripts/northflank/verify-build.ts \
             "$NORTHFLANK_MARKETING_SERVICE_ID" \
             --build-id "${{ steps.trigger_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
 
+      # Re-check main after the potentially long build. An old build may finish,
+      # but it must never replace a newer live deployment.
+      - name: Confirm build is still the latest main commit
+        if: steps.latest_before_build.outputs.is_latest == 'true'
+        id: latest_before_deploy
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main --depth=1
+          LATEST_SHA="$(git rev-parse origin/main)"
+          if [ "$LATEST_SHA" = "${{ github.sha }}" ]; then
+            echo "is_latest=true" >> "$GITHUB_OUTPUT"
+            echo "Build remains current: $LATEST_SHA"
+          else
+            echo "is_latest=false" >> "$GITHUB_OUTPUT"
+            echo "Build completed but will not deploy because main advanced. build=${{ github.sha }} latest=$LATEST_SHA"
+          fi
+
       - name: Deploy exact Marketing build
+        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
         run: |
           pnpm tsx scripts/northflank/trigger-deployment.ts \
             "$NORTHFLANK_MARKETING_SERVICE_ID" \
@@ -183,14 +237,17 @@ jobs:
             --sha "${{ github.sha }}"
 
       - name: Wait for Marketing deployment
+        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 3600000
 
       - name: Verify Northflank deployment SHA
+        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
         run: |
           set -euo pipefail
           pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
 
       - name: Smoke Marketing and require exact live SHA
+        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
         run: |
           set -euo pipefail
           EXPECTED_SHA="${{ github.sha }}"
@@ -228,10 +285,9 @@ jobs:
           exit 1
 
       - name: Verify trial API is no longer infrastructure-unavailable
+        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
         run: |
           set -euo pipefail
-          # Invalid input should produce 400. A 503 here means Marketing still lacks
-          # the privileged Supabase runtime dependency required by the trial flow.
           status=$(curl -sk --max-time 15 \
             -o /tmp/trial-check.json \
             -w "%{http_code}" \

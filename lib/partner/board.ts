@@ -6,43 +6,62 @@ import {
 } from '@/lib/partners/host-shop-onboarding';
 
 export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
-  'barber': { hours: 2000, label: 'Barber Apprenticeship' },
+  barber: { hours: 2000, label: 'Barber Apprenticeship' },
   'barber-apprenticeship': { hours: 2000, label: 'Barber Apprenticeship' },
-  // Keep the legacy program key for routing/database compatibility; display the
-  // registered occupation name in the Host Shop portal.
-  'cosmetology': { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  cosmetology: { hours: 1500, label: 'Hairstylist Apprenticeship' },
   'cosmetology-apprenticeship': { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  'hairstylist': { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  hairstylist: { hours: 1500, label: 'Hairstylist Apprenticeship' },
   'nail-tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
-  'nail_tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
-  'nail_technician': { hours: 450, label: 'Nail Technician Apprenticeship' },
-  'esthetician': { hours: 700, label: 'Esthetician Apprenticeship' },
-  'training_site': { hours: 2000, label: 'Apprenticeship' },
+  nail_tech: { hours: 450, label: 'Nail Technician Apprenticeship' },
+  nail_technician: { hours: 450, label: 'Nail Technician Apprenticeship' },
+  esthetician: { hours: 700, label: 'Esthetician Apprenticeship' },
+  training_site: { hours: 2000, label: 'Apprenticeship' },
+};
+
+type PartnerRecord = {
+  id: string;
+  partner_type?: string | null;
+  program_type?: string | null;
+  programs?: string[] | null;
+  approval_status?: string | null;
+  status?: string | null;
+  mou_signed?: boolean | null;
+  onboarding_completed?: boolean | null;
+  documents_verified?: boolean | null;
+  name?: string | null;
+  city?: string | null;
+  state?: string | null;
 };
 
 export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
 
-  // 1. Resolve partner record
-  const { data: partnerLink } = await db
+  // Tenant boundary: an active partner_users link is mandatory. Never fall
+  // back to profile.role when loading host-shop data with the service client.
+  const { data: partnerLink, error: partnerLinkError } = await db
     .from('partner_users')
-    .select('partner_id, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
+    .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
     .eq('user_id', userId)
     .eq('status', 'active')
     .maybeSingle();
 
-  const partner = partnerLink?.partners as any;
+  if (partnerLinkError || !partnerLink?.partner_id || !partnerLink.partners) {
+    throw new Error('HOST_SHOP_ACCESS_DENIED');
+  }
 
-  // 2. Resolve shop IDs
+  const partner = partnerLink.partners as unknown as PartnerRecord;
+
+  // Only shop assignments belonging to this authenticated user are eligible.
   const { data: shopLinks } = await db
     .from('shop_staff')
     .select('shop_id, shops(id, name, city, state, active)')
     .eq('user_id', userId);
 
-  const shops = (shopLinks || []).map((s: any) => s.shops).filter(Boolean);
-  const shopIds = shops.map((s: any) => s.id);
+  const shops = (shopLinks || [])
+    .map((row: any) => row.shops)
+    .filter((shop: any) => Boolean(shop?.id) && shop.active !== false);
+  const shopIds = shops.map((shop: any) => shop.id);
 
-  // 3. Active apprentices via apprentice_placements
   const { data: placements } = shopIds.length
     ? await db
         .from('apprentice_placements')
@@ -51,18 +70,16 @@ export async function getHostShopBoard(userId: string) {
         .eq('status', 'active')
     : { data: [] };
 
-  const apprentices = (placements || []).map((p: any) => ({
-    id: p.id,
-    student_id: p.student_id,
-    name: p.profiles?.full_name || 'Unknown',
-    email: p.profiles?.email || '',
-    discipline: p.discipline,
-    start_date: p.start_date,
+  const apprentices = (placements || []).map((placement: any) => ({
+    id: placement.id,
+    student_id: placement.student_id,
+    name: placement.profiles?.full_name || 'Unknown',
+    email: placement.profiles?.email || '',
+    discipline: placement.discipline,
+    start_date: placement.start_date,
   }));
+  const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
-  const studentIds = apprentices.map((a) => a.student_id);
-
-  // 4. OJT hours per student
   const ojtProgress: Record<string, { completed: number; required: number }> = {};
   if (studentIds.length) {
     const { data: ojt } = await db
@@ -70,81 +87,83 @@ export async function getHostShopBoard(userId: string) {
       .select('student_id, total_hours_completed, total_hours_required')
       .in('student_id', studentIds)
       .eq('status', 'active');
-    for (const o of ojt || []) {
-      ojtProgress[o.student_id] = {
-        completed: o.total_hours_completed || 0,
-        required: o.total_hours_required || 2000,
+    for (const row of ojt || []) {
+      ojtProgress[row.student_id] = {
+        completed: Number(row.total_hours_completed || 0),
+        required: Number(row.total_hours_required || 2000),
       };
     }
   }
 
-  // 5. Pending hours to verify
-  const { count: pendingHoursCount } = await db
-    .from('hour_entries')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'pending');
+  // Critical tenant fix: count only hour entries belonging to apprentices
+  // assigned to this host shop. Never expose a platform-wide pending count.
+  let pendingHoursCount = 0;
+  if (studentIds.length) {
+    const { count } = await db
+      .from('hour_entries')
+      .select('id', { count: 'exact', head: true })
+      .in('user_id', studentIds)
+      .eq('status', 'pending');
+    pendingHoursCount = count || 0;
+  }
 
-  // 6. Determine trade from the canonical host-shop program fields.
   const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.discipline });
-  const tradeKey = programType;
-  const tradeInfo = TRADE_TARGETS[tradeKey] || TRADE_TARGETS['barber'];
+  const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
-  // 7. Document and onboarding alerts for the partner dashboard.
-  const { data: programAccess } = partner?.id
-    ? await db
-        .from('partner_program_access')
-        .select('program_id')
-        .eq('partner_id', partner.id)
-        .is('revoked_at', null)
-    : { data: [] };
-  const programIds = Array.from(
-    new Set([
-      programType,
-      ...(programAccess || []).map((row: { program_id?: string }) => row.program_id).filter(Boolean),
-    ]),
-  );
+  const { data: programAccess } = await db
+    .from('partner_program_access')
+    .select('program_id')
+    .eq('partner_id', partner.id)
+    .is('revoked_at', null);
+
+  const programIds = Array.from(new Set([
+    programType,
+    ...(programAccess || []).map((row: { program_id?: string }) => row.program_id).filter((value): value is string => Boolean(value)),
+  ]));
 
   const { data: dbRequirements } = await db
     .from('partner_document_requirements')
     .select('*')
     .in('program_id', [...programIds, 'ALL'])
-    .in('state', [partner?.state || 'Indiana', 'ALL']);
+    .in('state', [partner.state || 'Indiana', 'ALL']);
 
   const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
-  const { data: uploadedDocs } = partner?.id
-    ? await db
-        .from('partner_documents')
-        .select('id, document_type, file_name, status, rejection_reason, expires_at')
-        .eq('partner_id', partner.id)
-        .order('created_at', { ascending: false })
-    : { data: [] };
+  const { data: uploadedDocs } = await db
+    .from('partner_documents')
+    .select('id, document_type, file_name, status, rejection_reason, expires_at')
+    .eq('partner_id', partner.id)
+    .order('created_at', { ascending: false });
 
   const latestDocs = new Map<string, any>();
   for (const doc of uploadedDocs || []) {
     if (!latestDocs.has(doc.document_type)) latestDocs.set(doc.document_type, doc);
   }
 
-  const documentStatuses = requirements.map((req: any) => {
-    const doc = latestDocs.get(req.document_type);
+  const documentStatuses = requirements.map((requirement: any) => {
+    const document = latestDocs.get(requirement.document_type);
     return {
-      ...req,
-      uploaded: !!doc,
-      document: doc || null,
-      status: doc?.status || 'missing',
+      ...requirement,
+      uploaded: Boolean(document),
+      document: document || null,
+      status: document?.status || 'missing',
     };
   });
   const missingDocuments = documentStatuses.filter(
-    (doc: any) => doc.is_required && (!doc.uploaded || ['missing', 'rejected', 'expired'].includes(doc.status)),
+    (document: any) => document.is_required && (!document.uploaded || ['missing', 'rejected', 'expired'].includes(document.status)),
   );
-  const pendingDocuments = documentStatuses.filter((doc: any) => doc.is_required && doc.status === 'pending');
-  const acceptedDocumentCount = documentStatuses.filter((doc: any) => doc.is_required && doc.status === 'accepted').length;
-  const requiredDocumentCount = documentStatuses.filter((doc: any) => doc.is_required).length;
+  const pendingDocuments = documentStatuses.filter(
+    (document: any) => document.is_required && document.status === 'pending',
+  );
+  const acceptedDocumentCount = documentStatuses.filter(
+    (document: any) => document.is_required && document.status === 'accepted',
+  ).length;
+  const requiredDocumentCount = documentStatuses.filter((document: any) => document.is_required).length;
 
   return {
     partner,
     shops,
-    tradeKey,
+    tradeKey: programType,
     tradeInfo,
     programType,
     onboardingPaths,
@@ -153,10 +172,10 @@ export async function getHostShopBoard(userId: string) {
     pendingDocuments,
     acceptedDocumentCount,
     requiredDocumentCount,
-    apprentices: apprentices.map((a) => ({
-      ...a,
-      ojt: ojtProgress[a.student_id] || { completed: 0, required: tradeInfo.hours },
+    apprentices: apprentices.map((apprentice) => ({
+      ...apprentice,
+      ojt: ojtProgress[apprentice.student_id] || { completed: 0, required: tradeInfo.hours },
     })),
-    pendingHoursCount: pendingHoursCount || 0,
+    pendingHoursCount,
   };
 }

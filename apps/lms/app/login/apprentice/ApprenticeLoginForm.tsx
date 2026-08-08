@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
@@ -64,9 +65,7 @@ export default function ApprenticeLoginForm() {
       )}
 
       <div>
-        <label htmlFor="apprentice-email" className="block text-sm font-medium text-slate-200 mb-1">
-          Email
-        </label>
+        <label htmlFor="apprentice-email" className="block text-sm font-medium text-slate-200 mb-1">Email</label>
         <input
           id="apprentice-email"
           type="email"
@@ -80,9 +79,7 @@ export default function ApprenticeLoginForm() {
       </div>
 
       <div>
-        <label htmlFor="apprentice-password" className="block text-sm font-medium text-slate-200 mb-1">
-          Password
-        </label>
+        <label htmlFor="apprentice-password" className="block text-sm font-medium text-slate-200 mb-1">Password</label>
         <input
           id="apprentice-password"
           type="password"
@@ -92,6 +89,11 @@ export default function ApprenticeLoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
+        <div className="mt-2 text-right">
+          <Link href="/reset-password" className="text-xs font-semibold text-amber-400 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
       </div>
 
       <button

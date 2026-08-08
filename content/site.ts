@@ -20,6 +20,6 @@ export const siteConfig = {
     checkout: '/store',
     enrollment: '/enrollment',
     lms: '/lms/courses',
-    studentPortal: '/learner/dashboard',
+    studentPortal: '/lms/dashboard',
   },
 };

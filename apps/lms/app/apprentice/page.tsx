@@ -1,492 +1,172 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import {
-  GraduationCap,
-  Clock,
-  FileText,
+  ArrowRight,
   Award,
   BookOpen,
-  ArrowRight,
+  Building2,
+  CheckCircle2,
+  Clock3,
+  FileText,
   Scissors,
-  AlertTriangle,
-  CreditCard,
-  Video,
-  Calendar,
-  MessageSquare,
-  HelpCircle,
-  MapPin,
-  Target,
-  TrendingUp,
-  CheckCircle,
-  Play,
-  Users,
-  FileCheck,
-  Settings,
-  Bell,
-  ChevronRight,
-  Hammer,
-  Sparkles,
-  User,
-  Globe,
+  UserRound,
 } from 'lucide-react';
-import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
+import { createClient } from '@/lib/supabase/server';
+import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 
 export const metadata: Metadata = {
-  title: 'Apprentice Portal | Indiana Barber Apprenticeship',
-  description: 'Track your Indiana barber apprenticeship progress, hours, and certifications.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/apprentice',
-  },
+  title: 'Apprentice Dashboard',
+  robots: { index: false, follow: false },
 };
-
 export const dynamic = 'force-dynamic';
-
-// Navigation items for left sidebar
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', href: '/apprentice', icon: GraduationCap, active: true },
-  { id: 'workbook', label: 'Workbook', href: '/apprentice/workbook', icon: BookOpen },
-  { id: 'course', label: 'Video Training', href: '/apprentice/course', icon: Video },
-  { id: 'timeclock', label: 'Clock Hours', href: '/apprentice/timeclock', icon: Clock },
-  { id: 'the-bosses', label: 'The Bosses (VR)', href: '/admin/staff-portal/vr', icon: Globe },
-  { id: 'competencies', label: 'Skills', href: '/apprentice/competencies', icon: Scissors },
-  { id: 'attendance', label: 'Attendance', href: '/apprentice/attendance', icon: Calendar },
-  { id: 'documents', label: 'Documents', href: '/apprentice/documents', icon: FileText },
-  { id: 'portfolio', label: 'Portfolio', href: '/apprentice/portfolio', icon: Award },
-  { id: 'billing', label: 'Payments', href: '/apprentice/billing', icon: CreditCard },
-];
-
-const rightNavItems = [
-  { id: 'messages', label: 'Messages', href: '/apprentice/messages', icon: MessageSquare },
-  { id: 'resources', label: 'Resources', href: '/apprentice/resources', icon: HelpCircle },
-  { id: 'profile', label: 'Profile', href: '/apprentice/profile', icon: User },
-];
-
-// Progress card component
-function ProgressCard({ icon: Icon, label, value, total, color, suffix = '' }: {
-  icon: React.ElementType;
-  label: string;
-  value: number;
-  total?: number;
-  color: string;
-  suffix?: string;
-}) {
-  const percent = total ? Math.min(Math.round((value / total) * 100), 100) : null;
-  
-  return (
-    <div className="bg-white rounded-xl p-5 border border-slate-100 hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-4">
-        <div className={`w-14 h-14 rounded-xl ${color} flex items-center justify-center`}>
-          <Icon className="w-7 h-7" />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm text-slate-500 mb-1">{label}</p>
-          <p className="text-2xl font-bold text-slate-900">
-            {value.toLocaleString()}{total !== undefined && ` / ${total.toLocaleString()}`}{suffix}
-          </p>
-          {percent !== null && (
-            <div className="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
-              <div 
-                className={`h-full ${color.replace('100', '500').replace('bg-', 'bg-')}`}
-                style={{ width: `${percent}%` }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Quick action card
-function QuickAction({ icon: Icon, label, description, href, color }: {
-  icon: React.ElementType;
-  label: string;
-  description: string;
-  href: string;
-  color: string;
-}) {
-  return (
-    <Link href={href} className="group">
-      <div className="bg-white rounded-xl border border-slate-100 p-5 hover:shadow-lg hover:border-brand-blue-200 transition-all">
-        <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-          <Icon className="w-6 h-6" />
-        </div>
-        <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-brand-blue-600 transition-colors">{label}</h3>
-        <p className="text-sm text-slate-500">{description}</p>
-      </div>
-    </Link>
-  );
-}
-
-// Skill progress card
-function SkillProgress({ name, icon: Icon, percent, color }: {
-  name: string;
-  icon: React.ElementType;
-  percent: number;
-  color: string;
-}) {
-  return (
-    <div className="bg-white rounded-xl p-4 border border-slate-100">
-      <div className="flex items-center gap-3 mb-3">
-        <div className={`w-10 h-10 rounded-lg ${color} flex items-center justify-center`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="flex-1">
-          <p className="font-medium text-slate-900 text-sm">{name}</p>
-          <p className="text-xs text-slate-500">{percent}% complete</p>
-        </div>
-      </div>
-      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-        <div 
-          className="h-full bg-gradient-to-r from-brand-blue-500 to-brand-blue-600 rounded-full transition-all"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-    </div>
-  );
-}
 
 export default async function ApprenticePortalPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/apprentice');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
+  if (!programSlug) redirect('/learner/dashboard?notice=apprentice-access-required');
 
-  if (!user) {
-    redirect('/login?redirect=/apprentice');
+  const [profileRes, enrollmentRes, apprenticeRes, hoursRes, docsRes, certsRes] = await Promise.all([
+    supabase.from('profiles').select('full_name, first_name, last_name').eq('id', user.id).maybeSingle(),
+    supabase
+      .from('program_enrollments')
+      .select('id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, progress_percent, course_id')
+      .eq('user_id', user.id)
+      .eq('program_slug', programSlug)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('apprentices')
+      .select('id, shop_id, employer_id, status')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase.from('hour_entries').select('accepted_hours, hours_claimed, status').eq('user_id', user.id),
+    supabase.from('documents').select('id, status, verification_status').eq('user_id', user.id),
+    supabase.from('program_completion_certificates').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+  ]);
+
+  const profile = profileRes.data;
+  const enrollment = enrollmentRes.data;
+  const apprentice = apprenticeRes.data;
+  const hours = hoursRes.data ?? [];
+  const approvedHours = hours
+    .filter((row) => String(row.status).toLowerCase() === 'approved')
+    .reduce((sum, row) => sum + Number(row.accepted_hours ?? row.hours_claimed ?? 0), 0);
+  const pendingEntries = hours.filter((row) => String(row.status).toLowerCase() === 'pending').length;
+  const requiredHours = 2000;
+  const progressPercent = Math.min(100, Math.max(0, Number(enrollment?.progress_percent ?? Math.round((approvedHours / requiredHours) * 100))));
+
+  let shopName: string | null = null;
+  const shopId = apprentice?.shop_id || apprentice?.employer_id;
+  if (shopId) {
+    const { data: shop } = await supabase.from('shops').select('name').eq('id', shopId).maybeSingle();
+    shopName = shop?.name ?? null;
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, avatar_url')
-    .eq('id', user.id)
-    .maybeSingle();
+  let courseTitle = 'Assigned RTI course';
+  if (enrollment?.course_id) {
+    const { data: course } = await supabase.from('courses').select('title').eq('id', enrollment.course_id).maybeSingle();
+    courseTitle = course?.title || courseTitle;
+  }
 
-  // Real database stats for the apprentice
-  const { data: hourStats } = await supabase
-    .from('hour_entries')
-    .select('hours_claimed, accepted_hours, status')
-    .eq('user_id', user.id);
+  const verifiedDocs = (docsRes.data ?? []).filter((doc) =>
+    ['approved', 'verified'].includes(String(doc.verification_status || doc.status || '').toLowerCase()),
+  ).length;
+  const totalDocs = docsRes.data?.length ?? 0;
+  const firstName = profile?.first_name || profile?.full_name?.split(' ')[0] || 'Apprentice';
+  const displayProgram = programSlug.replace(/[-_]/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-  const hoursCompleted = hourStats?.reduce((sum, h) => sum + (Number(h.accepted_hours) || 0), 0) || 0;
-  const pendingHours = hourStats?.filter(h => h.status === 'pending').length || 0;
-
-  const stats = {
-    hoursCompleted,
-    hoursRequired: 2000,
-    attendancePercent: 92,
-    skillsMastered: 12,
-    skillsTotal: 45,
-    certificationsEarned: 2,
-    rtiHours: 36,
-    rtiRequired: 144,
-  };
-
-  const nextAction = {
-    label: 'Complete Orientation',
-    time: 'Today',
-    description: 'Finish your apprenticeship orientation module'
-  };
-
-  const upcomingTasks = [
-    { id: 1, title: 'Watch RTI Module 5', due: 'Today', type: 'video' },
-    { id: 2, title: 'Log 4 hours at shop', due: 'Tomorrow', type: 'hours' },
-    { id: 3, title: 'Practice fade technique', due: 'This week', type: 'skill' },
-  ];
-
-  const skills = [
-    { name: 'Haircutting', icon: Scissors, percent: 80, color: 'bg-blue-100 text-blue-600' },
-    { name: 'Color Theory', icon: Sparkles, percent: 60, color: 'bg-purple-100 text-purple-600' },
-    { name: 'Sanitation', icon: CheckCircle, percent: 100, color: 'bg-green-100 text-green-600' },
-    { name: 'Shaving', icon: Hammer, percent: 45, color: 'bg-amber-100 text-amber-600' },
-  ];
+  const actions = [
+    { title: 'Clock hours', text: 'Record and review your on-the-job training hours.', href: '/apprentice/timeclock', icon: Clock3 },
+    { title: 'Open RTI course', text: courseTitle, href: enrollment?.course_id ? `/courses/${enrollment.course_id}` : '/apprentice/course', icon: BookOpen },
+    { title: 'Competencies', text: 'Review required skills and supervisor verification.', href: '/apprentice/competencies', icon: Scissors },
+    { title: 'Documents', text: 'Review required agreements and uploaded records.', href: '/apprentice/documents', icon: FileText },
+  ] as const;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-brand-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-blue-500/20">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <p className="font-bold text-slate-900">Elevate</p>
-                <p className="text-xs text-slate-500">Apprentice Portal</p>
-              </div>
-            </div>
-
-            {/* Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-md mx-8">
-              <div className="relative w-full">
-                <input 
-                  type="text" 
-                  placeholder="Search courses, skills, tasks..." 
-                  className="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-xl border-0 focus:ring-2 focus:ring-brand-blue-500 text-sm"
-                />
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Right Actions */}
-            <div className="flex items-center gap-2">
-              <button className="relative p-2 rounded-xl hover:bg-slate-100 transition">
-                <Bell className="w-5 h-5 text-slate-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-              <Link href="/apprentice/profile" className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition">
-                <div className="w-8 h-8 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <User className="w-4 h-4 text-brand-blue-600" />
-                </div>
-              </Link>
+    <main className="space-y-7 pb-10">
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Apprentice Dashboard</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">Welcome, {firstName}</h1>
+            <p className="mt-3 text-lg font-bold text-slate-800">{displayProgram}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
+              <span className="rounded-full bg-slate-100 px-3 py-1.5 text-slate-800">Status: {enrollment?.enrollment_state || apprentice?.status || 'Active record'}</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1.5 text-slate-800">Host Shop: {shopName || 'Not assigned'}</span>
             </div>
           </div>
+          <Link href="/apprentice/profile" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 font-bold text-slate-900 hover:bg-slate-50"><UserRound className="h-5 w-5" /> Profile</Link>
         </div>
-      </header>
+      </section>
 
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
-        <div className="flex gap-6">
-          {/* Left Sidebar Navigation */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <nav className="bg-white rounded-2xl border border-slate-100 p-4 sticky top-24">
-              <div className="space-y-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                      item.active 
-                        ? 'bg-brand-blue-50 text-brand-blue-700' 
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                    }`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                    {item.active && <ChevronRight className="w-4 h-4 ml-auto" />}
-                  </Link>
-                ))}
-              </div>
-              
-              <div className="mt-6 pt-6 border-t border-slate-100">
-                <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Support</p>
-                {rightNavItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition"
-                  >
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </nav>
-          </aside>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Apprentice progress">
+        <Metric label="Approved hours" value={`${approvedHours.toLocaleString()} / ${requiredHours.toLocaleString()}`} detail={`${progressPercent}% overall progress`} icon={Clock3} />
+        <Metric label="Pending hour entries" value={String(pendingEntries)} detail="Awaiting supervisor/admin review" icon={CheckCircle2} />
+        <Metric label="Verified documents" value={`${verifiedDocs} / ${totalDocs}`} detail={totalDocs ? 'Based on your uploaded records' : 'No documents recorded yet'} icon={FileText} />
+        <Metric label="Certificates earned" value={String(certsRes.count ?? 0)} detail="Program completion credentials on record" icon={Award} />
+      </section>
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0">
-            {/* Welcome Hero Banner */}
-            <div className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-600 to-indigo-700 rounded-3xl p-8 mb-6 text-white relative overflow-hidden">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-              <div className="absolute top-8 right-8 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl" />
-              
-              <div className="relative z-10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div>
-                    <p className="text-brand-blue-200 text-sm font-medium mb-2">Welcome back, {profile?.full_name?.split(' ')[0] || 'Apprentice'}</p>
-                    <h1 className="text-4xl font-bold mb-3">{programName}</h1>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-white/80">
-                      <span className="flex items-center gap-1.5">
-                        <Award className="w-4 h-4" />
-                        {programLevel}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Users className="w-4 h-4" />
-                        {instructorName}
-                      </span>
-                      <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
-                        License Goal: Indiana Barber
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-start md:items-end gap-3">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-                      <p className="text-sm text-white/70">Next Action</p>
-                      <p className="font-semibold">{nextAction.label}</p>
-                      <p className="text-xs text-white/70">{nextAction.time}</p>
-                    </div>
-                    <button className="bg-white text-brand-blue-700 px-6 py-3 rounded-xl font-bold hover:bg-white/90 transition shadow-lg flex items-center gap-2">
-                      <Play className="w-5 h-5" />
-                      Continue Learning
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Progress Cards Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-              <ProgressCard 
-                icon={Clock} 
-                label="Hours Completed" 
-                value={stats.hoursCompleted} 
-                total={stats.hoursRequired}
-                color="bg-blue-100 text-blue-600"
-                suffix=" hrs"
-              />
-              <ProgressCard 
-                icon={Target} 
-                label="Hours Remaining" 
-                value={stats.hoursRequired - stats.hoursCompleted}
-                total={stats.hoursRequired}
-                color="bg-amber-100 text-amber-600"
-                suffix=" hrs"
-              />
-              <ProgressCard 
-                icon={Calendar} 
-                label="Attendance" 
-                value={stats.attendancePercent}
-                color="bg-green-100 text-green-600"
-                suffix="%"
-              />
-              <ProgressCard 
-                icon={TrendingUp} 
-                label="Skills Mastered" 
-                value={stats.skillsMastered}
-                total={stats.skillsTotal}
-                color="bg-purple-100 text-purple-600"
-              />
-              <ProgressCard 
-                icon={Award} 
-                label="Certifications" 
-                value={stats.certificationsEarned}
-                color="bg-indigo-100 text-indigo-600"
-              />
-            </div>
-
-            {/* Two Column Layout */}
-            <div className="grid lg:grid-cols-3 gap-6">
-              {/* Left Column - Quick Actions & Skills */}
-              <div className="lg:col-span-2 space-y-6">
-                {/* Quick Actions */}
-                <div className="bg-white rounded-2xl border border-slate-100 p-6">
-                  <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Actions</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <QuickAction icon={Clock} label="Clock In/Out" description="Log work hours" href="/apprentice/timeclock" color="bg-green-100 text-green-600" />
-                    <QuickAction icon={Video} label="Watch Video" description="RTI training" href="/apprentice/course" color="bg-cyan-100 text-cyan-600" />
-                    <QuickAction icon={FileCheck} label="Submit Work" description="Upload assignments" href="/apprentice/workbook" color="bg-violet-100 text-violet-600" />
-                    <QuickAction icon={Calendar} label="Schedule" description="Book practical" href="/apprentice/attendance" color="bg-rose-100 text-rose-600" />
-                  </div>
-                </div>
-
-                {/* Skills Progress */}
-                <div className="bg-white rounded-2xl border border-slate-100 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-slate-900">Skills Progress</h2>
-                    <Link href="/apprentice/competencies" className="text-sm text-brand-blue-600 font-medium hover:underline">
-                      View All
-                    </Link>
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {skills.map((skill) => (
-                      <SkillProgress key={skill.name} {...skill} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - Tasks & Compliance */}
-              <div className="space-y-6">
-                {/* Today's Tasks */}
-                <div className="bg-white rounded-2xl border border-slate-100 p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-slate-900">Today's Tasks</h2>
-                    <span className="text-sm text-slate-500">{upcomingTasks.length} tasks</span>
-                  </div>
-                  <div className="space-y-3">
-                    {upcomingTasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          task.type === 'video' ? 'bg-cyan-100' :
-                          task.type === 'hours' ? 'bg-green-100' : 'bg-amber-100'
-                        }`}>
-                          {task.type === 'video' && <Video className="w-5 h-5 text-cyan-600" />}
-                          {task.type === 'hours' && <Clock className="w-5 h-5 text-green-600" />}
-                          {task.type === 'skill' && <Scissors className="w-5 h-5 text-amber-600" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 text-sm truncate">{task.title}</p>
-                          <p className="text-xs text-slate-500">{task.due}</p>
-                        </div>
-                        <button className="p-2 hover:bg-white rounded-lg transition">
-                          <ArrowRight className="w-4 h-4 text-slate-400" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Indiana Compliance Widget */}
-                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="w-5 h-5 text-amber-600" />
-                    <h2 className="text-lg font-bold text-amber-900">Indiana Requirements</h2>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-amber-800">OJL Hours</span>
-                      <span className="text-sm font-semibold text-amber-900">{Math.round(stats.hoursCompleted / stats.hoursRequired * 100)}%</span>
-                    </div>
-                    <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-500 rounded-full" style={{ width: `${stats.hoursCompleted / stats.hoursRequired * 100}%` }} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-amber-800">RTI Training</span>
-                      <span className="text-sm font-semibold text-amber-900">{Math.round(stats.rtiHours / stats.rtiRequired * 100)}%</span>
-                    </div>
-                    <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-orange-500 rounded-full" style={{ width: `${stats.rtiHours / stats.rtiRequired * 100}%` }} />
-                    </div>
-                    <p className="text-xs text-amber-700 pt-2">
-                      <strong>Required:</strong> 2,000 OJL + 144 RTI hours/year
-                    </p>
-                  </div>
-                </div>
-
-                {/* Motivational Message */}
-                <div className="bg-gradient-to-br from-brand-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
-                  <Sparkles className="w-6 h-6 mb-3 opacity-80" />
-                  <p className="text-lg font-medium mb-1">Keep Going!</p>
-                  <p className="text-sm text-white/80">
-                    You're {Math.round(stats.hoursCompleted / stats.hoursRequired * 100)}% toward your goal. 
-                    Every hour counts toward your future as a licensed barber.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </main>
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-slate-950">Apprenticeship progress</h2>
+            <p className="mt-1 text-sm text-slate-700">Calculated from your recorded enrollment progress and approved hour entries.</p>
+          </div>
+          <span className="text-2xl font-black text-slate-950">{progressPercent}%</span>
         </div>
-      </div>
+        <div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-full rounded-full bg-brand-red-600" style={{ width: `${progressPercent}%` }} />
+        </div>
+      </section>
 
-      {/* Floating Help Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white w-14 h-14 rounded-full shadow-lg shadow-brand-blue-500/30 flex items-center justify-center transition-all hover:scale-110">
-          <HelpCircle className="w-6 h-6" />
-        </button>
-      </div>
+      <section>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-slate-950">Your workspaces</h2>
+            <p className="mt-1 text-sm text-slate-700">These links lead to real apprentice workflows, not sample dashboard cards.</p>
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {actions.map(({ title, text, href, icon: Icon }) => (
+            <Link key={title} href={href} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-red-300 hover:shadow-md">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-900"><Icon className="h-5 w-5" /></div>
+              <h3 className="mt-4 text-lg font-black text-slate-950">{title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{text}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-extrabold text-brand-red-700">Open <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
-      {/* PARIS AI Coach */}
-      <ParisFloatingWrapper />
-    </div>
+      {!shopName && (
+        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
+          <div className="flex gap-3">
+            <Building2 className="mt-0.5 h-5 w-5 shrink-0" />
+            <div>
+              <h2 className="font-black">Host shop assignment needed</h2>
+              <p className="mt-1 text-sm leading-6">Your apprentice record does not currently resolve to a host shop. Contact apprenticeship administration before recording location-dependent OJT.</p>
+            </div>
+          </div>
+        </section>
+      )}
+    </main>
   );
 }
 
+function Metric({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: React.ElementType }) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-900"><Icon className="h-5 w-5" /></div>
+      <p className="mt-4 text-sm font-bold text-slate-700">{label}</p>
+      <p className="mt-1 text-2xl font-black text-slate-950">{value}</p>
+      <p className="mt-2 text-xs leading-5 text-slate-600">{detail}</p>
+    </article>
+  );
+}

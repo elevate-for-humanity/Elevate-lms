@@ -1,1 +1,1 @@
-export { default, dynamic, metadata } from '../../admin/studio/workflows/page';
+export { default } from '../../admin/studio/workflows/page';

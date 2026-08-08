@@ -41,7 +41,6 @@ export const PROGRAM_LABELS: Record<ProgramKey, string> = {
 };
 
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
-  // Expected format: "123 Main St, City, ST 12345"
   const parts = raw.split(',').map((p) => p.trim());
   const stateZip = (parts[2] ?? '').split(' ').filter(Boolean);
   return {
@@ -52,10 +51,12 @@ function parseAddress(raw: string): { address: string; city: string; state: stri
   };
 }
 
+function isPubliclyListedHostShop(shop: HostShop): boolean {
+  const name = shop.name.toLowerCase();
+  return !name.includes('prestige');
+}
+
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
-  // Admin client requires SUPABASE_SERVICE_ROLE_KEY — injected from SSM
-  // build time. Return empty list so static generation succeeds; ISR will
-  // populate real data at runtime.
   let db: Awaited<ReturnType<typeof requireAdminClient>>;
   try {
     db = await requireAdminClient();
@@ -79,7 +80,6 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .order('shop_name'),
   ]);
 
-  // Normalise barber rows
   const barberShops: HostShop[] = (barberRows ?? []).map((s) => ({
     id: s.id,
     name: s.shop_dba_name || s.shop_legal_name,
@@ -94,7 +94,6 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     badge: 'partner',
   }));
 
-  // Normalise host rows
   const hostShops: HostShop[] = (hostRows ?? []).map((s) => {
     const parsed = parseAddress(s.address ?? '');
     return {
@@ -109,19 +108,15 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     };
   });
 
-  // Merge programs for shops present in both tables (matched by name)
   const barberNameMap = new Map(barberShops.map((s) => [s.name.toLowerCase(), s]));
   barberShops.forEach((bs) => {
     const match = hostShops.find((hs) => hs.name.toLowerCase() === bs.name.toLowerCase());
     if (match) bs.programs = [...new Set([...bs.programs, ...match.programs])];
   });
 
-  // Host-only shops (not already in barber table)
   const hostOnly = hostShops.filter((s) => !barberNameMap.has(s.name.toLowerCase()));
+  const all = [...barberShops, ...hostOnly].filter(isPubliclyListedHostShop);
 
-  const all = [...barberShops, ...hostOnly];
-
-  // Filter by exact program slug if requested
   if (program) {
     const slug = PROGRAM_SLUGS[program];
     return all.filter((s) => s.programs.includes(slug));

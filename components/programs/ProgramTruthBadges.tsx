@@ -57,14 +57,14 @@ export function DeliveryBadge({ model }: DeliveryBadgeProps) {
 
 const FUNDING_COPY: Record<FundingType, { label: string; detail: string }> = {
   wioa: {
-    label: 'WIOA Eligible',
+    label: 'WIOA Consideration',
     detail:
-      'Workforce Innovation and Opportunity Act — covers tuition for eligible Indiana residents through WorkOne.',
+      'WorkOne may authorize eligible program costs after reviewing the participant and issuing written authorization.',
   },
   wrg: {
-    label: 'Workforce Ready Grant',
+    label: 'Workforce Ready Grant Consideration',
     detail:
-      'Indiana state grant covering tuition for high-demand programs. Eligibility determined through WorkOne.',
+      'Shown only for confirmed CDL and HVAC pathways. The responsible agency determines participant and program eligibility.',
   },
   impact: {
     label: 'FSSA IMPACT',
@@ -78,7 +78,7 @@ const FUNDING_COPY: Record<FundingType, { label: string; detail: string }> = {
   },
   self_pay: {
     label: 'Self-Pay Available',
-    detail: 'Flexible payment plans, BNPL options, and income-share available.',
+    detail: 'Published tuition and currently available checkout options are shown below.',
   },
   unknown: {
     label: 'Funding Details Pending',

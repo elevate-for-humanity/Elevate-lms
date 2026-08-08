@@ -33,7 +33,19 @@ describe('public funding registry', () => {
       const normalized = getStaticProgram(raw.slug);
       const canonical = getVerifiedProgramFunding(raw.slug)?.slug ?? raw.slug;
       expect(normalized?.isSelfPay).toBe(!EXPECTED.includes(canonical));
+      if (!EXPECTED.includes(canonical)) {
+        expect(normalized?.fundingOptions).toEqual(['self_pay']);
+        expect(normalized?.fundingStatement).not.toMatch(/WIOA|Workforce Ready Grant|WRG/);
+      }
     }
+  });
+
+  it('keeps WRG copy limited to CDL and HVAC', () => {
+    expect(getStaticProgram('business-administration')?.fundingStatement).not.toMatch(
+      /Workforce Ready Grant|WRG/,
+    );
+    expect(getStaticProgram('cdl-training')?.fundingStatement).toMatch(/Workforce Ready Grant/);
+    expect(getStaticProgram('hvac-technician')?.fundingStatement).toMatch(/Workforce Ready Grant/);
   });
 
   it('removes unsupported public funding guarantees', () => {
@@ -43,5 +55,19 @@ describe('public funding registry', () => {
         'peer-recovery-specialist',
       ),
     ).toBe('Learn practical career skills.');
+
+    expect(
+      sanitizePublicFundingText(
+        'WIOA covers exam and DOT physical. Safety training is included.',
+        'cdl-training',
+      ),
+    ).toBe('Safety training is included.');
+
+    expect(
+      sanitizePublicFundingText(
+        'Workforce Ready Grant eligible — $0 for most. EPA 608 exam preparation is included.',
+        'hvac-technician',
+      ),
+    ).toBe('EPA 608 exam preparation is included.');
   });
 });

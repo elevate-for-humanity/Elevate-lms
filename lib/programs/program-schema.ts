@@ -18,6 +18,8 @@
  *   J. Institutional footer + disclaimers
  */
 
+import { getVerifiedProgramFunding } from './funding-registry';
+
 // ─── Credential ──────────────────────────────────────────────────────
 export interface ProgramCredential {
   /** Credential name as it appears on the certificate/card */
@@ -600,47 +602,20 @@ export function getPrimaryCTA(p: ProgramSchema): PrimaryCTA | null {
 export function getEnrollmentTracks(
   p: ProgramSchema,
 ): NonNullable<ProgramSchema['enrollmentTracks']> {
-  if (p.enrollmentTracks) return p.enrollmentTracks;
-
-  const hasWIOA = p.fundingOptions?.some((f) => f === 'wioa' || f === 'wrg') ?? false;
-  const hasImpact = p.fundingOptions?.includes('impact') ?? false;
-  const hasEmployer = p.fundingOptions?.includes('employer_paid') ?? false;
+  const verified = getVerifiedProgramFunding(p.slug);
   const applyHref = p.cta.applyHref || `/apply?program=${p.slug}`;
-
-  // Funded track label/description varies by what funding is actually available
-  let fundedLabel = 'Workforce-Funded Training';
-  let fundedRequirement = 'Must reside in Indiana';
-  let fundedDescription =
-    'Funding assistance may be available through workforce development programs. Contact an advisor to check your eligibility.';
-
-  if (hasEmployer && !hasWIOA && !hasImpact) {
-    fundedLabel = 'Apprenticeship / Employer-Sponsored';
-    fundedRequirement = 'Requires employer sponsor agreement';
-    fundedDescription =
-      'Train while earning wages at a partner employer. Your employer covers tuition through the apprenticeship agreement. No out-of-pocket cost.';
-  } else if (hasEmployer && hasImpact && !hasWIOA) {
-    fundedLabel = 'FSSA IMPACT or Employer-Sponsored';
-    fundedRequirement = 'Indiana residents — SNAP/TANF recipients or employer sponsor';
-    fundedDescription =
-      "SNAP or TANF recipients may qualify for free training through Indiana's FSSA IMPACT program. Alternatively, a licensed employer can sponsor your apprenticeship at no cost to you.";
-  } else if (hasWIOA) {
-    fundedLabel = hasEmployer
-      ? 'Workforce-Funded or Employer-Sponsored'
-      : 'Workforce-Funded Training';
-    fundedRequirement = 'Must reside in Indiana';
-    fundedDescription =
-      'Federal and Indiana state workforce funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply for every option you qualify for.';
-  } else if (hasImpact) {
-    fundedLabel = 'FSSA IMPACT (SNAP/TANF)';
-    fundedRequirement = 'Indiana residents receiving SNAP or TANF';
-    fundedDescription =
-      "Indiana's SNAP Employment & Training (IMPACT) program can cover 100% of tuition for eligible recipients. You must be referred by your FSSA/DFR case worker — contact them to request a training authorization.";
-  }
+  const fundedDescription = verified?.wrgEligible
+    ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.'
+    : verified?.wioaEligible
+      ? 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.'
+      : 'This program is presented as self-pay; no public workforce-funding claim is made.';
 
   return {
     funded: {
-      label: fundedLabel,
-      requirement: fundedRequirement,
+      label: verified ? 'Workforce-Funding Consideration' : 'Self-Pay Program',
+      requirement: verified
+        ? 'Agency eligibility and written authorization required'
+        : 'Review published self-pay options',
       description: fundedDescription,
       applyHref,
       available: true as const,
@@ -649,7 +624,7 @@ export function getEnrollmentTracks(
       label: 'Self-Pay — All States',
       cost: p.selfPayCost,
       description:
-        'Enroll immediately without waiting for funding approval. Payment plans, BNPL (Klarna, Afterpay, Zip), and income-share options available.',
+        'Review the published tuition and currently available checkout options. Provider-specific installment terms are shown at checkout.',
       applyHref,
       available: p.enrollmentType !== 'waitlist',
       comingSoonMessage: 'Self-pay enrollment is opening soon. Join the waitlist to be notified.',

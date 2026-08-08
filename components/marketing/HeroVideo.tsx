@@ -79,7 +79,7 @@ export default function HeroVideo({
   }, [belowHeroHeadline, belowHeroSubheadline, transcript]);
 
   useEffect((): (() => void) | undefined => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined;
     setTtsSupported(true);
     const loadVoices = () => window.speechSynthesis.getVoices();
     loadVoices();
@@ -197,7 +197,7 @@ export default function HeroVideo({
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
-    if (!wrapper || typeof IntersectionObserver === 'undefined') return;
+    if (!wrapper || typeof IntersectionObserver === 'undefined') return undefined;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -241,7 +241,12 @@ export default function HeroVideo({
       return;
     }
 
-    if (typeof window !== 'undefined' && window.speechSynthesis?.paused && ttsText && !voiceoverSrc) {
+    if (
+      typeof window !== 'undefined' &&
+      window.speechSynthesis?.paused &&
+      ttsText &&
+      !voiceoverSrc
+    ) {
       window.speechSynthesis.resume();
       setMuted(false);
       return;
@@ -359,7 +364,10 @@ export default function HeroVideo({
                 {trustIndicators && trustIndicators.length > 0 && (
                   <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
                     {Array.from(new Set(trustIndicators)).map((item) => (
-                      <li key={item} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                      <li
+                        key={item}
+                        className="flex items-center gap-1.5 text-sm font-semibold text-slate-900"
+                      >
                         <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-red-600" />
                         {item}
                       </li>
@@ -386,7 +394,10 @@ export default function HeroVideo({
               Video transcript
             </button>
             {transcriptOpen && (
-              <p id={transcriptId} className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800">
+              <p
+                id={transcriptId}
+                className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800"
+              >
                 {transcript}
               </p>
             )}

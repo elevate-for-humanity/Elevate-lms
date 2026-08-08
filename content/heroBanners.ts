@@ -32,6 +32,14 @@ export interface HeroBannerConfig {
   analyticsName: string;
 }
 
+type RawHeroBannerConfig = Partial<HeroBannerConfig> & {
+  /** Legacy export keys retained in older generated banner records. */
+  headline?: string;
+  subheadline?: string;
+  ctaPrimary?: HeroBannerCta;
+  ctaSecondary?: HeroBannerCta;
+};
+
 export type ProgramHeroBannerConfig = HeroBannerConfig & {
   microLabel: string;
   credentialLabel: string;
@@ -49,14 +57,27 @@ let normalizedData: Record<string, HeroBannerConfig> | null = null;
 function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
 
-  const raw = loadJsonOnce<Record<string, HeroBannerConfig>>('hero-banners.json');
+  const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
   normalizedData = Object.fromEntries(
-    Object.entries(raw).map(([key, banner]) => [
-      key,
-      banner.videoSrcDesktop
-        ? { ...banner, videoSrcMobile: banner.videoSrcDesktop }
-        : banner,
-    ]),
+    Object.entries(raw).map(([key, banner]) => {
+      const primaryCta = banner.primaryCta ??
+        banner.ctaPrimary ?? {
+          label: 'View Programs',
+          href: '/programs',
+        };
+      const secondaryCta = banner.secondaryCta ?? banner.ctaSecondary;
+      const normalized: HeroBannerConfig = {
+        ...banner,
+        pageKey: banner.pageKey ?? key,
+        belowHeroHeadline: banner.belowHeroHeadline ?? banner.headline ?? '',
+        belowHeroSubheadline: banner.belowHeroSubheadline ?? banner.subheadline ?? '',
+        primaryCta,
+        secondaryCta,
+        analyticsName: banner.analyticsName ?? key,
+        ...(banner.videoSrcDesktop ? { videoSrcMobile: banner.videoSrcDesktop } : {}),
+      };
+      return [key, normalized];
+    }),
   );
 
   return normalizedData;

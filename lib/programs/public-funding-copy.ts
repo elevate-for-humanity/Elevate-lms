@@ -3,7 +3,7 @@ import { getVerifiedProgramFunding } from './funding-registry';
 const FUNDING_TERMS =
   /\b(?:WIOA|WRG|Workforce Ready Grant|Next Level Jobs|Job Ready Indy|JRI|FSSA|IMPACT|SNAP E&T|ETPL|funded|funding|no[- ]cost|free tuition|pay \$0)\b/i;
 const GUARANTEE_TERMS =
-  /\b(?:free|fully funded|full tuition|100%|pay \$0|no[- ]cost|covers? tuition|guaranteed|most students pay)\b/i;
+  /(?:\b(?:free|fully funded|full tuition|100%|pay \$0|no[- ]cost|guaranteed|most students pay)\b|\$0\b|\bcovers?\s+(?:tuition|books?|exam|fees?|physical)\b)/i;
 const UNSUPPORTED_SOURCE_TERMS = /\b(?:Job Ready Indy|JRI|FSSA|IMPACT|SNAP E&T)\b/i;
 
 function sentenceParts(text: string): string[] {

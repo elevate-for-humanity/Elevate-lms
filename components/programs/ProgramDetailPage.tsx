@@ -32,7 +32,7 @@ import {
   ExternalLink,
   Layers,
 } from 'lucide-react';
-import type { ProgramSchema } from '@/lib/programs/program-schema';
+import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
 import {
   validateProgram,
   getTotalHoursRange,
@@ -48,6 +48,7 @@ import {
   sanitizePublicFundingList,
   sanitizePublicFundingText,
 } from '@/lib/programs/public-funding-copy';
+import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 
 interface Props {
   program: ProgramSchema;
@@ -77,6 +78,23 @@ export default function ProgramDetailPage({
   const hoursRange = getTotalHoursRange(p);
   const primaryCTA = getPrimaryCTA(p);
   const enrollmentTracks = getEnrollmentTracks(p);
+  const verifiedFunding = getVerifiedProgramFunding(p.slug);
+  const isWorkforceFunded = Boolean(
+    verifiedFunding?.etplListedFor2Exclusive &&
+    (verifiedFunding.wioaEligible || verifiedFunding.wrgEligible),
+  );
+  const publicFundingOptions: FundingType[] = [
+    ...(verifiedFunding?.wioaEligible ? (['wioa'] as const) : []),
+    ...(verifiedFunding?.wrgEligible ? (['wrg'] as const) : []),
+    'self_pay',
+  ];
+  const fundedSources = [
+    ...(verifiedFunding?.wioaEligible ? ['WorkOne', 'WIOA'] : []),
+    ...(verifiedFunding?.wrgEligible ? ['Workforce Ready Grant'] : []),
+  ];
+  const fundedDescription = verifiedFunding?.wrgEligible
+    ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.'
+    : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment.';
   const selfPayNumeric = Number((p.selfPayCost || '').replace(/[^0-9.]/g, '')) || 0;
   // Use depositAmount from program data if set, otherwise fall back to $600 minimum.
   const bnplDepositStart = p.depositAmount
@@ -93,20 +111,7 @@ export default function ProgramDetailPage({
     bnplDepositStart && selfPayNumeric > bnplDepositStart && p.durationWeeks > 0
       ? Math.ceil((selfPayNumeric - bnplDepositStart) / p.durationWeeks)
       : null;
-  const hasIndianaFunding = p.fundingOptions?.some(
-    (f) => f === 'wioa' || f === 'wrg' || f === 'impact',
-  );
-  const hasWIOAFunding = p.fundingOptions?.some((f) => f === 'wioa' || f === 'wrg') ?? false;
-  const hasImpactOnly = !hasWIOAFunding && (p.fundingOptions?.includes('impact') ?? false);
-  // Only beauty/apprenticeship programs have a working /eligibility page
-  // (served by [program]/eligibility which calls getBeautyProgram)
-  const eligibilityPageSlugs = new Set([
-    'barber-apprenticeship',
-    'cosmetology-apprenticeship',
-    'esthetician-apprenticeship',
-    'nail-technician-apprenticeship',
-  ]);
-  const hasEligibilityPage = eligibilityPageSlugs.has(p.slug);
+  const hasIndianaFunding = isWorkforceFunded;
   const heroPosterSrc = resolveHeroPosterSrc(p.slug, { heroImage: p.heroImage });
   const requestInfoHref =
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
@@ -168,10 +173,9 @@ export default function ProgramDetailPage({
               );
               const voiceoverSrc =
                 safeTranscript === banner.transcript ? banner.voiceoverSrc : undefined;
-              const bannerCtas = [
-                banner.primaryCta,
-                ...(banner.secondaryCta ? [banner.secondaryCta] : []),
-              ];
+              const bannerCtas = [banner.primaryCta, banner.secondaryCta].filter(
+                (cta): cta is NonNullable<typeof cta> => Boolean(cta?.href && cta.label),
+              );
               // Use HeroPicture when no video is configured — avoids passing
               // undefined to HeroVideo's required videoSrcDesktop prop.
               if (!banner.videoSrcDesktop) {
@@ -226,18 +230,20 @@ export default function ProgramDetailPage({
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
-              {(p.breadcrumbs ?? []).map((b, i) => (
-                <span key={i} className="flex items-center gap-1.5">
-                  {i > 0 && <ChevronRight className="w-3 h-3" />}
-                  {b.href ? (
-                    <Link href={b.href} className="hover:text-slate-600 transition-colors">
-                      {b.label}
-                    </Link>
-                  ) : (
-                    <span className="text-slate-600 font-medium">{b.label}</span>
-                  )}
-                </span>
-              ))}
+              {(p.breadcrumbs ?? [])
+                .filter((b) => Boolean(b?.label))
+                .map((b, i) => (
+                  <span key={i} className="flex items-center gap-1.5">
+                    {i > 0 && <ChevronRight className="w-3 h-3" />}
+                    {b.href ? (
+                      <Link href={b.href} className="hover:text-slate-600 transition-colors">
+                        {b.label}
+                      </Link>
+                    ) : (
+                      <span className="text-slate-600 font-medium">{b.label}</span>
+                    )}
+                  </span>
+                ))}
             </nav>
 
             <div className="flex flex-col lg:flex-row lg:items-start gap-8">
@@ -322,11 +328,9 @@ export default function ProgramDetailPage({
                   <p className="text-2xl font-extrabold text-slate-900 mb-0.5">{p.selfPayCost}</p>
 
                   {/* Funding — only verified options, no fallback text */}
-                  {p.fundingOptions && p.fundingOptions.length > 0 && (
-                    <div className="mb-4 mt-2">
-                      <FundingSection fundingOptions={p.fundingOptions} />
-                    </div>
-                  )}
+                  <div className="mb-4 mt-2">
+                    <FundingSection fundingOptions={publicFundingOptions} />
+                  </div>
 
                   {primaryCTA && (
                     <>
@@ -623,35 +627,40 @@ export default function ProgramDetailPage({
               How You Can Start
             </p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-3">
-              Choose the path that fits your situation.
+              {isWorkforceFunded
+                ? 'Choose funding review or self-pay.'
+                : 'Self-pay enrollment options.'}
             </h2>
             <p className="text-slate-500 text-base max-w-2xl mx-auto">
-              There&apos;s a path to enrollment whether you qualify for funding or not. We&apos;ll
-              help you figure out which one.
+              {isWorkforceFunded
+                ? 'Funding is not automatic or guaranteed. An agency must confirm eligibility and issue written authorization.'
+                : 'This program is presented as self-pay. Review the published price and available payment options before applying.'}
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div
+            className={`grid gap-6 ${isWorkforceFunded ? 'sm:grid-cols-2' : 'max-w-2xl mx-auto'}`}
+          >
             {/* Track 1: Funded */}
-            <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  Lowest Cost Path
-                </span>
-              </div>
-              <h3 className="text-lg font-extrabold text-slate-900 mb-1">
-                {enrollmentTracks.funded.label}
-              </h3>
-              <p className="text-xs font-semibold text-brand-green-700 mb-3">
-                {enrollmentTracks.funded.requirement}
-              </p>
-              <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">
-                {enrollmentTracks.funded.description}
-              </p>
-              <div className="space-y-2">
-                {hasWIOAFunding && (
+            {isWorkforceFunded && (
+              <div className="bg-white rounded-2xl border-2 border-brand-green-500 shadow-sm p-7 flex flex-col">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="bg-brand-green-100 text-brand-green-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Agency Review Path
+                  </span>
+                </div>
+                <h3 className="text-lg font-extrabold text-slate-900 mb-1">
+                  Workforce-Funding Consideration
+                </h3>
+                <p className="text-xs font-semibold text-brand-green-700 mb-3">
+                  Agency eligibility and written authorization required
+                </p>
+                <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-1">
+                  {fundedDescription}
+                </p>
+                <div className="space-y-2">
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {['WorkOne', 'WIOA', 'Trade Act', 'SNAP E&T', 'JRI'].map((prog) => (
+                    {fundedSources.map((prog) => (
                       <span
                         key={prog}
                         className="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-1 rounded-lg"
@@ -660,38 +669,18 @@ export default function ProgramDetailPage({
                       </span>
                     ))}
                   </div>
-                )}
-                {hasImpactOnly && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {['FSSA IMPACT', 'SNAP E&T', 'Indiana Only'].map((prog) => (
-                      <span
-                        key={prog}
-                        className="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-lg"
-                      >
-                        {prog}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <Link
-                  href={
-                    hasEligibilityPage
-                      ? `/programs/${p.slug}/eligibility`
-                      : enrollmentTracks.funded.applyHref
-                  }
-                  className="block w-full text-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
-                >
-                  {hasImpactOnly
-                    ? 'Check Funding Eligibility'
-                    : 'Apply Now — $0 Tuition if Eligible'}
-                </Link>
-                <p className="text-center text-xs text-slate-500 mt-1">
-                  {hasImpactOnly
-                    ? 'Indiana SNAP/TANF recipients · must be referred by FSSA case worker'
-                    : 'Free to apply · no payment today · takes 2 minutes'}
-                </p>
+                  <Link
+                    href="/check-eligibility"
+                    className="block w-full text-center bg-brand-green-600 hover:bg-brand-green-700 text-white font-bold py-3.5 rounded-xl transition-colors text-sm"
+                  >
+                    Start Funding Review
+                  </Link>
+                  <p className="text-center text-xs text-slate-500 mt-1">
+                    No payment today · agency decision required
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Track 2: Self-pay */}
             <div
@@ -761,43 +750,14 @@ export default function ProgramDetailPage({
 
           {/* Reassurance line */}
           <p className="text-center text-slate-500 text-sm mt-8">
-            Not in Indiana or not currently funding-eligible?{' '}
+            {isWorkforceFunded
+              ? 'Not agency-authorized or prefer not to wait? '
+              : 'Questions about self-pay or payment plans? '}
             <Link href="/contact" className="text-brand-blue-600 hover:underline font-medium">
               Talk to an advisor about self-pay and payment plan options
             </Link>{' '}
             — we&apos;ll map the right next step in about 10 minutes.
           </p>
-
-          {/* Indiana funding context — shown for IMPACT-only programs */}
-          {hasImpactOnly && (
-            <div className="mt-6 bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-900 max-w-3xl mx-auto">
-              <p className="font-bold mb-1">
-                Indiana residents: funding is available through FSSA IMPACT
-              </p>
-              <p className="text-amber-800 mb-3">
-                This program is not on Indiana&rsquo;s ETPL and does not qualify for WIOA or the
-                Workforce Ready Grant. However, Indiana SNAP and TANF recipients may qualify for
-                free training through the FSSA IMPACT (SNAP Employment &amp; Training) program.
-                Contact your FSSA/DFR case worker to request a training referral.
-              </p>
-              <p className="text-amber-800">
-                <strong>Outside Indiana?</strong> Self-pay enrollment is available to everyone — no
-                residency required. Payment plans, BNPL, and employer sponsorship are all options.
-              </p>
-              {hasEligibilityPage && (
-                <Link
-                  href={
-                    hasEligibilityPage
-                      ? `/programs/${p.slug}/eligibility`
-                      : `/apply?program=${p.slug}`
-                  }
-                  className="inline-flex items-center gap-1.5 mt-3 text-amber-900 font-semibold underline underline-offset-2 hover:text-amber-700 text-sm"
-                >
-                  See all funding options for this program →
-                </Link>
-              )}
-            </div>
-          )}
 
           {/* Next Step CTAs */}
           <div className="mt-8 rounded-xl border border-slate-200 bg-white p-5">

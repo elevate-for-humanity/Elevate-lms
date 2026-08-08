@@ -142,8 +142,10 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
     isSelfPay: !workforceFunded,
     fundingOptions,
     fundingStatement: workforceFunded
-      ? 'Verified workforce-funded pathway. WorkOne determines participant eligibility and must authorize WIOA or Workforce Ready Grant funding before funded enrollment. Self-pay remains available.'
-      : 'Regular self-pay program. This program is not currently advertised as WIOA or Workforce Ready Grant eligible.',
+      ? verified?.wrgEligible
+        ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
+        : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
+      : 'Regular self-pay program. Review the published price and payment options before applying.',
     badge: workforceFunded ? 'Verified Workforce-Funded' : 'Self-Pay Program',
     badgeColor: workforceFunded ? 'green' : 'blue',
     funding: {

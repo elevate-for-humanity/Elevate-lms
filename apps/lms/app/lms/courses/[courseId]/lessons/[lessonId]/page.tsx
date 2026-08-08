@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Video } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import LessonProgressClient from './LessonProgressClient';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -49,7 +50,7 @@ export default async function LessonPage({
 
   const { data: lesson } = await supabase
     .from('course_lessons')
-    .select('id,title,slug,content,rendered_html,video_url,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,is_published,order_index')
+    .select('id,module_id,title,slug,content,rendered_html,video_url,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index')
     .eq('id', lessonId)
     .eq('course_id', course.id)
     .eq('is_published', true)
@@ -57,12 +58,22 @@ export default async function LessonPage({
 
   if (!lesson) notFound();
 
-  const { data: orderedLessons } = await supabase
-    .from('course_lessons')
-    .select('id,title,order_index')
-    .eq('course_id', course.id)
-    .eq('is_published', true)
-    .order('order_index');
+  const [{ data: orderedLessons }, { data: moduleRow }] = await Promise.all([
+    supabase
+      .from('course_lessons')
+      .select('id,title,order_index')
+      .eq('course_id', course.id)
+      .eq('is_published', true)
+      .order('order_index'),
+    lesson.module_id
+      ? supabase
+          .from('course_modules')
+          .select('order_index')
+          .eq('id', lesson.module_id)
+          .eq('course_id', course.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
 
   const lessonList = orderedLessons ?? [];
   const currentIndex = lessonList.findIndex((item) => item.id === lesson.id);
@@ -72,6 +83,9 @@ export default async function LessonPage({
   const questions = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions : [];
   const keyTerms = Array.isArray(lesson.key_terms) ? lesson.key_terms : [];
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
+  const lessonType = String(lesson.lesson_type ?? 'lesson');
+  const passingScore = Number(lesson.passing_score ?? 70);
+  const moduleOrder = Number(moduleRow?.order_index ?? 1);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -84,9 +98,9 @@ export default async function LessonPage({
             <ArrowLeft className="h-4 w-4" /> Back to {course.title}
           </Link>
           <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-slate-600">
-            {lesson.lesson_type === 'exam'
+            {lessonType === 'exam'
               ? 'Final Exam'
-              : lesson.lesson_type === 'checkpoint'
+              : lessonType === 'checkpoint'
                 ? 'Module Checkpoint'
                 : 'RTI Lesson'}
           </p>
@@ -153,28 +167,14 @@ export default async function LessonPage({
           </section>
         ) : null}
 
-        {questions.length ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-extrabold">Knowledge check</h2>
-            <p className="mt-2 text-sm font-medium leading-6 text-slate-700">
-              Review every question before completing a checkpoint or final exam. Passing and completion requirements are enforced by the LMS server.
-            </p>
-            <ol className="mt-5 space-y-5">
-              {questions.map((question: any, index: number) => (
-                <li key={question?.id ?? index} className="rounded-xl border border-slate-200 p-5">
-                  <p className="font-bold text-slate-950">{index + 1}. {String(question?.question ?? question?.question_text ?? '')}</p>
-                  {Array.isArray(question?.options) ? (
-                    <ul className="mt-3 space-y-2 text-sm font-medium text-slate-700">
-                      {question.options.map((option: unknown, optionIndex: number) => (
-                        <li key={optionIndex} className="rounded-lg bg-slate-50 px-3 py-2">{String(option)}</li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </li>
-              ))}
-            </ol>
-          </section>
-        ) : null}
+        <LessonProgressClient
+          courseId={course.id}
+          lessonId={lesson.id}
+          lessonType={lessonType}
+          moduleOrder={moduleOrder}
+          passingScore={passingScore}
+          questions={questions as any[]}
+        />
 
         <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
           {previous ? (

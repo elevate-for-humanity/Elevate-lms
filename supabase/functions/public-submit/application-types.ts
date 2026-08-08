@@ -21,17 +21,6 @@ export interface ApplicationTypeConfig {
 }
 
 export const APPLICATION_TYPES: Record<string, ApplicationTypeConfig> = {
-  // ── General-purpose application ──────────────────────────────
-  application: {
-    destination: 'applications',
-    required: ['email', 'program'],
-    allowed: ['name', 'email', 'phone', 'program', 'funding', 'eligible', 'notes'],
-    defaults: {
-      status: 'submitted',
-      source: 'public_form',
-    },
-  },
-
   // ── Career / workforce application (uses state-machine RPCs) ─
   career: {
     destination: 'career_applications',
@@ -106,38 +95,7 @@ export const APPLICATION_TYPES: Record<string, ApplicationTypeConfig> = {
     },
   },
 
-  // ── Partner (barbershop / training site) ─────────────────────
-  partner: {
-    destination: 'partner_applications',
-    required: [
-      'shop_name',
-      'owner_name',
-      'contact_email',
-      'phone',
-      'address_line1',
-      'city',
-      'state',
-      'zip',
-    ],
-    allowed: [
-      'shop_name',
-      'owner_name',
-      'contact_email',
-      'phone',
-      'address_line1',
-      'address_line2',
-      'city',
-      'state',
-      'zip',
-      'website',
-      'notes',
-    ],
-    defaults: {
-      status: 'submitted',
-    },
-  },
-
-  // ── Barbershop partner (detailed) ────────────────────────────
+  // ── Detailed Host Shop / barbershop partner ─────────────────
   barbershop_partner: {
     destination: 'barbershop_partner_applications',
     required: [
@@ -177,7 +135,7 @@ export const APPLICATION_TYPES: Record<string, ApplicationTypeConfig> = {
     },
   },
 
-  // ── Program holder ───────────────────────────────────────────
+  // ── Program holder / training provider ──────────────────────
   program_holder: {
     destination: 'program_holder_applications',
     required: ['organization_name', 'contact_name', 'email'],
@@ -193,27 +151,6 @@ export const APPLICATION_TYPES: Record<string, ApplicationTypeConfig> = {
     defaults: {
       status: 'submitted',
       source: 'public_form',
-    },
-  },
-
-  // ── Shop application ────────────────────────────────────────
-  shop: {
-    destination: 'shop_applications',
-    required: ['shop_name', 'owner_name', 'email', 'phone', 'address', 'city', 'zip'],
-    allowed: [
-      'shop_name',
-      'owner_name',
-      'email',
-      'phone',
-      'address',
-      'city',
-      'state',
-      'zip',
-      'website',
-      'notes',
-    ],
-    defaults: {
-      status: 'submitted',
     },
   },
 
@@ -247,17 +184,7 @@ export const APPLICATION_TYPES: Record<string, ApplicationTypeConfig> = {
     },
   },
 
-  // ── Tax application ──────────────────────────────────────────
-  tax: {
-    destination: 'tax_applications',
-    required: ['email', 'full_name'],
-    allowed: ['email', 'full_name', 'phone', 'tax_year', 'service_type', 'filing_status', 'notes'],
-    defaults: {
-      status: 'submitted',
-    },
-  },
-
-  // ── Generic submission (JSONB payload) ───────────────────────
+  // ── Generic program submission (canonical dynamic-program intake) ─────
   submission: {
     destination: 'application_submissions',
     required: ['program_id'],

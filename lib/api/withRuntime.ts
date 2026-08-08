@@ -56,7 +56,6 @@ async function recordCronRun(
       error: error ?? null,
     });
   } catch (err) {
-    // Non-fatal — observability must never break the cron job itself
     logger.warn('[withRuntime] cron_job_runs write failed', { jobName, error: String(err) });
   }
 }
@@ -65,26 +64,13 @@ type RateLimitTier = 'strict' | 'contact' | 'api' | 'auth' | 'payment' | 'public
 type AuthMode = 'user' | 'admin';
 
 export interface RuntimeOptions {
-  /**
-   * Environment variable names that must be non-empty after hydration.
-   * Handler will not run if any are missing — returns 503.
-   */
+  /** Environment variable names that must be non-empty after hydration. */
   secrets?: string[];
   /** Rate limit tier. Omit to skip rate limiting. */
   rateLimit?: RateLimitTier;
-  /**
-   * Auth requirement.
-   *   'user'  — any authenticated user
-   *   'admin' — admin, super_admin, or staff
-   * Omit for public routes.
-   */
+  /** Auth requirement. Omit for public routes. */
   auth?: AuthMode;
-  /**
-   * Cron route — validates cron secret header against CRON_SECRET env var.
-   * Automatically adds 'CRON_SECRET' to required secrets.
-   *   'x-header'  — checks x-cron-secret header (AWS EventBridge cron)
-   *   'bearer'    — checks Authorization: Bearer <secret> header (Vercel/manual cron)
-   */
+  /** Cron secret validation mode. */
   cron?: 'x-header' | 'bearer';
 }
 
@@ -95,21 +81,20 @@ export interface RuntimeContext {
   user?: { id: string; email: string };
 }
 
-type Handler = (req: NextRequest, ctx: RuntimeContext) => Promise<NextResponse>;
-// Also accept plain Next.js handlers (no RuntimeContext) so routes that call
-// withRuntime(withApiAudit(...)) without an options object compile and run.
+// Next.js App Router accepts the standard Web Response type. Keeping this
+// generic lets withRuntime compose cleanly with audit wrappers and helpers that
+// intentionally return Response rather than the NextResponse subclass.
+type Handler = (req: NextRequest, ctx: RuntimeContext) => Promise<Response>;
 type AnyHandler = (req: NextRequest, ...args: any[]) => Promise<Response>;
 
 /**
- * Wraps an API handler with guaranteed hydration, secret validation,
- * rate limiting, and auth — in that order.
+ * Wrap an API handler with hydration, secret validation, rate limiting and auth.
  *
  * Overloads:
- *   withRuntime(options, handler)  — full options + RuntimeContext
- *   withRuntime(handler)           — passthrough, no options (legacy call sites)
+ *   withRuntime(options, handler)
+ *   withRuntime(handler) — legacy passthrough with hydration only
  */
 export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handler?: Handler) {
-  // Passthrough overload: withRuntime(handler) — no options
   if (typeof optionsOrHandler === 'function') {
     const fn = optionsOrHandler;
     return async function wrappedHandler(req: NextRequest, ...args: any[]): Promise<Response> {
@@ -117,24 +102,21 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
       return fn(req, ...args);
     };
   }
+
   const options = optionsOrHandler;
-  return async function wrappedHandler(req: NextRequest): Promise<NextResponse> {
-    // 1. Hydrate process.env from Supabase app_secrets (ECS cold-start safe)
+  return async function wrappedHandler(req: NextRequest): Promise<Response> {
+    // 1. Hydrate process.env from shared runtime secrets.
     await hydrateProcessEnv();
 
-    // 2. Validate required secrets — fail hard, not silent
+    // 2. Validate required secrets — fail explicitly, not silently.
     const requiredSecrets = [...(options.secrets ?? []), ...(options.cron ? ['CRON_SECRET'] : [])];
-
     const env: Record<string, string> = {};
     const missing: string[] = [];
 
     for (const key of requiredSecrets) {
       const val = process.env[key];
-      if (!val) {
-        missing.push(key);
-      } else {
-        env[key] = val;
-      }
+      if (!val) missing.push(key);
+      else env[key] = val;
     }
 
     if (missing.length > 0) {
@@ -148,7 +130,7 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
       );
     }
 
-    // 3. Cron secret validation
+    // 3. Cron secret validation.
     if (options.cron) {
       const cronSecret = env['CRON_SECRET'];
       const provided =
@@ -165,13 +147,13 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
       }
     }
 
-    // 4. Rate limiting
+    // 4. Rate limiting.
     if (options.rateLimit) {
       const blocked = await applyRateLimit(req, options.rateLimit);
       if (blocked) return blocked;
     }
 
-    // 5. Auth
+    // 5. Auth.
     const ctx: RuntimeContext = { env };
 
     if (options.auth === 'admin') {
@@ -184,7 +166,7 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
       ctx.user = { id: guard.id, email: guard.email ?? '' };
     }
 
-    // 6. Run handler — catch unhandled throws so they never surface as 500 HTML
+    // 6. Run handler and normalize unhandled failures to JSON.
     const cronStartedAt = options.cron ? new Date() : null;
     const jobName = options.cron
       ? req.nextUrl.pathname.replace(/^\/api\/cron\//, '').replace(/\/$/, '')
@@ -194,7 +176,6 @@ export function withRuntime(optionsOrHandler: RuntimeOptions | AnyHandler, handl
     try {
       const response = await handler!(req, ctx);
       if (cronStartedAt && jobName) {
-        // Parse result body for observability — non-blocking
         response.clone().json().then(
           (body) => recordCronRun(jobName, 'success', cronStartedAt, body),
           () => recordCronRun(jobName, 'success', cronStartedAt),

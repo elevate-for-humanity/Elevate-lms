@@ -1,18 +1,21 @@
+import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
-import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const OJL_SOURCE_TYPES = ['ojl', 'host_shop', 'timeclock', 'manual'];
+
 async function _GET(req: Request) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
 
+  const supabase = await createClient();
   const {
     data: { user },
     error: authErr,
@@ -26,7 +29,6 @@ async function _GET(req: Request) {
   const enrollmentId = searchParams.get('enrollment_id');
 
   try {
-    // Get student's apprentice enrollment with transfer hours and required hours
     let enrollmentQuery = supabase
       .from('student_enrollments')
       .select(
@@ -52,20 +54,20 @@ async function _GET(req: Request) {
       enrollmentQuery = enrollmentQuery.eq('id', enrollmentId);
     }
 
-    const { data: enrollment, error: enrollmentError } = await enrollmentQuery.maybeSingle();
+    const { data: enrollment } = await enrollmentQuery.maybeSingle();
+    const program = enrollment?.programs as any;
+    const programSlug = program?.slug ?? null;
+    const barberConfig = RAPIDS_CONFIG.programs.barber;
+    const isBarber = programSlug === barberConfig.slug;
 
-    // Default required hours (Indiana barber = 2000)
     let requiredHours = 2000;
     let transferHours = 0;
 
     if (enrollment) {
-      // Use enrollment-specific required hours if set, otherwise use program default
-      requiredHours =
-        enrollment.required_hours || (enrollment.programs as any)?.total_hours || 2000;
-      transferHours = enrollment.transfer_hours || 0;
+      requiredHours = enrollment.required_hours || program?.total_hours || 2000;
+      transferHours = Number(enrollment.transfer_hours) || 0;
     }
 
-    // Get hour totals from consolidated hour_entries
     const { data: hourLogs, error: hoursError } = await supabase
       .from('hour_entries')
       .select('hours_claimed, accepted_hours, source_type, status, category')
@@ -75,115 +77,127 @@ async function _GET(req: Request) {
       logger.error('Error fetching hours:', hoursError);
     }
 
-    // Calculate totals (hour_entries stores hours directly, not minutes)
     const logs = hourLogs || [];
+    const hoursFor = (log: any) => Number(log.accepted_hours) || Number(log.hours_claimed) || 0;
 
     const totalRtiHours = logs
-      .filter((l) => l.source_type === 'rti')
-      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
+      .filter((log) => log.source_type === 'rti')
+      .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
     const totalOjlHours = logs
-      .filter(
-        (l) =>
-          l.source_type === 'ojl' ||
-          l.source_type === 'host_shop' ||
-          l.source_type === 'timeclock' ||
-          l.source_type === 'manual',
-      )
-      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
+      .filter((log) => OJL_SOURCE_TYPES.includes(log.source_type))
+      .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
-    const approvedHoursVal = logs
-      .filter((l) => l.status === 'approved')
-      .reduce((sum, l) => sum + (Number(l.accepted_hours) || Number(l.hours_claimed) || 0), 0);
+    const approvedRtiHours = logs
+      .filter((log) => log.status === 'approved' && log.source_type === 'rti')
+      .reduce((sum, log) => sum + hoursFor(log), 0);
+
+    const approvedOjlHours = logs
+      .filter((log) => log.status === 'approved' && OJL_SOURCE_TYPES.includes(log.source_type))
+      .reduce((sum, log) => sum + hoursFor(log), 0);
+
+    const approvedHoursVal = approvedOjlHours + approvedRtiHours;
 
     const pendingHoursVal = logs
-      .filter((l) => l.status === 'pending')
-      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
+      .filter((log) => log.status === 'pending')
+      .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
-    // WIOA-specific hours (tracked via category)
     const wioaRtiHours = logs
-      .filter((l) => l.source_type === 'rti' && l.category === 'wioa')
-      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
+      .filter((log) => log.source_type === 'rti' && log.category === 'wioa')
+      .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
     const wioaOjlHours = logs
       .filter(
-        (l) =>
-          (l.source_type === 'ojl' ||
-            l.source_type === 'host_shop' ||
-            l.source_type === 'timeclock' ||
-            l.source_type === 'manual') &&
-          l.category === 'wioa',
+        (log) => OJL_SOURCE_TYPES.includes(log.source_type) && log.category === 'wioa',
       )
-      .reduce((sum, l) => sum + (Number(l.hours_claimed) || 0), 0);
+      .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
-    // Alias for backward compat in calculations below
-    const totalRtiMinutes = totalRtiHours * 60;
-    const totalOjlMinutes = totalOjlHours * 60;
-    const approvedMinutes = approvedHoursVal * 60;
-    const pendingMinutes = pendingHoursVal * 60;
-    const wioaRtiMinutes = wioaRtiHours * 60;
-    const wioaOjlMinutes = wioaOjlHours * 60;
-
-    // Get RAPIDS status
     const { data: rapidsData } = await supabase
       .from('rapids_registrations')
       .select('rapids_id, status, registration_date')
       .eq('student_id', user.id)
       .maybeSingle();
 
-    // Get state board readiness
     const { data: stateBoardData } = await supabase
       .from('state_board_readiness')
       .select('ready_for_exam, lms_completed, practical_skills_verified')
       .eq('student_id', user.id)
       .maybeSingle();
 
-    // Calculate effective total and progress
-    const totalMinutes = totalRtiMinutes + totalOjlMinutes;
-    const totalHours = totalMinutes / 60;
-    const effectiveTotal = totalHours + transferHours;
-    const remainingHours = Math.max(requiredHours - effectiveTotal, 0);
-    const progressPercentage = Math.min((effectiveTotal / requiredHours) * 100, 100);
-    const readyForExam = effectiveTotal >= requiredHours;
+    const totalHours = totalRtiHours + totalOjlHours;
 
-    // Convert to hours — OJL and RTI are separate compliance buckets
+    let effectiveTotal = totalHours + transferHours;
+    let remainingHours = Math.max(requiredHours - effectiveTotal, 0);
+    let progressPercentage = Math.min((effectiveTotal / requiredHours) * 100, 100);
+    let readyForExam = effectiveTotal >= requiredHours;
+    let requiredOjlHours: number | null = null;
+    let requiredRtiHours: number | null = null;
+    let remainingOjlHours: number | null = null;
+    let remainingRtiHours: number | null = null;
+
+    if (isBarber) {
+      requiredOjlHours = barberConfig.totalHours;
+      requiredRtiHours = barberConfig.relatedInstructionHours;
+
+      // Transfer hours represent prior supervised work experience and therefore
+      // credit the OJL bucket only. RTI must be independently completed/approved.
+      const creditedOjl = Math.min(approvedOjlHours + transferHours, requiredOjlHours);
+      const creditedRti = Math.min(approvedRtiHours, requiredRtiHours);
+      const combinedRequirement = requiredOjlHours + requiredRtiHours;
+
+      effectiveTotal = creditedOjl + creditedRti;
+      remainingOjlHours = Math.max(requiredOjlHours - creditedOjl, 0);
+      remainingRtiHours = Math.max(requiredRtiHours - creditedRti, 0);
+      remainingHours = remainingOjlHours + remainingRtiHours;
+      progressPercentage = Math.min((effectiveTotal / combinedRequirement) * 100, 100);
+      readyForExam = remainingOjlHours === 0 && remainingRtiHours === 0;
+      requiredHours = requiredOjlHours;
+    }
+
     const summary = {
-      total_rti_hours: totalRtiMinutes / 60,
-      total_ojl_hours: totalOjlMinutes / 60,
-      // total_hours kept for dashboard display only — NOT for apprenticeship completion
+      total_rti_hours: totalRtiHours,
+      total_ojl_hours: totalOjlHours,
       total_hours: totalHours,
-      approved_hours: approvedMinutes / 60,
-      pending_hours: pendingMinutes / 60,
+      approved_hours: approvedHoursVal,
+      approved_ojl_hours: approvedOjlHours,
+      approved_rti_hours: approvedRtiHours,
+      pending_hours: pendingHoursVal,
       transfer_hours: transferHours,
       required_hours: requiredHours,
+      required_ojl_hours: requiredOjlHours,
+      required_rti_hours: requiredRtiHours,
       remaining_hours: remainingHours,
+      remaining_ojl_hours: remainingOjlHours,
+      remaining_rti_hours: remainingRtiHours,
       progress_percentage: progressPercentage,
-      wioa_rti_hours: wioaRtiMinutes / 60,
-      wioa_ojl_hours: wioaOjlMinutes / 60,
+      wioa_rti_hours: wioaRtiHours,
+      wioa_ojl_hours: wioaOjlHours,
       enrollment_id: enrollment?.id || null,
-      program_name: (enrollment?.programs as any)?.name || 'Barber Apprenticeship',
+      program_name: program?.name || 'Barber Apprenticeship',
+      program_slug: programSlug,
 
-      // RAPIDS info
       rapids_status: rapidsData?.status || enrollment?.rapids_status || 'pending',
       rapids_id: rapidsData?.rapids_id || enrollment?.rapids_id || null,
       rapids_registration_date: rapidsData?.registration_date || null,
 
-      // LMS enrollment status (DB columns retain milady_ prefix until migration)
       lms_enrolled: enrollment?.lms_enrolled || false,
       lms_completed: stateBoardData?.lms_completed || false,
 
-      // State board readiness
       ready_for_exam: readyForExam && (stateBoardData?.lms_completed || false),
       practical_skills_verified: stateBoardData?.practical_skills_verified || false,
 
-      // Shop info
       shop_id: enrollment?.shop_id || null,
     };
 
     return NextResponse.json({ summary });
   } catch (error: any) {
-    logger.error('Error in hours-summary', normalizeError(error, 'Hours summary error'), getErrorContext(error));
+    logger.error(
+      'Error in hours-summary',
+      normalizeError(error, 'Hours summary error'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Failed to fetch hour summary' }, { status: 500 });
   }
 }
+
 export const GET = withApiAudit('/api/apprentice/hours-summary', _GET);

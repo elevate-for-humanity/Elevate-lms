@@ -1,1 +1,5 @@
-export { POST, dynamic, runtime, maxDuration } from '../../../../../app/api/devstudio/execute/route';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 120;
+
+export { POST } from '../../../../../app/api/devstudio/execute/route';

@@ -1,455 +1,69 @@
-export const dynamic = 'force-dynamic';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { AchievementsBadges } from '@/components/AchievementsBadges';
-import MicroCredentialsBadges from '@/components/MicroCredentialsBadges';
-import {
-  Trophy,
-  Star,
-  Award,
-  Target,
-  BookOpen,
-  Flame,
-  Zap,
-  Medal,
-  Crown,
-  TrendingUp,
-  Calendar,
-  CheckCircle,
-} from 'lucide-react';
+import { Award, BookOpen, Medal, Star, Trophy } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { getGlobalLeaderboard, levelForPoints } from '@/lib/gamification/points';
 
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/lms/achievements',
-  },
-  title: 'My Achievements | Student Portal',
-  description: 'View your learning achievements, milestones, and progress.',
+  title: 'Achievements & Points | Elevate LMS',
+  description: 'Track points, levels, badges, certificates, and learning milestones.',
+  robots: { index: false, follow: false },
 };
 
 export default async function AchievementsPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/lms/achievements');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [profileResult, scoreResult, badgesResult, definitionsResult, certificatesResult, enrollmentsResult, leaderboard] = await Promise.all([
+    supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
+    supabase.from('leaderboard_scores').select('points').eq('user_id', user.id).is('course_id', null).maybeSingle(),
+    supabase.from('user_badges').select('badge_id,awarded_at').eq('user_id', user.id).order('awarded_at', { ascending: false }),
+    supabase.from('badge_definitions').select('id,key,name,description,icon_url,badge_type,points_reward,rarity').eq('is_active', true).order('points_reward', { ascending: true }),
+    supabase.from('certificates').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    supabase.from('program_enrollments').select('id,status,progress_percent').eq('user_id', user.id),
+    getGlobalLeaderboard(10),
+  ]);
 
-  if (!user) {
-    redirect('/login');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  // Fetch enrollments then hydrate course details separately (no FK on course_id)
-  const { data: rawAchEnrollments } = await supabase
-    .from('program_enrollments')
-    .select('id, status, course_id, progress_percent, created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-  const achCourseIds = [
-    ...new Set((rawAchEnrollments || []).map((e: any) => e.course_id).filter(Boolean)),
-  ];
-  const { data: achCourses } = achCourseIds.length
-    ? await supabase
-        .from('courses')
-        .select('id, title, description, thumbnail_url')
-        .in('id', achCourseIds)
-    : { data: [] };
-  const achCourseMap = Object.fromEntries((achCourses || []).map((c: any) => [c.id, c]));
-  const enrollments = (rawAchEnrollments || []).map((e: any) => ({
-    ...e,
-    courses: achCourseMap[e.course_id] ?? null,
-  }));
-
-  // Fetch completed courses
-  const { count: completedCourses } = await supabase
-    .from('program_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('status', 'completed');
-
-  // Fetch lesson progress
-  const { count: completedLessons } = await supabase
-    .from('student_progress')
-    .select('*', { count: 'exact', head: true })
-    .eq('student_id', user.id)
-    .eq('completed', true);
-
-  // Fetch quiz attempts
-  const { data: quizAttempts } = await supabase
-    .from('quiz_attempts')
-    .select('score, status')
-    .eq('user_id', user.id)
-    .eq('status', 'completed');
-
-  // Fetch certificates
-  const { count: certificatesEarned } = await supabase
-    .from('certificates')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id);
-
-  // Fetch badges
-  const { data: userBadges } = await supabase
-    .from('user_badges')
-    .select('*, badges (*)')
-    .eq('user_id', user.id);
-
-  // Calculate stats
-  const stats = {
-    coursesCompleted: completedCourses || 0,
-    lessonsCompleted: completedLessons || 0,
-    quizzesCompleted: quizAttempts?.length || 0,
-    perfectQuizzes: quizAttempts?.filter((q) => q.score === 100).length || 0,
-    certificatesEarned: certificatesEarned || 0,
-    badgesEarned: userBadges?.length || 0,
-    totalPoints: 0,
-  };
-
-  // Calculate total points
-  stats.totalPoints =
-    stats.coursesCompleted * 100 +
-    stats.lessonsCompleted * 10 +
-    stats.quizzesCompleted * 25 +
-    stats.perfectQuizzes * 50 +
-    stats.certificatesEarned * 200 +
-    stats.badgesEarned * 25;
-
-  // Define milestones
-  const milestones = [
-    {
-      id: 'first-lesson',
-      title: 'First Lesson',
-      description: 'Complete your first lesson',
-      icon: BookOpen,
-      color: 'blue',
-      target: 1,
-      current: stats.lessonsCompleted,
-      points: 10,
-    },
-    {
-      id: 'lesson-streak',
-      title: 'Lesson Streak',
-      description: 'Complete 10 lessons',
-      icon: Flame,
-      color: 'orange',
-      target: 10,
-      current: stats.lessonsCompleted,
-      points: 100,
-    },
-    {
-      id: 'first-course',
-      title: 'Course Graduate',
-      description: 'Complete your first course',
-      icon: Trophy,
-      color: 'yellow',
-      target: 1,
-      current: stats.coursesCompleted,
-      points: 100,
-    },
-    {
-      id: 'course-master',
-      title: 'Course Master',
-      description: 'Complete 5 courses',
-      icon: Crown,
-      color: 'blue',
-      target: 5,
-      current: stats.coursesCompleted,
-      points: 500,
-    },
-    {
-      id: 'quiz-taker',
-      title: 'Quiz Taker',
-      description: 'Complete 5 quizzes',
-      icon: Target,
-      color: 'green',
-      target: 5,
-      current: stats.quizzesCompleted,
-      points: 125,
-    },
-    {
-      id: 'perfectionist',
-      title: 'Perfectionist',
-      description: 'Score 100% on 3 quizzes',
-      icon: Star,
-      color: 'amber',
-      target: 3,
-      current: stats.perfectQuizzes,
-      points: 150,
-    },
-    {
-      id: 'certified',
-      title: 'Certified',
-      description: 'Earn your first certificate',
-      icon: Award,
-      color: 'indigo',
-      target: 1,
-      current: stats.certificatesEarned,
-      points: 200,
-    },
-    {
-      id: 'badge-collector',
-      title: 'Badge Collector',
-      description: 'Earn 5 badges',
-      icon: Medal,
-      color: 'pink',
-      target: 5,
-      current: stats.badgesEarned,
-      points: 125,
-    },
-  ];
-
-  const completedMilestones = milestones.filter((m) => m.current >= m.target);
-  const inProgressMilestones = milestones.filter((m) => m.current < m.target && m.current > 0);
-  const lockedMilestones = milestones.filter((m) => m.current === 0);
-
-  const colorMap: Record<string, { bg: string; text: string }> = {
-    blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600' },
-    orange: { bg: 'bg-brand-orange-100', text: 'text-brand-orange-600' },
-    yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
-    green: { bg: 'bg-brand-green-100', text: 'text-brand-green-600' },
-    amber: { bg: 'bg-amber-100', text: 'text-amber-600' },
-    indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' },
-    pink: { bg: 'bg-pink-100', text: 'text-pink-600' },
-  };
+  const points = Number(scoreResult.data?.points ?? 0);
+  const level = levelForPoints(points);
+  const earnedRows = badgesResult.data ?? [];
+  const earnedIds = new Set(earnedRows.map((row: any) => row.badge_id));
+  const earnedAt = new Map(earnedRows.map((row: any) => [row.badge_id, row.awarded_at]));
+  const definitions = definitionsResult.data ?? [];
+  const enrollments = enrollmentsResult.data ?? [];
+  const completedPrograms = enrollments.filter((row: any) => row.status === 'completed').length;
+  const activePrograms = enrollments.filter((row: any) => row.status !== 'completed').length;
+  const name = profileResult.data?.full_name || user.email?.split('@')[0] || 'Learner';
 
   return (
-    <div className="min-h-screen bg-white py-8">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Achievements' }]} />
+    <main className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
+      <section className="rounded-3xl bg-slate-950 p-6 text-white md:p-8">
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-amber-300">Progress & Recognition</p>
+        <div className="mt-3 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+          <div><h1 className="text-3xl font-black">{name}, you are Level {level.level}.</h1><p className="mt-2 max-w-2xl text-slate-300">Points come from real learning and constructive community activity. Badges recognize milestones, not clicks.</p></div>
+          <div className="rounded-2xl bg-white/10 px-6 py-4 text-center"><div className="text-3xl font-black">{points.toLocaleString()}</div><div className="text-xs font-bold uppercase tracking-wide text-slate-300">Total points</div></div>
+        </div>
+        <div className="mt-6"><div className="mb-2 flex justify-between text-xs font-bold text-slate-300"><span>Level {level.level}</span><span>{level.nextFloor.toLocaleString()} pts to next threshold</span></div><div className="h-2 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-amber-400" style={{ width: `${level.progress}%` }} /></div></div>
+      </section>
+
+      <section className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4"><BookOpen className="h-5 w-5 text-brand-blue-600" /><div className="mt-2 text-2xl font-black">{activePrograms}</div><div className="text-xs font-bold text-slate-500">Active programs</div></div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4"><Trophy className="h-5 w-5 text-amber-500" /><div className="mt-2 text-2xl font-black">{completedPrograms}</div><div className="text-xs font-bold text-slate-500">Programs completed</div></div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4"><Medal className="h-5 w-5 text-purple-600" /><div className="mt-2 text-2xl font-black">{earnedIds.size}</div><div className="text-xs font-bold text-slate-500">Badges earned</div></div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4"><Award className="h-5 w-5 text-emerald-600" /><div className="mt-2 text-2xl font-black">{certificatesResult.count ?? 0}</div><div className="text-xs font-bold text-slate-500">Certificates</div></div>
+      </section>
+
+      <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <section>
+          <div className="mb-4 flex items-end justify-between"><div><h2 className="text-2xl font-black text-slate-950">Badges</h2><p className="text-sm text-slate-600">One canonical badge system now powers onboarding, learning, credentials, career milestones, and community recognition.</p></div><Link href="/lms/progress" className="text-sm font-black text-brand-blue-700">View detailed progress</Link></div>
+          <div className="grid gap-4 md:grid-cols-2">{definitions.map((badge: any) => { const earned = earnedIds.has(badge.id); return <article key={badge.id} className={`rounded-2xl border p-5 ${earned ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}><div className="flex items-start gap-4"><div className={`flex h-11 w-11 items-center justify-center rounded-xl ${earned ? 'bg-amber-400 text-slate-950' : 'bg-slate-100 text-slate-500'}`}><Star className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950">{badge.name}</h3><span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-slate-500">{badge.rarity || 'common'}</span></div><p className="mt-1 text-sm leading-5 text-slate-600">{badge.description}</p><div className="mt-3 flex items-center justify-between text-xs font-bold"><span className={earned ? 'text-emerald-700' : 'text-slate-500'}>{earned ? `Earned ${new Date(earnedAt.get(badge.id) as string).toLocaleDateString()}` : 'Not earned yet'}</span><span className="text-amber-700">+{badge.points_reward ?? 0} pts</span></div></div></div></article>; })}</div>
+        </section>
+
+        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><Trophy className="h-5 w-5 text-amber-500" /><h2 className="font-black">Leaderboard</h2></div><p className="mt-1 text-sm text-slate-600">Global points across learning and community activity.</p><div className="mt-4 divide-y divide-slate-100">{leaderboard.map((row, index) => <div key={row.user_id} className="flex items-center gap-3 py-3"><div className="w-7 text-center text-sm font-black text-slate-500">{index + 1}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-black text-slate-900">{row.profile?.full_name || 'Learner'}</p><p className="text-xs text-slate-500">Level {levelForPoints(row.points).level}</p></div><div className="text-sm font-black">{row.points} pts</div></div>)}{!leaderboard.length && <p className="py-6 text-center text-sm text-slate-500">Leaderboard activity starts when learners earn points.</p>}</div></aside>
       </div>
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-            <Trophy className="w-8 h-8 text-yellow-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900">My Achievements</h1>
-          <p className="text-slate-600 mt-2">
-            Track your learning milestones and celebrate your progress
-          </p>
-        </div>
-
-        {/* Stats Overview */}
-        <div className="bg-brand-blue-600 rounded-2xl p-6 text-white mb-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-4xl font-black">{stats.totalPoints.toLocaleString()}</div>
-              <div className="text-brand-blue-100 text-sm">Total Points</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-black">{stats.coursesCompleted}</div>
-              <div className="text-brand-blue-100 text-sm">Courses Completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-black">{stats.lessonsCompleted}</div>
-              <div className="text-brand-blue-100 text-sm">Lessons Completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-black">{completedMilestones.length}</div>
-              <div className="text-brand-blue-100 text-sm">Milestones Achieved</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-brand-green-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">{stats.quizzesCompleted}</div>
-                <div className="text-xs text-slate-600">Quizzes Passed</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <Star className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">{stats.perfectQuizzes}</div>
-                <div className="text-xs text-slate-600">Perfect Scores</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <Award aria-label="award" className="w-5 h-5 text-indigo-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">{stats.certificatesEarned}</div>
-                <div className="text-xs text-slate-600">Certificates</div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                <Medal className="w-5 h-5 text-pink-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-slate-900">{stats.badgesEarned}</div>
-                <div className="text-xs text-slate-600">Badges</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Completed Milestones */}
-        {completedMilestones.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              Completed Milestones
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {completedMilestones.map((milestone) => {
-                const IconComponent = milestone.icon;
-                const colors = colorMap[milestone.color];
-                return (
-                  <div
-                    key={milestone.id}
-                    className="bg-white rounded-xl border-2 border-brand-green-200 p-6 text-center"
-                  >
-                    <div
-                      className={`w-14 h-14 ${colors.bg} rounded-full flex items-center justify-center mx-auto mb-3`}
-                    >
-                      <IconComponent className={`w-7 h-7 ${colors.text}`} />
-                    </div>
-                    <h3 className="font-bold text-slate-900 mb-1">{milestone.title}</h3>
-                    <p className="text-sm text-slate-600 mb-2">{milestone.description}</p>
-                    <div className="flex items-center justify-center gap-1 text-brand-green-600 font-semibold">
-                      <Star className="w-4 h-4" />+{milestone.points} pts
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* In Progress Milestones */}
-        {inProgressMilestones.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-brand-blue-600" />
-              In Progress
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {inProgressMilestones.map((milestone) => {
-                const IconComponent = milestone.icon;
-                const colors = colorMap[milestone.color];
-                const progress = Math.round((milestone.current / milestone.target) * 100);
-                return (
-                  <div
-                    key={milestone.id}
-                    className="bg-white rounded-xl border border-slate-200 p-6 text-center"
-                  >
-                    <div
-                      className={`w-14 h-14 ${colors.bg} rounded-full flex items-center justify-center mx-auto mb-3`}
-                    >
-                      <IconComponent className={`w-7 h-7 ${colors.text}`} />
-                    </div>
-                    <h3 className="font-bold text-slate-900 mb-1">{milestone.title}</h3>
-                    <p className="text-sm text-slate-600 mb-3">{milestone.description}</p>
-                    <div className="mb-2">
-                      <div className="h-2 bg-white rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${colors.bg.replace('100', '500')} rounded-full`}
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      {milestone.current} / {milestone.target} ({progress}%)
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Locked Milestones */}
-        {lockedMilestones.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-slate-400" />
-              Upcoming Milestones
-            </h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {lockedMilestones.map((milestone) => {
-                const IconComponent = milestone.icon;
-                return (
-                  <div
-                    key={milestone.id}
-                    className="bg-white rounded-xl border border-slate-200 p-6 text-center opacity-60"
-                  >
-                    <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
-                      <IconComponent className="w-7 h-7 text-slate-400" />
-                    </div>
-                    <h3 className="font-bold text-slate-700 mb-1">{milestone.title}</h3>
-                    <p className="text-sm text-slate-500 mb-2">{milestone.description}</p>
-                    <div className="flex items-center justify-center gap-1 text-slate-500 text-sm">
-                      <Star className="w-4 h-4" />
-                      {milestone.points} pts
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Empty State */}
-        {milestones.length === 0 && (
-          <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
-            <Trophy className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Start Your Journey</h2>
-            <p className="text-slate-600 mb-6">
-              Begin learning to unlock achievements and earn points!
-            </p>
-            <Link
-              href="/lms/courses"
-              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
-            >
-              <BookOpen className="w-5 h-5" />
-              Browse Courses
-            </Link>
-          </div>
-        )}
-
-        {/* Achievements Badges */}
-        <div className="mt-12">
-          <AchievementsBadges userId={user.id} />
-        </div>
-
-        {/* Micro-Credentials */}
-        <div className="mt-12">
-          <MicroCredentialsBadges />
-        </div>
-
-        {/* Back Link */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/lms/dashboard"
-            className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }

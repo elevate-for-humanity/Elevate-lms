@@ -30,13 +30,15 @@ const MANIFEST = join(__dir, 'env-keys-manifest.txt');
 const STATIC_ENV: Record<string, string> = {
   NODE_ENV: 'production',
   HOSTNAME: '0.0.0.0',
-  PORT: '8080',
+  // All Northflank production services expose Next.js on 3000 and all health
+  // probes target 3000. Do not override this shared runtime value to 8080.
+  PORT: '3000',
   NEXT_TELEMETRY_DISABLED: '1',
   SUPABASE_PROJECT_REF: 'cuxzzpsyufcewtmicszk',
   NEXT_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
   NEXT_PUBLIC_CANONICAL_DOMAIN: 'www.elevateforhumanity.org',
   NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
-  NEXT_PUBLIC_LMS_URL: 'https://www.elevateforhumanity.org/lms',
+  NEXT_PUBLIC_LMS_URL: 'https://app.elevateforhumanity.org',
   NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
   NEXT_PUBLIC_ORG_NAME: 'Elevate for Humanity',
   NEXT_PUBLIC_ORG_LEGAL_NAME: 'Elevate for Humanity Technical and Career Institute',
@@ -134,6 +136,12 @@ async function main() {
   }
   variables = { ...variables, ...loadFromProcessEnv(keys) };
   variables = dedupeSecretVariables(variables);
+
+  // Runtime must stay aligned with the three Northflank health probes and Docker
+  // images. Refuse a production sync that would silently move the app to another port.
+  if (variables.PORT && variables.PORT !== '3000') {
+    throw new Error(`Refusing to sync PORT=${variables.PORT}; production services require PORT=3000`);
+  }
 
   const missing = keys.filter((k) => !variables[k] && k.startsWith('NEXT_PUBLIC_'));
   const missingCritical = [

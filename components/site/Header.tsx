@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
-import HeaderDesktopMenu from './HeaderDesktopMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
@@ -28,14 +27,13 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop keeps the horizontal navigation and also exposes the full hamburger menu. */}
-        <div className="hidden min-w-0 justify-center overflow-visible lg:flex">
+        {/* Desktop/tablet-width navigation is horizontal. The drawer is for small screens only. */}
+        <div className="hidden min-w-0 justify-center overflow-visible md:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 items-center justify-end gap-2">
-          <div className="hidden items-center gap-1 lg:flex xl:gap-2">
-            <HeaderDesktopMenu items={NAV_ITEMS} />
+          <div className="hidden items-center gap-1 md:flex xl:gap-2">
             <Link
               href={ROUTES.login}
               className="whitespace-nowrap px-2 py-2 text-sm font-semibold text-slate-800 hover:text-slate-950 xl:px-3 xl:text-base"
@@ -50,7 +48,7 @@ export default function Header() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-1 lg:hidden">
+          <div className="flex items-center gap-1 md:hidden">
             <span className="hidden text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu
             </span>

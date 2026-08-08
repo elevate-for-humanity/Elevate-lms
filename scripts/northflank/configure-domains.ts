@@ -9,9 +9,8 @@
  *   NORTHFLANK_API_TOKEN, NORTHFLANK_PROJECT_ID
  *   NORTHFLANK_LMS_SERVICE_ID, NORTHFLANK_ADMIN_SERVICE_ID
  *
- * Defaults:
- *   LMS  → www (canonical) + apex (redirect to www in app; Durable apex uses URL forward)
- *   Admin → admin.elevateforhumanity.org
+ * Admin is a dedicated service. admin.elevateforhumanity.org must never be
+ * attached to LMS as a fallback.
  */
 
 import { nfFetch, projectApiPath, resolveProjectId, resolveLmsServiceId, resolveAdminServiceId, resolveTeamId } from './lib';
@@ -48,9 +47,7 @@ async function assignDomainToService(domain: string, projectId: string, serviceI
   console.log(`  CNAME target: ${content ?? '(see print-cname-targets.ts)'}`);
   console.log(`  CNAME verified: ${verified}`);
   if (!verified) {
-    console.warn(
-      '  CNAME not verified — path assign skipped. Use updateServiceDomains (A record apex is OK on Durable).',
-    );
+    console.warn('  CNAME not verified — path assignment skipped. Correct DNS before deployment verification.');
     return;
   }
   if (dryRun) return;
@@ -125,9 +122,10 @@ async function main() {
   const lmsId = resolveLmsServiceId();
   const adminId = resolveAdminServiceId();
 
-  if (!projectId || !lmsId) {
+  if (!projectId || !lmsId || !adminId) {
     console.error(
-      'Set NORTHFLANK_PROJECT_ID and NORTHFLANK_LMS_SERVICE_ID\nRun: npx tsx scripts/northflank/audit.ts',
+      'NORTHFLANK_PROJECT_ID, NORTHFLANK_LMS_SERVICE_ID, and NORTHFLANK_ADMIN_SERVICE_ID are required.\n' +
+        'Admin DNS will not be assigned to LMS as a fallback.',
     );
     process.exit(1);
   }
@@ -137,30 +135,18 @@ async function main() {
   for (const d of LMS_DOMAINS) {
     await assignDomainToService(d, projectId, lmsId, dryRun);
   }
-  // Durable apex often uses an A record (no CNAME verify). Still attach hostnames on the port.
   await updateServiceDomains(projectId, lmsId, LMS_DOMAINS, dryRun);
-  if (adminId) {
-    for (const d of ADMIN_DOMAINS) {
-      await assignDomainToService(d, projectId, adminId, dryRun);
-    }
-  } else {
-    console.warn(
-      '\nNo NORTHFLANK_ADMIN_SERVICE_ID — attaching admin hostname to LMS service (combined deploy).\n' +
-        'Create a separate admin service later and move admin.elevateforhumanity.org to it.\n',
-    );
-    await updateServiceDomains(projectId, lmsId, ADMIN_DOMAINS, dryRun);
+
+  for (const d of ADMIN_DOMAINS) {
+    await assignDomainToService(d, projectId, adminId, dryRun);
   }
+  await updateServiceDomains(projectId, adminId, ADMIN_DOMAINS, dryRun);
 
   console.log(`
---- DNS (at your registrar / Cloudflare) ---
-For each custom domain Northflank shows a CNAME target in the service → Ports UI.
-Point (browser should show apex, not www):
-  www.elevateforhumanity.org       → LMS www CNAME (canonical — valid TLS on Durable)
-  elevateforhumanity.org           → URL forward to www in Durable (not Northflank A record)
-  admin.elevateforhumanity.org     → Admin service CNAME
-  lms.elevateforhumanity.org       → LMS service CNAME (same target as www)
-
-After DNS propagates, TLS certificates provision automatically in Northflank.
+--- DNS ---
+admin.elevateforhumanity.org must point to the dedicated Admin service CNAME and
+Northflank path / must be assigned to the Admin service port named site.
+After DNS verification, TLS certificates provision automatically in Northflank.
 `);
 }
 

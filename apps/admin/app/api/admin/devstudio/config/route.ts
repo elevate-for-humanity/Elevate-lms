@@ -23,6 +23,14 @@ function parse<T>(value: string | null | undefined, fallback: T): T {
   try { return JSON.parse(value) as T; } catch { return fallback; }
 }
 
+function normalizeAdminTarget(url: string, adminUrl: string): string {
+  if (!url.startsWith(adminUrl)) return url;
+  return url
+    .replace(`${adminUrl}/admin/studio`, `${adminUrl}/studio`)
+    .replace(`${adminUrl}/admin/course-builder`, `${adminUrl}/course-builder`)
+    .replace(`${adminUrl}/admin`, `${adminUrl}/dashboard`);
+}
+
 export async function GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -48,9 +56,9 @@ export async function GET(req: NextRequest) {
       { label: 'Full Website', url: siteUrl },
       { label: 'Programs', url: `${siteUrl}/programs` },
       { label: 'Apply', url: `${siteUrl}/apply` },
-      { label: 'Admin Dashboard', url: `${adminUrl}/admin` },
-      { label: 'Course Builder', url: `${adminUrl}/admin/course-builder` },
-      { label: 'Dev Studio', url: `${adminUrl}/admin/studio` },
+      { label: 'Admin Dashboard', url: `${adminUrl}/dashboard` },
+      { label: 'Course Builder', url: `${adminUrl}/course-builder` },
+      { label: 'Dev Studio', url: `${adminUrl}/studio` },
       { label: 'LMS', url: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org' },
     ],
     tabFiles: {
@@ -69,11 +77,13 @@ export async function GET(req: NextRequest) {
     ]);
     if (error) return NextResponse.json(fallback);
     const settings = new Map<string, string>((data ?? []).map((r) => [r.key, r.value ?? '']));
+    const previewTargets = parse(settings.get('DEVSTUDIO_PREVIEW_TARGETS_JSON'), fallback.previewTargets)
+      .map((target) => ({ ...target, url: normalizeAdminTarget(target.url, adminUrl) }));
     return NextResponse.json({
       quickCommands: parse(settings.get('DEVSTUDIO_QUICK_COMMANDS_JSON'), fallback.quickCommands),
       workflowButtons: parse(settings.get('DEVSTUDIO_WORKFLOW_BUTTONS_JSON'), fallback.workflowButtons),
       defaultPreviewUrl: settings.get('DEVSTUDIO_DEFAULT_PREVIEW_URL') || fallback.defaultPreviewUrl,
-      previewTargets: parse(settings.get('DEVSTUDIO_PREVIEW_TARGETS_JSON'), fallback.previewTargets),
+      previewTargets,
       tabFiles: parse(settings.get('DEVSTUDIO_TAB_FILES_JSON'), fallback.tabFiles),
     });
   } catch {

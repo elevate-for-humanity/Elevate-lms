@@ -41,8 +41,10 @@ const nextConfig = {
 
   async redirects() {
     return [
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/admin', permanent: false },
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/admin/:path*', permanent: false },
+      // Admin is a standalone service at admin.elevateforhumanity.org.
+      // Strip the historical /admin prefix when crossing to that container.
+      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: false },
+      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: false },
       { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: false },
       { source: '/employer/:path*', destination: 'https://app.elevateforhumanity.org/employer/:path*', permanent: false },
       { source: '/apprentice/:path*', destination: 'https://app.elevateforhumanity.org/apprentice/:path*', permanent: false },
@@ -50,8 +52,6 @@ const nextConfig = {
       { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: false },
       { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/cosmetology-host-shop/:path*', permanent: false },
       { source: '/host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/:path*', permanent: false },
-      { source: '/partner', destination: 'https://app.elevateforhumanity.org/partner/dashboard', permanent: false },
-      { source: '/partner/:path*', destination: 'https://app.elevateforhumanity.org/partner/:path*', permanent: false },
     ];
   },
 };

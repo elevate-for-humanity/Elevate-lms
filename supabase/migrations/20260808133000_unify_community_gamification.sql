@@ -64,18 +64,19 @@ VALUES
   ('instructor_onboarded', 'Instructor Ready', 'Completed instructor platform onboarding.', 'completion', '{"type":"instructor_onboarded"}'::jsonb, 75, 'common', true)
 ON CONFLICT (key) DO NOTHING;
 
--- Idempotent point-event ledger. All point awards flow through this table so
--- refreshes/retries cannot double-award a learner.
+-- Idempotent point-event ledger. The table predates this migration in some
+-- environments, so reconcile missing columns instead of replacing it.
 CREATE TABLE IF NOT EXISTS public.gamification_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
   event_type text NOT NULL,
-  source_id text,
-  course_id uuid,
-  points integer NOT NULL DEFAULT 0,
-  metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
-  created_at timestamptz NOT NULL DEFAULT now()
+  points integer DEFAULT 0,
+  metadata jsonb DEFAULT '{}'::jsonb,
+  created_at timestamptz DEFAULT now()
 );
+ALTER TABLE public.gamification_events
+  ADD COLUMN IF NOT EXISTS source_id text,
+  ADD COLUMN IF NOT EXISTS course_id uuid;
 
 CREATE UNIQUE INDEX IF NOT EXISTS gamification_events_idempotency_unique
   ON public.gamification_events (user_id, event_type, source_id)

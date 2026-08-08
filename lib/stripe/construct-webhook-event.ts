@@ -1,12 +1,14 @@
 import type Stripe from 'stripe';
 
 /**
- * Collect Stripe webhook signing secrets for the canonical endpoint.
- * Order: primary secret first, then known alternate endpoint secrets.
+ * Collect Stripe webhook signing secrets used by Elevate endpoints.
+ * Each Stripe webhook endpoint has its own signing secret, so shared handlers
+ * must be able to verify the endpoint-specific secret as well as legacy ones.
  */
 export function getCanonicalStripeWebhookSecrets(): string[] {
   const candidates = [
     process.env.STRIPE_WEBHOOK_SECRET,
+    process.env.STRIPE_WEBHOOK_SECRET_SUBSCRIPTIONS,
     process.env.STRIPE_WEBHOOK_SECRET_BARBER,
     process.env.STRIPE_WEBHOOK_SECRET_BARBER_APPRENTICESHIP,
     process.env.STRIPE_WEBHOOK_SECRET_DONATIONS,
@@ -15,6 +17,8 @@ export function getCanonicalStripeWebhookSecrets(): string[] {
     process.env.STRIPE_WEBHOOK_SECRET_STORE,
     process.env.STRIPE_WEBHOOK_SECRET_COSMETOLOGY,
     process.env.STRIPE_TESTING_WEBHOOK_SECRET,
+    process.env.STRIPE_WEBHOOK_SECRET_HOST_SHOP,
+    process.env.STRIPE_WEBHOOK_SECRET_APPLICATION_FEE,
   ];
   const seen = new Set<string>();
   return candidates.filter((s): s is string => {
@@ -26,19 +30,13 @@ export function getCanonicalStripeWebhookSecrets(): string[] {
   });
 }
 
-/**
- * Verify a Stripe webhook payload against one of several configured secrets.
- * Used when Dashboard signing secrets and runtime values may be out of sync across endpoints.
- */
 export function constructStripeEventWithAnySecret(
   stripe: Stripe,
   body: string,
   signature: string,
   secrets: string[],
 ): Stripe.Event {
-  if (!secrets.length) {
-    throw new Error('No webhook signing secrets configured');
-  }
+  if (!secrets.length) throw new Error('No webhook signing secrets configured');
   let lastError: unknown = null;
   for (const secret of secrets) {
     try {
@@ -50,15 +48,11 @@ export function constructStripeEventWithAnySecret(
   throw lastError ?? new Error('Webhook signature verification failed');
 }
 
-/**
- * Alias for backward compatibility.
- * @deprecated Use constructStripeEventWithAnySecret with explicit secrets.
- */
+/** Backward-compatible helper for endpoints that share the configured secret pool. */
 export function constructWebhookEvent(
   stripe: Stripe,
   body: string,
   signature: string,
 ): Stripe.Event {
-  const secrets = getCanonicalStripeWebhookSecrets();
-  return constructStripeEventWithAnySecret(stripe, body, signature, secrets);
+  return constructStripeEventWithAnySecret(stripe, body, signature, getCanonicalStripeWebhookSecrets());
 }

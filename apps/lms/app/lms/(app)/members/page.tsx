@@ -18,27 +18,18 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login?redirect=/lms/members');
 
-  let query = supabase
-    .from('profiles')
-    .select('id, full_name, avatar_url, role, community_show_role')
-    .eq('community_visible', true)
-    .not('full_name', 'is', null)
-    .order('full_name', { ascending: true })
-    .limit(250);
-
-  if (q) query = query.ilike('full_name', `%${q.replace(/[%_]/g, '')}%`);
-  const { data: members, error } = await query;
+  const { data: members, error } = await supabase.rpc('get_community_members', { p_search: q || null });
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
       <section className="rounded-3xl bg-slate-950 p-6 text-white md:p-8">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Community</p>
         <h1 className="mt-2 text-3xl font-black">Members</h1>
-        <p className="mt-2 max-w-2xl text-slate-300">Find Elevate members who have chosen to participate in the community directory.</p>
+        <p className="mt-2 max-w-2xl text-slate-300">Find members in your Elevate organization who have chosen to participate in the community directory.</p>
       </section>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
-        <span>Your student/workforce record is private by default.</span>
+        <span>Your student/workforce record is private by default. The directory only receives safe community fields.</span>
         <Link href="/lms/settings/privacy" className="font-bold text-brand-blue-600 hover:underline">Manage my community privacy</Link>
       </div>
 
@@ -49,17 +40,15 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
       </form>
 
       {error ? (
-        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">The member directory is temporarily unavailable. Community posts, groups, and discussions remain available.</div>
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">The safe member directory function is not available yet. Apply the pending community migration before production traffic.</div>
       ) : !members?.length ? (
         <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center"><Users className="mx-auto h-10 w-10 text-slate-400" /><p className="mt-3 font-bold text-slate-900">No visible members found.</p><p className="mt-1 text-sm text-slate-600">Members appear here only after opting into the directory.</p></div>
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {members.map((member) => (
+          {members.map((member: any) => (
             <Link key={member.id} href={`/lms/members/${member.id}`} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-brand-blue-300 hover:shadow-md">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100">
-                {member.avatar_url ? <img src={member.avatar_url} alt="" className="h-full w-full object-cover" /> : <User className="h-5 w-5 text-slate-400" />}
-              </div>
-              <div className="min-w-0"><p className="truncate font-bold text-slate-900">{member.full_name ?? 'Member'}</p>{member.community_show_role && <p className="truncate text-sm capitalize text-slate-500">{member.role ?? 'student'}</p>}</div>
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100">{member.avatar_url ? <img src={member.avatar_url} alt="" className="h-full w-full object-cover" /> : <User className="h-5 w-5 text-slate-400" />}</div>
+              <div className="min-w-0"><p className="truncate font-bold text-slate-900">{member.full_name ?? 'Member'}</p>{member.community_show_role && member.role && <p className="truncate text-sm capitalize text-slate-500">{member.role}</p>}</div>
             </Link>
           ))}
         </div>

@@ -51,7 +51,6 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Completion Forecast', href: '/intelligence/forecast' },
       { label: 'Lizzy', href: '/dashboard' },
       { label: 'Workflows', href: '/admin/studio/workflows' },
-      { label: 'Workflows', href: '/admin/studio/workflows' },
       { label: 'System Health', href: '/system-health' },
       { label: 'Snapshots', href: '/snapshots' },
     ],
@@ -148,7 +147,6 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Contracts', href: '/contracts' },
       { label: 'JRI', href: '/jri' },
       { label: 'JRI — Participants', href: '/jri/participants' },
-
       { label: 'Payout Queue', href: '/payout-queue' },
       { label: 'Payroll Cards', href: '/payroll-cards' },
       { label: 'Incentives', href: '/incentives' },
@@ -225,7 +223,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'API Keys', href: '/api-keys' },
       { label: 'Integrations', href: '/integrations' },
       { label: 'Integrations — Stripe', href: '/integrations/stripe' },
-      { label: 'Integrations — Env Manager', href: '/integrations/env-manager' },
+      { label: 'Environment Settings', href: '/settings/integrations' },
       { label: 'Integrations — Google Classroom', href: '/integrations/google-classroom' },
       { label: 'Migrations', href: '/migrations' },
       { label: 'System Jobs', href: '/system/jobs' },
@@ -237,10 +235,6 @@ export const DEFAULT_NAV: NavSection[] = [
   },
 ];
 
-/**
- * Validate that a parsed value matches NavSection[].
- * Rejects anything that could inject arbitrary hrefs.
- */
 export function isNavSections(v: unknown): v is NavSection[] {
   if (!Array.isArray(v) || v.length === 0) return false;
   return v.every(

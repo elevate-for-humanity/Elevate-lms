@@ -112,7 +112,9 @@ USER nextjs
 
 EXPOSE 3000
 
+# Container health is pure liveness. /api/version is reserved for deployment
+# identity verification and /api/health is reserved for Northflank readiness.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
-  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/version" || exit 1
+  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
 
 CMD ["node", "--max-old-space-size=4096", "apps/marketing/server.js"]

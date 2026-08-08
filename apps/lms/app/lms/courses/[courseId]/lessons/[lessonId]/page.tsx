@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Video } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import InteractiveLessonExperience from '@/components/lms/InteractiveLessonExperience';
 import LessonProgressClient from './LessonProgressClient';
 
 export const dynamic = 'force-dynamic';
@@ -166,6 +167,8 @@ export default async function LessonPage({
             </div>
           </section>
         ) : null}
+
+        <InteractiveLessonExperience lessonSlug={lesson.slug} lessonId={lesson.id} />
 
         <LessonProgressClient
           courseId={course.id}

@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { resend } from '@/lib/resend';
-import { hydrateProcessEnv } from '@/lib/secrets';
 import { strictRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
@@ -59,7 +58,6 @@ async function sendWelcome(params: {
 }
 
 async function _POST(request: NextRequest) {
-  await hydrateProcessEnv();
   const reference = `trial_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 
   try {
@@ -79,7 +77,10 @@ async function _POST(request: NextRequest) {
     }
 
     const db = await getAdminClient();
-    if (!db) return NextResponse.json({ error: 'Trial service is unavailable.', correlationId: reference }, { status: 503 });
+    if (!db) {
+      logger.error('[trial] privileged Supabase client unavailable after runtime validation', undefined, { reference });
+      return NextResponse.json({ error: 'Trial service is unavailable.', correlationId: reference }, { status: 503 });
+    }
 
     let { data: organization } = await db.from('organizations').select('id, name, slug, contact_email').eq('contact_email', email).maybeSingle();
     let createdOrganization = false;
@@ -114,7 +115,7 @@ async function _POST(request: NextRequest) {
     const trialEnds = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
     const { data: existingLicense } = await db.from('managed_licenses').select('id, trial_ends_at, status').eq('organization_id', organization.id).maybeSingle();
-    let trialEndsAt = existingLicense?.trial_ends_at || trialEnds;
+    const trialEndsAt = existingLicense?.trial_ends_at || trialEnds;
 
     if (!existingLicense) {
       const license = await db.from('managed_licenses').insert({
@@ -139,8 +140,6 @@ async function _POST(request: NextRequest) {
     const fallbackLogin = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(dashboardUrl)}`;
     let loginUrl = fallbackLogin;
 
-    // Generate a genuine one-time magic link. Passing metadata lets profile-sync
-    // triggers preserve organization context on first sign-in where supported.
     try {
       const generated: any = await db.auth.admin.generateLink({
         type: 'magiclink',
@@ -155,7 +154,6 @@ async function _POST(request: NextRequest) {
       if (actionLink) loginUrl = actionLink;
 
       if (authUser?.id) {
-        // Best effort only: deployments differ on optional profile columns.
         await db.from('profiles').upsert({
           id: authUser.id,
           email,
@@ -196,4 +194,11 @@ async function _POST(request: NextRequest) {
   }
 }
 
-export const POST = withRuntime(withApiAudit('/api/trial/start-managed', _POST));
+const auditedPost = withApiAudit('/api/trial/start-managed', _POST);
+
+export const POST = withRuntime(
+  {
+    secrets: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
+  },
+  async (request) => auditedPost(request),
+);

@@ -1,139 +1,108 @@
 {
-  "plan": "unified-platform-consolidation",
+  "plan": "marketing-lms-admin-may-parity",
   "mode": "supervised",
-  "branch": "consolidation/unified-platform",
+  "branch": "audit/marketing-lms-admin-may-parity-20260808-v2",
   "rules": {
     "neverWriteMainDirectly": true,
     "neverDeleteBeforeParity": true,
     "preserveWorkingIntegrations": true,
     "preserveAppliedMigrationHistory": true,
     "stopOnFailedGate": true,
-    "recordRollbackCommitBeforeDeletion": true
+    "recordRollbackCommitBeforeDeletion": true,
+    "preserveNewerWorkingCode": true,
+    "noBlindRewrites": true
   },
   "waves": [
     {
-      "id": "foundation",
-      "goal": "Make the supervisor and preservation controls reliable",
+      "id": "may-baseline",
+      "goal": "Recover May behavior and requirements without rolling back newer working code",
       "tasks": [
-        "configure orchestrator endpoint from NEXT_PUBLIC_AUTOPILOT_ORCHESTRATOR_URL",
-        "inventory registered autopilots and unique capabilities",
-        "map plugin/integration dependencies",
-        "establish canonical repository and workspace boundaries",
-        "verify no production writes target main"
+        "read May audits, redirect parity checklists, auth audits and build artifacts",
+        "compare May route, application, dashboard, login, enrollment and portal behavior against current main",
+        "classify each difference as intentional improvement, regression, missing implementation or obsolete legacy behavior",
+        "create feature-preservation manifest before edits"
       ],
-      "gate": ["typecheck", "orchestrator diagnostics", "feature-preservation manifest present"]
+      "gate": ["May evidence captured", "feature-preservation manifest present", "no rollback of newer working implementation"]
     },
     {
-      "id": "dev-studio",
-      "goal": "One operational Dev Studio",
-      "canonical": ["apps/admin/app/admin/studio", "lib/devstudio"],
-      "review": [
-        "apps/admin/app/dev-studio/page.tsx",
-        "apps/lms/app/ai/dev-studio/page.tsx",
-        "apps/marketing/app/ai/dev-studio/page.tsx",
-        "apps/marketing/app/store/dev-studio/page.tsx",
-        "apps/marketing/app/(marketing)/dev-studio/page.tsx",
-        "lib/paris/dev-studio.ts"
-      ],
+      "id": "marketing",
+      "goal": "One production marketing surface with complete public journeys",
+      "canonical": ["apps/marketing"],
       "tasks": [
-        "classify each route as operational UI, authenticated delegate, marketing landing page, store product page, or obsolete duplicate",
-        "move unique operational capabilities into canonical admin studio",
-        "replace duplicate operational routes with redirects/delegation only after parity",
-        "preserve public/store landing pages when their purpose is marketing rather than operations",
-        "run dev-studio integration gate"
+        "audit homepage, header, footer, navigation, programs, apprenticeship, host shops, maps, applications and public authentication entry points",
+        "compare current pages to May working behavior and restore only missing capabilities",
+        "find duplicate or parallel public routes and preserve one canonical implementation",
+        "verify form fields, uploads, submit actions, network calls and success transitions",
+        "verify internal links, canonical URLs, sitemap and media references"
       ],
-      "gate": ["dev studio route tests", "auth guard audit", "API integration gate", "build"]
+      "gate": ["marketing build", "public route guard", "dead-link audit", "application journey tests", "accessibility checks"]
     },
     {
-      "id": "course-builder",
-      "goal": "One course-building engine with one admin UI",
-      "canonical": [
-        "scripts/course-builder",
-        "lib/course-builder",
-        "apps/admin/app/admin/course-builder",
-        "apps/app/api/admin/course-builder"
-      ],
-      "referenceAudit": "docs/audits/COURSE-BUILDER-CONSOLIDATION-AUDIT.md",
+      "id": "lms",
+      "goal": "One learner LMS with complete end-to-end enrollment and learning journeys",
+      "canonical": ["apps/lms"],
       "tasks": [
-        "inventory generators, seeds, validators, video generators, imports and exports",
-        "merge unique behavior into canonical pipeline",
-        "route AI write, quick add and lesson patch through canonical service layer",
-        "verify all existing program-specific generation behavior",
-        "remove obsolete scripts only after regression fixtures pass"
+        "audit login, learner dashboard, onboarding, digital binder, courses, lessons, assignments, grades, certificates, messages, community, events and AI team",
+        "compare current LMS behavior to May working flows and retain all newer community and gamification work",
+        "find parallel learner routes and migrate unique behavior into canonical LMS routes",
+        "verify application to enrollment to account creation to onboarding to learner portal continuity",
+        "verify role-safe routing and authenticated data wiring"
       ],
-      "gate": ["course builder tests", "generated-course validation", "database insert/sync test", "build"]
+      "gate": ["LMS build", "auth route tests", "enrollment E2E", "learner journey tests", "accessibility checks"]
     },
     {
-      "id": "supabase",
-      "goal": "One authoritative schema and client layer",
-      "canonical": ["supabase/migrations", "shared Supabase clients"],
+      "id": "admin",
+      "goal": "One standalone admin runtime with one canonical command center and Dev Studio",
+      "canonical": ["apps/admin", "lib/devstudio"],
       "tasks": [
-        "retain immutable migration history that may already be applied",
-        "use reconciliation migrations for conflicting historical schemas",
-        "audit schema drift",
-        "audit RLS",
-        "consolidate duplicate client wrappers after caller migration",
-        "verify auth roles and tenant scoping"
+        "audit admin login, dashboard, users, students, applications, enrollments, programs, workforce, compliance, finance, communications and operations",
+        "audit Dev Studio, Course Builder, orchestrator and admin-owned APIs",
+        "compare May working admin behavior to current standalone root-path routing",
+        "remove stale admin-prefixed or super-admin assumptions only after route parity is proven",
+        "verify every operator action is wired to a real API or database service and no dashboard uses fake statistics"
       ],
-      "gate": ["migration discipline audit", "schema drift audit", "RLS audit", "auth tests"]
+      "gate": ["admin build", "auth guard audit", "admin route tests", "Dev Studio integration gate", "API integration gate"]
     },
     {
-      "id": "product-surfaces",
-      "goal": "One Marketing app, one Admin app and one LMS app with clear ownership",
+      "id": "shared-contracts",
+      "goal": "Remove hidden duplication in APIs, clients, routes and shared libraries",
       "canonical": {
-        "marketing": "apps/marketing",
-        "admin": "apps/admin",
-        "lms": "apps/lms",
-        "sharedApi": "apps/app"
+        "sharedApi": "apps/app",
+        "supabase": "lib/supabase",
+        "routes": "config/canonical-routes.ts"
       },
       "tasks": [
-        "move public-only pages to marketing ownership",
-        "move operator-only pages to admin ownership",
-        "move learner learning experiences to LMS ownership",
-        "keep shared APIs in the platform API app until safely extracted",
-        "replace cross-app duplicate pages with redirects or shared packages",
-        "deduplicate navigation and route aliases"
+        "consolidate duplicate application, intake, enrollment and checkout write paths behind canonical services",
+        "remove null or obsolete compatibility clients only after callers are migrated",
+        "audit route registry against physical pages and redirect behavior",
+        "deduplicate navigation, Supabase clients, Stripe clients, hooks and common components where behavior is truly equivalent",
+        "do not delete aliases required for external compatibility until one-hop redirect parity is verified"
       ],
-      "gate": ["critical route guard", "dead-link audit", "auth route tests", "marketing build", "admin build", "LMS build"]
+      "gate": ["typecheck", "route audit", "redirect parity", "schema drift audit", "payment tests", "no null compatibility imports"]
     },
     {
       "id": "infrastructure",
-      "goal": "One deployment and infrastructure model",
+      "goal": "Keep Marketing, LMS and Admin deployments stable while consolidation occurs",
       "tasks": [
-        "canonicalize Cloudflare Worker/KV/R2 binding names",
-        "verify DNS and SSL automation without changing working domains unnecessarily",
-        "consolidate duplicate Dockerfiles by deployed service purpose",
-        "verify GitHub CI and protected-branch workflow",
-        "preserve plugin credentials and provider integrations",
-        "remove stale deployment documentation only after active path is verified"
+        "verify each service Dockerfile, build filter, health endpoint, port and domain ownership",
+        "verify GitHub workflows build the correct app when shared code changes",
+        "verify Northflank configuration does not restart healthy instances unnecessarily",
+        "preserve working DNS, secrets and provider integrations",
+        "block merge on crash-loop, health-check, build-identity or deployment-target mismatch"
       ],
-      "gate": ["environment audit", "deployment identity check", "post-deploy smoke specification"]
-    },
-    {
-      "id": "documentation",
-      "goal": "Make repository documentation describe the real unified product",
-      "tasks": [
-        "rewrite README from verified architecture",
-        "create one architecture document",
-        "create one deployment runbook",
-        "create one environment-variable reference without secrets",
-        "archive or remove contradictory readiness reports",
-        "mark open-source boundaries and licenses"
-      ],
-      "gate": ["README matches code", "no placeholder infrastructure URLs", "no contradictory production-readiness claims"]
+      "gate": ["environment audit", "deployment identity check", "marketing health", "LMS health", "admin health"]
     },
     {
       "id": "final",
-      "goal": "Prove feature parity before merging to main",
+      "goal": "Prove production parity before any deletion or merge",
       "tasks": [
-        "compare donor feature inventory against canonical inventory",
-        "run typecheck lint tests and production builds",
-        "run route/link/media/integrity checks",
-        "run schema/RLS/auth/security gates",
-        "verify student, admin, employer, workforce, course-builder and Dev Studio journeys",
-        "produce final deletion ledger and rollback reference"
+        "run Marketing, LMS and Admin production builds",
+        "run route, link, media, accessibility, enrollment, auth, security and schema gates",
+        "verify visitor, applicant, student, apprentice, employer, partner, instructor and admin journeys",
+        "produce deletion ledger with canonical replacement and rollback commit for every removed path",
+        "supervisor rejects any deletion without verified replacement and green dependent tests"
       ],
-      "gate": ["all required checks green", "zero unclassified feature losses", "supervisor sign-off"]
+      "gate": ["all required checks green", "zero unclassified feature losses", "zero parallel operational routes", "supervisor sign-off"]
     }
   ]
 }

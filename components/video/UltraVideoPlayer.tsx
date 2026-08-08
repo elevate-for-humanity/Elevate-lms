@@ -2,17 +2,35 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
-  Play, Pause, Volume2, VolumeX, Maximize, Minimize,
-  SkipBack, SkipForward, Settings, Loader2, RotateCcw,
-  PictureInPicture2, Languages, Captions, Subtitles,
-  ChevronDown, Check, X, ExternalLink, Download,
-  Monitor, Smartphone, RotateCw
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize,
+  Minimize,
+  SkipBack,
+  SkipForward,
+  Settings,
+  Loader2,
+  RotateCcw,
+  PictureInPicture2,
+  Languages,
+  Captions,
+  Subtitles,
+  ChevronDown,
+  Check,
+  X,
+  ExternalLink,
+  Download,
+  Monitor,
+  Smartphone,
+  RotateCw,
 } from 'lucide-react';
 import { trackLessonProgress } from '@/lib/xapi/xapi-client';
 
 /**
  * UltraVideoPlayer - Consolidated Video Player
- * 
+ *
  * Features from all video players:
  * - VideoPlayer: Progress tracking, xAPI, resume
  * - ProfessionalVideoPlayer: Speed control, captions
@@ -31,13 +49,13 @@ export interface UltraVideoPlayerProps {
   /** @deprecated Use poster instead */
   posterImage?: string;
   title?: string;
-  
+
   // Course/Lesson tracking
   courseId?: string;
   lessonId?: string;
   lessonName?: string;
   userId?: string;
-  
+
   // Playback
   autoPlay?: boolean;
   autoPlayOnMount?: boolean;
@@ -46,25 +64,25 @@ export interface UltraVideoPlayerProps {
   muted?: boolean;
   loop?: boolean;
   startTime?: number;
-  
+
   // Controls
   showControls?: boolean;
   controlsAutoHide?: boolean;
   controlPosition?: 'bottom' | 'overlay';
-  
+
   // Features
   enableProgressTracking?: boolean;
   enableResume?: boolean;
   enablePiP?: boolean;
   enableDownload?: boolean;
   enableChapterSkip?: boolean;
-  
+
   // Chapters (table of contents)
   chapters?: Chapter[];
-  
+
   // Captions/Subtitles
   captions?: CaptionTrack[];
-  
+
   // Events
   onPlay?: () => void;
   onPause?: () => void;
@@ -73,11 +91,11 @@ export interface UltraVideoPlayerProps {
   onComplete?: () => void;
   onError?: (error: string) => void;
   onReady?: () => void;
-  
+
   // Styling
   className?: string;
   aspectRatio?: '16:9' | '4:3' | '21:9' | 'auto';
-  
+
   // Responsive
   responsive?: boolean;
 }
@@ -100,7 +118,7 @@ const ASPECT_RATIOS = {
   '16:9': 'aspect-video',
   '4:3': 'aspect-[4/3]',
   '21:9': 'aspect-[21/9]',
-  'auto': 'aspect-auto',
+  auto: 'aspect-auto',
 };
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
@@ -141,8 +159,8 @@ export function UltraVideoPlayer({
 }: UltraVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
-  const progressIntervalRef = useRef<NodeJS.Timeout>();
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const progressIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -277,7 +295,7 @@ export function UltraVideoPlayer({
     if (!chapters.length) return;
 
     const chapter = chapters.find(
-      (c) => currentTime >= c.startTime && (!c.endTime || currentTime < c.endTime)
+      (c) => currentTime >= c.startTime && (!c.endTime || currentTime < c.endTime),
     );
 
     if (chapter?.id !== currentChapter?.id) {
@@ -557,9 +575,7 @@ export function UltraVideoPlayer({
                 </span>
               )}
               {watchedPercent > 0 && watchedPercent < 100 && (
-                <span className="text-white text-sm">
-                  {Math.round(watchedPercent)}% watched
-                </span>
+                <span className="text-white text-sm">{Math.round(watchedPercent)}% watched</span>
               )}
             </div>
           </div>
@@ -585,9 +601,7 @@ export function UltraVideoPlayer({
                 >
                   <span className="w-8 text-xs opacity-60">{formatTime(chapter.startTime)}</span>
                   <span className="flex-1">{chapter.title}</span>
-                  {currentChapter?.id === chapter.id && (
-                    <Play className="w-4 h-4" />
-                  )}
+                  {currentChapter?.id === chapter.id && <Play className="w-4 h-4" />}
                 </button>
               ))}
             </div>
@@ -660,11 +674,7 @@ export function UltraVideoPlayer({
               <div className="flex items-center gap-4">
                 {/* Play/Pause */}
                 <button onClick={togglePlay} className="text-white hover:text-white/80">
-                  {isPlaying ? (
-                    <Pause className="w-8 h-8" />
-                  ) : (
-                    <Play className="w-8 h-8 ml-1" />
-                  )}
+                  {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 ml-1" />}
                 </button>
 
                 {/* Volume */}
@@ -776,9 +786,7 @@ export function UltraVideoPlayer({
                                 }`}
                               >
                                 {caption.label}
-                                {currentCaption === caption.src && (
-                                  <Check className="w-4 h-4" />
-                                )}
+                                {currentCaption === caption.src && <Check className="w-4 h-4" />}
                               </button>
                             ))}
                           </div>
@@ -845,28 +853,28 @@ export function UltraVideoPlayer({
  */
 function resolveVideoSrc(src?: string): string | null {
   if (!src) return null;
-  
+
   // Full URL
   if (src.startsWith('http')) return src;
-  
+
   // Local path
   if (src.startsWith('/')) return src;
-  
+
   // YouTube embed
   if (src.includes('youtube.com/embed/') || src.includes('youtu.be/')) {
     return src;
   }
-  
+
   // Vimeo
   if (src.includes('vimeo.com/')) {
     return src;
   }
-  
+
   // Pexels video ID
   if (/^\d+$/.test(src)) {
     return `https://videos.pexels.com/video-files/${src}/`;
   }
-  
+
   return src;
 }
 

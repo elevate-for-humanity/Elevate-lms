@@ -97,7 +97,9 @@ function auditProgramPage(filePath: string): AuditResult {
   }
 
   const usesCanonicalTemplate =
-    /ProgramDetailPage|ProgramMarketingPage|ProgramPageLayout|ProgramCategoryPage|ProgramPageTemplate|BarberApprenticeshipClient/.test(content);
+    /ProgramDetailPage|ProgramMarketingPage|ProgramPageLayout|ProgramCategoryPage|ProgramPageTemplate|BarberApprenticeshipClient/.test(
+      content,
+    );
 
   // Check required patterns
   if (!usesCanonicalTemplate && !REQUIRED_PATTERNS.h1.test(content)) {
@@ -149,7 +151,7 @@ function auditProgramPage(filePath: string): AuditResult {
 
 function findProgramPages(dir: string): string[] {
   const pages: string[] = [];
-  const programsDir = path.join(dir, 'app', 'programs');
+  const programsDir = path.join(dir, 'apps', 'marketing', 'app', 'programs');
 
   if (!fs.existsSync(programsDir)) {
     console.error('Programs directory not found:', programsDir);
@@ -164,7 +166,7 @@ function findProgramPages(dir: string): string[] {
 
       if (entry.isDirectory()) {
         // Skip special directories
-        if (entry.name.startsWith('[') || entry.name === 'admin') {
+        if ((entry.name.startsWith('[') && entry.name !== '[program]') || entry.name === 'admin') {
           continue;
         }
         walkDir(fullPath);

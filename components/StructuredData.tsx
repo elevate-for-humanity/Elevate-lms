@@ -4,7 +4,11 @@ import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 export default function StructuredData() {
   const barber = RAPIDS_CONFIG.programs.barber;
-  const telephone = `+1${PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '')}`;
+  const telephoneDigits = PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '');
+  const telephone =
+    telephoneDigits.length === 11 && telephoneDigits.startsWith('1')
+      ? `+${telephoneDigits}`
+      : `+1${telephoneDigits}`;
 
   const organizationSchema = {
     '@context': 'https://schema.org',
@@ -109,7 +113,8 @@ export default function StructuredData() {
     '@id': `${PLATFORM_DEFAULTS.siteUrl}/#website`,
     url: PLATFORM_DEFAULTS.siteUrl,
     name: PLATFORM_DEFAULTS.orgName,
-    description: 'Career training, registered apprenticeship, workforce pathways, and testing services.',
+    description:
+      'Career training, registered apprenticeship, workforce pathways, and testing services.',
     publisher: {
       '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization`,
     },

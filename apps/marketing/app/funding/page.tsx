@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BNPL_DESCRIPTION } from '@/lib/bnpl-config';
 import { ArrowRight } from 'lucide-react';
+import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,11 +18,11 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
   title: 'Workforce Funding',
   description:
-    'Explore funding options for your career training — WIOA, WRG, Job Ready Indy, payment plans, and more. Many students qualify for funded training.',
+    'Review the four Elevate programs confirmed for workforce-funding consideration: CDL, HVAC, Business Administration, and Financial Literacy.',
   openGraph: {
     title: 'Workforce Funding',
     description:
-      'WIOA, WRG, Job Ready Indy, payment plans, and more. Many students qualify for funded career training.',
+      'CDL, HVAC, Business Administration, and Financial Literacy are the four confirmed workforce-fundable pathways. Agency authorization is required.',
     url: 'https://www.elevateforhumanity.org/funding',
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
@@ -41,12 +42,12 @@ const FUNDING_OPTIONS = [
     tag: 'Federal',
     tagColor: 'bg-brand-blue-100 text-brand-blue-800',
     title: 'WIOA — Workforce Innovation & Opportunity Act',
-    desc: 'Federal funding that covers tuition, books, exam fees, and support services for qualifying adults and dislocated workers.',
+    desc: 'WIOA may authorize approved training costs for an eligible participant after WorkOne reviews the applicant and program.',
     bullets: [
-      'Covers tuition and training costs',
-      'Books and supplies included',
-      'Certification exam fees',
-      'Support services (childcare, transportation)',
+      'Applicant eligibility is determined by WorkOne',
+      'Written authorization is required before training',
+      'Authorized amounts and services vary by participant',
+      'Applies only to an approved program selection',
     ],
     bulletColor: 'bg-brand-blue-500',
     image: '/images/pages/funding-page-3.webp',
@@ -58,12 +59,12 @@ const FUNDING_OPTIONS = [
     tag: 'State — Indiana',
     tagColor: 'bg-brand-orange-100 text-brand-orange-800',
     title: 'WRG — Workforce Ready Grant',
-    desc: 'Indiana state grant that covers tuition for high-demand certificate programs. Designed to get Hoosiers into high-wage careers quickly.',
+    desc: "Indiana's Workforce Ready Grant may support eligible high-demand training after the responsible agency confirms program and participant eligibility.",
     bullets: [
-      'Covers tuition for eligible programs',
-      'High-demand industry certifications',
-      'No repayment required',
-      'Available to Indiana residents',
+      'Confirmed here only for CDL and HVAC',
+      'Indiana eligibility requirements apply',
+      'Agency approval is required before enrollment',
+      'The agency determines the authorized amount',
     ],
     bulletColor: 'bg-brand-orange-500',
     image: '/images/pages/funding-page-3.webp',
@@ -71,74 +72,6 @@ const FUNDING_OPTIONS = [
     link: 'https://www.nextleveljobs.org',
     linkText: 'Learn about WRG at Next Level Jobs',
     external: true,
-  },
-  {
-    tag: 'State — Indiana',
-    tagColor: 'bg-brand-red-100 text-brand-red-800',
-    title: 'Job Ready Indy — Justice Reinvestment Initiative',
-    desc: 'State funding for justice-involved individuals. Covers training, certifications, and wraparound support services.',
-    bullets: [
-      'Full tuition coverage',
-      'Certification and exam fees',
-      'Transportation assistance',
-      'Case management support',
-    ],
-    bulletColor: 'bg-brand-red-500',
-    image: '/images/pages/funding-page-5.webp',
-    imageAlt: 'Job Ready Indy funding',
-    link: '/funding/jri',
-    linkText: 'Learn about Job Ready Indy',
-  },
-  {
-    tag: 'Indianapolis',
-    tagColor: 'bg-slate-100 text-slate-700',
-    title: 'Job Ready Indy',
-    desc: 'Indianapolis workforce initiative connecting Marion County residents to funded career training, credentials, and employer placement.',
-    bullets: [
-      'Marion County residents',
-      'Funded credential pathways',
-      'Employer placement support',
-      'Healthcare, trades, tech, CDL',
-    ],
-    bulletColor: 'bg-brand-blue-500',
-    image: '/images/pages/jri-hero.webp',
-    imageAlt: 'Job Ready Indy Indianapolis workforce initiative',
-    link: '/funding/job-ready-indy',
-    linkText: 'Learn about Job Ready Indy',
-  },
-  {
-    tag: 'State — Indiana',
-    tagColor: 'bg-purple-100 text-purple-800',
-    title: 'VR — Vocational Rehabilitation',
-    desc: 'Indiana FSSA Vocational Rehabilitation supports individuals with disabilities in achieving employment goals.',
-    bullets: [
-      'Individualized employment support',
-      'Training and credential programs',
-      'Workplace accommodation assistance',
-      'Coordination with VR counselors',
-    ],
-    bulletColor: 'bg-purple-500',
-    image: '/images/pages/funding-page-3.webp',
-    imageAlt: 'Vocational rehabilitation services',
-    link: '/employment-support',
-    linkText: 'Employment Support Services',
-  },
-  {
-    tag: 'Earn & Learn',
-    tagColor: 'bg-brand-green-100 text-brand-green-800',
-    title: 'OJT — On-the-Job Training',
-    desc: 'Get hired and earn a paycheck while you train. Employers receive wage reimbursement from WorkOne.',
-    bullets: [
-      'Paid from day one',
-      'Employer wage reimbursement (50–75%)',
-      'Leads to permanent employment',
-      'Available across industries',
-    ],
-    bulletColor: 'bg-brand-green-600',
-    image: '/images/pages/funding-page-3.webp',
-    imageAlt: 'On-the-job training with employer',
-    link: '/ojt-and-funding',
-    linkText: 'Learn about OJT',
   },
 ];
 
@@ -173,8 +106,8 @@ const HOW_TO_STEPS = [
   },
   {
     step: '5',
-    title: 'Start Training',
-    desc: 'Begin your program with funding in place.',
+    title: 'Confirm Authorization and Start',
+    desc: 'Enroll after the funding agency issues written authorization for your selected program.',
   },
 ];
 
@@ -190,9 +123,9 @@ export default function FundingPage() {
 
       {/* Hero — standard height, no text overlay */}
       <section className={`${heroTokens.imageWrap} w-full overflow-hidden`}>
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+        <Image
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
           src="/images/pages/funding-page-5.webp"
           alt="Workforce funding options for career training"
           fill
@@ -212,12 +145,13 @@ export default function FundingPage() {
             Workforce Funding
           </h1>
           <p className="text-black text-base sm:text-lg max-w-2xl leading-relaxed mb-2">
-            Federal and state funding covers tuition, tools, and certification fees for eligible
-            participants. Eligibility is determined through WorkOne — not Elevate.
+            CDL, HVAC, Business Administration, and Financial Literacy are the four Elevate programs
+            confirmed for workforce-funding consideration.
           </p>
           <p className="text-black text-sm max-w-2xl leading-relaxed mb-6">
-            The process typically takes 1–3 weeks from registration to funding approval. Students
-            who do not qualify for funding can enroll through flexible self-pay options.
+            Funding is not automatic or guaranteed. WorkOne or the responsible agency determines
+            participant eligibility, covered costs, and authorization. All other programs are
+            presented as self-pay unless an agency provides written authorization.
           </p>
           <div className="flex flex-wrap gap-3">
             <a
@@ -234,6 +168,47 @@ export default function FundingPage() {
             >
               Apply for Training
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+            Confirmed Program List
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">
+            Four Workforce-Fundable Pathways
+          </h2>
+          <p className="text-black text-base max-w-3xl leading-relaxed mb-8">
+            This list controls the funding labels across the website. Appearing here does not
+            guarantee that a particular applicant will be approved.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => (
+              <article key={program.slug} className="rounded-xl border border-slate-200 p-5">
+                <h3 className="font-bold text-slate-900 text-lg mb-2">{program.title}</h3>
+                <p className="text-black text-sm leading-relaxed mb-4">{program.description}</p>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {program.wioaEligible && (
+                    <span className="rounded-full bg-brand-blue-50 px-3 py-1 text-xs font-bold text-brand-blue-800">
+                      WIOA consideration
+                    </span>
+                  )}
+                  {program.wrgEligible && (
+                    <span className="rounded-full bg-brand-orange-50 px-3 py-1 text-xs font-bold text-brand-orange-800">
+                      WRG consideration
+                    </span>
+                  )}
+                </div>
+                <Link
+                  href={`/programs/${program.slug}`}
+                  className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline"
+                >
+                  View program <ArrowRight className="w-4 h-4" />
+                </Link>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -266,8 +241,8 @@ export default function FundingPage() {
             </p>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Funding Options</h2>
             <p className="text-black text-base mt-2 max-w-2xl leading-relaxed">
-              Eligibility is determined by WorkOne, not Elevate. Register and schedule an
-              appointment to find out what you qualify for.
+              WIOA may be considered for all four confirmed programs. WRG is shown only for CDL and
+              HVAC. WorkOne or the responsible agency makes the final decision.
             </p>
           </div>
 
@@ -280,7 +255,8 @@ export default function FundingPage() {
                     alt={opt.imageAlt}
                     fill
                     sizes="(max-width: 640px) 100vw, 50vw"
-                    className="object-cover" placeholder="empty"
+                    className="object-cover"
+                    placeholder="empty"
                   />
                   <span
                     className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full ${opt.tagColor}`}
@@ -335,7 +311,7 @@ export default function FundingPage() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Self-Pay Options</h2>
             <p className="text-black text-base mt-2 max-w-xl mx-auto leading-relaxed">
               If you do not qualify for state or federal funding, we offer flexible payment options
-              so cost is never a barrier to starting.
+              that may help you plan for enrollment.
             </p>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
@@ -348,7 +324,7 @@ export default function FundingPage() {
               {
                 tag: 'Flexible',
                 title: 'Payment Plan',
-                desc: 'Split your tuition into monthly installments. No interest. Set up at enrollment.',
+                desc: 'Ask admissions whether an installment arrangement is available for your selected program.',
               },
               {
                 tag: 'BNPL',
@@ -468,7 +444,7 @@ export default function FundingPage() {
               Go to Indiana Career Connect
             </a>
             <Link
-              href="/start-trial"
+              href="/apply"
               className="border-2 border-slate-600 hover:border-slate-400 text-white font-bold px-8 py-4 rounded-xl transition-colors text-base"
             >
               Apply for Training

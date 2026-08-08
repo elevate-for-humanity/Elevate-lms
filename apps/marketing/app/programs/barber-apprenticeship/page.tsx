@@ -1,24 +1,27 @@
-import { getStaticProgram } from "@/data/programs/index";
-import heroBanners from "@/content/heroBanners";
-import BarberApprenticeshipClient from "./BarberApprenticeshipClient";
-import BarberChatAssistant from "./BarberChatAssistant";
+import { notFound } from 'next/navigation';
+import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+import heroBanners from '@/content/heroBanners';
+import { loadProgramForPage } from '@/lib/programs/load-program-page';
+
+export const revalidate = 3600;
 
 export default async function BarberApprenticeshipPage() {
-  const program = getStaticProgram("barber-apprenticeship");
-  const banner = heroBanners["barber-apprenticeship"] ?? null;
+  const loaded = await loadProgramForPage('barber-apprenticeship');
+  if (!loaded) return notFound();
   return (
-    <>
-      <BarberApprenticeshipClient program={program} banner={banner} />
-      <BarberChatAssistant />
-    </>
+    <ProgramDetailPage
+      program={loaded.program}
+      banner={heroBanners['barber-apprenticeship'] ?? null}
+    />
   );
 }
 
 export async function generateMetadata() {
-  const program = getStaticProgram("barber-apprenticeship");
+  const loaded = await loadProgramForPage('barber-apprenticeship');
+  const program = loaded?.program;
   return {
-    title: program?.seoTitle ?? program?.title ?? "Barber Apprenticeship",
-    description: program?.seoDescription ?? program?.subtitle ?? "",
-    alternates: { canonical: "https://www.elevateforhumanity.org/programs/barber-apprenticeship" },
+    title: program?.metaTitle ?? program?.title ?? 'Barber Apprenticeship',
+    description: program?.metaDescription ?? program?.subtitle ?? '',
+    alternates: { canonical: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship' },
   };
 }

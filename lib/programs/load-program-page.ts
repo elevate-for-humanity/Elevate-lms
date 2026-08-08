@@ -3,7 +3,7 @@
  * Every resolved program renders through ProgramDetailPage (no legacy inline templates).
  */
 
-import { getStaticProgram } from '@/data/programs/index';
+import { getStaticProgram, normalizePublicProgram } from '@/data/programs/index';
 import { resolveProgram, resolveSlug } from '@/lib/program-registry';
 import { createPublicClient } from '@/lib/supabase/public';
 import {
@@ -21,10 +21,7 @@ export type LoadedProgramPage = {
   synthesized: boolean;
 };
 
-async function overlayDbFields(
-  program: ProgramSchema,
-  slug: string,
-): Promise<ProgramSchema> {
+async function overlayDbFields(program: ProgramSchema, slug: string): Promise<ProgramSchema> {
   const db = createPublicClient();
   if (!db) return program;
 
@@ -38,18 +35,18 @@ async function overlayDbFields(
 
   if (!row) return program;
 
-  return {
+  return normalizePublicProgram({
     ...program,
     title: row.title || program.title,
     subtitle: row.short_description || row.description || program.subtitle,
     durationWeeks: row.duration_weeks ?? program.durationWeeks,
     heroImage: row.image_url || program.heroImage,
-    ...(row.description && row.description !== row.short_description ?
-      {
-        programDescription: row.description.split(/\n\n+/).filter(Boolean),
-      }
-    : {}),
-  };
+    ...(row.description && row.description !== row.short_description
+      ? {
+          programDescription: row.description.split(/\n\n+/).filter(Boolean),
+        }
+      : {}),
+  });
 }
 
 /**
@@ -66,7 +63,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   const staticProgram = getStaticProgram(slug);
   if (staticProgram) {
     return {
-      program: await overlayDbFields(staticProgram, slug),
+      program: normalizePublicProgram(await overlayDbFields(staticProgram, slug)),
       synthesized: false,
     };
   }
@@ -75,7 +72,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   if (registryEntry?.active) {
     const base = buildProgramSchemaFromRegistry(registryEntry);
     return {
-      program: await overlayDbFields(base, registryEntry.slug),
+      program: normalizePublicProgram(await overlayDbFields(base, registryEntry.slug)),
       synthesized: true,
     };
   }
@@ -92,7 +89,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
 
     if (row) {
       return {
-        program: buildProgramSchemaFromDb(row as DbProgramRow),
+        program: normalizePublicProgram(buildProgramSchemaFromDb(row as DbProgramRow)),
         synthesized: true,
       };
     }

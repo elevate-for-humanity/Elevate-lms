@@ -1,12 +1,9 @@
 {
   "home": {
     "pageKey": "home",
-    "videoSrcDesktop": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "videoSrcMobile": "https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4",
-    "voiceoverSrc": "/audio/heroes/home.mp3",
-    "microLabel": "The AI-Powered Workforce Operating System",
+    "microLabel": "Career Training & Workforce Development",
     "belowHeroHeadline": "Career Training, Registered Apprenticeships & Workforce Technology in Indiana",
-    "belowHeroSubheadline": "DOL-registered apprenticeship sponsor and WIOA-approved training provider serving learners, employers, and workforce agencies in Indianapolis and across Indiana. Funded training in healthcare, skilled trades, CDL, and technology often at no cost for eligible participants.",
+    "belowHeroSubheadline": "CDL, HVAC, Business Administration, and Financial Literacy are the four confirmed workforce-fundable pathways. WorkOne or the responsible agency determines eligibility and authorization.",
     "primaryCta": {
       "label": "Get Started",
       "href": "/apply"
@@ -17,13 +14,13 @@
       "variant": "secondary"
     },
     "trustIndicators": [
-      "AI-Driven Career Navigation",
-      "Automated Compliance Tracking",
-      "Blockchain-Verified Credentials"
+      "DOL Registered Apprenticeship Sponsor",
+      "Four Confirmed Fundable Pathways",
+      "Agency Authorization Required"
     ],
-    "transcript": "Elevate for Humanity is an AI-powered workforce operating system \u2014 not just a training provider. We automate the entire journey from recruitment to employment. Our platform handles credentialing, compliance tracking, employer placement, and apprenticeship coordination through a single unified ecosystem.",
+    "transcript": "Elevate for Humanity provides career training, registered-apprenticeship support, credential documentation, and employer connections. CDL, HVAC, Business Administration, and Financial Literacy are the four confirmed workforce-fundable pathways. Funding is not guaranteed and requires agency authorization.",
     "analyticsName": "home",
-    "posterImage": "/images/heroes/hero-homepage.webp",
+    "posterImage": "/images/pages/workforce-training.webp",
     "eyebrow": "Career Training & Workforce Development"
   },
   "about": {

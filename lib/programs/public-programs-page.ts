@@ -15,6 +15,7 @@ import {
   getPublicFundingLabels,
   getVerifiedProgramFunding,
   isStrictWorkforceFundedProgram,
+  VERIFIED_WORKFORCE_FUNDED_PROGRAMS,
 } from '@/lib/programs/funding-registry';
 
 export const buildProgramsCatalogMetadata = buildProgramsListingMetadata;
@@ -22,15 +23,42 @@ export const getPublicProgramsCatalogPage = getPublicProgramsPageData;
 export type PublicCatalogProgram = ProgramsPageRow;
 
 export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
-  'cna-training','hvac','hvac-technician-program','hvac-2024','medical-assistant-program',
-  'phlebotomy-technician','phlebotomy-technician-program','barber','barber-program','cosmetology',
-  'nail-technician','cpr-cert','health-safety','forklift-operator','tax-prep','it-support',
-  'it-support-specialist','cybersecurity','bookkeeping-fundamentals','entrepreneurship-small-business',
-  'peer-recovery-specialist-jri','ai-advanced-project-management-1774494313718',
-  'ai-forklift-safety-certification-1774495387731','jri-badge-1-mindsets','jri-badge-2-self-management',
-  'jri-badge-3-learning-strategies','jri-badge-4-social-skills','jri-badge-5-workplace-skills',
-  'jri-badge-6-launch-a-career','jri-introduction','jri','micro-programs','emergency-health-safety',
+  'cna-training',
+  'hvac',
+  'hvac-technician-program',
+  'hvac-2024',
+  'medical-assistant-program',
+  'phlebotomy-technician',
+  'phlebotomy-technician-program',
+  'barber',
+  'barber-program',
+  'cosmetology',
+  'nail-technician',
+  'cpr-cert',
+  'health-safety',
+  'forklift-operator',
+  'tax-prep',
+  'it-support',
+  'it-support-specialist',
+  'cybersecurity',
+  'bookkeeping-fundamentals',
+  'entrepreneurship-small-business',
+  'peer-recovery-specialist-jri',
+  'ai-advanced-project-management-1774494313718',
+  'ai-forklift-safety-certification-1774495387731',
+  'jri-badge-1-mindsets',
+  'jri-badge-2-self-management',
+  'jri-badge-3-learning-strategies',
+  'jri-badge-4-social-skills',
+  'jri-badge-5-workplace-skills',
+  'jri-badge-6-launch-a-career',
+  'jri-introduction',
+  'jri',
+  'micro-programs',
   'nha-medical-assistant',
+  'nha-phlebotomy',
+  'nha-pharmacy-technician',
+  'cna-cert',
 ]);
 
 export type ProgramsPageRow = {
@@ -53,21 +81,42 @@ export type PublicProgramsPageData = {
 };
 
 function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
-  return listing.map((p) => {
+  const rows = new Map<string, ProgramsPageRow>();
+
+  for (const p of listing) {
     const verified = getVerifiedProgramFunding(p.slug);
-    return {
-      slug: p.slug,
-      title: p.title,
-      description: p.description,
-      category: p.sectionKey,
-      duration: p.duration,
-      credential: p.credential,
-      funding_eligible: isStrictWorkforceFundedProgram(p.slug),
-      funding_tier: getProgramFundingTier(p.slug),
-      funding_labels: getPublicFundingLabels(p.slug),
+    const slug = verified?.slug ?? p.slug;
+    if (rows.has(slug)) continue;
+    rows.set(slug, {
+      slug,
+      title: verified?.title ?? p.title,
+      description: verified?.description ?? p.description,
+      category: verified?.category ?? p.sectionKey,
+      duration: verified?.duration ?? p.duration,
+      credential: verified?.credential ?? p.credential,
+      funding_eligible: isStrictWorkforceFundedProgram(slug),
+      funding_tier: getProgramFundingTier(slug),
+      funding_labels: getPublicFundingLabels(slug),
       top_jobs_stars: verified?.topJobsStars ?? null,
-    };
-  });
+    });
+  }
+
+  for (const verified of VERIFIED_WORKFORCE_FUNDED_PROGRAMS) {
+    rows.set(verified.slug, {
+      slug: verified.slug,
+      title: verified.title,
+      description: verified.description,
+      category: verified.category,
+      duration: verified.duration,
+      credential: verified.credential,
+      funding_eligible: true,
+      funding_tier: 'workforce-funded',
+      funding_labels: getPublicFundingLabels(verified.slug),
+      top_jobs_stars: verified.topJobsStars,
+    });
+  }
+
+  return [...rows.values()].sort((a, b) => a.title.localeCompare(b.title));
 }
 
 export async function getPublicProgramsPageData(): Promise<PublicProgramsPageData> {
@@ -102,7 +151,11 @@ export async function buildProgramsListingMetadata(): Promise<Metadata> {
       type: 'website',
       locale: 'en_US',
     },
-    twitter: { card: 'summary_large_image', title: 'Career Training Programs | Elevate for Humanity', description },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Career Training Programs | Elevate for Humanity',
+      description,
+    },
   };
 }
 

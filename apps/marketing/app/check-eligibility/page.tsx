@@ -13,6 +13,10 @@ import {
   DollarSign,
   Briefcase,
 } from 'lucide-react';
+import {
+  getVerifiedProgramFunding,
+  VERIFIED_WORKFORCE_FUNDED_PROGRAMS,
+} from '@/lib/programs/funding-registry';
 
 const EMPLOYMENT_STATUS = [
   'Unemployed',
@@ -58,25 +62,71 @@ function formatDuration(weeks: number | null): string {
 
 function formatOutcome(p: DbProgram): string {
   if (p.salary_min && p.salary_max) {
-    return `Avg. $${p.salary_min.toLocaleString()}–$${p.salary_max.toLocaleString()}/yr`;
+    return `Published range: $${p.salary_min.toLocaleString()}–$${p.salary_max.toLocaleString()}/yr`;
   }
   if (p.credential_name) return `${p.credential_name} credential included`;
   return 'Industry-recognized credential';
 }
 
 function getFundedLabel(p: DbProgram): string {
-  const tags = p.funding_tags ?? [];
-  if (tags.includes('WIOA') && tags.includes('WRG')) return 'WIOA / Workforce Ready Grant';
-  if (tags.includes('WIOA')) return 'WIOA eligible';
-  if (tags.includes('WRG')) return 'Workforce Ready Grant';
-  if (p.wioa_approved) return 'WIOA eligible';
-  return 'Funding available';
+  const verified = getVerifiedProgramFunding(p.slug);
+  if (verified?.wioaEligible && verified.wrgEligible) return 'WIOA / Workforce Ready Grant';
+  if (verified?.wioaEligible) return 'WIOA / WorkOne authorization';
+  return 'Self-pay';
+}
+
+function verifiedFallbackPrograms(): DbProgram[] {
+  return VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => ({
+    id: program.slug,
+    slug: program.slug,
+    title: program.title,
+    duration_weeks: program.duration ? Number.parseInt(program.duration, 10) || null : null,
+    salary_min: null,
+    salary_max: null,
+    credential_name: program.credential,
+    funding_eligible: true,
+    wioa_approved: program.wioaEligible,
+    funding_tags: [
+      ...(program.wioaEligible ? ['WIOA'] : []),
+      ...(program.wrgEligible ? ['WRG'] : []),
+    ],
+    category: program.category,
+  }));
+}
+
+function normalizePrograms(programs: DbProgram[]): DbProgram[] {
+  const rows = new Map<string, DbProgram>();
+  for (const program of programs) {
+    const verified = getVerifiedProgramFunding(program.slug);
+    const slug = verified?.slug ?? program.slug;
+    if (rows.has(slug)) continue;
+    rows.set(slug, {
+      ...program,
+      slug,
+      title: verified?.title ?? program.title,
+      funding_eligible: Boolean(verified),
+      wioa_approved: Boolean(verified?.wioaEligible),
+      funding_tags: verified
+        ? [...(verified.wioaEligible ? ['WIOA'] : []), ...(verified.wrgEligible ? ['WRG'] : [])]
+        : [],
+    });
+  }
+  for (const fallback of verifiedFallbackPrograms()) rows.set(fallback.slug, fallback);
+  return [...rows.values()];
 }
 
 // Category slugs that map to healthcare programs
 const HEALTHCARE_CATEGORIES = ['healthcare', 'health', 'medical', 'nursing', 'allied-health'];
 // Category slugs that map to trades/technical programs
-const TRADES_CATEGORIES = ['trades', 'hvac', 'electrical', 'plumbing', 'construction', 'cdl', 'transportation'];
+const TRADES_CATEGORIES = [
+  'trades',
+  'hvac',
+  'electrical',
+  'plumbing',
+  'construction',
+  'cdl',
+  'transportation',
+];
 
 function pickRecommended(
   programs: DbProgram[],
@@ -89,7 +139,7 @@ function pickRecommended(
   const isIndiana = q2 === 'yes';
   const isCareerChange = employment === 'Employed — looking to change careers';
 
-  const funded = programs.filter((p) => p.funding_eligible || p.wioa_approved);
+  const funded = programs.filter((p) => Boolean(getVerifiedProgramFunding(p.slug)));
   const healthcare = funded.filter((p) =>
     HEALTHCARE_CATEGORIES.some((c) => p.category?.toLowerCase().includes(c)),
   );
@@ -105,9 +155,7 @@ function pickRecommended(
     );
   } else if (isCareerChange && isIndiana) {
     // Career changers: trades/technical first (higher wages)
-    pool = [...trades, ...funded].filter(
-      (p, i, arr) => arr.findIndex((x) => x.id === p.id) === i,
-    );
+    pool = [...trades, ...funded].filter((p, i, arr) => arr.findIndex((x) => x.id === p.id) === i);
   } else if (isIndiana) {
     // Indiana residents: funded programs, healthcare priority
     pool = [...healthcare, ...funded].filter(
@@ -146,14 +194,18 @@ export default function CheckEligibilityPage() {
   const [employment, setEmployment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [dbPrograms, setDbPrograms] = useState<DbProgram[]>([]);
+  const [dbPrograms, setDbPrograms] = useState<DbProgram[]>(verifiedFallbackPrograms);
 
   // Load live programs once on mount
   useEffect(() => {
     fetch('/api/funnel/programs')
       .then((r) => r.json())
-      .then((d) => { if (d.programs) setDbPrograms(d.programs); })
-      .catch(() => { /* silently fall through — recommended list will be empty */ });
+      .then((d) => {
+        if (Array.isArray(d.programs)) setDbPrograms(normalizePrograms(d.programs));
+      })
+      .catch(() => {
+        setDbPrograms(verifiedFallbackPrograms());
+      });
   }, []);
 
   const allAnswered = q1 !== null && q2 !== null && q3 !== null;
@@ -204,15 +256,15 @@ export default function CheckEligibilityPage() {
     A: {
       icon: <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />,
       bg: 'bg-green-50 border-green-200',
-      title: 'You likely qualify for fully funded training',
-      body: "WIOA, Workforce Ready Grant, and Job Ready Indy may cover your full tuition, books, and certification fees. Confirm your info below and we'll lock in your funding options.",
+      title: 'You may be eligible for a workforce-funding review',
+      body: 'CDL, HVAC, Business Administration, and Financial Literacy are the confirmed workforce-fundable pathways. WorkOne or the responsible agency makes the final eligibility and authorization decision.',
       cta: 'Continue to Application',
     },
     B: {
       icon: <Info className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />,
       bg: 'bg-blue-50 border-blue-200',
       title: 'You may qualify — we need a bit more info',
-      body: 'Some funding programs have additional criteria. Fill in your details and an advisor will confirm which options apply to you within 24 hours.',
+      body: 'Funding programs have participant and program requirements. Submit your information so an advisor can explain the correct next step.',
       cta: 'Get My Options',
     },
     C: {
@@ -251,15 +303,15 @@ export default function CheckEligibilityPage() {
   > = {
     A: {
       headline: 'Application received — next step is yours',
-      body: "We'll confirm your funding eligibility within 24 hours and send you a direct link to complete your application.",
+      body: 'Your information was received. WorkOne or the responsible agency—not Elevate—makes the funding eligibility and authorization decision.',
       primaryLabel: 'Start Application Now',
       primaryHref: applyHref,
       secondaryLabel: 'Browse Programs',
       secondaryHref: '/programs',
     },
     B: {
-      headline: "We'll be in touch within 24 hours",
-      body: 'An advisor will review your info and confirm which funding options apply to you. Check your email and phone.',
+      headline: 'Your information was received',
+      body: 'An advisor can explain the application steps, but the responsible agency decides funding eligibility.',
       primaryLabel: 'Browse Programs',
       primaryHref: '/programs',
       secondaryLabel: 'Back to Home',
@@ -315,14 +367,14 @@ export default function CheckEligibilityPage() {
           </div>
           <div className="pb-6">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">
-              Free Career Training
+              Workforce-Funding Review
             </p>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3 max-w-lg leading-tight">
               Check If You Qualify for Funded Training
             </h1>
             <p className="text-white/75 text-base max-w-md">
-              3 questions. 30 seconds. We'll match you with WIOA, Workforce Ready Grant, or JRI
-              funding.
+              Review the four confirmed workforce-fundable programs and prepare for the agency
+              eligibility process.
             </p>
           </div>
         </div>
@@ -336,9 +388,9 @@ export default function CheckEligibilityPage() {
               <div className="flex-1 h-1.5 rounded-full bg-slate-200" />
               <span className="text-xs text-slate-400 ml-1">Step 1 of 2</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
               Check if you qualify for funded training
-            </h1>
+            </h2>
             <p className="text-slate-500 text-sm mb-8">3 questions. Takes 30 seconds.</p>
             <div className="space-y-5">
               {(

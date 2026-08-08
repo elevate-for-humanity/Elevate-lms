@@ -1,20 +1,24 @@
-import { getStaticProgram } from "@/data/programs/index";
-import heroBanners from "@/content/heroBanners";
-import MedicalAssistantProgramPageClient from "./MedicalAssistantProgramPageClient";
+import { notFound } from 'next/navigation';
+import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+import heroBanners from '@/content/heroBanners';
+import { loadProgramForPage } from '@/lib/programs/load-program-page';
+
+export const revalidate = 3600;
 
 export default async function MedicalAssistantPage() {
-  const program = getStaticProgram("medical-assistant");
-  const banner = heroBanners["medical-assistant"] ?? null;
+  const loaded = await loadProgramForPage('medical-assistant');
+  if (!loaded) return notFound();
   return (
-    <MedicalAssistantProgramPageClient program={program} banner={banner} />
+    <ProgramDetailPage program={loaded.program} banner={heroBanners['medical-assistant'] ?? null} />
   );
 }
 
 export async function generateMetadata() {
-  const program = getStaticProgram("medical-assistant");
+  const loaded = await loadProgramForPage('medical-assistant');
+  const program = loaded?.program;
   return {
-    title: program?.seoTitle ?? program?.title ?? "Medical Assistant",
-    description: program?.seoDescription ?? program?.subtitle ?? "",
-    alternates: { canonical: "https://www.elevateforhumanity.org/programs/medical-assistant" },
+    title: program?.metaTitle ?? program?.title ?? 'Medical Assistant',
+    description: program?.metaDescription ?? program?.subtitle ?? '',
+    alternates: { canonical: 'https://www.elevateforhumanity.org/programs/medical-assistant' },
   };
 }

@@ -18,7 +18,7 @@ export function CourseStructuredData({ course }: CourseStructuredDataProps) {
     '@context': 'https://schema.org',
     '@type': 'Course',
     '@id': `${siteConfig.url}/courses/${course.id}`,
-    name: course.course_name,
+    name: course.title,
     description: course.description,
     provider: {
       '@type': 'Organization',
@@ -38,16 +38,17 @@ export function CourseStructuredData({ course }: CourseStructuredDataProps) {
         name: course.instructor,
       },
     }),
-    offers: {
-      '@type': 'Offer',
-      price: course.price || 0,
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: `${siteConfig.url}/courses/${course.id}`,
-      ...(course.price === 0 && {
-        description: 'Free with WIOA funding',
-      }),
-    },
+    ...(course.price && course.price > 0
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: course.price,
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            url: `${siteConfig.url}/courses/${course.id}`,
+          },
+        }
+      : {}),
     hasCourseInstance: {
       '@type': 'CourseInstance',
       courseMode: 'blended',
@@ -74,6 +75,7 @@ interface ProgramStructuredDataProps {
     image_url?: string;
     category?: string;
     outcomes?: string[];
+    funding_eligible?: boolean;
   };
 }
 
@@ -114,15 +116,23 @@ export function ProgramStructuredData({ program }: ProgramStructuredDataProps) {
         name: outcome,
       })),
     }),
-    offers: {
-      '@type': 'Offer',
-      price: program.price || 0,
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: `${siteConfig.url}/programs/${program.slug}`,
-      category: 'WIOA Eligible',
-    },
-    financialAidEligible: 'WIOA',
+    ...(program.price && program.price > 0
+      ? {
+          offers: {
+            '@type': 'Offer',
+            price: program.price,
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+            url: `${siteConfig.url}/programs/${program.slug}`,
+          },
+        }
+      : {}),
+    ...(program.funding_eligible
+      ? {
+          financialAidEligible:
+            'Workforce funding may be available after agency eligibility review and written authorization.',
+        }
+      : {}),
     applicationDeadline: 'Rolling admissions',
   };
 

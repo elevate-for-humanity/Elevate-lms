@@ -8,6 +8,8 @@ import { ALL_PROGRAMS } from '@/data/programs/catalog';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { logger } from '@/lib/logger';
 import { normalizeProgramSectionKey, resolveCredentialLabel } from './category-normalize';
+import { isStrictWorkforceFundedProgram } from './funding-registry';
+import { sanitizePublicFundingText } from './public-funding-copy';
 
 const ELEVATE_PROVIDER_SLUG = 'elevate';
 
@@ -22,22 +24,34 @@ const STATIC_SECTOR_SECTION: Record<string, string> = {
 /** SSR/Google-safe listing when public Supabase returns no published rows (RLS/env). */
 function listingFromStaticCatalog(suppressed: Set<string>): ProgramsListingItem[] {
   return ALL_PROGRAMS.filter((p) => p.slug && !suppressed.has(p.slug)).map((p) => {
-    const sectionKey =
-      STATIC_SECTOR_SECTION[p.sector] ?? normalizeProgramSectionKey(p.category);
+    const sectionKey = STATIC_SECTOR_SECTION[p.sector] ?? normalizeProgramSectionKey(p.category);
     const weeks = p.durationWeeks;
     return {
       slug: p.slug,
       title: p.title,
-      description: p.subtitle?.trim() || null,
+      description: sanitizePublicFundingText(p.subtitle, p.slug, '') || null,
       category: p.category,
       sectionKey,
       duration: weeks > 0 ? `${weeks} weeks` : null,
       credential: p.credentials?.[0]?.name ?? null,
-      funding_eligible: !p.isSelfPay,
+      funding_eligible: isStrictWorkforceFundedProgram(p.slug),
     };
   });
 }
 
+export function mergeDbListingWithStaticCatalog(
+  databasePrograms: ProgramsListingItem[],
+  suppressed: Set<string>,
+): ProgramsListingItem[] {
+  const merged = new Map<string, ProgramsListingItem>();
+  for (const program of databasePrograms) {
+    if (program.slug && !suppressed.has(program.slug)) merged.set(program.slug, program);
+  }
+  for (const program of listingFromStaticCatalog(suppressed)) {
+    if (!merged.has(program.slug)) merged.set(program.slug, program);
+  }
+  return [...merged.values()].sort((a, b) => a.title.localeCompare(b.title));
+}
 
 /** Columns that exist on live `programs` (PostgREST). */
 export const PUBLIC_PROGRAM_COLUMNS =
@@ -129,7 +143,10 @@ function escapeIlike(term: string): string {
   return term.replace(/[%_\\]/g, '\\$&');
 }
 
-export function mapProgramsRowToCatalog(row: ProgramsRow, providerSlug = ELEVATE_PROVIDER_SLUG): CatalogProgram {
+export function mapProgramsRowToCatalog(
+  row: ProgramsRow,
+  providerSlug = ELEVATE_PROVIDER_SLUG,
+): CatalogProgram {
   const credential = resolveCredentialLabel(row);
   return {
     program_id: row.id,
@@ -164,9 +181,7 @@ export function mapProgramsRowToListing(row: ProgramsRow): ProgramsListingItem {
   }
   const sectionKey = normalizeProgramSectionKey(row.category, row.category_norm);
   const weeks = row.duration_weeks ?? row.estimated_weeks;
-  const duration =
-    row.duration?.trim() ||
-    (weeks != null && weeks > 0 ? `${weeks} weeks` : null);
+  const duration = row.duration?.trim() || (weeks != null && weeks > 0 ? `${weeks} weeks` : null);
 
   return {
     slug: row.slug,
@@ -211,9 +226,7 @@ export async function loadProgramCatalog(
     query = query.eq('state_code', params.state.toUpperCase());
   }
   if (params.category) {
-    query = query.or(
-      `category.eq.${params.category},category_norm.eq.${params.category}`,
-    );
+    query = query.or(`category.eq.${params.category},category_norm.eq.${params.category}`);
   }
   if (q) {
     const safe = escapeIlike(q);
@@ -242,7 +255,7 @@ export async function loadProgramCatalog(
     .range(offset, offset + perPage - 1);
 
   if (error) {
-    logger.error('[loadProgramCatalog] query failed', { message: error.message });
+    logger.error('[loadProgramCatalog] query failed', new Error(error.message));
     return {
       programs: [],
       total: 0,
@@ -281,7 +294,7 @@ export async function loadPublishedProgramsListing(
   const { data, error } = await basePublishedQuery(client).order('title', { ascending: true });
 
   if (error) {
-    logger.error('[loadPublishedProgramsListing] query failed', { message: error.message });
+    logger.error('[loadPublishedProgramsListing] query failed', new Error(error.message));
   }
 
   const suppressed = options?.suppressSlugs ?? new Set<string>();
@@ -290,7 +303,11 @@ export async function loadPublishedProgramsListing(
     .map(mapProgramsRowToListing);
 
   if (dbPrograms.length > 0) {
-    return { programs: dbPrograms, error: error?.message, source: 'database' };
+    return {
+      programs: mergeDbListingWithStaticCatalog(dbPrograms, suppressed),
+      error: error?.message,
+      source: 'database',
+    };
   }
 
   if (!options?.suppressFallbackWarning) {
@@ -301,7 +318,7 @@ export async function loadPublishedProgramsListing(
   }
 
   return {
-    programs: listingFromStaticCatalog(suppressed),
+    programs: mergeDbListingWithStaticCatalog([], suppressed),
     error: error?.message,
     source: 'static-fallback',
   };

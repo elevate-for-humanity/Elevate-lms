@@ -1,8 +1,8 @@
 /**
  * HomeTrustBar
  *
- * Institutional validation strip — DOL registration, WIOA/ETPL approval,
- * RAPIDS tracking, JRI funding, WorkOne alignment. Each badge links to
+ * Institutional validation strip — DOL registration, ETPL participation,
+ * RAPIDS tracking, JRI services, and WorkOne process. Each badge links to
  * the relevant proof/detail page. Rendered near the bottom of the homepage.
  */
 
@@ -18,14 +18,14 @@ const TRUST_ITEMS = [
   },
   {
     img: '/images/pages/wioa-meeting.webp',
-    label: 'ETPL Approved',
-    sub: 'WIOA-funded tuition eligible',
+    label: 'ETPL Provider',
+    sub: 'Selected programs listed',
     href: '/federal-compliance',
   },
   {
     img: '/images/pages/about-career-training.webp',
-    label: 'WIOA Aligned',
-    sub: 'Title I & II compliant',
+    label: 'WIOA Process',
+    sub: 'Agency authorization required',
     href: '/eligibility',
   },
   {
@@ -36,24 +36,36 @@ const TRUST_ITEMS = [
   },
   {
     img: '/images/pages/about-team-hero.webp',
-    label: 'WorkOne Partner',
-    sub: 'Indiana DWD aligned',
+    label: 'WorkOne Pathway',
+    sub: 'Eligibility decided by agency',
     href: '/partners/workforce',
   },
   {
     img: '/images/pages/jri-hero.webp',
     label: 'JRI Approved',
-    sub: 'Marion County free tuition',
+    sub: 'Justice-involved services',
     href: '/partners/jri',
   },
 ];
 
 const PARTNER_LOGOS = [
-  { src: '/images/pages/about-funding-nav.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
-  { src: '/images/pages/about-partner-cta.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
-  { src: '/images/pages/workforce-board-page-2.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
+  {
+    src: '/images/pages/about-funding-nav.webp',
+    alt: 'US Department of Labor',
+    href: '/federal-compliance',
+  },
+  {
+    src: '/images/pages/about-partner-cta.webp',
+    alt: 'Indiana Department of Workforce Development',
+    href: '/partners/workforce',
+  },
+  {
+    src: '/images/pages/workforce-board-page-2.webp',
+    alt: 'WorkOne Indiana',
+    href: '/partners/workforce',
+  },
   { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
-  { src: '/images/pages/about-hero.webp', alt: 'OSHA Authorized', href: '/compliance' },
+  { src: '/images/pages/about-hero.webp', alt: 'Safety training', href: '/compliance' },
 ];
 
 export function HomeTrustBar() {

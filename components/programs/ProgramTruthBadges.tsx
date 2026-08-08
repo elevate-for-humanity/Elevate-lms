@@ -36,7 +36,10 @@ interface DeliveryBadgeProps {
 }
 
 export function DeliveryBadge({ model }: DeliveryBadgeProps) {
-  const Icon = DELIVERY_ICONS[model] as React.ComponentType<{className?: string; 'aria-hidden'?: boolean}>;
+  const Icon = DELIVERY_ICONS[model] as React.ComponentType<{
+    className?: string;
+    'aria-hidden'?: boolean;
+  }>;
   const label = DELIVERY_LABELS[model];
   const color = DELIVERY_COLORS[model];
 
@@ -44,7 +47,7 @@ export function DeliveryBadge({ model }: DeliveryBadgeProps) {
     <span
       className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${color}`}
     >
-      <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+      <Icon className="w-3.5 h-3.5" aria-hidden />
       {label}
     </span>
   );
@@ -75,8 +78,7 @@ const FUNDING_COPY: Record<FundingType, { label: string; detail: string }> = {
   },
   self_pay: {
     label: 'Self-Pay Available',
-    detail:
-      'Flexible payment plans, BNPL options, and income-share available.',
+    detail: 'Flexible payment plans, BNPL options, and income-share available.',
   },
   unknown: {
     label: 'Funding Details Pending',

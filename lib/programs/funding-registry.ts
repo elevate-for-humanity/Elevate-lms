@@ -4,6 +4,12 @@ export type ProgramFundingTier = 'workforce-funded' | 'self-pay';
 
 export type VerifiedProgramFunding = {
   slug: string;
+  title: string;
+  aliases?: readonly string[];
+  description: string;
+  duration: string | null;
+  credential: string | null;
+  category: string;
   etplListedFor2Exclusive: boolean;
   topJobsStars: number | null;
   wioaEligible: boolean;
@@ -12,84 +18,86 @@ export type VerifiedProgramFunding = {
 };
 
 /**
- * Strict public funding registry.
+ * Public workforce-funding source of truth.
  *
- * RULES:
- * 1. Public WIOA/WRG marketing is denied by default.
- * 2. Program must be verified on the Indiana ETPL for 2Exclusive LLC-S.
- * 3. Program must have a verified Top Jobs final rating of 3+ to enter the
- *    workforce-funded website/application track, per current operating policy.
- * 4. Anything not listed here, or listed with <3/unverified stars, is self-pay.
- *
- * This intentionally overrides stale database flags, old marketing copy, and
- * program-file fundingOptions. Additions require documentary verification.
+ * Only these four programs may display workforce-funding labels. WorkOne or
+ * the responsible agency determines participant eligibility, covered costs,
+ * and written authorization. Elevate does not guarantee approval.
  */
-const VERIFIED_PROGRAM_FUNDING: Record<string, VerifiedProgramFunding> = {
-  'cdl-training': {
+export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding[] = [
+  {
     slug: 'cdl-training',
+    title: 'CDL Training',
+    description:
+      'Commercial driver training with permit support, safety instruction, and coordinated road training.',
+    duration: '6 weeks',
+    credential: 'CDL Class A License',
+    category: 'trades',
     etplListedFor2Exclusive: true,
-    topJobsStars: 4,
+    topJobsStars: null,
     wioaEligible: true,
     wrgEligible: true,
-    sourceNote: '2Exclusive ETPL record; CDL WRG approval; Top Jobs Heavy and Tractor-Trailer Truck Drivers = 4 stars.',
+    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
   },
-  'peer-recovery-specialist': {
-    slug: 'peer-recovery-specialist',
+  {
+    slug: 'hvac-technician',
+    title: 'HVAC Technician',
+    description:
+      'Hands-on heating, cooling, refrigeration, safety, diagnostics, installation, and maintenance training.',
+    duration: '6 weeks',
+    credential: 'EPA 608 Universal',
+    category: 'trades',
     etplListedFor2Exclusive: true,
-    topJobsStars: 3,
+    topJobsStars: null,
+    wioaEligible: true,
+    wrgEligible: true,
+    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
+  },
+  {
+    slug: 'business-administration',
+    title: 'Business Administration',
+    aliases: ['business'],
+    description:
+      'Business, Microsoft Office, QuickBooks, entrepreneurship, and workplace administration training.',
+    duration: '8 weeks',
+    credential: 'Industry certification preparation',
+    category: 'business',
+    etplListedFor2Exclusive: true,
+    topJobsStars: null,
     wioaEligible: true,
     wrgEligible: false,
-    sourceNote: '2Exclusive ETPL record; Top Jobs Substance Abuse, Behavioral Disorder, and Mental Health Counselors = 3 stars.',
+    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
   },
+  {
+    slug: 'financial-literacy',
+    title: 'Financial Literacy',
+    description:
+      'Practical training in budgeting, banking, credit, debt management, saving, taxes, and financial decision-making.',
+    duration: null,
+    credential: null,
+    category: 'business',
+    etplListedFor2Exclusive: true,
+    topJobsStars: null,
+    wioaEligible: true,
+    wrgEligible: false,
+    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
+  },
+] as const;
 
-  // ETPL-listed/approved records that do NOT enter the funded public track
-  // under the strict 3-star rule until a qualifying Top Jobs rating is verified.
-  'medical-assistant': {
-    slug: 'medical-assistant',
-    etplListedFor2Exclusive: true,
-    topJobsStars: 2,
-    wioaEligible: false,
-    wrgEligible: false,
-    sourceNote: '2Exclusive ETPL record; Medical Assistants final Top Jobs rating is 2 under the wage threshold.',
-  },
-  cna: {
-    slug: 'cna',
-    etplListedFor2Exclusive: true,
-    topJobsStars: null,
-    wioaEligible: false,
-    wrgEligible: false,
-    sourceNote: '2Exclusive ETPL record; 3+ Top Jobs final rating not verified in registry.',
-  },
-  'barber-apprenticeship': {
-    slug: 'barber-apprenticeship',
-    etplListedFor2Exclusive: true,
-    topJobsStars: null,
-    wioaEligible: false,
-    wrgEligible: false,
-    sourceNote: '2Exclusive ETPL record; 3+ Top Jobs final rating not verified in registry.',
-  },
-  'information-technology-foundations': {
-    slug: 'information-technology-foundations',
-    etplListedFor2Exclusive: true,
-    topJobsStars: null,
-    wioaEligible: false,
-    wrgEligible: false,
-    sourceNote: '2Exclusive ETPL record; occupation mapping/final 3+ Top Jobs rating requires verification.',
-  },
-};
-
-export function getVerifiedProgramFunding(slug: string): VerifiedProgramFunding | null {
-  return VERIFIED_PROGRAM_FUNDING[slug] ?? null;
+const FUNDING_BY_SLUG = new Map<string, VerifiedProgramFunding>();
+for (const program of VERIFIED_WORKFORCE_FUNDED_PROGRAMS) {
+  FUNDING_BY_SLUG.set(program.slug, program);
+  for (const alias of program.aliases ?? []) FUNDING_BY_SLUG.set(alias, program);
 }
 
+export function getVerifiedProgramFunding(slug: string): VerifiedProgramFunding | null {
+  return FUNDING_BY_SLUG.get(slug) ?? null;
+}
+
+/** Retained name for compatibility; the decision comes from the explicit four-program registry. */
 export function isStrictWorkforceFundedProgram(slug: string): boolean {
   const record = getVerifiedProgramFunding(slug);
-  return Boolean(
-    record?.etplListedFor2Exclusive &&
-      record.topJobsStars !== null &&
-      record.topJobsStars >= 3 &&
-      (record.wioaEligible || record.wrgEligible),
-  );
+  return Boolean(record?.etplListedFor2Exclusive && (record.wioaEligible || record.wrgEligible));
 }
 
 export function getProgramFundingTier(slug: string): ProgramFundingTier {

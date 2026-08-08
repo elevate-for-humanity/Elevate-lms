@@ -219,6 +219,9 @@ export interface ProgramSchema {
   cohortSize: string;
   fundingStatement: string;
   selfPayCost: string;
+  /** Optional display prices retained for programs with a published promotion. */
+  regularPrice?: string;
+  salePrice?: string;
   /** Upfront deposit amount for BNPL enrollment (e.g., "$600"). Defaults to $600 for apprenticeship programs when omitted. */
   depositAmount?: string;
   /** When true, program is not WIOA/grant eligible — self-pay only */
@@ -330,7 +333,15 @@ export interface ProgramSchema {
    * Primary partner provider for partner/hybrid programs.
    * Only set when verified — do not guess.
    */
-  partnerProvider?: 'hsi' | 'careersafe' | 'elevate-lms' | 'jri' | 'employindy' | 'nrf' | 'milady' | null;
+  partnerProvider?:
+    | 'hsi'
+    | 'careersafe'
+    | 'elevate-lms'
+    | 'jri'
+    | 'employindy'
+    | 'nrf'
+    | 'milady'
+    | null;
 
   /**
    * Funding sources actually available for this program.
@@ -611,9 +622,11 @@ export function getEnrollmentTracks(
     fundedLabel = 'FSSA IMPACT or Employer-Sponsored';
     fundedRequirement = 'Indiana residents — SNAP/TANF recipients or employer sponsor';
     fundedDescription =
-      'SNAP or TANF recipients may qualify for free training through Indiana\'s FSSA IMPACT program. Alternatively, a licensed employer can sponsor your apprenticeship at no cost to you.';
+      "SNAP or TANF recipients may qualify for free training through Indiana's FSSA IMPACT program. Alternatively, a licensed employer can sponsor your apprenticeship at no cost to you.";
   } else if (hasWIOA) {
-    fundedLabel = hasEmployer ? 'Workforce-Funded or Employer-Sponsored' : 'Workforce-Funded Training';
+    fundedLabel = hasEmployer
+      ? 'Workforce-Funded or Employer-Sponsored'
+      : 'Workforce-Funded Training';
     fundedRequirement = 'Must reside in Indiana';
     fundedDescription =
       'Federal and Indiana state workforce funding may cover 100% of tuition, books, and exam fees for eligible Indiana residents. We help you apply for every option you qualify for.';
@@ -621,7 +634,7 @@ export function getEnrollmentTracks(
     fundedLabel = 'FSSA IMPACT (SNAP/TANF)';
     fundedRequirement = 'Indiana residents receiving SNAP or TANF';
     fundedDescription =
-      'Indiana\'s SNAP Employment & Training (IMPACT) program can cover 100% of tuition for eligible recipients. You must be referred by your FSSA/DFR case worker — contact them to request a training authorization.';
+      "Indiana's SNAP Employment & Training (IMPACT) program can cover 100% of tuition for eligible recipients. You must be referred by your FSSA/DFR case worker — contact them to request a training authorization.";
   }
 
   return {

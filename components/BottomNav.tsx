@@ -10,7 +10,7 @@ const navItems = [
   { icon: GraduationCap, label: 'Learn', href: '/lms/courses' },
   { icon: CalendarDays, label: 'Events', href: '/lms/events' },
   { icon: TrendingUp, label: 'Progress', href: '/lms/progress' },
-  { icon: Bot, label: 'AI Team', href: '/account/ai-team' },
+  { icon: Bot, label: 'AI Team', href: '/lms/ai-team' },
 ];
 
 export function BottomNav() {

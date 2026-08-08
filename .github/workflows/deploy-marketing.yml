@@ -178,12 +178,15 @@ jobs:
       # Existing health is diagnostic only. If production is already unhealthy,
       # the workflow must still be able to deploy a known-good replacement.
       - name: Record predeploy upstream health
+        id: predeploy
         run: |
           set -euo pipefail
           status=$(curl -sk --max-time 10 -o /tmp/predeploy-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
           if [ "$status" = "200" ]; then
+            echo "was_healthy=true" >> "$GITHUB_OUTPUT"
             echo "Existing Marketing upstream is healthy before rollout."
           else
+            echo "was_healthy=false" >> "$GITHUB_OUTPUT"
             echo "RECOVERY MODE: existing Marketing upstream is HTTP $status; continuing with strict zero-downtime configuration so a healthy replacement can recover service."
             cat /tmp/predeploy-health.json 2>/dev/null || true
           fi
@@ -244,6 +247,8 @@ jobs:
 
       - name: Deploy exact Marketing build with availability guard
         if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
+        env:
+          WAS_HEALTHY_BEFORE_ROLLOUT: ${{ steps.predeploy.outputs.was_healthy }}
         run: |
           set -euo pipefail
           rm -f /tmp/marketing-downtime.log
@@ -271,14 +276,14 @@ jobs:
           wait "$WATCH_PID" 2>/dev/null || true
           trap - EXIT
 
-          # If the service was healthy before rollout, any non-200 during rollout
-          # is a zero-downtime violation. If it was already unhealthy, recovery is
-          # judged by the post-deploy smoke test instead of blocking repair.
-          PRE_STATUS=$(curl -sk --max-time 10 -o /dev/null -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
-          if [ "$PRE_STATUS" = "200" ] && [ -s /tmp/marketing-downtime.log ]; then
+          if [ "$WAS_HEALTHY_BEFORE_ROLLOUT" = "true" ] && [ -s /tmp/marketing-downtime.log ]; then
             echo "ZERO-DOWNTIME VIOLATION: Marketing returned non-200 health responses during rollout:"
             cat /tmp/marketing-downtime.log
             exit 1
+          fi
+
+          if [ "$WAS_HEALTHY_BEFORE_ROLLOUT" != "true" ] && [ -s /tmp/marketing-downtime.log ]; then
+            echo "Recovery rollout began while upstream was already unhealthy; post-deploy convergence will determine success."
           fi
 
           echo "Marketing rollout completed; post-deploy health verification follows."

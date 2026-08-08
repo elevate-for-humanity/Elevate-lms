@@ -1,7 +1,21 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-export const dynamic = 'force-dynamic';
+import nextDynamic from 'next/dynamic';
+
+const DevContainerPanel = nextDynamic(() => import('@/components/studio/DevContainerPanel'), {
+  ssr: false,
+  loading: () => <div className="flex min-h-[50vh] items-center justify-center bg-slate-950 text-slate-300">Loading container runtime…</div>,
+});
+
+const ServicesPanel = nextDynamic(() => import('@/components/studio/ServicesPanel'), {
+  ssr: false,
+});
 
 export default function StudioContainersPage() {
-  redirect('/studio?tab=containers');
+  return (
+    <div className="grid min-h-screen gap-4 bg-slate-950 p-4 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+      <div className="min-w-0 overflow-hidden rounded-xl bg-white"><DevContainerPanel /></div>
+      <div className="min-w-0 overflow-hidden rounded-xl bg-white"><ServicesPanel /></div>
+    </div>
+  );
 }

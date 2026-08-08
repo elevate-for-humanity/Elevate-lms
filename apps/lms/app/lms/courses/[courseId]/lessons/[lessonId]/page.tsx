@@ -1,0 +1,192 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Video } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
+export const metadata: Metadata = {
+  title: 'Lesson | Elevate LMS',
+  robots: { index: false, follow: false },
+};
+
+function isUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function htmlFromContent(content: unknown, renderedHtml?: string | null) {
+  if (renderedHtml?.trim()) return renderedHtml;
+  if (typeof content === 'string') return content;
+  if (content && typeof content === 'object') {
+    const record = content as Record<string, unknown>;
+    for (const key of ['html', 'content', 'body', 'text']) {
+      if (typeof record[key] === 'string') return record[key] as string;
+    }
+  }
+  return '';
+}
+
+export default async function LessonPage({
+  params,
+}: {
+  params: Promise<{ courseId: string; lessonId: string }>;
+}) {
+  const { courseId, lessonId } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`);
+  }
+
+  let courseQuery = supabase
+    .from('courses')
+    .select('id,title,slug,is_active')
+    .eq('is_active', true);
+  courseQuery = isUuid(courseId) ? courseQuery.eq('id', courseId) : courseQuery.eq('slug', courseId);
+  const { data: course } = await courseQuery.maybeSingle();
+  if (!course) notFound();
+
+  const { data: lesson } = await supabase
+    .from('course_lessons')
+    .select('id,title,slug,content,rendered_html,video_url,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,is_published,order_index')
+    .eq('id', lessonId)
+    .eq('course_id', course.id)
+    .eq('is_published', true)
+    .maybeSingle();
+
+  if (!lesson) notFound();
+
+  const { data: orderedLessons } = await supabase
+    .from('course_lessons')
+    .select('id,title,order_index')
+    .eq('course_id', course.id)
+    .eq('is_published', true)
+    .order('order_index');
+
+  const lessonList = orderedLessons ?? [];
+  const currentIndex = lessonList.findIndex((item) => item.id === lesson.id);
+  const previous = currentIndex > 0 ? lessonList[currentIndex - 1] : null;
+  const next = currentIndex >= 0 && currentIndex < lessonList.length - 1 ? lessonList[currentIndex + 1] : null;
+  const objectives = Array.isArray(lesson.learning_objectives) ? lesson.learning_objectives : [];
+  const questions = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions : [];
+  const keyTerms = Array.isArray(lesson.key_terms) ? lesson.key_terms : [];
+  const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
+
+  return (
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+          <Link
+            href={`/lms/courses/${course.id}`}
+            className="inline-flex items-center gap-2 text-sm font-bold text-cyan-800 hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to {course.title}
+          </Link>
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-slate-600">
+            {lesson.lesson_type === 'exam'
+              ? 'Final Exam'
+              : lesson.lesson_type === 'checkpoint'
+                ? 'Module Checkpoint'
+                : 'RTI Lesson'}
+          </p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight">{lesson.title}</h1>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold text-slate-700">
+            <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
+              <Clock3 className="h-4 w-4" /> {Number(lesson.duration_minutes ?? 0)} min
+            </span>
+            {lesson.video_url ? (
+              <span className="inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-2 text-cyan-900">
+                <Video className="h-4 w-4" /> Video included
+              </span>
+            ) : null}
+            {questions.length ? (
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-emerald-900">
+                <CheckCircle2 className="h-4 w-4" /> {questions.length} knowledge checks
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+        {lesson.video_url ? (
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
+            <video controls preload="metadata" className="aspect-video w-full" src={lesson.video_url}>
+              Your browser does not support HTML video.
+            </video>
+          </section>
+        ) : null}
+
+        {objectives.length ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="flex items-center gap-2 text-xl font-extrabold"><BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives</h2>
+            <ul className="mt-4 space-y-2 text-base font-medium leading-7 text-slate-800">
+              {objectives.map((objective, index) => (
+                <li key={index} className="flex gap-3"><span className="font-extrabold text-cyan-700">•</span><span>{String(objective)}</span></li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {lessonHtml ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div
+              className="prose prose-slate max-w-none prose-headings:font-extrabold prose-p:font-medium prose-p:leading-7 prose-li:font-medium"
+              dangerouslySetInnerHTML={{ __html: lessonHtml }}
+            />
+          </section>
+        ) : (
+          <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 font-semibold text-amber-950">
+            Lesson content is not available. Contact your instructor before marking this lesson complete.
+          </section>
+        )}
+
+        {keyTerms.length ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-extrabold">Key terms</h2>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {keyTerms.map((term, index) => (
+                <span key={index} className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800">{typeof term === 'string' ? term : JSON.stringify(term)}</span>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {questions.length ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-extrabold">Knowledge check</h2>
+            <p className="mt-2 text-sm font-medium leading-6 text-slate-700">
+              Review every question before completing a checkpoint or final exam. Passing and completion requirements are enforced by the LMS server.
+            </p>
+            <ol className="mt-5 space-y-5">
+              {questions.map((question: any, index: number) => (
+                <li key={question?.id ?? index} className="rounded-xl border border-slate-200 p-5">
+                  <p className="font-bold text-slate-950">{index + 1}. {String(question?.question ?? question?.question_text ?? '')}</p>
+                  {Array.isArray(question?.options) ? (
+                    <ul className="mt-3 space-y-2 text-sm font-medium text-slate-700">
+                      {question.options.map((option: unknown, optionIndex: number) => (
+                        <li key={optionIndex} className="rounded-lg bg-slate-50 px-3 py-2">{String(option)}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </section>
+        ) : null}
+
+        <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
+          {previous ? (
+            <Link href={`/lms/courses/${course.id}/lessons/${previous.id}`} className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100">← {previous.title}</Link>
+          ) : <span />}
+          {next ? (
+            <Link href={`/lms/courses/${course.id}/lessons/${next.id}`} className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800">{next.title} →</Link>
+          ) : (
+            <Link href={`/lms/courses/${course.id}`} className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800">Return to course</Link>
+          )}
+        </nav>
+      </div>
+    </main>
+  );
+}

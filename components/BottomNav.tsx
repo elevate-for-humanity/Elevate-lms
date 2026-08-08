@@ -2,40 +2,29 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Users, Award, User } from 'lucide-react';
+import { Bot, CalendarDays, GraduationCap, Home, TrendingUp, Users } from 'lucide-react';
+
+const navItems = [
+  { icon: Home, label: 'Home', href: '/lms/dashboard' },
+  { icon: Users, label: 'Community', href: '/lms/community' },
+  { icon: GraduationCap, label: 'Learn', href: '/lms/courses' },
+  { icon: CalendarDays, label: 'Events', href: '/lms/events' },
+  { icon: TrendingUp, label: 'Progress', href: '/lms/progress' },
+  { icon: Bot, label: 'AI Team', href: '/account/ai-team' },
+];
 
 export function BottomNav() {
   const pathname = usePathname();
-
-  const navItems = [
-    { icon: Home, label: 'Home', href: '/lms/dashboard' },
-    { icon: BookOpen, label: 'Programs', href: '/lms/programs' },
-    { icon: Users, label: 'Groups', href: '/study-groups' },
-    { icon: Award, label: 'Awards', href: '/achievements' },
-    { icon: User, label: 'Profile', href: '/profile' },
-  ];
-
   return (
-    <nav
-      role="navigation"
-      aria-label="Main navigation"
-      className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40"
-    >
-      <div className="flex items-center justify-around">
-        {navItems.filter(item => item.href).map((item) => {
+    <nav role="navigation" aria-label="Learner navigation" className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white lg:hidden">
+      <div className="grid grid-cols-6">
+        {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
-
+          const active = pathname === item.href || pathname?.startsWith(`${item.href}/`);
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center gap-1 py-2 px-3 transition ${
-                isActive ? 'text-brand-orange-600' : 'text-slate-700 hover:text-brand-orange-600'
-              }`}
-            >
-              <Icon size={24} />
-              <span className="text-xs font-medium">{item.label}</span>
+            <Link key={item.href} href={item.href} className={`flex min-w-0 flex-col items-center gap-1 px-1 py-2 transition ${active ? 'text-brand-blue-700' : 'text-slate-600 hover:text-brand-blue-700'}`}>
+              <Icon className="h-5 w-5" />
+              <span className="w-full truncate text-center text-[10px] font-bold">{item.label}</span>
             </Link>
           );
         })}

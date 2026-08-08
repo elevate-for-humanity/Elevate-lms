@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
-import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
 
 export interface AuthResult {
   user: {
@@ -17,20 +16,10 @@ export interface AuthResult {
     last_name?: string;
     full_name?: string;
   };
-  /** All roles this user holds (profile.role + any user_roles entries). Use this for inline role checks instead of profile.role to support multi-role users. */
+  /** All roles this user holds (profile.role + any user_roles entries). */
   effectiveRoles: string[];
 }
 
-/**
- * Resolve the current request pathname for post-login redirect.
- *
- * Priority:
- *  1. x-pathname header  — set by middleware (works in Edge runtime)
- *  2. __efh_pathname cookie — set by middleware as fallback for standalone
- *                             Node.js deployments where headers() doesn't
- *                             carry Edge-set custom headers to server components
- *  3. ''                 — no usable path; caller must handle
- */
 async function resolveCurrentPath(): Promise<string> {
   const headersList = await headers();
   const fromHeader =
@@ -41,23 +30,19 @@ async function resolveCurrentPath(): Promise<string> {
 
   if (fromHeader) {
     try {
-      const u = new URL(fromHeader, 'http://localhost');
-      return u.pathname + (u.search || '');
+      const url = new URL(fromHeader, 'http://localhost');
+      return url.pathname + (url.search || '');
     } catch {
       // malformed URL — fall through to cookie
     }
   }
 
-  // Cookie fallback: set by middleware for standalone Node.js runtimes
-  // where Edge headers() are not propagated to server components.
   try {
     const cookieStore = await cookies();
     const cookie = cookieStore.get('__efh_pathname');
-    if (cookie?.value) {
-      return cookie.value;
-    }
+    if (cookie?.value) return cookie.value;
   } catch {
-    // cookies() throws during static prerender
+    // cookies() can throw during static prerender
   }
 
   return '';
@@ -65,8 +50,10 @@ async function resolveCurrentPath(): Promise<string> {
 
 /**
  * Require user to have one of the specified roles.
- * Redirects to /admin-login?redirect=<current-path> if not authenticated.
- * Redirects to /unauthorized if authenticated but wrong role.
+ *
+ * Authentication always enters through /login. Marketing /login performs a
+ * same-purpose handoff to the canonical LMS login; the LMS owns the login UI.
+ * Do not send shared portal code to the removed /admin-login alias.
  */
 export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   const supabase = await createClient();
@@ -76,12 +63,10 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
 
   if (!user) {
     const currentPath = await resolveCurrentPath();
-
     if (currentPath) {
-      redirect(`/admin-login?redirect=${encodeURIComponent(currentPath)}`);
+      redirect(`/login?redirect=${encodeURIComponent(currentPath)}`);
     }
-    // No usable path; send to the unified marketing login entry.
-    redirect('/admin-login');
+    redirect('/login');
   }
 
   const { data: profile } = await supabase
@@ -90,28 +75,20 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
     .eq('id', user.id)
     .maybeSingle();
 
-  // Profile row missing — authenticated but no profile record.
-  // Redirect to /unauthorized for handling.
-  if (!profile) {
-    redirect('/unauthorized');
-  }
+  if (!profile) redirect('/unauthorized');
 
-  // Load secondary roles from user_roles table (multi-role users)
   const { data: userRoleRows } = await supabase
     .from('user_roles')
     .select('roles(name)')
     .eq('user_id', user.id);
   const secondaryRoles = (userRoleRows || [])
-    .map((r: any) => r.roles?.name)
+    .map((row: any) => row.roles?.name)
     .filter(Boolean) as string[];
 
   const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles]));
+  const allowed = effectiveRoles.some((role) => allowedRoles.includes(role));
 
-  const allowed = effectiveRoles.some((r) => allowedRoles.includes(r));
-
-  if (!allowed) {
-    redirect('/unauthorized');
-  }
+  if (!allowed) redirect('/unauthorized');
 
   return {
     user: {
@@ -123,9 +100,6 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   };
 }
 
-/**
- * Check if user has specific role (returns boolean, doesn't redirect)
- */
 export async function hasRole(requiredRole: string): Promise<boolean> {
   const supabase = await createClient();
   const {
@@ -140,7 +114,14 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
     .eq('id', user.id)
     .maybeSingle();
 
-  return (
-    profile?.role === requiredRole || profile?.role === 'admin' || profile?.role === 'super_admin'
-  );
+  if (profile?.role === requiredRole || profile?.role === 'admin' || profile?.role === 'super_admin') {
+    return true;
+  }
+
+  const { data: userRoleRows } = await supabase
+    .from('user_roles')
+    .select('roles(name)')
+    .eq('user_id', user.id);
+
+  return (userRoleRows || []).some((row: any) => row.roles?.name === requiredRole);
 }

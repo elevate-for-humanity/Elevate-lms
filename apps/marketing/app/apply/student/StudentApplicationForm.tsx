@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApplicationDraft } from '@/hooks/useApplicationDraft';
+import {
+  TRANSFER_HOURS_EVIDENCE_ACCEPT,
+  uploadTransferHoursEvidence,
+} from '@/lib/applications/upload-transfer-hours-evidence';
 
 const WORKONE_INTAKE_URL = 'https://WorkOneIndy.as.me/IntakeApptwithCN';
 
@@ -160,6 +164,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
   const [consentAcknowledged, setConsentAcknowledged] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<SubmissionResult | null>(null);
+  const [transferHoursDocument, setTransferHoursDocument] = useState<File | null>(null);
 
   const { hasDraft, savedData, savedStep, savedAt, saveDraft, clearDraft } =
     useApplicationDraft<DraftData>('student-apply');
@@ -170,6 +175,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
 
   const requiresWorkOne = form.fundingSource === 'wioa' || form.fundingSource === 'wrg';
   const isApprenticeship = form.program.includes('apprenticeship');
+  const transferHoursClaimed = Math.max(0, Number.parseInt(form.transferHours || '0', 10) || 0);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -179,6 +185,12 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
     setResult(null);
     if (name === 'fundingSource' && value !== 'wioa' && value !== 'wrg') {
       setWorkOneAcknowledged(false);
+    }
+    if (name === 'program' && !value.includes('apprenticeship')) {
+      setTransferHoursDocument(null);
+    }
+    if (name === 'transferHours' && (Number.parseInt(value || '0', 10) || 0) <= 0) {
+      setTransferHoursDocument(null);
     }
   }
 
@@ -190,6 +202,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
     if (!savedData) return;
     setForm(savedData.form);
     setWorkOneAcknowledged(savedData.workOneAcknowledged);
+    setTransferHoursDocument(null);
     setStep(Math.min(Math.max(savedStep || 1, 1), 5));
     setShowResume(false);
   }
@@ -207,6 +220,9 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
       if (!form.program) return 'Select a program of interest.';
       if (isApprenticeship && form.hasHostShop === 'yes' && !form.hostShopName) {
         return 'Enter the name of your current or proposed Host Shop.';
+      }
+      if (isApprenticeship && transferHoursClaimed > 0 && !transferHoursDocument) {
+        return 'Upload documentation showing the apprenticeship hours you want transferred.';
       }
     }
     if (current === 3) {
@@ -312,6 +328,22 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
     };
 
     try {
+      if (isApprenticeship && transferHoursClaimed > 0) {
+        if (!transferHoursDocument) {
+          setResult({
+            success: false,
+            error: 'Upload documentation showing the apprenticeship hours you want transferred.',
+          });
+          return;
+        }
+        await uploadTransferHoursEvidence({
+          file: transferHoursDocument,
+          email: form.email,
+          program: form.program,
+          hoursClaimed: transferHoursClaimed,
+        });
+      }
+
       const { res, data } = await postApplication(payload);
       if (res.ok && (data.ok ?? data.success ?? true)) {
         clearDraft();
@@ -334,12 +366,14 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
           error: data.error || 'The application could not be submitted. Please review the form and try again.',
         });
       }
-    } catch {
+    } catch (error) {
       persist(step);
       setResult({
         success: false,
         error:
-          'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (317) 314-3757.',
+          error instanceof Error
+            ? error.message
+            : 'The application service could not be reached. Your progress is saved on this device. Please try again. If the issue continues, call (317) 314-3757.',
       });
     } finally {
       setSubmitting(false);
@@ -381,6 +415,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
               type="button"
               onClick={() => {
                 clearDraft();
+                setTransferHoursDocument(null);
                 setShowResume(false);
               }}
               className="rounded-lg border border-slate-400 bg-white px-4 py-2 text-sm font-bold text-slate-950"
@@ -450,6 +485,23 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
                 <div><label className={labelClass}>Do you already have a Host Shop?</label><select name="hasHostShop" value={form.hasHostShop} onChange={handleChange} className={fieldClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option><option value="need_help">I need placement help</option></select></div>
                 <div><label className={labelClass}>Host Shop Name</label><input name="hostShopName" value={form.hostShopName} onChange={handleChange} className={fieldClass} /></div>
                 <div><label className={labelClass}>Prior/Transfer Hours Claimed</label><input type="number" min="0" name="transferHours" value={form.transferHours} onChange={handleChange} className={fieldClass} /><p className="mt-1 text-xs text-slate-600">Claimed hours require documentation and verification before credit is awarded.</p></div>
+                {transferHoursClaimed > 0 && (
+                  <div className="sm:col-span-2 rounded-lg border border-amber-300 bg-amber-50 p-4">
+                    <label className={labelClass}>Transfer Hours Documentation *</label>
+                    <input
+                      type="file"
+                      required
+                      accept={TRANSFER_HOURS_EVIDENCE_ACCEPT}
+                      onChange={(event) => {
+                        setTransferHoursDocument(event.target.files?.[0] ?? null);
+                        setResult(null);
+                      }}
+                      className="block w-full rounded-lg border border-amber-300 bg-white px-3 py-3 text-sm text-slate-950 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:font-bold file:text-white"
+                    />
+                    <p className="mt-2 text-xs font-semibold text-amber-950">Upload an official transcript, hours statement, state-board record, prior school record, or employer/apprenticeship hours verification. PDF, JPG, PNG, or WEBP; maximum 10 MB.</p>
+                    {transferHoursDocument && <p className="mt-2 text-xs text-slate-700">Selected: {transferHoursDocument.name}</p>}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -512,6 +564,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
             <p><strong>Location:</strong> {form.city}, {form.state} {form.zipCode}</p>
             <p><strong>Funding:</strong> {form.fundingSource || 'Not selected'}</p>
             {isApprenticeship && <p><strong>Host Shop:</strong> {form.hasHostShop === 'yes' ? form.hostShopName || 'Yes' : form.hasHostShop || 'Not provided'}</p>}
+            {isApprenticeship && transferHoursClaimed > 0 && <p><strong>Transfer Hours:</strong> {transferHoursClaimed.toLocaleString()} claimed — evidence: {transferHoursDocument?.name || 'required'}</p>}
           </div>
           <label className="flex items-start gap-3 rounded-xl border border-slate-300 p-4 text-sm font-semibold leading-6 text-slate-900">
             <input type="checkbox" checked={consentAcknowledged} onChange={(event) => setConsentAcknowledged(event.target.checked)} className="mt-1 h-5 w-5 shrink-0" />

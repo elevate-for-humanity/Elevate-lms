@@ -1,12 +1,23 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import { getAdminClient } from '@/lib/supabase/admin';
 
 const ACCESSIBLE_STRIPE_STATUSES = new Set(['active', 'trialing']);
 
-export async function syncIndividualAppSubscription(userId: string, appSlug: string) {
-  const admin = await requireAdminClient();
-  const { data: row, error } = await admin
+export async function syncIndividualAppSubscription(
+  userId: string,
+  appSlug: string,
+  authenticatedClient?: SupabaseClient<any>,
+) {
+  // Server Components must not crash just because the service-role client is
+  // unavailable during a cold start. The authenticated user's client is safe
+  // here because RLS permits access to that user's own subscription row.
+  const admin = await getAdminClient();
+  const db = admin ?? authenticatedClient ?? null;
+  if (!db) return null;
+
+  const { data: row, error } = await db
     .from('user_app_subscriptions')
     .select('*')
     .eq('user_id', userId)
@@ -55,12 +66,12 @@ export async function syncIndividualAppSubscription(userId: string, appSlug: str
       updated_at: new Date().toISOString(),
     };
 
-    await admin.from('user_app_subscriptions').update(update).eq('id', row.id);
+    await db.from('user_app_subscriptions').update(update).eq('id', row.id);
     return { ...row, ...update };
   } catch {
     // Deleted/missing Stripe subscriptions must not continue granting paid access.
     const update = { status: 'canceled', updated_at: new Date().toISOString() };
-    await admin.from('user_app_subscriptions').update(update).eq('id', row.id);
+    await db.from('user_app_subscriptions').update(update).eq('id', row.id);
     return { ...row, ...update };
   }
 }

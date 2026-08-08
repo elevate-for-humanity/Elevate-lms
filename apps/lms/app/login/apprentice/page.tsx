@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { Scissors, GraduationCap } from 'lucide-react';
 import ApprenticeLoginForm from './ApprenticeLoginForm';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 
 export const metadata: Metadata = {
   title: `Apprentice Login — ${PLATFORM_DEFAULTS.orgName}`,
   description: 'Sign in to your apprenticeship portal. Track hours, competencies, and training progress.',
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +20,18 @@ export default async function ApprenticeLoginPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (user) {
-    redirect('/portal/apprentice');
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('portal_type')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const destination = await resolveStudentHomePath(
+      supabase,
+      user.id,
+      profile?.portal_type,
+    );
+    redirect(destination);
   }
 
   return (
@@ -29,31 +42,22 @@ export default async function ApprenticeLoginPage() {
             <Scissors className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white">Apprentice Portal</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Registered Apprenticeship Program
-          </p>
+          <p className="text-slate-400 text-sm mt-1">Registered Apprenticeship Program</p>
           <div className="flex items-center justify-center gap-2 mt-3">
             <GraduationCap aria-label="graduationcap" className="w-4 h-4 text-amber-400" />
-            <span className="text-xs text-amber-400 font-medium uppercase tracking-widest">
-              DOL Registered
-            </span>
+            <span className="text-xs text-amber-400 font-medium uppercase tracking-widest">DOL Registered</span>
           </div>
         </div>
 
         <ApprenticeLoginForm />
 
         <div className="mt-6 text-center space-y-2">
-          <Link
-            href="/login"
-            className="text-xs text-slate-500 hover:text-slate-300 transition"
-          >
+          <Link href="/login" className="text-xs text-slate-500 hover:text-slate-300 transition">
             Not an apprentice? Sign in as a different role →
           </Link>
           <p className="text-xs text-slate-600">
             Need help?{' '}
-            <Link href="/contact" className="text-amber-400 hover:underline">
-              Contact support
-            </Link>
+            <Link href="/contact" className="text-amber-400 hover:underline">Contact support</Link>
           </p>
         </div>
       </div>

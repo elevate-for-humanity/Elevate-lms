@@ -5,38 +5,32 @@
  *
  * Architecture:
  * - Marketing app (www.) serves public content and redirects portal routes
- * - Admin app (admin.) serves admin/staff portals
+ * - Admin app (admin.) serves admin/staff portals at root paths
  * - LMS app (app.) serves student/employer/apprentice portals
  *
  * Every routing decision (next.config redirects, middleware, navigation, login)
  * should import from this file. No hardcoded portal URLs.
  */
 
-// ── Subdomain constants ────────────────────────────────────────────────────────
-
 export const MARKETING_HOST = 'https://www.elevateforhumanity.org';
 export const ADMIN_HOST = 'https://admin.elevateforhumanity.org';
 export const LMS_HOST = 'https://app.elevateforhumanity.org';
 
-// ── Portal types ───────────────────────────────────────────────────────────────
-
 export type PortalType =
-  | 'marketing'   // Public content on www.
-  | 'admin'       // Admin portal on admin.
-  | 'lms'         // LMS/student portal on app.
-  | 'employer'    // Employer portal on app.
-  | 'apprentice'  // Apprentice portal on app.
-  | 'parent'      // Parent portal on app.
-  | 'workforce'   // Workforce portal on app.
-  | 'hostshop'    // Host shop portal on app.
-  | 'cosmetology' // Cosmetology host shop on app.
-  | 'workforceboard' // Workforce board (marketing only)
-  | 'casemanager' // Case manager (marketing only)
-  | 'provider'    // Provider (marketing only)
-  | 'partner'     // Partner (marketing only)
-  | 'programholder'; // Program holder (marketing only)
-
-// ── Portal routing table ───────────────────────────────────────────────────────
+  | 'marketing'
+  | 'admin'
+  | 'lms'
+  | 'employer'
+  | 'apprentice'
+  | 'parent'
+  | 'workforce'
+  | 'hostshop'
+  | 'cosmetology'
+  | 'workforceboard'
+  | 'casemanager'
+  | 'provider'
+  | 'partner'
+  | 'programholder';
 
 interface PortalRoute {
   type: PortalType;
@@ -48,7 +42,6 @@ interface PortalRoute {
 }
 
 export const PORTAL_MAP: Record<string, PortalRoute> = {
-  // ── LMS app portals (app.elevateforhumanity.org) ──────────────────────────
   lms: {
     type: 'lms',
     subdomain: 'app',
@@ -105,32 +98,33 @@ export const PORTAL_MAP: Record<string, PortalRoute> = {
     defaultPath: '/cosmetology-host-shop/dashboard',
     redirectPattern: '/cosmetology-host-shop/:path*',
   },
-  // ── Admin app portals (admin.elevateforhumanity.org) ───────────────────────
+
+  // Standalone Admin app: there is no /admin path prefix on the admin hostname.
   admin: {
     type: 'admin',
     subdomain: 'admin',
-    basePath: '/admin',
+    basePath: '',
     host: ADMIN_HOST,
-    defaultPath: '/admin/dashboard',
-    redirectPattern: '/admin/:path*',
+    defaultPath: '/dashboard',
+    redirectPattern: '',
   },
   instructor: {
     type: 'admin',
     subdomain: 'admin',
-    basePath: '/admin/instructor',
+    basePath: '/instructor',
     host: ADMIN_HOST,
-    defaultPath: '/admin/instructor/dashboard',
-    redirectPattern: '/admin/instructor/:path*',
+    defaultPath: '/instructor/dashboard',
+    redirectPattern: '/instructor/:path*',
   },
   staff: {
     type: 'admin',
     subdomain: 'admin',
-    basePath: '/admin/staff-portal',
+    basePath: '/staff-portal',
     host: ADMIN_HOST,
-    defaultPath: '/admin/staff-portal/dashboard',
-    redirectPattern: '/admin/staff-portal/:path*',
+    defaultPath: '/staff-portal/dashboard',
+    redirectPattern: '/staff-portal/:path*',
   },
-  // ── Marketing-only portals (www.elevateforhumanity.org) ───────────────────
+
   workforceboard: {
     type: 'workforceboard',
     subdomain: 'marketing',
@@ -173,12 +167,11 @@ export const PORTAL_MAP: Record<string, PortalRoute> = {
   },
 };
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 export function getPortalRedirect(key: string, path = ''): string {
   const portal = PORTAL_MAP[key];
   if (!portal) return MARKETING_HOST;
-  return `${portal.host}${portal.basePath}${path ? `/${path.replace(/^\//, '')}` : ''}`;
+  const suffix = path ? `/${path.replace(/^\//, '')}` : '';
+  return `${portal.host}${portal.basePath}${suffix}`;
 }
 
 export function getPortalHost(key: string): string {
@@ -187,8 +180,12 @@ export function getPortalHost(key: string): string {
 }
 
 export function getPortalKeyFromPath(pathname: string): string | null {
-  for (const [key, portal] of Object.entries(PORTAL_MAP)) {
-    if (pathname.startsWith(portal.basePath)) {
+  const candidates = Object.entries(PORTAL_MAP)
+    .filter(([, portal]) => portal.basePath.length > 0)
+    .sort(([, a], [, b]) => b.basePath.length - a.basePath.length);
+
+  for (const [key, portal] of candidates) {
+    if (pathname === portal.basePath || pathname.startsWith(`${portal.basePath}/`)) {
       return key;
     }
   }
@@ -196,13 +193,10 @@ export function getPortalKeyFromPath(pathname: string): string | null {
 }
 
 export function isMarketingRoute(pathname: string): boolean {
-  const marketingKeys = [
-    'workforceboard', 'casemanager', 'provider', 'partner',
-    'programholder', 'staff',
-  ] as const;
+  const marketingKeys = ['workforceboard', 'casemanager', 'provider', 'programholder'] as const;
   for (const key of marketingKeys) {
     const portal = PORTAL_MAP[key];
-    if (portal && pathname.startsWith(portal.basePath)) {
+    if (portal && (pathname === portal.basePath || pathname.startsWith(`${portal.basePath}/`))) {
       return true;
     }
   }

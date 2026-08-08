@@ -8,6 +8,7 @@ import {
   Bell,
   BookOpen,
   Bot,
+  BriefcaseBusiness,
   CalendarDays,
   ChevronLeft,
   ClipboardCheck,
@@ -78,7 +79,9 @@ const courseworkItems: NavItem[] = [
 ];
 
 const communicationItems: NavItem[] = [
+  { href: '/lms/members', label: 'Members', icon: Users },
   { href: '/lms/messages', label: 'Messages', icon: MessageSquare },
+  { href: '/lms/jobs', label: 'Career Opportunities', icon: BriefcaseBusiness },
 ];
 
 const toolItems: NavItem[] = [

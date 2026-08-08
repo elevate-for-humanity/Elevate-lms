@@ -2,9 +2,7 @@
 
 import nextDynamic from 'next/dynamic';
 
-// Prevent Next.js from prerendering this client component at build time.
-// The DevStudioUnifiedClient uses browser-only APIs (WebContainer, Monaco, etc.)
-// that cannot execute during static generation.
+// Prevent browser-only Studio dependencies from rendering on the server.
 export const dynamic = 'force-dynamic';
 
 const DevStudioUnifiedClient = nextDynamic(
@@ -12,13 +10,15 @@ const DevStudioUnifiedClient = nextDynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-red-600"></div>
+      <div className="flex h-screen items-center justify-center bg-slate-950">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-brand-red-600" />
       </div>
-    )
-  }
+    ),
+  },
 );
 
 export default function StudioPage() {
-  return <DevStudioUnifiedClient />;
+  // DevStudioUnifiedClient still exposes a legacy capability flag. In the current
+  // platform model, authenticated `admin` is the sole privileged Studio role.
+  return <DevStudioUnifiedClient isSuperAdmin />;
 }

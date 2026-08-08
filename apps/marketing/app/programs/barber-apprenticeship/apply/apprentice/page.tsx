@@ -8,44 +8,40 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Barber Apprentice Application',
-  description:
-    `Apply to enroll in the ${PLATFORM_DEFAULTS.orgName} DOL-registered barber apprenticeship program.`,
+  description: `Apply to enroll in the ${PLATFORM_DEFAULTS.orgName} DOL-registered barber apprenticeship program.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship/apply/apprentice' },
 };
 
-export default function BarberApprenticeApplyPage() {
+export default async function BarberApprenticeApplyPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ funding?: string }>;
+}) {
+  const params = await searchParams;
+  const initialFunding = typeof params.funding === 'string' ? params.funding : undefined;
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <Breadcrumbs
-            items={[
-              { label: 'Programs', href: '/programs' },
-              { label: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
-              { label: 'Apply', href: '/programs/barber-apprenticeship/apply' },
-              { label: 'Apprentice' },
-            ]}
-          />
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-4">
+          <Breadcrumbs items={[
+            { label: 'Programs', href: '/programs' },
+            { label: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+            { label: 'Apply', href: '/programs/barber-apprenticeship/apply' },
+            { label: 'Apprentice' },
+          ]} />
           <div className="mt-4">
-            <Link
-              href="/programs/barber-apprenticeship/apply"
-              className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
+            <Link href="/programs/barber-apprenticeship/apply" className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 transition-colors hover:text-slate-950">
+              <ArrowLeft className="h-4 w-4" /> Back
             </Link>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mt-4">
-            Barber Apprentice Application
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Complete the form below to apply as a barber apprentice.
-          </p>
+          <h1 className="mt-4 text-3xl font-black text-slate-950">Barber Apprentice Application</h1>
+          <p className="mt-2 text-base text-slate-700">Complete the full enrollment application. Your selected payment/funding path is carried into this form.</p>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <ApprenticeForm />
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <ApprenticeForm initialFunding={initialFunding} />
       </div>
     </div>
   );

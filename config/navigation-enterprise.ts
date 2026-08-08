@@ -22,10 +22,6 @@ export type NavSection = {
   items?: NavItem[];
 };
 
-/**
- * PHASE 1: PRE-INTENT NAVIGATION (Not Logged In)
- * Maximum 5 items. ONE CTA.
- */
 export const preIntentNav: NavSection[] = [
   {
     label: 'Programs',
@@ -38,20 +34,10 @@ export const preIntentNav: NavSection[] = [
       { label: 'View All Programs', href: '/programs' },
     ],
   },
-  {
-    label: 'How It Works',
-    href: '/how-it-works',
-  },
-  {
-    label: 'About',
-    href: '/about',
-  },
+  { label: 'How It Works', href: '/how-it-works' },
+  { label: 'About', href: '/about' },
 ];
 
-/**
- * PHASE 2: POST-INTENT NAVIGATION (Logged In)
- * Role-specific dashboard replaces "Apply Now"
- */
 export const postIntentNav: NavSection[] = [
   {
     label: 'Programs',
@@ -64,10 +50,7 @@ export const postIntentNav: NavSection[] = [
       { label: 'View All Programs', href: '/programs' },
     ],
   },
-  {
-    label: 'My Dashboard',
-    href: '/dashboard', // Will be replaced with role-specific URL
-  },
+  { label: 'My Dashboard', href: '/dashboard' },
   {
     label: 'Resources',
     items: [
@@ -79,23 +62,14 @@ export const postIntentNav: NavSection[] = [
   },
 ];
 
-/**
- * Get dashboard URL based on user role (canonical — role-destinations.ts).
- */
 export function getDashboardUrl(user: { role?: string } | null): string {
-  if (!user?.role) return '/learner/dashboard';
+  if (!user?.role) return '/lms/dashboard';
   return getRoleDestination(user.role);
 }
 
-/**
- * Get navigation based on authentication state
- */
 export function getEnterpriseNavigation(user?: { role?: string } | null): NavSection[] {
   if (user) {
-    // Logged in: Use post-intent navigation
     const nav = [...postIntentNav];
-
-    // Update dashboard URL based on role
     const dashboardIndex = nav.findIndex((section) => section.label === 'My Dashboard');
     if (dashboardIndex !== -1) {
       nav[dashboardIndex] = {
@@ -103,16 +77,10 @@ export function getEnterpriseNavigation(user?: { role?: string } | null): NavSec
         href: getDashboardUrl(user),
       };
     }
-
     return nav;
   }
-
-  // Not logged in: Use pre-intent navigation
   return preIntentNav;
 }
 
-/**
- * Export for backward compatibility
- */
 export const enterpriseNav = preIntentNav;
 export default getEnterpriseNavigation;

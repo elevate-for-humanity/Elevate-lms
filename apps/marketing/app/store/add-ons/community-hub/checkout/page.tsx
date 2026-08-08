@@ -1,23 +1,11 @@
-export const dynamic = 'force-static';
-
-import AddOnCheckout from '@/components/store/AddOnCheckout';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-static';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-
 export default function CommunityHubCheckoutPage() {
-  return (
-    <AddOnCheckout
-      productId="community-hub"
-      productName="Community Hub"
-      productImage="/images/pages/about-partners-hero.webp"
-      backHref="/store/add-ons/community-hub"
-      oneTimePrice={1997}
-      monthlyPrice={549}
-      monthlyCount={4}
-      accentColor="brand-blue"
-      features={['Unlimited members', 'Discussion forums', 'Leaderboards']}
-    />
-  );
+  // Community Hub pricing is controlled by the canonical platform catalog.
+  // This legacy checkout previously hard-coded a conflicting amount.
+  redirect('/pricing');
 }

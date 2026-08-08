@@ -1,30 +1,18 @@
 /**
  * Admin Roles API
- * Server-only endpoint using service-role key
- * Requires admin authentication
+ * Server-only endpoint using the canonical Supabase admin client.
  */
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
-
-// Lazy initialization - create client inside request handlers, not at module scope
-// This prevents build failures when env vars are not set during next build
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+export const runtime = 'nodejs';
 
 const handleGet: AuthHandler = async () => {
-  const supabase = getSupabaseAdmin();
-  const { data: roles, error } = await supabase
-    .from('roles')
-    .select('*')
-    .order('name');
+  const supabase = await requireAdminClient();
+  const { data: roles, error } = await supabase.from('roles').select('*').order('name');
 
   if (error) {
     return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
@@ -34,14 +22,16 @@ const handleGet: AuthHandler = async () => {
 };
 
 const handlePost: AuthHandler = async (req) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const body = await req.json();
+  const name = typeof body.name === 'string' ? body.name.trim() : '';
 
-  const { data: role, error } = await supabase
-    .from('roles')
-    .insert(body)
-    .select()
-    .single();
+  if (!name || name === 'super_admin') {
+    return NextResponse.json({ error: 'A valid role name is required' }, { status: 400 });
+  }
+
+  const payload = { ...body, name };
+  const { data: role, error } = await supabase.from('roles').insert(payload).select().single();
 
   if (error) {
     return NextResponse.json({ error: 'Operation failed' }, { status: 400 });
@@ -51,9 +41,16 @@ const handlePost: AuthHandler = async (req) => {
 };
 
 const handlePut: AuthHandler = async (req) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const body = await req.json();
   const { id, ...updates } = body;
+
+  if (!id) {
+    return NextResponse.json({ error: 'Role id is required' }, { status: 400 });
+  }
+  if (updates.name === 'super_admin') {
+    return NextResponse.json({ error: 'super_admin is not a supported role' }, { status: 400 });
+  }
 
   const { data: role, error } = await supabase
     .from('roles')
@@ -69,7 +66,6 @@ const handlePut: AuthHandler = async (req) => {
   return NextResponse.json({ role });
 };
 
-// Wrap handlers with admin authentication
-export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin'] });
-export const POST = withAuth(handlePost, { roles: ['admin', 'super_admin'] });
-export const PUT = withAuth(handlePut, { roles: ['admin', 'super_admin'] });
+export const GET = withAuth(handleGet, { roles: ['admin'] });
+export const POST = withAuth(handlePost, { roles: ['admin'] });
+export const PUT = withAuth(handlePut, { roles: ['admin'] });

@@ -19,6 +19,7 @@ on:
       - 'packages/shared-utils/**'
       - 'Dockerfile.lms'
       - 'Dockerfile.northflank-lms'
+      - 'scripts/northflank/**'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -45,7 +46,6 @@ jobs:
   deploy-lms:
     name: Build and deploy LMS on Northflank
     runs-on: ubuntu-latest
-    needs: []
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
@@ -85,13 +85,11 @@ jobs:
           echo "Actual SHA:   $ACTUAL_SHA"
           test "$ACTUAL_SHA" = "$EXPECTED_SHA"
           test "$(git status --porcelain)" = ""
-          echo "SHA verification passed"
 
       - name: Set build environment variables
         run: |
           echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
           echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
-          echo "Set GITHUB_SHA=${{ github.sha }} for trigger-build.ts"
 
       - name: Generate version file
         run: |
@@ -117,9 +115,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Configure Northflank LMS service only
-        if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
+      # Production configuration is part of deployment correctness, not an
+      # optional maintenance step. This PATCH does not trigger an extra build;
+      # it enforces port/probes/rollout shape before the exact build is deployed.
+      - name: Enforce canonical Northflank LMS runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_LMS_SERVICE_ID" --execute
+
+      - name: Verify LMS health-check contract
+        run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_LMS_SERVICE_ID"
 
       - name: Trigger LMS build
         id: trigger_lms_build
@@ -143,26 +146,43 @@ jobs:
             --sha "${{ github.sha }}"
 
       - name: Wait for LMS deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --timeout-ms 3600000
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_LMS_SERVICE_ID" --build-id "${{ steps.trigger_lms_build.outputs.build_id }}" --timeout-ms 3600000
 
       - name: Verify deployed SHA matches main
         env:
           EXPECTED_SHA: ${{ github.sha }}
         run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-lms --trust-deploy-status
 
-      - name: Smoke LMS
+      - name: Smoke LMS liveness and readiness
         run: |
           set -euo pipefail
           for i in $(seq 1 20); do
-            status=$(curl -sk --max-time 10 -o /tmp/lms-health.json -w "%{http_code}" https://app.elevateforhumanity.org/api/ping || true)
-            body=$(cat /tmp/lms-health.json 2>/dev/null || true)
-            if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
-              echo "LMS liveness passed."
+            ping_status=$(curl -sk --max-time 10 -o /tmp/lms-ping.json -w "%{http_code}" https://app.elevateforhumanity.org/api/ping || true)
+            health_status=$(curl -sk --max-time 10 -o /tmp/lms-health.json -w "%{http_code}" https://app.elevateforhumanity.org/api/health || true)
+            ping_body=$(cat /tmp/lms-ping.json 2>/dev/null || true)
+            health_body=$(cat /tmp/lms-health.json 2>/dev/null || true)
+            if [ "$ping_status" = "200" ] && [ "$health_status" = "200" ] \
+              && echo "$ping_body" | grep -q '"ok":true' \
+              && echo "$health_body" | grep -q '"ready":true'; then
+              echo "LMS liveness and readiness passed."
               exit 0
             fi
-            echo "LMS liveness not ready yet: HTTP ${status}. Retry ${i}/20."
+            echo "LMS not ready: ping=${ping_status} health=${health_status}. Retry ${i}/20."
             sleep 15
           done
-          echo "LMS liveness failed after deploy."
+          echo "LMS health contract failed after deploy."
+          cat /tmp/lms-ping.json 2>/dev/null || true
           cat /tmp/lms-health.json 2>/dev/null || true
           exit 1
+
+      - name: Smoke canonical learner route
+        run: |
+          set -euo pipefail
+          status=$(curl -sk --max-time 15 -o /tmp/lms-dashboard.html -w "%{http_code}" \
+            https://app.elevateforhumanity.org/lms/dashboard || true)
+          # Unauthenticated dashboard access may redirect to login. A 2xx or 3xx
+          # proves the application route is being served; 5xx is a production failure.
+          case "$status" in
+            2*|3*) echo "Canonical learner route served HTTP ${status}." ;;
+            *) echo "Canonical learner route failed HTTP ${status}."; cat /tmp/lms-dashboard.html || true; exit 1 ;;
+          esac

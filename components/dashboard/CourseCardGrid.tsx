@@ -98,7 +98,7 @@ function CourseCard({ course }: { course: Course }) {
 
         <div className="mt-3 flex justify-end">
           <Link
-            href={`/student/courses/${course.id}`}
+            href={`/lms/courses/${course.id}`}
             className="rounded-full bg-brand-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-brand-blue-700"
           >
             {isComplete ? 'View certificate' : 'Resume course'}

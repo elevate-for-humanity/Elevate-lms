@@ -1,11 +1,12 @@
 /**
- * Resolve which Northflank service(s) a script should touch.
- * Deploy workflows must pass a single service id so LMS and Admin CI/CD stay independent.
+ * Resolve which Northflank production service(s) a script should touch.
+ * Deploy workflows may pass a single service id so Marketing, LMS, and Admin
+ * remain independently deployable, while --all covers the full platform.
  */
 
 import { resolveAdminServiceId, resolveLmsServiceId } from './lib';
 
-export type NorthflankServiceRole = 'lms' | 'admin';
+export type NorthflankServiceRole = 'marketing' | 'lms' | 'admin';
 
 export type NorthflankServiceTarget = {
   role: NorthflankServiceRole;
@@ -13,6 +14,10 @@ export type NorthflankServiceTarget = {
 };
 
 export const NORTHFLANK_SERVICE_TARGETS: NorthflankServiceTarget[] = [
+  {
+    role: 'marketing',
+    id: process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing',
+  },
   {
     role: 'lms',
     id: process.env.NORTHFLANK_LMS_SERVICE_ID || resolveLmsServiceId() || 'elevate-lms',
@@ -38,6 +43,7 @@ function parseArgvFlags(argv: string[]): { all: boolean; roles: Set<NorthflankSe
   let all = false;
   for (const arg of argv) {
     if (arg === '--all') all = true;
+    else if (arg === 'marketing') roles.add('marketing');
     else if (arg === 'lms') roles.add('lms');
     else if (arg === 'admin') roles.add('admin');
     else {
@@ -52,9 +58,9 @@ function parseArgvFlags(argv: string[]): { all: boolean; roles: Set<NorthflankSe
  * Resolve target service ids from CLI args, env, or both.
  *
  * Priority:
- *   1. CLI: `elevate-lms`, `elevate-admin`, `lms`, `admin`, or `--all`
- *   2. Env: `NORTHFLANK_TARGET_SERVICE` = lms | admin | elevate-lms | elevate-admin
- *   3. Default: all services (manual full-platform scripts only)
+ *   1. CLI: marketing|lms|admin, concrete service ids, or --all
+ *   2. Env: NORTHFLANK_TARGET_SERVICE = marketing|lms|admin|all|service-id
+ *   3. Default: all production services
  */
 const SCRIPT_FLAGS = new Set(['--execute', '--dry-run', '--all']);
 
@@ -64,7 +70,17 @@ export function resolveTargetServiceIds(argv: string[] = process.argv.slice(2)):
 
   const envTarget = process.env.NORTHFLANK_TARGET_SERVICE?.trim().toLowerCase();
   if (envTarget) {
-    if (envTarget === 'lms' || envTarget === 'elevate-lms' || envTarget === serviceIdForRole('lms')) {
+    if (
+      envTarget === 'marketing' ||
+      envTarget === 'elevate-marketing' ||
+      envTarget === serviceIdForRole('marketing')
+    ) {
+      roles.add('marketing');
+    } else if (
+      envTarget === 'lms' ||
+      envTarget === 'elevate-lms' ||
+      envTarget === serviceIdForRole('lms')
+    ) {
       roles.add('lms');
     } else if (
       envTarget === 'admin' ||
@@ -77,13 +93,7 @@ export function resolveTargetServiceIds(argv: string[] = process.argv.slice(2)):
     }
   }
 
-  if (all) {
-    return allServiceIds();
-  }
-
-  if (roles.size === 0) {
-    return allServiceIds();
-  }
+  if (all || roles.size === 0) return allServiceIds();
 
   return NORTHFLANK_SERVICE_TARGETS.filter((t) => roles.has(t.role)).map((t) => t.id);
 }
@@ -92,7 +102,8 @@ export function requireSingleTarget(argv: string[] = process.argv.slice(2)): str
   const ids = resolveTargetServiceIds(argv);
   if (ids.length !== 1) {
     console.error(
-      'Pass exactly one service: elevate-lms | elevate-admin (or set NORTHFLANK_TARGET_SERVICE=lms|admin).',
+      'Pass exactly one service: elevate-marketing | elevate-lms | elevate-admin ' +
+        '(or set NORTHFLANK_TARGET_SERVICE=marketing|lms|admin).',
     );
     console.error(`Resolved: ${ids.join(', ') || '(none)'}`);
     process.exit(1);

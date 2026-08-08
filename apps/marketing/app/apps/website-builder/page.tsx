@@ -23,7 +23,7 @@ export default async function WebsiteBuilderPage() {
     redirect('/login?redirect=/apps/website-builder&message=login-required');
   }
 
-  const subscription = await syncIndividualAppSubscription(user.id, 'website-builder');
+  const subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
 
   if (!subscription) {
     redirect('/apps/website-builder/start-trial');

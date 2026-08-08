@@ -1,10 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-
-import React from 'react';
-
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface TextToSpeechProps {
   text: string;
@@ -25,37 +22,26 @@ export default function TextToSpeech({
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [rate, setRate] = useState(1);
   const [pitch, setPitch] = useState(1);
-  const [userPrefs, setUserPrefs] = useState<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const supabase = createClient();
 
-  // Load user TTS preferences from DB
   useEffect(() => {
     async function loadPreferences() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('accessibility_preferences')
-          .select('tts_rate, tts_pitch, tts_voice')
-          .eq('user_id', user.id)
-          .single();
-        if (data) {
-          setUserPrefs(data);
-          if (data.tts_rate) setRate(data.tts_rate);
-          if (data.tts_pitch) setPitch(data.tts_pitch);
-        }
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('accessibility_preferences')
+        .select('tts_rate, tts_pitch, tts_voice')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (data?.tts_rate) setRate(data.tts_rate);
+      if (data?.tts_pitch) setPitch(data.tts_pitch);
     }
-    loadPreferences();
+    void loadPreferences();
   }, [supabase]);
 
-  // Log TTS usage for analytics
   const logTTSUsage = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('tts_usage_log').insert({
       user_id: user?.id,
       content_id: contentId,
@@ -65,32 +51,26 @@ export default function TextToSpeech({
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const loadVoices = () => {
-        const availableVoices = window.speechSynthesis.getVoices();
-        setVoices(availableVoices);
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
 
-        // Prefer English voices
-        const englishVoice =
-          availableVoices.find(
-            (voice) => voice.lang.startsWith('en') && voice.name.includes('Google'),
-          ) || availableVoices.find((voice) => voice.lang.startsWith('en'));
+    const loadVoices = () => {
+      const availableVoices = window.speechSynthesis.getVoices();
+      setVoices(availableVoices);
+      const englishVoice =
+        availableVoices.find((voice) => voice.lang.startsWith('en') && voice.name.includes('Google')) ||
+        availableVoices.find((voice) => voice.lang.startsWith('en')) ||
+        availableVoices[0] ||
+        null;
+      setSelectedVoice(englishVoice);
+    };
 
-        setSelectedVoice(englishVoice || availableVoices[0]);
-      };
-
-      loadVoices();
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-
-      return () => {
-        window.speechSynthesis.cancel();
-      };
-    }
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.onvoiceschanged = null;
+    };
   }, []);
-
-  // REMOVED: Auto-play on mount is blocked by browsers
-  // TTS must be user-triggered to play with sound
-  // Component is now "ready on load" but requires user click
 
   const handlePlay = () => {
     if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -103,118 +83,86 @@ export default function TextToSpeech({
     }
 
     window.speechSynthesis.cancel();
-
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.voice = selectedVoice;
     utterance.rate = rate;
     utterance.pitch = pitch;
-
     utterance.onstart = () => {
       setIsPlaying(true);
       setIsPaused(false);
+      void logTTSUsage();
     };
-
     utterance.onend = () => {
       setIsPlaying(false);
       setIsPaused(false);
-      // NO LOOP: Do not restart speech on end
     };
-
     utterance.onerror = () => {
       setIsPlaying(false);
       setIsPaused(false);
     };
-
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
   };
 
   const handlePause = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.pause();
-      setIsPaused(true);
-      setIsPlaying(false);
-    }
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.pause();
+    setIsPaused(true);
+    setIsPlaying(false);
   };
 
   const handleStop = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsPlaying(false);
-      setIsPaused(false);
-    }
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    setIsPlaying(false);
+    setIsPaused(false);
   };
 
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    return null;
-  }
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {/* Play/Pause Button */}
+    <div
+      className={`relative z-0 flex w-full max-w-full flex-wrap items-center gap-2 overflow-hidden rounded-xl bg-white/95 p-2 sm:gap-3 ${className}`}
+      data-tts-control
+    >
       {!isPlaying && !isPaused && (
         <button
+          type="button"
           onClick={handlePlay}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
+          className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-brand-blue-600 px-3 py-2 text-white transition-colors hover:bg-brand-blue-700 sm:px-4"
           title="Listen to this content"
         >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
           </svg>
-          <span className="text-sm font-medium">Listen</span>
+          <span className="text-sm font-semibold">Listen</span>
         </button>
       )}
 
       {isPlaying && (
-        <button
-          onClick={handlePause}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition-colors"
-          title="Pause"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" />
-          </svg>
-          <span className="text-sm font-medium">Pause</span>
+        <button type="button" onClick={handlePause} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-brand-orange-600 px-3 py-2 text-white hover:bg-brand-orange-700 sm:px-4" title="Pause">
+          <span className="text-sm font-semibold">Pause</span>
         </button>
       )}
 
       {isPaused && (
-        <button
-          onClick={handlePlay}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 transition-colors"
-          title="Resume"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-          </svg>
-          <span className="text-sm font-medium">Resume</span>
+        <button type="button" onClick={handlePlay} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-brand-green-600 px-3 py-2 text-white hover:bg-brand-green-700 sm:px-4" title="Resume">
+          <span className="text-sm font-semibold">Resume</span>
         </button>
       )}
 
-      {/* Stop Button */}
       {(isPlaying || isPaused) && (
-        <button
-          onClick={handleStop}
-          className="p-2 bg-slate-200 text-black rounded-lg hover:bg-slate-300 transition-colors"
-          title="Stop"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"
-              clipRule="evenodd"
-            />
-          </svg>
+        <button type="button" onClick={handleStop} className="min-h-10 shrink-0 rounded-lg bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-300" title="Stop">
+          Stop
         </button>
       )}
 
-      {/* Speed Control */}
-      <div className="flex items-center gap-2">
-        <label className="text-xs text-black font-medium">Speed:</label>
+      <label className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-800">
+        <span>Speed</span>
         <select
           value={rate}
-          onChange={(e) => setRate(parseFloat(e.target.value))}
-          className="text-xs px-2 py-2 border border-slate-300 rounded bg-white"
+          onChange={(event) => setRate(Number(event.target.value))}
+          className="min-h-10 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900"
           disabled={isPlaying}
         >
           <option value="0.5">0.5x</option>
@@ -224,30 +172,24 @@ export default function TextToSpeech({
           <option value="1.5">1.5x</option>
           <option value="2">2x</option>
         </select>
-      </div>
+      </label>
 
-      {/* Voice Selection */}
       {voices.length > 0 && (
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-black font-medium">Voice:</label>
+        <label className="hidden min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-slate-800 sm:flex">
+          <span className="shrink-0">Voice</span>
           <select
             value={selectedVoice?.name || ''}
-            onChange={(e) => {
-              const voice = voices.find((v) => v.name === e.target.value);
-              setSelectedVoice(voice || null);
-            }}
-            className="text-xs px-2 py-2 border border-slate-300 rounded bg-white max-w-7xl"
+            onChange={(event) => setSelectedVoice(voices.find((voice) => voice.name === event.target.value) || null)}
+            className="min-h-10 min-w-0 max-w-56 flex-1 truncate rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900"
             disabled={isPlaying}
           >
-            {voices
-              .filter((v) => v.lang.startsWith('en'))
-              .map((voice) => (
-                <option key={voice.name} value={voice.name}>
-                  {voice.name.split(' ').slice(0, 2).join(' ')}
-                </option>
-              ))}
+            {voices.filter((voice) => voice.lang.startsWith('en')).map((voice) => (
+              <option key={`${voice.name}-${voice.lang}`} value={voice.name}>
+                {voice.name}
+              </option>
+            ))}
           </select>
-        </div>
+        </label>
       )}
     </div>
   );

@@ -24,7 +24,7 @@ export default async function AdminDashboardPage() {
       .eq('id', user.id)
       .maybeSingle();
 
-    canAccessDevStudio = profile?.role === 'admin' || profile?.role === 'super_admin';
+    canAccessDevStudio = profile?.role === 'admin';
   }
 
   const data = normalizeAdminDashboardData(await getAdminDashboardData());

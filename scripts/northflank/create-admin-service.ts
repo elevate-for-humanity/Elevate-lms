@@ -16,6 +16,7 @@ import { combinedServiceCreatePath, nfFetch, projectApiPath, resolveProjectId, r
 const DEFAULT_SERVICE_ID = 'elevate-admin';
 const REPO = 'https://github.com/elevate-for-humanity/Elevate-lms';
 const DOCKERFILE = '/Dockerfile.northflank-admin';
+const RUNTIME_PORT = 3000;
 
 function parseArgs() {
   return {
@@ -43,7 +44,7 @@ function adminServicePayload(serviceId: string, branch: string) {
     ports: [
       {
         name: 'site',
-        internalPort: 8080,
+        internalPort: RUNTIME_PORT,
         public: true,
         protocol: 'HTTP',
       },
@@ -75,24 +76,35 @@ function adminServicePayload(serviceId: string, branch: string) {
     },
     runtimeEnvironment: {
       SERVICE_ROLE: 'admin',
-      PORT: '8080',
+      PORT: String(RUNTIME_PORT),
       HOSTNAME: '0.0.0.0',
       NODE_ENV: 'production',
       NEXT_TELEMETRY_DISABLED: '1',
       NEXT_PUBLIC_SITE_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
       NEXT_PUBLIC_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
+      NEXT_PUBLIC_LMS_URL: 'https://app.elevateforhumanity.org',
     },
     healthChecks: [
       {
         protocol: 'HTTP',
+        type: 'startupProbe',
+        path: '/api/ping',
+        port: RUNTIME_PORT,
+        initialDelaySeconds: 60,
+        periodSeconds: 10,
+        timeoutSeconds: 10,
+        failureThreshold: 12,
+      },
+      {
+        protocol: 'HTTP',
         type: 'readinessProbe',
-        path: '/admin',
-        port: 8080,
+        path: '/api/health',
+        port: RUNTIME_PORT,
         initialDelaySeconds: 30,
         periodSeconds: 10,
-        timeoutSeconds: 5,
-        failureThreshold: 6,
+        timeoutSeconds: 10,
+        failureThreshold: 3,
         successThreshold: 1,
       },
     ],
@@ -111,7 +123,7 @@ async function serviceExists(projectId: string, serviceId: string): Promise<bool
 async function main() {
   const { dryRun, serviceId, branch } = parseArgs();
   const projectId = resolveProjectId();
-  const teamId = resolveTeamId();
+  resolveTeamId();
   if (!projectId) {
     console.error('Set NORTHFLANK_PROJECT_ID');
     process.exit(1);
@@ -125,6 +137,7 @@ async function main() {
   console.log(`Service: ${serviceId} (${exists ? 'update' : 'create'})`);
   console.log(`Git branch: ${branch}`);
   console.log(`Dockerfile: ${DOCKERFILE}`);
+  console.log(`Runtime port: ${RUNTIME_PORT}`);
 
   if (dryRun) {
     console.log('\nPayload summary:', JSON.stringify(payload, null, 2).slice(0, 1200), '...');
@@ -145,7 +158,7 @@ async function main() {
 
   console.log(`\nService "${serviceId}" saved. Northflank will build from branch ${branch}.`);
   console.log('Next:');
-  console.log('  1. npx tsx scripts/northflank/sync-env.ts --execute  (links secret to both services)');
+  console.log('  1. npx tsx scripts/northflank/sync-env.ts --execute  (links shared secret to Marketing + LMS + Admin)');
   console.log('  2. After domains verified: npx tsx scripts/northflank/configure-domains.ts --execute');
   console.log(`  3. export NORTHFLANK_ADMIN_SERVICE_ID=${serviceId}`);
 }

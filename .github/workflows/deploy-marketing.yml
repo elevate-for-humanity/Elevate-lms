@@ -149,6 +149,7 @@ jobs:
       - name: Sync production env to Marketing + LMS + Admin
         run: pnpm tsx scripts/northflank/sync-env.ts --execute
 
+      # Routine code deploys must not mutate service configuration.
       - name: Configure Northflank Marketing service
         if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[apply-northflank-config]')
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute

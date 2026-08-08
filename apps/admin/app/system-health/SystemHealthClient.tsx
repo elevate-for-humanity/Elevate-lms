@@ -31,8 +31,8 @@ function StatusDot({ status }: { status: string }) {
   return <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${color}`} />;
 }
 
-function formatRelative(iso: string) {
-  const diff = Date.now() - new Date(iso).getTime();
+function formatRelative(iso: string, nowMs: number) {
+  const diff = Math.max(0, nowMs - new Date(iso).getTime());
   const s = Math.floor(diff / 1000);
   if (s < 60)  return `${s}s ago`;
   const m = Math.floor(s / 60);
@@ -55,7 +55,7 @@ function ServiceCard({ check }: { check: ServiceCheck }) {
   return (
     <div className={`rounded-xl border p-4 ${statusBg(check.status)}`}>
       <div className="flex items-start justify-between mb-3">
-        <div className={`w-9 h-9 rounded-lg flex items-center justify-center bg-slate-900/60`}>
+        <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-slate-900/60">
           <Icon className={`w-4 h-4 ${statusColor(check.status)}`} />
         </div>
         <div className="flex items-center gap-1.5">
@@ -105,17 +105,29 @@ export default function SystemHealthClient({
 }: {
   initialSnapshot: PlatformHealthSnapshot;
 }) {
-  const [snap, setSnap]           = useState<PlatformHealthSnapshot>(initialSnapshot);
+  const [snap, setSnap] = useState<PlatformHealthSnapshot>(initialSnapshot);
   const [refreshing, setRefreshing] = useState(false);
+  // Keep the SSR/client hydration text identical. Relative time starts only
+  // after hydration, so Date.now() can never change the server HTML.
+  const [nowMs, setNowMs] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
     try {
       const res = await fetch('/api/admin/platform-health');
-      if (res.ok) setSnap(await res.json());
+      if (res.ok) {
+        setSnap(await res.json());
+        setNowMs(Date.now());
+      }
     } finally {
       setRefreshing(false);
     }
+  }, []);
+
+  useEffect(() => {
+    setNowMs(Date.now());
+    const clockId = setInterval(() => setNowMs(Date.now()), 1_000);
+    return () => clearInterval(clockId);
   }, []);
 
   // 30s auto-refresh
@@ -142,7 +154,7 @@ export default function SystemHealthClient({
           <h1 className="text-2xl font-bold text-white">System Health</h1>
           <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
-            {formatRelative(snap.timestamp)} · {snap.responseTimeMs}ms
+            {nowMs === null ? 'Just checked' : formatRelative(snap.timestamp, nowMs)} · {snap.responseTimeMs}ms
           </p>
         </div>
         <button

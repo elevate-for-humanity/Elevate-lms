@@ -17,7 +17,7 @@ export const ROUTES = {
 
   // Authentication / portals
   login: `${APP_URL}/login`,
-  studentPortal: `${APP_URL}/learner/dashboard`,
+  studentPortal: `${APP_URL}/lms/dashboard`,
   lmsPortal: `${APP_URL}/lms/dashboard`,
   employerPortal: `${APP_URL}/employer/dashboard`,
   apprenticePortal: `${APP_URL}/apprentice`,
@@ -25,10 +25,10 @@ export const ROUTES = {
   workforcePortal: `${APP_URL}/workforce/dashboard`,
   hostShopPortal: `${APP_URL}/host-shop/dashboard`,
   cosmetologyHostShopPortal: `${APP_URL}/cosmetology-host-shop/dashboard`,
-  partnerPortal: `${APP_URL}/partner/dashboard`,
-  adminPortal: `${ADMIN_URL}/admin/dashboard`,
-  instructorPortal: `${ADMIN_URL}/admin/instructor/dashboard`,
-  staffPortal: `${ADMIN_URL}/admin/staff-portal/dashboard`,
+  partnerPortal: `${APP_URL}/host-shop/dashboard`,
+  adminPortal: `${ADMIN_URL}/dashboard`,
+  instructorPortal: `${ADMIN_URL}/instructor/dashboard`,
+  staffPortal: `${ADMIN_URL}/staff-portal/dashboard`,
   adminLogin: `${ADMIN_URL}/login`,
   caseManagerPortal: '/case-manager/dashboard',
   providerPortal: '/provider/dashboard',
@@ -55,7 +55,7 @@ export const ROUTES = {
   // Apprenticeships / host shops
   apprenticeships: '/apprenticeships',
   apprenticeshipsHowItWorks: '/how-it-works',
-  apprenticeshipsHostShop: '/host-shop',
+  apprenticeshipsHostShop: '/partners/host-shops',
   apprenticeshipSponsor: '/apprenticeship-sponsor',
 
   // Funding

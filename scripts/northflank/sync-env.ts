@@ -14,7 +14,8 @@
  *
  * Env:
  *   NORTHFLANK_API_TOKEN, NORTHFLANK_PROJECT_ID
- *   NORTHFLANK_LMS_SERVICE_ID, NORTHFLANK_ADMIN_SERVICE_ID (optional restrict)
+ *   NORTHFLANK_LMS_SERVICE_ID, NORTHFLANK_ADMIN_SERVICE_ID,
+ *   NORTHFLANK_MARKETING_SERVICE_ID (optional overrides)
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -44,7 +45,7 @@ const STATIC_ENV: Record<string, string> = {
   NEXT_PUBLIC_EMAIL_FROM_NAME: 'Elevate for Humanity',
   NEXT_PUBLIC_EMAIL_FROM_ADDRESS: 'noreply@elevateforhumanity.org',
   NEXT_PUBLIC_CERT_HOLDER: 'Elevate for Humanity',
-  // SERVICE_ROLE is set per-service in configure-services.ts (lms vs admin) — do not put in shared secrets.
+  // SERVICE_ROLE is set per-service in configure-services.ts — do not put it in shared secrets.
   DEVSTUDIO_DEVCONTAINER_MODE: 'github-only',
   COURSE_VIDEO_STORAGE_BACKEND: 'auto',
   COURSE_VIDEO_R2_MIN_BYTES: '5242880',
@@ -160,9 +161,20 @@ async function main() {
     process.exit(missingCritical.length ? 1 : 0);
   }
 
+  if (missingCritical.length) {
+    throw new Error(
+      `Refusing to update production secret group with missing critical keys: ${missingCritical.join(', ')}`,
+    );
+  }
+
   const lmsId = resolveLmsServiceId();
   const adminId = resolveAdminServiceId() || 'elevate-admin';
-  const serviceIds = [lmsId, adminId].filter(Boolean) as string[];
+  const marketingId = process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing';
+
+  // Shared production secrets are required by all three production services.
+  // Marketing needs SUPABASE_SERVICE_ROLE_KEY for public server-side workflows
+  // such as /api/trial/start-managed; excluding it causes deterministic 503s.
+  const serviceIds = [...new Set([lmsId, adminId, marketingId].filter(Boolean) as string[])];
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);
 
@@ -189,7 +201,8 @@ async function main() {
   });
 
   console.log(`\nUpdated secret group "${groupId}" with ${Object.keys(variables).length} variables.`);
-  console.log('Redeploy LMS and Admin services in Northflank to pick up changes.');
+  console.log(`Attached to services: ${serviceIds.join(', ')}`);
+  console.log('Redeploy Marketing, LMS, and Admin services in Northflank to pick up changes.');
 }
 
 main().catch((e) => {

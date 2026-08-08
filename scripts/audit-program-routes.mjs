@@ -56,32 +56,6 @@ function discoverAppRoutes(dir, prefix = '') {
 }
 
 const programAppRoutes = discoverAppRoutes(path.join(ROOT, 'app/programs'), '/programs');
-const hasDynamicProgramRoute = fs.existsSync(
-  path.join(ROOT, 'app/programs/[program]/page.tsx'),
-);
-
-/** Slugs served by app/programs/[program]/page.tsx via data/programs/*.ts */
-function loadStaticProgramSlugs() {
-  const slugs = new Set();
-  const dataDir = path.join(ROOT, 'data/programs');
-  if (!fs.existsSync(dataDir)) return slugs;
-  for (const file of fs.readdirSync(dataDir)) {
-    if (!file.endsWith('.ts') || file === 'index.ts' || file === 'catalog.ts') continue;
-    const content = fs.readFileSync(path.join(dataDir, file), 'utf8');
-    const m = content.match(/slug:\s*['"`]([a-z0-9-]+)['"`]/);
-    if (m) slugs.add(m[1]);
-  }
-  return slugs;
-}
-const staticProgramSlugs = loadStaticProgramSlugs();
-
-function isServedProgramRoute(appRoute) {
-  if (programAppRoutes.has(appRoute)) return true;
-  if (!hasDynamicProgramRoute) return false;
-  const slug = appRoute.replace('/programs/', '');
-  return staticProgramSlugs.has(slug);
-}
-
 // Dynamic catch-all: app/programs/[program]/page.tsx serves any static/registry slug
 const hasDynamicProgramRoute = fs.existsSync(
   path.join(ROOT, 'app/programs/[program]/page.tsx'),

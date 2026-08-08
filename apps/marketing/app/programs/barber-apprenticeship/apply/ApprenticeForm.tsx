@@ -24,6 +24,10 @@ import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import {
+  TRANSFER_HOURS_EVIDENCE_ACCEPT,
+  uploadTransferHoursEvidence,
+} from '@/lib/applications/upload-transfer-hours-evidence';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -94,6 +98,7 @@ export default function ApprenticeForm({
   const [transferHoursChoice, setTransferHoursChoice] =
     useState<TransferHoursChoice>('undecided');
   const [transferHoursStr, setTransferHoursStr] = useState('');
+  const [transferHoursDocument, setTransferHoursDocument] = useState<File | null>(null);
   const maxTransferHours = TOTAL_HOURS_REQUIRED - 100;
   const transferHours = Math.min(
     maxTransferHours,
@@ -167,7 +172,7 @@ export default function ApprenticeForm({
       return;
     }
 
-    if (!turnstileToken) {
+    if (isSelfPay && !turnstileToken) {
       setError('Please complete the security check above before continuing.');
       setErrorSeverity('info');
       return;
@@ -187,12 +192,26 @@ export default function ApprenticeForm({
       setErrorSeverity('info');
       return;
     }
+    if (transferHoursChoice === 'yes' && !transferHoursDocument) {
+      setError('Upload documentation showing the barber training hours you want transferred.');
+      setErrorSeverity('info');
+      return;
+    }
 
     setLoading(true);
     setError('');
     setErrorSeverity('info');
 
     try {
+      if (transferHoursChoice === 'yes' && transferHoursDocument) {
+        await uploadTransferHoursEvidence({
+          file: transferHoursDocument,
+          email: formData.email,
+          program: 'barber-apprenticeship',
+          hoursClaimed: transferHours,
+        });
+      }
+
       // If returning to complete payment (application already exists), skip the POST
       let applicationId: string | undefined = initialApplicationId;
 
@@ -257,7 +276,7 @@ export default function ApprenticeForm({
           const isBotError = apiError.toLowerCase().includes('bot') || apiError.toLowerCase().includes('verification');
           setError(
             isBotError
-              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call {PLATFORM_DEFAULTS.supportPhone}.`
+              ? `Security check failed. Please scroll up, complete the verification widget, and try again. Need help? Call ${PLATFORM_DEFAULTS.supportPhone}.`
               : apiError || `Failed to save your application. Please try again or call ${PLATFORM_DEFAULTS.supportPhone}.`,
           );
           setErrorSeverity('critical');
@@ -505,7 +524,11 @@ export default function ApprenticeForm({
       }
     } catch (err) {
       logger.error('Checkout exception:', err);
-      setError('Something went wrong. Please try again or select a different payment option.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Something went wrong. Please try again or select a different payment option.',
+      );
       setErrorSeverity('critical');
       setLoading(false);
     }
@@ -567,6 +590,7 @@ export default function ApprenticeForm({
                       if (transferHoursChoice === 'undecided' || transferHoursChoice === 'no') {
                         setTransferHoursChoice(val > 0 ? 'yes' : 'no');
                       }
+                      if (val <= 0) setTransferHoursDocument(null);
                     }}
                     disabled={transferHoursChoice === 'no'}
                     className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-slate-900 placeholder-white/50 disabled:opacity-60"
@@ -764,6 +788,7 @@ export default function ApprenticeForm({
                         onChange={() => {
                           setTransferHoursChoice('no');
                           setTransferHoursStr('');
+                          setTransferHoursDocument(null);
                         }}
                         className="w-4 h-4 text-amber-600"
                       />
@@ -771,9 +796,32 @@ export default function ApprenticeForm({
                     </label>
                   </div>
                   {transferHoursChoice === 'yes' && (
-                    <p className="text-xs text-amber-700 mt-2">
-                      Adjust your transfer hours in the calculator on the left.
-                    </p>
+                    <div className="mt-3 rounded-lg border border-amber-300 bg-white p-3">
+                      <p className="text-xs text-amber-800 mb-3">
+                        Adjust your transfer hours in the calculator on the left, then upload proof of those hours.
+                      </p>
+                      <label className="block text-sm font-bold text-amber-950 mb-1">
+                        Transfer Hours Documentation *
+                      </label>
+                      <input
+                        type="file"
+                        required
+                        accept={TRANSFER_HOURS_EVIDENCE_ACCEPT}
+                        onChange={(event) => {
+                          setTransferHoursDocument(event.target.files?.[0] ?? null);
+                          setError('');
+                        }}
+                        className="block w-full rounded-lg border border-amber-300 bg-white px-3 py-2 text-sm text-slate-950 file:mr-3 file:rounded-md file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:font-bold file:text-white"
+                      />
+                      <p className="mt-2 text-xs text-amber-800">
+                        Upload an official transcript, hours statement, state-board record, prior school record, or employer/apprenticeship verification. PDF, JPG, PNG, or WEBP; maximum 10 MB.
+                      </p>
+                      {transferHoursDocument && (
+                        <p className="mt-2 text-xs font-semibold text-slate-700">
+                          Selected: {transferHoursDocument.name}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -1146,6 +1194,7 @@ export default function ApprenticeForm({
                         !formData.phone ||
                         (!completingExistingPayment && !formData.fundingInterest) ||
                         (isSelfPay && !turnstileToken) ||
+                        (transferHoursChoice === 'yes' && (!transferHoursDocument || transferHours <= 0)) ||
                         (!isSelfPay && !completingExistingPayment && !fundedOptionsReady)
                       }
                       className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"

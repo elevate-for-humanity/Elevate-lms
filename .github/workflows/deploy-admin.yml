@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'apps/admin/**'
-      - 'lib/auth/**'
+      - 'lib/**'
       - 'packages/**'
       - 'components/admin/**'
       - 'public/**'
@@ -109,10 +109,6 @@ jobs:
         if: github.event_name != 'workflow_dispatch'
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
-      # NOTE: set-service-branch.ts removed — it PATCHes vcsData which can trigger a Northflank
-      # auto-build in addition to trigger-build.ts, causing multiple containers to build.
-      # trigger-build.ts makes one POST /build call and does not PATCH service config.
-
       - name: Trigger admin build
         id: trigger_admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
@@ -143,7 +139,6 @@ jobs:
           for i in $(seq 1 20); do
             status=$(curl -sk --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
             body=$(cat /tmp/admin-health.json 2>/dev/null || true)
-            # Accept either "ok":true or "status":"ok" or "status":"healthy"
             if [ "$status" = "200" ] && echo "$body" | grep -qE '"ok":true|"status":"(ok|healthy)"'; then
               echo "Admin liveness passed."
               exit 0
@@ -159,5 +154,4 @@ jobs:
         env:
           EXPECTED_SHA: ${{ github.sha }}
         run: |
-          # If deploy is stale due to concurrent workflows, trust SUCCESS/COMPLETED status
           pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status

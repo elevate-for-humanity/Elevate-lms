@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
+import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,43 +13,30 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login?redirect=/dashboard');
-  }
+  if (!user) redirect('/login?redirect=/dashboard');
 
-  // Get user role and redirect based on role
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, portal_type')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
-  const role = profile?.role;
+  if (!profile) redirect('/unauthorized');
 
-  // Role-based dashboard routing
-  switch (role) {
-    case 'admin':
-    case 'super_admin':
-    case 'staff':
-      redirect('/admin/dashboard');
-      break;
-    case 'program_holder':
-    case 'partner':
-      redirect('/partner/dashboard');
-      break;
-    case 'host_shop':
-      redirect('/host-shop/dashboard');
-      break;
-    case 'employer':
-      redirect('/employer/dashboard');
-      break;
-    case 'instructor':
-      redirect('/admin/instructor/dashboard');
-      break;
-    case 'student':
-    case 'learner':
-    default:
-      redirect('/learner/dashboard');
-      break;
+  const { data: roleRows } = await supabase
+    .from('user_roles')
+    .select('roles(name)')
+    .eq('user_id', user.id);
+
+  const secondaryRoles = (roleRows ?? [])
+    .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
+    .filter((role): role is string => typeof role === 'string');
+  const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles].filter(Boolean))) as string[];
+
+  if (effectiveRoles.some((role) => ['apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(role))) {
+    const destination = await resolveStudentHomePath(supabase, user.id, profile.portal_type);
+    redirect(destination);
   }
+
+  redirect(resolveDashboardUrl(profile.role, effectiveRoles));
 }

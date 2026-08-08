@@ -1,22 +1,5 @@
 'use client';
 
-/**
- * FundingGateCard
- *
- * Shown on apprentice apply index pages.
- * Asks "How are you planning to pay?" before routing the user:
- *   - Self-pay / payment plan → enrollment flow (enrollHref)
- *   - Any funding source      → inquiry flow (inquiryHref)
- *
- * Props:
- *   icon        — icon element rendered in the card header
- *   title       — card heading
- *   description — card sub-text
- *   enrollHref  — destination when self-pay is selected
- *   inquiryHref — destination when funding is selected
- *   accentColor — Tailwind color token prefix, e.g. 'brand-red' or 'brand-blue'
- */
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, ChevronDown } from 'lucide-react';
@@ -33,7 +16,7 @@ const FUNDING_OPTIONS = [
   { value: 'workforce-ready-grant', label: 'Workforce Ready Grant' },
   { value: 'employer-sponsored', label: 'Employer sponsored' },
   { value: 'not-sure', label: 'Not sure — need guidance' },
-];
+] as const;
 
 interface Props {
   icon: React.ReactNode;
@@ -41,7 +24,9 @@ interface Props {
   description: string;
   enrollHref: string;
   inquiryHref: string;
-  /** Tailwind color prefix, e.g. 'brand-red' */
+  /** When true, funded applicants stay in the full enrollment application. */
+  routeFundedToEnrollment?: boolean;
+  /** Retained for API compatibility; visual styling uses canonical brand colors. */
   accentColor?: string;
 }
 
@@ -52,7 +37,6 @@ export default function FundingGateCard({
   enrollHref,
   inquiryHref,
   routeFundedToEnrollment = false,
-  accentColor = 'brand-red',
 }: Props) {
   const router = useRouter();
   const [funding, setFunding] = useState('');
@@ -63,73 +47,63 @@ export default function FundingGateCard({
       setTouched(true);
       return;
     }
-    if (SELF_PAY_VALUES.has(funding)) {
-      router.push(enrollHref);
-    } else {
-      // Pass funding type so the inquiry form can pre-fill it
-      router.push(`${inquiryHref}?funding=${encodeURIComponent(funding)}`);
+
+    const query = `funding=${encodeURIComponent(funding)}`;
+    if (SELF_PAY_VALUES.has(funding) || routeFundedToEnrollment) {
+      router.push(`${enrollHref}${enrollHref.includes('?') ? '&' : '?'}${query}`);
+      return;
     }
+    router.push(`${inquiryHref}${inquiryHref.includes('?') ? '&' : '?'}${query}`);
   };
 
+  const funded = Boolean(funding) && !SELF_PAY_VALUES.has(funding);
+
   return (
-    <div className="p-6 bg-white border-2 border-slate-200 rounded-xl space-y-4">
-      {/* Header */}
+    <div className="space-y-4 rounded-xl border-2 border-slate-200 bg-white p-6">
       <div className="flex items-start gap-4">
-        <div className={`w-12 h-12 rounded-full bg-${accentColor}-50 flex items-center justify-center shrink-0`}>
-          {icon}
-        </div>
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-red-50">{icon}</div>
         <div>
-          <p className="font-bold text-slate-900 text-lg">{title}</p>
-          <p className="text-slate-600 text-sm leading-relaxed">{description}</p>
+          <p className="text-lg font-bold text-slate-950">{title}</p>
+          <p className="text-sm leading-relaxed text-slate-700">{description}</p>
         </div>
       </div>
 
-      {/* Funding dropdown */}
       <div className="relative">
-        <label htmlFor={`funding-${title.replace(/\s+/g, '-').toLowerCase()}`} className="block text-sm font-semibold text-slate-700 mb-1">
-          How are you planning to pay? <span className="text-red-500">*</span>
+        <label htmlFor={`funding-${title.replace(/\s+/g, '-').toLowerCase()}`} className="mb-1 block text-sm font-semibold text-slate-900">
+          How are you planning to pay? <span className="text-red-600">*</span>
         </label>
         <div className="relative">
           <select
             id={`funding-${title.replace(/\s+/g, '-').toLowerCase()}`}
             value={funding}
-            onChange={(e) => { setFunding(e.target.value); setTouched(false); }}
-            className={`w-full appearance-none border rounded-lg px-4 py-2.5 pr-10 text-slate-900 focus:outline-none focus:ring-2 focus:ring-${accentColor}-500 focus:border-transparent ${
-              touched && !funding ? 'border-red-400 bg-red-50' : 'border-slate-300'
-            }`}
+            onChange={(event) => {
+              setFunding(event.target.value);
+              setTouched(false);
+            }}
+            className={`w-full appearance-none rounded-lg border bg-white px-4 py-3 pr-10 text-slate-950 focus:border-brand-red-500 focus:outline-none focus:ring-2 focus:ring-brand-red-200 ${touched && !funding ? 'border-red-500' : 'border-slate-300'}`}
           >
-            {FUNDING_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value} disabled={o.value === ''}>
-                {o.label}
-              </option>
+            {FUNDING_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value} disabled={!option.value}>{option.label}</option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         </div>
-        {touched && !funding && (
-          <p className="text-xs text-red-600 mt-1">Please select a payment option to continue.</p>
-        )}
-        {funding && !SELF_PAY_VALUES.has(funding) && (
-          <p className="text-xs text-amber-700 mt-1 bg-amber-50 border border-amber-200 rounded px-3 py-2">
-            We&apos;ll connect you with an advisor who can help secure funding for your program.
+        {touched && !funding && <p className="mt-1 text-xs font-semibold text-red-700">Select a payment or funding option to continue.</p>}
+        {funded && (
+          <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
+            Funding eligibility must be verified. Your application will collect the WorkOne/funding information required for review.
           </p>
         )}
       </div>
 
-      {/* CTA */}
       <button
         type="button"
         onClick={handleContinue}
-        className={`w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-bold text-white transition-colors ${
-          funding
-            ? SELF_PAY_VALUES.has(funding)
-              ? `bg-${accentColor}-600 hover:bg-${accentColor}-700`
-              : 'bg-slate-800 hover:bg-slate-900'
-            : 'bg-slate-300 cursor-not-allowed'
-        }`}
+        disabled={!funding}
+        className="flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-brand-red-600 px-5 py-3 font-bold text-white transition-colors hover:bg-brand-red-700 disabled:cursor-not-allowed disabled:bg-slate-400"
       >
-        {funding && !SELF_PAY_VALUES.has(funding) ? 'Talk to an Advisor' : 'Continue to Application'}
-        <ArrowRight className="w-4 h-4" />
+        {funded && !routeFundedToEnrollment ? 'Continue to Funding Inquiry' : 'Continue to Application'}
+        <ArrowRight className="h-4 w-4" />
       </button>
     </div>
   );

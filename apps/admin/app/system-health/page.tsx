@@ -20,7 +20,7 @@ export default async function SystemHealthPage() {
     <div className="min-h-screen bg-slate-950 p-6">
       <div className="max-w-5xl mx-auto space-y-6">
         <Breadcrumbs
-          items={[{ label: 'Admin', href: '/admin' }, { label: 'System Health' }]}
+          items={[{ label: 'Admin', href: '/dashboard' }, { label: 'System Health' }]}
         />
         <SystemHealthClient initialSnapshot={snapshot} />
       </div>

@@ -1,16 +1,27 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
+
+const RAPIDS = RAPIDS_CONFIG.programs.barber;
+const OJL_HOURS = RAPIDS.totalHours;
+const RTI_HOURS = RAPIDS.relatedInstructionHours;
+const TUITION = BARBER_PRICING.fullPrice;
+const TUITION_LABEL = `$${TUITION.toLocaleString('en-US')}`;
 
 /**
- * Barber Apprenticeship — Program Detail Template v1
- * Indiana DOL Registered Apprenticeship
- * Indiana requires 2,000 hours total: 1,500 OJT + 260 RTI.
- * Tuition ($4,980) covers the full program — RTI instruction, tool kit, exam fees, and placement support.
+ * Barber Apprenticeship — canonical public program record.
+ *
+ * Source hierarchy:
+ *   1. RAPIDS_CONFIG for registered apprenticeship requirements
+ *   2. BARBER_PRICING for self-pay tuition/payment terms
+ *   3. This file for presentation/content only
+ *
+ * Do not hard-code alternate OJL/RTI totals in page components.
  */
 export const BARBER_APPRENTICESHIP: ProgramSchema = {
-  slug: 'barber-apprenticeship',
-  title: 'Barber Apprenticeship',
-  subtitle: 'DOL Registered Apprenticeship in barbering. Complete 2,000 hours of training (1,500 OJT + 260 RTI) to earn your Indiana Barber License.',
+  slug: RAPIDS.slug,
+  title: RAPIDS.name,
+  subtitle: `DOL Registered Apprenticeship in barbering. Complete ${OJL_HOURS.toLocaleString()} hours of supervised on-the-job learning plus ${RTI_HOURS} hours of Related Technical Instruction under the registered program standards.`,
   sector: 'personal-services',
   category: 'Personal Services',
   programType: 'apprenticeship',
@@ -22,18 +33,18 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   deliveryMode: 'hybrid',
   deliveredBy: 'Partner',
   durationWeeks: 52,
-  hoursPerWeekMin: 15,
-  hoursPerWeekMax: 20,
+  hoursPerWeekMin: 40,
+  hoursPerWeekMax: 40,
   hoursBreakdown: {
-    onlineInstruction: 300,
-    handsOnLab: 500,
-    examPrep: 50,
-    careerPlacement: 50,
+    onlineInstruction: RTI_HOURS,
+    handsOnLab: OJL_HOURS,
+    examPrep: 0,
+    careerPlacement: 0,
   },
-  schedule: 'Flexible — 15–20 hrs/week (OJT at host shop + RTI online)',
-  cohortSize: '8–12 apprentices per cohort',
-  fundingStatement: 'FSSA/SNAP E&T (IMPACT) eligible. Self-pay: $4,980 — $600 down, then weekly payments or BNPL.',
-  selfPayCost: '$4,980',
+  schedule: `40 OJL hours/week at the assigned host shop; ${RTI_HOURS} RTI hours are completed through the LMS across the program.`,
+  cohortSize: 'Enrollment and host-shop capacity vary by placement availability',
+  fundingStatement: `Funding eligibility varies by participant and funding source. Self-pay tuition is ${TUITION_LABEL}; payment plan and eligible BNPL options are available at checkout.`,
+  selfPayCost: TUITION_LABEL,
   badge: 'DOL Registered',
   badgeColor: 'blue',
 
@@ -41,114 +52,113 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       name: 'Indiana Barber License',
       issuer: 'Indiana State Board of Cosmetology and Barber Examiners',
-      description: 'State license required to practice barbering in Indiana. Earned after completing 2,000 apprenticeship hours and passing the state exam.',
-      validity: 'Renewable every 4 years',
+      description: 'State licensure is issued only after the applicant satisfies Indiana licensing requirements, including accepted education/apprenticeship documentation and the required examination.',
+      validity: 'Subject to Indiana renewal requirements',
     },
     {
       name: 'DOL Registered Apprenticeship Certificate',
       issuer: 'U.S. Department of Labor',
-      description: 'National credential recognizing completion of a registered apprenticeship program. Portable across all 50 states.',
-      validity: 'Lifetime',
+      description: 'Certificate of Completion issued for successful completion of the registered apprenticeship program requirements.',
+      validity: 'Completion credential',
     },
     {
       name: 'Barbershop Business Management Certificate',
       issuer: 'Elevate for Humanity',
-      description: 'Business fundamentals for barbers: client management, booking systems, pricing strategy, and shop operations.',
+      description: 'Business fundamentals for barbers including client management, booking, pricing, and shop operations.',
     },
   ],
 
   outcomes: [
-    { statement: 'Perform 6 standard haircut styles (fade, taper, buzz, scissor-over-comb, flat top, shape-up) to client satisfaction', assessedAt: 'Month 6' },
-    { statement: 'Execute straight razor shaves following Indiana sanitation and safety protocols', assessedAt: 'Month 4' },
-    { statement: 'Identify and treat 5 common scalp conditions using appropriate products', assessedAt: 'Month 3' },
-    { statement: 'Demonstrate proper sanitation and disinfection procedures per Indiana Board standards', assessedAt: 'Month 1' },
-    { statement: 'Complete 1,500 hours of on-the-job training at a licensed barbershop', assessedAt: 'Month 12' },
-    { statement: 'Pass the Indiana Barber License written and practical exams', assessedAt: 'Month 12' },
-    { statement: 'Build a client portfolio of 50+ documented services', assessedAt: 'Month 9' },
+    { statement: 'Perform standard haircut styles under qualified supervision and documented competency review', assessedAt: 'During OJL' },
+    { statement: 'Execute shaving and facial-hair services using required sanitation and safety procedures', assessedAt: 'During OJL' },
+    { statement: 'Recognize common hair/scalp conditions and know when referral is appropriate', assessedAt: 'During RTI/OJL' },
+    { statement: 'Demonstrate required sanitation, disinfection, and workstation procedures', assessedAt: 'Beginning and throughout program' },
+    { statement: `Complete ${OJL_HOURS.toLocaleString()} approved OJL hours at an assigned host shop`, assessedAt: 'Program completion' },
+    { statement: `Complete ${RTI_HOURS} hours of Related Technical Instruction`, assessedAt: 'Program completion' },
+    { statement: 'Prepare for the Indiana barber licensing examination', assessedAt: 'End of program' },
   ],
 
   careerPathway: [
     {
       title: 'Barber Apprentice',
-      timeframe: '0–12 months (during program)',
-      requirements: 'Enrolled in DOL Registered Apprenticeship',
-      salaryRange: 'Employer-set (min. wage compliant)',
+      timeframe: 'During registered apprenticeship',
+      requirements: 'Registered apprentice with an approved host-shop placement',
+      salaryRange: 'Employer-set under the registered wage schedule',
     },
     {
       title: 'Licensed Barber',
-      timeframe: '1–3 years',
-      requirements: 'Indiana Barber License + 2,000 hours completed',
-      salaryRange: 'Employer-set',
+      timeframe: 'After program and licensing requirements are completed',
+      requirements: 'Program completion plus Indiana licensing requirements',
+      salaryRange: 'Employer/market dependent',
     },
     {
       title: 'Senior Barber / Specialist',
-      timeframe: '3–5 years',
-      requirements: 'Established clientele + advanced techniques',
-      salaryRange: 'Employer-set',
+      timeframe: 'Experience-based',
+      requirements: 'Established skills and clientele',
+      salaryRange: 'Employer/market dependent',
     },
     {
-      title: 'Shop Owner / Master Barber',
-      timeframe: '5+ years',
-      requirements: 'Business license + management experience',
-      salaryRange: 'Independent',
+      title: 'Shop Owner / Manager',
+      timeframe: 'Experience-based',
+      requirements: 'Applicable business/shop licensing and management requirements',
+      salaryRange: 'Business-performance dependent',
     },
   ],
 
   weeklySchedule: [
-    { week: 'Month 1–2', title: 'Foundations & Sanitation', competencyMilestone: 'Pass sanitation assessment, identify all tools, demonstrate proper disinfection procedures.' },
-    { week: 'Month 3', title: 'Basic Cutting Techniques', competencyMilestone: 'Perform buzz cuts and basic tapers on mannequins, begin supervised client services.' },
-    { week: 'Month 4', title: 'Shaving & Facial Hair', competencyMilestone: 'Execute straight razor shaves, shape beards and mustaches, demonstrate hot towel technique.' },
-    { week: 'Month 5–6', title: 'Intermediate Cutting', competencyMilestone: 'Perform fades (low, mid, high), scissor-over-comb, and shape-ups to client satisfaction.' },
-    { week: 'Month 7–8', title: 'Advanced Techniques', competencyMilestone: 'Hair design, texturizing, chemical services (relaxers, color). Build client portfolio to 25+ services.' },
-    { week: 'Month 9–10', title: 'Business & Client Management', competencyMilestone: 'Manage booking system, build pricing strategy, reach 50+ documented client services.' },
-    { week: 'Month 11', title: 'License Exam Prep', competencyMilestone: 'Pass practice written exam (80%+), complete practical exam rehearsals.' },
-    { week: 'Month 12', title: 'Certification & Licensing', competencyMilestone: 'Take Indiana Barber License exam (written + practical), complete 2,000 total hours.' },
+    { week: 'Phase 1', title: 'Foundations & Sanitation', competencyMilestone: 'Demonstrate sanitation, tool identification, disinfection, and safe workstation procedures.' },
+    { week: 'Phase 2', title: 'Basic Cutting Techniques', competencyMilestone: 'Begin supervised cutting services and documented skill repetitions.' },
+    { week: 'Phase 3', title: 'Shaving & Facial Hair', competencyMilestone: 'Demonstrate safe shaving, beard shaping, and client-preparation procedures.' },
+    { week: 'Phase 4', title: 'Intermediate Cutting', competencyMilestone: 'Demonstrate fades, tapers, scissor-over-comb, and shape-up techniques under supervision.' },
+    { week: 'Phase 5', title: 'Advanced Techniques', competencyMilestone: 'Progress through advanced services and competency verification.' },
+    { week: 'Phase 6', title: 'Business & Client Management', competencyMilestone: 'Apply booking, pricing, client-service, and business fundamentals.' },
+    { week: 'Phase 7', title: 'License Exam Preparation', competencyMilestone: 'Complete exam-preparation activities and required program documentation.' },
+    { week: 'Phase 8', title: 'Completion', competencyMilestone: `Complete ${OJL_HOURS.toLocaleString()} OJL hours, ${RTI_HOURS} RTI hours, required competencies, and completion documentation.` },
   ],
 
   curriculum: [
     {
       title: 'Barbering Foundations',
-      topics: ['History and culture of barbering', 'Indiana Board of Cosmetology and Barber Examiners regulations', 'Sanitation, disinfection, and infection control', 'Tool identification and maintenance', 'Client consultation and communication'],
+      topics: ['Barbering profession and standards', 'Indiana licensing and professional requirements', 'Sanitation, disinfection, and infection control', 'Tool identification and maintenance', 'Client consultation and communication'],
     },
     {
       title: 'Hair Cutting Techniques',
-      topics: ['Clipper techniques: fades, tapers, buzz cuts', 'Scissor-over-comb and shear work', 'Shape-ups and edge work', 'Flat tops and specialty cuts', 'Hair texturizing and layering'],
+      topics: ['Clipper techniques', 'Scissor-over-comb and shear work', 'Shape-ups and edge work', 'Specialty cuts', 'Hair texturizing and layering'],
     },
     {
       title: 'Shaving & Facial Hair',
-      topics: ['Straight razor shaving technique and safety', 'Beard shaping and design', 'Hot towel preparation and application', 'Facial skin care and product knowledge', 'Mustache trimming and styling'],
+      topics: ['Straight razor safety', 'Beard shaping and design', 'Hot towel procedures', 'Facial skin care', 'Mustache trimming and styling'],
     },
     {
       title: 'Scalp & Hair Science',
-      topics: ['Hair and scalp anatomy', 'Common scalp conditions: dandruff, alopecia, folliculitis', 'Product selection by hair type', 'Chemical services: relaxers, color, treatments', 'Allergic reactions and contraindications'],
+      topics: ['Hair and scalp anatomy', 'Common scalp conditions', 'Product selection', 'Chemical-service safety', 'Contraindications and referral'],
     },
     {
       title: 'Business Management',
-      topics: ['Barbershop operations and workflow', 'Client booking and scheduling systems', 'Pricing strategy and service menus', 'Social media marketing for barbers', 'Financial basics: income tracking, taxes, tips'],
+      topics: ['Shop operations', 'Client booking and scheduling', 'Pricing fundamentals', 'Marketing fundamentals', 'Income and expense tracking'],
     },
     {
       title: 'License Exam Prep & Career Launch',
-      topics: ['Indiana written exam review (laws, sanitation, theory)', 'Practical exam rehearsal (timed haircut + shave)', 'Portfolio documentation and presentation', 'Resume building and shop placement', 'Entrepreneurship: opening your own shop'],
+      topics: ['Indiana examination review', 'Practical-skill review', 'Portfolio documentation', 'Career preparation', 'Entrepreneurship fundamentals'],
     },
   ],
 
   complianceAlignment: [
-    { standard: 'DOL Registered Apprenticeship', description: 'Program registered with the U.S. Department of Labor. Apprentices earn a nationally portable credential.' },
-    { standard: 'Indiana IC 25-7', description: 'Training meets Indiana Code requirements for barber apprenticeship (2,000 hours: 1,500 OJT + 260 RTI).' },
-    { standard: 'Indiana Board of Cosmetology and Barber Examiners', description: 'Curriculum aligned to state licensing exam content and sanitation standards.' },
-    { standard: 'DOL Apprenticeship Standards', description: 'Program follows DOL registered apprenticeship wage and hour requirements. Employer-sponsored funding may apply.' },
-    { standard: 'Indiana Professional Licensing Agency', description: 'Program prepares apprentices for the Indiana Barber License exam administered by the Indiana Professional Licensing Agency.' },
+    { standard: 'DOL Registered Apprenticeship', description: `Program standards require ${OJL_HOURS.toLocaleString()} supervised OJL hours plus ${RTI_HOURS} hours of Related Technical Instruction.` },
+    { standard: 'RAPIDS Program Registration', description: `Sponsor of Record: ${RAPIDS_CONFIG.sponsorOfRecord}; registration ID ${RAPIDS_CONFIG.registrationId}.` },
+    { standard: 'Indiana Professional Licensing Agency', description: 'Indiana accepts qualifying Department of Labor Registered Apprenticeship completion documentation as part of the barber licensing application process.' },
+    { standard: 'Indiana State Board of Cosmetology and Barber Examiners', description: 'Licensure remains subject to state application, examination, and other current requirements.' },
   ],
 
   trainingPhases: [
     {
       phase: 1,
       title: 'Foundations & Sanitation',
-      weeks: 'Weeks 1–8',
-      focus: 'Indiana barber law, sanitation/infection control, scalp and hair analysis, and tool proficiency.',
+      weeks: 'Early program',
+      focus: 'Professional requirements, sanitation/infection control, hair/scalp fundamentals, and tool proficiency.',
       labCompetencies: [
-        'Sanitize and disinfect all tools per Indiana Board of Health standards',
-        'Identify scalp conditions that require medical referral',
+        'Sanitize and disinfect tools and work surfaces correctly',
+        'Identify conditions that require referral',
         'Demonstrate proper draping and client preparation',
         'Maintain a clean and organized workstation',
       ],
@@ -156,76 +166,76 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       phase: 2,
       title: 'Cutting & Styling Techniques',
-      weeks: 'Weeks 9–26',
+      weeks: 'Progressive OJL',
       focus: 'Clipper cuts, scissor cuts, fades, tapers, beard shaping, and styling.',
       labCompetencies: [
-        'Perform a skin fade with seamless blending',
-        'Execute scissor-over-comb technique on varied hair textures',
-        'Shape and line a beard using straight razor and trimmers',
-        'Complete a full men\'s haircut in under 30 minutes',
-        'Perform a hot towel straight razor shave',
+        'Perform fades and blending under supervision',
+        'Execute scissor-over-comb techniques',
+        'Shape and line facial hair safely',
+        'Complete services within expected shop workflow',
+        'Demonstrate safe shaving procedures',
       ],
     },
     {
       phase: 3,
-      title: 'Chemical Services & Advanced Skills',
-      weeks: 'Weeks 27–40',
-      focus: 'Chemical treatments, color services, hair replacement, and business fundamentals.',
+      title: 'Advanced Skills & Business',
+      weeks: 'Progressive OJL/RTI',
+      focus: 'Advanced services, client management, and business fundamentals.',
       labCompetencies: [
-        'Apply chemical relaxer with proper strand test and timing',
-        'Perform a single-process color application',
-        'Demonstrate hair replacement attachment techniques',
-        'Calculate service pricing and product costs',
+        'Perform advanced services within authorized scope',
+        'Apply consultation and service-planning skills',
+        'Maintain client/service documentation',
+        'Apply basic pricing and business concepts',
       ],
     },
     {
       phase: 4,
-      title: 'Apprenticeship Hours & Exam Prep',
-      weeks: 'Weeks 41–52',
-      focus: 'Supervised shop floor hours, client management, and Indiana state board exam preparation.',
+      title: 'Completion & Exam Preparation',
+      weeks: 'Final program phase',
+      focus: 'Completion of registered hours, competencies, documentation, and licensing preparation.',
       labCompetencies: [
-        'Complete 2,000 supervised apprenticeship hours (1,500 OJT + 260 RTI)',
-        'Manage a personal client book of 20+ regular clients',
-        'Pass practical exam simulation (4 required skills)',
-        'Pass written exam practice test with 75%+ score',
+        `Complete ${OJL_HOURS.toLocaleString()} approved supervised OJL hours`,
+        `Complete ${RTI_HOURS} required RTI hours`,
+        'Complete required competency verification',
+        'Complete licensing-exam preparation',
       ],
     },
   ],
 
   credentialPipeline: [
     {
-      training: 'Barber apprenticeship (52 weeks)',
+      training: 'Registered barber apprenticeship',
+      certification: 'DOL Registered Apprenticeship Certificate of Completion',
+      certBody: 'U.S. Department of Labor',
+      jobRole: 'Barber apprentice / program completer',
+    },
+    {
+      training: 'Indiana barber licensing preparation',
       certification: 'Indiana Barber License',
-      certBody: 'Indiana Professional Licensing Agency (SPLA)',
+      certBody: 'Indiana Professional Licensing Agency',
       jobRole: 'Licensed Barber',
     },
     {
-      training: 'Sanitation/infection control (Weeks 1–8)',
-      certification: 'Sanitation & Infection Control Certificate',
+      training: 'Business fundamentals',
+      certification: 'Barbershop Business Management Certificate',
       certBody: 'Elevate for Humanity',
-      jobRole: 'Barber / Personal Care Professional',
-    },
-    {
-      training: 'Business fundamentals (Weeks 27–40)',
-      certification: 'Barbershop Business Certificate',
-      certBody: 'Elevate for Humanity',
-      jobRole: 'Barbershop Manager / Owner',
+      jobRole: 'Barber / future shop manager or owner',
     },
   ],
 
   laborMarket: {
     medianSalary: 38000,
-    salaryRange: '$30,000–$55,000+',
-    growthRate: '+3–4% (average)',
+    salaryRange: 'Varies by employer, location, tips, clientele, and business model',
+    growthRate: 'See current BLS Occupational Outlook Handbook',
     source: 'U.S. Bureau of Labor Statistics, Occupational Outlook Handbook',
-    sourceYear: 2024, // BLS OES 2024; projections 2024–2034
+    sourceYear: 2024,
     region: 'Indiana',
   },
   careers: [
-    { title: 'Licensed Barber', salary: '$30K–$45K' },
-    { title: 'Senior Barber / Stylist', salary: '$40K–$55K' },
-    { title: 'Barbershop Manager', salary: '$45K–$65K' },
-    { title: 'Shop Owner', salary: '$60K–$120K+' },
+    { title: 'Licensed Barber', salary: 'Market dependent' },
+    { title: 'Senior Barber / Stylist', salary: 'Market dependent' },
+    { title: 'Barbershop Manager', salary: 'Market dependent' },
+    { title: 'Shop Owner', salary: 'Business-performance dependent' },
   ],
 
   cta: {
@@ -236,29 +246,27 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   },
 
   admissionRequirements: [
-    '16 years or older (Indiana minimum for barber apprentice)',
-    'High school diploma or GED (or actively pursuing)',
-    'Must be paired with a licensed host barbershop',
-    'No prior barbering experience required',
+    'Meet the minimum age and other eligibility requirements applicable to the registered program and employment placement',
+    'Complete Elevate admissions and apprenticeship onboarding',
+    'Be assigned to or approved with a participating host shop before OJL begins',
+    'Provide required identity, employment, and program documentation',
   ],
-  equipmentIncluded: 'Starter tool kit (clippers, shears, combs, cape), training materials, and license exam fees included',
-  modality: 'Hybrid — Related Technical Instruction online via LMS, On-the-Job Training at licensed host barbershop',
-  facilityInfo: 'Host barbershops across Indianapolis metro area',
-  bilingualSupport: 'Bilingual (English/Spanish) instruction available.',
+  equipmentIncluded: 'Program-provided items are governed by the current enrollment agreement and program cost disclosure.',
+  modality: 'Hybrid — Related Technical Instruction through the LMS and supervised On-the-Job Learning at an approved host shop',
+  facilityInfo: 'Approved participating host shops',
+  bilingualSupport: 'Support availability may vary; contact admissions for current language-support options.',
   employerPartners: [
-    'Partner barbershops in Indianapolis (host shops)',
-    'Indiana Barber Association',
+    'Approved participating host shops',
   ],
   pricingIncludes: [
-    'Full 2,000-hour program (260 hrs RTI + 1,500 hrs OJT)',
-    'Starter barber tool kit',
-    'Indiana Barber License exam fee',
-    'LMS access for full program duration',
-    'Career placement and shop matching',
+    `${OJL_HOURS.toLocaleString()} supervised OJL-hour registered pathway`,
+    `${RTI_HOURS} hours of Related Technical Instruction`,
+    'LMS access for assigned RTI coursework',
+    'Apprenticeship progress and compliance tracking',
+    'Licensing-exam preparation support',
   ],
-  paymentTerms: '$4,980. Payment plans available.',
+  paymentTerms: `${TUITION_LABEL}. Payment plan and eligible BNPL options are available for self-pay applicants.`,
 
-  // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'partner',
   deliveryModelDetail: 'hybrid',
   partnerProvider: 'milady',
@@ -266,7 +274,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   funding: {
     fssa_eligible: true,
     snap_et_eligible: true,
-    wioa_eligible: false,   // DOL apprenticeship — not on Indiana ETPL
+    wioa_eligible: false,
     etpl_approved: false,
     wrg_eligible: false,
   },
@@ -276,8 +284,8 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       courseId: 'prestige-elevation-barber-curriculum',
       label: 'Prestige Elevation Barber Curriculum',
       partnerName: 'Elevate for Humanity',
-      credentialIssued: 'RTI completion (260 hours)',
-      duration: '260 hours RTI',
+      credentialIssued: `RTI completion (${RTI_HOURS} hours)`,
+      duration: `${RTI_HOURS} hours RTI`,
       required: true,
       enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
     },
@@ -295,10 +303,10 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   faqs: [
-    { question: 'How much does the program cost?', answer: 'Tuition is $4,980. Payment plans are available — contact us to discuss options.' },
-    { question: 'How long is the program?', answer: '12 months (52 weeks). Indiana requires 2,000 total hours: 1,500 hours of on-the-job training at a licensed shop and 260 hours of Related Technical Instruction delivered online.' },
-    { question: 'Do I need my own barbershop?', answer: 'No. We match you with a licensed host barbershop in the Indianapolis area. The host shop provides your on-the-job training environment.' },
-    { question: 'What license do I earn?', answer: 'The Indiana Barber License, issued by the Indiana State Board of Cosmetology and Barber Examiners. You also earn a DOL Registered Apprenticeship certificate, which is recognized in all 50 states.' },
+    { question: 'How much does the program cost?', answer: `Current self-pay tuition is ${TUITION_LABEL}. Payment plan and eligible BNPL options are available. Public funding eligibility is determined separately.` },
+    { question: 'How long is the program?', answer: `The registered program requires ${OJL_HOURS.toLocaleString()} approved OJL hours plus ${RTI_HOURS} RTI hours. At a standard 40-hour OJL workweek, the OJL requirement is approximately 50 weeks; actual completion depends on approved hours, attendance, RTI completion, transfer credit, and the host-shop schedule.` },
+    { question: 'Do I need my own barbershop?', answer: 'No. Applicants without a host shop can request placement assistance. OJL can begin only at an approved participating host shop.' },
+    { question: 'What credential do I earn?', answer: 'Successful program completers receive the Registered Apprenticeship completion credential. Indiana barber licensure is a separate state process and requires satisfaction of current licensing and examination requirements.' },
   ],
 
   breadcrumbs: [
@@ -307,6 +315,6 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { label: 'Barber Apprenticeship' },
   ],
 
-  metaTitle: 'Barber Apprenticeship | DOL Registered | Indianapolis',
-  metaDescription: '52-week DOL Registered Barber Apprenticeship. Earn your Indiana Barber License. 2,000 hours. $4,980 tuition. Payment plans available. Indianapolis.',
+  metaTitle: 'Barber Registered Apprenticeship | Indianapolis | Elevate for Humanity',
+  metaDescription: `DOL Registered Barber Apprenticeship: ${OJL_HOURS.toLocaleString()} supervised OJL hours plus ${RTI_HOURS} RTI hours. Host-shop placement, LMS instruction, progress tracking, and self-pay options available.`,
 };

@@ -28,31 +28,49 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Full navigation begins at lg. Below lg, use the compact drawer so
-            header controls never wrap or collide with page accessibility/TTS UI. */}
-        <div className="hidden min-w-0 justify-center overflow-visible lg:flex">
+        {/* Only render the full horizontal navigation when the viewport has
+            enough room for every group without wrapping or colliding. */}
+        <div className="hidden min-w-0 justify-center overflow-visible xl:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          <div className="hidden flex-nowrap items-center gap-1 lg:flex xl:gap-1.5">
-            <div className="hidden xl:block">
-              <HeaderDesktopMenu items={NAV_ITEMS} />
-            </div>
+          {/* Full desktop controls. */}
+          <div className="hidden flex-nowrap items-center gap-1.5 xl:flex">
+            <HeaderDesktopMenu items={NAV_ITEMS} />
             <Link
               href={ROUTES.login}
-              className="hidden whitespace-nowrap px-2 py-2 text-sm font-semibold text-slate-800 hover:text-slate-950 xl:inline-flex xl:px-2.5 xl:text-base"
+              className="inline-flex whitespace-nowrap px-2.5 py-2 text-base font-semibold text-slate-800 hover:text-slate-950"
             >
               Sign In
             </Link>
             <Link
               href={ROUTES.apply}
-              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-3 py-2 text-sm font-bold text-white hover:bg-brand-red-700 xl:px-4 xl:py-2.5 xl:text-base"
+              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-4 py-2.5 text-base font-bold text-white hover:bg-brand-red-700"
             >
               Apply
             </Link>
           </div>
 
+          {/* Compact desktop/tablet controls. HeaderDesktopMenu opens a
+              desktop side panel and does not depend on the mobile drawer. */}
+          <div className="hidden flex-nowrap items-center gap-1.5 lg:flex xl:hidden">
+            <HeaderDesktopMenu items={NAV_ITEMS} />
+            <Link
+              href={ROUTES.login}
+              className="inline-flex whitespace-nowrap px-2 py-2 text-sm font-semibold text-slate-800 hover:text-slate-950"
+            >
+              Sign In
+            </Link>
+            <Link
+              href={ROUTES.apply}
+              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-3 py-2 text-sm font-bold text-white hover:bg-brand-red-700"
+            >
+              Apply
+            </Link>
+          </div>
+
+          {/* Phones and small tablets use the dedicated mobile drawer. */}
           <div className="flex flex-nowrap items-center gap-1 lg:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu

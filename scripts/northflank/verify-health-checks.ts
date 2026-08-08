@@ -1,67 +1,100 @@
 #!/usr/bin/env tsx
 /**
- * Verify Northflank HTTP health probes for one service (or --all).
+ * Verify canonical Northflank runtime configuration for one service or --all.
  *
- *   npx tsx scripts/northflank/verify-health-checks.ts elevate-admin
- *   npx tsx scripts/northflank/verify-health-checks.ts --all
+ * Checks the actual service object after configure-services.ts applies:
+ * - public internal port = 3000
+ * - runtime PORT = 3000
+ * - startup probe = /api/ping:3000
+ * - readiness probe = /api/health:3000
+ * - correct public host responds on /api/ping
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 import { resolveTargetServiceIds, serviceIdForRole } from './service-targets';
 
-// Northflank services use /api/version as the health probe path (not /api/ping).
-// Both endpoints are available in the running container; /api/version is
-// the canonical probe endpoint because it is always present and returns 200
-// without requiring authentication.
-const EXPECTED_HEALTH_SNIPPET = 'startupProbe:/api/ping:3000, readinessProbe:/api/health:3000';
+const RUNTIME_PORT = 3000;
 
 const PUBLIC_SMOKE_BY_SERVICE: Record<string, string> = {
-  [serviceIdForRole('lms')]: 'https://www.elevateforhumanity.org/api/ping',
+  [serviceIdForRole('marketing')]: 'https://www.elevateforhumanity.org/api/ping',
+  [serviceIdForRole('lms')]: 'https://app.elevateforhumanity.org/api/ping',
   [serviceIdForRole('admin')]: 'https://admin.elevateforhumanity.org/api/ping',
 };
 
+function readRuntimePort(service: any): string | undefined {
+  const env = service?.runtimeEnvironment;
+  if (!env) return undefined;
+  if (Array.isArray(env)) {
+    return env.find((row: any) => row?.key === 'PORT' || row?.name === 'PORT')?.value;
+  }
+  return env.PORT;
+}
+
+function hasProbe(service: any, type: string, path: string): boolean {
+  const probes = Array.isArray(service?.healthChecks) ? service.healthChecks : [];
+  return probes.some(
+    (probe: any) =>
+      probe?.type === type && probe?.path === path && Number(probe?.port) === RUNTIME_PORT,
+  );
+}
+
 async function main() {
+  const projectId = resolveProjectId();
+  if (!projectId) throw new Error('Set NORTHFLANK_PROJECT_ID');
+
   let ok = true;
   const targets = resolveTargetServiceIds();
 
   for (const serviceId of targets) {
     console.log(`\n=== ${serviceId} ===`);
-    console.log('Applying health probe config for this service only...\n');
-    const out = execSync(
-      `npx tsx scripts/northflank/configure-services.ts ${serviceId} --execute`,
-      { encoding: 'utf8', cwd: process.cwd() },
-    );
-    console.log(out);
 
-    const line = out
-      .split('\n')
-      .find((l) => l.includes(`[patch-ok] ${serviceId}`) && l.includes('health=['));
-    if (!line?.includes(EXPECTED_HEALTH_SNIPPET)) {
-      console.error(`  Expected health=[${EXPECTED_HEALTH_SNIPPET}] in patch response`);
-      console.error(`  Got: ${line ?? '(no patch-ok line)'}`);
+    execFileSync(
+      'npx',
+      ['tsx', 'scripts/northflank/configure-services.ts', serviceId, '--execute'],
+      { stdio: 'inherit', cwd: process.cwd() },
+    );
+
+    const response = await nfFetch<any>(projectApiPath(projectId, `/services/${serviceId}`));
+    const service = response?.data ?? response;
+
+    const sitePort = (service?.ports ?? []).find((p: any) => p?.name === 'site') ?? service?.ports?.[0];
+    const internalPort = Number(sitePort?.internalPort);
+    const runtimePort = readRuntimePort(service);
+    const startupOk = hasProbe(service, 'startupProbe', '/api/ping');
+    const readinessOk = hasProbe(service, 'readinessProbe', '/api/health');
+
+    console.log(`  internalPort=${internalPort || 'missing'}`);
+    console.log(`  runtime PORT=${runtimePort ?? 'missing'}`);
+    console.log(`  startup /api/ping:3000=${startupOk}`);
+    console.log(`  readiness /api/health:3000=${readinessOk}`);
+
+    if (internalPort !== RUNTIME_PORT || runtimePort !== String(RUNTIME_PORT) || !startupOk || !readinessOk) {
       ok = false;
-    } else {
-      console.log(`  Northflank probes: ${EXPECTED_HEALTH_SNIPPET}`);
+      console.error('  Canonical Northflank runtime configuration mismatch.');
     }
 
     const smokeUrl = PUBLIC_SMOKE_BY_SERVICE[serviceId];
-    if (smokeUrl) {
-      console.log(`\nPublic smoke: ${smokeUrl}`);
-      try {
-        const res = await fetch(smokeUrl, { signal: AbortSignal.timeout(15_000) });
-        console.log(`  → HTTP ${res.status}`);
-        if (!res.ok) ok = false;
-      } catch (e) {
-        console.error(`  → failed:`, e);
-        ok = false;
-      }
+    if (!smokeUrl) {
+      ok = false;
+      console.error(`  No public smoke mapping for ${serviceId}`);
+      continue;
+    }
+
+    try {
+      const res = await fetch(smokeUrl, { signal: AbortSignal.timeout(15_000) });
+      console.log(`  ${smokeUrl} -> HTTP ${res.status}`);
+      if (!res.ok) ok = false;
+    } catch (error) {
+      console.error(`  ${smokeUrl} -> failed`, error);
+      ok = false;
     }
   }
 
   process.exit(ok ? 0 : 1);
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

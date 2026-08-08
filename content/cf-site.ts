@@ -1,6 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 // Site config — merged from next-platform-starter into this repo.
-// All handoff URLs now point to the same domain (no cross-domain redirects).
 export const siteConfig = {
   name: 'Elevate for Humanity',
   url: 'https://www.elevateforhumanity.org',
@@ -12,7 +11,7 @@ export const siteConfig = {
     login: '/login',
     checkout: '/store',
     lms: '/lms',
-    studentPortal: '/learner/dashboard',
+    studentPortal: '/lms/dashboard',
   },
   social: {
     facebook: 'https://www.facebook.com/elevateforhumanity',

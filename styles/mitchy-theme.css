@@ -12,6 +12,13 @@
   --brand-gray: #374151;
 }
 
+/* Marketing readability baseline. Inter is a variable font in production;
+   a 450 body weight prevents the thin/light appearance on large mobile displays
+   while explicit Tailwind font-medium/semibold/bold utilities still win. */
+body {
+  font-weight: 450;
+}
+
 /* ============================================================================
    MARQUEE ANIMATIONS - Scrolling text like Mitchy
    ============================================================================ */
@@ -303,7 +310,6 @@
   animation: fadeInRight 0.6s ease forwards;
 }
 
-/* Staggered delays */
 .delay-100 {
   animation-delay: 0.1s;
 }

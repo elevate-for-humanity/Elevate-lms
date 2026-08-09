@@ -20,7 +20,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
   if (auth.error) return auth.error;
-  await hydrateProcessEnv().catch(() => {});
+  await hydrateProcessEnv().catch(() => undefined);
 
   let dbGroq = false;
   let dbGemini = false;
@@ -40,7 +40,13 @@ export async function GET(req: NextRequest) {
       if (row.key === 'ANTHROPIC_API_KEY') dbAnthropic = set;
       if (row.key === 'GITHUB_TOKEN') dbGitHub = set;
     }
-  } catch {}
+  } catch {
+    dbGroq = false;
+    dbGemini = false;
+    dbOpenAI = false;
+    dbAnthropic = false;
+    dbGitHub = false;
+  }
 
   const shellWsUrl = process.env.STUDIO_SHELL_WS_URL ?? '';
   const shellSecret = process.env.STUDIO_SHELL_SECRET ?? '';
@@ -67,7 +73,11 @@ export async function GET(req: NextRequest) {
   const northflankServices = getNorthflankServices().map((service) => ({ key: service.key, id: service.id, configured: !!service.id }));
   const studioRuntime = buildStudioRuntimeCompletion({ adminConfigured, probe: shellProbe, hasGitHubToken: hasGitHub, aiConfigured });
   let nextVersion = 'unknown';
-  try { nextVersion = require('next/package.json').version; } catch {}
+  try {
+    nextVersion = require('next/package.json').version;
+  } catch {
+    nextVersion = 'unknown';
+  }
 
   return NextResponse.json({
     hasGroq, hasGemini, hasOpenAI, hasAnthropic, hasGitHub, aiConfigured,

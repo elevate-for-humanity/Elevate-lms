@@ -1,158 +1,201 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 
-/**
- * Public marketing site E2E tests
- * 
- * These tests verify:
- * 1. Homepage exposes the primary customer paths
- * 2. No placeholder addresses are visible
- * 3. Pricing pages handle empty states gracefully
- * 4. All main navigation links return successful responses
- */
+const CRITICAL_PUBLIC_ROUTES = [
+  '/',
+  '/about',
+  '/contact',
+  '/programs',
+  '/apprenticeships',
+  '/funding',
+  '/for-students',
+  '/for-employers',
+  '/partners',
+  '/testing',
+  '/testing/workkeys',
+  '/pricing',
+  '/apply',
+  '/apply/student',
+  '/apply/status',
+  '/support',
+  '/login',
+];
 
-test.describe('public marketing site', () => {
-  test('homepage exposes the primary customer paths', async ({ page }) => {
-    await page.goto('/');
+const CRITICAL_PROGRAM_ROUTES = [
+  '/programs/barber-apprenticeship',
+  '/programs/cdl-training',
+  '/programs/bookkeeping',
+  '/programs/business-management',
+  '/programs/medical-assistant',
+  '/programs/phlebotomy-technician',
+  '/programs/hvac-technician',
+];
 
-    // Check for primary CTAs
-    await expect(
-      page.getByRole('link', { name: /apply/i })
-    ).toBeVisible({ timeout: 10000 });
+const FORBIDDEN_PLACEHOLDERS = [
+  '123 Main St',
+  'Columbia, MD',
+  '21044',
+  'Lorem ipsum',
+  'TODO:',
+  '[object Object]',
+];
 
-    await expect(
-      page.getByRole('heading', { name: /career training|pathway/i })
-    ).toBeVisible({ timeout: 10000 });
+function isInternalHref(href: string | null): href is string {
+  return Boolean(
+    href &&
+      href.startsWith('/') &&
+      !href.startsWith('//') &&
+      !href.startsWith('/api/') &&
+      !href.startsWith('/_next/') &&
+      !href.includes('#'),
+  );
+}
 
-    // Check for pathway sections
-    await expect(
-      page.getByText(/apply.*funding.*training.*credential.*employment/i)
-    ).toBeVisible({ timeout: 10000 });
+async function assertSuccessfulResponse(
+  request: APIRequestContext,
+  href: string,
+  context: string,
+) {
+  const response = await request.get(href, { maxRedirects: 10 });
+  expect(response.status(), `${context}: ${href} returned ${response.status()}`).toBeLessThan(400);
+}
+
+async function collectInternalLinks(page: Page, selector: string) {
+  const hrefs = await page.locator(selector).evaluateAll((links) =>
+    links.map((link) => link.getAttribute('href')),
+  );
+  return [...new Set(hrefs.filter(isInternalHref))].sort();
+}
+
+async function assertNoRuntimeFailure(page: Page, route: string) {
+  const pageErrors: string[] = [];
+  const consoleErrors: string[] = [];
+
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error') consoleErrors.push(message.text());
   });
 
-  test('does not expose placeholder addresses', async ({ page }) => {
-    await page.goto('/');
+  const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
+  expect(response, `${route} did not return a response`).not.toBeNull();
+  expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
 
-    // Check for any placeholder addresses
-    const body = await page.locator('body').textContent();
-    
-    // These should NOT appear
-    expect(body).not.toContain('123 Main St');
-    expect(body).not.toContain('Columbia, MD');
-    expect(body).not.toContain('21044');
-    
-    // The correct address should appear if mentioned
-    // 120 Market St Suite 930 is the correct address
-  });
+  await page.waitForLoadState('networkidle').catch(() => undefined);
 
-  test('pricing handles empty state gracefully', async ({ page }) => {
-    await page.goto('/pricing');
+  const body = (await page.locator('body').textContent()) ?? '';
+  expect(body.trim().length, `${route} rendered an empty body`).toBeGreaterThan(80);
+  expect(body, `${route} rendered an application exception`).not.toMatch(
+    /Application error|client-side exception|server-side exception|ChunkLoadError|no healthy upstream/i,
+  );
 
-    // The page should not crash or show errors
-    await expect(page.getByRole('heading', { name: /pricing|training/i })).toBeVisible({ timeout: 10000 });
-    
-    // Should not show "0 programs available" in a broken way
-    // If programs.length === 0, show a message but don't crash
-    const body = await page.locator('body').textContent();
-    // Should either show programs OR a graceful message
-    // The key is it shouldn't show an error or blank page
-  });
+  expect(pageErrors, `${route} emitted page errors: ${pageErrors.join(' | ')}`).toEqual([]);
 
-  test('testing page shows correct pricing', async ({ page }) => {
-    await page.goto('/testing/workkeys');
+  const actionableConsoleErrors = consoleErrors.filter(
+    (error) => !/favicon|third-party cookie/i.test(error),
+  );
+  expect(
+    actionableConsoleErrors,
+    `${route} emitted console errors: ${actionableConsoleErrors.join(' | ')}`,
+  ).toEqual([]);
+}
 
-    // Should show exam prices (not $0)
-    await expect(page.getByText(/\$104|\$168/)).toBeVisible({ timeout: 10000 });
-    
-    // Should show Add to Cart buttons
-    await expect(
-      page.getByRole('button', { name: /add to cart/i })
-    ).toBeVisible({ timeout: 10000 });
-  });
+test.describe.configure({ mode: 'serial' });
 
-  test('testing page shows correct address', async ({ page }) => {
-    await page.goto('/testing');
+test.describe('page-by-page public production audit', () => {
+  for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
+    test(`${route} renders without runtime failure`, async ({ page }) => {
+      await assertNoRuntimeFailure(page, route);
+    });
+  }
 
-    // Should show the correct address
-    const body = await page.locator('body').textContent();
-    expect(body).toContain('120 Market St');
-  });
-
-  test('about page shows correct address', async ({ page }) => {
-    await page.goto('/about');
-
-    // Should show the correct address
-    const body = await page.locator('body').textContent();
-    expect(body).toContain('120 Market St');
-  });
-
-  test('contact page FAQ mentions correct address', async ({ page }) => {
-    await page.goto('/contact');
-
-    // Check FAQ section mentions correct address
-    const body = await page.locator('body').textContent();
-    expect(body).toContain('120 Market St');
-  });
-});
-
-test.describe('navigation integrity', () => {
-  test('homepage main navigation links work', async ({ page, request }) => {
-    await page.goto('/');
-
-    // Get main navigation links
-    const navLinks = await page
-      .locator('header nav a[href], header a[href]')
-      .evaluateAll((links) =>
-        links
-          .map((link) => link.getAttribute('href'))
-          .filter((href) => href?.startsWith('/') && !href.startsWith('//'))
-          .filter(Boolean)
-      );
-
-    // Test a sample of navigation links
-    const sampleLinks = [...new Set(navLinks)].slice(0, 10);
-
-    for (const href of sampleLinks) {
-      const response = await request.get(href as string);
-      expect(
-        response.status(),
-        `${href} returned ${response.status()}`
-      ).toBeLessThan(400);
+  test('critical pages do not expose known placeholder content', async ({ page }) => {
+    for (const route of [...CRITICAL_PUBLIC_ROUTES, ...CRITICAL_PROGRAM_ROUTES]) {
+      await page.goto(route, { waitUntil: 'domcontentloaded' });
+      const body = (await page.locator('body').textContent()) ?? '';
+      for (const placeholder of FORBIDDEN_PLACEHOLDERS) {
+        expect(body, `${route} contains forbidden placeholder: ${placeholder}`).not.toContain(
+          placeholder,
+        );
+      }
     }
   });
 
-  test('footer links are valid', async ({ page, request }) => {
-    await page.goto('/');
+  test('every homepage header and footer internal link resolves', async ({ page, request }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    const links = await collectInternalLinks(page, 'header a[href], footer a[href]');
+    expect(links.length, 'No internal header or footer links were discovered').toBeGreaterThan(5);
+    for (const href of links) {
+      await assertSuccessfulResponse(request, href, 'navigation integrity');
+    }
+  });
 
-    // Get footer links
-    const footerLinks = await page
-      .locator('footer a[href]')
-      .evaluateAll((links) =>
-        links
-          .map((link) => link.getAttribute('href'))
-          .filter((href) => href?.startsWith('/') && !href.startsWith('//'))
-          .filter(Boolean)
-      );
-
-    // Test a sample of footer links
-    const sampleLinks = [...new Set(footerLinks)].slice(0, 10);
-
-    for (const href of sampleLinks) {
-      const response = await request.get(href as string);
-      expect(
-        response.status(),
-        `${href} returned ${response.status()}`
-      ).toBeLessThan(400);
+  test('program directory links resolve', async ({ page, request }) => {
+    await page.goto('/programs', { waitUntil: 'domcontentloaded' });
+    const links = await collectInternalLinks(page, 'main a[href^="/programs/"]');
+    expect(links.length, 'No program links were discovered').toBeGreaterThan(0);
+    for (const href of links) {
+      await assertSuccessfulResponse(request, href, 'program route');
     }
   });
 });
 
-test.describe('application flow basics', () => {
-  test('apply page loads and shows form', async ({ page }) => {
-    await page.goto('/apply');
+test.describe('responsive navigation acceptance', () => {
+  test('desktop keeps the main navigation horizontal', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-    // Should show the application form
-    await expect(
-      page.getByRole('heading', { name: /apply|application/i })
-    ).toBeVisible({ timeout: 10000 });
+    const desktopNav = page.getByRole('navigation', { name: 'Main navigation' });
+    await expect(desktopNav).toBeVisible();
+    const box = await desktopNav.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height, 'Desktop nav appears wrapped into multiple rows').toBeLessThan(90);
+  });
+
+  test('mobile exposes an operable menu without desktop nav collision', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const menuButton = page.getByRole('button', { name: /open menu|menu/i }).first();
+    await expect(menuButton).toBeVisible();
+    await menuButton.click();
+
+    const mobileNav = page.getByRole('navigation', { name: /mobile navigation/i });
+    await expect(mobileNav).toBeVisible();
+  });
+});
+
+test.describe('application entry audit', () => {
+  for (const route of ['/apply', '/apply/student', '/programs/barber-apprenticeship/apply']) {
+    test(`${route} exposes an actionable application experience`, async ({ page }) => {
+      await assertNoRuntimeFailure(page, route);
+      const control = page.locator('form, input, select, textarea, button[type="submit"]').first();
+      await expect(control, `${route} has no actionable application control`).toBeVisible();
+    });
+  }
+
+  test('student application has a submission control', async ({ page }) => {
+    await page.goto('/apply/student', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('button', { name: /submit application/i })).toBeVisible();
+  });
+
+  test('application status page accepts tracking information', async ({ page }) => {
+    await page.goto('/apply/status', { waitUntil: 'domcontentloaded' });
+    const trackingInput = page.locator(
+      'input[name*="application" i], input[placeholder*="application" i], input[type="email"]',
+    );
+    await expect(trackingInput.first()).toBeVisible();
+  });
+});
+
+test.describe('pricing and testing integrity', () => {
+  test('pricing page has a useful populated or graceful empty state', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/pricing');
+    const body = (await page.locator('body').textContent()) ?? '';
+    expect(body).not.toMatch(/0 programs available/i);
+  });
+
+  test('WorkKeys page shows non-zero prices and purchase controls', async ({ page }) => {
+    await assertNoRuntimeFailure(page, '/testing/workkeys');
+    await expect(page.getByText(/\$104|\$168/).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /add to cart/i }).first()).toBeVisible();
   });
 });

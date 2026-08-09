@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - authenticated route resolves the current user and owned website before any RLS-scoped website_domains write.
 /** Connect a customer-owned domain to a published Website Builder site. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';

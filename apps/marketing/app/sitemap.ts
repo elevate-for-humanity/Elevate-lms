@@ -65,7 +65,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ROUTES.programsEsthetician,
     ROUTES.programsNailTech,
     ROUTES.programsTechnology,
-    '/programs/business',
   ];
 
   const appStoreRoutes = [

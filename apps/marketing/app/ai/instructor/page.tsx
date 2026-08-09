@@ -37,7 +37,7 @@ export default function AIInstructorPage() {
                 AI-powered tutoring that adapts to individual needs.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/student/ai-tutor" className="px-8 py-4 bg-violet-600 rounded-lg font-semibold hover:bg-violet-500 transition">
+                <Link href="https://app.elevateforhumanity.org/ai-tutor" className="px-8 py-4 bg-violet-600 rounded-lg font-semibold hover:bg-violet-500 transition">
                   Try AI Instructor
                 </Link>
                 <Link href="/contact" className="px-8 py-4 bg-white/10 border border-white/30 rounded-lg font-semibold hover:bg-white/20 transition">
@@ -86,7 +86,7 @@ export default function AIInstructorPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Every Student Deserves a Great Tutor</h2>
           <div className="flex flex-wrap gap-4 justify-center mt-8">
-            <Link href="/student/ai-tutor" className="px-8 py-4 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition">
+            <Link href="https://app.elevateforhumanity.org/ai-tutor" className="px-8 py-4 bg-white text-violet-600 rounded-lg font-semibold hover:bg-violet-50 transition">
               Try AI Instructor
             </Link>
             <Link href="/platform/enterprise" className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition">

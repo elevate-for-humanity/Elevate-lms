@@ -18,6 +18,8 @@ import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { SkipToContent } from '@/components/accessibility/SkipToContent';
+import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
@@ -48,9 +50,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MarketingPwaClient />
         <ChunkRecovery />
         <GoogleAnalytics />
+        <AssociateFormLabels />
         <I18nProvider>
+          <SkipToContent />
           <Header />
-          <main className="site-main pt-[68px]">{children}</main>
+          <main id="main-content" tabIndex={-1} className="site-main pt-[68px] focus:outline-none">
+            {children}
+          </main>
           <SiteFooter />
         </I18nProvider>
       </body>

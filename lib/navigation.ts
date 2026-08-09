@@ -25,7 +25,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Barber & Beauty', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Tech & Business', isHeader: true },
       { name: 'Technology Programs', href: ROUTES.programsTechnology, isSectionLink: true },
-      { name: 'Business Programs', href: '/programs/business', isSectionLink: true },
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
     ],
   },

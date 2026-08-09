@@ -1,0 +1,154 @@
+name: One-time Finish Repeated Route Normalization
+
+on:
+  push:
+    branches:
+      - fix/remaining-duplicate-surfaces-20260809
+    paths:
+      - .github/workflows/one-time-finish-repeated-route-normalization.yml
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout sweep branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/remaining-duplicate-surfaces-20260809
+          fetch-depth: 1
+
+      - name: Move remaining repeated-segment page implementations to canonical paths
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const roots = ['apps/marketing/app', 'apps/lms/app', 'apps/admin/app'];
+          const pagePattern = /^page\.(tsx|ts|jsx|js)$/;
+          const routeGroup = /^\(.+\)$/;
+          const parallelRoute = /^@.+$/;
+
+          function walk(dir, out = []) {
+            for (const entry of fs.readdirSync(dir)) {
+              if (entry === 'node_modules' || entry === '.next' || entry.startsWith('_')) continue;
+              const full = path.join(dir, entry);
+              const stat = fs.statSync(full);
+              if (stat.isDirectory()) walk(full, out);
+              else if (pagePattern.test(entry)) out.push(full);
+            }
+            return out;
+          }
+
+          function isRedirect(source) {
+            return /\b(?:redirect|permanentRedirect)\s*\(/.test(source);
+          }
+
+          function collapseRelative(file, root) {
+            const rel = path.relative(root, file).split(path.sep);
+            const filename = rel.pop();
+            const collapsed = [];
+            let changed = false;
+            for (const segment of rel) {
+              const previous = collapsed.at(-1);
+              if (
+                previous === segment &&
+                !routeGroup.test(segment) &&
+                !parallelRoute.test(segment) &&
+                !segment.startsWith('[')
+              ) {
+                changed = true;
+                continue;
+              }
+              collapsed.push(segment);
+            }
+            return changed ? { filename, dirs: collapsed } : null;
+          }
+
+          function routeFromDirs(dirs) {
+            const visible = dirs.filter((segment) => !routeGroup.test(segment) && !parallelRoute.test(segment));
+            return `/${visible.join('/')}`.replace(/\/+/g, '/');
+          }
+
+          function redirectSource(route, extension) {
+            const params = [];
+            for (const segment of route.split('/').filter(Boolean)) {
+              if (segment.includes('...')) return null;
+              const match = segment.match(/^\[([^.[\]]+)\]$/);
+              if (match) params.push(match[1]);
+            }
+            const typed = extension === 'ts' || extension === 'tsx';
+            const header = "import { permanentRedirect } from 'next/navigation';\n\nexport const metadata = { robots: { index: false, follow: false } };\n";
+            if (params.length === 0) {
+              return `${header}\nexport default function LegacyRepeatedRoute() {\n  permanentRedirect('${route}');\n}\n`;
+            }
+            const shape = params.map((name) => `${name}: string`).join('; ');
+            const signature = typed ? `({ params }: { params: Promise<{ ${shape} }> })` : '({ params })';
+            let target = route;
+            for (const name of params) target = target.replace(`[${name}]`, `\${encodeURIComponent(${name})}`);
+            return `${header}\nexport default async function LegacyRepeatedRoute${signature} {\n  const { ${params.join(', ')} } = await params;\n  permanentRedirect(\`${target}\`);\n}\n`;
+          }
+
+          const moved = [];
+          const redirected = [];
+          const skipped = [];
+
+          for (const root of roots) {
+            if (!fs.existsSync(root)) continue;
+            for (const sourceFile of walk(root)) {
+              const collapsed = collapseRelative(sourceFile, root);
+              if (!collapsed) continue;
+              const source = fs.readFileSync(sourceFile, 'utf8');
+              if (isRedirect(source)) continue;
+
+              const targetFile = path.join(root, ...collapsed.dirs, collapsed.filename);
+              const targetRoute = routeFromDirs(collapsed.dirs);
+              const extension = collapsed.filename.split('.').at(-1);
+              const redirect = redirectSource(targetRoute, extension);
+              if (!redirect) {
+                skipped.push({ sourceFile, targetFile, targetRoute, reason: 'catch-all parameter' });
+                continue;
+              }
+
+              if (!fs.existsSync(targetFile)) {
+                fs.mkdirSync(path.dirname(targetFile), { recursive: true });
+                fs.copyFileSync(sourceFile, targetFile);
+                moved.push({ sourceFile, targetFile, targetRoute });
+              }
+
+              fs.writeFileSync(sourceFile, redirect);
+              redirected.push({ sourceFile, targetFile, targetRoute });
+            }
+          }
+
+          fs.mkdirSync('artifacts', { recursive: true });
+          fs.writeFileSync(
+            'artifacts/repeated-route-normalization.json',
+            JSON.stringify({ moved, redirected, skipped }, null, 2) + '\n',
+          );
+          console.log(`Moved ${moved.length} implementations to canonical paths.`);
+          console.log(`Converted ${redirected.length} repeated routes to redirects.`);
+          console.log(`Skipped ${skipped.length} routes.`);
+          for (const item of moved) console.log(`MOVE ${item.sourceFile} -> ${item.targetFile}`);
+          for (const item of redirected) console.log(`REDIRECT ${item.sourceFile} -> ${item.targetRoute}`);
+          for (const item of skipped) console.log(`SKIP ${item.sourceFile}: ${item.reason}`);
+          NODE
+
+      - name: Commit normalized routes and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/one-time-finish-repeated-route-normalization.yml
+          if git diff --quiet; then
+            echo 'No additional repeated routes required normalization.'
+            exit 0
+          fi
+          git config user.name 'elevateforhumanity'
+          git config user.email '221907459+elevateforhumanity@users.noreply.github.com'
+          git add apps/marketing/app apps/lms/app apps/admin/app .github/workflows/one-time-finish-repeated-route-normalization.yml
+          git commit -m 'fix(routes): normalize remaining repeated-segment pages'
+          git push origin HEAD:fix/remaining-duplicate-surfaces-20260809

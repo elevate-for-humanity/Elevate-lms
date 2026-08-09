@@ -66,7 +66,11 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
     primaryCta,
     secondaryCta,
     analyticsName: banner.analyticsName ?? key,
-    ...(banner.videoSrcDesktop ? { videoSrcMobile: banner.videoSrcDesktop } : {}),
+    // Preserve a real mobile-specific asset. Only fall back to desktop media
+    // when the source catalog does not provide a mobile hero.
+    ...(banner.videoSrcDesktop || banner.videoSrcMobile
+      ? { videoSrcMobile: banner.videoSrcMobile ?? banner.videoSrcDesktop }
+      : {}),
   };
 
   if (key === 'barber-apprenticeship') {

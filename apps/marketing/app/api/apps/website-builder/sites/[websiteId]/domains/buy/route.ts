@@ -64,13 +64,16 @@ export async function POST(
 
   const { data: existing } = await supabase
     .from('website_domains')
-    .select('id')
+    .select('id, status, payment_status')
     .eq('website_id', websiteId)
     .eq('user_id', user.id)
     .ilike('hostname', hostname)
     .neq('status', 'deleted')
     .maybeSingle();
-  if (existing) return NextResponse.json({ error: 'This domain already has a connection or purchase in progress.' }, { status: 409 });
+
+  if (existing && !['awaiting_payment', 'failed'].includes(String(existing.status))) {
+    return NextResponse.json({ error: 'This domain already has a connection or registration in progress.' }, { status: 409 });
+  }
 
   try {
     const quote = await checkDomainPurchase(hostname);
@@ -79,27 +82,44 @@ export async function POST(
     const markupCents = Math.max(0, Number(process.env.DOMAIN_RETAIL_MARKUP_CENTS ?? 1000) || 1000);
     const retailCents = quote.pricing.totalCents + markupCents;
     const customerReference = `elevate-${user.id}-${websiteId}`;
+    const pendingValues = {
+      website_id: websiteId,
+      user_id: user.id,
+      hostname,
+      mode: 'buy',
+      status: 'awaiting_payment',
+      payment_status: 'pending',
+      provider_cost_cents: quote.pricing.totalCents,
+      retail_cents: retailCents,
+      origin_url: originUrl,
+      customer_reference: customerReference,
+      stripe_checkout_session_id: null,
+      error: null,
+      metadata: { years, registrant, quotedProviderCostCents: quote.pricing.totalCents, markupCents, premium: quote.premium },
+    };
 
-    const { data: pending, error: insertError } = await supabase
-      .from('website_domains')
-      .insert({
-        website_id: websiteId,
-        user_id: user.id,
-        hostname,
-        mode: 'buy',
-        status: 'awaiting_payment',
-        payment_status: 'pending',
-        provider_cost_cents: quote.pricing.totalCents,
-        retail_cents: retailCents,
-        origin_url: originUrl,
-        customer_reference: customerReference,
-        metadata: { years, registrant, quotedProviderCostCents: quote.pricing.totalCents, markupCents, premium: quote.premium },
-      })
-      .select('id')
-      .maybeSingle();
-    if (insertError || !pending) {
-      logger.error('website domain pending purchase insert failed', undefined, { error: insertError?.message, hostname });
-      return NextResponse.json({ error: 'Could not prepare domain checkout.' }, { status: 500 });
+    let pendingId: string | null = existing?.id ?? null;
+    if (pendingId) {
+      const { error: resetError } = await supabase
+        .from('website_domains')
+        .update(pendingValues)
+        .eq('id', pendingId)
+        .eq('user_id', user.id);
+      if (resetError) {
+        logger.error('website domain pending checkout reset failed', undefined, { error: resetError.message, hostname });
+        return NextResponse.json({ error: 'Could not refresh domain checkout.' }, { status: 500 });
+      }
+    } else {
+      const { data: pending, error: insertError } = await supabase
+        .from('website_domains')
+        .insert(pendingValues)
+        .select('id')
+        .maybeSingle();
+      if (insertError || !pending) {
+        logger.error('website domain pending purchase insert failed', undefined, { error: insertError?.message, hostname });
+        return NextResponse.json({ error: 'Could not prepare domain checkout.' }, { status: 500 });
+      }
+      pendingId = pending.id;
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -111,7 +131,7 @@ export async function POST(
         kind: 'website_domain_purchase',
         user_id: user.id,
         website_id: websiteId,
-        domain_record_id: pending.id,
+        domain_record_id: pendingId,
         hostname,
       },
       line_items: [{
@@ -130,11 +150,11 @@ export async function POST(
     });
 
     if (!session.url) {
-      await supabase.from('website_domains').update({ status: 'failed', payment_status: 'checkout_failed' }).eq('id', pending.id);
+      await supabase.from('website_domains').update({ status: 'failed', payment_status: 'checkout_failed' }).eq('id', pendingId);
       return NextResponse.json({ error: 'Stripe did not return a checkout URL.' }, { status: 502 });
     }
 
-    await supabase.from('website_domains').update({ stripe_checkout_session_id: session.id }).eq('id', pending.id);
+    await supabase.from('website_domains').update({ stripe_checkout_session_id: session.id }).eq('id', pendingId);
     return NextResponse.json({ checkoutUrl: session.url, retailCents, providerCostCents: quote.pricing.totalCents, hostname });
   } catch (err) {
     logger.error('domain checkout creation failed', err instanceof Error ? err : undefined, { hostname });

@@ -1,14 +1,12 @@
 /**
  * Canonical Route Constants — single source of truth for navigation.
  *
- * Marketing routes remain relative to www.elevateforhumanity.org.
- * Authenticated portal routes use the deployed app/admin origins so navigation
- * remains correct when Marketing, LMS, and Admin run as separate Northflank
- * services.
+ * Marketing routes remain relative to www.elevateforhumanity.org when they are
+ * public pages. Authenticated portal routes are always absolute and use the
+ * service ownership defined in lib/routing/portal-map.ts.
  */
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.elevateforhumanity.org').replace(/\/$/, '');
-const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
+import { ADMIN_HOST, LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
 
 export const ROUTES = {
   // Home / intake
@@ -16,25 +14,28 @@ export const ROUTES = {
   apply: '/apply/student',
 
   // Authentication / portals
-  login: `${APP_URL}/login`,
-  studentPortal: `${APP_URL}/lms/dashboard`,
-  lmsPortal: `${APP_URL}/lms/dashboard`,
-  employerPortal: `${APP_URL}/employer/dashboard`,
-  apprenticePortal: `${APP_URL}/apprentice`,
-  parentPortal: `${APP_URL}/parent-portal/dashboard`,
-  workforcePortal: `${APP_URL}/workforce/dashboard`,
-  hostShopPortal: `${APP_URL}/host-shop/dashboard`,
+  login: `${LMS_HOST}/login`,
+  studentPortal: `${LMS_HOST}/lms/dashboard`,
+  lmsPortal: `${LMS_HOST}/lms/dashboard`,
+  employerPortal: `${LMS_HOST}/employer/dashboard`,
+  apprenticePortal: `${LMS_HOST}/apprentice`,
+  parentPortal: `${LMS_HOST}/parent-portal/dashboard`,
+  workforcePortal: `${LMS_HOST}/workforce/dashboard`,
+  hostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
   // Compatibility aliases retained for old bookmarks; do not expose as separate navigation items.
-  cosmetologyHostShopPortal: `${APP_URL}/host-shop/dashboard`,
-  partnerPortal: `${APP_URL}/host-shop/dashboard`,
-  adminPortal: `${ADMIN_URL}/dashboard`,
-  instructorPortal: `${ADMIN_URL}/instructor/dashboard`,
-  staffPortal: `${ADMIN_URL}/staff-portal/dashboard`,
-  adminLogin: `${ADMIN_URL}/login`,
-  caseManagerPortal: '/case-manager/dashboard',
-  providerPortal: '/provider/dashboard',
-  programHolderPortal: '/program-holder/dashboard',
-  workforceBoardPortal: '/workforce-board/dashboard',
+  cosmetologyHostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
+  partnerPortal: `${LMS_HOST}/host-shop/dashboard`,
+  adminPortal: `${ADMIN_HOST}/dashboard`,
+  instructorPortal: `${ADMIN_HOST}/instructor/dashboard`,
+  staffPortal: `${ADMIN_HOST}/staff-portal/dashboard`,
+  adminLogin: `${ADMIN_HOST}/login`,
+  // These operational workspaces still live on the Marketing service. Keep
+  // their URLs absolute so shared navigation never resolves them against the
+  // LMS or Admin hostname.
+  caseManagerPortal: `${MARKETING_HOST}/case-manager/dashboard`,
+  providerPortal: `${MARKETING_HOST}/provider/dashboard`,
+  programHolderPortal: `${MARKETING_HOST}/program-holder/dashboard`,
+  workforceBoardPortal: `${MARKETING_HOST}/workforce-board/dashboard`,
 
   // Programs
   programs: '/programs',
@@ -70,7 +71,7 @@ export const ROUTES = {
   // Employers
   employers: '/employer',
   employersHireGraduates: '/hire-graduates',
-  employersPostJob: `${APP_URL}/employer/dashboard`,
+  employersPostJob: `${LMS_HOST}/employer/dashboard`,
   forAgencies: '/for-agencies',
 
   // About

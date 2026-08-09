@@ -9,17 +9,21 @@ export default function StructuredData() {
     telephoneDigits.length === 11 && telephoneDigits.startsWith('1')
       ? `+${telephoneDigits}`
       : `+1${telephoneDigits}`;
+  const canonicalSiteUrl = 'https://www.elevateforhumanity.org';
 
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
-    '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization`,
+    '@id': `${canonicalSiteUrl}/#organization`,
     name: PLATFORM_DEFAULTS.orgName,
     legalName: `2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgLegalName}`,
-    url: PLATFORM_DEFAULTS.siteUrl,
+    url: canonicalSiteUrl,
     logo: {
       '@type': 'ImageObject',
-      url: `${PLATFORM_DEFAULTS.siteUrl}/images/Elevate_for_Humanity_logo_81bf0fab.jpg`,
+      url: `${canonicalSiteUrl}/icon-512.png`,
+      contentUrl: `${canonicalSiteUrl}/icon-512.png`,
+      width: 512,
+      height: 512,
     },
     description:
       'Career training, registered apprenticeship, workforce-development, testing, and employer-connected education services based in Indianapolis, Indiana.',
@@ -43,7 +47,10 @@ export default function StructuredData() {
       availableLanguage: ['English'],
     },
     sameAs: [
-      'https://www.instagram.com/elevateforhumanity',
+      'https://facebook.com/elevateforhumanity',
+      'https://twitter.com/elevatefh',
+      'https://linkedin.com/company/elevateforhumanity',
+      'https://instagram.com/elevateforhumanity',
       'https://www.youtube.com/@elevateforhumanity',
     ],
     hasOfferCatalog: {
@@ -57,13 +64,13 @@ export default function StructuredData() {
             '@type': 'Course',
             name: barber.name,
             description: `DOL Registered Apprenticeship requiring ${barber.totalHours.toLocaleString()} supervised OJL hours plus ${barber.relatedInstructionHours} hours of Related Technical Instruction under the registered program standards.`,
-            url: `${PLATFORM_DEFAULTS.siteUrl}/programs/barber-apprenticeship`,
-            provider: { '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization` },
+            url: `${canonicalSiteUrl}/programs/barber-apprenticeship`,
+            provider: { '@id': `${canonicalSiteUrl}/#organization` },
             offers: {
               '@type': 'Offer',
               price: String(BARBER_PRICING.fullPrice),
               priceCurrency: 'USD',
-              url: `${PLATFORM_DEFAULTS.siteUrl}/programs/barber-apprenticeship/apply`,
+              url: `${canonicalSiteUrl}/programs/barber-apprenticeship/apply`,
             },
           },
         },
@@ -72,8 +79,8 @@ export default function StructuredData() {
           itemOffered: {
             '@type': 'Course',
             name: 'HVAC Technician Training',
-            url: `${PLATFORM_DEFAULTS.siteUrl}/programs/hvac-technician`,
-            provider: { '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization` },
+            url: `${canonicalSiteUrl}/programs/hvac-technician`,
+            provider: { '@id': `${canonicalSiteUrl}/#organization` },
           },
         },
         {
@@ -81,8 +88,8 @@ export default function StructuredData() {
           itemOffered: {
             '@type': 'Course',
             name: 'Certified Nursing Assistant (CNA)',
-            url: `${PLATFORM_DEFAULTS.siteUrl}/programs/cna`,
-            provider: { '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization` },
+            url: `${canonicalSiteUrl}/programs/cna`,
+            provider: { '@id': `${canonicalSiteUrl}/#organization` },
           },
         },
         {
@@ -90,8 +97,8 @@ export default function StructuredData() {
           itemOffered: {
             '@type': 'Course',
             name: 'IT Help Desk',
-            url: `${PLATFORM_DEFAULTS.siteUrl}/programs/it-help-desk`,
-            provider: { '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization` },
+            url: `${canonicalSiteUrl}/programs/it-help-desk`,
+            provider: { '@id': `${canonicalSiteUrl}/#organization` },
           },
         },
         {
@@ -99,8 +106,8 @@ export default function StructuredData() {
           itemOffered: {
             '@type': 'Course',
             name: 'CDL Training',
-            url: `${PLATFORM_DEFAULTS.siteUrl}/programs/cdl-training`,
-            provider: { '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization` },
+            url: `${canonicalSiteUrl}/programs/cdl-training`,
+            provider: { '@id': `${canonicalSiteUrl}/#organization` },
           },
         },
       ],
@@ -110,21 +117,13 @@ export default function StructuredData() {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    '@id': `${PLATFORM_DEFAULTS.siteUrl}/#website`,
-    url: PLATFORM_DEFAULTS.siteUrl,
+    '@id': `${canonicalSiteUrl}/#website`,
+    url: canonicalSiteUrl,
     name: PLATFORM_DEFAULTS.orgName,
     description:
       'Career training, registered apprenticeship, workforce pathways, and testing services.',
     publisher: {
-      '@id': `${PLATFORM_DEFAULTS.siteUrl}/#organization`,
-    },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${PLATFORM_DEFAULTS.siteUrl}/search?q={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
+      '@id': `${canonicalSiteUrl}/#organization`,
     },
   };
 

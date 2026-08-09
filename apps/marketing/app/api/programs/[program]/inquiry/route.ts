@@ -50,8 +50,14 @@ export async function POST(request: NextRequest, { params }: { params: { program
       last_name: lastName.trim(),
       email: email.toLowerCase().trim(),
       phone: phone?.trim() || null,
+      // The live schema requires a non-blank city, but this short form does not
+      // collect one. Its empty-string default is normalized to NULL by a trigger.
+      city: 'Not provided',
       program_interest: slug,
-      status: 'inquiry',
+      // `inquiry` is the record type, not an applications workflow status.
+      // The live applications_status_check constraint accepts `submitted`.
+      status: 'submitted',
+      application_type: 'inquiry',
       source: body.source || 'program-request-info',
       notes:
         [

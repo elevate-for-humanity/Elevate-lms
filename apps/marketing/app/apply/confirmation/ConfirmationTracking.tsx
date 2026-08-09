@@ -28,11 +28,11 @@ export default function ConfirmationTracking() {
     }
 
     // After a successful application, prepare the WorkOne handoff only when
-    // the saved application is actually WIOA/WRG funded. The API is idempotent,
-    // so refreshing the confirmation page will not resend the packet.
+    // the saved application is actually WIOA/WRG funded. The API verifies the
+    // application and is idempotent, so refreshing will not resend the packet.
     try {
       const reference = new URLSearchParams(window.location.search).get('ref');
-      if (reference?.startsWith('EFH-')) {
+      if (reference && reference.length <= 100) {
         void fetch('/api/workone/handoff', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

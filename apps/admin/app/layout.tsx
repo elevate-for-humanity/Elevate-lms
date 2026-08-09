@@ -4,6 +4,7 @@
  */
 import type { Metadata } from "next";
 import "./globals.css";
+import '../../../styles/contrast-guardrails.css';
 import BuildVersionSync from '@/components/BuildVersionSync';
 import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 import AdminHeader from '@/components/admin/AdminHeader';
@@ -75,7 +76,7 @@ export default async function AdminGroupLayout({
       <head>
         <SupabasePublicConfigScript />
       </head>
-      <body className="admin-portal">
+      <body className="admin-portal efh-contrast">
         <SupabaseConfigBootstrap />
         <AdminPwaRegister />
         <AdminUpdateNotice />

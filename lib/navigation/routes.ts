@@ -24,7 +24,8 @@ export const ROUTES = {
   parentPortal: `${APP_URL}/parent-portal/dashboard`,
   workforcePortal: `${APP_URL}/workforce/dashboard`,
   hostShopPortal: `${APP_URL}/host-shop/dashboard`,
-  cosmetologyHostShopPortal: `${APP_URL}/cosmetology-host-shop/dashboard`,
+  // Compatibility aliases retained for old bookmarks; do not expose as separate navigation items.
+  cosmetologyHostShopPortal: `${APP_URL}/host-shop/dashboard`,
   partnerPortal: `${APP_URL}/host-shop/dashboard`,
   adminPortal: `${ADMIN_URL}/dashboard`,
   instructorPortal: `${ADMIN_URL}/instructor/dashboard`,
@@ -49,10 +50,10 @@ export const ROUTES = {
   programsCosmetology: '/programs/cosmetology-apprenticeship',
   programsEsthetician: '/programs/esthetician-apprenticeship',
   programsNailTech: '/programs/nail-technician-apprenticeship',
-  programsIT: '/programs/it-help-desk',
+  programsIT: '/programs/technology',
   programsTechnology: '/programs/technology',
 
-  // Apprenticeships / host shops
+  // Apprenticeships / host sites
   apprenticeships: '/apprenticeships',
   apprenticeshipsHowItWorks: '/how-it-works',
   apprenticeshipsHostShop: '/partners/host-shops',

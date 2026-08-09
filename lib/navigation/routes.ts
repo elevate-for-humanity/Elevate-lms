@@ -69,7 +69,9 @@ export const ROUTES = {
   eligibility: '/eligibility/quiz',
 
   // Employers
-  employers: '/employer',
+  // /employer is retained only as a compatibility redirect. Public employer
+  // discovery belongs on the maintained /hire-graduates page.
+  employers: '/hire-graduates',
   employersHireGraduates: '/hire-graduates',
   employersPostJob: `${LMS_HOST}/employer/dashboard`,
   forAgencies: '/for-agencies',

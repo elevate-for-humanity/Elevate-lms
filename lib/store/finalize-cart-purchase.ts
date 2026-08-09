@@ -20,12 +20,70 @@ export type FinalizeCartPurchaseResult = {
   error?: string;
 };
 
+async function ensureEntitlement({
+  db,
+  userId,
+  item,
+  paymentId,
+  now,
+}: {
+  db: SupabaseClient;
+  userId: string;
+  item: OrderSnapshotItem;
+  paymentId: string;
+  now: string;
+}): Promise<string | null> {
+  const values = {
+    name: item.name,
+    description: `Store purchase: ${item.name}`,
+    status: 'active',
+    entitlement_type: item.type || 'store_product',
+    granted_at: now,
+    stripe_payment_id: paymentId,
+    updated_at: now,
+  };
+
+  const { data: existing, error: lookupError } = await db
+    .from('user_entitlements')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('product_id', item.product_id)
+    .limit(1)
+    .maybeSingle();
+  if (lookupError) return lookupError.message;
+
+  if (existing?.id) {
+    const { error } = await db.from('user_entitlements').update(values).eq('id', existing.id);
+    return error?.message ?? null;
+  }
+
+  const { error: insertError } = await db.from('user_entitlements').insert({
+    user_id: userId,
+    product_id: item.product_id,
+    ...values,
+  });
+  if (!insertError) return null;
+
+  // A concurrent success-page/webhook finalizer may have inserted the same
+  // entitlement after our lookup. Re-read once and normalize the existing row.
+  const { data: raced } = await db
+    .from('user_entitlements')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('product_id', item.product_id)
+    .limit(1)
+    .maybeSingle();
+  if (!raced?.id) return insertError.message;
+
+  const { error: updateError } = await db.from('user_entitlements').update(values).eq('id', raced.id);
+  return updateError?.message ?? null;
+}
+
 /**
  * Finalize one Stripe-backed server cart purchase.
  *
- * Idempotency comes from store_orders.status plus the unique
- * store_orders.stripe_session_id and user_entitlements(user_id, product_id)
- * indexes shipped with the same remediation branch.
+ * The pending store_order is the idempotency/state boundary. Entitlement logic
+ * works before or after the optional unique-index hardening migration is applied.
  */
 export async function finalizeCartPurchase({
   db,
@@ -99,30 +157,21 @@ export async function finalizeCartPurchase({
       ? session.payment_intent
       : session.payment_intent?.id || session.id;
   const now = new Date().toISOString();
-  const digitalItems = items.filter((item) => !item.requires_shipping);
 
-  if (digitalItems.length) {
-    const entitlementRows = digitalItems.map((item) => ({
-      user_id: userId,
-      product_id: item.product_id,
-      name: item.name,
-      description: `Store purchase: ${item.name}`,
-      status: 'active',
-      entitlement_type: item.type || 'store_product',
-      granted_at: now,
-      stripe_payment_id: paymentId,
-      updated_at: now,
-    }));
-
-    const { error: entitlementError } = await db
-      .from('user_entitlements')
-      .upsert(entitlementRows, { onConflict: 'user_id,product_id' });
+  for (const item of items.filter((row) => !row.requires_shipping)) {
+    const entitlementError = await ensureEntitlement({ db, userId, item, paymentId, now });
     if (entitlementError) {
-      logger.error('[store/finalize] entitlement grant failed', entitlementError, {
+      logger.error('[store/finalize] entitlement grant failed', undefined, {
         orderId,
         userId,
+        productId: item.product_id,
+        error: entitlementError,
       });
-      return { success: false, orderId, error: 'Payment is confirmed but digital access could not be granted.' };
+      return {
+        success: false,
+        orderId,
+        error: 'Payment is confirmed but digital access could not be granted.',
+      };
     }
   }
 
@@ -148,6 +197,16 @@ export async function finalizeCartPurchase({
     .maybeSingle();
 
   if (updateError || !updated) {
+    // If a concurrent finalizer moved the order first, treat that as success.
+    const { data: recheck } = await db
+      .from('store_orders')
+      .select('status, stripe_session_id')
+      .eq('id', orderId)
+      .maybeSingle();
+    if (recheck?.status === 'paid' && recheck.stripe_session_id === session.id) {
+      return { success: true, orderId, alreadyFinalized: true };
+    }
+
     logger.error('[store/finalize] order status update failed', updateError ?? undefined, {
       orderId,
       stripeSessionId: session.id,
@@ -171,8 +230,7 @@ export async function finalizeCartPurchase({
     }
   }
 
-  // Inventory decrement is best-effort and runs only after the order has moved
-  // from pending -> paid, so retries cannot double-decrement.
+  // Inventory decrement happens only after this finalizer wins pending -> paid.
   for (const item of items.filter((row) => row.track_inventory)) {
     const { data: product } = await db
       .from('products')
@@ -180,6 +238,7 @@ export async function finalizeCartPurchase({
       .eq('id', item.product_id)
       .maybeSingle();
     if (!product || product.inventory_quantity === null) continue;
+
     const nextQuantity = Math.max(0, Number(product.inventory_quantity) - Number(item.quantity || 0));
     const { error } = await db
       .from('products')

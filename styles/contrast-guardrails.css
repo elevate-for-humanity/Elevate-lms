@@ -75,6 +75,69 @@
   color: #cbd5e1 !important;
 }
 
+/*
+ * Correct the most common production contrast failure without overriding text
+ * inside nested light cards: dark utility text on the dark panel itself, or on
+ * an immediate child of that panel. Nested .bg-white cards retain dark copy.
+ */
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900
+  ):is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-zinc-500,
+    .text-zinc-600,
+    .text-zinc-700,
+    .text-zinc-800
+  ),
+.efh-contrast
+  :is(
+    .bg-black,
+    .bg-slate-950,
+    .bg-slate-900,
+    .bg-slate-800,
+    .bg-gray-950,
+    .bg-gray-900,
+    .bg-zinc-950,
+    .bg-zinc-900,
+    .bg-brand-blue-700,
+    .bg-brand-blue-800,
+    .bg-brand-blue-900
+  )
+  > :is(
+    .text-slate-500,
+    .text-slate-600,
+    .text-slate-700,
+    .text-slate-800,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-zinc-500,
+    .text-zinc-600,
+    .text-zinc-700,
+    .text-zinc-800
+  ) {
+  color: #e2e8f0 !important;
+}
+
 .efh-contrast
   :is(
     .bg-black,

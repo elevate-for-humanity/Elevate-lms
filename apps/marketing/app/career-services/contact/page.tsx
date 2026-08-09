@@ -1,99 +1,74 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
-import { Phone, Mail, MapPin, Clock, Send, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Contact Career Services',
-  keywords: ["career services", "contact", "support", "questions"],
+  keywords: ['career services', 'contact', 'support', 'questions'],
   description: 'Get in touch with our career services team. We\'re here to help with resume building, job placement, and career counseling.',
 };
 
 export default function CareerServicesContactPage() {
+  const phoneHref = `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`;
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <MessageCircle className="w-4 h-4" />
-              Career Services
+      <PictureFirstPageHero
+        image="/images/pages/career-services-page-10.webp"
+        alt="Career services team supporting job seekers"
+        eyebrow="Career Services"
+        title="Contact Career Services"
+        description="Have questions about resume building, interview prep, or job placement? Our career services team is here to help."
+        actions={(
+          <a href={phoneHref} className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">
+            <Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.supportPhone}
+          </a>
+        )}
+      />
+
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <Phone className="mx-auto mb-4 h-8 w-8 text-brand-blue-700" />
+              <h3 className="mb-2 font-bold text-slate-950">Call Us</h3>
+              <p className="mb-4 text-sm text-slate-700">Speak directly with a career counselor</p>
+              <a href={phoneHref} className="text-sm font-semibold text-brand-blue-700 hover:underline">{PLATFORM_DEFAULTS.supportPhone}</a>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Contact Career Services
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Have questions about resume building, interview prep, or job placement? Our career services team is here to help.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a href="tel:3173143757" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                <Phone className="w-4 h-4 mr-2" />
-                Call (317) 314-3757
-              </a>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <Mail className="mx-auto mb-4 h-8 w-8 text-brand-blue-700" />
+              <h3 className="mb-2 font-bold text-slate-950">Email Us</h3>
+              <p className="mb-4 text-sm text-slate-700">Send your questions anytime</p>
+              <a href="mailto:careers@elevateforhumanity.org" className="text-sm font-semibold text-brand-blue-700 hover:underline">careers@elevateforhumanity.org</a>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <Clock className="mx-auto mb-4 h-8 w-8 text-brand-blue-700" />
+              <h3 className="mb-2 font-bold text-slate-950">Office Hours</h3>
+              <p className="mb-4 text-sm text-slate-700">Monday–Friday, 8 AM–5 PM ET</p>
+              <span className="text-sm font-semibold text-brand-blue-700">Virtual appointments available</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Contact Options */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-6 h-6 text-brand-blue-600" />
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Call Us</h3>
-              <p className="text-sm text-slate-600 mb-4">Speak directly with a career counselor</p>
-              <a href="tel:3173143757" className="text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700">
-                (317) 314-3757
-              </a>
-            </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-brand-blue-600" />
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Email Us</h3>
-              <p className="text-sm text-slate-600 mb-4">Send your questions anytime</p>
-              <a href="mailto:careers@elevateforhumanity.org" className="text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700">
-                careers@elevateforhumanity.org
-              </a>
-            </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200 text-center">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-6 h-6 text-brand-blue-600" />
-              </div>
-              <h3 className="font-bold text-slate-900 mb-2">Office Hours</h3>
-              <p className="text-sm text-slate-600 mb-4">Mon-Fri, 8am-5pm EST</p>
-              <span className="text-brand-blue-600 font-semibold text-sm">
-                Virtual appointments available
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Form */}
       <section className="py-16">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-4">Send Us a Message</h2>
-          <p className="text-slate-600 text-center mb-8">Fill out the form below and we'll get back to you within 24 hours.</p>
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950">Send Us a Message</h2>
+          <p className="mb-8 text-center text-slate-700">Fill out the form below and we&apos;ll get back to you within one business day.</p>
+          <div className="rounded-xl border border-slate-200 bg-white p-6">
             <form className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Your Name</label>
-                <input type="text" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" placeholder="John Smith" />
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Your Name</label>
+                <input type="text" className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500" placeholder="Your name" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
-                <input type="email" className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" placeholder="john@example.com" />
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Email Address</label>
+                <input type="email" className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500" placeholder="you@example.com" />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">How Can We Help?</label>
-                <select className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 bg-white">
+                <label className="mb-1 block text-sm font-semibold text-slate-900">How Can We Help?</label>
+                <select className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-950 focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500">
                   <option>Select a topic</option>
                   <option>Resume Building Help</option>
                   <option>Interview Preparation</option>
@@ -103,26 +78,22 @@ export default function CareerServicesContactPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Message</label>
-                <textarea rows={4} className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" placeholder="Tell us how we can help..."></textarea>
+                <label className="mb-1 block text-sm font-semibold text-slate-900">Message</label>
+                <textarea rows={4} className="w-full rounded-lg border border-slate-300 px-4 py-3 text-slate-950 focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500" placeholder="Tell us how we can help..." />
               </div>
-              <button type="submit" className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-3 rounded-lg transition-colors inline-flex items-center justify-center gap-2">
-                Send Message <Send className="w-4 h-4" />
+              <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-700 py-3 font-bold text-white transition-colors hover:bg-brand-blue-800">
+                Send Message <Send className="h-4 w-4" />
               </button>
             </form>
           </div>
         </div>
       </section>
 
-      {/* Location */}
-      <section className="py-16 bg-slate-50 border-t border-slate-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Visit Us</h2>
-          <div className="flex items-center justify-center gap-2 text-slate-600 mb-2">
-            <MapPin className="w-4 h-4" />
-            Indianapolis, Indiana
-          </div>
-          <p className="text-sm text-slate-500">Virtual services available throughout Indiana</p>
+      <section className="border-t border-slate-100 bg-slate-50 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-xl font-bold text-slate-950">Visit Us</h2>
+          <div className="mb-2 flex items-center justify-center gap-2 text-slate-700"><MapPin className="h-4 w-4" /> Indianapolis, Indiana</div>
+          <p className="text-sm text-slate-700">Virtual services are available throughout Indiana.</p>
         </div>
       </section>
     </div>

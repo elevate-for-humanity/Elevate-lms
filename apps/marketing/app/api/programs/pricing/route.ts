@@ -4,6 +4,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import { safeError } from '@/lib/api/safe-error';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getStaticProgram } from '@/data/programs/index';
+import { getMinimumDepositCents } from '@/lib/programs/deposit-policy';
 
 export const runtime = 'nodejs';
 export const revalidate = 300;
@@ -22,8 +23,11 @@ function buildStaticPricing(slug: string) {
   if (!tuitionCents) return null;
 
   const configuredDeposit = parseMoneyToCents(program.depositAmount);
-  const fallbackMinimum = Math.min(tuitionCents, Math.max(10000, Math.round(tuitionCents * 0.1)));
-  const depositMinCents = configuredDeposit || fallbackMinimum;
+  const depositMinCents = getMinimumDepositCents({
+    slug: program.slug,
+    tuitionCents,
+    configuredDepositCents: configuredDeposit,
+  });
   const depositDefaultCents = Math.min(
     tuitionCents,
     Math.max(depositMinCents, Math.round(tuitionCents * 0.35)),
@@ -65,7 +69,22 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (!error && data) {
-      return NextResponse.json({ ...data, source: 'program_pricing' });
+      const tuitionCents = Number(data.tuition_cents || 0);
+      const depositMinCents = getMinimumDepositCents({
+        slug,
+        tuitionCents,
+        configuredDepositCents: Number(data.deposit_min_cents || 0),
+      });
+      const depositDefaultCents = Math.min(
+        tuitionCents,
+        Math.max(depositMinCents, Number(data.deposit_default_cents || depositMinCents)),
+      );
+      return NextResponse.json({
+        ...data,
+        deposit_min_cents: depositMinCents,
+        deposit_default_cents: depositDefaultCents,
+        source: 'program_pricing',
+      });
     }
   } catch {
     // Static fallback below keeps the public calculator available if Supabase is unavailable.

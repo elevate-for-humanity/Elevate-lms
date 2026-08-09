@@ -1,127 +1,20 @@
 // scripts/db/runMigrations.js
-// Apply SQL migrations via Supabase exec_sql RPC (service role).
-// Tracks applied files in efh_migrations — skips already-applied ones.
-// No direct Postgres connection required.
+//
+// RETIRED.
+//
+// This repository previously replayed every SQL migration through a custom
+// service-role RPC (`public.exec_sql`) and tracked filenames in
+// `public.efh_migrations`. That created a second migration history beside
+// Supabase's canonical `supabase_migrations.schema_migrations` ledger and caused
+// legacy migrations to be retried against the current production schema.
+//
+// Do not re-enable this executor. It cannot safely run migrations containing
+// transaction control and must not be used to mutate Supabase-managed schemas.
+// Use the `Supabase Migrations` GitHub workflow / Supabase CLI so migration
+// history is compared against the official remote ledger before any apply.
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SERVICE_KEY) {
-  console.warn('⚠️  NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set — skipping automated migration run.');
-  console.warn('   Apply migrations manually via the Supabase Dashboard SQL Editor.');
-  process.exit(0);
-}
-
-const BASE_HEADERS = {
-  apikey: SERVICE_KEY,
-  Authorization: `Bearer ${SERVICE_KEY}`,
-  'Content-Type': 'application/json',
-};
-
-async function execSql(sql) {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec_sql`, {
-    method: 'POST',
-    headers: BASE_HEADERS,
-    body: JSON.stringify({ sql }),
-  });
-  if (r.status !== 200 && r.status !== 204) {
-    const t = await r.text();
-    throw new Error(`${r.status}: ${t.slice(0, 300)}`);
-  }
-}
-
-async function ensureTrackingTable() {
-  await execSql(`
-    CREATE TABLE IF NOT EXISTS public.efh_migrations (
-      id          SERIAL PRIMARY KEY,
-      filename    TEXT UNIQUE NOT NULL,
-      executed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-    GRANT ALL    ON public.efh_migrations TO service_role;
-    GRANT SELECT ON public.efh_migrations TO authenticated;
-  `);
-}
-
-async function getApplied() {
-  const r = await fetch(`${SUPABASE_URL}/rest/v1/efh_migrations?select=filename&limit=10000`, {
-    headers: BASE_HEADERS,
-  });
-  if (!r.ok) return new Set();
-  const rows = await r.json();
-  return new Set(Array.isArray(rows) ? rows.map((r) => r.filename) : []);
-}
-
-async function markApplied(filename) {
-  await fetch(`${SUPABASE_URL}/rest/v1/efh_migrations`, {
-    method: 'POST',
-    headers: { ...BASE_HEADERS, Prefer: 'return=minimal,resolution=ignore-duplicates' },
-    body: JSON.stringify({ filename }),
-  });
-}
-
-async function runMigrations() {
-  const migrationsDir = path.join(__dirname, '../../supabase/migrations');
-  if (!fs.existsSync(migrationsDir)) {
-    console.error('supabase/migrations not found');
-    process.exit(1);
-  }
-
-  const files = fs
-    .readdirSync(migrationsDir)
-    .filter((f) => f.endsWith('.sql'))
-    .sort();
-
-  console.log(`Found ${files.length} migration files`);
-
-  await ensureTrackingTable();
-  const applied = await getApplied();
-  console.log(`Already applied: ${applied.size}`);
-
-  let ok = 0,
-    skip = 0,
-    fail = 0;
-
-  for (const file of files) {
-    if (applied.has(file)) {
-      skip++;
-      continue;
-    }
-
-    const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
-    process.stdout.write(`  ${file} ... `);
-
-    try {
-      await execSql(sql);
-      await markApplied(file);
-      console.log('OK');
-      ok++;
-    } catch (e) {
-      const msg = e.message || '';
-      // Already-applied objects are not failures — mark as applied and continue
-      const alreadyExists =
-        msg.includes('already exists') ||
-        msg.includes('42710') || // duplicate_object
-        msg.includes('42P07') || // duplicate_table
-        msg.includes('42723'); // duplicate_function
-      if (alreadyExists) {
-        await markApplied(file);
-        console.log('SKIP (already exists)');
-        skip++;
-      } else {
-        console.log('FAIL: ' + msg.slice(0, 120));
-        fail++;
-      }
-    }
-  }
-
-  console.log(`\nDone: ${ok} applied, ${skip} skipped, ${fail} failed`);
-  if (fail > 0) process.exit(1);
-}
-
-runMigrations();
+console.error(
+  '[runMigrations] RETIRED: use the Supabase Migrations workflow / Supabase CLI. ' +
+    'The legacy exec_sql replay path is intentionally disabled.',
+);
+process.exit(1);

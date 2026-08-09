@@ -5,6 +5,7 @@ import MarqueeBanner from '@/components/MarqueeBanner';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
+import { HomeBusinessLaunch } from '@/components/home/HomeBusinessLaunch';
 import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
@@ -51,8 +52,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  // Preserve the August 7, 2026 ~7:00 PM homepage hero independently of
-  // later shared hero-banner changes used by other pages.
   const banner = {
     ...heroBanners.home,
     videoSrcDesktop:
@@ -64,7 +63,7 @@ export default function HomePage() {
     belowHeroHeadline:
       'Career Training, Registered Apprenticeships & Workforce Technology in Indiana',
     belowHeroSubheadline:
-      'DOL-registered apprenticeship sponsor and WIOA-approved training provider serving learners, employers, and workforce agencies in Indianapolis and across Indiana. Funded training in healthcare, skilled trades, CDL, and technology often at no cost for eligible participants.',
+      'DOL-registered apprenticeship sponsor and WIOA-approved training provider serving learners, employers, and workforce agencies in Indianapolis and across Indiana. Funding options may be available for eligible participants.',
     primaryCta: { label: 'Get Started', href: '/apply' },
     secondaryCta: {
       label: 'For Employers & Agencies',
@@ -85,31 +84,16 @@ export default function HomePage() {
 
   return (
     <>
-      {/* 1. Immediate visual identity + primary action */}
       <HomeHeroVideo banner={banner} />
-
-      {/* 2. Short current notices — not a second navigation bar */}
       <MarqueeBanner />
-
-      {/* 3. Let visitors choose a visual career pathway */}
       <HomeCareerPathways />
-
-      {/* 4. Explain the journey only after they can see the opportunities */}
+      <HomeBusinessLaunch />
       <HomeHowItWorks />
-
-      {/* 5. Explain how training may be paid for */}
       <HomeFunding />
-
-      {/* 6. Show the work-based learning infrastructure */}
       <HomeApprenticeshipInfra />
-
-      {/* 7. Give employers a clear entry point */}
       <HomeEmployerStrip />
-
-      {/* 8. Verification and trust, then one final action */}
       <HomeTrustBar />
       <HomeFinalCTA />
-
       <ParisFloatingButton />
     </>
   );

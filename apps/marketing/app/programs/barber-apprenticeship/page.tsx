@@ -5,8 +5,8 @@ import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
 // Registered-apprenticeship requirements are compliance-sensitive. Always
-// render from the current RAPIDS-backed source of truth instead of serving an
-// ISR snapshot or cached data after requirements or approved public copy change.
+// render from the current RAPIDS-backed source of truth with no ISR or fetch
+// cache after requirements or approved public copy changes.
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';

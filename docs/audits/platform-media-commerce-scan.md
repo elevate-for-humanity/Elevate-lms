@@ -1,10 +1,10 @@
 # Platform media, commerce, application & PWA audit
 
-Generated: 2026-08-09T09:40:19.800Z
+Generated: 2026-08-09T09:47:37.237Z
 
 ## Summary
 
-- Source files scanned: **5769**
+- Source files scanned: **5770**
 - Program/training page files found: **79**
 - Program pages with detected gradient/dark overlays: **21**
 - Program pages with no detected image/video media: **67**
@@ -14,7 +14,7 @@ Generated: 2026-08-09T09:40:19.800Z
 - Application/form implementation files: **58**
 - Application files with SSN language: **3**
 - Application files with government/photo ID language: **3**
-- Commerce/payment/cart/calculator files: **517**
+- Commerce/payment/cart/calculator files: **518**
 - PWA/service-worker/manifest files: **33**
 - Files with potentially light text classes: **1679**
 
@@ -117,10 +117,10 @@ Generated: 2026-08-09T09:40:19.800Z
 | /images/pages/cdl-truck-highway.webp | apps/lms/app/programs/[program]/courses/page.tsx<br>apps/marketing/app/programs/[program]/training/page.tsx<br>apps/marketing/app/programs/skilled-trades/SkilledTradesPageClient.tsx<br>components/ProgramHighlights.tsx<br>components/home/ProgramOutcomes.tsx<br>components/quiz/ProgramFinderQuiz.tsx<br>lib/content/archetype-content.ts<br>lib/content/archetypes.ts<br>lib/hero-config.ts<br>lib/programs/catalog-sectors.ts<br>lib/programs/programs.data.ts |
 | /images/pages/healthcare-grad.jpg | apps/marketing/app/how-it-works/page.tsx<br>apps/marketing/app/services/page.tsx<br>apps/marketing/app/transparency/page.tsx<br>components/EnrollmentProcess.tsx<br>components/ProgramHighlights.tsx<br>components/marketing/SuccessStoryCards.tsx<br>lib/content/archetype-content.ts<br>lib/hero-config.ts<br>lib/program-images.ts<br>lib/programs-data-complete.ts<br>lib/video/registry.ts |
 | /images/pages/healthcare-hero.webp | apps/marketing/app/courses/page.tsx<br>apps/marketing/public/data/hero-banners.json<br>components/SocialProof.tsx<br>components/home/Programs.tsx<br>components/programs/VisualProgramTemplate.tsx<br>components/programs/programAssets.ts<br>data/programs/cna.ts<br>data/programs/cpr-first-aid.ts<br>data/programs/emergency-health-safety.ts<br>data/programs/qma.ts |
-| /images/pages/training-cohort.webp | apps/marketing/app/programs/ProgramsHeroVideo.tsx<br>components/ProgramCTA.tsx<br>components/TutorialSystem.tsx<br>components/home/HomeEmployerStrip.tsx<br>components/layouts/AutoPolishedPage.tsx<br>components/programs/ProgramCard.tsx<br>components/programs/ProgramDetails.tsx<br>lib/content/archetype-content.ts<br>lib/hero-config.ts<br>lib/programs/programs.data.ts |
 | /images/pages/cna-clinical.jpg | apps/marketing/app/programs/[program]/training/page.tsx<br>apps/marketing/app/tutoring/TutoringClient.tsx<br>apps/marketing/app/tutoring/page.tsx<br>components/ProgramHighlights.tsx<br>components/VideoTestimonials.tsx<br>components/home/ProgramOutcomes.tsx<br>components/quiz/ProgramFinderQuiz.tsx<br>lib/content/archetypes.ts<br>lib/hero-config.ts<br>lib/programs/programs.data.ts |
 | /images/pages/about-career-training.webp | apps/lms/app/parent-portal/dashboard/page.tsx<br>apps/lms/app/parent-portal/page.tsx<br>apps/marketing/app/about/mission/mission/page.tsx<br>apps/marketing/app/email/page.tsx<br>apps/marketing/app/onboarding/page.tsx<br>apps/marketing/app/programs/[program]/training/page.tsx<br>apps/marketing/app/programs/barber-apprenticeship/orientation/OrientationClient.tsx<br>apps/marketing/app/workforce-partners/page.tsx<br>components/home/HomeTrustBar.tsx |
 | /images/pages/about-hero.webp | apps/marketing/app/offline/page.tsx<br>apps/marketing/app/store/licenses/school-license/page.tsx<br>apps/marketing/app/transparency/page.tsx<br>components/home/HomeTrustBar.tsx<br>components/home/TrustBadges.tsx<br>components/layouts/AutoPolishedPage.tsx<br>components/programs/programAssets.ts<br>lib/hero-config.ts<br>lib/lms/image-map.ts |
+| /images/pages/training-cohort.webp | apps/marketing/app/programs/ProgramsHeroVideo.tsx<br>components/ProgramCTA.tsx<br>components/TutorialSystem.tsx<br>components/home/HomeEmployerStrip.tsx<br>components/layouts/AutoPolishedPage.tsx<br>components/programs/ProgramDetails.tsx<br>lib/content/archetype-content.ts<br>lib/hero-config.ts<br>lib/programs/programs.data.ts |
 | /videos/it-technology.mp4 | data/programs/cad-drafting.ts<br>data/programs/cybersecurity-analyst.ts<br>data/programs/graphic-design.ts<br>data/programs/it-help-desk.ts<br>data/programs/network-administration.ts<br>data/programs/network-support-technician.ts<br>data/programs/software-development.ts<br>data/programs/technology.ts<br>data/programs/web-development.ts |
 | /images/pages/how-it-works-hero.webp | apps/lms/app/pathways/pathways/page.tsx<br>apps/lms/app/start/start/page.tsx<br>apps/marketing/app/how-it-works/page.tsx<br>apps/marketing/app/workforce-board/page.tsx<br>components/home/AudienceRouter.tsx<br>components/layouts/AutoPolishedPage.tsx<br>lib/hero-config.ts<br>content/blog/posts.ts |
 | /images/pages/admin-analytics-hero.webp | apps/lms/app/pathways/pathways/page.tsx<br>apps/marketing/app/store/add-ons/analytics-pro/checkout/page.tsx<br>apps/marketing/app/store/add-ons/analytics-pro/page.tsx<br>apps/marketing/app/store/guides/licensing/page.tsx<br>apps/marketing/app/store/guides/page.tsx<br>apps/marketing/app/store/practice-tests/page.tsx<br>components/home/HomePlatformPreview.tsx<br>lib/demo/scenes.ts |
@@ -940,6 +940,7 @@ Generated: 2026-08-09T09:40:19.800Z
 | lib/program-constants.ts | yes | no | no | yes | no |
 | lib/programs/application-config.ts | yes | yes | no | yes | no |
 | lib/programs/beauty-programs.ts | no | yes | no | yes | no |
+| lib/programs/deposit-policy.ts | no | yes | no | no | no |
 | lib/programs/pricing.ts | no | no | no | yes | no |
 | lib/programs/program-at-a-glance.ts | yes | no | no | no | no |
 | lib/programs/program-pricing.ts | yes | no | no | no | no |

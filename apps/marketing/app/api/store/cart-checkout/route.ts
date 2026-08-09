@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
-import { getProductBySlug } from '@/lib/store/products';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,18 +38,25 @@ function productUnitAmountCents(product: CartProduct): number {
 
 export async function POST(request: NextRequest) {
   await hydrateProcessEnv();
-  const supabase = await createClient();
+  const sessionClient = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await sessionClient.auth.getUser();
 
   if (!user?.id || !user.email) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  // The authenticated server cart is the source of truth. Do not trust a client
-  // payload for product identity, quantity, price, inventory, or shipping status.
-  const { data: rawCart, error: cartError } = await supabase
+  let db;
+  try {
+    db = await requireAdminClient();
+  } catch {
+    return NextResponse.json({ error: 'Checkout service is temporarily unavailable.' }, { status: 503 });
+  }
+
+  // Server-side cart + product rows are the source of truth. Never trust client
+  // product IDs, prices, inventory, shipping requirements, or quantities.
+  const { data: rawCart, error: cartError } = await db
     .from('cart_items')
     .select(
       `id, quantity, product:products(
@@ -89,8 +97,53 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const products = cart.map((row) => row.product as CartProduct);
+  const physicalProductIds = products
+    .filter((product) => product.requires_shipping === true)
+    .map((product) => product.id);
+
+  const snapshot = cart.map(({ product, quantity }) => {
+    const item = product as CartProduct;
+    return {
+      product_id: item.id,
+      slug: item.slug,
+      name: item.name,
+      unit_price_cents: productUnitAmountCents(item),
+      quantity,
+      type: item.type,
+      requires_shipping: Boolean(item.requires_shipping),
+      track_inventory: Boolean(item.track_inventory),
+    };
+  });
+  const totalCents = snapshot.reduce(
+    (sum, item) => sum + item.unit_price_cents * item.quantity,
+    0,
+  );
+
+  const { data: pendingOrder, error: orderError } = await db
+    .from('store_orders')
+    .insert({
+      user_id: user.id,
+      status: 'pending',
+      total_cents: totalCents,
+      items: snapshot,
+      notes: 'Server cart snapshot created before Stripe Checkout',
+    })
+    .select('id')
+    .single();
+
+  if (orderError || !pendingOrder?.id) {
+    logger.error('[store/cart-checkout] pending order insert failed', orderError ?? undefined, {
+      userId: user.id,
+    });
+    return NextResponse.json({ error: 'Unable to prepare your order.' }, { status: 500 });
+  }
+
   const stripe = getStripe();
-  if (!stripe) return NextResponse.json({ error: 'Payment system is temporarily unavailable.' }, { status: 503 });
+  if (!stripe) {
+    await db.from('store_orders').delete().eq('id', pendingOrder.id).eq('status', 'pending');
+    return NextResponse.json({ error: 'Payment system is temporarily unavailable.' }, { status: 503 });
+  }
 
   const lineItems = cart.map(({ product, quantity }) => {
     const item = product as CartProduct;
@@ -108,45 +161,59 @@ export async function POST(request: NextRequest) {
     };
   });
 
-  const products = cart.map((row) => row.product as CartProduct);
-  const productIds = products.map((product) => product.id);
-  const physicalProductIds = products.filter((product) => product.requires_shipping === true).map((product) => product.id);
-  const digitalProductIds = products.filter((product) => product.requires_shipping !== true).map((product) => product.id);
-  const courseSlugs = products
-    .map((product) => getProductBySlug(product.slug)?.programId)
-    .filter((value): value is string => Boolean(value && value !== 'all'));
-
-  const metadata = {
-    checkout_type: 'store_cart',
-    user_id: user.id,
-    product_id: productIds[0] ?? '',
-    product_ids: productIds.join(','),
-    digital_product_ids: digitalProductIds.join(','),
-    physical_product_ids: physicalProductIds.join(','),
-    course_slugs: [...new Set(courseSlugs)].join(','),
-    lms_access: courseSlugs.length ? 'true' : 'false',
-  };
-
   const origin = request.nextUrl.origin;
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    line_items: lineItems,
-    customer_email: user.email,
-    client_reference_id: user.id,
-    metadata,
-    allow_promotion_codes: true,
-    shipping_address_collection: physicalProductIds.length ? { allowed_countries: ['US'] } : undefined,
-    success_url: `${origin}/store/cart-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/store/cart?checkout=cancelled`,
-  });
+  try {
+    const checkout = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items: lineItems,
+      customer_email: user.email,
+      client_reference_id: user.id,
+      metadata: {
+        kind: 'store_purchase',
+        checkout_type: 'store_cart',
+        store_order_id: pendingOrder.id,
+        user_id: user.id,
+        item_count: String(snapshot.length),
+        has_physical_items: physicalProductIds.length ? 'true' : 'false',
+      },
+      allow_promotion_codes: true,
+      shipping_address_collection: physicalProductIds.length
+        ? { allowed_countries: ['US'] }
+        : undefined,
+      success_url: `${origin}/store/cart-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/store/cart?checkout=cancelled`,
+    });
 
-  if (!session.url) {
-    return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
+    if (!checkout.url) throw new Error('Stripe did not return a checkout URL.');
+
+    const { error: sessionUpdateError } = await db
+      .from('store_orders')
+      .update({ stripe_session_id: checkout.id, updated_at: new Date().toISOString() })
+      .eq('id', pendingOrder.id)
+      .eq('status', 'pending');
+    if (sessionUpdateError) {
+      logger.error('[store/cart-checkout] failed to persist Stripe session ID', sessionUpdateError, {
+        orderId: pendingOrder.id,
+        stripeSessionId: checkout.id,
+      });
+    }
+
+    const acceptsJson = request.headers.get('accept')?.includes('application/json');
+    if (acceptsJson) {
+      return NextResponse.json({
+        checkoutUrl: checkout.url,
+        orderId: pendingOrder.id,
+        sessionId: checkout.id,
+      });
+    }
+    return NextResponse.redirect(checkout.url, 303);
+  } catch (error) {
+    await db.from('store_orders').delete().eq('id', pendingOrder.id).eq('status', 'pending');
+    logger.error(
+      '[store/cart-checkout] Stripe session creation failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { orderId: pendingOrder.id, userId: user.id },
+    );
+    return NextResponse.json({ error: 'Unable to start secure checkout. Please try again.' }, { status: 500 });
   }
-
-  // HTML forms can follow a 303 directly; API callers still receive JSON when
-  // they explicitly ask for JSON.
-  const acceptsJson = request.headers.get('accept')?.includes('application/json');
-  if (acceptsJson) return NextResponse.json({ checkoutUrl: session.url });
-  return NextResponse.redirect(session.url, 303);
 }

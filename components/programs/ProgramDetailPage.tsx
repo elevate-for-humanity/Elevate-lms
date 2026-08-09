@@ -269,9 +269,9 @@ export default function ProgramDetailPage({
                   )}
                   {p.deliveryModelDetail && <DeliveryBadge model={p.deliveryModelDetail} />}
                 </div>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
                   {p.title}
-                </h1>
+                </h2>
                 <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
                   {p.subtitle}
                 </p>

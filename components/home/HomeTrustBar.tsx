@@ -41,7 +41,7 @@ const TRUST_ITEMS = [
     href: '/partners/workforce',
   },
   {
-    img: '/images/pages/jri-hero.webp',
+    img: '/images/pages/funding-impact-2.jpg',
     label: 'JRI Approved',
     sub: 'Marion County free tuition',
     href: '/partners/jri',
@@ -49,9 +49,21 @@ const TRUST_ITEMS = [
 ];
 
 const PARTNER_LOGOS = [
-  { src: '/images/pages/about-funding-nav.webp', alt: 'US Department of Labor', href: '/federal-compliance' },
-  { src: '/images/pages/about-partner-cta.webp', alt: 'Indiana Department of Workforce Development', href: '/partners/workforce' },
-  { src: '/images/pages/workforce-board-page-2.webp', alt: 'WorkOne Indiana', href: '/partners/workforce' },
+  {
+    src: '/images/pages/about-funding-nav.webp',
+    alt: 'US Department of Labor',
+    href: '/federal-compliance',
+  },
+  {
+    src: '/images/pages/about-partner-cta.webp',
+    alt: 'Indiana Department of Workforce Development',
+    href: '/partners/workforce',
+  },
+  {
+    src: '/images/pages/workforce-board-page-2.webp',
+    alt: 'WorkOne Indiana',
+    href: '/partners/workforce',
+  },
   { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
   { src: '/images/pages/about-hero.webp', alt: 'OSHA Authorized', href: '/compliance' },
 ];

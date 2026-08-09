@@ -20,8 +20,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Registered Apprenticeship Sponsor',
-  description:
-    `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute is a USDOL Registered Apprenticeship Sponsor providing RTI, apprenticeship governance, and coordination with licensed employer training sites.`,
+  description: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute is a USDOL Registered Apprenticeship Sponsor providing RTI, apprenticeship governance, and coordination with licensed employer training sites.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/apprenticeship-sponsor' },
 };
 
@@ -47,9 +46,9 @@ export default function ApprenticeshipSponsorPage() {
           <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
             USDOL Registered
           </p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
             Apprenticeship Sponsor
-          </h1>
+          </h2>
           <p className="text-slate-600 mt-2 max-w-2xl">
             Centralized apprenticeship governance, instruction, and partner training site
             coordination.
@@ -70,9 +69,9 @@ export default function ApprenticeshipSponsorPage() {
               <h2 className="text-2xl font-bold">Sponsor of Record</h2>
             </div>
             <p className="text-slate-600 text-lg leading-relaxed mb-6">
-              {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute, a program of 2Exclusive LLC-S,
-              operates as a centralized workforce development and Registered Apprenticeship sponsor
-              organization. The institute provides related technical instruction (RTI),
+              {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute, a program of 2Exclusive
+              LLC-S, operates as a centralized workforce development and Registered Apprenticeship
+              sponsor organization. The institute provides related technical instruction (RTI),
               apprenticeship sponsorship, workforce-funded career pathway enrollment, and
               coordination with licensed employer training sites under a unified governance and
               compliance structure.
@@ -326,4 +325,3 @@ export default function ApprenticeshipSponsorPage() {
     </div>
   );
 }
-

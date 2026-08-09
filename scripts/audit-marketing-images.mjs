@@ -1,18 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 
 const root = process.cwd();
 
-const sourceRoots = [
-  'apps/marketing/app',
-  'components',
-  'lib',
-];
+const sourceRoots = ['apps/marketing/app', 'components', 'lib'];
 
-const publicRoots = [
-  path.join(root, 'public'),
-  path.join(root, 'apps/marketing/public'),
-];
+const publicRoots = [path.join(root, 'public'), path.join(root, 'apps/marketing/public')];
 
 const sourceExtensions = new Set(['.ts', '.tsx', '.js', '.jsx', '.json']);
 
@@ -37,14 +31,15 @@ for (const sourceRoot of sourceRoots) {
 
 const references = new Map();
 
-const imagePattern = /(?:src|heroImage|image|imageUrl|backgroundImage)\s*[=:]\s*["'`](\/[^"'`]+(?:\.(?:png|jpe?g|webp|avif|gif|svg)))["'`]/gi;
+const imagePattern =
+  /(?:src|heroImage|image|imageUrl|backgroundImage)\s*[=:]\s*["'`](\/[^"'`]+(?:\.(?:png|jpe?g|webp|avif|gif|svg)))["'`]/gi;
 
 for (const file of files) {
   const source = fs.readFileSync(file, 'utf8');
   for (const match of source.matchAll(imagePattern)) {
     const imagePath = match[1].split('?')[0];
-    if (!references.has(imagePath)) references.set(imagePath, []);
-    references.get(imagePath).push(path.relative(root, file));
+    if (!references.has(imagePath)) references.set(imagePath, new Set());
+    references.get(imagePath).add(path.relative(root, file));
   }
 }
 
@@ -59,26 +54,49 @@ function resolvePublicImage(imagePath) {
 
 const missing = [];
 const duplicates = [];
+const binaries = new Map();
 
 for (const [imagePath, usages] of references) {
-  if (!resolvePublicImage(imagePath)) {
-    missing.push({ imagePath, usages });
+  const resolvedImage = resolvePublicImage(imagePath);
+  const uniqueUsages = [...usages].sort();
+
+  if (!resolvedImage) {
+    missing.push({ imagePath, usages: uniqueUsages });
+  } else {
+    const hash = crypto.createHash('sha256').update(fs.readFileSync(resolvedImage)).digest('hex');
+    if (!binaries.has(hash)) binaries.set(hash, []);
+    binaries.get(hash).push(imagePath);
   }
-  if (usages.length >= 3) {
-    duplicates.push({ imagePath, usages });
+
+  if (uniqueUsages.length >= 3) {
+    duplicates.push({ imagePath, usages: uniqueUsages });
   }
 }
+
+const duplicateBinaries = [...binaries.values()]
+  .map((imagePaths) => [...new Set(imagePaths)].sort())
+  .filter((imagePaths) => imagePaths.length > 1)
+  .sort((a, b) => b.length - a.length);
 
 console.log('\nMarketing image audit\n');
 console.log(`Image references: ${references.size}`);
 console.log(`Missing local images: ${missing.length}`);
 console.log(`Images used in 3+ files: ${duplicates.length}`);
+console.log(`Duplicate image binaries under different paths: ${duplicateBinaries.length}`);
 
 if (missing.length > 0) {
   console.log('\nMissing image files:\n');
   for (const item of missing) {
     console.log(`- ${item.imagePath}`);
     for (const usage of item.usages) console.log(`  ${usage}`);
+  }
+}
+
+if (duplicateBinaries.length > 0) {
+  console.log('\nDuplicate image files (same pixels, different paths):\n');
+  for (const imagePaths of duplicateBinaries) {
+    console.log(`- ${imagePaths.length} copies`);
+    for (const imagePath of imagePaths) console.log(`  ${imagePath}`);
   }
 }
 

@@ -10,7 +10,8 @@ const PATHWAYS = [
   {
     slug: 'barber-apprenticeship',
     title: 'Barber Apprenticeship',
-    description: 'Earn while you learn through structured on-the-job training and related technical instruction.',
+    description:
+      'Earn while you learn through structured on-the-job training and related technical instruction.',
     image: '/images/pages/barber-hero-main.webp',
     imageAlt: 'Barber apprenticeship training at a partner barbershop',
     ctaHref: '/programs/barber-apprenticeship',
@@ -19,7 +20,8 @@ const PATHWAYS = [
   {
     slug: 'host-shop',
     title: 'Become a Host Shop',
-    description: 'Train apprentices at your licensed shop while Elevate supports onboarding, tracking, and compliance.',
+    description:
+      'Train apprentices at your licensed shop while Elevate supports onboarding, tracking, and compliance.',
     image: '/images/pages/shop-hero.webp',
     imageAlt: 'Barbershop and salon host shop partnership',
     ctaHref: '/partners/barber-host-shop',
@@ -28,7 +30,8 @@ const PATHWAYS = [
   {
     slug: 'cdl-training',
     title: 'CDL Training',
-    description: 'Prepare for commercial driving with permit support, safety instruction, and coordinated road training.',
+    description:
+      'Prepare for commercial driving with permit support, safety instruction, and coordinated road training.',
     image: '/images/pages/cdl-hero.webp',
     imageAlt: 'Commercial driver training',
     ctaHref: '/programs/cdl-training',
@@ -37,7 +40,8 @@ const PATHWAYS = [
   {
     slug: 'hvac-technician',
     title: 'HVAC Training',
-    description: 'Build hands-on skills in heating, cooling, refrigeration, safety, diagnostics, installation, and maintenance.',
+    description:
+      'Build hands-on skills in heating, cooling, refrigeration, safety, diagnostics, installation, and maintenance.',
     image: '/images/pages/hvac-technician.webp',
     imageAlt: 'HVAC technician training',
     ctaHref: '/programs/hvac-technician',
@@ -46,7 +50,8 @@ const PATHWAYS = [
   {
     slug: 'business',
     title: 'Business & Career Advancement',
-    description: 'Build practical skills for business launch, operations, budgeting, branding, marketing, and career growth.',
+    description:
+      'Build practical skills for business launch, operations, budgeting, branding, marketing, and career growth.',
     image: '/images/business/office-admin.webp',
     imageAlt: 'Business and entrepreneurship training',
     ctaHref: '/programs/business',
@@ -62,22 +67,26 @@ export function HomeCareerPathways() {
           <p className="mb-3 text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
             Career Pathways
           </p>
-          <h2 id="featured-pathways-heading" className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h2
+            id="featured-pathways-heading"
+            className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl"
+          >
             See yourself in the next step.
           </h2>
           <p className="mt-4 text-lg leading-8 text-slate-700">
-            Explore hands-on training, apprenticeships, and career pathways designed around real work and industry credentials.
+            Explore hands-on training, apprenticeships, and career pathways designed around real
+            work and industry credentials.
           </p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {PATHWAYS.map((p, index) => (
+          {PATHWAYS.map((p) => (
             <article
               key={p.slug}
-              className={`group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl ${index < 2 ? 'lg:col-span-1' : ''}`}
+              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
             >
               <Link href={p.ctaHref} className="block">
-                <div className="relative h-56 overflow-hidden bg-slate-100 sm:h-64">
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                   <Image
                     src={p.image}
                     alt={p.imageAlt}
@@ -94,7 +103,8 @@ export function HomeCareerPathways() {
                   <h3 className="text-2xl font-black leading-tight text-slate-950">{p.title}</h3>
                   <p className="mt-3 text-base leading-7 text-slate-700">{p.description}</p>
                   <span className="mt-5 inline-flex items-center gap-2 text-base font-extrabold text-brand-red-700">
-                    Explore pathway <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Explore pathway{' '}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
               </Link>

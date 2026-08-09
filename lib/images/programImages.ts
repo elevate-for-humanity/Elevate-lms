@@ -35,7 +35,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'CDL student performing a pre-trip inspection on a commercial truck',
   },
   'diesel-mechanic': {
-    card: `${P}/diesel-mechanic.webp`,
+    card: '/images/pexels/diesel.webp',
     hero: `${P}/cdl-cab-interior.webp`,
     alt: 'Diesel mechanic working on a commercial vehicle engine',
   },
@@ -51,7 +51,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   plumbing: {
     card: `${P}/plumbing-pipes.webp`,
-    hero: `${P}/plumbing.jpg`,
+    hero: '/images/pexels/plumbing.webp',
     alt: 'Plumber installing pipes during a commercial plumbing job',
   },
   'construction-trades-certification': {
@@ -87,7 +87,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'cpr-first-aid': {
     card: `${P}/cpr-mannequin.webp`,
-    hero: `${P}/cpr-training-real.webp`,
+    hero: `${P}/programs-cpr-hero.webp`,
     alt: 'CPR certification training on a mannequin',
   },
 
@@ -103,7 +103,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'esthetician-apprenticeship': {
     card: '/images/beauty/esthetician.webp',
-    hero: '/images/beauty/esthetics-hero.webp',
+    hero: '/images/pexels/esthetician.webp',
     alt: 'Esthetician apprentice providing a professional skincare treatment',
   },
   'nail-technician-apprenticeship': {
@@ -113,7 +113,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
 
   'it-help-desk': {
-    card: `${P}/it-helpdesk-desk.webp`,
+    card: `${P}/tech-classroom.webp`,
     hero: `${P}/it-help-desk.webp`,
     alt: 'IT help desk technician supporting a user at a workstation',
   },
@@ -139,7 +139,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'web-development': {
     card: `${P}/web-development.webp`,
-    hero: `${P}/comp-layout-hero.webp`,
+    hero: `${P}/programs-tech-webdev-hero.webp`,
     alt: 'Web development student building a site',
   },
   'graphic-design': {
@@ -160,7 +160,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   bookkeeping: {
     card: `${P}/bookkeeping-ledger.webp`,
-    hero: `${P}/bookkeeping.webp`,
+    hero: '/images/pexels/bookkeeping.webp',
     alt: 'Bookkeeping student working with financial records',
   },
   'finance-bookkeeping-accounting': {
@@ -174,7 +174,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Entrepreneur working on a business plan',
   },
   business: {
-    card: `${P}/business-sector.webp`,
+    card: '/images/pexels/business.webp',
     hero: '/images/business/team-4.webp',
     alt: 'Business administration student in a professional setting',
   },
@@ -184,13 +184,13 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Office administrator working at a professional workstation',
   },
   'project-management': {
-    card: `${P}/project-management.webp`,
+    card: '/images/pexels/project.webp',
     hero: `${P}/comp-home-highlight-success.webp`,
     alt: 'Project manager leading a team meeting',
   },
 
   'culinary-apprenticeship': {
-    card: `${P}/culinary.webp`,
+    card: '/images/pexels/culinary.webp',
     hero: `${P}/culinary-apprenticeship-hero.webp`,
     alt: 'Culinary apprentice preparing food in a professional kitchen',
   },

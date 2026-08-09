@@ -17,6 +17,39 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+const STORE_DEMO_SLIDES = [
+  {
+    src: '/images/pages/comp-layout-hero.webp',
+    alt: 'Elevate Website Builder workspace preview',
+    label: 'Build and publish websites',
+  },
+  {
+    src: '/images/pages/admin-campaigns-hero.webp',
+    alt: 'Elevate CRM and campaign management preview',
+    label: 'Manage CRM, leads and campaigns',
+  },
+  {
+    src: '/images/pages/admin-ai-studio-hero.webp',
+    alt: 'Elevate AI Studio preview',
+    label: 'Run your AI operations team',
+  },
+  {
+    src: '/images/pages/admin-courses-partners-hero.webp',
+    alt: 'Elevate Course Builder preview',
+    label: 'Build courses and training programs',
+  },
+  {
+    src: '/images/pages/admin-wioa-hero.webp',
+    alt: 'Elevate workforce management preview',
+    label: 'Operate workforce and funded programs',
+  },
+  {
+    src: '/images/heroes/lms-analytics.webp',
+    alt: 'Elevate LMS analytics preview',
+    label: 'Track learners, progress and outcomes',
+  },
+];
+
 export default function StorePage() {
   const hero = heroBanners.store;
 
@@ -30,6 +63,10 @@ export default function StorePage() {
         microLabel="Elevate Business Operating Platform"
         transcript={hero.transcript}
         analyticsName={hero.analyticsName}
+        mediaFit="contain"
+        demoSlides={STORE_DEMO_SLIDES}
+        demoStartSeconds={6}
+        demoSlideSeconds={4.5}
         belowHeroHeadline="Start with what you need. Add more when your business is ready."
         belowHeroSubheadline="Website, CRM, AI assistants, education, workforce, testing and operations in one platform."
         ctas={[

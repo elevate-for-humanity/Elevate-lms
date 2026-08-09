@@ -1,5 +1,6 @@
 // Server Component - NO 'use client'
-// This header renders on the server and is visible even with JS disabled
+// This header renders on the server and is visible even with JS disabled.
+// Marketing has exactly one header owner: apps/marketing/app/layout.tsx.
 
 import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
@@ -12,9 +13,10 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export default function Header() {
   return (
     <header
-      className="fixed inset-x-0 top-0 z-[9999] isolate h-[68px] overflow-visible border-b border-slate-200 bg-white shadow-sm"
+      className="relative z-[100] isolate h-[68px] overflow-visible border-b border-slate-200 bg-white shadow-sm"
       role="banner"
       data-site-header
+      data-header-owner="marketing-root"
     >
       <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 lg:gap-2 lg:px-3 xl:gap-3 xl:px-4 2xl:px-6">
         <Link
@@ -28,9 +30,8 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Desktop is always one horizontal navigation row from 1024px up.
-            Keep the mobile drawer below lg so standard Windows laptop widths
-            and 125% display scaling do not fall into a compact desktop menu. */}
+        {/* One canonical desktop navigation row. No second desktop menu,
+            no horizontal scrolling strip, and no duplicated header shell. */}
         <div className="hidden min-w-0 justify-center overflow-visible lg:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>

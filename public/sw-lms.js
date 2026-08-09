@@ -1,37 +1,36 @@
 // Service Worker — LMS Domain
 // __CACHE_VERSION__ replaced at build time by scripts/stamp-sw.mjs.
 const CACHE_VERSION = '__CACHE_VERSION__';
-
 const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const COURSE_CACHE = `${CACHE_VERSION}-courses`;
-const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
-  '/',
-  OFFLINE_URL,
+  '/offline.html',
   '/manifest-lms.json',
   `${CDN}/icons/student-192.png`,
   `${CDN}/icons/student-512.png`,
 ];
 
-const CACHE_STRATEGIES = {
-  noCache: [
-    /\/api\//,
-    /\/login/,
-    /\/logout/,
-    /\/unauthorized/,
-    /supabase/,
-    /analytics/,
-    /gtag/,
-  ],
-  nextChunks: [/\/_next\/static\//, /\/_next\/data\//],
-  static: [/\.(woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
-  staleWhileRevalidate: [/\/api\/public\//],
-  networkFirst: [/\/courses\//, /\/programs\//, /\/lms\//],
-};
+function isCacheableResponse(response) {
+  return Boolean(
+    response &&
+      response.status === 200 &&
+      response.ok &&
+      !response.redirected &&
+      response.type !== 'opaqueredirect',
+  );
+}
+
+async function safeCachePut(cache, request, response) {
+  if (!isCacheableResponse(response)) return;
+  try {
+    await cache.put(request, response.clone());
+  } catch (error) {
+    console.warn('[SW-lms] Cache put skipped:', error?.message || String(error));
+  }
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -39,16 +38,14 @@ self.addEventListener('install', (event) => {
       const cache = await caches.open(STATIC_CACHE);
       const results = await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
-          const req = new Request(asset, { cache: 'reload' });
+          const req = new Request(asset, { cache: 'reload', redirect: 'follow' });
           const res = await fetch(req);
-          if (!res.ok) throw new Error(`Precache failed: ${asset} HTTP ${res.status}`);
-          await cache.put(req, res);
+          if (!isCacheableResponse(res)) return;
+          await safeCachePut(cache, req, res);
         }),
       );
-      const failures = results.filter((r) => r.status === 'rejected');
-      if (failures.length > 0) {
-        console.warn('[SW-lms] Optional precache failures:', failures.length);
-      }
+      const failures = results.filter((result) => result.status === 'rejected');
+      if (failures.length) console.warn('[SW-lms] Optional precache failures:', failures.length);
       await self.skipWaiting();
     })(),
   );
@@ -68,87 +65,51 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-function matchesPattern(url, patterns) {
-  return patterns.some((pattern) => pattern.test(url));
-}
-
-async function networkFirst(request, cacheName) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    return caches.match(request);
-  }
-}
-
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(STATIC_CACHE);
   const cached = await cache.match(request);
-  const fetchPromise = fetch(request)
-    .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+  const network = fetch(request)
+    .then(async (response) => {
+      await safeCachePut(cache, request, response);
       return response;
     })
     .catch(() => null);
-  return cached || fetchPromise;
+  return cached || network;
 }
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET') return;
-  if (url.origin !== self.location.origin) return;
-  if (matchesPattern(request.url, CACHE_STRATEGIES.noCache)) return;
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  if (matchesPattern(request.url, CACHE_STRATEGIES.nextChunks)) {
-    event.respondWith(fetch(request, { cache: 'no-store' }));
+  // Never cache authenticated HTML/RSC, application APIs, auth routes, or range
+  // requests. Course-page offline caching is explicit through CACHE_COURSE below;
+  // generic /lms/* responses are intentionally not cached.
+  if (
+    request.mode === 'navigate' ||
+    request.headers.has('range') ||
+    request.headers.get('RSC') === '1' ||
+    url.searchParams.has('_rsc') ||
+    url.pathname.startsWith('/api/') ||
+    /\/(?:login|logout|unauthorized)(?:\/|$)/.test(url.pathname) ||
+    /\/(?:lms\/dashboard|apprentice|employer|host-shop|workforce|parent-portal)(?:\/|$)/.test(url.pathname)
+  ) {
     return;
   }
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      (async () => {
-        try {
-          return await fetch(request, { cache: 'no-store', redirect: 'follow' });
-        } catch {
-          const cached = await caches.match(request);
-          if (cached) return cached;
-          const offline = await caches.match(OFFLINE_URL);
-          if (offline) return offline;
-          return new Response('LMS is temporarily unavailable.', {
-            status: 503,
-            headers: { 'Content-Type': 'text/plain' },
-          });
-        }
-      })(),
-    );
+  if (/^\/_next\/(?:static|data)\//.test(url.pathname)) {
+    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }));
     return;
   }
 
-  let responsePromise;
-  if (matchesPattern(request.url, CACHE_STRATEGIES.static)) {
-    responsePromise = staleWhileRevalidate(request, STATIC_CACHE);
-  } else if (matchesPattern(request.url, CACHE_STRATEGIES.staleWhileRevalidate)) {
-    responsePromise = staleWhileRevalidate(request, DYNAMIC_CACHE);
-  } else if (matchesPattern(request.url, CACHE_STRATEGIES.networkFirst)) {
-    responsePromise = networkFirst(request, COURSE_CACHE);
-  } else {
-    responsePromise = networkFirst(request, DYNAMIC_CACHE);
-  }
+  const isStaticAsset =
+    /\.(?:woff2?|ttf|eot|png|jpe?g|webp|avif|gif|svg|ico)$/i.test(url.pathname) ||
+    url.pathname.startsWith('/images/') ||
+    url.pathname.startsWith('/icons/');
 
-  event.respondWith(
-    responsePromise.then(async (response) => {
-      if (response) return response;
-      const offline = await caches.match(OFFLINE_URL);
-      if (offline && request.destination === 'document') return offline;
-      return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-    }),
-  );
+  if (!isStaticAsset) return;
+  event.respondWith(staleWhileRevalidate(request).then((response) => response || fetch(request)));
 });
 
 self.addEventListener('message', (event) => {
@@ -156,17 +117,25 @@ self.addEventListener('message', (event) => {
 
   switch (type) {
     case 'CACHE_COURSE':
-      if (payload?.urls) {
-        caches.open(COURSE_CACHE).then((cache) => {
-          Promise.allSettled(
-            payload.urls.map((url) => fetch(url, { cache: 'reload' }).then((r) => r.ok && cache.put(url, r))),
-          );
-        });
+      if (Array.isArray(payload?.urls)) {
+        event.waitUntil(
+          caches.open(COURSE_CACHE).then((cache) =>
+            Promise.allSettled(
+              payload.urls.map(async (rawUrl) => {
+                const url = new URL(rawUrl, self.location.origin);
+                if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+                const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow' });
+                const response = await fetch(request);
+                await safeCachePut(cache, request, response);
+              }),
+            ),
+          ),
+        );
       }
       break;
 
     case 'CLEAR_COURSE_CACHE':
-      caches.delete(COURSE_CACHE);
+      event.waitUntil(caches.delete(COURSE_CACHE));
       break;
 
     case 'SKIP_WAITING':
@@ -174,28 +143,24 @@ self.addEventListener('message', (event) => {
       break;
 
     case 'GET_CACHE_SIZE':
-      Promise.all([
-        caches.open(STATIC_CACHE).then((c) => c.keys()),
-        caches.open(DYNAMIC_CACHE).then((c) => c.keys()),
-        caches.open(COURSE_CACHE).then((c) => c.keys()),
-      ]).then(([staticKeys, dynamicKeys, courseKeys]) => {
-        event.source.postMessage({
-          type: 'CACHE_SIZE',
-          payload: { static: staticKeys.length, dynamic: dynamicKeys.length, courses: courseKeys.length },
-        });
-      });
+      event.waitUntil(
+        Promise.all([
+          caches.open(STATIC_CACHE).then((cache) => cache.keys()),
+          caches.open(COURSE_CACHE).then((cache) => cache.keys()),
+        ]).then(([staticKeys, courseKeys]) => {
+          event.source?.postMessage({
+            type: 'CACHE_SIZE',
+            payload: { static: staticKeys.length, courses: courseKeys.length },
+          });
+        }),
+      );
       break;
   }
 });
 
 self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-enrollment') event.waitUntil(syncEnrollmentData());
   if (event.tag === 'sync-hours') event.waitUntil(syncHoursData());
 });
-
-async function syncEnrollmentData() {
-  console.log('[SW-lms] Syncing enrollment data...');
-}
 
 async function syncHoursData() {
   const db = await openOfflineDB();
@@ -205,14 +170,15 @@ async function syncHoursData() {
 
   for (const req of requests) {
     try {
-      await fetch(req.url, {
+      const response = await fetch(req.url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify(req.data),
       });
-      store.delete(req.id);
+      if (response.ok) store.delete(req.id);
     } catch (error) {
-      console.log('[SW-lms] Failed to sync hours:', error);
+      console.warn('[SW-lms] Hour sync deferred:', error?.message || String(error));
     }
   }
 }
@@ -266,7 +232,5 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
-  if (event.action === 'view') {
-    event.waitUntil(clients.openWindow(url));
-  }
+  event.waitUntil(clients.openWindow(url));
 });

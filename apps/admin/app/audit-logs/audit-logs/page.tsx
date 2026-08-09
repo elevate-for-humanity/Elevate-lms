@@ -1,13 +1,7 @@
-import { Metadata } from 'next';
-import { requireRole } from '@/lib/auth/require-role';
-import AuditLogsPageClient from '../PageClient';
+import { permanentRedirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-export const metadata: Metadata = {
-  title: 'Audit Logs | Admin',
-};
+export const metadata = { robots: { index: false, follow: false } };
 
-export default async function AuditLogsPage() {
-  await requireRole(['admin', 'super_admin']);
-  return <AuditLogsPageClient />;
+export default function LegacyDuplicateRoute() {
+  permanentRedirect('/audit-logs');
 }

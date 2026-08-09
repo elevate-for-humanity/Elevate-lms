@@ -1,6 +1,6 @@
 # Platform Surface Consolidation Audit — 2026-08-09
 
-Scope: Marketing (`www`), LMS (`app`), Admin (`admin`), public sitemap, shared navigation/footer, compatibility routes, and high-risk duplicated product surfaces.
+Scope: Marketing (`www`), LMS (`app`), Admin (`admin`), standalone Next.js routing, public sitemap, shared navigation/footer, compatibility routes, and high-risk duplicated product surfaces.
 
 ## Decision rule
 
@@ -24,6 +24,30 @@ No page is removed simply because another page has a similar name. Overlapping r
 | Testing | Marketing `/testing`, Admin `/testing-center`, Store `/store/testing` | Marketing public `/testing`; Admin operational `/testing-center` | Public exam information/booking discovery; authenticated operations/statistics | Intentional separation retained |
 | Business program alias | `/programs/business` -> missing `/programs/business-administration` | `/programs` catalog | No unique working business page existed to preserve | Alias now redirects to maintained catalog; removed from header and sitemap |
 | IT Help Desk alias | `/programs/it-help-desk` / `/programs/it-helpdesk` absent | `/programs/technology` | Technology program discovery | Shared route and header point to existing technology page; no thin duplicate page created |
+
+## Standalone service routing
+
+Production architecture was verified against workspace package scripts and Dockerfiles:
+
+- Marketing builds with `pnpm --filter @elevate/marketing build` and runs the Marketing standalone server.
+- LMS builds with `pnpm --filter @elevate/lms build` and runs the LMS standalone server.
+- Admin has its own app-local middleware for RBAC and protected Admin routes.
+
+The repository-root `middleware.ts` still described an obsolete architecture where all three domains shared one container. It also contained a fourth set of cross-domain routing rules that conflicted with the standalone services. That legacy middleware has been removed.
+
+Active routing is now limited to the actual service authorities:
+
+- `apps/marketing/next.config.mjs` — public-host and historical cross-service redirects;
+- `apps/lms/next.config.mjs` — LMS compatibility redirects to public Marketing/Admin destinations;
+- `apps/admin/middleware.ts` — Admin authentication/RBAC and route protection.
+
+Additional one-hop corrections:
+
+- historical Marketing `/cosmetology-host-shop/*` and `/partner/*` now land on `https://app.elevateforhumanity.org/host-shop/dashboard`;
+- LMS `/apply` now lands directly on `https://www.elevateforhumanity.org/apply/student`;
+- LMS `/eligibility` now lands directly on `/eligibility/quiz`;
+- LMS `/portal` lands on `/lms/dashboard`;
+- LMS `/admin` lands on `https://admin.elevateforhumanity.org/dashboard`, not the obsolete `/admin/dashboard` path.
 
 ## Navigation / footer / homepage alignment
 
@@ -53,12 +77,15 @@ Confirmed and addressed:
 
 - Canonical Host Site page upgraded to a picture-led hero plus multiple visual sections instead of a text-only merged page.
 - `/hire-graduates` upgraded from a text/gradient lead section to a picture-first employer page and canonical Employer Portal action.
-- New image references were repository-verified before use; two guessed image paths that did not exist were rejected and not shipped.
+- `/scholarships` upgraded from a text-only dark hero to a picture-led funding page using a repository-verified image.
+- `/store/apps/website-builder` upgraded with a visual hero using a repository-verified platform image while preserving the separate authenticated builder.
+- New image references were repository-verified before use; guessed image paths that did not exist were rejected and not shipped.
+- Shared contrast guardrails now correct dark utility text on dark surfaces/direct children without forcing nested light cards to white text.
 - Host Site and employer content uses stronger foreground/background contrast.
 
-Confirmed remaining audit category:
+Remaining audit category:
 
-- Some public sitemap pages still use text-only lead sections or dark panels and need page-specific visual/contrast remediation rather than a risky global color override. The public media/navigation audit now scans every sitemap/header page for missing lead media, text-heavy layouts, missing assets, broken routes, and contrast-risk patterns.
+- The expanded public media/navigation audit now checks every sitemap/header page for missing lead media, text-heavy layouts, missing assets, broken routes, sitemap omissions, and contrast-risk patterns. Those findings should be fixed page-by-page rather than through a broad global style override.
 
 ## Enforcement added
 
@@ -72,4 +99,4 @@ Confirmed remaining audit category:
 
 ## Validation status
 
-Repository source and route relationships were reviewed directly on branch `fix/platform-route-consolidation-20260809`. No full application build or Northflank deployment was triggered during this audit in order to avoid unnecessary build spend. Runtime/build validation remains required before production merge/deploy.
+Repository source, route relationships, workspace build roots, Docker build roots, and compatibility paths were reviewed directly on branch `fix/platform-route-consolidation-20260809`. No full application build or Northflank deployment was triggered during this audit in order to avoid unnecessary build spend. Runtime/build validation remains required before production merge/deploy.

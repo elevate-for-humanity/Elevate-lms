@@ -41,8 +41,6 @@ on:
       - 'pnpm-lock.yaml'
       - 'package.json'
 
-    branches: [main]
-
 env:
   NODE_VERSION: '22'
   PNPM_VERSION: '10.28.2'

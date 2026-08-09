@@ -5,7 +5,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
   Users, CheckCircle, Award, Briefcase, TrendingUp, AlertTriangle,
-  Clock, FileText, Shield, HeartHandshake, Search, ChevronRight,
+  Clock, FileText, Shield, HeartHandshake, Search, ChevronRight, CheckSquare,
 } from 'lucide-react';
 import { StudentSearchPanel } from '@/apps/marketing/app/case-manager/StudentSearchPanel';
 
@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function WorkforceDashboardPage() {
   const { user, profile } = await requireRole([
-    'workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin',
+    'workforce_board', 'case_manager', 'admin', 'staff', 'org_admin',
   ]);
 
   const supabase = await createClient();
@@ -26,7 +26,7 @@ export default async function WorkforceDashboardPage() {
   const db = admin || supabase;
 
   const isCaseManager = profile?.role === 'case_manager';
-  const isWorkforceBoard = profile?.role === 'workforce_board' || profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'staff' || profile?.role === 'org_admin';
+  const isWorkforceBoard = profile?.role === 'workforce_board' || profile?.role === 'admin' || profile?.role === 'staff' || profile?.role === 'org_admin';
 
   // ── Case manager: load assigned caseload ──────────────────────────────────
   let learnerIds: string[] = [];
@@ -47,8 +47,7 @@ export default async function WorkforceDashboardPage() {
     await Promise.all([
       (isCaseManager && learnerIds.length === 0)
         ? Promise.resolve({ count: 0 })
-        : db.from('program_enrollments').select('*', { count: 'exact', head: true })
-            .pipe ? enrollBase : enrollBase,
+        : enrollBase,
       isCaseManager && learnerIds.length === 0
         ? Promise.resolve({ count: 0 })
         : (isCaseManager
@@ -164,7 +163,7 @@ export default async function WorkforceDashboardPage() {
   // Quick actions — role-based
   const quickActions = [
     { label: 'View Participants', href: '/workforce/participants', icon: Users, show: true },
-    { label: 'Student Search', href: '/workforce/search', icon: Search, show: isCaseManager || !isCaseManager },
+    { label: 'Student Search', href: '/workforce/search', icon: Search, show: true },
     { label: 'Verify Placements', href: '/workforce/placements?filter=pending', icon: Briefcase, show: true },
     { label: 'WIOA Export', href: '/workforce/wioa-export', icon: FileText, show: true },
     { label: 'Follow-Ups', href: '/workforce/follow-ups', icon: CheckSquare, show: isWorkforceBoard },

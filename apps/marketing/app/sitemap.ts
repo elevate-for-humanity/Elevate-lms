@@ -2,7 +2,6 @@ import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.elevateforhumanity.org';
-  const now = new Date();
 
   const coreRoutes: Array<{
     path: string;
@@ -12,8 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/', changeFrequency: 'weekly', priority: 1 },
     { path: '/programs', changeFrequency: 'weekly', priority: 0.95 },
     { path: '/apply', changeFrequency: 'monthly', priority: 0.95 },
-    { path: '/host-shop', changeFrequency: 'weekly', priority: 0.9 },
-    { path: '/host-shop/apply', changeFrequency: 'monthly', priority: 0.85 },
     { path: '/apprenticeships', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/testing', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/funding', changeFrequency: 'weekly', priority: 0.9 },
@@ -51,6 +48,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/programs/hvac-technician',
     '/programs/skilled-trades',
     '/programs/cdl-training',
+    '/barber-and-beauty-apprenticeships',
     '/programs/barber-apprenticeship',
     '/programs/barber-apprenticeship/apply',
     '/programs/barber-apprenticeship/request-info',
@@ -75,19 +73,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...coreRoutes.map(({ path, changeFrequency, priority }) => ({
       url: `${baseUrl}${path === '/' ? '' : path}`,
-      lastModified: now,
       changeFrequency,
       priority,
     })),
     ...programRoutes.map((path) => ({
       url: `${baseUrl}${path}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: path.includes('barber-apprenticeship') ? 0.9 : 0.8,
     })),
     ...appStoreRoutes.map((path) => ({
       url: `${baseUrl}${path}`,
-      lastModified: now,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     })),

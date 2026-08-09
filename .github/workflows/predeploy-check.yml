@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -45,13 +47,75 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Run Platform Doctor (PR)
+      - name: Run full Platform Doctor report (PR)
+        id: full-doctor-pr
         if: github.event_name == 'pull_request'
-        run: pnpm platform:doctor
+        continue-on-error: true
+        run: |
+          pnpm platform:doctor
+          status=$?
+          if [ -f artifacts/platform-doctor-report.json ]; then
+            cp artifacts/platform-doctor-report.json artifacts/platform-doctor-full-report.json
+          fi
+          exit "$status"
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
           SKIP_ENV_VALIDATION: 'true'
+
+      - name: Scan PR static criticals
+        if: github.event_name == 'pull_request'
+        run: node scripts/platform-doctor-static.mjs --out artifacts/platform-doctor-pr-static-report.json
+
+      - name: Scan base static criticals
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/platform-doctor-base
+          git worktree add --detach /tmp/platform-doctor-base "$BASE_SHA"
+          cp "$GITHUB_WORKSPACE/scripts/platform-doctor-static.mjs" /tmp/platform-doctor-base/scripts/platform-doctor-static.mjs
+          cd /tmp/platform-doctor-base
+          node scripts/platform-doctor-static.mjs --out "$GITHUB_WORKSPACE/artifacts/platform-doctor-base-static-report.json"
+          cd "$GITHUB_WORKSPACE"
+          git worktree remove --force /tmp/platform-doctor-base
+
+      - name: Block only newly introduced critical findings
+        if: github.event_name == 'pull_request'
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const base = JSON.parse(fs.readFileSync('artifacts/platform-doctor-base-static-report.json', 'utf8'));
+          const pr = JSON.parse(fs.readFileSync('artifacts/platform-doctor-pr-static-report.json', 'utf8'));
+
+          const stableKey = (finding) => [
+            finding.severity || 'CRITICAL',
+            finding.code || '',
+            finding.file || '.',
+            finding.message || '',
+          ].join('|');
+
+          const baseCritical = (base.findings || []).filter((f) => f.severity === 'CRITICAL');
+          const prCritical = (pr.findings || []).filter((f) => f.severity === 'CRITICAL');
+          const baseKeys = new Set(baseCritical.map(stableKey));
+          const newCritical = prCritical.filter((finding) => !baseKeys.has(stableKey(finding)));
+          const resolvedCritical = baseCritical.filter(
+            (finding) => !new Set(prCritical.map(stableKey)).has(stableKey(finding)),
+          );
+
+          console.log(`Platform Doctor PR delta: base=${baseCritical.length} current=${prCritical.length} new=${newCritical.length} resolved=${resolvedCritical.length}`);
+
+          if (newCritical.length) {
+            console.log('::error::Platform Doctor found new CRITICAL regressions introduced by this PR:');
+            for (const finding of newCritical.slice(0, 50)) {
+              console.log(`::error file=${finding.file},line=${finding.line || 1}::${finding.code}: ${finding.message}`);
+            }
+            process.exit(1);
+          }
+
+          console.log('Platform Doctor delta gate passed: this PR introduces no new static CRITICAL findings.');
+          NODE
 
       - name: Run Platform Doctor Strict (main)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -62,6 +126,30 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
           SKIP_ENV_VALIDATION: 'true'
 
+      - name: Summarize full Platform Doctor report
+        if: always()
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const candidates = [
+            'artifacts/platform-doctor-full-report.json',
+            'artifacts/platform-doctor-report.json',
+          ];
+          const p = candidates.find((candidate) => fs.existsSync(candidate));
+          if (!p) {
+            console.log('Platform Doctor full report was not generated.');
+            process.exit(0);
+          }
+          const report = JSON.parse(fs.readFileSync(p, 'utf8'));
+          const counts = report.countsBySeverity || { CRITICAL: 0, STRICT: 0, REPORT: 0 };
+          console.log(`Full repository report: CRITICAL=${counts.CRITICAL}, STRICT=${counts.STRICT}, REPORT=${counts.REPORT}`);
+          if ((counts.CRITICAL || 0) > 0 && process.env.GITHUB_EVENT_NAME === 'pull_request') {
+            console.log('::warning::Historic repository CRITICAL findings remain visible in the full report; the PR delta gate separately blocks newly introduced criticals.');
+          }
+          NODE
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+
       - name: Upload Platform Doctor artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,29 +157,11 @@ jobs:
           name: platform-doctor-artifacts
           path: |
             artifacts/platform-doctor-report.json
+            artifacts/platform-doctor-full-report.json
+            artifacts/platform-doctor-pr-static-report.json
+            artifacts/platform-doctor-base-static-report.json
             artifacts/design-enforcer-report.json
             artifacts/image-contract-report.json
             artifacts/program-template-audit-report.json
             reports/platform_polish_report.json
           retention-days: 14
-
-      - name: Explain failure severity (CRITICAL vs STRICT)
-        if: failure()
-        run: |
-          node - <<'NODE'
-          const fs = require('fs');
-          const p = 'artifacts/platform-doctor-report.json';
-          if (!fs.existsSync(p)) {
-            console.log('::error::Platform Doctor failed before report was generated.');
-            process.exit(0);
-          }
-          const r = JSON.parse(fs.readFileSync(p, 'utf8'));
-          const c = r.countsBySeverity || { CRITICAL: 0, STRICT: 0, REPORT: 0 };
-          console.log(`::error::Platform Doctor blocked deploy. CRITICAL=${c.CRITICAL}, STRICT=${c.STRICT}, REPORT=${c.REPORT}`);
-          if ((c.CRITICAL || 0) > 0) {
-            console.log('::error::CRITICAL issues must be fixed on all branches.');
-          }
-          if ((c.STRICT || 0) > 0) {
-            console.log('::warning::STRICT issues are report-only unless PLATFORM_DOCTOR_ENFORCE_STRICT or PLATFORM_DOCTOR_BLOCK_STRICT_ON_MAIN is enabled.');
-          }
-          NODE

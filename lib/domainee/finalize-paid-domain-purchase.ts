@@ -19,19 +19,12 @@ interface DomainPurchaseRow {
   metadata: Record<string, unknown> | null;
 }
 
-export async function finalizePaidDomainPurchase({
-  db,
-  stripe,
-  session,
-}: {
+export async function finalizePaidDomainPurchase({ db, stripe, session }: {
   db: any;
   stripe: Stripe;
   session: Stripe.Checkout.Session;
 }) {
-  if (session.metadata?.kind !== 'website_domain_purchase') {
-    return { handled: false as const };
-  }
-
+  if (session.metadata?.kind !== 'website_domain_purchase') return { handled: false as const };
   if (!['paid', 'no_payment_required'].includes(session.payment_status ?? '')) {
     return { handled: true as const, success: false, error: 'Payment is not confirmed.' };
   }
@@ -48,7 +41,6 @@ export async function finalizePaidDomainPurchase({
     .eq('id', domainRecordId)
     .eq('user_id', userId)
     .maybeSingle();
-
   if (error || !data) {
     return { handled: true as const, success: false, error: error?.message || 'Domain purchase record not found.' };
   }
@@ -71,36 +63,29 @@ export async function finalizePaidDomainPurchase({
   }
 
   try {
-    // Re-quote at fulfillment time. If the provider price rose above what the
-    // customer paid, fail closed and refund instead of silently losing money.
     const liveQuote = await checkDomainPurchase(row.hostname);
     if (!liveQuote.available) {
       await refundCheckout(stripe, session, 'Domain became unavailable before registration.');
-      await db
-        .from('website_domains')
-        .update({ status: 'failed', payment_status: 'refunded', error: 'Domain became unavailable before registration.' })
-        .eq('id', row.id);
+      await db.from('website_domains').update({ status: 'failed', payment_status: 'refunded', error: 'Domain became unavailable before registration.' }).eq('id', row.id);
       return { handled: true as const, success: false, error: 'Domain became unavailable; payment refunded.' };
     }
 
     if (liveQuote.pricing.totalCents > paidCents) {
       await refundCheckout(stripe, session, 'Provider price increased above the amount collected.');
-      await db
-        .from('website_domains')
-        .update({
-          status: 'failed',
-          payment_status: 'refunded',
-          provider_cost_cents: liveQuote.pricing.totalCents,
-          error: 'Provider price changed before registration.',
-        })
-        .eq('id', row.id);
+      await db.from('website_domains').update({
+        status: 'failed',
+        payment_status: 'refunded',
+        provider_cost_cents: liveQuote.pricing.totalCents,
+        error: 'Provider price changed before registration.',
+      }).eq('id', row.id);
       return { handled: true as const, success: false, error: 'Domain price changed; payment refunded.' };
     }
 
-    await db
-      .from('website_domains')
-      .update({ status: 'processing', payment_status: 'paid', provider_cost_cents: liveQuote.pricing.totalCents })
-      .eq('id', row.id);
+    await db.from('website_domains').update({
+      status: 'processing',
+      payment_status: 'paid',
+      provider_cost_cents: liveQuote.pricing.totalCents,
+    }).eq('id', row.id);
 
     const result = await buyDomain(row.hostname, years, registrant, {
       originUrl: row.origin_url,
@@ -109,17 +94,14 @@ export async function finalizePaidDomainPurchase({
     });
 
     const purchase = result.purchase;
-    await db
-      .from('website_domains')
-      .update({
-        domainee_domain_id: purchase.connectedDomainId ?? null,
-        domainee_purchase_id: purchase.id,
-        status: purchase.status === 'completed' ? 'active' : 'processing',
-        payment_status: 'paid',
-        provider_cost_cents: purchase.totalCents,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', row.id);
+    await db.from('website_domains').update({
+      domainee_domain_id: purchase.connectedDomainId ?? null,
+      domainee_purchase_id: purchase.id,
+      status: purchase.status === 'completed' ? 'active' : 'processing',
+      payment_status: 'paid',
+      provider_cost_cents: purchase.totalCents,
+      updated_at: new Date().toISOString(),
+    }).eq('id', row.id);
 
     return { handled: true as const, success: true, domainId: row.id, purchaseId: purchase.id };
   } catch (err) {
@@ -128,18 +110,16 @@ export async function finalizePaidDomainPurchase({
       hostname: row.hostname,
       stripeSessionId: session.id,
     });
-    await db
-      .from('website_domains')
-      .update({ status: 'failed', error: err instanceof Error ? err.message : 'Domain registration failed.' })
-      .eq('id', row.id);
+    await db.from('website_domains').update({
+      status: 'failed',
+      error: err instanceof Error ? err.message : 'Domain registration failed.',
+    }).eq('id', row.id);
     return { handled: true as const, success: false, error: err instanceof Error ? err.message : 'Domain registration failed.' };
   }
 }
 
 async function refundCheckout(stripe: Stripe, session: Stripe.Checkout.Session, reason: string) {
-  const paymentIntent = typeof session.payment_intent === 'string'
-    ? session.payment_intent
-    : session.payment_intent?.id;
+  const paymentIntent = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id;
   if (!paymentIntent) throw new Error(`${reason} Payment intent is unavailable for refund.`);
   await stripe.refunds.create({ payment_intent: paymentIntent, metadata: { reason } });
 }

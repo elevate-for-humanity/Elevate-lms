@@ -22,7 +22,6 @@ const ROLE_MAPPINGS: RoleMapping[] = [
   { role: 'user', label: 'User', dashboardUrl: `${LMS_HOST}/lms/dashboard`, portalKey: 'lms' },
 
   { role: 'admin', label: 'Admin', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
-  { role: 'super_admin', label: 'Super Admin', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
   { role: 'org_admin', label: 'Org Admin', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
   { role: 'staff', label: 'Staff', dashboardUrl: `${ADMIN_HOST}/staff-portal/dashboard`, portalKey: 'staff' },
   { role: 'instructor', label: 'Instructor', dashboardUrl: `${ADMIN_HOST}/instructor/dashboard`, portalKey: 'instructor' },
@@ -59,7 +58,7 @@ export function resolveDashboardUrl(
 ): string {
   const allRoles = effectiveRoles ?? ([role].filter(Boolean) as string[]);
 
-  if (allRoles.some((r) => ['admin', 'super_admin', 'org_admin', 'advisor'].includes(r))) {
+  if (allRoles.some((r) => ['admin', 'org_admin', 'advisor'].includes(r))) {
     return `${ADMIN_HOST}/dashboard`;
   }
   if (allRoles.some((r) => r === 'staff')) return `${ADMIN_HOST}/staff-portal/dashboard`;
@@ -80,7 +79,7 @@ export function getPortalKeyForRole(
 ): string {
   const allRoles = effectiveRoles ?? ([role].filter(Boolean) as string[]);
 
-  if (allRoles.some((r) => ['admin', 'super_admin', 'org_admin', 'advisor', 'test_admin', 'proctor'].includes(r))) return 'admin';
+  if (allRoles.some((r) => ['admin', 'org_admin', 'advisor', 'test_admin', 'proctor'].includes(r))) return 'admin';
   if (allRoles.some((r) => r === 'staff')) return 'staff';
   if (allRoles.some((r) => r === 'instructor')) return 'instructor';
 

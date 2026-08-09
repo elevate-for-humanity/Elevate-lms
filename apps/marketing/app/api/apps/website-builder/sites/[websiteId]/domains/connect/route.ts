@@ -1,8 +1,5 @@
-/**
- * POST /api/apps/website-builder/sites/[websiteId]/domains/connect
- * Connect a domain the customer already owns (BYO). Returns the CNAME
- * the customer must publish at their DNS provider. Domainee provisions SSL.
- */
+// pre-auth-registry: exempt - authenticated route resolves the current user and owned website before any RLS-scoped website_domains write.
+/** Connect a customer-owned domain to a published Website Builder site. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { connectDomain, isDomaineeConfigured } from '@/lib/domainee/client';
@@ -28,41 +25,34 @@ export async function POST(
 
   const entitlementError = requireCustomDomainEntitlement(entitlement);
   if (entitlementError) return entitlementError;
-
   if (!site.is_published) {
     return NextResponse.json({ error: 'Publish the website before connecting a custom domain.' }, { status: 409 });
   }
-
   if (!isDomaineeConfigured()) {
     return NextResponse.json({ error: 'Domain service is temporarily unavailable.' }, { status: 503 });
   }
 
   const body = await request.json().catch(() => ({}));
   const hostname = validateHostname(String(body.hostname ?? ''));
-  if (!hostname) {
-    return NextResponse.json({ error: 'Enter a valid domain (e.g. shop.example.com)' }, { status: 400 });
-  }
+  if (!hostname) return NextResponse.json({ error: 'Enter a valid domain.' }, { status: 400 });
 
   const { data: existing } = await supabase
     .from('website_domains')
-    .select('id, status, domainee_domain_id')
+    .select('id')
     .eq('website_id', websiteId)
     .eq('user_id', user.id)
     .ilike('hostname', hostname)
     .neq('status', 'deleted')
     .maybeSingle();
-  if (existing) {
-    return NextResponse.json({ error: 'This domain is already connected to your site.' }, { status: 409 });
-  }
+  if (existing) return NextResponse.json({ error: 'This domain is already connected to your site.' }, { status: 409 });
 
-  const idempotencyKey = `elevate-connect-${websiteId}-${hostname}`;
   try {
+    const idempotencyKey = `elevate-connect-${websiteId}-${hostname}`;
     const result = await connectDomain(hostname, originUrl, {
       metadata: { websiteId, userId: user.id, siteName: site.site_name },
       idempotencyKey,
     });
     const domain = result.domain;
-
     const { data: row, error: insertError } = await supabase
       .from('website_domains')
       .insert({
@@ -82,10 +72,9 @@ export async function POST(
       .select('*')
       .maybeSingle();
     if (insertError) {
-      logger.error('website_domains insert failed', undefined, { error: insertError.message });
+      logger.error('website_domains insert failed', undefined, { error: insertError.message, hostname });
       return NextResponse.json({ error: 'Failed to save domain record' }, { status: 500 });
     }
-
     return NextResponse.json({
       domain: row,
       dnsRecords: domain.dnsRecords,
@@ -95,9 +84,6 @@ export async function POST(
     });
   } catch (err) {
     logger.error('domainee connect failed', err instanceof Error ? err : undefined, { hostname });
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Failed to connect domain' },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Failed to connect domain' }, { status: 502 });
   }
 }

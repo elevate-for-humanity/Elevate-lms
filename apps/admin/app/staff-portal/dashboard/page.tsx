@@ -175,7 +175,7 @@ export default async function StaffDashboard() {
                 <div className="text-sm text-black">Manage student accounts and enrollments</div>
               </Link>
               <Link
-                href={`https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/programs`}
+                href="/programs"
                 className="block p-3 border rounded-lg hover:bg-slate-50 transition"
               >
                 <div className="font-semibold">View Programs</div>

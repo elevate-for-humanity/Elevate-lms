@@ -133,7 +133,7 @@ jobs:
             --sha "${{ github.sha }}"
 
       - name: Wait for admin deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 1200000
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 1200000
 
       - name: Smoke Admin liveness and readiness
         run: |

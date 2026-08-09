@@ -1,7 +1,4 @@
-/**
- * Domainee API types — derived from verified API responses.
- */
-
+/** Domainee API response/request types used by the Website Builder integration. */
 export interface DomaineeDnsRecord {
   type: string;
   name: string;
@@ -9,10 +6,7 @@ export interface DomaineeDnsRecord {
   purpose: string;
 }
 
-export interface DomaineeWarning {
-  code: string;
-  message: string;
-}
+export interface DomaineeWarning { code: string; message: string }
 
 export interface DomaineeDomain {
   id: string;
@@ -35,15 +29,8 @@ export interface DomaineeDomain {
   updatedAt: string;
 }
 
-export interface DomaineeConnectResponse {
-  domain: DomaineeDomain;
-  warnings: DomaineeWarning[];
-}
-
-export interface DomaineeListResponse {
-  domains: DomaineeDomain[];
-  nextCursor: string | null;
-}
+export interface DomaineeConnectResponse { domain: DomaineeDomain; warnings: DomaineeWarning[] }
+export interface DomaineeListResponse { domains: DomaineeDomain[]; nextCursor: string | null }
 
 export interface DomaineeRegistrant {
   firstName?: string;
@@ -71,14 +58,6 @@ export interface DomaineePurchaseQuote {
   pricing: DomaineePurchasePricing;
 }
 
-export interface DomaineeBuyRequest {
-  hostname: string;
-  years: number;
-  registrant: DomaineeRegistrant;
-  customerReference?: string;
-  autoConnect?: { originUrl: string };
-}
-
 export interface DomaineePurchase {
   id: string;
   hostname: string;
@@ -88,24 +67,8 @@ export interface DomaineePurchase {
   connectedDomainId?: string;
 }
 
-export interface DomaineeBuyResponse {
-  purchase: DomaineePurchase;
-}
-
-export interface DomaineePurchaseListResponse {
-  purchases: DomaineePurchase[];
-  nextCursor: string | null;
-}
-
-export interface DomaineeWebhookEndpoint {
-  id: string;
-  workspaceId: string;
-  url: string;
-  secret: string;
-  events: string[];
-  enabled: boolean;
-  createdAt: string;
-}
+export interface DomaineeBuyResponse { purchase: DomaineePurchase }
+export interface DomaineePurchaseListResponse { purchases: DomaineePurchase[]; nextCursor: string | null }
 
 export type DomaineeWebhookEventType =
   | 'domain.created'
@@ -122,9 +85,4 @@ export interface DomaineeWebhookEvent {
   type: DomaineeWebhookEventType;
   createdAt: string;
   data: Record<string, unknown> & { id?: string };
-}
-
-export interface DomaineeApiError {
-  error: string;
-  message?: string;
 }

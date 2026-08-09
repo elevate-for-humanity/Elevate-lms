@@ -1,14 +1,14 @@
 /**
  * /terms - Legacy route redirecting to canonical /legal
  */
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 export default function TermsRedirect() {
-  redirect('/legal');
+  permanentRedirect('/legal');
 }
 
 export const metadata = {
   title: 'Terms of Service',
   description: 'Elevate for Humanity Terms of Service',
-  robots: { index: false, follow: false },
+  robots: { index: false, follow: true },
 };

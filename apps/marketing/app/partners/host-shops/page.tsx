@@ -1,173 +1,174 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Host Shop Program | Elevate for Humanity',
-  description: 'Become a host shop for apprenticeship programs and help train the next generation of skilled professionals in your industry.',
+  title: 'Host Site Program | Elevate for Humanity',
+  description:
+    'Become an approved apprenticeship Host Site for Barber, Cosmetology, Esthetics, or Nail Technician training.',
 };
 
-export default function Page() {
+const PROGRAMS = [
+  {
+    name: 'Barber Apprenticeship',
+    detail: '2,000-hour registered apprenticeship pathway',
+    image: '/images/pages/barber-training.webp',
+    program: 'barber',
+  },
+  {
+    name: 'Cosmetology Apprenticeship',
+    detail: 'Licensed salon-based apprenticeship pathway',
+    image: '/images/pages/cosmetology.webp',
+    program: 'cosmetology',
+  },
+  {
+    name: 'Esthetics Apprenticeship',
+    detail: 'Licensed spa/esthetics worksite pathway',
+    image: '/images/beauty/esthetics-hero.webp',
+    program: 'esthetician',
+  },
+  {
+    name: 'Nail Technician Apprenticeship',
+    detail: 'Licensed nail-salon apprenticeship pathway',
+    image: '/images/pages/nail-technician.webp',
+    program: 'nail',
+  },
+] as const;
+
+const REQUIREMENTS = [
+  'Current business/shop or establishment license appropriate to the occupation.',
+  'A currently licensed supervising professional who can oversee training and verify OJL hours and competencies.',
+  'Commercial/general liability insurance and workers’ compensation coverage or a valid exemption.',
+  'Adequate chairs/workstations, equipment, client/service volume, and a safe training environment.',
+  'EIN verification or W-9 and any applicable local business or occupancy documentation.',
+  'Agreement to use Elevate’s hour, competency, document, and compliance verification workflows.',
+];
+
+export default function HostShopsPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-4 mb-4">
-            <span className="bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium">Apprenticeship Program</span>
+    <main className="min-h-screen bg-white text-slate-950">
+      <section className="relative h-[clamp(240px,42vw,520px)] overflow-hidden bg-slate-100">
+        <Image
+          src="/images/pages/admin-employers-hero.webp"
+          alt="Licensed employer mentoring a workforce trainee at an approved worksite"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+      </section>
+
+      <section className="border-b border-slate-200 bg-white py-9">
+        <div className="mx-auto max-w-6xl px-4">
+          <p className="text-sm font-black uppercase tracking-[0.15em] text-brand-red-700">
+            Apprenticeship employer partnership
+          </p>
+          <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">
+            Become an approved apprenticeship Host Site
+          </h1>
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-700">
+            Licensed businesses can partner with Elevate to provide supervised on-the-job learning
+            while the apprentice completes structured RTI, hour tracking, competency verification,
+            and required compliance documentation.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href="/partners/host-shop/apply"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700"
+            >
+              Start Host Site Application
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold text-slate-950 hover:bg-slate-50"
+            >
+              Ask a Partnership Question
+            </Link>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Become a Host Shop</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">Train the next generation of skilled professionals while building your workforce pipeline and giving back to your community.</p>
         </div>
       </section>
-      
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-6">What is a Host Shop?</h2>
-              <p className="text-lg text-slate-600 mb-6">Host shops are licensed businesses that partner with Elevate to provide hands-on training for apprentices. You'll mentor future professionals while building a reliable talent pipeline for your business.</p>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900">Real-World Training</h4>
-                    <p className="text-slate-600 text-sm">Apprentices learn by doing under your supervision</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-brand-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900">Potential Workforce Support</h4>
-                    <p className="text-slate-600 text-sm">Employers may qualify for OJT reimbursement and workforce incentives. Eligibility varies.</p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900">Future Employees</h4>
-                    <p className="text-slate-600 text-sm">Pre-trained talent ready to hire</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Beauty Apprenticeship Programs</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <span className="text-2xl">✂️</span>
-                  <div>
-                    <div className="font-medium text-slate-900">Barbering</div>
-                    <div className="text-xs text-slate-500">2,000 hrs · DOL Registered</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <span className="text-2xl">💇</span>
-                  <div>
-                    <div className="font-medium text-slate-900">Cosmetology</div>
-                    <div className="text-xs text-slate-500">2,000 hrs · DOL Registered</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <span className="text-2xl">💅</span>
-                  <div>
-                    <div className="font-medium text-slate-900">Nail Technology</div>
-                    <div className="text-xs text-slate-500">DOL Registered</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <span className="text-2xl">✨</span>
-                  <div>
-                    <div className="font-medium text-slate-900">Esthetics</div>
-                    <div className="text-xs text-slate-500">DOL Registered</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm mb-16">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Host Shop Requirements</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <h4 className="font-semibold text-slate-900 mb-2">Licensed Business</h4>
-                <p className="text-slate-600 text-sm">Valid business license in your industry</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                </div>
-                <h4 className="font-semibold text-slate-900 mb-2">Qualified Mentor</h4>
-                <p className="text-slate-600 text-sm">Licensed professional to supervise apprentices</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                </div>
-                <h4 className="font-semibold text-slate-900 mb-2">Training Space</h4>
-                <p className="text-slate-600 text-sm">Adequate area for apprentice instruction</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                </div>
-                <h4 className="font-semibold text-slate-900 mb-2">RTI Tracking</h4>
-                <p className="text-slate-600 text-sm">Use our system to log training hours</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-brand-blue-700 rounded-2xl p-8 md:p-12 text-white mb-16">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2">Join Our Beauty Apprenticeship Network</h2>
-              <p className="text-blue-200 max-w-xl mx-auto">
-                We currently host Registered Apprenticeships in Barbering, Cosmetology, Esthetics, and Nail Technology in the Indianapolis metro area.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
-              <div className="bg-white/10 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-brand-red-400 mb-1">Barber</div>
-                <div className="text-sm text-blue-200">2,000-hour Registered Apprenticeship</div>
-              </div>
-              <div className="bg-white/10 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-brand-red-400 mb-1">Cosmetology</div>
-                <div className="text-sm text-blue-200">2,000-hour Registered Apprenticeship</div>
-              </div>
-              <div className="bg-white/10 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-brand-red-400 mb-1">Esthetics</div>
-                <div className="text-sm text-blue-200">Apprenticeship available</div>
-              </div>
-              <div className="bg-white/10 rounded-xl p-6 text-center">
-                <div className="text-3xl font-bold text-brand-red-400 mb-1">Nail Technology</div>
-                <div className="text-sm text-blue-200">Apprenticeship available</div>
-              </div>
-            </div>
-            <p className="text-xs text-blue-300 text-center mt-6">
-              Apprenticeship programs are sponsored by 2Exclusive LLC-S under DOL Registered Apprenticeship standards. Programs subject to availability and approval.
+
+      <section className="bg-slate-50 py-12">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="max-w-3xl">
+            <h2 className="text-3xl font-black">Beauty apprenticeship Host Site pathways</h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              Choose the occupation that matches the business license, supervising professional,
+              and worksite where the apprentice will train.
             </p>
           </div>
-          
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Become a Host Shop?</h2>
-            <p className="text-slate-600 mb-8 max-w-2xl mx-auto">Apply online and our team will review your shop and contact you within 2-3 business days.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/partners/barber-host-shop/apply" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700 transition-colors">
-                Apply Now
-              </Link>
-              <Link href="/contact" className="bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-50 transition-colors">
-                Contact Us
-              </Link>
-            </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {PROGRAMS.map((program) => (
+              <article key={program.program} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="relative aspect-[4/3] bg-slate-100">
+                  <Image
+                    src={program.image}
+                    alt={`${program.name} Host Site training environment`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-black text-slate-950">{program.name}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">{program.detail}</p>
+                  <Link
+                    href={`/partners/host-shop/apply?program=${program.program}`}
+                    className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800"
+                  >
+                    Apply for this pathway
+                  </Link>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
-    </div>
+
+      <section className="py-12">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+          <div className="relative min-h-[340px] overflow-hidden rounded-2xl bg-slate-100">
+            <Image
+              src="/images/pages/apprenticeship-structure.webp"
+              alt="Structured apprenticeship training and supervision"
+              fill
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              className="object-cover"
+            />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black">Host Site approval requirements</h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              Approval is based on the actual worksite and occupation. Submitting an application does
+              not authorize a shop to begin hosting apprentices until the required records are verified.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {REQUIREMENTS.map((requirement) => (
+                <li key={requirement} className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-semibold leading-6 text-slate-800">
+                  {requirement}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-slate-200 bg-slate-950 py-10 text-white">
+        <div className="mx-auto max-w-6xl px-4 text-center">
+          <h2 className="text-3xl font-black">Ready to submit your worksite for review?</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-200">
+            The application uploads licensing, insurance, workers’ compensation, supervisor, and
+            EIN/W-9 documentation directly to the private documents system.
+          </p>
+          <Link
+            href="/partners/host-shop/apply"
+            className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-7 py-3 font-black text-white hover:bg-brand-red-700"
+          >
+            Start Host Site Application
+          </Link>
+        </div>
+      </section>
+    </main>
   );
 }

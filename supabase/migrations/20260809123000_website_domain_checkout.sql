@@ -1,6 +1,4 @@
--- Payment-first domain purchase state for the Website Builder.
--- This is a follow-up migration because 20260809110000_website_domains.sql
--- was already applied while the initial Domainee integration was being tested.
+-- Payment-first domain purchase state for Website Builder.
 ALTER TABLE public.website_domains
   ADD COLUMN IF NOT EXISTS stripe_checkout_session_id text,
   ADD COLUMN IF NOT EXISTS payment_status text,

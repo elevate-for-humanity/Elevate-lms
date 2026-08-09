@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getProductBySlug } from '@/lib/store/products';
 import {
   ShoppingCart,
   Trash2,
@@ -25,6 +26,10 @@ export const dynamic = 'force-dynamic';
 const CART_ERROR_MESSAGES: Record<string, string> = {
   'payment-unavailable': `Checkout is temporarily unavailable. Please try again later or call ${PLATFORM_DEFAULTS.supportPhone}.`,
   'checkout-failed': 'We could not start your checkout session. Please try again.',
+  'cart-update-invalid': 'That cart quantity was not valid.',
+  'cart-update-failed': 'We could not update that cart item. Please try again.',
+  'cart-remove-invalid': 'That cart item could not be identified.',
+  'cart-remove-failed': 'We could not remove that cart item. Please try again.',
 };
 
 export default async function CartPage({
@@ -33,37 +38,38 @@ export default async function CartPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error: errorSlug } = await searchParams;
-  const checkoutError = errorSlug ? (CART_ERROR_MESSAGES[errorSlug] ?? 'Something went wrong. Please try again.') : null;
+  const checkoutError = errorSlug
+    ? (CART_ERROR_MESSAGES[errorSlug] ?? 'Something went wrong. Please try again.')
+    : null;
 
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const { data: { user } } = await supabase.auth.getUser();
-
-  // Show empty cart for guests instead of redirecting
   if (!user) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex items-center gap-4 mb-8">
-            <Link href="/store" className="text-slate-700 hover:text-slate-900">
-              <ArrowLeft className="w-5 h-5" />
+        <div className="mx-auto max-w-4xl px-4 py-8">
+          <div className="mb-8 flex items-center gap-4">
+            <Link href="/store" className="text-slate-700 hover:text-slate-900" aria-label="Back to store">
+              <ArrowLeft className="h-5 w-5" />
             </Link>
-            <h1 className="text-2xl font-bold">Shopping Cart</h1>
+            <h1 className="text-2xl font-bold text-slate-950">Shopping Cart</h1>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
-            <ShoppingCart className="w-16 h-16 mx-auto mb-4 text-slate-700" />
-            <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-            <p className="text-slate-700 mb-6">Sign in to view your cart or browse our store.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="rounded-xl border bg-white p-12 text-center shadow-sm">
+            <h2 className="mb-2 text-xl font-semibold text-slate-950">Your cart is empty</h2>
+            <p className="mb-6 text-slate-700">Sign in to view your cart or browse our store.</p>
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Link
                 href="/login?redirect=/store/cart"
-                className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-red-700"
+                className="inline-flex items-center justify-center bg-brand-red-600 px-6 py-3 font-medium text-white hover:bg-brand-red-700 rounded-lg"
               >
                 Sign In
               </Link>
               <Link
                 href="/store"
-                className="inline-flex items-center gap-2 border border-slate-300 px-6 py-3 rounded-lg font-medium hover:bg-white"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-6 py-3 font-medium hover:bg-slate-50"
               >
                 Continue Shopping
               </Link>
@@ -74,7 +80,6 @@ export default async function CartPage({
     );
   }
 
-  // Get cart items with product details
   const { data: cartItems } = await supabase
     .from('cart_items')
     .select(`
@@ -82,6 +87,7 @@ export default async function CartPage({
       quantity,
       product:products(
         id,
+        slug,
         name,
         price,
         image_url,
@@ -90,155 +96,147 @@ export default async function CartPage({
     `)
     .eq('user_id', user.id);
 
-  const subtotal = cartItems?.reduce((sum: number, item: any) => {
-    return sum + (item.product?.price || 0) * item.quantity;
-  }, 0) || 0;
-
-  const tax = subtotal * 0.07; // 7% tax
-  const total = subtotal + tax;
+  const subtotal =
+    cartItems?.reduce((sum: number, item: any) => {
+      return sum + Number(item.product?.price || 0) * Number(item.quantity || 0);
+    }, 0) || 0;
+  const total = subtotal;
 
   return (
     <div className="min-h-screen bg-white">
-
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-red-500">
-        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white">
-            <ShoppingCart className="w-16 h-16 mx-auto mb-2" />
-            <p className="text-xl font-bold">Your Cart</p>
-          </div>
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-4">
+          <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Cart' }]} />
         </div>
-      </section>
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Cart" }]} />
       </div>
-<div className="max-w-4xl mx-auto px-4 py-8">
+
+      <div className="mx-auto max-w-4xl px-4 py-8">
         {checkoutError && (
           <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
             {checkoutError}
           </div>
         )}
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/store" className="text-slate-700 hover:text-slate-900">
-            <ArrowLeft className="w-5 h-5" />
+
+        <div className="mb-8 flex items-center gap-4">
+          <Link href="/store" className="text-slate-700 hover:text-slate-900" aria-label="Back to store">
+            <ArrowLeft className="h-5 w-5" />
           </Link>
-          <h1 className="text-2xl font-bold">Shopping Cart</h1>
+          <h1 className="text-2xl font-bold text-slate-950">Shopping Cart</h1>
         </div>
 
         {cartItems && cartItems.length > 0 ? (
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item: any) => (
-                <div key={item.id} className="bg-white rounded-xl shadow-sm border p-4">
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 bg-white rounded-lg overflow-hidden flex-shrink-0 relative">
-                      {item.product?.image_url ? (
-                        <Image
-                          src={item.product.image_url}
-                          alt={item.product?.name || 'Store product'}
-                          fill
-                          className="object-cover object-top"
-                          sizes="80px"
-                          placeholder="empty"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-slate-100 rounded-lg" aria-hidden="true" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{item.product?.name}</h3>
-                      <p className="text-sm text-slate-700 capitalize">{item.product?.type}</p>
-                      <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center gap-2">
-                          <form action={`/api/cart/update`} method="POST">
-                            <input type="hidden" name="itemId" value={item.id} />
-                            <input type="hidden" name="quantity" value={item.quantity - 1} />
-                            <button 
-                              type="submit"
-                              className="w-8 h-8 flex items-center justify-center border rounded hover:bg-white"
-                              disabled={item.quantity <= 1}
-                            >
-                              <Minus className="w-4 h-4" />
-                            </button>
-                          </form>
-                          <span className="w-8 text-center font-medium">{item.quantity}</span>
-                          <form action={`/api/cart/update`} method="POST">
-                            <input type="hidden" name="itemId" value={item.id} />
-                            <input type="hidden" name="quantity" value={item.quantity + 1} />
-                            <button 
-                              type="submit"
-                              className="w-8 h-8 flex items-center justify-center border rounded hover:bg-white"
-                            >
-                              <Plus className="w-4 h-4" />
-                            </button>
-                          </form>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="font-bold">
-                            ${((item.product?.price || 0) * item.quantity).toFixed(2)}
-                          </span>
-                          <form action={`/api/cart/remove`} method="POST">
-                            <input type="hidden" name="itemId" value={item.id} />
-                            <button 
-                              type="submit"
-                              className="text-brand-red-500 hover:text-brand-red-700"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          </form>
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="space-y-4 lg:col-span-2">
+              {cartItems.map((item: any) => {
+                const staticProduct = getProductBySlug(item.product?.slug || '');
+                const productImage = item.product?.image_url || staticProduct?.image || null;
+                return (
+                  <div key={item.id} className="rounded-xl border bg-white p-4 shadow-sm">
+                    <div className="flex gap-4">
+                      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                        {productImage ? (
+                          <Image
+                            src={productImage}
+                            alt={item.product?.name || 'Store product'}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center px-2 text-center text-[10px] font-bold text-slate-700">
+                            Image pending
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-950">{item.product?.name}</h3>
+                        <p className="text-sm capitalize text-slate-700">{item.product?.type}</p>
+                        <div className="mt-3 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <form action="/api/cart/update" method="POST">
+                              <input type="hidden" name="itemId" value={item.id} />
+                              <input type="hidden" name="quantity" value={item.quantity - 1} />
+                              <button
+                                type="submit"
+                                className="flex h-8 w-8 items-center justify-center rounded border hover:bg-slate-50"
+                                disabled={item.quantity <= 1}
+                                aria-label={`Decrease quantity for ${item.product?.name || 'item'}`}
+                              >
+                                <Minus className="h-4 w-4" />
+                              </button>
+                            </form>
+                            <span className="w-8 text-center font-medium">{item.quantity}</span>
+                            <form action="/api/cart/update" method="POST">
+                              <input type="hidden" name="itemId" value={item.id} />
+                              <input type="hidden" name="quantity" value={item.quantity + 1} />
+                              <button
+                                type="submit"
+                                className="flex h-8 w-8 items-center justify-center rounded border hover:bg-slate-50"
+                                aria-label={`Increase quantity for ${item.product?.name || 'item'}`}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </button>
+                            </form>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="font-bold text-slate-950">
+                              ${(Number(item.product?.price || 0) * Number(item.quantity || 0)).toFixed(2)}
+                            </span>
+                            <form action="/api/cart/remove" method="POST">
+                              <input type="hidden" name="itemId" value={item.id} />
+                              <button
+                                type="submit"
+                                className="text-brand-red-600 hover:text-brand-red-800"
+                                aria-label={`Remove ${item.product?.name || 'item'} from cart`}
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </button>
+                            </form>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-8">
-                <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-                <div className="space-y-3 mb-6">
+              <div className="sticky top-8 rounded-xl border bg-white p-6 shadow-sm">
+                <h2 className="mb-4 text-lg font-semibold text-slate-950">Order Summary</h2>
+                <div className="mb-6 space-y-3">
                   <div className="flex justify-between text-slate-700">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-slate-700">
-                    <span>Tax (7%)</span>
-                    <span>${tax.toFixed(2)}</span>
-                  </div>
-                  <div className="border-t pt-3 flex justify-between font-bold text-lg">
+                  <div className="flex justify-between border-t pt-3 text-lg font-bold text-slate-950">
                     <span>Total</span>
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
                 <form action="/api/store/cart-checkout" method="POST">
-                  <input type="hidden" name="customerEmail" value={user.email || ''} />
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-2 bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-red-600 py-3 font-semibold text-white hover:bg-brand-red-700"
                   >
-                    <CreditCard className="w-5 h-5" />
+                    <CreditCard className="h-5 w-5" />
                     Proceed to Checkout
                   </button>
                 </form>
-                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-slate-700">
-                  <ShieldCheck className="w-4 h-4" />
+                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-slate-700">
+                  <ShieldCheck className="h-4 w-4" />
                   Secure checkout
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
-            <ShoppingCart className="w-16 h-16 mx-auto mb-4 text-slate-700" />
-            <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-            <p className="text-slate-700 mb-6">Browse our store to find resources that support your journey.</p>
+          <div className="rounded-xl border bg-white p-12 text-center shadow-sm">
+            <h2 className="mb-2 text-xl font-semibold text-slate-950">Your cart is empty</h2>
+            <p className="mb-6 text-slate-700">Browse our store to find resources that support your journey.</p>
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 bg-brand-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-red-700"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-red-600 px-6 py-3 font-medium text-white hover:bg-brand-red-700"
             >
               Continue Shopping
             </Link>

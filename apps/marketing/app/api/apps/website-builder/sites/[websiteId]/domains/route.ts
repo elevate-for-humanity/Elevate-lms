@@ -1,7 +1,4 @@
-/**
- * GET /api/apps/website-builder/sites/[websiteId]/domains
- * Lists domains attached to an owned website and returns the paid-plan gate.
- */
+/** List domains attached to an owned Website Builder site. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { isDomaineeConfigured } from '@/lib/domainee/client';
@@ -18,8 +15,8 @@ export async function GET(
   const { websiteId } = await params;
   const resolved = await resolveOwnedSite(websiteId);
   if ('error' in resolved) return resolved.error;
-
   const { user, supabase, entitlement } = resolved;
+
   const { data: domains, error } = await supabase
     .from('website_domains')
     .select('*')
@@ -27,7 +24,6 @@ export async function GET(
     .eq('user_id', user.id)
     .neq('status', 'deleted')
     .order('created_at', { ascending: false });
-
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({

@@ -23,7 +23,6 @@ async function resolveWebsiteBuilderEntitlement(
     .maybeSingle();
 
   if (!data) return { allowed: false, plan: null, status: null };
-
   const synced = await syncPaidAppSubscription(data).catch(() => data);
   const plan = String(synced?.plan ?? '').toLowerCase();
   const status = String(synced?.status ?? '').toLowerCase();
@@ -34,16 +33,9 @@ async function resolveWebsiteBuilderEntitlement(
   };
 }
 
-/**
- * Resolve a website owned by the authenticated user and compute the
- * origin URL Domainee should proxy to (the published tenant subdomain URL).
- * Also resolves the paid Website Builder entitlement used by domain routes.
- */
 export async function resolveOwnedSite(websiteId: string) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) {
     return { error: NextResponse.json({ error: 'Authentication required' }, { status: 401 }) };
   }
@@ -53,9 +45,7 @@ export async function resolveOwnedSite(websiteId: string) {
     .select('id, user_id, subdomain, site_name, is_published')
     .eq('id', websiteId)
     .maybeSingle();
-  if (error) {
-    return { error: NextResponse.json({ error: error.message }, { status: 500 }) };
-  }
+  if (error) return { error: NextResponse.json({ error: error.message }, { status: 500 }) };
   if (!site || site.user_id !== user.id) {
     return { error: NextResponse.json({ error: 'Website not found' }, { status: 404 }) };
   }
@@ -64,7 +54,6 @@ export async function resolveOwnedSite(websiteId: string) {
     ? tenantPublicSiteUrl(site.subdomain)
     : process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
   const entitlement = await resolveWebsiteBuilderEntitlement(supabase, user.id);
-
   return { user, supabase, site, originUrl, entitlement };
 }
 
@@ -82,11 +71,9 @@ export function requireCustomDomainEntitlement(entitlement: WebsiteBuilderEntitl
   );
 }
 
-/** Validate a hostname (RFC 1035-ish, apex or subdomain). */
 export function validateHostname(hostname: string): string | null {
   const h = hostname.trim().toLowerCase();
   if (!h || h.length > 253) return null;
-  if (!/^[a-z0-9]([a-z0-9-]{0,251}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,251}[a-z0-9])?)+$/.test(h))
-    return null;
+  if (!/^[a-z0-9]([a-z0-9-]{0,251}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,251}[a-z0-9])?)+$/.test(h)) return null;
   return h;
 }

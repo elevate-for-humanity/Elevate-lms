@@ -44,7 +44,7 @@ export const ROUTES = {
   programsPhlebotomy: '/programs/phlebotomy',
   programsHVAC: '/programs/hvac-technician',
   programsCDL: '/programs/cdl-training',
-  programsBeauty: '/programs',
+  programsBeauty: '/barber-and-beauty-apprenticeships',
   programsBarber: '/programs/barber-apprenticeship',
   programsCosmetology: '/programs/cosmetology-apprenticeship',
   programsEsthetician: '/programs/esthetician-apprenticeship',

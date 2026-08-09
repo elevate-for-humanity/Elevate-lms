@@ -14,6 +14,7 @@ import { getEmployerState } from '@/lib/orchestration/state-machine';
 import { StateAwareDashboard, SectionCard } from '@/components/dashboards/StateAwareDashboard';
 import { Briefcase, Users, FileText, Shield, Building2, TrendingUp } from 'lucide-react';
 import WorkforceLiveWidget from '@/components/employer/WorkforceLiveWidget';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ export default async function EmployerDashboardOrchestrated() {
 
   // requireRole already enforced the role gate — this is just for behavior branching
   const isEmployer = effectiveRoles.includes('employer') || effectiveRoles.includes('sponsor');
-  const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('admin');
+  const isAdmin = effectiveRoles.includes('admin');
 
   // Employer account exists but not yet approved — show pending state
   if (isEmployer && !isAdmin && !profile.verified) {
@@ -72,10 +73,10 @@ export default async function EmployerDashboardOrchestrated() {
               Learn About Employer Partnership
             </Link>
             <a
-              href="tel:3173143757"
+              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
               className="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition"
             >
-              Call (317) 314-3757
+              Call {PLATFORM_DEFAULTS.supportPhone}
             </a>
           </div>
         </div>

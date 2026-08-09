@@ -140,7 +140,7 @@ export default async function ParentDashboardPage() {
                 <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.supportPhone}
               </a>
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`}
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors"
               >
                 <Mail className="w-4 h-4" /> Email Us

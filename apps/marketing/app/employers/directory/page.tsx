@@ -1,99 +1,72 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Building2, MapPin, Users, Phone, Search } from 'lucide-react';
+import { Building2, Users, ArrowRight } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
   title: 'Employer Directory | Elevate',
-  description: 'Connect with our employer partners hiring graduates from our training programs.',
+  description: 'Explore employer, host-site, and workforce connections by occupation and view current employment resources.',
 };
 
 export default function EmployerDirectoryPage() {
-  const employers = [
-    { name: 'Healthcare Plus', location: 'Indianapolis, IN', type: 'Healthcare', hires: 'Medical Assistants, Phlebotomists' },
-    { name: 'Cool Air Solutions', location: 'Carmel, IN', type: 'Skilled Trades', hires: 'HVAC Technicians' },
-    { name: 'Midwest Logistics', location: 'Greenfield, IN', type: 'Transportation', hires: 'CDL Drivers' },
-    { name: 'Elevate Salon', location: 'Indianapolis, IN', type: 'Beauty', hires: 'Barbers, Cosmetologists' },
-    { name: 'Community Pharmacy', location: 'Noblesville, IN', type: 'Healthcare', hires: 'Pharmacy Technicians' },
-    { name: 'Regional Medical Center', location: 'Fishers, IN', type: 'Healthcare', hires: 'Medical Assistants, EKG Techs' },
+  const employerCategories = [
+    { title: 'Healthcare Employers', description: 'Healthcare organizations, clinics, pharmacies, home-care providers, and related employers.', href: '/workforce-board/employment?industry=healthcare' },
+    { title: 'Skilled Trades Employers', description: 'HVAC, construction, maintenance, electrical, plumbing, and related trade employers.', href: '/workforce-board/employment?industry=skilled-trades' },
+    { title: 'Transportation Employers', description: 'CDL, logistics, warehouse, distribution, and transportation employers.', href: '/workforce-board/employment?industry=transportation' },
+    { title: 'Beauty Host Sites', description: 'Barbershops, salons, spas, and nail salons participating in apprenticeship pathways.', href: '/partners/host-shops' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Building2 className="w-4 h-4" />
-              Employer Partners
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Employer Directory
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Connect with employers actively hiring graduates from our training programs. Find your next career opportunity.
-            </p>
-            <div className="relative max-w-md">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search employers..."
-                className="w-full pl-12 pr-4 py-3 rounded-xl text-slate-900 focus:ring-2 focus:ring-brand-red-500"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/hero-images/employer-new-hero.webp"
+        alt="Employers and workforce partners connecting with trained candidates"
+        eyebrow="Employer Connections"
+        title="Employer Directory"
+        description="Use the directory to reach current employment resources and employer/host-site pathways. Employer availability changes, so this page no longer publishes hard-coded company records."
+        actions={(
+          <>
+            <Link href="/workforce-board/employment" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">View Employment Resources</Link>
+            <Link href="/apply/employer" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Become an Employer Partner</Link>
+          </>
+        )}
+      />
 
-      {/* Employers */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4">
-            {employers.map((employer) => (
-              <div key={employer.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md hover:border-brand-blue-200 transition-all">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                        <Building2 className="w-5 h-5 text-brand-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-slate-900">{employer.name}</h3>
-                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{employer.type}</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {employer.location}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        Hires: {employer.hires}
-                      </div>
-                    </div>
-                  </div>
-                  <Link href="/workforce-board/employment" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors">
-                    View Jobs
-                  </Link>
-                </div>
-              </div>
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <h2 className="text-2xl font-black text-slate-950 md:text-3xl">Browse by Employer Type</h2>
+            <p className="mt-3 max-w-3xl text-slate-700">These routes lead to live employment or host-site resources instead of static employer names that can become outdated.</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            {employerCategories.map((category) => (
+              <Link key={category.title} href={category.href} className="group rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-blue-300 hover:shadow-md">
+                <Building2 className="mb-4 h-8 w-8 text-brand-blue-700" />
+                <h3 className="text-lg font-bold text-slate-950">{category.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{category.description}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-brand-blue-700">Open <ArrowRight className="h-4 w-4" /></span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-brand-blue-50 border-t border-brand-blue-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Are You an Employer?</h2>
-          <p className="text-slate-600 mb-8">Join our network of employer partners to hire trained graduates.</p>
-          <Link href="/apply/employer" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-            Become a Partner
-          </Link>
+      <section className="py-16">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 bg-white p-7">
+              <Users className="mb-4 h-8 w-8 text-brand-green-700" />
+              <h2 className="text-xl font-black text-slate-950">Hiring?</h2>
+              <p className="mt-3 text-slate-700">Submit the employer partnership application so the workforce team can review your organization and hiring needs.</p>
+              <Link href="/apply/employer" className="mt-5 inline-flex items-center font-bold text-brand-blue-700 hover:underline">Employer Application <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-7">
+              <Building2 className="mb-4 h-8 w-8 text-brand-red-700" />
+              <h2 className="text-xl font-black text-slate-950">Want to host an apprentice?</h2>
+              <p className="mt-3 text-slate-700">Beauty apprenticeship employers should complete the universal Host Site compliance application.</p>
+              <Link href="/partners/host-shop/apply" className="mt-5 inline-flex items-center font-bold text-brand-blue-700 hover:underline">Host Site Application <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>

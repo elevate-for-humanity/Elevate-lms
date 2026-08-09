@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - transfer-hours evidence is intentionally staged before account creation and reconciled to the matching application by normalized email/program metadata.
 import { NextResponse } from 'next/server';
 import { createHash, randomUUID } from 'node:crypto';
 import { getAdminClient } from '@/lib/supabase/admin';

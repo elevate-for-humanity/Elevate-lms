@@ -1,7 +1,4 @@
-/**
- * POST /api/webhooks/domainee
- * Signed, idempotent Domainee lifecycle webhook for connected and purchased domains.
- */
+/** Signed, idempotent Domainee lifecycle webhook. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -28,11 +25,8 @@ export async function POST(request: NextRequest) {
   }
 
   let event: DomaineeWebhookEvent;
-  try {
-    event = JSON.parse(rawBody) as DomaineeWebhookEvent;
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
-  }
+  try { event = JSON.parse(rawBody) as DomaineeWebhookEvent; }
+  catch { return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 }); }
 
   const db = await requireAdminClient();
   if (!db) return NextResponse.json({ error: 'Admin client unavailable' }, { status: 500 });
@@ -51,7 +45,6 @@ export async function POST(request: NextRequest) {
   }
 
   const purchaseId = (event.data.id as string | undefined) ?? (event.data.purchaseId as string | undefined);
-
   if (event.type === 'domain_purchase.completed' || event.type === 'domain_purchase.failed') {
     if (!purchaseId) return NextResponse.json({ received: true, ignored: true });
     const update: Record<string, unknown> = {
@@ -61,11 +54,7 @@ export async function POST(request: NextRequest) {
     if (typeof event.data.connectedDomainId === 'string') update.domainee_domain_id = event.data.connectedDomainId;
     if (typeof event.data.totalCents === 'number') update.provider_cost_cents = event.data.totalCents;
     if (event.type === 'domain_purchase.failed') update.error = String(event.data.error ?? event.data.message ?? 'Domain purchase failed');
-
-    const { error } = await db
-      .from('website_domains')
-      .update(update)
-      .eq('domainee_purchase_id', purchaseId);
+    const { error } = await db.from('website_domains').update(update).eq('domainee_purchase_id', purchaseId);
     if (error) {
       logger.error('domainee purchase webhook update failed', undefined, { purchaseId, error: error.message });
       return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
@@ -95,6 +84,5 @@ export async function POST(request: NextRequest) {
     logger.error('domainee domain webhook update failed', undefined, { domainId, error: error.message });
     return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
   }
-
   return NextResponse.json({ received: true, processed: true });
 }

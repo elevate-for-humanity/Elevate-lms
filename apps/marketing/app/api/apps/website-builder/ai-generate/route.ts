@@ -69,12 +69,30 @@ export async function POST(request: NextRequest) {
   const fallback = buildDefaultSiteConfig({ organizationName: businessName, industry, contactEmail: contactEmail || undefined });
   let config: TenantSiteConfig = fallback;
 
+  const responseShape = {
+    branding: {
+      primaryColor: '#hex',
+      secondaryColor: '#hex',
+      accentColor: '#hex',
+      logoText: 'text',
+      tagline: 'text',
+    },
+    homepage: {
+      heroTitle: 'text',
+      heroSubtitle: 'text',
+      heroCtaText: 'text',
+      features: [{ title: 'text', description: 'text' }],
+    },
+    programs: [{ name: 'text', description: 'text' }],
+    seo: { title: 'text', description: 'text', keywords: ['text'] },
+  };
+
   try {
     const result = await aiChat({
       messages: [
         {
           role: 'system',
-          content: `You are PARIS, an AI website strategist inside Elevate Website Builder. Build a concise, conversion-focused website configuration from the business interview. Return ONLY valid JSON with this exact shape:\n{\n  \"branding\": {\"primaryColor\":\"#hex\",\"secondaryColor\":\"#hex\",\"accentColor\":\"#hex\",\"logoText\":\"text\",\"tagline\":\"text\"},\n  \"homepage\": {\"heroTitle\":\"text\",\"heroSubtitle\":\"text\",\"heroCtaText\":\"text\",\"features\":[{\"title\":\"text\",\"description\":\"text\"}]},\n  \"programs\":[{\"name\":\"text\",\"description\":\"text\"}],\n  \"seo\": {\"title\":\"text\",\"description\":\"text\",\"keywords\":[\"text\"]}\n}. Use 3-5 homepage features. Programs may represent services if this is not a school. Do not invent addresses, licenses, accreditations, testimonials, ratings, outcomes or legal claims.`,
+          content: `You are PARIS, an AI website strategist inside Elevate Website Builder. Build a concise, conversion-focused website configuration from the business interview. Return ONLY valid JSON with this exact shape:\n${JSON.stringify(responseShape, null, 2)}\nUse 3-5 homepage features. Programs may represent services if this is not a school. Do not invent addresses, licenses, accreditations, testimonials, ratings, outcomes or legal claims.`,
         },
         {
           role: 'user',

@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import ApprenticeshipHub from '@/components/beauty/ApprenticeshipHub';
 
+const CANONICAL_URL = 'https://www.elevateforhumanity.org/barber-and-beauty-apprenticeships';
+
 export const metadata: Metadata = {
   title: 'Barber & Beauty Apprenticeship Programs | DOL Registered | Earn While You Learn | Nationwide',
   description: 'Start your barber or beauty career with our DOL-registered apprenticeships. Programs include Barber, Cosmetology, Esthetician, and Nail Technician. 2,000 hours. Funding available nationwide.',
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Beauty Apprenticeships | DOL Registered | Earn While You Learn',
     description: 'Start your beauty career with DOL-registered apprenticeships. 2,000 hours of training, Indiana licensure, $4,980 total.',
-    url: 'https://www.elevateforhumanity.org/beauty-apprenticeships',
+    url: CANONICAL_URL,
     siteName: 'Elevate for Humanity',
     type: 'website',
   },
@@ -41,7 +43,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/beauty-apprenticeships',
+    canonical: CANONICAL_URL,
   },
 };
 

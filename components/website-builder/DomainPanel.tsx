@@ -12,7 +12,6 @@ interface WebsiteDomain {
   dns_records?: DnsRecord[];
   dnsRecords?: DnsRecord[];
 }
-
 interface Props { websiteId: string; isPublished: boolean }
 
 function normalizeDomain(domain: WebsiteDomain): WebsiteDomain {
@@ -31,7 +30,6 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
   const [info, setInfo] = useState<string | null>(null);
   const [quote, setQuote] = useState<string | null>(null);
   const [polling, setPolling] = useState<string | null>(null);
-
   const [registrant, setRegistrant] = useState({
     firstName: '', lastName: '', email: '', phone: '', address1: '', city: '', state: '', postalCode: '', country: 'US',
   });
@@ -49,7 +47,7 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
       const pending = list.find((domain) => domain.status === 'pending' || domain.status === 'processing');
       setPolling(pending?.id ?? null);
     } catch {
-      // The editor remains usable even if domain status is temporarily unavailable.
+      // Keep the editor usable when domain status is temporarily unavailable.
     }
   }, [websiteId]);
 
@@ -87,9 +85,8 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
       setPolling(data.domain.id);
       setInfo(data.nextStep || 'Add the CNAME at your DNS provider.');
       setHostname('');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not connect domain');
-    } finally { setBusy(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Could not connect domain'); }
+    finally { setBusy(false); }
   }
 
   async function getQuote() {
@@ -101,9 +98,8 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
       if (!res.ok) throw new Error(data.error || 'Could not price domain');
       if (!data.available) throw new Error('That domain is not available.');
       setQuote(data.retailFormatted);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not price domain');
-    } finally { setBusy(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Could not price domain'); }
+    finally { setBusy(false); }
   }
 
   async function startDomainCheckout() {
@@ -195,10 +191,8 @@ export function DomainPanel({ websiteId, isPublished }: Props) {
             <button type="button" onClick={() => { setTab('connect'); setQuote(null); }} className={`px-3 py-2 text-sm font-black ${tab === 'connect' ? 'border-b-2 border-brand-red-600 text-brand-red-600' : 'text-slate-500'}`}>I own a domain</button>
             <button type="button" onClick={() => { setTab('buy'); setQuote(null); }} className={`px-3 py-2 text-sm font-black ${tab === 'buy' ? 'border-b-2 border-brand-red-600 text-brand-red-600' : 'text-slate-500'}`}>Buy a domain</button>
           </div>
-
           <div className="mt-4 space-y-3">
             <label className="block"><span className="mb-1 block text-sm font-bold">Domain</span><input value={hostname} onChange={(e) => { setHostname(e.target.value); setQuote(null); }} placeholder="yourbusiness.com" className="w-full rounded-xl border px-3 py-3" /></label>
-
             {tab === 'connect' ? (
               <button type="button" disabled={busy || !hostname} onClick={() => void connectOwnedDomain()} className="w-full rounded-xl bg-brand-red-600 px-4 py-3 font-black text-white disabled:opacity-50">{busy ? 'Connecting…' : 'Connect my domain'}</button>
             ) : (

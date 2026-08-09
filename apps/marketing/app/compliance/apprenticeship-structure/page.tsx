@@ -1,88 +1,74 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Award, CheckCircle, Clock, Users, Building } from 'lucide-react';
+import { Award, CheckCircle, Users, Building } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Structure | Compliance',
-  description: 'Learn about our DOL-registered apprenticeship program structure and requirements.',
+  description: 'Understand how Elevate apprenticeship programs combine occupation-specific on-the-job learning, related technical instruction, documentation, supervision, and completion requirements.',
 };
 
 export default function ApprenticeshipStructurePage() {
   const structure = [
-    { hours: '2,000', label: 'Total Training Hours', desc: 'Combined on-the-job training and related technical instruction' },
-    { hours: '1,500', label: 'On-the-Job Training', desc: 'Hands-on work experience at your host shop' },
-    { hours: '500', label: 'Related Technical Instruction', desc: 'Classroom and online learning' },
+    { label: 'On-the-Job Learning (OJL)', desc: 'Paid, supervised work-based learning at an approved employer or host site. Required hours and competencies depend on the registered occupation.' },
+    { label: 'Related Technical Instruction (RTI)', desc: 'Structured theory and technical instruction delivered through the approved curriculum. RTI requirements are occupation-specific.' },
+    { label: 'Competency & Documentation', desc: 'Hours, competencies, mentor verification, required documents, and completion evidence are recorded throughout the apprenticeship.' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Award className="w-4 h-4" />
-              Compliance
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Apprenticeship Structure
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Our DOL-registered apprenticeship programs follow a structured approach combining hands-on training with classroom instruction to prepare you for licensure.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/images/pages/store-compliance-ferpa-hero.webp"
+        alt="Apprenticeship compliance records and training documentation"
+        eyebrow="Compliance"
+        title="Registered Apprenticeship Structure"
+        description="Registered Apprenticeships follow occupation-specific standards. Elevate combines supervised on-the-job learning, related technical instruction, mentor verification, and documented completion requirements."
+        actions={(
+          <>
+            <Link href="/programs/apprenticeships" className="rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">View Apprenticeships</Link>
+            <Link href="/partners/host-shop/apply" className="rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Host Site Application</Link>
+          </>
+        )}
+      />
 
-      {/* Program Structure */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">Program Structure</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950 md:text-3xl">Core Structure</h2>
+          <p className="mx-auto mb-12 max-w-3xl text-center text-slate-700">Do not use one hour total for every occupation. The registered standard for each program controls the required OJL, RTI, competencies, and completion evidence.</p>
+          <div className="grid gap-6 md:grid-cols-3">
             {structure.map((item) => (
-              <div key={item.label} className="bg-white rounded-xl p-6 border border-slate-200 text-center">
-                <div className="text-4xl font-black text-brand-blue-600 mb-2">{item.hours}</div>
-                <h3 className="font-bold text-slate-900 mb-2">{item.label}</h3>
-                <p className="text-sm text-slate-600">{item.desc}</p>
+              <div key={item.label} className="rounded-xl border border-slate-200 bg-white p-6">
+                <Award className="mb-4 h-8 w-8 text-brand-blue-700" />
+                <h3 className="mb-2 font-bold text-slate-950">{item.label}</h3>
+                <p className="text-sm leading-6 text-slate-700">{item.desc}</p>
               </div>
             ))}
           </div>
+
+          <div className="mt-8 rounded-xl border border-brand-blue-200 bg-brand-blue-50 p-6">
+            <p className="font-bold text-slate-950">Barber Apprenticeship example</p>
+            <p className="mt-2 text-sm leading-6 text-slate-800">The current Barber standard uses 2,000 OJL hours plus 144 RTI hours. Other apprenticeship occupations may use different registered requirements; always follow the program-specific standard shown on that program page and in the learner record.</p>
+          </div>
         </div>
       </section>
 
-      {/* Requirements */}
       <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">Requirements</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-brand-blue-600" />
-                For Apprentices
-              </h3>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-12 text-center text-2xl font-bold text-slate-950 md:text-3xl">Participant Requirements</h2>
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 p-6">
+              <h3 className="mb-4 flex items-center gap-2 font-bold text-slate-950"><Users className="h-5 w-5 text-brand-blue-700" /> Apprentices</h3>
               <ul className="space-y-3">
-                {['Be 16 years or older', 'Have a high school diploma or GED', 'Pass a basic skills assessment', 'Find a licensed host shop', 'Complete required documentation'].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    {item}
-                  </li>
+                {['Complete the formal application and eligibility steps', 'Complete secure identity and required document verification', 'Meet the occupation-specific entry requirements', 'Work under an approved employer/host site when required', 'Complete and document OJL, RTI, competencies, and required assessments'].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-800"><CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-green-700" /> {item}</li>
                 ))}
               </ul>
             </div>
-            <div>
-              <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Building className="w-5 h-5 text-brand-blue-600" />
-                For Host Shops
-              </h3>
+            <div className="rounded-xl border border-slate-200 p-6">
+              <h3 className="mb-4 flex items-center gap-2 font-bold text-slate-950"><Building className="h-5 w-5 text-brand-blue-700" /> Employers / Host Sites</h3>
               <ul className="space-y-3">
-                {['Licensed barber or cosmetology shop', 'Willingness to mentor apprentices', 'DOL registered as a training site', 'Maintain required records', 'Pay apprentice wages'].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    {item}
-                  </li>
+                {['Complete the Host Site application and compliance review', 'Maintain the required business and professional licensing', 'Maintain required liability insurance and workers’ compensation/exemption documentation', 'Provide qualified supervision and verify OJL hours/competencies', 'Maintain wage, worksite, safety, and apprenticeship records as required'].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-800"><CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-green-700" /> {item}</li>
                 ))}
               </ul>
             </div>
@@ -90,39 +76,33 @@ export default function ApprenticeshipStructurePage() {
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="py-16 bg-brand-blue-50 border-t border-brand-blue-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">Program Timeline</h2>
-          <div className="grid sm:grid-cols-4 gap-4">
+      <section className="border-t border-brand-blue-100 bg-brand-blue-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-12 text-center text-2xl font-bold text-slate-950 md:text-3xl">Apprenticeship Flow</h2>
+          <div className="grid gap-4 sm:grid-cols-4">
             {[
-              { step: '1', title: 'Apply', desc: 'Submit application and documents' },
-              { step: '2', title: 'Match', desc: 'Get matched with a host shop' },
-              { step: '3', title: 'Train', desc: 'Complete 2,000 hours of training' },
-              { step: '4', title: 'License', desc: 'Pass state exam and get licensed' },
+              { step: '1', title: 'Apply', desc: 'Submit the complete student or host-site application.' },
+              { step: '2', title: 'Verify', desc: 'Complete eligibility, identity, licensing, documents, and worksite review.' },
+              { step: '3', title: 'Train', desc: 'Complete occupation-specific OJL, RTI, and competency requirements.' },
+              { step: '4', title: 'Complete', desc: 'Finish required assessments, records, and credential/licensure steps.' },
             ].map((s) => (
-              <div key={s.step} className="bg-white rounded-xl p-6 border border-slate-200 text-center">
-                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold mx-auto mb-3">{s.step}</div>
-                <h3 className="font-bold text-slate-900 mb-1">{s.title}</h3>
-                <p className="text-sm text-slate-600">{s.desc}</p>
+              <div key={s.step} className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-brand-blue-700 text-lg font-bold text-white">{s.step}</div>
+                <h3 className="mb-1 font-bold text-slate-950">{s.title}</h3>
+                <p className="text-sm text-slate-700">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Start Your Apprenticeship?</h2>
-          <p className="text-slate-600 mb-8">Apply today or contact us for more information.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/barber-apprenticeship" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Apply Now
-            </Link>
-            <Link href="/contact" className="inline-flex items-center border-2 border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
-              Contact Us
-            </Link>
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold text-slate-950">Ready to Start?</h2>
+          <p className="mb-8 text-slate-700">Choose the apprenticeship first so the correct occupation-specific requirements are applied.</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/apply/student" className="rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Student Application</Link>
+            <Link href="/partners/host-shop/apply" className="rounded-lg border-2 border-slate-300 px-8 py-4 font-bold text-slate-800 transition-colors hover:bg-slate-50">Host Site Application</Link>
           </div>
         </div>
       </section>

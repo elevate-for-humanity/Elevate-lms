@@ -12,7 +12,7 @@ export default function ServerLayout({ children }: ServerLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main id="main-content" className="flex-1 pt-[70px]" role="main">
+      <main id="main-content" tabIndex={-1} className="flex-1 pt-[70px] focus:outline-none" role="main">
         {children}
       </main>
       <ServerFooter />

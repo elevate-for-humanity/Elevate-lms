@@ -1,147 +1,110 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Briefcase, Users, Target, CheckCircle, TrendingUp, Phone, ArrowRight } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Job Placement Services | Career Services',
-  keywords: ["job placement", "career services", "employment assistance", "job search"],
-  description: 'Get help finding your perfect job. Our career services team connects graduates with employers and provides ongoing employment support.',
+  keywords: ['job placement', 'career services', 'employment assistance', 'job search'],
+  description: 'Get help finding your next job. Our career services team connects graduates with employers and provides ongoing employment support.',
 };
 
 export default function JobPlacementPage() {
   const services = [
-    { icon: Target, title: 'Resume Optimization', desc: 'ATS-friendly resumes that get past screening and catch recruiter attention.' },
-    { icon: Users, title: 'Employer Connections', desc: 'Direct connections to our network of 200+ employer partners actively hiring.' },
-    { icon: Briefcase, title: 'Interview Prep', desc: 'Mock interviews, feedback, and coaching to help you ace every interview.' },
-    { icon: TrendingUp, title: 'Career Coaching', desc: 'Ongoing support for salary negotiation, career progression, and job changes.' },
+    { icon: Target, title: 'Resume Optimization', desc: 'ATS-friendly resumes designed to improve clarity and recruiter readability.' },
+    { icon: Users, title: 'Employer Connections', desc: 'Introductions to employer and workforce partners when matching opportunities are available.' },
+    { icon: Briefcase, title: 'Interview Prep', desc: 'Mock interviews, feedback, and coaching to help you prepare for employer conversations.' },
+    { icon: TrendingUp, title: 'Career Coaching', desc: 'Ongoing support for job search strategy, career progression, and workplace readiness.' },
   ];
 
   const stats = [
     { value: 'Career', label: 'Services Available' },
-    { value: 'Active', label: 'Employer Network' },
+    { value: 'Active', label: 'Employer Outreach' },
     { value: 'Ongoing', label: 'Graduate Support' },
-    { value: 'Connected', label: 'Hiring Partners' },
+    { value: 'Direct', label: 'Workforce Referrals' },
   ];
+  const phoneHref = `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`;
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Briefcase className="w-4 h-4" />
-              Career Services
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Job Placement Services
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              We don't just train you — we help you get hired. Our career services team works with you from graduation to your first day on the job.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/career-services/contact" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Get Placement Help
-              </Link>
-              <a href="tel:3173143757" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                <Phone className="w-4 h-4 mr-2" />
-                Call (317) 314-3757
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/images/pages/pathways-page-10.webp"
+        alt="Career placement and employment support"
+        eyebrow="Career Services"
+        title="Job Placement Services"
+        description="Training is only part of the pathway. Career services helps you prepare for employers, identify openings, and move from graduation into the workforce."
+        actions={(
+          <>
+            <Link href="/career-services/contact" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Get Placement Help</Link>
+            <a href={phoneHref} className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500"><Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.supportPhone}</a>
+          </>
+        )}
+      />
 
-      {/* Stats */}
-      <section className="py-12 bg-slate-50 border-b border-slate-200">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <section className="border-b border-slate-200 bg-slate-50 py-12">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
             {stats.map((s) => (
               <div key={s.label}>
-                <div className="text-3xl md:text-4xl font-black text-brand-blue-600 mb-1">{s.value}</div>
-                <div className="text-sm text-slate-500">{s.label}</div>
+                <div className="mb-1 text-3xl font-black text-brand-blue-700 md:text-4xl">{s.value}</div>
+                <div className="text-sm font-medium text-slate-700">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Services */}
-      <section className="py-16 bg-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4">How We Help You Get Hired</h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">Comprehensive support from graduation to your first day on the job.</p>
-          <div className="grid sm:grid-cols-2 gap-6">
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950 md:text-3xl">How We Help You Get Hired</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-slate-700">Practical support from application materials through employer follow-up.</p>
+          <div className="grid gap-6 sm:grid-cols-2">
             {services.map((s) => (
-              <div key={s.title} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                <s.icon className="w-8 h-8 text-brand-blue-600 mb-4" />
-                <h3 className="font-bold text-slate-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-slate-600">{s.desc}</p>
+              <div key={s.title} className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+                <s.icon className="mb-4 h-8 w-8 text-brand-blue-700" />
+                <h3 className="mb-2 font-bold text-slate-950">{s.title}</h3>
+                <p className="text-sm text-slate-700">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Employer Network */}
-      <section className="py-16 bg-brand-blue-50 border-y border-brand-blue-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4">Our Employer Network</h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">Graduates have access to our growing network of employer partners.</p>
-          <div className="grid sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {['Healthcare Plus', 'Cool Air Solutions', 'Midwest Logistics', 'Elevate Salon', 'Community Pharmacy', 'Local Hospitals', 'Retail Chains', 'Manufacturing'].map((company) => (
-              <div key={company} className="bg-white rounded-lg p-4 text-center border border-slate-200">
-                <p className="text-sm font-medium text-slate-700">{company}</p>
+      <section className="border-y border-brand-blue-100 bg-brand-blue-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950 md:text-3xl">Employer & Workforce Connections</h2>
+          <p className="mx-auto mb-10 max-w-2xl text-center text-slate-700">Connections vary by occupation, location, employer demand, funding partner, and student eligibility.</p>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {['Healthcare employers', 'Skilled-trades employers', 'Transportation employers', 'Beauty host sites', 'Workforce agencies', 'Community partners', 'Staffing partners', 'Local businesses'].map((category) => (
+              <div key={category} className="rounded-lg border border-slate-200 bg-white p-4 text-center">
+                <p className="text-sm font-semibold text-slate-800">{category}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-slate-500 mt-6">And 190+ more employers actively hiring our graduates</p>
         </div>
       </section>
 
-      {/* Testimonials */}
       <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">Success Stories</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { name: 'Maria G.', program: 'Medical Assistant', story: 'The career team helped me land a job at a top hospital within 2 weeks of graduating.', outcome: 'Now working at Community Hospital' },
-              { name: 'James T.', program: 'HVAC Technician', story: 'They connected me with an employer who was hiring immediately. Best decision I made.', outcome: 'Started at $22/hr with benefits' },
-              { name: 'Keisha R.', program: 'Barber Apprenticeship', story: 'The interview prep was incredible. I felt so confident going into every interview.', outcome: 'Now employed at Elevate Salon' },
-            ].map((t) => (
-              <div key={t.name} className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-brand-blue-600">{t.name[0]}</span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-900">{t.name}</p>
-                    <p className="text-xs text-slate-500">{t.program}</p>
-                  </div>
-                </div>
-                <p className="text-slate-700 italic mb-4">"{t.story}"</p>
-                <p className="text-xs text-brand-blue-600 font-medium">{t.outcome}</p>
-              </div>
-            ))}
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-7 sm:p-9">
+            <h2 className="mb-4 text-2xl font-bold text-slate-950">What placement support includes</h2>
+            <div className="space-y-3 text-slate-800">
+              {['Resume and application review', 'Interview preparation', 'Employer referrals when opportunities match', 'Workforce partner coordination', 'Follow-up after interviews and placement'].map((item) => (
+                <p key={item} className="flex items-start gap-3"><CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-brand-green-700" /> {item}</p>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-slate-900 text-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Your Career?</h2>
-          <p className="text-slate-400 mb-8">Our career services team is here to help you find your perfect job.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/career-services/contact" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Contact Career Services <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
-            <Link href="/programs" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-slate-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Browse Training Programs
-            </Link>
+      <section className="bg-slate-950 py-16 text-white">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold md:text-3xl">Ready to Start Your Career?</h2>
+          <p className="mb-8 text-slate-300">Our career services team can help you prepare for the next employer opportunity.</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/career-services/contact" className="inline-flex items-center rounded-lg bg-brand-red-600 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-red-700">Contact Career Services <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-white px-8 py-4 font-bold text-white transition-colors hover:bg-white hover:text-slate-950">Browse Training Programs</Link>
           </div>
         </div>
       </section>

@@ -21,8 +21,12 @@ NF_CONFIG="scripts/northflank/configure-services.ts"
 [[ -f "$ADMIN_DOCKERFILE" ]] || fail "$ADMIN_DOCKERFILE missing"
 [[ -f "$NF_CONFIG" ]] || fail "$NF_CONFIG missing"
 
-grep -q "SERVICE_ROLE: 'lms'" "$NF_CONFIG" || fail "Northflank config must set SERVICE_ROLE=lms"
-grep -q "SERVICE_ROLE: 'admin'" "$NF_CONFIG" || fail "Northflank config must set SERVICE_ROLE=admin"
+# The configurator declares each service's role once and runtimeEnvironmentFor()
+# maps that role to SERVICE_ROLE. Validate the actual implementation instead of
+# requiring duplicated literal SERVICE_ROLE strings inside each config object.
+grep -q "role: 'lms'" "$NF_CONFIG" || fail "Northflank config must declare the LMS role"
+grep -q "role: 'admin'" "$NF_CONFIG" || fail "Northflank config must declare the Admin role"
+grep -q 'SERVICE_ROLE: service.role' "$NF_CONFIG" || fail "Northflank runtime config must map service.role to SERVICE_ROLE"
 grep -q '/api/ping' "$LMS_DOCKERFILE" || fail "LMS Dockerfile must healthcheck /api/ping"
 grep -q '/api/ping' "$ADMIN_DOCKERFILE" || fail "Admin Dockerfile must healthcheck /api/ping"
 pass "Northflank Dockerfile and service config separation looks correct"

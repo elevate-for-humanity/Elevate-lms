@@ -16,7 +16,6 @@ const ROUTE = /^route\.(tsx|ts|jsx|js)$/;
 const ROUTE_GROUP = /^\(.+\)$/;
 const PARALLEL = /^@.+$/;
 const DYNAMIC = /^\[.*\]$/;
-
 const ALIASES = new Map([
   ['student', 'learner'], ['students', 'learner'], ['learner', 'learner'], ['learners', 'learner'],
   ['participant', 'learner'], ['participants', 'learner'],
@@ -29,13 +28,11 @@ const ALIASES = new Map([
   ['workforce-board', 'workforce'], ['workforce-partner', 'workforce'], ['workforce-partners', 'workforce'],
   ['dashboards', 'dashboard'], ['portals', 'portal'],
 ]);
-
 const WEAK = new Set(['', 'page', 'index', 'home', 'dashboard', 'portal', 'manage', 'management', 'admin', 'app', 'api']);
 
 function existsDir(path) {
   try { return statSync(path).isDirectory(); } catch { return false; }
 }
-
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir)) {
     if (entry === 'node_modules' || entry === '.next' || entry.startsWith('_')) continue;
@@ -46,11 +43,9 @@ function walk(dir, out = []) {
   }
   return out;
 }
-
 function kind(file) {
   return PAGE.test(file.split(sep).at(-1) ?? '') ? 'page' : 'route';
 }
-
 function urlFor(root, file) {
   const parts = relative(root, file).split(sep);
   parts.pop();
@@ -58,11 +53,9 @@ function urlFor(root, file) {
   const url = `/${segments.join('/')}`.replace(/\/+/g, '/');
   return url === '/' ? '/' : url.replace(/\/$/, '');
 }
-
 function redirectOnly(source) {
   return /\b(?:redirect|permanentRedirect)\s*\(/.test(source) && !/return\s*\(\s*</.test(source);
 }
-
 function normalizedHash(source) {
   const normalized = source
     .replace(/\/\*[\s\S]*?\*\//g, '')
@@ -71,21 +64,14 @@ function normalizedHash(source) {
     .trim();
   return createHash('sha256').update(normalized).digest('hex');
 }
-
 function semanticTokens(url) {
-  return url
-    .split('/')
-    .filter(Boolean)
-    .filter((segment) => !DYNAMIC.test(segment))
-    .map((segment) => segment.toLowerCase())
-    .map((segment) => ALIASES.get(segment) ?? segment)
+  return url.split('/').filter(Boolean).filter((segment) => !DYNAMIC.test(segment))
+    .map((segment) => segment.toLowerCase()).map((segment) => ALIASES.get(segment) ?? segment)
     .filter((segment) => !WEAK.has(segment));
 }
-
 function semanticSignature(url) {
   return [...new Set(semanticTokens(url))].sort().join('|');
 }
-
 function publicRecord(record) {
   return {
     app: record.app,
@@ -102,20 +88,31 @@ for (const [app, config] of Object.entries(ROOTS)) {
   if (!existsDir(config.path)) continue;
   for (const file of walk(config.path)) {
     const source = readFileSync(file, 'utf8');
+    const routeKind = kind(file);
+    const url = urlFor(config.path, file);
     records.push({
       app,
       root: config.path,
       production: config.production,
       file,
-      kind: kind(file),
-      url: urlFor(config.path, file),
+      kind: routeKind,
+      url,
       source,
       redirectOnly: redirectOnly(source),
       hash: normalizedHash(source),
-      semanticSignature: semanticSignature(urlFor(config.path, file)),
+      semanticSignature: semanticSignature(url),
     });
   }
 }
+
+const redirectIntegrityFailures = records
+  .filter((record) => record.kind === 'page' && record.source.includes('permanentRedirect'))
+  .filter((record) => {
+    const hasDefaultExport = /export\s+default\s+(?:async\s+)?(?:function|class)|export\s+default\s+[A-Za-z_$]/.test(record.source);
+    const callsRedirect = /\bpermanentRedirect\s*\(/.test(record.source.replace(/import\s*\{[^}]*permanentRedirect[^}]*\}\s*from[^;]+;/g, ''));
+    return !hasDefaultExport || !callsRedirect;
+  })
+  .map(publicRecord);
 
 const inventory = Object.entries(ROOTS).map(([app, config]) => {
   const rows = records.filter((record) => record.app === app);
@@ -136,9 +133,7 @@ for (const record of records) {
   list.push(record);
   byAppUrl.set(key, list);
 }
-const exactWithinRoot = [...byAppUrl.values()]
-  .filter((items) => items.length > 1)
-  .map((items) => items.map(publicRecord));
+const exactWithinRoot = [...byAppUrl.values()].filter((items) => items.length > 1).map((items) => items.map(publicRecord));
 
 const byUrl = new Map();
 for (const record of records) {
@@ -147,18 +142,15 @@ for (const record of records) {
   list.push(record);
   byUrl.set(key, list);
 }
-
 const sameUrlCrossRoot = [...byUrl.entries()]
   .filter(([, items]) => new Set(items.map((item) => item.app)).size > 1)
   .map(([key, items]) => ({ key, items: items.map(publicRecord) }));
-
-const productionCrossAppSameUrl = sameUrlCrossRoot.filter(({ items }) => {
-  return new Set(items.filter((item) => item.production).map((item) => item.app)).size > 1;
-});
-
-const legacyOverlaps = sameUrlCrossRoot.filter(({ items }) => {
-  return items.some((item) => item.production) && items.some((item) => !item.production);
-});
+const productionCrossAppSameUrl = sameUrlCrossRoot.filter(({ items }) =>
+  new Set(items.filter((item) => item.production).map((item) => item.app)).size > 1,
+);
+const legacyOverlaps = sameUrlCrossRoot.filter(({ items }) =>
+  items.some((item) => item.production) && items.some((item) => !item.production),
+);
 
 const hashGroups = new Map();
 for (const record of records) {
@@ -182,7 +174,6 @@ const semanticFamilies = [...semanticGroups.entries()]
   .filter(([, items]) => new Set(items.map((item) => `${item.app}:${item.url}`)).size > 1)
   .map(([signature, items]) => ({ signature, items: items.map(publicRecord) }))
   .sort((a, b) => b.items.length - a.items.length);
-
 const productionSemanticCandidates = semanticFamilies.filter(({ items }) => {
   const productionItems = items.filter((item) => item.production);
   return new Set(productionItems.map((item) => `${item.app}:${item.url}`)).size > 1;
@@ -195,6 +186,7 @@ const report = {
     files: records.length,
     productionFiles: records.filter((record) => record.production).length,
     legacyFiles: records.filter((record) => !record.production).length,
+    redirectIntegrityFailures: redirectIntegrityFailures.length,
     exactWithinRoot: exactWithinRoot.length,
     sameUrlCrossRoot: sameUrlCrossRoot.length,
     productionCrossAppSameUrl: productionCrossAppSameUrl.length,
@@ -203,6 +195,7 @@ const report = {
     semanticFamilies: semanticFamilies.length,
     productionSemanticCandidates: productionSemanticCandidates.length,
   },
+  redirectIntegrityFailures,
   exactWithinRoot,
   productionCrossAppSameUrl,
   legacyOverlaps,
@@ -220,6 +213,7 @@ for (const row of inventory) {
   console.log(`- ${row.app} (${row.root}) ${row.production ? '[production]' : '[legacy]'}: ${row.pages} pages, ${row.routes} route handlers`);
 }
 console.log(`- total route files: ${report.totals.files}`);
+console.log(`- redirect integrity failures: ${report.totals.redirectIntegrityFailures}`);
 console.log(`- legacy-to-production exact URL overlaps: ${report.totals.legacyOverlaps}`);
 console.log(`- production cross-app same-URL candidates: ${report.totals.productionCrossAppSameUrl}`);
 console.log(`- exact implementation clone groups: ${report.totals.clonedImplementations}`);
@@ -227,6 +221,11 @@ console.log(`- semantic page families: ${report.totals.semanticFamilies}`);
 console.log(`- production semantic candidates: ${report.totals.productionSemanticCandidates}`);
 console.log(`- report: ${out}`);
 
+if (redirectIntegrityFailures.length > 0) {
+  console.error(`Found ${redirectIntegrityFailures.length} malformed permanentRedirect page(s).`);
+  for (const item of redirectIntegrityFailures) console.error(`  ${item.app}:${item.url} -> ${item.file}`);
+  process.exit(1);
+}
 if (exactWithinRoot.length > 0) {
   console.error(`Found ${exactWithinRoot.length} exact route collision(s) inside individual app roots.`);
   for (const group of exactWithinRoot.slice(0, 25)) {

@@ -2,7 +2,6 @@
  * IMPORTANT: client-polyfills MUST be the first import in this file.
  * It patches the browser environment (Buffer, process, etc.) before
  * any other module — including Next.js internals — runs.
- * Placing it anywhere else risks a "Buffer is not defined" crash.
  */
 import './client-polyfills';
 
@@ -21,19 +20,52 @@ import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
 
+const siteUrl = 'https://www.elevateforhumanity.org';
+const logoUrl = `${siteUrl}/images/logo.png`;
+
 export const metadata: Metadata = {
-  title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
-  description: 'Vocational education and workforce development',
+  title: {
+    default: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
+    template: '%s | Elevate for Humanity',
+  },
+  description:
+    'Elevate for Humanity Career & Technical Institute provides workforce training and registered apprenticeship pathways in barbering, cosmetology, esthetics, nail technology, healthcare, skilled trades, CDL, technology and business.',
   applicationName: 'Elevate for Humanity',
-  metadataBase: new URL('https://www.elevateforhumanity.org'),
+  metadataBase: new URL(siteUrl),
   manifest: '/manifest-marketing.json',
+  keywords: [
+    'registered apprenticeship',
+    'barber apprenticeship',
+    'cosmetology apprenticeship',
+    'hair stylist apprenticeship',
+    'esthetician apprenticeship',
+    'nail technician apprenticeship',
+    'manicuring apprenticeship',
+    'career training',
+    'workforce training',
+    'WIOA training',
+    'apprenticeship sponsor',
+  ],
   icons: {
-    // Keep one stable favicon candidate for search engines. The legacy
-    // /favicon.ico remains available for old browsers but is intentionally not
-    // advertised so Google does not have competing brand icons to choose from.
     icon: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
     shortcut: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
     apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'Elevate for Humanity',
+    url: siteUrl,
+    title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
+    description:
+      'Career training, registered apprenticeships, workforce funding and employer partnerships from Elevate for Humanity Career & Technical Institute.',
+    images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
+    description:
+      'Career training, registered apprenticeships, workforce funding and employer partnerships.',
+    images: [logoUrl],
   },
   robots: {
     index: true,
@@ -48,8 +80,44 @@ export const metadata: Metadata = {
   },
 };
 
-// Keep current rendering semantics until the route-by-route cache audit proves
-// which public pages are safe to move to static/ISR rendering.
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': ['Organization', 'EducationalOrganization'],
+  '@id': `${siteUrl}/#organization`,
+  name: 'Elevate for Humanity Career & Technical Institute',
+  alternateName: 'Elevate for Humanity',
+  legalName: '2Exclusive LLC-S',
+  url: siteUrl,
+  logo: {
+    '@type': 'ImageObject',
+    url: logoUrl,
+    contentUrl: logoUrl,
+    width: 256,
+    height: 256,
+  },
+  image: logoUrl,
+  telephone: '+1-317-314-3757',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Indianapolis',
+    addressRegion: 'IN',
+    addressCountry: 'US',
+  },
+  description:
+    'Career and technical training provider and U.S. Department of Labor Registered Apprenticeship sponsor serving learners, employers and workforce partners.',
+  knowsAbout: [
+    'Registered Apprenticeship',
+    'Barbering',
+    'Cosmetology',
+    'Hair Styling',
+    'Esthetics',
+    'Nail Technology',
+    'Manicuring',
+    'Workforce Development',
+    'WIOA',
+  ],
+};
+
 export const dynamic = 'force-dynamic';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -57,6 +125,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <head>
         <SupabasePublicConfigScript />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
       </head>
       <body className="efh-contrast">
         <SupabaseConfigBootstrap />

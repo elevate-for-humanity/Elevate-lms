@@ -139,7 +139,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <I18nProvider>
           <SkipToContent />
           <Header />
-          <main id="main-content" tabIndex={-1} className="site-main pt-[68px] focus:outline-none">
+          <main id="main-content" tabIndex={-1} className="site-main focus:outline-none">
             {children}
           </main>
           <SiteFooter />

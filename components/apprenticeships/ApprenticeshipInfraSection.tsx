@@ -6,26 +6,27 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import { card, hero, layout, type } from '@/lib/page-design-tokens';
+import { ROUTES } from '@/lib/navigation/routes';
 
 const bulletDot = 'w-1.5 h-1.5 rounded-full bg-brand-red-500 mt-2 shrink-0';
 
 const EMPLOYER_CAPABILITIES = [
-  'DOL-registered apprenticeship sponsorship',
-  'OJT wage reimbursement up to 50%',
+  'Approved Host Site pathway under Elevate sponsorship',
+  'OJT reimbursement support when available and eligible',
   'RAPIDS-compatible hour tracking',
-  'Employer dashboard with live cohort visibility',
+  'Host Site dashboard with apprentice visibility',
   'WEX and OJT agreement management',
-  'WOTC tax credit documentation',
-  'Compliance reporting for workforce boards',
+  'Workforce incentive documentation support',
+  'Compliance reporting workflows for workforce partners',
 ];
 
 const LEARNER_CAPABILITIES = [
-  'Earn wages while you train',
-  'Hours tracked automatically — no paperwork',
-  'Geofenced check-in at employer sites',
+  'Earn wages while you train when employed in the apprenticeship role',
+  'Digital OJL and RTI hour tracking',
+  'Worksite attendance and verification workflows',
   'Apprenticeship progress visible in your portal',
-  'Credential issued on completion, publicly verifiable',
-  'Pathway to journeyman status and wage increases',
+  'Credential and completion records maintained in the platform',
+  'Structured progression toward program completion',
 ];
 
 export interface ApprenticeshipInfraSectionProps {
@@ -53,9 +54,9 @@ export function ApprenticeshipInfraSection({
               Real apprenticeships. Real oversight.
             </h2>
             <p className={`${type.bodySmall} max-w-2xl mx-auto`}>
-              Elevate is a DOL-registered apprenticeship sponsor. Structured OJT, employer coordination,
-              RAPIDS-compatible tracking, and compliance documentation — so employers and learners can focus
-              on the work.
+              Elevate is a Registered Apprenticeship sponsor. Structured OJL, employer coordination,
+              RAPIDS-compatible tracking, and compliance documentation keep learners and approved Host Sites
+              in one operating workflow.
             </p>
           </div>
         ) : (
@@ -96,8 +97,8 @@ export function ApprenticeshipInfraSection({
                 ))}
               </ul>
               <Link
-                href="/apprenticeships#pathways"
-                className="inline-flex items-center gap-1.5 mt-5 text-sm font-bold text-brand-red-600 hover:text-brand-red-700 transition-colors"
+                href={`${ROUTES.apprenticeships}#pathways`}
+                className="inline-flex items-center gap-1.5 mt-5 text-sm font-bold text-brand-red-700 hover:text-brand-red-800 transition-colors"
               >
                 Explore apprenticeship programs <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
@@ -122,7 +123,7 @@ export function ApprenticeshipInfraSection({
             <div className="px-5 pt-4 pb-1 border-b border-slate-100">
               <p className={type.eyebrow}>For employers</p>
               <h3 id="apprenticeship-employers-heading" className={type.h3}>
-                Hire, train, retain
+                Become an approved Host Site
               </h3>
             </div>
             <div className={card.body}>
@@ -135,10 +136,10 @@ export function ApprenticeshipInfraSection({
                 ))}
               </ul>
               <Link
-                href="/for-employers"
-                className="inline-flex items-center gap-1.5 mt-5 text-sm font-bold text-brand-red-600 hover:text-brand-red-700 transition-colors"
+                href={ROUTES.apprenticeshipsHostShop}
+                className="inline-flex items-center gap-1.5 mt-5 text-sm font-bold text-brand-red-700 hover:text-brand-red-800 transition-colors"
               >
-                Employer partnership info <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                Host Site program and application <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </div>
           </article>
@@ -157,19 +158,18 @@ export function ApprenticeshipInfraSection({
           </div>
           <div className="px-5 sm:px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="max-w-lg">
-              <p className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug mb-1">
+              <p className="text-lg sm:text-xl font-extrabold text-slate-950 leading-snug mb-1">
                 Apprenticeship isn&apos;t a program add-on. It&apos;s the pathway.
               </p>
               <p className={type.bodySmall}>
-                Structured OJT, employer coordination, and RAPIDS-compatible reporting — built into every
-                eligible program from day one.
+                Structured OJL, employer coordination, and sponsor reporting are connected from enrollment through completion.
               </p>
             </div>
             <Link
-              href="/apprenticeship-sponsor"
-              className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shrink-0"
+              href={ROUTES.apprenticeshipSponsor}
+              className="inline-flex items-center gap-2 bg-slate-950 hover:bg-slate-800 text-white font-bold text-sm px-5 py-2.5 rounded-lg transition-colors shrink-0"
             >
-              About our apprenticeship program <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              Sponsor of Record & Governance <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>

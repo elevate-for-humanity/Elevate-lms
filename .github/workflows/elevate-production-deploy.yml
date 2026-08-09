@@ -113,7 +113,7 @@ jobs:
         run: |
           set -Eeuo pipefail
           for FILE in Dockerfile.marketing Dockerfile.admin Dockerfile.lms; do
-            if ! grep -Eq 'CMD.*server\.js|CMD.*pnpm.*start|ENTRYPOINT.*server\.js' "$FILE"; then
+            if ! grep -Eq 'CMD.*server\.(js|cjs)|CMD.*pnpm.*start|ENTRYPOINT.*server\.(js|cjs)' "$FILE"; then
               echo "::error file=$FILE::No valid production startup command found."
               exit 1
             fi

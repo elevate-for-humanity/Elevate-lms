@@ -1,0 +1,86 @@
+name: Patch dashboard audit branch
+
+on:
+  push:
+    branches:
+      - audit/platform-typography-pwa-dashboards-20260809
+    paths:
+      - '.github/workflows/patch-dashboard-audit-branch.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/platform-typography-pwa-dashboards-20260809
+          fetch-depth: 1
+
+      - name: Patch verified dashboard defects
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          # Workforce dashboard: missing import, retired role, dead expressions.
+          p = Path('apps/lms/app/workforce/dashboard/page.tsx')
+          s = p.read_text()
+          s = s.replace(
+              "  Clock, FileText, Shield, HeartHandshake, Search, ChevronRight,\n",
+              "  Clock, FileText, Shield, HeartHandshake, Search, ChevronRight, CheckSquare,\n",
+              1,
+          )
+          s = s.replace("    'workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin',\n", "    'workforce_board', 'case_manager', 'admin', 'staff', 'org_admin',\n", 1)
+          s = s.replace("profile?.role === 'workforce_board' || profile?.role === 'admin' || profile?.role === 'super_admin' || profile?.role === 'staff' || profile?.role === 'org_admin'", "profile?.role === 'workforce_board' || profile?.role === 'admin' || profile?.role === 'staff' || profile?.role === 'org_admin'", 1)
+          s = s.replace("            .pipe ? enrollBase : enrollBase,", "            ,", 1)
+          s = s.replace("{ label: 'Student Search', href: '/workforce/search', icon: Search, show: isCaseManager || !isCaseManager },", "{ label: 'Student Search', href: '/workforce/search', icon: Search, show: true },", 1)
+          p.write_text(s)
+
+          # Apprentice dashboard: use program-configured OJL requirement rather than 2,000 literal.
+          p = Path('apps/lms/app/apprentice/page.tsx')
+          s = p.read_text()
+          s = s.replace(
+              "'id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, progress_percent, course_id'",
+              "'id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, progress_percent, course_id, programs(min_ojl_hours)'",
+              1,
+          )
+          s = s.replace(
+              "  const requiredHours = 2000;\n  const progressPercent = Math.min(100, Math.max(0, Number(enrollment?.progress_percent ?? Math.round((approvedHours / requiredHours) * 100))));",
+              "  const configuredOjlHours = Number((enrollment?.programs as { min_ojl_hours?: number | null } | null)?.min_ojl_hours ?? 0);\n  const requiredHours = configuredOjlHours > 0 ? configuredOjlHours : null;\n  const calculatedProgress = requiredHours ? Math.round((approvedHours / requiredHours) * 100) : 0;\n  const progressPercent = Math.min(100, Math.max(0, Number(enrollment?.progress_percent ?? calculatedProgress)));",
+              1,
+          )
+          s = s.replace(
+              "value={`${approvedHours.toLocaleString()} / ${requiredHours.toLocaleString()}`}",
+              "value={requiredHours ? `${approvedHours.toLocaleString()} / ${requiredHours.toLocaleString()}` : approvedHours.toLocaleString()}",
+              1,
+          )
+          p.write_text(s)
+
+          # Employer dashboard: platform-configured support phone, remove duplicate admin test.
+          p = Path('apps/lms/app/employer/dashboard/page.tsx')
+          s = p.read_text()
+          if "PLATFORM_DEFAULTS" not in s:
+              s = s.replace("import WorkforceLiveWidget from '@/components/employer/WorkforceLiveWidget';", "import WorkforceLiveWidget from '@/components/employer/WorkforceLiveWidget';\nimport { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';", 1)
+          s = s.replace("const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('admin');", "const isAdmin = effectiveRoles.includes('admin');", 1)
+          s = s.replace('href="tel:3173143757"', 'href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, \'\')}`}', 1)
+          s = s.replace('Call (317) 314-3757', 'Call {PLATFORM_DEFAULTS.supportPhone}', 1)
+          p.write_text(s)
+          PY
+
+          git diff --check
+          git diff -- apps/lms/app/workforce/dashboard/page.tsx apps/lms/app/apprentice/page.tsx apps/lms/app/employer/dashboard/page.tsx
+
+      - name: Commit patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/lms/app/workforce/dashboard/page.tsx apps/lms/app/apprentice/page.tsx apps/lms/app/employer/dashboard/page.tsx
+          git commit -m 'fix(dashboards): remove hard-coded and stale runtime behavior' || exit 0
+          git push origin HEAD:audit/platform-typography-pwa-dashboards-20260809

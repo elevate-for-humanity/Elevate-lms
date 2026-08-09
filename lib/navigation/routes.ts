@@ -13,7 +13,7 @@ const ADMIN_URL = (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.elevatefo
 export const ROUTES = {
   // Home / intake
   home: '/',
-  apply: '/apply',
+  apply: '/apply/student',
 
   // Authentication / portals
   login: `${APP_URL}/login`,

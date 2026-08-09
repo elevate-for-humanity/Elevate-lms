@@ -22,7 +22,8 @@ export async function POST(request: NextRequest) {
       categories: result.readiness.categories.map((c) => ({ name: c.name, score: c.score, passed: c.passed })),
     }});
   } catch (error) {
-    logger.error('Unified course builder API error', { error });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`Unified course builder API error: ${errorMessage}`);
     return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }

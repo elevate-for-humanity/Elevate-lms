@@ -36,7 +36,7 @@ function getHostFromEnv(value: string | undefined, fallback: string): string {
 }
 
 export default async function ProviderDashboardPage() {
-  const { user } = await requireRole(['provider_admin', 'admin', 'super_admin', 'staff']);
+  const { user } = await requireRole(['provider_admin', 'admin', 'staff']);
   const supabase = await createClient();
   const db = await requireAdminClient();
 

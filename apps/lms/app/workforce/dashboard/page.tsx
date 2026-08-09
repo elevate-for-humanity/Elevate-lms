@@ -47,8 +47,7 @@ export default async function WorkforceDashboardPage() {
     await Promise.all([
       (isCaseManager && learnerIds.length === 0)
         ? Promise.resolve({ count: 0 })
-        : db.from('program_enrollments').select('*', { count: 'exact', head: true })
-            ,
+        : enrollBase,
       isCaseManager && learnerIds.length === 0
         ? Promise.resolve({ count: 0 })
         : (isCaseManager

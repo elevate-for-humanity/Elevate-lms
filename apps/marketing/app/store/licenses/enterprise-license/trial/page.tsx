@@ -1,6 +1,9 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-/** Canonical 14-day managed platform trial (license evaluation → /store/trial). */
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+/** Canonical managed platform trial redirects to /store/trial. */
 export default function EnterpriseLicenseTrialPage() {
   redirect('/store/trial');
 }

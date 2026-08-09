@@ -57,9 +57,7 @@ function corsHeadersForOrigin(origin: string, allowedOrigins: Set<string>) {
 
 async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  // No secret configured - skip verification (dev / unconfigured environments)
   if (!secret) return true;
-  // No token sent - fail only when secret is configured
   if (!token) return false;
 
   try {
@@ -174,14 +172,22 @@ async function _POST(req: Request) {
       );
     }
 
+    // Same-origin forms are already constrained by the origin allowlist, public
+    // contact rate limiter, and honeypot above. Require Turnstile only when a
+    // caller actually supplies a token or when the request is cross-origin.
+    // This keeps the canonical API compatible with the existing student/CDL
+    // forms, which do not render a Turnstile widget.
     const turnstileToken = body.turnstileToken || body.cfTurnstileToken || '';
-    const clientIp = getClientIp(req);
-    const humanVerified = await verifyTurnstile(turnstileToken, clientIp);
-    if (!humanVerified) {
-      return NextResponse.json(
-        { error: 'Bot verification failed' },
-        { status: 403, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-      );
+    const isSameOriginSubmission = !!origin && allowedOrigins.has(origin);
+    if (turnstileToken || !isSameOriginSubmission) {
+      const clientIp = getClientIp(req);
+      const humanVerified = await verifyTurnstile(turnstileToken, clientIp);
+      if (!humanVerified) {
+        return NextResponse.json(
+          { error: 'Bot verification failed' },
+          { status: 403, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
     }
 
     // Basic required fields - core fields that all forms must have
@@ -690,7 +696,7 @@ async function _POST(req: Request) {
                 <p style="margin-bottom: 12px;">Schedule your advisor call now:</p>
                 <a href="https://calendly.com/elevate4humanityedu" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
               </div>`
-                  : ""}
+                  : ''}
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
@@ -736,7 +742,7 @@ async function _POST(req: Request) {
           <p><strong>Application Status:</strong> ${applicationStatus}</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
-          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ""}
+          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
           <div style="text-align:center;margin:24px 0;">
             <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll -></a>
           </div>
@@ -765,8 +771,8 @@ async function _POST(req: Request) {
     try {
       const adminDb = await getAdminClient();
       if (adminDb) {
-        await adminDb.from("job_queue").insert({
-          type: "application_submitted",
+        await adminDb.from('job_queue').insert({
+          type: 'application_submitted',
           payload: {
             applicationId: data.id,
             programSlug: body.programSlug || body.preferredProgramId || null,
@@ -777,10 +783,10 @@ async function _POST(req: Request) {
           },
           run_after: new Date().toISOString(),
         });
-        logger.info("[Applications] Automation job queued", { applicationId: data.id });
+        logger.info('[Applications] Automation job queued', { applicationId: data.id });
       }
     } catch (queueError) {
-      logger.warn("[Applications] Failed to queue automation job", queueError instanceof Error ? queueError.message : String(queueError));
+      logger.warn('[Applications] Failed to queue automation job', queueError instanceof Error ? queueError.message : String(queueError));
     }
 
     return NextResponse.json(

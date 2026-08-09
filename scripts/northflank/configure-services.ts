@@ -122,8 +122,6 @@ function deploymentFor(mode: RolloutMode) {
       ? {
           type: 'custom',
           settings: {
-            // Single-instance production still gets a second temporary pod.
-            // The existing healthy pod cannot be removed until the new pod is ready.
             maxSurge: 1,
             maxUnavailable: 0,
           },
@@ -137,7 +135,6 @@ function deploymentFor(mode: RolloutMode) {
     instances: DESIRED_INSTANCES,
     docker: { configType: 'default' },
     strategy,
-    // Allow in-flight requests to drain after the replacement is ready.
     gracePeriodSeconds: 60,
   };
 }
@@ -226,37 +223,11 @@ async function patchWithZeroDowntimeStrategy(
     });
     return { response, rolloutMode: 'custom' };
   } catch (customError) {
-    // Marketing must never fall back to a rollout mode whose availability
-    // semantics are not explicit. With a single steady instance, any strategy
-    // that can remove the old pod before the replacement is ready can expose
-    // "no healthy upstream". Fail closed instead of accepting that risk.
-    if (service.role === 'marketing') {
-      throw new Error(
-        `Northflank rejected the required Marketing zero-downtime strategy ` +
-          `(maxSurge=1,maxUnavailable=0). Refusing deployment rather than risking 503/no healthy upstream. ` +
-          `${customError instanceof Error ? customError.message : String(customError)}`,
-      );
-    }
-
-    console.warn(
-      `[rollout-retry] ${service.id}: custom maxSurge/maxUnavailable strategy rejected; trying rollout-steady. ` +
+    throw new Error(
+      `Northflank rejected the required ${service.role} zero-downtime strategy ` +
+        `(maxSurge=1,maxUnavailable=0). Refusing deployment rather than risking 503/no healthy upstream. ` +
         `${customError instanceof Error ? customError.message : String(customError)}`,
     );
-
-    try {
-      const response = await nfFetch<Record<string, any>>(path, {
-        method: 'PATCH',
-        body: JSON.stringify(buildPatch(service, storageMb, 'rollout-steady')),
-      });
-      return { response, rolloutMode: 'rollout-steady' };
-    } catch (steadyError) {
-      throw new Error(
-        `Northflank refused both zero-downtime rollout strategies for ${service.id}. ` +
-          `Refusing to continue with a recreate deployment that can cause 503/no healthy upstream. ` +
-          `custom=${customError instanceof Error ? customError.message : String(customError)}; ` +
-          `rollout-steady=${steadyError instanceof Error ? steadyError.message : String(steadyError)}`,
-      );
-    }
   }
 }
 

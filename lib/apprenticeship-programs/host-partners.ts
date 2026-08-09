@@ -12,6 +12,8 @@ export type FeaturedHostPartner = {
   state: string;
   programs: string[];
   note?: string;
+  resourceUrl?: string;
+  resourceLabel?: string;
 };
 
 export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
@@ -33,6 +35,15 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     city: 'New Castle',
     state: 'IN',
     programs: ['barber-apprenticeship'],
+  },
+  {
+    name: 'Razors Image Barbershop',
+    city: 'Bloomington',
+    state: 'IN',
+    programs: ['barber-apprenticeship'],
+    note: 'Approved barber apprenticeship host shop.',
+    resourceUrl: 'https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:8be7070f-ef4e-42b8-b646-1806801ac9b3',
+    resourceLabel: 'View Razors Image document',
   },
   {
     name: 'Style and Scissor Salon',

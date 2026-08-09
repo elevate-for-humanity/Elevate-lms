@@ -48,6 +48,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/programs/hvac-technician',
     '/programs/skilled-trades',
     '/programs/cdl-training',
+    '/barber-and-beauty-apprenticeships',
     '/programs/barber-apprenticeship',
     '/programs/barber-apprenticeship/apply',
     '/programs/barber-apprenticeship/request-info',

@@ -108,9 +108,13 @@ function checkUnsafeServerAnonWrites() {
 }
 
 function collectAppRoutes() {
-  const appDir = path.join(ROOT, 'app');
+  const appDirs = [
+    path.join(ROOT, 'app'),
+    path.join(ROOT, 'apps', 'marketing', 'app'),
+    path.join(ROOT, 'apps', 'lms', 'app'),
+    path.join(ROOT, 'apps', 'admin', 'app'),
+  ];
   const routes = new Set(['/']);
-  if (!fs.existsSync(appDir)) return routes;
 
   function traverse(dir, prefix = '') {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -125,7 +129,9 @@ function collectAppRoutes() {
     }
   }
 
-  traverse(appDir, '');
+  for (const appDir of appDirs) {
+    if (fs.existsSync(appDir)) traverse(appDir, '');
+  }
   return routes;
 }
 

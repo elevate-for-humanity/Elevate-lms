@@ -1581,9 +1581,9 @@ article a:hover {
   color: #ffffff !important;
 }
 
-/* Footer text contrast - all white */
-footer,
-footer * {
+/* Footer text contrast - only force white text on dark footer surfaces */
+footer:is(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800),
+footer:is(.bg-black, .bg-slate-950, .bg-slate-900, .bg-slate-800) * {
   color: #ffffff !important;
 }
 

@@ -26,7 +26,10 @@ export function HomeFinalCTA() {
         >
           The Infrastructure for the Next Economy.
         </h2>
-        <p className="text-red-50 text-xs sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto">
+        <p
+          className="text-red-50 text-xs sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto"
+          style={{ color: "#fef2f2" }}
+        >
           Apply once for training, funding, apprenticeship, certification, and employment — all in
           one system.
         </p>

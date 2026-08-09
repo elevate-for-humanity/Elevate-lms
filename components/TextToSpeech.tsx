@@ -161,8 +161,7 @@ export default function TextToSpeech({
         <span>Speed</span>
         <select
           value={rate}
-          onChange={(event) => setRate(Number(event.target.value))
-          }
+          onChange={(event) => setRate(Number(event.target.value))}
           className="min-h-9 shrink-0 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900"
           disabled={isPlaying}
         >

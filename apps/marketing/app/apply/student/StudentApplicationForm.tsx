@@ -458,17 +458,17 @@ export default function StudentApplicationForm({ initialProgram = '' }: StudentA
             <p className="mt-1 text-sm text-slate-700">Use your legal name and current contact information.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><label className={labelClass}>First Name *</label><input name="firstName" required value={form.firstName} onChange={handleChange} className={fieldClass} autoComplete="given-name" /></div>
-            <div><label className={labelClass}>Last Name *</label><input name="lastName" required value={form.lastName} onChange={handleChange} className={fieldClass} autoComplete="family-name" /></div>
-            <div><label className={labelClass}>Date of Birth *</label><input type="date" name="dateOfBirth" required value={form.dateOfBirth} onChange={handleChange} className={fieldClass} /></div>
+            <div><label className={labelClass}>First Name *</label><input aria-label="First Name" name="firstName" required value={form.firstName} onChange={handleChange} className={fieldClass} autoComplete="given-name" /></div>
+            <div><label className={labelClass}>Last Name *</label><input aria-label="Last Name" name="lastName" required value={form.lastName} onChange={handleChange} className={fieldClass} autoComplete="family-name" /></div>
+            <div><label className={labelClass}>Date of Birth *</label><input aria-label="Date of Birth" type="date" name="dateOfBirth" required value={form.dateOfBirth} onChange={handleChange} className={fieldClass} /></div>
             <div><label className={labelClass}>Preferred Contact</label><select name="preferredContact" value={form.preferredContact} onChange={handleChange} className={fieldClass}><option value="phone">Phone</option><option value="text">Text</option><option value="email">Email</option></select></div>
-            <div><label className={labelClass}>Email *</label><input type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} autoComplete="email" /></div>
-            <div><label className={labelClass}>Phone *</label><input type="tel" name="phone" required value={form.phone} onChange={handleChange} className={fieldClass} autoComplete="tel" /></div>
-            <div className="sm:col-span-2"><label className={labelClass}>Street Address *</label><input name="address" required value={form.address} onChange={handleChange} className={fieldClass} autoComplete="street-address" /></div>
-            <div><label className={labelClass}>City *</label><input name="city" required value={form.city} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>State *</label><input name="state" required value={form.state} onChange={handleChange} className={fieldClass} /></div>
-            <div><label className={labelClass}>ZIP Code *</label><input name="zipCode" required value={form.zipCode} onChange={handleChange} className={fieldClass} inputMode="numeric" maxLength={10} /></div>
-            <div><label className={labelClass}>County of Residence</label><input name="countyOfResidence" value={form.countyOfResidence} onChange={handleChange} className={fieldClass} /></div>
+            <div><label className={labelClass}>Email *</label><input aria-label="Email" type="email" name="email" required value={form.email} onChange={handleChange} className={fieldClass} autoComplete="email" /></div>
+            <div><label className={labelClass}>Phone *</label><input aria-label="Phone" type="tel" name="phone" required value={form.phone} onChange={handleChange} className={fieldClass} autoComplete="tel" /></div>
+            <div className="sm:col-span-2"><label className={labelClass}>Street Address *</label><input aria-label="Street Address" name="address" required value={form.address} onChange={handleChange} className={fieldClass} autoComplete="street-address" /></div>
+            <div><label className={labelClass}>City *</label><input aria-label="City" name="city" required value={form.city} onChange={handleChange} className={fieldClass} /></div>
+            <div><label className={labelClass}>State *</label><input aria-label="State" name="state" required value={form.state} onChange={handleChange} className={fieldClass} /></div>
+            <div><label className={labelClass}>ZIP Code *</label><input aria-label="ZIP Code" name="zipCode" required value={form.zipCode} onChange={handleChange} className={fieldClass} inputMode="numeric" maxLength={10} /></div>
+            <div><label className={labelClass}>County of Residence</label><input aria-label="County of Residence" name="countyOfResidence" value={form.countyOfResidence} onChange={handleChange} className={fieldClass} /></div>
           </div>
         </section>
       )}

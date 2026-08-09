@@ -1,15 +1,14 @@
-'use client';
+import type { Metadata } from 'next';
 
-import nextDynamic from 'next/dynamic';
+import { requireAdmin } from '@/lib/authGuards';
+import PageClient from '../../../admin/studio/workflows/new/PageClient';
 
-const WorkflowsClient = nextDynamic(
-  () => import('../../../admin/studio/workflows/WorkflowsClient'),
-  {
-    ssr: false,
-    loading: () => <div className="flex min-h-[50vh] items-center justify-center bg-white text-slate-600">Loading workflow builder…</div>,
-  },
-);
+export const dynamic = 'force-dynamic';
 
-export default function NewWorkflowPage() {
-  return <WorkflowsClient />;
+export const metadata: Metadata = { title: 'New Workflow | Dev Studio' };
+
+/** Canonical workflow creation page for the Admin-owned Studio. */
+export default async function NewWorkflowPage() {
+  await requireAdmin();
+  return <PageClient />;
 }

@@ -490,7 +490,7 @@ export default function WorkflowsClient({ embedded = false }: { embedded?: boole
                     )}
                     {w.type === 'general' ? (
                       <Link
-                        href={`/admin/studio/workflows/${w.id}`}
+                        href={`/studio/workflows/${w.id}`}
                         title="View workflow detail"
                         className={`p-1.5 rounded-lg border transition-colors hover:border-indigo-300 hover:text-indigo-600 ${
                           embedded ? 'border-[#333] text-slate-500' : 'border-slate-200 text-slate-400'

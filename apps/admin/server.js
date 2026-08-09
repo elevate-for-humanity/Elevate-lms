@@ -6,7 +6,6 @@
 
 const fs = require('fs');
 const path = require('path');
-const v8 = require('v8');
 
 // Inline logger to avoid @ alias issues in standalone
 function createLogger(prefix) {
@@ -23,14 +22,13 @@ function createLogger(prefix) {
     serverStart: (host, port, ctx) => format('INFO', `Server starting on ${host}:${port}`, ctx),
     serverStop: (signal, uptime, ctx) => format('INFO', `Server stopped (${signal}) uptime=${uptime}s`, ctx),
     rejection: (id, type, ctx) => format(type === 'suppressed' ? 'WARN' : 'ERROR', `Unhandled rejection [${id}] ${type}`, ctx),
-    recovery: (id, action, ctx) => format('INFO', `Recovery [${id}] ${action}`, ctx),
   };
 }
 const log = createLogger('admin');
 
 // Inline memory monitor
 let memoryInterval = null;
-function startMonitoring(shutdownFn, logFn) {
+function startMonitoring(logFn) {
   memoryInterval = setInterval(() => {
     const mem = process.memoryUsage();
     if (mem.heapUsed > 3 * 1024 * 1024 * 1024) {
@@ -85,9 +83,10 @@ const rejectionMetrics = {
   unhandled: 0,
   recentSuppressed: [],
   recentUnhandled: [],
-  lastRecoveryAttempt: 0,
-  recoveryCount: 0,
 };
+
+const UNHANDLED_REJECTION_WINDOW_MS = 60_000;
+const MAX_UNHANDLED_REJECTIONS_PER_WINDOW = 3;
 
 // Known safe-to-ignore error codes from Node.js
 const KNOWN_SAFE_ERROR_CODES = new Set([
@@ -111,99 +110,6 @@ function isFatalError(errorCode, errorName) {
   if (errorCode && FATAL_ERROR_CODES.has(errorCode)) return true;
   if (errorName === 'ReferenceError' || errorName === 'SyntaxError') return true;
   return false;
-}
-
-/**
- * Attempt to RECOVER from unhandled rejection
- */
-function attemptRecovery(reason, errorId) {
-  const now = Date.now();
-  
-  if (now - rejectionMetrics.lastRecoveryAttempt < 30_000) {
-    log.warn('Recovery rate limited', { 
-      lastAttemptSeconds: Math.round((now - rejectionMetrics.lastRecoveryAttempt) / 1000),
-      errorId 
-    });
-    return true;
-  }
-  
-  rejectionMetrics.lastRecoveryAttempt = now;
-  rejectionMetrics.recoveryCount++;
-
-  // 1. Clear rejection references
-  try {
-    if (reason && typeof reason === 'object') {
-      Object.keys(reason).forEach(key => {
-        try { reason[key] = null; } catch { /* non-writable */ }
-      });
-    }
-    log.recovery(errorId, 'references_cleared', { 
-      errorCode: reason instanceof Error ? reason.code : null 
-    });
-  } catch (clearErr) {
-    log.warn('Failed to clear references', { error: clearErr.message, errorId });
-  }
-
-  // 2. Force GC if exposed
-  if (typeof global.gc === 'function') {
-    try {
-      global.gc();
-      log.recovery(errorId, 'gc_forced', {});
-    } catch (gcErr) {
-      log.warn('GC failed', { error: gcErr.message, errorId });
-    }
-  } else {
-    log.info('GC not exposed', { hint: 'Start with --expose-gc for best recovery', errorId });
-  }
-
-  // 3. Clear require cache
-  ['next/dist/server/web/sandbox-context', 'next/dist/server/web/error-overlay/hot-reloader'].forEach(modName => {
-    try {
-      if (require.cache[require.resolve(modName)]) {
-        delete require.cache[require.resolve(modName)];
-        log.recovery(errorId, 'cache_cleared', { module: modName });
-      }
-    } catch { /* not loaded */ }
-  });
-
-  // 4. Heap snapshot
-  try {
-    const heapSnapshot = v8.writeHeapSnapshot();
-    log.recovery(errorId, 'heap_snapshot', { file: path.basename(heapSnapshot) });
-  } catch (snapshotErr) {
-    log.warn('Heap snapshot failed', { error: snapshotErr.message, errorId });
-  }
-
-  // 5. Memory usage
-  const memUsage = process.memoryUsage();
-  log.recovery(errorId, 'memory_snapshot', {
-    heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
-    heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
-    rssMB: Math.round(memUsage.rss / 1024 / 1024),
-  });
-
-  // 6. Emit warning
-  if (typeof process.emitWarning === 'function') {
-    process.emitWarning(
-      `Unhandled rejection recovered. error_id=${errorId}, recovery_count=${rejectionMetrics.recoveryCount}`,
-      'UnhandledRejection', 'ELMS001', { errorId, recoveryCount: rejectionMetrics.recoveryCount }
-    );
-  }
-
-  // 7. Check limits
-  if (rejectionMetrics.recoveryCount > 20) {
-    log.error('Recovery failed - exceeded limit', { 
-      recoveryCount: rejectionMetrics.recoveryCount,
-      errorId 
-    });
-    return false;
-  }
-
-  log.recovery(errorId, 'recovery_attempted', { 
-    recoveryCount: rejectionMetrics.recoveryCount 
-  });
-  
-  return true;
 }
 
 function loadStandaloneConfig() {
@@ -256,7 +162,7 @@ const { startServer } = require('next/dist/server/lib/start-server');
  * Graceful shutdown handler for SIGTERM/SIGINT.
  * Northflank sends SIGTERM for container termination.
  */
-async function gracefulShutdown(signal) {
+async function gracefulShutdown(signal, exitCode = 0) {
   if (isShuttingDown) {
     log.debug('Duplicate shutdown signal ignored', { signal });
     return;
@@ -270,7 +176,6 @@ async function gracefulShutdown(signal) {
       total: rejectionMetrics.total,
       suppressed: rejectionMetrics.suppressed,
       unhandled: rejectionMetrics.unhandled,
-      recoveries: rejectionMetrics.recoveryCount,
     },
     memoryMetrics: getMetrics(),
   });
@@ -306,7 +211,7 @@ async function gracefulShutdown(signal) {
 
   const uptimeSeconds = Math.round(process.uptime());
   log.serverStop(signal, uptimeSeconds, { event: 'shutdown_complete' });
-  process.exit(0);
+  process.exit(exitCode);
 }
 
 // Register signal handlers for graceful shutdown
@@ -317,16 +222,9 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('unhandledRejection', (reason) => {
   rejectionMetrics.total++;
 
-  if (!reason) {
-    log.error('Unhandled promise rejection (null/undefined reason)', { 
-      event: 'promise_rejection',
-      type: 'null_reason'
-    });
-    rejectionMetrics.unhandled++;
-    return;
-  }
-
-  const error = reason instanceof Error ? reason : new Error(String(reason));
+  const error = reason instanceof Error
+    ? reason
+    : new Error(reason == null ? 'Unhandled rejection without a reason' : String(reason));
   const errorCode = error.code;
   const errorName = error.name;
 
@@ -352,19 +250,18 @@ process.on('unhandledRejection', (reason) => {
     return;
   }
 
-  // Track unhandled errors for pattern detection
   const errorId = Date.now().toString(36);
+  const now = Date.now();
+  rejectionMetrics.recentUnhandled = rejectionMetrics.recentUnhandled.filter(
+    (item) => now - item.timestamp < UNHANDLED_REJECTION_WINDOW_MS,
+  );
   rejectionMetrics.recentUnhandled.push({
     code: errorCode,
     name: errorName,
     message: error.message.substring(0, 200),
-    timestamp: Date.now(),
+    timestamp: now,
   });
-  if (rejectionMetrics.recentUnhandled.length > 10) {
-    rejectionMetrics.recentUnhandled.shift();
-  }
 
-  // Genuine unhandled rejection
   log.rejection(errorId, 'unhandled', {
     errorCode,
     errorName,
@@ -374,7 +271,6 @@ process.on('unhandledRejection', (reason) => {
 
   rejectionMetrics.unhandled++;
 
-  // Check for fatal errors
   if (isFatalError(errorCode, errorName)) {
     log.error('FATAL error detected - initiating shutdown', { 
       event: 'fatal_error',
@@ -382,29 +278,21 @@ process.on('unhandledRejection', (reason) => {
       errorCode,
       errorName 
     });
-    gracefulShutdown('FATAL_ERROR');
+    void gracefulShutdown('FATAL_ERROR', 1);
     return;
   }
 
-  // Attempt recovery
-  const shouldContinue = attemptRecovery(reason, errorId);
-
-  if (!shouldContinue) {
-    log.error('Recovery failed - initiating shutdown', { 
-      event: 'recovery_failed',
+  // A single rejected background task is logged without mutating live Next.js
+  // modules or blocking the event loop. Repeated unhandled failures indicate an
+  // unhealthy process; drain it so the orchestrator can replace it cleanly.
+  if (rejectionMetrics.recentUnhandled.length >= MAX_UNHANDLED_REJECTIONS_PER_WINDOW) {
+    log.error('Unhandled rejection threshold exceeded - initiating shutdown', {
+      event: 'rejection_threshold',
       errorId,
-      recoveryCount: rejectionMetrics.recoveryCount
+      count: rejectionMetrics.recentUnhandled.length,
+      windowMs: UNHANDLED_REJECTION_WINDOW_MS,
     });
-    gracefulShutdown('RECOVERY_FAILED');
-    return;
-  }
-
-  if (rejectionMetrics.unhandled > 10) {
-    log.error('High number of unhandled rejections', { 
-      event: 'rejection_warning',
-      unhandledCount: rejectionMetrics.unhandled,
-      suppressedCount: rejectionMetrics.suppressed
-    });
+    void gracefulShutdown('UNHANDLED_REJECTION_THRESHOLD', 1);
   }
 });
 
@@ -444,7 +332,7 @@ startServer({
     });
     
     // Start memory monitoring after server is ready
-    startMonitoring(gracefulShutdown, (level, msg, ctx) => {
+    startMonitoring((level, msg, ctx) => {
       if (level === 'error') log.error(msg, ctx);
       else if (level === 'warn') log.warn(msg, ctx);
       else if (level === 'info') log.info(msg, ctx);

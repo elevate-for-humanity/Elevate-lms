@@ -7,7 +7,7 @@ import Image from 'next/image';
 import {
   Zap, Play, Plus, CheckCircle, XCircle, Clock,
   RefreshCw, Trash2, ChevronDown, ChevronUp, AlertTriangle,
-  ArrowLeft, Workflow,
+  Activity, ArrowLeft, Workflow,
 } from 'lucide-react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────

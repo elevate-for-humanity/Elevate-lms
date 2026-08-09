@@ -71,10 +71,6 @@ const adminConfig = {
       { source: '/admin/staff-portal', destination: '/staff-portal/dashboard', permanent: true },
       { source: '/admin/staff-portal/:path*', destination: '/staff-portal/:path*', permanent: true },
 
-      // Keep Workflow Designer on one canonical page. The existing page already
-      // contains the create form, so /new must never become a separate dead route.
-      { source: '/studio/workflows/new', destination: '/studio/workflows', permanent: false },
-
       // Only genuine cross-application redirects belong here.
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
@@ -82,18 +78,6 @@ const adminConfig = {
       { source: '/contact', destination: 'https://www.elevateforhumanity.org/contact', permanent: false },
       { source: '/testing', destination: 'https://www.elevateforhumanity.org/testing', permanent: false },
     ];
-  },
-
-  async rewrites() {
-    return {
-      beforeFiles: [
-        // Compatibility contract for older Studio bundles. Route this before
-        // filesystem matching so a stale browser bundle cannot hit a 404.
-        { source: '/api/admin/workflows/run', destination: '/api/workflows/run' },
-      ],
-      afterFiles: [],
-      fallback: [],
-    };
   },
 
   outputFileTracingRoot: ROOT,

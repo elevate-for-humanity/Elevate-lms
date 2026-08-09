@@ -12,28 +12,36 @@ type Workspace = {
   healthEndpoint: string;
 };
 
-type HealthState = 'checking' | 'healthy' | 'degraded' | 'unavailable';
+type HealthState = 'not checked' | 'checking' | 'healthy' | 'degraded' | 'unavailable';
 
-const HEALTH_CONCURRENCY = 3;
-const HEALTH_TIMEOUT_MS = 8000;
+const HEALTH_CONCURRENCY = 2;
+const HEALTH_TIMEOUT_MS = 5000;
 
 export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Workspace[] }) {
-  const [health, setHealth] = useState<Record<string, HealthState>>({});
+  const [health, setHealth] = useState<Record<string, HealthState>>(() =>
+    Object.fromEntries(workspaces.map((workspace) => [workspace.id, 'not checked'])),
+  );
   const [refreshToken, setRefreshToken] = useState(0);
 
   useEffect(() => {
+    // Capability checks are intentionally user-triggered. Automatically issuing
+    // one authenticated request per workspace made every Studio visit fan out
+    // into dozens of Supabase auth and table queries, which could destabilize the
+    // single Admin container during cold starts and deployment rollovers.
+    if (refreshToken === 0) return;
+
     let cancelled = false;
     setHealth(Object.fromEntries(workspaces.map((workspace) => [workspace.id, 'checking'])));
 
     async function checkWorkspace(workspace: Workspace) {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+
       try {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
         const response = await fetch(workspace.healthEndpoint, {
           cache: 'no-store',
           signal: controller.signal,
         });
-        window.clearTimeout(timeout);
 
         const body = await response.json().catch(() => ({}));
         const reported = typeof body?.status === 'string' ? body.status : '';
@@ -51,6 +59,8 @@ export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Worksp
         if (!cancelled) {
           setHealth((current) => ({ ...current, [workspace.id]: 'unavailable' }));
         }
+      } finally {
+        window.clearTimeout(timeout);
       }
     }
 
@@ -72,6 +82,8 @@ export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Worksp
     };
   }, [workspaces, refreshToken]);
 
+  const isChecking = Object.values(health).some((state) => state === 'checking');
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4">
@@ -82,16 +94,17 @@ export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Worksp
         <button
           type="button"
           onClick={() => setRefreshToken((value) => value + 1)}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800"
+          disabled={isChecking}
+          className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60"
         >
-          <RefreshCw className="h-4 w-4" />
-          Refresh health
+          <RefreshCw className={`h-4 w-4 ${isChecking ? 'animate-spin' : ''}`} />
+          {isChecking ? 'Checking health' : 'Check health'}
         </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {workspaces.map((workspace) => {
-          const state = health[workspace.id] ?? 'checking';
+          const state = health[workspace.id] ?? 'not checked';
           return (
             <Link
               key={workspace.id}

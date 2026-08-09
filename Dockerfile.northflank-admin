@@ -116,6 +116,7 @@ RUN echo "Verifying build arguments..." && \
     (test -n "$NF_GIT_SHA" || (echo "ERROR: NF_GIT_SHA is not set" && exit 1)) && \
     echo "All required build arguments verified."
 RUN pnpm --filter @elevate/admin build
+RUN node scripts/verify-admin-critical-routes.mjs
 RUN set -eux; \
     ADMIN_NEXT_DIR="/workspace/apps/admin/.next"; \
     BUILD_ID_FILE="${ADMIN_NEXT_DIR}/BUILD_ID"; \

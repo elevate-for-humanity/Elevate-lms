@@ -336,7 +336,7 @@ export default function NewWorkflowPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to save');
-      router.push('/admin/studio/workflows');
+      router.push('/studio/workflows');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       setSaving(false);

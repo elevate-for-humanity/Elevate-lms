@@ -67,7 +67,7 @@ export default async function AdminGroupLayout({
 }) {
   // Dev Studio provides its own shell - exclude admin layout components.
   const headersList = await import('next/headers');
-  const headers = headersList.headers();
+  const headers = await headersList.headers();
   const pathname = headers.get('x-pathname') || '';
   const isDevStudio = pathname.includes('/admin/studio') || pathname.includes('/studio');
 

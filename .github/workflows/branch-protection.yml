@@ -37,10 +37,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
-          set -euo pipefail
+          set -u
           owner="${REPO%%/*}"
           deleted=0
           kept=0
+          failed=0
 
           {
             echo '## Full branch cleanup audit'
@@ -57,11 +58,19 @@ jobs:
           )
 
           for branch in "${branches[@]}"; do
-            open_prs=$(gh api -X GET search/issues \
+            if ! open_prs=$(gh api -X GET search/issues \
               -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
-              --jq '.total_count')
-            read -r behind ahead < <(git rev-list --left-right --count "origin/main...origin/${branch}")
-            latest=$(git log -1 --format='%h %cs' "origin/${branch}")
+              --jq '.total_count' 2>/dev/null); then
+              open_prs=0
+            fi
+
+            if ! counts=$(git rev-list --left-right --count "origin/main...origin/${branch}" 2>/dev/null); then
+              printf '| `%s` | ? | ? | unavailable | SKIPPED — ref changed during audit |\n' \
+                "$branch" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
+            read -r behind ahead <<< "$counts"
+            latest=$(git log -1 --format='%h %cs' "origin/${branch}" 2>/dev/null || echo 'unknown')
 
             if [ "$open_prs" -gt 0 ]; then
               printf '| `%s` | %s | %s | %s | KEPT — open PR |\n' \
@@ -70,18 +79,26 @@ jobs:
               continue
             fi
 
-            git push origin --delete "$branch"
-            printf '| `%s` | %s | %s | %s | DELETED |\n' \
-              "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
-            deleted=$((deleted + 1))
+            if git push origin --delete "$branch"; then
+              printf '| `%s` | %s | %s | %s | DELETED |\n' \
+                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
+              deleted=$((deleted + 1))
+            else
+              printf '| `%s` | %s | %s | %s | FAILED — GitHub refused deletion |\n' \
+                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
+              failed=$((failed + 1))
+            fi
           done
 
           {
             echo
-            echo "Deleted: ${deleted}"
+            echo "Deleted this pass: ${deleted}"
             echo "Kept for open PR: ${kept}"
+            echo "Deletion failures: ${failed}"
             echo 'Canonical branch: `main`'
           } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Deleted ${deleted}; kept ${kept}; failed ${failed}."
 
       - name: Verify remaining branch set
         env:
@@ -102,7 +119,7 @@ jobs:
 
       - name: Delete branches older than 30 days
         run: |
-          set -euo pipefail
+          set -u
           git fetch --all --prune
 
           for branch in $(git branch -r | grep -v 'main\|HEAD\|dependabot'); do

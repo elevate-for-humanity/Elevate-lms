@@ -211,7 +211,7 @@ export default function HowItWorksPage() {
               Apply for Training
             </Link>
             <Link
-              href="/booking/booking/enrollment"
+              href="/booking/enrollment"
               className="border-2 border-white/60 text-white/90 font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center"
             >
               Book Enrollment Session

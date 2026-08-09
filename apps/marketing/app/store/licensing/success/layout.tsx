@@ -1,2 +1,14 @@
-export { metadata } from '@/app/store/licenses/success/layout';
-export { default } from '@/app/store/licenses/success/layout';
+import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
+
+export const metadata: Metadata = {
+  title: 'License Purchase Complete',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
+export default function LegacyLicenseSuccessLayout({ children }: { children: ReactNode }) {
+  return children;
+}

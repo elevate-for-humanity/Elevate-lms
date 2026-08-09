@@ -1,12 +1,3 @@
-/**
- * Canonical redirect for student application success.
- *
- * Consolidates ALL submission confirmation pages to this single redirect.
- * Preserves ALL query parameters and redirects to /apply/confirmation.
- *
- * Handles: student, employer, program-holder, staff roles.
- * Handles: enrolled=true (approved), funding, program, ref, etc.
- */
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -25,6 +16,12 @@ export default async function ApplicationSuccessPage({
     } else if (Array.isArray(value) && typeof value[0] === 'string') {
       query.set(key, value[0]);
     }
+  }
+
+  if (query.get('type') === 'host-shop') {
+    query.delete('type');
+    const suffix = query.size > 0 ? `?${query.toString()}` : '';
+    redirect(`/partners/host-shop/confirmation${suffix}`);
   }
 
   const suffix = query.size > 0 ? `?${query.toString()}` : '';

@@ -10,6 +10,7 @@ const records=files.map(p=>({path:path.relative(root,p).replaceAll('\\','/'),tex
 const searches={
   secureIdentity:/secure_identity|prepareSSNForStorage|hashSSN\(|ssn_last4|ssn_hash/i,
   identityDocuments:/government.?issued|photo id|identity document|driver.?s license|state id|identity_documents_uploaded/i,
+  verificationSubmit:/verification\/submit|idFront|idBack|selfie/i,
   cartRoutes:/cart_items|cart-checkout|\/api\/cart\//i,
   pwaRegistration:/serviceWorker\.register|PwaRegistration|PWAInit|AdminPwaRegister|manifest-(?:lms|admin|marketing)/i,
   heroOverlay:/hero|banner/i,
@@ -19,6 +20,6 @@ for(const [name,re] of Object.entries(searches)){
   const hits=records.filter(r=>re.test(r.text));
   md+=`## ${name}\n\n${hits.length} files\n\n`+hits.map(r=>`- ${r.path}`).join('\n')+'\n\n';
 }
-const routeFiles=records.filter(r=>/\/route\.(?:ts|js)$/.test(r.path) && /cart|identity|ssn|application/i.test(r.path+' '+r.text.slice(0,3000)));
+const routeFiles=records.filter(r=>/\/route\.(?:ts|js)$/.test(r.path) && /cart|identity|ssn|verification|application|idFront|selfie/i.test(r.path+' '+r.text.slice(0,5000)));
 md+='## Critical route files\n\n'+routeFiles.map(r=>`- ${r.path}`).join('\n')+'\n';
 const out=path.join(root,'docs/audits/critical-wiring.md'); fs.mkdirSync(path.dirname(out),{recursive:true}); fs.writeFileSync(out,md); console.log(`Wrote ${path.relative(root,out)}`);

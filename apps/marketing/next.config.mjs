@@ -49,6 +49,13 @@ const nextConfig = {
         permanent: true,
       },
 
+      // Canonicalize historical barber/beauty public URLs in one hop. These are
+      // compatibility redirects only; current navigation points directly to the
+      // canonical destinations below.
+      { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
+      { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
+      { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
+
       // Historical cross-service paths remain as one-hop permanent redirects.
       // Internal navigation should point directly to the destination hosts.
       { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: true },

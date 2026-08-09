@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface HeroSectionProps {
   title: string;
@@ -22,93 +22,76 @@ export function HeroSection({
   subtitle,
   heroVideo,
   heroImage,
-  primaryCta = { label: 'Apply Now', href: '/apply' },
+  primaryCta = { label: 'Apply Now', href: '/apply/student' },
   secondaryCta = { label: 'Learn More', href: '#program' },
   stats = [],
 }: HeroSectionProps) {
   return (
-    <section className="relative min-h-[90vh] flex items-end overflow-hidden bg-white">
-      {/* Background Media */}
-      <div className="absolute inset-0">
+    <section className="overflow-hidden bg-white">
+      <div className="relative h-[clamp(220px,42vw,520px)] w-full overflow-hidden bg-slate-100">
         {heroVideo ? (
           <video
             autoPlay
             muted
             loop
             playsInline
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             poster={heroImage}
+            aria-label={`${title} program overview video`}
           >
             <source src={heroVideo} type="video/mp4" />
           </video>
         ) : (
-          <Image src={heroImage} alt={title} fill className="object-cover" priority />
+          <Image src={heroImage} alt={`${title} training`} fill className="object-cover" priority sizes="100vw" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pb-20 w-full">
-        <div className="max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <p className="text-amber-400 font-bold uppercase tracking-widest text-sm mb-4">
-              {tagline}
-            </p>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
-              {title}
-            </h1>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              {subtitle}
-            </p>
+      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl"
+        >
+          <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
+            {tagline}
+          </p>
+          <h1 className="mt-3 text-4xl font-black leading-tight text-slate-950 md:text-6xl">
+            {title}
+          </h1>
+          <p className="mt-4 max-w-3xl text-lg font-medium leading-8 text-slate-700 md:text-xl">
+            {subtitle}
+          </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href={primaryCta.href}
-                className="hidden md:inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-colors"
-              >
-                {primaryCta.label}
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              {secondaryCta && (
-                <Link
-                  href={secondaryCta.href}
-                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-xl border border-white/30 transition-colors"
-                >
-                  {secondaryCta.label}
-                </Link>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Stats */}
-          {stats.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-wrap gap-8 mt-12"
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              href={primaryCta.href}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3 font-extrabold text-white hover:bg-brand-red-700"
             >
-              {stats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-3xl font-black text-white">{stat.value}</div>
-                  <div className="text-sm text-white/70">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </div>
-      </div>
+              {primaryCta.label}
+              <ArrowRight className="h-5 w-5" aria-hidden />
+            </Link>
+            {secondaryCta ? (
+              <Link
+                href={secondaryCta.href}
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-950 hover:bg-slate-50"
+              >
+                {secondaryCta.label}
+              </Link>
+            ) : null}
+          </div>
+        </motion.div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center pt-2">
-          <div className="w-1.5 h-3 bg-white/50 rounded-full animate-pulse" />
-        </div>
+        {stats.length > 0 ? (
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label={`${title} program facts`}>
+            {stats.map((stat) => (
+              <div key={`${stat.label}-${stat.value}`} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-2xl font-black text-slate-950">{stat.value}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-700">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

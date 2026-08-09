@@ -9,6 +9,7 @@ import './client-polyfills';
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
+import '../../../styles/contrast-guardrails.css';
 import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import { I18nProvider } from '@/lib/i18n/context';
@@ -17,6 +18,8 @@ import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { SkipToContent } from '@/components/accessibility/SkipToContent';
+import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
 
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
@@ -42,14 +45,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <SupabasePublicConfigScript />
       </head>
-      <body>
+      <body className="efh-contrast">
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
         <ChunkRecovery />
         <GoogleAnalytics />
+        <AssociateFormLabels />
         <I18nProvider>
+          <SkipToContent />
           <Header />
-          <main className="site-main pt-[68px]">{children}</main>
+          <main id="main-content" tabIndex={-1} className="site-main pt-[68px] focus:outline-none">
+            {children}
+          </main>
           <SiteFooter />
         </I18nProvider>
       </body>

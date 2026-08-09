@@ -3,242 +3,161 @@ export const dynamic = 'force-static';
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Workflow, ArrowRight, Play, CheckCircle, Zap, Users, Database, Bell, FileText, Settings } from 'lucide-react';
+import { Workflow, ArrowRight, CheckCircle, Zap } from 'lucide-react';
 import { getAdminUrl } from '@/lib/config/admin-url';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
   title: 'Workflow Studio',
-  description: 'Visual drag-and-drop workflow automation. Build enrollment pipelines, compliance workflows, and business processes without code.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/workflow-studio',
-  },
+  description: 'Visual workflow automation for enrollment pipelines, compliance tasks, notifications, and business processes.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/store/workflow-studio' },
 };
 
 const triggers = [
-  { name: 'Form Submission', desc: 'When application submitted' },
-  { name: 'Payment Received', desc: 'When Stripe payment clears' },
-  { name: 'Document Uploaded', desc: 'When student uploads docs' },
-  { name: 'Schedule Event', desc: 'Time-based triggers' },
-  { name: 'Email Received', desc: 'Inbound email triggers' },
-  { name: 'Webhook', desc: 'External system triggers' },
+  { name: 'Form Submission', desc: 'Start a workflow when an application or form is submitted.' },
+  { name: 'Payment Received', desc: 'Continue a workflow after a verified payment event.' },
+  { name: 'Document Uploaded', desc: 'Respond to a document or evidence upload.' },
+  { name: 'Schedule Event', desc: 'Run time-based workflow steps.' },
+  { name: 'Webhook', desc: 'Receive an approved external system event.' },
 ];
 
 const actions = [
-  { name: 'Send Email', desc: 'Automated email sending' },
-  { name: 'Create Record', desc: 'Database record creation' },
-  { name: 'Update Status', desc: 'Record status changes' },
-  { name: 'Notify Team', desc: 'Slack/Teams alerts' },
-  { name: 'Generate Document', desc: 'PDF/doc creation' },
-  { name: 'API Call', desc: 'External system integration' },
+  { name: 'Send Email', desc: 'Send a workflow email or notification.' },
+  { name: 'Create Record', desc: 'Create a supported platform record.' },
+  { name: 'Update Status', desc: 'Move a record to the next verified state.' },
+  { name: 'Notify Team', desc: 'Surface work that requires staff attention.' },
+  { name: 'Generate Document', desc: 'Create approved workflow documents.' },
+  { name: 'API Call', desc: 'Call an approved connected service.' },
 ];
 
 const templates = [
-  { name: 'Student Enrollment', flows: 147, success: '99.2%' },
-  { name: 'Payment Processing', flows: 89, success: '99.8%' },
-  { name: 'Credential Issuance', flows: 234, success: '100%' },
-  { name: 'Compliance Alerts', flows: 56, success: '98.5%' },
+  { name: 'Student Enrollment', desc: 'Application, review, approval, onboarding, and enrollment steps.' },
+  { name: 'Payment Processing', desc: 'Payment confirmation and post-payment fulfillment.' },
+  { name: 'Credential Issuance', desc: 'Completion review and credential-processing steps.' },
+  { name: 'Compliance Alerts', desc: 'Surface missing, expiring, or review-required records.' },
 ];
 
 export default function WorkflowStudioPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Workflow Studio" }]} />
+      <div className="mx-auto max-w-7xl px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Workflow Studio' }]} />
       </div>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image 
-            src="/images/pages/admin-automation-qa-hero.webp" 
-            alt="Workflow Automation" 
-            fill 
-            className="object-cover object-center"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-900/95 via-orange-900/80 to-orange-900/60" />
-        </div>
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-full text-sm font-bold mb-6 backdrop-blur-sm">
-                <Workflow className="w-4 h-4" />
-                Workflow Studio
-              </div>
-              
-              <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-                Automate Any <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-yellow-300">Business Process</span>
-              </h1>
-              
-              <p className="text-xl text-slate-200 mb-8">
-                Visual drag-and-drop workflow builder. Create enrollment pipelines, compliance workflows, 
-                and automate repetitive tasks without writing code.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a href={getAdminUrl("/studio/workflows")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-brand-red-700 transition-all hover:-translate-y-0.5">
-                  Open Workflow Studio
-                  <ArrowRight className="w-5 h-5" />
-                </a>
-                <Link href="#templates" className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all">
-                  <Play className="w-5 h-5" />
-                  View Templates
-                </Link>
-              </div>
+      <PictureFirstPageHero
+        image="/images/pages/admin-automation-qa-hero.webp"
+        alt="Workflow automation studio interface"
+        eyebrow="Workflow Studio"
+        title="Automate Business Processes"
+        description="Build enrollment, compliance, notification, and operational workflows without placing marketing copy over the hero image."
+        actions={(
+          <>
+            <a href={getAdminUrl('/studio/workflows')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-red-700">Open Workflow Studio <ArrowRight className="h-5 w-5" /></a>
+            <Link href="#templates" className="inline-flex items-center justify-center rounded-xl border-2 border-slate-300 bg-white px-8 py-4 font-bold text-slate-900 transition-colors hover:border-slate-500">View Templates</Link>
+          </>
+        )}
+      />
+
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-900 px-4 py-3">
+              <span className="h-3 w-3 rounded-full bg-red-400" />
+              <span className="h-3 w-3 rounded-full bg-yellow-400" />
+              <span className="h-3 w-3 rounded-full bg-green-400" />
+              <span className="ml-2 text-xs font-semibold text-slate-300">Workflow Builder</span>
             </div>
-            
-            {/* Workflow Builder Preview */}
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-              <div className="bg-slate-800 px-4 py-3 flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                </div>
-                <span className="text-xs text-slate-400 ml-2">Workflow Builder</span>
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-semibold text-slate-900">Student Enrollment Pipeline</span>
-                  <span className="text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded">Active</span>
-                </div>
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                  {[
-                    { label: 'Application', color: 'bg-blue-100' },
-                    { label: 'Validate', color: 'bg-purple-100' },
-                    { label: 'Alert', color: 'bg-yellow-100' },
-                    { label: 'Enroll', color: 'bg-emerald-100' },
-                    { label: 'Setup', color: 'bg-slate-100' },
-                  ].map((node, i) => (
-                    <div key={node.label} className="flex items-center">
-                      <div className={`w-20 p-2 ${node.color} rounded-lg text-center`}>
-                        <p className="text-xs font-medium text-slate-700">{node.label}</p>
-                      </div>
-                      {i < 4 && <ArrowRight className="w-4 h-4 text-slate-400 mx-1" />}
-                    </div>
-                  ))}
-                </div>
+            <div className="p-6">
+              <p className="font-bold text-slate-950">Example: Student Enrollment Pipeline</p>
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                {['Application', 'Validate', 'Review', 'Enroll', 'Onboard'].map((label, index, list) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-800">{label}</span>
+                    {index < list.length - 1 ? <ArrowRight className="h-4 w-4 text-slate-400" /> : null}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Build in Minutes</h2>
-            <p className="text-lg text-slate-600">Three steps to automation</p>
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold text-slate-950">Build in Three Steps</h2>
+            <p className="text-lg text-slate-700">Choose a trigger, add supported actions, then activate and review the workflow.</p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid gap-8 md:grid-cols-3">
             {[
-              { step: 1, icon: Zap, title: 'Choose Trigger', desc: 'Start with a form submission, payment, schedule, or webhook' },
-              { step: 2, icon: Workflow, title: 'Add Steps', desc: 'Drag conditions, actions, and integrations into your flow' },
-              { step: 3, icon: CheckCircle, title: 'Activate', desc: 'Turn on and monitor with real-time logs and analytics' },
-            ].map(item => (
+              { step: 1, icon: Zap, title: 'Choose Trigger', desc: 'Start from a supported form, payment, upload, schedule, or webhook event.' },
+              { step: 2, icon: Workflow, title: 'Add Steps', desc: 'Configure conditions and supported actions without duplicating business logic.' },
+              { step: 3, icon: CheckCircle, title: 'Activate', desc: 'Turn on the workflow and review its execution and exception handling.' },
+            ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-8 h-8 text-orange-600" />
-                </div>
-                <span className="text-sm font-bold text-orange-600">Step {item.step}</span>
-                <h3 className="text-xl font-bold text-slate-900 mt-2 mb-3">{item.title}</h3>
-                <p className="text-slate-600">{item.desc}</p>
+                <item.icon className="mx-auto mb-4 h-10 w-10 text-orange-600" />
+                <span className="text-sm font-bold text-orange-700">Step {item.step}</span>
+                <h3 className="mt-2 text-xl font-bold text-slate-950">{item.title}</h3>
+                <p className="mt-3 text-slate-700">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Triggers & Actions */}
-      <section className="py-16 px-4 bg-slate-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-6">Triggers</h3>
-              <div className="space-y-3">
-                {triggers.map(t => (
-                  <div key={t.name} className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-900">{t.name}</p>
-                      <p className="text-sm text-slate-500">{t.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+      <section className="bg-slate-50 px-4 py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2">
+          <div>
+            <h3 className="mb-6 text-2xl font-bold text-slate-950">Triggers</h3>
+            <div className="space-y-3">
+              {triggers.map((item) => (
+                <div key={item.name} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="font-bold text-slate-950">{item.name}</p>
+                  <p className="mt-1 text-sm text-slate-700">{item.desc}</p>
+                </div>
+              ))}
             </div>
-            <div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-6">Actions</h3>
-              <div className="space-y-3">
-                {actions.map(a => (
-                  <div key={a.name} className="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-900">{a.name}</p>
-                      <p className="text-sm text-slate-500">{a.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          </div>
+          <div>
+            <h3 className="mb-6 text-2xl font-bold text-slate-950">Actions</h3>
+            <div className="space-y-3">
+              {actions.map((item) => (
+                <div key={item.name} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="font-bold text-slate-950">{item.name}</p>
+                  <p className="mt-1 text-sm text-slate-700">{item.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Templates */}
-      <section id="templates" className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready-to-Use Templates</h2>
-            <p className="text-lg text-slate-600">Start with proven workflows</p>
+      <section id="templates" className="px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold text-slate-950">Workflow Templates</h2>
+            <p className="text-lg text-slate-700">Use templates as starting structures; actual execution depends on the configured platform integrations and permissions.</p>
           </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {templates.map(t => (
-              <div key={t.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-lg transition-shadow">
-                <Workflow className="w-8 h-8 text-orange-600 mb-4" />
-                <h3 className="font-bold text-slate-900 mb-2">{t.name}</h3>
-                <div className="flex items-center gap-4 text-sm text-slate-500">
-                  <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    {t.flows} flows
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    {t.success}
-                  </span>
-                </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {templates.map((template) => (
+              <div key={template.name} className="rounded-xl border border-slate-200 bg-white p-6">
+                <Workflow className="mb-4 h-8 w-8 text-orange-600" />
+                <h3 className="font-bold text-slate-950">{template.name}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{template.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 px-4 bg-slate-900 text-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <Workflow className="w-12 h-12 text-orange-400 mx-auto mb-6" />
-          <h2 className="text-3xl font-bold mb-4">Ready to automate?</h2>
-          <p className="text-xl text-slate-300 mb-8">
-            Start with pre-built templates or build your own workflow from scratch.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={getAdminUrl("/studio/workflows")} className="inline-flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-xl transition-all hover:-translate-y-0.5">
-              Open Workflow Studio
-              <ArrowRight className="w-5 h-5" />
-            </a>
-            <Link href="/store/trial" className="inline-flex items-center justify-center gap-2 border border-slate-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-slate-800 transition-all">
-              Start Free Trial
-            </Link>
+      <section className="bg-slate-950 px-4 py-16 text-white">
+        <div className="mx-auto max-w-3xl text-center">
+          <Workflow className="mx-auto mb-6 h-12 w-12 text-orange-400" />
+          <h2 className="text-3xl font-bold">Ready to automate?</h2>
+          <p className="mt-4 text-lg text-slate-300">Open the Admin Workflow Studio to work with the actual platform workflow tools.</p>
+          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <a href={getAdminUrl('/studio/workflows')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-8 py-4 font-bold text-white hover:bg-brand-red-700">Open Workflow Studio <ArrowRight className="h-5 w-5" /></a>
+            <Link href="/store/trial" className="inline-flex items-center justify-center rounded-xl border border-slate-600 px-8 py-4 font-bold text-white hover:bg-slate-800">Start Trial</Link>
           </div>
         </div>
       </section>

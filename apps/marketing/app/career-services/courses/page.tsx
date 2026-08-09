@@ -1,10 +1,11 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, Clock, Award, ArrowRight } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
   title: 'Career Courses | Career Services',
-  keywords: ["career courses", "professional development", "skills training"],
+  keywords: ['career courses', 'professional development', 'skills training'],
   description: 'Enhance your career with our professional development courses. Build skills that employers value.',
 };
 
@@ -20,53 +21,35 @@ export default function CareerServicesCoursesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <BookOpen className="w-4 h-4" />
-              Professional Development
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Career Courses & Workshops
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Short courses designed to boost your professional skills and make you more valuable to employers.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/career-services/contact" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Enroll Now
-              </Link>
-              <Link href="/programs" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                View Full Programs
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/images/pages/instructional-framework-page-1.webp"
+        alt="Professional development class and career skills training"
+        eyebrow="Professional Development"
+        title="Career Courses & Workshops"
+        description="Short courses designed to strengthen professional skills and make you more valuable to employers."
+        actions={(
+          <>
+            <Link href="/career-services/contact" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Enroll Now</Link>
+            <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">View Full Programs</Link>
+          </>
+        )}
+      />
 
-      {/* Courses Grid */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4">Available Courses</h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">Quick courses to enhance your professional skills.</p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950 md:text-3xl">Available Courses</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-slate-700">Quick courses to enhance your professional skills.</p>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {courses.map((course) => (
-              <div key={course.title} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-lg hover:border-brand-blue-200 transition-all">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <course.icon className="w-6 h-6 text-brand-blue-600" />
+              <div key={course.title} className="rounded-xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-blue-200 hover:shadow-lg">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-100">
+                  <course.icon className="h-6 w-6 text-brand-blue-700" />
                 </div>
-                <h3 className="font-bold text-slate-900 mb-2">{course.title}</h3>
-                <p className="text-sm text-slate-600 mb-4">{course.desc}</p>
+                <h3 className="mb-2 font-bold text-slate-950">{course.title}</h3>
+                <p className="mb-4 text-sm text-slate-700">{course.desc}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-500">{course.hours} hours</span>
-                  <Link href="/career-services/contact" className="text-sm text-brand-blue-600 font-semibold inline-flex items-center gap-1 hover:text-brand-blue-700">
-                    Enroll <ArrowRight className="w-3 h-3" />
-                  </Link>
+                  <span className="text-xs font-medium text-slate-600">{course.hours} hours</span>
+                  <Link href="/career-services/contact" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-blue-700 hover:underline">Enroll <ArrowRight className="h-3 w-3" /></Link>
                 </div>
               </div>
             ))}
@@ -74,18 +57,13 @@ export default function CareerServicesCoursesPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Need Custom Training?</h2>
-          <p className="text-slate-600 mb-8">We can create custom courses for your workforce. Contact us to discuss your needs.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/career-services/contact" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Contact Career Services
-            </Link>
-            <Link href="/programs" className="inline-flex items-center border-2 border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
-              Explore Programs
-            </Link>
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold text-slate-950 md:text-3xl">Need Custom Training?</h2>
+          <p className="mb-8 text-slate-700">We can create custom courses for your workforce. Contact us to discuss your needs.</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/career-services/contact" className="inline-flex items-center rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Contact Career Services</Link>
+            <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-slate-300 px-8 py-4 font-bold text-slate-800 transition-colors hover:bg-slate-50">Explore Programs</Link>
           </div>
         </div>
       </section>

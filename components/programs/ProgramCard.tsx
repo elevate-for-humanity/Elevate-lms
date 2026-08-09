@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Program } from '@/lib/programs/programs.data';
+import { getProgramCardImage } from '@/lib/images/programImages';
 
 /**
  * Standard program card — system-locked structure.
@@ -8,17 +9,20 @@ import type { Program } from '@/lib/programs/programs.data';
  * Do not add icons, checkmarks, or colored badges here.
  */
 export default function ProgramCard({ program }: { program: Program }) {
+  const imageSrc = program.cardImage || program.heroImage || getProgramCardImage(program.slug);
+
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">
       {/* Flush top image — 16:9 */}
       <div className="relative aspect-[16/9] overflow-hidden">
         {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
-          src={program.cardImage || program.heroImage || '/images/pages/training-cohort.webp'}
+          src={imageSrc}
           alt={program.title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover" placeholder="empty"
+          className="object-cover"
+          placeholder="empty"
         />
       </div>
 

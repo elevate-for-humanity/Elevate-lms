@@ -1,24 +1,24 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Scissors, Store } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import FundingGateCard from '@/components/programs/FundingGateCard';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Apply — Cosmetology Apprenticeship',
-  description:
-    `Apply to the ${PLATFORM_DEFAULTS.orgName} DOL-registered cosmetology apprenticeship — as an apprentice or as a partner salon.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship/apply' },
+  description: `Apply to the ${PLATFORM_DEFAULTS.orgName} cosmetology apprenticeship as an apprentice or approved host salon.`,
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship/apply',
+  },
 };
 
 export default function CosmetologyApplyIndexPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-4">
           <Breadcrumbs
             items={[
               { label: 'Programs', href: '/programs' },
@@ -26,62 +26,84 @@ export default function CosmetologyApplyIndexPage() {
               { label: 'Apply' },
             ]}
           />
-          <div className="mt-4">
-            <Link
-              href="/programs/cosmetology-apprenticeship"
-              className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Program
-            </Link>
-          </div>
+          <Link
+            href="/programs/cosmetology-apprenticeship"
+            className="mt-4 inline-flex text-sm font-bold text-brand-blue-700 hover:underline"
+          >
+            Back to Program
+          </Link>
         </div>
       </div>
 
-      <section className="bg-slate-900 py-10">
-        <div className="max-w-2xl mx-auto px-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">
-            DOL-Registered Apprenticeship
+      <section className="border-b border-slate-200 bg-white py-10">
+        <div className="mx-auto max-w-4xl px-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+            Apprenticeship applications
           </p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-            Apply — Cosmetology Apprenticeship
-          </h1>
-          <p className="text-slate-300 text-base">
-            Select the application that applies to you.
+          <h1 className="mt-2 text-3xl font-black sm:text-4xl">Choose the correct Cosmetology application</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-700">
+            Apprentices complete the full student application. Salons use the universal beauty
+            host-site application with licensing, insurance, workers&apos; compensation,
+            supervisor-license, EIN/W-9, and worksite verification.
           </p>
         </div>
       </section>
 
-      <section className="py-12">
-        <div className="max-w-2xl mx-auto px-4 space-y-4">
-          {/* Apprentice card — funding gate routes to inquiry or enrollment */}
-          <FundingGateCard
-            icon={<Scissors className="w-6 h-6 text-brand-red-600" />}
-            title="I'm an Apprentice"
-            description="I want to enroll in the cosmetology apprenticeship program as a student."
-            enrollHref="/programs/cosmetology-apprenticeship/apply/apprentice"
-            inquiryHref="/programs/cosmetology-apprenticeship/request-info"
-            routeFundedToEnrollment
-            accentColor="brand-red"
-          />
+      <section className="mx-auto grid max-w-4xl gap-6 px-4 py-10 md:grid-cols-2">
+        <ApplicationCard
+          image="/images/pages/cosmetology.webp"
+          title="I’m an Apprentice"
+          description="Complete the full student application for the Cosmetology Apprenticeship, including funding, background, and transfer-hour information when applicable."
+          href="/apply/student?program=cosmetology-apprenticeship"
+          cta="Start Student Application"
+        />
+        <ApplicationCard
+          image="/images/pages/admin-courses-partners-hero.webp"
+          title="I’m a Partner Salon"
+          description="Apply to host apprentices using the one beauty host-site compliance application for licensed businesses."
+          href="/partners/barber-host-shop/apply"
+          cta="Start Host Site Application"
+        />
+      </section>
 
-          {/* Partner salon card — no funding gate needed */}
-          <Link
-            href="/programs/cosmetology-apprenticeship/apply"
-            className="flex items-start gap-5 p-6 bg-white border-2 border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-md transition-all group"
-          >
-            <div className="w-12 h-12 rounded-full bg-brand-blue-50 group-hover:bg-brand-blue-100 flex items-center justify-center shrink-0 transition-colors">
-              <Store className="w-6 h-6 text-brand-blue-600" />
-            </div>
-            <div>
-              <p className="font-bold text-slate-900 text-lg mb-1">I&apos;m a Partner Cosmetology Academy</p>
-              <p className="text-slate-600 text-sm leading-relaxed">
-                I own or manage a salon and want to host apprentices.
-              </p>
-            </div>
-          </Link>
+      <section className="mx-auto max-w-4xl px-4 pb-10">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm leading-6 text-slate-700">
+          Self-pay applicants can review the server-priced $600-minimum deposit, pay-in-full, and
+          BNPL/payment options after completing the application.
         </div>
       </section>
-    </div>
+    </main>
+  );
+}
+
+function ApplicationCard({
+  image,
+  title,
+  description,
+  href,
+  cta,
+}: {
+  image: string;
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+}) {
+  return (
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="relative aspect-[16/9] bg-slate-100">
+        <Image src={image} alt={title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+      </div>
+      <div className="p-6">
+        <h2 className="text-xl font-black text-slate-950">{title}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{description}</p>
+        <Link
+          href={href}
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700"
+        >
+          {cta}
+        </Link>
+      </div>
+    </article>
   );
 }

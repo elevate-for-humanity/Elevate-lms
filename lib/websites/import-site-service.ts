@@ -58,13 +58,8 @@ export async function importExistingWebsite(
   rawUrl: string,
   includePages: string[] = ['/', '/about', '/programs', '/contact'],
 ) {
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(rawUrl);
-    assertSafePublicImportUrl(parsedUrl);
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Invalid URL');
-  }
+  const parsedUrl = new URL(rawUrl);
+  assertSafePublicImportUrl(parsedUrl);
 
   const scrapedData = await scrapeSite(parsedUrl.origin, includePages);
   if (!scrapedData.success) {

@@ -5,6 +5,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { getStaticProgram } from '@/data/programs/index';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
+import { getMinimumDepositCents } from '@/lib/programs/deposit-policy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,10 +27,15 @@ async function resolvePricing(slug: string) {
       .eq('active', true)
       .maybeSingle();
     if (data?.tuition_cents) {
+      const tuitionCents = Number(data.tuition_cents);
       return {
         name: data.program_name,
-        tuitionCents: Number(data.tuition_cents),
-        depositMinCents: Number(data.deposit_min_cents || 0),
+        tuitionCents,
+        depositMinCents: getMinimumDepositCents({
+          slug,
+          tuitionCents,
+          configuredDepositCents: Number(data.deposit_min_cents || 0),
+        }),
       };
     }
   }
@@ -42,8 +48,11 @@ async function resolvePricing(slug: string) {
   return {
     name: program.title,
     tuitionCents,
-    depositMinCents:
-      configuredDeposit || Math.min(tuitionCents, Math.max(10000, Math.round(tuitionCents * 0.1))),
+    depositMinCents: getMinimumDepositCents({
+      slug: program.slug,
+      tuitionCents,
+      configuredDepositCents: configuredDeposit,
+    }),
   };
 }
 
@@ -98,7 +107,12 @@ export async function POST(request: NextRequest) {
   if (checkoutMode === 'deposit') {
     chargeCents = requested || pricing.depositMinCents;
     if (chargeCents < pricing.depositMinCents || chargeCents > pricing.tuitionCents) {
-      return NextResponse.json({ error: 'Deposit amount is outside the allowed range.' }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: `Deposit must be between $${Math.round(pricing.depositMinCents / 100).toLocaleString('en-US')} and $${Math.round(pricing.tuitionCents / 100).toLocaleString('en-US')}.`,
+        },
+        { status: 400 },
+      );
     }
   }
 

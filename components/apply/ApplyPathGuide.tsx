@@ -3,51 +3,39 @@ import Link from 'next/link';
 type Variant = 'hub' | 'student';
 
 /**
- * Clarifies the two student application paths (/apply quick intake vs /apply/student full form).
+ * Canonical student-application guidance.
+ *
+ * Historical /apply quick intake was removed because it created a second,
+ * partial student application. Keep this component API-compatible while making
+ * the full application + secure identity sequence explicit.
  */
-export default function ApplyPathGuide({ variant }: { variant: Variant }) {
-  const isHub = variant === 'hub';
-
+export default function ApplyPathGuide({ variant: _variant }: { variant: Variant }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 sm:p-6 mb-8">
-      <h2 className="text-lg font-bold text-slate-900 mb-2">Which application should I use?</h2>
-      <div className="grid sm:grid-cols-2 gap-4 text-sm">
-        <div
-          className={`rounded-lg border p-4 bg-white ${isHub ? 'border-brand-red-300 ring-1 ring-brand-red-200' : 'border-slate-200'}`}
-        >
-          <p className="font-semibold text-slate-900 mb-1">Quick eligibility check (3–5 min)</p>
-          <p className="text-slate-600 mb-3">
-            Best when you want funding screening first (WIOA, WRG, FSSA) before choosing a program.
+    <div className="mb-8 rounded-xl border border-slate-300 bg-slate-50 p-5 sm:p-6">
+      <h2 className="text-lg font-black text-slate-950">Complete application and enrollment requirements</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="font-bold text-slate-950">1. Full student application</p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">
+            Provide legal contact information, program selection, funding, education/background,
+            support needs, required acknowledgements, and apprenticeship transfer-hour evidence when applicable.
           </p>
-          {isHub ? (
-            <span className="text-brand-red-600 font-semibold">You are here</span>
-          ) : (
-            <Link href="/apply" className="text-brand-red-600 font-semibold hover:underline">
-              Go to quick intake →
-            </Link>
-          )}
         </div>
-        <div
-          className={`rounded-lg border p-4 bg-white ${!isHub ? 'border-brand-red-300 ring-1 ring-brand-red-200' : 'border-slate-200'}`}
-        >
-          <p className="font-semibold text-slate-900 mb-1">Full student application (~10 min)</p>
-          <p className="text-slate-600 mb-3">
-            Best when you know your program and want to provide enrollment, funding, background,
-            support-needs, and apprenticeship transfer-hour evidence when applicable.
+        <div className="rounded-xl border border-blue-300 bg-blue-50 p-4">
+          <p className="font-bold text-blue-950">2. Secure identity verification before enrollment</p>
+          <p className="mt-2 text-sm leading-6 text-blue-950">
+            Your student account must verify your complete Social Security number and government-issued
+            photo ID (front/back as applicable) plus a current selfie. The full SSN is never stored in the
+            general application record; the protected identity service stores only its hash and last four.
           </p>
-          {!isHub ? (
-            <span className="text-brand-red-600 font-semibold">You are here</span>
-          ) : (
-            <Link href="/apply/student" className="text-brand-red-600 font-semibold hover:underline">
-              Start full application →
-            </Link>
-          )}
         </div>
       </div>
-      <p className="text-xs text-slate-500 mt-4">
-        Apprenticeship programs (barber, cosmetology, esthetician, nail) may also use dedicated apply
-        pages linked from each program. Required program-specific documents are collected in the
-        applicable application or onboarding step and routed to review before credit or approval is granted.
+      <p className="mt-4 text-xs font-semibold leading-5 text-slate-700">
+        Host shops/employers do not use the student form. They use the separate{' '}
+        <Link href="/partners/host-shop/apply" className="font-bold text-brand-blue-700 hover:underline">
+          Host Site compliance application
+        </Link>
+        .
       </p>
     </div>
   );

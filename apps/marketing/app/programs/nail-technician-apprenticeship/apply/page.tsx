@@ -1,24 +1,24 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Store } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import FundingGateCard from '@/components/programs/FundingGateCard';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Apply — Nail Technician Apprenticeship',
-  description:
-    `Apply to the ${PLATFORM_DEFAULTS.orgName} DOL-registered nail technician apprenticeship — as an apprentice or as a partner nail salon.`,
-  alternates: { canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship/apply' },
+  description: `Apply to the ${PLATFORM_DEFAULTS.orgName} nail technician apprenticeship as an apprentice or approved host nail salon.`,
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship/apply',
+  },
 };
 
 export default function NailApplyIndexPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-4">
           <Breadcrumbs
             items={[
               { label: 'Programs', href: '/programs' },
@@ -26,60 +26,77 @@ export default function NailApplyIndexPage() {
               { label: 'Apply' },
             ]}
           />
-          <div className="mt-4">
-            <Link
-              href="/programs/nail-technician-apprenticeship"
-              className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-800 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Program
-            </Link>
-          </div>
+          <Link
+            href="/programs/nail-technician-apprenticeship"
+            className="mt-4 inline-flex text-sm font-bold text-brand-blue-700 hover:underline"
+          >
+            Back to Program
+          </Link>
         </div>
       </div>
 
-      <section className="bg-slate-900 py-10">
-        <div className="max-w-2xl mx-auto px-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-purple-400 mb-2">
-            DOL-Registered Apprenticeship
+      <section className="border-b border-slate-200 bg-white py-10">
+        <div className="mx-auto max-w-4xl px-4">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-700">
+            Apprenticeship applications
           </p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-            Apply — Nail Technician Apprenticeship
-          </h1>
-          <p className="text-slate-300 text-base">
-            Select the application that applies to you.
+          <h1 className="mt-2 text-3xl font-black sm:text-4xl">Choose the correct Nail Technician application</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-700">
+            Apprentices complete the full student application. Nail salons use the universal beauty
+            host-site application with licensing, insurance, workers&apos; compensation,
+            supervisor-license, EIN/W-9, and worksite verification.
           </p>
         </div>
       </section>
 
-      <section className="py-12">
-        <div className="max-w-2xl mx-auto px-4 space-y-4">
-          <FundingGateCard
-            icon={<Sparkles className="w-6 h-6 text-purple-600" />}
-            title="I'm an Apprentice"
-            description="I want to enroll in the nail technician apprenticeship program as a student."
-            enrollHref="/programs/nail-technician-apprenticeship/apply/apprentice"
-            inquiryHref="/contact?program=nail-technician-apprenticeship"
-            routeFundedToEnrollment
-            accentColor="brand-red"
-          />
-
-          <Link
-            href="/programs/nail-technician-apprenticeship/apply"
-            className="flex items-start gap-5 p-6 bg-white border-2 border-slate-200 rounded-xl hover:border-purple-400 hover:shadow-md transition-all group"
-          >
-            <div className="w-12 h-12 rounded-full bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center shrink-0 transition-colors">
-              <Store className="w-6 h-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="font-bold text-slate-900 text-lg mb-1">I&apos;m a Partner Nail Salon</p>
-              <p className="text-slate-600 text-sm leading-relaxed">
-                I own or manage a nail salon and want to host nail technician apprentices.
-              </p>
-            </div>
-          </Link>
-        </div>
+      <section className="mx-auto grid max-w-4xl gap-6 px-4 py-10 md:grid-cols-2">
+        <ApplicationCard
+          image="/images/pages/nail-technician.webp"
+          title="I’m an Apprentice"
+          description="Complete the full student application for the Nail Technician Apprenticeship, including funding and background information."
+          href="/apply/student?program=nail-technician-apprenticeship"
+          cta="Start Student Application"
+        />
+        <ApplicationCard
+          image="/images/pages/admin-employers-hero.webp"
+          title="I’m a Partner Nail Salon"
+          description="Apply to host apprentices using the one beauty host-site compliance application for licensed businesses."
+          href="/partners/barber-host-shop/apply"
+          cta="Start Host Site Application"
+        />
       </section>
-    </div>
+    </main>
+  );
+}
+
+function ApplicationCard({
+  image,
+  title,
+  description,
+  href,
+  cta,
+}: {
+  image: string;
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+}) {
+  return (
+    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="relative aspect-[16/9] bg-slate-100">
+        <Image src={image} alt={title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+      </div>
+      <div className="p-6">
+        <h2 className="text-xl font-black text-slate-950">{title}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{description}</p>
+        <Link
+          href={href}
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700"
+        >
+          {cta}
+        </Link>
+      </div>
+    </article>
   );
 }

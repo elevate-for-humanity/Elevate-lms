@@ -5,8 +5,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Compatibility route only. Public employer discovery is maintained at
-// /hire-graduates; authenticated employer operations live on the LMS service.
+// Compatibility route only. The public employer overview lives at /employers;
+// hiring-specific discovery lives at /hire-graduates, and authenticated employer
+// operations live on the LMS service.
 export default function EmployerRootRedirect() {
-  permanentRedirect('/hire-graduates');
+  permanentRedirect('/employers');
 }

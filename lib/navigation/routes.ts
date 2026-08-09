@@ -69,7 +69,9 @@ export const ROUTES = {
   eligibility: '/eligibility/quiz',
 
   // Employers
-  employers: '/employer',
+  // /employer remains a compatibility alias. The general employer overview and
+  // hire-graduates recruiting page are intentionally separate public surfaces.
+  employers: '/employers',
   employersHireGraduates: '/hire-graduates',
   employersPostJob: `${LMS_HOST}/employer/dashboard`,
   forAgencies: '/for-agencies',

@@ -1,4 +1,7 @@
-import Page from '../../intelligence/page';
+import { permanentRedirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-export default Page;
+export const metadata = { robots: { index: false, follow: false } };
+
+export default function LegacyAdminAlias() {
+  permanentRedirect('/intelligence');
+}

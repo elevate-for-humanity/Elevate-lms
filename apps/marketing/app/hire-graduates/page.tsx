@@ -58,10 +58,10 @@ export default function HireGraduatesPage() {
               Open Employer Portal <ArrowRight className="h-5 w-5" />
             </a>
             <Link
-              href={ROUTES.employers}
+              href={ROUTES.apprenticeshipsHostShop}
               className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-7 py-3 font-black text-slate-950 hover:bg-slate-100"
             >
-              Employer Overview
+              Become a Host Site
             </Link>
           </>
         )}

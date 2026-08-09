@@ -1,1 +1,8 @@
-export { default, generateMetadata, dynamic } from '../../../../crm/leads/[id]/page';
+import { permanentRedirect } from 'next/navigation';
+
+export const metadata = { robots: { index: false, follow: false } };
+
+export default async function LegacyAdminAlias({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  permanentRedirect(`/crm/leads/${encodeURIComponent(id)}`);
+}

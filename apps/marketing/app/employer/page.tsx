@@ -1,7 +1,13 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import { permanentRedirect } from 'next/navigation';
 
-// /employer is the authenticated employer portal (see /employer/dashboard, etc.)
-// The public employer marketing page is at /employers
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
+// Compatibility route only. The public employer overview lives at /employers;
+// hiring-specific discovery lives at /hire-graduates, and authenticated employer
+// operations live on the LMS service.
 export default function EmployerRootRedirect() {
-  redirect('/employers');
+  permanentRedirect('/employers');
 }

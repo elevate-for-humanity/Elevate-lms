@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 4,
   "updated": "2026-08-09",
   "surfaces": {
     "studentApplication": {
@@ -34,6 +34,19 @@
       ],
       "informational": [
         { "app": "marketing", "path": "/apprenticeship-sponsor", "purpose": "Sponsor-of-record governance and compliance; not a second employer application" }
+      ]
+    },
+    "employerPublic": {
+      "function": "General public employer partnership and workforce solution overview",
+      "canonical": { "app": "marketing", "path": "/employers" },
+      "compatibility": [
+        { "app": "marketing", "path": "/employer", "target": "/employers" }
+      ],
+      "informational": [
+        { "app": "marketing", "path": "/hire-graduates", "purpose": "Hiring-specific recruiting and candidate pathway page" }
+      ],
+      "operational": [
+        { "app": "lms", "path": "/employer/dashboard", "purpose": "Authenticated employer job posting and candidate management" }
       ]
     },
     "workforcePortal": {

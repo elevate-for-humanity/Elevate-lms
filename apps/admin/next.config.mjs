@@ -65,6 +65,12 @@ const adminConfig = {
 
   async redirects() {
     return [
+      // Canonical staff workspace lives directly under /staff-portal on the
+      // Admin hostname. Preserve old /admin/staff-portal bookmarks without
+      // keeping a second operational URL hierarchy.
+      { source: '/admin/staff-portal', destination: '/staff-portal/dashboard', permanent: true },
+      { source: '/admin/staff-portal/:path*', destination: '/staff-portal/:path*', permanent: true },
+
       // Keep Workflow Designer on one canonical page. The existing page already
       // contains the create form, so /new must never become a separate dead route.
       { source: '/studio/workflows/new', destination: '/studio/workflows', permanent: false },

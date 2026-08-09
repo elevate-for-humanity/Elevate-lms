@@ -1,1 +1,7 @@
-export { default, metadata, dynamic, revalidate } from '../../submissions/page';
+import { permanentRedirect } from 'next/navigation';
+
+export const metadata = { robots: { index: false, follow: false } };
+
+export default function LegacyAdminAlias() {
+  permanentRedirect('/submissions');
+}

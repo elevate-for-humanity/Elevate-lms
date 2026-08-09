@@ -1,4 +1,7 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /**
  * Legacy Barber-specific apprentice intake retained only for historical links.

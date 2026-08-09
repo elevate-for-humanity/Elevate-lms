@@ -31,12 +31,12 @@ const PATHWAYS = [
   {
     title: 'Skilled Trades',
     description: 'Reach learners developing technical skills for HVAC and other employer-driven trade pathways.',
-    image: '/images/pages/skilled-trades-page-1.webp',
+    image: '/images/pages/apprenticeship-structure.webp',
   },
   {
     title: 'Technology & Business',
     description: 'Find candidates building digital, office, customer-service, and business operations skills.',
-    image: '/images/pages/technology-page-1.webp',
+    image: '/images/pages/admin-partners-hero.webp',
   },
 ] as const;
 

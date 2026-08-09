@@ -29,6 +29,16 @@ export default function FeaturedHostPartners() {
               <p className="text-xs text-brand-blue-800 font-bold mt-3">
                 Programs: {shop.programs.map((p) => p.replace(/-apprenticeship$/, '')).join(' · ')}
               </p>
+              {shop.resourceUrl && (
+                <a
+                  href={shop.resourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex text-sm font-extrabold text-brand-red-700 underline underline-offset-4 hover:text-brand-red-800"
+                >
+                  {shop.resourceLabel ?? 'View shop document'}
+                </a>
+              )}
             </div>
           ))}
         </div>

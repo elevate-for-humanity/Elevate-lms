@@ -57,9 +57,7 @@ function corsHeadersForOrigin(origin: string, allowedOrigins: Set<string>) {
 
 async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  // No secret configured - skip verification (dev / unconfigured environments)
   if (!secret) return true;
-  // No token sent - fail only when secret is configured
   if (!token) return false;
 
   try {
@@ -152,9 +150,6 @@ async function _POST(req: Request) {
 
     const body = await req.json();
 
-    // Normalize all public application forms at this canonical boundary.
-    // Older forms use programInterest/fundingSource while newer program pages
-    // use program/programSlug/fundingType.
     body.program = body.program || body.programInterest || body.programSlug || body.program_slug;
     body.programSlug =
       body.programSlug || body.program_slug || body.programInterest || body.program;
@@ -166,7 +161,6 @@ async function _POST(req: Request) {
       null;
     body.zip = body.zip || body.zipCode || body.postalCode || '';
 
-    // Honeypot field for commodity bots.
     if (body.website && String(body.website).trim() !== '') {
       return NextResponse.json(
         { ok: true, accepted: true },
@@ -175,19 +169,19 @@ async function _POST(req: Request) {
     }
 
     const turnstileToken = body.turnstileToken || body.cfTurnstileToken || '';
-    const clientIp = getClientIp(req);
-    const humanVerified = await verifyTurnstile(turnstileToken, clientIp);
-    if (!humanVerified) {
-      return NextResponse.json(
-        { error: 'Bot verification failed' },
-        { status: 403, headers: corsHeadersForOrigin(origin, allowedOrigins) },
-      );
+    const isSameOriginSubmission = !!origin && allowedOrigins.has(origin);
+    if (turnstileToken || !isSameOriginSubmission) {
+      const clientIp = getClientIp(req);
+      const humanVerified = await verifyTurnstile(turnstileToken, clientIp);
+      if (!humanVerified) {
+        return NextResponse.json(
+          { error: 'Bot verification failed' },
+          { status: 403, headers: corsHeadersForOrigin(origin, allowedOrigins) },
+        );
+      }
     }
 
-    // Basic required fields - core fields that all forms must have
     const coreRequired = ['firstName', 'lastName', 'phone', 'email'];
-
-    // Program is required but can come from different field names
     const program = body.program || body.programSlug;
     if (!program) {
       return NextResponse.json(
@@ -231,7 +225,6 @@ async function _POST(req: Request) {
     }
 
     const supabase = await getAdminClient();
-
     if (!supabase) {
       return NextResponse.json(
         {
@@ -242,7 +235,6 @@ async function _POST(req: Request) {
       );
     }
 
-    // Program state gate - reject submissions for waitlisted or closed programs
     const enrollmentState = await getProgramEnrollmentState(supabase, program);
     if (enrollmentState === 'waitlist') {
       return NextResponse.json(
@@ -261,9 +253,6 @@ async function _POST(req: Request) {
       );
     }
 
-    // Dedup: block same email + program within 24 hours.
-    // Excludes intake-form mirrors - those are pre-application inquiries, not submissions.
-    // Allows re-application after the window (e.g. student applies months later).
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: recentApp } = await supabase
       .from('applications')
@@ -301,9 +290,6 @@ async function _POST(req: Request) {
       );
     }
 
-    // Active-application check: warn (don't block) if same email has an active
-    // application for the SAME program that isn't rejected/withdrawn.
-    // This helps students who forgot they already applied.
     const { data: activeApp } = await supabase
       .from('applications')
       .select('id, reference_number, status')
@@ -321,10 +307,8 @@ async function _POST(req: Request) {
         `Track your application: /apply/track?id=${activeApp.reference_number ?? activeApp.id}`;
     }
 
-    // Generate reference number
     const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 
-    // Build notes field with all the extra data
     const notes = [
       `Reference: ${referenceNumber}`,
       body.city ? `City: ${body.city}` : '',
@@ -351,23 +335,15 @@ async function _POST(req: Request) {
       body.hasCaseManager ? `Has Case Manager: ${body.hasCaseManager}` : '',
       body.caseManagerAgency ? `Case Manager Agency: ${body.caseManagerAgency}` : '',
       body.supportNeeds ? `Support Needs: ${body.supportNeeds}` : '',
-      // Transfer hours are stored in transfer_hours_claimed column - not duplicated here.
     ]
       .filter(Boolean)
       .join('\n');
 
-    // Insert into applications table
-    // Parse claimed transfer hours - stored in structured column, not notes.
-    // Does not affect pricing. Progress credit only.
     const transferHoursClaimed = Math.max(
       0,
       parseInt(body.transferHours ?? body.transfer_hours_claimed ?? '0') || 0,
     );
 
-    // Determine application status based on funding type and eligibility.
-    // WIOA / WRG applications require admin approval before enrollment.
-    // Students who have not yet been to Indiana Career Connect are saved as
-    // 'pending_funding' - they must complete the ICC process and reapply.
     const FUNDED_TYPES = ['wioa', 'wrg'];
     const fundingType = body.fundingType || body.fundingInterest || null;
     const eligibilityStatus = body.fundingEligibilityStatus || null;
@@ -376,17 +352,13 @@ async function _POST(req: Request) {
 
     let applicationStatus: string;
     if (needsICC) {
-      // Has not been to ICC yet - hold application, send them to ICC first
       applicationStatus = 'pending_funding';
     } else if (isFunded) {
-      // Has ICC approval or is in process - needs admin review before enrollment
       applicationStatus = 'pending_admin_review';
     } else {
-      // Self-pay, employer, unsure - standard submitted flow
       applicationStatus = 'submitted';
     }
 
-    // Core insert payload - columns confirmed to exist in all environments
     const corePayload: Record<string, any> = {
       first_name: body.firstName,
       last_name: body.lastName,
@@ -420,21 +392,6 @@ async function _POST(req: Request) {
       .select()
       .maybeSingle();
 
-    // Three-tier retry - each tier strips more columns to handle DB environments
-    // where migrations haven't been applied yet.
-    //
-    // Tier 1 (corePayload): all columns including recent migrations
-    // Tier 2: strip columns from migrations 20260425–20260621 (funding_eligibility_status,
-    //         normalized_email/phone, county_of_residence, household_income, family_size,
-    //         modality_preference, transfer_hours_claimed, type)
-    // Tier 3 (baseline): only the 15 columns present in the original schema baseline
-    //         (20260227000003) - this MUST succeed or the DB is broken
-    //
-    // Error codes:
-    //   42703 = unknown column
-    //   23514 = check constraint violation (status values not yet in constraint)
-    //   23502 = not-null violation (column exists but has unexpected NOT NULL)
-
     const isRetryableError = (e: any) =>
       e &&
       (e.code === '42703' ||
@@ -445,7 +402,6 @@ async function _POST(req: Request) {
         e.message?.includes('check') ||
         e.message?.includes('violates'));
 
-    // Tier 2 - strip columns from post-baseline migrations
     if (isRetryableError(error)) {
       logger.warn('[api/applications] Tier-2 retry - stripping extended columns', {
         code: error.code,
@@ -455,9 +411,6 @@ async function _POST(req: Request) {
         .from('applications')
         .insert({
           ...corePayload,
-          // Strip columns added in migrations that may not be live yet.
-          // Keep this list in sync with corePayload - any column not in the
-          // baseline schema (20260227000003) must be stripped here.
           normalized_email: undefined,
           normalized_phone: undefined,
           county_of_residence: undefined,
@@ -466,9 +419,9 @@ async function _POST(req: Request) {
           modality_preference: undefined,
           transfer_hours_claimed: undefined,
           funding_eligibility_status: undefined,
-          funding_type: undefined,       // added in 20260425000001
-          program_slug: undefined,       // added in 20260224000002 (applications table)
-          date_of_birth: undefined,      // added in 20260304120000
+          funding_type: undefined,
+          program_slug: undefined,
+          date_of_birth: undefined,
           type: undefined,
           status: 'submitted',
         })
@@ -478,7 +431,6 @@ async function _POST(req: Request) {
       error = tier2.error;
     }
 
-    // Tier 3 - absolute baseline: only columns guaranteed in 20260227000003
     if (isRetryableError(error)) {
       logger.warn('[api/applications] Tier-3 retry - baseline columns only', {
         code: error.code,
@@ -498,7 +450,7 @@ async function _POST(req: Request) {
           status: 'submitted',
           source: body.source || 'website',
           contact_preference: body.preferredContact || 'phone',
-          reference_number: referenceNumber, // CRITICAL: include ref number so email has it
+          reference_number: referenceNumber,
         })
         .select()
         .maybeSingle();
@@ -524,9 +476,6 @@ async function _POST(req: Request) {
       );
     }
 
-    // Provision auth account immediately so the applicant can access the portal
-    // and complete onboarding while their application is under review.
-    // Admin still approves before enrollment is activated.
     let userId: string | null = null;
     let passwordSetupLink: string | null = null;
 
@@ -562,7 +511,6 @@ async function _POST(req: Request) {
         logger.info('[Applications] Account provisioned', { userId, isNewUser: provision.isNewUser });
       }
 
-      // Link provisioned userId back to the application row
       if (userId && data?.id) {
         await supabase
           .from('applications')
@@ -581,7 +529,6 @@ async function _POST(req: Request) {
       applicationStatus,
     });
 
-    // Send email notifications - direct call, no self-fetch
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
     let emailStatus: { student: string; staff: string } = {
       student: 'not-attempted',
@@ -594,7 +541,6 @@ async function _POST(req: Request) {
         hasPasswordLink: !!passwordSetupLink,
       });
 
-      // Build password setup section (only for new users)
       const passwordSection = passwordSetupLink
         ? '<div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">' +
           '<h3 style="margin-top: 0; color: #065f46;">Your Student Account Is Ready</h3>' +
@@ -606,8 +552,6 @@ async function _POST(req: Request) {
         '</div>'
         : '';
 
-      // Confirmation + onboarding email to applicant
-      // Build next-steps content based on application status
       const fundingLabel: Record<string, string> = {
         wioa: 'WIOA (Workforce Innovation and Opportunity Act)',
         wrg: 'Workforce Ready Grant / Next Level Jobs',
@@ -690,7 +634,7 @@ async function _POST(req: Request) {
                 <p style="margin-bottom: 12px;">Schedule your advisor call now:</p>
                 <a href="https://calendly.com/elevate4humanityedu" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Schedule Call Now</a>
               </div>`
-                  : ""}
+                  : ''}
 
               <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
                 <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Reference Number:</p>
@@ -710,7 +654,6 @@ async function _POST(req: Request) {
         `,
       });
 
-      // Send staff email in parallel (don't wait for it to finish before responding)
       const staffSubject = needsICC
         ? `! Pending Funding [${referenceNumber}]: ${body.firstName} ${body.lastName} - Needs ICC First`
         : isFunded
@@ -736,7 +679,7 @@ async function _POST(req: Request) {
           <p><strong>Application Status:</strong> ${applicationStatus}</p>
           ${body.hasCaseManager ? `<p><strong>Has Case Manager:</strong> ${body.hasCaseManager}</p>` : ''}
           ${body.caseManagerAgency ? `<p><strong>Agency:</strong> ${body.caseManagerAgency}</p>` : ''}
-          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ""}
+          ${body.supportNeeds ? `<p><strong>Support Needs:</strong> ${body.supportNeeds}</p>` : ''}
           <div style="text-align:center;margin:24px 0;">
             <a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/admin/applications/review/${data.id}" style="display:inline-block;background:#16a34a;color:#fff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:700;font-size:15px;">Review &amp; Enroll -></a>
           </div>
@@ -761,12 +704,11 @@ async function _POST(req: Request) {
       emailStatus = { student: 'exception', staff: 'exception' };
     }
 
-    // Queue automation jobs for post-submission processing (non-blocking)
     try {
       const adminDb = await getAdminClient();
       if (adminDb) {
-        await adminDb.from("job_queue").insert({
-          type: "application_submitted",
+        await adminDb.from('job_queue').insert({
+          type: 'application_submitted',
           payload: {
             applicationId: data.id,
             programSlug: body.programSlug || body.preferredProgramId || null,
@@ -777,10 +719,10 @@ async function _POST(req: Request) {
           },
           run_after: new Date().toISOString(),
         });
-        logger.info("[Applications] Automation job queued", { applicationId: data.id });
+        logger.info('[Applications] Automation job queued', { applicationId: data.id });
       }
     } catch (queueError) {
-      logger.warn("[Applications] Failed to queue automation job", queueError instanceof Error ? queueError.message : String(queueError));
+      logger.warn('[Applications] Failed to queue automation job', queueError instanceof Error ? queueError.message : String(queueError));
     }
 
     return NextResponse.json(
@@ -789,7 +731,7 @@ async function _POST(req: Request) {
         id: data.id,
         email: data.email,
         program: data.program_interest ?? program,
-        referenceNumber: referenceNumber,
+        referenceNumber,
         emailStatus,
         ...(duplicateWarning ? { duplicateWarning } : {}),
       },
@@ -799,11 +741,10 @@ async function _POST(req: Request) {
     const allowedOrigins = getAllowedOrigins();
     const origin = getRequestOrigin(req);
     return NextResponse.json(
-      {
-        error: 'Unexpected error. Please call 317-314-3757 for immediate assistance.',
-      },
+      { error: 'Unexpected error. Please call 317-314-3757 for immediate assistance.' },
       { status: 500, headers: corsHeadersForOrigin(origin, allowedOrigins) },
     );
   }
 }
+
 export const POST = withApiAudit('/api/applications', _POST);

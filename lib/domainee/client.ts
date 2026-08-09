@@ -1,17 +1,6 @@
 import 'server-only';
 import crypto from 'node:crypto';
 
-/**
- * Domainee server-side API client.
- *
- * Reads DOMAINEE_API_KEY from process.env (populated by hydrateProcessEnv()
- * from app_secrets/platform_secrets at request time). The key is NEVER
- * exposed to the client — this module is server-only and must not be imported
- * from any NEXT_PUBLIC_* path or client component.
- *
- * Verified against the live API 2026-08-09. Base: https://api.domainee.dev/v1
- */
-
 const API_BASE = 'https://api.domainee.dev/v1';
 
 export class DomaineeError extends Error {
@@ -32,10 +21,6 @@ function isUsableKey(value: string | undefined | null): value is string {
   return trimmed.startsWith('sk_live_') || trimmed.startsWith('sk_test_');
 }
 
-/**
- * Returns the Domainee API key from the runtime environment, or null if
- * unconfigured. Callers must null-check — the key may be absent at build time.
- */
 export function getDomaineeApiKey(): string | null {
   const key = process.env.DOMAINEE_API_KEY;
   return isUsableKey(key) ? key : null;
@@ -51,10 +36,7 @@ async function domaineeFetch<T>(
 ): Promise<T> {
   const key = getDomaineeApiKey();
   if (!key) {
-    throw new DomaineeError(
-      'DOMAINEE_API_KEY is not configured. Set it in Northflank secrets.',
-      500,
-    );
+    throw new DomaineeError('DOMAINEE_API_KEY is not configured.', 500);
   }
   const { idempotencyKey, headers, ...rest } = options;
   const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
@@ -72,10 +54,7 @@ async function domaineeFetch<T>(
   try {
     json = text ? JSON.parse(text) : null;
   } catch {
-    throw new DomaineeError(
-      `Domainee non-JSON ${res.status}: ${text.slice(0, 300)}`,
-      res.status,
-    );
+    throw new DomaineeError(`Domainee non-JSON ${res.status}: ${text.slice(0, 300)}`, res.status);
   }
   if (!res.ok) {
     const err = json as { error?: string; message?: string } | null;
@@ -89,10 +68,6 @@ async function domaineeFetch<T>(
   return json as T;
 }
 
-/**
- * Connect a domain the customer already owns (BYO).
- * Returns the domain + DNS records the customer must publish.
- */
 export async function connectDomain(
   hostname: string,
   originUrl: string,
@@ -117,10 +92,15 @@ export async function connectDomain(
   });
 }
 
-/**
- * Buy a new domain and auto-connect it to the site in one call.
- * Charges the workspace card (wholesale + $1). Customer is legal registrant.
- */
+/** Live availability + pass-through cost. This call does not charge or create a purchase. */
+export async function checkDomainPurchase(hostname: string) {
+  const type = await import('./types');
+  const query = new URLSearchParams({ hostname });
+  return domaineeFetch<type.DomaineePurchaseQuote>(`/domain-purchases/check?${query.toString()}`, {
+    method: 'GET',
+  });
+}
+
 export async function buyDomain(
   hostname: string,
   years: number,
@@ -132,15 +112,9 @@ export async function buyDomain(
   } = {},
 ) {
   const type = await import('./types');
-  const body: Record<string, unknown> = {
-    hostname,
-    years,
-    registrant,
-  };
+  const body: Record<string, unknown> = { hostname, years, registrant };
   if (opts.customerReference) body.customerReference = opts.customerReference;
-  if (opts.originUrl) {
-    body.autoConnect = { originUrl: opts.originUrl };
-  }
+  if (opts.originUrl) body.autoConnect = { originUrl: opts.originUrl };
   return domaineeFetch<type.DomaineeBuyResponse>('/domain-purchases', {
     method: 'POST',
     body: JSON.stringify(body),
@@ -150,17 +124,14 @@ export async function buyDomain(
 
 export async function getDomain(domainId: string) {
   const type = await import('./types');
-  return domaineeFetch<{ domain: type.DomaineeDomain }>(`/domains/${domainId}`, {
-    method: 'GET',
-  });
+  return domaineeFetch<{ domain: type.DomaineeDomain }>(`/domains/${domainId}`, { method: 'GET' });
 }
 
 export async function getPurchase(purchaseId: string) {
   const type = await import('./types');
-  return domaineeFetch<{ purchase: type.DomaineePurchase }>(
-    `/domain-purchases/${purchaseId}`,
-    { method: 'GET' },
-  );
+  return domaineeFetch<{ purchase: type.DomaineePurchase }>(`/domain-purchases/${purchaseId}`, {
+    method: 'GET',
+  });
 }
 
 export async function listDomains(cursor?: string) {
@@ -170,17 +141,9 @@ export async function listDomains(cursor?: string) {
 }
 
 export async function deleteDomain(domainId: string) {
-  return domaineeFetch<{ deleted: boolean }>(`/domains/${domainId}`, {
-    method: 'DELETE',
-  });
+  return domaineeFetch<{ deleted: boolean }>(`/domains/${domainId}`, { method: 'DELETE' });
 }
 
-/**
- * Verify a Domainee webhook signature.
- * Domainee uses HMAC-SHA256(secret, raw_request_body) sent in the
- * x-domainee-signature header. The raw body bytes MUST be used — frameworks
- * that auto-parse JSON will break verification.
- */
 export function verifyDomaineeWebhook(
   rawBody: string | Buffer,
   signature: string,

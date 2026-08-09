@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { IDVerificationForm } from '@/components/verification/IDVerificationForm';
+import { SecureIdentityVerificationForm } from '@/components/verification/SecureIdentityVerificationForm';
+import { hasSSNOnFile } from '@/lib/security/secure-identity';
 
 export const metadata: Metadata = {
   robots: { index: false },
@@ -22,24 +23,36 @@ export default async function VerifyIdentityPage() {
   if (!user) redirect('/login?redirect=/onboarding/learner/verify-identity');
 
   const supabase = await requireAdminClient();
+  const [{ data: idDocs }, ssnOnFile] = await Promise.all([
+    supabase
+      .from('documents')
+      .select('id, status, verification_status, created_at, metadata')
+      .eq('user_id', user.id)
+      .eq('document_type', 'photo_id')
+      .order('created_at', { ascending: false }),
+    hasSSNOnFile(user.id),
+  ]);
 
-  // Check identity via documents table (id_verifications has no user_id column)
-  const { data: idDoc } = await supabase
-    .from('documents')
-    .select('id, status, created_at')
-    .eq('user_id', user.id)
-    .eq('document_type', 'photo_id')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const isVerified = idDoc?.status === 'approved' || idDoc?.status === 'verified';
-  const isPending = !!idDoc && !isVerified;
+  const documents = idDocs ?? [];
+  const isVerified =
+    ssnOnFile &&
+    documents.some((doc) =>
+      ['approved', 'verified'].includes(
+        String(doc.verification_status || doc.status || '').toLowerCase(),
+      ),
+    );
+  const isPending =
+    ssnOnFile &&
+    documents.some((doc) =>
+      ['pending', 'pending_review', 'submitted', 'under_review'].includes(
+        String(doc.verification_status || doc.status || '').toLowerCase(),
+      ),
+    );
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+    <div className="min-h-screen bg-white text-slate-950">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs
             items={[
               { label: 'Onboarding', href: '/onboarding/learner' },
@@ -49,64 +62,56 @@ export default async function VerifyIdentityPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-4xl px-4 py-8">
         <Link
           href="/onboarding/learner"
-          className="text-sm text-brand-blue-600 flex items-center gap-1 mb-6"
+          className="mb-6 inline-flex items-center gap-1 text-sm font-bold text-brand-blue-700 hover:underline"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Onboarding
+          <ArrowLeft className="h-4 w-4" /> Back to Onboarding
         </Link>
 
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Verify Your Identity</h1>
-        <p className="text-slate-700 mb-6">
-          Federal and state workforce regulations require identity verification for all enrolled
-          students. Upload a clear photo of your government-issued ID (front and back) and a selfie.
+        <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
+          Secure enrollment step
+        </p>
+        <h1 className="mt-2 text-3xl font-black text-slate-950">Verify your identity</h1>
+        <p className="mt-3 max-w-3xl text-base leading-7 text-slate-700">
+          Enrollment and workforce-funded training require identity verification. Complete your
+          Social Security number verification and upload a clear government-issued photo ID plus a
+          current selfie. These records are handled separately from the general application.
         </p>
 
         {isVerified ? (
-          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-6 text-center">
-            <span className="w-12 h-12 rounded-full bg-brand-green-600 inline-block flex-shrink-0 mx-auto mb-3" aria-hidden="true" />
-            <h2 className="text-xl font-bold text-brand-green-900 mb-2">Identity Verified</h2>
-            <p className="text-brand-green-700 mb-4">
-              Your identity has been verified. You can proceed to the next onboarding step.
+          <div className="mt-8 rounded-xl border border-emerald-300 bg-emerald-50 p-6">
+            <h2 className="text-xl font-black text-emerald-950">Identity verification complete</h2>
+            <p className="mt-2 text-sm leading-6 text-emerald-900">
+              Your secure SSN record and government ID verification are on file.
             </p>
             <Link
               href="/onboarding/learner"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-green-600 text-white rounded-lg font-medium hover:bg-brand-green-700"
+              className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-emerald-700 px-5 py-2.5 font-bold text-white hover:bg-emerald-800"
             >
-              Continue Onboarding <ArrowLeft className="w-4 h-4 rotate-180" />
+              Continue onboarding
             </Link>
           </div>
         ) : isPending ? (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
-            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-amber-600 text-xl font-bold">!</span>
-            </div>
-            <h2 className="text-xl font-bold text-amber-900 mb-2">Verification Pending</h2>
-            <p className="text-amber-700 mb-4">
-              Your identity documents have been submitted and are under review. This typically takes
-              1–2 business days. You can continue with other onboarding steps while you wait.
+          <div className="mt-8 rounded-xl border border-amber-300 bg-amber-50 p-6">
+            <h2 className="text-xl font-black text-amber-950">Identity review pending</h2>
+            <p className="mt-2 text-sm leading-6 text-amber-900">
+              Your SSN verification is on file and your government ID documents are waiting for
+              authorized staff review. You can continue other onboarding steps while the review is
+              pending.
             </p>
             <Link
               href="/onboarding/learner"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700"
+              className="mt-5 inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-950 px-5 py-2.5 font-bold text-white hover:bg-slate-800"
             >
-              Continue Onboarding <ArrowLeft className="w-4 h-4 rotate-180" />
+              Continue onboarding
             </Link>
           </div>
         ) : (
-          <>
-            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
-              <h3 className="font-semibold text-brand-blue-900 mb-2">What you need:</h3>
-              <ul className="text-sm text-brand-blue-800 space-y-1">
-                <li>• Government-issued photo ID (driver&apos;s license, state ID, or passport)</li>
-                <li>• Clear photo of the front of your ID</li>
-                <li>• Clear photo of the back of your ID</li>
-                <li>• A selfie (face clearly visible, matching your ID photo)</li>
-              </ul>
-            </div>
-            <IDVerificationForm />
-          </>
+          <div className="mt-8">
+            <SecureIdentityVerificationForm />
+          </div>
         )}
       </div>
     </div>

@@ -104,9 +104,11 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (!validEmail(email)) {
       return NextResponse.json({ ok: false, error: 'Enter a valid email address.' }, { status: 400 });
     }
+
     if (!licenseNumber || !supervisorName || !supervisorLicenseNumber || !supervisorYearsLicensed) {
       return NextResponse.json(
         {
@@ -117,6 +119,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (canSuperviseAndVerify !== 'yes') {
       return NextResponse.json(
         {
@@ -127,6 +130,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (hasInsurance !== 'yes') {
       return NextResponse.json(
         {
@@ -136,6 +140,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (!workersCompStatus || workersCompStatus === 'none') {
       return NextResponse.json(
         {
@@ -146,12 +151,14 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (!compensationModel) {
       return NextResponse.json(
         { ok: false, error: 'Select the apprentice compensation/employment model.' },
         { status: 400 },
       );
     }
+
     if (!body.shopLicenseFileData || !body.shopLicenseFileName) {
       return NextResponse.json(
         { ok: false, error: 'Upload a copy of the current shop/business license.' },
@@ -174,8 +181,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error:
-            "Upload the workers' compensation certificate or the valid exemption documentation.",
+          error: "Upload the workers' compensation certificate or the valid exemption documentation.",
         },
         { status: 400 },
       );
@@ -189,6 +195,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (!signerName || body.signatureAcknowledged !== true) {
       return NextResponse.json(
         {
@@ -198,6 +205,7 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     if (body.mouAcknowledged !== true || body.consentAcknowledged !== true) {
       return NextResponse.json(
         {
@@ -295,56 +303,74 @@ export async function POST(request: Request) {
     }
 
     const businessType = BUSINESS_TYPE_MAP[clean(body.industryType, 50)] || 'other';
-    const notes = [
-      `Programs requested: ${programs.join(', ')}`,
-      `Legal business name: ${legalBusinessName}`,
-      dbaName ? `DBA: ${dbaName}` : '',
-      `Owner: ${ownerName}`,
-      `Full address: ${[address1, address2, city, state, zip].filter(Boolean).join(', ')}`,
-      body.yearsInBusiness ? `Years in business: ${clean(body.yearsInBusiness, 20)}` : '',
-      body.numberOfChairs ? `Number of chairs/workstations: ${clean(body.numberOfChairs, 20)}` : '',
-      numberOfEmployees ? `Number of employees: ${numberOfEmployees}` : '',
-      'Liability insurance status: yes',
-      `Workers comp status: ${workersCompStatus}`,
-      `Apprentice compensation model: ${compensationModel}`,
-      `Supervisor: ${supervisorName}`,
-      `Supervisor license: ${supervisorLicenseNumber}`,
-      `Supervisor years licensed: ${supervisorYearsLicensed}`,
-      'Can supervise and verify OJL/competencies: yes',
-      documentReadiness ? `Document readiness: ${documentReadiness}` : '',
-      documentSupportNeeded ? `Document support needed: ${documentSupportNeeded}` : '',
-      `Shop license document: ${licensePath}`,
-      `Insurance COI document: ${insurancePath}`,
-      `Supervisor license document: ${supervisorLicensePath}`,
-      `Workers comp/exemption document: ${workersCompPath}`,
-      `EIN/W-9 verification document: ${einPath}`,
-      localBusinessPath ? `Local business/occupancy document: ${localBusinessPath}` : '',
-      body.howHeard ? `How heard: ${clean(body.howHeard, 80)}` : '',
-      body.message ? `Applicant notes: ${clean(body.message, 2000)}` : '',
-      `Authorized signer: ${signerName}${signerTitle ? `, ${signerTitle}` : ''}`,
-      `Certification signed at: ${new Date().toISOString()}`,
-      'Host Shop responsibilities acknowledged: yes',
-      'Verification / information release consent acknowledged: yes',
-      'Signature certification acknowledged: yes',
-    ]
-      .filter(Boolean)
-      .join('\n');
+    const fullAddress = [address1, address2, city, state, zip].filter(Boolean).join(', ');
 
+    const licenseInfo = {
+      businessType,
+      licenseNumber,
+      shopLicenseDocument: licensePath,
+      liabilityInsuranceDocument: insurancePath,
+      workersCompStatus,
+      workersCompDocument: workersCompPath,
+      supervisor: {
+        name: supervisorName,
+        licenseNumber: supervisorLicenseNumber,
+        yearsLicensed: supervisorYearsLicensed,
+        licenseDocument: supervisorLicensePath,
+        canSuperviseAndVerify: true,
+      },
+      einDocument: einPath,
+      localBusinessDocument: localBusinessPath,
+    };
+
+    const intake = {
+      legalBusinessName,
+      dbaName,
+      contactName,
+      programs,
+      yearsInBusiness: clean(body.yearsInBusiness, 20) || null,
+      numberOfChairs: clean(body.numberOfChairs, 20) || null,
+      numberOfEmployees: numberOfEmployees || null,
+      hasInsurance: true,
+      workersCompStatus,
+      compensationModel,
+      documentReadiness: documentReadiness || null,
+      documentSupportNeeded: documentSupportNeeded || null,
+      howHeard: clean(body.howHeard, 80) || null,
+      message: clean(body.message, 2000) || null,
+      acknowledgements: {
+        mou: true,
+        verificationConsent: true,
+        signatureCertification: true,
+      },
+      authorizedSigner: {
+        name: signerName,
+        title: signerTitle || null,
+        signedAt: new Date().toISOString(),
+      },
+      source: clean(body.source || 'barber-host-shop-application', 100),
+    };
+
+    // IMPORTANT: this insert intentionally matches the live host_shop_applications
+    // schema. The previous implementation wrote columns that do not exist in
+    // production (fee_status, fee_amount_cents, business_type, license_number,
+    // contact_name, contact_phone, partner_tier, internal_notes) and used the
+    // invalid status "pending_review". Those mismatches caused every otherwise
+    // valid Host Shop submission to fail at the database boundary.
     const { data, error } = await admin
       .from('host_shop_applications')
       .insert({
-        status: 'pending_review',
-        fee_status: 'pending',
-        fee_amount_cents: 0,
-        business_name: businessName,
-        business_type: businessType,
-        license_number: licenseNumber,
-        address: [address1, address2, city, state, zip].filter(Boolean).join(', '),
-        contact_name: contactName,
+        shop_name: businessName,
+        owner_name: ownerName,
+        email,
+        phone,
+        address: fullAddress,
+        license_info: licenseInfo,
+        intake,
+        status: 'submitted',
+        submitted_at: new Date().toISOString(),
         contact_email: email,
-        contact_phone: phone,
-        partner_tier: 'free',
-        internal_notes: notes,
+        business_name: legalBusinessName,
       })
       .select('id')
       .maybeSingle();
@@ -365,14 +391,19 @@ export async function POST(request: Request) {
       subject: 'Host Shop Application Received | Elevate for Humanity',
       html: `<p>Hello ${contactName},</p><p>We received the host shop application for <strong>${businessName}</strong>.</p><p>Reference: <strong>${data.id}</strong></p><p>Our team will verify the business license, supervisor credentials, liability insurance, workers' compensation/exemption documentation, business identity documentation, worksite capacity, and program fit before approval.</p>`,
     });
+
     const adminEmail = sendEmail({
       to: process.env.PARTNER_NOTIFICATION_EMAIL || 'elevate4humanityedu@gmail.com',
       subject: `[HOST SHOP APPLICATION] ${businessName}`,
       html: `<p>New host shop application.</p><p><strong>${businessName}</strong><br>${contactName}<br>${email}<br>${phone}</p><p>Programs: ${programs.join(', ')}</p><p>Supervisor: ${supervisorName} — ${supervisorLicenseNumber}</p><p>Shop license: ${licensePath}</p><p>Insurance COI: ${insurancePath}</p><p>Workers comp/exemption: ${workersCompPath}</p><p>Supervisor license: ${supervisorLicensePath}</p><p>EIN/W-9 record: ${einPath}</p><p>Reference: ${data.id}</p>`,
     });
+
     await Promise.allSettled([applicantEmail, adminEmail]);
 
-    return NextResponse.json({ ok: true, applicationId: data.id, referenceNumber: data.id }, { status: 201 });
+    return NextResponse.json(
+      { ok: true, applicationId: data.id, referenceNumber: data.id },
+      { status: 201 },
+    );
   } catch (error) {
     logger.error('[host-shop/apply] unexpected error', error instanceof Error ? error : undefined);
     return NextResponse.json(

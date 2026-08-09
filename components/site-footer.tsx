@@ -127,7 +127,7 @@ export function SiteFooter() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-700">
               <Link href="/privacy" className="hover:text-slate-950 hover:underline">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-slate-950 hover:underline">Terms of Service</Link>
+              <Link href="/legal" className="hover:text-slate-950 hover:underline">Terms of Service</Link>
               <Link href="/accessibility" className="hover:text-slate-950 hover:underline">Accessibility</Link>
               <Link href="/federal-compliance" className="hover:text-slate-950 hover:underline">Federal Compliance</Link>
               <a href="https://www.dol.gov/agencies/eta/apprenticeship" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-slate-950 hover:underline">DOL Apprenticeship <ExternalLink className="h-3 w-3" /></a>

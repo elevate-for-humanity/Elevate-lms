@@ -28,12 +28,11 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.elevateforhumanity.org'),
   manifest: '/manifest-marketing.json',
   icons: {
-    icon: [
-      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
-      { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
-    ],
-    shortcut: [{ url: '/icon-192.png', type: 'image/png', sizes: '192x192' }],
+    // Keep one stable favicon candidate for search engines. The legacy
+    // /favicon.ico remains available for old browsers but is intentionally not
+    // advertised so Google does not have competing brand icons to choose from.
+    icon: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
+    shortcut: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
     apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
   },
   robots: {

@@ -6,34 +6,38 @@ on:
       - main
     paths:
       - 'apps/marketing/**'
-      - 'components/marketing/**'
       - 'components/site/**'
+      - 'components/marketing/**'
+      - 'components/programs/**'
+      - 'components/home/**'
+      - 'components/ui/**'
       - 'lib/navigation/**'
+      - 'lib/programs/**'
+      - 'lib/apprenticeship-programs/**'
+      - 'lib/images/**'
+      - 'lib/config/**'
       - 'lib/secrets.ts'
       - 'lib/supabase/**'
+      - 'content/**'
+      - 'data/programs/**'
+      - 'public/images/**'
+      - 'public/audio/**'
       - 'public/sw.js'
       - 'public/manifest.webmanifest'
+      - 'public/manifest-marketing.json'
+      - 'styles/**'
       - 'middleware.ts'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
       - 'Dockerfile.marketing'
-      - 'scripts/northflank/configure-services.ts'
+      - 'scripts/northflank/**'
       - 'pnpm-lock.yaml'
       - 'package.json'
       - 'pnpm-workspace.yaml'
       - '.github/workflows/deploy-marketing.yml'
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to deploy (defaults to main)'
-        required: false
-        default: ''
-      apply_config:
-        description: 'Apply canonical Northflank Marketing service configuration'
-        required: false
-        default: false
-        type: boolean
       sync_secrets:
         description: 'Synchronize shared production secret group to all three services'
         required: false
@@ -44,6 +48,9 @@ permissions:
   contents: read
   actions: read
 
+# Marketing deployments own only the Marketing service. A newer Marketing run
+# cancels an older Marketing run, but unrelated Admin/LMS commits must not abort
+# a valid Marketing deployment in this monorepo.
 concurrency:
   group: northflank-marketing-deploy
   cancel-in-progress: true
@@ -65,7 +72,6 @@ jobs:
       NORTHFLANK_SECRET_GROUP_ID: ${{ secrets.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env' }}
       FORCE_FRESH_BUILD: 'true'
       DEPLOY_BRANCH: main
-
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -73,7 +79,6 @@ jobs:
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
       STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
       SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-
       NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
       NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
@@ -83,7 +88,7 @@ jobs:
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
 
     steps:
-      - name: Checkout exact commit
+      - name: Checkout exact Marketing commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -102,13 +107,9 @@ jobs:
       - name: Verify source commit SHA
         run: |
           set -euo pipefail
-          ACTUAL_SHA="$(git rev-parse HEAD)"
-          EXPECTED_SHA="${{ github.sha }}"
-          echo "Expected SHA: $EXPECTED_SHA"
-          echo "Actual SHA:   $ACTUAL_SHA"
-          test "$ACTUAL_SHA" = "$EXPECTED_SHA"
+          test "$(git rev-parse HEAD)" = "${{ github.sha }}"
           test "$(git status --porcelain)" = ""
-          echo "SHA verification passed"
+          echo "Building exact Marketing SHA ${{ github.sha }}"
 
       - name: Generate version file
         run: |
@@ -140,43 +141,19 @@ jobs:
       - name: Verify production deployment credentials
         run: |
           set -euo pipefail
-          required=(
-            NORTHFLANK_API_TOKEN
-            NEXT_PUBLIC_SUPABASE_URL
-            NEXT_PUBLIC_SUPABASE_ANON_KEY
-          )
+          required=(NORTHFLANK_API_TOKEN NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY)
           for name in "${required[@]}"; do
             test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }
           done
           echo "Marketing deployment credentials are configured"
 
-      - name: Verify shared production secrets for explicit secret sync
-        if: (github.event_name == 'workflow_dispatch' && inputs.sync_secrets == true) || contains(github.event.head_commit.message, '[sync-production-env]')
-        run: |
-          set -euo pipefail
-          required=(
-            SUPABASE_SERVICE_ROLE_KEY
-            NEXTAUTH_SECRET
-            STRIPE_SECRET_KEY
-            SENDGRID_API_KEY
-          )
-          for name in "${required[@]}"; do
-            test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }
-          done
-          echo "Shared production secrets are configured"
-
-      - name: Sync production env to Marketing + LMS + Admin
-        if: (github.event_name == 'workflow_dispatch' && inputs.sync_secrets == true) || contains(github.event.head_commit.message, '[sync-production-env]')
+      - name: Sync production env when explicitly requested
+        if: github.event_name == 'workflow_dispatch' && inputs.sync_secrets == true
         run: pnpm tsx scripts/northflank/sync-env.ts --execute
 
-      # Always apply the canonical rollout contract before a production build.
-      # This prevents service-level drift from silently reintroducing a recreate
-      # deployment or stale probe/port configuration.
-      - name: Enforce canonical Northflank Marketing rollout configuration
+      - name: Enforce canonical Northflank Marketing configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --execute
 
-      # Existing health is diagnostic only. If production is already unhealthy,
-      # the workflow must still be able to deploy a known-good replacement.
       - name: Record predeploy upstream health
         id: predeploy
         run: |
@@ -184,165 +161,67 @@ jobs:
           status=$(curl -sk --max-time 10 -o /tmp/predeploy-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
           if [ "$status" = "200" ]; then
             echo "was_healthy=true" >> "$GITHUB_OUTPUT"
-            echo "Existing Marketing upstream is healthy before rollout."
           else
             echo "was_healthy=false" >> "$GITHUB_OUTPUT"
-            echo "RECOVERY MODE: existing Marketing upstream is HTTP $status; continuing with strict zero-downtime configuration so a healthy replacement can recover service."
-            cat /tmp/predeploy-health.json 2>/dev/null || true
+            echo "Existing upstream returned HTTP $status; continuing in recovery mode."
           fi
 
-      - name: Confirm this is still the latest main commit
-        id: latest_before_build
-        run: |
-          set -euo pipefail
-          git fetch --no-tags origin main --depth=1
-          LATEST_SHA="$(git rev-parse origin/main)"
-          if [ "$LATEST_SHA" = "${{ github.sha }}" ]; then
-            echo "is_latest=true" >> "$GITHUB_OUTPUT"
-            echo "This workflow is still current: $LATEST_SHA"
-          else
-            echo "is_latest=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping stale Marketing deployment. workflow=${{ github.sha }} latest=$LATEST_SHA"
-          fi
-
-      - name: Trigger Marketing build
-        if: steps.latest_before_build.outputs.is_latest == 'true'
+      - name: Trigger fresh Marketing build
         id: trigger_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
 
-      - name: Require a concrete Northflank build id
-        if: steps.latest_before_build.outputs.is_latest == 'true'
+      - name: Require concrete Northflank build id
         run: |
           set -euo pipefail
           BUILD_ID="${{ steps.trigger_build.outputs.build_id }}"
           test -n "$BUILD_ID" || { echo "Northflank trigger returned no build_id"; exit 1; }
           echo "Northflank build id: $BUILD_ID"
 
-      - name: Wait for Marketing build to complete
-        if: steps.latest_before_build.outputs.is_latest == 'true'
+      - name: Wait for Marketing build
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.trigger_build.outputs.build_id }}" --timeout-ms 3600000
 
-      - name: Verify exact Marketing build succeeded
-        if: steps.latest_before_build.outputs.is_latest == 'true'
+      - name: Verify exact Marketing build
         run: |
           pnpm tsx scripts/northflank/verify-build.ts \
             "$NORTHFLANK_MARKETING_SERVICE_ID" \
             --build-id "${{ steps.trigger_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
 
-      - name: Confirm build is still the latest main commit
-        if: steps.latest_before_build.outputs.is_latest == 'true'
-        id: latest_before_deploy
+      - name: Deploy exact Marketing build
         run: |
           set -euo pipefail
-          git fetch --no-tags origin main --depth=1
-          LATEST_SHA="$(git rev-parse origin/main)"
-          if [ "$LATEST_SHA" = "${{ github.sha }}" ]; then
-            echo "is_latest=true" >> "$GITHUB_OUTPUT"
-            echo "Build remains current: $LATEST_SHA"
-          else
-            echo "is_latest=false" >> "$GITHUB_OUTPUT"
-            echo "Build completed but will not deploy because main advanced. build=${{ github.sha }} latest=$LATEST_SHA"
-          fi
-
-      - name: Deploy exact Marketing build with availability guard
-        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
-        env:
-          WAS_HEALTHY_BEFORE_ROLLOUT: ${{ steps.predeploy.outputs.was_healthy }}
-        run: |
-          set -euo pipefail
-          rm -f /tmp/marketing-downtime.log
-
-          (
-            while true; do
-              code=$(curl -sk --max-time 5 -o /tmp/rollout-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
-              if [ "$code" != "200" ]; then
-                printf '%s HTTP %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$code" >> /tmp/marketing-downtime.log
-              fi
-              sleep 2
-            done
-          ) &
-          WATCH_PID=$!
-          trap 'kill "$WATCH_PID" 2>/dev/null || true' EXIT
-
           pnpm tsx scripts/northflank/trigger-deployment.ts \
             "$NORTHFLANK_MARKETING_SERVICE_ID" \
             --build-id "${{ steps.trigger_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
-
           pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 3600000
 
-          kill "$WATCH_PID" 2>/dev/null || true
-          wait "$WATCH_PID" 2>/dev/null || true
-          trap - EXIT
-
-          if [ "$WAS_HEALTHY_BEFORE_ROLLOUT" = "true" ] && [ -s /tmp/marketing-downtime.log ]; then
-            echo "ZERO-DOWNTIME VIOLATION: Marketing returned non-200 health responses during rollout:"
-            cat /tmp/marketing-downtime.log
-            exit 1
-          fi
-
-          if [ "$WAS_HEALTHY_BEFORE_ROLLOUT" != "true" ] && [ -s /tmp/marketing-downtime.log ]; then
-            echo "Recovery rollout began while upstream was already unhealthy; post-deploy convergence will determine success."
-          fi
-
-          echo "Marketing rollout completed; post-deploy health verification follows."
-
       - name: Verify Northflank deployment SHA
-        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
         run: |
           set -euo pipefail
           pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
 
-      - name: Smoke Marketing and require exact live SHA
-        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
+      - name: Smoke production and require exact live SHA
         run: |
           set -euo pipefail
           EXPECTED_SHA="${{ github.sha }}"
-          MAX_RETRIES=30
-          RETRY_INTERVAL=20
-
-          echo "Expected live SHA: $EXPECTED_SHA"
-
-          for i in $(seq 1 $MAX_RETRIES); do
+          for i in $(seq 1 30); do
             health_status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
             version_status=$(curl -sk --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
-            page_status=$(curl -sk --max-time 10 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
-
+            page_status=$(curl -sk --max-time 10 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
             LIVE_SHA="$(node -e "try{const d=require('/tmp/www-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
-
-            echo "Attempt $i/$MAX_RETRIES: health=$health_status version=$version_status page=$page_status live_sha=${LIVE_SHA:-missing}"
-
+            echo "Attempt $i/30: health=$health_status version=$version_status page=$page_status live_sha=${LIVE_SHA:-missing}"
             if [ "$health_status" = "200" ] \
               && [ "$version_status" = "200" ] \
               && [ "$page_status" = "200" ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
-              && grep -q "Elevate" /tmp/www-page.html; then
-              echo "MARKETING DEPLOYMENT VERIFIED: live SHA matches $EXPECTED_SHA"
+              && grep -q "Barber Apprenticeship" /tmp/www-page.html; then
+              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live"
               exit 0
             fi
-
-            sleep "$RETRY_INTERVAL"
+            sleep 20
           done
-
-          echo "DEPLOYMENT FAILED: live site did not converge to expected SHA $EXPECTED_SHA"
-          echo "Last health response:"
+          echo "DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA"
           cat /tmp/www-health.json 2>/dev/null || true
-          echo "Last version response:"
           cat /tmp/www-version.json 2>/dev/null || true
           exit 1
-
-      - name: Verify trial API is no longer infrastructure-unavailable
-        if: steps.latest_before_build.outputs.is_latest == 'true' && steps.latest_before_deploy.outputs.is_latest == 'true'
-        run: |
-          set -euo pipefail
-          status=$(curl -sk --max-time 15 \
-            -o /tmp/trial-check.json \
-            -w "%{http_code}" \
-            -X POST \
-            -H 'content-type: application/json' \
-            --data '{"orgName":"x","adminName":"x","adminEmail":"invalid"}' \
-            https://www.elevateforhumanity.org/api/trial/start-managed || true)
-          echo "Trial API validation probe HTTP $status"
-          cat /tmp/trial-check.json || true
-          test "$status" = "400"

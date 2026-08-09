@@ -26,6 +26,25 @@ export default function ConfirmationTracking() {
     } catch {
       // Non-critical — if session storage fails, just don't show tracking
     }
+
+    // After a successful application, prepare the WorkOne handoff only when
+    // the saved application is actually WIOA/WRG funded. The API is idempotent,
+    // so refreshing the confirmation page will not resend the packet.
+    try {
+      const reference = new URLSearchParams(window.location.search).get('ref');
+      if (reference?.startsWith('EFH-')) {
+        void fetch('/api/workone/handoff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: JSON.stringify({ reference }),
+        }).catch(() => undefined);
+      }
+    } catch {
+      // Non-critical — the original application remains submitted even if the
+      // handoff email service is temporarily unavailable.
+    }
   }, []);
 
   if (!application) return null;
@@ -44,4 +63,3 @@ export default function ConfirmationTracking() {
     />
   );
 }
-

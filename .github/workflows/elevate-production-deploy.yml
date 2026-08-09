@@ -142,6 +142,7 @@ jobs:
           push: false
           tags: elevate-marketing:test
           build-args: |
+            NF_GIT_SHA=${{ needs.prepare.outputs.sha }}
             GITHUB_SHA=${{ needs.prepare.outputs.sha }}
             GIT_SHA=${{ needs.prepare.outputs.sha }}
             NEXT_PUBLIC_GIT_SHA=${{ needs.prepare.outputs.sha }}
@@ -295,6 +296,7 @@ jobs:
             ghcr.io/${{ env.GITHUB_OWNER }}/elevate-marketing:${{ needs.prepare.outputs.sha }}
             ghcr.io/${{ env.GITHUB_OWNER }}/elevate-marketing:${{ inputs.environment }}-${{ needs.prepare.outputs.short_sha }}
           build-args: |
+            NF_GIT_SHA=${{ needs.prepare.outputs.sha }}
             GITHUB_SHA=${{ needs.prepare.outputs.sha }}
             GIT_SHA=${{ needs.prepare.outputs.sha }}
             NEXT_PUBLIC_GIT_SHA=${{ needs.prepare.outputs.sha }}

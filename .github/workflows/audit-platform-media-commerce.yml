@@ -1,0 +1,37 @@
+name: Audit platform media commerce applications and PWA
+
+on:
+  push:
+    branches:
+      - audit/platform-typography-pwa-dashboards-20260809
+    paths:
+      - 'scripts/audit-platform-media-commerce.mjs'
+      - '.github/workflows/audit-platform-media-commerce.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: audit/platform-typography-pwa-dashboards-20260809
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run repository-wide audit
+        run: node scripts/audit-platform-media-commerce.mjs
+
+      - name: Commit audit report to audit branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/audits/platform-media-commerce-scan.md
+          git commit -m 'docs(audit): platform media commerce application PWA scan' || exit 0
+          git push origin HEAD:audit/platform-typography-pwa-dashboards-20260809

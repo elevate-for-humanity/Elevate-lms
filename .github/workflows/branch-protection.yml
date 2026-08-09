@@ -2,12 +2,96 @@ name: Branch Protection & Cleanup
 
 on:
   schedule:
-    # Run daily at 2 AM UTC
     - cron: '0 2 * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/branch-protection.yml'
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: branch-protection-cleanup
+  cancel-in-progress: false
 
 jobs:
-  cleanup-stale-branches:
+  one-time-full-cleanup:
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[cleanup-all-stale-branches]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout canonical main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch all remote refs
+        run: git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+
+      - name: Side-by-side audit and delete non-main branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          owner="${REPO%%/*}"
+          deleted=0
+          kept=0
+
+          {
+            echo '## Full branch cleanup audit'
+            echo
+            echo '| Branch | Ahead | Behind | Latest commit | Action |'
+            echo '|---|---:|---:|---|---|'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          mapfile -t branches < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | sort
+          )
+
+          for branch in "${branches[@]}"; do
+            open_prs=$(gh api -X GET search/issues \
+              -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
+              --jq '.total_count')
+            read -r behind ahead < <(git rev-list --left-right --count "origin/main...origin/${branch}")
+            latest=$(git log -1 --format='%h %cs' "origin/${branch}")
+
+            if [ "$open_prs" -gt 0 ]; then
+              printf '| `%s` | %s | %s | %s | KEPT — open PR |\n' \
+                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
+              kept=$((kept + 1))
+              continue
+            fi
+
+            git push origin --delete "$branch"
+            printf '| `%s` | %s | %s | %s | DELETED |\n' \
+              "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
+            deleted=$((deleted + 1))
+          done
+
+          {
+            echo
+            echo "Deleted: ${deleted}"
+            echo "Kept for open PR: ${kept}"
+            echo 'Canonical branch: `main`'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify remaining branch set
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'
+
+  scheduled-stale-cleanup:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
@@ -15,31 +99,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Delete stale branches
+      - name: Delete branches older than 30 days
         run: |
-          echo "Checking for stale branches..."
-
-          # Get all remote branches
+          set -euo pipefail
           git fetch --all --prune
 
-          # Delete branches older than 30 days (except main and dependabot)
           for branch in $(git branch -r | grep -v 'main\|HEAD\|dependabot'); do
-            branch_name=$(echo $branch | sed 's/origin\///')
-
-            # Get last commit date
-            last_commit=$(git log -1 --format=%ct origin/$branch_name)
+            branch_name=$(echo "$branch" | sed 's#origin/##')
+            last_commit=$(git log -1 --format=%ct "origin/$branch_name")
             current_time=$(date +%s)
-            days_old=$(( ($current_time - $last_commit) / 86400 ))
+            days_old=$(( (current_time - last_commit) / 86400 ))
 
-            if [ $days_old -gt 30 ]; then
+            if [ "$days_old" -gt 30 ]; then
               echo "Deleting stale branch: $branch_name (${days_old} days old)"
-              git push origin --delete $branch_name || echo "Failed to delete $branch_name"
+              git push origin --delete "$branch_name" || echo "Failed to delete $branch_name"
             fi
           done
 
       - name: Report cleanup
         run: |
-          echo "Branch cleanup complete!"
-          git branch -r | grep -v 'main\|HEAD' | wc -l | xargs echo "Remaining branches:"
+          echo 'Branch cleanup complete.'
+          git branch -r | grep -v 'main\|HEAD' | wc -l | xargs echo 'Remaining branches:'

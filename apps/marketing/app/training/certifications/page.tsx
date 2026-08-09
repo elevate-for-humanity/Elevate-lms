@@ -1,116 +1,86 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Award, CheckCircle, ExternalLink, Shield } from 'lucide-react';
+import { Award, CheckCircle, Shield } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
   title: 'Certifications | Training',
-  keywords: ["certifications", "credentials", "licenses", "testing", "exams"],
-  description: 'Earn industry-recognized certifications through our testing center. NHA, Certiport, EPA 608, and more.',
+  keywords: ['certifications', 'credentials', 'licenses', 'testing', 'exams'],
+  description: 'Explore industry certification and testing options available through Elevate programs and testing partnerships.',
 };
 
 export default function TrainingCertificationsPage() {
   const certifications = [
-    { name: 'NHA Certifications', provider: 'National Healthcareer Association', exams: ['CPhT', 'CCMA', 'Phlebotomy Tech', 'EKG Tech'], valid: '2 years' },
-    { name: 'Certiport Certifications', provider: 'Certiport / Pearson VUE', exams: ['MOS Excel', 'MOS Word', 'IC3', 'A+'], valid: 'Varies' },
-    { name: 'EPA 608 Certification', provider: 'EPA', exams: ['Universal', 'Type I', 'Type II', 'Type III'], valid: 'Lifetime' },
-    { name: 'CPR / First Aid', provider: 'American Heart Association', exams: ['BLS', 'Heartsaver', 'First Aid'], valid: '2 years' },
-    { name: 'OSHA 10-Hour', provider: 'OSHA', exams: ['Construction', 'General Industry'], valid: 'Lifetime' },
-    { name: 'CareerSafe', provider: 'CareerSafe', exams: ['OSHA 10-Hour', 'Youth Safety'], valid: 'Lifetime' },
+    { name: 'Healthcare Certifications', provider: 'Approved testing partners', exams: ['Medical Assisting', 'Phlebotomy', 'Pharmacy Technician', 'EKG'], valid: 'Varies by credential' },
+    { name: 'Digital & Office Certifications', provider: 'Approved testing partners', exams: ['Microsoft Office', 'Digital Literacy', 'Business Applications'], valid: 'Varies by credential' },
+    { name: 'EPA 608 Certification', provider: 'EPA-approved testing pathway', exams: ['Core', 'Type I', 'Type II', 'Type III', 'Universal'], valid: 'Credential-specific' },
+    { name: 'CPR / First Aid', provider: 'Approved training/testing partner', exams: ['CPR', 'First Aid', 'BLS where offered'], valid: 'Credential-specific' },
+    { name: 'Workplace Safety', provider: 'Approved safety training partners', exams: ['OSHA-aligned safety', 'Youth Safety', 'Industry Safety'], valid: 'Credential-specific' },
+    { name: 'Career Readiness', provider: 'Approved workforce/testing partners', exams: ['Work readiness', 'Employability', 'Career skills'], valid: 'Credential-specific' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Award className="w-4 h-4" />
-              Testing Center
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Industry Certifications
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Earn credentials that employers recognize. Our testing center offers proctored exams for healthcare, trades, technology, and safety certifications.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/testing/book" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Schedule Exam
-              </Link>
-              <Link href="/programs" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                View Training Programs
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/images/pages/orientation-page-2.webp"
+        alt="Learners preparing for industry certification testing"
+        eyebrow="Testing & Credentials"
+        title="Industry Certifications"
+        description="Prepare for credentials employers recognize. Certification availability depends on the program, testing partner, eligibility, and current exam requirements."
+        actions={(
+          <>
+            <Link href="/testing/book" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Schedule Testing</Link>
+            <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">View Training Programs</Link>
+          </>
+        )}
+      />
 
-      {/* Certifications Grid */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4">Available Certifications</h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">Industry-recognized credentials to boost your career.</p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950 md:text-3xl">Certification Pathways</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-slate-700">Exam and credential options vary by occupation and testing-provider authorization.</p>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {certifications.map((cert) => (
-              <div key={cert.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-lg hover:border-brand-blue-200 transition-all">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <Award className="w-6 h-6 text-brand-blue-600" />
+              <div key={cert.name} className="rounded-xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-blue-200 hover:shadow-lg">
+                <Award className="mb-4 h-8 w-8 text-brand-blue-700" />
+                <h3 className="mb-1 font-bold text-slate-950">{cert.name}</h3>
+                <p className="mb-3 text-sm font-medium text-slate-600">{cert.provider}</p>
+                <div className="mb-4 flex flex-wrap gap-1">
+                  {cert.exams.map((exam) => <span key={exam} className="rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">{exam}</span>)}
                 </div>
-                <h3 className="font-bold text-slate-900 mb-1">{cert.name}</h3>
-                <p className="text-sm text-slate-500 mb-3">{cert.provider}</p>
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {cert.exams.map((exam) => (
-                    <span key={exam} className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">{exam}</span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <Shield className="w-3 h-3" />
-                  Valid for: {cert.valid}
-                </div>
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-600"><Shield className="h-3 w-3" /> {cert.valid}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Why Get Certified */}
       <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">Why Get Certified?</h2>
-          <div className="grid sm:grid-cols-3 gap-8">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-12 text-center text-2xl font-bold text-slate-950 md:text-3xl">Why Credentials Matter</h2>
+          <div className="grid gap-8 sm:grid-cols-3">
             {[
-              { title: 'Higher Earning Potential', desc: 'Certified professionals earn an average of 25% more than non-certified workers in the same field.' },
-              { title: 'Job Security', desc: 'Certifications demonstrate verified skills that employers trust and value.' },
-              { title: 'Career Advancement', desc: 'Credentials open doors to promotions, supervisory roles, and specialized positions.' },
+              { title: 'Verified Skills', desc: 'Credentials document that you met the testing or competency requirements for that certification.' },
+              { title: 'Employer Readiness', desc: 'Many occupations use certifications to verify safety, technical, healthcare, or software knowledge.' },
+              { title: 'Career Progression', desc: 'Some credentials are prerequisites for employment, advancement, licensing, or additional training.' },
             ].map((item) => (
               <div key={item.title} className="text-center">
-                <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-brand-red-600" />
-                </div>
-                <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-600">{item.desc}</p>
+                <CheckCircle className="mx-auto mb-4 h-10 w-10 text-brand-green-700" />
+                <h3 className="mb-2 font-bold text-slate-950">{item.title}</h3>
+                <p className="text-sm text-slate-700">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-brand-blue-50 border-y border-brand-blue-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Get Certified?</h2>
-          <p className="text-slate-600 mb-8">Schedule your exam at our testing center or enroll in a training program first.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/testing/book" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Schedule Exam
-            </Link>
-            <Link href="/programs" className="inline-flex items-center border-2 border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
-              View Programs
-            </Link>
+      <section className="border-y border-brand-blue-100 bg-brand-blue-50 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold text-slate-950">Ready to Prepare or Test?</h2>
+          <p className="mb-8 text-slate-700">Check the testing page for current availability or enroll in the related training program first.</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/testing/book" className="inline-flex items-center rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Testing Options</Link>
+            <Link href="/programs" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-8 py-4 font-bold text-slate-800 transition-colors hover:border-slate-500">View Programs</Link>
           </div>
         </div>
       </section>

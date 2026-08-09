@@ -1,117 +1,85 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { BookOpen, Video, FileText, Headphones, ArrowRight } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
 
 export const metadata: Metadata = {
   title: 'Learning Center | Training Resources',
-  keywords: ["learning center", "resources", "guides", "tutorials", "learning"],
-  description: 'Access training resources, tutorials, guides, and videos to support your learning journey.',
+  keywords: ['learning center', 'resources', 'guides', 'tutorials', 'learning'],
+  description: 'Access training resources, program information, funding guidance, career support, and help resources.',
 };
 
 export default function TrainingLearningCenterPage() {
   const resources = [
-    { icon: Video, title: 'Video Tutorials', count: 45, desc: 'Step-by-step video guides for common tasks and procedures.' },
-    { icon: FileText, title: 'Guides & Docs', count: 28, desc: 'Comprehensive documentation and how-to guides.' },
-    { icon: Headphones, title: 'Support Articles', count: 62, desc: 'Helpful articles answering common questions.' },
-    { icon: BookOpen, title: 'Course Materials', count: 15, desc: 'Supplementary materials for training programs.' },
+    { icon: Video, title: 'Program & Course Learning', desc: 'Open training programs and learner resources.', href: '/programs' },
+    { icon: FileText, title: 'Application Guidance', desc: 'Start the complete student application and review the enrollment process.', href: '/apply/student' },
+    { icon: Headphones, title: 'Support', desc: 'Get help with enrollment, accounts, payments, and technical questions.', href: '/support/contact' },
+    { icon: BookOpen, title: 'Career Resources', desc: 'Resume, job-placement, and professional-development support.', href: '/career-services' },
   ];
 
-  const popular = [
-    { title: 'Getting Started with Your LMS', views: '2.4k views' },
-    { title: 'How to Submit Your Application', views: '1.8k views' },
-    { title: 'Understanding WIOA Funding', views: '1.5k views' },
-    { title: 'Resume Building Best Practices', views: '1.2k views' },
-    { title: 'Interview Preparation Guide', views: '980 views' },
+  const guides = [
+    { title: 'Start a Training Application', href: '/apply/student' },
+    { title: 'Explore Funding Options', href: '/funding' },
+    { title: 'Resume Building', href: '/career-services/resume-building' },
+    { title: 'Job Placement Support', href: '/career-services/job-placement' },
+    { title: 'Testing & Certifications', href: '/testing' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <BookOpen className="w-4 h-4" />
-              Learning Center
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Learning Resources
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Access tutorials, guides, and resources to support your training journey. Everything you need to succeed, all in one place.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/programs" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Start Learning
-              </Link>
-              <Link href="/support/contact" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Get Support
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/images/pages/higher-ed-hero.webp"
+        alt="Learners using education and training resources"
+        eyebrow="Learning Center"
+        title="Learning Resources"
+        description="Use the Learning Center to reach the real program, funding, application, career-services, and support resources across the Elevate platform."
+        actions={(
+          <>
+            <Link href="/programs" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Explore Programs</Link>
+            <Link href="/support/contact" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Get Support</Link>
+          </>
+        )}
+      />
 
-      {/* Resources */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-4">Resource Categories</h2>
-          <p className="text-slate-600 text-center mb-12 max-w-2xl mx-auto">Browse our collection of learning resources.</p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-center text-2xl font-bold text-slate-950 md:text-3xl">Resource Categories</h2>
+          <p className="mx-auto mb-12 max-w-2xl text-center text-slate-700">Each card links to an active platform resource—no placeholder links.</p>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {resources.map((r) => (
-              <div key={r.title} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-lg hover:border-brand-blue-200 transition-all">
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <r.icon className="w-6 h-6 text-brand-blue-600" />
-                </div>
-                <h3 className="font-bold text-slate-900 mb-1">{r.title}</h3>
-                <p className="text-sm text-slate-500 mb-3">{r.count} resources</p>
-                <p className="text-sm text-slate-600 mb-4">{r.desc}</p>
-                <Link href="#" className="text-sm text-brand-blue-600 font-semibold inline-flex items-center gap-1 hover:text-brand-blue-700">
-                  Browse <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
+              <Link key={r.title} href={r.href} className="rounded-xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-blue-200 hover:shadow-lg">
+                <r.icon className="mb-4 h-8 w-8 text-brand-blue-700" />
+                <h3 className="mb-2 font-bold text-slate-950">{r.title}</h3>
+                <p className="mb-4 text-sm text-slate-700">{r.desc}</p>
+                <span className="inline-flex items-center gap-1 text-sm font-semibold text-brand-blue-700">Open <ArrowRight className="h-3 w-3" /></span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Popular Resources */}
       <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">Popular Resources</h2>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-8 text-2xl font-bold text-slate-950">Frequently Used Resources</h2>
           <div className="space-y-4">
-            {popular.map((item, index) => (
-              <Link key={index} href="#" className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200 hover:shadow-md hover:border-brand-blue-200 transition-all">
+            {guides.map((item, index) => (
+              <Link key={item.href} href={item.href} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-brand-blue-200 hover:shadow-md">
                 <div className="flex items-center gap-4">
                   <span className="text-2xl font-bold text-slate-300">{index + 1}</span>
-                  <div>
-                    <p className="font-medium text-slate-900">{item.title}</p>
-                    <p className="text-sm text-slate-500">{item.views}</p>
-                  </div>
+                  <p className="font-semibold text-slate-900">{item.title}</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-400" />
+                <ArrowRight className="h-5 w-5 text-slate-500" />
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-brand-blue-50 border-t border-brand-blue-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Need More Help?</h2>
-          <p className="text-slate-600 mb-8">Our support team is here to help you succeed.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/support/contact" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              Contact Support
-            </Link>
-            <Link href="/programs" className="inline-flex items-center border-2 border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
-              View Programs
-            </Link>
-          </div>
+      <section className="border-t border-brand-blue-100 bg-brand-blue-50 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold text-slate-950">Need More Help?</h2>
+          <p className="mb-8 text-slate-700">Use the support page if you cannot find the resource or next step you need.</p>
+          <Link href="/support/contact" className="inline-flex items-center rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Contact Support</Link>
         </div>
       </section>
     </div>

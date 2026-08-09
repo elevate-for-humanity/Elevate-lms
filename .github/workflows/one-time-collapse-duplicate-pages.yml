@@ -1,0 +1,166 @@
+name: One-time Repeated Segment Page Consolidation
+
+on:
+  push:
+    branches:
+      - 'fix/full-platform-cleanup-continuation-20260809'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-collapse-duplicate-pages
+  cancel-in-progress: false
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/full-platform-cleanup-continuation-20260809
+          fetch-depth: 1
+
+      - name: Convert repeated-segment pages to compatibility redirects
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const roots = [
+            'apps/marketing/app',
+            'apps/lms/app',
+            'apps/admin/app',
+          ];
+          const pagePattern = /^page\.(tsx|ts|jsx|js)$/;
+          const routeGroup = /^\(.+\)$/;
+          const parallelRoute = /^@.+$/;
+
+          function walk(dir, out = []) {
+            for (const entry of fs.readdirSync(dir)) {
+              if (entry === 'node_modules' || entry === '.next' || entry.startsWith('_')) continue;
+              const full = path.join(dir, entry);
+              const stat = fs.statSync(full);
+              if (stat.isDirectory()) walk(full, out);
+              else if (pagePattern.test(entry)) out.push(full);
+            }
+            return out;
+          }
+
+          function urlFor(root, file) {
+            const parts = path.relative(root, file).split(path.sep);
+            parts.pop();
+            const segments = parts.filter((segment) => !routeGroup.test(segment) && !parallelRoute.test(segment));
+            const url = `/${segments.join('/')}`.replace(/\/+/g, '/');
+            return url === '/' ? '/' : url.replace(/\/$/, '');
+          }
+
+          function collapsedUrl(url) {
+            const segments = url.split('/').filter(Boolean);
+            const collapsed = [];
+            let changed = false;
+            for (const segment of segments) {
+              if (collapsed.at(-1) === segment && !segment.startsWith('[')) {
+                changed = true;
+                continue;
+              }
+              collapsed.push(segment);
+            }
+            return changed ? `/${collapsed.join('/')}` : null;
+          }
+
+          function dynamicParams(url) {
+            const params = [];
+            for (const segment of url.split('/').filter(Boolean)) {
+              const match = segment.match(/^\[([^.[\]]+)\]$/);
+              if (match) params.push(match[1]);
+              if (segment.includes('...')) return null;
+            }
+            return params;
+          }
+
+          function redirectSource(targetUrl, extension) {
+            const params = dynamicParams(targetUrl);
+            if (params === null) return null;
+            const typed = extension === 'tsx' || extension === 'ts';
+            const importLine = "import { permanentRedirect } from 'next/navigation';";
+            const metadata = "export const metadata = { robots: { index: false, follow: false } };";
+
+            if (params.length === 0) {
+              return `${importLine}\n\n${metadata}\n\nexport default function LegacyDuplicateRoute() {\n  permanentRedirect('${targetUrl}');\n}\n`;
+            }
+
+            const typeShape = params.map((name) => `${name}: string`).join('; ');
+            const signature = typed
+              ? `({ params }: { params: Promise<{ ${typeShape} }> })`
+              : '({ params })';
+            const destructure = `const { ${params.join(', ')} } = await params;`;
+            let expression = targetUrl;
+            for (const name of params) expression = expression.replace(`[${name}]`, `\${encodeURIComponent(${name})}`);
+
+            return `${importLine}\n\n${metadata}\n\nexport default async function LegacyDuplicateRoute${signature} {\n  ${destructure}\n  permanentRedirect(\`${expression}\`);\n}\n`;
+          }
+
+          const modified = [];
+          const skipped = [];
+
+          for (const root of roots) {
+            if (!fs.existsSync(root)) continue;
+            const pages = walk(root);
+            const byUrl = new Map(pages.map((file) => [urlFor(root, file), file]));
+
+            for (const file of pages) {
+              const url = urlFor(root, file);
+              const targetUrl = collapsedUrl(url);
+              if (!targetUrl) continue;
+
+              const targetFile = byUrl.get(targetUrl);
+              if (!targetFile) {
+                skipped.push({ root, url, targetUrl, reason: 'canonical target page does not exist' });
+                continue;
+              }
+
+              const current = fs.readFileSync(file, 'utf8');
+              if (/\b(?:redirect|permanentRedirect)\s*\(/.test(current)) continue;
+
+              const extension = file.split('.').at(-1);
+              const replacement = redirectSource(targetUrl, extension);
+              if (!replacement) {
+                skipped.push({ root, url, targetUrl, reason: 'unsupported catch-all dynamic segment' });
+                continue;
+              }
+
+              fs.writeFileSync(file, replacement);
+              modified.push({ root, url, targetUrl, file, targetFile });
+            }
+          }
+
+          fs.mkdirSync('artifacts', { recursive: true });
+          fs.writeFileSync(
+            'artifacts/repeated-segment-consolidation.json',
+            `${JSON.stringify({ modified, skipped }, null, 2)}\n`,
+          );
+
+          console.log(`Converted ${modified.length} repeated-segment pages to permanent redirects.`);
+          console.log(`Skipped ${skipped.length} repeated-segment pages without an existing canonical target.`);
+          for (const item of modified) console.log(`  ${item.url} -> ${item.targetUrl}`);
+          for (const item of skipped) console.log(`  SKIP ${item.url} -> ${item.targetUrl}: ${item.reason}`);
+          NODE
+
+      - name: Commit bulk route consolidation and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/one-time-collapse-duplicate-pages.yml
+          if git diff --quiet; then
+            echo 'No route changes were needed.'
+            exit 0
+          fi
+          git config user.name 'elevateforhumanity'
+          git config user.email '221907459+elevateforhumanity@users.noreply.github.com'
+          git add apps/marketing/app apps/lms/app apps/admin/app .github/workflows/one-time-collapse-duplicate-pages.yml
+          git commit -m 'fix(routes): collapse repeated-segment duplicate pages'
+          git push origin HEAD:fix/full-platform-cleanup-continuation-20260809

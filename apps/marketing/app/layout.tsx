@@ -24,14 +24,28 @@ import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLab
 export const metadata: Metadata = {
   title: { default: 'Elevate for Humanity', template: '%s | Elevate for Humanity' },
   description: 'Vocational education and workforce development',
+  applicationName: 'Elevate for Humanity',
   metadataBase: new URL('https://www.elevateforhumanity.org'),
   manifest: '/manifest-marketing.json',
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon.png', type: 'image/png' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+      { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
     ],
-    apple: '/apple-touch-icon.png',
+    shortcut: [{ url: '/icon-192.png', type: 'image/png', sizes: '192x192' }],
+    apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
 };
 

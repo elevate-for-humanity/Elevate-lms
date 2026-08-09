@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-08-09",
   "surfaces": {
     "studentApplication": {
@@ -35,6 +35,33 @@
       "informational": [
         { "app": "marketing", "path": "/apprenticeship-sponsor", "purpose": "Sponsor-of-record governance and compliance; not a second employer application" }
       ]
+    },
+    "workforcePortal": {
+      "function": "Workforce partner participant management, placements, outcomes, and reporting",
+      "canonical": { "app": "lms", "path": "/workforce/dashboard" },
+      "operational": [
+        { "app": "lms", "path": "/workforce/participants", "purpose": "Participant search and filtered workforce list" }
+      ]
+    },
+    "caseManagerPortal": {
+      "function": "Assigned caseload, participant detail, placement, and case-manager reporting",
+      "canonical": { "app": "marketing", "path": "/case-manager/dashboard" },
+      "operational": [
+        { "app": "marketing", "path": "/case-manager/participants", "purpose": "Assignment-scoped participant list" },
+        { "app": "marketing", "path": "/case-manager/participants/[id]", "purpose": "Assignment-scoped participant detail" }
+      ]
+    },
+    "workforceBoardPortal": {
+      "function": "Workforce board oversight and aggregate outcomes",
+      "canonical": { "app": "marketing", "path": "/workforce-board/dashboard" }
+    },
+    "providerPortal": {
+      "function": "Training provider programs, onboarding, compliance, domains, and enrollment operations",
+      "canonical": { "app": "marketing", "path": "/provider/dashboard" }
+    },
+    "programHolderPortal": {
+      "function": "Program holder training programs, students, hours, documents, and required actions",
+      "canonical": { "app": "marketing", "path": "/program-holder/dashboard" }
     },
     "courseBuilder": {
       "function": "Create and manage course content",

@@ -17,11 +17,19 @@ export default async function CosmetologyApprenticeshipPage() {
 }
 
 export async function generateMetadata() {
-  const loaded = await loadProgramForPage('cosmetology-apprenticeship');
-  const program = loaded?.program;
   return {
-    title: program?.metaTitle ?? program?.title ?? 'Cosmetology Apprenticeship',
-    description: program?.metaDescription ?? program?.subtitle ?? '',
+    title: 'Cosmetology & Hair Stylist Apprenticeship | Earn While You Learn',
+    description:
+      'Cosmetology and hair stylist apprenticeship pathway with structured on-the-job learning, related technical instruction, employer training sites, progress tracking and apprenticeship sponsor oversight.',
+    keywords: [
+      'cosmetology apprenticeship',
+      'hair stylist apprenticeship',
+      'hairstylist apprenticeship',
+      'cosmetology apprenticeship Indiana',
+      'paid cosmetology apprenticeship',
+      'salon apprenticeship',
+      'cosmetology training',
+    ],
     alternates: {
       canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
     },

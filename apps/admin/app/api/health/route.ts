@@ -1,8 +1,9 @@
 /**
  * GET /api/health
  *
- * Readiness probe - verifies application is initialized
- * and ready to serve requests. Still NO external dependency checks.
+ * Readiness probe - verifies application is initialized and ready to serve
+ * requests. This intentionally performs no external dependency checks so
+ * Northflank readiness cannot remove every pod because of a downstream outage.
  */
 
 import { NextResponse } from 'next/server';
@@ -17,6 +18,8 @@ export async function GET() {
       service: 'admin',
       status: 'healthy',
       ready: true,
+      canonicalDashboard: '/dashboard',
+      healthContract: 'admin-v2',
       commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
       buildId: process.env.NEXT_PUBLIC_BUILD_ID ?? 'unknown',
       builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
@@ -29,6 +32,6 @@ export async function GET() {
       headers: {
         'Cache-Control': 'no-store',
       },
-    }
+    },
   );
 }

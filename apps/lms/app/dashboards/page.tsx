@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 };
 
 const dashboards = [
-  { title: 'Student Dashboard', href: '/student/dashboard', icon: GraduationCap, desc: 'Track your progress, courses, and assignments' },
+  { title: 'Student Dashboard', href: '/lms/dashboard', icon: GraduationCap, desc: 'Track your progress, courses, and assignments' },
   { title: 'Instructor Dashboard', href: '/instructor/dashboard', icon: Users, desc: 'Manage classes, students, and grades' },
   { title: 'Employer Dashboard', href: '/employer/dashboard', icon: Building2, desc: 'View apprentices, post jobs, manage partnerships' },
   { title: 'Apprentice Dashboard', href: '/apprentice/dashboard', icon: User, desc: 'Track hours, log work, view progress' },
-  { title: 'Admin Dashboard', href: '/admin', icon: Shield, desc: 'Platform administration and analytics' },
+  { title: 'Admin Dashboard', href: 'https://admin.elevateforhumanity.org/dashboard', icon: Shield, desc: 'Platform administration and analytics' },
 ];
 
 export default function DashboardsPage() {

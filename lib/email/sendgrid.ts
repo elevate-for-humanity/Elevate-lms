@@ -221,7 +221,32 @@ export async function sendPayoutConfirmationEmail(params: {
   return sendEmail({
     to: params.email,
     subject: `Payout Processed: $${params.amount.toFixed(2)}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#10b981">Payout Processed!</h2><p>Hi ${params.name},</p><p>Your payout of <strong>$${params.amount.toFixed(2)}</strong> has been processed.</p><p>Reference: ${params.payoutId}</p></div>`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#10b981">Payout Processed!</h2><p>Hi ${params.name},</p><div style="font-size:32px;font-weight:bold;color:#10b981;text-align:center;margin:20px 0">$${params.amount.toFixed(2)}</div><p><strong>Payout ID:</strong> ${params.payoutId}</p><p>Funds should arrive within 2-5 business days.</p></div>`,
+  });
+}
+
+export async function sendProductApprovalEmail(params: {
+  email: string;
+  name: string;
+  productName: string;
+}) {
+  return sendEmail({
+    to: params.email,
+    subject: `Product Approved: ${params.productName}`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#10b981">Product Approved!</h2><p>Hi ${params.name},</p><p>Your product "<strong>${params.productName}</strong>" is now live on the marketplace.</p></div>`,
+  });
+}
+
+export async function sendProductRejectionEmail(params: {
+  email: string;
+  name: string;
+  productName: string;
+  reason: string;
+}) {
+  return sendEmail({
+    to: params.email,
+    subject: `Product Needs Revision: ${params.productName}`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>Product Review Update</h2><p>Hi ${params.name},</p><p>Your product "<strong>${params.productName}</strong>" requires revisions.</p><p><strong>Reason:</strong> ${params.reason}</p></div>`,
   });
 }
 
@@ -234,8 +259,8 @@ export async function sendMarketplaceSaleNotification(params: {
 }) {
   return sendEmail({
     to: params.creatorEmail,
-    subject: `New Sale - ${params.productName}`,
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>New Marketplace Sale</h2><p>Hi ${params.creatorName},</p><p>${params.buyerName} purchased <strong>${params.productName}</strong> for <strong>$${params.amount.toFixed(2)}</strong>.</p></div>`,
+    subject: `New Sale: ${params.productName}`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#10b981">New Sale!</h2><p>Hi ${params.creatorName},</p><p><strong>Product:</strong> ${params.productName}</p><p><strong>Buyer:</strong> ${params.buyerName}</p><p><strong>Amount:</strong> <span style="font-size:24px;font-weight:bold;color:#10b981">$${params.amount.toFixed(2)}</span></p></div>`,
   });
 }
 
@@ -246,7 +271,7 @@ export async function sendMarketplaceApplicationEmail(params: {
 }) {
   return sendEmail({
     to: params.adminEmail,
-    subject: 'New Marketplace Creator Application',
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2>New Creator Application</h2><p><strong>Name:</strong> ${params.applicantName}</p><p><strong>Email:</strong> ${params.applicantEmail}</p></div>`,
+    subject: 'New Creator Application',
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto"><h2 style="color:#10b981">New Creator Application</h2><p><strong>Name:</strong> ${params.applicantName}</p><p><strong>Email:</strong> ${params.applicantEmail}</p><p>Please review in the admin dashboard.</p></div>`,
   });
 }

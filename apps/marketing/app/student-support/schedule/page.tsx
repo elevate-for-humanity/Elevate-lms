@@ -1,91 +1,73 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Clock, User, Phone, Mail, CheckCircle } from 'lucide-react';
+import { Phone, Mail, CheckCircle } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Schedule Tutoring | Student Support',
-  description: 'Book tutoring and academic support sessions with our instructors. Get the help you need to succeed.',
+  description: 'Request tutoring and academic support for your training program.',
 };
 
 export default function StudentSupportSchedulePage() {
+  const phoneHref = `tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`;
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Calendar className="w-4 h-4" />
-              Student Support
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Schedule a Tutoring Session
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Get one-on-one support from our instructors. Book a session to clarify concepts, review materials, or prepare for exams.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <a href="tel:3173143757" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                <Phone className="w-4 h-4 mr-2" />
-                Call to Schedule
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PictureFirstPageHero
+        image="/images/pages/orientation-page-1.webp"
+        alt="Student receiving one-on-one academic support"
+        eyebrow="Student Support"
+        title="Request Tutoring & Academic Support"
+        description="Need help with course content, study skills, exam preparation, or your learning plan? Contact student support and we will route the request to the appropriate instructor or staff member."
+        actions={(
+          <>
+            <a href={phoneHref} className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700"><Phone className="mr-2 h-4 w-4" /> Call {PLATFORM_DEFAULTS.supportPhone}</a>
+            <Link href="/support/contact" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Support Request</Link>
+          </>
+        )}
+      />
 
-      {/* How It Works */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">How It Works</h2>
-          <div className="grid sm:grid-cols-3 gap-8">
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-12 text-center text-2xl font-bold text-slate-950 md:text-3xl">How It Works</h2>
+          <div className="grid gap-8 sm:grid-cols-3">
             {[
-              { step: '1', title: 'Contact Us', desc: 'Call or email to request a tutoring session. Tell us what you need help with.' },
-              { step: '2', title: 'Get Matched', desc: 'We\'ll connect you with an instructor who specializes in your subject area.' },
-              { step: '3', title: 'Schedule & Meet', desc: 'Book a time that works for you. Sessions available in-person or virtual.' },
+              { step: '1', title: 'Request Support', desc: 'Tell us your program, the topic you need help with, and how to reach you.' },
+              { step: '2', title: 'Get Routed', desc: 'Student support routes the request to the appropriate instructor, coach, or staff member.' },
+              { step: '3', title: 'Meet & Follow Up', desc: 'Use the available in-person or virtual support option and follow up if additional help is needed.' },
             ].map((s) => (
               <div key={s.step} className="text-center">
-                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">{s.step}</div>
-                <h3 className="font-bold text-slate-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-slate-600">{s.desc}</p>
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-700 text-xl font-bold text-white">{s.step}</div>
+                <h3 className="mb-2 font-bold text-slate-950">{s.title}</h3>
+                <p className="text-sm text-slate-700">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Subjects */}
       <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 text-center mb-12">Subjects We Support</h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {['Medical Terminology', 'Pharmacology', 'Anatomy & Physiology', 'Math Fundamentals', 'Reading Comprehension', 'Test Prep', 'Study Skills', 'Career Planning'].map((subject) => (
-              <div key={subject} className="bg-slate-50 rounded-lg p-4 text-center border border-slate-200">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-slate-700">{subject}</p>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <h2 className="mb-12 text-center text-2xl font-bold text-slate-950 md:text-3xl">Common Support Areas</h2>
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            {['Course concepts', 'Practice and review', 'Exam preparation', 'Math fundamentals', 'Reading comprehension', 'Study skills', 'LMS navigation', 'Career planning'].map((subject) => (
+              <div key={subject} className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-center">
+                <CheckCircle className="mx-auto mb-2 h-5 w-5 text-brand-blue-700" />
+                <p className="text-sm font-medium text-slate-800">{subject}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section className="py-16 bg-brand-blue-50 border-t border-brand-blue-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-slate-600 mb-8">Contact us to schedule your tutoring session today.</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:3173143757" className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-              <Phone className="w-4 h-4" />
-              Call (317) 314-3757
-            </a>
-            <a href="mailto:tutoring@elevateforhumanity.org" className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 hover:bg-white text-slate-700 font-bold py-4 px-8 rounded-lg transition-colors">
-              <Mail className="w-4 h-4" />
-              Email Us
-            </a>
+      <section className="border-t border-brand-blue-100 bg-brand-blue-50 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold text-slate-950">Need Support?</h2>
+          <p className="mb-8 text-slate-700">Contact the Elevate team and include your program and the topic you need help with.</p>
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <a href={phoneHref} className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800"><Phone className="h-4 w-4" /> {PLATFORM_DEFAULTS.supportPhone}</a>
+            <a href="mailto:support@elevateforhumanity.org" className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-slate-300 bg-white px-8 py-4 font-bold text-slate-800 transition-colors hover:border-slate-500"><Mail className="h-4 w-4" /> Email Support</a>
           </div>
         </div>
       </section>

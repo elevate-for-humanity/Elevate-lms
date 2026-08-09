@@ -1,17 +1,16 @@
 /**
- * Domainee API types — derived from real API responses (verified 2026-08-09).
- * See https://domainee.dev/docs
+ * Domainee API types — derived from verified API responses.
  */
 
 export interface DomaineeDnsRecord {
-  type: string; // "CNAME" | "ALIAS" | "A"
+  type: string;
   name: string;
-  value: string; // e.g. "edge.domainee.dev"
-  purpose: string; // e.g. "Traffic Routing"
+  value: string;
+  purpose: string;
 }
 
 export interface DomaineeWarning {
-  code: string; // e.g. "dns_unresolvable"
+  code: string;
   message: string;
 }
 
@@ -21,17 +20,17 @@ export interface DomaineeDomain {
   hostname: string;
   originUrl: string;
   metadata?: Record<string, unknown>;
-  mode: string; // "proxy"
+  mode: string;
   keepHost: boolean;
   redirectWww: boolean;
   redirectStatus: number;
-  status: string; // "pending" | "verified" | "active" | "failed"
+  status: string;
   dnsRecords: DomaineeDnsRecord[];
   verificationToken?: string;
   isResolving: boolean;
   pointsToEdge: boolean;
   dnsPointedAt: string[];
-  monitorStatus: string; // "unknown" | "ok" | ...
+  monitorStatus: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -58,6 +57,20 @@ export interface DomaineeRegistrant {
   country?: string;
 }
 
+export interface DomaineePurchasePricing {
+  wholesaleCents: number;
+  feeCents: number;
+  totalCents: number;
+  currency: string;
+}
+
+export interface DomaineePurchaseQuote {
+  hostname: string;
+  available: boolean;
+  premium: boolean;
+  pricing: DomaineePurchasePricing;
+}
+
 export interface DomaineeBuyRequest {
   hostname: string;
   years: number;
@@ -69,7 +82,7 @@ export interface DomaineeBuyRequest {
 export interface DomaineePurchase {
   id: string;
   hostname: string;
-  status: string; // "completed" | "failed" | "pending"
+  status: string;
   totalCents: number;
   expiresAt?: string;
   connectedDomainId?: string;
@@ -100,7 +113,9 @@ export type DomaineeWebhookEventType =
   | 'domain.failed'
   | 'domain.expired'
   | 'domain.deleted'
-  | 'domain.monitor_updated';
+  | 'domain.monitor_updated'
+  | 'domain_purchase.completed'
+  | 'domain_purchase.failed';
 
 export interface DomaineeWebhookEvent {
   id: string;

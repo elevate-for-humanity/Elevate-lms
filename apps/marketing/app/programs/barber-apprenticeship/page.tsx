@@ -4,9 +4,6 @@ import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberAppre
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
-// Registered-apprenticeship requirements are compliance-sensitive. Always
-// render from the current RAPIDS-backed source of truth with no ISR or fetch
-// cache after requirements or approved public copy changes.
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
@@ -26,11 +23,19 @@ export default async function BarberApprenticeshipPage() {
 }
 
 export async function generateMetadata() {
-  const loaded = await loadProgramForPage('barber-apprenticeship');
-  const program = loaded?.program;
   return {
-    title: program?.metaTitle ?? program?.title ?? 'Barber Apprenticeship',
-    description: program?.metaDescription ?? program?.subtitle ?? '',
+    title: 'Barber Apprenticeship | Earn While You Learn Barbering',
+    description:
+      'Registered barber apprenticeship pathway from Elevate for Humanity in Indiana. Complete structured on-the-job learning with approved host shops, related technical instruction, hour tracking and sponsor oversight.',
+    keywords: [
+      'barber apprenticeship',
+      'barber apprenticeship Indiana',
+      'barber apprentice program',
+      'paid barber apprenticeship',
+      'registered barber apprenticeship',
+      'barber training',
+      'barber license apprenticeship',
+    ],
     alternates: { canonical: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship' },
   };
 }

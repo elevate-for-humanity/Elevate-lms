@@ -3,6 +3,7 @@
     "publicMarketing": {
       "home": "/",
       "programs": "/programs",
+      "apply": "/apply/student",
       "apprenticeships": "/apprenticeships",
       "funding": "/funding",
       "disclosures": "/disclosures",

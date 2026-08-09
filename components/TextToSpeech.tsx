@@ -122,14 +122,14 @@ export default function TextToSpeech({
 
   return (
     <div
-      className={`relative z-0 flex w-full max-w-full flex-wrap items-center gap-2 overflow-hidden rounded-xl bg-white/95 p-2 sm:gap-3 ${className}`}
+      className={`relative z-0 inline-flex w-fit max-w-full flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-lg bg-white/95 p-1.5 ${className}`}
       data-tts-control
     >
       {!isPlaying && !isPaused && (
         <button
           type="button"
           onClick={handlePlay}
-          className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-brand-blue-600 px-3 py-2 text-white transition-colors hover:bg-brand-blue-700 sm:px-4"
+          className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-brand-blue-600 px-3 py-1.5 text-white transition-colors hover:bg-brand-blue-700"
           title="Listen to this content"
         >
           <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -140,29 +140,29 @@ export default function TextToSpeech({
       )}
 
       {isPlaying && (
-        <button type="button" onClick={handlePause} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-brand-orange-600 px-3 py-2 text-white hover:bg-brand-orange-700 sm:px-4" title="Pause">
+        <button type="button" onClick={handlePause} className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-brand-orange-600 px-3 py-1.5 text-white hover:bg-brand-orange-700" title="Pause">
           <span className="text-sm font-semibold">Pause</span>
         </button>
       )}
 
       {isPaused && (
-        <button type="button" onClick={handlePlay} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg bg-brand-green-600 px-3 py-2 text-white hover:bg-brand-green-700 sm:px-4" title="Resume">
+        <button type="button" onClick={handlePlay} className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-brand-green-600 px-3 py-1.5 text-white hover:bg-brand-green-700" title="Resume">
           <span className="text-sm font-semibold">Resume</span>
         </button>
       )}
 
       {(isPlaying || isPaused) && (
-        <button type="button" onClick={handleStop} className="min-h-10 shrink-0 rounded-lg bg-slate-200 px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-300" title="Stop">
+        <button type="button" onClick={handleStop} className="min-h-9 shrink-0 rounded-lg bg-slate-200 px-3 py-1.5 text-sm font-semibold text-slate-900 hover:bg-slate-300" title="Stop">
           Stop
         </button>
       )}
 
-      <label className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-800">
+      <label className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-800">
         <span>Speed</span>
         <select
           value={rate}
           onChange={(event) => setRate(Number(event.target.value))}
-          className="min-h-10 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900"
+          className="min-h-9 shrink-0 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900"
           disabled={isPlaying}
         >
           <option value="0.5">0.5x</option>
@@ -175,12 +175,12 @@ export default function TextToSpeech({
       </label>
 
       {voices.length > 0 && (
-        <label className="hidden min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-slate-800 sm:flex">
+        <label className="hidden shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-800 sm:flex">
           <span className="shrink-0">Voice</span>
           <select
             value={selectedVoice?.name || ''}
             onChange={(event) => setSelectedVoice(voices.find((voice) => voice.name === event.target.value) || null)}
-            className="min-h-10 min-w-0 max-w-56 flex-1 truncate rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900"
+            className="min-h-9 w-44 shrink-0 truncate rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-900 lg:w-52"
             disabled={isPlaying}
           >
             {voices.filter((voice) => voice.lang.startsWith('en')).map((voice) => (

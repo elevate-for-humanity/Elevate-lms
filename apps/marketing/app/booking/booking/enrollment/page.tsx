@@ -1,11 +1,7 @@
-import EnrollmentBookingPage from './EnrollmentClient';
-import { loadApplyProgramOptions } from '@/lib/programs/public-program-list';
+import { permanentRedirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const metadata = { robots: { index: false, follow: false } };
 
-export default async function Page() {
-  const { options } = await loadApplyProgramOptions();
-  const programs = options.map((o) => ({ id: o.id, title: o.title, slug: o.slug }));
-  return <EnrollmentBookingPage programs={programs} />;
+export default function LegacyRepeatedRoute() {
+  permanentRedirect('/booking/enrollment');
 }

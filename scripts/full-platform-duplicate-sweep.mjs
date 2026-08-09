@@ -82,6 +82,25 @@ function publicRecord(record) {
     redirectOnly: record.redirectOnly,
   };
 }
+function routeSegments(url) {
+  return url.split('/').filter(Boolean);
+}
+function isDirectDynamicChild(parentUrl, childUrl) {
+  const parent = routeSegments(parentUrl);
+  const child = routeSegments(childUrl);
+  if (child.length !== parent.length + 1) return false;
+  if (!parent.every((segment, index) => segment === child[index])) return false;
+  return DYNAMIC.test(child.at(-1) ?? '');
+}
+function isSameAppListDetailFamily(family) {
+  const productionItems = family.items.filter((item) => item.production);
+  if (productionItems.length < 2) return false;
+  if (new Set(productionItems.map((item) => item.app)).size !== 1) return false;
+  const urls = productionItems.map((item) => item.url);
+  return urls.some((parentUrl) =>
+    urls.every((url) => url === parentUrl || isDirectDynamicChild(parentUrl, url)),
+  );
+}
 
 const records = [];
 for (const [app, config] of Object.entries(ROOTS)) {
@@ -178,6 +197,10 @@ const productionSemanticCandidates = semanticFamilies.filter(({ items }) => {
   const productionItems = items.filter((item) => item.production);
   return new Set(productionItems.map((item) => `${item.app}:${item.url}`)).size > 1;
 });
+const listDetailFamilies = productionSemanticCandidates.filter(isSameAppListDetailFamily);
+const actionableSemanticCandidates = productionSemanticCandidates.filter(
+  (family) => !isSameAppListDetailFamily(family),
+);
 
 const report = {
   generatedAt: new Date().toISOString(),
@@ -194,6 +217,8 @@ const report = {
     clonedImplementations: clonedImplementations.length,
     semanticFamilies: semanticFamilies.length,
     productionSemanticCandidates: productionSemanticCandidates.length,
+    listDetailFamilies: listDetailFamilies.length,
+    actionableSemanticCandidates: actionableSemanticCandidates.length,
   },
   redirectIntegrityFailures,
   exactWithinRoot,
@@ -202,6 +227,8 @@ const report = {
   clonedImplementations,
   semanticFamilies,
   productionSemanticCandidates,
+  listDetailFamilies,
+  actionableSemanticCandidates,
 };
 
 const out = process.env.DUPLICATE_SWEEP_OUT || 'artifacts/full-platform-duplicate-sweep.json';
@@ -219,6 +246,8 @@ console.log(`- production cross-app same-URL candidates: ${report.totals.product
 console.log(`- exact implementation clone groups: ${report.totals.clonedImplementations}`);
 console.log(`- semantic page families: ${report.totals.semanticFamilies}`);
 console.log(`- production semantic candidates: ${report.totals.productionSemanticCandidates}`);
+console.log(`- normal list/detail families: ${report.totals.listDetailFamilies}`);
+console.log(`- actionable semantic candidates after list/detail filtering: ${report.totals.actionableSemanticCandidates}`);
 console.log(`- report: ${out}`);
 
 if (redirectIntegrityFailures.length > 0) {

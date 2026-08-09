@@ -15,6 +15,13 @@ export default async function CandidatesPage() {
   const { user } = await requireRole(['employer', 'admin']);
   const supabase = await createClient();
 
+  const { data: employerProfile } = await supabase
+    .from('profiles')
+    .select('verified')
+    .eq('id', user.id)
+    .maybeSingle();
+  const canContact = Boolean(employerProfile?.verified);
+
   // Get completed/graduated candidates only — not all students
   const { data: enrollments } = await supabase
     .from('program_enrollments')
@@ -160,7 +167,7 @@ export default async function CandidatesPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    {profile.verified ? (
+                    {canContact ? (
                       <>
                         {candidate.email && (
                           <a

@@ -1,283 +1,171 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { POST as submitCanonicalApplication } from '../../applications/route';
+import { GET as trackCanonicalApplication } from '../../applications/track/route';
 
-// Lazy init — null when env vars absent, so we fail safely instead of using fake data
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  return createClient(url, key);
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const PROGRAM_ALIASES: Record<string, string> = {
+  'medical-assistant': 'medical-assistant',
+  phlebotomy: 'phlebotomy',
+  'hvac-technician': 'hvac-technician',
+  barber: 'barber-apprenticeship',
+  'barber-apprenticeship': 'barber-apprenticeship',
+  cosmetology: 'cosmetology-apprenticeship',
+  'cosmetology-apprenticeship': 'cosmetology-apprenticeship',
+  esthetician: 'esthetician-apprenticeship',
+  'esthetician-apprenticeship': 'esthetician-apprenticeship',
+  nail: 'nail-technician-apprenticeship',
+  'nail-technician': 'nail-technician-apprenticeship',
+  'nail-technician-apprenticeship': 'nail-technician-apprenticeship',
+  cna: 'cna',
+  qma: 'qma',
+};
+
+const FUNDING_ALIASES: Record<string, string> = {
+  self: 'self_pay',
+  self_pay: 'self_pay',
+  wioa: 'wioa',
+  next_level_jobs: 'wrg',
+  wrg: 'wrg',
+  snap: 'snap',
+  employer: 'employer',
+  other: 'unsure',
+};
+
+function normalizedProgram(value: unknown): string {
+  const key = String(value ?? '').trim().toLowerCase();
+  return PROGRAM_ALIASES[key] ?? key;
 }
 
-// Active statuses for duplicate detection — excludes completed/denied/withdrawn
-const ACTIVE_STATUSES = ['draft','submitted','under_review','interview_pending',
-  'documents_pending','funding_pending','orientation_pending','approved'];
+function legacySuccessResponse(data: Record<string, unknown>, program: string) {
+  const referenceNumber = String(data.referenceNumber ?? '');
+  const applicationId = String(data.id ?? '');
+  const confirmationParams = new URLSearchParams();
+  if (referenceNumber) confirmationParams.set('ref', referenceNumber);
+  if (program) confirmationParams.set('program', program);
 
-function generateRefNumber(): string {
-  const year = new Date().getFullYear();
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `EFH-${year}-${random}`;
+  return NextResponse.json({
+    success: true,
+    applicationId,
+    referenceNumber,
+    nextStep: referenceNumber ? `/apply/track?id=${encodeURIComponent(referenceNumber)}` : '/apply/track',
+    confirmationUrl: `/apply/confirmation?${confirmationParams.toString()}`,
+    canonical: true,
+  });
 }
 
-// Send confirmation email — non-blocking, failures logged but do NOT block the application
-async function sendConfirmationEmail(email: string, firstName: string, programName: string, refNumber: string, interviewLink: string) {
-  const key = process.env.SENDGRID_API_KEY;
-  if (!key) { console.warn('[enrollment-v2] SENDGRID_API_KEY not set — skipping email'); return; }
-  try {
-    await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email }] }],
-        from: { email: 'noreply@elevateforhumanity.org', name: 'Elevate for Humanity' },
-        reply_to: { email: 'admissions@elevateforhumanity.org' },
-        subject: `Application Received — ${refNumber}`,
-        content: [{ type: 'text/html', value: `
-          <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px">
-            <h1 style="color:#1e3a5f">Application Received!</h1>
-            <p>Hi ${firstName},</p>
-            <p>We've received your application for <strong>${programName}</strong>.</p>
-            <p><strong>Reference:</strong> ${refNumber}</p>
-            <p>Next step: Complete your admissions interview with Paris AI.</p>
-            <a href="${interviewLink}" style="display:inline-block;background:#1e3a5f;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;margin:16px 0">Start Your Interview</a>
-            <p>Questions? Call (317) 314-3757 or email admissions@elevateforhumanity.org</p>
-            <hr/><p style="color:#666;font-size:12px">Elevate for Humanity · Indianapolis, IN</p>
-          </div>
-        ` }],
-      }),
-    });
-  } catch (err) {
-    console.error('[enrollment-v2] Email error (will retry via outbox):', err);
-    // Queue for retry via outbox table
-  }
-}
-
-// Queue a notification for retry — uses existing notification_outbox table
-async function queueNotification(supabase: ReturnType<typeof createClient>, notification: {
-  type: string; recipient_email: string; applicant_name: string;
-  program_name: string; reference_number: string; interview_link?: string;
-}) {
-  try {
-    await supabase.from('notification_outbox').insert({
-      type: notification.type,
-      recipient_email: notification.recipient_email,
-      subject: `Elevate Application — ${notification.reference_number}`,
-      metadata: notification,
-      attempts: 0,
-      max_attempts: 5,
-      entity_type: 'application',
-      entity_id: null,
-    });
-  } catch (err) {
-    console.error('[enrollment-v2] Outbox insert error:', err);
-  }
-}
-
+/**
+ * Compatibility POST for historical /api/enrollment-v2/apply callers.
+ *
+ * No application is written here. The payload is normalized and forwarded to
+ * the canonical /api/applications handler so validation, rate limiting,
+ * idempotency, program-state checks, account provisioning, notifications,
+ * auditing, and job-queue behavior cannot drift into a second implementation.
+ */
 export async function POST(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
+  const body = (await req.json().catch(() => null)) as Record<string, any> | null;
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid application payload.' }, { status: 400 });
+  }
+  if (!body.consentAcknowledged) {
+    return NextResponse.json({ error: 'Consent acknowledgment is required.' }, { status: 400 });
+  }
 
-  // Fail safely — never report success when DB is unavailable
-  if (!supabase) {
-    console.error('[enrollment-v2] FATAL: Supabase not configured — cannot accept application');
+  const program = normalizedProgram(body.programSlug || body.program || body.programName);
+  if (!program) {
+    return NextResponse.json({ error: 'Program is required.' }, { status: 400 });
+  }
+
+  // The retired v2 funnel mixed standalone testing products into student
+  // training enrollment. Keep those callers out of the training application.
+  if (program === 'act-workkeys' || program === 'epa-608') {
     return NextResponse.json(
-      { error: 'Application system temporarily unavailable. Please call (317) 314-3757 to apply by phone.' },
-      { status: 503 }
+      { error: 'Testing registrations are handled through the Testing Center.', redirect: '/testing' },
+      { status: 410 },
     );
   }
 
-  try {
-    const body = await req.json();
-    const {
-      programSlug, programName, firstName, lastName, email, phone,
-      dateOfBirth, addressLine1, addressCity, addressState, addressZip,
-      fundingSource, goals, howHeard, preferredStartDate, educationLevel,
-      employmentStatus, emergencyContactName, emergencyContactRelationship,
-      emergencyContactPhone, consentAcknowledged,
-    } = body;
+  const fundingRaw = String(body.fundingSource ?? body.fundingType ?? '').trim().toLowerCase();
+  const fundingType = FUNDING_ALIASES[fundingRaw] ?? fundingRaw || null;
+  const mapped = {
+    firstName: body.firstName,
+    lastName: body.lastName,
+    email: body.email,
+    phone: body.phone,
+    dateOfBirth: body.dateOfBirth,
+    address: body.addressLine1 || body.address,
+    city: body.addressCity || body.city,
+    state: body.addressState || body.state,
+    zip: body.addressZip || body.zip,
+    program,
+    programSlug: program,
+    fundingSource: fundingType,
+    fundingType,
+    preferredStartDate: body.preferredStartDate,
+    highestEducation: body.educationLevel || body.highestEducation,
+    employmentStatus: body.employmentStatus,
+    goals: body.goals,
+    howDidYouHear: body.howHeard || body.howDidYouHear,
+    emergencyContactName: body.emergencyContactName,
+    emergencyContactRelationship: body.emergencyContactRelationship,
+    emergencyContactPhone: body.emergencyContactPhone,
+    source: 'legacy-enrollment-v2-adapter',
+  };
 
-    // Required field validation
-    const missing: string[] = [];
-    if (!programSlug) missing.push('program');
-    if (!firstName) missing.push('first name');
-    if (!lastName) missing.push('last name');
-    if (!email) missing.push('email');
-    if (!consentAcknowledged) missing.push('consent acknowledgment');
+  const headers = new Headers(req.headers);
+  headers.set('content-type', 'application/json');
+  headers.set('accept', 'application/json');
 
-    if (missing.length > 0) {
-      return NextResponse.json({ error: `Missing required fields: ${missing.join(', ')}` }, { status: 400 });
-    }
+  const canonicalRequest = new Request(new URL('/api/applications', req.url), {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(mapped),
+  });
 
-    // Normalize for duplicate check
-    const normalizedEmail = email.toLowerCase().trim();
-    const normalizedPhone = phone?.replace(/[^0-9]/g, '') || null;
+  const response = await submitCanonicalApplication(canonicalRequest);
+  const data = (await response.clone().json().catch(() => ({}))) as Record<string, unknown>;
+  if (!response.ok || !data.ok) return response;
 
-    // Duplicate check — look for active application with same email + program
-    const { data: existing } = await supabase
-      .from('applications')
-      .select('id, reference_number, application_status')
-      .eq('email', normalizedEmail)
-      .eq('program_slug', programSlug)
-      .in('application_status', ACTIVE_STATUSES)
-      .limit(1)
-      .maybeSingle();
-
-    if (existing) {
-      return NextResponse.json({
-        error: 'You already have an active application for this program.',
-        application_id: existing.id,
-        reference_number: existing.reference_number,
-        duplicate: true,
-      }, { status: 409 });
-    }
-
-    const refNumber = generateRefNumber();
-    const now = new Date().toISOString();
-    const interviewLink = `/paris/interview?application=${refNumber}`;
-
-    // Determine initial statuses based on funding source
-    const isFunded = fundingSource && fundingSource !== 'self_pay' && fundingSource !== 'self';
-    const initialStatus = 'submitted';
-    const initialParisStatus = 'pending';
-    const initialFundingStatus = isFunded ? 'screening' : 'not_applicable';
-
-    // Insert into canonical applications table
-    const { data: app, error: appError } = await supabase
-      .from('applications')
-      .insert({
-        reference_number: refNumber,
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        email: normalizedEmail,
-        phone: normalizedPhone,
-        date_of_birth: dateOfBirth || null,
-        address_line1: addressLine1 || null,
-        address_city: addressCity || null,
-        address_state: addressState || null,
-        address_zip: addressZip || null,
-        program_slug: programSlug,
-        program_name: programName || programSlug,
-        preferred_start_date: preferredStartDate || null,
-        education_level: educationLevel || null,
-        employment_status: employmentStatus || null,
-        funding_source: fundingSource || 'self_pay',
-        application_status: initialStatus,
-        paris_interview_status: initialParisStatus,
-        funding_status: initialFundingStatus,
-        document_status: 'not_started',
-        orientation_status: 'not_started',
-        enrollment_status: 'not_started',
-        goals: goals?.trim() || null,
-        emergency_contact_name: emergencyContactName?.trim() || null,
-        emergency_contact_relationship: emergencyContactRelationship?.trim() || null,
-        emergency_contact_phone: emergencyContactPhone?.replace(/[^0-9]/g, '') || null,
-        source: 'website_enrollment_v2',
-        utm_campaign: howHeard || null,
-        submitted_at: now,
-        ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || null,
-        user_agent: req.headers.get('user-agent') || null,
-      })
-      .select('id, reference_number')
-      .single();
-
-    if (appError) {
-      console.error('[enrollment-v2] Application insert error:', appError);
-      return NextResponse.json({ error: 'Failed to submit application. Please try again or call (317) 314-3757.' }, { status: 500 });
-    }
-
-    // Queue PARIS interview session creation
-    try {
-      await supabase.from('paris_interviews').insert({
-        application_id: app.id,
-        reference_number: refNumber,
-        status: 'pending',
-        created_at: now,
-      });
-    } catch (parisErr) {
-      console.error('[enrollment-v2] PARIS interview queue error:', parisErr);
-      // Non-critical — admin can create manually
-    }
-
-    // Queue applicant confirmation email
-    await sendConfirmationEmail(
-      normalizedEmail, firstName,
-      programName || programSlug, refNumber,
-      `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}${interviewLink}`
-    );
-
-    // Queue staff notification
-    await queueNotification(supabase, {
-      type: 'application_received',
-      recipient_email: 'admissions@elevateforhumanity.org',
-      applicant_name: `${firstName} ${lastName}`,
-      program_name: programName || programSlug,
-      reference_number: refNumber,
-      interview_link: interviewLink,
-    });
-
-    // Audit log
-    try {
-      await supabase.from('audit_log').insert({
-        entity_type: 'application',
-        entity_id: app.id,
-        action: 'created',
-        actor_type: 'applicant',
-        actor_id: normalizedEmail,
-        metadata: { source: 'enrollment_v2', funding_source: fundingSource, program_slug: programSlug },
-        created_at: now,
-      });
-    } catch { /* non-critical */ }
-
-    return NextResponse.json({
-      success: true,
-      applicationId: app.id,
-      referenceNumber: refNumber,
-      nextStep: interviewLink,
-      confirmationUrl: `/enrollment-v2/confirmation?confirmation=${refNumber}&program=${encodeURIComponent(programName || programSlug)}&firstName=${encodeURIComponent(firstName)}`,
-    });
-
-  } catch (err) {
-    console.error('[enrollment-v2] Unexpected error:', err);
-    return NextResponse.json({ error: 'Internal server error. Please call (317) 314-3757.' }, { status: 500 });
-  }
+  return legacySuccessResponse(data, program);
 }
 
-// GET — look up by reference number or email
+/**
+ * Compatibility GET for historical v2 status lookups.
+ * It delegates to /api/applications/track, then reshapes the response for old
+ * clients. No legacy status-column query remains here.
+ */
 export async function GET(req: NextRequest) {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    return NextResponse.json({ error: 'Application system temporarily unavailable.' }, { status: 503 });
+  const ref = req.nextUrl.searchParams.get('ref');
+  const email = req.nextUrl.searchParams.get('email');
+  if (!ref && !email) {
+    return NextResponse.json({ error: 'ref or email parameter required' }, { status: 400 });
   }
-  try {
-    const { searchParams } = new URL(req.url);
-    const ref = searchParams.get('ref');
-    const email = searchParams.get('email');
 
-    if (!ref && !email) {
-      return NextResponse.json({ error: 'ref or email parameter required' }, { status: 400 });
-    }
+  const trackUrl = new URL('/api/applications/track', req.url);
+  if (ref) trackUrl.searchParams.set('id', ref);
+  if (!ref && email) trackUrl.searchParams.set('email', email);
 
-    let query = supabase.from('applications').select(`
-      id, reference_number, first_name, last_name, email, phone,
-      program_slug, program_name, funding_source,
-      application_status, paris_interview_status, funding_status,
-      document_status, orientation_status, enrollment_status,
-      submitted_at, created_at, updated_at
-    `);
+  const tracked = await trackCanonicalApplication(new NextRequest(trackUrl, { headers: req.headers }));
+  const payload = (await tracked.clone().json().catch(() => ({}))) as Record<string, any>;
+  if (!tracked.ok) return tracked;
 
-    if (ref) query = query.eq('reference_number', ref.toUpperCase().trim());
-    else if (email) query = query.eq('email', email.toLowerCase().trim());
-
-    const { data, error } = await query.limit(1).maybeSingle();
-
-    if (error) {
-      console.error('[enrollment-v2] Lookup error:', error);
-      return NextResponse.json({ error: 'Could not load application.' }, { status: 500 });
-    }
-    if (!data) return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
-
-    return NextResponse.json({ data });
-  } catch (err) {
-    console.error('[enrollment-v2] GET error:', err);
-    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
-  }
+  const app = payload.application ?? payload;
+  return NextResponse.json({
+    data: {
+      id: app.id,
+      reference_number: app.reference_number,
+      first_name: app.first_name,
+      last_name: app.last_name,
+      email: app.email,
+      phone: app.phone,
+      program_slug: app.program_interest,
+      program_name: app.program_interest,
+      application_status: app.status,
+      submitted_at: app.submitted_at || app.created_at,
+      created_at: app.created_at,
+      updated_at: app.updated_at,
+    },
+    canonical: true,
+  });
 }

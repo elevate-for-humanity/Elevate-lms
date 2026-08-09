@@ -115,12 +115,12 @@ function collectSitemapHrefs(routeConstants) {
   return hrefs;
 }
 
-function collectVisualFindings(navItems) {
+function collectVisualFindings(items) {
   const heroMissing = [];
   const textHeavy = [];
   const checked = new Set();
 
-  for (const item of navItems) {
+  for (const item of items) {
     if (item.auth || !item.href.startsWith('/')) continue;
     const file = routePageFile(item.href);
     if (!file || checked.has(file)) continue;
@@ -128,13 +128,13 @@ function collectVisualFindings(navItems) {
     const source = read(file);
     if (/\bredirect\s*\(/.test(source)) continue;
 
-    const firstChunk = source.slice(0, 7000);
-    const hasHero = /HeroVideo|HomeHeroVideo|HeroPicture|QualityHero|ProgramPageLayout|ProgramCategoryPage|heroBanners|<section[^>]+(?:h-\[|min-h-\[|hero)/is.test(firstChunk)
+    const firstChunk = source.slice(0, 9000);
+    const hasHero = /HeroVideo|HomeHeroVideo|HeroPicture|QualityHero|PictureFirstPageHero|ProgramPageLayout|ProgramCategoryPage|heroBanners|<section[^>]+(?:h-\[|min-h-\[|hero)/is.test(firstChunk)
       || /<Image\b|<img\b|<video\b/.test(firstChunk);
     if (!hasHero) heroMissing.push({ label: item.label, href: item.href, file });
 
     const textBlocks = (source.match(/<(?:p|li|h[1-6])\b/g) ?? []).length;
-    const mediaBlocks = (source.match(/<Image\b|<img\b|<video\b|HeroVideo|HeroPicture/g) ?? []).length;
+    const mediaBlocks = (source.match(/<Image\b|<img\b|<video\b|HeroVideo|HeroPicture|PictureFirstPageHero/g) ?? []).length;
     if (textBlocks >= 18 && mediaBlocks <= 1) {
       textHeavy.push({ label: item.label, href: item.href, file, textBlocks, mediaBlocks });
     }
@@ -148,9 +148,9 @@ function collectContrastRisks() {
   const findings = [];
   const classPattern = /className=["'`]([^"'`]+)["'`]/g;
   const lightBg = /\bbg-(?:white|slate-50|slate-100|gray-50|gray-100)\b/;
-  const weakOnLight = /\btext-(?:slate|gray|zinc|neutral|stone)-400\b/;
-  const darkBg = /\bbg-(?:black|slate-900|slate-950|gray-900|gray-950)\b/;
-  const weakOnDark = /\btext-(?:black|slate-700|slate-800|gray-700|gray-800)\b/;
+  const weakOnLight = /\btext-(?:slate|gray|zinc|neutral|stone)-(?:400|500)\b/;
+  const darkBg = /\bbg-(?:black|slate-800|slate-900|slate-950|gray-900|gray-950|brand-blue-700|brand-blue-800|brand-blue-900)\b/;
+  const weakOnDark = /\btext-(?:black|slate|gray|zinc|neutral|stone)-(?:500|600|700|800|900|950)\b/;
 
   for (const file of files) {
     const source = read(file);
@@ -158,8 +158,18 @@ function collectContrastRisks() {
       const classes = match[1];
       if ((lightBg.test(classes) && weakOnLight.test(classes)) || (darkBg.test(classes) && weakOnDark.test(classes))) {
         const line = source.slice(0, match.index).split('\n').length;
-        findings.push({ file, line, classes });
+        findings.push({ file, line, classes, type: 'same-element' });
       }
+    }
+
+    // Heuristic for the common pattern the user reported: a dark brand panel
+    // with explicit dark copy on immediate child content. Report only; do not
+    // auto-fix because nested white cards can legitimately contain dark text.
+    const darkPanelRe = /<(?:section|div)[^>]*className=["'`][^"'`]*(?:bg-slate-(?:800|900|950)|bg-brand-blue-(?:700|800|900)|bg-black)[^"'`]*["'`][^>]*>([\s\S]{0,4500}?)(?:<\/(?:section|div)>)/g;
+    for (const panel of source.matchAll(darkPanelRe)) {
+      if (!/text-(?:slate|gray)-(?:500|600|700|800|900)/.test(panel[1])) continue;
+      const line = source.slice(0, panel.index).split('\n').length;
+      findings.push({ file, line, classes: 'dark panel contains explicit dark descendant text', type: 'panel-context' });
     }
   }
   return findings;
@@ -173,7 +183,12 @@ const publicNavItems = navItems.filter((item) => !item.auth && item.href.startsW
 const missingRoutes = publicNavItems.filter((item) => !routeExists(item.href));
 const sitemapHrefs = collectSitemapHrefs(routeConstants);
 const sitemapMissing = publicNavItems.filter((item) => !sitemapHrefs.has(item.href));
-const { heroMissing, textHeavy } = collectVisualFindings(publicNavItems);
+const sitemapBroken = [...sitemapHrefs].filter((href) => !routeExists(href));
+const visualTargets = [
+  ...publicNavItems,
+  ...[...sitemapHrefs].map((href) => ({ label: 'Sitemap route', href, auth: false })),
+];
+const { heroMissing, textHeavy } = collectVisualFindings(visualTargets);
 const contrastRisks = collectContrastRisks();
 
 console.log('# Public Site Canonical Navigation + Visual Audit');
@@ -182,11 +197,13 @@ console.log(`- Marketing app root: ${MARKETING_APP}`);
 console.log(`- Image references checked: ${imageRefs.length}`);
 console.log(`- Missing image files: ${missingImages.length}`);
 console.log(`- Public header destinations checked: ${publicNavItems.length}`);
-console.log(`- Missing public routes: ${missingRoutes.length}`);
+console.log(`- Sitemap routes checked: ${sitemapHrefs.size}`);
+console.log(`- Missing public header routes: ${missingRoutes.length}`);
 console.log(`- Header destinations missing from sitemap: ${sitemapMissing.length}`);
-console.log(`- Header-linked pages without detected hero/media treatment: ${heroMissing.length}`);
-console.log(`- Header-linked text-heavy pages with little media: ${textHeavy.length}`);
-console.log(`- Same-element contrast risks: ${contrastRisks.length}`);
+console.log(`- Sitemap entries without a public page: ${sitemapBroken.length}`);
+console.log(`- Public sitemap/header pages without detected hero/media treatment: ${heroMissing.length}`);
+console.log(`- Public sitemap/header text-heavy pages with little media: ${textHeavy.length}`);
+console.log(`- Contrast risks: ${contrastRisks.length}`);
 console.log();
 
 if (missingImages.length) {
@@ -207,14 +224,20 @@ if (sitemapMissing.length) {
   console.log();
 }
 
+if (sitemapBroken.length) {
+  console.log('## Broken Sitemap Entries');
+  for (const href of sitemapBroken) console.log(`- ${href}`);
+  console.log();
+}
+
 if (heroMissing.length) {
-  console.log('## Header-Linked Pages Without Detected Hero / Lead Media');
+  console.log('## Public Pages Without Detected Hero / Lead Media');
   for (const item of heroMissing) console.log(`- ${item.href} (${item.file})`);
   console.log();
 }
 
 if (textHeavy.length) {
-  console.log('## Text-Heavy Pages With Limited Media');
+  console.log('## Text-Heavy Public Pages With Limited Media');
   for (const item of textHeavy) {
     console.log(`- ${item.href} (${item.textBlocks} text blocks / ${item.mediaBlocks} media blocks) — ${item.file}`);
   }
@@ -223,10 +246,10 @@ if (textHeavy.length) {
 
 if (contrastRisks.length) {
   console.log('## Contrast Risks');
-  for (const item of contrastRisks) console.log(`- ${item.file}:${item.line} — ${item.classes}`);
+  for (const item of contrastRisks) console.log(`- ${item.file}:${item.line} [${item.type}] — ${item.classes}`);
   console.log();
 }
 
-if (!missingImages.length && !missingRoutes.length && !sitemapMissing.length && !heroMissing.length && !textHeavy.length && !contrastRisks.length) {
-  console.log('No public media, navigation, sitemap, hero, text-density, or obvious same-element contrast issues detected.');
+if (!missingImages.length && !missingRoutes.length && !sitemapMissing.length && !sitemapBroken.length && !heroMissing.length && !textHeavy.length && !contrastRisks.length) {
+  console.log('No public media, navigation, sitemap, hero, text-density, or obvious contrast issues detected.');
 }

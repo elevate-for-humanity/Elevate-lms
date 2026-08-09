@@ -3,10 +3,18 @@
     "publicMarketing": {
       "home": "/",
       "programs": "/programs",
+      "apply": "/apply/student",
+      "apprenticeships": "/apprenticeships",
       "funding": "/funding",
       "disclosures": "/disclosures",
       "partners": "/partners",
-      "contact": "/contact"
+      "hostSites": "/partners/host-shops",
+      "employers": "/employer",
+      "testing": "/testing",
+      "about": "/about",
+      "approvals": "/approvals",
+      "contact": "/contact",
+      "store": "/store"
     },
     "programs": {
       "certifiedNursingAssistant": "/programs/cna",
@@ -26,12 +34,12 @@
       "softwareDevelopment": "/programs/technology",
       "graphicDesign": "/programs/technology",
       "cadDrafting": "/programs/technology",
-      "bookkeeping": "/programs/business",
-      "taxPreparation": "/programs/business",
-      "officeAdministration": "/programs/business",
-      "businessAdministration": "/programs/business",
-      "entrepreneurship": "/programs/business",
-      "projectManagement": "/programs/business",
+      "bookkeeping": "/programs",
+      "taxPreparation": "/programs",
+      "officeAdministration": "/programs",
+      "businessAdministration": "/programs",
+      "entrepreneurship": "/programs",
+      "projectManagement": "/programs",
       "barberApprenticeship": "/programs/barber-apprenticeship",
       "cosmetologyApprenticeship": "/programs/cosmetology-apprenticeship",
       "nailTechnicianApprenticeship": "/programs/nail-technician-apprenticeship",
@@ -45,19 +53,19 @@
       "communityHealthWorker": "/programs/healthcare",
       "sanitationInfectionControl": "/programs/healthcare",
       "technology": "/programs/technology",
-      "cdlTraining": "/programs/cdl-training",
       "esthetician": "/programs/esthetician-apprenticeship"
     },
     "complianceFunding": {
       "funding": "/funding",
       "disclosures": "/disclosures",
-      "privacyPolicy": "/privacy-policy",
-      "termsOfService": "/terms-of-service"
+      "privacyPolicy": "/privacy",
+      "termsOfService": "/legal"
     },
     "partners": {
       "index": "/partners",
-      "employers": "/employers",
-      "partnerWithUs": "/for-providers"
+      "employers": "/employer",
+      "hostSites": "/partners/host-shops",
+      "workforceAgencies": "/for-agencies"
     }
   }
 }

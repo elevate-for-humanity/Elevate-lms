@@ -2,7 +2,12 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
-const roots = ['app', 'apps/admin/app'].filter((root) => {
+const roots = [
+  'app',
+  'apps/marketing/app',
+  'apps/lms/app',
+  'apps/admin/app',
+].filter((root) => {
   try { return statSync(root).isDirectory(); } catch { return false; }
 });
 
@@ -51,8 +56,8 @@ for (const root of roots) {
 }
 
 if (duplicateCount > 0) {
-  console.error(`Found ${duplicateCount} duplicate App Router route(s).`);
+  console.error(`Found ${duplicateCount} duplicate App Router route(s) across ${roots.length} app root(s).`);
   process.exit(1);
 }
 
-console.log('No duplicate App Router page/route files found.');
+console.log(`No duplicate App Router page/route files found across ${roots.length} app root(s).`);

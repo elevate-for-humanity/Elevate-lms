@@ -90,13 +90,24 @@ export const PORTAL_MAP: Record<string, PortalRoute> = {
     defaultPath: '/host-shop/dashboard',
     redirectPattern: '/host-shop/:path*',
   },
+
+  // Compatibility aliases. They may match historical URLs, but every default
+  // entry resolves to the canonical Host Site dashboard.
   cosmetology: {
     type: 'cosmetology',
     subdomain: 'app',
     basePath: '/cosmetology-host-shop',
     host: LMS_HOST,
-    defaultPath: '/cosmetology-host-shop/dashboard',
+    defaultPath: '/host-shop/dashboard',
     redirectPattern: '/cosmetology-host-shop/:path*',
+  },
+  partner: {
+    type: 'partner',
+    subdomain: 'app',
+    basePath: '/partner',
+    host: LMS_HOST,
+    defaultPath: '/host-shop/dashboard',
+    redirectPattern: '/partner/:path*',
   },
 
   // Standalone Admin app: there is no /admin path prefix on the admin hostname.
@@ -149,14 +160,6 @@ export const PORTAL_MAP: Record<string, PortalRoute> = {
     defaultPath: '/provider/dashboard',
     redirectPattern: '/provider/:path*',
   },
-  partner: {
-    type: 'partner',
-    subdomain: 'app',
-    basePath: '/partner',
-    host: LMS_HOST,
-    defaultPath: '/partner/dashboard',
-    redirectPattern: '/partner/:path*',
-  },
   programholder: {
     type: 'programholder',
     subdomain: 'marketing',
@@ -170,7 +173,8 @@ export const PORTAL_MAP: Record<string, PortalRoute> = {
 export function getPortalRedirect(key: string, path = ''): string {
   const portal = PORTAL_MAP[key];
   if (!portal) return MARKETING_HOST;
-  const suffix = path ? `/${path.replace(/^\//, '')}` : '';
+  if (!path) return `${portal.host}${portal.defaultPath}`;
+  const suffix = `/${path.replace(/^\//, '')}`;
   return `${portal.host}${portal.basePath}${suffix}`;
 }
 

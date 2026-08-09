@@ -59,7 +59,6 @@ export function SiteFooter() {
             <li><Link href={ROUTES.programsCosmetology} className={linkClass}>Cosmetology</Link></li>
             <li><Link href={ROUTES.programsEsthetician} className={linkClass}>Esthetics</Link></li>
             <li><Link href={ROUTES.programsNailTech} className={linkClass}>Nail Technician</Link></li>
-            <li><Link href={ROUTES.apprenticeshipsHostShop} className={linkClass}>Host Shops</Link></li>
           </FooterGroup>
 
           <FooterGroup title="Funding">
@@ -78,7 +77,7 @@ export function SiteFooter() {
               <a href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`} className="flex items-start gap-2 hover:text-slate-950 hover:underline"><Mail className="mt-1 h-4 w-4 shrink-0" /><span className="break-all">{PLATFORM_DEFAULTS.supportEmail}</span></a>
               <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`} className="flex items-center gap-2 hover:text-slate-950 hover:underline"><Phone className="h-4 w-4" /><span>{PLATFORM_DEFAULTS.supportPhone}</span></a>
               <div className="flex items-start gap-2"><MapPin className="mt-1 h-4 w-4 shrink-0" /><span>{siteConfig.address}</span></div>
-              <Link href={ROUTES.contact} className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-600 px-4 py-2 font-bold text-white hover:bg-brand-red-700">Contact Us</Link>
+              <Link href={ROUTES.contact} className="inline-flex min-h-11 items-center rounded-lg bg-brand-red-700 px-4 py-2 font-bold text-white hover:bg-brand-red-800">Contact Us</Link>
             </div>
           </div>
         </div>
@@ -87,6 +86,7 @@ export function SiteFooter() {
           <FooterGroup title="About">
             <li><Link href={ROUTES.about} className={linkClass}>About / Mission</Link></li>
             <li><Link href={ROUTES.aboutApprovals} className={linkClass}>Approvals</Link></li>
+            <li><Link href={ROUTES.apprenticeshipSponsor} className={linkClass}>Apprenticeship Sponsor of Record</Link></li>
             <li><Link href={ROUTES.successStories} className={linkClass}>Success Stories</Link></li>
             <li><Link href={ROUTES.blog} className={linkClass}>Blog</Link></li>
             <li><Link href={ROUTES.faq} className={linkClass}>FAQ</Link></li>
@@ -94,8 +94,7 @@ export function SiteFooter() {
 
           <FooterGroup title="Employers">
             <li><Link href={ROUTES.employersHireGraduates} className={linkClass}>Hire Graduates</Link></li>
-            <li><Link href={ROUTES.apprenticeshipsHostShop} className={linkClass}>Become a Host Shop</Link></li>
-            <li><Link href={ROUTES.apprenticeshipSponsor} className={linkClass}>Sponsor an Apprentice</Link></li>
+            <li><Link href={ROUTES.apprenticeshipsHostShop} className={linkClass}>Become a Host Site</Link></li>
             <li><a href={ROUTES.employerPortal} className={linkClass}>Employer Portal</a></li>
             <li><Link href={ROUTES.forAgencies} className={linkClass}>For Agencies</Link></li>
           </FooterGroup>
@@ -103,9 +102,8 @@ export function SiteFooter() {
           <FooterGroup title="Portals & Store">
             <li><a href={portalHref('lms')} className={linkClass}>Student / LMS Portal</a></li>
             <li><a href={portalHref('apprentice')} className={linkClass}>Apprentice Portal</a></li>
-            <li><a href={portalHref('hostshop')} className={linkClass}>Host Shop Portal</a></li>
+            <li><a href={portalHref('hostshop')} className={linkClass}>Host Site Portal</a></li>
             <li><a href={portalHref('workforce')} className={linkClass}>Workforce Portal</a></li>
-            <li><a href={portalHref('partner')} className={linkClass}>Partner Portal</a></li>
             <li><Link href={ROUTES.store} className="text-base font-bold text-brand-red-700 hover:underline">Store</Link></li>
           </FooterGroup>
 

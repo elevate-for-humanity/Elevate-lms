@@ -1,1 +1,10 @@
-export { default, metadata } from '../../partners/barber-host-shop/page';
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
+export default function LegacyApprenticeshipHostShopPage() {
+  redirect('/partners/host-shops');
+}

@@ -65,7 +65,9 @@ const nextConfig = {
       { source: '/apprentice/:path*', destination: 'https://app.elevateforhumanity.org/apprentice/:path*', permanent: true },
       { source: '/parent-portal/:path*', destination: 'https://app.elevateforhumanity.org/parent-portal/:path*', permanent: true },
       { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: true },
-      { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/cosmetology-host-shop/:path*', permanent: true },
+      { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: true },
+      { source: '/partner/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: true },
+      { source: '/host-shop', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: true },
       { source: '/host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/:path*', permanent: true },
     ];
   },

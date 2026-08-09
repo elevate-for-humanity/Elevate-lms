@@ -2,13 +2,10 @@
  * lib/programs/host-shops.ts
  *
  * Single source of truth for fetching and normalising approved host shops
- * from both barbershop_partner_applications (barber) and
- * host_shop_applications (cosmetology / multi-program).
+ * from both barbershop_partner_applications and host_shop_applications.
  *
- * Used by:
- *   - app/api/programs/host-shops/route.ts  (public API)
- *   - app/programs/barber-apprenticeship/host-shops/page.tsx  (SSR page)
- *   - components/programs/HostShopSelect.tsx  (client dropdown via API)
+ * Public pages, APIs, and selectors should consume this helper instead of
+ * rebuilding host-site lists independently.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -31,14 +28,34 @@ export type HostShop = {
 export const PROGRAM_SLUGS = {
   barber: 'barber-apprenticeship',
   cosmetology: 'cosmetology-apprenticeship',
+  esthetician: 'esthetician-apprenticeship',
+  nail: 'nail-technician-apprenticeship',
 } as const;
 
 export type ProgramKey = keyof typeof PROGRAM_SLUGS;
 
-export const PROGRAM_LABELS: Record<ProgramKey, string> = {
-  barber: 'Barber Apprenticeship',
-  cosmetology: 'Cosmetology Apprenticeship',
+export const PROGRAM_LABELS: Record<string, string> = {
+  [PROGRAM_SLUGS.barber]: 'Barber Apprenticeship',
+  [PROGRAM_SLUGS.cosmetology]: 'Cosmetology Apprenticeship',
+  [PROGRAM_SLUGS.esthetician]: 'Esthetician Apprenticeship',
+  [PROGRAM_SLUGS.nail]: 'Nail Technician Apprenticeship',
 };
+
+const PROGRAM_ALIASES: Record<string, string> = {
+  barber: PROGRAM_SLUGS.barber,
+  cosmetology: PROGRAM_SLUGS.cosmetology,
+  esthetician: PROGRAM_SLUGS.esthetician,
+  esthetics: PROGRAM_SLUGS.esthetician,
+  nail: PROGRAM_SLUGS.nail,
+  nails: PROGRAM_SLUGS.nail,
+  'nail-technician': PROGRAM_SLUGS.nail,
+  ...Object.fromEntries(Object.values(PROGRAM_SLUGS).map((slug) => [slug, slug])),
+};
+
+function normalizeProgram(value: unknown): string | null {
+  const key = String(value ?? '').trim().toLowerCase();
+  return PROGRAM_ALIASES[key] ?? null;
+}
 
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
   const parts = raw.split(',').map((p) => p.trim());
@@ -96,6 +113,11 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
 
   const hostShops: HostShop[] = (hostRows ?? []).map((s) => {
     const parsed = parseAddress(s.address ?? '');
+    const rawPrograms = Array.isArray(s.intake?.programs) ? s.intake.programs : [];
+    const programs = rawPrograms
+      .map(normalizeProgram)
+      .filter((value): value is string => Boolean(value));
+
     return {
       id: s.id,
       name: s.shop_name,
@@ -103,7 +125,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       phone: s.phone ?? '',
       email: s.email ?? '',
       supervisor: '',
-      programs: (s.intake?.programs as string[]) ?? [PROGRAM_SLUGS.cosmetology],
+      programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.cosmetology],
       badge: 'partner',
     };
   });

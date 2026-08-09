@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://app.elevateforhumanity.org'),
   manifest: '/manifest-lms.json',
   applicationName: 'Elevate LMS',
+  robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     title: 'Elevate LMS',

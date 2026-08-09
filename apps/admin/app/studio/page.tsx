@@ -1,3 +1,4 @@
+// Admin-owned Dev Studio entry point. Keep this file in the Admin build so shared Dev Studio fixes trigger an Admin redeploy.
 import Link from 'next/link';
 import { ArrowLeft, Bot } from 'lucide-react';
 

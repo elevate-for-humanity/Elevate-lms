@@ -33,7 +33,7 @@ export default async function ApprenticePortalPage() {
     supabase.from('profiles').select('full_name, first_name, last_name').eq('id', user.id).maybeSingle(),
     supabase
       .from('program_enrollments')
-      .select('id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, progress_percent, course_id')
+      .select('id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, progress_percent, course_id, programs(min_ojl_hours)')
       .eq('user_id', user.id)
       .eq('program_slug', programSlug)
       .order('created_at', { ascending: false })
@@ -59,8 +59,10 @@ export default async function ApprenticePortalPage() {
     .filter((row) => String(row.status).toLowerCase() === 'approved')
     .reduce((sum, row) => sum + Number(row.accepted_hours ?? row.hours_claimed ?? 0), 0);
   const pendingEntries = hours.filter((row) => String(row.status).toLowerCase() === 'pending').length;
-  const requiredHours = 2000;
-  const progressPercent = Math.min(100, Math.max(0, Number(enrollment?.progress_percent ?? Math.round((approvedHours / requiredHours) * 100))));
+  const configuredOjlHours = Number((enrollment?.programs as { min_ojl_hours?: number | null } | null)?.min_ojl_hours ?? 0);
+  const requiredHours = configuredOjlHours > 0 ? configuredOjlHours : null;
+  const calculatedProgress = requiredHours ? Math.round((approvedHours / requiredHours) * 100) : 0;
+  const progressPercent = Math.min(100, Math.max(0, Number(enrollment?.progress_percent ?? calculatedProgress)));
 
   let shopName: string | null = null;
   const shopId = apprentice?.shop_id || apprentice?.employer_id;
@@ -107,7 +109,7 @@ export default async function ApprenticePortalPage() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Apprentice progress">
-        <Metric label="Approved hours" value={`${approvedHours.toLocaleString()} / ${requiredHours.toLocaleString()}`} detail={`${progressPercent}% overall progress`} icon={Clock3} />
+        <Metric label="Approved hours" value={requiredHours ? `${approvedHours.toLocaleString()} / ${requiredHours.toLocaleString()}` : approvedHours.toLocaleString()} detail={`${progressPercent}% overall progress`} icon={Clock3} />
         <Metric label="Pending hour entries" value={String(pendingEntries)} detail="Awaiting supervisor/admin review" icon={CheckCircle2} />
         <Metric label="Verified documents" value={`${verifiedDocs} / ${totalDocs}`} detail={totalDocs ? 'Based on your uploaded records' : 'No documents recorded yet'} icon={FileText} />
         <Metric label="Certificates earned" value={String(certsRes.count ?? 0)} detail="Program completion credentials on record" icon={Award} />

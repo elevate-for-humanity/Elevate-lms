@@ -1,0 +1,133 @@
+name: One-time Surface Ownership Cleanup
+
+on:
+  push:
+    branches:
+      - fix/remaining-duplicate-surfaces-20260809
+    paths:
+      - .github/workflows/one-time-surface-ownership-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout sweep branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/remaining-duplicate-surfaces-20260809
+          fetch-depth: 1
+
+      - name: Consolidate proven cross-service duplicate surfaces
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          function write(file, content) {
+            fs.writeFileSync(file, content.endsWith('\n') ? content : content + '\n');
+            console.log(`updated ${file}`);
+          }
+
+          // Public AI product pages belong to Marketing. LMS keeps only the
+          // operational learner AI tutor surface.
+          write('apps/lms/app/ai/instructor/page.tsx', `import type { Metadata } from 'next';
+          import { permanentRedirect } from 'next/navigation';
+
+          export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+          export default function LegacyLmsAIInstructor() {
+            permanentRedirect('https://www.elevateforhumanity.org/ai/instructor');
+          }
+          `.replace(/^          /gm, ''));
+
+          write('apps/lms/app/ai/paris/page.tsx', `import type { Metadata } from 'next';
+          import { permanentRedirect } from 'next/navigation';
+
+          export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+          export default function LegacyLmsParisAI() {
+            permanentRedirect('https://www.elevateforhumanity.org/ai/paris');
+          }
+          `.replace(/^          /gm, ''));
+
+          const instructorPath = 'apps/marketing/app/ai/instructor/page.tsx';
+          let instructor = fs.readFileSync(instructorPath, 'utf8');
+          instructor = instructor.replaceAll('href="/student/ai-tutor"', 'href="https://app.elevateforhumanity.org/ai-tutor"');
+          write(instructorPath, instructor);
+
+          // /case-manager/candidates was an exact Employer Portal copy, including
+          // employer-only authorization and employer dashboard links. Keep the old
+          // URL as a compatibility handoff to the actual LMS-owned employer page.
+          write('apps/marketing/app/case-manager/candidates/page.tsx', `import type { Metadata } from 'next';
+          import { permanentRedirect } from 'next/navigation';
+
+          export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+          export default function LegacyCaseManagerCandidates() {
+            permanentRedirect('https://app.elevateforhumanity.org/employer/candidates');
+          }
+          `.replace(/^          /gm, ''));
+
+          const candidatesPath = 'apps/lms/app/employer/candidates/page.tsx';
+          let candidates = fs.readFileSync(candidatesPath, 'utf8');
+          candidates = candidates.replace(
+            "  const { user } = await requireRole(['employer', 'admin']);\n  const supabase = await createClient();",
+            "  const { user } = await requireRole(['employer', 'admin']);\n  const supabase = await createClient();\n\n  const { data: employerProfile } = await supabase\n    .from('profiles')\n    .select('verified')\n    .eq('id', user.id)\n    .maybeSingle();\n  const canContact = Boolean(employerProfile?.verified);",
+          );
+          candidates = candidates.replaceAll('profile.verified', 'canContact');
+          if (!candidates.includes('const canContact = Boolean(employerProfile?.verified);')) {
+            throw new Error('Employer candidates profile guard patch did not apply');
+          }
+          write(candidatesPath, candidates);
+
+          // Admin blog management contained exact copies of public author/category
+          // pages with public canonicals. Redirect those management aliases to the
+          // Marketing-owned public surfaces instead of maintaining duplicate UIs.
+          write('apps/admin/app/blog/management/author/[author]/page.tsx', `import type { Metadata } from 'next';
+          import { permanentRedirect } from 'next/navigation';
+
+          export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+          export default async function LegacyAdminBlogAuthor({ params }: { params: Promise<{ author: string }> }) {
+            const { author } = await params;
+            permanentRedirect(\`https://www.elevateforhumanity.org/blog/author/\${encodeURIComponent(author)}\`);
+          }
+          `.replace(/^          /gm, ''));
+
+          write('apps/admin/app/blog/management/category/[category]/page.tsx', `import type { Metadata } from 'next';
+          import { permanentRedirect } from 'next/navigation';
+
+          export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+          export default async function LegacyAdminBlogCategory({ params }: { params: Promise<{ category: string }> }) {
+            const { category } = await params;
+            permanentRedirect(\`https://www.elevateforhumanity.org/blog/category/\${encodeURIComponent(category)}\`);
+          }
+          `.replace(/^          /gm, ''));
+
+          write('apps/admin/app/blog/management/rss.xml/route.ts', `import { NextResponse } from 'next/server';
+
+          export function GET() {
+            return NextResponse.redirect('https://www.elevateforhumanity.org/blog/rss.xml', 308);
+          }
+          `.replace(/^          /gm, ''));
+          NODE
+
+      - name: Commit ownership cleanup and remove one-time workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/one-time-surface-ownership-cleanup.yml
+          git config user.name 'elevateforhumanity'
+          git config user.email '221907459+elevateforhumanity@users.noreply.github.com'
+          git add apps/marketing/app apps/lms/app apps/admin/app .github/workflows/one-time-surface-ownership-cleanup.yml
+          if git diff --cached --quiet; then
+            echo 'No ownership changes needed.'
+            exit 0
+          fi
+          git commit -m 'fix(routes): consolidate proven cross-service surface duplicates'
+          git push origin HEAD:fix/remaining-duplicate-surfaces-20260809

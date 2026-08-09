@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
   }
 
   const fundingRaw = String(body.fundingSource ?? body.fundingType ?? '').trim().toLowerCase();
-  const fundingType = FUNDING_ALIASES[fundingRaw] ?? fundingRaw || null;
+  const fundingType = (FUNDING_ALIASES[fundingRaw] ?? fundingRaw) || null;
   const mapped = {
     firstName: body.firstName,
     lastName: body.lastName,

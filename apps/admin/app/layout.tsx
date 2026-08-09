@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     "Manage Elevate for Humanity programs, courses, students, website content, and operations.",
   manifest: "/manifest-admin.json",
   applicationName: "Elevate Admin",
+  robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     title: "Elevate Admin",
@@ -64,8 +65,7 @@ export default async function AdminGroupLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Dev Studio provides its own shell - exclude admin layout components
-  // Dev Studio routes start with /admin/admin/studio
+  // Dev Studio provides its own shell - exclude admin layout components.
   const headersList = await import('next/headers');
   const headers = headersList.headers();
   const pathname = headers.get('x-pathname') || '';
@@ -82,10 +82,8 @@ export default async function AdminGroupLayout({
         <AdminUpdateNotice />
         <I18nProvider>
           {isDevStudio ? (
-            // Dev Studio - standalone layout with dark background
             <>{children}</>
           ) : (
-            // Standard admin pages - include header/footer
             <div className="min-h-screen flex flex-col bg-slate-50">
               <BuildVersionSync />
               <AdminHeader />

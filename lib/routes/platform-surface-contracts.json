@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "updated": "2026-08-09",
+  "surfaces": {
+    "studentApplication": {
+      "function": "Complete public student training application",
+      "canonical": { "app": "marketing", "path": "/apply/student" },
+      "compatibility": [
+        { "app": "marketing", "path": "/apply", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2/apply", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2/documents", "target": "/apply/student" },
+        { "app": "marketing", "path": "/enrollment-v2/funding", "target": "/funding" },
+        { "app": "marketing", "path": "/enrollment-v2/program", "target": "/programs" }
+      ],
+      "api": {
+        "canonical": { "app": "marketing", "path": "/api/applications" },
+        "compatibility": [
+          { "app": "marketing", "path": "/api/enrollment-v2/apply", "mode": "adapter" }
+        ]
+      }
+    },
+    "hostSites": {
+      "function": "Apprenticeship Host Site information, approval, application, directory, and portal access",
+      "canonical": { "app": "marketing", "path": "/partners/host-shops" },
+      "application": { "app": "marketing", "path": "/partners/host-shop/apply" },
+      "portal": { "app": "lms", "path": "/host-shop/dashboard" },
+      "compatibility": [
+        { "app": "marketing", "path": "/partners/barber-host-shop", "target": "/partners/host-shops" },
+        { "app": "marketing", "path": "/apprenticeships/host-shop", "target": "/partners/host-shops" },
+        { "app": "marketing", "path": "/programs/barber-apprenticeship/host-shops", "target": "/partners/host-shops" },
+        { "app": "marketing", "path": "/partners/barber-host-shop/apply", "target": "/partners/host-shop/apply" },
+        { "app": "lms", "path": "/cosmetology-host-shop/dashboard", "target": "/host-shop/dashboard" }
+      ],
+      "informational": [
+        { "app": "marketing", "path": "/apprenticeship-sponsor", "purpose": "Sponsor-of-record governance and compliance; not a second employer application" }
+      ]
+    },
+    "courseBuilder": {
+      "function": "Create and manage course content",
+      "canonical": { "app": "admin", "path": "/course-builder" },
+      "informational": [
+        { "app": "marketing", "path": "/store/course-builder", "purpose": "Public Store description that launches the Admin builder" }
+      ]
+    },
+    "websiteBuilder": {
+      "function": "Create, edit, preview, and publish customer websites",
+      "canonical": { "app": "marketing", "path": "/apps/website-builder" },
+      "informational": [
+        { "app": "marketing", "path": "/store/apps/website-builder", "purpose": "Public Store product and plan page" }
+      ]
+    },
+    "devStudio": {
+      "function": "Platform development and operations workspace",
+      "canonical": { "app": "admin", "path": "/studio" },
+      "informational": [
+        { "app": "marketing", "path": "/store/dev-studio", "purpose": "Public Store description that launches Admin Studio" }
+      ]
+    },
+    "authentication": {
+      "function": "User sign-in",
+      "canonical": { "app": "lms", "path": "/login" },
+      "compatibility": [
+        { "app": "marketing", "path": "/login", "target": "https://app.elevateforhumanity.org/login" }
+      ],
+      "informational": [
+        { "app": "admin", "path": "/login", "purpose": "Separate staff/admin authentication surface" }
+      ]
+    },
+    "testing": {
+      "function": "Testing and credential exam workflows",
+      "canonical": { "app": "marketing", "path": "/testing" },
+      "operational": [
+        { "app": "admin", "path": "/testing-center", "purpose": "Authenticated booking/session/slot operations" }
+      ],
+      "informational": [
+        { "app": "marketing", "path": "/store/testing", "purpose": "Store/catalog testing products and services" }
+      ]
+    }
+  }
+}

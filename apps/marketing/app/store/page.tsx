@@ -8,6 +8,8 @@ import heroBanners from '@/content/heroBanners';
 import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { UnifiedSalesMarketplace } from '@/components/store/UnifiedSalesMarketplace';
+import { GuidedProductInterview } from '@/components/store/GuidedProductInterview';
+import { HomeBusinessLaunch } from '@/components/home/HomeBusinessLaunch';
 
 export const metadata: Metadata = {
   title: 'Elevate Store | AI Business, Workforce & Education Platform',
@@ -71,7 +73,7 @@ export default function StorePage() {
         belowHeroSubheadline="Website, CRM, AI assistants, education, workforce, testing and operations in one platform."
         ctas={[
           { label: 'Start 14-Day Free Trial', href: '/store/trial' },
-          { label: 'Explore Everything', href: '#marketplace', variant: 'secondary' },
+          { label: 'Tell AI What I Need', href: '#guided-setup', variant: 'secondary' },
           { label: 'Try Interactive Demo', href: '/store/demo/admin', variant: 'secondary' },
         ]}
         trustIndicators={hero.trustIndicators}
@@ -102,7 +104,9 @@ export default function StorePage() {
         </div>
       </section>
 
+      <GuidedProductInterview />
       <UnifiedSalesMarketplace />
+      <HomeBusinessLaunch />
 
       <section className="py-16">
         <div className="mx-auto max-w-6xl px-5">

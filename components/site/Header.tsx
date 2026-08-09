@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
-import HeaderDesktopMenu from './HeaderDesktopMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
@@ -17,7 +16,7 @@ export default function Header() {
       role="banner"
       data-site-header
     >
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 lg:gap-3 lg:px-4 xl:gap-3 xl:px-4 2xl:px-6">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 lg:gap-2 lg:px-3 xl:gap-3 xl:px-4 2xl:px-6">
         <Link
           href="/"
           className="flex min-w-0 flex-shrink-0 items-center gap-2"
@@ -29,50 +28,30 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Full desktop is one horizontal row only. Do not render a second
-            desktop Menu control beside this navigation; that consumed the
-            remaining width and caused the nav to collide with page controls. */}
-        <div className="hidden min-w-0 justify-center overflow-visible xl:flex">
+        {/* Desktop is always one horizontal navigation row from 1024px up.
+            Keep the mobile drawer below lg so standard Windows laptop widths
+            and 125% display scaling do not fall into a compact desktop menu. */}
+        <div className="hidden min-w-0 justify-center overflow-visible lg:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          {/* Full desktop controls: horizontal nav is already visible, so only
-              authentication/application actions belong in this cluster. */}
-          <div className="hidden flex-nowrap items-center gap-1 xl:flex">
+          <div className="hidden flex-nowrap items-center gap-1 lg:flex">
             <Link
               href={ROUTES.login}
-              className="inline-flex whitespace-nowrap px-2 py-2 text-sm font-semibold text-slate-800 hover:text-slate-950"
+              className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"
             >
               Sign In
             </Link>
             <Link
               href={ROUTES.apply}
-              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-3 py-2 text-sm font-bold text-white hover:bg-brand-red-700"
+              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-2.5 py-2 text-[13px] font-bold text-white hover:bg-brand-red-700 xl:px-3 xl:text-sm"
             >
               Apply
             </Link>
           </div>
 
-          {/* Compact desktop/tablet controls. HeaderDesktopMenu owns navigation
-              only while the full horizontal row is hidden. */}
-          <div className="hidden flex-nowrap items-center gap-1.5 lg:flex xl:hidden">
-            <HeaderDesktopMenu items={NAV_ITEMS} />
-            <Link
-              href={ROUTES.login}
-              className="inline-flex whitespace-nowrap px-2 py-2 text-sm font-semibold text-slate-800 hover:text-slate-950"
-            >
-              Sign In
-            </Link>
-            <Link
-              href={ROUTES.apply}
-              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-3 py-2 text-sm font-bold text-white hover:bg-brand-red-700"
-            >
-              Apply
-            </Link>
-          </div>
-
-          {/* Phones and small tablets use the dedicated mobile drawer. */}
+          {/* Phones and tablets below 1024px use the dedicated mobile drawer. */}
           <div className="flex flex-nowrap items-center gap-1 lg:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu

@@ -41,7 +41,7 @@ import { ParisFloatingWrapper } from '@/components/paris/ParisFloatingWrapper';
 export const dynamic = 'force-dynamic';
 
 export default async function StudentDashboard() {
-  const { user, profile } = await requireRole(['student', 'admin', 'super_admin']);
+  const { user, profile } = await requireRole(['student', 'admin']);
   const supabase = await createClient();
 
   // ── Core data fetches ────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ export default async function StudentDashboard() {
     supabase
       .from('quiz_attempts')
       .select('id, score, passed, completed_at, quiz_id, quizzes(title)')
-      .eq('user_id', user.id)
+      .eq('user_uuid', user.id)
       .not('completed_at', 'is', null)
       .order('completed_at', { ascending: false })
       .limit(5),

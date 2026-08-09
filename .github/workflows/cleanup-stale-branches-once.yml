@@ -1,0 +1,98 @@
+name: One-time stale branch cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cleanup-stale-branches-once.yml'
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: one-time-stale-branch-cleanup
+  cancel-in-progress: false
+
+jobs:
+  audit-and-clean:
+    if: contains(github.event.head_commit.message, '[cleanup-stale-branches]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout canonical main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Fetch all remote branch refs
+        run: |
+          set -euo pipefail
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+
+      - name: Side-by-side audit and delete non-main branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          owner="${REPO%%/*}"
+          deleted=0
+          skipped=0
+
+          {
+            echo '## One-time branch cleanup audit'
+            echo
+            echo '| Branch | Ahead of main | Behind main | Latest commit | Action |'
+            echo '|---|---:|---:|---|---|'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          mapfile -t branches < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | sort
+          )
+
+          for branch in "${branches[@]}"; do
+            # Never delete a branch that unexpectedly has an open PR at cleanup time.
+            open_prs=$(gh api -X GET search/issues \
+              -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
+              --jq '.total_count')
+
+            read -r behind ahead < <(git rev-list --left-right --count "origin/main...origin/${branch}")
+            latest=$(git log -1 --format='%h %cs' "origin/${branch}")
+
+            if [ "$open_prs" -gt 0 ]; then
+              printf '| `%s` | %s | %s | %s | KEPT — open PR |\n' \
+                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
+              skipped=$((skipped + 1))
+              continue
+            fi
+
+            # The repository owner explicitly approved deletion of every remaining
+            # non-main branch after the valuable stale work was reimplemented and
+            # merged into current main. Record divergence before removing the ref.
+            git push origin --delete "$branch"
+            printf '| `%s` | %s | %s | %s | DELETED |\n' \
+              "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
+            deleted=$((deleted + 1))
+          done
+
+          {
+            echo
+            echo "Deleted branches: ${deleted}"
+            echo "Kept because of open PRs: ${skipped}"
+            echo 'Canonical branch: `main`'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Deleted ${deleted} stale branches; kept ${skipped} branches with open PRs."
+
+      - name: Verify canonical branch set
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          echo 'Remaining remote branches:'
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'

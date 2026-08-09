@@ -6,6 +6,7 @@
 import { getStaticProgram, normalizePublicProgram } from '@/data/programs/index';
 import { resolveProgram, resolveSlug } from '@/lib/program-registry';
 import { createPublicClient } from '@/lib/supabase/public';
+import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import {
   buildProgramSchemaFromDb,
   buildProgramSchemaFromPartial,
@@ -34,6 +35,18 @@ async function overlayDbFields(program: ProgramSchema, slug: string): Promise<Pr
     .maybeSingle();
 
   if (!row) return program;
+
+  // Registered-apprenticeship requirements and public compliance copy are
+  // governed by RAPIDS_CONFIG through the static ProgramSchema. Database rows
+  // may carry historical values from older seeds, so they must never override
+  // the registered OJL/RTI requirements or descriptive copy. A DB-managed image
+  // is safe to overlay because it does not change program requirements.
+  if (isRAPIDSProgram(slug)) {
+    return normalizePublicProgram({
+      ...program,
+      heroImage: row.image_url || program.heroImage,
+    });
+  }
 
   return normalizePublicProgram({
     ...program,

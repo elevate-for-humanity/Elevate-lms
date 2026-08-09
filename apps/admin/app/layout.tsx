@@ -75,7 +75,7 @@ export default async function AdminGroupLayout({
       <head>
         <SupabasePublicConfigScript />
       </head>
-      <body>
+      <body className="admin-portal">
         <SupabaseConfigBootstrap />
         <AdminPwaRegister />
         <AdminUpdateNotice />

@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - authenticated route resolves the current user and owned website before any RLS-scoped website_domains write.
 /**
  * Payment-first domain purchase. Quotes Domainee, charges the customer through
  * Stripe, then the canonical Stripe webhook fulfills the Domainee registration.

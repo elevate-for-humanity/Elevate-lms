@@ -1,39 +1,34 @@
 // Service Worker — Admin Domain
 // __CACHE_VERSION__ replaced at build time by scripts/stamp-sw.mjs.
 const CACHE_VERSION = '__CACHE_VERSION__';
-
 const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
-
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
-const OFFLINE_URL = '/offline.html';
 
 const PRECACHE_ASSETS = [
-  '/',
   '/offline.html',
   '/manifest-admin.json',
   `${CDN}/icons/admin-192.png`,
   `${CDN}/icons/admin-512.png`,
 ];
 
-const CACHE_STRATEGIES = {
-  // Never cache admin/auth routes or external services.
-  noCache: [
-    /\/api\//,
-    /\/login/,
-    /\/logout/,
-    /\/unauthorized/,
-    /supabase/,
-    /analytics/,
-    /gtag/,
-  ],
-  // Admin API data — stale-while-revalidate.
-  staleWhileRevalidate: [/\/api\/public\//],
-  // Next.js chunks — always network.
-  nextChunks: [/\/_next\/static\//, /\/_next\/data\//],
-  // Static assets.
-  static: [/\.(woff2?|ttf|eot)$/, /\/images\//, /\/icons\//],
-};
+function isCacheableResponse(response) {
+  return Boolean(
+    response &&
+      response.status === 200 &&
+      response.ok &&
+      !response.redirected &&
+      response.type !== 'opaqueredirect',
+  );
+}
+
+async function safeCachePut(cache, request, response) {
+  if (!isCacheableResponse(response)) return;
+  try {
+    await cache.put(request, response.clone());
+  } catch (error) {
+    console.warn('[SW-admin] Cache put skipped:', error?.message || String(error));
+  }
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -41,16 +36,14 @@ self.addEventListener('install', (event) => {
       const cache = await caches.open(STATIC_CACHE);
       const results = await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
-          const req = new Request(asset, { cache: 'reload' });
+          const req = new Request(asset, { cache: 'reload', redirect: 'follow' });
           const res = await fetch(req);
-          if (!res.ok) throw new Error(`Precache failed: ${asset} HTTP ${res.status}`);
-          await cache.put(req, res);
+          if (!isCacheableResponse(res)) return;
+          await safeCachePut(cache, req, res);
         }),
       );
-      const failures = results.filter((r) => r.status === 'rejected');
-      if (failures.length > 0) {
-        console.warn('[SW-admin] Optional precache failures:', failures.length);
-      }
+      const failures = results.filter((result) => result.status === 'rejected');
+      if (failures.length) console.warn('[SW-admin] Optional precache failures:', failures.length);
       await self.skipWaiting();
     })(),
   );
@@ -70,84 +63,51 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-function matchesPattern(url, patterns) {
-  return patterns.some((pattern) => pattern.test(url));
-}
-
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(STATIC_CACHE);
   const cached = await cache.match(request);
-  const fetchPromise = fetch(request)
-    .then((response) => {
-      if (response.ok) cache.put(request, response.clone());
+  const network = fetch(request)
+    .then(async (response) => {
+      await safeCachePut(cache, request, response);
       return response;
     })
     .catch(() => null);
-  return cached || fetchPromise;
-}
-
-async function networkFirst(request, cacheName) {
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    return caches.match(request);
-  }
+  return cached || network;
 }
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET') return;
-  if (url.origin !== self.location.origin) return;
-  if (matchesPattern(request.url, CACHE_STRATEGIES.noCache)) return;
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  if (matchesPattern(request.url, CACHE_STRATEGIES.nextChunks)) {
-    event.respondWith(fetch(request, { cache: 'no-store' }));
+  // Admin pages and data are authenticated and may contain sensitive records.
+  // Never cache navigations, APIs, RSC responses, auth paths or range/media data.
+  if (
+    request.mode === 'navigate' ||
+    request.headers.has('range') ||
+    request.headers.get('RSC') === '1' ||
+    url.searchParams.has('_rsc') ||
+    url.pathname.startsWith('/api/') ||
+    /\/(?:login|logout|unauthorized)(?:\/|$)/.test(url.pathname)
+  ) {
     return;
   }
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      (async () => {
-        try {
-          return await fetch(request, { cache: 'no-store', redirect: 'follow' });
-        } catch {
-          const cached = await caches.match(request);
-          if (cached) return cached;
-          return new Response('Admin is temporarily unavailable.', {
-            status: 503,
-            headers: { 'Content-Type': 'text/plain' },
-          });
-        }
-      })(),
-    );
+  if (/^\/_next\/(?:static|data)\//.test(url.pathname)) {
+    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }));
     return;
   }
 
-  let responsePromise;
-  if (matchesPattern(request.url, CACHE_STRATEGIES.static)) {
-    responsePromise = staleWhileRevalidate(request, STATIC_CACHE);
-  } else if (matchesPattern(request.url, CACHE_STRATEGIES.staleWhileRevalidate)) {
-    responsePromise = staleWhileRevalidate(request, DYNAMIC_CACHE);
-  } else {
-    responsePromise = networkFirst(request, DYNAMIC_CACHE);
-  }
+  const isStaticAsset =
+    /\.(?:woff2?|ttf|eot|png|jpe?g|webp|avif|gif|svg|ico)$/i.test(url.pathname) ||
+    url.pathname.startsWith('/images/') ||
+    url.pathname.startsWith('/icons/');
 
-  event.respondWith(
-    responsePromise.then((response) => {
-      if (response) return response;
-      return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-    }),
-  );
+  if (!isStaticAsset) return;
+  event.respondWith(staleWhileRevalidate(request).then((response) => response || fetch(request)));
 });
 
-// Push notifications — admin users receive platform notifications.
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
@@ -175,23 +135,18 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
-  if (event.action === 'view') {
-    event.waitUntil(clients.openWindow(url));
-  }
+  event.waitUntil(clients.openWindow(url));
 });
 
 self.addEventListener('message', (event) => {
   const { type } = event.data || {};
   if (type === 'SKIP_WAITING') self.skipWaiting();
   if (type === 'GET_CACHE_SIZE') {
-    Promise.all([
-      caches.open(STATIC_CACHE).then((c) => c.keys()),
-      caches.open(DYNAMIC_CACHE).then((c) => c.keys()),
-    ]).then(([staticKeys, dynamicKeys]) => {
-      event.source.postMessage({
-        type: 'CACHE_SIZE',
-        payload: { static: staticKeys.length, dynamic: dynamicKeys.length },
+    caches
+      .open(STATIC_CACHE)
+      .then((cache) => cache.keys())
+      .then((keys) => {
+        event.source?.postMessage({ type: 'CACHE_SIZE', payload: { static: keys.length } });
       });
-    });
   }
 });

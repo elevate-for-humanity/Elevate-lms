@@ -1,15 +1,16 @@
 # Critical wiring references
 
-Generated: 2026-08-09T09:47:37.557Z
+Generated: 2026-08-09T10:01:56.771Z
 
 ## secureIdentity
 
-30 files
+32 files
 
 - apps/admin/app/wioa/verify/page.tsx
 - apps/admin/app/wotc/actions.ts
 - apps/app/api/admin/fssa/participants/route.ts
 - apps/app/api/devstudio/chat/route.ts
+- apps/marketing/app/api/verification/submit/route.ts
 - apps/marketing/app/onboarding/learner/documents/page.tsx
 - lib/audit/api-audit.ts
 - lib/audit.ts
@@ -34,12 +35,13 @@ Generated: 2026-08-09T09:47:37.557Z
 - supabase/migrations/20260527000012_client_consents.sql
 - supabase/migrations/20260602000009_tax_clients_column_aliases.sql
 - supabase/migrations/20260629000007_ita_vouchers.sql
+- supabase/migrations/20260809094500_remove_retired_super_admin_secure_identity_policy.sql
 - scripts/audit-critical-wiring.mjs
 - scripts/pending_migrations.sql
 
 ## identityDocuments
 
-100 files
+102 files
 
 - apps/admin/app/instructor/documents/InstructorDocumentsClient.tsx
 - apps/admin/app/proctor-portal/NewSessionForm.tsx
@@ -54,6 +56,7 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/lms/app/orientation/schedule/page.tsx
 - apps/marketing/app/about/team/team/carl-brown/page.tsx
 - apps/marketing/app/api/host-shop/apply/route.ts
+- apps/marketing/app/api/verification/submit/route.ts
 - apps/marketing/app/apply/pending-workone/page.tsx
 - apps/marketing/app/certiport-exam/certiport-exam/page.tsx
 - apps/marketing/app/certiport-exam/page.tsx
@@ -84,6 +87,7 @@ Generated: 2026-08-09T09:47:37.557Z
 - components/barber/BarberApprenticeshipDashboard.tsx
 - components/home/Programs.tsx
 - components/portal/ApprenticePortalShell.tsx
+- components/programs/ProgramApplyForm.tsx
 - components/quiz/ProgramFinderQuiz.tsx
 - components/testing/TestingCenter.tsx
 - components/verification/IDVerificationForm.tsx
@@ -142,10 +146,25 @@ Generated: 2026-08-09T09:47:37.557Z
 - scripts/generate-course-preview-audio.ts
 - scripts/generate-program-videos.mjs
 
+## verificationSubmit
+
+8 files
+
+- apps/marketing/app/api/verification/submit/route.ts
+- apps/marketing/app/onboarding/learner/page.tsx
+- apps/marketing/app/onboarding/learner/verify-identity/page.tsx
+- components/admin/VerificationReviewForm.tsx
+- components/verification/IDVerificationForm.tsx
+- supabase/migrations/20260225000004_fix_onboarding_schema.sql
+- supabase/migrations/20260327000004_certificate_tables.sql
+- scripts/audit-critical-wiring.mjs
+
 ## cartRoutes
 
-14 files
+16 files
 
+- apps/marketing/app/api/cart/remove/route.ts
+- apps/marketing/app/api/cart/update/route.ts
 - apps/marketing/app/api/store/cart-checkout/route.ts
 - apps/marketing/app/store/cart/page.tsx
 - apps/marketing/app/store/checkout/page.tsx
@@ -638,7 +657,6 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/marketing/app/store/add-ons/page.tsx
 - apps/marketing/app/store/ai-studio/page.tsx
 - apps/marketing/app/store/apps/website-builder/page.tsx
-- apps/marketing/app/store/cart/page.tsx
 - apps/marketing/app/store/checkout/cancel/page.tsx
 - apps/marketing/app/store/checkout/success/page.tsx
 - apps/marketing/app/store/compliance/ferpa/page.tsx
@@ -1046,6 +1064,7 @@ Generated: 2026-08-09T09:47:37.557Z
 - scripts/audit-duplicates.mjs
 - scripts/audit-forbidden-placeholder-images.mjs
 - scripts/audit-hero-banner-coverage.mjs
+- scripts/audit-hero-banners.mjs
 - scripts/audit-hero-banners.ts
 - scripts/audit-heroes.ts
 - scripts/audit-image-assets.mjs
@@ -1118,6 +1137,7 @@ Generated: 2026-08-09T09:47:37.557Z
 
 - apps/admin/app/api/admin/applications/route.ts
 - apps/admin/app/api/admin/course-builder/bls/route.ts
+- apps/admin/app/api/admin/course-builder/program/route.ts
 - apps/admin/app/api/admin/courses/route.ts
 - apps/admin/app/api/admin/enrollment/route.ts
 - apps/admin/app/api/admin/programs/route.ts
@@ -1130,6 +1150,7 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/admin/app/api/surveys/workone/submit/route.ts
 - apps/admin/app/api/version/route.ts
 - apps/admin/app/blog/management/rss.xml/route.ts
+- apps/app/api/admin/analytics/route.ts
 - apps/app/api/admin/applicants/export/route.ts
 - apps/app/api/admin/applications/[id]/approve/route.ts
 - apps/app/api/admin/applications/[id]/approve-and-grant/route.ts
@@ -1148,20 +1169,28 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/app/api/admin/applications/route.ts
 - apps/app/api/admin/applications/summary/route.ts
 - apps/app/api/admin/applications/transition/route.ts
+- apps/app/api/admin/assign-shop-placement/route.ts
 - apps/app/api/admin/audit-export/route.ts
 - apps/app/api/admin/barber-onboarding-blast/route.ts
 - apps/app/api/admin/barber-shop-applications/[id]/approve/route.ts
 - apps/app/api/admin/barber-shop-applications/status/route.ts
 - apps/app/api/admin/catalog/export/route.ts
 - apps/app/api/admin/certifications/minority/prefill/route.ts
+- apps/app/api/admin/completions/route.ts
+- apps/app/api/admin/contracts/approve-field/route.ts
+- apps/app/api/admin/contracts/export/route.ts
 - apps/app/api/admin/contracts/prefill/route.ts
 - apps/app/api/admin/contracts/upload/route.ts
 - apps/app/api/admin/courses/parse-file/route.ts
 - apps/app/api/admin/documents/extract/route.ts
 - apps/app/api/admin/email-marketing/audience-counts/route.ts
+- apps/app/api/admin/enrollments/[id]/documents/route.ts
+- apps/app/api/admin/enrollments/[id]/grant-access/route.ts
 - apps/app/api/admin/enrollments/mark-payout-paid/route.ts
+- apps/app/api/admin/entity-docs/route.ts
 - apps/app/api/admin/export-etpl/route.ts
 - apps/app/api/admin/fssa/participants/route.ts
+- apps/app/api/admin/generate-course/route.ts
 - apps/app/api/admin/grants/applications/route.ts
 - apps/app/api/admin/grants/generate-narrative/route.ts
 - apps/app/api/admin/grants/sam/prefill/route.ts
@@ -1169,16 +1198,21 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/app/api/admin/intakes/route.ts
 - apps/app/api/admin/integrations/quickbooks/route.ts
 - apps/app/api/admin/monitoring/errors/route.ts
+- apps/app/api/admin/monitoring/verify-schema/route.ts
 - apps/app/api/admin/mou/cdl/route.ts
 - apps/app/api/admin/mou/employer/route.ts
 - apps/app/api/admin/performance/route.ts
+- apps/app/api/admin/program-holders/mou/countersign/route.ts
 - apps/app/api/admin/program-holders/mou/route.ts
 - apps/app/api/admin/program-holders/signed-mou/route.ts
 - apps/app/api/admin/review-queue/resolve/route.ts
 - apps/app/api/admin/send-onboarding-emails/route.ts
 - apps/app/api/admin/send-reminder/route.ts
+- apps/app/api/admin/sign-documents/send/route.ts
 - apps/app/api/admin/test-email/route.ts
 - apps/app/api/admin/validate-coi/route.ts
+- apps/app/api/admin/verifications/review/route.ts
+- apps/app/api/admin/wioa/verify/route.ts
 - apps/app/api/analytics/analytics/performance/alert/route.ts
 - apps/app/api/analytics/analytics/performance-alert/route.ts
 - apps/app/api/analytics/analytics/slow-resources/route.ts
@@ -1187,8 +1221,11 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/app/api/cfd/cases/route.ts
 - apps/app/api/cmi/outcomes/route.ts
 - apps/app/api/credentialing/route.ts
+- apps/app/api/cron/career-course-emails/route.ts
 - apps/app/api/cron/check-stuck-approvals/route.ts
 - apps/app/api/cron/end-of-day-summary/route.ts
+- apps/app/api/cron/escalate-funding-sla/route.ts
+- apps/app/api/cron/funding-escalation/route.ts
 - apps/app/api/cron/funding-followup/route.ts
 - apps/app/api/cron/health/route.ts
 - apps/app/api/cron/missed-checkins/route.ts
@@ -1197,44 +1234,67 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/app/api/cron/process-notifications/route.ts
 - apps/app/api/cron/school-application-followup/route.ts
 - apps/app/api/cron/stale-applications/route.ts
+- apps/app/api/devstudio/chat/route.ts
+- apps/app/api/devstudio/container-env/route.ts
 - apps/app/api/devstudio/execute/route.ts
 - apps/app/api/devstudio/openhands/agent/route.ts
 - apps/app/api/devstudio/openhands/chat/route.ts
+- apps/app/api/devstudio/plan/route.ts
 - apps/app/api/devstudio/platform-state/route.ts
+- apps/app/api/devstudio/platform-status/route.ts
 - apps/app/api/devstudio/shell/route.ts
 - apps/app/api/devstudio/system-health/route.ts
 - apps/app/api/devstudio/upload/route.ts
+- apps/app/api/health/route.ts
 - apps/app/api/reports/outcomes/route.ts
+- apps/app/api/reports/participants/export/route.ts
 - apps/app/api/reports/wioa/route.ts
 - apps/app/api/upload/route.ts
 - apps/lms/app/api/ai/build-remote/route.ts
+- apps/lms/app/api/ai-chat/route.ts
 - apps/lms/app/api/ai-instructor/hvac/route.ts
 - apps/lms/app/api/ai-instructor/message/route.ts
+- apps/lms/app/api/ai-tutor/chat/route.ts
 - apps/lms/app/api/ai-tutor/public/route.ts
 - apps/lms/app/api/ai-tutor-basic/route.ts
+- apps/lms/app/api/apprentice/transfer-request/route.ts
+- apps/lms/app/api/attendance/verify/route.ts
+- apps/lms/app/api/auth/azure/callback/route.ts
 - apps/lms/app/api/auth/linkedin/callback/route.ts
 - apps/lms/app/api/auth/quickbooks/callback/route.ts
 - apps/lms/app/api/auth/send-magic-link/route.ts
 - apps/lms/app/api/auth/youtube/callback/route.ts
 - apps/lms/app/api/certificates/[certificateId]/download/route.ts
+- apps/lms/app/api/certificates/download/route.ts
 - apps/lms/app/api/certificates/generate/route.ts
 - apps/lms/app/api/certificates/pdf/route.ts
+- apps/lms/app/api/certificates/verify/route.ts
 - apps/lms/app/api/checkout/phlebotomy/route.ts
+- apps/lms/app/api/courses/[courseId]/complete/route.ts
 - apps/lms/app/api/courses/[courseId]/lessons/[lessonId]/complete/route.ts
 - apps/lms/app/api/courses/complete/route.ts
+- apps/lms/app/api/credentials/verify/route.ts
 - apps/lms/app/api/enrollments/apprentice/route.ts
 - apps/lms/app/api/enrollments/host-shop/route.ts
+- apps/lms/app/api/health/build-version/route.ts
 - apps/lms/app/api/health/northflank/route.ts
 - apps/lms/app/api/health/route.ts
+- apps/lms/app/api/lessons/[lessonId]/complete/route.ts
+- apps/lms/app/api/lessons/[lessonId]/ojt-status/route.ts
 - apps/lms/app/api/onboarding/complete/route.ts
 - apps/lms/app/api/onboarding/step-complete/route.ts
 - apps/lms/app/api/onboarding/validate-document/route.ts
+- apps/lms/app/api/payments/create-session/route.ts
+- apps/lms/app/api/payments/route.ts
 - apps/lms/app/api/stripe/checkout/route.ts
 - apps/lms/app/api/stripe/route.ts
+- apps/lms/app/api/timeclock/context/route.ts
 - apps/lms/app/api/version/route.ts
 - apps/lms/app/api/webhooks/jotform/route.ts
+- apps/lms/app/api/webhooks/stripe/career-courses/route.ts
 - apps/lms/app/api/webhooks/stripe/route.ts
 - apps/lms/app/api/webhooks/stripe-identity/route.ts
+- apps/lms/app/api/wioa/employment/route.ts
 - apps/marketing/app/api/ai-chat/route.ts
 - apps/marketing/app/api/applications/[id]/reject/route.ts
 - apps/marketing/app/api/applications/[id]/verify/route.ts
@@ -1246,13 +1306,18 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/marketing/app/api/applications/wioa/route.ts
 - apps/marketing/app/api/apply/student/route.ts
 - apps/marketing/app/api/apps/website-builder/ai-generate/route.ts
+- apps/marketing/app/api/auth/azure/callback/route.ts
 - apps/marketing/app/api/auth/linkedin/callback/route.ts
 - apps/marketing/app/api/auth/quickbooks/callback/route.ts
 - apps/marketing/app/api/auth/send-magic-link/route.ts
 - apps/marketing/app/api/auth/youtube/callback/route.ts
+- apps/marketing/app/api/cart/remove/route.ts
+- apps/marketing/app/api/cart/update/route.ts
 - apps/marketing/app/api/contact/route.ts
+- apps/marketing/app/api/donations/webhook/route.ts
 - apps/marketing/app/api/employer/apply/route.ts
 - apps/marketing/app/api/enrollment-v2/apply/route.ts
+- apps/marketing/app/api/health/build-version/route.ts
 - apps/marketing/app/api/health/northflank/route.ts
 - apps/marketing/app/api/health/route.ts
 - apps/marketing/app/api/host-shop/apply/route.ts
@@ -1284,8 +1349,11 @@ Generated: 2026-08-09T09:47:37.557Z
 - apps/marketing/app/api/store/cart-checkout/route.ts
 - apps/marketing/app/api/stripe/checkout/route.ts
 - apps/marketing/app/api/stripe/route.ts
+- apps/marketing/app/api/testing/webhook/route.ts
+- apps/marketing/app/api/verification/submit/route.ts
 - apps/marketing/app/api/version/route.ts
 - apps/marketing/app/api/webhooks/jotform/route.ts
+- apps/marketing/app/api/webhooks/stripe/career-courses/route.ts
 - apps/marketing/app/api/webhooks/stripe/route.ts
 - apps/marketing/app/api/webhooks/stripe-identity/route.ts
 - apps/marketing/app/blog/rss.xml/route.ts

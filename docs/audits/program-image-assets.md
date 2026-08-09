@@ -1,6 +1,6 @@
 # Canonical program image asset audit
 
-Generated: 2026-08-09T09:47:37.293Z
+Generated: 2026-08-09T10:01:56.456Z
 
 - Image assets scanned: **721**
 - Registry image assignments parsed: **68**

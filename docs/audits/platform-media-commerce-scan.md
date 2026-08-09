@@ -1,22 +1,22 @@
 # Platform media, commerce, application & PWA audit
 
-Generated: 2026-08-09T09:47:37.237Z
+Generated: 2026-08-09T10:01:56.392Z
 
 ## Summary
 
-- Source files scanned: **5770**
+- Source files scanned: **5773**
 - Program/training page files found: **79**
 - Program pages with detected gradient/dark overlays: **21**
 - Program pages with no detected image/video media: **67**
 - Program pages with no detected CTA: **50**
 - Program pages with no detected BNPL/payment-plan language: **69**
 - Duplicate program/hero media literals: **247**
-- Application/form implementation files: **58**
+- Application/form implementation files: **57**
 - Application files with SSN language: **3**
 - Application files with government/photo ID language: **3**
-- Commerce/payment/cart/calculator files: **518**
+- Commerce/payment/cart/calculator files: **520**
 - PWA/service-worker/manifest files: **33**
-- Files with potentially light text classes: **1679**
+- Files with potentially light text classes: **1678**
 
 ## Program/training page media matrix
 
@@ -323,7 +323,7 @@ Generated: 2026-08-09T09:47:37.237Z
 | components/program-card.tsx | NO | no | no |
 | components/programs/BarberProgram.tsx | NO | yes | no |
 | components/programs/HomepageProgramsTeaser.tsx | yes | no | no |
-| components/programs/ProgramApplyForm.tsx | NO | no | yes |
+| components/programs/ProgramApplyForm.tsx | NO | no | no |
 | components/programs/ProgramApplyPage.tsx | NO | yes | yes |
 | components/programs/ProgramAppointmentBanner.tsx | NO | no | no |
 | components/programs/ProgramAtAGlance.tsx | NO | yes | yes |
@@ -494,7 +494,6 @@ Generated: 2026-08-09T09:47:37.237Z
 | components/enrollment/NextActionBanner.tsx | no | yes | NO | NO | no | yes |
 | components/lms/EnrollButton.tsx | no | yes | NO | NO | no | no |
 | components/payment/EnrollmentCheckout.jsx | no | yes | NO | NO | no | no |
-| components/programs/ProgramApplyForm.tsx | yes | NO | NO | NO | no | no |
 | components/programs/ProgramApplyPage.tsx | no | yes | NO | NO | yes | yes |
 | components/programs/ProgramEnrollment.tsx | no | yes | NO | NO | no | no |
 | lib/applications/upload-transfer-hours-evidence.ts | no | yes | NO | NO | yes | no |
@@ -593,6 +592,8 @@ Generated: 2026-08-09T09:47:37.237Z
 | apps/marketing/app/api/ai/route.ts | yes | no | no | no | yes |
 | apps/marketing/app/api/ai-chat/route.ts | yes | no | no | no | yes |
 | apps/marketing/app/api/apps/upgrade/route.ts | no | yes | no | yes | no |
+| apps/marketing/app/api/cart/remove/route.ts | no | yes | no | no | no |
+| apps/marketing/app/api/cart/update/route.ts | no | yes | no | no | no |
 | apps/marketing/app/api/checkout/program/route.ts | no | yes | no | yes | yes |
 | apps/marketing/app/api/donate/create-checkout/route.ts | no | yes | no | yes | yes |
 | apps/marketing/app/api/donate/route.ts | no | yes | no | yes | yes |
@@ -1202,7 +1203,6 @@ Generated: 2026-08-09T09:47:37.237Z
 - apps/marketing/app/store/StoreHeroVideo.tsx
 - apps/marketing/app/store/add-ons/page.tsx
 - apps/marketing/app/store/ai-studio/page.tsx
-- apps/marketing/app/store/cart/page.tsx
 - apps/marketing/app/store/checkout/success/page.tsx
 - apps/marketing/app/store/course-builder/page.tsx
 - apps/marketing/app/store/courses/hvac-technician-course-license/page.tsx

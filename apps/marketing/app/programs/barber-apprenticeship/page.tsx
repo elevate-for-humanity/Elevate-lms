@@ -4,7 +4,11 @@ import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberAppre
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
-export const revalidate = 3600;
+// Registered-apprenticeship requirements are compliance-sensitive. Always
+// render from the current RAPIDS-backed source of truth instead of serving an
+// hour-old ISR snapshot after requirements or approved public copy changes.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function BarberApprenticeshipPage() {
   const loaded = await loadProgramForPage('barber-apprenticeship');

@@ -6,7 +6,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { connectDomain, isDomaineeConfigured } from '@/lib/domainee/client';
-import { resolveOwnedSite, validateHostname } from '@/lib/domainee/site-resolver';
+import {
+  requireCustomDomainEntitlement,
+  resolveOwnedSite,
+  validateHostname,
+} from '@/lib/domainee/site-resolver';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -16,25 +20,29 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ websiteId: string }> },
 ) {
-  await hydrateProcessEnv().catch(() => {});
+  await hydrateProcessEnv().catch(() => undefined);
   const { websiteId } = await params;
   const resolved = await resolveOwnedSite(websiteId);
   if ('error' in resolved) return resolved.error;
-  const { user, supabase, site, originUrl } = resolved;
+  const { user, supabase, site, originUrl, entitlement } = resolved;
+
+  const entitlementError = requireCustomDomainEntitlement(entitlement);
+  if (entitlementError) return entitlementError;
+
+  if (!site.is_published) {
+    return NextResponse.json({ error: 'Publish the website before connecting a custom domain.' }, { status: 409 });
+  }
 
   if (!isDomaineeConfigured()) {
-    return NextResponse.json(
-      { error: 'Domain service is not configured. Set DOMAINEE_API_KEY.' },
-      { status: 503 },
-    );
+    return NextResponse.json({ error: 'Domain service is temporarily unavailable.' }, { status: 503 });
   }
 
   const body = await request.json().catch(() => ({}));
   const hostname = validateHostname(String(body.hostname ?? ''));
-  if (!hostname)
+  if (!hostname) {
     return NextResponse.json({ error: 'Enter a valid domain (e.g. shop.example.com)' }, { status: 400 });
+  }
 
-  // Reject duplicate active domains for the same site.
   const { data: existing } = await supabase
     .from('website_domains')
     .select('id, status, domainee_domain_id')
@@ -43,13 +51,11 @@ export async function POST(
     .ilike('hostname', hostname)
     .neq('status', 'deleted')
     .maybeSingle();
-  if (existing)
-    return NextResponse.json(
-      { error: 'This domain is already connected to your site.' },
-      { status: 409 },
-    );
+  if (existing) {
+    return NextResponse.json({ error: 'This domain is already connected to your site.' }, { status: 409 });
+  }
 
-  const idempotencyKey = `elevate-${websiteId}-${hostname}-${Date.now()}`;
+  const idempotencyKey = `elevate-connect-${websiteId}-${hostname}`;
   try {
     const result = await connectDomain(hostname, originUrl, {
       metadata: { websiteId, userId: user.id, siteName: site.site_name },
@@ -76,7 +82,7 @@ export async function POST(
       .select('*')
       .maybeSingle();
     if (insertError) {
-      logger.error('website_domains insert failed', { error: insertError.message });
+      logger.error('website_domains insert failed', undefined, { error: insertError.message });
       return NextResponse.json({ error: 'Failed to save domain record' }, { status: 500 });
     }
 
@@ -84,13 +90,11 @@ export async function POST(
       domain: row,
       dnsRecords: domain.dnsRecords,
       warnings: result.warnings,
-      nextStep:
-        'Add the CNAME record above at your DNS provider. SSL is provisioned automatically once DNS resolves — we will mark the domain active when verified.',
-      cloudflareNote:
-        'If your domain is on Cloudflare, set the CNAME to DNS-only (grey cloud) during verification, then re-enable proxying after.',
+      nextStep: 'Add the CNAME shown below at your DNS provider. Elevate will verify it and activate SSL automatically.',
+      cloudflareNote: 'If your domain uses Cloudflare, keep the CNAME DNS-only (grey cloud) until verification completes.',
     });
   } catch (err) {
-    logger.error('domainee connect failed', { hostname, error: String(err) });
+    logger.error('domainee connect failed', err instanceof Error ? err : undefined, { hostname });
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Failed to connect domain' },
       { status: 502 },

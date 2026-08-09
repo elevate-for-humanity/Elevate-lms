@@ -1,0 +1,54 @@
+name: Patch LMS dashboard schema mismatch
+
+on:
+  push:
+    branches:
+      - fix/lms-dashboard-schema-20260809
+    paths:
+      - '.github/workflows/patch-lms-dashboard-schema.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/lms-dashboard-schema-20260809
+          fetch-depth: 1
+      - name: Patch exact verified LMS dashboard defects
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE='apps/lms/app/lms/(app)/dashboard/page.tsx'
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("apps/lms/app/lms/(app)/dashboard/page.tsx")
+          s = p.read_text()
+          old_role = "requireRole(['student', 'admin', 'super_admin'])"
+          new_role = "requireRole(['student', 'admin'])"
+          old_quiz = ".from('quiz_attempts')\n      .select('id, score, passed, completed_at, quiz_id, quizzes(title)')\n      .eq('user_id', user.id)"
+          new_quiz = ".from('quiz_attempts')\n      .select('id, score, passed, completed_at, quiz_id, quizzes(title)')\n      .eq('user_uuid', user.id)"
+          if old_role not in s:
+              raise SystemExit('Expected super_admin dashboard role string not found')
+          if old_quiz not in s:
+              raise SystemExit('Expected quiz_attempts user_id query not found')
+          s = s.replace(old_role, new_role, 1).replace(old_quiz, new_quiz, 1)
+          p.write_text(s)
+          PY
+          git diff --check
+          git diff -- "$FILE"
+          grep -F "requireRole(['student', 'admin'])" "$FILE"
+          grep -A2 -F ".from('quiz_attempts')" "$FILE" | grep -F ".eq('user_uuid', user.id)"
+      - name: Commit patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 'apps/lms/app/lms/(app)/dashboard/page.tsx'
+          git commit -m 'fix(lms): align dashboard auth and quiz user UUID' || exit 0
+          git push origin HEAD:fix/lms-dashboard-schema-20260809

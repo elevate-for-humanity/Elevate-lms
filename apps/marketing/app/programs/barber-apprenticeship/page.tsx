@@ -4,6 +4,7 @@ import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberAppre
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
+// Marketing deployment touch: publish the consolidated header and current host-shop media bundle.
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';

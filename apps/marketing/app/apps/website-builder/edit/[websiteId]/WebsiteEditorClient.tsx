@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { DomainPanel } from '@/components/website-builder/DomainPanel';
 
 interface Props {
   websiteId: string;
@@ -143,6 +144,8 @@ export function WebsiteEditorClient({
               <TextArea label="SEO description" value={seoDescription} onChange={setSeoDescription} />
             </div>
           </div>
+
+          <DomainPanel websiteId={websiteId} isPublished={published} />
         </section>
 
         <aside className="lg:sticky lg:top-6 lg:self-start">

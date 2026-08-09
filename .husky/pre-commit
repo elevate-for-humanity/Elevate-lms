@@ -35,4 +35,4 @@ pnpm audit:casing || exit 1
 
 # TypeScript type check on LMS workspace
 echo "🔍 Running TypeScript check..."
-pnpm --filter @elevate/lms exec tsc --noEmit || exit 1
+NODE_OPTIONS="--max-old-space-size=8192" pnpm --filter @elevate/lms exec tsc --noEmit || exit 1

@@ -12,6 +12,7 @@ import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { emailService } from '@/lib/notifications/email';
 import { sendWorkflowNotification } from '@/lib/integrations/notifications';
+import { setAuditContext } from '@/lib/audit-context';
 
 // ============================================
 // TYPES
@@ -129,9 +130,16 @@ function getServiceClient() {
 export async function provisionEnrollment(
   input: ProvisioningInput,
 ): Promise<ProvisioningResult> {
-  const supabase = getServiceClient();
+    const supabase = getServiceClient();
   const { applicationId, enrolledById } = input;
-  
+
+  // Attribute service-role writes (RLS is bypassed with the service key).
+  await setAuditContext(supabase, {
+    actorUserId: enrolledById,
+    systemActor: 'paris_provisioning',
+    requestId: `provision_${applicationId}`,
+  });
+
   logger.info('Starting enrollment provisioning', { applicationId });
   
   try {

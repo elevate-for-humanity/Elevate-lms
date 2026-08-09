@@ -11,6 +11,7 @@ import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
+import StructuredData from '@/components/StructuredData';
 
 export const revalidate = 300;
 
@@ -31,12 +32,12 @@ export const metadata: Metadata = {
     'career training Marion County',
     PLATFORM_DEFAULTS.orgName,
   ],
-  alternates: { canonical: PLATFORM_DEFAULTS.siteUrl },
+  alternates: { canonical: 'https://www.elevateforhumanity.org' },
   openGraph: {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Career Programs`,
     description:
       'DOL-registered apprenticeship sponsor and Indiana ETPL-listed training provider. Career programs in healthcare, skilled trades, CDL, technology, and beauty — funding options may be available.',
-    url: PLATFORM_DEFAULTS.siteUrl,
+    url: 'https://www.elevateforhumanity.org',
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
@@ -85,6 +86,8 @@ export default function HomePage() {
 
   return (
     <>
+      <StructuredData />
+
       {/* 1. Immediate visual identity + primary action */}
       <HomeHeroVideo banner={banner} />
 

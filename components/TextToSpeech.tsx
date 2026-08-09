@@ -122,7 +122,7 @@ export default function TextToSpeech({
 
   return (
     <div
-      className={`relative z-0 inline-flex w-fit max-w-full flex-nowrap items-center gap-2 overflow-x-auto overflow-y-hidden whitespace-nowrap rounded-lg bg-white/95 p-1.5 ${className}`}
+      className={`relative z-0 inline-flex w-auto max-w-full flex-nowrap items-center gap-1 overflow-x-auto overflow-y-hidden whitespace-nowrap bg-transparent p-0 sm:gap-2 sm:rounded-lg sm:bg-white/95 sm:p-1.5 ${className}`}
       data-tts-control
     >
       {!isPlaying && !isPaused && (
@@ -157,7 +157,7 @@ export default function TextToSpeech({
         </button>
       )}
 
-      <label className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-800">
+      <label className="hidden shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-800 sm:flex">
         <span>Speed</span>
         <select
           value={rate}
@@ -175,7 +175,7 @@ export default function TextToSpeech({
       </label>
 
       {voices.length > 0 && (
-        <label className="hidden shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-800 sm:flex">
+        <label className="hidden shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-800 md:flex">
           <span className="shrink-0">Voice</span>
           <select
             value={selectedVoice?.name || ''}

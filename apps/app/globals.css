@@ -1592,51 +1592,20 @@ footer {
 
 /* ============================================================================
    COLOR & CONTRAST ENHANCEMENT (WCAG AA Compliant)
-   Scoped to content areas - header/nav use component styles
+   Component Tailwind classes own foreground colors. Keep global contrast rules
+   narrow so dark/brand sections and light footers are not overridden.
    ============================================================================ */
 
-/* Headings in content areas */
-main h1,
-main h2,
-main h3,
-main h4,
-main h5,
-main h6,
-section h1,
-section h2,
-section h3,
-section h4,
-section h5,
-section h6,
-article h1,
-article h2,
-article h3,
-article h4,
-article h5,
-article h6 {
-  color: #0f172a; /* Near-black for maximum readability */
+:where(main, section, article)
+  :is(.bg-white, .bg-slate-50, .bg-slate-100, .bg-gray-50, .bg-gray-100)
+  :is(.text-slate-400, .text-gray-400) {
+  color: #475569;
 }
 
-/* Paragraph text in content areas */
-main p,
-section p,
-article p {
-  color: #334155; /* Slate-700 equivalent, WCAG AA compliant */
-}
-
-/* Links with better contrast and hover states - scoped to content areas */
-main a,
-section a,
-article a {
-  color: #0369a1; /* Sky-700, accessible blue */
-  text-decoration: none;
-}
-
-main a:hover,
-section a:hover,
-article a:hover {
-  color: #0c4a6e; /* Sky-900, darker on hover */
-  text-decoration: underline;
+:where(main, section, article)
+  :is(.bg-white, .bg-slate-50, .bg-slate-100, .bg-gray-50, .bg-gray-100)
+  :is(.text-slate-500, .text-gray-500, .text-slate-600, .text-gray-600) {
+  color: #334155;
 }
 
 /* Button text contrast */
@@ -1664,12 +1633,6 @@ article a:hover {
 .bg-brand-blue-800,
 .bg-brand-orange-600,
 .bg-brand-orange-700 {
-  color: #ffffff !important;
-}
-
-/* Footer text contrast - all white */
-footer,
-footer * {
   color: #ffffff !important;
 }
 

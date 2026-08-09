@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const LEGAL_DOCS = [
   { icon: FileText, title: 'Terms of Service', desc: 'User agreement governing access to the Elevate platform and programs.', href: '/legal' },
-  { icon: Lock, title: 'Privacy Policy', desc: 'How we collect, use, and protect your personal information.', href: '/legal/privacy' },
+  { icon: Lock, title: 'Privacy Policy', desc: 'How we collect, use, and protect your personal information.', href: '/privacy' },
   { icon: Shield, title: 'Security & Data Protection', desc: 'Technical and organizational measures protecting student and partner data.', href: '/security-and-data-protection' },
   { icon: Scale, title: 'License Agreement', desc: 'Software license terms for LMS platform licensees.', href: '/legal/license-agreement' },
   { icon: Scale, title: 'Program License Agreement', desc: 'Terms governing the licensing of Elevate training programs to external organizations.', href: '/legal/program-license-agreement' },

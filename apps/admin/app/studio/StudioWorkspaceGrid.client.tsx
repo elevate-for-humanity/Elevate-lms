@@ -14,6 +14,9 @@ type Workspace = {
 
 type HealthState = 'checking' | 'healthy' | 'degraded' | 'unavailable';
 
+const HEALTH_CONCURRENCY = 3;
+const HEALTH_TIMEOUT_MS = 8000;
+
 export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Workspace[] }) {
   const [health, setHealth] = useState<Record<string, HealthState>>({});
   const [refreshToken, setRefreshToken] = useState(0);
@@ -22,24 +25,47 @@ export default function StudioWorkspaceGrid({ workspaces }: { workspaces: Worksp
     let cancelled = false;
     setHealth(Object.fromEntries(workspaces.map((workspace) => [workspace.id, 'checking'])));
 
-    void Promise.all(
-      workspaces.map(async (workspace) => {
-        try {
-          const response = await fetch(workspace.healthEndpoint, { cache: 'no-store' });
-          const body = await response.json().catch(() => ({}));
-          const reported = typeof body?.status === 'string' ? body.status : '';
-          const state: HealthState =
-            response.ok && (reported === 'healthy' || reported === 'available')
-              ? 'healthy'
-              : response.ok
-                ? 'degraded'
-                : 'unavailable';
-          if (!cancelled) setHealth((current) => ({ ...current, [workspace.id]: state }));
-        } catch {
-          if (!cancelled) setHealth((current) => ({ ...current, [workspace.id]: 'unavailable' }));
+    async function checkWorkspace(workspace: Workspace) {
+      try {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), HEALTH_TIMEOUT_MS);
+        const response = await fetch(workspace.healthEndpoint, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        window.clearTimeout(timeout);
+
+        const body = await response.json().catch(() => ({}));
+        const reported = typeof body?.status === 'string' ? body.status : '';
+        const state: HealthState =
+          response.ok && (reported === 'healthy' || reported === 'available')
+            ? 'healthy'
+            : response.ok && reported === 'degraded'
+              ? 'degraded'
+              : 'unavailable';
+
+        if (!cancelled) {
+          setHealth((current) => ({ ...current, [workspace.id]: state }));
         }
-      }),
-    );
+      } catch {
+        if (!cancelled) {
+          setHealth((current) => ({ ...current, [workspace.id]: 'unavailable' }));
+        }
+      }
+    }
+
+    async function runChecks() {
+      // Check in small batches instead of issuing every capability request at once.
+      // This prevents Studio landing-page traffic from creating a burst against the
+      // Admin container immediately after login or deployment.
+      for (let index = 0; index < workspaces.length; index += HEALTH_CONCURRENCY) {
+        if (cancelled) return;
+        const batch = workspaces.slice(index, index + HEALTH_CONCURRENCY);
+        await Promise.all(batch.map(checkWorkspace));
+      }
+    }
+
+    void runChecks();
 
     return () => {
       cancelled = true;

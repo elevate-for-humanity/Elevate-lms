@@ -50,11 +50,14 @@ function DropdownContent({ subItems }: { subItems: NavSubItem[] }) {
   );
 }
 
+const topLevelClass =
+  'rounded-md px-1.5 py-2 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 xl:px-2.5 xl:text-sm';
+
 export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   return (
     <nav
       aria-label="Main navigation"
-      className="flex min-w-0 flex-row flex-nowrap items-center justify-center gap-0.5 overflow-visible whitespace-nowrap"
+      className="flex min-w-0 flex-row flex-nowrap items-center justify-center gap-0 overflow-visible whitespace-nowrap xl:gap-0.5"
     >
       {items.map((item) => {
         const key = item.id ?? item.name;
@@ -63,12 +66,7 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
         if (!hasSubItems) {
           if (!item.href) return null;
           return (
-            <Link
-              key={key}
-              href={item.href}
-              prefetch={false}
-              className="rounded-md px-2.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
-            >
+            <Link key={key} href={item.href} prefetch={false} className={topLevelClass}>
               {item.name}
             </Link>
           );
@@ -81,20 +79,20 @@ export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
                 <Link
                   href={item.href}
                   prefetch={false}
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
+                  className={`inline-flex items-center gap-0.5 xl:gap-1 ${topLevelClass}`}
                   aria-haspopup="menu"
                 >
                   <span>{item.name}</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
+                  <ChevronDown className="h-3 w-3 text-slate-400 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180 xl:h-3.5 xl:w-3.5" aria-hidden="true" />
                 </Link>
               ) : (
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
+                  className={`inline-flex items-center gap-0.5 xl:gap-1 ${topLevelClass}`}
                   aria-haspopup="menu"
                 >
                   <span>{item.name}</span>
-                  <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
+                  <ChevronDown className="h-3 w-3 text-slate-400 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180 xl:h-3.5 xl:w-3.5" aria-hidden="true" />
                 </button>
               )}
             </div>

@@ -44,20 +44,11 @@ function isInternalIP(ip: string): boolean {
 /**
  * Check rate limit and return 429 response if exceeded.
  * Returns null if the request is allowed.
- *
- * Usage:
- *   const blocked = await applyRateLimit(request, 'contact');
- *   if (blocked) return blocked;
  */
 export async function applyRateLimit(
   request: Request,
   tier: Tier = 'contact',
 ): Promise<NextResponse | null> {
-  // /api/inquiry is a public lead/application-interest endpoint. Older code
-  // still requests the strict tier there, but public inquiry must never fail
-  // closed merely because Redis/Upstash is unavailable. Normalize it to the
-  // contact tier at the shared boundary while preserving strict behavior for
-  // admin/security-sensitive routes.
   const pathname = (() => {
     try {
       return new URL(request.url).pathname;
@@ -65,7 +56,18 @@ export async function applyRateLimit(
       return '';
     }
   })();
-  const effectiveTier: Tier = pathname === '/api/inquiry' && tier === 'strict' ? 'contact' : tier;
+
+  // Public inquiry and authenticated identity upload must not become service
+  // outages merely because Redis/Upstash is temporarily unavailable. Identity
+  // is still protected by auth + the auth request-rate tier; only the Redis
+  // failure mode changes from fail-closed to fail-open.
+  const effectiveTier: Tier =
+    pathname === '/api/inquiry' && tier === 'strict'
+      ? 'contact'
+      : pathname === '/api/verification/submit' && tier === 'strict'
+        ? 'auth'
+        : tier;
+
   const limiter = limiters[effectiveTier]?.get();
   const failClosed = effectiveTier === 'strict';
   const isProduction = process.env.NODE_ENV === 'production';
@@ -76,16 +78,12 @@ export async function applyRateLimit(
       return NextResponse.json({ error: 'Rate limiting temporarily unavailable' }, { status: 503 });
     }
 
-    // Redis is optional in local/test environments and public contact paths
-    // intentionally fail open so an infrastructure dependency cannot block leads.
     logger.warn('[rate-limit] Redis unavailable — failing open', { tier: effectiveTier });
     return null;
   }
 
   const id = getIP(request);
 
-  // Skip Redis for internal/ECS health check IPs — they are not external callers
-  // and would otherwise burn ~1,440 Upstash requests/day per task per route.
   if (isInternalIP(id)) return null;
 
   try {
@@ -104,29 +102,32 @@ export async function applyRateLimit(
       );
     }
   } catch (err) {
-    // Redis error (timeout, connection refused, bad credentials, plan limit exceeded, etc.).
-    // Strict tier fails closed; other tiers fail open.
     const msg = err instanceof Error ? err.message : String(err);
     const isQuotaExhausted = msg.includes('max requests limit exceeded');
     const isCredential = msg.includes('401') || msg.includes('403') || msg.includes('Unauthorized');
 
     if (failClosed) {
-      // Only strict tier logs at error — it's actually blocking traffic.
-      logger.error(`[rate-limit] Redis error — failing closed`, undefined, { tier: effectiveTier, error: msg });
+      logger.error('[rate-limit] Redis error — failing closed', undefined, {
+        tier: effectiveTier,
+        error: msg,
+      });
       return NextResponse.json({ error: 'Rate limiting temporarily unavailable' }, { status: 503 });
     }
 
     if (isQuotaExhausted) {
-      // Monthly quota exhausted — log once at warn, not error, to avoid Sentry spam.
-      // Failing open: traffic continues normally until quota resets.
-      logger.warn('[rate-limit] Upstash monthly quota exhausted — failing open until reset', { tier: effectiveTier });
+      logger.warn('[rate-limit] Upstash monthly quota exhausted — failing open until reset', {
+        tier: effectiveTier,
+      });
     } else if (isCredential) {
       logger.error('[rate-limit] Redis credential error — failing open', undefined, {
         tier: effectiveTier,
         action: 'Check UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in SSM /elevate/',
       });
     } else {
-      logger.warn('[rate-limit] Redis unavailable — failing open', { tier: effectiveTier, error: msg });
+      logger.warn('[rate-limit] Redis unavailable — failing open', {
+        tier: effectiveTier,
+        error: msg,
+      });
     }
 
     return null;

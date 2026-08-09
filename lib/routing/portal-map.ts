@@ -1,20 +1,39 @@
 /**
  * lib/routing/portal-map.ts
  *
- * SINGLE SOURCE OF TRUTH for all cross-application routing.
+ * SINGLE SOURCE OF TRUTH for cross-application portal routing and service
+ * ownership.
  *
  * Architecture:
- * - Marketing app (www.) serves public content and redirects portal routes
- * - Admin app (admin.) serves admin/staff portals at root paths
- * - LMS app (app.) serves student/employer/apprentice portals
+ * - Marketing (www.) owns public content plus the legacy authenticated
+ *   workforce-board, case-manager, provider, and program-holder workspaces.
+ * - LMS (app.) owns learner, employer, apprentice, parent, workforce, and Host
+ *   Site portals.
+ * - Admin (admin.) owns administrator, instructor, staff, and testing operations.
  *
- * Every routing decision (next.config redirects, middleware, navigation, login)
- * should import from this file. No hardcoded portal URLs.
+ * The four Marketing-hosted operational workspaces are explicitly documented
+ * here so they are not mistaken for public landing pages or recreated in LMS.
+ * If they are migrated later, change ownership here first and convert the old
+ * Marketing routes to compatibility redirects only.
  */
 
-export const MARKETING_HOST = 'https://www.elevateforhumanity.org';
-export const ADMIN_HOST = 'https://admin.elevateforhumanity.org';
-export const LMS_HOST = 'https://app.elevateforhumanity.org';
+function normalizeHost(value: string | undefined, fallback: string): string {
+  const candidate = value?.trim() || fallback;
+  return candidate.replace(/\/+$/, '');
+}
+
+export const MARKETING_HOST = normalizeHost(
+  process.env.NEXT_PUBLIC_MARKETING_URL || process.env.NEXT_PUBLIC_SITE_URL,
+  'https://www.elevateforhumanity.org',
+);
+export const ADMIN_HOST = normalizeHost(
+  process.env.NEXT_PUBLIC_ADMIN_URL,
+  'https://admin.elevateforhumanity.org',
+);
+export const LMS_HOST = normalizeHost(
+  process.env.NEXT_PUBLIC_APP_URL,
+  'https://app.elevateforhumanity.org',
+);
 
 export type PortalType =
   | 'marketing'

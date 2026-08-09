@@ -1,12 +1,14 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
+import { Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import Link from 'next/link';
-import { Users, ChevronRight, Search } from 'lucide-react';
+import { StudentSearchPanel } from '@/components/workforce/StudentSearchPanel';
 
 export const metadata: Metadata = {
   title: 'Participants | Workforce Portal',
+  robots: { index: false, follow: false },
 };
 
 export const dynamic = 'force-dynamic';
@@ -16,98 +18,117 @@ export default async function WorkforceParticipantsPage({
 }: {
   searchParams: Promise<{ filter?: string; q?: string }>;
 }) {
-  await requireRole(['workforce_board', 'case_manager', 'admin', 'super_admin', 'staff', 'org_admin']);
-
+  const { effectiveRoles } = await requireRole([
+    'workforce_partner',
+    'admin',
+    'super_admin',
+    'staff',
+    'org_admin',
+  ]);
   const { filter, q } = await searchParams;
+  const normalizedQuery = q?.trim().toLowerCase() ?? '';
 
   const supabase = await createClient();
-  const admin = await requireAdminClient();
-  const db = admin || supabase;
+  const privileged = effectiveRoles.some((role) =>
+    ['admin', 'super_admin', 'staff', 'org_admin'].includes(role),
+  );
+  const admin = privileged ? await requireAdminClient() : null;
 
-  let query = db
-    .from('profiles')
-    .select('id, full_name, email, role, created_at')
-    .eq('role', 'student')
-    .order('created_at', { ascending: false })
-    .limit(100);
+  // Workforce partners query through the signed-in client so RLS remains in
+  // force. Service-role access is reserved for internal oversight roles.
+  const db = admin ?? supabase;
 
-  if (q) {
-    query = query.or(`full_name.ilike.%${q}%,email.ilike.%${q}%`);
+  let restrictedIds: string[] | null = null;
+  if (filter === 'at-risk') {
+    const { data: atRiskEnrollments } = await db
+      .from('program_enrollments')
+      .select('user_id')
+      .eq('at_risk', true);
+    restrictedIds = [
+      ...new Set((atRiskEnrollments ?? []).map((row: any) => row.user_id).filter(Boolean)),
+    ];
   }
 
-  const { data: participants } = await query;
+  let participants: any[] = [];
+  if (restrictedIds === null || restrictedIds.length > 0) {
+    let query = db
+      .from('profiles')
+      .select('id, full_name, email, role, created_at')
+      .eq('role', 'student')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (restrictedIds) query = query.in('id', restrictedIds);
+
+    const { data } = await query;
+    participants = data ?? [];
+  }
+
+  if (normalizedQuery) {
+    participants = participants.filter((participant) => {
+      const searchable = `${participant.full_name ?? ''} ${participant.email ?? ''}`.toLowerCase();
+      return searchable.includes(normalizedQuery);
+    });
+  }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="mx-auto max-w-5xl p-6">
+      <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Participants</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            {participants?.length ?? 0} participant{(participants?.length ?? 0) !== 1 ? 's' : ''}
-            {filter ? ` · filtered: ${filter}` : ''}
+          <p className="mt-1 text-sm text-slate-600">
+            {participants.length} participant{participants.length !== 1 ? 's' : ''}
+            {filter === 'at-risk' ? ' · at-risk enrollments' : ''}
           </p>
         </div>
         <Link
           href="/workforce/dashboard"
-          className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
+          className="text-sm font-semibold text-brand-blue-700 hover:underline"
         >
-          Dashboard <ChevronRight className="w-4 h-4" />
+          Back to dashboard
         </Link>
       </div>
 
-      {/* Search */}
-      <form method="GET" className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Search by name or email…"
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-400"
-          />
-        </div>
-      </form>
+      <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <StudentSearchPanel
+          action="/workforce/participants"
+          defaultValue={q ?? ''}
+          label="Search workforce participants"
+        />
+        {(normalizedQuery || filter) && (
+          <Link
+            href="/workforce/participants"
+            className="mt-2 inline-block text-xs font-semibold text-brand-blue-700 hover:underline"
+          >
+            Clear filters
+          </Link>
+        )}
+      </div>
 
-      {/* Table */}
-      {!participants?.length ? (
+      {!participants.length ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
-          <Users className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <p className="text-sm font-medium text-slate-600">No participants found</p>
-          {q && (
-            <Link href="/workforce/participants" className="text-xs text-brand-blue-600 hover:underline mt-2 inline-block">
-              Clear search
-            </Link>
-          )}
+          <Users className="mx-auto mb-3 h-10 w-10 text-slate-400" />
+          <p className="text-sm font-medium text-slate-700">No participants found</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="border-b border-slate-200 bg-slate-50">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">Name</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">Email</th>
-                <th className="text-left px-4 py-3 font-medium text-slate-600">Joined</th>
-                <th className="px-4 py-3" />
+                <th className="px-4 py-3 text-left font-medium text-slate-700">Name</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-700">Email</th>
+                <th className="px-4 py-3 text-left font-medium text-slate-700">Joined</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {participants.map(p => (
-                <tr key={p.id} className="hover:bg-slate-50 transition">
+              {participants.map((participant) => (
+                <tr key={participant.id} className="transition hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium text-slate-900">
-                    {p.full_name ?? '—'}
+                    {participant.full_name ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{p.email}</td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {new Date(p.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/case-manager/students/${p.id}`}
-                      className="text-xs font-medium text-brand-blue-600 hover:text-brand-blue-800"
-                    >
-                      View
-                    </Link>
+                  <td className="px-4 py-3 text-slate-700">{participant.email}</td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {new Date(participant.created_at).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

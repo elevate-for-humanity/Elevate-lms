@@ -24,21 +24,26 @@ export const handleCheckoutSessionCompleted: StripeEventHandler = async (
         stripe: context.stripe,
         session,
       });
+      if (!result.handled) {
+        return handleExistingCheckoutSessionCompleted(event, context);
+      }
+      const domainId = 'domainId' in result ? result.domainId : undefined;
+      const alreadyFinalized = 'alreadyFinalized' in result ? result.alreadyFinalized : false;
       if (!result.success) {
         const error = new Error(result.error || 'Website domain fulfillment failed');
         Sentry.captureException(error, {
           tags: { subsystem: 'stripe_webhook', kind: 'website_domain_purchase' },
-          extra: { sessionId: session.id, domainId: result.domainId },
+          extra: { sessionId: session.id, domainId },
         });
         logger.error('[webhook/domain] Domain purchase could not be finalized', error, {
           sessionId: session.id,
-          domainId: result.domainId,
+          domainId,
         });
       } else {
         logger.info('[webhook/domain] Domain purchase finalized', {
           sessionId: session.id,
-          domainId: result.domainId,
-          alreadyFinalized: result.alreadyFinalized ?? false,
+          domainId,
+          alreadyFinalized,
         });
       }
       return;

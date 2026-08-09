@@ -1,11 +1,43 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
+import { syncPaidAppSubscription } from '@/lib/apps/sync-paid-app-subscription';
+
+const CUSTOM_DOMAIN_PLANS = new Set(['professional', 'enterprise']);
+
+export interface WebsiteBuilderEntitlement {
+  allowed: boolean;
+  plan: string | null;
+  status: string | null;
+}
+
+async function resolveWebsiteBuilderEntitlement(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<WebsiteBuilderEntitlement> {
+  const { data } = await supabase
+    .from('user_app_subscriptions')
+    .select('id, app_slug, plan, status, stripe_subscription_id, current_period_end')
+    .eq('user_id', userId)
+    .eq('app_slug', 'website-builder')
+    .maybeSingle();
+
+  if (!data) return { allowed: false, plan: null, status: null };
+
+  const synced = await syncPaidAppSubscription(data).catch(() => data);
+  const plan = String(synced?.plan ?? '').toLowerCase();
+  const status = String(synced?.status ?? '').toLowerCase();
+  return {
+    allowed: status === 'active' && CUSTOM_DOMAIN_PLANS.has(plan),
+    plan: plan || null,
+    status: status || null,
+  };
+}
 
 /**
  * Resolve a website owned by the authenticated user and compute the
  * origin URL Domainee should proxy to (the published tenant subdomain URL).
- * Throws an NextResponse-shaped error via the returned `error` field.
+ * Also resolves the paid Website Builder entitlement used by domain routes.
  */
 export async function resolveOwnedSite(websiteId: string) {
   const supabase = await createClient();
@@ -15,6 +47,7 @@ export async function resolveOwnedSite(websiteId: string) {
   if (!user?.id) {
     return { error: NextResponse.json({ error: 'Authentication required' }, { status: 401 }) };
   }
+
   const { data: site, error } = await supabase
     .from('user_websites')
     .select('id, user_id, subdomain, site_name, is_published')
@@ -26,10 +59,27 @@ export async function resolveOwnedSite(websiteId: string) {
   if (!site || site.user_id !== user.id) {
     return { error: NextResponse.json({ error: 'Website not found' }, { status: 404 }) };
   }
+
   const originUrl = site.subdomain
     ? tenantPublicSiteUrl(site.subdomain)
     : process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
-  return { user, supabase, site, originUrl };
+  const entitlement = await resolveWebsiteBuilderEntitlement(supabase, user.id);
+
+  return { user, supabase, site, originUrl, entitlement };
+}
+
+export function requireCustomDomainEntitlement(entitlement: WebsiteBuilderEntitlement) {
+  if (entitlement.allowed) return null;
+  return NextResponse.json(
+    {
+      error: 'Custom domains require the Website Builder Professional or Enterprise plan.',
+      code: 'UPGRADE_REQUIRED',
+      plan: entitlement.plan,
+      status: entitlement.status,
+      upgradeUrl: '/store/apps/website-builder',
+    },
+    { status: 403 },
+  );
 }
 
 /** Validate a hostname (RFC 1035-ish, apex or subdomain). */

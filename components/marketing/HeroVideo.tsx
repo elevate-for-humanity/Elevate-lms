@@ -12,6 +12,7 @@
  * - Narration/video audio is attempted when playback begins, but browsers may
  *   require a user gesture for audible autoplay. The visible sound button is
  *   always the fallback and controls the real media/narration source.
+ * - Optional demoSlides can take over the visual while narration continues.
  * - All narration stops when the hero finishes or unmounts.
  */
 
@@ -23,6 +24,12 @@ export interface HeroVideoCta {
   label: string;
   href: string;
   variant?: 'primary' | 'secondary';
+}
+
+export interface HeroDemoSlide {
+  src: string;
+  alt: string;
+  label?: string;
 }
 
 export interface HeroVideoProps {
@@ -40,6 +47,10 @@ export interface HeroVideoProps {
   analyticsName?: string;
   className?: string;
   children?: React.ReactNode;
+  mediaFit?: 'cover' | 'contain';
+  demoSlides?: HeroDemoSlide[];
+  demoStartSeconds?: number;
+  demoSlideSeconds?: number;
 }
 
 export default function HeroVideo({
@@ -57,16 +68,24 @@ export default function HeroVideo({
   analyticsName,
   className = '',
   children,
+  mediaFit = 'cover',
+  demoSlides = [],
+  demoStartSeconds = 6,
+  demoSlideSeconds = 4.5,
 }: HeroVideoProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const demoStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const demoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [hasEnded, setHasEnded] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [ttsSupported, setTtsSupported] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop);
+  const [demoActive, setDemoActive] = useState(false);
+  const [demoSlideIndex, setDemoSlideIndex] = useState(0);
   const transcriptId = useId();
 
   useEffect(() => {
@@ -77,6 +96,27 @@ export default function HeroVideo({
     const fallback = [belowHeroHeadline, belowHeroSubheadline].filter(Boolean).join(' ');
     return (transcript || fallback).trim();
   }, [belowHeroHeadline, belowHeroSubheadline, transcript]);
+
+  const clearDemoTimers = useCallback(() => {
+    if (demoStartTimerRef.current) clearTimeout(demoStartTimerRef.current);
+    if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+    demoStartTimerRef.current = null;
+    demoIntervalRef.current = null;
+  }, []);
+
+  const startDemoSequence = useCallback(() => {
+    if (!demoSlides.length || demoStartTimerRef.current || demoActive) return;
+    demoStartTimerRef.current = setTimeout(() => {
+      setDemoActive(true);
+      setDemoSlideIndex(0);
+      demoStartTimerRef.current = null;
+      if (demoSlides.length > 1) {
+        demoIntervalRef.current = setInterval(() => {
+          setDemoSlideIndex((current) => (current + 1) % demoSlides.length);
+        }, Math.max(2000, demoSlideSeconds * 1000));
+      }
+    }, Math.max(0, demoStartSeconds * 1000));
+  }, [demoActive, demoSlideSeconds, demoSlides.length, demoStartSeconds]);
 
   useEffect((): (() => void) | undefined => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined;
@@ -141,8 +181,6 @@ export default function HeroVideo({
   }, [ttsSupported, ttsText]);
 
   const startAudibleTrack = useCallback(async () => {
-    // Dedicated narration wins. If none exists, use TTS when copy is available.
-    // Otherwise unmute the video's own audio track.
     if (voiceoverSrc && audioRef.current) {
       try {
         audioRef.current.currentTime = Math.min(
@@ -178,22 +216,22 @@ export default function HeroVideo({
 
   const startOrResume = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || hasEnded) return;
+    if (!video || (hasEnded && !demoSlides.length)) return;
+
+    startDemoSequence();
+    if (hasEnded) return;
 
     video.loop = false;
-    // Begin muted so scroll autoplay can start under browser autoplay policy.
     if (!hasStarted) video.muted = true;
 
     try {
       await video.play();
       setHasStarted(true);
-      // Attempt sound/narration once playback has successfully begun. Browsers
-      // that require a gesture will reject this cleanly and keep the sound button.
       if (muted) void startAudibleTrack();
     } catch {
       // Keep the poster/frame visible. User can start from native interaction.
     }
-  }, [hasEnded, hasStarted, muted, startAudibleTrack]);
+  }, [demoSlides.length, hasEnded, hasStarted, muted, startAudibleTrack, startDemoSequence]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -201,7 +239,7 @@ export default function HeroVideo({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.45 && !hasEnded) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
           void startOrResume();
           if (typeof window !== 'undefined' && window.speechSynthesis?.paused) {
             window.speechSynthesis.resume();
@@ -223,14 +261,15 @@ export default function HeroVideo({
 
     observer.observe(wrapper);
     return () => observer.disconnect();
-  }, [hasEnded, muted, startOrResume]);
+  }, [muted, startOrResume]);
 
   useEffect(() => {
     return () => {
       videoRef.current?.pause();
+      clearDemoTimers();
       stopNarration(true);
     };
-  }, [stopNarration]);
+  }, [clearDemoTimers, stopNarration]);
 
   async function toggleMute() {
     if (!muted) {
@@ -258,10 +297,11 @@ export default function HeroVideo({
   function handleEnded() {
     setHasEnded(true);
     videoRef.current?.pause();
-    stopNarration(true);
+    if (!demoSlides.length) stopNarration(true);
   }
 
   const hasSoundControl = Boolean(voiceoverSrc || ttsText || videoSrc);
+  const activeSlide = demoActive ? demoSlides[demoSlideIndex] : null;
 
   return (
     <div ref={wrapperRef} className={`w-full ${className}`}>
@@ -279,9 +319,28 @@ export default function HeroVideo({
           muted
           loop={false}
           onEnded={handleEnded}
-          className="absolute inset-0 z-10 h-full w-full object-cover object-center"
+          className={`absolute inset-0 z-10 h-full w-full ${mediaFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
           aria-label={analyticsName ? `${analyticsName} video` : 'Program video'}
         />
+
+        {activeSlide && (
+          <div className="absolute inset-0 z-[11] bg-slate-950" aria-live="polite">
+            {demoSlides.map((slide, index) => (
+              <div
+                key={`${slide.src}-${index}`}
+                className={`absolute inset-0 transition-opacity duration-700 ${index === demoSlideIndex ? 'opacity-100' : 'opacity-0'}`}
+                aria-hidden={index !== demoSlideIndex}
+              >
+                <img src={slide.src} alt={slide.alt} className="h-full w-full object-contain" />
+                {slide.label && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-slate-950/85 px-4 py-2 text-xs font-bold text-white shadow-lg sm:text-sm">
+                    {slide.label}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {voiceoverSrc && (
           <audio
@@ -312,7 +371,7 @@ export default function HeroVideo({
           </div>
         )}
 
-        {hasSoundControl && !hasEnded && (
+        {hasSoundControl && (!hasEnded || demoSlides.length > 0) && (
           <div className="absolute bottom-4 right-4 z-20">
             <button
               type="button"

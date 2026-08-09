@@ -1,57 +1,57 @@
 import crypto from 'crypto';
 import { logger } from '@/lib/logger';
 
-const SSN_SALT = process.env.SSN_SALT;
+let warnedMissingSalt = false;
 
-// Only warn in server-side code (not during build)
-if (!SSN_SALT && typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
-  logger.warn('SSN_SALT environment variable is not set. SSN hashing will fail in production.');
+function getSSNSalt(): string {
+  const salt = process.env.SSN_SALT?.trim();
+  if (!salt) {
+    if (!warnedMissingSalt && typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+      warnedMissingSalt = true;
+      logger.warn('SSN_SALT environment variable is not set. SSN hashing cannot proceed.');
+    }
+    throw new Error('SSN_SALT environment variable is required for SSN operations.');
+  }
+  return salt;
 }
 
 /**
- * Hash an SSN for secure storage
- * Never store plain-text SSNs - always use this function
+ * Hash an SSN for secure storage.
+ * Never store plain-text SSNs. The salt is read at operation time because
+ * production secrets may be hydrated after module import.
  */
 export function hashSSN(ssn: string): string {
-  if (!SSN_SALT) {
-    throw new Error('SSN_SALT environment variable is required for SSN operations.');
-  }
   const cleaned = ssn.replace(/\D/g, '');
+  if (cleaned.length !== 9) throw new Error('A valid 9-digit SSN is required.');
   return crypto
     .createHash('sha256')
-    .update(cleaned + SSN_SALT)
+    .update(cleaned + getSSNSalt())
     .digest('hex');
 }
 
-/**
- * Get last 4 digits of SSN for display/lookup purposes
- */
 export function getSSNLast4(ssn: string): string {
   const cleaned = ssn.replace(/\D/g, '');
   return cleaned.slice(-4);
 }
 
-/**
- * Mask SSN for display (XXX-XX-1234)
- */
 export function maskSSN(ssn: string): string {
-  const last4 = getSSNLast4(ssn);
-  return `XXX-XX-${last4}`;
+  return `XXX-XX-${getSSNLast4(ssn)}`;
 }
 
-/**
- * Validate SSN format (9 digits)
- */
 export function isValidSSN(ssn: string): boolean {
   const cleaned = ssn.replace(/\D/g, '');
-  return cleaned.length === 9;
+  if (cleaned.length !== 9) return false;
+  if (/^(\d)\1{8}$/.test(cleaned)) return false;
+  if (['078051120', '219099999'].includes(cleaned)) return false;
+  return true;
 }
 
 /**
- * Prepare SSN data for secure storage
- * Returns object with hash and last4, never the full SSN
+ * Prepare SSN data for isolated secure_identity storage.
+ * Returns only the hash and last four; never the full SSN.
  */
 export function prepareSSNForStorage(ssn: string): { ssn_hash: string; ssn_last4: string } {
+  if (!isValidSSN(ssn)) throw new Error('A valid 9-digit SSN is required.');
   return {
     ssn_hash: hashSSN(ssn),
     ssn_last4: getSSNLast4(ssn),

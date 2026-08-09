@@ -16,14 +16,29 @@ test.describe('Canonical application flow', () => {
     expect(await page.locator('main a[href*="/programs/"]:visible').count()).toBeGreaterThan(0);
   });
 
-  test('apply page exposes canonical intake form', async ({ page }) => {
+  test('apply page exposes and advances the canonical multi-step intake form', async ({ page }) => {
     await page.goto('/apply');
-    await expect(page).toHaveURL(/\/apply/);
-    const form = page.locator('main form, main #application, main [id*="form"]').first();
+    await expect(page).toHaveURL(/\/apply\/student/);
+
+    const form = page.locator('main form').first();
     await expect(form).toBeVisible();
-    await expect(form.locator('input[type="email"], input[name="email"]').first()).toBeVisible();
-    await expect(form.locator('input[type="tel"], input[name="phone"]').first()).toBeVisible();
-    await expect(form.locator('button[type="submit"]').first()).toBeVisible();
+    await expect(form.locator('input[name="email"]')).toBeVisible();
+    await expect(form.locator('input[name="phone"]')).toBeVisible();
+    await expect(form.getByRole('button', { name: 'Continue' })).toBeVisible();
+
+    await form.locator('input[name="firstName"]').fill('Smoke');
+    await form.locator('input[name="lastName"]').fill('Tester');
+    await form.locator('input[name="dateOfBirth"]').fill('1990-01-01');
+    await form.locator('input[name="email"]').fill('smoke.tester@example.com');
+    await form.locator('input[name="phone"]').fill('3175550100');
+    await form.locator('input[name="address"]').fill('100 Test Street');
+    await form.locator('input[name="city"]').fill('Indianapolis');
+    await form.locator('input[name="state"]').fill('Indiana');
+    await form.locator('input[name="zipCode"]').fill('46204');
+
+    await form.getByRole('button', { name: 'Continue' }).click();
+    await expect(form.getByText('Program and training preferences')).toBeVisible();
+    await expect(form.locator('select[name="program"]')).toBeVisible();
   });
 
   test('canonical applications API validates missing fields', async ({ request }) => {
@@ -33,11 +48,9 @@ test.describe('Canonical application flow', () => {
     expect(response.status()).toBeLessThan(500);
   });
 
-  test('compatibility apply API validates missing fields', async ({ request }) => {
+  test('retired compatibility apply API is not an active submit surface', async ({ request }) => {
     const response = await request.post('/api/apply', { data: {}, failOnStatusCode: false });
-    expect(response.status()).toBe(400);
-    const body = await response.json();
-    expect(String(body.error || '')).toMatch(/required|missing/i);
+    expect([404, 405, 410]).toContain(response.status());
   });
 
   for (const route of [

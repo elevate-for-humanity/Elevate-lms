@@ -41,17 +41,25 @@ const nextConfig = {
 
   async redirects() {
     return [
-      // Admin is a standalone service at admin.elevateforhumanity.org.
-      // Strip the historical /admin prefix when crossing to that container.
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: false },
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: false },
-      { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: false },
-      { source: '/employer/:path*', destination: 'https://app.elevateforhumanity.org/employer/:path*', permanent: false },
-      { source: '/apprentice/:path*', destination: 'https://app.elevateforhumanity.org/apprentice/:path*', permanent: false },
-      { source: '/parent-portal/:path*', destination: 'https://app.elevateforhumanity.org/parent-portal/:path*', permanent: false },
-      { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: false },
-      { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/cosmetology-host-shop/:path*', permanent: false },
-      { source: '/host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/:path*', permanent: false },
+      // Canonical public hostname. Keep all indexable Marketing URLs on www.
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'elevateforhumanity.org' }],
+        destination: 'https://www.elevateforhumanity.org/:path*',
+        permanent: true,
+      },
+
+      // Historical cross-service paths remain as one-hop permanent redirects.
+      // Internal navigation should point directly to the destination hosts.
+      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: true },
+      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
+      { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: true },
+      { source: '/employer/:path*', destination: 'https://app.elevateforhumanity.org/employer/:path*', permanent: true },
+      { source: '/apprentice/:path*', destination: 'https://app.elevateforhumanity.org/apprentice/:path*', permanent: true },
+      { source: '/parent-portal/:path*', destination: 'https://app.elevateforhumanity.org/parent-portal/:path*', permanent: true },
+      { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: true },
+      { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/cosmetology-host-shop/:path*', permanent: true },
+      { source: '/host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/:path*', permanent: true },
     ];
   },
 };

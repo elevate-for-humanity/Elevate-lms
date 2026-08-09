@@ -2,10 +2,20 @@ name: Supabase Migrations
 
 on:
   workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Apply pending migrations after the official history check'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   supabase-migrations:
     runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
     steps:
       - name: Checkout repo
@@ -16,52 +26,46 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Check secrets
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Verify migration credentials
+        shell: bash
         run: |
-          if [ -z "$NEXT_PUBLIC_SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "⚠️ Supabase secrets not configured. Add these secrets at:"
-            echo "   https://github.com/elevate-for-humanity/Elevate-lms/settings/secrets/actions"
-            echo "   - NEXT_PUBLIC_SUPABASE_URL"
-            echo "   - SUPABASE_SERVICE_ROLE_KEY"
-            echo "Skipping migrations for now."
-            exit 0
+          set -euo pipefail
+          missing=0
+          for key in SUPABASE_ACCESS_TOKEN SUPABASE_PROJECT_REF SUPABASE_DB_PASSWORD; do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::$key is required for the official Supabase migration workflow"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
           fi
 
       - name: Lint migrations
         run: node scripts/lint-migrations.cjs
 
-      - name: Apply migrations
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/db/runMigrations.js
+      - name: Link production project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
 
-      - name: Verify lms_lessons
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Compare local and official remote migration history
+        run: supabase migration list
+
+      - name: Dry-run pending migrations
+        run: supabase db push --dry-run
+
+      - name: Apply pending migrations
+        if: ${{ inputs.apply == true }}
+        run: supabase db push
+
+      - name: Migration mode summary
         run: |
-          node -e "
-          const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-          fetch(url + '/rest/v1/lms_lessons?course_id=eq.0ba9a61c-1f1b-4019-be6f-90e92eba2bc0&select=count', {
-            headers: { apikey: key, Authorization: 'Bearer ' + key, Prefer: 'count=exact' }
-          }).then(r => r.json()).then(d => {
-            const count = d[0]?.count;
-            console.log('HVAC lms_lessons:', count);
-            if (parseInt(count) !== 96) process.exit(1);
-          });
-          "
-
-      - name: Notify success
-        if: success()
-        run: echo "Migrations complete"
+          if [ "${{ inputs.apply }}" = "true" ]; then
+            echo "Official Supabase migration push completed."
+          else
+            echo "Audit-only run completed. Re-run with apply=true only after migration history is reconciled."
+          fi

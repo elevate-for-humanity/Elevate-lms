@@ -1,3 +1,4 @@
+# One-time execution trigger after workflow registration.
 name: One-time stale branch cleanup
 
 on:
@@ -56,7 +57,6 @@ jobs:
           )
 
           for branch in "${branches[@]}"; do
-            # Never delete a branch that unexpectedly has an open PR at cleanup time.
             open_prs=$(gh api -X GET search/issues \
               -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
               --jq '.total_count')
@@ -71,9 +71,6 @@ jobs:
               continue
             fi
 
-            # The repository owner explicitly approved deletion of every remaining
-            # non-main branch after the valuable stale work was reimplemented and
-            # merged into current main. Record divergence before removing the ref.
             git push origin --delete "$branch"
             printf '| `%s` | %s | %s | %s | DELETED |\n' \
               "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"

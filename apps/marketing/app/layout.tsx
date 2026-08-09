@@ -9,6 +9,7 @@ import './client-polyfills';
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';
+import '../../../styles/contrast-guardrails.css';
 import Header from '@/components/site/Header';
 import { SiteFooter } from '@/components/site-footer';
 import { I18nProvider } from '@/lib/i18n/context';
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <SupabasePublicConfigScript />
       </head>
-      <body>
+      <body className="efh-contrast">
         <SupabaseConfigBootstrap />
         <MarketingPwaClient />
         <ChunkRecovery />

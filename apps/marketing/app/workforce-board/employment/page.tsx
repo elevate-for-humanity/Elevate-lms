@@ -1,108 +1,118 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Briefcase, MapPin, DollarSign, Building2, Clock, ArrowRight } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Building2, ArrowRight } from 'lucide-react';
+import PictureFirstPageHero from '@/components/site/PictureFirstPageHero';
+import { getAdminClient } from '@/lib/supabase/admin';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Employment Opportunities | Workforce Board',
-  keywords: ["jobs", "employment", "careers", "workforce", "hiring"],
-  description: 'Find employment opportunities with our workforce board partners. Browse job listings and connect with local employers.',
+  keywords: ['jobs', 'employment', 'careers', 'workforce', 'hiring'],
+  description: 'View current employment opportunities and connect with employers and workforce partners.',
 };
 
-export default function WorkforceEmploymentPage() {
-  const jobs = [
-    { title: 'Medical Assistant', company: 'Healthcare Plus', location: 'Indianapolis, IN', salary: '$35,000 - $42,000/year', type: 'Full-time', posted: '2 days ago' },
-    { title: 'HVAC Technician', company: 'Cool Air Solutions', location: 'Carmel, IN', salary: '$45,000 - $55,000/year', type: 'Full-time', posted: '5 days ago' },
-    { title: 'Barber / Cosmetologist', company: 'Elevate Salon', location: 'Indianapolis, IN', salary: '$30,000 - $50,000/year', type: 'Full-time / Commission', posted: '1 week ago' },
-    { title: 'CDL Driver', company: 'Midwest Logistics', location: 'Greenfield, IN', salary: '$55,000 - $65,000/year', type: 'Full-time', posted: '3 days ago' },
-    { title: 'Pharmacy Technician', company: 'Community Pharmacy', location: 'Noblesville, IN', salary: '$32,000 - $38,000/year', type: 'Full-time', posted: '1 week ago' },
-  ];
+type JobRow = {
+  id: string;
+  title: string | null;
+  name: string | null;
+  company: string | null;
+  location: string | null;
+  type: string | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  description: string | null;
+  created_at: string | null;
+};
+
+function moneyRange(min: number | null, max: number | null) {
+  if (min == null && max == null) return null;
+  const fmt = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+  if (min != null && max != null) return `${fmt(min)}–${fmt(max)}`;
+  return min != null ? `From ${fmt(min)}` : `Up to ${fmt(max as number)}`;
+}
+
+export default async function WorkforceEmploymentPage() {
+  let jobs: JobRow[] = [];
+  try {
+    const db = await getAdminClient();
+    if (db) {
+      const { data } = await db
+        .from('jobs')
+        .select('id,title,name,company,location,type,salary_min,salary_max,description,created_at')
+        .in('status', ['active', 'open', 'published'])
+        .order('created_at', { ascending: false })
+        .limit(50);
+      jobs = (data ?? []) as JobRow[];
+    }
+  } catch {
+    jobs = [];
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-brand-red-500 to-brand-orange-500" />
-        </div>
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-red-500/20 text-brand-red-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <Briefcase className="w-4 h-4" />
-              Workforce Board
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Employment Opportunities
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              Browse job opportunities from our employer partners. These employers are actively hiring graduates from our training programs.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/workforce-board/dashboard" className="inline-flex items-center bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Post a Job
-              </Link>
-              <Link href="/programs" className="inline-flex items-center border-2 border-white hover:bg-white hover:text-brand-blue-900 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-                Browse Training Programs
-              </Link>
-            </div>
+      <PictureFirstPageHero
+        image="/images/pages/ojt-and-funding-page-1.webp"
+        alt="Workforce employment and employer connection services"
+        eyebrow="Workforce Employment"
+        title="Employment Opportunities"
+        description="Current openings are loaded from the platform job database. If no jobs are published, career services can still help with employer referrals and job-search support."
+        actions={(
+          <>
+            <Link href="/career-services/contact" className="inline-flex items-center rounded-lg bg-brand-red-600 px-7 py-3 font-bold text-white transition-colors hover:bg-brand-red-700">Get Job-Search Help</Link>
+            <Link href="/apply/employer" className="inline-flex items-center rounded-lg border-2 border-slate-300 bg-white px-7 py-3 font-bold text-slate-900 transition-colors hover:border-slate-500">Employer Partnership</Link>
+          </>
+        )}
+      />
+
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 flex items-center justify-between gap-4">
+            <h2 className="text-2xl font-bold text-slate-950">Published Positions</h2>
+            <span className="text-sm font-semibold text-slate-600">{jobs.length} current listing{jobs.length === 1 ? '' : 's'}</span>
           </div>
+
+          {jobs.length === 0 ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center sm:p-12">
+              <Briefcase className="mx-auto h-10 w-10 text-slate-500" />
+              <h3 className="mt-4 text-xl font-black text-slate-950">No jobs are published right now</h3>
+              <p className="mx-auto mt-3 max-w-xl text-slate-700">This page no longer displays fabricated sample jobs. Contact career services for current employer referrals or check again when new listings are published.</p>
+              <Link href="/career-services/contact" className="mt-6 inline-flex items-center rounded-lg bg-brand-blue-700 px-6 py-3 font-bold text-white hover:bg-brand-blue-800">Contact Career Services <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {jobs.map((job) => {
+                const salary = moneyRange(job.salary_min, job.salary_max);
+                return (
+                  <article key={job.id} className="rounded-xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-blue-200 hover:shadow-md">
+                    <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+                      <div className="flex-1">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          {job.type ? <span className="rounded bg-brand-blue-100 px-2 py-1 text-xs font-semibold text-brand-blue-800">{job.type}</span> : null}
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-950">{job.title || job.name || 'Employment Opportunity'}</h3>
+                        <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-700">
+                          {job.company ? <span className="inline-flex items-center gap-1"><Building2 className="h-4 w-4" /> {job.company}</span> : null}
+                          {job.location ? <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" /> {job.location}</span> : null}
+                          {salary ? <span className="inline-flex items-center gap-1"><DollarSign className="h-4 w-4" /> {salary}</span> : null}
+                        </div>
+                        {job.description ? <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-700">{job.description}</p> : null}
+                      </div>
+                      <Link href={`/career-services/contact?job=${encodeURIComponent(job.id)}`} className="inline-flex shrink-0 items-center rounded-lg bg-brand-blue-700 px-5 py-2.5 font-semibold text-white hover:bg-brand-blue-800">Ask About This Job</Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Job Listings */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-slate-900">Available Positions</h2>
-            <span className="text-sm text-slate-500">{jobs.length} jobs posted</span>
-          </div>
-          <div className="space-y-4">
-            {jobs.map((job, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-lg hover:border-brand-blue-200 transition-all">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-1 rounded">{job.type}</span>
-                      <span className="text-xs text-slate-400">{job.posted}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">{job.title}</h3>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600">
-                      <div className="flex items-center gap-1">
-                        <Building2 className="w-4 h-4" />
-                        {job.company}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {job.location}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        {job.salary}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <button className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors">
-                      Apply Now
-                    </button>
-                    <button className="border border-slate-200 hover:border-slate-300 text-slate-600 font-semibold py-2.5 px-4 rounded-lg transition-colors">
-                      Save
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Employer CTA */}
-      <section className="py-16 bg-brand-blue-50 border-y border-brand-blue-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Are You an Employer?</h2>
-          <p className="text-slate-600 mb-8">Post your job openings to reach our trained graduates. It's free for workforce partners.</p>
-          <Link href="/workforce-board/dashboard" className="inline-flex items-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors">
-            Post a Job <ArrowRight className="w-4 h-4 ml-2" />
-          </Link>
+      <section className="border-y border-brand-blue-100 bg-brand-blue-50 py-16">
+        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="mb-4 text-2xl font-bold text-slate-950">Are You Hiring?</h2>
+          <p className="mb-8 text-slate-700">Employer partners can submit their organization and hiring needs for review.</p>
+          <Link href="/apply/employer" className="inline-flex items-center rounded-lg bg-brand-blue-700 px-8 py-4 font-bold text-white transition-colors hover:bg-brand-blue-800">Employer Application <ArrowRight className="ml-2 h-4 w-4" /></Link>
         </div>
       </section>
     </div>

@@ -10,6 +10,18 @@ import {
   addonPriceCents,
   type BillingInterval,
 } from '@/lib/store/platform-pricing';
+import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
+import { resolveBillingOrganizationId } from '@/lib/platform/organization-features';
+import { normalizeAddonCode } from '@/lib/platform/feature-catalog';
+import {
+  platformAddonPriceLookupKey,
+  platformPlanPriceLookupKey,
+} from '@/lib/platform/orchestration/commerce';
+import {
+  ensureCanonicalStripePrice,
+  resolveCanonicalStripePrice,
+} from '@/lib/stripe/resolve-canonical-price';
+import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -45,24 +57,22 @@ export async function POST(request: NextRequest) {
   }
 
   const admin = await requireAdminClient();
-  if (!admin) {
-    return NextResponse.json({ error: 'Billing service unavailable' }, { status: 503 });
-  }
-
-  const { data: organization, error: orgError } = await admin
-    .from('organizations')
-    .select('id, name, contact_email')
-    .eq('contact_email', user.email.toLowerCase())
-    .maybeSingle();
-
-  if (orgError) {
-    return NextResponse.json({ error: 'Could not resolve your organization' }, { status: 500 });
-  }
-
-  if (!organization?.id) {
+  const tenantId = await resolveTenantIdForUser(user.id);
+  if (!tenantId) {
     return NextResponse.json(
       {
         error: 'Start your organization trial first so the subscription can be attached to the correct workspace.',
+        trialUrl: '/store/trial',
+      },
+      { status: 409 },
+    );
+  }
+
+  const billingOrganizationId = await resolveBillingOrganizationId(tenantId, admin);
+  if (!billingOrganizationId) {
+    return NextResponse.json(
+      {
+        error: 'Your workspace is not linked to a billing organization yet.',
         trialUrl: '/store/trial',
       },
       { status: 409 },
@@ -75,45 +85,75 @@ export async function POST(request: NextRequest) {
   }
 
   const recurringInterval = interval === 'annual' ? 'year' : 'month';
-  const lineItems: any[] = [
-    {
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: `Elevate Platform — ${plan.name}`,
-          metadata: { plan_id: plan.id },
-        },
-        unit_amount: priceCents(plan, interval),
-        recurring: { interval: recurringInterval },
+  const baseLookupKey = platformPlanPriceLookupKey(plan.id, interval);
+
+  let basePrice;
+  try {
+    basePrice = await resolveCanonicalStripePrice(stripe, {
+      lookupKey: baseLookupKey,
+      unitAmount: priceCents(plan, interval),
+      recurringInterval,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: 'Platform subscription catalog is temporarily unavailable',
+        detail: error instanceof Error ? error.message : 'Base plan price could not be resolved',
       },
-      quantity: 1,
-    },
+      { status: 503 },
+    );
+  }
+
+  const lineItems: Array<{ price: string; quantity: number }> = [
+    { price: basePrice.id, quantity: 1 },
   ];
 
   for (const addon of addons) {
     if (!addon) continue;
+    const addonCode = normalizeAddonCode(addon.slug);
     const amount = interval === 'annual' ? addonPriceCents(addon) * 12 : addonPriceCents(addon);
-    lineItems.push({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: `Elevate Add-on — ${addon.name}`,
-          metadata: { addon_slug: addon.slug },
+    const lookupKey = platformAddonPriceLookupKey(addonCode, interval);
+
+    try {
+      const price = await ensureCanonicalStripePrice(stripe, {
+        lookupKey,
+        unitAmount: amount,
+        recurringInterval,
+        productName: `Elevate Add-on — ${addon.name} (${interval === 'annual' ? 'Annual' : 'Monthly'})`,
+        nickname: `${addon.name} ${interval}`,
+        productMetadata: {
+          type: 'platform_addon',
+          addon_code: addonCode,
+          addon_slug: addon.slug,
         },
-        unit_amount: amount,
-        recurring: { interval: recurringInterval },
-      },
-      quantity: 1,
-    });
+        priceMetadata: {
+          checkout_type: 'platform_saas',
+          addon_code: addonCode,
+          addon_slug: addon.slug,
+          billing_interval: interval,
+        },
+      });
+      lineItems.push({ price: price.id, quantity: 1 });
+    } catch (error) {
+      return NextResponse.json(
+        {
+          error: `The ${addon.name} billing option is temporarily unavailable`,
+          detail: error instanceof Error ? error.message : 'Add-on price could not be resolved',
+        },
+        { status: 503 },
+      );
+    }
   }
 
   const metadata = {
     checkout_type: 'platform_saas',
     user_id: user.id,
-    tenant_id: organization.id,
+    tenant_id: tenantId,
+    billing_organization_id: billingOrganizationId,
     plan_id: plan.id,
     billing_interval: interval,
     addon_slugs: addonSlugs.join(','),
+    base_price_lookup_key: baseLookupKey,
   };
 
   const session = await stripe.checkout.sessions.create({
@@ -130,6 +170,31 @@ export async function POST(request: NextRequest) {
 
   if (!session.url) {
     return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
+  }
+
+  try {
+    await emitPlatformEvent(admin, {
+      eventType: PlatformEventType.COMMERCE_CHECKOUT_CREATED,
+      category: 'commerce',
+      source: 'marketing.api.store.platform-checkout',
+      actorId: user.id,
+      actorType: 'user',
+      tenantId,
+      subjectType: 'platform_subscription_checkout',
+      subjectId: session.id,
+      correlationId: session.id,
+      idempotencyKey: `platform-checkout-created:${session.id}`,
+      dispatch: false,
+      payload: {
+        plan_id: plan.id,
+        billing_interval: interval,
+        addon_slugs: addonSlugs,
+        base_price_id: basePrice.id,
+        base_price_lookup_key: baseLookupKey,
+      },
+    });
+  } catch {
+    // Audit/event telemetry must not invalidate an otherwise valid Stripe checkout.
   }
 
   return NextResponse.json({ checkoutUrl: session.url });

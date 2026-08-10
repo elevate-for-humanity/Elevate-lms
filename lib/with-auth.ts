@@ -35,8 +35,6 @@ async function getAuthedUser(_req: NextRequest): Promise<{
             });
           } catch {
             // Middleware is the primary request-boundary refresher for Admin/LMS.
-            // Some server contexts cannot mutate cookies; authorization can still
-            // proceed with the identity already validated by getUser().
           }
         },
       },
@@ -70,14 +68,22 @@ async function getAuthedUser(_req: NextRequest): Promise<{
   };
 }
 
-/**
- * Wrap a Next route handler and inject the authenticated user into context.
- *
- * Admin/super_admin receive the same platform override as page-level guards.
- * Routes needing super-admin-only access must explicitly use roles:
- * ['super_admin'] and set adminOverride=false at the permission layer instead
- * of relying on a separate role implementation.
- */
+function canSatisfyRequestedRoles(
+  effectiveRoles: string[],
+  requestedRoles: readonly UserRole[],
+): boolean {
+  // A route that explicitly asks for super_admin and does not include admin is
+  // a privileged boundary, not a portal-access role set. Preserve that exact
+  // requirement instead of applying the normal platform-admin override.
+  const superAdminOnlyBoundary =
+    requestedRoles.includes('super_admin') && !requestedRoles.includes('admin');
+
+  return hasAnyRole(effectiveRoles, requestedRoles, {
+    adminOverride: !superAdminOnlyBoundary,
+  });
+}
+
+/** Wrap a Next route handler and inject the authenticated user into context. */
 export function withAuth<TParams = Record<string, string>>(
   handler: AuthHandler<TParams>,
   options: WithAuthOptions = {},
@@ -95,7 +101,7 @@ export function withAuth<TParams = Record<string, string>>(
     if (
       options.roles &&
       options.roles.length > 0 &&
-      !hasAnyRole(auth.effectiveRoles, options.roles, { adminOverride: true })
+      !canSatisfyRequestedRoles(auth.effectiveRoles, options.roles)
     ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

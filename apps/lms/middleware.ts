@@ -7,17 +7,26 @@ type PendingCookie = {
   options?: Record<string, unknown>;
 };
 
+function platformCookieOptions(options: Record<string, unknown> | undefined) {
+  return {
+    ...(options || {}),
+    path: '/',
+    sameSite: 'lax' as const,
+    ...(process.env.NODE_ENV === 'production'
+      ? { domain: '.elevateforhumanity.org', secure: true }
+      : {}),
+  };
+}
+
 /**
  * LMS session synchronizer.
  *
- * Supabase refreshes should happen once at the request boundary and the
- * refreshed cookies must be copied onto the response. Server components then
- * receive the fresh access token instead of racing each other to reuse the same
- * refresh token.
+ * Supabase refreshes happen once at the request boundary and refreshed cookies
+ * are copied onto the outgoing response. Production auth cookies are written
+ * on .elevateforhumanity.org so app. and admin. share one session instead of
+ * creating competing host-only refresh tokens.
  *
- * This middleware deliberately does not make route-authorization decisions;
- * each portal still uses the canonical server-side role guard. Its job is only
- * session synchronization + preserving the requested path.
+ * Route authorization remains in the canonical server-side role guards.
  */
 export async function middleware(request: NextRequest) {
   const pendingCookies: PendingCookie[] = [];
@@ -45,16 +54,20 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // One boundary validation/refresh for this page/API request. Do not call
-  // getSession() here; getUser() validates and refreshes when required.
+  // One boundary validation/refresh for this request. Do not call getSession()
+  // here; getUser() validates and refreshes when needed.
   await supabase.auth.getUser();
 
   for (const cookie of pendingCookies) {
-    response.cookies.set(cookie.name, cookie.value, cookie.options as any);
+    response.cookies.set(
+      cookie.name,
+      cookie.value,
+      platformCookieOptions(cookie.options) as any,
+    );
   }
   response.cookies.set('__efh_pathname', requestedPath, {
     httpOnly: false,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
     maxAge: 60,

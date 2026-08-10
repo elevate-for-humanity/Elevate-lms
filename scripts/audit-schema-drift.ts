@@ -10,11 +10,13 @@
  *   pnpm audit:schema
  *   pnpm audit:schema:strict
  *   pnpm tsx scripts/audit-schema-drift.ts --fail-on-drift --require-live
+ *   pnpm tsx scripts/audit-schema-drift.ts --fail-on-drift --require-live --changed-only
  *   pnpm tsx scripts/audit-schema-drift.ts --table applications
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { glob } from 'glob';
 
@@ -26,6 +28,7 @@ const args = process.argv.slice(2);
 const filterTable = args.find((arg, index) => args[index - 1] === '--table')?.toLowerCase() ?? null;
 const failOnDrift = args.includes('--fail-on-drift');
 const requireLive = args.includes('--require-live');
+const changedOnly = args.includes('--changed-only');
 const forceMigrations = args.includes('--source') && args[args.indexOf('--source') + 1] === 'migrations';
 
 type TableSchema = Map<string, Set<string>>;
@@ -162,7 +165,7 @@ function parseSelectColumns(select: string): string[] {
     .filter((column) => column && column !== '*');
 }
 
-function sourceFiles(): string[] {
+function allSourceFiles(): string[] {
   const patterns = [
     'apps/marketing/**/*.{ts,tsx}',
     'apps/lms/**/*.{ts,tsx}',
@@ -190,6 +193,35 @@ function sourceFiles(): string[] {
   );
 }
 
+function changedSourceFiles(): string[] {
+  const candidates: string[][] = [
+    ['diff', '--name-only', '--diff-filter=ACMR', 'HEAD^1', 'HEAD'],
+    ['diff', '--name-only', '--diff-filter=ACMR', 'HEAD^', 'HEAD'],
+  ];
+
+  for (const command of candidates) {
+    try {
+      const output = execFileSync('git', command, { cwd: ROOT, encoding: 'utf8' });
+      const files = output
+        .split('\n')
+        .map((file) => file.trim())
+        .filter(Boolean)
+        .filter((file) => /^(apps\/(marketing|lms|admin)|lib|components)\/.*\.(ts|tsx)$/.test(file))
+        .map((file) => path.join(ROOT, file))
+        .filter((file) => fs.existsSync(file));
+      return [...new Set(files)];
+    } catch {
+      // Try the next git comparison shape.
+    }
+  }
+
+  throw new Error('changed-only schema audit requires git history for the previous/base commit');
+}
+
+function sourceFiles(): string[] {
+  return changedOnly ? changedSourceFiles() : allSourceFiles();
+}
+
 function extractSelectCalls(): SelectCall[] {
   const results: SelectCall[] = [];
 
@@ -207,8 +239,8 @@ function extractSelectCalls(): SelectCall[] {
       const tail = source.slice(chainStart, chainStart + 2000);
 
       // Never associate a .select() from a later Supabase query with this
-      // .from(). The previous implementation searched an arbitrary 1200-char
-      // window, which produced hundreds of false schema-drift failures.
+      // .from(). The previous implementation searched an arbitrary window,
+      // producing hundreds of false schema-drift failures.
       const boundaries = [tail.indexOf('.from('), tail.indexOf(';')].filter((index) => index >= 0);
       const chainEnd = boundaries.length ? Math.min(...boundaries) : tail.length;
       const chain = tail.slice(0, chainEnd);
@@ -254,10 +286,7 @@ async function main() {
     localEnv.SUPABASE_URL ||
     localEnv.NEXT_PUBLIC_SUPABASE_URL ||
     '';
-  const serviceKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    localEnv.SUPABASE_SERVICE_ROLE_KEY ||
-    '';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || localEnv.SUPABASE_SERVICE_ROLE_KEY || '';
 
   let schema: TableSchema | null = null;
   let source = '';
@@ -283,13 +312,16 @@ async function main() {
     console.log(`Using ${source}.`);
   }
 
+  const files = sourceFiles();
   const calls = extractSelectCalls();
   const drift = auditDrift(calls, schema);
 
-  console.log(`Scanned ${calls.length} static Supabase select call(s) against ${source}.`);
+  console.log(
+    `Scanned ${calls.length} static Supabase select call(s) in ${files.length} ${changedOnly ? 'changed ' : ''}source file(s) against ${source}.`,
+  );
 
   if (!drift.length) {
-    console.log('PASS: no static table/column drift detected.');
+    console.log('PASS: no static table/column drift detected in the audited scope.');
     return;
   }
 

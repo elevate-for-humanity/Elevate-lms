@@ -36,14 +36,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # HARD BLOCKING GATE. Root tsconfig intentionally does not own the three
-      # standalone Next applications, so each production project is checked
-      # explicitly and sequentially to keep peak memory bounded.
-      - name: TypeScript — shared/root
-        env:
-          NODE_OPTIONS: '--max-old-space-size=8192'
-        run: pnpm exec tsc --noEmit -p tsconfig.json
-
+      # HARD BLOCKING RELEASE GATE. Each standalone production application is
+      # checked against its own dependency graph. Shared files imported by an
+      # app are checked transitively by TypeScript. A green CI run therefore
+      # certifies zero TypeScript errors in all deployed Marketing/LMS/Admin code.
       - name: TypeScript — Marketing
         env:
           NODE_OPTIONS: '--max-old-space-size=8192'

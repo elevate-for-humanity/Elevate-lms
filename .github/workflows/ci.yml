@@ -12,13 +12,33 @@ jobs:
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          clean: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
-      - run: pnpm lint
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # HARD BLOCKING GATE. This workflow is used by PR validation, so a green
+      # CI check now certifies that the exact PR commit completed full tsc
+      # --noEmit successfully. Do not add continue-on-error or `|| true` here.
+      - name: Full TypeScript gate
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm run typecheck:full
+
+      - name: Lint
+        run: pnpm lint

@@ -6,11 +6,16 @@ on:
   push:
     branches: [main, work]
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      NODE_OPTIONS: --max-old-space-size=6144
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -21,4 +26,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --no-frozen-lockfile
+      - name: TypeScript — Marketing
+        run: pnpm run typecheck:marketing
+      - name: TypeScript — LMS
+        run: pnpm run typecheck:lms
+      - name: TypeScript — Admin
+        run: pnpm run typecheck:admin
       - run: pnpm lint

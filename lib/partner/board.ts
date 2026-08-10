@@ -33,6 +33,41 @@ type PartnerRecord = {
   state?: string | null;
 };
 
+type HourEntryRow = {
+  user_id: string | null;
+  host_shop_id: string | null;
+  status: string | null;
+  approval_status: string | null;
+  accepted_hours: number | string | null;
+  hours: number | string | null;
+  hours_claimed: number | string | null;
+};
+
+function numericHours(value: number | string | null | undefined): number {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function approvedHours(row: HourEntryRow): number {
+  if (row.approval_status !== 'approved' && row.status !== 'approved') return 0;
+  const accepted = numericHours(row.accepted_hours);
+  if (accepted > 0) return accepted;
+  const canonical = numericHours(row.hours);
+  if (canonical > 0) return canonical;
+  return numericHours(row.hours_claimed);
+}
+
+function isPendingHour(row: HourEntryRow): boolean {
+  return row.approval_status === 'pending' || row.status === 'pending';
+}
+
+function isEntryForAssignedShop(row: HourEntryRow, shopIds: string[]): boolean {
+  // Legacy hour entries may not yet carry host_shop_id. They are still safe to
+  // include because the query is already restricted to apprentices assigned to
+  // this authenticated host shop. When host_shop_id is present, require a match.
+  return !row.host_shop_id || shopIds.includes(row.host_shop_id);
+}
+
 export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
 
@@ -65,7 +100,7 @@ export async function getHostShopBoard(userId: string) {
   const { data: placements } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        .select('id, student_id, shop_id, discipline, status, start_date, profiles(full_name, email)')
+        .select('id, student_id, shop_id, discipline, program_slug, status, start_date, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
     : { data: [] };
@@ -75,36 +110,34 @@ export async function getHostShopBoard(userId: string) {
     student_id: placement.student_id,
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
-    discipline: placement.discipline,
+    discipline: placement.discipline || placement.program_slug,
+    program_slug: placement.program_slug,
     start_date: placement.start_date,
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
-  const ojtProgress: Record<string, { completed: number; required: number }> = {};
-  if (studentIds.length) {
-    const { data: ojt } = await db
-      .from('ojt_placements')
-      .select('student_id, total_hours_completed, total_hours_required')
-      .in('student_id', studentIds)
-      .eq('status', 'active');
-    for (const row of ojt || []) {
-      ojtProgress[row.student_id] = {
-        completed: Number(row.total_hours_completed || 0),
-        required: Number(row.total_hours_required || 2000),
-      };
-    }
-  }
-
-  // Critical tenant fix: count only hour entries belonging to apprentices
-  // assigned to this host shop. Never expose a platform-wide pending count.
+  // Canonical OJT source: hour_entries. ojt_placements is an optional legacy
+  // projection and is not authoritative; production may legitimately have no
+  // rows there while approved hours exist.
+  const ojtCompletedByUser: Record<string, number> = {};
   let pendingHoursCount = 0;
+
   if (studentIds.length) {
-    const { count } = await db
+    const { data: hourRows, error: hourError } = await db
       .from('hour_entries')
-      .select('id', { count: 'exact', head: true })
-      .in('user_id', studentIds)
-      .eq('status', 'pending');
-    pendingHoursCount = count || 0;
+      .select('user_id, host_shop_id, status, approval_status, accepted_hours, hours, hours_claimed')
+      .in('user_id', studentIds);
+
+    if (hourError) throw new Error(`HOST_SHOP_HOURS_LOAD_FAILED:${hourError.message}`);
+
+    for (const row of (hourRows || []) as HourEntryRow[]) {
+      if (!row.user_id || !isEntryForAssignedShop(row, shopIds)) continue;
+      if (isPendingHour(row)) pendingHoursCount += 1;
+      const accepted = approvedHours(row);
+      if (accepted > 0) {
+        ojtCompletedByUser[row.user_id] = (ojtCompletedByUser[row.user_id] || 0) + accepted;
+      }
+    }
   }
 
   const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.discipline });
@@ -172,10 +205,19 @@ export async function getHostShopBoard(userId: string) {
     pendingDocuments,
     acceptedDocumentCount,
     requiredDocumentCount,
-    apprentices: apprentices.map((apprentice) => ({
-      ...apprentice,
-      ojt: ojtProgress[apprentice.student_id] || { completed: 0, required: tradeInfo.hours },
-    })),
+    apprentices: apprentices.map((apprentice) => {
+      const apprenticeTrade =
+        TRADE_TARGETS[apprentice.discipline] ||
+        TRADE_TARGETS[apprentice.program_slug] ||
+        tradeInfo;
+      return {
+        ...apprentice,
+        ojt: {
+          completed: Math.round((ojtCompletedByUser[apprentice.student_id] || 0) * 100) / 100,
+          required: apprenticeTrade.hours,
+        },
+      };
+    }),
     pendingHoursCount,
   };
 }

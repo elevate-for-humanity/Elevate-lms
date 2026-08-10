@@ -1,14 +1,14 @@
 /**
  * PARIS Voice Command System
- * Natural language voice interface for PARIS operations
+ * Natural-language voice input with natural AI spoken responses.
  */
 
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { parisCommand, type ParsedCommand, type CommandIntent } from './dev-studio';
+import { parisCommand } from './dev-studio';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
-// Voice recognition types
 interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -39,37 +39,84 @@ declare global {
   }
 }
 
-// Voice command hooks
+type VoiceCommandResult = {
+  success: boolean;
+  message?: string;
+  result?: unknown;
+  error?: string;
+  followUp?: string;
+};
+
+function responseText(data: { message?: string; error?: string; followUp?: string; result?: unknown }) {
+  if (data.message) return data.message;
+  if (data.error) return data.error;
+  if (data.followUp) return data.followUp;
+  if (data.result && typeof data.result === 'object' && 'message' in (data.result as Record<string, unknown>)) {
+    return String((data.result as Record<string, unknown>).message || 'Done');
+  }
+  if (typeof data.result === 'string') return data.result;
+  return 'Done';
+}
+
+/**
+ * Compatibility helper for callers outside React hooks. It deliberately uses
+ * the shared natural-voice endpoint and never falls back to SpeechSynthesis.
+ */
+export async function speakResponse(data: { message?: string; error?: string; followUp?: string; result?: unknown }) {
+  if (typeof window === 'undefined') return;
+  const text = responseText(data).trim();
+  if (!text) return;
+
+  try {
+    const response = await fetch('/api/voice/natural', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.slice(0, 2400), voice: 'coral', style: 'assistant' }),
+    });
+    if (!response.ok) return;
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    audio.onerror = () => URL.revokeObjectURL(url);
+    await audio.play();
+  } catch {
+    // Voice is an enhancement; command execution remains usable by text.
+  }
+}
+
 export function useVoiceCommands() {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
-  const [lastResult, setLastResult] = useState<{
-    success: boolean;
-    message?: string;
-    result?: unknown;
-    error?: string;
-    followUp?: string;
-  } | null>(null);
+  const [lastResult, setLastResult] = useState<VoiceCommandResult | null>(null);
+  const naturalVoice = useNaturalVoice();
 
   useEffect(() => {
-    // Check if speech recognition is supported
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    setIsSupported(!!SpeechRecognition);
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    setIsSupported(Boolean(Recognition));
   }, []);
 
+  const execute = useCallback(async (text: string) => {
+    const clean = text.trim();
+    if (!clean) return null;
+    const result = await parisCommand(clean);
+    const normalized: VoiceCommandResult = result;
+    setLastResult(normalized);
+    const spoken = responseText(normalized);
+    void naturalVoice.play(spoken.slice(0, 2400), { voice: 'coral', style: 'assistant', rate: 1 });
+    return normalized;
+  }, [naturalVoice]);
+
   const startListening = useCallback(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
-    if (!SpeechRecognition) {
-      setLastResult({
-        success: false,
-        error: 'Speech recognition not supported in this browser',
-      });
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+      setLastResult({ success: false, error: 'Speech recognition is not supported in this browser.' });
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    naturalVoice.stop();
+    const recognition = new Recognition();
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
@@ -78,52 +125,31 @@ export function useVoiceCommands() {
       setIsListening(true);
       setTranscript('');
     };
-
-    recognition.onresult = async (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       const results = Array.from(event.results);
       const latest = results[results.length - 1];
-      const text = latest[0].transcript;
-      
+      const text = latest?.[0]?.transcript || '';
       setTranscript(text);
-
-      if (latest.isFinal) {
+      if (latest?.isFinal) {
         setIsListening(false);
-        
-        // Execute the command
-        const result = await parisCommand(text);
-        setLastResult(result);
-        
-        // Speak the response if available
-        if (result.success && result.result) {
-          speakResponse(result.result);
-        } else if (result.error) {
-          speakResponse({ error: result.error });
-        }
+        void execute(text);
       }
     };
-
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       setIsListening(false);
-      setLastResult({
-        success: false,
-        error: `Speech recognition error: ${event.error}`,
-      });
+      setLastResult({ success: false, error: `Speech recognition error: ${event.error}` });
     };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
+    recognition.onend = () => setIsListening(false);
     recognition.start();
-  }, []);
+  }, [execute, naturalVoice]);
 
   const stopListening = useCallback(() => {
     setIsListening(false);
   }, []);
 
   const speak = useCallback((text: string) => {
-    speakResponse({ message: text });
-  }, []);
+    void naturalVoice.play(text.slice(0, 2400), { voice: 'coral', style: 'assistant', rate: 1 });
+  }, [naturalVoice]);
 
   return {
     isListening,
@@ -132,259 +158,146 @@ export function useVoiceCommands() {
     lastResult,
     startListening,
     stopListening,
+    execute,
     speak,
+    stopSpeaking: naturalVoice.stop,
+    isSpeaking: naturalVoice.isPlaying || naturalVoice.isLoading,
+    voiceError: naturalVoice.error,
   };
 }
 
-/**
- * Speak text using Web Speech API
- */
-export function speakResponse(data: { message?: string; error?: string; followUp?: string }) {
-  if (typeof window === 'undefined') return;
-  
-  const utterance = new SpeechSynthesisUtterance();
-  utterance.text = data.message || data.error || data.followUp || 'Done';
-  utterance.rate = 1;
-  utterance.pitch = 1;
-  utterance.volume = 1;
-  
-  // Try to find a good voice
-  const voices = speechSynthesis.getVoices();
-  const preferredVoice = voices.find(v => 
-    v.name.includes('Samantha') || 
-    v.name.includes('Google') || 
-    v.name.includes('Microsoft')
-  );
-  
-  if (preferredVoice) {
-    utterance.voice = preferredVoice;
-  }
-
-  speechSynthesis.speak(utterance);
-}
-
-/**
- * Voice command button component
- */
-export function VoiceCommandButton({ 
+export function VoiceCommandButton({
   onCommand,
-  className = '' 
-}: { 
+  className = '',
+}: {
   onCommand?: (result: unknown) => void;
   className?: string;
 }) {
   const { isListening, transcript, isSupported, lastResult, startListening, stopListening } = useVoiceCommands();
 
   useEffect(() => {
-    if (lastResult && onCommand) {
-      onCommand(lastResult);
-    }
+    if (lastResult && onCommand) onCommand(lastResult);
   }, [lastResult, onCommand]);
 
-  if (!isSupported) {
-    return null;
-  }
+  if (!isSupported) return null;
 
   return (
     <div className={`flex flex-col items-center gap-2 ${className}`}>
       <button
+        type="button"
         onClick={isListening ? stopListening : startListening}
-        className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${
-          isListening 
-            ? 'bg-red-500 animate-pulse' 
-            : 'bg-brand-red-600 hover:bg-brand-red-700'
+        className={`flex h-16 w-16 items-center justify-center rounded-full transition-all ${
+          isListening ? 'animate-pulse bg-red-600' : 'bg-brand-red-600 hover:bg-brand-red-700'
         }`}
         aria-label={isListening ? 'Stop listening' : 'Start voice command'}
       >
         {isListening ? (
-          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <rect x="6" y="6" width="12" height="12" rx="2" />
           </svg>
         ) : (
-          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+          <svg className="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z" />
           </svg>
         )}
       </button>
-      
-      {isListening && (
-        <p className="text-sm text-slate-600 animate-pulse">Listening...</p>
-      )}
-      
-      {transcript && (
-        <p className="text-xs text-slate-500 max-w-[200px] truncate">
-          "{transcript}"
-        </p>
-      )}
+      {isListening ? <p className="animate-pulse text-sm font-semibold text-slate-700">Listening...</p> : null}
+      {transcript ? <p className="max-w-[200px] truncate text-xs font-medium text-slate-700">“{transcript}”</p> : null}
     </div>
   );
 }
 
-/**
- * Voice command chat interface
- */
 export function VoiceCommandChat() {
-  const { isListening, transcript, isSupported, lastResult, startListening } = useVoiceCommands();
+  const {
+    isListening,
+    transcript,
+    isSupported,
+    lastResult,
+    startListening,
+    execute,
+    voiceError,
+  } = useVoiceCommands();
   const [input, setInput] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!input.trim()) return;
-
-    const result = await parisCommand(input);
-    setLastResult(result);
+    await execute(input);
     setInput('');
   };
 
   if (!isSupported) {
-    return (
-      <div className="text-center text-slate-500 p-4">
-        Voice commands not supported in this browser
-      </div>
-    );
+    return <div className="p-4 text-center font-medium text-slate-700">Voice input is not supported in this browser. Type a command instead.</div>;
   }
 
   return (
-    <div className="flex flex-col h-[400px] bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Header */}
-      <div className="bg-brand-red-600 text-white p-4 flex items-center gap-3">
+    <div className="flex h-[400px] flex-col overflow-hidden rounded-lg bg-white shadow-lg">
+      <div className="flex items-center gap-3 bg-brand-red-600 p-4 text-white">
         <VoiceCommandButton />
         <div>
-          <h3 className="font-bold">PARIS Voice Assistant</h3>
-          <p className="text-sm opacity-80">Tap the mic and speak your command</p>
+          <h3 className="font-bold text-white">PARIS Voice Assistant</h3>
+          <p className="text-sm font-medium text-white">Tap the mic and speak your command</p>
         </div>
       </div>
 
-      {/* Transcript/Results */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {transcript && (
-          <div className="bg-slate-100 rounded-lg p-3">
-            <p className="text-sm font-medium text-slate-600">You said:</p>
-            <p className="text-slate-900">"{transcript}"</p>
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
+        {isListening ? <p className="font-semibold text-slate-700">Listening…</p> : null}
+        {transcript ? (
+          <div className="rounded-lg bg-slate-100 p-3">
+            <p className="text-sm font-semibold text-slate-700">You said:</p>
+            <p className="font-medium text-slate-950">“{transcript}”</p>
           </div>
-        )}
-        
-        {lastResult && (
+        ) : null}
+        {lastResult ? (
           <div className={`rounded-lg p-3 ${lastResult.success ? 'bg-emerald-50' : 'bg-red-50'}`}>
-            <p className={`text-sm font-medium ${lastResult.success ? 'text-emerald-600' : 'text-red-600'}`}>
+            <p className={`text-sm font-bold ${lastResult.success ? 'text-emerald-800' : 'text-red-800'}`}>
               {lastResult.success ? 'Success' : 'Error'}
             </p>
-            <p className="text-slate-900">
-              {lastResult.result && typeof lastResult.result === 'object' 
-                ? (lastResult.result as any).message || JSON.stringify(lastResult.result)
-                : lastResult.error}
-            </p>
-            {lastResult.followUp && (
-              <p className="text-sm text-slate-600 mt-2">{lastResult.followUp}</p>
-            )}
+            <p className="font-medium text-slate-950">{responseText(lastResult)}</p>
+            {lastResult.followUp ? <p className="mt-2 text-sm font-medium text-slate-700">{lastResult.followUp}</p> : null}
           </div>
-        )}
+        ) : null}
+        {voiceError ? <p className="text-sm font-semibold text-red-800">Natural spoken response is temporarily unavailable; command results remain visible above.</p> : null}
       </div>
 
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t">
+      <form onSubmit={handleSubmit} className="border-t border-slate-300 p-4">
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(event) => setInput(event.target.value)}
             placeholder="Type a command or tap the mic..."
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-red-600"
+            className="flex-1 rounded-lg border border-slate-400 px-4 py-2 font-medium text-slate-950 outline-none placeholder:text-slate-600 focus:ring-2 focus:ring-brand-red-600"
           />
-          <button
-            type="submit"
-            className="px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
-          >
-            Send
-          </button>
+          <button type="submit" className="rounded-lg bg-brand-red-600 px-4 py-2 font-bold text-white hover:bg-brand-red-700">Send</button>
         </div>
       </form>
     </div>
   );
 }
 
-/**
- * Text-to-speech wrapper
- */
+/** Compatibility hook: same call shape, natural AI output, no browser voices. */
 export function useSpeech() {
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const naturalVoice = useNaturalVoice();
+  const speak = useCallback((text: string, options?: { rate?: number; pitch?: number; voice?: SpeechSynthesisVoice }) => {
+    void naturalVoice.play(text.slice(0, 2400), {
+      voice: 'coral',
+      style: 'assistant',
+      rate: options?.rate || 1,
+    });
+  }, [naturalVoice]);
 
-  useEffect(() => {
-    // Load voices
-    const loadVoices = () => {
-      const availableVoices = speechSynthesis.getVoices();
-      setVoices(availableVoices);
-    };
-
-    loadVoices();
-    speechSynthesis.onvoiceschanged = loadVoices;
-
-    return () => {
-      speechSynthesis.onvoiceschanged = null;
-    };
-  }, []);
-
-  const speak = useCallback((text: string, options?: {
-    rate?: number;
-    pitch?: number;
-    voice?: SpeechSynthesisVoice;
-  }) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = options?.rate || 1;
-    utterance.pitch = options?.pitch || 1;
-    
-    if (options?.voice) {
-      utterance.voice = options.voice;
-    }
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    speechSynthesis.speak(utterance);
-  }, []);
-
-  const stop = useCallback(() => {
-    speechSynthesis.cancel();
-    setIsSpeaking(false);
-  }, []);
-
-  return { speak, stop, isSpeaking, voices };
+  return {
+    speak,
+    stop: naturalVoice.stop,
+    isSpeaking: naturalVoice.isPlaying || naturalVoice.isLoading,
+    voices: [] as SpeechSynthesisVoice[],
+  };
 }
 
-// Command examples for voice interface
 export const VOICE_COMMAND_EXAMPLES = [
-  {
-    category: 'Getting Started',
-    examples: [
-      'Import this GitHub repository',
-      'Hire a recruiter agent',
-      'Create a marketing campaign',
-    ],
-  },
-  {
-    category: 'Content',
-    examples: [
-      'Generate a video reel about Medical Assistant training',
-      'Write social media posts for our new program',
-      'Schedule posts for next week',
-    ],
-  },
-  {
-    category: 'Agents',
-    examples: [
-      'Create a customer support agent',
-      'Add a grant writing specialist',
-      'Train the recruiter on our hiring process',
-    ],
-  },
-  {
-    category: 'Code',
-    examples: [
-      'Analyze this codebase',
-      'Connect to the Stripe API',
-      'Import the React components',
-    ],
-  },
+  { category: 'Getting Started', examples: ['Import this GitHub repository', 'Hire a recruiter agent', 'Create a marketing campaign'] },
+  { category: 'Content', examples: ['Generate a video reel about Medical Assistant training', 'Write social media posts for our new program', 'Schedule posts for next week'] },
+  { category: 'Agents', examples: ['Create a customer support agent', 'Add a grant writing specialist', 'Train the recruiter on our hiring process'] },
+  { category: 'Code', examples: ['Analyze this codebase', 'Connect to the Stripe API', 'Import the React components'] },
 ];

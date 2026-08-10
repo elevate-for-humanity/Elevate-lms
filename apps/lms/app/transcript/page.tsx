@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+type CompetencyStatus = 'completed' | 'in_progress' | 'not_started';
+
 export default async function TranscriptPage() {
   const supabase = await createClient();
   const {
@@ -20,12 +22,9 @@ export default async function TranscriptPage() {
 
   const db = await requireAdminClient();
 
-  // Enrollment + program
   const { data: enrollment } = await db
     .from('program_enrollments')
-    .select(
-      'id, progress_percent, enrolled_at, completed_at, course_id, training_courses(id, title)',
-    )
+    .select('id, progress_percent, enrolled_at, completed_at, course_id, training_courses(id, title)')
     .eq('user_id', user.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
@@ -37,7 +36,6 @@ export default async function TranscriptPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  // All lessons for this course
   const courseId = (enrollment?.training_courses as any)?.id ?? enrollment?.course_id;
   const { data: lessons } = courseId
     ? await db
@@ -46,7 +44,6 @@ export default async function TranscriptPage() {
         .eq('course_id', courseId)
     : { data: [] };
 
-  // Lesson progress for this user
   const lessonIds = (lessons ?? []).map((l: any) => l.id);
   const { data: progress } =
     lessonIds.length > 0
@@ -57,7 +54,6 @@ export default async function TranscriptPage() {
           .in('lesson_id', lessonIds)
       : { data: [] };
 
-  // Checkpoint scores
   const { data: checkpointScores } = await db
     .from('checkpoint_scores')
     .select('lesson_id, passed, score')
@@ -69,11 +65,8 @@ export default async function TranscriptPage() {
   const allLessons = lessons ?? [];
   const completedLessons = allLessons.filter((l: any) => progressMap.get(l.id)).length;
   const checkpointLessons = allLessons.filter((l: any) => l.step_type === 'checkpoint');
-  const checkpointsPassed = checkpointLessons.filter(
-    (l: any) => checkpointMap.get(l.id)?.passed,
-  ).length;
+  const checkpointsPassed = checkpointLessons.filter((l: any) => checkpointMap.get(l.id)?.passed).length;
 
-  // Group lessons into domains by module_id (each module = one domain)
   const { data: modules } = courseId
     ? await db
         .from('modules')
@@ -95,11 +88,12 @@ export default async function TranscriptPage() {
       competencies: modLessons.map((l: any) => {
         const cp = checkpointMap.get(l.id);
         const done = progressMap.get(l.id);
+        const status: CompetencyStatus = done ? 'completed' : cp ? 'in_progress' : 'not_started';
         return {
           code: `M${String(idx + 1).padStart(2, '0')}-${String(l.lesson_number ?? 0).padStart(2, '0')}`,
           name: l.title,
           type: l.step_type ?? 'lesson',
-          status: done ? 'completed' : cp ? 'in_progress' : 'not_started',
+          status,
           score: cp?.score ?? null,
         };
       }),

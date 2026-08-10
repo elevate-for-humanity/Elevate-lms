@@ -1,6 +1,5 @@
 /* Barber Apprenticeship Blueprint — modular source
  * Master blueprint lives here; module content is split into ./module-1.ts … ./module-8.ts
- * Seeding: pnpm tsx scripts/seed-course-from-blueprint.ts --blueprint barber-apprenticeship-v1 --program <programId>
  */
 import type { CredentialBlueprint, BlueprintVideoConfig } from '../types';
 import { barberModule1 } from './module-1';
@@ -27,6 +26,8 @@ const BARBER_VIDEO_CONFIG: BlueprintVideoConfig = {
   segments: ['intro', 'concept', 'visual', 'application', 'wrapup'],
   generateDalleImage: true,
   dalleImageStyle: 'natural',
+  width: 1920,
+  height: 1080,
 };
 
 export const barberApprenticeshipBlueprint: CredentialBlueprint = {
@@ -39,7 +40,6 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
   credentialCode: 'IN-BARBER',
   trackVariants: ['apprenticeship'],
   status: 'active',
-
   generationRules: {
     allowRemediation: true,
     allowExpansionLessons: false,
@@ -48,13 +48,8 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
     requiresUniversalReview: false,
     generatorMode: 'fixed',
   },
-
-  // The eight authored module files currently define 50 production lessons total.
-  // Keep this count synchronized with the actual blueprint content; do not use a
-  // larger expected count unless additional lessons are authored in the modules.
   expectedModuleCount: 8,
   expectedLessonCount: 50,
-
   certificationPathway: {
     certificationBodyId: 'cb000000-0000-0000-0000-000000000006',
     credentialName: 'Indiana Registered Barber License Examination',
@@ -64,34 +59,10 @@ export const barberApprenticeshipBlueprint: CredentialBlueprint = {
     eligibilityReview: true,
     isPrimary: true,
   },
-
-  modules: [
-    barberModule1,
-    barberModule2,
-    barberModule3,
-    barberModule4,
-    barberModule5,
-    barberModule6,
-    barberModule7,
-    barberModule8,
-  ],
-
+  modules: [barberModule1, barberModule2, barberModule3, barberModule4, barberModule5, barberModule6, barberModule7, barberModule8],
   videoConfig: BARBER_VIDEO_CONFIG,
-
   assessmentRules: [
-    {
-      assessmentType: 'module',
-      scope: 'all',
-      minQuestions: 5,
-      maxQuestions: 10,
-      passingThreshold: 0.7,
-    },
-    {
-      assessmentType: 'final',
-      scope: 'all',
-      minQuestions: 25,
-      maxQuestions: 50,
-      passingThreshold: 0.7,
-    },
+    { assessmentType: 'module', scope: 'all', minQuestions: 5, maxQuestions: 10, passingThreshold: 0.7 },
+    { assessmentType: 'final', scope: 'all', minQuestions: 25, maxQuestions: 50, passingThreshold: 0.7 },
   ],
 };

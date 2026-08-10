@@ -1,21 +1,36 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { AlertTriangle, CheckCircle2, ChevronRight, FileCheck2, Loader2, Upload } from 'lucide-react';
+
 const ACCOMMODATION_TYPES = [
-  { title: 'Extended Time', desc: '1.5x or 2x time' },
-  { title: 'Screen Reader', desc: 'Assistive technology support' },
-  { title: 'Large Print', desc: 'Enlarged text materials' },
-  { title: 'Separate Room', desc: 'Private testing environment' },
-  { title: 'Frequent Breaks', desc: 'Additional rest periods' },
-  { title: 'Scribe', desc: 'Verbal response transcription' },
-];
+  { value: 'extended_time', title: 'Extended Time', description: '1.5x or 2x time when approved.' },
+  { value: 'screen_reader', title: 'Screen Reader', description: 'Assistive technology support.' },
+  { value: 'large_print', title: 'Large Print', description: 'Enlarged testing materials.' },
+  { value: 'separate_room', title: 'Separate Room', description: 'Private testing environment.' },
+  { value: 'frequent_breaks', title: 'Frequent Breaks', description: 'Additional approved rest periods.' },
+  { value: 'other', title: 'Other', description: 'Another accommodation supported by documentation.' },
+] as const;
 
-import { TESTING_CENTER } from '@/lib/testing/testing-config';
-import { AlertTriangle, CheckCircle, ChevronRight, Mail, Phone, Upload, Loader2, FileCheck, Send } from 'lucide-react';
+const STEPS = [
+  { step: 1, title: 'Submit the request', description: 'Send the request at least 30 days before the intended exam date whenever possible.' },
+  { step: 2, title: 'Attach documentation', description: 'Upload supporting documentation from a qualified professional or the testing sponsor.' },
+  { step: 3, title: 'Staff review', description: 'Testing staff reviews the request and contacts you about the approved accommodation.' },
+  { step: 4, title: 'Confirm the exam', description: 'Schedule or confirm the exam after the accommodation is approved.' },
+] as const;
 
-function AccommodationsContent() {
-  const [formData, setFormData] = useState({
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_TYPES = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]);
+
+export default function TestingAccommodationsPage() {
+  const [fields, setFields] = useState({
     name: '',
     email: '',
     phone: '',
@@ -26,413 +41,132 @@ function AccommodationsContent() {
   });
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
   const [confirmationId, setConfirmationId] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const today = new Date();
-  const minDate = new Date(today.setDate(today.getDate() + 30))
-    .toISOString()
-    .split('T')[0];
+  const minimumExamDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 30);
+    return date.toISOString().slice(0, 10);
+  }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  function setField(name: keyof typeof fields, value: string) {
+    setFields((current) => ({ ...current, [name]: value }));
+  }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (selected && selected.size <= 10 * 1024 * 1024) {
-      setFile(selected);
-    } else if (selected) {
-      alert('File must be under 10MB');
+  function chooseFile(selected: File | undefined) {
+    if (!selected) return;
+    if (selected.size > MAX_FILE_SIZE) {
+      setError('Supporting documentation must be 10 MB or smaller.');
+      return;
     }
-  };
+    if (!ACCEPTED_TYPES.has(selected.type)) {
+      setError('Upload a PDF, JPG, PNG, DOC, or DOCX file.');
+      return;
+    }
+    setError('');
+    setFile(selected);
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) return;
+  async function submitRequest(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!file) {
+      setError('Supporting documentation is required.');
+      return;
+    }
 
     setSubmitting(true);
+    setError('');
     try {
-      const formDataToSend = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
-      });
-      formDataToSend.append('documentation', file);
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(fields)) formData.append(key, value);
+      formData.append('documentation', file);
 
-      const res = await fetch('/api/testing/accommodations', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setConfirmationId(data.confirmationId || `ACQ-${Date.now()}`);
-        setSubmitted(true);
-      } else {
-        throw new Error('Submission failed');
+      const response = await fetch('/api/testing/accommodations', { method: 'POST', body: formData });
+      const payload = (await response.json()) as { confirmationId?: string; error?: string };
+      if (!response.ok || !payload.confirmationId) {
+        throw new Error(payload.error || 'Accommodation request could not be submitted.');
       }
-    } catch {
-      alert('Unable to submit request. Please try again or call us directly.');
+      setConfirmationId(payload.confirmationId);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Accommodation request could not be submitted.');
     } finally {
       setSubmitting(false);
     }
-  };
+  }
+
+  if (confirmationId) {
+    return (
+      <main className="min-h-screen bg-slate-50 px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-green-200 bg-white p-8 text-center shadow-sm sm:p-10">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100"><CheckCircle2 className="h-8 w-8 text-green-700" /></div>
+          <h1 className="mt-5 text-3xl font-black text-slate-950">Accommodation request received</h1>
+          <p className="mt-3 leading-7 text-slate-700">Testing staff will review the request and supporting documentation before confirming accommodations.</p>
+          <p className="mt-4 font-mono text-sm font-black text-slate-900">Reference: {confirmationId}</p>
+          <Link href="/testing" className="mt-7 inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 font-black text-white">Return to Testing Center</Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="bg-white">
-      {/* HERO */}
-      <section className="bg-[#1E3A5F] text-white py-16 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-brand-gold-400 text-sm font-semibold uppercase tracking-widest mb-3">
-            Certification Testing
-          </p>
-          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
-            Testing Accommodations
-          </h1>
-          <p className="text-slate-300 text-lg max-w-xl mx-auto">
-            We are committed to providing equal access to all candidates. Accommodation requests
-            must be submitted at least 30 days before your exam date.
-          </p>
+    <main className="min-h-screen bg-white text-slate-950">
+      <section className="bg-slate-950 px-4 py-14 text-white sm:px-6 sm:py-20">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="text-sm font-black uppercase tracking-[0.18em] text-blue-300">Certification testing</p>
+          <h1 className="mt-3 text-4xl font-black sm:text-5xl">Testing Accommodations</h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-200">Request approved testing supports and securely submit supporting documentation for review.</p>
         </div>
       </section>
 
-      {/* DEADLINE WARNING */}
-      <section className="bg-amber-50 border-b border-amber-200 py-6 px-4">
-        <div className="max-w-3xl mx-auto flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-amber-800 text-sm leading-relaxed">
-            <strong className="text-amber-900">30-Day Deadline.</strong> Accommodation requests must
-            be submitted at least 30 days before your exam date. Submit early — late requests cannot
-            be guaranteed.
-          </p>
-        </div>
+      <section className="border-b border-amber-200 bg-amber-50 px-4 py-5 sm:px-6">
+        <div className="mx-auto flex max-w-4xl gap-3 text-sm leading-6 text-amber-950"><AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" /><p><strong>Submit early.</strong> When the exam sponsor requires advance approval, allow at least 30 days before the intended exam date.</p></div>
       </section>
 
-      {/* AVAILABLE ACCOMMODATIONS */}
-      <section className="py-14 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Available Accommodations</h2>
-          <p className="text-slate-500 text-sm mb-8">
-            All accommodations require supporting documentation from a licensed professional.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {ACCOMMODATION_TYPES.map((item) => (
-              <div
-                key={item.title}
-                className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4"
-              >
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold text-slate-900 text-sm">{item.title}</p>
-                    <p className="text-slate-500 text-xs mt-1">{item.desc}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <section className="px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="text-2xl font-black">Common accommodations</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {ACCOMMODATION_TYPES.map((item) => <article key={item.value} className="rounded-2xl border border-slate-200 bg-slate-50 p-5"><CheckCircle2 className="h-5 w-5 text-green-700" /><h3 className="mt-3 font-black">{item.title}</h3><p className="mt-1 text-sm leading-6 text-slate-600">{item.description}</p></article>)}
           </div>
         </div>
       </section>
 
-      {/* HOW TO REQUEST */}
-      <section className="bg-slate-50 border-y border-slate-200 py-14 px-4">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-slate-900 text-center mb-2">
-            How to Request Accommodations
-          </h2>
-          <p className="text-slate-500 text-sm text-center mb-10">
-            Four steps to get your accommodations approved before exam day.
-          </p>
-          <div className="space-y-6">
-            {STEPS.map(({ step, title, desc }) => (
-              <div key={step} className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-full bg-[#1E3A5F] text-white font-extrabold text-sm flex items-center justify-center flex-shrink-0">
-                  {step}
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-900">{title}</p>
-                  <p className="text-slate-500 text-sm mt-1">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-3xl"><h2 className="text-center text-2xl font-black">How the request works</h2><div className="mt-8 space-y-5">{STEPS.map((item) => <div key={item.step} className="flex gap-4"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-950 font-black text-white">{item.step}</div><div><h3 className="font-black">{item.title}</h3><p className="mt-1 text-sm leading-6 text-slate-600">{item.description}</p></div></div>)}</div></div>
       </section>
 
-      {/* SECURE REQUEST FORM */}
-      <section className="py-14 px-4 bg-slate-50">
-        <div className="max-w-xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Submit Accommodation Request</h2>
-            <p className="text-slate-500 text-sm">
-              Complete the form below to securely submit your accommodation request and documentation.
-              All information is encrypted and handled with strict confidentiality.
-            </p>
+      <section className="bg-white px-4 py-12 sm:px-6 sm:py-16">
+        <form onSubmit={submitRequest} className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-black">Submit accommodation request</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Your documentation is stored in private Testing Center storage and is not published.</p>
+
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+            <Field label="Full name" required value={fields.name} onChange={(value) => setField('name', value)} />
+            <Field label="Email" required type="email" value={fields.email} onChange={(value) => setField('email', value)} />
+            <Field label="Phone" type="tel" value={fields.phone} onChange={(value) => setField('phone', value)} />
+            <label className="text-sm font-bold">Exam provider *<select required value={fields.provider} onChange={(event) => setField('provider', event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium"><option value="">Select</option><option value="nha">NHA</option><option value="act-workkeys">ACT WorkKeys</option><option value="certiport">Certiport</option><option value="nrf-rise-up">NRF RISE Up</option><option value="esco">ESCO</option><option value="other">Other</option></select></label>
+            <label className="text-sm font-bold">Intended exam date<input type="date" min={minimumExamDate} value={fields.examDate} onChange={(event) => setField('examDate', event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-medium" /></label>
+            <label className="text-sm font-bold">Requested accommodation *<select required value={fields.accommodationType} onChange={(event) => setField('accommodationType', event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 font-medium"><option value="">Select</option>{ACCOMMODATION_TYPES.map((item) => <option key={item.value} value={item.value}>{item.title}</option>)}</select></label>
           </div>
 
-          {submitted ? (
-            <div className="bg-white rounded-2xl shadow-sm border border-green-200 p-8 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">Request Submitted Successfully</h3>
-              <p className="text-slate-600 mb-4">
-                Your accommodation request has been received. Our team will review your documentation
-                and contact you within 5–7 business days to confirm approved accommodations.
-              </p>
-              <p className="text-sm text-slate-500 mb-6">
-                Reference: <span className="font-mono font-semibold">{confirmationId}</span>
-              </p>
-              <Link
-                href="/testing/book"
-                className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-full transition-colors"
-              >
-                Schedule Your Exam <ChevronRight className="w-5 h-5" />
-              </Link>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-5"
-            >
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Jane Smith"
-                />
-              </div>
+          <label className="mt-5 block text-sm font-bold">Details *<textarea required rows={5} value={fields.details} onChange={(event) => setField('details', event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-medium" placeholder="Describe the accommodation requested and any testing-sponsor instructions." /></label>
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="jane@example.com"
-                />
-              </div>
+          <div className="mt-5">
+            <p className="text-sm font-bold">Supporting documentation *</p>
+            <input ref={inputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" className="hidden" onChange={(event) => chooseFile(event.target.files?.[0])} />
+            <button type="button" onClick={() => inputRef.current?.click()} className="mt-2 flex min-h-24 w-full items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 font-bold text-slate-700 hover:border-blue-400">{file ? <><FileCheck2 className="h-5 w-5 text-green-700" />{file.name}</> : <><Upload className="h-5 w-5" />Choose documentation</>}</button>
+          </div>
 
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="(555) 555-5555"
-                />
-              </div>
-
-              {/* Exam Provider */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Exam Provider <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="provider"
-                  required
-                  value={formData.provider}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select exam provider</option>
-                  <option value="nha">NHA – National Healthcareer Association</option>
-                  <option value="epa">EPA 608 – Clean Air Act</option>
-                  <option value="act">ACT WorkKeys</option>
-                  <option value="comptia">CompTIA</option>
-                  <option value="other">Other / Not Sure</option>
-                </select>
-              </div>
-
-              {/* Exam Date */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Intended Exam Date
-                </label>
-                <input
-                  type="date"
-                  name="examDate"
-                  value={formData.examDate}
-                  onChange={handleChange}
-                  min={minDate}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <p className="text-xs text-slate-500 mt-1">
-                  Accommodation requests require at least 30 days advance notice.
-                </p>
-              </div>
-
-              {/* Accommodation Type */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Requested Accommodation <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="accommodationType"
-                  required
-                  value={formData.accommodationType}
-                  onChange={handleChange}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select accommodation type</option>
-                  <option value="extended_time">Extended Time (1.5x or 2x)</option>
-                  <option value="screen_reader">Screen Reader / Assistive Technology</option>
-                  <option value="large_print">Large Print</option>
-                  <option value="separate_room">Separate Testing Room</option>
-                  <option value="frequent_breaks">Frequent Breaks</option>
-                  <option value="other">Other (describe below)</option>
-                </select>
-              </div>
-
-              {/* Details */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Additional Details <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  name="details"
-                  required
-                  value={formData.details}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder="Describe your disability and the accommodations you are requesting. Be as specific as possible."
-                />
-              </div>
-
-              {/* File Upload */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">
-                  Supporting Documentation <span className="text-red-500">*</span>
-                </label>
-                <div
-                  className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
-                    file ? 'border-green-400 bg-green-50' : 'border-slate-300 hover:border-blue-400 hover:bg-blue-50'
-                  }`}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  {file ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <FileCheck className="w-5 h-5 text-green-600" />
-                      <span className="text-sm font-medium text-green-700">{file.name}</span>
-                      <span className="text-xs text-green-600">
-                        ({(file.size / 1024).toFixed(1)} KB)
-                      </span>
-                    </div>
-                  ) : (
-                    <>
-                      <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                      <p className="text-sm text-slate-600 font-medium">
-                        Click to upload documentation
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        PDF, PNG, JPG, DOC up to 10MB
-                      </p>
-                    </>
-                  )}
-                </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  Required: Letter from licensed professional (physician, psychologist, or specialist)
-                  describing your disability and requested accommodations.
-                </p>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={submitting || !file}
-                className="w-full bg-[#1E3A5F] hover:bg-[#162d4a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5" />
-                    Submit Accommodation Request
-                  </>
-                )}
-              </button>
-
-              {!file && (
-                <p className="text-xs text-amber-600 text-center">
-                  Documentation is required to process your request.
-                </p>
-              )}
-
-              <div className="flex items-center justify-center gap-4 pt-2">
-                <a
-                  href={`tel:${TESTING_CENTER.phoneTel}`}
-                  className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900"
-                >
-                  <Phone className="w-4 h-4" />
-                  {TESTING_CENTER.phone}
-                </a>
-                <span className="text-slate-300">|</span>
-                <a
-                  href={`mailto:${TESTING_CENTER.email}`}
-                  className="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-900"
-                >
-                  <Mail className="w-4 h-4" />
-                  Email Us
-                </a>
-              </div>
-            </form>
-          )}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-10 px-4 bg-white border-t border-slate-200">
-        <div className="max-w-2xl mx-auto text-center">
-          <p className="text-slate-500 text-sm mb-4">Ready to schedule your exam?</p>
-          <Link
-            href="/testing/book"
-            className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors"
-          >
-            Schedule Your Exam <ChevronRight className="w-5 h-5" />
-          </Link>
-        </div>
+          {error ? <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-800">{error}</div> : null}
+          <button type="submit" disabled={submitting || !file} className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 font-black text-white disabled:opacity-50">{submitting ? <><Loader2 className="h-5 w-5 animate-spin" />Submitting…</> : <>Submit request <ChevronRight className="h-5 w-5" /></>}</button>
+        </form>
       </section>
     </main>
   );
 }
 
-function AccommodationsPage() {
-  return <AccommodationsContent />;
-}
-
-export default function TestingAccommodationsPage() {
-  return <AccommodationsPage />;
+function Field({ label, value, onChange, type = 'text', required = false }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean }) {
+  return <label className="text-sm font-bold">{label}{required ? ' *' : ''}<input required={required} type={type} value={value} onChange={(event) => onChange(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 font-medium" /></label>;
 }

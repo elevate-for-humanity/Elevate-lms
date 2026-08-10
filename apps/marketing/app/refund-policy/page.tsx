@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { createPublicClient } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const revalidate = 3600;
@@ -14,21 +13,12 @@ export const metadata: Metadata = {
     'Learn about our refund policy for training programs and tax services at Elevate For Humanity.',
 };
 
-export default async function RefundPolicyPage() {
-  const supabase = createPublicClient();
-
-  // Fetch refund policy
-  const { data: policy } = await supabase
-    .from('legal_documents')
-    .select('*')
-    .eq('type', 'refund_policy')
-    .maybeSingle();
+export default function RefundPolicyPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Refund Policy' }]} />
       </div>
-      {/* Hero Section - No Gradient, No Image, No CTAs */}
       <section className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Refund Policy</h1>
@@ -36,7 +26,6 @@ export default async function RefundPolicyPage() {
         </div>
       </section>
 
-      {/* Content */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <div className="prose prose-lg max-w-none">
@@ -103,8 +92,8 @@ export default async function RefundPolicyPage() {
               Tax Refund Advances
             </h2>
             <p className="text-black mb-6">
-              Refund advances are loans provided by third-party lenders and
-              are subject to separate terms and conditions:
+              Refund advances are loans provided by third-party lenders and are subject to separate
+              terms and conditions:
             </p>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
               <li>

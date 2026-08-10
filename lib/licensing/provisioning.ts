@@ -61,17 +61,20 @@ function generateSlug(name: string): string {
   return `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').substring(0, 50)}-${crypto.randomBytes(4).toString('hex')}`;
 }
 
+type AuthUserSummary = { id: string; email?: string | null };
+
 async function findAuthUserByEmail(
   admin: Awaited<ReturnType<typeof requireAdminClient>>,
   email: string,
-) {
+): Promise<AuthUserSummary | null> {
   const normalized = email.trim().toLowerCase();
   for (let page = 1; page <= 20; page++) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
     if (error) throw error;
-    const match = data.users.find((user) => user.email?.toLowerCase() === normalized);
+    const users = data.users as unknown as AuthUserSummary[];
+    const match = users.find((user) => user.email?.toLowerCase() === normalized);
     if (match) return match;
-    if (data.users.length < 1000) break;
+    if (users.length < 1000) break;
   }
   return null;
 }

@@ -19,7 +19,6 @@ async function _POST(req: NextRequest, { params }: Params) {
   const supabase = await createClient();
   const { courseId } = await params;
 
-  // 1) Get current user
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -28,7 +27,6 @@ async function _POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  // 2) Get enrollment row (using program_id since that's what the table uses)
   const { data: enrollment, error: enrollError } = await supabase
     .from('program_enrollments')
     .select('*')
@@ -41,7 +39,6 @@ async function _POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Enrollment not found for this course' }, { status: 404 });
   }
 
-  // 3) Check internal completion flag
   if (!enrollment.internal_complete) {
     return NextResponse.json(
       {
@@ -52,7 +49,6 @@ async function _POST(req: NextRequest, { params }: Params) {
     );
   }
 
-  // 4) Call Postgres function to check external modules
   const { data: extCheck, error: extError } = await supabase.rpc('external_modules_complete', {
     p_course_id: courseId,
     p_user_id: user.id,
@@ -66,7 +62,6 @@ async function _POST(req: NextRequest, { params }: Params) {
   const externalOK = Boolean(extCheck);
 
   if (!externalOK) {
-    // Get details about what's missing
     const { data: summary } = await supabase.rpc('external_modules_summary', {
       p_course_id: courseId,
       p_user_id: user.id,
@@ -84,7 +79,6 @@ async function _POST(req: NextRequest, { params }: Params) {
     );
   }
 
-  // 5) If both internal + external are complete, mark course completed
   const { error: updateError } = await supabase
     .from('program_enrollments')
     .update({
@@ -104,7 +98,6 @@ async function _POST(req: NextRequest, { params }: Params) {
   });
 }
 
-// GET endpoint to check status without updating
 async function _GET(req: NextRequest, { params }: Params) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -119,18 +112,16 @@ async function _GET(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  // Get completion status
   const { data: status, error } = await supabase.rpc('check_course_completion', {
     p_course_id: courseId,
     p_user_id: user.id,
   });
 
   if (error) {
-    logger.error(error);
+    logger.error('Course completion check failed', error);
     return NextResponse.json({ error: 'Error checking completion status' }, { status: 500 });
   }
 
-  // Get external module summary
   const { data: summary } = await supabase.rpc('external_modules_summary', {
     p_course_id: courseId,
     p_user_id: user.id,

@@ -60,10 +60,17 @@ is_known_public_contract() {
     /api/jobs/search|/api/jobs/salary|/api/onet/careers) return 0 ;;
   esac
 
-  # Public admissions/intake endpoints must remain usable before account creation.
   if [[ "$f" == "$ROOT/apps/marketing/app/"* ]]; then
+    # Public admissions/intake endpoints must remain usable before account creation.
     case "$p" in
       /api/applications|/api/applications/*|/api/enrollment-v2/apply|/api/employer/apply|/api/host-shop/apply|/api/program-holder/apply) return 0 ;;
+    esac
+
+    # WorkOne handoff is an idempotent post-application action keyed by the
+    # applicant's saved reference. Progress is protected by the 256-bit private
+    # token issued to that applicant and stored only as a SHA-256 hash.
+    case "$p" in
+      /api/workone/handoff|/api/workone/progress) return 0 ;;
     esac
   fi
 

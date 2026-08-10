@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 /**
- * Read-only verification of program-holder and partner portal readiness (no email, no writes).
+ * Read-only verification of program-holder and host-shop portal readiness.
+ * No email and no database writes.
  *
  *   pnpm tsx --env-file=.env.local scripts/ops/verify-portal-dashboards.ts
  */
@@ -20,10 +21,11 @@ const EXPECTED_HOLDERS: { email: string; minPrograms: number; org?: string }[] =
   { email: 'info@enchantedheartstraining.com', minPrograms: 0, org: 'Shawndra (MOU may block)' },
 ];
 
-const EXPECTED_PARTNERS: { email: string; label: string }[] = [
-  { email: 'info@prestigeelevation.com', label: 'Prestige / Elizabeth Greene barber' },
-  { email: 'calvincutz1985@gmail.com', label: 'Calvin barber host' },
-  { email: 'christopherd.newkirk@gmail.com', label: 'Chris barber host' },
+// Only currently active host-shop accounts belong in this production readiness list.
+// Archived partners (including Prestige Elevation) are intentionally excluded.
+const EXPECTED_HOST_SHOPS: { email: string; label: string }[] = [
+  { email: 'calvincutz1985@gmail.com', label: 'Cals Kutz Studio / Calvin Pena' },
+  { email: 'christopherd.newkirk@gmail.com', label: "B-52's Barber Shop / Chris Newkirk" },
 ];
 
 function gateHolderDashboard(holder: {
@@ -91,50 +93,66 @@ async function main() {
       .maybeSingle();
 
     const roleOk = prof?.role === 'program_holder' && prof.program_holder_id === holder.id;
-    const ok = programsOk && mouSigOk && roleOk && (exp.minPrograms === 0 || programsOk);
-
-    const parts = [
-      `programs=${progCount ?? 0}${exp.minPrograms ? ` (need ≥${exp.minPrograms})` : ''}`,
-      gate.canDashboard ? 'dashboard=OK' : `dashboard=BLOCKED (${gate.blockers.join(', ')})`,
-      mouSigOk ? 'mou_sig=OK' : 'mou_sig=MISSING',
-      roleOk ? 'profile=OK' : `profile=bad role=${prof?.role ?? '?'}`,
-      `login ${SITE}/login`,
-    ];
-
+    const ok = programsOk && mouSigOk && roleOk;
     if (!ok) fail++;
-    rows.push({ label: `${holder.organization_name} <${exp.email}>`, ok, detail: parts.join(' · ') });
+
+    rows.push({
+      label: `${holder.organization_name} <${exp.email}>`,
+      ok,
+      detail: [
+        `programs=${progCount ?? 0}${exp.minPrograms ? ` (need ≥${exp.minPrograms})` : ''}`,
+        gate.canDashboard ? 'dashboard=OK' : `dashboard=BLOCKED (${gate.blockers.join(', ')})`,
+        mouSigOk ? 'mou_sig=OK' : 'mou_sig=MISSING',
+        roleOk ? 'profile=OK' : `profile=bad role=${prof?.role ?? '?'}`,
+        `login ${SITE}/login`,
+      ].join(' · '),
+    });
   }
 
-  for (const exp of EXPECTED_PARTNERS) {
-    const { data: prof } = await db.from('profiles').select('id, role').eq('email', exp.email).maybeSingle();
+  for (const exp of EXPECTED_HOST_SHOPS) {
+    const { data: prof } = await db
+      .from('profiles')
+      .select('id, role')
+      .eq('email', exp.email)
+      .maybeSingle();
+
     let userId = prof?.id;
     if (!userId) {
       const { data: listed } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-      userId = listed?.users?.find((u) => u.email?.toLowerCase() === exp.email)?.id;
+      userId = listed?.users?.find((user) => user.email?.toLowerCase() === exp.email.toLowerCase())?.id;
     }
 
-    const { data: pu } = userId
-      ? await db.from('partner_users').select('partner_id, status').eq('user_id', userId).maybeSingle()
+    const { data: partnerUser } = userId
+      ? await db
+          .from('partner_users')
+          .select('partner_id, role, status')
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .maybeSingle()
       : { data: null };
 
-    const { data: partner } = pu?.partner_id
-      ? await db.from('partners').select('partner_type, type, name').eq('id', pu.partner_id).maybeSingle()
+    const { data: partner } = partnerUser?.partner_id
+      ? await db
+          .from('partners')
+          .select('name, partner_type, type, program_type, status, approval_status, is_active')
+          .eq('id', partnerUser.partner_id)
+          .maybeSingle()
       : { data: null };
 
-    const { data: app } = await db
-      .from('barbershop_partner_applications')
-      .select('status, mou_signed_at')
-      .eq('contact_email', exp.email)
-      .maybeSingle();
+    const roleOk = ['partner', 'host_shop', 'host_shop_admin'].includes(prof?.role ?? '');
+    const wired = Boolean(partnerUser?.partner_id);
+    const activeLink = partnerUser?.status === 'active';
+    const activePartner =
+      partner?.status === 'active' &&
+      partner?.approval_status === 'approved' &&
+      partner?.is_active !== false;
+    const typeText = [partner?.partner_type, partner?.type, partner?.program_type]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    const hostShopType = /(barber|salon|shop|training_site|cosmet)/.test(typeText);
 
-    const roleOk = prof?.role === 'partner';
-    const wired = Boolean(pu?.partner_id);
-    const barberType =
-      partner?.partner_type === 'barber' ||
-      partner?.partner_type === 'barbershop' ||
-      partner?.type === 'barber';
-
-    const ok = Boolean(userId) && roleOk && wired && barberType;
+    const ok = Boolean(userId) && roleOk && wired && activeLink && activePartner && hostShopType;
     if (!ok) fail++;
 
     rows.push({
@@ -142,26 +160,26 @@ async function main() {
       ok,
       detail: [
         userId ? 'auth=OK' : 'auth=MISSING',
-        roleOk ? 'role=partner' : `role=${prof?.role ?? '?'}`,
-        wired ? `partner_users=${pu?.partner_id?.slice(0, 8)}…` : 'partner_users=MISSING',
-        barberType ? 'partner_type=barber' : `partner_type=${partner?.partner_type ?? '?'}`,
-        app ? `application=${app.status} mou=${app.mou_signed_at ? 'signed' : 'unsigned'}` : 'no barber application row',
-        `dashboard ${SITE}/partner/dashboard`,
+        roleOk ? `role=${prof?.role}` : `role=${prof?.role ?? '?'}`,
+        wired ? `partner_users=${partnerUser?.partner_id?.slice(0, 8)}…` : 'partner_users=MISSING',
+        activeLink ? 'link=active' : `link=${partnerUser?.status ?? '?'}`,
+        activePartner ? 'partner=active+approved' : `partner=${partner?.status ?? '?'}/${partner?.approval_status ?? '?'}`,
+        hostShopType ? 'type=host-shop' : `type=${partner?.partner_type ?? '?'}`,
+        `dashboard ${SITE}/host-shop/dashboard`,
       ].join(' · '),
     });
   }
 
-  const w = Math.max(...rows.map((r) => r.label.length), 20);
-  for (const r of rows) {
-    const mark = r.ok ? '✅' : '❌';
-    console.log(`${mark} ${r.label.padEnd(w)}  ${r.detail}`);
+  const width = Math.max(...rows.map((row) => row.label.length), 20);
+  for (const row of rows) {
+    console.log(`${row.ok ? '✅' : '❌'} ${row.label.padEnd(width)}  ${row.detail}`);
   }
 
   console.log(`\n${fail ? `❌ ${fail} issue(s)` : '✅ All checks passed'} · no emails sent\n`);
   process.exit(fail ? 1 : 0);
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

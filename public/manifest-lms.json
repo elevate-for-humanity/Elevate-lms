@@ -1,8 +1,8 @@
 {
   "id": "org.elevateforhumanity.lms",
-  "name": "Elevate LMS",
-  "short_name": "Elevate LMS",
-  "description": "Student, apprentice, employer, and workforce dashboards for Elevate for Humanity",
+  "name": "Elevate Learning & Apprenticeship",
+  "short_name": "Elevate",
+  "description": "Learner, apprentice, host shop, employer, and workforce dashboards for Elevate for Humanity.",
   "start_url": "/dashboards?utm_source=homescreen&utm_medium=pwa",
   "scope": "/",
   "display": "standalone",
@@ -34,14 +34,19 @@
   ],
   "shortcuts": [
     {
-      "name": "Student Dashboard",
-      "short_name": "Student",
+      "name": "Learner Dashboard",
+      "short_name": "Learner",
       "url": "/lms/dashboard"
     },
     {
       "name": "Apprentice Dashboard",
       "short_name": "Apprentice",
       "url": "/apprentice"
+    },
+    {
+      "name": "Host Shop Dashboard",
+      "short_name": "Host Shop",
+      "url": "/host-shop/dashboard"
     },
     {
       "name": "Employer Dashboard",

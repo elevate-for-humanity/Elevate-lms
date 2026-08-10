@@ -3,38 +3,36 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Mic, MicOff, Loader2, Volume2, AlertCircle } from 'lucide-react';
 import type { SpeechRecognitionConstructor } from '@/lib/types/external-sdks';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 interface VoiceControlProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
   className?: string;
   showTextResponse?: boolean;
+  responseText?: string;
 }
 
 type VoiceState = 'idle' | 'listening' | 'processing' | 'error';
 
-// Window extension for speech recognition
 interface SpeechWindow {
   SpeechRecognition?: SpeechRecognitionConstructor;
   webkitSpeechRecognition?: SpeechRecognitionConstructor;
   _currentRecognition?: {
     stop: () => void;
+    abort: () => void;
   };
 }
 
-// Speech recognition result interface
 interface SpeechRecognitionResultList {
   [index: number]: {
-    [index: number]: {
-      transcript: string;
-    };
+    [index: number]: { transcript: string };
     isFinal: boolean;
     length: number;
   };
   length: number;
 }
 
-// Speech recognition event interface
 interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
 }
@@ -44,32 +42,32 @@ export default function VoiceControl({
   disabled = false,
   className = '',
   showTextResponse = true,
+  responseText = '',
 }: VoiceControlProps) {
   const [state, setState] = useState<VoiceState>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [lastTranscript, setLastTranscript] = useState<string>('');
-  const [aiResponse, setAiResponse] = useState<string>('');
-  const [speaking, setSpeaking] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const [lastTranscript, setLastTranscript] = useState('');
+  const naturalVoice = useNaturalVoice();
 
-  // Check for Web Speech API support
   const speechSupported = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
-  const synthesisSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  const speaking = naturalVoice.isPlaying || naturalVoice.isPaused || naturalVoice.isLoading;
 
   const startListening = useCallback(async () => {
     if (!speechSupported || disabled) {
-      setError('Speech recognition not supported in this browser');
+      setError('Speech recognition is not supported in this browser');
       setState('error');
       return;
     }
 
     try {
+      naturalVoice.stop();
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach((track) => track.stop());
+
       const win = window as unknown as SpeechWindow;
-      const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      
+      const Recognition = win.SpeechRecognition || win.webkitSpeechRecognition;
+      if (!Recognition) return;
+      const recognition = new Recognition();
       recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = 'en-US';
@@ -78,82 +76,48 @@ export default function VoiceControl({
         setState('listening');
         setError(null);
       };
-
-      recognition.onresult = (event: { results: Array<Array<{ transcript: string; isFinal: boolean }>> }) => {
-        const transcript = Array.from(event.results)
-          .map((result) => result[0].transcript)
-          .join('');
-        
+      recognition.onresult = (event: { results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean }> }) => {
+        const results = Array.from(event.results);
+        const transcript = results.map((result) => result[0]?.transcript || '').join('');
         setLastTranscript(transcript);
-        
-        if (event.results[0][0].isFinal) {
+        const latest = results[results.length - 1];
+        if (latest?.isFinal) {
           setState('processing');
           onTranscript(transcript);
-        }
-      };
-
-      recognition.onerror = (event: { error: string }) => {
-        console.error('Speech recognition error:', event.error);
-        setError(event.error === 'not-allowed' ? 'Microphone access denied' : 'Speech recognition error');
-        setState('error');
-      };
-
-      recognition.onend = () => {
-        if (state === 'listening') {
           setState('idle');
         }
       };
-
+      recognition.onerror = (event: { error: string }) => {
+        setError(event.error === 'not-allowed' ? 'Microphone access denied' : 'Speech recognition error');
+        setState('error');
+      };
+      recognition.onend = () => setState((current) => current === 'listening' ? 'idle' : current);
       recognition.start();
-      mediaRecorderRef.current = null;
-
-    } catch (err) {
-      console.error('Error accessing microphone:', err);
+      win._currentRecognition = recognition as unknown as SpeechWindow['_currentRecognition'];
+    } catch {
       setError('Could not access microphone');
       setState('error');
     }
-  }, [speechSupported, disabled, onTranscript, state]);
+  }, [disabled, naturalVoice, onTranscript, speechSupported]);
 
   const stopListening = useCallback(() => {
     const win = window as unknown as SpeechWindow;
-    const recognition = win._currentRecognition;
-    if (recognition) {
-      recognition.stop();
-    }
+    win._currentRecognition?.stop();
     setState('idle');
   }, []);
 
-  const speakResponse = useCallback((text: string) => {
-    if (!synthesisSupported) return;
-    
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-    utterance.volume = 0.8;
-    
-    utterance.onstart = () => setSpeaking(true);
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    
-    window.speechSynthesis.speak(utterance);
-  }, [synthesisSupported]);
+  const playResponse = useCallback(() => {
+    if (!responseText.trim()) return;
+    if (speaking) {
+      naturalVoice.stop();
+      return;
+    }
+    void naturalVoice.play(responseText.slice(0, 2400), { voice: 'coral', style: 'assistant', rate: 1 });
+  }, [naturalVoice, responseText, speaking]);
 
-  const stopSpeaking = useCallback(() => {
-    window.speechSynthesis.cancel();
-    setSpeaking(false);
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      const win = window as unknown as SpeechWindow;
-      const recognition = win._currentRecognition;
-      if (recognition) {
-        recognition.abort();
-      }
-      window.speechSynthesis.cancel();
-    };
+  useEffect(() => () => {
+    const win = window as unknown as SpeechWindow;
+    win._currentRecognition?.abort();
   }, []);
 
   const isListening = state === 'listening';
@@ -161,94 +125,61 @@ export default function VoiceControl({
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
-      {/* Voice Control Button */}
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={isListening ? stopListening : startListening}
           disabled={disabled || isProcessing || !speechSupported}
-          className={`
-            relative flex items-center justify-center w-10 h-10 rounded-full
-            transition-all duration-200
-            ${isListening 
-              ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 animate-pulse' 
+          className={`relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 ${
+            isListening
+              ? 'animate-pulse bg-red-600 text-white shadow-lg shadow-red-500/30'
               : disabled || !speechSupported
-                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                : 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white shadow-lg shadow-brand-blue-500/30'
-            }
-          `}
+                ? 'cursor-not-allowed bg-slate-200 text-slate-500'
+                : 'bg-brand-blue-700 text-white shadow-lg shadow-brand-blue-500/30 hover:bg-brand-blue-800'
+          }`}
           title={!speechSupported ? 'Speech recognition not supported' : isListening ? 'Stop listening' : 'Start voice input'}
         >
-          {isProcessing ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : isListening ? (
-            <MicOff className="w-5 h-5" />
-          ) : (
-            <Mic className="w-5 h-5" />
-          )}
-          
-          {/* Pulsing ring when listening */}
-          {isListening && (
-            <span className="absolute inset-0 rounded-full border-2 border-red-400 animate-ping opacity-75" />
-          )}
+          {isProcessing ? <Loader2 className="h-5 w-5 animate-spin" /> : isListening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+          {isListening ? <span className="absolute inset-0 animate-ping rounded-full border-2 border-red-400 opacity-75" /> : null}
         </button>
 
-        {/* Status indicator */}
-        <div className="text-xs text-slate-500">
+        <div className="text-xs font-medium text-slate-700">
           {state === 'idle' && 'Click to speak'}
           {state === 'listening' && 'Listening...'}
           {state === 'processing' && 'Processing...'}
           {state === 'error' && error}
         </div>
 
-        {/* Voice response button */}
-        {showTextResponse && aiResponse && (
+        {showTextResponse && responseText ? (
           <button
             type="button"
-            onClick={speaking ? stopSpeaking : () => speakResponse(aiResponse)}
-            disabled={!synthesisSupported}
-            className={`
-              flex items-center gap-1 px-2 py-1 rounded-full text-xs
-              ${speaking
-                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }
-              ${!synthesisSupported ? 'opacity-50 cursor-not-allowed' : ''}
-            `}
-            title={!synthesisSupported ? 'Text-to-speech not supported' : speaking ? 'Stop speaking' : 'Read response aloud'}
+            onClick={playResponse}
+            className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${speaking ? 'bg-amber-100 text-amber-900 hover:bg-amber-200' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'}`}
+            title={speaking ? 'Stop natural voice' : 'Read response with natural AI voice'}
           >
-            <Volume2 className="w-3 h-3" />
-            {speaking ? 'Stop' : 'Listen'}
+            {naturalVoice.isLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Volume2 className="h-3 w-3" />}
+            {naturalVoice.isLoading ? 'Preparing' : speaking ? 'Stop' : 'Listen'}
           </button>
-        )}
+        ) : null}
       </div>
 
-      {/* Error message */}
-      {state === 'error' && error && (
-        <div className="flex items-center gap-1 text-xs text-red-600">
-          <AlertCircle className="w-3 h-3" />
-          {error}
-        </div>
-      )}
+      {state === 'error' && error ? (
+        <div className="flex items-center gap-1 text-xs font-semibold text-red-800"><AlertCircle className="h-3 w-3" />{error}</div>
+      ) : null}
 
-      {/* Last transcript */}
-      {lastTranscript && (
-        <div className="text-xs text-slate-500 bg-slate-50 rounded px-2 py-1">
-          You said: <span className="text-slate-700">{lastTranscript}</span>
-        </div>
-      )}
+      {lastTranscript ? (
+        <div className="rounded bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700">You said: <span className="text-slate-950">{lastTranscript}</span></div>
+      ) : null}
 
-      {/* AI Response display */}
-      {aiResponse && (
-        <div className="text-xs text-slate-600 bg-blue-50 rounded px-2 py-1">
-          AI: <span className="text-blue-700">{aiResponse.slice(0, 100)}{aiResponse.length > 100 ? '...' : ''}</span>
-        </div>
-      )}
+      {responseText ? (
+        <div className="rounded bg-blue-50 px-2 py-1 text-xs font-medium text-slate-800">AI: <span className="text-blue-900">{responseText.slice(0, 100)}{responseText.length > 100 ? '...' : ''}</span></div>
+      ) : null}
+
+      {naturalVoice.error ? <div className="text-xs font-semibold text-red-800">Natural voice is temporarily unavailable.</div> : null}
     </div>
   );
 }
 
-// Hook for using voice control
 export function useVoiceControl(onTranscript: (text: string) => void) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -256,44 +187,30 @@ export function useVoiceControl(onTranscript: (text: string) => void) {
 
   const startListening = useCallback(() => {
     if (typeof window === 'undefined') return;
-    
     const win = window as unknown as SpeechWindow;
-    const SpeechRecognitionClass = win.SpeechRecognition || win.webkitSpeechRecognition;
-    if (!SpeechRecognitionClass) return;
+    const Recognition = win.SpeechRecognition || win.webkitSpeechRecognition;
+    if (!Recognition) return;
 
-    const recognition = new SpeechRecognitionClass();
+    const recognition = new Recognition();
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
-
     recognition.onstart = () => setIsListening(true);
     recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const text = Array.from(event.results)
-        .map((result) => result[0].transcript)
-        .join('');
+      const text = Array.from(event.results).map((result) => result[0].transcript).join('');
       setTranscript(text);
-      if (event.results[0].isFinal) {
-        onTranscript(text);
-      }
+      if (event.results[0].isFinal) onTranscript(text);
     };
     recognition.onend = () => setIsListening(false);
     recognition.onerror = () => setIsListening(false);
-
     recognition.start();
     recognitionRef.current = recognition;
   }, [onTranscript]);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
+    recognitionRef.current?.stop();
     setIsListening(false);
   }, []);
 
-  return {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-  };
+  return { isListening, transcript, startListening, stopListening };
 }

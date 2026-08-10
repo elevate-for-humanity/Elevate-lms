@@ -6,6 +6,8 @@ import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
 import { getCommercialAgent } from '@/lib/platform/commercial-ai-agents';
 import type { ChatMessage } from '@/lib/ai/types';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
+import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 
 export async function handleCommercialAgentChat(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
@@ -21,20 +23,43 @@ export async function handleCommercialAgentChat(request: NextRequest) {
   const agent = getCommercialAgent(typeof body.agent === 'string' ? body.agent.toLowerCase() : '');
   if (!agent) return NextResponse.json({ error: 'Unknown AI assistant' }, { status: 400 });
 
-  const access = await requireFeatureForAuth(request, agent.feature);
-  if (access instanceof NextResponse) {
-    return NextResponse.json(
-      {
-        error: `${agent.name} is an upgrade for this organization.`,
-        feature: agent.feature,
-        upgradeUrl: `https://www.elevateforhumanity.org/store?search=${encodeURIComponent(agent.name)}`,
-      },
-      { status: 403 },
-    );
-  }
-
   const message = typeof body.message === 'string' ? body.message.trim().slice(0, 6000) : '';
   if (!message) return NextResponse.json({ error: 'message is required' }, { status: 400 });
+
+  let access = await requireFeatureForAuth(request, agent.feature);
+  let trialCredits: { charged: number; balance: number | null } | null = null;
+
+  if (access instanceof NextResponse) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user?.id) {
+      return NextResponse.json(
+        {
+          error: `${agent.name} is an upgrade for this organization.`,
+          feature: agent.feature,
+          upgradeUrl: `https://www.elevateforhumanity.org/store?search=${encodeURIComponent(agent.name)}`,
+        },
+        { status: 403 },
+      );
+    }
+
+    const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'assistant_chat');
+    if (!credit.allowed || !credit.isTrial) {
+      return NextResponse.json(
+        {
+          error: credit.error || `${agent.name} is an upgrade for this organization.`,
+          feature: agent.feature,
+          creditsRemaining: credit.balance,
+          upgradeUrl: credit.upgradeUrl || `https://www.elevateforhumanity.org/store?search=${encodeURIComponent(agent.name)}`,
+        },
+        { status: credit.isTrial ? 402 : 403 },
+      );
+    }
+
+    trialCredits = { charged: credit.charged, balance: credit.balance };
+    access = { userId: user.id, tenantId: 'website-builder-trial' };
+  }
 
   const history: ChatMessage[] = Array.isArray(body.history)
     ? body.history
@@ -70,6 +95,8 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       tenantId: access.tenantId,
       tokensUsed: result.tokensUsed,
       provider: result.provider,
+      trialCreditsCharged: trialCredits?.charged ?? 0,
+      trialCreditsRemaining: trialCredits?.balance ?? null,
     });
 
     return NextResponse.json({
@@ -78,9 +105,15 @@ export async function handleCommercialAgentChat(request: NextRequest) {
       response: result.content,
       provider: result.provider,
       tokensUsed: result.tokensUsed ?? null,
+      creditsCharged: trialCredits?.charged ?? 0,
+      creditsRemaining: trialCredits?.balance ?? null,
     });
   } catch (error) {
     logger.error('[commercial-ai] assistant failed', error instanceof Error ? error : new Error(String(error)), { agent: agent.id });
-    return NextResponse.json({ error: `${agent.name} is temporarily unavailable` }, { status: 503 });
+    return NextResponse.json({
+      error: `${agent.name} is temporarily unavailable`,
+      creditsCharged: trialCredits?.charged ?? 0,
+      creditsRemaining: trialCredits?.balance ?? null,
+    }, { status: 503 });
   }
 }

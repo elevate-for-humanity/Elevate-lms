@@ -1,17 +1,17 @@
 {
-  "name": "Elevate Programs",
-  "short_name": "Programs",
-  "description": "Program holder portal for managing training programs and compliance",
-  "start_url": "/program-holder",
-  "scope": "/program-holder",
+  "id": "org.elevateforhumanity.programholder",
+  "name": "Elevate Program Holder Portal",
+  "short_name": "Program Holder",
+  "description": "Manage approved training programs, students, training hours, documents, and compliance actions.",
+  "start_url": "/program-holder/dashboard",
+  "scope": "/program-holder/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#dc2626",
-  "categories": [
-    "education",
-    "business"
-  ],
+  "categories": ["education", "business", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/program-holder-192.png",
@@ -26,12 +26,6 @@
       "purpose": "any"
     },
     {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/program-holder-192-maskable.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/program-holder-512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
@@ -40,33 +34,27 @@
   ],
   "shortcuts": [
     {
-      "name": "Programs",
-      "url": "/program-holder/programs"
+      "name": "Program Holder Dashboard",
+      "short_name": "Dashboard",
+      "url": "/program-holder/dashboard"
     },
     {
       "name": "Students",
+      "short_name": "Students",
       "url": "/program-holder/students"
     },
     {
-      "name": "Compliance",
-      "url": "/program-holder/compliance"
-    }
-  ],
-  "id": "org.elevateforhumanity.programholder",
-  "screenshots": [
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-narrow.jpg",
-      "sizes": "1080x1920",
-      "type": "image/jpeg",
-      "form_factor": "narrow",
-      "label": "Home screen"
+      "name": "Onboarding",
+      "short_name": "Onboarding",
+      "url": "/program-holder/onboarding"
     },
     {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/screenshots/home-wide.jpg",
-      "sizes": "1920x1080",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "Dashboard view"
+      "name": "Verification",
+      "short_name": "Verify",
+      "url": "/program-holder/verification"
     }
-  ]
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

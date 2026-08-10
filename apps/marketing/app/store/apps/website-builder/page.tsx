@@ -5,25 +5,28 @@ import { ArrowRight, Globe2, Layout, Search, Palette, Upload, Pencil } from 'luc
 import { IndividualAppPlansSection } from '@/components/store/IndividualAppPlansSection';
 import ProductWalkthrough from '@/components/store/ProductWalkthrough';
 import ZeroCodeSetup from '@/components/store/ZeroCodeSetup';
+import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercial';
 import { INDIVIDUAL_APP_CATALOG } from '@/lib/apps/individual-app-plans';
+import { WEBSITE_BUILDER_TRIAL } from '@/lib/apps/website-builder-trial';
 
 export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
-  title: 'Website Builder for Training Providers | Elevate Store',
+  title: 'AI Website Builder You Can Talk To | Elevate Store',
   description:
-    'Create, edit, preview, and publish a training-provider website with Elevate. Includes organization branding, homepage content, SEO fields, subdomain publishing, and plan-based site limits.',
+    'Talk or type to PARIS and build a business website through conversation. Start with a limited 14-day trial, then add AI assistants, marketing, grants, images, video, courses, CRM, booking and automation.',
   keywords: [
-    'website builder',
+    'AI website builder',
+    'website builder you can talk to',
+    'small business website builder',
     'training provider website',
-    'workforce website builder',
-    'education website builder',
-    'SEO website builder',
+    'AI business assistant',
+    'no code website builder',
   ],
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/apps/website-builder' },
   openGraph: {
-    title: 'Website Builder for Training Providers | Elevate Store',
-    description: 'Create and publish training-provider websites from your Elevate account.',
+    title: 'AI Website Builder You Can Talk To | Elevate Store',
+    description: 'Tell PARIS what you want and keep building by voice or text as your website changes.',
     url: 'https://www.elevateforhumanity.org/store/apps/website-builder',
     type: 'website',
   },
@@ -34,66 +37,66 @@ const catalog = INDIVIDUAL_APP_CATALOG['website-builder'];
 const features = [
   {
     icon: Layout,
-    title: 'Structured site setup',
-    desc: 'Start from an Elevate training-provider site configuration instead of a blank page.',
+    title: 'Start by talking to PARIS',
+    desc: 'Describe the business, audience, services, style and goal. PARIS creates the first website draft instead of giving you a blank canvas.',
   },
   {
     icon: Pencil,
-    title: 'Live editing',
-    desc: 'Edit site identity, homepage hero content, branding, and search metadata from the authenticated editor.',
+    title: 'Keep building by conversation',
+    desc: 'Say or type what you want changed. PARIS stays in the editor, updates the saved draft and keeps the website moving with you.',
   },
   {
     icon: Globe2,
-    title: 'Subdomain publishing',
-    desc: 'Choose an available Elevate subdomain and publish the current site configuration.',
+    title: 'Preview and publish',
+    desc: 'Review the website before it is public, publish to an Elevate web address, and unlock supported custom-domain workflows when you upgrade.',
   },
   {
     icon: Search,
-    title: 'SEO fields',
-    desc: 'Manage the site title and description stored with the website configuration.',
+    title: 'SEO controls',
+    desc: 'Manage site title, description, keywords and search-facing content as part of the website configuration.',
   },
   {
     icon: Palette,
     title: 'Brand controls',
-    desc: 'Manage logo text, tagline, primary color, and secondary color.',
+    desc: 'Change logo text, tagline, primary color, secondary color and the visual direction without writing code.',
   },
   {
     icon: Upload,
-    title: 'Existing-site intake',
-    desc: 'The Store includes a separate import entry point for organizations bringing an existing site into the workflow.',
+    title: 'Import an existing website',
+    desc: 'Bring an existing public website into the Elevate workflow, map its content and branding, then review the result before publishing.',
   },
 ];
 
 const walkthrough = [
   {
     label: '1. Describe it',
-    title: 'Tell AI what business you are building',
+    title: 'Tell PARIS what business you are building',
     description:
       'Example: “Build a professional home-healthcare agency website in Indianapolis with services, an about section and a contact call to action.”',
   },
   {
     label: '2. Generate',
-    title: 'Elevate creates your first draft',
+    title: 'PARIS creates your first draft',
     description:
-      'AI turns your business description into a starting website structure and content so you are not staring at a blank canvas.',
+      'AI turns your business interview into a starting website structure, branding and conversion-focused content so you are not staring at a blank canvas.',
   },
   {
-    label: '3. Make it yours',
-    title: 'Edit the words, brand and look',
+    label: '3. Keep talking',
+    title: 'Tell PARIS what to change next',
     description:
-      'Update your business name, hero message, colors, tagline and search metadata from the visual workspace—no code required.',
+      'Say “make it more professional,” “rewrite my services,” “change the colors,” or “improve the homepage.” PARIS updates the current site instead of starting over.',
   },
   {
     label: '4. Preview',
-    title: 'Review before anybody sees it',
+    title: 'Watch the site change as you build',
     description:
-      'Preview the site, refine the message and make sure the business is represented correctly before publishing.',
+      'Preview the saved website, refine the message and make sure the business is represented correctly before anything is published.',
   },
   {
-    label: '5. Publish',
-    title: 'Choose your web address and go live',
+    label: '5. Publish + upgrade',
+    title: 'Go live, then add the business tools you need',
     description:
-      'Select an available Elevate subdomain and publish the saved website configuration when you are ready.',
+      'Publish when ready and unlock custom domains, more credits, AI assistants, marketing, grant writing, images, commercial video, courses and automation as the business grows.',
   },
 ];
 
@@ -137,7 +140,7 @@ const jsonLd = {
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
   url: 'https://www.elevateforhumanity.org/store/apps/website-builder',
-  description: 'Website creation and publishing tools for training providers and workforce organizations.',
+  description: 'Conversational AI website creation, editing, preview and publishing for businesses and training providers.',
   offers: catalog.plans.map((plan) => ({
     '@type': 'Offer',
     price: String(plan.priceMonthly),
@@ -154,25 +157,25 @@ export default function WebsiteBuilderStorePage() {
       <section className="border-b border-slate-200 bg-slate-950 px-4 py-10 text-white sm:py-14">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <p className="text-sm font-black uppercase tracking-widest text-white">Elevate Apps</p>
+            <p className="text-sm font-black uppercase tracking-widest text-cyan-300">Talk it. Type it. Build it.</p>
             <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
-              Website Builder for Training Providers
+              A Website Builder You Can Actually Talk To
             </h1>
             <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-slate-100 sm:text-lg">
-              Build and publish an Elevate-hosted training website from your account. The editor covers site identity, homepage content, branding, SEO, preview, save, publishing, and supported domain workflows.
+              Tell PARIS what you want and watch the website take shape. Keep talking or typing as you go—PARIS stays in the builder, changes the saved draft, and helps you move from idea to publishable website without code.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="#guided-setup"
+                href={catalog.trialHref}
                 className="rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800"
               >
-                Guided setup
+                Start 14-day trial
               </Link>
               <Link
-                href="#walkthrough"
+                href="#commercial"
                 className="rounded-xl border-2 border-white px-6 py-3 font-black text-white hover:bg-white/10"
               >
-                Watch walkthrough
+                Watch commercial
               </Link>
               <Link
                 href={catalog.appHref}
@@ -186,14 +189,42 @@ export default function WebsiteBuilderStorePage() {
           <div className="relative min-h-[300px] overflow-hidden rounded-2xl border border-white/20 bg-slate-800 shadow-2xl sm:min-h-[380px]">
             <Image
               src="/images/pages/platform-page-12.webp"
-              alt="Elevate platform workspace used to configure digital workforce tools"
+              alt="Elevate AI Website Builder workspace"
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 52vw"
               className="object-cover"
             />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/90 to-transparent p-5 pt-16">
-              <p className="text-sm font-bold text-white">Create → edit → preview → publish from one workspace.</p>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/95 to-transparent p-5 pt-16">
+              <p className="text-sm font-bold text-white">Interview → first draft → talk or type changes → preview → publish → upgrade.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="commercial">
+        <WebsiteBuilderCommercial />
+      </div>
+
+      <section className="border-b border-slate-200 bg-cyan-50 px-4 py-14">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-7 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-brand-red-700">Limited 14-day trial</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950">Try the builder and the upgrades before you buy them.</h2>
+              <p className="mt-4 leading-7 text-slate-700">
+                The Website Builder trial includes {WEBSITE_BUILDER_TRIAL.credits} shared AI credits, one website, up to five pages, PARIS, and limited preview access to the upgrade tools. Heavy AI work uses more credits than quick text changes.
+              </p>
+              <p className="mt-3 text-sm font-semibold text-slate-600">
+                Domain purchases, white-labeling and API access are paid upgrades. Trial publishing uses an Elevate web address.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {WEBSITE_BUILDER_TRIAL.includedPreviewCapabilities.map((capability) => (
+                <div key={capability} className="rounded-xl border border-cyan-200 bg-white p-4 text-sm font-bold text-slate-800 shadow-sm">
+                  {capability}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -211,11 +242,11 @@ export default function WebsiteBuilderStorePage() {
       <div id="guided-setup">
         <ZeroCodeSetup
           productName="AI Website Builder"
-          intro="Answer four simple questions and Elevate carries that context into the Website Builder so you can start with a configured direction instead of an empty canvas."
+          intro="Answer four simple questions and Elevate carries that context into the Website Builder so PARIS can start with the business direction instead of an empty canvas."
           questions={setupQuestions}
           startHref={catalog.appHref}
           trialHref={catalog.trialHref}
-          advancedNote="Professional and Enterprise can expose custom domains, imports, white-label, API and multi-user controls after the basic zero-code workflow is working."
+          advancedNote="Upgrade for more websites, more credits, custom domains, advanced capacity and additional business assistants and tools."
         />
       </div>
 
@@ -235,9 +266,9 @@ export default function WebsiteBuilderStorePage() {
 
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-14">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-black text-slate-950">How the flow works</h2>
+          <h2 className="text-3xl font-black text-slate-950">How the revenue journey works</h2>
           <div className="mt-8 grid gap-4 md:grid-cols-4">
-            {['Start trial or subscribe', 'Create a website', 'Edit and preview', 'Choose a domain and publish'].map(
+            {['Start the limited trial', 'Build with PARIS + credits', 'Upgrade tools as needed', 'Publish, grow and add capacity'].map(
               (step, index) => (
                 <div key={step} className="rounded-xl border border-slate-300 bg-white p-5">
                   <div className="text-sm font-black text-brand-red-700">{index + 1}</div>
@@ -247,7 +278,7 @@ export default function WebsiteBuilderStorePage() {
             )}
           </div>
           <p className="mt-6 text-sm font-medium leading-6 text-slate-700">
-            Domain capabilities depend on the active plan and enabled services. The product page describes the supported customer workflow without creating a second Website Builder implementation.
+            The base subscription gets the customer into the builder. Additional AI capacity, assistants and business capabilities can be activated as the customer asks PARIS to do more.
           </p>
         </div>
       </section>

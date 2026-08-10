@@ -16,7 +16,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
+function isBlockedExternalTraining(course: { partner_name?: string | null; external_url?: string | null }) {
+  const provider = String(course.partner_name || '').toLowerCase();
+  const url = String(course.external_url || '').toLowerCase();
+  return provider.includes('coursera') || url.includes('coursera.org');
+}
 
 const ExternalCourseSchema = z.object({
   partner_name: z.string().min(1, 'Partner name required'),
@@ -31,7 +35,6 @@ const ExternalCourseSchema = z.object({
   is_required: z.boolean().default(true),
   sort_order: z.number().int().min(0).default(0),
   manual_completion_enabled: z.boolean().default(true),
-  // Competency area — used for proctor-authority guard (replaces keyword matching)
   competency_area: z.string().optional().nullable(),
 });
 
@@ -39,8 +42,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
+
   const { programId } = await params;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
@@ -57,13 +61,18 @@ export async function GET(
     logger.error('GET external courses error', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-  return NextResponse.json({ items: data ?? [] });
+
+  const items = (data ?? []).filter((course) => !isBlockedExternalTraining(course));
+  return NextResponse.json({ items });
 }
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string }> },
 ) {
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+
   const { programId } = await params;
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
@@ -77,11 +86,14 @@ export async function POST(
     return NextResponse.json({ error: issues }, { status: 422 });
   }
 
-  const db = await requireAdminClient();
+  if (isBlockedExternalTraining(parsed.data)) {
+    return NextResponse.json(
+      { error: 'Coursera-linked training is not permitted on the Elevate platform.' },
+      { status: 422 },
+    );
+  }
 
-  // Proctor-authority guard: block external attachment if Elevate already holds
-  // proctor authority for a credential in the same competency_area.
-  // Uses competency_area field (not keyword matching) for reliable enforcement.
+  const db = await requireAdminClient();
   const competencyArea = parsed.data.competency_area ?? null;
 
   if (competencyArea) {

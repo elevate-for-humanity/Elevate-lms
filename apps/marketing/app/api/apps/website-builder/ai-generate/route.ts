@@ -4,6 +4,7 @@ import { aiChat } from '@/lib/ai/ai-service';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Website Builder subscription required' }, { status: 403 });
   }
   if (subscription.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
-    return NextResponse.json({ error: 'Website Builder trial has expired' }, { status: 403 });
+    return NextResponse.json({ error: 'Website Builder trial has expired', upgradeUrl: '/store/apps/website-builder' }, { status: 403 });
   }
 
   const plan = subscription.plan || 'starter';
@@ -54,6 +55,15 @@ export async function POST(request: NextRequest) {
         upgradeUrl: '/store/apps/website-builder',
       }, { status: 409 });
     }
+  }
+
+  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'initial_site_generation');
+  if (!credit.allowed) {
+    return NextResponse.json({
+      error: credit.error || 'Not enough Website Builder credits',
+      creditsRemaining: credit.balance,
+      upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder',
+    }, { status: 402 });
   }
 
   const body = await request.json().catch(() => ({}));
@@ -145,7 +155,6 @@ export async function POST(request: NextRequest) {
       },
     };
   } catch {
-    // Fallback still creates a usable website if AI is temporarily unavailable.
     config = fallback;
   }
 
@@ -166,5 +175,11 @@ export async function POST(request: NextRequest) {
 
   if (error || !site) return NextResponse.json({ error: error?.message || 'Could not create AI website' }, { status: 500 });
 
-  return NextResponse.json({ website: site, generated: true, editUrl: `/apps/website-builder/edit/${site.id}` }, { status: 201 });
+  return NextResponse.json({
+    website: site,
+    generated: true,
+    editUrl: `/apps/website-builder/edit/${site.id}`,
+    creditsCharged: credit.charged,
+    creditsRemaining: credit.balance,
+  }, { status: 201 });
 }

@@ -1,95 +1,105 @@
-import { Metadata } from 'next';
 import Link from 'next/link';
-import { CreditCard, Calendar, Check, AlertCircle } from 'lucide-react';
+import { AlertCircle, Calendar, CreditCard, ShieldCheck } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard } from '@/lib/partner/board';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
-export const metadata: Metadata = {
+export const dynamic = 'force-dynamic';
+
+export const metadata = {
   title: 'Subscription | Host Shop Portal',
-  keywords: ["subscription", "platform access", "host shop"],
-  description: 'Manage your host shop subscription and billing.',
+  description: 'View the host shop subscription record stored in Elevate.',
+  robots: { index: false, follow: false },
 };
 
-export default function SubscriptionPage() {
+export default async function SubscriptionPage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
+  const db = await requireAdminClient();
+  const shopIds = board.shops.map((shop) => shop.id).filter(Boolean);
+
+  const { data: subscriptions, error } = shopIds.length
+    ? await db
+        .from('host_shop_subscriptions')
+        .select('id, host_shop_id, plan, status, started_at, expires_at, created_at')
+        .in('host_shop_id', shopIds)
+        .order('created_at', { ascending: false })
+        .limit(10)
+    : { data: [], error: null };
+
+  const rows = subscriptions ?? [];
+  const current = rows.find((subscription) =>
+    ['active', 'trialing', 'past_due'].includes(String(subscription.status || '').toLowerCase()),
+  ) ?? rows[0] ?? null;
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <section className="bg-white border-b border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h1 className="text-2xl font-bold text-slate-900">Subscription</h1>
-          <p className="text-sm text-slate-500 mt-1">Manage your host shop subscription and billing</p>
+    <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
+            {board.partner?.name || 'Host Shop'}
+          </p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Subscription</h1>
+          <p className="mt-2 text-slate-600">Live host-shop subscription status. Sample prices and billing history have been removed.</p>
         </div>
-      </section>
+        <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+          Back to board
+        </Link>
+      </div>
 
-      {/* Current Plan */}
-      <section className="py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden mb-6">
-            <div className="p-6 border-b border-slate-100 bg-slate-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Current Plan</h2>
-                  <p className="text-sm text-slate-500">Your active subscription</p>
-                </div>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                  Active
-                </span>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-3xl font-bold text-slate-900">$99</span>
-                <span className="text-slate-500">/month</span>
-              </div>
-              <p className="text-sm text-slate-600 mb-6">Host Shop Portal License</p>
-              <div className="space-y-3 mb-6">
-                {['Up to 5 apprentices', 'Apprentice hour tracking', 'Competency verification', 'OJL logging', 'Email support'].map((feature) => (
-                  <div key={feature} className="flex items-center gap-2 text-sm text-slate-700">
-                    <Check className="w-4 h-4 text-green-500" />
-                    {feature}
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <Calendar className="w-4 h-4" />
-                Next billing date: Next month
-              </div>
-            </div>
-          </div>
-
-          {/* Billing History */}
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <div className="p-6 border-b border-slate-100">
-              <h2 className="text-lg font-semibold text-slate-900">Billing History</h2>
-            </div>
-            <div className="divide-y divide-slate-100">
-              <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CreditCard className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center" />
-                  <div>
-                    <p className="font-medium text-slate-900">Host Shop License</p>
-                    <p className="text-sm text-slate-500">July 2025</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-slate-900">$99.00</p>
-                  <p className="text-sm text-green-600">Paid</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Help Text */}
-          <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium text-amber-800">Need to upgrade or cancel?</p>
-              <p className="text-amber-700 mt-1">Contact our support team to modify your subscription.</p>
-              <Link href="/contact" className="text-amber-800 font-medium hover:underline mt-2 inline-block">
-                Contact Support →
-              </Link>
-            </div>
-          </div>
+      {error ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+          Subscription data could not be loaded. No sample billing information is being substituted.
         </div>
-      </section>
-    </div>
+      ) : null}
+
+      {current ? (
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-7 sm:p-9">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-50 text-brand-blue-700">
+                <CreditCard className="h-6 w-6" />
+              </div>
+              <h2 className="mt-5 text-2xl font-black capitalize text-slate-950">{current.plan || 'Host Shop Plan'}</h2>
+              <p className="mt-1 text-sm text-slate-600">Subscription record {current.id}</p>
+            </div>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-black capitalize text-slate-800">
+              {current.status || 'unknown'}
+            </span>
+          </div>
+
+          <dl className="mt-7 grid gap-5 sm:grid-cols-2">
+            <div className="rounded-2xl border border-slate-200 p-5">
+              <dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Started</dt>
+              <dd className="mt-2 font-black text-slate-950">{current.started_at ? new Date(current.started_at).toLocaleString() : 'Not recorded'}</dd>
+            </div>
+            <div className="rounded-2xl border border-slate-200 p-5">
+              <dt className="flex items-center gap-2 text-sm font-bold text-slate-600"><Calendar className="h-4 w-4" /> Expires / renews</dt>
+              <dd className="mt-2 font-black text-slate-950">{current.expires_at ? new Date(current.expires_at).toLocaleString() : 'Not recorded'}</dd>
+            </div>
+          </dl>
+        </section>
+      ) : (
+        <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-7 sm:p-9">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <h2 className="mt-5 text-2xl font-black text-slate-950">No host-shop subscription record found</h2>
+          <p className="mt-3 max-w-2xl leading-7 text-slate-700">
+            This account does not currently have a record in the host-shop subscription ledger. The portal will not invent a plan, price, payment, or renewal date.
+          </p>
+          <div className="mt-6 rounded-2xl border border-brand-green-200 bg-brand-green-50 p-5">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="mt-0.5 h-5 w-5 text-brand-green-700" />
+              <p className="text-sm font-semibold text-brand-green-950">Billing details appear only after a verified subscription or payment workflow creates the corresponding database record.</p>
+            </div>
+          </div>
+          <Link href="/contact" className="mt-6 inline-flex rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">
+            Contact support about host-shop billing
+          </Link>
+        </section>
+      )}
+    </main>
   );
 }

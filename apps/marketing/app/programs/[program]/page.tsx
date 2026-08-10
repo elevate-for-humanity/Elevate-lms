@@ -3,7 +3,7 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import { ProgramStructuredData } from '@/components/seo/CourseStructuredData';
-import heroBanners from '@/content/heroBanners';
+import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { loadProgramForPage, loadProgramMetadataSource } from '@/lib/programs/load-program-page';
 import { getProgramOgImageUrl } from '@/lib/programs/og-images';
@@ -62,6 +62,28 @@ export default async function PublicProgramPage({
   }
 
   const price = Number.parseInt(resolved.selfPayCost.replace(/[^0-9]/g, ''), 10);
+  const configuredBanner = heroBanners[resolved.slug] ?? null;
+  const banner: HeroBannerConfig = configuredBanner?.pageKey
+    ? configuredBanner
+    : {
+        pageKey: resolved.slug,
+        posterImage: resolved.heroImage,
+        microLabel: resolved.category || resolved.programType,
+        belowHeroHeadline: resolved.title,
+        belowHeroSubheadline: resolved.subtitle,
+        primaryCta: {
+          label: 'Apply Now',
+          href: resolved.cta.applyHref,
+          variant: 'primary',
+        },
+        secondaryCta: {
+          label: 'Request Information',
+          href: resolved.cta.requestInfoHref || `/contact?program=${encodeURIComponent(resolved.slug)}`,
+          variant: 'secondary',
+        },
+        analyticsName: `program-${resolved.slug}`,
+        transcript: `${resolved.title}. ${resolved.subtitle}`,
+      };
 
   return (
     <>
@@ -79,7 +101,7 @@ export default async function PublicProgramPage({
           funding_eligible: !resolved.isSelfPay,
         }}
       />
-      <ProgramDetailPage program={resolved} banner={heroBanners[resolved.slug] ?? null} />
+      <ProgramDetailPage program={resolved} banner={banner} />
     </>
   );
 }

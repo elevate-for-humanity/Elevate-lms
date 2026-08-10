@@ -1,338 +1,207 @@
-'use client';
-import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { useState, useEffect } from 'react';
+import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Clock, XCircle, ArrowLeft, User, Calendar, Building, AlertCircle } from 'lucide-react';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { logger } from '@/lib/logger';
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard } from '@/lib/partner/board';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
-interface PendingHour {
-  id: string;
-  user_id: string;
-  work_date: string;
-  hours_claimed: number;
-  source_type: string;
-  category: string | null;
-  notes: string | null;
-  status: string;
-  created_at: string;
-  student_name?: string;
-  student_email?: string;
-}
+export const dynamic = 'force-dynamic';
 
-export default function PartnerHoursPendingPage() {
-  const router = useRouter();
-  const [pendingHours, setPendingHours] = useState<PendingHour[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+export const metadata = {
+  title: 'Pending Hours | Host Shop Portal',
+  description: 'Review OJT hour entries explicitly assigned to this host shop.',
+  robots: { index: false, follow: false },
+};
 
-  useEffect(() => {
-    fetchPendingHours();
-  }, []);
+async function getAuthorizedHour(hourId: string) {
+  const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
+  const db = await requireAdminClient();
+  const shopIds = board.shops.map((shop) => shop.id).filter(Boolean);
 
-  const fetchPendingHours = async () => {
-    setLoading(true);
-    try {
-      // Use API route (admin client + role checks) instead of direct Supabase query
-      const res = await fetch('/api/partner/hours?status=pending');
-      if (!res.ok) throw new Error('Failed to load pending hours');
-      const data = await res.json();
-      const hours = data.hours || [];
+  const { data: hour } = await db
+    .from('hour_entries')
+    .select('id, user_id, host_shop_id, program_slug, hours_claimed, hours, status, approval_status')
+    .eq('id', hourId)
+    .maybeSingle();
 
-      if (hours.length > 0) {
-        const enrichedHours = hours.map((h: any) => ({
-          ...h,
-          student_name: h.profiles?.full_name || 'Unknown',
-          student_email: h.profiles?.email || '',
-        }));
-
-        setPendingHours(enrichedHours);
-      } else {
-        setPendingHours([]);
-      }
-    } catch (err: any) {
-      logger.error('Error fetching pending hours:', err);
-      setError('Failed to load pending hours');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleApprove = async (hourId: string) => {
-    setProcessing(hourId);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const response = await fetch('/api/apprenticeship/hours/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hour_id: hourId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to approve hours');
-      }
-
-      setSuccess('Hours approved successfully');
-      setPendingHours((prev) => prev.filter((h) => h.id !== hourId));
-    } catch (err: any) {
-      setError('An error occurred');
-    } finally {
-      setProcessing(null);
-    }
-  };
-
-  const handleReject = async (hourId: string) => {
-    const reason = prompt('Please provide a reason for rejection:');
-    if (!reason) return;
-
-    setProcessing(hourId);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const response = await fetch('/api/apprenticeship/hours/reject', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hour_id: hourId, reason }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to reject hours');
-      }
-
-      setSuccess('Hours rejected');
-      setPendingHours((prev) => prev.filter((h) => h.id !== hourId));
-    } catch (err: any) {
-      setError('An error occurred');
-    } finally {
-      setProcessing(null);
-    }
-  };
-
-  const handleBulkApprove = async () => {
-    if (pendingHours.length === 0) return;
-
-    const confirmed = confirm(`Approve all ${pendingHours.length} pending hours entries?`);
-    if (!confirmed) return;
-
-    setProcessing('bulk');
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const hourIds = pendingHours.map((h) => h.id);
-
-      const response = await fetch('/api/apprenticeship/hours/approve', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hour_ids: hourIds }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to approve hours');
-      }
-
-      setSuccess(`${hourIds.length} hours entries approved`);
-      setPendingHours([]);
-    } catch (err: any) {
-      setError('An error occurred');
-    } finally {
-      setProcessing(null);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <Clock className="w-12 h-12 text-slate-700 mx-auto mb-4 animate-pulse" />
-          <p className="text-slate-700">Loading pending hours...</p>
-        </div>
-      </div>
-    );
+  if (!hour || !hour.user_id || !hour.host_shop_id || !shopIds.includes(hour.host_shop_id)) {
+    throw new Error('HOUR_ENTRY_NOT_AUTHORIZED');
   }
 
+  const placement = board.apprentices.find(
+    (apprentice) =>
+      apprentice.student_id === hour.user_id &&
+      apprentice.shop_id === hour.host_shop_id &&
+      (!apprentice.program_slug || !hour.program_slug || apprentice.program_slug === hour.program_slug),
+  );
+  if (!placement) throw new Error('HOUR_ENTRY_NOT_AUTHORIZED');
+
+  const pending = hour.status === 'pending' || hour.approval_status === 'pending';
+  if (!pending) throw new Error('HOUR_ENTRY_NOT_PENDING');
+
+  return { user, effectiveRoles, db, hour };
+}
+
+async function approveHour(formData: FormData) {
+  'use server';
+
+  const hourId = String(formData.get('hourId') || '').trim();
+  if (!hourId) return;
+
+  const { user, effectiveRoles, db, hour } = await getAuthorizedHour(hourId);
+  const claimed = Number(hour.hours_claimed ?? hour.hours ?? 0);
+  if (!Number.isFinite(claimed) || claimed <= 0) throw new Error('INVALID_HOURS');
+
+  const { error } = await db
+    .from('hour_entries')
+    .update({
+      status: 'approved',
+      approval_status: 'approved',
+      accepted_hours: claimed,
+      approved_by: user.email || user.id,
+      approved_by_role: effectiveRoles[0] || 'host_shop',
+      approved_at: new Date().toISOString(),
+      rejection_reason: null,
+      approval_notes: 'Verified by assigned Host Shop.',
+    })
+    .eq('id', hourId)
+    .eq('host_shop_id', hour.host_shop_id);
+
+  if (error) throw new Error(`HOUR_APPROVAL_FAILED:${error.message}`);
+  revalidatePath('/host-shop/dashboard/board');
+  revalidatePath('/host-shop/dashboard/hours');
+  revalidatePath('/host-shop/dashboard/hours/pending');
+}
+
+async function rejectHour(formData: FormData) {
+  'use server';
+
+  const hourId = String(formData.get('hourId') || '').trim();
+  const reason = String(formData.get('reason') || '').trim().slice(0, 1000);
+  if (!hourId || reason.length < 3) return;
+
+  const { user, effectiveRoles, db, hour } = await getAuthorizedHour(hourId);
+  const { error } = await db
+    .from('hour_entries')
+    .update({
+      status: 'rejected',
+      approval_status: 'rejected',
+      accepted_hours: 0,
+      approved_by: user.email || user.id,
+      approved_by_role: effectiveRoles[0] || 'host_shop',
+      approved_at: null,
+      rejection_reason: reason,
+      approval_notes: reason,
+    })
+    .eq('id', hourId)
+    .eq('host_shop_id', hour.host_shop_id);
+
+  if (error) throw new Error(`HOUR_REJECTION_FAILED:${error.message}`);
+  revalidatePath('/host-shop/dashboard/board');
+  revalidatePath('/host-shop/dashboard/hours');
+  revalidatePath('/host-shop/dashboard/hours/pending');
+}
+
+export default async function PendingHoursPage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
+  const db = await requireAdminClient();
+  const studentIds = board.apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
+  const shopIds = board.shops.map((shop) => shop.id).filter(Boolean);
+
+  const { data: pendingHours, error } = studentIds.length && shopIds.length
+    ? await db
+        .from('hour_entries')
+        .select('id, user_id, host_shop_id, program_slug, work_date, hours_claimed, hours, source_type, category, notes, status, approval_status, created_at')
+        .in('user_id', studentIds)
+        .in('host_shop_id', shopIds)
+        .or('status.eq.pending,approval_status.eq.pending')
+        .order('created_at', { ascending: true })
+    : { data: [], error: null };
+
+  const apprenticeById = new Map(
+    board.apprentices.map((apprentice) => [apprentice.student_id, apprentice]),
+  );
+  const rows = (pendingHours || []).filter((hour) => {
+    const placement = apprenticeById.get(hour.user_id);
+    return Boolean(
+      placement &&
+      placement.shop_id === hour.host_shop_id &&
+      (!placement.program_slug || !hour.program_slug || placement.program_slug === hour.program_slug),
+    );
+  });
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/partner-page-6.webp"
-          alt="Pending hours"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority 
-        />
-      </section>
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[
-              { label: 'Partner', href: '/partner/attendance' },
-              { label: 'Hours', href: '/partner/hours' },
-              { label: 'Pending Review' },
-            ]}
-          />
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <Link href="/host-shop/dashboard/hours" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950">
+        <ArrowLeft className="h-4 w-4" /> Back to hours
+      </Link>
+
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">{board.partner?.name || 'Host Shop'}</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Pending OJT Hours</h1>
+          <p className="mt-2 text-slate-600">Only hour entries explicitly assigned to this Host Shop and an active apprentice placement are shown.</p>
         </div>
+        <div className="rounded-full bg-amber-100 px-4 py-2 text-sm font-black text-amber-900">{rows.length} pending</div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link href="/host-shop/dashboard/hours" className="text-slate-700 hover:text-slate-900">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">Pending Hours Review</h1>
-              <p className="text-slate-700 mt-1">
-                {pendingHours.length} {pendingHours.length === 1 ? 'entry' : 'entries'} awaiting
-                approval
-              </p>
-            </div>
-          </div>
-          {pendingHours.length > 1 && (
-            <button
-              onClick={handleBulkApprove}
-              disabled={processing === 'bulk'}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
-            >
-              <span className="text-slate-500 flex-shrink-0">•</span>
-              {processing === 'bulk' ? 'Processing...' : 'Approve All'}
-            </button>
-          )}
+      {error ? (
+        <div className="mt-6 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /> Unable to load pending hour entries.
         </div>
+      ) : null}
 
-        {error && (
-          <div className="mb-6 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-brand-red-600" />
-            <p className="text-brand-red-800">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-6 p-4 bg-brand-green-50 border border-brand-green-200 rounded-lg flex items-center gap-3">
-            <span className="text-slate-500 flex-shrink-0">•</span>
-            <p className="text-brand-green-800">{success}</p>
-          </div>
-        )}
-
-        {pendingHours.length === 0 ? (
-          <div className="bg-white rounded-xl border p-12 text-center">
-            <span className="text-slate-500 flex-shrink-0">•</span>
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">All caught up!</h2>
-            <p className="text-slate-700 mb-6">No pending hours to review.</p>
-            <Link
-              href="/host-shop/dashboard/hours"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-900 rounded-lg hover:bg-slate-200"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Hours
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {pendingHours.map((hour) => (
-              <div key={hour.id} className="bg-white rounded-xl border p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-brand-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{hour.student_name}</h3>
-                        <p className="text-sm text-slate-700">{hour.student_email}</p>
-                      </div>
+      {rows.length === 0 ? (
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
+          <CheckCircle2 className="mx-auto h-10 w-10 text-brand-green-600" />
+          <h2 className="mt-3 text-xl font-black text-slate-950">No Host Shop hours awaiting review</h2>
+          <p className="mt-1 text-sm text-slate-500">Transfer hours or entries not assigned to this shop are intentionally excluded.</p>
+        </section>
+      ) : (
+        <div className="mt-6 space-y-4">
+          {rows.map((hour) => {
+            const apprentice = apprenticeById.get(hour.user_id);
+            const claimed = Number(hour.hours_claimed ?? hour.hours ?? 0);
+            return (
+              <article key={hour.id} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <h2 className="text-lg font-black text-slate-950">{apprentice?.name || 'Assigned apprentice'}</h2>
+                    <p className="text-sm text-slate-500">{apprentice?.email || ''}</p>
+                    <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-700">
+                      <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" /> {Number.isFinite(claimed) ? claimed : 0} hours</span>
+                      <span>{hour.work_date ? new Date(`${hour.work_date}T00:00:00`).toLocaleDateString() : 'Date not supplied'}</span>
+                      <span className="capitalize">{(hour.source_type || 'ojt').replace(/[-_]/g, ' ')}</span>
+                      {hour.category ? <span className="capitalize">{hour.category.replace(/[-_]/g, ' ')}</span> : null}
                     </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-slate-700" />
-                        <span className="text-sm text-slate-900">
-                          {new Date(hour.work_date).toLocaleDateString('en-US', {
-                            timeZone: 'UTC',
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-slate-700" />
-                        <span className="text-sm font-medium text-slate-900">
-                          {hour.hours_claimed} hours
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            hour.source_type === 'ojt'
-                              ? 'bg-brand-blue-100 text-brand-blue-700'
-                              : 'bg-purple-100 text-purple-700'
-                          }`}
-                        >
-                          {hour.source_type === 'ojt'
-                            ? 'OJT'
-                            : hour.source_type === 'rti'
-                              ? 'RTI'
-                              : hour.source_type?.toUpperCase()}
-                        </span>
-                      </div>
-                      {hour.category && (
-                        <div className="flex items-center gap-2">
-                          <Building className="w-4 h-4 text-slate-700" />
-                          <span className="text-sm text-slate-900">{hour.category}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {hour.notes && (
-                      <div className="bg-white rounded-lg p-3 mb-4">
-                        <p className="text-sm text-slate-900">{hour.notes}</p>
-                      </div>
-                    )}
+                    {hour.notes ? <p className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-700">{hour.notes}</p> : null}
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4">
-                    <button
-                      onClick={() => handleReject(hour.id)}
-                      disabled={processing === hour.id}
-                      className="inline-flex items-center gap-1 px-3 py-2 text-brand-red-600 hover:bg-brand-red-50 rounded-lg disabled:opacity-50"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => handleApprove(hour.id)}
-                      disabled={processing === hour.id}
-                      className="inline-flex items-center gap-1 px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-brand-green-700 disabled:opacity-50"
-                    >
-                      <span className="text-slate-500 flex-shrink-0">•</span>
-                      {processing === hour.id ? 'Processing...' : 'Approve'}
-                    </button>
+                  <div className="w-full space-y-3 lg:w-80">
+                    <form action={approveHour}>
+                      <input type="hidden" name="hourId" value={hour.id} />
+                      <button className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-green-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-green-800">
+                        <CheckCircle2 className="h-4 w-4" /> Approve {Number.isFinite(claimed) ? claimed : 0} hours
+                      </button>
+                    </form>
+                    <form action={rejectHour} className="space-y-2">
+                      <input type="hidden" name="hourId" value={hour.id} />
+                      <label className="block text-xs font-bold uppercase tracking-wide text-slate-500" htmlFor={`reason-${hour.id}`}>Rejection reason</label>
+                      <input id={`reason-${hour.id}`} name="reason" required minLength={3} maxLength={1000} className="min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm" placeholder="Explain why this entry cannot be approved" />
+                      <button className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-300 bg-white px-4 py-2 text-sm font-black text-red-800 hover:bg-red-50">
+                        <XCircle className="h-4 w-4" /> Reject entry
+                      </button>
+                    </form>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </main>
   );
 }

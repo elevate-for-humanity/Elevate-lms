@@ -1,10 +1,8 @@
 import { BARBER_COURSE_ID } from '@/lib/barber/pricing';
-
-/** Programs with a dedicated enrollment document upload flow under /programs/[slug]/documents */
-const PROGRAM_DOCUMENT_UPLOAD_SLUGS = new Set([
-  'barber-apprenticeship',
-  'cosmetology-apprenticeship',
-]);
+import {
+  PRESTIGE_ELEVATION_BARBER_CURRICULUM,
+  PRESTIGE_ELEVATION_BARBER_CURRICULUM_SHORT,
+} from '@/lib/barber/branding';
 
 /** Self-pay programs — never show WorkOne / WIOA intake checklist */
 export const WORKONE_INELIGIBLE_PROGRAM_SLUGS = new Set(['barber-apprenticeship']);
@@ -16,19 +14,18 @@ const SELF_PAY_FUNDING_TYPES = new Set([
   'self_pay',
 ]);
 
-/** Canonical LMS course IDs for apprenticeship RTI (Milady / online coursework) */
+/** Canonical LMS course IDs for apprenticeship RTI. */
 export const APPRENTICESHIP_LMS_COURSE_IDS: Record<string, string> = {
   'barber-apprenticeship': BARBER_COURSE_ID,
 };
 
+/** Apprentice onboarding stays inside the authenticated LMS session. */
 export function apprenticeshipOrientationPath(programSlug: string): string {
-  return `/programs/${programSlug}/orientation`;
+  return `/apprentice/orientation?program=${encodeURIComponent(programSlug)}`;
 }
 
-export function apprenticeshipDocumentsPath(programSlug: string): string {
-  if (PROGRAM_DOCUMENT_UPLOAD_SLUGS.has(programSlug)) {
-    return `/programs/${programSlug}/documents`;
-  }
+/** Apprentice documents use one authenticated operational route. */
+export function apprenticeshipDocumentsPath(_programSlug: string): string {
   return '/apprentice/documents';
 }
 
@@ -42,8 +39,12 @@ export function apprenticeshipWorkbookHref(programSlug: string): string {
 }
 
 export function apprenticeshipRtiLabel(programSlug: string, short = false): string | null {
-  const courseId = APPRENTICESHIP_LMS_COURSE_IDS[programSlug];
-  return courseId ? `/lms/courses/${courseId}` : null;
+  if (programSlug === 'barber-apprenticeship') {
+    return short
+      ? PRESTIGE_ELEVATION_BARBER_CURRICULUM_SHORT
+      : PRESTIGE_ELEVATION_BARBER_CURRICULUM;
+  }
+  return APPRENTICESHIP_LMS_COURSE_IDS[programSlug] ? 'Online Course' : null;
 }
 
 export function isWorkoneChecklistEligibleApplication(app: {

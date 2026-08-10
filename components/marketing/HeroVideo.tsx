@@ -10,10 +10,12 @@
  * - Once started, video continues to completion even if the user scrolls away.
  * - Video plays once; it never loops.
  * - Optional demo slides advance once in order; they never wrap/overlap indefinitely.
- * - All video, timers, narration, and speech stop immediately on route change/unmount.
+ * - All video, timers, and narration stop immediately on route change/unmount.
+ * - Never fall back to browser SpeechSynthesis. Narration must be recorded media
+ *   or natural AI audio supplied through voiceoverSrc.
  */
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Volume2, VolumeX } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -49,7 +51,6 @@ export interface HeroVideoProps {
   demoSlides?: HeroDemoSlide[];
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
-  /** Canonical hero frame sizing. Override only for an intentional compact/full variant. */
   heightClassName?: string;
 }
 
@@ -85,7 +86,6 @@ export default function HeroVideo({
   const [muted, setMuted] = useState(true);
   const [hasEnded, setHasEnded] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
-  const [ttsSupported, setTtsSupported] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop);
   const [demoActive, setDemoActive] = useState(false);
   const [demoSlideIndex, setDemoSlideIndex] = useState(0);
@@ -94,11 +94,6 @@ export default function HeroVideo({
   useEffect(() => {
     setVideoSrc(videoSrcMobile && window.innerWidth < 768 ? videoSrcMobile : videoSrcDesktop);
   }, [videoSrcDesktop, videoSrcMobile]);
-
-  const ttsText = useMemo(() => {
-    const fallback = [belowHeroHeadline, belowHeroSubheadline].filter(Boolean).join(' ');
-    return (transcript || fallback).trim();
-  }, [belowHeroHeadline, belowHeroSubheadline, transcript]);
 
   const clearDemoTimers = useCallback(() => {
     if (demoStartTimerRef.current) clearTimeout(demoStartTimerRef.current);
@@ -112,10 +107,6 @@ export default function HeroVideo({
     if (audio) {
       audio.pause();
       if (reset) audio.currentTime = 0;
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      if (reset) window.speechSynthesis.cancel();
-      else window.speechSynthesis.pause();
     }
     setMuted(true);
   }, []);
@@ -155,55 +146,6 @@ export default function HeroVideo({
     }, Math.max(0, demoStartSeconds * 1000));
   }, [demoActive, demoSlideSeconds, demoSlides.length, demoStartSeconds]);
 
-  useEffect((): (() => void) | undefined => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined;
-    setTtsSupported(true);
-    const loadVoices = () => window.speechSynthesis.getVoices();
-    loadVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
-    return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
-      window.speechSynthesis.cancel();
-    };
-  }, []);
-
-  const startTtsNarration = useCallback(() => {
-    if (!ttsSupported || !ttsText || typeof window === 'undefined' || !window.speechSynthesis) {
-      return false;
-    }
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(ttsText);
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
-    utterance.lang = 'en-US';
-
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = [
-      'Google US English',
-      'Microsoft Aria Online (Natural) - English (United States)',
-      'Microsoft Guy Online (Natural) - English (United States)',
-      'Microsoft Zira - English (United States)',
-      'Samantha',
-    ];
-    const voice =
-      preferred.reduce<SpeechSynthesisVoice | null>(
-        (found, name) => found ?? voices.find((candidate) => candidate.name === name) ?? null,
-        null,
-      ) ??
-      voices.find((candidate) => candidate.lang === 'en-US' && !candidate.localService) ??
-      voices.find((candidate) => candidate.lang === 'en-US') ??
-      voices.find((candidate) => candidate.lang.startsWith('en')) ??
-      null;
-
-    if (voice) utterance.voice = voice;
-    utterance.onend = () => setMuted(true);
-    utterance.onerror = () => setMuted(true);
-    window.speechSynthesis.speak(utterance);
-    setMuted(false);
-    return true;
-  }, [ttsSupported, ttsText]);
-
   const startAudibleTrack = useCallback(async () => {
     if (voiceoverSrc && audioRef.current) {
       try {
@@ -215,11 +157,9 @@ export default function HeroVideo({
         setMuted(false);
         return true;
       } catch {
-        // Browser blocked audible autoplay; user can use the sound button.
+        // Audible autoplay can be blocked; user can use the sound button.
       }
     }
-
-    if (ttsText && startTtsNarration()) return true;
 
     const video = videoRef.current;
     if (video) {
@@ -236,7 +176,7 @@ export default function HeroVideo({
 
     setMuted(true);
     return false;
-  }, [startTtsNarration, ttsText, voiceoverSrc]);
+  }, [voiceoverSrc]);
 
   const startOrResume = useCallback(async () => {
     const video = videoRef.current;
@@ -249,11 +189,10 @@ export default function HeroVideo({
     try {
       await video.play();
       setHasStarted(true);
-      if (muted) void startAudibleTrack();
     } catch {
       // Keep the poster/frame visible. User can start from native interaction.
     }
-  }, [hasEnded, hasStarted, muted, startAudibleTrack, startDemoSequence]);
+  }, [hasEnded, hasStarted, startDemoSequence]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -285,24 +224,12 @@ export default function HeroVideo({
 
   async function toggleMute() {
     if (!muted) {
-      if (!voiceoverSrc && !ttsText && videoRef.current) {
-        videoRef.current.muted = true;
-      }
-      stopNarration(false);
+      const audio = audioRef.current;
+      if (audio) audio.pause();
+      if (videoRef.current) videoRef.current.muted = true;
+      setMuted(true);
       return;
     }
-
-    if (
-      typeof window !== 'undefined' &&
-      window.speechSynthesis?.paused &&
-      ttsText &&
-      !voiceoverSrc
-    ) {
-      window.speechSynthesis.resume();
-      setMuted(false);
-      return;
-    }
-
     await startAudibleTrack();
   }
 
@@ -312,7 +239,7 @@ export default function HeroVideo({
     if (!demoSlides.length) stopNarration(true);
   }
 
-  const hasSoundControl = Boolean(voiceoverSrc || ttsText || videoSrc);
+  const hasSoundControl = Boolean(voiceoverSrc || videoSrc);
   const activeSlide = demoActive ? demoSlides[demoSlideIndex] : null;
 
   return (
@@ -410,7 +337,7 @@ export default function HeroVideo({
                   </h1>
                 )}
                 {belowHeroSubheadline && (
-                  <p className="mb-6 max-w-2xl text-base leading-relaxed text-slate-800 sm:mb-8 sm:text-lg">
+                  <p className="mb-6 max-w-2xl text-base font-medium leading-relaxed text-slate-800 sm:mb-8 sm:text-lg">
                     {belowHeroSubheadline}
                   </p>
                 )}
@@ -422,7 +349,7 @@ export default function HeroVideo({
                         href={cta.href}
                         className={
                           cta.variant === 'secondary'
-                            ? 'rounded-lg border border-slate-300 px-7 py-3.5 text-center text-sm font-bold text-slate-900 transition-colors hover:bg-slate-50'
+                            ? 'rounded-lg border border-slate-400 px-7 py-3.5 text-center text-sm font-bold text-slate-950 transition-colors hover:bg-slate-50'
                             : 'rounded-lg bg-brand-red-600 px-7 py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-brand-red-700'
                         }
                       >
@@ -458,7 +385,7 @@ export default function HeroVideo({
               onClick={() => setTranscriptOpen((open) => !open)}
               aria-expanded={transcriptOpen}
               aria-controls={transcriptId}
-              className="flex min-h-11 items-center gap-2 rounded text-xs font-semibold text-slate-700 transition-colors hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+              className="flex min-h-11 items-center gap-2 rounded text-xs font-semibold text-slate-800 transition-colors hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
             >
               <span>{transcriptOpen ? '▲' : '▼'}</span>
               Video transcript
@@ -466,7 +393,7 @@ export default function HeroVideo({
             {transcriptOpen && (
               <p
                 id={transcriptId}
-                className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800"
+                className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800"
               >
                 {transcript}
               </p>

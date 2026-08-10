@@ -21,11 +21,7 @@ const categoryMeta: Record<CapabilityCategory, { label: string }> = {
   enterprise: { label: 'Enterprise' },
 };
 
-/**
- * Distinct, repository-verified imagery for every public capability card.
- * These are existing assets already shipped by Elevate; none are placeholders
- * and no image is reused within this marketplace mapping.
- */
+/** Distinct repository screenshots for public capability cards. */
 const CAPABILITY_IMAGES: Record<string, string> = {
   website_builder: '/images/pages/comp-layout-hero.webp',
   crm: '/images/pages/admin-campaigns-hero.webp',
@@ -75,7 +71,7 @@ function priceFor(capability: PlatformCapability): string | null {
 }
 
 function primaryHref(capability: PlatformCapability): string {
-  return capability.storeHref || capability.marketingHref || capability.demoHref || '/store/plans';
+  return capability.storeHref || capability.marketingHref || capability.appHref || '/store/plans';
 }
 
 export function UnifiedSalesMarketplace() {
@@ -96,16 +92,15 @@ export function UnifiedSalesMarketplace() {
   }, [query, category]);
 
   return (
-    <section className="bg-slate-950 py-16 text-white" id="marketplace">
+    <section className="bg-slate-950 py-16 font-medium text-white" id="marketplace">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand-red-300">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-300">
             Start basic. Add capabilities as your business grows.
           </p>
-          <h2 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">Build your Elevate business stack</h2>
-          <p className="mt-4 text-base leading-7 text-slate-200 sm:text-lg">
-            Search the platform, try products, start a trial, and add specialized AI, education,
-            workforce and business tools without buying a second system.
+          <h2 className="mt-5 text-3xl font-black tracking-tight text-white sm:text-5xl">Build your Elevate business stack</h2>
+          <p className="mt-4 text-base font-semibold leading-7 text-slate-100 sm:text-lg">
+            Search the platform, watch a separate product demo, understand the subscription, and add specialized AI, education, workforce and business tools without buying a second system.
           </p>
         </div>
 
@@ -116,7 +111,7 @@ export function UnifiedSalesMarketplace() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search website builder, CRM, PARIS, testing, apprenticeship..."
-              className="w-full rounded-2xl border border-white/20 bg-white px-5 py-4 text-base font-medium text-slate-950 outline-none ring-brand-red-500 focus:ring-2"
+              className="w-full rounded-2xl border border-white/30 bg-white px-5 py-4 text-base font-bold text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2"
             />
           </label>
         </div>
@@ -125,7 +120,7 @@ export function UnifiedSalesMarketplace() {
           <button
             type="button"
             onClick={() => setCategory('all')}
-            className={`rounded-full px-4 py-2 text-sm font-bold ${category === 'all' ? 'bg-brand-red-600 text-white' : 'bg-white/10 text-slate-100 hover:bg-white/15'}`}
+            className={`rounded-full px-4 py-2 text-sm font-black ${category === 'all' ? 'bg-brand-red-600 text-white' : 'bg-white/15 text-white hover:bg-white/25'}`}
           >
             All
           </button>
@@ -134,7 +129,7 @@ export function UnifiedSalesMarketplace() {
               key={key}
               type="button"
               onClick={() => setCategory(key)}
-              className={`rounded-full px-4 py-2 text-sm font-bold ${category === key ? 'bg-brand-red-600 text-white' : 'bg-white/10 text-slate-100 hover:bg-white/15'}`}
+              className={`rounded-full px-4 py-2 text-sm font-black ${category === key ? 'bg-brand-red-600 text-white' : 'bg-white/15 text-white hover:bg-white/25'}`}
             >
               {categoryMeta[key].label}
             </button>
@@ -144,32 +139,38 @@ export function UnifiedSalesMarketplace() {
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((capability) => {
             const price = priceFor(capability);
-            const image = CAPABILITY_IMAGES[String(capability.key)] || '/images/pages/comp-home-highlight-biz.webp';
+            const image = CAPABILITY_IMAGES[String(capability.key)];
             return (
-              <article key={capability.key} className="flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-lg">
+              <article key={capability.key} className="flex min-h-[390px] flex-col overflow-hidden rounded-2xl border border-white/20 bg-slate-900 shadow-lg">
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-800">
-                  <Image
-                    src={image}
-                    alt={`${capability.name} platform capability`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    className="object-cover"
-                    placeholder="empty"
-                  />
+                  {image ? (
+                    <Image
+                      src={image}
+                      alt={`${capability.name} platform capability`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      className="object-cover"
+                      placeholder="empty"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-slate-800 p-8 text-center">
+                      <span className="text-2xl font-black text-white">{capability.name}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-1 flex-col p-6">
                   <div className="flex items-start justify-between gap-4">
-                    <span className="text-xs font-bold uppercase tracking-wide text-slate-300">
+                    <span className="text-xs font-black uppercase tracking-wide text-slate-100">
                       {categoryMeta[capability.category].label}
                     </span>
-                    <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-200">
+                    <span className="rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-black uppercase tracking-wide text-white">
                       {capability.status === 'enterprise' ? 'Enterprise' : capability.status === 'repair' ? 'Preview' : 'Available'}
                     </span>
                   </div>
 
                   <h3 className="mt-4 text-xl font-black text-white">{capability.name}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-6 text-slate-200">{capability.description}</p>
+                  <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-100">{capability.description}</p>
                   {price ? <p className="mt-4 text-sm font-black text-white">{price}</p> : null}
 
                   <div className="mt-5 flex flex-wrap gap-2">
@@ -179,14 +180,12 @@ export function UnifiedSalesMarketplace() {
                     >
                       {capability.status === 'enterprise' ? 'Explore' : 'View / Start'}
                     </Link>
-                    {capability.demoHref ? (
-                      <Link
-                        href={capability.demoHref}
-                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/25 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/10"
-                      >
-                        Demo
-                      </Link>
-                    ) : null}
+                    <Link
+                      href={`/store/demo/capability/${String(capability.key)}`}
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/40 bg-white/10 px-4 py-2.5 text-sm font-black text-white hover:bg-white/20"
+                    >
+                      Demo + Subscription
+                    </Link>
                   </div>
                 </div>
               </article>
@@ -195,19 +194,19 @@ export function UnifiedSalesMarketplace() {
         </div>
 
         {items.length === 0 ? (
-          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-slate-200">
+          <div className="mt-10 rounded-2xl border border-white/20 bg-white/10 p-8 text-center font-semibold text-slate-100">
             No matching capability. Try a broader search.
           </div>
         ) : null}
 
-        <div className="mt-12 grid gap-4 rounded-3xl border border-brand-red-500/30 bg-slate-900 p-7 md:grid-cols-[1fr_auto] md:items-center">
+        <div className="mt-12 grid gap-4 rounded-3xl border border-brand-red-500/40 bg-slate-900 p-7 md:grid-cols-[1fr_auto] md:items-center">
           <div>
-            <h3 className="text-2xl font-black">Not sure what to choose?</h3>
-            <p className="mt-2 text-slate-200">Start with the 14-day trial. Your platform can recommend upgrades based on the tools you actually use.</p>
+            <h3 className="text-2xl font-black text-white">Not sure what to choose?</h3>
+            <p className="mt-2 font-semibold text-slate-100">Start with the 14-day trial. Your platform can recommend upgrades based on the tools you actually use.</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="/store/trial" className="rounded-xl bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">Start Free Trial</Link>
-            <Link href="/store/plans" className="rounded-xl border border-white/25 px-5 py-3 font-black text-white hover:bg-white/10">Compare Plans</Link>
+            <Link href="/store/plans" className="rounded-xl border border-white/40 px-5 py-3 font-black text-white hover:bg-white/10">Compare Plans</Link>
           </div>
         </div>
       </div>

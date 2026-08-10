@@ -1,217 +1,113 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
-import {
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Clock,
-  Calendar as CalendarIcon,
-  Users,
-  Check,
-} from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { createClient } from '@/lib/supabase/server';
 
-const currentDate = new Date('2026-06-15');
+export const dynamic = 'force-dynamic';
 
-const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export const metadata = {
+  title: 'Schedule | Host Shop Portal',
+  description: 'View training sessions hosted by the signed-in host-shop user.',
+  robots: { index: false, follow: false },
+};
 
-const events = [
-  { id: 1, title: 'Competency Review - Marcus J.', time: '10:00 AM', type: 'competency', day: 15 },
-  { id: 2, title: 'Class - Haircutting Basics', time: '2:00 PM', type: 'class', day: 16 },
-  { id: 3, title: 'Evaluation - DeShawn W.', time: '11:00 AM', type: 'evaluation', day: 18 },
-  { id: 4, title: 'Practical Session', time: '9:00 AM', type: 'practical', day: 20 },
-];
+export default async function HostShopSchedulePage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const supabase = await createClient();
 
-export default function SchedulePage() {
-  const [currentMonth, setCurrentMonth] = useState(5); // June (0-indexed)
-  const [currentYear, setCurrentYear] = useState(2026);
-  const [selectedDay, setSelectedDay] = useState<number | null>(15);
+  const { data: sessions, error } = await supabase
+    .from('attendance_sessions')
+    .select('id, title, scheduled_at, status')
+    .eq('host_id', user.id)
+    .order('scheduled_at', { ascending: true })
+    .limit(50);
 
-  const getDaysInMonth = (month: number, year: number) => new Date(year, month + 1, 0).getDate();
-  const getFirstDayOfMonth = (month: number, year: number) => new Date(year, month, 1).getDay();
-
-  const daysInMonth = getDaysInMonth(currentMonth, currentYear);
-  const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
-
-  const prevMonth = () => {
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else {
-      setCurrentMonth(currentMonth - 1);
-    }
-  };
-
-  const nextMonth = () => {
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else {
-      setCurrentMonth(currentMonth + 1);
-    }
-  };
-
-  const getEventsForDay = (day: number) => events.filter(e => e.day === day);
-
-  const renderCalendar = () => {
-    const calendarDays = [];
-    
-    // Empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
-      calendarDays.push(<div key={`empty-${i}`} className="h-24 bg-slate-50"></div>);
-    }
-    
-    // Days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayEvents = getEventsForDay(day);
-      const isToday = day === 15 && currentMonth === 5 && currentYear === 2026;
-      const isSelected = day === selectedDay;
-      
-      calendarDays.push(
-        <button
-          key={day}
-          onClick={() => setSelectedDay(day)}
-          className={`h-24 p-2 border border-slate-100 text-left transition hover:bg-slate-50 ${
-            isToday ? 'bg-brand-blue-50' : ''
-          } ${isSelected ? 'ring-2 ring-brand-blue-500' : ''}`}
-        >
-          <span className={`text-sm font-medium ${isToday ? 'text-brand-blue-600' : 'text-slate-700'}`}>
-            {day}
-          </span>
-          <div className="mt-1 space-y-1">
-            {dayEvents.slice(0, 2).map(event => (
-              <div key={event.id} className={`text-xs px-1.5 py-0.5 rounded truncate ${
-                event.type === 'competency' ? 'bg-green-100 text-green-700' :
-                event.type === 'class' ? 'bg-blue-100 text-blue-700' :
-                event.type === 'evaluation' ? 'bg-amber-100 text-amber-700' :
-                'bg-purple-100 text-purple-700'
-              }`}>
-                {event.title.split(' - ')[0]}
-              </div>
-            ))}
-            {dayEvents.length > 2 && (
-              <span className="text-xs text-slate-500">+{dayEvents.length - 2} more</span>
-            )}
-          </div>
-        </button>
-      );
-    }
-    
-    return calendarDays;
-  };
+  const rows = sessions ?? [];
+  const now = Date.now();
+  const upcoming = rows.filter((session) => {
+    const timestamp = session.scheduled_at ? new Date(session.scheduled_at).getTime() : 0;
+    return timestamp >= now && session.status !== 'cancelled';
+  });
+  const past = rows
+    .filter((session) => {
+      const timestamp = session.scheduled_at ? new Date(session.scheduled_at).getTime() : 0;
+      return timestamp < now || session.status === 'completed';
+    })
+    .reverse()
+    .slice(0, 10);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <Link href="/host-shop/dashboard" className="w-10 h-10 bg-gradient-to-br from-brand-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
-              </Link>
-              <div>
-                <p className="font-bold text-slate-900">Elevate</p>
-                <p className="text-xs text-slate-500">Schedule</p>
-              </div>
-            </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-xl font-medium hover:bg-brand-blue-700 transition">
-              <Plus className="w-4 h-4" />
-              Add Event
-            </button>
-          </div>
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Host Shop</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Training Schedule</h1>
+          <p className="mt-2 text-slate-600">Only attendance sessions hosted by this signed-in account are shown.</p>
         </div>
-      </header>
-
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-8">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900 mb-1">Schedule</h1>
-          <p className="text-slate-500">Manage apprentice schedules and upcoming events</p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Calendar */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 overflow-hidden">
-            {/* Calendar Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-100">
-              <button onClick={prevMonth} className="p-2 hover:bg-slate-100 rounded-lg">
-                <ChevronLeft className="w-5 h-5 text-slate-600" />
-              </button>
-              <h2 className="text-lg font-bold text-slate-900">
-                {months[currentMonth]} {currentYear}
-              </h2>
-              <button onClick={nextMonth} className="p-2 hover:bg-slate-100 rounded-lg">
-                <ChevronRight className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7">
-              {days.map(day => (
-                <div key={day} className="p-2 text-center text-sm font-semibold text-slate-500 border-b border-slate-100">
-                  {day}
-                </div>
-              ))}
-              {renderCalendar()}
-            </div>
-          </div>
-
-          {/* Events Sidebar */}
-          <div className="space-y-4">
-            {/* Upcoming Events */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h3 className="font-bold text-slate-900 mb-4">Upcoming Events</h3>
-              <div className="space-y-3">
-                {events.map(event => (
-                  <div key={event.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      event.type === 'competency' ? 'bg-green-100' :
-                      event.type === 'class' ? 'bg-blue-100' :
-                      event.type === 'evaluation' ? 'bg-amber-100' :
-                      'bg-purple-100'
-                    }`}>
-                      {event.type === 'competency' && <Check className="w-5 h-5 text-green-600" />}
-                      {event.type === 'class' && <Users className="w-5 h-5 text-blue-600" />}
-                      {event.type === 'evaluation' && <CalendarIcon className="w-5 h-5 text-amber-600" />}
-                      {event.type === 'practical' && <Clock className="w-5 h-5 text-purple-600" />}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-slate-900 text-sm">{event.title}</p>
-                      <p className="text-xs text-slate-500">June {event.day}, 2026 • {event.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5">
-              <h3 className="font-bold text-slate-900 mb-4">Legend</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-green-100 rounded"></div>
-                  <span className="text-sm text-slate-600">Competency Review</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-100 rounded"></div>
-                  <span className="text-sm text-slate-600">Class / Training</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-amber-100 rounded"></div>
-                  <span className="text-sm text-slate-600">Evaluation</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-100 rounded"></div>
-                  <span className="text-sm text-slate-600">Practical Session</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/host-shop/dashboard/attendance/record" className="rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-800">
+            Record attendance
+          </Link>
+          <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+            Back to board
+          </Link>
         </div>
       </div>
-    </div>
+
+      {error ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+          Schedule data could not be loaded. No sample events are being substituted.
+        </div>
+      ) : null}
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
+          <h2 className="font-black text-slate-950">Upcoming sessions</h2>
+        </div>
+        {upcoming.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <Calendar className="mx-auto h-10 w-10 text-slate-300" />
+            <h3 className="mt-3 font-bold text-slate-900">No upcoming sessions</h3>
+            <p className="mt-1 text-sm text-slate-500">New hosted attendance sessions will appear here automatically.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-200">
+            {upcoming.map((session) => (
+              <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <div>
+                  <p className="font-black text-slate-950">{session.title || 'Training session'}</p>
+                  <p className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+                    <Clock className="h-4 w-4" />
+                    {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'}
+                  </p>
+                </div>
+                <span className="text-sm font-bold capitalize text-slate-700">{session.status || 'scheduled'}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
+          <h2 className="font-black text-slate-950">Recent sessions</h2>
+        </div>
+        {past.length === 0 ? (
+          <p className="px-6 py-8 text-sm text-slate-500">No completed or past sessions are recorded for this account.</p>
+        ) : (
+          <div className="divide-y divide-slate-200">
+            {past.map((session) => (
+              <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <p className="font-semibold text-slate-900">{session.title || 'Training session'}</p>
+                <p className="text-sm text-slate-500">
+                  {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'} · {session.status || 'recorded'}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

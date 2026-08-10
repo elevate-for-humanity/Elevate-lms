@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { Calendar, Clock, Plus, Users } from 'lucide-react';
+import { Calendar, CheckCircle2, Plus, Users } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,47 +13,37 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-function weeklyHours(record: any) {
-  return [
-    record.mon_hours,
-    record.tue_hours,
-    record.wed_hours,
-    record.thu_hours,
-    record.fri_hours,
-    record.sat_hours,
-    record.sun_hours,
-  ].reduce((sum, value) => sum + (Number.parseFloat(String(value ?? '0')) || 0), 0);
-}
-
 export default async function HostShopAttendancePage() {
   const { user } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
-  const supabase = await createClient();
-  const studentIds = board.apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
+  const db = await requireAdminClient();
+  const placementIds = board.apprentices.map((apprentice) => apprentice.id).filter(Boolean);
 
-  const [{ data: sessions, error: sessionsError }, weeklyResult] = await Promise.all([
-    supabase
+  const [{ data: sessions, error: sessionsError }, attendanceResult] = await Promise.all([
+    db
       .from('attendance_sessions')
       .select('id, title, scheduled_at, status, created_at')
       .eq('host_id', user.id)
       .order('scheduled_at', { ascending: false })
       .limit(25),
-    studentIds.length
-      ? supabase
-          .from('partner_attendance')
-          .select('id, student_id, program_slug, mon_hours, tue_hours, wed_hours, thu_hours, fri_hours, sat_hours, sun_hours, notes, created_at')
-          .in('student_id', studentIds)
+    placementIds.length
+      ? db
+          .from('host_shop_attendance_records')
+          .select('id, placement_id, student_id, attendance_date, status, notes, recorded_by, created_at, updated_at')
+          .eq('partner_id', board.partner.id)
+          .in('placement_id', placementIds)
+          .order('attendance_date', { ascending: false })
           .order('created_at', { ascending: false })
-          .limit(25)
+          .limit(100)
       : Promise.resolve({ data: [], error: null }),
   ]);
 
-  const weeklyRecords = weeklyResult.data ?? [];
-  const weeklyError = weeklyResult.error;
-  const nameByStudent = new Map(
-    board.apprentices.map((apprentice) => [apprentice.student_id, apprentice.name]),
+  const attendance = attendanceResult.data ?? [];
+  const attendanceError = attendanceResult.error;
+  const apprenticeByPlacement = new Map(
+    board.apprentices.map((apprentice) => [apprentice.id, apprentice]),
   );
-  const totalWeeklyHours = weeklyRecords.reduce((sum, record) => sum + weeklyHours(record), 0);
+  const presentCount = attendance.filter((record) => record.status === 'present').length;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -63,13 +53,21 @@ export default async function HostShopAttendancePage() {
             {board.partner?.name || 'Host Shop'}
           </p>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Attendance Tracking</h1>
-          <p className="mt-2 text-slate-600">Attendance is limited to the signed-in host and apprentices actively placed at this shop.</p>
+          <p className="mt-2 text-slate-600">
+            Attendance is limited to active placements assigned to this Host Shop.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/host-shop/dashboard/attendance/record" className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-blue-800">
+          <Link
+            href="/host-shop/dashboard/attendance/record"
+            className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-blue-800"
+          >
             <Plus className="h-4 w-4" /> Record attendance
           </Link>
-          <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+          <Link
+            href="/host-shop/dashboard/board"
+            className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50"
+          >
             Back to board
           </Link>
         </div>
@@ -83,49 +81,58 @@ export default async function HostShopAttendancePage() {
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <Calendar className="h-5 w-5 text-purple-700" />
-          <p className="mt-3 text-3xl font-black text-slate-950">{sessions?.length ?? 0}</p>
-          <p className="text-sm text-slate-600">Hosted sessions</p>
+          <p className="mt-3 text-3xl font-black text-slate-950">{attendance.length}</p>
+          <p className="text-sm text-slate-600">Attendance records</p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <Clock className="h-5 w-5 text-amber-700" />
-          <p className="mt-3 text-3xl font-black text-slate-950">{totalWeeklyHours.toFixed(1)}h</p>
-          <p className="text-sm text-slate-600">Weekly attendance hours shown</p>
+          <CheckCircle2 className="h-5 w-5 text-brand-green-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{presentCount}</p>
+          <p className="text-sm text-slate-600">Present records</p>
         </div>
       </div>
 
-      {sessionsError || weeklyError ? (
-        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
-          Some attendance data could not be loaded. No records from other shops are substituted.
+      {sessionsError || attendanceError ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900">
+          Some attendance data could not be loaded. No records from another shop are substituted.
         </div>
       ) : null}
 
       <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
-          <h2 className="font-black text-slate-950">Weekly apprentice records</h2>
+          <h2 className="font-black text-slate-950">Recorded attendance</h2>
         </div>
-        {weeklyRecords.length === 0 ? (
+        {attendance.length === 0 ? (
           <div className="px-6 py-12 text-center">
             <Calendar className="mx-auto h-10 w-10 text-slate-300" />
-            <h3 className="mt-3 font-bold text-slate-900">No weekly attendance recorded</h3>
-            <p className="mt-1 text-sm text-slate-500">Attendance for actively assigned apprentices will appear here.</p>
+            <h3 className="mt-3 font-bold text-slate-900">No attendance recorded yet</h3>
+            <p className="mt-1 text-sm text-slate-500">
+              New records saved through the Host Shop attendance form will appear here.
+            </p>
           </div>
         ) : (
           <div className="divide-y divide-slate-200">
-            {weeklyRecords.map((record) => (
-              <article key={record.id} className="px-5 py-4 sm:px-6">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="font-black text-slate-950">{nameByStudent.get(record.student_id) || 'Assigned apprentice'}</p>
-                    <p className="mt-1 text-sm capitalize text-slate-600">{(record.program_slug || board.programType || 'apprenticeship').replace(/[-_]/g, ' ')}</p>
-                    {record.notes ? <p className="mt-2 text-sm text-slate-500">{record.notes}</p> : null}
+            {attendance.map((record) => {
+              const apprentice = apprenticeByPlacement.get(record.placement_id);
+              return (
+                <article key={record.id} className="px-5 py-4 sm:px-6">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <p className="font-black text-slate-950">{apprentice?.name || 'Assigned apprentice'}</p>
+                      <p className="mt-1 text-sm text-slate-500">{apprentice?.email || ''}</p>
+                      {record.notes ? <p className="mt-2 text-sm text-slate-700">{record.notes}</p> : null}
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-black capitalize text-slate-800">
+                        {record.status}
+                      </span>
+                      <p className="mt-2 text-sm font-semibold text-slate-700">
+                        {new Date(`${record.attendance_date}T00:00:00`).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-left sm:text-right">
-                    <p className="font-black text-slate-950">{weeklyHours(record).toFixed(1)} hours</p>
-                    <p className="mt-1 text-xs text-slate-500">{record.created_at ? new Date(record.created_at).toLocaleString() : 'Date unavailable'}</p>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         )}
       </section>
@@ -141,7 +148,9 @@ export default async function HostShopAttendancePage() {
             {sessions.map((session) => (
               <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <p className="font-semibold text-slate-900">{session.title || 'Training session'}</p>
-                <p className="text-sm text-slate-500">{session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'} · {session.status || 'recorded'}</p>
+                <p className="text-sm text-slate-500">
+                  {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'} · {session.status || 'recorded'}
+                </p>
               </div>
             ))}
           </div>

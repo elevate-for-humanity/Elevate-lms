@@ -1,4 +1,5 @@
 import type { IndividualAppSlug, IndividualPlanId } from '@/lib/apps/individual-app-plans';
+import type { BasePlanId, BillingInterval as PlatformBillingInterval } from '@/lib/store/platform-pricing';
 
 export type BillingInterval = 'month' | 'year' | 'week' | 'one_time';
 
@@ -18,13 +19,27 @@ export function individualAppPriceLookupKey(
   return canonicalPriceLookupKey(['app', appSlug, plan, 'monthly']);
 }
 
+export function platformPlanPriceLookupKey(
+  plan: BasePlanId,
+  interval: PlatformBillingInterval,
+): string {
+  return canonicalPriceLookupKey(['platform', plan, interval]);
+}
+
+export function platformAddonPriceLookupKey(
+  addonSlug: string,
+  interval: PlatformBillingInterval,
+): string {
+  return canonicalPriceLookupKey(['platform', 'addon', addonSlug, interval]);
+}
+
 export const PLATFORM_PRICE_LOOKUP_KEYS = {
-  solo_monthly: canonicalPriceLookupKey(['platform', 'solo', 'monthly']),
-  solo_annual: canonicalPriceLookupKey(['platform', 'solo', 'annual']),
-  business_monthly: canonicalPriceLookupKey(['platform', 'business', 'monthly']),
-  business_annual: canonicalPriceLookupKey(['platform', 'business', 'annual']),
-  professional_monthly: canonicalPriceLookupKey(['platform', 'professional', 'monthly']),
-  professional_annual: canonicalPriceLookupKey(['platform', 'professional', 'annual']),
+  solo_monthly: platformPlanPriceLookupKey('solo', 'monthly'),
+  solo_annual: platformPlanPriceLookupKey('solo', 'annual'),
+  business_monthly: platformPlanPriceLookupKey('business', 'monthly'),
+  business_annual: platformPlanPriceLookupKey('business', 'annual'),
+  professional_monthly: platformPlanPriceLookupKey('professional', 'monthly'),
+  professional_annual: platformPlanPriceLookupKey('professional', 'annual'),
 } as const;
 
 export const HOST_SHOP_PRICE_LOOKUP_KEYS = {

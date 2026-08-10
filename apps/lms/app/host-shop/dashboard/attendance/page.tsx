@@ -1,255 +1,152 @@
-import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Users, Plus, AlertTriangle, QrCode } from 'lucide-react';
+import { Calendar, Clock, Plus, Users } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard } from '@/lib/partner/board';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import {
-  getAttendanceSummary,
-  getStudentsWithLowAttendance,
-  type AttendanceSession,
-} from '@/lib/blended-learning/attendance';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: 'Attendance | Partner Portal',
-  description: 'Track and manage student attendance for your training sessions.',
+export const metadata = {
+  title: 'Attendance | Host Shop Portal',
+  description: 'View attendance records scoped to apprentices assigned to this host shop.',
+  robots: { index: false, follow: false },
 };
 
-export default async function PartnerAttendancePage() {
+function weeklyHours(record: any) {
+  return [
+    record.mon_hours,
+    record.tue_hours,
+    record.wed_hours,
+    record.thu_hours,
+    record.fri_hours,
+    record.sat_hours,
+    record.sun_hours,
+  ].reduce((sum, value) => sum + (Number.parseFloat(String(value ?? '0')) || 0), 0);
+}
+
+export default async function HostShopAttendancePage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  const studentIds = board.apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (!profile || !['partner', 'admin', 'staff'].includes(profile.role))
-    redirect('/unauthorized');
-
-  let sessions: any[] = [];
-  let summary: any = null;
-  let lowAttendance: any[] = [];
-
-  try {
-    // Get partner org
-    const { data: partnerUser } = await supabase
-      .from('partner_users')
-      .select('partner_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    const orgId = partnerUser?.partner_id;
-
-    // Fetch attendance sessions — scoped to this partner's hosted sessions
-    const { data: sessionData } = await supabase
+  const [{ data: sessions, error: sessionsError }, weeklyResult] = await Promise.all([
+    supabase
       .from('attendance_sessions')
-      .select('*')
+      .select('id, title, scheduled_at, status, created_at')
       .eq('host_id', user.id)
       .order('scheduled_at', { ascending: false })
-      .limit(20);
-    sessions = sessionData || [];
+      .limit(25),
+    studentIds.length
+      ? supabase
+          .from('partner_attendance')
+          .select('id, student_id, program_slug, mon_hours, tue_hours, wed_hours, thu_hours, fri_hours, sat_hours, sun_hours, notes, created_at')
+          .in('student_id', studentIds)
+          .order('created_at', { ascending: false })
+          .limit(25)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
-    // Get summary using the lib
-    if (orgId) {
-      summary = await getAttendanceSummary(orgId);
-      lowAttendance = await getStudentsWithLowAttendance(orgId, 75);
-    }
-
-    // Also pull from partner_attendance for weekly records
-    const { data: weeklyRecords } = await supabase
-      .from('partner_attendance')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    // Merge weekly records into sessions view if no attendance_sessions data
-    if (sessions.length === 0 && weeklyRecords && weeklyRecords.length > 0) {
-      sessions = weeklyRecords.map((r: any) => ({
-        id: r.id,
-        title: r.program_slug?.replace(/-/g, ' ') || 'Training Session',
-        date: r.created_at,
-        status: 'completed',
-        total_hours: [
-          r.mon_hours,
-          r.tue_hours,
-          r.wed_hours,
-          r.thu_hours,
-          r.fri_hours,
-          r.sat_hours,
-          r.sun_hours,
-        ].reduce((a: number, b: string) => a + (parseFloat(b) || 0), 0),
-        notes: r.notes,
-      }));
-    }
-  } catch {
-    // Tables may not exist yet
-  }
-
-  const totalSessions = sessions.length;
-  const avgRate = summary?.averageAttendanceRate ?? 0;
-  const totalStudents = summary?.totalStudents ?? 0;
+  const weeklyRecords = weeklyResult.data ?? [];
+  const weeklyError = weeklyResult.error;
+  const nameByStudent = new Map(
+    board.apprentices.map((apprentice) => [apprentice.student_id, apprentice.name]),
+  );
+  const totalWeeklyHours = weeklyRecords.reduce((sum, record) => sum + weeklyHours(record), 0);
 
   return (
-    <div>
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden rounded-xl mb-6 -mx-4 sm:-mx-6 lg:-mx-8">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/partner-page-2.webp"
-          alt="Partner attendance"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority 
-        />
-      </section>
-      <div className="mb-6">
-        <Breadcrumbs
-          items={[{ label: 'Partner', href: '/partner/attendance' }, { label: 'Attendance' }]}
-        />
-      </div>
-
-      <div className="flex items-center justify-between mb-8">
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Attendance Tracking</h1>
-          <p className="text-slate-700 mt-1">Manage attendance for training sessions</p>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
+            {board.partner?.name || 'Host Shop'}
+          </p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Attendance Tracking</h1>
+          <p className="mt-2 text-slate-600">Attendance is limited to the signed-in host and apprentices actively placed at this shop.</p>
         </div>
-        <div className="flex gap-3">
-          <Link
-            href="/host-shop/dashboard/attendance/record"
-            className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
-          >
-            <Plus className="w-4 h-4" /> Record Attendance
+        <div className="flex flex-wrap gap-2">
+          <Link href="/host-shop/dashboard/attendance/record" className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-blue-800">
+            <Plus className="h-4 w-4" /> Record attendance
+          </Link>
+          <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+            Back to board
           </Link>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-xl border p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <Calendar className="w-5 h-5 text-brand-blue-600" />
-            <span className="text-sm text-slate-700">Total Sessions</span>
-          </div>
-          <p className="text-3xl font-bold text-slate-900">{totalSessions}</p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Users className="h-5 w-5 text-brand-blue-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{board.apprentices.length}</p>
+          <p className="text-sm text-slate-600">Active apprentices</p>
         </div>
-        <div className="bg-white rounded-xl border p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <QrCode className="w-5 h-5 text-brand-green-600" />
-            <span className="text-sm text-slate-700">Avg Attendance Rate</span>
-          </div>
-          <p className="text-3xl font-bold text-slate-900">{Math.round(avgRate)}%</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Calendar className="h-5 w-5 text-purple-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{sessions?.length ?? 0}</p>
+          <p className="text-sm text-slate-600">Hosted sessions</p>
         </div>
-        <div className="bg-white rounded-xl border p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <Users className="w-5 h-5 text-indigo-600" />
-            <span className="text-sm text-slate-700">Total Students</span>
-          </div>
-          <p className="text-3xl font-bold text-slate-900">{totalStudents}</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Clock className="h-5 w-5 text-amber-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{totalWeeklyHours.toFixed(1)}h</p>
+          <p className="text-sm text-slate-600">Weekly attendance hours shown</p>
         </div>
       </div>
 
-      {/* Low Attendance Alert */}
-      {lowAttendance.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-amber-800">Low Attendance Alert</h3>
-              <p className="text-amber-700 text-sm mt-1">
-                {lowAttendance.length} student{lowAttendance.length > 1 ? 's' : ''} below 75%
-                attendance threshold:
-              </p>
-              <ul className="mt-2 space-y-1">
-                {lowAttendance.slice(0, 5).map((s: any, i: number) => (
-                  <li key={i} className="text-sm text-amber-700">
-                    {s.student_name || s.student_id} — {Math.round(s.rate || 0)}% attendance
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+      {sessionsError || weeklyError ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+          Some attendance data could not be loaded. No records from other shops are substituted.
         </div>
-      )}
+      ) : null}
 
-      {/* Sessions Table */}
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <div className="px-6 py-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Recent Sessions</h2>
+      <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
+          <h2 className="font-black text-slate-950">Weekly apprentice records</h2>
         </div>
-        {sessions.length > 0 ? (
-          <table className="w-full">
-            <thead className="bg-white">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">
-                  Session
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Date</th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-slate-900">
-                  Hours
-                </th>
-                <th className="px-6 py-3 text-center text-sm font-semibold text-slate-900">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Notes</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200">
-              {sessions.map((s: any) => (
-                <tr key={s.id} className="hover:bg-white">
-                  <td className="px-6 py-4 font-medium text-slate-900 capitalize">
-                    {s.title || 'Session'}
-                  </td>
-                  <td className="px-6 py-4 text-slate-700 text-sm">
-                    {s.date ? new Date(s.date).toLocaleDateString() : '—'}
-                  </td>
-                  <td className="px-6 py-4 text-center text-sm">
-                    {(s.total_hours ?? s.duration_minutes)
-                      ? `${Math.round((s.duration_minutes || 0) / 60)}h`
-                      : '—'}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        s.status === 'completed'
-                          ? 'bg-brand-green-100 text-brand-green-700'
-                          : s.status === 'active'
-                            ? 'bg-brand-blue-100 text-brand-blue-700'
-                            : 'bg-white text-slate-900'
-                      }`}
-                    >
-                      {s.status || 'recorded'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-700 text-sm truncate max-w-7xl">
-                    {s.notes || '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {weeklyRecords.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <Calendar className="mx-auto h-10 w-10 text-slate-300" />
+            <h3 className="mt-3 font-bold text-slate-900">No weekly attendance recorded</h3>
+            <p className="mt-1 text-sm text-slate-500">Attendance for actively assigned apprentices will appear here.</p>
+          </div>
         ) : (
-          <div className="text-center py-12">
-            <Calendar className="w-12 h-12 text-slate-700 mx-auto mb-3" />
-            <p className="text-slate-700 mb-4">No attendance sessions recorded yet.</p>
-            <Link
-              href="/host-shop/dashboard/attendance/record"
-              className="text-brand-blue-600 font-medium hover:underline"
-            >
-              Record your first session
-            </Link>
+          <div className="divide-y divide-slate-200">
+            {weeklyRecords.map((record) => (
+              <article key={record.id} className="px-5 py-4 sm:px-6">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="font-black text-slate-950">{nameByStudent.get(record.student_id) || 'Assigned apprentice'}</p>
+                    <p className="mt-1 text-sm capitalize text-slate-600">{(record.program_slug || board.programType || 'apprenticeship').replace(/[-_]/g, ' ')}</p>
+                    {record.notes ? <p className="mt-2 text-sm text-slate-500">{record.notes}</p> : null}
+                  </div>
+                  <div className="text-left sm:text-right">
+                    <p className="font-black text-slate-950">{weeklyHours(record).toFixed(1)} hours</p>
+                    <p className="mt-1 text-xs text-slate-500">{record.created_at ? new Date(record.created_at).toLocaleString() : 'Date unavailable'}</p>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         )}
-      </div>
-    </div>
+      </section>
+
+      <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
+          <h2 className="font-black text-slate-950">Hosted sessions</h2>
+        </div>
+        {!sessions?.length ? (
+          <p className="px-6 py-8 text-sm text-slate-500">No attendance sessions are recorded for this host account.</p>
+        ) : (
+          <div className="divide-y divide-slate-200">
+            {sessions.map((session) => (
+              <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <p className="font-semibold text-slate-900">{session.title || 'Training session'}</p>
+                <p className="text-sm text-slate-500">{session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'} · {session.status || 'recorded'}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { getIndividualAppCatalog } from '@/lib/apps/individual-app-plans';
+import { syncIndividualAppLifecycle } from '@/lib/platform/subscription-lifecycle';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -75,59 +76,30 @@ export default async function IndividualAppSubscriptionSuccess({
   }
 
   const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
-  const customerId = typeof session.customer === 'string' ? session.customer : null;
   if (!subscriptionId) {
     return <ErrorState message="Stripe did not attach a recurring subscription to this checkout." />;
   }
 
-  let periodStart: string | null = null;
-  let periodEnd: string | null = null;
   try {
     const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
-    const raw = stripeSubscription as unknown as {
-      current_period_start?: number;
-      current_period_end?: number;
-      status?: string;
-    };
-    if (raw.current_period_start) periodStart = new Date(raw.current_period_start * 1000).toISOString();
-    if (raw.current_period_end) periodEnd = new Date(raw.current_period_end * 1000).toISOString();
-    if (raw.status && !['active', 'trialing'].includes(raw.status)) {
-      return <ErrorState message={`Stripe subscription status is ${raw.status}, so access was not activated.`} />;
+    if (!['active', 'trialing'].includes(stripeSubscription.status)) {
+      return <ErrorState message={`Stripe subscription status is ${stripeSubscription.status}, so access was not activated.`} />;
     }
+
+    const subscriptionMetadata = stripeSubscription.metadata || {};
+    if (
+      subscriptionMetadata.checkout_type !== 'individual_app' ||
+      subscriptionMetadata.user_id !== user.id ||
+      subscriptionMetadata.app_slug !== catalog.slug ||
+      subscriptionMetadata.plan_id !== plan.id
+    ) {
+      return <ErrorState message="Stripe subscription metadata does not match this purchase." />;
+    }
+
+    const admin = await requireAdminClient();
+    await syncIndividualAppLifecycle(admin, stripeSubscription);
   } catch {
-    return <ErrorState message="The recurring Stripe subscription could not be verified." />;
-  }
-
-  const admin = await requireAdminClient();
-  const { data: existing, error: readError } = await admin
-    .from('user_app_subscriptions')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('app_slug', catalog.slug)
-    .maybeSingle();
-
-  if (readError) return <ErrorState message="We could not read the app subscription record." />;
-
-  const payload = {
-    user_id: user.id,
-    gov: catalog.slug,
-    app_slug: catalog.slug,
-    plan: plan.id,
-    status: 'active',
-    trial_ends_at: null,
-    current_period_start: periodStart,
-    current_period_end: periodEnd,
-    stripe_subscription_id: subscriptionId,
-    stripe_customer_id: customerId,
-    updated_at: new Date().toISOString(),
-  };
-
-  const writeResult = existing?.id
-    ? await admin.from('user_app_subscriptions').update(payload).eq('id', existing.id)
-    : await admin.from('user_app_subscriptions').insert(payload);
-
-  if (writeResult.error) {
-    return <ErrorState message="Your payment was verified, but the app entitlement could not be saved. Please contact support before purchasing again." />;
+    return <ErrorState message="Your payment was verified, but the app entitlement could not be synchronized. Please contact support before purchasing again." />;
   }
 
   redirect(`/apps/${catalog.slug}?subscription=active`);

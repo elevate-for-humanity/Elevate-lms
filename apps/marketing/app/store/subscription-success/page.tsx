@@ -4,7 +4,9 @@ import { CheckCircle, ArrowRight, CreditCard, PlusCircle } from 'lucide-react';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { ADD_ON_MARKETPLACE, getBasePlan } from '@/lib/store/platform-pricing';
+import { syncPlatformSubscriptionLifecycle } from '@/lib/platform/subscription-lifecycle';
 
 export const dynamic = 'force-dynamic';
 export const metadata = {
@@ -47,9 +49,34 @@ export default async function SubscriptionSuccessPage({
 
   const planId = session.metadata?.plan_id ?? '';
   const plan = getBasePlan(planId);
-  const purchasedAddons = new Set((session.metadata?.addon_slugs || '').split(',').map((value) => value.trim()).filter(Boolean));
-  const planFeatures = new Set(plan?.features || []);
+  if (!plan) return <Failure message="The purchased platform plan is not in the current Store catalog." />;
 
+  const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
+  if (!subscriptionId) {
+    return <Failure message="Stripe did not attach a recurring subscription to this checkout." />;
+  }
+
+  try {
+    const stripeSubscription = await stripe.subscriptions.retrieve(subscriptionId);
+    if (!['active', 'trialing'].includes(stripeSubscription.status)) {
+      return <Failure message={`Stripe subscription status is ${stripeSubscription.status}, so platform access was not activated.`} />;
+    }
+    if (
+      stripeSubscription.metadata?.checkout_type !== 'platform_saas' ||
+      stripeSubscription.metadata?.user_id !== user.id ||
+      stripeSubscription.metadata?.plan_id !== plan.id
+    ) {
+      return <Failure message="Stripe subscription metadata does not match this platform purchase." />;
+    }
+
+    const admin = await requireAdminClient();
+    await syncPlatformSubscriptionLifecycle(admin, stripeSubscription);
+  } catch {
+    return <Failure message="Your payment was verified, but platform access could not be synchronized. Please contact support before purchasing again." />;
+  }
+
+  const purchasedAddons = new Set((session.metadata?.addon_slugs || '').split(',').map((value) => value.trim()).filter(Boolean));
+  const planFeatures = new Set(plan.features || []);
   const recommendedAddons = ADD_ON_MARKETPLACE.filter((addon) => {
     if (purchasedAddons.has(addon.slug)) return false;
     if (addon.features.length > 0 && addon.features.every((feature) => planFeatures.has(feature))) return false;
@@ -65,7 +92,7 @@ export default async function SubscriptionSuccessPage({
           </div>
           <h1 className="text-center text-3xl font-black text-slate-950">Subscription confirmed</h1>
           <p className="mt-3 text-center text-slate-600">
-            Stripe confirmed your {plan?.name || planId || 'platform'} subscription. Your organization access is synchronized by the Store fulfillment flow.
+            Stripe confirmed your {plan.name} subscription and Elevate synchronized the workspace entitlements before showing this confirmation.
           </p>
 
           <div className="mt-8 rounded-xl bg-slate-50 p-5 text-sm text-slate-700">
@@ -82,16 +109,10 @@ export default async function SubscriptionSuccessPage({
             >
               Open Platform <ArrowRight className="h-4 w-4" />
             </a>
-            <Link
-              href="/store/plans"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50"
-            >
+            <Link href="/store/plans" className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50">
               Manage plan options
             </Link>
-            <Link
-              href="/store/apps"
-              className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50"
-            >
+            <Link href="/store/apps" className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-semibold text-slate-800 hover:bg-slate-50">
               Search full Store
             </Link>
           </div>

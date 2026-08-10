@@ -39,7 +39,6 @@ export async function POST(
       );
     }
     
-    // Verify admin/staff authentication
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -51,7 +50,6 @@ export async function POST(
     const token = authHeader.substring(7);
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
-    
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
@@ -61,7 +59,6 @@ export async function POST(
       );
     }
     
-    // Check if user has admissions role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -78,7 +75,6 @@ export async function POST(
     
     const { applicationId } = await context.params;
     const input = decisionSchema.parse(await request.json());
-    
     const result = await recordAdmissionsDecision(
       applicationId,
       {
@@ -105,7 +101,7 @@ export async function POST(
         {
           success: false,
           error: 'Validation error',
-          details: error.errors,
+          details: error.issues,
         },
         { status: 400 },
       );

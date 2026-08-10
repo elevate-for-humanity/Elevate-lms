@@ -1,12 +1,9 @@
 /**
- * Shared news/blog data layer.
+ * Shared public news/blog data layer.
  * Table: blog_posts
- * Columns: id, title, slug, excerpt, content, featured_image,
- *          author_id, category, tags, published, published_at, created_at
  */
 
 import { createPublicClient } from '@/lib/supabase/public';
-import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
 export interface BlogPost {
@@ -26,30 +23,25 @@ export interface BlogPostFull extends BlogPost {
   author_id: string | null;
 }
 
-const LIST_COLS =
-  'id, title, slug, excerpt, featured_image, category, tags, published_at, created_at';
+const LIST_COLS = 'id, title, slug, excerpt, featured_image, category, tags, published_at, created_at';
 const FULL_COLS = `${LIST_COLS}, content, author_id`;
 
-async function getDb() {
-  const db = createPublicClient();
-  if (admin) return admin;
-  return await createClient();
+function getDb() {
+  return createPublicClient();
 }
 
-export async function getPublishedPosts(
-  opts: { limit?: number; category?: string } = {},
-): Promise<BlogPost[]> {
-  const db = await getDb();
-  let q = db
+export async function getPublishedPosts(opts: { limit?: number; category?: string } = {}): Promise<BlogPost[]> {
+  const db = getDb();
+  let query = db
     .from('blog_posts')
     .select(LIST_COLS)
     .eq('published', true)
     .order('published_at', { ascending: false })
     .limit(opts.limit ?? 20);
 
-  if (opts.category) q = q.eq('category', opts.category);
+  if (opts.category) query = query.eq('category', opts.category);
 
-  const { data, error } = await q;
+  const { data, error } = await query;
   if (error) {
     logger.error('[news] getPublishedPosts error:', error.message);
     return [];
@@ -58,8 +50,7 @@ export async function getPublishedPosts(
 }
 
 export async function getFeaturedPost(): Promise<BlogPost | null> {
-  const db = await getDb();
-  const { data, error } = await db
+  const { data, error } = await getDb()
     .from('blog_posts')
     .select(LIST_COLS)
     .eq('published', true)
@@ -75,8 +66,7 @@ export async function getFeaturedPost(): Promise<BlogPost | null> {
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPostFull | null> {
-  const db = await getDb();
-  const { data, error } = await db
+  const { data, error } = await getDb()
     .from('blog_posts')
     .select(FULL_COLS)
     .eq('slug', slug)
@@ -91,16 +81,14 @@ export async function getPostBySlug(slug: string): Promise<BlogPostFull | null> 
 }
 
 export async function getCategories(): Promise<string[]> {
-  const db = await getDb();
-  const { data, error } = await db
+  const { data, error } = await getDb()
     .from('blog_posts')
     .select('category')
     .eq('published', true)
     .not('category', 'is', null);
 
   if (error) return [];
-  const cats = [...new Set((data ?? []).map((r: any) => r.category).filter(Boolean))];
-  return cats as string[];
+  return [...new Set((data ?? []).map((row: any) => row.category).filter(Boolean))] as string[];
 }
 
 export function formatPostDate(dateStr: string | null): string {

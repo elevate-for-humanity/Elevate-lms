@@ -17,7 +17,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
   const [isMuted, setIsMuted] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  useEffect((): void => {
+  useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
@@ -28,11 +28,8 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
         const video = videoRef.current;
         if (!video) return;
 
-        // Try unmuted first — works if user already clicked/scrolled on the page
         video.muted = false;
         video.play().catch(() => {
-          // Browser blocked unmuted autoplay — fall back to muted, then
-          // unmute on the next user interaction anywhere on the page
           video.muted = true;
           video.play().catch(() => {});
           const unmute = () => {
@@ -53,8 +50,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
     return () => observer.disconnect();
   }, [hasPlayed]);
 
-  // Auto-play when visible, pause when not. Unmute on visibility since user scrolled.
-  useEffect((): void => {
+  useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     if (isVisible) {
@@ -62,7 +58,6 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
         .play()
         .then(() => {
           setIsPlaying(true);
-          // Unmute automatically — the scroll that triggered visibility is a user gesture
           if (video.muted && !hasInteracted) {
             video.muted = false;
             setIsMuted(false);
@@ -80,10 +75,7 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
-      video
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {});
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
     } else {
       video.pause();
       setIsPlaying(false);
@@ -106,40 +98,26 @@ export default function PageAvatar({ videoSrc, title, position = 'default' }: Pa
     setHasInteracted(true);
   }, []);
 
+  void isPlaying;
+  void isMuted;
+  void togglePlay;
+  void unmute;
+  void toggleMute;
+
   if (position === 'inline') {
     return (
-      <div
-        ref={containerRef}
-        className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-900"
-      >
-        <video
-          ref={videoRef}
-          className="w-full h-full object-cover"
-          src={videoSrc}
-          playsInline
-          preload="metadata"
-        />
+      <div ref={containerRef} className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-900">
+        <video ref={videoRef} className="w-full h-full object-cover" src={videoSrc} playsInline preload="metadata" />
       </div>
     );
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full rounded-2xl overflow-hidden shadow-xl bg-slate-900 relative aspect-video"
-    >
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        src={videoSrc}
-        playsInline
-        preload="metadata"
-      />
+    <div ref={containerRef} className="w-full rounded-2xl overflow-hidden shadow-xl bg-slate-900 relative aspect-video">
+      <video ref={videoRef} className="absolute inset-0 w-full h-full object-cover" src={videoSrc} playsInline preload="metadata" />
       {title && (
         <div className="absolute bottom-3 right-3 z-10 pointer-events-none">
-          <span className="bg-black/70 text-white text-xs font-medium rounded px-2 py-1">
-            {title}
-          </span>
+          <span className="bg-black/70 text-white text-xs font-medium rounded px-2 py-1">{title}</span>
         </div>
       )}
     </div>

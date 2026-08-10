@@ -30,36 +30,33 @@ const PROGRAM_ALIASES: Record<string, HostShopProgramType> = {
   'esthetician-apprenticeship': 'esthetician',
 };
 
-/**
- * One canonical authenticated Host Shop onboarding flow for every trade.
- * Program is a query parameter, not a parallel route tree.
- */
+/** One canonical authenticated Host Shop onboarding route tree for every trade. */
 export const HOST_SHOP_ONBOARDING_PATHS: Record<
   HostShopProgramType,
   { signMou: string; forms: string; documents: string; dashboard: string }
 > = {
   barber: {
-    signMou: '/host-shop/mou?program=barber',
-    forms: '/host-shop/onboarding?program=barber',
-    documents: '/host-shop/dashboard/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   cosmetology: {
-    signMou: '/host-shop/mou?program=cosmetology',
-    forms: '/host-shop/onboarding?program=cosmetology',
-    documents: '/host-shop/dashboard/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   nail_technician: {
-    signMou: '/host-shop/mou?program=nail',
-    forms: '/host-shop/onboarding?program=nail',
-    documents: '/host-shop/dashboard/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   esthetician: {
-    signMou: '/host-shop/mou?program=esthetician',
-    forms: '/host-shop/onboarding?program=esthetician',
-    documents: '/host-shop/dashboard/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
 };
@@ -154,15 +151,11 @@ export function mergeHostShopDocumentRequirements(
   const defaults = getDefaultHostShopDocumentRequirements(program);
   const byType = new Map<string, Record<string, unknown>>();
 
-  for (const req of defaults) {
-    byType.set(req.document_type, req);
-  }
-
+  for (const req of defaults) byType.set(req.document_type, req);
   for (const req of dbRequirements ?? []) {
     const documentType = String(req.document_type ?? '');
     if (!documentType) continue;
     byType.set(documentType, { ...req, id: req.id ?? `${program}-${documentType}` });
   }
-
   return Array.from(byType.values());
 }

@@ -7,16 +7,14 @@
  * - No gradient overlay over media.
  * - No primary copy over media.
  * - Video begins when substantially scrolled into view.
+ * - Once started, video continues to completion even if the user scrolls away.
  * - Video plays once; it never loops.
- * - Leaving the viewport pauses playback; returning resumes until completion.
- * - Narration/video audio is attempted when playback begins, but browsers may
- *   require a user gesture for audible autoplay. The visible sound button is
- *   always the fallback and controls the real media/narration source.
- * - Optional demoSlides can take over the visual while narration continues.
- * - All narration stops when the hero finishes or unmounts.
+ * - Optional demo slides advance once in order; they never wrap/overlap indefinitely.
+ * - All video, timers, narration, and speech stop immediately on route change/unmount.
  */
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Volume2, VolumeX } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -51,6 +49,8 @@ export interface HeroVideoProps {
   demoSlides?: HeroDemoSlide[];
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
+  /** Canonical hero frame sizing. Override only for an intentional compact/full variant. */
+  heightClassName?: string;
 }
 
 export default function HeroVideo({
@@ -72,7 +72,10 @@ export default function HeroVideo({
   demoSlides = [],
   demoStartSeconds = 6,
   demoSlideSeconds = 4.5,
+  heightClassName = 'h-[38vh] min-h-[260px] max-h-[520px]',
 }: HeroVideoProps) {
+  const pathname = usePathname();
+  const initialPathRef = useRef(pathname);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -89,8 +92,8 @@ export default function HeroVideo({
   const transcriptId = useId();
 
   useEffect(() => {
-    if (videoSrcMobile && window.innerWidth < 768) setVideoSrc(videoSrcMobile);
-  }, [videoSrcMobile]);
+    setVideoSrc(videoSrcMobile && window.innerWidth < 768 ? videoSrcMobile : videoSrcDesktop);
+  }, [videoSrcDesktop, videoSrcMobile]);
 
   const ttsText = useMemo(() => {
     const fallback = [belowHeroHeadline, belowHeroSubheadline].filter(Boolean).join(' ');
@@ -104,6 +107,33 @@ export default function HeroVideo({
     demoIntervalRef.current = null;
   }, []);
 
+  const stopNarration = useCallback((reset = false) => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      if (reset) audio.currentTime = 0;
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      if (reset) window.speechSynthesis.cancel();
+      else window.speechSynthesis.pause();
+    }
+    setMuted(true);
+  }, []);
+
+  const stopAllMedia = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      try {
+        video.currentTime = 0;
+      } catch {
+        // Media may not have metadata yet; pausing is sufficient.
+      }
+    }
+    clearDemoTimers();
+    stopNarration(true);
+  }, [clearDemoTimers, stopNarration]);
+
   const startDemoSequence = useCallback(() => {
     if (!demoSlides.length || demoStartTimerRef.current || demoActive) return;
     demoStartTimerRef.current = setTimeout(() => {
@@ -112,7 +142,14 @@ export default function HeroVideo({
       demoStartTimerRef.current = null;
       if (demoSlides.length > 1) {
         demoIntervalRef.current = setInterval(() => {
-          setDemoSlideIndex((current) => (current + 1) % demoSlides.length);
+          setDemoSlideIndex((current) => {
+            if (current >= demoSlides.length - 1) {
+              if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+              demoIntervalRef.current = null;
+              return current;
+            }
+            return current + 1;
+          });
         }, Math.max(2000, demoSlideSeconds * 1000));
       }
     }, Math.max(0, demoStartSeconds * 1000));
@@ -128,19 +165,6 @@ export default function HeroVideo({
       window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
       window.speechSynthesis.cancel();
     };
-  }, []);
-
-  const stopNarration = useCallback((reset = false) => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      if (reset) audio.currentTime = 0;
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      if (reset) window.speechSynthesis.cancel();
-      else window.speechSynthesis.pause();
-    }
-    setMuted(true);
   }, []);
 
   const startTtsNarration = useCallback(() => {
@@ -216,11 +240,9 @@ export default function HeroVideo({
 
   const startOrResume = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || (hasEnded && !demoSlides.length)) return;
+    if (!video || hasEnded) return;
 
     startDemoSequence();
-    if (hasEnded) return;
-
     video.loop = false;
     if (!hasStarted) video.muted = true;
 
@@ -231,45 +253,35 @@ export default function HeroVideo({
     } catch {
       // Keep the poster/frame visible. User can start from native interaction.
     }
-  }, [demoSlides.length, hasEnded, hasStarted, muted, startAudibleTrack, startDemoSequence]);
+  }, [hasEnded, hasStarted, muted, startAudibleTrack, startDemoSequence]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
-    if (!wrapper || typeof IntersectionObserver === 'undefined') return undefined;
+    if (!wrapper || hasStarted || hasEnded) return undefined;
+    if (typeof IntersectionObserver === 'undefined') {
+      void startOrResume();
+      return undefined;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.45) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
           void startOrResume();
-          if (typeof window !== 'undefined' && window.speechSynthesis?.paused) {
-            window.speechSynthesis.resume();
-          }
-          if (!muted && audioRef.current?.paused) {
-            void audioRef.current.play().catch(() => setMuted(true));
-          }
-          return;
-        }
-
-        videoRef.current?.pause();
-        audioRef.current?.pause();
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          window.speechSynthesis.pause();
+          observer.disconnect();
         }
       },
-      { threshold: [0, 0.45, 0.75] },
+      { threshold: [0, 0.35, 0.75] },
     );
 
     observer.observe(wrapper);
     return () => observer.disconnect();
-  }, [muted, startOrResume]);
+  }, [hasEnded, hasStarted, startOrResume]);
 
   useEffect(() => {
-    return () => {
-      videoRef.current?.pause();
-      clearDemoTimers();
-      stopNarration(true);
-    };
-  }, [clearDemoTimers, stopNarration]);
+    if (pathname !== initialPathRef.current) stopAllMedia();
+  }, [pathname, stopAllMedia]);
+
+  useEffect(() => () => stopAllMedia(), [stopAllMedia]);
 
   async function toggleMute() {
     if (!muted) {
@@ -306,15 +318,14 @@ export default function HeroVideo({
   return (
     <div ref={wrapperRef} className={`w-full ${className}`}>
       <section
-        className="relative w-full overflow-hidden bg-slate-900"
-        style={{ height: 'clamp(320px, 50vw, 640px)' }}
+        className={`relative w-full overflow-hidden bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero video` : 'Hero video'}
       >
         <video
           ref={videoRef}
           src={videoSrc}
           poster={posterImage}
-          preload="metadata"
+          preload="auto"
           playsInline
           muted
           loop={false}
@@ -328,12 +339,12 @@ export default function HeroVideo({
             {demoSlides.map((slide, index) => (
               <div
                 key={`${slide.src}-${index}`}
-                className={`absolute inset-0 transition-opacity duration-700 ${index === demoSlideIndex ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 transition-opacity duration-500 ${index === demoSlideIndex ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
                 aria-hidden={index !== demoSlideIndex}
               >
                 <img src={slide.src} alt={slide.alt} className="h-full w-full object-contain" />
                 {slide.label && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-slate-950/85 px-4 py-2 text-xs font-bold text-white shadow-lg sm:text-sm">
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-slate-950/90 px-4 py-2 text-xs font-bold text-white shadow-lg sm:text-sm">
                     {slide.label}
                   </div>
                 )}
@@ -365,7 +376,7 @@ export default function HeroVideo({
 
         {microLabel && (
           <div className="absolute bottom-4 left-4 z-20">
-            <span className="rounded bg-slate-950/80 px-2 py-1 text-xs font-semibold uppercase tracking-widest text-white">
+            <span className="rounded bg-slate-950/90 px-2 py-1 text-xs font-semibold uppercase tracking-widest text-white">
               {microLabel}
             </span>
           </div>
@@ -377,7 +388,7 @@ export default function HeroVideo({
               type="button"
               onClick={() => void toggleMute()}
               aria-label={muted ? 'Turn on hero audio' : 'Turn off hero audio'}
-              className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-slate-950/80 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-slate-950/90 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
             >
               {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               <span className="hidden sm:inline">{muted ? 'Sound on' : 'Sound off'}</span>

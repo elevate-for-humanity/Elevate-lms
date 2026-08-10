@@ -1,9 +1,9 @@
 /**
  * Static program data registry.
  *
- * Maps slug -> ProgramSchema for all programs that have a static data file.
- * Public reads are normalized through getStaticProgram() so stale funding flags
- * inside old program files cannot leak into the website.
+ * Maps slug -> ProgramSchema for programs with a static data file. Public reads
+ * are normalized through normalizePublicProgram() so stale funding or federal
+ * apprenticeship claims inside old program files cannot leak into production.
  */
 
 import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
@@ -12,6 +12,7 @@ import {
   isStrictWorkforceFundedProgram,
 } from '@/lib/programs/funding-registry';
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 import { BOOKKEEPING } from './bookkeeping';
 import { BUSINESS_ADMIN } from './business-administration';
 import { CAD_DRAFTING } from './cad-drafting';
@@ -85,7 +86,11 @@ const STATIC_PROGRAMS: ProgramSchema[] = [
 ];
 
 export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(
-  STATIC_PROGRAMS.map((p) => [p.slug, p]),
+  STATIC_PROGRAMS.map((program) => [program.slug, program]),
+);
+
+const VERIFIED_RAPIDS_SLUGS = new Set<string>(
+  Object.values(RAPIDS_CONFIG.programs).map((program) => program.slug),
 );
 
 function hasNumericSelfPayPrice(program: ProgramSchema): boolean {
@@ -93,61 +98,91 @@ function hasNumericSelfPayPrice(program: ProgramSchema): boolean {
   return Number.isFinite(amount) && amount > 0;
 }
 
-/**
- * Public-safe ProgramSchema.
- *
- * Funding rule:
- * - WIOA/WRG only when the explicit four-program registry says yes.
- * - Everything else is presented as regular/self-pay.
- *
- * Payment rule:
- * - Every program with a numeric self-pay price gets the canonical Stripe checkout
- *   route, calculator, promotion-code field, and eligible BNPL methods.
- */
+function looksLikeApprenticeship(program: ProgramSchema): boolean {
+  return program.programType === 'apprenticeship' || /apprenticeship/i.test(program.slug) || /apprenticeship/i.test(program.title);
+}
+
+function replaceUnverifiedRegisteredLanguage(text: string | undefined, slug: string): string {
+  if (!text || VERIFIED_RAPIDS_SLUGS.has(slug)) return text || '';
+  return text
+    .replace(/DOL[-\s]?registered/gi, 'work-based training')
+    .replace(/U\.S\. Department of Labor Registered Apprenticeship/gi, 'work-based training pathway')
+    .replace(/federally registered apprenticeship/gi, 'work-based training pathway')
+    .replace(/registered apprenticeship/gi, 'training pathway')
+    .replace(/RAPIDS[-\s]registered/gi, 'training-pathway')
+    .replace(/RAPIDS program/gi, 'training program');
+}
+
+function publicTitle(program: ProgramSchema): string {
+  if (!looksLikeApprenticeship(program) || VERIFIED_RAPIDS_SLUGS.has(program.slug)) return program.title;
+  return program.title.replace(/\s*Apprenticeship\b/gi, ' Training Pathway').replace(/\s+/g, ' ').trim();
+}
+
 export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
-  const verified = getVerifiedProgramFunding(program.slug);
+  const verifiedFunding = getVerifiedProgramFunding(program.slug);
   const workforceFunded = isStrictWorkforceFundedProgram(program.slug);
-  const canonicalSlug = verified?.slug ?? program.slug;
-  const copyFallback = verified?.description ?? `${program.title} career training.`;
+  const canonicalSlug = verifiedFunding?.slug ?? program.slug;
+  const registered = VERIFIED_RAPIDS_SLUGS.has(canonicalSlug);
+  const apprenticeshipLike = looksLikeApprenticeship(program);
+  const copyFallback = verifiedFunding?.description ?? `${publicTitle(program)} career training.`;
   const fundingOptions: FundingType[] = ['self_pay'];
-  if (workforceFunded && verified?.wioaEligible) fundingOptions.unshift('wioa');
-  if (workforceFunded && verified?.wrgEligible) fundingOptions.unshift('wrg');
+  if (workforceFunded && verifiedFunding?.wioaEligible) fundingOptions.unshift('wioa');
+  if (workforceFunded && verifiedFunding?.wrgEligible) fundingOptions.unshift('wrg');
+
+  const normalizeCopy = (value: string | undefined, fallback = '') => {
+    const fundingSafe = sanitizePublicFundingText(value || '', canonicalSlug, fallback);
+    return replaceUnverifiedRegisteredLanguage(fundingSafe, canonicalSlug);
+  };
+
+  const normalizedTitle = publicTitle({ ...program, slug: canonicalSlug });
+  const registrationDisclosure =
+    apprenticeshipLike && !registered
+      ? 'This page describes a training pathway. Federal Registered Apprenticeship/RAPIDS status is not currently published for this program in Elevate’s canonical RAPIDS registry.'
+      : null;
 
   return {
     ...program,
     slug: canonicalSlug,
-    subtitle: sanitizePublicFundingText(program.subtitle, canonicalSlug, copyFallback),
-    programDescription: program.programDescription
-      ?.map((paragraph) => sanitizePublicFundingText(paragraph, canonicalSlug))
-      .filter(Boolean),
+    title: normalizedTitle,
+    programType:
+      apprenticeshipLike && !registered && program.programType === 'apprenticeship'
+        ? 'workforce'
+        : program.programType,
+    subtitle: [normalizeCopy(program.subtitle, copyFallback), registrationDisclosure]
+      .filter(Boolean)
+      .join(' '),
+    programDescription: [
+      ...(program.programDescription || [])
+        .map((paragraph) => normalizeCopy(paragraph))
+        .filter(Boolean),
+      ...(registrationDisclosure ? [registrationDisclosure] : []),
+    ],
     faqs: program.faqs.map((faq) => ({
       ...faq,
-      answer: sanitizePublicFundingText(
-        faq.answer,
-        canonicalSlug,
-        'Contact admissions for current program details.',
-      ),
+      question: replaceUnverifiedRegisteredLanguage(faq.question, canonicalSlug),
+      answer: normalizeCopy(faq.answer, 'Contact admissions for current program details.'),
     })),
     complianceAlignment: program.complianceAlignment
       .map((item) => ({
-        standard: sanitizePublicFundingText(item.standard, canonicalSlug),
-        description: sanitizePublicFundingText(item.description, canonicalSlug),
+        standard: replaceUnverifiedRegisteredLanguage(item.standard, canonicalSlug),
+        description: normalizeCopy(item.description),
       }))
       .filter((item) => item.standard && item.description),
-    metaDescription: sanitizePublicFundingText(
-      program.metaDescription,
-      canonicalSlug,
-      copyFallback,
-    ),
+    metaTitle: replaceUnverifiedRegisteredLanguage(program.metaTitle, canonicalSlug),
+    metaDescription: normalizeCopy(program.metaDescription, copyFallback),
     isSelfPay: !workforceFunded,
     fundingOptions,
     fundingStatement: workforceFunded
-      ? verified?.wrgEligible
-        ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
-        : 'WIOA may be considered. WorkOne or the responsible agency determines eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
+      ? verifiedFunding?.wrgEligible
+        ? 'WIOA or Workforce Ready Grant may be considered. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
+        : 'WIOA may be considered. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization before funded enrollment. Self-pay remains available.'
       : 'Regular self-pay program. Review the published price and payment options before applying.',
-    badge: workforceFunded ? 'Verified Workforce-Funded' : 'Self-Pay Program',
-    badgeColor: workforceFunded ? 'green' : 'blue',
+    badge: registered
+      ? 'Registered Apprenticeship'
+      : workforceFunded
+        ? 'Verified Workforce-Funded'
+        : 'Self-Pay Program',
+    badgeColor: registered || workforceFunded ? 'green' : 'blue',
     funding: {
       ...(program.funding ?? {
         fssa_eligible: false,
@@ -155,12 +190,12 @@ export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
         wrg_eligible: false,
       }),
       fssa_eligible: false,
-      wioa_eligible: Boolean(workforceFunded && verified?.wioaEligible),
-      wrg_eligible: Boolean(workforceFunded && verified?.wrgEligible),
-      etpl_approved: Boolean(verified?.etplListedFor2Exclusive),
+      wioa_eligible: Boolean(workforceFunded && verifiedFunding?.wioaEligible),
+      wrg_eligible: Boolean(workforceFunded && verifiedFunding?.wrgEligible),
+      etpl_approved: Boolean(verifiedFunding?.etplListedFor2Exclusive),
       jobReadyIndyEligible: false,
       fundingNotes:
-        verified?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
+        verifiedFunding?.sourceNote ?? 'No verified WIOA/WRG public funding record for this program.',
     },
     enrollmentTracks: undefined,
     cta: {

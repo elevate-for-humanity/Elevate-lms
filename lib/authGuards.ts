@@ -2,27 +2,24 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import {
+  ADMIN_ROLES,
+  INSTRUCTOR_ROLES,
+  PROGRAM_HOLDER_ROLES,
+  hasAnyRole,
+  hasPermission as roleHasPermission,
+  normalizeRole,
+  normalizeRoles,
+  PERMISSIONS,
+  type Permission,
+  type UserRole,
+} from '@/lib/rbac/role-matrix';
 
-// =====================================================
-// TYPE DEFINITIONS
-// =====================================================
-
-export type UserRole =
-  | 'student'
-  | 'instructor'
-  | 'admin'
-  | 'super_admin'
-  | 'staff'
-  | 'program_holder'
-  | 'provider_admin'
-  | 'case_manager'
-  | 'employer'
-  | 'partner'
-  | 'delegate';
+export type { UserRole } from '@/lib/rbac/role-matrix';
 
 export interface AuthGuardOptions {
   requireAuth?: boolean;
-  allowedRoles?: UserRole[];
+  allowedRoles?: readonly UserRole[];
   redirectTo?: string;
   requireEmailVerified?: boolean;
 }
@@ -31,19 +28,11 @@ export interface AuthGuardResult {
   user: any;
   profile: any;
   role: UserRole | null;
+  effectiveRoles: UserRole[];
   isAuthenticated: boolean;
   isAuthorized: boolean;
 }
 
-// =====================================================
-// CORE AUTH GUARDS
-// =====================================================
-
-/**
- * Resolve the current request pathname for post-login redirect.
- * In standalone Node.js deployments, Edge middleware custom headers are not
- * reliably propagated to server components, so a cookie is used as fallback.
- */
 async function resolveCurrentPath(): Promise<string> {
   const headersList = await headers();
   const rawUrl =
@@ -55,31 +44,50 @@ async function resolveCurrentPath(): Promise<string> {
 
   if (rawUrl) {
     try {
-      const u = new URL(rawUrl, 'http://localhost');
-      const returnPath = u.pathname + (u.search || '');
+      const url = new URL(rawUrl, 'http://localhost');
+      const returnPath = url.pathname + (url.search || '');
       if (returnPath) return returnPath;
     } catch {
       // fall through to cookie
     }
   }
 
-  // Cookie fallback for standalone Node.js runtimes
   try {
     const cookieStore = await cookies();
     const cookie = cookieStore.get('__efh_pathname');
     if (cookie?.value) return cookie.value;
   } catch {
-    // cookies() throws during static prerender
+    // cookies() can throw during prerender
   }
 
   return '';
 }
 
+async function loadEffectiveAuth() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
+  if (error || !user) {
+    return { supabase, user: null, profile: null, role: null, effectiveRoles: [] as UserRole[] };
+  }
 
-/**
- * Comprehensive authentication guard for server components
- */
+  const [{ data: profile }, { data: roleRows }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
+  ]);
+
+  const secondaryRoles = (roleRows ?? [])
+    .map((row: any) => row?.roles?.name)
+    .filter((value: unknown): value is string => typeof value === 'string');
+  const role = normalizeRole(profile?.role);
+  const effectiveRoles = normalizeRoles([role, ...secondaryRoles]);
+
+  return { supabase, user, profile, role, effectiveRoles };
+}
+
 export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGuardResult> {
   const {
     requireAuth = true,
@@ -88,15 +96,9 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
     requireEmailVerified = false,
   } = options;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const { user, profile, role, effectiveRoles } = await loadEffectiveAuth();
 
-  // Check if authentication is required
-  if (requireAuth && (!user || error)) {
-    // Preserve the current path so login can return the user here.
+  if (requireAuth && !user) {
     let destination = redirectTo;
     if (redirectTo === '/login') {
       const currentPath = await resolveCurrentPath();
@@ -112,367 +114,189 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
       user: null,
       profile: null,
       role: null,
+      effectiveRoles: [],
       isAuthenticated: false,
       isAuthorized: false,
     };
   }
 
-  // Get user profile
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
+  if (requireEmailVerified && !user.email_confirmed_at) redirect('/verify-email');
 
-  const role = profile?.role as UserRole | null;
+  const isAuthorized =
+    allowedRoles.length === 0 ||
+    hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
-  // Check email verification
-  if (requireEmailVerified && !user.email_confirmed_at) {
-    redirect('/verify-email');
-  }
-
-  // Check role authorization
-  const isAuthorized = allowedRoles.length === 0 || (role && allowedRoles.includes(role));
-
-  if (requireAuth && !isAuthorized) {
-    redirect('/unauthorized');
-  }
+  if (requireAuth && !isAuthorized) redirect('/unauthorized');
 
   return {
     user,
     profile,
     role,
+    effectiveRoles,
     isAuthenticated: true,
     isAuthorized,
   };
 }
 
-// =====================================================
-// BASIC AUTH GUARDS
-// =====================================================
-
 export async function requireAuth() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login');
-  }
-
+  const { user } = await authGuard({ requireAuth: true });
   return user;
 }
 
 export async function requireAdmin() {
-  const { user, role } = await authGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff'],
-  });
-
+  const { user } = await authGuard({ requireAuth: true, allowedRoles: ADMIN_ROLES });
   return user;
 }
 
 export async function requireInstructor() {
-  const { user } = await authGuard({
-    requireAuth: true,
-    allowedRoles: ['instructor', 'admin'],
-  });
-
+  const { user } = await authGuard({ requireAuth: true, allowedRoles: INSTRUCTOR_ROLES });
   return user;
 }
 
 export async function requireStudent() {
   const { user } = await authGuard({
     requireAuth: true,
-    allowedRoles: ['student'],
+    allowedRoles: ['student', 'learner'],
   });
-
   return user;
 }
 
 export async function requireProgramHolder() {
   const { user } = await authGuard({
     requireAuth: true,
-    allowedRoles: ['program_holder'],
+    allowedRoles: PROGRAM_HOLDER_ROLES,
   });
-
   return user;
 }
 
 export async function requireDelegate() {
-  const { user } = await authGuard({
-    requireAuth: true,
-    allowedRoles: ['delegate'],
-  });
-
+  const { user } = await authGuard({ requireAuth: true, allowedRoles: ['delegate'] });
   return user;
 }
 
 export async function requireAdminOrDelegate() {
   const { user } = await authGuard({
     requireAuth: true,
-    allowedRoles: ['admin', 'delegate'],
+    allowedRoles: ['super_admin', 'admin', 'org_admin', 'delegate'],
   });
-
   return user;
 }
 
 export async function optionalAuth() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await loadEffectiveAuth();
   return user;
 }
 
 export async function getUserRole(): Promise<UserRole | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return null;
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  return (profile?.role as UserRole) || null;
+  const { role } = await loadEffectiveAuth();
+  return role;
 }
 
-// =====================================================
-// PERMISSION SYSTEM
-// =====================================================
-
-const PERMISSIONS: Record<UserRole, string[]> = {
-  admin: ['*'], // All permissions
-  super_admin: ['*'],
-  staff: ['view_students', 'view_programs', 'view_analytics', 'manage_enrollments'],
-  instructor: [
-    'view_students',
-    'grade_assignments',
-    'manage_own_courses',
-    'view_analytics',
-    'send_messages',
-    'create_quizzes',
-    'manage_discussions',
-  ],
-  student: [
-    'view_courses',
-    'submit_assignments',
-    'take_quizzes',
-    'join_discussions',
-    'view_own_progress',
-  ],
-  program_holder: ['view_programs', 'manage_programs', 'view_students', 'view_analytics'],
-  provider_admin: ['view_programs', 'manage_programs', 'view_students', 'view_analytics'],
-  case_manager: ['view_students', 'view_programs', 'view_analytics', 'manage_enrollments'],
-  employer: ['view_students', 'view_programs', 'view_analytics'],
-  partner: ['view_programs', 'view_students', 'view_analytics'],
-  delegate: ['view_programs', 'view_students', 'view_analytics', 'manage_enrollments'],
-};
-
 export async function hasPermission(permission: string): Promise<boolean> {
-  const role = await getUserRole();
-
-  if (!role) return false;
-
-  const rolePermissions = PERMISSIONS[role] || [];
-  return rolePermissions.includes('*') || rolePermissions.includes(permission);
+  if (!(permission in PERMISSIONS)) return false;
+  const { effectiveRoles } = await loadEffectiveAuth();
+  return effectiveRoles.some((role) => roleHasPermission(role, permission as Permission));
 }
 
 export async function requirePermission(permission: string) {
-  const hasAccess = await hasPermission(permission);
-
-  if (!hasAccess) {
-    redirect('/unauthorized');
-  }
-
+  if (!(await hasPermission(permission))) redirect('/unauthorized');
   return true;
 }
 
-// =====================================================
-// RESOURCE-SPECIFIC GUARDS
-// =====================================================
-
-/**
- * Check if user can access a specific course
- */
 export async function canAccessCourse(courseId: string): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user, effectiveRoles } = await loadEffectiveAuth();
   if (!user) return false;
+  if (hasAnyRole(effectiveRoles, ['super_admin', 'admin'], { adminOverride: false })) return true;
 
-  const role = await getUserRole();
-
-  // Admins can access all courses
-  if (role === 'admin') return true;
-
-  // Check if user is enrolled
   const { data: enrollment } = await supabase
     .from('program_enrollments')
     .select('id')
     .eq('user_id', user.id)
     .eq('course_id', courseId)
     .maybeSingle();
-
   if (enrollment) return true;
 
-  // Check if user is the course instructor
+  if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
   const { data: course } = await supabase
     .from('lms_courses')
     .select('instructor_id')
     .eq('id', courseId)
     .maybeSingle();
-
   return course?.instructor_id === user.id;
 }
 
-/**
- * Guard for course access
- */
 export async function requireCourseAccess(courseId: string) {
-  const hasAccess = await canAccessCourse(courseId);
-
-  if (!hasAccess) {
-    redirect('/lms/courses');
-  }
-
+  if (!(await canAccessCourse(courseId))) redirect('/lms/courses');
   return { hasAccess: true };
 }
 
-/**
- * Check if user can edit a course
- */
 export async function canEditCourse(courseId: string): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user, effectiveRoles } = await loadEffectiveAuth();
   if (!user) return false;
+  if (hasAnyRole(effectiveRoles, ['super_admin', 'admin'], { adminOverride: false })) return true;
+  if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
 
-  const role = await getUserRole();
-
-  // Admins can edit all courses
-  if (role === 'admin') return true;
-
-  // Check if user is the course instructor
   const { data: course } = await supabase
     .from('lms_courses')
     .select('instructor_id')
     .eq('id', courseId)
     .maybeSingle();
-
   return course?.instructor_id === user.id;
 }
 
-/**
- * Guard for course editing
- */
 export async function requireCourseEditAccess(courseId: string) {
-  const canEdit = await canEditCourse(courseId);
-
-  if (!canEdit) {
-    redirect('/instructor/courses');
-  }
-
+  if (!(await canEditCourse(courseId))) redirect('/instructor/courses');
   return { canEdit: true };
 }
 
-/**
- * Check if user can access student data
- */
 export async function canAccessStudentData(studentId: string): Promise<boolean> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { supabase, user, effectiveRoles } = await loadEffectiveAuth();
   if (!user) return false;
-
-  const role = await getUserRole();
-
-  // Admins can access all student data
-  if (role === 'admin') return true;
-
-  // Users can access their own data
+  if (hasAnyRole(effectiveRoles, ['super_admin', 'admin'], { adminOverride: false })) return true;
   if (user.id === studentId) return true;
+  if (!hasAnyRole(effectiveRoles, ['instructor'], { adminOverride: false })) return false;
 
-  // Instructors can access data of their enrolled students.
-  // courses table has no instructor_id column — instructor_id lives on training_courses.
-  // Check via training_courses for legacy courses; for canonical courses, instructors
-  // are treated as admins and the role check above handles access.
-  if (role === 'instructor') {
-    const { data: enrollment } = await supabase
-      .from('program_enrollments')
-      .select('course_id')
-      .eq('user_id', studentId)
-      .maybeSingle();
+  const { data: enrollment } = await supabase
+    .from('program_enrollments')
+    .select('course_id')
+    .eq('user_id', studentId)
+    .not('course_id', 'is', null)
+    .limit(1)
+    .maybeSingle();
+  if (!enrollment?.course_id) return false;
 
-    if (!enrollment?.course_id) return false;
-
-    // Check if instructor owns this course via training_courses
-    const { data: tc } = await supabase
-      .from('lms_courses')
-      .select('id')
-      .eq('id', enrollment.course_id)
-      .eq('instructor_id', user.id)
-      .maybeSingle();
-
-    return !!tc;
-  }
-
-  return false;
+  const { data: course } = await supabase
+    .from('lms_courses')
+    .select('id')
+    .eq('id', enrollment.course_id)
+    .eq('instructor_id', user.id)
+    .maybeSingle();
+  return Boolean(course);
 }
 
-/**
- * Guard for student data access
- */
 export async function requireStudentDataAccess(studentId: string) {
-  const hasAccess = await canAccessStudentData(studentId);
-
-  if (!hasAccess) {
-    redirect('/unauthorized');
-  }
-
+  if (!(await canAccessStudentData(studentId))) redirect('/unauthorized');
   return { hasAccess: true };
 }
 
-// =====================================================
-// API ROUTE GUARDS
-// =====================================================
-
-/**
- * Guard for API routes - returns response instead of redirecting
- */
 export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
   authorized: boolean;
   user: any;
   profile: any;
   role: UserRole | null;
+  effectiveRoles: UserRole[];
   error?: string;
 }> {
   const { requireAuth = true, allowedRoles = [], requireEmailVerified = false } = options;
+  const { user, profile, role, effectiveRoles } = await loadEffectiveAuth();
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (requireAuth && (!user || error)) {
+  if (requireAuth && !user) {
     return {
       authorized: false,
       user: null,
       profile: null,
       role: null,
+      effectiveRoles: [],
       error: 'Authentication required',
     };
   }
@@ -483,16 +307,9 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
       user: null,
       profile: null,
       role: null,
+      effectiveRoles: [],
     };
   }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  const role = profile?.role as UserRole | null;
 
   if (requireEmailVerified && !user.email_confirmed_at) {
     return {
@@ -500,84 +317,48 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
       user,
       profile,
       role,
+      effectiveRoles,
       error: 'Email verification required',
     };
   }
 
-  const isAuthorized = allowedRoles.length === 0 || (role && allowedRoles.includes(role));
-
-  if (requireAuth && !isAuthorized) {
-    return {
-      authorized: false,
-      user,
-      profile,
-      role,
-      error: 'Insufficient permissions',
-    };
-  }
+  const isAuthorized =
+    allowedRoles.length === 0 ||
+    hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
   return {
-    authorized: true,
+    authorized: isAuthorized,
     user,
     profile,
     role,
+    effectiveRoles,
+    ...(isAuthorized ? {} : { error: 'Insufficient permissions' }),
   };
 }
 
-/**
- * API guard for admin-only endpoints
- */
 export async function apiRequireAdmin() {
-  const result = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['admin', 'super_admin', 'staff'],
-  });
-
+  const result = await apiAuthGuard({ requireAuth: true, allowedRoles: ADMIN_ROLES });
   if (!result.authorized) {
     return NextResponse.json({ error: result.error || 'Unauthorized' }, { status: 401 });
   }
-
   return result;
 }
 
-/**
- * API guard for instructor-only endpoints
- */
 export async function apiRequireInstructor() {
-  const result = await apiAuthGuard({
-    requireAuth: true,
-    allowedRoles: ['instructor', 'admin'],
-  });
-
+  const result = await apiAuthGuard({ requireAuth: true, allowedRoles: INSTRUCTOR_ROLES });
   if (!result.authorized) {
     return NextResponse.json({ error: result.error || 'Unauthorized' }, { status: 401 });
   }
-
   return result;
 }
 
-/**
- * API guard for student-only endpoints
- */
 export async function apiRequireStudent() {
   const result = await apiAuthGuard({
     requireAuth: true,
-    allowedRoles: ['student'],
+    allowedRoles: ['student', 'learner'],
   });
-
   if (!result.authorized) {
     return NextResponse.json({ error: result.error || 'Unauthorized' }, { status: 401 });
   }
-
   return result;
 }
-
-// =====================================================
-// DEPRECATION NOTICE
-// =====================================================
-// For API routes: import apiAuthGuard and apiRequireAdmin from '@/lib/admin/guards'.
-// The implementations above (apiAuthGuard, apiRequireAdmin, apiRequireInstructor,
-// apiRequireStudent) are kept for backward compatibility with page components
-// but will be removed in a future cleanup pass.
-//
-// Do NOT add new imports from this file in API routes.

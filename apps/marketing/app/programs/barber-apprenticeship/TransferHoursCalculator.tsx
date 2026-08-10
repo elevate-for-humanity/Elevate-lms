@@ -11,7 +11,6 @@ import {
 
 const SETUP_FEE = MIN_SETUP_FEE_CENTS / 100;
 const REMAINING_BALANCE = TUITION_DOLLARS - SETUP_FEE;
-// Weekly payment is fixed — 29 weeks regardless of transfer hours or pace
 const WEEKLY_PAYMENT = Math.round((REMAINING_BALANCE / PAYMENT_TERM_WEEKS) * 100) / 100;
 
 function formatCurrency(amount: number): string {
@@ -27,14 +26,19 @@ export function TransferHoursCalculator() {
   const [transferHoursStr, setTransferHoursStr] = useState('');
   const [hoursPerWeek, setHoursPerWeek] = useState(40);
   const maxTransferHours = TOTAL_HOURS_REQUIRED - 100;
-  const transferHours = Math.min(
-    maxTransferHours,
-    Math.max(0, parseInt(transferHoursStr, 10) || 0),
-  );
-
+  const transferHours = Math.min(maxTransferHours, Math.max(0, parseInt(transferHoursStr, 10) || 0));
   const remainingHours = Math.max(0, TOTAL_HOURS_REQUIRED - transferHours);
-  // Duration estimate is display-only — does not affect price
   const estimatedWeeks = Math.ceil(remainingHours / hoursPerWeek);
+
+  function updateTransferHours(value: string) {
+    if (value === '') {
+      setTransferHoursStr('');
+      return;
+    }
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isFinite(parsed)) return;
+    setTransferHoursStr(String(Math.min(maxTransferHours, Math.max(0, parsed))));
+  }
 
   return (
     <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white">
@@ -42,35 +46,30 @@ export function TransferHoursCalculator() {
         <Calculator className="w-6 h-6" />
         <h3 className="text-lg font-bold">Transfer Hours Calculator</h3>
       </div>
-      
       <p className="text-amber-100 text-sm mb-6">
-        Already have documented barber training hours? Enter them below to see your estimated weekly payment.
+        Already have documented barber training hours? Enter them below to see the effect on your remaining OJL hours and estimated duration.
       </p>
 
       <div className="grid sm:grid-cols-2 gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium text-amber-100 mb-2">
-            Hours to Transfer
-          </label>
+          <label className="block text-sm font-medium text-amber-100 mb-2">Hours to Transfer</label>
           <input
             type="number"
             min="0"
-            max={TOTAL_HOURS_REQUIRED - 100}
+            max={maxTransferHours}
             step="50"
-            value={transferHours}
-            onChange={(e) => setTransferHours(Math.min(TOTAL_HOURS_REQUIRED - 100, Math.max(0, parseInt(e.target.value) || 0)))}
+            value={transferHoursStr}
+            onChange={(event) => updateTransferHours(event.target.value)}
             className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-slate-900 placeholder-white/50 focus:ring-2 focus:ring-white/50 focus:border-transparent"
             placeholder="e.g., 500"
           />
-          <p className="text-xs text-amber-200 mt-1">Max: {TOTAL_HOURS_REQUIRED - 100} hours</p>
+          <p className="text-xs text-amber-200 mt-1">Max: {maxTransferHours} hours</p>
         </div>
         <div>
-          <label className="block text-sm font-medium text-amber-100 mb-2">
-            Hours Per Week
-          </label>
+          <label className="block text-sm font-medium text-amber-100 mb-2">Hours Per Week</label>
           <select
             value={hoursPerWeek}
-            onChange={(e) => setHoursPerWeek(parseInt(e.target.value))}
+            onChange={(event) => setHoursPerWeek(Number.parseInt(event.target.value, 10))}
             className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-slate-900 focus:ring-2 focus:ring-white/50 focus:border-transparent"
           >
             <option value="20">20 hrs/week</option>
@@ -82,7 +81,6 @@ export function TransferHoursCalculator() {
         </div>
       </div>
 
-      {/* Results */}
       <div className="bg-white/10 rounded-xl p-4">
         <div className="grid sm:grid-cols-3 gap-4 text-center">
           <div>
@@ -102,9 +100,7 @@ export function TransferHoursCalculator() {
         <div className="mt-4 pt-4 border-t border-white/20 flex items-start gap-2">
           <Info className="w-4 h-4 text-amber-200 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-amber-100">
-            <strong>Weekly payment is fixed at ${WEEKLY_PAYMENT.toFixed(2)}</strong> for all students —
-            transfer hours reduce your remaining OJL hours only, not your payment amount.
-            Setup fee: {formatCurrency(SETUP_FEE)} minimum down payment.
+            <strong>Weekly payment is fixed at ${WEEKLY_PAYMENT.toFixed(2)}</strong> for all students — transfer hours reduce your remaining OJL hours only, not tuition. Setup fee: {formatCurrency(SETUP_FEE)} minimum down payment.
           </p>
         </div>
       </div>

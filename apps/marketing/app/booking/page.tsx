@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, MapPin, User, Video, Building } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Book an Appointment | Elevate For Humanity',
@@ -14,24 +15,22 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 3600;
+
 export default async function BookingPage() {
   const supabase = createPublicClient();
 
-  // Get available appointment types
   const { data: appointmentTypes } = await supabase
     .from('appointment_types')
     .select('*')
     .eq('is_active', true)
     .order('name', { ascending: true });
 
-  // Get staff available for appointments
   const { data: staff } = await supabase
     .from('staff')
     .select('id, name, title, department, avatar_url')
     .eq('accepts_appointments', true)
     .order('name', { ascending: true });
 
-  // Get locations
   const { data: locations } = await supabase
     .from('locations')
     .select('id, name, address, city, state')
@@ -61,8 +60,8 @@ export default async function BookingPage() {
     },
     {
       id: 'financial',
-      name: 'Financial Aid Consultation',
-      description: 'Discuss funding options and WIOA eligibility',
+      name: 'Funding Consultation',
+      description: 'Discuss available funding and payment options',
       duration: 30,
       icon: Clock,
     },
@@ -80,20 +79,17 @@ export default async function BookingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Booking' }]} />
         </div>
       </div>
 
-      {/* Hero */}
-      {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image
             src="/images/pages/booking-page-1.webp"
-            alt="Hero image"
+            alt="Elevate for Humanity appointment and advising team"
             fill
             className="object-cover"
             priority
@@ -113,7 +109,6 @@ export default async function BookingPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Appointment Types */}
         <section className="mb-16">
           <h2 className="text-3xl font-bold mb-8">Select Appointment Type</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -138,9 +133,8 @@ export default async function BookingPage() {
           </div>
         </section>
 
-        {/* Locations */}
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8">Our Locations</h2>
+          <h2 className="text-3xl font-bold mb-8">Appointment Locations</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {locations && locations.length > 0 ? (
               locations.map((location: any) => (
@@ -150,8 +144,7 @@ export default async function BookingPage() {
                     <div>
                       <h3 className="font-semibold text-lg">{location.name}</h3>
                       <p className="text-slate-700">
-                        {location.address}
-                        <br />
+                        {location.address}<br />
                         {location.city}, {location.state}
                       </p>
                     </div>
@@ -159,39 +152,21 @@ export default async function BookingPage() {
                 </div>
               ))
             ) : (
-              <>
-                <div className="bg-white rounded-xl shadow-sm border p-6">
-                  <div className="flex items-start gap-4">
-                    <MapPin className="w-6 h-6 text-slate-700 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-lg">Main Campus</h3>
-                      <p className="text-slate-700">
-                        123 Education Way
-                        <br />
-                        Indianapolis, IN 46204
-                      </p>
-                    </div>
+              <div className="bg-white rounded-xl shadow-sm border p-6">
+                <div className="flex items-start gap-4">
+                  <Video className="w-6 h-6 text-slate-700 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-semibold text-lg">Virtual or Staff-Confirmed Location</h3>
+                    <p className="text-slate-700">
+                      Appointment location is confirmed when you schedule. Virtual appointments are available when offered.
+                    </p>
                   </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border p-6">
-                  <div className="flex items-start gap-4">
-                    <Video className="w-6 h-6 text-slate-700 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-lg">Virtual Appointments</h3>
-                      <p className="text-slate-700">
-                        Available via Zoom or Google Meet
-                        <br />
-                        Flexible scheduling options
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </>
+              </div>
             )}
           </div>
         </section>
 
-        {/* Staff */}
         {staff && staff.length > 0 && (
           <section className="mb-16">
             <h2 className="text-3xl font-bold mb-8">Meet Our Team</h2>
@@ -207,7 +182,6 @@ export default async function BookingPage() {
                         src={member.avatar_url}
                         alt={member.name}
                         fill
-                        sizes="100vw"
                         className="object-cover"
                         sizes="80px"
                       />
@@ -225,21 +199,20 @@ export default async function BookingPage() {
           </section>
         )}
 
-        {/* Contact Alternative */}
         <section>
-          <div className="bg-white rounded-xl p-8 text-center">
+          <div className="bg-slate-50 rounded-xl p-8 text-center border border-slate-200">
             <h3 className="font-semibold text-xl mb-2">Need Immediate Assistance?</h3>
-            <p className="text-slate-700 mb-4">Our team is available Monday-Friday, 9am-5pm EST.</p>
+            <p className="text-slate-700 mb-4">Contact our team for scheduling assistance.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/support"
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`}
                 className="inline-flex items-center justify-center bg-slate-800 text-white px-6 py-3 rounded-lg font-medium hover:bg-slate-900"
               >
-                Call (317) 314-3757
+                Call {PLATFORM_DEFAULTS.supportPhone}
               </a>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center border border-slate-800 text-slate-800 px-6 py-3 rounded-lg font-medium hover:bg-slate-200"
+                className="inline-flex items-center justify-center border border-slate-800 text-slate-800 px-6 py-3 rounded-lg font-medium hover:bg-slate-100"
               >
                 Contact Form
               </Link>

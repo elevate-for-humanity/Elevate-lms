@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-type Params = Promise<{ slug: string }>;
+type Params = Promise<{ program: string }>;
 
 async function _GET(request: Request, { params }: { params: Params }) {
   try {
@@ -19,7 +19,6 @@ async function _GET(request: Request, { params }: { params: Params }) {
     const { program: slug } = await params;
     const supabase = await createServerSupabaseClient();
 
-    // Map program slugs to course categories
     const categoryMap: Record<string, string> = {
       healthcare: 'Healthcare',
       'skilled-trades': 'Skilled Trades',
@@ -36,8 +35,6 @@ async function _GET(request: Request, { params }: { params: Params }) {
     };
 
     const category = categoryMap[slug] || slug;
-
-    // Fetch courses matching the category
     const { data: courses, error } = await supabase
       .from('lms_courses')
       .select('*')
@@ -46,16 +43,9 @@ async function _GET(request: Request, { params }: { params: Params }) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json(
-        {
-          error: toErrorMessage(error),
-          courses: [],
-        },
-        { status: 200 },
-      );
+      return NextResponse.json({ error: toErrorMessage(error), courses: [] }, { status: 200 });
     }
 
-    // Transform courses to match expected format
     const transformedCourses = (courses || []).map((course) => ({
       id: course.id,
       title: course.title,
@@ -70,18 +60,10 @@ async function _GET(request: Request, { params }: { params: Params }) {
       image: course.cover_image_url || '/images/pages/course-create-hero.webp',
     }));
 
-    return NextResponse.json({
-      courses: transformedCourses,
-      total: transformedCourses.length,
-    });
+    return NextResponse.json({ courses: transformedCourses, total: transformedCourses.length });
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: toErrorMessage(error),
-        courses: [],
-      },
-      { status: 200 },
-    );
+    return NextResponse.json({ error: toErrorMessage(error), courses: [] }, { status: 200 });
   }
 }
-export const GET = withApiAudit('/api/programs/[slug]/courses', _GET);
+
+export const GET = withApiAudit('/api/programs/[program]/courses', _GET);

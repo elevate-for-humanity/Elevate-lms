@@ -1,15 +1,12 @@
 'use client';
-import { logger } from '@/lib/logger';
 
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-
-import React from 'react';
-
-import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
-interface Course {
+type Course = {
   id: string;
   title: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
@@ -18,341 +15,126 @@ interface Course {
   matchScore: number;
   prerequisites: string[];
   skills: string[];
-}
+};
 
-interface LearningPath {
+type LearningPath = {
   id: string;
   name: string;
   description: string;
   courses: Course[];
   totalDuration: string;
   matchScore: number;
-}
-
+};
 
 const defaultPaths: LearningPath[] = [
   {
-    id: '1',
+    id: 'full-stack',
     name: 'Full-Stack Developer',
-    description: 'Personalized path based on your JavaScript proficiency and career goals',
+    description: 'A progressive path through JavaScript, React, and backend development.',
     totalDuration: '6 months',
     matchScore: 95,
     courses: [
-      {
-        id: 'c1',
-        title: 'Advanced JavaScript',
-        difficulty: 'intermediate',
-        duration: '4 weeks',
-        recommended: true,
-        matchScore: 98,
-        prerequisites: ['JavaScript Basics'],
-        skills: ['ES6+', 'Async/Await', 'Closures'],
-      },
-      {
-        id: 'c2',
-        title: 'React Fundamentals',
-        difficulty: 'intermediate',
-        duration: '6 weeks',
-        recommended: true,
-        matchScore: 92,
-        prerequisites: ['Advanced JavaScript'],
-        skills: ['Components', 'Hooks', 'State Management'],
-      },
-      {
-        id: 'c3',
-        title: 'Node.js Backend',
-        difficulty: 'intermediate',
-        duration: '8 weeks',
-        recommended: true,
-        matchScore: 88,
-        prerequisites: ['Advanced JavaScript'],
-        skills: ['Express', 'REST APIs', 'Authentication'],
-      },
-    ],
-  },
-  {
-    id: '2',
-    name: 'Frontend Specialist',
-    description: 'Optimized for your visual design interests and UI/UX background',
-    totalDuration: '4 months',
-    matchScore: 87,
-    courses: [
-      {
-        id: 'c4',
-        title: 'Advanced CSS & Animations',
-        difficulty: 'intermediate',
-        duration: '3 weeks',
-        recommended: true,
-        matchScore: 94,
-        prerequisites: ['CSS Basics'],
-        skills: ['Flexbox', 'Grid', 'Animations'],
-      },
-      {
-        id: 'c5',
-        title: 'React & TypeScript',
-        difficulty: 'advanced',
-        duration: '8 weeks',
-        recommended: false,
-        matchScore: 82,
-        prerequisites: ['React Fundamentals', 'TypeScript Basics'],
-        skills: ['Type Safety', 'Advanced Patterns'],
-      },
+      { id: 'c1', title: 'Advanced JavaScript', difficulty: 'intermediate', duration: '4 weeks', recommended: true, matchScore: 98, prerequisites: ['JavaScript Basics'], skills: ['ES6+', 'Async/Await', 'Closures'] },
+      { id: 'c2', title: 'React Fundamentals', difficulty: 'intermediate', duration: '6 weeks', recommended: true, matchScore: 92, prerequisites: ['Advanced JavaScript'], skills: ['Components', 'Hooks', 'State Management'] },
+      { id: 'c3', title: 'Node.js Backend', difficulty: 'intermediate', duration: '8 weeks', recommended: true, matchScore: 88, prerequisites: ['Advanced JavaScript'], skills: ['REST APIs', 'Authentication'] },
     ],
   },
 ];
+
+function calculateMatchScore(path: any, skills: any[]) {
+  if (!skills?.length) return 0;
+  const pathSkills: string[] = path.skills ?? path.required_skills ?? [];
+  if (!pathSkills.length) return 0;
+  const userSkills = new Set(skills.map((skill: any) => skill.skill_name ?? skill.skill_id ?? skill.id ?? skill));
+  return Math.round((pathSkills.filter((skill) => userSkills.has(skill)).length / pathSkills.length) * 100);
+}
 
 export function AdaptiveLearningPath() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load learning paths from database
-  React.useEffect(() => {
-    const loadPaths = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
+  useEffect(() => {
+    async function loadPaths() {
       try {
-        // Fetch user's skill assessments
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
         const { data: skills } = user
-          ? await supabase
-              .from('user_skills')
-              .select('skill_name, proficiency_level')
-              .eq('user_id', user.id)
-          : { data: null };
-
-        // Fetch available learning paths
+          ? await supabase.from('user_skills').select('skill_name, proficiency_level').eq('user_id', user.id)
+          : { data: [] as any[] };
         const { data: paths } = await supabase
           .from('learning_paths')
           .select('*, learning_path_courses(*, training_programs(*))')
           .eq('is_active', true);
 
-        if (paths && paths.length > 0) {
-          const formatted: LearningPath[] = paths.map((p) => ({
-            id: p.id,
-            name: p.name,
-            description: p.description,
-            totalDuration: p.total_duration || '6 months',
-            matchScore: calculateMatchScore(p, skills || []),
-            courses: (p.learning_path_courses || []).map((c: any) => ({
-              id: c.id,
-              title: c.training_programs?.name || c.course_name,
-              difficulty: c.difficulty || 'intermediate',
-              duration: c.duration || '4 weeks',
-              recommended: true,
-              matchScore: 90,
-              prerequisites: c.prerequisites || [],
-              skills: c.skills || [],
-            })),
-          }));
-          setLearningPaths(formatted);
-        } else {
-          // Fallback data
+        if (!paths?.length) {
           setLearningPaths(defaultPaths);
+          return;
         }
-      } catch (err) {
-        logger.error('Error loading paths:', err);
+
+        setLearningPaths(paths.map((path: any) => ({
+          id: path.id,
+          name: path.name,
+          description: path.description || '',
+          totalDuration: path.total_duration || '6 months',
+          matchScore: calculateMatchScore(path, skills || []),
+          courses: (path.learning_path_courses || []).map((entry: any) => ({
+            id: entry.id,
+            title: entry.training_programs?.name || entry.course_name || 'Course',
+            difficulty: entry.difficulty || 'intermediate',
+            duration: entry.duration || '4 weeks',
+            recommended: true,
+            matchScore: Number(entry.match_score || 90),
+            prerequisites: entry.prerequisites || [],
+            skills: entry.skills || [],
+          })),
+        })));
+      } catch (error) {
+        logger.error('Error loading adaptive paths', error);
         setLearningPaths(defaultPaths);
       } finally {
         setLoading(false);
       }
-    };
-    loadPaths();
+    }
+    void loadPaths();
   }, []);
 
-  const calculateMatchScore = (path: any, skills: any[]) => {
-    if (!skills?.length) return 0;
-    const pathSkills: string[] = path.skills ?? path.required_skills ?? [];
-    if (!pathSkills.length) return 0;
-    const userSkillIds = new Set(skills.map((s: any) => s.skill_id ?? s.id ?? s));
-    const matched = pathSkills.filter((s) => userSkillIds.has(s)).length;
-    return Math.round((matched / pathSkills.length) * 100);
-  };
-
-  const enrollInPath = async (pathId: string) => {
+  async function enrollInPath(pathId: string) {
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-
-    await supabase.from('user_learning_paths').insert({
-      user_id: user.id,
-      learning_path_id: pathId,
-      started_at: new Date().toISOString(),
-      status: 'active',
-    });
-
+    await supabase.from('user_learning_paths').insert({ user_id: user.id, learning_path_id: pathId, started_at: new Date().toISOString(), status: 'active' });
     setSelectedPath(pathId);
-  };
+  }
 
-
-  const selectedPathData = learningPaths.find((p) => p.id === selectedPath);
+  if (loading) return <div className="p-8 text-center text-slate-600">Loading learning paths…</div>;
+  const selected = learningPaths.find((path) => path.id === selectedPath) ?? null;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="   text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">
-            Adaptive Learning Paths
-          </h1>
-          <p className="text-white">AI-recommended courses tailored to your goals and skills</p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Card className="p-6 mb-8   ">
-          <div className="flex items-start gap-4">
-            <div className="text-4xl text-2xl md:text-3xl lg:text-4xl">🤖</div>
-            <div>
-              <h3 className="text-xl font-bold mb-2">Your Personalized Recommendations</h3>
-              <p className="text-black mb-2">
-                Based on your current skills, learning patterns, and career goals, we've curated
-                these learning paths for you.
-              </p>
-              <div className="flex gap-4 text-sm">
-                <span className="px-3 py-2 bg-white rounded">JavaScript: Advanced</span>
-                <span className="px-3 py-2 bg-white rounded">Goal: Full-Stack Developer</span>
-                <span className="px-3 py-2 bg-white rounded">Learning Style: Visual</span>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <main className="min-h-screen bg-white">
+      <section className="bg-slate-950 py-12 text-white"><div className="mx-auto max-w-7xl px-4"><h1 className="text-4xl font-bold">Adaptive Learning Paths</h1><p className="mt-2 text-slate-300">Recommended course sequences based on your goals and available training.</p></div></section>
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="grid gap-6 lg:grid-cols-2">
           {learningPaths.map((path) => (
-            <Card
-              key={path.id}
-              className={`p-6 cursor-pointer transition-all ${
-                selectedPath === path.id ? 'ring-2 ring-brand-red-600' : ''
-              }`}
-              onClick={() => setSelectedPath(path.id)}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">{path.name}</h3>
-                  <p className="text-black text-sm mb-3">{path.description}</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-brand-orange-600">{path.matchScore}%</div>
-                  <p className="text-xs text-black">Match</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4 text-sm text-black mb-4">
-                <span>📚 {path.courses.length} courses</span>
-                <span>⏱️ {path.totalDuration}</span>
-              </div>
-
-              <div className="space-y-2">
-                {path.courses.slice(0, 3).map((course) => (
-                  <div key={course.id} className="flex items-center gap-2 text-sm">
-                    {course.recommended && <span className="text-brand-green-500">•</span>}
-                    <span className="text-black">{course.course_name}</span>
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs ${
-                        course.difficulty === 'beginner'
-                          ? 'bg-brand-blue-100 text-brand-blue-700'
-                          : course.difficulty === 'intermediate'
-                            ? 'bg-purple-100 text-purple-700'
-                            : 'bg-brand-red-100 text-brand-red-700'
-                      }`}
-                    >
-                      {course.difficulty}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <Button className="w-full mt-4">
-                {selectedPath === path.id ? 'Selected' : 'Select Path'}
-              </Button>
+            <Card key={path.id} className={`cursor-pointer p-6 ${selectedPath === path.id ? 'ring-2 ring-brand-orange-500' : ''}`} onClick={() => setSelectedPath(path.id)}>
+              <div className="flex justify-between gap-4"><div><h2 className="text-2xl font-bold">{path.name}</h2><p className="mt-2 text-slate-700">{path.description}</p></div><div className="text-right"><p className="text-2xl font-bold text-brand-orange-600">{path.matchScore}%</p><p className="text-xs text-slate-500">Match</p></div></div>
+              <p className="mt-4 text-sm text-slate-600">{path.courses.length} courses · {path.totalDuration}</p>
+              <div className="mt-4 space-y-2">{path.courses.slice(0, 3).map((course) => <div key={course.id} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm"><span className="font-medium text-slate-900">{course.title}</span><span className="text-slate-600">{course.difficulty}</span></div>)}</div>
+              <Button className="mt-4 w-full">{selectedPath === path.id ? 'Selected' : 'Select Path'}</Button>
             </Card>
           ))}
         </div>
 
-        {selectedPathData && (
-          <Card className="p-6">
-            <h3 className="text-2xl font-bold mb-6">Course Sequence: {selectedPathData.name}</h3>
-            <div className="space-y-4">
-              {selectedPathData.courses.map((course, index) => (
-                <div key={course.id} className="relative">
-                  {index > 0 && <div className="absolute left-6 -top-4 w-0.5 h-4 bg-slate-300" />}
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0 w-12 h-12    text-white rounded-full flex items-center justify-center font-bold">
-                      {index + 1}
-                    </div>
-                    <div className="flex-1 p-4 bg-slate-50 rounded-lg">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="text-lg font-bold">{course.course_name}</h4>
-                          <p className="text-sm text-black">{course.duration}</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xl font-bold text-brand-orange-600">
-                            {course.matchScore}%
-                          </div>
-                          <p className="text-xs text-black">Match</p>
-                        </div>
-                      </div>
-
-                      {course.prerequisites.length > 0 && (
-                        <div className="mb-2">
-                          <p className="text-xs font-semibold text-black">Prerequisites:</p>
-                          <p className="text-xs text-black">{course.prerequisites.join(', ')}</p>
-                        </div>
-                      )}
-
-                      <div className="mb-3">
-                        <p className="text-xs font-semibold text-black mb-1">
-                          Skills you'll learn:
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {course.skills.map((skill) => (
-                            <span
-                              key={skill}
-                              className="px-2 py-0.5 bg-brand-orange-100 text-brand-orange-700 text-xs rounded"
-                            >
-                              {skill}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {course.recommended && (
-                        <div className="flex items-center gap-2 text-sm text-brand-green-700">
-                          <span>•</span>
-                          <span className="font-medium">Highly recommended for you</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 p-4    rounded-lg">
-              <h4 className="font-bold mb-2">Why this path?</h4>
-              <ul className="space-y-1 text-sm text-black">
-                <li>• Builds on your existing JavaScript knowledge</li>
-                <li>• Aligns with your full-stack developer career goal</li>
-                <li>• Matches your visual learning style with interactive content</li>
-                <li>• Optimized completion timeline based on your study patterns</li>
-              </ul>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <Button className="flex-1">Start Learning Path</Button>
-              <Button variant="secondary" className="flex-1">
-                Customize Path
-              </Button>
-            </div>
+        {selected ? (
+          <Card className="mt-8 p-6">
+            <h2 className="text-2xl font-bold">Course Sequence: {selected.name}</h2>
+            <div className="mt-6 space-y-4">{selected.courses.map((course, index) => <div key={course.id} className="rounded-xl bg-slate-50 p-4"><div className="flex justify-between gap-4"><div><p className="text-xs font-bold uppercase text-brand-blue-700">Step {index + 1}</p><h3 className="text-lg font-bold">{course.title}</h3><p className="text-sm text-slate-600">{course.duration}</p></div><p className="font-bold text-brand-orange-600">{course.matchScore}% match</p></div>{course.prerequisites.length ? <p className="mt-3 text-xs text-slate-600">Prerequisites: {course.prerequisites.join(', ')}</p> : null}<div className="mt-3 flex flex-wrap gap-2">{course.skills.map((skill) => <span key={skill} className="rounded-full bg-orange-100 px-2 py-1 text-xs text-orange-800">{skill}</span>)}</div></div>)}</div>
+            <Button className="mt-6 w-full" onClick={() => void enrollInPath(selected.id)}>Start Learning Path</Button>
           </Card>
-        )}
+        ) : null}
       </div>
-    </div>
+    </main>
   );
 }
-export { AdaptiveLearningPath as default } from './AdaptiveLearningPath';
+
+export default AdaptiveLearningPath;

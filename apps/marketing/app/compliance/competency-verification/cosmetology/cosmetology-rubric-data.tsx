@@ -5,15 +5,29 @@ export interface CosmetologyItem {
   assessmentCriteria: string;
   rtiHours: number;
   ojtHours: number;
+  /** Legacy public/scoring alias derived from assessmentMethod. */
+  assessmentType: string;
 }
 
 export interface CosmetologySection {
   id: string;
   name: string;
   items: CosmetologyItem[];
+  /** Legacy print/scoring label derived from array position. */
+  section: number;
+  /** Legacy print/scoring title; canonical value is name. */
+  title: string;
+  description: string;
 }
 
-export const COSMETOLOGY_SECTIONS: CosmetologySection[] = [
+type BaseCosmetologyItem = Omit<CosmetologyItem, 'assessmentType'>;
+type BaseCosmetologySection = {
+  id: string;
+  name: string;
+  items: BaseCosmetologyItem[];
+};
+
+const BASE_COSMETOLOGY_SECTIONS: BaseCosmetologySection[] = [
   {
     id: 'hair',
     name: 'Hair Care Services',
@@ -111,3 +125,14 @@ export const COSMETOLOGY_SECTIONS: CosmetologySection[] = [
     ],
   },
 ];
+
+export const COSMETOLOGY_SECTIONS: CosmetologySection[] = BASE_COSMETOLOGY_SECTIONS.map((section, index) => ({
+  ...section,
+  section: index + 1,
+  title: section.name,
+  description: `${section.name} competency verification`,
+  items: section.items.map((item) => ({
+    ...item,
+    assessmentType: item.assessmentMethod,
+  })),
+}));

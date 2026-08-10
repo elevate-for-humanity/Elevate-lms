@@ -1,11 +1,11 @@
 /**
  * Admin Enrollment V2 API
- * Server-only endpoint using service-role key
- * Lists and manages enrollment_v2_applications
+ * Server-only endpoint using service-role key.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { withAuth } from '@/lib/with-auth';
+import { API_ADMIN_ROLES } from '@/lib/rbac/role-matrix';
 import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 }
 
@@ -23,8 +23,8 @@ const handleGet: AuthHandler = async (req: NextRequest) => {
   const status = url.searchParams.get('status');
   const programSlug = url.searchParams.get('program');
   const fundingSource = url.searchParams.get('funding');
-  const limit = parseInt(url.searchParams.get('limit') ?? '50');
-  const offset = parseInt(url.searchParams.get('offset') ?? '0');
+  const limit = parseInt(url.searchParams.get('limit') ?? '50', 10);
+  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10);
 
   let query = supabase
     .from('enrollment_v2_applications')
@@ -37,7 +37,6 @@ const handleGet: AuthHandler = async (req: NextRequest) => {
   if (fundingSource) query = query.eq('funding_source', fundingSource);
 
   const { data: applications, error, count } = await query;
-
   if (error) {
     console.error('Admin enrollment v2 error:', error);
     return NextResponse.json({ error: 'Failed to load applications' }, { status: 500 });
@@ -125,30 +124,6 @@ const handlePost: AuthHandler = async (req: NextRequest) => {
   return NextResponse.json({ success: true, application: data, action });
 };
 
-// Export handlers
-export async function GET(req: NextRequest) {
-  try {
-    return await withAuth(req, handleGet);
-  } catch (err: any) {
-    if (err.status) return NextResponse.json({ error: err.message }, { status: err.status });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-}
-
-export async function PATCH(req: NextRequest) {
-  try {
-    return await withAuth(req, handlePatch);
-  } catch (err: any) {
-    if (err.status) return NextResponse.json({ error: err.message }, { status: err.status });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    return await withAuth(req, handlePost);
-  } catch (err: any) {
-    if (err.status) return NextResponse.json({ error: err.message }, { status: err.status });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-}
+export const GET = withAuth(handleGet, { roles: API_ADMIN_ROLES });
+export const PATCH = withAuth(handlePatch, { roles: API_ADMIN_ROLES });
+export const POST = withAuth(handlePost, { roles: API_ADMIN_ROLES });

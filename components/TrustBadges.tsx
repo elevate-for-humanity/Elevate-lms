@@ -1,100 +1,59 @@
-import Image from 'next/image';
-import { Shield, Award, Lock } from 'lucide-react';
+import Link from 'next/link';
+
+const TRUST_ITEMS = [
+  {
+    title: 'Registered Apprenticeships',
+    detail: 'Sponsor and program information is published with the applicable apprenticeship pathway.',
+    href: '/approvals',
+    linkLabel: 'Review approvals',
+  },
+  {
+    title: 'Workforce Funding Pathways',
+    detail: 'Funding is shown by program and remains subject to participant eligibility, agency approval, and available funds.',
+    href: '/funding',
+    linkLabel: 'Review funding rules',
+  },
+  {
+    title: 'Credential & Testing Partners',
+    detail: 'Program and testing pages identify the credential, exam, or testing relationship that applies to that offering.',
+    href: '/testing',
+    linkLabel: 'Review testing options',
+  },
+  {
+    title: 'Privacy & Student Records',
+    detail: 'Privacy, accessibility, and platform policies are published so applicants and partners can review how information is handled.',
+    href: '/privacy',
+    linkLabel: 'Review privacy policy',
+  },
+] as const;
 
 export function TrustBadges() {
   return (
-    <section className="py-12 border-y border-slate-200">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-black mb-2">
-            Trusted by Government Agencies & Employers
+    <section className="border-y border-slate-200 bg-slate-50 py-12" aria-labelledby="trust-evidence-heading">
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="mx-auto mb-8 max-w-3xl text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand-red-700">Evidence before claims</p>
+          <h2 id="trust-evidence-heading" className="mt-2 text-2xl font-extrabold text-slate-950 sm:text-3xl">
+            Verify the approval, funding, credential, or policy that applies to you.
           </h2>
-          <p className="text-black">
-            Accredited, compliant, and recognized by leading workforce development organizations
+          <p className="mt-3 leading-7 text-slate-700">
+            Elevate does not use generic partner logos or unsupported outcome percentages as proof. Review the underlying program and policy pages before making an enrollment or funding decision.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center justify-items-center">
-          {/* FERPA Compliant */}
-          <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-3">
-              <Shield className="w-8 h-8 text-brand-blue-600" />
-            </div>
-            <div className="text-sm font-semibold text-black">FERPA</div>
-            <div className="text-xs text-black">Compliant</div>
-          </div>
-
-          {/* WIOA Approved */}
-          <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mb-3">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-            </div>
-            <div className="text-sm font-semibold text-black">WIOA</div>
-            <div className="text-xs text-black">Approved Provider</div>
-          </div>
-
-          {/* Industry Certified */}
-          <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-brand-orange-100 rounded-full flex items-center justify-center mb-3">
-              <Award aria-label="award" className="w-8 h-8 text-brand-orange-600" />
-            </div>
-            <div className="text-sm font-semibold text-black">Industry</div>
-            <div className="text-xs text-black">Certified Programs</div>
-          </div>
-
-          {/* Data Security */}
-          <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-3">
-              <Lock className="w-8 h-8 text-brand-blue-600" />
-            </div>
-            <div className="text-sm font-semibold text-black">Secure</div>
-            <div className="text-xs text-black">AES-256 Encrypted</div>
-          </div>
-        </div>
-
-        {/* Partner Logos */}
-        <div className="mt-12 pt-8 border-t border-slate-200">
-          <p className="text-center text-sm text-slate-800 mb-6">
-            Partnered with leading workforce development organizations
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center">
-            <div className="h-14 flex items-center justify-center">
-              <Image
-                src="/images/heroes/hero-homepage.webp"
-                alt="WorkOne Indiana"
-                width={120}
-                height={48}
-                className="object-contain h-10 w-auto" sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-            <div className="h-14 flex items-center justify-center">
-              <Image
-                src="/images/heroes/hero-homepage.webp"
-                alt="Indiana Department of Workforce Development"
-                width={120}
-                height={48}
-                className="object-contain h-10 w-auto" sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-            <div className="h-14 flex items-center justify-center">
-              <Image
-                src="/images/heroes/hero-homepage.webp"
-                alt="U.S. Department of Labor"
-                width={120}
-                height={48}
-                className="object-contain h-10 w-auto" sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-            <div className="h-14 flex items-center justify-center">
-              <Image
-                src="/images/heroes/hero-homepage.webp"
-                alt="Next Level Jobs Indiana"
-                width={120}
-                height={48}
-                className="object-contain h-10 w-auto" sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-          </div>
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          {TRUST_ITEMS.map((item) => (
+            <article key={item.title} className="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-950">{item.title}</h3>
+              <p className="mt-3 flex-1 text-sm leading-6 text-slate-700">{item.detail}</p>
+              <Link
+                href={item.href}
+                className="mt-5 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline decoration-2 underline-offset-4 hover:text-brand-blue-950"
+              >
+                {item.linkLabel}
+              </Link>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -103,18 +62,22 @@ export function TrustBadges() {
 
 export function SecurityBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green-50 border border-brand-green-200 rounded-lg">
-      <Lock className="w-4 h-4 text-brand-green-600" />
-      <span className="text-sm font-medium text-brand-green-900">Secure & FERPA Compliant</span>
-    </div>
+    <Link
+      href="/privacy"
+      className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-50"
+    >
+      Review privacy & data practices
+    </Link>
   );
 }
 
 export function AccreditationBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
-      <Award aria-label="award" className="w-4 h-4 text-brand-blue-600" />
-      <span className="text-sm font-medium text-brand-blue-900">WIOA Approved Provider</span>
-    </div>
+    <Link
+      href="/approvals"
+      className="inline-flex min-h-11 items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-slate-50"
+    >
+      Review approvals & registrations
+    </Link>
   );
 }

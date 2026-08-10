@@ -1,286 +1,98 @@
-import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/public';
-import { generateMetadata } from '@/lib/seo/metadata';
+import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-export const metadata: Metadata = generateMetadata({
-  title: 'Platform Architecture',
-  description: 'Platform Architecture - {PLATFORM_DEFAULTS.orgName} workforce training and career development programs in Indianapolis.',
-  path: '/platform/architecture',
-});
-
 import { ComplianceBar } from '@/components/ComplianceBar';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const dynamic = 'force-dynamic';
+export const metadata: Metadata = {
+  title: 'Platform Architecture | Elevate for Humanity',
+  description: 'Technical architecture for the Elevate for Humanity workforce platform across Marketing, LMS, Admin, Supabase, Stripe, and Northflank.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/platform/architecture' },
+};
 
-export default async function ArchitecturePage() {
-  const supabase = createPublicClient();
-  
-  // Fetch architecture docs
-  const { data: docs } = await db
-    .from('documentation')
-    .select('*')
-    .eq('category', 'architecture');
+const SERVICE_SURFACES = [
+  {
+    title: 'Marketing',
+    host: 'www.elevateforhumanity.org',
+    description: 'Public programs, applications, funding information, provider/case-manager surfaces, store, and public support experiences.',
+  },
+  {
+    title: 'LMS & Portals',
+    host: 'app.elevateforhumanity.org',
+    description: 'Learner, apprentice, employer, host-shop, parent, and workforce portal experiences.',
+  },
+  {
+    title: 'Administration',
+    host: 'admin.elevateforhumanity.org',
+    description: 'Administrative operations, testing-center controls, reporting, Studio, system health, and protected staff workflows.',
+  },
+];
+
+const STACK = [
+  ['Application framework', 'Next.js 15 + React 19 + TypeScript'],
+  ['Database & identity', 'Supabase PostgreSQL, Auth, Storage, and Row Level Security'],
+  ['Payments', 'Stripe Checkout, subscriptions, and webhook-backed payment workflows'],
+  ['Deployment', 'Northflank multi-container services for Marketing, LMS, and Admin'],
+  ['Package/runtime', 'pnpm workspace + Node.js 22'],
+  ['Access control', 'Server-side role normalization, protected portal routes, and database RLS'],
+];
+
+export default function ArchitecturePage() {
   return (
-    <div className="bg-white">
-      <Breadcrumbs
-        items={[
-          { label: 'Platform', href: '/platform' },
-          { label: 'Architecture' },
-        ]}
-      />
+    <main className="bg-white text-slate-950">
+      <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+        <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Architecture' }]} />
+      </div>
       <ComplianceBar />
 
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <h1 className="text-4xl font-bold mb-6 text-black">
-          Platform Architecture
-        </h1>
+      <section className="border-y border-slate-200 bg-slate-950 px-4 py-14 text-white sm:px-6">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-red-300">Production architecture</p>
+          <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">Three application surfaces, one workforce operating platform.</h1>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
+            Elevate separates public marketing, learner/partner portals, and protected administration into independently deployable services while sharing the same canonical data and identity infrastructure.
+          </p>
+        </div>
+      </section>
 
-        <p className="text-xl text-black mb-12 leading-relaxed">
-          Built from the ground up as government-aligned workforce
-          infrastructure, not adapted from generic LMS software.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              Core Infrastructure
-            </h2>
-            <ul className="space-y-3 text-black">
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Multi-tenant architecture</strong> - Complete data
-                  isolation per organization
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Row-level security (RLS)</strong> - Database-enforced
-                  access control
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>License enforcement</strong> - Automatic seat and
-                  feature limits
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Stripe subscription billing</strong> - Automated
-                  payment processing
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-brand-green-50 border border-brand-green-200 rounded-xl p-8">
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              Compliance & Reporting
-            </h2>
-            <ul className="space-y-3 text-black">
-              <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold">•</span>
-                <span>
-                  <strong>RAPIDS integration</strong> - DOL apprenticeship
-                  tracking
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold">•</span>
-                <span>
-                  <strong>ETPL reporting</strong> - Automated state compliance
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold">•</span>
-                <span>
-                  <strong>Workforce dashboards</strong> - Real-time outcome
-                  tracking
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold">•</span>
-                <span>
-                  <strong>Audit logs</strong> - Complete activity history
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              Mobile & AI
-            </h2>
-            <ul className="space-y-3 text-black">
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Native mobile app</strong> - iOS and Android (React
-                  Native + Expo)
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Push notifications</strong> - Expo push notification
-                  service
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Offline mode</strong> - Download courses, sync when
-                  online
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>AI tutoring</strong> - 5 AI systems for learner
-                  support
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-brand-blue-600 font-bold">•</span>
-                <span>
-                  <strong>Biometric auth</strong> - Face ID, Touch ID,
-                  Fingerprint
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-8">
-            <h2 className="text-2xl font-bold mb-4 text-black">
-              Engagement & Gamification
-            </h2>
-            <ul className="space-y-3 text-black">
-              <li className="flex items-start gap-3">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span>
-                  <strong>Badge system</strong> - Earned achievements with
-                  progress tracking
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span>
-                  <strong>Leaderboards</strong> - Weekly, monthly, all-time
-                  rankings
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span>
-                  <strong>Points system</strong> - Rewards for activity and
-                  completion
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span>
-                  <strong>Streaks</strong> - Daily engagement tracking
-                </span>
-              </li>
-            </ul>
+      <section className="px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-3xl font-black">Application boundaries</h2>
+          <div className="mt-7 grid gap-5 lg:grid-cols-3">
+            {SERVICE_SURFACES.map((surface) => (
+              <article key={surface.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="text-xl font-black">{surface.title}</h3>
+                <p className="mt-2 font-mono text-xs font-semibold text-brand-blue-700">{surface.host}</p>
+                <p className="mt-4 text-sm leading-6 text-slate-700">{surface.description}</p>
+              </article>
+            ))}
           </div>
         </div>
+      </section>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-black">
-            Partner Integrations
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6 text-black">
-            <div>
-              <h3 className="font-bold text-black mb-2">LMS Partners (6)</h3>
-              <ul className="text-sm space-y-1">
-                <li>• Coursera</li>
-                <li>• Udemy Business</li>
-                <li>• LinkedIn Learning</li>
-                <li>• Milady</li>
-                <li>• Pivot Point</li>
-                <li>• Custom LMS</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-black mb-2">
-                Payment Processing
-              </h3>
-              <ul className="text-sm space-y-1">
-                <li>• Stripe subscriptions</li>
-                <li>• Webhook automation</li>
-                <li>• License enforcement</li>
-                <li>• Invoice generation</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-black mb-2">
-                Government Systems
-              </h3>
-              <ul className="text-sm space-y-1">
-                <li>• RAPIDS (DOL)</li>
-                <li>• ETPL (State)</li>
-                <li>• WIOA tracking</li>
-                <li>• WRG reporting</li>
-              </ul>
-            </div>
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-3xl font-black">Current production stack</h2>
+          <div className="mt-7 grid gap-4 md:grid-cols-2">
+            {STACK.map(([label, value]) => (
+              <div key={label} className="rounded-xl border border-slate-200 bg-white p-5">
+                <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{label}</p>
+                <p className="mt-2 font-semibold text-slate-900">{value}</p>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
 
-        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
-          <h2 className="text-2xl font-bold mb-4 text-black">
-            Technical Stack
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6 text-black">
-            <div>
-              <h3 className="font-bold text-black mb-3">Frontend</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Next.js 16 (Turbopack)</li>
-                <li>• React 19</li>
-                <li>• TypeScript</li>
-                <li>• Tailwind CSS</li>
-                <li>• Shadcn/ui components</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-black mb-3">Backend</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Supabase (PostgreSQL)</li>
-                <li>• Row-level security (RLS)</li>
-                <li>• Edge Functions</li>
-                <li>• Real-time subscriptions</li>
-                <li>• Netlify hosting</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-black mb-3">Mobile</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• React Native</li>
-                <li>• Expo SDK 50</li>
-                <li>• TypeScript</li>
-                <li>• Expo Router</li>
-                <li>• Expo Push Notifications</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold text-black mb-3">Infrastructure</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Multi-tenant database</li>
-                <li>• Automated backups</li>
-                <li>• SSL/TLS encryption</li>
-                <li>• CDN delivery</li>
-                <li>• 99.9% uptime SLA</li>
-              </ul>
-            </div>
-          </div>
+      <section className="px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-7">
+          <h2 className="text-2xl font-black">Data and security model</h2>
+          <p className="mt-4 leading-7 text-slate-700">
+            Authentication is resolved server-side before protected portal operations. Tenant- and user-scoped records are additionally constrained with Supabase Row Level Security. Privileged administrative operations use explicit server guards and service-role access only after authorization checks.
+          </p>
+          <p className="mt-4 leading-7 text-slate-700">
+            Public program, application, apprenticeship, testing, payment, and portal routes are maintained as separate contracts so public pages do not become accidental back doors into LMS or Admin functionality.
+          </p>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

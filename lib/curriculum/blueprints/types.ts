@@ -1,35 +1,4 @@
-/**
- * lib/curriculum/blueprints/types.ts
- *
- * Single canonical type for the credential blueprint system.
- *
- * Every blueprint — HVAC, PRS, and any future program — uses this type.
- * Slugs are the durable identity. Titles are display text only.
- * The generator, builder, validator, and auditor all read from this type.
- *
- * Design notes:
- *   - `modules[].slug` is the identity key used by the generator (ModuleDef.slug).
- *   - `modules[].lessons` is the flat lesson list used by buildCourseFromBlueprint.
- *   - `modules[].competencies` and `requiredLessonTypes` are used by the auditor.
- *   - `assessmentRules` drives quiz/exam configuration per module and final.
- *   - `expectedModuleCount` / `expectedLessonCount` are validated at module load
- *     time by the hard-guard pattern in each blueprint file.
- */
-
-// ─── Lesson reference (flat list consumed by buildCourseFromBlueprint) ────────
-//
-// Production contract: a lesson ref MUST carry the full instructional payload
-// required for its step_type before the seeder will insert a DB row.
-//
-// Required by step_type:
-//   lesson      — content (HTML) + objective
-//   checkpoint  — content (HTML) + objective + quizQuestions (≥5) + passingScore
-//   quiz/exam   — quizQuestions (≥5) + passingScore
-//   lab         — content (HTML) + objective
-//   assignment  — content (HTML) + objective
-//
-// If any required field is absent, the seeder logs the exact missing fields
-// and skips the lesson entirely. No draft shell is created.
+/** Canonical credential-blueprint types shared by generator, auditor, and seeded curricula. */
 
 export type BlueprintQuizQuestion = {
   id: string;
@@ -39,179 +8,103 @@ export type BlueprintQuizQuestion = {
   explanation?: string;
 };
 
-export type BlueprintLessonRef = {
-  /** Stable slug — identity key, never change after seeding */
-  slug: string;
-  title: string;
-  /** 1-based position within the module */
-  order: number;
-  /** credential_exam_domains.domain_key this lesson covers */
-  domainKey: string;
-  competencyKeys?: string[];
-
-  // ── Production content payload ──────────────────────────────────────
-  // Required fields vary by step_type (inferred from slug suffix).
-  // The seeder validates these before inserting. Missing = no row created.
-
-  /** What the learner will be able to do after this lesson */
-  objective?: string;
-
-  /**
-   * Full lesson body as sanitized HTML.
-   * Required for: lesson, checkpoint, lab, assignment.
-   * Must be > 200 characters of visible text after stripping tags.
-   */
-  content?: string;
-
-  /**
-   * Quiz/checkpoint questions.
-   * Required for: checkpoint, quiz, exam.
-   * Minimum 5 questions per lesson.
-   */
-  quizQuestions?: BlueprintQuizQuestion[];
-
-  /**
-   * Minimum passing score (0–100).
-   * Required for: checkpoint, quiz, exam.
-   */
-  passingScore?: number;
-
-  /** Duration hint in minutes — used for display only, not validated */
-  durationMinutes?: number;
-
-  /**
-   * Path to a demo video file in /public/videos/.
-   * Used for real demo videos (not avatar/AI generated).
-   * Stored as video_url on the course_lessons row.
-   */
-  videoFile?: string;
-
-  /**
-   * Certiport or external exam code.
-   * Required for exam lessons that use an external proctoring system.
-   */
-  partnerExamCode?: string;
-
-  /**
-   * Instructor-facing notes for practical evaluation.
-   * Not shown to learners. Used by instructor sign-off UI.
-   */
-  instructorNotes?: string[];
-
-  /**
-   * Observable competency checks for practical sign-off.
-   * Each string is a discrete behavior the instructor verifies.
-   * Required for lab and skill lessons.
-   */
-  competencyChecks?: string[];
+export type BlueprintCompetencyCheck = {
+  key: string;
+  label: string;
+  description?: string;
+  isCritical?: boolean;
+  requiresInstructorSignoff?: boolean;
 };
 
-// ─── Competency requirement (consumed by auditor) ─────────────────────────────
+export type BlueprintLessonRef = {
+  slug: string;
+  title: string;
+  order: number;
+  domainKey: string;
+  competencyKeys?: string[];
+  objective?: string;
+  /** Newer barber curricula carry a list in addition to the canonical objective. */
+  learningObjectives?: string[];
+  content?: string;
+  quizQuestions?: BlueprintQuizQuestion[];
+  passingScore?: number;
+  durationMinutes?: number;
+  videoFile?: string;
+  partnerExamCode?: string;
+  /** Accept both legacy single-note payloads and the canonical list. */
+  instructorNotes?: string | string[];
+  /** Practical curricula may use either labels or structured sign-off checks. */
+  competencyChecks?: Array<string | BlueprintCompetencyCheck>;
+};
 
 export type BlueprintCompetency = {
   competencyKey: string;
   isCritical: boolean;
-  /** Minimum number of lessons in this module that must cover this competency */
   minimumTouchpoints: number;
-  /** How this competency is assessed */
   assessmentMethod?: 'quiz' | 'lab' | 'exam' | 'observation' | 'assignment';
-  /** Domain key for state board / credential alignment */
   domainKey?: string;
-  /** When true, competency cannot be marked achieved by quiz alone */
   requiresInstructorSignoff?: boolean;
 };
-
-// ─── Lesson type requirement (consumed by auditor) ────────────────────────────
 
 export type BlueprintLessonTypeRule = {
   lessonType: string;
   requiredCount: number;
 };
 
-// ─── Module definition ────────────────────────────────────────────────────────
-
 export type BlueprintModule = {
-  /**
-   * Stable machine key — used as ModuleDef.slug by the generator.
-   * Also used as the identity key by the auditor.
-   * Never change after modules are seeded.
-   */
   slug: string;
   title: string;
-  /** 1-based position within the program */
   orderIndex: number;
-
-  // ── Lesson bounds (enforced by auditor) ──
   minLessons: number;
   maxLessons: number;
-
-  // ── Lesson type requirements (enforced by auditor) ──
   quizRequired: boolean;
   practicalRequired: boolean;
   isCritical: boolean;
   requiredLessonTypes: BlueprintLessonTypeRule[];
-
-  // ── Competency coverage requirements (enforced by auditor) ──
   competencies: BlueprintCompetency[];
-
-  /**
-   * Suggested lesson titles for the AI generator.
-   * Not enforced — generator may deviate within bounds.
-   */
   suggestedLessonSkeleton?: string[];
-
-  /**
-   * Flat lesson list consumed by buildCourseFromBlueprint.
-   * Required for blueprints that pre-define exact lesson slugs (e.g. PRS Indiana).
-   * Optional for generation-rules-only blueprints.
-   */
   lessons?: BlueprintLessonRef[];
-
-  /**
-   * credential_exam_domains.domain_key for this module.
-   * Used by buildCourseFromBlueprint when lessons[] is present.
-   */
   domainKey?: string;
+  /** Optional interaction metadata used by interactive lesson blueprints. */
+  interactionSpecs?: unknown[];
 };
-
-// ─── Assessment rules (consumed by auditor and quiz generator) ────────────────
 
 export type BlueprintAssessmentRule = {
   assessmentType: 'module' | 'type_specific' | 'universal_review' | 'final';
-  /** Module slug this rule applies to, or 'all' for program-wide rules */
   scope: string;
   minQuestions: number;
   maxQuestions: number;
-  /** 0–1 decimal, e.g. 0.70 = 70% */
   passingThreshold: number;
-  /**
-   * Minimum fraction each domain must contribute to this assessment.
-   * Keys are competencyKey or domain_key strings.
-   */
   distributionConstraints?: Record<string, number>;
 };
 
-// ─── Generation rules ─────────────────────────────────────────────────────────
-
+/**
+ * Generation policy supports both the canonical generator controls and the
+ * earlier bounds-based curriculum format. They describe the same build intent
+ * and are normalized by the generator at runtime.
+ */
 export type BlueprintGenerationRules = {
-  allowRemediation: boolean;
-  allowExpansionLessons: boolean;
-  maxTotalLessons: number;
-  requiresFinalExam: boolean;
-  requiresUniversalReview: boolean;
-  generatorMode: 'fixed' | 'flexible';
+  allowRemediation?: boolean;
+  allowExpansionLessons?: boolean;
+  maxTotalLessons?: number;
+  requiresFinalExam?: boolean;
+  requiresUniversalReview?: boolean;
+  generatorMode?: 'fixed' | 'flexible';
+  minModules?: number;
+  maxModules?: number;
+  minLessonsPerModule?: number;
+  maxLessonsPerModule?: number;
+  requireCheckpointPerModule?: boolean;
+  requireFinalExam?: boolean;
+  passingScore?: number;
+  allowedLessonTypes?: string[];
 };
-
-// ─── Final exam config ────────────────────────────────────────────────────────
 
 export type BlueprintFinalExamConfig = {
   questionCount: number;
   passingScore: number;
-  /** Domain key → percentage of questions from that domain (must sum to 100) */
   domainDistribution?: Record<string, number>;
 };
-
-// ─── Certificate requirements ─────────────────────────────────────────────────
 
 export type BlueprintCertificateRequirements = {
   includeHours: boolean;
@@ -219,181 +112,56 @@ export type BlueprintCertificateRequirements = {
   includeInstructorVerification: boolean;
 };
 
-// ─── Video config (locked into blueprint — drives automatic generation) ───────
-
 export type BlueprintVideoConfig = {
-  /**
-   * Video generation backend.
-   *
-   * Policy: ALL new programs must use 'runway'. The course generator
-   * (seed-course-from-blueprint) reads this field and calls lib/video/runway.ts.
-   * 'canvas-slides' is legacy-only (HVAC) and must not be used for new programs.
-   *
-   *   'runway'       — Runway Gen4.5 text-to-video + OpenAI TTS narration (default for new)
-   *   'canvas-slides'— Canvas-rendered slide deck + TTS (HVAC legacy only)
-   *   'manual'       — Pre-existing MP4s in public/videos/, no generation
-   */
   videoGenerator: 'runway' | 'canvas-slides' | 'manual';
-
-  /**
-   * Layout template to use for all lesson videos in this program.
-   * 'elevate-slide' = dark navy + orange top bar + DALL-E image bottom-left
-   *                   + bullet points + instructor name. Matches HVAC template.
-   */
   template: 'elevate-slide' | 'talking-head' | 'screencast' | 'custom';
-
-  /** Avatar/instructor identity */
   instructorName: string;
   instructorTitle: string;
-  /** Path relative to /public */
   instructorImagePath: string;
-
-  /** Brand colors */
-  topBarColor: string; // e.g. '#f97316'
-  accentColor: string; // e.g. '#3b82f6'
-  backgroundColor: string; // e.g. '#0f172a'
-
-  /** Voice for TTS narration */
+  topBarColor: string;
+  accentColor: string;
+  backgroundColor: string;
   ttsVoice: 'onyx' | 'alloy' | 'echo' | 'fable' | 'nova' | 'shimmer';
-  ttsSpeed: number; // 0.25–4.0, default 0.85
-
-  /** Number of slides per lesson video */
+  ttsSpeed: number;
   slideCount: 5;
-
-  /** Slide segment labels in order */
   segments: ['intro', 'concept', 'visual', 'application', 'wrapup'];
-
-  /** Generate a DALL-E image per lesson for the bottom-left thumbnail */
   generateDalleImage: boolean;
   dalleImageStyle: 'natural' | 'vivid';
-
-  /** Output resolution */
-  width: 1920;
-  height: 1080;
+  /** Resolution was added after the earliest blueprints; generator supplies defaults. */
+  width?: 1920;
+  height?: 1080;
 };
 
-// ─── Canonical blueprint ──────────────────────────────────────────────────────
-
 export type CredentialBlueprint = {
-  /**
-   * Stable machine ID — used by getBlueprintById().
-   * Format: '{program}-{state}-v{n}', e.g. 'prs-indiana', 'hvac-epa608-v1'
-   */
   id: string;
   version: string;
-
-  /** credential_exam_domains parent credential slug */
   credentialSlug: string;
   credentialTitle: string;
-
-  /** Two-letter state code, or 'federal' for federal credentials */
   state: string;
-
-  /** programs.slug — links blueprint to the DB program row */
   programSlug: string;
-
-  /** Short credential code for display, e.g. 'EPA-608', 'IN-PRS' */
   credentialCode: string;
-
-  /**
-   * Certiport exam codes this program prepares learners for.
-   * Keys must match entries in CERTIPORT_EXAMS in lib/partners/certiport.ts.
-   * Used by the course builder AI to inject exam-aligned context and by the
-   * proctor portal to pre-populate exam selection.
-   * Omit for programs with no Certiport-delivered exam.
-   */
   certiportExamCodes?: string[];
-
-  /**
-   * External industry courses included in this program's pathway.
-   * These are seeded into program_external_courses by seed-fast-external-courses.ts.
-   * The learner dashboard shows them as "Industry Partner Courses" with
-   * Elevate support fee checkout and manual certificate upload.
-   *
-   * title    — must match the title in fast-launch.json exactly (used for dedup)
-   * provider — display name of the external provider
-   * url      — direct link to the external course
-   * required — whether completion is required for program completion
-   */
   externalCourses?: Array<{
     title: string;
     provider: string;
     url: string;
     required: boolean;
   }>;
-
-  /** O*NET Standard Occupational Classification code — used for industry standards injection */
   socCode?: string;
-
-  /** Exam track variants this program supports */
   trackVariants: string[];
-
   status: 'active' | 'draft' | 'archived';
-
-  // ── Credential alignment ──────────────────────────────────────────────────
-  /** Credential body this program aligns to */
   credentialTarget?: 'IC&RC' | 'NAADAC' | 'STATE_BOARD' | 'DOL_APPRENTICESHIP' | 'INTERNAL';
-
-  /** Minimum total instructional hours — compiler hard-fails if not met */
   minimumHours?: number;
-
-  /** When true, compiler enforces a final exam lesson at the end */
   requiresFinalExam?: boolean;
-
-  /** Final exam configuration — required when requiresFinalExam is true */
   finalExam?: BlueprintFinalExamConfig;
-
-  /** What evidence must be present before a certificate can be issued */
   certificateRequirements?: BlueprintCertificateRequirements;
-
   generationRules: BlueprintGenerationRules;
-
-  /**
-   * When true, the seeder skips LQS validation for this blueprint.
-   * Use for non-cosmetology programs where the barber-specific LQS rules
-   * (sanitation, hair type, visual cues) do not apply.
-   */
   skipLqs?: boolean;
-
-  /**
-   * Hard counts validated at module load time by each blueprint file.
-   * expectedLessonCount counts only lessons[] entries, not generated lessons.
-   * Set to 0 for generation-rules-only blueprints that do not pre-define lessons.
-   */
   expectedModuleCount: number;
   expectedLessonCount: number;
-
   modules: BlueprintModule[];
-
   assessmentRules?: BlueprintAssessmentRule[];
-
-  /**
-   * Locked video format for this program.
-   * The course generator reads this and stores it on course_lessons.
-   * The video generation service reads it to produce consistent videos
-   * without manual configuration per lesson.
-   */
   videoConfig?: BlueprintVideoConfig;
-
-  /**
-   * Certification pathway written to program_certification_pathways by the seeder.
-   *
-   * Required for the auto_create_exam_authorization trigger to fire when a learner
-   * completes all checkpoints. Without a pathway row, the trigger silently skips
-   * authorization creation.
-   *
-   * certificationBodyId — certification_bodies.id (UUID). Use an existing row or
-   *   insert a new one in a migration first.
-   * credentialName      — human-readable name, e.g. 'EPA 608 Universal Certification'
-   * credentialAbbrev    — short code, e.g. 'EPA 608'
-   * examFeeCents        — fee in cents charged to student (0 = covered by program)
-   * feePayer            — 'student' | 'elevate' | 'grant'
-   * eligibilityReview   — true if staff must manually approve before exam scheduling
-   * isPrimary           — true for the main credential (only one per program)
-   *
-   * Omit this field only for internal/non-credentialed programs where no exam
-   * authorization is needed.
-   */
   certificationPathway?: {
     certificationBodyId: string;
     credentialName: string;
@@ -403,29 +171,8 @@ export type CredentialBlueprint = {
     eligibilityReview?: boolean;
     isPrimary?: boolean;
   };
-
-  /**
-   * Where the seeder reads lesson content (script_text), quiz_questions,
-   * passing_score, and step_type from.
-   *
-   * 'blueprint'           — content is embedded in lessons[].content /
-   *                         quizQuestions / passingScore (default for new programs).
-   *                         The production-content gate enforces all required fields.
-   *
-   * 'curriculum_lessons'  — content lives in the curriculum_lessons table, keyed
-   *                         by lesson_slug = lessons[].slug. The seeder fetches it
-   *                         at seed time and writes it into course_lessons.
-   *                         The production-content gate is bypassed for these rows
-   *                         because content is authoritative in the DB, not the file.
-   *                         step_type is also read from curriculum_lessons.step_type
-   *                         rather than inferred from the slug suffix.
-   *
-   * Defaults to 'blueprint' when omitted.
-   */
   contentSource?: 'blueprint' | 'curriculum_lessons';
 };
-
-// ─── Audit result types (consumed by auditor.ts) ──────────────────────────────
 
 export type BlueprintAuditViolation = {
   severity: 'error' | 'warning';

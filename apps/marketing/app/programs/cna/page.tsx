@@ -10,19 +10,16 @@ export default async function CnaPage() {
   if (!loaded) { return notFound(); }
   const p = loaded.program;
   const banner = heroBanners["cna"] ?? null;
-
-  return (
-    <ProgramDetailPage program={p} banner={banner} />
-  );
+  return <ProgramDetailPage program={p} banner={banner} />;
 }
 
 export async function generateMetadata() {
   const loaded = await loadProgramForPage("cna");
-  if (!loaded) { return { title: "Cna" }; }
+  if (!loaded) return { title: "CNA" };
   const p = loaded.program;
   return {
-    title: p.seoTitle ?? p.title ?? "Cna",
-    description: p.seoDescription ?? p.subtitle ?? "",
+    title: p.metaTitle ?? p.title ?? "CNA",
+    description: p.metaDescription ?? p.subtitle ?? "",
     alternates: { canonical: "https://www.elevateforhumanity.org/programs/cna" },
   };
 }

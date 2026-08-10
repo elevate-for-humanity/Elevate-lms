@@ -9,19 +9,6 @@ import type {
 
 /**
  * Azure OpenAI provider — standard GPT models + reasoning models (o1/o3/o4).
- *
- * Standard models (gpt-4o, gpt-4.1, etc.):
- *   AZURE_OPENAI_ENDPOINT      — https://your-resource.openai.azure.com
- *   AZURE_OPENAI_API_KEY
- *   AZURE_OPENAI_DEPLOYMENT    — deployment name (default: gpt-4o)
- *   AZURE_OPENAI_API_VERSION   — e.g. 2025-01-01-preview
- *
- * Reasoning models (o1, o3-mini, o4-mini):
- *   AZURE_REASONING_DEPLOYMENT — deployment name (default: o3-mini)
- *   AZURE_REASONING_EFFORT     — low | medium | high (default: medium)
- *
- * Image generation (DALL-E 3):
- *   AZURE_DALLE_DEPLOYMENT     — deployment name (default: dall-e-3)
  */
 
 const REASONING_PREFIXES = ['o1', 'o3', 'o4'];
@@ -52,7 +39,6 @@ export class AzureProvider implements AIProvider, AIImageProvider {
     const model = options.model || this.deployment;
     const reasoning = isReasoningModel(model);
 
-    // Reasoning models don't support system role — merge into first user message
     let messages = options.messages;
     if (reasoning) {
       const sysMsg = messages.find((m) => m.role === 'system');
@@ -69,7 +55,6 @@ export class AzureProvider implements AIProvider, AIImageProvider {
     const body: Record<string, unknown> = { messages };
 
     if (reasoning) {
-      // Reasoning models: no temperature/top_p, uses max_completion_tokens + reasoning_effort
       body.max_completion_tokens = options.maxTokens || 16384;
       body.reasoning_effort = this.reasoningEffort;
     } else {
@@ -93,7 +78,6 @@ export class AzureProvider implements AIProvider, AIImageProvider {
 
     return {
       content: choice.message.content || '',
-      provider: 'azure',
       model: data.model || model,
       usage: data.usage ? {
         promptTokens: data.usage.prompt_tokens,
@@ -103,7 +87,6 @@ export class AzureProvider implements AIProvider, AIImageProvider {
     };
   }
 
-  /** Chat using the configured reasoning model (o3-mini by default). */
   async reason(options: Omit<ChatCompletionOptions, 'model'>): Promise<ChatCompletionResult> {
     return this.chat({ ...options, model: this.reasoningDeployment });
   }

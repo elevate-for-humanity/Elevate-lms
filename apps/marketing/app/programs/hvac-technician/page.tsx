@@ -7,22 +7,19 @@ export const revalidate = 3600;
 
 export default async function HvacTechnicianPage() {
   const loaded = await loadProgramForPage("hvac-technician");
-  if (!loaded) { return notFound(); }
+  if (!loaded) return notFound();
   const p = loaded.program;
   const banner = heroBanners["hvac-technician"] ?? null;
-
-  return (
-    <ProgramDetailPage program={p} banner={banner} />
-  );
+  return <ProgramDetailPage program={p} banner={banner} />;
 }
 
 export async function generateMetadata() {
   const loaded = await loadProgramForPage("hvac-technician");
-  if (!loaded) { return { title: "Hvac Technician" }; }
+  if (!loaded) return { title: "HVAC Technician" };
   const p = loaded.program;
   return {
-    title: p.seoTitle ?? p.title ?? "Hvac Technician",
-    description: p.seoDescription ?? p.subtitle ?? "",
+    title: p.metaTitle ?? p.title ?? "HVAC Technician",
+    description: p.metaDescription ?? p.subtitle ?? "",
     alternates: { canonical: "https://www.elevateforhumanity.org/programs/hvac-technician" },
   };
 }

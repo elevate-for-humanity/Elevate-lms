@@ -5,6 +5,10 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 
 const ACCESS_STATUSES = new Set<Stripe.Subscription.Status>(['active', 'trialing']);
 
+type StripeSubscriptionWithPeriods = Stripe.Subscription & {
+  current_period_end?: number;
+};
+
 export async function syncPaidAppSubscription(subscription: any) {
   if (!subscription || subscription.status !== 'active' || !subscription.stripe_subscription_id) {
     return subscription;
@@ -18,7 +22,10 @@ export async function syncPaidAppSubscription(subscription: any) {
     const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripe_subscription_id);
     const hasAccess = ACCESS_STATUSES.has(stripeSubscription.status);
     const nextStatus = hasAccess ? 'active' : stripeSubscription.status === 'past_due' ? 'past_due' : 'inactive';
-    const currentPeriodEnd = new Date(stripeSubscription.current_period_end * 1000).toISOString();
+    const periodEndSeconds = (stripeSubscription as StripeSubscriptionWithPeriods).current_period_end;
+    const currentPeriodEnd = periodEndSeconds
+      ? new Date(periodEndSeconds * 1000).toISOString()
+      : null;
     const customerId = typeof stripeSubscription.customer === 'string' ? stripeSubscription.customer : stripeSubscription.customer.id;
 
     const admin = await requireAdminClient();
@@ -41,7 +48,6 @@ export async function syncPaidAppSubscription(subscription: any) {
       current_period_end: currentPeriodEnd,
     };
   } catch {
-    // Fail closed when a paid Stripe subscription can no longer be verified.
     const admin = await requireAdminClient();
     if (admin) {
       await admin

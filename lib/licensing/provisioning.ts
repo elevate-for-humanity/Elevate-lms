@@ -1,14 +1,7 @@
-/**
- * Enterprise License Provisioning
- * Transactional provisioning with rollback support
- * No partial states - all or nothing
- */
-
+import * as crypto from 'node:crypto';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { generateLicenseKey } from '@/lib/store/license';
-import * as crypto from 'node:crypto';
-
 import { logAuditEvent } from '@/lib/audit';
 import { setAuditContext } from '@/lib/audit-context';
 
@@ -25,6 +18,8 @@ type ProvisioningStep =
   | 'failed'
   | 'rolled_back';
 
+type AdminUserRecord = { id: string; email?: string | null };
+
 interface ProvisioningContext {
   correlationId: string;
   email: string;
@@ -37,7 +32,7 @@ interface ProvisioningContext {
   metadata?: Record<string, any>;
 }
 
-interface ProvisioningResult {
+export interface ProvisioningResult {
   success: boolean;
   tenantId?: string;
   licenseId?: string;
@@ -54,9 +49,9 @@ async function logProvisioningEvent(
   paymentIntentId?: string,
   error?: string,
   metadata?: Record<string, any>,
-): Promise<void> {
+) {
   const supabase = await requireAdminClient();
-  await supabase.from('provisioning_events').insert({
+  const { error: insertError } = await supabase.from('provisioning_events').insert({
     correlation_id: correlationId,
     step,
     status,
@@ -66,77 +61,56 @@ async function logProvisioningEvent(
     metadata: metadata || null,
     environment: ENVIRONMENT,
   });
+  if (insertError) logger.warn('Provisioning event write failed', { step, error: insertError.message });
 }
 
-function generateTemporaryPassword(): string {
+function temporaryPassword() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';
-  let password = '';
-  const randomBytes = crypto.randomBytes(16);
-  for (let i = 0; i < 16; i++) {
-    password += chars[randomBytes[i] % chars.length];
-  }
-  return password;
+  const bytes = crypto.randomBytes(18);
+  return Array.from(bytes, (byte) => chars[byte % chars.length]).join('');
 }
 
-function generateSlug(name: string): string {
-  return (
-    name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')
-      .substring(0, 50) +
-    '-' +
-    crypto.randomBytes(4).toString('hex')
-  );
+function tenantSlug(name: string) {
+  const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);
+  return `${base || 'organization'}-${crypto.randomBytes(4).toString('hex')}`;
+}
+
+async function findUserByEmail(supabase: Awaited<ReturnType<typeof requireAdminClient>>, email: string): Promise<AdminUserRecord | null> {
+  const normalized = email.trim().toLowerCase();
+  for (let page = 1; page <= 10; page += 1) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
+    if (error) throw error;
+    const users = (data?.users ?? []) as AdminUserRecord[];
+    const match = users.find((user) => user.email?.toLowerCase() === normalized);
+    if (match) return match;
+    if (users.length < 100) break;
+  }
+  return null;
 }
 
 export async function provisionLicense(ctx: ProvisioningContext): Promise<ProvisioningResult> {
   const supabase = await requireAdminClient();
-  const {
-    correlationId,
-    email,
-    productId,
-    paymentIntentId,
-    sessionId,
-    amountCents,
-    currency,
-    organizationName,
-  } = ctx;
-
-  // Set audit context so DB triggers attribute writes to this automation
-  await setAuditContext(supabase, {
-    systemActor: 'license_provisioning',
-    requestId: correlationId,
-  });
-
+  const { correlationId, email, productId, paymentIntentId, sessionId, amountCents, currency } = ctx;
+  const orgName = ctx.organizationName || `${email.split('@')[0]} Organization`;
   let purchaseId: string | undefined;
   let tenantId: string | undefined;
   let licenseId: string | undefined;
   let adminUserId: string | undefined;
 
-  try {
-    await logProvisioningEvent(
-      correlationId,
-      'payment_received',
-      'completed',
-      undefined,
-      paymentIntentId,
-      undefined,
-      {
-        email,
-        product_id: productId,
-        amount_cents: amountCents,
-      },
-    );
+  await setAuditContext(supabase, { systemActor: 'license_provisioning', requestId: correlationId });
 
-    await logProvisioningEvent(correlationId, 'purchase_created', 'started');
-    const orgName = organizationName || email.split('@')[0] + ' Organization';
+  try {
+    await logProvisioningEvent(correlationId, 'payment_received', 'completed', undefined, paymentIntentId, undefined, {
+      email,
+      product_id: productId,
+      amount_cents: amountCents,
+    });
 
     const { data: purchase, error: purchaseError } = await supabase
       .from('license_purchases')
       .insert({
         organization_name: orgName,
-        contact_name: orgName + ' Admin',
+        contact_name: `${orgName} Admin`,
         contact_email: email,
         license_type: 'enterprise',
         product_slug: productId,
@@ -147,27 +121,16 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
         currency,
       })
       .select('id')
-      .maybeSingle();
-
-    if (purchaseError || !purchase)
-      throw new Error(`Failed to create purchase: ${purchaseError?.message}`);
+      .single();
+    if (purchaseError) throw purchaseError;
     purchaseId = purchase.id;
-    await logProvisioningEvent(
-      correlationId,
-      'purchase_created',
-      'completed',
-      undefined,
-      paymentIntentId,
-    );
-
-    await logProvisioningEvent(correlationId, 'tenant_created', 'started');
-    const slug = generateSlug(orgName);
+    await logProvisioningEvent(correlationId, 'purchase_created', 'completed', undefined, paymentIntentId);
 
     const { data: tenant, error: tenantError } = await supabase
       .from('tenants')
       .insert({
         name: orgName,
-        slug,
+        slug: tenantSlug(orgName),
         license_status: 'active',
         stripe_customer_id: ctx.metadata?.stripe_customer_id,
         stripe_subscription_id: ctx.metadata?.stripe_subscription_id,
@@ -180,23 +143,13 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
         },
       })
       .select('id')
-      .maybeSingle();
-
-    if (tenantError || !tenant) throw new Error(`Failed to create tenant: ${tenantError?.message}`);
+      .single();
+    if (tenantError) throw tenantError;
     tenantId = tenant.id;
-    await logProvisioningEvent(
-      correlationId,
-      'tenant_created',
-      'completed',
-      tenantId,
-      paymentIntentId,
-    );
-
     await supabase.from('license_purchases').update({ tenant_id: tenantId }).eq('id', purchaseId);
+    await logProvisioningEvent(correlationId, 'tenant_created', 'completed', tenantId, paymentIntentId);
 
-    await logProvisioningEvent(correlationId, 'license_created', 'started', tenantId);
     const licenseKey = generateLicenseKey();
-
     const { data: license, error: licenseError } = await supabase
       .from('licenses')
       .insert({
@@ -211,75 +164,49 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
         metadata: { product_id: productId, correlation_id: correlationId },
       })
       .select('id')
-      .maybeSingle();
-
-    if (licenseError || !license)
-      throw new Error(`Failed to create license: ${licenseError?.message}`);
+      .single();
+    if (licenseError) throw licenseError;
     licenseId = license.id;
     await supabase.from('license_purchases').update({ license_id: licenseId }).eq('id', purchaseId);
-    await logProvisioningEvent(
-      correlationId,
-      'license_created',
-      'completed',
-      tenantId,
-      paymentIntentId,
-    );
+    await logProvisioningEvent(correlationId, 'license_created', 'completed', tenantId, paymentIntentId);
 
-    await logProvisioningEvent(correlationId, 'admin_created', 'started', tenantId);
-    const { data: existingUser } = await supabase.auth.admin.getUserByEmail(email);
-    let temporaryPassword: string | undefined;
-
-    if (existingUser?.user) {
-      adminUserId = existingUser.user.id;
-      await supabase
-        .from('profiles')
-        .update({ tenant_id: tenantId, role: 'admin' })
-        .eq('id', adminUserId);
+    const existingUser = await findUserByEmail(supabase, email);
+    let generatedPassword: string | undefined;
+    if (existingUser) {
+      adminUserId = existingUser.id;
+      await supabase.from('profiles').upsert({ id: adminUserId, email, tenant_id: tenantId, role: 'admin' }, { onConflict: 'id' });
     } else {
-      temporaryPassword = generateTemporaryPassword();
-      const { data: newUser, error: userError } = await supabase.auth.admin.createUser({
+      generatedPassword = temporaryPassword();
+      const { data: created, error: createError } = await supabase.auth.admin.createUser({
         email,
-        password: temporaryPassword,
+        password: generatedPassword,
         email_confirm: true,
         user_metadata: { tenant_id: tenantId, role: 'admin' },
       });
-      if (userError || !newUser.user)
-        throw new Error(`Failed to create admin user: ${userError?.message}`);
-      adminUserId = newUser.user.id;
-      await supabase
-        .from('profiles')
-        .insert({
-          id: adminUserId,
-          email: email,
-          tenant_id: tenantId,
-          role: 'admin',
-          full_name: orgName + ' Admin',
-        });
+      if (createError || !created.user) throw createError || new Error('Admin user creation failed.');
+      adminUserId = created.user.id;
+      await supabase.from('profiles').upsert({
+        id: adminUserId,
+        email,
+        tenant_id: tenantId,
+        role: 'admin',
+        full_name: `${orgName} Admin`,
+      }, { onConflict: 'id' });
     }
-    await logProvisioningEvent(
-      correlationId,
-      'admin_created',
-      'completed',
-      tenantId,
-      paymentIntentId,
-      undefined,
-      { admin_user_id: adminUserId, new_user: !!temporaryPassword },
-    );
+    await logProvisioningEvent(correlationId, 'admin_created', 'completed', tenantId, paymentIntentId, undefined, {
+      admin_user_id: adminUserId,
+      new_user: Boolean(generatedPassword),
+    });
 
-    await logProvisioningEvent(correlationId, 'email_sent', 'started', tenantId);
     try {
       const { data: magicLink } = await supabase.auth.admin.generateLink({
         type: 'magiclink',
         email,
         options: { redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback?redirect=${encodeURIComponent('/admin')}` },
       });
-
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.CRON_SECRET ?? '',
-        },
+        headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.CRON_SECRET ?? '' },
         body: JSON.stringify({
           to: email,
           subject: 'Your Elevate Platform License is Ready',
@@ -288,187 +215,83 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
             organizationName: orgName,
             email,
             licenseKey,
-            loginUrl:
-              magicLink?.properties?.action_link || `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
+            loginUrl: magicLink?.properties?.action_link || `${process.env.NEXT_PUBLIC_SITE_URL}/login`,
             adminUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/admin`,
-            temporaryPassword,
+            temporaryPassword: generatedPassword,
             supportEmail: 'info@elevateforhumanity.org',
           },
         }),
       });
-      await logProvisioningEvent(
-        correlationId,
-        'email_sent',
-        'completed',
-        tenantId,
-        paymentIntentId,
-      );
+      await logProvisioningEvent(correlationId, 'email_sent', 'completed', tenantId, paymentIntentId);
     } catch (emailError) {
       logger.error('Failed to send provisioning email', emailError as Error);
-      await logProvisioningEvent(
-        correlationId,
-        'email_sent',
-        'failed',
-        tenantId,
-        paymentIntentId,
-        emailError instanceof Error ? emailError.message : 'Email failed',
-      );
+      await logProvisioningEvent(correlationId, 'email_sent', 'failed', tenantId, paymentIntentId, emailError instanceof Error ? emailError.message : 'Email failed');
     }
 
-    await logProvisioningEvent(
-      correlationId,
-      'completed',
-      'completed',
-      tenantId,
-      paymentIntentId,
-      undefined,
-      { license_id: licenseId, admin_user_id: adminUserId },
-    );
-    logger.info('License provisioning completed', {
-      correlationId,
-      tenantId,
-      licenseId,
-      adminUserId,
-    });
-
-    // L1 audit: record successful provisioning
     await logAuditEvent({
       action: 'LICENSE_PROVISIONED',
       actor_id: adminUserId || 'system:license_provisioning',
-      target_type: 'license',
-      target_id: licenseId,
-      metadata: {
-        correlation_id: correlationId,
-        tenant_id: tenantId,
-        product_id: productId,
-        payment_intent_id: paymentIntentId,
-        email,
-        amount_cents: amountCents,
-      },
+      resourceType: 'license',
+      resourceId: licenseId,
+      metadata: { correlation_id: correlationId, tenant_id: tenantId, product_id: productId, payment_intent_id: paymentIntentId, amount_cents: amountCents },
     });
-
+    await logProvisioningEvent(correlationId, 'completed', 'completed', tenantId, paymentIntentId);
     return { success: true, tenantId, licenseId, licenseKey, adminUserId };
   } catch (error) {
-    const errorMessage = 'Operation failed';
+    const message = error instanceof Error ? error.message : 'Provisioning failed.';
     logger.error('License provisioning failed', error as Error);
-    await logProvisioningEvent(
-      correlationId,
-      'failed',
-      'failed',
-      tenantId,
-      paymentIntentId,
-      errorMessage,
-    );
-
-    // L1 audit: record failed provisioning
+    await logProvisioningEvent(correlationId, 'failed', 'failed', tenantId, paymentIntentId, message);
     await logAuditEvent({
       action: 'LICENSE_PROVISIONING_FAILED',
       actor_id: 'system:license_provisioning',
-      target_type: 'license',
-      target_id: correlationId,
-      metadata: {
-        correlation_id: correlationId,
-        tenant_id: tenantId,
-        payment_intent_id: paymentIntentId,
-        email,
-        error: errorMessage,
-      },
+      resourceType: 'license',
+      resourceId: licenseId || correlationId,
+      metadata: { correlation_id: correlationId, tenant_id: tenantId, payment_intent_id: paymentIntentId },
     });
-
     try {
       if (licenseId) await supabase.from('licenses').delete().eq('id', licenseId);
       if (tenantId) await supabase.from('tenants').delete().eq('id', tenantId);
-      if (purchaseId)
-        await supabase.from('license_purchases').update({ status: 'failed' }).eq('id', purchaseId);
-      await logProvisioningEvent(
-        correlationId,
-        'rolled_back',
-        'completed',
-        tenantId,
-        paymentIntentId,
-        undefined,
-        { rolled_back_resources: { licenseId, tenantId } },
-      );
+      if (purchaseId) await supabase.from('license_purchases').update({ status: 'failed' }).eq('id', purchaseId);
+      await logProvisioningEvent(correlationId, 'rolled_back', 'rolled_back', tenantId, paymentIntentId);
     } catch (rollbackError) {
-      logger.error('Rollback failed', rollbackError as Error);
-      await logProvisioningEvent(
-        correlationId,
-        'rolled_back',
-        'failed',
-        tenantId,
-        paymentIntentId,
-        rollbackError instanceof Error ? rollbackError.message : 'Rollback failed',
-      );
+      logger.error('License provisioning rollback failed', rollbackError as Error);
     }
-
-    return { success: false, error: errorMessage };
+    return { success: false, error: message };
   }
 }
 
 export async function suspendLicense(tenantId: string, reason: string): Promise<void> {
   const supabase = await requireAdminClient();
   const correlationId = crypto.randomUUID();
-
   await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId: correlationId });
-
   await supabase.from('tenants').update({ license_status: 'suspended' }).eq('id', tenantId);
   await supabase.from('licenses').update({ status: 'suspended' }).eq('tenant_id', tenantId);
-  await logProvisioningEvent(
-    correlationId,
-    'completed',
-    'completed',
-    tenantId,
-    undefined,
-    undefined,
-    { action: 'suspended', reason },
-  );
-
   await logAuditEvent({
     action: 'LICENSE_SUSPENDED',
     actor_id: 'system:license_enforcement',
-    target_type: 'tenant',
-    target_id: tenantId,
+    resourceType: 'tenant',
+    resourceId: tenantId,
     metadata: { reason, correlation_id: correlationId },
   });
-
-  logger.info('License suspended', { tenantId, reason });
 }
 
 export async function enforceSubscriptionStatus(subscriptionId: string): Promise<void> {
   const supabase = await requireAdminClient();
-  const { data: tenant } = await supabase
-    .from('tenants')
-    .select('id')
-    .eq('stripe_subscription_id', subscriptionId)
-    .maybeSingle();
+  const { data: tenant } = await supabase.from('tenants').select('id').eq('stripe_subscription_id', subscriptionId).maybeSingle();
   if (tenant) await suspendLicense(tenant.id, 'subscription_payment_failed');
 }
 
 export async function reactivateLicense(tenantId: string): Promise<void> {
   const supabase = await requireAdminClient();
   const correlationId = crypto.randomUUID();
-
   await setAuditContext(supabase, { systemActor: 'license_enforcement', requestId: correlationId });
-
   await supabase.from('tenants').update({ license_status: 'active' }).eq('id', tenantId);
   await supabase.from('licenses').update({ status: 'active' }).eq('tenant_id', tenantId);
-  await logProvisioningEvent(
-    correlationId,
-    'completed',
-    'completed',
-    tenantId,
-    undefined,
-    undefined,
-    { action: 'reactivated' },
-  );
-
   await logAuditEvent({
     action: 'LICENSE_REACTIVATED',
     actor_id: 'system:license_enforcement',
-    target_type: 'tenant',
-    target_id: tenantId,
+    resourceType: 'tenant',
+    resourceId: tenantId,
     metadata: { correlation_id: correlationId },
   });
-
-  logger.info('License reactivated', { tenantId });
 }

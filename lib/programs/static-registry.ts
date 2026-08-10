@@ -1,8 +1,10 @@
 /**
- * Unified static program registry — single list for marketing, search, and detail pages.
+ * Unified static program registry — single normalized list for marketing,
+ * search, navigation, and detail-page fallbacks.
  *
- * Source: every `ProgramSchema` registered in `data/programs/index.ts` (STATIC_PROGRAM_MAP).
- * `data/programs/catalog.ts` re-exports from here for backward compatibility.
+ * Source files are registered in data/programs/index.ts. Every public read is
+ * passed through getStaticProgram(), which applies the current funding and
+ * RAPIDS claim policy before a ProgramSchema leaves the registry.
  */
 
 import type { ProgramSchema } from '@/lib/programs/program-schema';
@@ -10,50 +12,50 @@ import { STATIC_PROGRAM_MAP, getStaticProgram } from '@/data/programs/index';
 
 function buildAllPrograms(): ProgramSchema[] {
   const bySlug = new Map<string, ProgramSchema>();
-  for (const program of STATIC_PROGRAM_MAP.values()) {
-    bySlug.set(program.slug, program);
+  for (const raw of STATIC_PROGRAM_MAP.values()) {
+    const normalized = getStaticProgram(raw.slug);
+    if (normalized) bySlug.set(normalized.slug, normalized);
   }
   return [...bySlug.values()].sort((a, b) => a.title.localeCompare(b.title));
 }
 
-/** All static programs (deduped by slug). */
+/** All static programs, normalized and deduped by canonical slug. */
 export const ALL_PROGRAMS: ProgramSchema[] = buildAllPrograms();
 
 export { getStaticProgram };
 
 export function getProgramBySlug(slug: string): ProgramSchema | undefined {
-  return getStaticProgram(slug) ?? ALL_PROGRAMS.find((p) => p.slug === slug);
+  return getStaticProgram(slug) ?? ALL_PROGRAMS.find((program) => program.slug === slug);
 }
 
 export function getProgramsBySector(sector: string): ProgramSchema[] {
-  return ALL_PROGRAMS.filter((p) => p.sector === sector);
+  return ALL_PROGRAMS.filter((program) => program.sector === sector);
 }
 
 export const SECTORS = [
   {
     key: 'skilled-trades',
     label: 'Skilled Trades',
-    description: 'Hands-on technical training in construction, HVAC, electrical, and welding.',
+    description: 'Hands-on technical training for skilled-trade occupations.',
   },
   {
     key: 'healthcare',
     label: 'Healthcare',
-    description:
-      'Clinical and patient care training leading to nationally recognized certifications.',
+    description: 'Healthcare training with program-specific credential and clinical requirements.',
   },
   {
     key: 'personal-services',
     label: 'Personal Services',
-    description: 'Licensed trade programs in barbering, cosmetology, and personal care.',
+    description: 'Barbering, beauty, and personal-service training pathways.',
   },
   {
     key: 'technology',
     label: 'Technology',
-    description: 'IT support, cybersecurity, and software development pathways.',
+    description: 'IT support, cybersecurity, networking, and software-development training.',
   },
   {
     key: 'business',
     label: 'Business & Office',
-    description: 'Office administration, bookkeeping, and business management.',
+    description: 'Office administration, bookkeeping, entrepreneurship, and business training.',
   },
 ] as const;

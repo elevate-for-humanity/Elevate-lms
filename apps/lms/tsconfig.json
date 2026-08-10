@@ -8,31 +8,14 @@
     ]
   },
   "include": [
-    "../../components/**/*.ts",
-    "../../components/**/*.tsx",
-    "../../data/**/*.ts",
-    "../../data/**/*.tsx",
-    "../../lib/**/*.ts",
-    "../../lib/**/*.tsx",
-    "../../lms-data/**/*.ts",
-    "../../lms-data/**/*.tsx",
-    "../../packages/db/**/*.ts",
-    "../../packages/db/**/*.tsx",
-    "../../packages/shared/**/*.ts",
-    "../../packages/shared/**/*.tsx",
-    "./**/*.js",
-    "./**/*.mjs",
-    "./**/*.ts",
-    "./**/*.tsx",
-    "app/**/*.ts",
-    "app/**/*.tsx",
+    "next-env.d.ts",
+    "**/*.js",
+    "**/*.mjs",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "../../app-legacy",
-    "../../apps/admin",
-    "../../apps/marketing",
-    "../../packages/ui"
+    "node_modules"
   ]
 }

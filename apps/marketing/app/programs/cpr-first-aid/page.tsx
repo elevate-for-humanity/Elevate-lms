@@ -7,22 +7,19 @@ export const revalidate = 3600;
 
 export default async function CprFirstAidPage() {
   const loaded = await loadProgramForPage("cpr-first-aid");
-  if (!loaded) { return notFound(); }
+  if (!loaded) return notFound();
   const p = loaded.program;
   const banner = heroBanners["cpr-first-aid"] ?? null;
-
-  return (
-    <ProgramDetailPage program={p} banner={banner} />
-  );
+  return <ProgramDetailPage program={p} banner={banner} />;
 }
 
 export async function generateMetadata() {
   const loaded = await loadProgramForPage("cpr-first-aid");
-  if (!loaded) { return { title: "Cpr First Aid" }; }
+  if (!loaded) return { title: "CPR & First Aid" };
   const p = loaded.program;
   return {
-    title: p.seoTitle ?? p.title ?? "Cpr First Aid",
-    description: p.seoDescription ?? p.subtitle ?? "",
+    title: p.metaTitle ?? p.title ?? "CPR & First Aid",
+    description: p.metaDescription ?? p.subtitle ?? "",
     alternates: { canonical: "https://www.elevateforhumanity.org/programs/cpr-first-aid" },
   };
 }

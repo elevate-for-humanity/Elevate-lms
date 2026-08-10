@@ -1,11 +1,5 @@
 /**
- * lib/programs/host-shops.ts
- *
- * Single source of truth for fetching and normalising approved host shops
- * from both barbershop_partner_applications and host_shop_applications.
- *
- * Public pages, APIs, and selectors should consume this helper instead of
- * rebuilding host-site lists independently.
+ * Single source of truth for fetching and normalising approved host shops.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -20,7 +14,6 @@ export type HostShop = {
   phone: string;
   email: string;
   supervisor: string;
-  /** Canonical program slugs this shop is approved for */
   programs: string[];
   badge: string;
 };
@@ -58,7 +51,7 @@ function normalizeProgram(value: unknown): string | null {
 }
 
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
-  const parts = raw.split(',').map((p) => p.trim());
+  const parts = raw.split(',').map((part) => part.trim());
   const stateZip = (parts[2] ?? '').split(' ').filter(Boolean);
   return {
     address: parts[0] ?? raw,
@@ -69,8 +62,7 @@ function parseAddress(raw: string): { address: string; city: string; state: stri
 }
 
 function isPubliclyListedHostShop(shop: HostShop): boolean {
-  const name = shop.name.toLowerCase();
-  return !name.includes('prestige');
+  return !shop.name.toLowerCase().includes('prestige');
 }
 
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
@@ -85,9 +77,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const [{ data: barberRows }, { data: hostRows }] = await Promise.all([
     db
       .from('barbershop_partner_applications')
-      .select(
-        'id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name',
-      )
+      .select('id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name')
       .eq('status', 'approved')
       .order('shop_legal_name'),
     db
@@ -97,51 +87,51 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .order('shop_name'),
   ]);
 
-  const barberShops: HostShop[] = (barberRows ?? []).map((s) => ({
-    id: s.id,
-    name: s.shop_dba_name || s.shop_legal_name,
-    address: s.shop_address_line1 ?? '',
-    city: s.shop_city ?? '',
-    state: s.shop_state ?? 'IN',
-    zip: s.shop_zip ?? '',
-    phone: s.contact_phone ?? '',
-    email: s.contact_email ?? '',
-    supervisor: s.supervisor_name ?? '',
+  const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
+    id: shop.id,
+    name: shop.shop_dba_name || shop.shop_legal_name,
+    address: shop.shop_address_line1 ?? '',
+    city: shop.shop_city ?? '',
+    state: shop.shop_state ?? 'IN',
+    zip: shop.shop_zip ?? '',
+    phone: shop.contact_phone ?? '',
+    email: shop.contact_email ?? '',
+    supervisor: shop.supervisor_name ?? '',
     programs: [PROGRAM_SLUGS.barber],
     badge: 'partner',
   }));
 
-  const hostShops: HostShop[] = (hostRows ?? []).map((s) => {
-    const parsed = parseAddress(s.address ?? '');
-    const rawPrograms = Array.isArray(s.intake?.programs) ? s.intake.programs : [];
-    const programs = rawPrograms
+  const hostShops: HostShop[] = (hostRows ?? []).map((shop) => {
+    const parsed = parseAddress(shop.address ?? '');
+    const rawPrograms: unknown[] = Array.isArray(shop.intake?.programs) ? shop.intake.programs : [];
+    const programs: string[] = rawPrograms
       .map(normalizeProgram)
-      .filter((value): value is string => Boolean(value));
+      .filter((value): value is string => typeof value === 'string');
 
     return {
-      id: s.id,
-      name: s.shop_name,
+      id: shop.id,
+      name: shop.shop_name,
       ...parsed,
-      phone: s.phone ?? '',
-      email: s.email ?? '',
+      phone: shop.phone ?? '',
+      email: shop.email ?? '',
       supervisor: '',
-      programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.cosmetology],
+      programs: programs.length ? [...new Set<string>(programs)] : [PROGRAM_SLUGS.cosmetology],
       badge: 'partner',
     };
   });
 
-  const barberNameMap = new Map(barberShops.map((s) => [s.name.toLowerCase(), s]));
-  barberShops.forEach((bs) => {
-    const match = hostShops.find((hs) => hs.name.toLowerCase() === bs.name.toLowerCase());
-    if (match) bs.programs = [...new Set([...bs.programs, ...match.programs])];
+  const barberNameMap = new Map(barberShops.map((shop) => [shop.name.toLowerCase(), shop]));
+  barberShops.forEach((barberShop) => {
+    const match = hostShops.find((hostShop) => hostShop.name.toLowerCase() === barberShop.name.toLowerCase());
+    if (match) barberShop.programs = [...new Set<string>([...barberShop.programs, ...match.programs])];
   });
 
-  const hostOnly = hostShops.filter((s) => !barberNameMap.has(s.name.toLowerCase()));
+  const hostOnly = hostShops.filter((shop) => !barberNameMap.has(shop.name.toLowerCase()));
   const all = [...barberShops, ...hostOnly].filter(isPubliclyListedHostShop);
 
   if (program) {
     const slug = PROGRAM_SLUGS[program];
-    return all.filter((s) => s.programs.includes(slug));
+    return all.filter((shop) => shop.programs.includes(slug));
   }
 
   return all;

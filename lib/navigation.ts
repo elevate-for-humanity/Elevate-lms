@@ -1,11 +1,10 @@
 // lib/navigation.ts — Elevate for Humanity site-wide navigation config
 // Single source of truth for the public marketing site header navigation.
-// Consumed by HeaderDesktopNav and HeaderMobileMenu.
-//
-// All routes come from lib/navigation/routes.ts to prevent drift.
 
-import { type NavItem } from '@/types/navigation';
+import type { NavItem, NavSubItem } from '@/types/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
+
+export type { NavItem, NavSubItem } from '@/types/navigation';
 
 export const NAV_ITEMS: NavItem[] = [
   {
@@ -91,11 +90,7 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Admin Portal', href: ROUTES.adminPortal, isSectionLink: true, isAuth: true },
     ],
   },
-  {
-    id: 'store',
-    name: 'Store',
-    href: ROUTES.store,
-  },
+  { id: 'store', name: 'Store', href: ROUTES.store },
   {
     id: 'about',
     name: 'About',
@@ -120,32 +115,28 @@ export function findDuplicateNavHrefs(navItems: NavItem[]): Array<{ href: string
     hrefMap.set(item.href, [...existing, item]);
   }
   return Array.from(hrefMap.entries())
-    .filter(({ 1: items }) => items.length > 1)
-    .map(({ 0: href, 1: items }) => ({ href, items }));
+    .filter(([, items]) => items.length > 1)
+    .map(([href, items]) => ({ href, items }));
 }
 
-export function groupNavSubItemsByHeader(navItems: NavItem[]): Record<string, NavItem[]>;
-export function groupNavSubItemsByHeader(navItems: import('@/types/navigation').NavSubItem[]): Record<string, import('@/types/navigation').NavSubItem[]>;
-export function groupNavSubItemsByHeader(navItems: NavItem[] | import('@/types/navigation').NavSubItem[]): Record<string, NavItem[]> | Record<string, import('@/types/navigation').NavSubItem[]> {
-  const groups: Record<string, any[]> = {};
+export function groupNavSubItemsByHeader(navItems: NavSubItem[]): Record<string, NavSubItem[]> {
+  const groups: Record<string, NavSubItem[]> = {};
   let currentHeader = '';
 
-  for (const item of navItems as any[]) {
+  for (const item of navItems) {
     if (item.isHeader) {
       currentHeader = item.name;
       if (!groups[currentHeader]) groups[currentHeader] = [];
       groups[currentHeader].push(item);
       continue;
     }
-
     if (!groups[currentHeader]) groups[currentHeader] = [];
     groups[currentHeader].push(item);
   }
-
-  return groups as Record<string, NavItem[]> | Record<string, import('@/types/navigation').NavSubItem[]>;
+  return groups;
 }
 
-export function getNavCategoryLabel(column: import('@/types/navigation').NavSubItem[]): string {
+export function getNavCategoryLabel(column: NavSubItem[]): string {
   const header = column.find((item) => item.isHeader);
   return header?.name.replace(/—/g, '').trim() ?? '';
 }

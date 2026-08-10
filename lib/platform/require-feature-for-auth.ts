@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { NextResponse, type NextRequest } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError } from '@/lib/api/safe-error';
 import { apiRequireOrganizationFeature } from '@/lib/api/require-organization-feature';
@@ -10,7 +11,6 @@ import {
   resolveTenantIdForUser,
 } from '@/lib/platform/resolve-tenant-for-user';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { NextRequest, NextResponse } from 'next/server';
 
 const TRIAL_DEFAULT_FEATURES: FeatureCode[] = [
   FEATURES.WEBSITE,
@@ -21,9 +21,6 @@ const TRIAL_DEFAULT_FEATURES: FeatureCode[] = [
   FEATURES.LMS,
 ];
 
-/**
- * Gate paid APIs: authenticated user + plan feature (or active trial license).
- */
 export async function requireFeatureForAuth(
   request: NextRequest,
   feature: FeatureCode,
@@ -31,7 +28,7 @@ export async function requireFeatureForAuth(
   const auth = await apiAuthGuard(request);
   if (auth.error) return auth.error;
 
-  const userId = auth.user.id;
+  const userId = auth.id;
   const tenantId = await resolveTenantIdForUser(userId);
 
   if (!tenantId) {
@@ -56,5 +53,9 @@ export async function requireFeatureForAuth(
     }
   }
 
-  return apiRequireOrganizationFeature(tenantId, feature);
+  const featureAccess = await apiRequireOrganizationFeature(tenantId, feature);
+  if (featureAccess instanceof NextResponse) {
+    return featureAccess;
+  }
+  return { userId, tenantId };
 }

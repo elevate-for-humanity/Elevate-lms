@@ -3,9 +3,20 @@
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  Shield, Briefcase, GraduationCap, BarChart3,
-  ArrowRight, Play, Pause, Volume2, VolumeX,
+  Shield,
+  Briefcase,
+  GraduationCap,
+  BarChart3,
+  ArrowRight,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
   ExternalLink,
+  CheckCircle2,
+  Layers3,
+  Sparkles,
+  Replace,
 } from 'lucide-react';
 
 const DEMOS = [
@@ -15,13 +26,20 @@ const DEMOS = [
     icon: Shield,
     video: '/videos/dashboard-admin-narrated.mp4',
     liveHref: '/store/demo/admin',
-    description: 'Search students, review applications, track compliance, generate WIOA reports.',
+    description:
+      'Run enrollment, courses, compliance, funding and intervention work from one operating view instead of bouncing between disconnected systems.',
+    buyer: 'Training providers, schools, workforce organizations and multi-program operators',
+    benefit:
+      'Staff can see what is happening from first application through enrollment, training, funding and compliance without rebuilding the same record in multiple places.',
+    differentiator:
+      'Elevate connects the operational record across admissions, learners, courses, funding, compliance and reporting. The dashboard is not a reporting shell sitting on top of separate products.',
+    replaces: 'Spreadsheets + separate SIS/LMS + compliance trackers + disconnected intake tools',
     features: [
-      'Enrollment pipeline with real-time status',
-      'Compliance tracking and PIRL reporting',
-      'Funding utilization across WIOA, WRG, Job Ready Indy',
-      'At-risk student alerts and intervention tools',
-      'Application review and approval workflow',
+      'Enrollment pipeline with application and status visibility',
+      'Compliance tracking and workforce reporting workflows',
+      'Funding utilization across supported workforce programs',
+      'At-risk learner alerts and intervention workflows',
+      'Application review and approval from the same platform record',
     ],
   },
   {
@@ -30,13 +48,20 @@ const DEMOS = [
     icon: Briefcase,
     video: '/videos/dashboard-employer-narrated.mp4',
     liveHref: '/store/demo/employer',
-    description: 'Find trained candidates, track apprentices, manage OJT reimbursements and WOTC credits.',
+    description:
+      'Give employers one place to find talent, manage apprenticeship participation, review workforce activity and complete required documents.',
+    buyer: 'Employers, apprenticeship host sites, workforce partners and business-services teams',
+    benefit:
+      'Employers spend less time emailing documents and status questions back and forth because candidate, apprentice and program activity is connected to the same operating system.',
+    differentiator:
+      'The employer experience is connected to the learner, apprenticeship, workforce and compliance records behind the scenes—not a standalone job board with another login and another database.',
+    replaces: 'Email chains + shared spreadsheets + separate recruiting/OJT/apprenticeship trackers',
     features: [
-      'Browse pre-screened candidates with credentials',
-      'Apprenticeship hour tracking and wage progression',
-      'OJT contract management and reimbursement tracking',
-      'WOTC tax credit documentation',
-      'MOU and compliance document signing',
+      'Browse candidates with training and credential context',
+      'Apprenticeship hour and wage-progression workflows',
+      'OJT contract and reimbursement tracking',
+      'Workforce incentive and documentation workflows',
+      'MOU and compliance-document workflows',
     ],
   },
   {
@@ -45,13 +70,20 @@ const DEMOS = [
     icon: GraduationCap,
     video: '/videos/dashboard-student-narrated.mp4',
     liveHref: '/store/demo/student',
-    description: 'Course modules, progress tracking, apprenticeship hours, certificates earned.',
+    description:
+      'Give learners one guided place for courses, progress, apprenticeship activity, credentials and next-step career support.',
+    buyer: 'Career schools, training providers, apprenticeship sponsors and workforce programs',
+    benefit:
+      'Learners do not have to figure out which system holds the class, which form tracks hours, or where credentials live. Their training journey stays together.',
+    differentiator:
+      'Elevate combines LMS delivery with workforce and apprenticeship context. The learner portal can reflect the full career pathway, not only course completion.',
+    replaces: 'Standalone LMS + paper/hour logs + separate certificate folders + scattered career-service links',
     features: [
       'Course modules with video lessons and quizzes',
-      'Progress bars and completion tracking',
+      'Progress and completion tracking',
       'Apprenticeship hour logging from mobile',
-      'Earned certificates and credential wallet',
-      'Career services and job placement tools',
+      'Earned certificates and credential records',
+      'Career-service and job-placement workflows',
     ],
   },
   {
@@ -59,14 +91,21 @@ const DEMOS = [
     label: 'Workforce Board',
     icon: BarChart3,
     video: '/videos/dashboard-analytics-narrated.mp4',
-    liveHref: '/store/demo/admin',
-    description: 'WIOA eligibility, ITA tracking, PIRL reporting, provider network management.',
+    liveHref: '/store/demo/admin?view=workforce',
+    description:
+      'Manage eligibility, funding, provider activity, compliance and outcomes from the same data used to operate programs day to day.',
+    buyer: 'Workforce boards, funded-program operators, agencies and provider networks',
+    benefit:
+      'Program teams can reduce manual reconciliation because eligibility, participant activity, funding and outcomes are linked instead of reported from disconnected files after the fact.',
+    differentiator:
+      'Elevate is designed around the operating workflow behind workforce reporting. Data can originate in intake, enrollment, training and employer activity before it becomes a report.',
+    replaces: 'Eligibility spreadsheets + separate provider trackers + manual funding logs + after-the-fact reporting files',
     features: [
-      'WIOA eligibility screening with document verification',
-      'ITA management and funding allocation',
-      'Automated PIRL reporting and quarterly performance',
-      'Provider network oversight and outcomes',
-      'Multi-source funding tracking (WIOA, state, employer)',
+      'Eligibility screening with document-verification workflows',
+      'ITA and funding-allocation management',
+      'PIRL-oriented reporting workflows and performance views',
+      'Provider-network oversight and outcomes',
+      'Multi-source funding tracking across supported programs',
     ],
   },
 ];
@@ -77,7 +116,7 @@ export default function DemoTabs() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const active = DEMOS.find(d => d.id === activeTab) || DEMOS[0];
+  const active = DEMOS.find((demo) => demo.id === activeTab) || DEMOS[0];
 
   const switchTab = useCallback((id: string) => {
     setActiveTab(id);
@@ -111,34 +150,32 @@ export default function DemoTabs() {
 
   return (
     <div>
-      {/* Tab bar */}
-      <div className="flex flex-wrap gap-1 bg-white rounded-xl p-1 mb-6">
-        {DEMOS.map(demo => (
+      <div className="mb-6 flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-slate-100 p-2">
+        {DEMOS.map((demo) => (
           <button
             key={demo.id}
+            type="button"
             onClick={() => switchTab(demo.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all flex-1 min-w-[140px] justify-center ${
+            className={`flex min-w-[140px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
               activeTab === demo.id
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-slate-950 text-white shadow-md'
+                : 'bg-white text-slate-800 hover:bg-slate-50'
             }`}
           >
-            <demo.icon className="w-4 h-4" />
+            <demo.icon className="h-4 w-4" />
             <span className="hidden sm:inline">{demo.label}</span>
             <span className="sm:hidden">{demo.label.split(' ')[0]}</span>
           </button>
         ))}
       </div>
 
-      {/* Video + info */}
-      <div className="grid lg:grid-cols-5 gap-6">
-        {/* Video player - 3 cols */}
+      <div className="grid gap-7 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <div className="relative rounded-2xl overflow-hidden bg-slate-900 aspect-video shadow-xl">
+          <div className="relative aspect-video overflow-hidden rounded-2xl bg-slate-950 shadow-xl">
             <video
               ref={videoRef}
               key={active.video}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
               src={active.video}
               muted
               playsInline
@@ -148,82 +185,108 @@ export default function DemoTabs() {
               onEnded={() => setIsPlaying(false)}
             />
 
-            {/* Play overlay */}
             {!isPlaying && (
               <button
+                type="button"
                 onClick={togglePlay}
-                className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 hover:bg-black/50 transition-colors cursor-pointer"
-                aria-label="Play demo walkthrough"
+                className="absolute inset-0 z-10 flex cursor-pointer flex-col items-center justify-center bg-black/55 transition-colors hover:bg-black/65"
+                aria-label={`Play ${active.label} narrated walkthrough`}
               >
-                <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg mb-3">
-                  <Play className="w-7 h-7 text-brand-red-600 ml-1" />
+                <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg">
+                  <Play className="ml-1 h-7 w-7 text-brand-red-700" />
                 </div>
-                <span className="text-white text-sm font-semibold">Watch Narrated Walkthrough</span>
+                <span className="text-sm font-bold text-white">Watch the benefit-focused walkthrough</span>
               </button>
             )}
 
-            {/* Controls */}
             {isPlaying && (
               <div className="absolute bottom-3 left-3 z-20 flex gap-2">
                 <button
+                  type="button"
                   onClick={togglePlay}
-                  className="p-2 bg-black/60 hover:bg-black/80 rounded-full transition-colors"
-                  title="Pause"
+                  className="rounded-full bg-black/75 p-2 transition-colors hover:bg-black"
+                  aria-label="Pause demo"
                 >
-                  <Pause className="w-5 h-5 text-white" />
+                  <Pause className="h-5 w-5 text-white" />
                 </button>
                 <button
+                  type="button"
                   onClick={toggleMute}
-                  className="p-2 bg-black/60 hover:bg-black/80 rounded-full transition-colors"
-                  title={isMuted ? 'Unmute' : 'Mute'}
+                  className="rounded-full bg-black/75 p-2 transition-colors hover:bg-black"
+                  aria-label={isMuted ? 'Turn demo sound on' : 'Turn demo sound off'}
                 >
-                  {isMuted ? <VolumeX className="w-5 h-5 text-white" /> : <Volume2 className="w-5 h-5 text-white" />}
+                  {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
                 </button>
               </div>
             )}
 
-            {/* Label */}
-            <div className="absolute top-3 left-3 z-10">
-              <span className="bg-black/70 text-white text-xs font-medium rounded px-2 py-1 backdrop-blur-sm">
+            <div className="absolute left-3 top-3 z-10">
+              <span className="rounded bg-black/80 px-2.5 py-1 text-xs font-bold text-white">
                 {active.label} Demo
               </span>
             </div>
           </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+              <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+              <p className="mt-3 text-xs font-black uppercase tracking-wide text-emerald-800">Business benefit</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{active.benefit}</p>
+            </div>
+            <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-5">
+              <Sparkles className="h-5 w-5 text-brand-red-700" />
+              <p className="mt-3 text-xs font-black uppercase tracking-wide text-brand-red-800">Why Elevate is different</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{active.differentiator}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-300 bg-slate-100 p-5">
+              <Replace className="h-5 w-5 text-slate-800" />
+              <p className="mt-3 text-xs font-black uppercase tracking-wide text-slate-700">What it can replace</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{active.replaces}</p>
+            </div>
+          </div>
         </div>
 
-        {/* Info panel - 2 cols */}
-        <div className="lg:col-span-2 flex flex-col">
-          <h2 className="text-xl font-bold text-slate-900 mb-2">{active.label}</h2>
-          <p className="text-slate-600 mb-4">{active.description}</p>
+        <div className="flex flex-col lg:col-span-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2 text-brand-red-700">
+              <Layers3 className="h-5 w-5" />
+              <span className="text-xs font-black uppercase tracking-[0.16em]">Built for</span>
+            </div>
+            <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{active.buyer}</p>
 
-          <ul className="space-y-2 mb-6 flex-1">
-            {active.features.map(f => (
-              <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                <span className="text-brand-red-500 mt-0.5 flex-shrink-0">&#10003;</span>
-                {f}
-              </li>
-            ))}
-          </ul>
+            <h2 className="mt-5 text-2xl font-black text-slate-950">{active.label}</h2>
+            <p className="mt-2 text-base leading-7 text-slate-700">{active.description}</p>
 
-          <div className="space-y-2">
-            <Link
-              href={active.liveHref}
-              className="flex items-center justify-center gap-2 w-full bg-brand-red-600 text-white py-3 rounded-lg font-bold hover:bg-brand-red-700 transition"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Open Interactive Demo
-            </Link>
-            <Link
-              href="/store/trial"
-              className="flex items-center justify-center gap-2 w-full border border-slate-300 text-slate-700 py-3 rounded-lg font-semibold hover:bg-white transition"
-            >
-              Start 14-Day Trial <ArrowRight className="w-4 h-4" />
-            </Link>
+            <h3 className="mt-6 text-sm font-black uppercase tracking-wide text-slate-700">What you will see</h3>
+            <ul className="mt-3 flex-1 space-y-3">
+              {active.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2 text-sm font-medium leading-6 text-slate-800">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-7 space-y-2">
+              <Link
+                href={active.liveHref}
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-700 py-3 font-black text-white transition hover:bg-brand-red-800"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Interactive Demo
+              </Link>
+              <Link
+                href="/store/trial"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-400 py-3 font-bold text-slate-900 transition hover:bg-slate-50"
+              >
+                Try it with your organization <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <p className="mt-3 text-center text-xs font-medium text-slate-600">
+              Sample-data environment. Demo actions do not change production records.
+            </p>
           </div>
-
-          <p className="text-xs text-slate-400 mt-3 text-center">
-            Guided video walkthrough. Nothing affects any real system.
-          </p>
         </div>
       </div>
     </div>

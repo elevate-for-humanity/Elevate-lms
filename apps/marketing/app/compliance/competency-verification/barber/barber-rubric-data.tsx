@@ -12,6 +12,10 @@ export interface RubricSection {
   id: string;
   name: string;
   items: RubricItem[];
+  /** Legacy print/scoring label derived from array position. */
+  section: number;
+  /** Legacy print/scoring title; canonical value is name. */
+  title: string;
 }
 
 export interface BarberStats {
@@ -21,7 +25,9 @@ export interface BarberStats {
   totalOJTHours: number;
 }
 
-export const BARBER_SECTIONS: RubricSection[] = [
+type BaseRubricSection = Omit<RubricSection, 'section' | 'title'>;
+
+const BASE_BARBER_SECTIONS: BaseRubricSection[] = [
   {
     id: 'sanitation',
     name: 'Sanitation & Safety',
@@ -141,6 +147,12 @@ export const BARBER_SECTIONS: RubricSection[] = [
     ],
   },
 ];
+
+export const BARBER_SECTIONS: RubricSection[] = BASE_BARBER_SECTIONS.map((section, index) => ({
+  ...section,
+  section: index + 1,
+  title: section.name,
+}));
 
 export const BARBER_STATS: BarberStats = {
   totalCompetencies: 14,

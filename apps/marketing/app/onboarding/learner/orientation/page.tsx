@@ -1,74 +1,81 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { AlertTriangle, ArrowLeft, BookOpen, Clock, Shield, Users } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import UltraVideoPlayer from '@/components/video/UltraVideoPlayer';
-import {
-  BookOpen,
-  ArrowLeft,
-  Shield,
-  Clock,
-  Users,
-  AlertTriangle,
-} from 'lucide-react';
-import OrientationAvatar from './OrientationAvatar';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  robots: { index: false },
-  title: 'Orientation',
+  robots: { index: false, follow: false },
+  title: 'Learner Orientation | Elevate',
 };
+
+type ProgramJoin = {
+  title: string | null;
+  slug: string | null;
+  duration_weeks: number | null;
+  description: string | null;
+};
+
+type CourseJoin = {
+  course_name: string | null;
+  slug: string | null;
+  duration_hours: number | null;
+};
+
+const PROGRAM_META: Record<string, { duration: string; hours: string; credentials: string[]; hasOJT: boolean }> = {
+  'hvac-technician': { duration: '6–8 weeks', hours: '240 hours', credentials: ['EPA 608 Universal', 'OSHA 30', 'CPR'], hasOJT: true },
+  'barber-apprenticeship': { duration: '15 months', hours: '2,000 OJL hours', credentials: ['Indiana Barber License pathway'], hasOJT: true },
+  bookkeeping: { duration: '8 weeks', hours: '80 hours', credentials: ['QuickBooks Certified User', 'Microsoft Office Specialist'], hasOJT: false },
+  'business-management': { duration: '5 weeks', hours: '50 hours', credentials: ['Business credential pathway'], hasOJT: false },
+  'home-health-aide': { duration: '4 weeks', hours: '80 hours', credentials: ['HHA pathway', 'CPR'], hasOJT: true },
+  'medical-assistant': { duration: '21 weeks', hours: 'Program schedule', credentials: ['Medical Assistant credential pathway'], hasOJT: false },
+  'pharmacy-technician': { duration: '10 weeks', hours: '120 hours', credentials: ['Pharmacy Technician credential pathway'], hasOJT: false },
+  cna: { duration: '4–6 weeks', hours: 'State-required training hours', credentials: ['Indiana CNA certification pathway', 'CPR'], hasOJT: true },
+  cdl: { duration: '4 weeks', hours: '160 hours', credentials: ['CDL Class A pathway'], hasOJT: true },
+};
+
+function firstRelation<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) return null;
+  return Array.isArray(value) ? (value[0] ?? null) : value;
+}
 
 async function completeOrientation() {
   'use server';
-  const { createClient } = await import('@/lib/supabase/server');
-  const { logger } = await import('@/lib/logger');
+
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/onboarding/learner/orientation');
 
   const now = new Date().toISOString();
-
-  await Promise.all([
-    // Mark profile flag (read by onboarding page completion check)
-    supabase
-      .from('profiles')
-      .update({
-        orientation_completed: true,
-        orientation_completed_at: now,
-        onboarding_completed: true,
-      })
-      .eq('id', user.id),
-    // Write to orientation_completions table (also read by onboarding page)
-    supabase.from('orientation_completions').upsert(
-      {
-        user_id: user.id,
-        completed_at: now,
-        orientation_type: 'learner',
-      },
-      { onConflict: 'user_id', ignoreDuplicates: true },
-    ),
-    // Write to onboarding_progress (canonical step tracker)
-    supabase.from('onboarding_progress').upsert(
-      {
-        user_id: user.id,
-        step: 'orientation',
-        completed: true,
-        completed_at: now,
-        updated_at: now,
-      },
-      { onConflict: 'user_id,step' },
-    ),
+  const results = await Promise.all([
+    supabase.from('profiles').update({
+      orientation_completed: true,
+      orientation_completed_at: now,
+      onboarding_completed: true,
+    }).eq('id', user.id),
+    supabase.from('orientation_completions').upsert({
+      user_id: user.id,
+      completed_at: now,
+      orientation_type: 'learner',
+    }, { onConflict: 'user_id' }),
+    supabase.from('onboarding_progress').upsert({
+      user_id: user.id,
+      step: 'orientation',
+      completed: true,
+      completed_at: now,
+      updated_at: now,
+    }, { onConflict: 'user_id,step' }),
   ]);
 
-  // Send "you're ready to start" email — non-blocking
+  const failed = results.find((result) => result.error)?.error;
+  if (failed) throw new Error(`ORIENTATION_COMPLETE_FAILED:${failed.message}`);
+
   try {
     const { data: profile } = await supabase
       .from('profiles')
@@ -78,164 +85,34 @@ async function completeOrientation() {
 
     if (profile?.email) {
       const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'there';
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-      const orgName = PLATFORM_DEFAULTS.orgName;
-      const supportPhone = PLATFORM_DEFAULTS.supportPhone;
       const { sendEmail } = await import('@/lib/email/resend');
       await sendEmail({
         to: profile.email,
         subject: 'Orientation complete — your course is ready',
-        html: `
-<div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;color:#1e293b">
-  <div style="background:#1e293b;padding:24px 32px">
-    <p style="margin:0;color:#fff;font-size:18px;font-weight:700">${orgName}</p>
-    <p style="margin:4px 0 0;color:#94a3b8;font-size:13px">Career &amp; Technical Institute</p>
-  </div>
-  <div style="padding:32px">
-    <h1 style="margin:0 0 16px;font-size:22px">You're ready to start, ${firstName}!</h1>
-    <p style="color:#475569;line-height:1.6;margin:0 0 16px">
-      You've completed orientation. Your coursework is now unlocked and waiting for you.
-    </p>
-    <p style="color:#475569;line-height:1.6;margin:0 0 24px">
-      Log in to your learner dashboard to begin your first lesson. Work at your own pace —
-      your progress is saved automatically.
-    </p>
-    <a href="${siteUrl}/learner/dashboard"
-       style="display:inline-block;background:#dc2626;color:#fff;font-weight:700;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:15px">
-      Go to My Dashboard →
-    </a>
-    <p style="margin:32px 0 0;color:#94a3b8;font-size:12px">
-      Questions? Call <strong>${supportPhone}</strong> or reply to this email.<br>
-      ${orgName} Career &amp; Technical Institute
-    </p>
-  </div>
-</div>`,
-      }).catch((err: Error) => logger.error('[orientation] Post-orientation email failed', err));
+        html: `<p>Hi ${firstName},</p><p>Your Elevate orientation is complete. Sign in to your learner dashboard to begin training.</p><p><a href="${PLATFORM_DEFAULTS.siteUrl}/learner/dashboard">Open your dashboard</a></p>`,
+      });
     }
-  } catch (emailErr) {
-    logger.error('[orientation] Post-orientation email failed', emailErr);
+  } catch (error) {
+    logger.error('[orientation] completion email failed', error instanceof Error ? error : new Error(String(error)));
   }
 
   redirect('/onboarding/learner/complete');
 }
 
-// Per-program credential and duration data from INTraining
-const PROGRAM_META: Record<
-  string,
-  { duration: string; hours: string; credentials: string[]; hasOJT: boolean }
-> = {
-  'hvac-technician': {
-    duration: '6–8 weeks',
-    hours: '240 hours',
-    credentials: [
-      'EPA 608 Universal',
-      'OSHA 30',
-      'CPR',
-      'Rise Up Certificate',
-      'Residential HVAC Cert 1 & 2',
-    ],
-    hasOJT: true,
-  },
-  'barber-apprenticeship': {
-    duration: '15 months',
-    hours: '2,000 hours',
-    credentials: ['Indiana Registered Barber License', 'Rise Up Certificate'],
-    hasOJT: true,
-  },
-  'beauty-educator': {
-    duration: '84 days',
-    hours: '336 hours',
-    credentials: ['CPR', 'OSHA 10', 'Rise Up Certificate'],
-    hasOJT: false,
-  },
-  bookkeeping: {
-    duration: '8 weeks',
-    hours: '80 hours',
-    credentials: ['QuickBooks Certified User', 'Microsoft Office Specialist Associate'],
-    hasOJT: false,
-  },
-  'business-management': {
-    duration: '5 weeks',
-    hours: '50 hours',
-    credentials: ['Business of Retail Certified Specialist', 'Certified Business Professional'],
-    hasOJT: false,
-  },
-  'cpr-aed': {
-    duration: '1 day',
-    hours: '8 hours',
-    credentials: ['CPR/AED Certification'],
-    hasOJT: false,
-  },
-  'emergency-health': {
-    duration: '4 weeks',
-    hours: '80 hours',
-    credentials: ['CPR', 'Emergency Medical Responder (EMR)', 'OSHA 10'],
-    hasOJT: false,
-  },
-  'home-health-aide': {
-    duration: '4 weeks',
-    hours: '80 hours',
-    credentials: ['Home Health Aide (HHA) License', 'CCHW', 'CPR', 'Rise Up Certificate'],
-    hasOJT: true,
-  },
-  'medical-assistant': {
-    duration: '21 days',
-    hours: '168 hours',
-    credentials: ['CCHW', 'CPR', 'Rise Up Certificate'],
-    hasOJT: false,
-  },
-  esthetician: {
-    duration: '5 weeks',
-    hours: '100 hours',
-    credentials: ['OSHA 10', 'Business of Retail Certified Specialist'],
-    hasOJT: false,
-  },
-  'reentry-specialist': {
-    duration: '45 days',
-    hours: '360 hours',
-    credentials: ['CPRC', 'CPSP', 'CCHW', 'CPR', 'Rise Up Certificate'],
-    hasOJT: false,
-  },
-  'pharmacy-technician': {
-    duration: '10 weeks',
-    hours: '120 hours',
-    credentials: ['PTCB CPhT'],
-    hasOJT: false,
-  },
-  cna: {
-    duration: '6 weeks',
-    hours: '120 hours',
-    credentials: ['Indiana CNA License', 'CPR'],
-    hasOJT: true,
-  },
-  cdl: {
-    duration: '4 weeks',
-    hours: '160 hours',
-    credentials: ['CDL Class A License'],
-    hasOJT: true,
-  },
-};
-
 export default async function OrientationPage() {
   const sessionClient = await createClient();
-  const {
-    data: { user },
-  } = await sessionClient.auth.getUser();
-  if (!user) redirect('/login');
+  const { data: { user } } = await sessionClient.auth.getUser();
+  if (!user) redirect('/login?redirect=/onboarding/learner/orientation');
 
-  const supabase = await requireAdminClient();
-
-  // Pull from program_enrollments first, fall back to training_enrollments (legacy HVAC)
-  const [{ data: enrollment }, { data: legacyEnrollment }] = await Promise.all([
-    supabase
-      .from('program_enrollments')
+  const db = await requireAdminClient();
+  const [{ data: enrollment }, { data: courseEnrollment }] = await Promise.all([
+    db.from('program_enrollments')
       .select('program_id, programs ( title, slug, duration_weeks, description )')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from('program_enrollments')
+    db.from('program_enrollments')
       .select('training_courses ( course_name, slug, duration_hours )')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -243,157 +120,102 @@ export default async function OrientationPage() {
       .maybeSingle(),
   ]);
 
-  const program = enrollment?.programs as {
-    title: string;
-    slug: string;
-    duration_weeks: number;
-    description: string;
-  } | null;
-
-  // Legacy fallback — training_enrollments (HVAC and older courses)
-  const legacyCourse = legacyEnrollment?.training_courses as {
-    course_name: string;
-    slug: string;
-    duration_hours: number;
-  } | null;
-
+  const program = firstRelation(enrollment?.programs as ProgramJoin | ProgramJoin[] | null);
+  const legacyCourse = firstRelation(courseEnrollment?.training_courses as CourseJoin | CourseJoin[] | null);
   const slug = program?.slug ?? legacyCourse?.slug ?? '';
   const meta = PROGRAM_META[slug];
-
-  const programTitle = program?.title ?? legacyCourse?.course_name ?? 'Your Program';
-  const duration =
-    meta?.duration ??
-    (program?.duration_weeks ? `${program.duration_weeks} weeks` : 'your program duration');
-  const hours =
-    meta?.hours ?? (legacyCourse?.duration_hours ? `${legacyCourse.duration_hours} hours` : '');
+  const programTitle = program?.title ?? legacyCourse?.course_name ?? 'Your training program';
+  const duration = meta?.duration ?? (program?.duration_weeks ? `${program.duration_weeks} weeks` : 'See your enrollment plan');
+  const hours = meta?.hours ?? (legacyCourse?.duration_hours ? `${legacyCourse.duration_hours} hours` : '');
   const credentials = meta?.credentials ?? [];
   const hasOJT = meta?.hasOJT ?? false;
 
-  const overviewItems = [
-    `Your program is ${duration}${hours ? ` (${hours})` : ''} combining online coursework${hasOJT ? ' and hands-on training' : ''}.`,
-    'Related Technical Instruction (RTI) is delivered through the Elevate LMS.',
-    ...(hasOJT ? ['On-the-Job Training (OJT) is completed at employer partner sites.'] : []),
-    credentials.length > 0
-      ? `You will prepare for and earn the following credentials: ${credentials.join(', ')}.`
-      : 'You will prepare for and sit for industry-recognized credential exams administered through their respective certifying organizations.',
-  ];
-
   const sections = [
-    { title: `Program Overview — ${programTitle}`, icon: BookOpen, items: overviewItems },
+    {
+      title: `Program Overview — ${programTitle}`,
+      icon: BookOpen,
+      items: [
+        `Your current program duration is ${duration}${hours ? ` (${hours})` : ''}.`,
+        'Related Technical Instruction and assigned coursework are tracked in the Elevate LMS.',
+        ...(hasOJT ? ['On-the-job learning is completed and verified through the apprenticeship/worksite workflow.'] : []),
+        credentials.length ? `Credential pathway: ${credentials.join(', ')}.` : 'Credential requirements are listed inside your assigned program.',
+      ],
+    },
     {
       title: 'Attendance & Expectations',
       icon: Clock,
       items: [
-        'Attendance is tracked daily. Two consecutive unexcused absences trigger an intervention.',
-        'You must complete all assigned coursework, quizzes, and assessments.',
-        'Maintain professional conduct at all times — in class, online, and at employer sites.',
-        'Communicate any schedule conflicts or issues to your instructor immediately.',
+        'Complete assigned coursework, quizzes, assessments, and required activities on schedule.',
+        'Communicate absences or schedule conflicts to program staff promptly.',
+        'Maintain professional conduct in class, online, and at employer or clinical sites.',
+        'Review your dashboard regularly for assignments, documents, and staff messages.',
       ],
     },
     {
       title: 'Safety & Compliance',
       icon: Shield,
       items: [
-        'OSHA safety training is mandatory before any hands-on work.',
-        'Follow all safety protocols at employer sites. PPE is required where specified.',
-        'Report any safety concerns to your instructor or site supervisor immediately.',
-        'Drug screening and background checks may be required by employer partners.',
+        'Complete required safety training before hands-on work.',
+        'Follow worksite, clinical, and lab safety requirements, including required PPE.',
+        'Report safety concerns to your instructor or site supervisor immediately.',
+        'Employer or clinical placements may require additional screening or documentation.',
       ],
     },
     {
       title: 'Support Services',
       icon: Users,
       items: [
-        'Career services are available throughout and after your program.',
-        'Contact your case manager for supportive services (transportation, childcare, etc.).',
-        'Tutoring and additional instruction are available upon request.',
-        'Grievance procedures are documented in the student handbook.',
+        'Career services are available during and after training.',
+        'Contact your case manager or program staff for approved supportive-service needs.',
+        'Tutoring and additional instruction may be requested when available.',
+        'Use the student handbook and grievance process for formal concerns.',
       ],
     },
     {
       title: 'Academic Integrity',
       icon: AlertTriangle,
       items: [
-        'All work must be your own. Plagiarism or cheating results in disciplinary action.',
-        'Certification exams are proctored. No unauthorized materials during exams.',
-        'Quiz and assessment scores are tracked in the LMS.',
-        'A minimum passing score of 70% is required on all assessments.',
+        'Submit your own work and follow exam/proctoring rules.',
+        'Do not use unauthorized materials during assessments.',
+        'Assessment and completion records are maintained in the LMS.',
+        'Program-specific passing requirements are shown with each course or credential.',
       ],
     },
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* VIDEO HERO — students learning, full bleed */}
-      <div
-        className="relative w-full overflow-hidden"
-        style={{ height: '55vh', minHeight: 280, maxHeight: 480 }}
-      >
-        <UltraVideoPlayer
-          src="/videos/getting-started-hero.mp4"
-          poster="/images/pages/orientation-page-1.webp"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <div className="border-b bg-slate-950 text-white">
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-300">Learner onboarding</p>
+          <h1 className="mt-3 text-4xl font-black">Orientation</h1>
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-200">Review how your training, progress, safety, support, and responsibilities work before entering the learner dashboard.</p>
+        </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-        <Breadcrumbs
-          items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Orientation' }]}
-        />
-        <Link
-          href="/onboarding/learner"
-          className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Onboarding
-        </Link>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Student Orientation</h1>
-        <p className="text-sm text-slate-700 mb-6">
-          Review the following information before starting your program. You must acknowledge each
-          section to complete orientation.
-        </p>
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Orientation' }]} />
+        <Link href="/onboarding/learner" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-brand-blue-700"><ArrowLeft className="h-4 w-4" /> Back to onboarding</Link>
 
-        <OrientationAvatar />
-
-        <div className="space-y-4 mb-8">
-          {sections.map((s, i) => (
-            <div key={i} className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <div className="px-5 py-3 bg-white border-b border-slate-100 flex items-center gap-2">
-                <s.icon className="w-4 h-4 text-brand-blue-600" />
-                <h2 className="text-sm font-semibold text-slate-900">{s.title}</h2>
-              </div>
-              <ul className="p-5 space-y-2">
-                {s.items.map((item, j) => (
-                  <li key={j} className="flex items-start gap-2 text-xs text-slate-900">
-                    <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    {item}
-                  </li>
-                ))}
+        <div className="mt-6 space-y-5">
+          {sections.map(({ title, icon: Icon, items }) => (
+            <section key={title} className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7">
+              <div className="flex items-center gap-3"><Icon className="h-6 w-6 text-brand-blue-700" /><h2 className="text-xl font-black">{title}</h2></div>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-700">
+                {items.map((item) => <li key={item} className="flex gap-3"><span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-brand-blue-600" />{item}</li>)}
               </ul>
-            </div>
+            </section>
           ))}
         </div>
 
-        <form
-          action={completeOrientation}
-          className="bg-white rounded-xl border border-slate-200 p-6"
-        >
-          <label className="flex items-start gap-3 cursor-pointer">
-            <input type="checkbox" required className="mt-1" />
-            <span className="text-sm text-slate-900">
-              I have read and understand the orientation materials above. I agree to follow all
-              program policies, attendance requirements, and safety protocols.
-            </span>
-          </label>
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
-            >
-              <span className="w-4 h-4 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> Complete Orientation
-            </button>
+        <form action={completeOrientation} className="mt-8 rounded-2xl border border-green-200 bg-green-50 p-6 sm:flex sm:items-center sm:justify-between sm:gap-5">
+          <div>
+            <h2 className="font-black text-green-950">Ready to continue?</h2>
+            <p className="mt-1 text-sm text-green-900">Completing orientation unlocks the next learner onboarding step.</p>
           </div>
+          <button type="submit" className="mt-4 min-h-12 rounded-xl bg-green-700 px-6 font-black text-white hover:bg-green-800 sm:mt-0">Complete orientation</button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

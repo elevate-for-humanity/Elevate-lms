@@ -1,138 +1,166 @@
 /**
- * Centralized RBAC role matrix.
+ * Canonical RBAC role matrix.
  *
- * Single source of truth for which roles can perform which actions.
- * Guards, middleware, and UI visibility checks should import from here
- * rather than hardcoding role arrays inline.
- *
- * Roles (from lib/admin/guards.ts UserRole):
- *   super_admin    — full platform access, can impersonate, manage all settings
- *   admin          — platform admin, cannot impersonate or access dev tools
- *   staff          — case managers, enrollment staff, limited admin access
- *   org_admin      — organization-level admin (employer orgs, partner orgs)
- *   instructor     — course delivery, lesson sign-offs, student progress
- *   case_manager   — WIOA/workforce case management
- *   employer       — employer portal access, apprentice tracking
- *   program_holder — partner salon/barbershop, apprentice oversight
- *   provider_admin — training provider admin
- *   partner        — partner organization access
- *   delegate       — delegated access (limited, time-bound)
- *   student        — learner, default authenticated role
+ * This is the single authorization taxonomy consumed by page guards,
+ * middleware, API guards, and portal access helpers. Historical role aliases
+ * that still exist in production are recognized here so routing and
+ * authorization cannot disagree about whether a role exists.
  */
 
 export type UserRole =
   | 'super_admin'
   | 'admin'
-  | 'staff'
   | 'org_admin'
+  | 'advisor'
+  | 'staff'
   | 'instructor'
-  | 'case_manager'
-  | 'employer'
-  | 'program_holder'
-  | 'provider_admin'
-  | 'partner'
+  | 'test_admin'
+  | 'proctor'
+  | 'student'
+  | 'learner'
+  | 'user'
   | 'delegate'
-  | 'student';
+  | 'grant_client'
+  | 'apprentice'
+  | 'barber_apprentice'
+  | 'cosmetology_apprentice'
+  | 'sponsor'
+  | 'employer'
+  | 'recruiter'
+  | 'partner'
+  | 'host_shop'
+  | 'host_shop_admin'
+  | 'workforce_partner'
+  | 'parent'
+  | 'creator'
+  | 'case_manager'
+  | 'workforce_board'
+  | 'workforce_board_admin'
+  | 'program_holder'
+  | 'provider'
+  | 'provider_admin';
 
-// ── Role sets ─────────────────────────────────────────────────────────────────
-// Named sets used by guards. Import these instead of writing inline arrays.
+const ROLE_ALIASES: Record<string, UserRole> = {
+  superadmin: 'super_admin',
+  'super-admin': 'super_admin',
+  orgadmin: 'org_admin',
+  'org-admin': 'org_admin',
+  testadmin: 'test_admin',
+  'test-admin': 'test_admin',
+  hostshop: 'host_shop',
+  'host-shop': 'host_shop',
+  hostshopadmin: 'host_shop_admin',
+  'host-shop-admin': 'host_shop_admin',
+  workforce: 'workforce_partner',
+  workforcepartner: 'workforce_partner',
+  'workforce-partner': 'workforce_partner',
+  programholder: 'program_holder',
+  'program-holder': 'program_holder',
+  provideradmin: 'provider_admin',
+  'provider-admin': 'provider_admin',
+  workforceboard: 'workforce_board',
+  'workforce-board': 'workforce_board',
+  workforceboardadmin: 'workforce_board_admin',
+  'workforce-board-admin': 'workforce_board_admin',
+};
 
-/** Can access /admin/* routes */
-export const ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'org_admin'];
+const CANONICAL_ROLES = new Set<UserRole>([
+  'super_admin', 'admin', 'org_admin', 'advisor', 'staff', 'instructor',
+  'test_admin', 'proctor', 'student', 'learner', 'user', 'delegate',
+  'grant_client', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice',
+  'sponsor', 'employer', 'recruiter', 'partner', 'host_shop', 'host_shop_admin',
+  'workforce_partner', 'parent', 'creator', 'case_manager', 'workforce_board',
+  'workforce_board_admin', 'program_holder', 'provider', 'provider_admin',
+]);
 
-/** Can access admin API routes (apiRequireAdmin) */
-export const API_ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'org_admin'];
+export function normalizeRole(value: unknown): UserRole | null {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, '_');
+  if (!normalized) return null;
+  if (CANONICAL_ROLES.has(normalized as UserRole)) return normalized as UserRole;
+  return ROLE_ALIASES[normalized] ?? null;
+}
 
-/** Can perform instructor actions (sign-offs, lesson management) */
+export function normalizeRoles(values: unknown[]): UserRole[] {
+  return Array.from(
+    new Set(values.map(normalizeRole).filter((role): role is UserRole => role !== null)),
+  );
+}
+
+export const ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'staff'];
+export const API_ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'staff'];
 export const INSTRUCTOR_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'instructor'];
-
-/** Can access employer portal */
-export const EMPLOYER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'employer', 'org_admin'];
-
-/** Can access staff portal */
+export const TESTING_CENTER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'test_admin', 'proctor'];
+export const EMPLOYER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'employer', 'sponsor', 'recruiter', 'org_admin'];
 export const STAFF_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager'];
+export const WORKFORCE_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager', 'workforce_partner'];
+export const PROGRAM_HOLDER_ROLES: UserRole[] = ['super_admin', 'admin', 'program_holder', 'provider_admin'];
+export const HOST_SHOP_ROLES: UserRole[] = ['super_admin', 'admin', 'partner', 'host_shop', 'host_shop_admin', 'program_holder'];
+export const APPRENTICE_ROLES: UserRole[] = ['super_admin', 'admin', 'student', 'learner', 'apprentice', 'barber_apprentice', 'cosmetology_apprentice'];
 
-/** Can access workforce board / WIOA case management */
-export const WORKFORCE_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'case_manager'];
+export const ALL_AUTHENTICATED_ROLES: UserRole[] = Array.from(CANONICAL_ROLES);
 
-/** Can access program holder portal */
-export const PROGRAM_HOLDER_ROLES: UserRole[] = ['super_admin', 'admin', 'program_holder'];
+/**
+ * Match an effective-role set against required roles.
+ * Admin/super-admin can enter ordinary role portals when adminOverride is true,
+ * but a super-admin-only requirement is never widened to normal admin.
+ */
+export function hasAnyRole(
+  effectiveRoles: readonly (UserRole | string)[],
+  allowedRoles: readonly (UserRole | string)[],
+  options: { adminOverride?: boolean } = { adminOverride: true },
+): boolean {
+  const effective = normalizeRoles([...effectiveRoles]);
+  const allowed = normalizeRoles([...allowedRoles]);
+  if (!allowed.length) return effective.length > 0;
+  if (effective.some((role) => allowed.includes(role))) return true;
 
-/** Any authenticated user (all roles) */
-export const ALL_AUTHENTICATED_ROLES: UserRole[] = [
-  'super_admin', 'admin', 'staff', 'org_admin', 'instructor',
-  'case_manager', 'employer', 'program_holder', 'provider_admin',
-  'partner', 'delegate', 'student',
-];
-
-// ── Permission map ────────────────────────────────────────────────────────────
-// Declarative map of capability → allowed roles.
-// Use hasPermission() to check a specific capability.
+  if (options.adminOverride !== false) {
+    const superAdminOnly = allowed.length === 1 && allowed[0] === 'super_admin';
+    if (!superAdminOnly && effective.some((role) => role === 'admin' || role === 'super_admin')) {
+      return true;
+    }
+  }
+  return false;
+}
 
 export const PERMISSIONS = {
-  // Identity & access
-  impersonate_users:          ['super_admin'] as UserRole[],
-  manage_roles:               ['super_admin'] as UserRole[],
-  access_dev_tools:           ['super_admin'] as UserRole[],
-  view_audit_logs:            ['super_admin', 'admin'] as UserRole[],
-
-  // Platform administration
-  manage_programs:            ['super_admin', 'admin'] as UserRole[],
-  manage_courses:             ['super_admin', 'admin', 'staff'] as UserRole[],
-  manage_enrollments:         ['super_admin', 'admin', 'staff'] as UserRole[],
-  manage_users:               ['super_admin', 'admin'] as UserRole[],
-  manage_payments:            ['super_admin', 'admin'] as UserRole[],
-  manage_grants:              ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
-  manage_platform_settings:   ['super_admin'] as UserRole[],
-  trigger_deployments:        ['super_admin'] as UserRole[],
-  run_bulk_operations:        ['super_admin', 'admin'] as UserRole[],
-
-  // Instructor actions
-  sign_off_lab_submissions:   ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
-  view_student_progress:      ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
-  manage_lesson_content:      ['super_admin', 'admin', 'instructor'] as UserRole[],
-
-  // Employer portal
-  view_apprentice_hours:      ['super_admin', 'admin', 'staff', 'employer', 'org_admin'] as UserRole[],
-  approve_apprentice_hours:   ['super_admin', 'admin', 'staff', 'employer'] as UserRole[],
-  post_jobs:                  ['super_admin', 'admin', 'employer', 'org_admin'] as UserRole[],
-
-  // Workforce / WIOA
-  manage_wioa_cases:          ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
-  authorize_funding:          ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
-
-  // Program holder
-  manage_partner_shop:        ['super_admin', 'admin', 'program_holder'] as UserRole[],
-  view_apprentice_compliance: ['super_admin', 'admin', 'staff', 'program_holder'] as UserRole[],
-
-  // Student / learner
-  access_lms:                 ALL_AUTHENTICATED_ROLES,
-  submit_application:         ALL_AUTHENTICATED_ROLES,
-  view_own_certificates:      ALL_AUTHENTICATED_ROLES,
+  impersonate_users: ['super_admin'] as UserRole[],
+  manage_roles: ['super_admin'] as UserRole[],
+  access_dev_tools: ['super_admin'] as UserRole[],
+  view_audit_logs: ['super_admin', 'admin'] as UserRole[],
+  manage_programs: ['super_admin', 'admin'] as UserRole[],
+  manage_courses: ['super_admin', 'admin', 'staff'] as UserRole[],
+  manage_enrollments: ['super_admin', 'admin', 'staff'] as UserRole[],
+  manage_users: ['super_admin', 'admin'] as UserRole[],
+  manage_payments: ['super_admin', 'admin'] as UserRole[],
+  manage_grants: ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
+  manage_platform_settings: ['super_admin'] as UserRole[],
+  trigger_deployments: ['super_admin'] as UserRole[],
+  run_bulk_operations: ['super_admin', 'admin'] as UserRole[],
+  sign_off_lab_submissions: ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
+  view_student_progress: ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
+  manage_lesson_content: ['super_admin', 'admin', 'instructor'] as UserRole[],
+  view_apprentice_hours: EMPLOYER_ROLES,
+  approve_apprentice_hours: ['super_admin', 'admin', 'staff', 'employer', 'sponsor'] as UserRole[],
+  post_jobs: ['super_admin', 'admin', 'employer', 'sponsor', 'recruiter', 'org_admin'] as UserRole[],
+  manage_wioa_cases: WORKFORCE_ROLES,
+  authorize_funding: ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
+  manage_partner_shop: HOST_SHOP_ROLES,
+  view_apprentice_compliance: ['super_admin', 'admin', 'staff', 'partner', 'host_shop', 'host_shop_admin', 'program_holder'] as UserRole[],
+  access_lms: ALL_AUTHENTICATED_ROLES,
+  submit_application: ALL_AUTHENTICATED_ROLES,
+  view_own_certificates: ALL_AUTHENTICATED_ROLES,
 } as const;
 
 export type Permission = keyof typeof PERMISSIONS;
 
-// ── Helper ────────────────────────────────────────────────────────────────────
-
-/**
- * Check if a role has a specific permission.
- *
- * @example
- * if (!hasPermission(user.role, 'impersonate_users')) redirect('/unauthorized');
- */
 export function hasPermission(role: UserRole | null | undefined, permission: Permission): boolean {
   if (!role) return false;
-  return (PERMISSIONS[permission] as UserRole[]).includes(role);
+  return (PERMISSIONS[permission] as readonly UserRole[]).includes(role);
 }
 
-/**
- * Check if a role is in a named role set.
- *
- * @example
- * if (!isInRoleSet(user.role, ADMIN_ROLES)) return forbidden();
- */
-export function isInRoleSet(role: UserRole | null | undefined, roleSet: UserRole[]): boolean {
+export function isInRoleSet(role: UserRole | null | undefined, roleSet: readonly UserRole[]): boolean {
   if (!role) return false;
   return roleSet.includes(role);
 }

@@ -30,11 +30,7 @@ function matches(path: string, prefix: string): boolean {
   return path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`);
 }
 
-/**
- * Convert a canonical role destination into its deployed application URL.
- * Admin paths are their real root paths on the Admin hostname; no synthetic
- * /admin prefix is used anywhere in the role-routing contract.
- */
+/** Convert a canonical role destination into its deployed application URL. */
 export function absoluteRoleDestination(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
 
@@ -45,7 +41,7 @@ export function absoluteRoleDestination(path: string): string {
   }
 
   if (MARKETING_PATH_PREFIXES.some((prefix) => matches(normalized, prefix))) {
-    return `${siteUrls.marketing}${normalized}`;
+    return `${siteUrls.site}${normalized}`;
   }
 
   return `${siteUrls.app}${normalized}`;

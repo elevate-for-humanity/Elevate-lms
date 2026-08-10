@@ -1,8 +1,7 @@
 /**
  * Canonical role → portal destination registry.
  *
- * This file is the single source of truth for post-auth role routing.
- * `portal-map.ts` owns application hosts/base paths; this file owns which role
+ * portal-map.ts owns application hosts/base paths; this file owns which role
  * belongs to which portal and its canonical destination within that portal.
  */
 
@@ -12,29 +11,9 @@ import {
   MARKETING_HOST,
   type PortalKey,
 } from '@/lib/routing/portal-map';
+import type { UserRole } from '@/lib/rbac/role-matrix';
 
-export type UserRole =
-  | 'student'
-  | 'instructor'
-  | 'admin'
-  | 'org_admin'
-  | 'staff'
-  | 'program_holder'
-  | 'delegate'
-  | 'partner'
-  | 'host_shop'
-  | 'host_shop_admin'
-  | 'sponsor'
-  | 'employer'
-  | 'creator'
-  | 'workforce_board'
-  | 'case_manager'
-  | 'provider_admin'
-  | 'grant_client'
-  | 'apprentice'
-  | 'test_admin'
-  | 'proctor';
-
+export type { UserRole } from '@/lib/rbac/role-matrix';
 export type PortalHost = 'admin' | 'lms' | 'marketing';
 
 export interface RoleRouteConfig {
@@ -44,12 +23,8 @@ export interface RoleRouteConfig {
   label: string;
 }
 
-/**
- * Includes canonical database roles plus supported historical/secondary role
- * values that can still be present on profiles or effective-role assignments.
- * Aliases resolve to canonical portals; they do not create routes.
- */
 export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
+  super_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Super Admin' },
   admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Admin' },
   org_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Org Admin' },
   advisor: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Advisor' },
@@ -88,8 +63,8 @@ export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
   provider_admin: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider Admin' },
 };
 
-/** Higher index is not implied; this is explicit first-match precedence. */
-export const ROLE_ROUTE_PRIORITY: ReadonlyArray<string> = [
+export const ROLE_ROUTE_PRIORITY: ReadonlyArray<UserRole | string> = [
+  'super_admin',
   'admin',
   'org_admin',
   'advisor',

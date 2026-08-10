@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
+import { hasAnyRole, normalizeRoles, type UserRole } from '@/lib/rbac/role-matrix';
 
 export interface AuthResult {
   user: {
@@ -16,8 +17,7 @@ export interface AuthResult {
     last_name?: string;
     full_name?: string;
   };
-  /** All roles this user holds (profile.role + any user_roles entries). */
-  effectiveRoles: string[];
+  effectiveRoles: UserRole[];
 }
 
 async function resolveCurrentPath(): Promise<string> {
@@ -33,7 +33,7 @@ async function resolveCurrentPath(): Promise<string> {
       const url = new URL(fromHeader, 'http://localhost');
       return url.pathname + (url.search || '');
     } catch {
-      // malformed URL — fall through to cookie
+      // fall through to cookie
     }
   }
 
@@ -48,14 +48,7 @@ async function resolveCurrentPath(): Promise<string> {
   return '';
 }
 
-/**
- * Require user to have one of the specified roles.
- *
- * Authentication always enters through /login. Marketing /login performs a
- * same-purpose handoff to the canonical LMS login; the LMS owns the login UI.
- * Do not send shared portal code to the removed /admin-login alias.
- */
-export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
+export async function requireRole(allowedRoles: readonly (UserRole | string)[]): Promise<AuthResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -63,32 +56,25 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
 
   if (!user) {
     const currentPath = await resolveCurrentPath();
-    if (currentPath) {
-      redirect(`/login?redirect=${encodeURIComponent(currentPath)}`);
-    }
+    if (currentPath) redirect(`/login?redirect=${encodeURIComponent(currentPath)}`);
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
+  const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
+    supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
+  ]);
 
   if (!profile) redirect('/unauthorized');
 
-  const { data: userRoleRows } = await supabase
-    .from('user_roles')
-    .select('roles(name)')
-    .eq('user_id', user.id);
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
-    .filter(Boolean) as string[];
+    .filter((value: unknown): value is string => typeof value === 'string');
+  const effectiveRoles = normalizeRoles([profile.role, ...secondaryRoles]);
 
-  const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles]));
-  const allowed = effectiveRoles.some((role) => allowedRoles.includes(role));
-
-  if (!allowed) redirect('/unauthorized');
+  if (!hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true })) {
+    redirect('/unauthorized');
+  }
 
   return {
     user: {
@@ -105,24 +91,17 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   if (!user) return false;
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
+  const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
+    supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+    supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
+  ]);
 
-  // Admin is the single platform-wide privileged role.
-  if (profile?.role === requiredRole || profile?.role === 'admin') {
-    return true;
-  }
+  const secondaryRoles = (userRoleRows || [])
+    .map((row: any) => row.roles?.name)
+    .filter((value: unknown): value is string => typeof value === 'string');
+  const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
 
-  const { data: userRoleRows } = await supabase
-    .from('user_roles')
-    .select('roles(name)')
-    .eq('user_id', user.id);
-
-  return (userRoleRows || []).some((row: any) => row.roles?.name === requiredRole);
+  return hasAnyRole(effectiveRoles, [requiredRole], { adminOverride: true });
 }

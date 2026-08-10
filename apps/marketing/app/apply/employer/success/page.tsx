@@ -14,17 +14,15 @@ export const metadata: Metadata = {
 
 export default async function EmployerApplicationSuccess() {
   const supabase = await createClient();
-  // Best-effort page view log — ignore errors
+  // Best-effort page view log. PostgREST builders are PromiseLike, so await
+  // the request directly instead of chaining Promise.catch().
   await supabase
     .from('page_views')
-    .insert({ page: 'employer_application_success' })
-    .then(() => null)
-    .catch(() => null);
+    .insert({ page: 'employer_application_success' });
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
       <div className="max-w-2xl w-full">
-        {/* Success card */}
         <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center mb-6 shadow-sm">
           <CheckCircle className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-slate-900 mb-3">Application Submitted!</h1>
@@ -33,7 +31,6 @@ export default async function EmployerApplicationSuccess() {
             and contact you within 1–2 business days.
           </p>
 
-          {/* What's next */}
           <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-6 text-left">
             <h2 className="font-semibold text-slate-900 mb-3">What happens next</h2>
             <ol className="space-y-3">
@@ -56,14 +53,13 @@ export default async function EmployerApplicationSuccess() {
           </div>
         </div>
 
-        {/* Onboarding CTA */}
         <div className="bg-white border border-brand-blue-200 rounded-2xl p-6 mb-4 shadow-sm">
           <h2 className="font-bold text-slate-900 mb-1">Ready to get started?</h2>
           <p className="text-sm text-slate-600 mb-4">
             You can begin employer onboarding now while we review your application.
           </p>
           <Link
-            href="/apply/employer/success"
+            href="/onboarding/employer/orientation"
             className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-colors w-full justify-center"
           >
             Start Employer Onboarding <ArrowRight className="w-4 h-4" />

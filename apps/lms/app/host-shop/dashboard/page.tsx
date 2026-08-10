@@ -15,6 +15,7 @@ import {
   getHostShopOnboardingPaths,
   resolveHostShopProgram,
 } from '@/lib/partners/host-shop-onboarding';
+import { provisionPartnerFromBarberApplication } from '@/lib/partners/provision-barber-partner';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +57,6 @@ export default async function HostShopDashboardPage() {
 
   const isPlatformAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin');
   if (isPlatformAdmin) {
-    // Admins can enter the Host Shop portal, but tenant selection must be explicit.
     redirect('/host-shop/dashboard/board');
   }
 
@@ -85,20 +85,35 @@ export default async function HostShopDashboardPage() {
     const { data: legacyApplication } = user.email
       ? await db
           .from('barbershop_partner_applications')
-          .select('status, mou_signed_at')
+          .select(
+            'id, shop_legal_name, shop_dba_name, owner_name, contact_name, contact_email, contact_phone, shop_address_line1, shop_address_line2, shop_city, shop_state, shop_zip, indiana_shop_license_number, supervisor_name, supervisor_license_number, supervisor_years_licensed, compensation_model, workers_comp_status, can_supervise_and_verify, mou_signed_at, mou_signature_data, status',
+          )
           .eq('contact_email', user.email)
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle()
       : { data: null };
 
-    if (legacyApplication?.status === 'approved' && !legacyApplication.mou_signed_at) {
-      redirect('/host-shop/apply/sign-mou');
+    if (legacyApplication?.status === 'approved') {
+      const provisioned = await provisionPartnerFromBarberApplication(db, legacyApplication, {
+        linkUserId: user.id,
+      });
+
+      if (!provisioned) {
+        redirect('/host-shop/login?error=provisioning');
+      }
+
+      redirect(
+        legacyApplication.mou_signed_at
+          ? '/host-shop/onboarding/profile'
+          : '/host-shop/onboarding/mou',
+      );
     }
-    if (legacyApplication?.status === 'approved') redirect('/host-shop/apply/forms');
+
     if (legacyApplication?.status === 'pending' || legacyApplication?.status === 'submitted') {
-      redirect('/host-shop/apply/thank-you');
+      redirect('/host-shop/login?status=pending');
     }
+
     redirect('/host-shop/login?error=no_partner');
   }
 
@@ -110,6 +125,7 @@ export default async function HostShopDashboardPage() {
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
   if (!partner.mou_signed) redirect(onboardingPaths.signMou);
+  if (!partner.onboarding_completed) redirect(onboardingPaths.forms);
 
   redirect('/host-shop/dashboard/board');
 }

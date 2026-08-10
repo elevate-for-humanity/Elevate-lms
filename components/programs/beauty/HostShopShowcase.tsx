@@ -1,0 +1,159 @@
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play, Scissors } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
+
+const ROTATION_MS = 6500;
+
+export default function HostShopShowcase() {
+  const shops = useMemo(() => FEATURED_BEAUTY_HOST_PARTNERS, []);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setReduceMotion(query.matches);
+    sync();
+    query.addEventListener('change', sync);
+    return () => query.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (paused || reduceMotion || shops.length < 2) return;
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % shops.length);
+    }, ROTATION_MS);
+    return () => window.clearInterval(timer);
+  }, [paused, reduceMotion, shops.length]);
+
+  if (!shops.length) return null;
+
+  const shop = shops[activeIndex];
+  const image = shop.media?.[0];
+  const externalUrl = shop.websiteUrl ?? shop.onlineListingUrl ?? shop.socialUrl;
+  const externalLabel = shop.websiteLabel ?? shop.onlineListingLabel ?? shop.socialLabel ?? 'Visit shop online';
+
+  function go(delta: number) {
+    setActiveIndex((current) => (current + delta + shops.length) % shops.length);
+  }
+
+  return (
+    <section aria-labelledby="host-shop-showcase-heading" className="bg-slate-950 px-4 py-12 text-white sm:px-6 sm:py-16">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-red-300">Meet the host-shop network</p>
+            <h2 id="host-shop-showcase-heading" className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
+              Train in real shops. Discover the businesses behind the apprenticeship.
+            </h2>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">
+              This rotating showcase introduces approved host shops, where they are located, and how to visit, book, or learn more.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPaused((value) => !value)}
+            className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl border border-white/25 px-4 py-2 text-sm font-bold text-white hover:bg-white/10 sm:self-auto"
+            aria-label={paused ? 'Resume host shop slideshow' : 'Pause host shop slideshow'}
+          >
+            {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+            {paused ? 'Play' : 'Pause'}
+          </button>
+        </div>
+
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900">
+          <div className="grid min-h-[430px] lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="relative min-h-[300px] overflow-hidden bg-slate-800 lg:min-h-[430px]">
+              {image ? (
+                <Image
+                  key={image.src}
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  priority={activeIndex === 0}
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className={image.kind === 'flyer' ? 'object-contain bg-white p-4' : 'object-cover'}
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-black px-8 text-center">
+                  <Scissors className="h-14 w-14 text-red-300" aria-hidden="true" />
+                  <p className="mt-5 text-3xl font-black">{shop.dba ?? shop.name}</p>
+                  <p className="mt-2 text-slate-300">{shop.city}, {shop.state}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col justify-center p-7 sm:p-9 lg:p-10" aria-live="polite">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-red-300">
+                Featured host shop {activeIndex + 1} of {shops.length}
+              </p>
+              <h3 className="mt-3 text-3xl font-black tracking-tight">{shop.dba ?? shop.name}</h3>
+              {shop.dba ? <p className="mt-1 text-sm text-slate-400">Legal name: {shop.name}</p> : null}
+              <p className="mt-5 text-base leading-7 text-slate-300">{shop.marketingBlurb ?? shop.note}</p>
+              <p className="mt-5 flex items-start gap-2 text-sm font-semibold text-slate-200">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-red-300" aria-hidden="true" />
+                <span>{shop.address}, {shop.city}, {shop.state} {shop.zip}</span>
+              </p>
+
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href={`/host-shops/${shop.slug}`}
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-red-600 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-red-500"
+                >
+                  Explore this host shop
+                </Link>
+                {externalUrl ? (
+                  <a
+                    href={externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-sm font-extrabold text-white hover:bg-white/10"
+                  >
+                    {externalLabel} <ExternalLink className="h-4 w-4" />
+                  </a>
+                ) : null}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 px-5 py-4 sm:px-7">
+            <div className="flex gap-2" aria-label="Choose a host shop slide">
+              {shops.map((item, index) => (
+                <button
+                  key={item.slug}
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  className={`h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-red-400' : 'w-2.5 bg-white/30 hover:bg-white/50'}`}
+                  aria-label={`Show ${item.dba ?? item.name}`}
+                  aria-current={index === activeIndex ? 'true' : undefined}
+                />
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => go(-1)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 hover:bg-white/10"
+                aria-label="Previous host shop"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => go(1)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 hover:bg-white/10"
+                aria-label="Next host shop"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -65,36 +65,54 @@ export const HOST_SHOP_ONBOARDING_PATHS: Record<
   },
 };
 
+const DOCUMENT_TYPE_ALIASES: Record<string, string> = {
+  barbershop_license: 'establishment_license',
+  salon_license: 'establishment_license',
+  shop_license: 'establishment_license',
+  business_license: 'establishment_license',
+  liability_insurance: 'insurance_coi',
+  insurance: 'insurance_coi',
+  ein_letter: 'w9',
+  ein: 'w9',
+};
+
+export function canonicalHostShopDocumentType(value: unknown): string {
+  const raw = String(value ?? '').trim().toLowerCase();
+  return DOCUMENT_TYPE_ALIASES[raw] ?? raw;
+}
+
 const DEFAULT_REQUIREMENTS: Record<HostShopProgramType, HostShopDocumentRequirement[]> = {
   barber: [
-    requirement('barber', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the shop EIN.'),
-    requirement('barber', 'w9', 'IRS W-9', 'Completed W-9 for partner payout and tax records.'),
-    requirement('barber', 'barbershop_license', 'Indiana Barbershop License', 'Current Indiana barbershop establishment license.', true),
-    requirement('barber', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
-    requirement('barber', 'liability_insurance', 'General Liability Insurance Certificate', 'Certificate of general liability insurance for the host shop.', true),
-    requirement('barber', 'supervisor_license', 'Supervising Barber License', 'Indiana barber license for the direct apprentice supervisor.', true),
+    requirement('barber', 'establishment_license', 'Indiana Business / Barbershop License', 'Current Indiana business or barbershop establishment license.', true),
+    requirement('barber', 'insurance_coi', 'Liability Insurance Certificate', 'Current commercial/general liability insurance certificate of insurance.', true),
+    requirement('barber', 'workers_comp', "Workers' Compensation Certificate / Exemption", "Current workers' compensation certificate or valid Indiana exemption."),
+    requirement('barber', 'supervisor_license', 'Supervising Barber License', 'Current Indiana barber license for the direct apprentice supervisor.', true),
+    requirement('barber', 'w9', 'EIN Verification / IRS W-9', 'IRS EIN verification or completed W-9 confirming the business tax identity.'),
+    requirement('barber', 'local_business', 'Occupancy / Local Business Document', 'Local occupancy permit or business document when applicable.', false, false),
   ],
   cosmetology: [
-    requirement('cosmetology', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the salon EIN.'),
-    requirement('cosmetology', 'w9', 'IRS W-9', 'Completed W-9 for partner payout and tax records.'),
-    requirement('cosmetology', 'salon_license', 'Indiana Cosmetology Salon License', 'Current Indiana cosmetology salon license.', true),
-    requirement('cosmetology', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
-    requirement('cosmetology', 'liability_insurance', 'General Liability Insurance Certificate', 'Certificate of general liability insurance for the host salon.', true),
-    requirement('cosmetology', 'supervisor_license', 'Supervising Cosmetologist License', 'Indiana cosmetology license for the designated apprentice supervisor.', true),
+    requirement('cosmetology', 'establishment_license', 'Indiana Business / Salon License', 'Current Indiana business or cosmetology salon establishment license.', true),
+    requirement('cosmetology', 'insurance_coi', 'Liability Insurance Certificate', 'Current commercial/general liability insurance certificate of insurance.', true),
+    requirement('cosmetology', 'workers_comp', "Workers' Compensation Certificate / Exemption", "Current workers' compensation certificate or valid Indiana exemption."),
+    requirement('cosmetology', 'supervisor_license', 'Supervising Cosmetologist License', 'Current Indiana cosmetology license for the designated apprentice supervisor.', true),
+    requirement('cosmetology', 'w9', 'EIN Verification / IRS W-9', 'IRS EIN verification or completed W-9 confirming the business tax identity.'),
+    requirement('cosmetology', 'local_business', 'Occupancy / Local Business Document', 'Local occupancy permit or business document when applicable.', false, false),
   ],
   nail_technician: [
-    requirement('nail_technician', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the salon EIN.'),
-    requirement('nail_technician', 'salon_license', 'Indiana Nail Salon License', 'Current Indiana nail salon license.', true),
-    requirement('nail_technician', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
-    requirement('nail_technician', 'supervisor_license', 'Supervising Nail Technician License', 'Indiana nail technician license for the apprentice supervisor.', true),
-    requirement('nail_technician', 'business_license', 'City/County Business License', 'Local business license or occupancy permit, if applicable.', false),
+    requirement('nail_technician', 'establishment_license', 'Indiana Business / Nail Salon License', 'Current Indiana business or nail salon establishment license.', true),
+    requirement('nail_technician', 'insurance_coi', 'Liability Insurance Certificate', 'Current commercial/general liability insurance certificate of insurance.', true),
+    requirement('nail_technician', 'workers_comp', "Workers' Compensation Certificate / Exemption", "Current workers' compensation certificate or valid Indiana exemption."),
+    requirement('nail_technician', 'supervisor_license', 'Supervising Nail Technician License', 'Current Indiana nail technician license for the apprentice supervisor.', true),
+    requirement('nail_technician', 'w9', 'EIN Verification / IRS W-9', 'IRS EIN verification or completed W-9 confirming the business tax identity.'),
+    requirement('nail_technician', 'local_business', 'Occupancy / Local Business Document', 'Local occupancy permit or business document when applicable.', false, false),
   ],
   esthetician: [
-    requirement('esthetician', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the spa EIN.'),
-    requirement('esthetician', 'salon_license', 'Indiana Esthetician Establishment License', 'Current Indiana esthetics establishment license.', true),
-    requirement('esthetician', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
-    requirement('esthetician', 'supervisor_license', 'Supervising Esthetician License', 'Indiana esthetician license for the apprentice supervisor.', true),
-    requirement('esthetician', 'business_license', 'City/County Business License', 'Local business license or occupancy permit, if applicable.', false),
+    requirement('esthetician', 'establishment_license', 'Indiana Business / Esthetics License', 'Current Indiana business or esthetics establishment license.', true),
+    requirement('esthetician', 'insurance_coi', 'Liability Insurance Certificate', 'Current commercial/general liability insurance certificate of insurance.', true),
+    requirement('esthetician', 'workers_comp', "Workers' Compensation Certificate / Exemption", "Current workers' compensation certificate or valid Indiana exemption."),
+    requirement('esthetician', 'supervisor_license', 'Supervising Esthetician License', 'Current Indiana esthetician license for the apprentice supervisor.', true),
+    requirement('esthetician', 'w9', 'EIN Verification / IRS W-9', 'IRS EIN verification or completed W-9 confirming the business tax identity.'),
+    requirement('esthetician', 'local_business', 'Occupancy / Local Business Document', 'Local occupancy permit or business document when applicable.', false, false),
   ],
 };
 
@@ -160,9 +178,19 @@ export function mergeHostShopDocumentRequirements(
   }
 
   for (const req of dbRequirements ?? []) {
-    const documentType = String(req.document_type ?? '');
-    if (!documentType) continue;
-    byType.set(documentType, { ...req, id: req.id ?? `${program}-${documentType}` });
+    const originalType = String(req.document_type ?? '');
+    const documentType = canonicalHostShopDocumentType(originalType);
+    if (!documentType || documentType === 'mou') continue;
+    if (!byType.has(documentType)) continue;
+
+    const existing = byType.get(documentType) ?? {};
+    byType.set(documentType, {
+      ...existing,
+      ...req,
+      id: req.id ?? `${program}-${documentType}`,
+      document_type: documentType,
+      program_id: program,
+    });
   }
 
   return Array.from(byType.values());

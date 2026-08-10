@@ -6,7 +6,12 @@
  * belongs to which portal and its canonical destination within that portal.
  */
 
-import { ADMIN_HOST, LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+import {
+  ADMIN_HOST,
+  LMS_HOST,
+  MARKETING_HOST,
+  type PortalKey,
+} from '@/lib/routing/portal-map';
 
 export type UserRole =
   | 'student'
@@ -35,7 +40,7 @@ export type PortalHost = 'admin' | 'lms' | 'marketing';
 export interface RoleRouteConfig {
   path: string;
   host: PortalHost;
-  portalKey: string;
+  portalKey: PortalKey;
   label: string;
 }
 
@@ -74,7 +79,7 @@ export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
   workforce_partner: { path: '/workforce/dashboard', host: 'lms', portalKey: 'workforce', label: 'Workforce Partner' },
   parent: { path: '/parent-portal/dashboard', host: 'lms', portalKey: 'parent', label: 'Parent' },
 
-  creator: { path: '/creator/products', host: 'marketing', portalKey: 'marketing', label: 'Creator' },
+  creator: { path: '/creator/products', host: 'marketing', portalKey: 'creator', label: 'Creator' },
   case_manager: { path: '/case-manager/dashboard', host: 'marketing', portalKey: 'casemanager', label: 'Case Manager' },
   workforce_board: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board' },
   workforce_board_admin: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board Admin' },
@@ -137,8 +142,14 @@ export function getRoleDestinationUrl(
 export function getRolePortalKey(
   role: string | null | undefined,
   effectiveRoles?: string[],
-): string {
+): PortalKey {
   return resolveRoleRoute(role, effectiveRoles).portalKey;
+}
+
+export function getRolesForPortal(portalKey: PortalKey): string[] {
+  return Object.entries(ROLE_ROUTE_CONFIG)
+    .filter(([, config]) => config.portalKey === portalKey)
+    .map(([role]) => role);
 }
 
 export function getRoleLabel(role: string | null | undefined): string {

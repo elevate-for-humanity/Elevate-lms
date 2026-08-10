@@ -2,12 +2,11 @@
  * lib/routing/dashboard-resolver.ts
  *
  * SINGLE SOURCE OF TRUTH for role → dashboard URL resolution.
- *
- * Every login redirect and post-auth redirect should call resolveDashboardUrl().
- * Paths in this file are the ACTUAL deployed paths for each application host.
+ * Every login and post-auth redirect should call resolveDashboardUrl().
  */
 
 import { MARKETING_HOST, ADMIN_HOST, LMS_HOST } from './portal-map';
+import { normalizeRole, normalizeRoles } from '@/lib/rbac/role-matrix';
 
 interface RoleMapping {
   role: string;
@@ -18,9 +17,8 @@ interface RoleMapping {
 
 const ROLE_MAPPINGS: RoleMapping[] = [
   { role: 'student', label: 'Student', dashboardUrl: `${LMS_HOST}/lms/dashboard`, portalKey: 'lms' },
-  { role: 'learner', label: 'Learner', dashboardUrl: `${LMS_HOST}/lms/dashboard`, portalKey: 'lms' },
-  { role: 'user', label: 'User', dashboardUrl: `${LMS_HOST}/lms/dashboard`, portalKey: 'lms' },
 
+  { role: 'super_admin', label: 'Super Admin', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
   { role: 'admin', label: 'Admin', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
   { role: 'org_admin', label: 'Org Admin', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
   { role: 'staff', label: 'Staff', dashboardUrl: `${ADMIN_HOST}/staff-portal/dashboard`, portalKey: 'staff' },
@@ -30,40 +28,42 @@ const ROLE_MAPPINGS: RoleMapping[] = [
   { role: 'recruiter', label: 'Recruiter', dashboardUrl: `${LMS_HOST}/employer/dashboard`, portalKey: 'employer' },
 
   { role: 'apprentice', label: 'Apprentice', dashboardUrl: `${LMS_HOST}/apprentice`, portalKey: 'apprentice' },
-  { role: 'barber_apprentice', label: 'Barber Apprentice', dashboardUrl: `${LMS_HOST}/apprentice`, portalKey: 'apprentice' },
-  { role: 'cosmetology_apprentice', label: 'Cosmetology Apprentice', dashboardUrl: `${LMS_HOST}/apprentice`, portalKey: 'apprentice' },
 
   { role: 'host_shop', label: 'Host Shop', dashboardUrl: `${LMS_HOST}/host-shop/dashboard`, portalKey: 'hostshop' },
-  { role: 'host_shop_admin', label: 'Host Shop Admin', dashboardUrl: `${LMS_HOST}/host-shop/dashboard`, portalKey: 'hostshop' },
-  // `partner` is retained as a database role value only. Its old /partner/* routes are not canonical.
   { role: 'partner', label: 'Host Shop Partner', dashboardUrl: `${LMS_HOST}/host-shop/dashboard`, portalKey: 'hostshop' },
 
+  { role: 'workforce', label: 'Workforce', dashboardUrl: `${LMS_HOST}/workforce/dashboard`, portalKey: 'workforce' },
   { role: 'workforce_partner', label: 'Workforce Partner', dashboardUrl: `${LMS_HOST}/workforce/dashboard`, portalKey: 'workforce' },
   { role: 'program_holder', label: 'Program Holder', dashboardUrl: `${MARKETING_HOST}/program-holder/dashboard`, portalKey: 'programholder' },
   { role: 'provider', label: 'Training Provider', dashboardUrl: `${MARKETING_HOST}/provider/dashboard`, portalKey: 'provider' },
   { role: 'provider_admin', label: 'Training Provider Admin', dashboardUrl: `${MARKETING_HOST}/provider/dashboard`, portalKey: 'provider' },
   { role: 'case_manager', label: 'Case Manager', dashboardUrl: `${MARKETING_HOST}/case-manager/dashboard`, portalKey: 'casemanager' },
   { role: 'workforce_board', label: 'Workforce Board', dashboardUrl: `${MARKETING_HOST}/workforce-board/dashboard`, portalKey: 'workforceboard' },
-  { role: 'workforce_board_admin', label: 'Workforce Board Admin', dashboardUrl: `${MARKETING_HOST}/workforce-board/dashboard`, portalKey: 'workforceboard' },
 
-  { role: 'advisor', label: 'Advisor', dashboardUrl: `${ADMIN_HOST}/dashboard`, portalKey: 'admin' },
   { role: 'parent', label: 'Parent', dashboardUrl: `${LMS_HOST}/parent-portal/dashboard`, portalKey: 'parent' },
-  { role: 'test_admin', label: 'Test Admin', dashboardUrl: `${ADMIN_HOST}/testing-center`, portalKey: 'admin' },
-  { role: 'proctor', label: 'Proctor', dashboardUrl: `${ADMIN_HOST}/testing-center`, portalKey: 'admin' },
+  { role: 'test_admin', label: 'Test Admin', dashboardUrl: `${ADMIN_HOST}/testing-center`, portalKey: 'testing' },
+  { role: 'proctor', label: 'Proctor', dashboardUrl: `${ADMIN_HOST}/testing-center`, portalKey: 'testing' },
 ];
+
+function resolvedRoles(role: string | null | undefined, effectiveRoles?: string[]): string[] {
+  return normalizeRoles(effectiveRoles?.length ? effectiveRoles : [role]);
+}
 
 export function resolveDashboardUrl(
   role: string | null | undefined,
-  effectiveRoles?: string[]
+  effectiveRoles?: string[],
 ): string {
-  const allRoles = effectiveRoles ?? ([role].filter(Boolean) as string[]);
+  const allRoles = resolvedRoles(role, effectiveRoles);
 
-  if (allRoles.some((r) => ['admin', 'org_admin', 'advisor'].includes(r))) {
+  // Platform-wide administrative identities always land in Admin.
+  if (allRoles.some((current) => ['super_admin', 'admin', 'org_admin'].includes(current))) {
     return `${ADMIN_HOST}/dashboard`;
   }
-  if (allRoles.some((r) => r === 'staff')) return `${ADMIN_HOST}/staff-portal/dashboard`;
-  if (allRoles.some((r) => r === 'instructor')) return `${ADMIN_HOST}/instructor/dashboard`;
-  if (allRoles.some((r) => ['test_admin', 'proctor'].includes(r))) return `${ADMIN_HOST}/testing-center`;
+  if (allRoles.includes('staff')) return `${ADMIN_HOST}/staff-portal/dashboard`;
+  if (allRoles.includes('instructor')) return `${ADMIN_HOST}/instructor/dashboard`;
+  if (allRoles.some((current) => ['test_admin', 'proctor'].includes(current))) {
+    return `${ADMIN_HOST}/testing-center`;
+  }
 
   for (const currentRole of allRoles) {
     const mapping = ROLE_MAPPINGS.find((item) => item.role === currentRole);
@@ -75,13 +75,16 @@ export function resolveDashboardUrl(
 
 export function getPortalKeyForRole(
   role: string | null | undefined,
-  effectiveRoles?: string[]
+  effectiveRoles?: string[],
 ): string {
-  const allRoles = effectiveRoles ?? ([role].filter(Boolean) as string[]);
+  const allRoles = resolvedRoles(role, effectiveRoles);
 
-  if (allRoles.some((r) => ['admin', 'org_admin', 'advisor', 'test_admin', 'proctor'].includes(r))) return 'admin';
-  if (allRoles.some((r) => r === 'staff')) return 'staff';
-  if (allRoles.some((r) => r === 'instructor')) return 'instructor';
+  if (allRoles.some((current) => ['super_admin', 'admin', 'org_admin'].includes(current))) {
+    return 'admin';
+  }
+  if (allRoles.includes('staff')) return 'staff';
+  if (allRoles.includes('instructor')) return 'instructor';
+  if (allRoles.some((current) => ['test_admin', 'proctor'].includes(current))) return 'testing';
 
   for (const currentRole of allRoles) {
     const mapping = ROLE_MAPPINGS.find((item) => item.role === currentRole);
@@ -92,6 +95,7 @@ export function getPortalKeyForRole(
 
 export function getRoleLabel(role: string | null | undefined): string {
   if (!role) return 'Unknown';
-  const mapping = ROLE_MAPPINGS.find((item) => item.role === role);
+  const normalized = normalizeRole(role);
+  const mapping = ROLE_MAPPINGS.find((item) => item.role === normalized);
   return mapping?.label ?? role;
 }

@@ -53,6 +53,10 @@ const nextConfig = {
       { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
       { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
+      // The former IPLA signup page had hard-coded 2025 dates and referenced a
+      // checkout API that never existed. Route candidates to the maintained
+      // testing center instead of exposing a broken payment flow.
+      { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
 
       // Retire the old per-trade apprenticeship dashboards. The LMS /apprentice
       // route is the only operational apprenticeship dashboard.

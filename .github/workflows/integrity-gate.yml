@@ -77,13 +77,13 @@ jobs:
       - name: Admin native modules check
         run: pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
-
       # Deployment anti-drift gates — must pass before any build
       - name: Next.js version parity check
         run: pnpm run verify:next-parity
 
       - name: Build identity configuration check
         run: pnpm run verify:build-identity
+
       - name: No AWS ECS deploy artifacts
         run: node scripts/verify-no-aws-deploy.mjs
 
@@ -109,6 +109,13 @@ jobs:
       - name: Media integrity check
         run: pnpm run integrity:media
 
+      # Production UX acceptance: canonical routes, required heroes/lead media,
+      # image accessibility/sizing, duplicate media, CTA destinations, and
+      # deterministic contrast failures. This used to be report-only; it is
+      # now a blocking merge gate.
+      - name: Public UX and media acceptance check
+        run: node scripts/audit-public-site-media-nav.mjs
+
       - name: LMS course integrity check
         run: pnpm run integrity:lms
         env:
@@ -121,6 +128,12 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Stripe route and webhook integrity check
+        run: pnpm run integrity:stripe
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: Analytics integrity check
         run: pnpm run integrity:analytics

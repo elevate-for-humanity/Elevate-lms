@@ -597,18 +597,19 @@ export async function saveCourseBlueprint(
 
     const lessons = (mod.lessons ?? []).map((lesson, li) => {
       const compiled = lesson.compiled;
-      // Merge compiled narration into content field; store full compiled package
-      // (slide_outline, examples, quiz_questions) in quiz_questions JSONB column
+      // Merge compiled narration into content; store the current compiler package
+      // in the lesson quiz_questions JSONB field for downstream rendering.
       const compiledContent = compiled?.narration_script
         ? compiled.narration_script
         : lesson.content || null;
 
       const lessonQuizData = compiled
         ? {
-            learning_objectives: compiled.learning_objectives,
+            lesson_objectives: compiled.lesson_objectives,
             slide_outline: compiled.slide_outline,
-            examples: compiled.examples,
-            quiz_questions: compiled.quiz_questions,
+            practice_exercise: compiled.practice_exercise,
+            knowledge_check: compiled.knowledge_check,
+            instructor_notes: compiled.instructor_notes,
           }
         : null;
 
@@ -621,7 +622,7 @@ export async function saveCourseBlueprint(
         duration_minutes: lesson.duration_minutes || null,
         lesson_type: (lesson as any).lesson_type ?? 'lesson',
         is_published: false,
-        // Store compiled slide/quiz/example assets in quiz_questions JSONB
+        // Store compiled slide/quiz/practice assets in quiz_questions JSONB.
         ...(lessonQuizData ? { quiz_questions: lessonQuizData } : {}),
       };
     });

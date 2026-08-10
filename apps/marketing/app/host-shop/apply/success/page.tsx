@@ -54,18 +54,20 @@ export default async function HostShopApplicationSuccess({
 
   const now = new Date().toISOString();
   if (application.application_fee_status !== 'paid' || application.status === 'drafted') {
+    const update: Record<string, unknown> = {
+      status: application.status === 'drafted' ? 'submitted' : application.status,
+      application_fee_status: 'paid',
+      application_fee_amount_cents: APPLICATION_FEE_CENTS,
+      application_fee_paid_at: now,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id: paymentIntentId,
+      updated_at: now,
+    };
+    if (application.status === 'drafted') update.submitted_at = now;
+
     const { error } = await db
       .from('host_shop_applications')
-      .update({
-        status: application.status === 'drafted' ? 'submitted' : application.status,
-        submitted_at: application.status === 'drafted' ? now : undefined,
-        application_fee_status: 'paid',
-        application_fee_amount_cents: APPLICATION_FEE_CENTS,
-        application_fee_paid_at: now,
-        stripe_session_id: session.id,
-        stripe_payment_intent_id: paymentIntentId,
-        updated_at: now,
-      })
+      .update(update)
       .eq('id', applicationId);
     if (error) return <Failure message="Payment was verified, but the Host Shop application could not be synchronized." />;
   }
@@ -98,8 +100,8 @@ export default async function HostShopApplicationSuccess({
           Your $50 application fee and application are linked to the same record. You do not need to submit or pay again.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/host-shops" className="rounded-xl bg-slate-950 px-6 py-3 font-bold text-white">
-            View Host Shops
+          <Link href="/apprenticeships" className="rounded-xl bg-slate-950 px-6 py-3 font-bold text-white">
+            View Apprenticeships
           </Link>
           <Link href="/contact" className="rounded-xl border border-slate-300 px-6 py-3 font-bold text-slate-700">
             Contact Support

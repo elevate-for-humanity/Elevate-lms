@@ -8,13 +8,14 @@ import {
 export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
   barber: { hours: 2000, label: 'Barber Apprenticeship' },
   'barber-apprenticeship': { hours: 2000, label: 'Barber Apprenticeship' },
-  cosmetology: { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  'cosmetology-apprenticeship': { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  hairstylist: { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  cosmetology: { hours: 2000, label: 'Cosmetology Apprenticeship' },
+  'cosmetology-apprenticeship': { hours: 2000, label: 'Cosmetology Apprenticeship' },
+  hairstylist: { hours: 2000, label: 'Cosmetology Apprenticeship' },
   'nail-tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_tech: { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_technician: { hours: 450, label: 'Nail Technician Apprenticeship' },
   esthetician: { hours: 700, label: 'Esthetician Apprenticeship' },
+  'esthetician-apprenticeship': { hours: 700, label: 'Esthetician Apprenticeship' },
   training_site: { hours: 2000, label: 'Apprenticeship' },
 };
 
@@ -36,8 +37,6 @@ type PartnerRecord = {
 export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
 
-  // Tenant boundary: an active partner_users link is mandatory. Never fall
-  // back to profile.role when loading host-shop data with the service client.
   const { data: partnerLink, error: partnerLinkError } = await db
     .from('partner_users')
     .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
@@ -51,7 +50,6 @@ export async function getHostShopBoard(userId: string) {
 
   const partner = partnerLink.partners as unknown as PartnerRecord;
 
-  // Only shop assignments belonging to this authenticated user are eligible.
   const { data: shopLinks } = await db
     .from('shop_staff')
     .select('shop_id, shops(id, name, city, state, active)')
@@ -62,41 +60,63 @@ export async function getHostShopBoard(userId: string) {
     .filter((shop: any) => Boolean(shop?.id) && shop.active !== false);
   const shopIds = shops.map((shop: any) => shop.id);
 
-  const { data: placements } = shopIds.length
+  const { data: placements, error: placementsError } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        .select('id, student_id, shop_id, discipline, status, start_date, profiles(full_name, email)')
+        .select('id, student_id, shop_id, program_slug, status, start_date, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
-    : { data: [] };
+    : { data: [], error: null };
+
+  if (placementsError) {
+    throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
+  }
 
   const apprentices = (placements || []).map((placement: any) => ({
     id: placement.id,
     student_id: placement.student_id,
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
-    discipline: placement.discipline,
+    program_slug: placement.program_slug || null,
+    discipline: placement.program_slug || null,
     start_date: placement.start_date,
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
+  const programByStudent = new Map(
+    apprentices.map((apprentice) => [apprentice.student_id, apprentice.program_slug]),
+  );
+
   const ojtProgress: Record<string, { completed: number; required: number }> = {};
   if (studentIds.length) {
-    const { data: ojt } = await db
-      .from('ojt_placements')
-      .select('student_id, total_hours_completed, total_hours_required')
-      .in('student_id', studentIds)
-      .eq('status', 'active');
-    for (const row of ojt || []) {
-      ojtProgress[row.student_id] = {
-        completed: Number(row.total_hours_completed || 0),
-        required: Number(row.total_hours_required || 2000),
-      };
+    const { data: approvedHours, error: approvedHoursError } = await db
+      .from('hour_entries')
+      .select('user_id, program_slug, accepted_hours, hours, hours_claimed')
+      .in('user_id', studentIds)
+      .eq('status', 'approved');
+
+    if (approvedHoursError) {
+      throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${approvedHoursError.message}`);
+    }
+
+    for (const studentId of studentIds) {
+      const programSlug = programByStudent.get(studentId) || '';
+      const target = TRADE_TARGETS[programSlug]?.hours ?? 2000;
+      ojtProgress[studentId] = { completed: 0, required: target };
+    }
+
+    for (const row of approvedHours || []) {
+      if (!row.user_id || !ojtProgress[row.user_id]) continue;
+      const expectedProgram = programByStudent.get(row.user_id);
+      if (expectedProgram && row.program_slug && row.program_slug !== expectedProgram) continue;
+
+      const accepted = Number(row.accepted_hours ?? row.hours ?? row.hours_claimed ?? 0);
+      if (Number.isFinite(accepted) && accepted > 0) {
+        ojtProgress[row.user_id].completed += accepted;
+      }
     }
   }
 
-  // Critical tenant fix: count only hour entries belonging to apprentices
-  // assigned to this host shop. Never expose a platform-wide pending count.
   let pendingHoursCount = 0;
   if (studentIds.length) {
     const { count } = await db
@@ -107,7 +127,7 @@ export async function getHostShopBoard(userId: string) {
     pendingHoursCount = count || 0;
   }
 
-  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.discipline });
+  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.program_slug });
   const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
@@ -129,11 +149,15 @@ export async function getHostShopBoard(userId: string) {
     .in('state', [partner.state || 'Indiana', 'ALL']);
 
   const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
-  const { data: uploadedDocs } = await db
+  const { data: uploadedDocs, error: uploadedDocsError } = await db
     .from('partner_documents')
-    .select('id, document_type, file_name, status, rejection_reason, expires_at')
+    .select('id, document_type, display_name, file_name, file_url, status, rejection_reason, expiration_date, uploaded_at')
     .eq('partner_id', partner.id)
-    .order('created_at', { ascending: false });
+    .order('uploaded_at', { ascending: false });
+
+  if (uploadedDocsError) {
+    throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
+  }
 
   const latestDocs = new Map<string, any>();
   for (const doc of uploadedDocs || []) {

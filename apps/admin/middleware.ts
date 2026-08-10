@@ -4,6 +4,11 @@ import { createServerClient } from '@supabase/ssr';
 
 /**
  * Admin Middleware - handles auth BEFORE pages render to avoid redirect loops.
+ *
+ * Supabase may rotate the auth/refresh cookies while getUser() runs. Those
+ * cookies MUST be copied to the outgoing response. Updating only req.cookies
+ * causes the browser to keep the stale refresh token and can create a refresh
+ * storm (refresh_token_already_used / 429 responses).
  */
 
 const PUBLIC_PATHS = [
@@ -58,6 +63,23 @@ export async function middleware(req: NextRequest) {
 
   if (!isProtected) return NextResponse.next();
 
+  const refreshedCookies: Array<{
+    name: string;
+    value: string;
+    options?: Record<string, unknown>;
+  }> = [];
+
+  const applyRefreshedCookies = (response: NextResponse) => {
+    for (const { name, value, options } of refreshedCookies) {
+      const isAuthCookie = name.startsWith('sb-') && name.includes('-auth-token');
+      response.cookies.set(name, value, {
+        ...(options as any),
+        ...(isAuthCookie ? { domain: '.elevateforhumanity.org' } : {}),
+      });
+    }
+    return response;
+  };
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -67,20 +89,26 @@ export async function middleware(req: NextRequest) {
           return req.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Make the freshly rotated value visible to the rest of this request.
             req.cookies.set(name, value);
+            // Persist it to the browser on the outgoing response below.
+            refreshedCookies.push({ name, value, options: options as Record<string, unknown> });
           });
         },
       },
     },
   );
 
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    return applyRefreshedCookies(NextResponse.redirect(loginUrl));
   }
 
   const { data: profile } = await supabase
@@ -100,7 +128,7 @@ export async function middleware(req: NextRequest) {
   const effectiveRoles = Array.from(new Set([profile?.role, ...secondaryRoles].filter(Boolean))) as string[];
 
   if (!effectiveRoles.some((role) => ADMIN_PORTAL_ROLES.includes(role))) {
-    return NextResponse.redirect(new URL('/unauthorized', req.url));
+    return applyRefreshedCookies(NextResponse.redirect(new URL('/unauthorized', req.url)));
   }
 
   const isDevStudioRoute =
@@ -112,7 +140,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith('/api/devstudio');
 
   if (isDevStudioRoute && !effectiveRoles.includes('admin')) {
-    return NextResponse.redirect(new URL('/unauthorized', req.url));
+    return applyRefreshedCookies(NextResponse.redirect(new URL('/unauthorized', req.url)));
   }
 
   const requestHeaders = new Headers(req.headers);
@@ -126,7 +154,7 @@ export async function middleware(req: NextRequest) {
     path: '/',
     maxAge: 60,
   });
-  return response;
+  return applyRefreshedCookies(response);
 }
 
 export const config = {

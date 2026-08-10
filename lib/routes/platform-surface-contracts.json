@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "updated": "2026-08-09",
+  "version": 5,
+  "updated": "2026-08-10",
   "surfaces": {
     "studentApplication": {
       "function": "Complete public student training application",
@@ -20,11 +20,35 @@
         ]
       }
     },
+    "studentPortal": {
+      "function": "Student LMS dashboard and learning workspace",
+      "canonical": { "app": "lms", "path": "/lms/dashboard" },
+      "operational": [
+        { "app": "lms", "path": "/lms/courses", "purpose": "Assigned course catalog" }
+      ]
+    },
+    "apprenticePortal": {
+      "function": "Registered apprenticeship OJT, RTI, competencies, documents, and program-specific progress",
+      "canonical": { "app": "lms", "path": "/apprentice" },
+      "operational": [
+        { "app": "lms", "path": "/apprentice/timeclock", "purpose": "OJT timeclock and hour entry" },
+        { "app": "marketing", "path": "/portal/barber", "purpose": "Barber program-specific apprenticeship dashboard" },
+        { "app": "marketing", "path": "/portal/cosmetology", "purpose": "Cosmetology program-specific apprenticeship dashboard" },
+        { "app": "marketing", "path": "/portal/esthetician", "purpose": "Esthetician program-specific apprenticeship dashboard" },
+        { "app": "marketing", "path": "/portal/nail-technician", "purpose": "Nail Technician program-specific apprenticeship dashboard" },
+        { "app": "marketing", "path": "/portal/culinary", "purpose": "Culinary program-specific apprenticeship dashboard" },
+        { "app": "marketing", "path": "/portal/electrical", "purpose": "Electrical program-specific apprenticeship dashboard" },
+        { "app": "marketing", "path": "/portal/plumbing", "purpose": "Plumbing program-specific apprenticeship dashboard" }
+      ]
+    },
     "hostSites": {
       "function": "Apprenticeship Host Site information, approval, application, directory, and portal access",
       "canonical": { "app": "marketing", "path": "/partners/host-shops" },
       "application": { "app": "marketing", "path": "/partners/host-shop/apply" },
       "portal": { "app": "lms", "path": "/host-shop/dashboard" },
+      "operational": [
+        { "app": "lms", "path": "/host-shop/dashboard/board", "purpose": "Host Site apprentice/OJT operational board" }
+      ],
       "compatibility": [
         { "app": "marketing", "path": "/partners/barber-host-shop", "target": "/partners/host-shops" },
         { "app": "marketing", "path": "/apprenticeships/host-shop", "target": "/partners/host-shops" },
@@ -48,6 +72,10 @@
       "operational": [
         { "app": "lms", "path": "/employer/dashboard", "purpose": "Authenticated employer job posting and candidate management" }
       ]
+    },
+    "parentPortal": {
+      "function": "Parent/guardian learner progress visibility",
+      "canonical": { "app": "lms", "path": "/parent-portal/dashboard" }
     },
     "workforcePortal": {
       "function": "Workforce partner participant management, placements, outcomes, and reporting",
@@ -75,6 +103,29 @@
     "programHolderPortal": {
       "function": "Program holder training programs, students, hours, documents, and required actions",
       "canonical": { "app": "marketing", "path": "/program-holder/dashboard" }
+    },
+    "adminPortal": {
+      "function": "Platform administration and operational command center",
+      "canonical": { "app": "admin", "path": "/dashboard" },
+      "operational": [
+        { "app": "admin", "path": "/applications", "purpose": "Application operations" },
+        { "app": "admin", "path": "/students", "purpose": "Student operations" },
+        { "app": "admin", "path": "/programs", "purpose": "Program operations" },
+        { "app": "admin", "path": "/crm", "purpose": "CRM operations" },
+        { "app": "admin", "path": "/system-health", "purpose": "System health operations" }
+      ]
+    },
+    "instructorPortal": {
+      "function": "Instructor student, course, submission, OJT, and signoff operations",
+      "canonical": { "app": "admin", "path": "/instructor/dashboard" }
+    },
+    "staffPortal": {
+      "function": "Staff student, enrollment, support, and operational workflows",
+      "canonical": { "app": "admin", "path": "/staff-portal/dashboard" }
+    },
+    "testingOperations": {
+      "function": "Authenticated testing-center booking, session, slot, and proctor operations",
+      "canonical": { "app": "admin", "path": "/testing-center" }
     },
     "courseBuilder": {
       "function": "Create and manage course content",
@@ -108,7 +159,7 @@
       ]
     },
     "testing": {
-      "function": "Testing and credential exam workflows",
+      "function": "Public testing and credential exam discovery",
       "canonical": { "app": "marketing", "path": "/testing" },
       "operational": [
         { "app": "admin", "path": "/testing-center", "purpose": "Authenticated booking/session/slot operations" }

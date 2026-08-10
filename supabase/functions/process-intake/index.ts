@@ -1,14 +1,9 @@
 /**
  * process-intake Edge Function
  *
- * Reads 'received' rows from application_intake, maps each to its
- * destination workflow table, inserts with resolved_tenant_id, marks
- * the intake row processed, and emits an application_state_event.
- *
- * Run manually or on a cron schedule. Uses service_role — never
- * exposed to the public.
- *
- * Copyright (c) 2025–2026 Elevate for Humanity
+ * Reads received rows from application_intake and routes them into the
+ * canonical workflow tables. Student/general applications MUST use
+ * public.applications; student_applications is retired.
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -16,33 +11,67 @@ import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supa
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
 const BATCH_SIZE = 25;
 
-// ── Per-type routing ───────────────────────────────────────────
-// Each handler extracts fields from payload and returns the record
-// to insert into the destination table.
+type Payload = Record<string, unknown>;
+type RowMapper = (payload: Payload, tenantId: string | null) => {
+  table: string;
+  record: Record<string, unknown>;
+};
 
-type RowMapper = (
-  payload: Record<string, unknown>,
-  tenantId: string | null,
-) => { table: string; record: Record<string, unknown> };
+function stringValue(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function uuidOrNull(value: unknown): string | null {
+  const candidate = stringValue(value);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
+    ? candidate
+    : null;
+}
+
+function canonicalApplicationRecord(p: Payload): Record<string, unknown> {
+  const fullName = stringValue(p.full_name || p.name);
+  const parts = fullName.split(/\s+/).filter(Boolean);
+  const firstName = stringValue(p.first_name) || parts[0] || '';
+  const lastName = stringValue(p.last_name) || parts.slice(1).join(' ');
+  const rawProgram = stringValue(p.program_slug || p.program_interest || p.program || p.program_id);
+  const programId = uuidOrNull(p.program_id);
+  const programSlug = stringValue(p.program_slug) || (!programId ? stringValue(p.program_id || p.program) : '');
+  const funding = stringValue(p.funding_type || p.funding_source || p.funding);
+
+  return {
+    first_name: firstName,
+    last_name: lastName,
+    full_name: fullName || [firstName, lastName].filter(Boolean).join(' '),
+    email: stringValue(p.email),
+    phone: stringValue(p.phone) || null,
+    program_id: programId,
+    program_slug: programSlug || null,
+    program_interest: rawProgram || 'General Inquiry',
+    funding_type: stringValue(p.funding_type) || funding || null,
+    funding_source: stringValue(p.funding_source) || funding || null,
+    notes: stringValue(p.notes) || null,
+    metadata: {
+      ...(typeof p.data === 'object' && p.data !== null ? (p.data as Record<string, unknown>) : {}),
+      intake_payload: p,
+    },
+    status: 'submitted',
+    state: 'submitted',
+    source: 'application_intake',
+    submitted_at: new Date().toISOString(),
+  };
+}
 
 const ROUTE_MAP: Record<string, RowMapper> = {
-  student: (p, t) => ({
-    table: 'student_applications',
-    record: {
-      tenant_id: t,
-      full_name: p.full_name,
-      email: p.email,
-      phone: p.phone ?? null,
-      program_id: p.program_id ?? null,
-      funding_type: p.funding_type ?? null,
-      notes: p.notes ?? null,
-      data: p.data ?? null,
-      status: 'submitted',
-      source: 'public_form',
-    },
+  student: (p) => ({
+    table: 'applications',
+    record: canonicalApplicationRecord(p),
+  }),
+
+  application: (p) => ({
+    table: 'applications',
+    record: canonicalApplicationRecord(p),
   }),
 
   employer: (p, t) => ({
@@ -94,7 +123,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  partner: (p, _t) => ({
+  partner: (p) => ({
     table: 'partner_applications',
     record: {
       shop_name: p.shop_name,
@@ -112,7 +141,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  barbershop_partner: (p, _t) => ({
+  barbershop_partner: (p) => ({
     table: 'barbershop_partner_applications',
     record: {
       shop_legal_name: p.shop_legal_name,
@@ -135,7 +164,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  shop: (p, _t) => ({
+  shop: (p) => ({
     table: 'shop_applications',
     record: {
       shop_name: p.shop_name,
@@ -152,21 +181,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  application: (p, _t) => ({
-    table: 'applications',
-    record: {
-      name: p.name ?? null,
-      email: p.email,
-      phone: p.phone ?? null,
-      program: p.program,
-      funding: p.funding ?? null,
-      eligible: p.eligible ?? null,
-      notes: p.notes ?? null,
-      status: 'submitted',
-    },
-  }),
-
-  affiliate: (p, _t) => ({
+  affiliate: (p) => ({
     table: 'affiliate_applications',
     record: {
       email: p.email ?? null,
@@ -180,7 +195,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  funding: (p, _t) => ({
+  funding: (p) => ({
     table: 'funding_applications',
     record: {
       email: p.email ?? null,
@@ -193,7 +208,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  job: (p, _t) => ({
+  job: (p) => ({
     table: 'job_applications',
     record: {
       email: p.email ?? null,
@@ -207,8 +222,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-
-  tax: (p, _t) => ({
+  tax: (p) => ({
     table: 'tax_applications',
     record: {
       email: p.email ?? null,
@@ -222,7 +236,7 @@ const ROUTE_MAP: Record<string, RowMapper> = {
     },
   }),
 
-  submission: (p, _t) => ({
+  submission: (p) => ({
     table: 'application_submissions',
     record: {
       program_id: p.program_id,
@@ -233,15 +247,11 @@ const ROUTE_MAP: Record<string, RowMapper> = {
   }),
 };
 
-// Career applications use the state-machine RPCs, handled separately.
-
-// ── Interfaces ─────────────────────────────────────────────────
-
 interface IntakeRow {
   id: string;
   application_type: string;
   program_id: string | null;
-  payload: Record<string, unknown>;
+  payload: Payload;
   resolved_tenant_id: string | null;
   created_at: string;
 }
@@ -253,8 +263,6 @@ interface ProcessResult {
   destination_id?: string;
   error?: string;
 }
-
-// ── Main ───────────────────────────────────────────────────────
 
 serve(async (req: Request) => {
   if (req.method !== 'POST' && req.method !== 'GET') {
@@ -290,14 +298,12 @@ serve(async (req: Request) => {
   }
 
   const results: ProcessResult[] = [];
-
   for (const row of rows as IntakeRow[]) {
-    const result = await processRow(db, row);
-    results.push(result);
+    results.push(await processRow(db, row));
   }
 
-  const succeeded = results.filter((r) => r.ok).length;
-  const failed = results.filter((r) => !r.ok).length;
+  const succeeded = results.filter((result) => result.ok).length;
+  const failed = results.length - succeeded;
 
   return new Response(JSON.stringify({ processed: results.length, succeeded, failed, results }), {
     status: 200,
@@ -305,25 +311,17 @@ serve(async (req: Request) => {
   });
 });
 
-// ── Row processor ──────────────────────────────────────────────
-
 async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessResult> {
-  const type = row.application_type;
+  if (row.application_type === 'career') return processCareer(db, row);
 
-  // Career applications use the state-machine RPCs
-  if (type === 'career') {
-    return processCareer(db, row);
-  }
-
-  const mapper = ROUTE_MAP[type];
+  const mapper = ROUTE_MAP[row.application_type];
   if (!mapper) {
-    await markRejected(db, row.id, `Unknown application_type: ${type}`);
-    return { intake_id: row.id, ok: false, error: `Unknown type: ${type}` };
+    await markRejected(db, row.id, `Unknown application_type: ${row.application_type}`);
+    return { intake_id: row.id, ok: false, error: `Unknown type: ${row.application_type}` };
   }
 
   try {
     const { table, record } = mapper(row.payload, row.resolved_tenant_id);
-
     const { data: inserted, error: insertErr } = await db
       .from(table)
       .insert(record)
@@ -335,7 +333,6 @@ async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessRe
       return { intake_id: row.id, ok: false, error: insertErr.message };
     }
 
-    // Mark processed
     await db
       .from('application_intake')
       .update({
@@ -346,17 +343,13 @@ async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessRe
       })
       .eq('id', row.id);
 
-    // Emit state event (best-effort)
-    await db
-      .from('application_state_events')
-      .insert({
-        application_type: type,
-        application_id: inserted.id,
-        to_state: 'submitted',
-      })
-      .then(({ error }) => {
-        if (error) console.error('State event error:', error.message);
-      });
+    await db.from('application_state_events').insert({
+      application_type: row.application_type,
+      application_id: inserted.id,
+      to_state: 'submitted',
+    }).then(({ error }) => {
+      if (error) console.error('State event error:', error.message);
+    });
 
     return {
       intake_id: row.id,
@@ -364,20 +357,17 @@ async function processRow(db: SupabaseClient, row: IntakeRow): Promise<ProcessRe
       destination_table: table,
       destination_id: inserted.id,
     };
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    await markRejected(db, row.id, msg);
-    return { intake_id: row.id, ok: false, error: msg };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await markRejected(db, row.id, message);
+    return { intake_id: row.id, ok: false, error: message };
   }
 }
-
-// ── Career: state-machine RPCs ─────────────────────────────────
 
 async function processCareer(db: SupabaseClient, row: IntakeRow): Promise<ProcessResult> {
   const p = row.payload;
 
   try {
-    // 1. Start application
     const { data: startResult, error: startErr } = await db.rpc('start_application', {
       p_first_name: p.first_name || '',
       p_last_name: p.last_name || '',
@@ -386,14 +376,12 @@ async function processCareer(db: SupabaseClient, row: IntakeRow): Promise<Proces
     });
 
     if (startErr || !startResult?.success) {
-      const msg = startErr?.message || startResult?.error || 'start_application failed';
-      await markRejected(db, row.id, msg);
-      return { intake_id: row.id, ok: false, error: msg };
+      const message = startErr?.message || startResult?.error || 'start_application failed';
+      await markRejected(db, row.id, message);
+      return { intake_id: row.id, ok: false, error: message };
     }
 
-    const appId = startResult.application_id;
-
-    // 2. Advance with personal data if available
+    const applicationId = startResult.application_id;
     const personalFields = [
       'date_of_birth',
       'address',
@@ -407,26 +395,25 @@ async function processCareer(db: SupabaseClient, row: IntakeRow): Promise<Proces
       'major',
     ];
     const personalData: Record<string, unknown> = {};
-    for (const f of personalFields) {
-      if (p[f]) personalData[f] = p[f];
+    for (const field of personalFields) {
+      if (p[field]) personalData[field] = p[field];
     }
 
     if (Object.keys(personalData).length > 0) {
       await db.rpc('advance_application_state', {
-        p_application_id: appId,
+        p_application_id: applicationId,
         p_next_state: 'eligibility_complete',
         p_data: personalData,
       });
     }
 
-    // Mark processed
     await db
       .from('application_intake')
       .update({
         status: 'processed',
         processed_at: new Date().toISOString(),
         destination_table: 'career_applications',
-        destination_id: appId,
+        destination_id: applicationId,
       })
       .eq('id', row.id);
 
@@ -434,16 +421,14 @@ async function processCareer(db: SupabaseClient, row: IntakeRow): Promise<Proces
       intake_id: row.id,
       ok: true,
       destination_table: 'career_applications',
-      destination_id: appId,
+      destination_id: applicationId,
     };
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    await markRejected(db, row.id, msg);
-    return { intake_id: row.id, ok: false, error: msg };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await markRejected(db, row.id, message);
+    return { intake_id: row.id, ok: false, error: message };
   }
 }
-
-// ── Helpers ────────────────────────────────────────────────────
 
 async function markRejected(db: SupabaseClient, id: string, error: string): Promise<void> {
   await db

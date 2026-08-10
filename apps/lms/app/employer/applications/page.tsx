@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
+import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { FileText, Clock, XCircle, Eye, Briefcase } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Applications | Employer Portal',
   description: 'Review candidate applications across your job postings.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/employer/applications' },
+  robots: { index: false, follow: false },
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -20,31 +21,45 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 export default async function EmployerApplicationsPage() {
-  const { user } = await requireRole(['employer', 'admin']);
+  const { user } = await requireRole(['employer', 'sponsor', 'admin']);
   const supabase = await createClient();
+  const employer = await getEmployerRecord(supabase, user.id);
 
-  const { data: jobs } = await supabase
-    .from('job_postings')
-    .select('id, title, status, created_at')
-    .eq('employer_id', user.id)
-    .order('created_at', { ascending: false });
+  const { data: jobs } = employer
+    ? await supabase
+        .from('job_postings')
+        .select('id, title, status, created_at')
+        .eq('employer_id', employer.id)
+        .order('created_at', { ascending: false })
+    : { data: [] };
 
-  const jobIds = (jobs ?? []).map((j: any) => j.id);
-  const jobMap = Object.fromEntries((jobs ?? []).map((j: any) => [j.id, j]));
+  const jobIds = (jobs ?? []).map((job: any) => job.id);
+  const jobMap = Object.fromEntries((jobs ?? []).map((job: any) => [job.id, job]));
 
   const { data: applications } = jobIds.length
     ? await supabase
         .from('job_applications')
-        .select('id, job_posting_id, applicant_name, applicant_email, status, created_at, updated_at')
+        .select('id, job_posting_id, student_id, status, applied_at, updated_at')
         .in('job_posting_id', jobIds)
-        .order('created_at', { ascending: false })
+        .order('applied_at', { ascending: false })
     : { data: [] };
 
+  const studentIds = Array.from(
+    new Set((applications ?? []).map((application: any) => application.student_id).filter(Boolean)),
+  );
+  const { data: applicantProfiles } = studentIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', studentIds)
+    : { data: [] };
+  const applicantMap = Object.fromEntries(
+    (applicantProfiles ?? []).map((profile: any) => [profile.id, profile]),
+  );
+
   const rows = applications ?? [];
-  const pendingCount = rows.filter((r: any) => r.status === 'pending').length;
-  const reviewedCount = rows.filter((r: any) => r.status === 'reviewed').length;
-  const hiredCount = rows.filter((r: any) => r.status === 'hired').length;
-  const rejectedCount = rows.filter((r: any) => r.status === 'rejected').length;
+  const pendingCount = rows.filter((row: any) => row.status === 'pending').length;
+  const reviewedCount = rows.filter((row: any) => row.status === 'reviewed').length;
+  const hiredCount = rows.filter((row: any) => row.status === 'hired').length;
+  const rejectedCount = rows.filter((row: any) => row.status === 'rejected').length;
+  const companyName = employer?.company_name || employer?.business_name || 'your company';
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -56,7 +71,7 @@ export default async function EmployerApplicationsPage() {
             </p>
             <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Applications</h1>
             <p className="text-slate-600 mt-1">
-              Review applicants across all job postings for {profile.company_name || 'your company'}.
+              Review applicants across all job postings for {companyName}.
             </p>
           </div>
           <Link
@@ -68,11 +83,20 @@ export default async function EmployerApplicationsPage() {
           </Link>
         </div>
 
-        {!profile.verified && (
+        {!employer && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+            <p className="font-semibold">Employer profile required</p>
+            <p className="text-sm mt-1">
+              Complete employer onboarding before managing job postings and applications.
+            </p>
+          </div>
+        )}
+
+        {employer && !employer.approved && (
           <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
             <p className="font-semibold">Verification pending</p>
             <p className="text-sm mt-1">
-              You can review applications now. Complete account verification before making final hiring decisions.
+              You can review your application queue. Employer approval is still pending.
             </p>
           </div>
         )}
@@ -108,24 +132,27 @@ export default async function EmployerApplicationsPage() {
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
-              {rows.map((app: any) => {
-                const posting = jobMap[app.job_posting_id];
+              {rows.map((application: any) => {
+                const posting = jobMap[application.job_posting_id];
+                const applicant = applicantMap[application.student_id];
                 return (
-                  <div key={app.id} className="px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                  <div key={application.id} className="px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-slate-900">{app.applicant_name || 'Applicant'}</p>
-                      <p className="text-sm text-slate-600">{app.applicant_email || 'Email not provided'}</p>
+                      <p className="font-semibold text-slate-900">{applicant?.full_name || 'Applicant'}</p>
+                      <p className="text-sm text-slate-600">{applicant?.email || 'Email not available'}</p>
                       <p className="text-sm text-slate-700 mt-1">
                         {posting?.title || 'Job posting'}
                         {' · '}
-                        {app.created_at ? new Date(app.created_at).toLocaleDateString() : 'Unknown date'}
+                        {application.applied_at
+                          ? new Date(application.applied_at).toLocaleDateString()
+                          : 'Unknown date'}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[app.status] || 'bg-slate-100 text-slate-700'}`}
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLE[application.status] || 'bg-slate-100 text-slate-700'}`}
                       >
-                        {app.status || 'pending'}
+                        {application.status || 'pending'}
                       </span>
                       {posting?.id && (
                         <Link

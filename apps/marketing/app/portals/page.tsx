@@ -2,9 +2,20 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { PortalRouter, PORTAL_META, type PortalKey } from '@/lib/routing/portal-router';
 import {
-  GraduationCap, Shield, Handshake, Briefcase, Users,
-  Building2, Crown, ClipboardList, UserCheck, Home,
-  Palette, Scissors, Wrench, Heart, ArrowRight,
+  ArrowRight,
+  Briefcase,
+  Building2,
+  ClipboardCheck,
+  ClipboardList,
+  Crown,
+  GraduationCap,
+  Heart,
+  Palette,
+  Scissors,
+  Shield,
+  UserCheck,
+  Users,
+  Wrench,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -12,124 +23,121 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Portals',
-  description: 'Access your personalized portal. Whether you are a student, employer, partner, parent, staff member, or client, find your dedicated dashboard here.',
-  keywords: ['student portal', 'employer portal', 'partner portal', 'parent portal', 'staff portal', 'client portal', 'dashboard', 'login'],
+  description:
+    'Access your personalized Elevate portal for learning, apprenticeships, employers, partners, workforce services, testing, staff, and administration.',
+  keywords: ['student portal', 'employer portal', 'host shop portal', 'parent portal', 'staff portal', 'dashboard', 'login'],
   alternates: { canonical: 'https://www.elevateforhumanity.org/portals' },
 };
 
-// Portal keys shown on the hub page (in display order)
+/** Distinct canonical portal destinations only. No role aliases. */
 const PORTAL_KEYS: PortalKey[] = [
   'lms',
-  'employer',
   'apprentice',
   'hostshop',
-  'cosmetology',
-  'instructor',
-  'casemanager',
-  'partner',
-  'programholder',
-  'workforce',
-  'admin',
-  'staff',
-  'workforceboard',
-  'provider',
+  'employer',
   'parent',
+  'workforce',
+  'instructor',
+  'staff',
+  'testing',
+  'programholder',
+  'provider',
+  'casemanager',
+  'workforceboard',
+  'creator',
+  'admin',
 ];
 
-// Enhanced portal metadata with features and full descriptions
-const PORTAL_DETAILS: Record<string, { description: string; features: string[] }> = {
+const PORTAL_DETAILS: Partial<Record<PortalKey, { description: string; features: string[] }>> = {
   lms: {
-    description: 'Access your courses, track progress, view grades, manage your schedule, and connect with instructors and career services.',
-    features: ['Course Materials', 'Grade Tracking', 'Career Services', 'Schedule Management'],
-  },
-  employer: {
-    description: 'Post jobs, manage apprentices, track training progress, access compliance documents, and connect with program coordinators.',
-    features: ['Job Postings', 'Apprentice Management', 'Compliance Documents', 'Hiring Tools'],
+    description: 'Access courses, track progress, view grades, manage your schedule, and connect with instructors and career services.',
+    features: ['Course Materials', 'Progress Tracking', 'Certificates', 'Career Services'],
   },
   apprentice: {
-    description: "Track your apprenticeship hours, log competencies, manage timeclock, access your handbook, and prepare for state board exams.",
-    features: ['Hour Tracking', 'Competency Logs', 'Timeclock', 'State Board Prep'],
+    description: 'Track apprenticeship hours, RTI, competencies, documents, and training progress.',
+    features: ['OJT Hours', 'RTI', 'Competencies', 'Documents'],
   },
   hostshop: {
-    description: 'Manage apprentices, approve hours, track OJL, view syllabus, and monitor RTI progress for your salon or barbershop.',
-    features: ['Apprentice Management', 'Hour Approvals', 'OJL Tracking', 'RTI Monitoring'],
+    description: 'Manage apprentices, approve hours, track OJT, maintain compliance documents, and monitor RTI progress.',
+    features: ['Apprentice Management', 'Hour Approvals', 'Compliance', 'RTI Monitoring'],
   },
-  cosmetology: {
-    description: 'Access cosmetology-specific training materials, track beauty program hours, and manage your salon apprenticeship.',
-    features: ['Beauty Training', 'Hour Tracking', 'State License Prep', 'Salon Placement'],
-  },
-  instructor: {
-    description: 'View your student roster, review lab and assignment submissions, track completions, and manage course content.',
-    features: ['Student Roster', 'Submission Review', 'Grade Tracking', 'Course Management'],
-  },
-  casemanager: {
-    description: 'Track assigned participants, verify enrollments, record job placements, and generate WIOA compliance reports.',
-    features: ['Caseload Management', 'Enrollment Verification', 'Job Placements', 'WIOA Reports'],
-  },
-  partner: {
-    description: "Record attendance, manage apprentice hours, access MOU documents, and track your organization's program involvement.",
-    features: ['Attendance Recording', 'Hours Tracking', 'MOU Documents', 'Program Reports'],
-  },
-  programholder: {
-    description: 'Manage your programs, track enrollments, handle compliance documentation, and monitor student outcomes.',
-    features: ['Program Management', 'Enrollment Tracking', 'Compliance Docs', 'Outcomes Reports'],
-  },
-  workforce: {
-    description: 'Access workforce development tools, manage training programs, and connect job seekers with career pathways.',
-    features: ['Training Programs', 'Career Pathways', 'Job Matching', 'Funding Management'],
-  },
-  admin: {
-    description: 'Full platform administration including students, courses, payments, testing, CRM, and system configuration.',
-    features: ['Student Management', 'Course Administration', 'Payment Processing', 'System Settings'],
-  },
-  staff: {
-    description: 'Manage students, record attendance, flag at-risk learners, run reports, and coordinate daily operations.',
-    features: ['Student Management', 'Attendance Tracking', 'At-Risk Flags', 'Reports'],
-  },
-  workforceboard: {
-    description: 'Workforce board portal for managing regional workforce development initiatives, employer partnerships, and program analytics.',
-    features: ['Regional Analytics', 'Employer Partnerships', 'Program Oversight', 'Reporting'],
-  },
-  provider: {
-    description: 'Service provider portal for managing workforce services, participant tracking, and outcome reporting.',
-    features: ['Service Management', 'Participant Tracking', 'Outcome Reporting', 'Billing'],
+  employer: {
+    description: 'Post jobs, manage candidates and apprentices, and access employer partnership tools.',
+    features: ['Job Postings', 'Candidates', 'Apprenticeships', 'Hiring Tools'],
   },
   parent: {
-    description: 'Monitor your student progress, view attendance, communicate with instructors, and track career development.',
-    features: ['Progress Monitoring', 'Attendance View', 'Instructor Communication', 'Career Tracking'],
+    description: 'Monitor linked student progress, attendance, and communications.',
+    features: ['Progress Monitoring', 'Attendance', 'Communications'],
   },
-};
-
-const colorClasses: Record<string, { bg: string; border: string; light: string }> = {
-  blue: { bg: 'bg-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
-  green: { bg: 'bg-green-600', border: 'border-green-200', light: 'bg-green-50' },
-  red: { bg: 'bg-brand-red-600', border: 'border-brand-red-200', light: 'bg-red-50' },
-  purple: { bg: 'bg-purple-600', border: 'border-purple-200', light: 'bg-purple-50' },
-  orange: { bg: 'bg-orange-600', border: 'border-orange-200', light: 'bg-orange-50' },
-  teal: { bg: 'bg-teal-600', border: 'border-teal-200', light: 'bg-teal-50' },
-  indigo: { bg: 'bg-indigo-600', border: 'border-indigo-200', light: 'bg-indigo-50' },
-  pink: { bg: 'bg-pink-600', border: 'border-pink-200', light: 'bg-pink-50' },
+  workforce: {
+    description: 'Access workforce development tools, training participation, placements, and career pathways.',
+    features: ['Training', 'Career Pathways', 'Placements', 'Workforce Services'],
+  },
+  instructor: {
+    description: 'View student rosters, review submissions, track completions, and manage instructional work.',
+    features: ['Student Roster', 'Submission Review', 'Progress', 'Courses'],
+  },
+  staff: {
+    description: 'Manage students, enrollments, at-risk flags, reports, and daily operations.',
+    features: ['Students', 'Enrollments', 'At-Risk Flags', 'Reports'],
+  },
+  testing: {
+    description: 'Manage testing bookings, sessions, slots, providers, and proctoring operations.',
+    features: ['Bookings', 'Sessions', 'Slots', 'Proctoring'],
+  },
+  programholder: {
+    description: 'Manage programs, students, hours, documents, and compliance responsibilities.',
+    features: ['Programs', 'Students', 'Hours', 'Compliance'],
+  },
+  provider: {
+    description: 'Manage provider programs, enrollments, onboarding, compliance, and service delivery.',
+    features: ['Programs', 'Enrollments', 'Onboarding', 'Compliance'],
+  },
+  casemanager: {
+    description: 'Track assigned participants, enrollments, credentials, placements, and case activity.',
+    features: ['Caseload', 'Enrollments', 'Credentials', 'Placements'],
+  },
+  workforceboard: {
+    description: 'Review regional workforce participation, providers, programs, credentials, and outcomes.',
+    features: ['Regional Analytics', 'Providers', 'Programs', 'Outcomes'],
+  },
+  creator: {
+    description: 'Build and publish learning products through the creator workspace.',
+    features: ['Products', 'Content', 'Publishing'],
+  },
+  admin: {
+    description: 'Platform administration for applications, students, programs, CRM, compliance, testing, and system operations.',
+    features: ['Applications', 'Students', 'Programs', 'Operations'],
+  },
 };
 
 const IconMap: Record<string, React.ElementType> = {
-  GraduationCap, Shield, Handshake, Briefcase, Users,
-  Building2, Crown, ClipboardList, UserCheck,
-  Palette, Scissors, Wrench, Heart,
+  GraduationCap,
+  Shield,
+  Briefcase,
+  Users,
+  Building2,
+  Crown,
+  ClipboardList,
+  ClipboardCheck,
+  UserCheck,
+  Palette,
+  Scissors,
+  Wrench,
+  Heart,
 };
 
 const portals = PORTAL_KEYS.map((key) => {
   const meta = PORTAL_META[key];
-  const Icon = IconMap[meta.iconName] ?? Building2;
-  const details = PORTAL_DETAILS[key] || { description: meta.description, features: [] };
-  const colors = colorClasses[meta.colorClass] || colorClasses.blue;
+  const details = PORTAL_DETAILS[key] ?? { description: meta.description, features: [] };
   return {
     key,
     href: PortalRouter.get(key),
-    icon: Icon,
+    icon: IconMap[meta.iconName] ?? Building2,
     title: meta.label,
     description: details.description,
     features: details.features,
-    colors,
+    colorClass: meta.colorClass,
   };
 });
 
@@ -145,7 +153,7 @@ export default function PortalsPage() {
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Access Your Portal</h1>
-          <p className="text-blue-200 text-lg">Select the portal that matches your role.</p>
+          <p className="text-blue-200 text-lg">Select the workspace that matches your role.</p>
         </div>
       </section>
 
@@ -158,9 +166,9 @@ export default function PortalsPage() {
                 <Link
                   key={portal.key}
                   href={portal.href}
-                  className={`bg-white rounded-xl border ${portal.colors.border} p-6 shadow-md hover:shadow-xl transition-all group flex flex-col`}
+                  className="bg-white rounded-xl border border-slate-200 p-6 shadow-md hover:shadow-xl transition-all group flex flex-col"
                 >
-                  <div className={`w-14 h-14 rounded-xl ${portal.colors.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-14 h-14 rounded-xl ${portal.colorClass} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                     <Icon className="w-7 h-7 text-white" />
                   </div>
                   <h2 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
@@ -171,13 +179,13 @@ export default function PortalsPage() {
                     <div className="space-y-1">
                       {portal.features.slice(0, 3).map((feature) => (
                         <div key={feature} className="flex items-center gap-2 text-xs text-slate-500">
-                          <div className={`w-1.5 h-1.5 rounded-full ${portal.colors.bg.replace('bg-', 'bg-')}`} />
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                           <span>{feature}</span>
                         </div>
                       ))}
                     </div>
                   )}
-                  <div className={`mt-4 flex items-center gap-1 text-sm font-semibold ${portal.colors.bg.replace('bg-', 'text-')}`}>
+                  <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-brand-blue-600">
                     Access Portal <ArrowRight className="w-4 h-4" />
                   </div>
                 </Link>
@@ -189,16 +197,10 @@ export default function PortalsPage() {
             <h3 className="text-xl font-bold text-slate-900 mb-2">Need access to a portal?</h3>
             <p className="text-slate-600 mb-6">Contact our support team for assistance with portal access or permissions.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-brand-red-700 transition-colors"
-              >
+              <Link href="/contact" className="inline-flex items-center justify-center gap-2 bg-brand-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-brand-red-700 transition-colors">
                 Contact Support
               </Link>
-              <a
-                href="tel:+13173143757"
-                className="inline-flex items-center justify-center gap-2 bg-slate-100 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-200 transition-colors"
-              >
+              <a href="tel:+13173143757" className="inline-flex items-center justify-center gap-2 bg-slate-100 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-200 transition-colors">
                 (317) 314-3757
               </a>
             </div>
@@ -208,4 +210,3 @@ export default function PortalsPage() {
     </div>
   );
 }
-

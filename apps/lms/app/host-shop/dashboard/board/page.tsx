@@ -10,10 +10,10 @@ export const dynamic = 'force-dynamic';
 export default async function PartnerBoardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/partner/board');
+  if (!user) redirect('/login?redirect=/host-shop/dashboard/board');
 
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (!profile || !['partner', 'admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
+  if (!profile || !['partner', 'host_shop', 'host_shop_admin', 'admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   const board = await getHostShopBoard(user.id);
 

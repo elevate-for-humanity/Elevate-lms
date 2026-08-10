@@ -32,8 +32,8 @@ export const siteUrls = {
   apply: `${SITE_URL}/apply`,
   enroll: `${SITE_URL}/enroll`,
   login: `${APP_URL}/login`,
-  dashboard: `${APP_URL}/learner/dashboard`,
-  employerPortal: `${APP_URL}/employer`,
+  dashboard: `${APP_URL}/lms/dashboard`,
+  employerPortal: `${APP_URL}/employer/dashboard`,
   adminLogin: `${ADMIN_URL}/login`,
   adminDashboard: `${ADMIN_URL}/dashboard`,
 

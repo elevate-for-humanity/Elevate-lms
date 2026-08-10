@@ -8,9 +8,9 @@ import {
 export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
   barber: { hours: 2000, label: 'Barber Apprenticeship' },
   'barber-apprenticeship': { hours: 2000, label: 'Barber Apprenticeship' },
-  cosmetology: { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  'cosmetology-apprenticeship': { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  hairstylist: { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  cosmetology: { hours: 2000, label: 'Cosmetology Apprenticeship' },
+  'cosmetology-apprenticeship': { hours: 2000, label: 'Cosmetology Apprenticeship' },
+  hairstylist: { hours: 2000, label: 'Cosmetology Apprenticeship' },
   'nail-tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_tech: { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_technician: { hours: 450, label: 'Nail Technician Apprenticeship' },

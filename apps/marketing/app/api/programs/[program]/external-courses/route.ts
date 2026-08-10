@@ -15,7 +15,9 @@ function isBlockedExternalTraining(course: { partner_name?: string | null; exter
 export async function GET(request: NextRequest, { params }: { params: Promise<{ program: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  await apiAuthGuard(request);
+
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
 
   const { program: slug } = await params;
   const db = await createClient();

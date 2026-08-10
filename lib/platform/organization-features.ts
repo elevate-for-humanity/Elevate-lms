@@ -24,6 +24,11 @@ export interface OrganizationEntitlements {
   currentPeriodEnd: string | null;
 }
 
+export interface OrganizationIdentity {
+  tenantId: string;
+  billingOrganizationId: string | null;
+}
+
 export class FeatureUpgradeRequiredError extends Error {
   readonly statusCode = 403;
   readonly feature: string;
@@ -50,50 +55,71 @@ function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
 }
 
 /**
- * Convert the canonical SaaS tenant id (tenants.id) to the billing organization
- * id (organizations.id). Legacy callers that already pass organizations.id are
- * also supported so the migration is backward compatible.
+ * Normalize either identifier used historically by billing:
+ * - tenants.id (canonical application identity)
+ * - organizations.id (legacy Stripe metadata / billing identity)
  */
+export async function resolveOrganizationIdentity(
+  tenantOrOrganizationId: string,
+  client?: SupabaseClient,
+): Promise<OrganizationIdentity> {
+  const supabase = client ?? (await requireAdminClient());
+  if (!supabase) {
+    return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
+  }
+
+  const { data: byTenant } = await supabase
+    .from('organizations')
+    .select('id, tenant_id')
+    .eq('tenant_id', tenantOrOrganizationId)
+    .maybeSingle();
+  if (byTenant?.id) {
+    return {
+      tenantId: (byTenant.tenant_id as string | null) ?? tenantOrOrganizationId,
+      billingOrganizationId: byTenant.id as string,
+    };
+  }
+
+  const { data: byOrganization } = await supabase
+    .from('organizations')
+    .select('id, tenant_id')
+    .eq('id', tenantOrOrganizationId)
+    .maybeSingle();
+  if (byOrganization?.id) {
+    return {
+      tenantId: (byOrganization.tenant_id as string | null) ?? tenantOrOrganizationId,
+      billingOrganizationId: byOrganization.id as string,
+    };
+  }
+
+  return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
+}
+
 export async function resolveBillingOrganizationId(
   tenantOrOrganizationId: string,
   client?: SupabaseClient,
 ): Promise<string | null> {
-  const supabase = client ?? (await requireAdminClient());
-  if (!supabase) return null;
-
-  const { data: byTenant } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('tenant_id', tenantOrOrganizationId)
-    .maybeSingle();
-  if (byTenant?.id) return byTenant.id as string;
-
-  const { data: byId } = await supabase
-    .from('organizations')
-    .select('id')
-    .eq('id', tenantOrOrganizationId)
-    .maybeSingle();
-  return (byId?.id as string | undefined) ?? null;
+  const identity = await resolveOrganizationIdentity(tenantOrOrganizationId, client);
+  return identity.billingOrganizationId;
 }
 
 /**
- * Load merged feature codes for a canonical SaaS tenant.
- *
- * Billing plan rows live under organizations.id while add-ons and licenses are
- * keyed by tenants.id. This function is the normalization boundary: callers
- * always pass the tenant id and never need to know which persistence model a
- * commercial subsystem historically used.
+ * Load merged feature codes for a SaaS tenant. Legacy organizations.id callers
+ * are normalized at this boundary so downstream feature checks always operate
+ * on tenants.id.
  */
 export async function getOrganizationFeatures(
-  tenantId: string,
+  tenantOrOrganizationId: string,
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const supabase = client ?? (await requireAdminClient());
   if (!supabase) {
-    return emptyEntitlements(tenantId);
+    return emptyEntitlements(tenantOrOrganizationId);
   }
 
-  const billingOrganizationId = await resolveBillingOrganizationId(tenantId, supabase);
+  const identity = await resolveOrganizationIdentity(tenantOrOrganizationId, supabase);
+  const tenantId = identity.tenantId;
+  const billingOrganizationId = identity.billingOrganizationId;
 
   let orgSub: any = null;
   if (billingOrganizationId) {

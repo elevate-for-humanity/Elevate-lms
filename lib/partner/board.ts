@@ -15,6 +15,7 @@ export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
   nail_tech: { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_technician: { hours: 450, label: 'Nail Technician Apprenticeship' },
   esthetician: { hours: 700, label: 'Esthetician Apprenticeship' },
+  'esthetician-apprenticeship': { hours: 700, label: 'Esthetician Apprenticeship' },
   training_site: { hours: 2000, label: 'Apprenticeship' },
 };
 
@@ -36,8 +37,6 @@ type PartnerRecord = {
 export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
 
-  // Tenant boundary: an active partner_users link is mandatory. Never fall
-  // back to profile.role when loading host-shop data with the service client.
   const { data: partnerLink, error: partnerLinkError } = await db
     .from('partner_users')
     .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
@@ -51,7 +50,6 @@ export async function getHostShopBoard(userId: string) {
 
   const partner = partnerLink.partners as unknown as PartnerRecord;
 
-  // Only shop assignments belonging to this authenticated user are eligible.
   const { data: shopLinks } = await db
     .from('shop_staff')
     .select('shop_id, shops(id, name, city, state, active)')
@@ -65,8 +63,6 @@ export async function getHostShopBoard(userId: string) {
   const { data: placements, error: placementsError } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        // Live canonical schema uses program_slug; the retired discipline column
-        // is not present and caused this board query to fail at runtime.
         .select('id, student_id, shop_id, program_slug, status, start_date, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
@@ -82,8 +78,6 @@ export async function getHostShopBoard(userId: string) {
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
     program_slug: placement.program_slug || null,
-    // Keep the legacy UI property populated while the component contract is
-    // migrated; its value now comes from the canonical placement program_slug.
     discipline: placement.program_slug || null,
     start_date: placement.start_date,
   }));
@@ -93,9 +87,6 @@ export async function getHostShopBoard(userId: string) {
     apprentices.map((apprentice) => [apprentice.student_id, apprentice.program_slug]),
   );
 
-  // Canonical OJT ledger: approved hour_entries are the same records used by
-  // the apprentice portal. Do not read the empty legacy ojt_placements table,
-  // otherwise Host Shop and Apprentice dashboards disagree for the same user.
   const ojtProgress: Record<string, { completed: number; required: number }> = {};
   if (studentIds.length) {
     const { data: approvedHours, error: approvedHoursError } = await db
@@ -126,8 +117,6 @@ export async function getHostShopBoard(userId: string) {
     }
   }
 
-  // Critical tenant fix: count only hour entries belonging to apprentices
-  // assigned to this host shop. Never expose a platform-wide pending count.
   let pendingHoursCount = 0;
   if (studentIds.length) {
     const { count } = await db
@@ -160,11 +149,15 @@ export async function getHostShopBoard(userId: string) {
     .in('state', [partner.state || 'Indiana', 'ALL']);
 
   const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
-  const { data: uploadedDocs } = await db
+  const { data: uploadedDocs, error: uploadedDocsError } = await db
     .from('partner_documents')
-    .select('id, document_type, file_name, status, rejection_reason, expires_at')
+    .select('id, document_type, display_name, file_name, file_url, status, rejection_reason, expiration_date, uploaded_at')
     .eq('partner_id', partner.id)
-    .order('created_at', { ascending: false });
+    .order('uploaded_at', { ascending: false });
+
+  if (uploadedDocsError) {
+    throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
+  }
 
   const latestDocs = new Map<string, any>();
   for (const doc of uploadedDocs || []) {

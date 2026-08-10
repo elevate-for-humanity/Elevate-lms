@@ -1,12 +1,11 @@
-import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import ApplyPathGuide from '@/components/apply/ApplyPathGuide';
 import StudentApplicationForm from './StudentApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { resolveSlug } from '@/lib/program-registry';
-import { getProgramBySlug } from '@/data/programs/catalog';
+import { getProgramBySlug } from '@/lib/programs/static-registry';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { hero as heroTokens } from '@/lib/page-design-tokens';
 import { getAdminUrl } from '@/lib/config/admin-url';
@@ -14,16 +13,16 @@ import { getAdminUrl } from '@/lib/config/admin-url';
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: 'Apply for Career Training',
+  title: 'Apply for Career Training | Elevate for Humanity',
   description:
-    'Apply for workforce training in healthcare, skilled trades, CDL, barbering, and technology. Funding may be available for eligible Indiana residents through WIOA and state grants.',
+    'Submit a student application for Elevate career training. Review the exact program requirements, tuition, credentials, and any program-specific funding options before enrollment.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply/student',
   },
   openGraph: {
-    title: 'Apply for Career Training',
+    title: 'Apply for Career Training | Elevate for Humanity',
     description:
-      'Apply for workforce training and career development programs. Funding may be available for eligible participants. Most students begin training within 2–4 weeks.',
+      'Apply for career training and review the program-specific requirements, tuition, credential pathway, and funding process that apply to your selection.',
     url: 'https://www.elevateforhumanity.org/apply/student',
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
@@ -38,8 +37,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Featured program slugs — order controls display sequence.
-// Add a slug here to feature it; remove to unfeature. Data comes from data/programs/catalog.ts.
 const FEATURED_SLUGS = [
   'cna',
   'medical-assistant',
@@ -49,78 +46,82 @@ const FEATURED_SLUGS = [
   'phlebotomy',
   'it-help-desk',
   'bookkeeping',
-];
+] as const;
 
 const PROGRAMS = FEATURED_SLUGS.flatMap((slug) => {
-  const p = getProgramBySlug(slug);
-  if (!p) return [];
-  return [{
-    title: p.title,
-    duration: p.durationWeeks ? `${p.durationWeeks} weeks` : 'Varies',
-    credential: p.credentials?.[0]?.name ?? '',
-    href: `/programs/${p.slug}`,
-    image: p.heroImage,
-  }];
+  const program = getProgramBySlug(slug);
+  if (!program) return [];
+  return [
+    {
+      slug: program.slug,
+      title: program.title,
+      duration: program.durationWeeks ? `${program.durationWeeks} weeks` : 'See program page',
+      credential: program.credentials?.[0]?.name || 'See program page',
+      href: `/programs/${program.slug}`,
+      image: program.heroImage,
+      fundingStatement: program.fundingStatement,
+    },
+  ];
 });
 
 const STEPS = [
   {
     n: '1',
-    title: 'Submit This Application',
-    desc: 'Takes about 5 minutes. Tell us your goals and which program interests you.',
+    title: 'Submit Your Application',
+    desc: 'Tell us which program you are considering and provide the information needed for admissions review.',
   },
   {
     n: '2',
-    title: 'Attend Orientation',
-    desc: 'A short session where we walk through programs, funding options, and next steps.',
+    title: 'Review the Exact Program',
+    desc: 'Confirm the current tuition, schedule, admission requirements, credential or licensing objective, and required documents for that program.',
   },
   {
     n: '3',
-    title: 'Funding Determination',
-    desc: 'We connect you with WorkOne to check WIOA, WRG, and other funding eligibility.',
+    title: 'Complete Funding Review if Requested',
+    desc: 'If you want third-party funding, WorkOne or the responsible funding agency determines your eligibility, the approved program, covered costs, and authorized amount.',
   },
   {
     n: '4',
-    title: 'Enroll & Start Training',
-    desc: 'Once funding is confirmed, you get placed in a cohort. Most students start within 2–4 weeks.',
+    title: 'Complete Required Onboarding',
+    desc: 'Complete the orientation, agreements, document uploads, payment or funding authorization, and any other enrollment requirements that apply.',
   },
   {
     n: '5',
-    title: 'Earn Your Credential',
-    desc: 'Complete training, pass your certification exam, and receive your industry credential.',
+    title: 'Begin Training After Enrollment Is Active',
+    desc: 'Course access begins after the required enrollment controls are complete and your enrollment is activated.',
   },
   {
     n: '6',
-    title: 'Get Placed in a Job',
-    desc: 'Career services connects you with employer partners actively hiring in your field.',
+    title: 'Use Career Support',
+    desc: 'Career services may provide resume, interview, referral, and job-search assistance. Employment, wages, and hiring decisions are not guaranteed.',
   },
-];
+] as const;
 
 const TRUST = [
-  { stat: '$0', label: 'Cost for most eligible students' },
-  { stat: '2–4 wks', label: 'Average time from apply to start' },
-  { stat: '90%+', label: 'Credential pass rate' },
-  { stat: '6 fields', label: 'Healthcare, trades, CDL, tech, and more' },
-];
+  { stat: 'Program-specific', label: 'Tuition, schedule, credentials, and requirements' },
+  { stat: 'Written approval', label: 'Required before third-party funding is treated as confirmed' },
+  { stat: 'Verified records', label: 'Enrollment and completion depend on actual learner records' },
+  { stat: 'Career support', label: 'Job-search assistance without employment guarantees' },
+] as const;
 
 const FUNDING = [
   {
     label: 'WIOA',
-    desc: 'Federal funding for adults, dislocated workers, and youth. Covers tuition, books, and support services.',
+    desc: 'May be considered for eligible participants and eligible programs. WorkOne or the responsible workforce agency controls eligibility, authorization, and covered costs.',
   },
   {
     label: 'Workforce Ready Grant',
-    desc: 'Indiana state grant for high-demand certificate programs. No repayment required.',
+    desc: 'May apply only to programs and participants that meet current Indiana eligibility and program-list requirements. Do not assume every Elevate program qualifies.',
   },
   {
-    label: 'Job Ready Indy',
-    desc: 'For justice-involved individuals. Covers training and support services.',
+    label: 'Other Agency or Employer Funding',
+    desc: 'Vocational rehabilitation, employer sponsorship, or other assistance may apply when the responsible organization approves the participant and program in writing.',
   },
   {
-    label: 'Self-Pay / BNPL',
-    desc: 'Flexible payment plans for students who do not qualify for grant funding.',
+    label: 'Self-Pay',
+    desc: 'Self-pay is available for programs with published tuition. Use the exact program page and checkout or enrollment agreement for the controlling price and payment terms.',
   },
-];
+] as const;
 
 export default async function StudentApplicationPage({
   searchParams,
@@ -131,14 +132,11 @@ export default async function StudentApplicationPage({
   const initialProgram = resolveSlug(params?.program || '') || '';
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
+    <main className="min-h-screen bg-white text-slate-950">
       <div className={heroTokens.imageWrap}>
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+        <Image
           src="/images/pages/apply-page-4.jpg"
-          alt={`Apply for career training — ${PLATFORM_DEFAULTS.orgName}`}
+          alt={`Student applying for career training with ${PLATFORM_DEFAULTS.orgName}`}
           fill
           sizes="100vw"
           className="object-cover"
@@ -146,197 +144,167 @@ export default async function StudentApplicationPage({
         />
       </div>
 
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Student' }]} />
         </div>
       </div>
 
-      {/* Page identity */}
-      <section className="border-b border-slate-100 py-10 px-4">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
+      <section className="border-b border-slate-200 px-4 py-10">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-brand-red-700">
             Student Application — Indianapolis, Indiana
           </p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight mb-3">
-            Start Your Career Journey
+          <h1 className="mb-3 text-3xl font-extrabold leading-tight text-slate-950 sm:text-4xl">
+            Apply after reviewing the exact program you want.
           </h1>
-          <p className="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed mb-6">
-            Apply in minutes. We match you with the right program and help you access WIOA, WRG,
-            and other funding sources — most eligible students pay nothing out of pocket.
+          <p className="mb-6 max-w-3xl text-base leading-7 text-slate-700 sm:text-lg">
+            Submit your application, then complete the admission, funding, payment, document, and onboarding steps that apply to your selected program. Third-party funding is never guaranteed by submitting this form.
           </p>
           <div className="flex flex-wrap gap-3">
             <a
               href="#application-form"
-              className="bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+              className="inline-flex min-h-12 items-center rounded-xl bg-brand-red-600 px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-red-700"
             >
-              Apply Now
+              Start Application
             </a>
             <Link
-              href="/wioa-eligibility"
-              className="border-2 border-slate-300 hover:border-brand-blue-400 text-slate-700 font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+              href="/eligibility/quiz"
+              className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-300 px-7 py-3 text-sm font-bold text-slate-950 transition-colors hover:border-brand-blue-600"
             >
-              Check Funding Eligibility
+              Preliminary Eligibility Check
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Trust stats */}
-      <section className="bg-slate-900 py-10 px-4">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {TRUST.map((t) => (
-            <div key={t.stat} className="text-center">
-              <p className="text-3xl font-extrabold text-white mb-1">{t.stat}</p>
-              <p className="text-slate-400 text-xs leading-snug">{t.label}</p>
+      <section className="bg-slate-950 px-4 py-10 text-white" aria-label="Application safeguards">
+        <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {TRUST.map((item) => (
+            <div key={item.stat}>
+              <p className="mb-1 text-lg font-extrabold text-white">{item.stat}</p>
+              <p className="text-sm leading-6 text-slate-300">{item.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Programs */}
-      <section className="py-14 px-4 border-b border-slate-100">
-        <div className="max-w-6xl mx-auto">
+      <section className="border-b border-slate-200 px-4 py-14">
+        <div className="mx-auto max-w-6xl">
           <div className="mb-10">
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
-              Available Programs
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
-              Choose Your Career Path
-            </h2>
-            <p className="text-slate-600 text-sm max-w-2xl leading-relaxed">
-              Every program leads to a nationally or state-recognized credential. Most are available
-              at no cost through WIOA or state funding.
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-brand-red-700">Featured Programs</p>
+            <h2 className="mb-2 text-2xl font-extrabold text-slate-950 sm:text-3xl">Review Before You Select</h2>
+            <p className="max-w-3xl text-sm leading-6 text-slate-700">
+              Program requirements are not interchangeable. Open the program record to verify its current duration, credential objective, tuition, delivery model, and funding disclosure.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {PROGRAMS.map((p) => (
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {PROGRAMS.map((program) => (
               <Link
-                key={p.title}
-                href={p.href}
-                className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all"
+                key={program.slug}
+                href={program.href}
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="relative aspect-[16/9] overflow-hidden">
+                <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
                   <Image
-                    src={p.image}
-                    alt={p.title}
+                    src={program.image}
+                    alt={program.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500" placeholder="empty"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <span className="absolute top-2 right-2 bg-brand-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                    Funding May Apply
-                  </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-slate-900 text-sm mb-1">{p.title}</h3>
-                  <p className="text-xs text-slate-500 mb-0.5">
-                    <span className="font-semibold text-slate-700">Duration:</span> {p.duration}
+                  <h3 className="mb-2 text-sm font-bold text-slate-950">{program.title}</h3>
+                  <p className="text-xs leading-5 text-slate-700">
+                    <span className="font-bold text-slate-950">Duration:</span> {program.duration}
                   </p>
-                  <p className="text-xs text-slate-500">
-                    <span className="font-semibold text-slate-700">Credential:</span> {p.credential}
+                  <p className="mt-1 text-xs leading-5 text-slate-700">
+                    <span className="font-bold text-slate-950">Credential:</span> {program.credential}
                   </p>
+                  <p className="mt-3 text-xs leading-5 text-slate-600">{program.fundingStatement}</p>
                 </div>
               </Link>
             ))}
           </div>
+
           <div className="mt-8 text-center">
             <Link
               href="/programs"
-              className="inline-block border-2 border-slate-300 hover:border-brand-red-400 text-slate-700 font-bold px-7 py-3 rounded-xl transition-colors text-sm"
+              className="inline-flex min-h-12 items-center rounded-xl border-2 border-slate-300 px-7 py-3 text-sm font-bold text-slate-950 transition-colors hover:border-brand-red-600"
             >
-              View All Programs →
+              View All Programs
             </Link>
           </div>
         </div>
       </section>
 
-      {/* What happens after you apply */}
-      <section className="py-14 px-4 bg-slate-50 border-b border-slate-100">
-        <div className="max-w-5xl mx-auto">
+      <section className="border-b border-slate-200 bg-slate-50 px-4 py-14">
+        <div className="mx-auto max-w-5xl">
           <div className="mb-10 text-center">
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
-              The Process
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              What Happens After You Apply
-            </h2>
-            <p className="text-slate-600 text-sm mt-2 max-w-xl mx-auto">
-              From application to job placement — here is every step.
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-brand-red-700">The Process</p>
+            <h2 className="text-2xl font-extrabold text-slate-950 sm:text-3xl">What Happens After You Apply</h2>
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-700">
+              The exact sequence can vary by program and funding source. These are the controls every applicant should expect to verify.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {STEPS.map((s) => (
-              <div key={s.n} className="bg-white rounded-2xl border border-slate-200 p-6">
-                <div className="w-9 h-9 rounded-full bg-brand-red-600 text-white text-sm font-extrabold flex items-center justify-center mb-4">
-                  {s.n}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {STEPS.map((step) => (
+              <article key={step.n} className="rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-brand-red-600 text-sm font-extrabold text-white">
+                  {step.n}
                 </div>
-                <h3 className="font-bold text-slate-900 text-sm mb-2">{s.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{s.desc}</p>
-              </div>
+                <h3 className="mb-2 text-sm font-bold text-slate-950">{step.title}</h3>
+                <p className="text-sm leading-6 text-slate-700">{step.desc}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Funding sources */}
-      <section className="py-14 px-4 border-b border-slate-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid sm:grid-cols-2 gap-10 items-start">
-            <div>
-              <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
-                Funding & Cost
-              </p>
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-4">
-                Most students pay $0.
-              </h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                Federal and state funding covers tuition, books, and certification exam fees for
-                eligible Indiana residents. Eligibility is determined through WorkOne — not Elevate.
-              </p>
-              <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                Justice-involved individuals may qualify for Job Ready Indy funding.
-              </p>
-              <Link
-                href="/funding"
-                className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm"
-              >
-                Explore Funding Options
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {FUNDING.map((f) => (
-                <div key={f.label} className="bg-slate-50 rounded-xl border border-slate-200 p-4">
-                  <p className="font-bold text-slate-900 text-sm mb-1">{f.label}</p>
-                  <p className="text-slate-600 text-sm leading-relaxed">{f.desc}</p>
-                </div>
-              ))}
-            </div>
+      <section className="border-b border-slate-200 px-4 py-14">
+        <div className="mx-auto grid max-w-5xl gap-10 sm:grid-cols-2 sm:items-start">
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-brand-red-700">Funding & Cost</p>
+            <h2 className="mb-4 text-2xl font-extrabold text-slate-950">Funding must be verified for the participant and program.</h2>
+            <p className="mb-4 text-sm leading-6 text-slate-700">
+              Some applicants may qualify for workforce, vocational-rehabilitation, employer, or other third-party assistance. The responsible funder—not Elevate—determines eligibility, available funds, covered costs, and the authorized amount.
+            </p>
+            <p className="mb-6 text-sm leading-6 text-slate-700">
+              Do not treat an application, eligibility quiz, provider relationship, or website funding label as a voucher or payment authorization.
+            </p>
+            <Link
+              href="/funding"
+              className="inline-flex min-h-12 items-center rounded-xl bg-brand-red-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-brand-red-700"
+            >
+              Review Funding Options
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {FUNDING.map((funding) => (
+              <article key={funding.label} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="mb-1 text-sm font-bold text-slate-950">{funding.label}</h3>
+                <p className="text-sm leading-6 text-slate-700">{funding.desc}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Application form */}
-      <section id="application-form" className="py-14 px-4">
-        <div className="max-w-4xl mx-auto">
+      <section id="application-form" className="px-4 py-14">
+        <div className="mx-auto max-w-4xl">
           <div className="mb-8">
-            <p className="text-brand-red-600 font-bold text-xs uppercase tracking-widest mb-2">
-              Apply Now
-            </p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
-              Submit Your Application
-            </h2>
-            <p className="text-slate-600 text-sm max-w-xl leading-relaxed">
-              Takes about 5 minutes. We will follow up within one business day to schedule your
-              orientation. Call us at{' '}
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-brand-red-700">Apply Now</p>
+            <h2 className="mb-2 text-2xl font-extrabold text-slate-950 sm:text-3xl">Submit Your Student Application</h2>
+            <p className="max-w-2xl text-sm leading-6 text-slate-700">
+              Provide complete and accurate information. Admissions will use the contact information you submit to communicate your next required steps. For assistance, call{' '}
               <a
-                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
-                className="text-brand-red-600 font-semibold hover:underline"
+                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`}
+                className="font-bold text-brand-red-700 hover:underline"
               >
                 {PLATFORM_DEFAULTS.supportPhone}
-              </a>{' '}
-              if you have questions.
+              </a>.
             </p>
           </div>
           <ApplyPathGuide variant="student" />
@@ -344,37 +312,25 @@ export default async function StudentApplicationPage({
         </div>
       </section>
 
-      {/* Other application types */}
-      <section className="border-t border-slate-200 bg-slate-50 py-8 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-slate-500 text-sm mb-3">Not a student?</p>
-          <div className="flex flex-wrap justify-center gap-6">
-            <Link
-              href="/apply/employer"
-              className="text-brand-blue-600 hover:underline font-semibold text-sm"
-            >
+      <section className="border-t border-slate-200 bg-slate-50 px-4 py-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="mb-3 text-sm text-slate-600">Applying in another role?</p>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+            <Link href="/apply/employer" className="text-sm font-semibold text-brand-blue-800 hover:underline">
               Employer Partnership
             </Link>
-            <Link
-              href="/apply/program-holder"
-              className="text-brand-blue-600 hover:underline font-semibold text-sm"
-            >
+            <Link href="/apply/program-holder" className="text-sm font-semibold text-brand-blue-800 hover:underline">
               Become a Program Holder
             </Link>
-            <Link
-              href="/for-providers"
-              className="text-brand-blue-600 hover:underline font-semibold text-sm"
-            >
+            <Link href="/for-providers" className="text-sm font-semibold text-brand-blue-800 hover:underline">
               Training Provider
             </Link>
-            <a href={getAdminUrl("/staff-portal")}
-              className="text-brand-blue-600 hover:underline font-semibold text-sm"
-            >
-              Staff Application
+            <a href={getAdminUrl('/staff-portal')} className="text-sm font-semibold text-brand-blue-800 hover:underline">
+              Staff Portal
             </a>
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

@@ -8,10 +8,21 @@
     ]
   },
   "include": [
-    "../../**/*.js",
-    "../../**/*.mjs",
-    "../../**/*.ts",
-    "../../**/*.tsx",
+    "../../components/**/*.ts",
+    "../../components/**/*.tsx",
+    "../../config/**/*.ts",
+    "../../contexts/**/*.ts",
+    "../../contexts/**/*.tsx",
+    "../../data/**/*.ts",
+    "../../data/**/*.tsx",
+    "../../hooks/**/*.ts",
+    "../../hooks/**/*.tsx",
+    "../../lib/**/*.ts",
+    "../../lib/**/*.tsx",
+    "../../packages/shared/**/*.ts",
+    "../../packages/shared/**/*.tsx",
+    "../../types/**/*.ts",
+    "../../types/**/*.d.ts",
     "./**/*.js",
     "./**/*.mjs",
     "./**/*.ts",
@@ -19,6 +30,19 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "../../apps/admin",
+    "../../apps/lms",
+    "../../app-legacy",
+    "../../scripts",
+    "../../server",
+    "../../supabase",
+    "../../tests",
+    "../../tools",
+    "../../workers",
+    "../../**/*.test.ts",
+    "../../**/*.test.tsx",
+    "../../**/*.spec.ts",
+    "../../**/*.spec.tsx"
   ]
 }

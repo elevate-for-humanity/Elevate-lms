@@ -54,6 +54,11 @@ function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
   }
 }
 
+/**
+ * Normalize either identifier used historically by billing:
+ * - tenants.id (canonical application identity)
+ * - organizations.id (legacy Stripe metadata / billing identity)
+ */
 export async function resolveOrganizationIdentity(
   tenantOrOrganizationId: string,
   client?: SupabaseClient,
@@ -98,6 +103,11 @@ export async function resolveBillingOrganizationId(
   return identity.billingOrganizationId;
 }
 
+/**
+ * Load merged feature codes for a SaaS tenant. Legacy organizations.id callers
+ * are normalized at this boundary so downstream feature checks always operate
+ * on tenants.id.
+ */
 export async function getOrganizationFeatures(
   tenantOrOrganizationId: string,
   client?: SupabaseClient,
@@ -155,6 +165,7 @@ export async function getOrganizationFeatures(
     PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
   }
 
+  // Add-ons are tenant-keyed and may be sold independently of a base plan.
   const { data: addonRows } = await supabase
     .from('addon_subscriptions')
     .select('addon_code, saas_addon_catalog ( feature_codes )')
@@ -190,6 +201,9 @@ export async function getOrganizationFeatures(
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
   }
 
+  // A legacy/manual license is a compatibility source only when there is no
+  // recurring organization subscription. It must never resurrect features for
+  // a canceled or past-due Stripe subscription.
   if (featureSet.size === 0 && !orgSub) {
     const { data: license } = await supabase
       .from('licenses')

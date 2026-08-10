@@ -29,6 +29,7 @@ export const WEBSITE_BUILDER_TRIAL = {
 export const WEBSITE_BUILDER_CREDIT_COSTS = {
   initial_site_generation: 60,
   paris_edit: 8,
+  assistant_chat: 12,
   marketing_generation: 25,
   image_generation: 40,
   grant_draft: 80,
@@ -81,9 +82,6 @@ export async function consumeWebsiteBuilderCredits(
   }
 
   if (subscription.status === 'active') {
-    // Paid plan credit bundles are intentionally not forced through trial
-    // credits. They can use the same wallet/ledger when paid pack pricing is
-    // activated without changing the Website Builder AI endpoints again.
     return { allowed: true, charged: 0, balance: null, isTrial: false };
   }
 

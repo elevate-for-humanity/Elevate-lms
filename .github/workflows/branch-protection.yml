@@ -32,22 +32,26 @@ jobs:
       - name: Fetch all remote refs
         run: git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
 
-      - name: Side-by-side audit and delete non-main branches
+      - name: Guard against active pull requests
         env:
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
         run: |
-          set -u
-          owner="${REPO%%/*}"
-          deleted=0
-          kept=0
-          failed=0
+          set -euo pipefail
+          open_count=$(gh pr list --state open --limit 100 --json number --jq 'length')
+          echo "Open pull requests: $open_count"
+          test "$open_count" -eq 0 || {
+            echo 'Refusing full cleanup while an open pull request exists.'
+            exit 1
+          }
 
+      - name: Side-by-side branch audit
+        run: |
+          set -euo pipefail
           {
             echo '## Full branch cleanup audit'
             echo
-            echo '| Branch | Ahead | Behind | Latest commit | Action |'
-            echo '|---|---:|---:|---|---|'
+            echo '| Branch | Ahead of main | Behind main | Latest commit |'
+            echo '|---|---:|---:|---|'
           } >> "$GITHUB_STEP_SUMMARY"
 
           mapfile -t branches < <(
@@ -58,54 +62,70 @@ jobs:
           )
 
           for branch in "${branches[@]}"; do
-            if ! open_prs=$(gh api -X GET search/issues \
-              -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
-              --jq '.total_count' 2>/dev/null); then
-              open_prs=0
-            fi
-
-            if ! counts=$(git rev-list --left-right --count "origin/main...origin/${branch}" 2>/dev/null); then
-              printf '| `%s` | ? | ? | unavailable | SKIPPED — ref changed during audit |\n' \
-                "$branch" >> "$GITHUB_STEP_SUMMARY"
-              continue
-            fi
-            read -r behind ahead <<< "$counts"
-            latest=$(git log -1 --format='%h %cs' "origin/${branch}" 2>/dev/null || echo 'unknown')
-
-            if [ "$open_prs" -gt 0 ]; then
-              printf '| `%s` | %s | %s | %s | KEPT — open PR |\n' \
-                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
-              kept=$((kept + 1))
-              continue
-            fi
-
-            if git push origin --delete "$branch"; then
-              printf '| `%s` | %s | %s | %s | DELETED |\n' \
-                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
-              deleted=$((deleted + 1))
-            else
-              printf '| `%s` | %s | %s | %s | FAILED — GitHub refused deletion |\n' \
-                "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
-              failed=$((failed + 1))
-            fi
+            read -r behind ahead < <(git rev-list --left-right --count "origin/main...origin/${branch}")
+            latest=$(git log -1 --format='%h %cs' "origin/${branch}")
+            printf '| `%s` | %s | %s | %s |\n' "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
           done
 
-          {
-            echo
-            echo "Deleted this pass: ${deleted}"
-            echo "Kept for open PR: ${kept}"
-            echo "Deletion failures: ${failed}"
-            echo 'Canonical branch: `main`'
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo "AUDITED_BRANCH_COUNT=${#branches[@]}" >> "$GITHUB_ENV"
 
-          echo "Deleted ${deleted}; kept ${kept}; failed ${failed}."
+      - name: Bulk delete every non-main branch
+        run: |
+          set -u
+          mapfile -t branches < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | sort
+          )
 
-      - name: Verify remaining branch set
+          if [ "${#branches[@]}" -eq 0 ]; then
+            echo 'No non-main branches remain.'
+            exit 0
+          fi
+
+          echo "Deleting ${#branches[@]} non-main branches in one ref update batch."
+          git push origin --delete "${branches[@]}" || true
+
+          # Retry any refs GitHub refused in the batch, but never abort the whole sweep.
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          mapfile -t remaining < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | sort
+          )
+
+          for branch in "${remaining[@]}"; do
+            echo "Retrying deletion: $branch"
+            git push origin --delete "$branch" || echo "GitHub refused deletion of $branch"
+          done
+
+      - name: Verify canonical branch set
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api --paginate "repos/${GITHUB_REPOSITORY}/branches?per_page=100" --jq '.[].name'
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          mapfile -t remaining < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | sort
+          )
+
+          {
+            echo
+            echo "Audited before cleanup: ${AUDITED_BRANCH_COUNT:-unknown}"
+            echo "Remaining non-main branches: ${#remaining[@]}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "${#remaining[@]}" -gt 0 ]; then
+            printf 'Remaining: %s\n' "${remaining[@]}"
+            exit 1
+          fi
+
+          echo 'Branch cleanup complete: main is the only remote branch.'
 
   scheduled-stale-cleanup:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

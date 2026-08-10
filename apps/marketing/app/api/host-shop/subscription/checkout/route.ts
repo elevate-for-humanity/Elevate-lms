@@ -17,6 +17,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
+const HOST_SHOP_DASHBOARD_URL = 'https://app.elevateforhumanity.org/host-shop/dashboard';
 
 export async function POST(request: NextRequest) {
   await hydrateProcessEnv();
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
       });
       await syncHostShopSubscriptionLifecycle(admin, updated);
       return NextResponse.json({
-        url: '/host-shop/dashboard/subscription?subscription=updated',
+        url: `${HOST_SHOP_DASHBOARD_URL}?subscription=updated`,
         sessionId: null,
         updated: true,
       });
@@ -161,7 +162,7 @@ export async function POST(request: NextRequest) {
     metadata,
     subscription_data: { metadata },
     success_url: `${SITE_URL}/host-shop/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${SITE_URL}/host-shop/dashboard/subscription?checkout=cancelled`,
+    cancel_url: `${HOST_SHOP_DASHBOARD_URL}?checkout=cancelled`,
     billing_address_collection: 'required',
   });
 

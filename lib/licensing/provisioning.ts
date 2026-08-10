@@ -18,6 +18,8 @@ type ProvisioningStep =
   | 'failed'
   | 'rolled_back';
 
+type AdminUserRecord = { id: string; email?: string | null };
+
 interface ProvisioningContext {
   correlationId: string;
   email: string;
@@ -73,14 +75,15 @@ function tenantSlug(name: string) {
   return `${base || 'organization'}-${crypto.randomBytes(4).toString('hex')}`;
 }
 
-async function findUserByEmail(supabase: Awaited<ReturnType<typeof requireAdminClient>>, email: string) {
+async function findUserByEmail(supabase: Awaited<ReturnType<typeof requireAdminClient>>, email: string): Promise<AdminUserRecord | null> {
   const normalized = email.trim().toLowerCase();
   for (let page = 1; page <= 10; page += 1) {
     const { data, error } = await supabase.auth.admin.listUsers({ page, perPage: 100 });
     if (error) throw error;
-    const match = data.users.find((user) => user.email?.toLowerCase() === normalized);
+    const users = (data?.users ?? []) as AdminUserRecord[];
+    const match = users.find((user) => user.email?.toLowerCase() === normalized);
     if (match) return match;
-    if (data.users.length < 100) break;
+    if (users.length < 100) break;
   }
   return null;
 }

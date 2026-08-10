@@ -1,127 +1,61 @@
-import { Metadata } from 'next';
 import Link from 'next/link';
-import { UserPlus, ArrowLeft, User, Mail, Phone, Calendar } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, UserPlus, Users } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard } from '@/lib/partner/board';
 
-export const metadata: Metadata = {
-  title: 'Add New Apprentice | Host Shop Portal',
-  description: 'Add a new apprentice to your host shop.',
+export const dynamic = 'force-dynamic';
+
+export const metadata = {
+  title: 'Add Apprentice | Host Shop Portal',
+  description: 'Use the approved match and placement workflow to add apprentices to a host shop.',
+  robots: { index: false, follow: false },
 };
 
-export default function NewApprenticePage() {
+export default async function NewApprenticePage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <section className="bg-white border-b border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center gap-4 mb-4">
-            <Link
-              href="/host-shop/dashboard/apprentices"
-              className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 text-sm"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Apprentices
-            </Link>
+    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <Link href="/host-shop/dashboard/apprentices" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950">
+        <ArrowLeft className="h-4 w-4" /> Back to apprentices
+      </Link>
+
+      <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-9">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue-50 text-brand-blue-700">
+          <UserPlus className="h-6 w-6" />
+        </div>
+        <p className="mt-5 text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
+          {board.partner?.name || 'Host Shop'}
+        </p>
+        <h1 className="mt-2 text-3xl font-black text-slate-950">Add an apprentice through the placement workflow</h1>
+        <p className="mt-3 max-w-2xl leading-7 text-slate-700">
+          Host shops cannot create arbitrary student records. An apprentice must be an existing Elevate learner and become assigned to this shop through an approved match or placement record. This keeps the roster, hours, competencies, and compliance records tied to the correct tenant.
+        </p>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <Users className="h-5 w-5 text-brand-blue-700" />
+            <p className="mt-3 text-2xl font-black text-slate-950">{board.apprentices.length}</p>
+            <p className="text-sm text-slate-600">Current active placements</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-              <UserPlus className="w-6 h-6 text-brand-blue-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Add New Apprentice</h1>
-              <p className="text-sm text-slate-500">Register a new apprentice for your host shop</p>
-            </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <ShieldCheck className="h-5 w-5 text-brand-green-700" />
+            <p className="mt-3 font-black text-slate-950">Tenant-safe placement</p>
+            <p className="mt-1 text-sm text-slate-600">Approved records only; no demo or manually fabricated users.</p>
           </div>
         </div>
-      </section>
 
-      {/* Form */}
-      <section className="py-8">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-            <form className="p-6 space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">First Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                    placeholder="Enter last name"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="email"
-                    className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                    placeholder="apprentice@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="tel"
-                    className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                    placeholder="(555) 555-5555"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Program</label>
-                <select className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
-                  <option value="">Select a program</option>
-                  <option value="barber">Barber Apprenticeship</option>
-                  <option value="cosmetology">Cosmetology Apprenticeship</option>
-                  <option value="esthetician">Esthetician Apprenticeship</option>
-                  <option value="nail">Nail Technician Apprenticeship</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Start Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <button
-                  type="submit"
-                  className="flex-1 bg-brand-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
-                >
-                  Add Apprentice
-                </button>
-                <Link
-                  href="/host-shop/dashboard/apprentices"
-                  className="px-6 py-3 border border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors"
-                >
-                  Cancel
-                </Link>
-              </div>
-            </form>
-          </div>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link href="/host-shop/dashboard/match-requests" className="rounded-xl bg-brand-blue-700 px-5 py-3 text-sm font-black text-white hover:bg-brand-blue-800">
+            Review match requests
+          </Link>
+          <Link href="/host-shop/dashboard/apprentices" className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800 hover:bg-slate-50">
+            View current roster
+          </Link>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

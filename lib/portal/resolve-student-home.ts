@@ -5,19 +5,20 @@ import {
   portalTypeForProgramSlug,
 } from '@/lib/portal/apprenticeship-portal-paths';
 import { PORTAL_PATHS, PORTAL_FALLBACK, type PortalKey } from '@/lib/portal/router';
+import { LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
 
-const MARKETING_URL = 'https://www.elevateforhumanity.org';
-
-/** Prefix a portal path with the marketing origin so it resolves to www, not app. */
-function marketingUrl(path: string): string {
+function absolutePortalUrl(path: string): string {
   if (path.startsWith('http')) return path;
-  return `${MARKETING_URL}${path}`;
+  if (path === '/apprentice' || path.startsWith('/apprentice?') || path.startsWith('/lms/')) {
+    return `${LMS_HOST}${path}`;
+  }
+  return `${MARKETING_HOST}${path}`;
 }
 
 /**
- * Resolves where a student should land after login.
- * Priority: (1) program_slug in active enrollment, (2) program lookup by program_id,
- * (3) cached portal_type, (4) student default.
+ * Resolve the post-login learner destination from the canonical enrollment.
+ * Apprenticeship routes always land on the LMS /apprentice workspace; legacy
+ * per-trade portal_type values are retained only as program context.
  */
 export async function resolveStudentHomePath(
   supabase: SupabaseClient,
@@ -33,17 +34,15 @@ export async function resolveStudentHomePath(
     .limit(1)
     .maybeSingle();
 
-  // Try program_slug directly first
   let slugPath = portalPathForProgramSlug(enrollment?.program_slug);
   if (slugPath) {
     const portalType = portalTypeForProgramSlug(enrollment?.program_slug);
     if (portalType) {
       await supabase.from('profiles').update({ portal_type: portalType }).eq('id', userId);
     }
-    return marketingUrl(slugPath);
+    return absolutePortalUrl(slugPath);
   }
 
-  // Fallback: look up program by program_id if program_slug is empty
   if (enrollment?.program_id) {
     const { data: program } = await supabase
       .from('programs')
@@ -58,20 +57,30 @@ export async function resolveStudentHomePath(
         if (portalType) {
           await supabase.from('profiles').update({ portal_type: portalType }).eq('id', userId);
         }
-        return marketingUrl(slugPath);
+        return absolutePortalUrl(slugPath);
       }
     }
   }
 
-  // Try cached portal_type
   if (cachedPortalType) {
     const canonical = PORTAL_PATHS[cachedPortalType as PortalKey];
-    if (canonical) return marketingUrl(canonical);
-    // Per-program portal_type values (barber, cosmetology, …)
-    if (/^[a-z0-9-]+$/.test(cachedPortalType)) {
-      return marketingUrl(`/portal/${cachedPortalType}`);
-    }
+    if (canonical) return absolutePortalUrl(canonical);
+
+    // Historical per-program portal_type values should no longer recreate a
+    // Marketing /portal/<trade> route. Resolve them back to the canonical LMS
+    // apprentice workspace instead.
+    const slugByPortalType: Record<string, string> = {
+      barber: 'barber-apprenticeship',
+      cosmetology: 'cosmetology-apprenticeship',
+      esthetician: 'esthetician-apprenticeship',
+      'nail-technician': 'nail-technician-apprenticeship',
+      culinary: 'culinary-apprenticeship',
+      electrical: 'electrical',
+      plumbing: 'plumbing',
+    };
+    const cachedSlug = slugByPortalType[cachedPortalType];
+    if (cachedSlug) return `${LMS_HOST}/apprentice?program=${encodeURIComponent(cachedSlug)}`;
   }
 
-  return marketingUrl(PORTAL_FALLBACK);
+  return absolutePortalUrl(PORTAL_FALLBACK);
 }

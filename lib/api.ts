@@ -1,6 +1,3 @@
-import type { NextRequest } from 'next/server';
-import type { ApiResponse as _ApiResponse } from '@/types/api';
-
 /**
  * Client fetch helper. Server route error handling is re-exported from the
  * canonical lib/api/* implementation below so `/lib/api.ts` and `/lib/api/`

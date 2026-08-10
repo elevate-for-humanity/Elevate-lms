@@ -1,11 +1,16 @@
 /**
  * Canonical Host Shop Dashboard entry point.
- * Authenticates the user, verifies an active partner-user linkage and partner
- * approval/onboarding state, then routes to the real board workspace.
+ * Authenticates once, applies the shared RBAC model, verifies the concrete
+ * partner assignment for non-admin users, then routes into the real board.
  */
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import {
+  HOST_SHOP_ROLES,
+  hasAnyRole,
+  normalizeRoles,
+} from '@/lib/rbac/role-matrix';
 import {
   getHostShopOnboardingPaths,
   resolveHostShopProgram,
@@ -23,9 +28,10 @@ export default async function HostShopDashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) redirect('/host-shop/login?redirect=/host-shop/dashboard');
+  if (authError || !user) redirect('/host-shop/login?redirect=/host-shop/dashboard');
 
   let db;
   try {
@@ -34,14 +40,24 @@ export default async function HostShopDashboardPage() {
     redirect('/host-shop/login?error=identity');
   }
 
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
+  const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
+    db.from('profiles').select('role').eq('id', user.id).maybeSingle(),
+    db.from('user_roles').select('roles(name)').eq('user_id', user.id),
+  ]);
 
-  if (profile?.role === 'admin' || profile?.role === 'staff') {
-    redirect('https://admin.elevateforhumanity.org/dashboard');
+  const secondaryRoles = (userRoleRows || [])
+    .map((row: any) => row.roles?.name)
+    .filter((role: unknown): role is string => typeof role === 'string');
+  const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
+
+  if (!hasAnyRole(effectiveRoles, HOST_SHOP_ROLES, { adminOverride: true })) {
+    redirect('/unauthorized');
+  }
+
+  const isPlatformAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin');
+  if (isPlatformAdmin) {
+    // Admins can enter the Host Shop portal, but tenant selection must be explicit.
+    redirect('/host-shop/dashboard/board');
   }
 
   const { data: partnerLink } = await db

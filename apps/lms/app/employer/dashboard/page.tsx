@@ -5,6 +5,7 @@ import { Briefcase, Users, FileText, Shield, Building2, TrendingUp } from 'lucid
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { safeFormatDate } from '@/lib/format-utils';
 import { getEmployerState } from '@/lib/orchestration/state-machine';
 import { StateAwareDashboard, SectionCard } from '@/components/dashboards/StateAwareDashboard';
@@ -47,7 +48,7 @@ export default async function EmployerDashboardOrchestrated() {
             Your login is active, but no employer organization record is linked to this account yet.
           </p>
           <Link
-            href="/employer/onboarding"
+            href={`${MARKETING_HOST}/onboarding/employer`}
             className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
           >
             Continue Employer Setup

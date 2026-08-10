@@ -121,21 +121,42 @@ function parseMigrations(migrationsDir: string): TableSchema {
   return schema;
 }
 
-function parseSelectColumns(select: string): string[] {
-  let value = select;
-  let previous = '';
-  while (previous !== value) {
-    previous = value;
-    value = value.replace(/\w+(?:!\w+)?\s*\([^()]*\)/g, '');
+function splitTopLevelSelect(select: string): string[] {
+  const parts: string[] = [];
+  let current = '';
+  let depth = 0;
+
+  for (const char of select) {
+    if (char === '(') depth += 1;
+    if (char === ')') depth = Math.max(0, depth - 1);
+
+    if (char === ',' && depth === 0) {
+      parts.push(current);
+      current = '';
+      continue;
+    }
+
+    current += char;
   }
 
-  return value
-    .split(/[\s,\n]+/)
+  if (current.trim()) parts.push(current);
+  return parts;
+}
+
+function parseSelectColumns(select: string): string[] {
+  return splitTopLevelSelect(select)
+    .map((token) => token.trim())
+    // Nested PostgREST relationship projections (for example
+    // `profile:profiles(full_name)`) are columns on the related table, not on
+    // the base table passed to .from(). Ignore the whole nested projection.
+    .filter((token) => token && !token.includes('('))
     .map((token) => {
-      let cleaned = token.trim();
+      let cleaned = token;
+      // PostgREST scalar aliases are `alias:column`; validate the source column.
       if (cleaned.includes(':')) cleaned = cleaned.split(':').pop()!;
+      // JSON traversal validates the root column only.
       if (cleaned.includes('->')) cleaned = cleaned.split('->')[0];
-      cleaned = cleaned.replace(/^!/, '').replace(/\(.*$/, '').replace(/[^A-Za-z0-9_*]/g, '');
+      cleaned = cleaned.replace(/^!/, '').replace(/[^A-Za-z0-9_*]/g, '');
       return cleaned.toLowerCase();
     })
     .filter((column) => column && column !== '*');
@@ -182,8 +203,16 @@ function extractSelectCalls(): SelectCall[] {
       if (filterTable && table !== filterTable) continue;
 
       const line = source.slice(0, match.index).split('\n').length;
-      const ahead = source.slice(match.index, match.index + 1200);
-      const selectMatch = ahead.match(/\.select\(\s*(`[^`]*`|'[^']*'|"[^"]*"|[A-Za-z_$][\w$]*)\s*\)/);
+      const chainStart = match.index + match[0].length;
+      const tail = source.slice(chainStart, chainStart + 2000);
+
+      // Never associate a .select() from a later Supabase query with this
+      // .from(). The previous implementation searched an arbitrary 1200-char
+      // window, which produced hundreds of false schema-drift failures.
+      const boundaries = [tail.indexOf('.from('), tail.indexOf(';')].filter((index) => index >= 0);
+      const chainEnd = boundaries.length ? Math.min(...boundaries) : tail.length;
+      const chain = tail.slice(0, chainEnd);
+      const selectMatch = chain.match(/\.select\(\s*(`[^`]*`|'[^']*'|"[^"]*"|[A-Za-z_$][\w$]*)\s*\)/);
       if (!selectMatch) continue;
 
       const raw = selectMatch[1];

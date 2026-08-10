@@ -1,626 +1,196 @@
 /**
- * Canonical program registry.
- * Single source of truth for slugs, display names, and intake routing.
- * Every form, dropdown, and redirect must consume this list.
+ * Canonical intake/navigation program registry.
  *
- * To add a program: add one entry here. Everything else picks it up.
+ * Displayed programs are derived from the normalized static program registry so
+ * program titles, funding claims, and RAPIDS claims cannot drift between the
+ * program detail pages and intake dropdowns. Programs without a dedicated
+ * static schema live in one explicit supplemental list below.
+ *
+ * Compatibility aliases are accepted as INPUT ONLY. They are never returned by
+ * getActivePrograms() and therefore do not create duplicate public choices.
  */
 
-export type ProgramEntry = {
+import { ALL_PROGRAMS } from '@/lib/programs/static-registry';
+
+export type ApplicationFormType =
+  | 'student'
+  | 'barber'
+  | 'employer'
+  | 'partner'
+  | 'staff';
+
+export interface ProgramEntry {
   slug: string;
   name: string;
   category: string;
-  /** Which intake form this program routes to */
-  /** 'apply' routes to /apply/student, 'inquiry' routes to /inquiry */
-  formType: 'apply' | 'inquiry';
+  formType: ApplicationFormType;
   active: boolean;
-  /** If set, /apply?program=slug redirects here instead of the generic form */
   dedicatedApplyPage?: string;
+}
+
+const DEDICATED_APPLY_PAGES: Record<string, string> = {
+  'barber-apprenticeship': '/apply/barber-apprenticeship',
+  'cosmetology-apprenticeship': '/apply/cosmetology-apprenticeship',
+  'peer-recovery-specialist': '/apply/peer-recovery-specialist',
 };
 
-export const PROGRAMS: ProgramEntry[] = [
-  // Healthcare
-  {
-    slug: 'cna',
-    name: 'CNA (Certified Nursing Assistant)',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'medical-assistant',
-    name: 'Medical Assistant',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'phlebotomy',
-    name: 'Phlebotomy Technician',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'home-health-aide',
-    name: 'Home Health Aide',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'emergency-health-safety',
-    name: 'Emergency Health & Safety Technician',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'cpr-first-aid',
-    name: 'CPR, AED & First Aid',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
+const STATIC_ENTRIES: ProgramEntry[] = ALL_PROGRAMS.map((program) => ({
+  slug: program.slug,
+  name: program.title,
+  category: program.category || program.sector,
+  formType: program.slug === 'barber-apprenticeship' ? 'barber' : 'student',
+  active: true,
+  ...(DEDICATED_APPLY_PAGES[program.slug]
+    ? { dedicatedApplyPage: DEDICATED_APPLY_PAGES[program.slug] }
+    : {}),
+}));
 
-  // Skilled Trades
-  {
-    slug: 'hvac-technician',
-    name: 'HVAC Technician',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'cdl-training',
-    name: 'CDL (Commercial Driver License)',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'building-maintenance-wrg',
-    name: 'Building Maintenance Technician',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Barber & Beauty
-  {
-    slug: 'barber-apprenticeship',
-    name: 'Barber Apprenticeship',
-    category: 'Barber & Beauty',
-    formType: 'apply',
-    active: true,
-    dedicatedApplyPage: '/programs/barber-apprenticeship/apply',
-  },
-  {
-    slug: 'esthetician',
-    name: 'Esthetician & Skincare Specialist',
-    category: 'Barber & Beauty',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Business & Financial
-  {
-    slug: 'business',
-    name: 'Business Administration',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'business-startup',
-    name: 'Business Start-up & Marketing',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Human Services
-  {
-    slug: 'peer-recovery-specialist',
-    name: 'Certified Peer Recovery Coach',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'reentry-specialist',
-    name: 'Public Safety Reentry Specialist',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'drug-alcohol-specimen-collector',
-    name: 'Drug & Alcohol Specimen Collector',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'dsp-training',
-    name: 'Direct Support Professional',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'sanitation-infection-control',
-    name: 'Sanitation & Infection Control',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Technology
-  {
-    slug: 'it-support-specialist',
-    name: 'IT Support Specialist',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'cybersecurity-analyst',
-    name: 'Cybersecurity Fundamentals',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Additional Skilled Trades
-  {
-    slug: 'electrical',
-    name: 'Electrical Apprenticeship',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'plumbing',
-    name: 'Plumbing Apprenticeship',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'forklift-operator',
-    name: 'Forklift Operator Certification',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'welding',
-    name: 'Welding Certification',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'diesel-mechanic',
-    name: 'Diesel Mechanic',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Additional Barber & Beauty
-  {
-    slug: 'cosmetology-apprenticeship',
-    name: 'Cosmetology Apprenticeship',
-    category: 'Barber & Beauty',
-    formType: 'apply',
-    active: true,
-    dedicatedApplyPage: '/programs/cosmetology-apprenticeship/apply',
-  },
-  {
-    slug: 'nail-technician',
-    name: 'Nail Technician Apprenticeship',
-    category: 'Barber & Beauty',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Additional Programs
-  {
-    slug: 'culinary-apprenticeship',
-    name: 'Culinary Apprenticeship',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-
-  // Programs added from data/programs/ — ensure all slugs resolve
-  {
-    slug: 'business-administration',
-    name: 'Business Administration',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'cad-drafting',
-    name: 'CAD / Drafting',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'cdl-training',
-    name: 'CDL Training',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'construction-trades-certification',
-    name: 'Construction Trades Certification',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'cpr-first-aid',
-    name: 'CPR & First Aid',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'emergency-health-safety',
-    name: 'Emergency Health & Safety',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'entrepreneurship',
-    name: 'Entrepreneurship',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'forklift',
-    name: 'Forklift Operator Certification',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'graphic-design',
-    name: 'Graphic Design',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'home-health-aide',
-    name: 'Home Health Aide',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'hospitality',
-    name: 'Hospitality & Customer Service',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'it-help-desk',
-    name: 'IT Help Desk',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'medical-assistant',
-    name: 'Medical Assistant',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'network-administration',
-    name: 'Network Administration',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'network-support-technician',
-    name: 'Network Support Technician',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'office-administration',
-    name: 'Office Administration',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'peer-recovery-specialist',
-    name: 'Peer Recovery Specialist',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-    dedicatedApplyPage: '/programs/peer-recovery-specialist/apply',
-  },
-  {
-    slug: 'project-management',
-    name: 'Project Management',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'sanitation-infection-control',
-    name: 'Sanitation & Infection Control',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'software-development',
-    name: 'Software Development',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'technology',
-    name: 'Technology Career Training',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-
-  // DB-synced programs (active in Supabase)
-  {
-    slug: 'administrative-assistant',
-    name: 'Administrative Assistant',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'automotive-technician',
-    name: 'Automotive Technician',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'bookkeeping',
-    name: 'Bookkeeping',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'chw-cert',
-    name: 'Community Health Worker',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'customer-service-representative',
-    name: 'Customer Service Representative',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'data-analytics',
-    name: 'Data Analytics',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'dental-assistant',
-    name: 'Dental Assistant',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'emt-apprenticeship',
-    name: 'EMT Apprenticeship',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'entrepreneurship-small-business',
-    name: 'Entrepreneurship & Small Business',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'insurance-agent',
-    name: 'Insurance Agent',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'life-coach-certification-wioa',
-    name: 'Life Coach Certification (WIOA)',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'manufacturing-technician',
-    name: 'Manufacturing Technician',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'nrf-riseup',
-    name: 'NRF RiseUp Retail Certification',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'peer-support',
-    name: 'Peer Support Specialist',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'pharmacy-technician',
-    name: 'Pharmacy Technician',
-    category: 'Healthcare',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'real-estate-agent',
-    name: 'Real Estate Agent',
-    category: 'Business & Financial',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'recovery-coach',
-    name: 'Recovery Coach',
-    category: 'Human Services',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'solar-panel-installation',
-    name: 'Solar Panel Installation',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'web-development',
-    name: 'Web Development',
-    category: 'Technology',
-    formType: 'apply',
-    active: true,
-  },
-  {
-    slug: 'youth-culinary-apprenticeship',
-    name: 'Youth Culinary Apprenticeship',
-    category: 'Skilled Trades',
-    formType: 'apply',
-    active: true,
-  },
+/**
+ * Active intake choices that do not yet have a dedicated static ProgramSchema.
+ * Keep names neutral unless a credential/approval is verified elsewhere.
+ */
+const SUPPLEMENTAL_PROGRAMS: ProgramEntry[] = [
+  { slug: 'administrative-assistant', name: 'Administrative Assistant', category: 'Business', formType: 'student', active: true },
+  { slug: 'automotive-technician', name: 'Automotive Technician', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'building-maintenance-wrg', name: 'Building Maintenance Training', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'business-startup', name: 'Business Startup Training', category: 'Business', formType: 'student', active: true },
+  { slug: 'chw-cert', name: 'Community Health Worker Training', category: 'Healthcare', formType: 'student', active: true },
+  { slug: 'customer-service-representative', name: 'Customer Service Representative', category: 'Business', formType: 'student', active: true },
+  { slug: 'data-analytics', name: 'Data Analytics', category: 'Technology', formType: 'student', active: true },
+  { slug: 'dental-assistant', name: 'Dental Assistant', category: 'Healthcare', formType: 'student', active: true },
+  { slug: 'drug-alcohol-specimen-collector', name: 'Drug & Alcohol Specimen Collector', category: 'Healthcare', formType: 'student', active: true },
+  { slug: 'dsp-training', name: 'Direct Support Professional Training', category: 'Healthcare', formType: 'student', active: true },
+  { slug: 'electrical', name: 'Electrical Training Pathway', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'emt-apprenticeship', name: 'EMT Training Pathway', category: 'Healthcare', formType: 'student', active: true },
+  { slug: 'entrepreneurship-small-business', name: 'Entrepreneurship & Small Business', category: 'Business', formType: 'student', active: true },
+  { slug: 'financial-literacy', name: 'Financial Literacy', category: 'Business', formType: 'student', active: true },
+  { slug: 'forklift-operator', name: 'Forklift Operator Training', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'insurance-agent', name: 'Insurance Agent Training', category: 'Business', formType: 'student', active: true },
+  { slug: 'it-support-specialist', name: 'IT Support Specialist', category: 'Technology', formType: 'student', active: true },
+  { slug: 'life-coach-certification-wioa', name: 'Life Coach Training', category: 'Human Services', formType: 'student', active: true },
+  { slug: 'manufacturing-technician', name: 'Manufacturing Technician', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'nrf-riseup', name: 'NRF RISE Up Training', category: 'Business', formType: 'student', active: true },
+  { slug: 'plumbing', name: 'Plumbing Training Pathway', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'real-estate-agent', name: 'Real Estate Agent Training', category: 'Business', formType: 'student', active: true },
+  { slug: 'reentry-specialist', name: 'Public Safety Reentry Specialist', category: 'Human Services', formType: 'student', active: true },
+  { slug: 'solar-panel-installation', name: 'Solar Panel Installation', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'welding', name: 'Welding Training', category: 'Skilled Trades', formType: 'student', active: true },
+  { slug: 'youth-culinary-apprenticeship', name: 'Youth Culinary Training Pathway', category: 'Hospitality', formType: 'student', active: true },
 ];
 
-/** All valid canonical slugs */
-export const VALID_SLUGS = new Set(PROGRAMS.map((p) => p.slug));
+function buildCanonicalPrograms(): ProgramEntry[] {
+  const bySlug = new Map<string, ProgramEntry>();
+  for (const program of [...STATIC_ENTRIES, ...SUPPLEMENTAL_PROGRAMS]) {
+    if (bySlug.has(program.slug)) {
+      throw new Error(`Duplicate canonical program slug: ${program.slug}`);
+    }
+    bySlug.set(program.slug, program);
+  }
+  return [...bySlug.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
 
-/** Common aliases → canonical slugs */
-const SLUG_ALIASES: Record<string, string> = {
-  // Healthcare
+export const PROGRAMS: ProgramEntry[] = buildCanonicalPrograms();
+
+/** Compatibility input aliases only; never rendered as separate programs. */
+export const PROGRAM_ALIASES: Record<string, string> = {
   barber: 'barber-apprenticeship',
-  'cna-cert': 'cna',
-  'cna-certification': 'cna',
-  'certified-nursing-assistant': 'cna',
-  'cna-training': 'cna',
-  'cna-training-wrg': 'cna',
-  hvac: 'hvac-technician',
-  'hvac-tech': 'hvac-technician',
-  'hvac-technician-wrg': 'hvac-technician',
   cdl: 'cdl-training',
-  'esthetician-apprenticeship': 'esthetician',
-  'professional-esthetician': 'esthetician',
-  'phlebotomy-technician': 'phlebotomy',
-  'building-maintenance': 'building-maintenance-wrg',
-  'building-maintenance-tech': 'building-maintenance-wrg',
-  'building-services-technician': 'building-maintenance-wrg',
-  // PRS: legacy DB slug → canonical public slug
-  'peer-recovery-specialist-jri': 'peer-recovery-specialist',
-  'peer-recovery': 'peer-recovery-specialist',
-  'peer-recovery-coach': 'peer-recovery-specialist',
-  'certified-peer-recovery-coach': 'peer-recovery-specialist',
-  'peer-support-professional': 'peer-recovery-specialist',
+  hvac: 'hvac-technician',
+  business: 'business-administration',
+  forklift: 'forklift-operator',
+  'nail-technician': 'nail-technician-apprenticeship',
+  'nail-tech': 'nail-technician-apprenticeship',
   'peer-support': 'peer-recovery-specialist',
   'recovery-coach': 'peer-recovery-specialist',
-  'nail-technician-apprenticeship': 'nail-technician',
-  'nail-tech-apprenticeship': 'nail-technician',
-  'nail-tech': 'nail-technician',
-  'cpr-cert': 'cpr-first-aid',
-  'cpr-first-aid-hsi': 'cpr-first-aid',
-  'cdl-transportation': 'cdl-training',
-  'it-support': 'it-help-desk',
-  'it-support-specialist': 'it-help-desk',
-  cybersecurity: 'cybersecurity-analyst',
-  'direct-support-professional': 'dsp-training',
-  'forklift-operator': 'forklift',
-  'public-safety-reentry-specialist': 'reentry-specialist',
-  'emergency-health-safety-tech': 'emergency-health-safety',
-  'business-startup-marketing': 'business-startup',
-  // Category-level aliases
-  healthcare: 'cna',
-  'skilled-trades': 'hvac-technician',
-  technology: 'it-help-desk',
-  beauty: 'cosmetology-apprenticeship',
-  apprenticeship: 'barber-apprenticeship',
-  'federal-funded': 'cna',
-  'micro-programs': 'cpr-first-aid',
-  jri: 'peer-recovery-specialist',
-  'drug-collector': 'drug-alcohol-specimen-collector',
-  reentry: 'reentry-specialist',
-  'home-health': 'home-health-aide',
-  cpr: 'cpr-first-aid',
-  'first-aid': 'cpr-first-aid',
-  'business-administration': 'business',
-  'business-management': 'business',
-  'health-safety': 'emergency-health-safety',
-  'emergency-health': 'emergency-health-safety',
-  cosmetology: 'cosmetology-apprenticeship',
+  'esthetician-apprenticeship': 'esthetician',
+  'home-health-aid': 'home-health-aide',
 };
 
-/**
- * Resolve a raw slug (or alias) to a canonical program entry.
- */
+export function normalizeProgramSlug(slug: string): string {
+  return slug.trim().toLowerCase().replace(/_/g, '-');
+}
+
+export function resolveSlug(rawSlug: string): string | null {
+  const normalized = normalizeProgramSlug(rawSlug || '');
+  if (!normalized) return null;
+  const canonical = PROGRAM_ALIASES[normalized] ?? normalized;
+  return PROGRAMS.some((program) => program.slug === canonical) ? canonical : null;
+}
+
 export function resolveProgram(rawSlug: string): ProgramEntry | undefined {
-  const normalized = rawSlug.toLowerCase().trim();
-  const canonical = SLUG_ALIASES[normalized] || normalized;
-  return PROGRAMS.find((p) => p.slug === canonical);
+  const slug = resolveSlug(rawSlug);
+  return slug ? PROGRAMS.find((program) => program.slug === slug) : undefined;
 }
 
-/**
- * Resolve to canonical slug. Returns undefined if not recognized.
- */
-export function resolveSlug(rawSlug: string): string | undefined {
-  return resolveProgram(rawSlug)?.slug;
-}
+export const getProgram = resolveProgram;
 
-/** Active programs for dropdowns */
 export function getActivePrograms(): ProgramEntry[] {
-  return PROGRAMS.filter((p) => p.active);
+  return PROGRAMS.filter((program) => program.active);
 }
 
-/** Active programs grouped by category for <optgroup> rendering */
-export function getActiveProgramsByCategory(): { category: string; programs: ProgramEntry[] }[] {
-  const grouped = new Map<string, ProgramEntry[]>();
-  for (const p of getActivePrograms()) {
-    const list = grouped.get(p.category) || [];
-    list.push(p);
-    grouped.set(p.category, list);
-  }
-  return Array.from(grouped.entries()).map(([category, programs]) => ({ category, programs }));
+export function getProgramNames(): string[] {
+  return getActivePrograms().map((program) => program.name);
+}
+
+export function getApplyUrl(rawSlug: string): string {
+  const program = resolveProgram(rawSlug);
+  if (!program) return '/apply/student';
+  return program.dedicatedApplyPage ?? `/apply/student?program=${encodeURIComponent(program.slug)}`;
+}
+
+export const PROGRAM_CATEGORIES = [
+  'Healthcare',
+  'Skilled Trades',
+  'Technology',
+  'Business',
+  'Personal Services',
+  'Human Services',
+  'Hospitality',
+  'Workforce Training',
+] as const;
+
+export type ProgramCategory = (typeof PROGRAM_CATEGORIES)[number];
+export const PROGRAM_CATEGORIES_WITH_ALL = ['All', ...PROGRAM_CATEGORIES] as const;
+
+const CATEGORY_ALIASES: Record<string, ProgramCategory> = {
+  healthcare: 'Healthcare',
+  health: 'Healthcare',
+  'skilled-trades': 'Skilled Trades',
+  trades: 'Skilled Trades',
+  technology: 'Technology',
+  tech: 'Technology',
+  business: 'Business',
+  'personal-services': 'Personal Services',
+  beauty: 'Personal Services',
+  barber: 'Personal Services',
+  'human-services': 'Human Services',
+  hospitality: 'Hospitality',
+  workforce: 'Workforce Training',
+  'workforce-training': 'Workforce Training',
+};
+
+export function normalizeProgramCategory(value: string | null | undefined): ProgramCategory | null {
+  if (!value) return null;
+  const exact = PROGRAM_CATEGORIES.find((category) => category.toLowerCase() === value.trim().toLowerCase());
+  if (exact) return exact;
+  return CATEGORY_ALIASES[value.trim().toLowerCase()] ?? null;
+}
+
+export function isProgramCategory(value: string): value is ProgramCategory {
+  return PROGRAM_CATEGORIES.includes(value as ProgramCategory);
+}
+
+export function programCategoryFromSearchParam(value: string | null | undefined): ProgramCategory | 'All' {
+  if (!value || value.toLowerCase() === 'all') return 'All';
+  return normalizeProgramCategory(value) ?? 'All';
+}
+
+export function programMatchesCategory(program: Pick<ProgramEntry, 'category'>, category: ProgramCategory | 'All'): boolean {
+  if (category === 'All') return true;
+  return normalizeProgramCategory(program.category) === category;
+}
+
+export function buildProgramsHref(category?: ProgramCategory | 'All'): string {
+  if (!category || category === 'All') return '/programs';
+  return `/programs?category=${encodeURIComponent(category)}`;
 }

@@ -33,8 +33,6 @@ interface RunContext {
   triggerPayload: Record<string, unknown>;
 }
 
-// ── Interpolation ─────────────────────────────────────────────────────────────
-
 function interpolate(v: unknown, payload: Record<string, unknown>): unknown {
   if (typeof v === 'string') {
     return v.replace(/\{\{(\w+(?:\.\w+)*)\}\}/g, (_, path: string) => {
@@ -55,8 +53,6 @@ function interpolate(v: unknown, payload: Record<string, unknown>): unknown {
 function interpolateObj(obj: Record<string, unknown>, payload: Record<string, unknown>): Record<string, unknown> {
   return interpolate(obj, payload) as Record<string, unknown>;
 }
-
-// ── Step executors ────────────────────────────────────────────────────────────
 
 async function execSendNotification(config: Record<string, unknown>, ctx: RunContext) {
   const db = await requireAdminClient();
@@ -129,7 +125,7 @@ function execCondition(config: Record<string, unknown>, conditionExpr: string | 
   const expr = (config.condition_expr as string | undefined) ?? conditionExpr;
   if (!expr) return { ok: true, output: { condition: 'passed', reason: 'no_expression' } };
   const match = expr.trim().match(/^([\w.]+)\s*(==|!=|>=|<=|>|<|contains|exists)\s*(.*)$/);
-  if (!match) return { ok: true, output: { condition: 'passed', reason: 'unparseable' } };
+  if (!match) return { ok: false, output: { error: `Unsupported condition expression: ${expr}` } };
   const [, path, op, rawExpected] = match;
   const expected = rawExpected.trim().replace(/^["']|["']$/g, '');
   const actual = path.split('.').reduce<unknown>((obj, key) =>
@@ -148,9 +144,11 @@ function execCondition(config: Record<string, unknown>, conditionExpr: string | 
     case '<=':       passed = !isNaN(actualNum) && !isNaN(expectedNum) && actualNum <= expectedNum; break;
     case 'contains': passed = actualStr.includes(expected); break;
     case 'exists':   passed = actual !== undefined && actual !== null && actual !== ''; break;
-    default:         passed = true;
+    default:         passed = false;
   }
-  return { ok: passed, output: { condition: passed ? 'passed' : 'failed', expr, actual: actualStr, expected } };
+  return passed
+    ? { ok: true, output: { condition: 'passed', expr, actual: actualStr, expected } }
+    : { ok: false, output: { error: `Condition failed: ${expr}`, condition: 'failed', expr, actual: actualStr, expected } };
 }
 
 async function execCreateRecord(config: Record<string, unknown>, ctx: RunContext) {
@@ -202,9 +200,12 @@ async function execAiAction(config: Record<string, unknown>, ctx: RunContext) {
       const db = await requireAdminClient();
       let matchObj: Record<string, unknown>;
       try { matchObj = typeof persistMatch === 'string' ? JSON.parse(persistMatch) : persistMatch; }
-      catch { matchObj = {}; }
-      await db.from(persistTable).update({ [persistField]: response }).match(interpolateObj(matchObj, ctx.triggerPayload))
-        .then(undefined, (err) => logger.warn('[workflow/ai_action] persist failed', { run_id: ctx.runId, error: String(err) }));
+      catch { return { ok: false, output: { error: 'ai_action persist_match must be valid JSON' } }; }
+      const { error } = await db
+        .from(persistTable)
+        .update({ [persistField]: response })
+        .match(interpolateObj(matchObj, ctx.triggerPayload));
+      if (error) return { ok: false, output: { error: error.message } };
     }
     return { ok: true, output: { response } };
   } catch (err: unknown) {
@@ -223,8 +224,11 @@ async function execStep(step: WorkflowStep, ctx: RunContext): Promise<{ ok: bool
     case 'update_record':     return execUpdateRecord(step.action_config, ctx);
     case 'ai_action':         return execAiAction(step.action_config, ctx);
     default:
-      logger.warn('[workflow/engine] unknown action_type', { action_type: step.action_type, run_id: ctx.runId });
-      return { ok: true, output: { note: `action_type '${step.action_type}' not implemented` } };
+      logger.error('[workflow/engine] unsupported action_type', new Error(`Unsupported action_type: ${step.action_type}`), {
+        action_type: step.action_type,
+        run_id: ctx.runId,
+      });
+      return { ok: false, output: { error: `action_type '${step.action_type}' is not implemented` } };
   }
 }
 
@@ -244,7 +248,6 @@ async function execStepWithRetry(
     lastResult = await execStep(step, ctx);
     if (lastResult.ok) return { ...lastResult, attempts };
   }
-  // Dead-letter
   await db.from('workflow_dead_letters').insert({
     workflow_id: ctx.workflowId,
     run_id: ctx.runId,
@@ -264,8 +267,6 @@ async function execStepWithRetry(
   });
   return { ...lastResult, attempts };
 }
-
-// ── Main executor ─────────────────────────────────────────────────────────────
 
 export async function executeWorkflow(
   workflowId: string,

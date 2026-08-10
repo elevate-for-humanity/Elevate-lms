@@ -49,15 +49,23 @@ const nextConfig = {
         permanent: true,
       },
 
-      // Canonicalize historical barber/beauty public URLs in one hop. These are
-      // compatibility redirects only; current navigation points directly to the
-      // canonical destinations below.
+      // Canonicalize historical barber/beauty public URLs in one hop.
       { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
       { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
 
+      // The LMS /apprentice route is the only operational apprenticeship
+      // dashboard. Old per-program Marketing portals remain compatibility URLs
+      // and carry the program slug only as context.
+      { source: '/portal/barber', destination: 'https://app.elevateforhumanity.org/apprentice?program=barber-apprenticeship', permanent: true },
+      { source: '/portal/cosmetology', destination: 'https://app.elevateforhumanity.org/apprentice?program=cosmetology-apprenticeship', permanent: true },
+      { source: '/portal/esthetician', destination: 'https://app.elevateforhumanity.org/apprentice?program=esthetician-apprenticeship', permanent: true },
+      { source: '/portal/nail-technician', destination: 'https://app.elevateforhumanity.org/apprentice?program=nail-technician-apprenticeship', permanent: true },
+      { source: '/portal/culinary', destination: 'https://app.elevateforhumanity.org/apprentice?program=culinary-apprenticeship', permanent: true },
+      { source: '/portal/electrical', destination: 'https://app.elevateforhumanity.org/apprentice?program=electrical', permanent: true },
+      { source: '/portal/plumbing', destination: 'https://app.elevateforhumanity.org/apprentice?program=plumbing', permanent: true },
+
       // Historical cross-service paths remain as one-hop permanent redirects.
-      // Internal navigation should point directly to the destination hosts.
       { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: true },
       { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
       { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: true },

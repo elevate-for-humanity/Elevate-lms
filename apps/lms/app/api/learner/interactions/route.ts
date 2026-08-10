@@ -6,7 +6,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/requireAuth';
-import { getClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import { loadBlueprintWithProgram } from '@/lib/course-factory/blueprint-loader';
 import type { BlueprintModule } from '@/lib/curriculum/blueprints/types';
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   if (!lessonSlug) return NextResponse.json({ error: 'lessonSlug required' }, { status: 400 });
 
   try {
-    const db = getClient();
+    const db = await createClient();
     const { data: lesson, error: lessonError } = await db
       .from('course_lessons')
       .select('id,slug,title,course_id,module_id,content_json')
@@ -51,7 +51,6 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Compatibility fallback for older courses that only have blueprint specs.
     const { data: course } = await db.from('courses').select('program_id').eq('id', lesson.course_id).maybeSingle();
     const loaded = course?.program_id ? await loadBlueprintWithProgram(db as any, { programId: course.program_id }) : null;
     const blueprint = loaded?.blueprint;

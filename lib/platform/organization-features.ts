@@ -2,7 +2,6 @@ import type { SupabaseClient } from '@/lib/supabase';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   ADDON_FEATURE_FALLBACK,
-  FEATURES,
   PLAN_FEATURE_FALLBACK,
   PLAN_LIMITS_FALLBACK,
   normalizeAddonCode,
@@ -12,7 +11,10 @@ import {
 } from '@/lib/platform/feature-catalog';
 
 export interface OrganizationEntitlements {
+  /** Canonical SaaS tenant id (tenants.id). */
   organizationId: string;
+  /** Billing organization id (organizations.id) when one is mapped to the tenant. */
+  billingOrganizationId: string | null;
   planSlug: string | null;
   planName: string | null;
   status: string | null;
@@ -20,6 +22,11 @@ export interface OrganizationEntitlements {
   limits: PlanLimits;
   activeAddonCodes: string[];
   currentPeriodEnd: string | null;
+}
+
+export interface OrganizationIdentity {
+  tenantId: string;
+  billingOrganizationId: string | null;
 }
 
 export class FeatureUpgradeRequiredError extends Error {
@@ -32,6 +39,8 @@ export class FeatureUpgradeRequiredError extends Error {
     this.feature = feature;
   }
 }
+
+const ACCESSIBLE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing']);
 
 function addFeature(featureSet: Set<FeatureCode>, raw: string | null | undefined) {
   if (!raw) return;
@@ -46,35 +55,93 @@ function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
 }
 
 /**
- * Load merged feature codes for an organization (tenant).
- * DB plan/add-on definitions are preferred; code-side fallbacks keep recently
- * introduced capabilities usable during catalog migration/deployment windows.
+ * Normalize either identifier used historically by billing:
+ * - tenants.id (canonical application identity)
+ * - organizations.id (legacy Stripe metadata / billing identity)
+ */
+export async function resolveOrganizationIdentity(
+  tenantOrOrganizationId: string,
+  client?: SupabaseClient,
+): Promise<OrganizationIdentity> {
+  const supabase = client ?? (await requireAdminClient());
+  if (!supabase) {
+    return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
+  }
+
+  const { data: byTenant } = await supabase
+    .from('organizations')
+    .select('id, tenant_id')
+    .eq('tenant_id', tenantOrOrganizationId)
+    .maybeSingle();
+  if (byTenant?.id) {
+    return {
+      tenantId: (byTenant.tenant_id as string | null) ?? tenantOrOrganizationId,
+      billingOrganizationId: byTenant.id as string,
+    };
+  }
+
+  const { data: byOrganization } = await supabase
+    .from('organizations')
+    .select('id, tenant_id')
+    .eq('id', tenantOrOrganizationId)
+    .maybeSingle();
+  if (byOrganization?.id) {
+    return {
+      tenantId: (byOrganization.tenant_id as string | null) ?? tenantOrOrganizationId,
+      billingOrganizationId: byOrganization.id as string,
+    };
+  }
+
+  return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
+}
+
+export async function resolveBillingOrganizationId(
+  tenantOrOrganizationId: string,
+  client?: SupabaseClient,
+): Promise<string | null> {
+  const identity = await resolveOrganizationIdentity(tenantOrOrganizationId, client);
+  return identity.billingOrganizationId;
+}
+
+/**
+ * Load merged feature codes for a SaaS tenant. Legacy organizations.id callers
+ * are normalized at this boundary so downstream feature checks always operate
+ * on tenants.id.
  */
 export async function getOrganizationFeatures(
-  organizationId: string,
+  tenantOrOrganizationId: string,
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const supabase = client ?? (await requireAdminClient());
   if (!supabase) {
-    return emptyEntitlements(organizationId);
+    return emptyEntitlements(tenantOrOrganizationId);
   }
 
-  const { data: orgSub } = await supabase
-    .from('organization_subscriptions')
-    .select(
-      'status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )',
-    )
-    .eq('organization_id', organizationId)
-    .maybeSingle();
+  const identity = await resolveOrganizationIdentity(tenantOrOrganizationId, supabase);
+  const tenantId = identity.tenantId;
+  const billingOrganizationId = identity.billingOrganizationId;
+
+  let orgSub: any = null;
+  if (billingOrganizationId) {
+    const { data } = await supabase
+      .from('organization_subscriptions')
+      .select(
+        'status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )',
+      )
+      .eq('organization_id', billingOrganizationId)
+      .maybeSingle();
+    orgSub = data;
+  }
 
   const planJoin = orgSub?.subscription_plans;
   const planRow = Array.isArray(planJoin) ? planJoin[0] : planJoin;
   const planSlug = planRow?.slug ?? null;
   const planId = orgSub?.plan_id as string | undefined;
+  const subscriptionHasAccess = ACCESSIBLE_SUBSCRIPTION_STATUSES.has(orgSub?.status ?? '');
 
   const featureSet = new Set<FeatureCode>();
 
-  if (planId) {
+  if (subscriptionHasAccess && planId) {
     const { data: planFeatureRows } = await supabase
       .from('plan_features')
       .select('features ( code )')
@@ -89,14 +156,20 @@ export async function getOrganizationFeatures(
     }
   }
 
-  if (featureSet.size === 0 && planSlug && planSlug in PLAN_FEATURE_FALLBACK) {
+  if (
+    subscriptionHasAccess &&
+    featureSet.size === 0 &&
+    planSlug &&
+    planSlug in PLAN_FEATURE_FALLBACK
+  ) {
     PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
   }
 
+  // Add-ons are tenant-keyed and may be sold independently of a base plan.
   const { data: addonRows } = await supabase
     .from('addon_subscriptions')
     .select('addon_code, saas_addon_catalog ( feature_codes )')
-    .eq('organization_id', organizationId)
+    .eq('organization_id', tenantId)
     .eq('active', true);
 
   const activeAddonCodes: string[] = [];
@@ -112,7 +185,7 @@ export async function getOrganizationFeatures(
   const { data: legacyAddons } = await supabase
     .from('organization_addons')
     .select('addon_slug')
-    .eq('tenant_id', organizationId)
+    .eq('tenant_id', tenantId)
     .eq('status', 'active');
 
   for (const leg of legacyAddons ?? []) {
@@ -128,11 +201,14 @@ export async function getOrganizationFeatures(
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
   }
 
-  if (featureSet.size === 0) {
+  // A legacy/manual license is a compatibility source only when there is no
+  // recurring organization subscription. It must never resurrect features for
+  // a canceled or past-due Stripe subscription.
+  if (featureSet.size === 0 && !orgSub) {
     const { data: license } = await supabase
       .from('licenses')
       .select('features')
-      .eq('tenant_id', organizationId)
+      .eq('tenant_id', tenantId)
       .eq('status', 'active')
       .maybeSingle();
     for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
@@ -143,7 +219,8 @@ export async function getOrganizationFeatures(
     (planSlug && PLAN_LIMITS_FALLBACK[planSlug] ? PLAN_LIMITS_FALLBACK[planSlug] : { users: 1 });
 
   return {
-    organizationId,
+    organizationId: tenantId,
+    billingOrganizationId,
     planSlug,
     planName: planRow?.name ?? null,
     status: orgSub?.status ?? null,
@@ -154,9 +231,10 @@ export async function getOrganizationFeatures(
   };
 }
 
-function emptyEntitlements(organizationId: string): OrganizationEntitlements {
+function emptyEntitlements(tenantId: string): OrganizationEntitlements {
   return {
-    organizationId,
+    organizationId: tenantId,
+    billingOrganizationId: null,
     planSlug: null,
     planName: null,
     status: null,
@@ -177,11 +255,11 @@ export function organizationHasFeature(
 }
 
 export async function requireFeature(
-  organizationId: string,
+  tenantId: string,
   feature: string,
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
-  const entitlements = await getOrganizationFeatures(organizationId, client);
+  const entitlements = await getOrganizationFeatures(tenantId, client);
   if (!organizationHasFeature(entitlements, feature)) {
     throw new FeatureUpgradeRequiredError(feature);
   }

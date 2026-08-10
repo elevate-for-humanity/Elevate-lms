@@ -34,7 +34,7 @@ interface Dashboard {
   order_index: number;
 }
 
-interface DashboardDefinition extends Omit<Dashboard, 'href' | 'roles'> {}
+type DashboardDefinition = Omit<Dashboard, 'href' | 'roles'>;
 
 interface Props {
   className?: string;

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { NextResponse, type NextRequest } from 'next/server';
 import { apiAuthGuard } from '@/lib/admin/guards';
 import { safeError } from '@/lib/api/safe-error';
 import { apiRequireOrganizationFeature } from '@/lib/api/require-organization-feature';
@@ -10,7 +11,6 @@ import {
   resolveTenantIdForUser,
 } from '@/lib/platform/resolve-tenant-for-user';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { NextRequest, NextResponse } from 'next/server';
 
 const TRIAL_DEFAULT_FEATURES: FeatureCode[] = [
   FEATURES.WEBSITE,
@@ -54,8 +54,8 @@ export async function requireFeatureForAuth(
   }
 
   const featureAccess = await apiRequireOrganizationFeature(tenantId, feature);
-  if ('ok' in featureAccess && featureAccess.ok) {
-    return { userId, tenantId };
+  if (featureAccess instanceof NextResponse) {
+    return featureAccess;
   }
-  return featureAccess;
+  return { userId, tenantId };
 }

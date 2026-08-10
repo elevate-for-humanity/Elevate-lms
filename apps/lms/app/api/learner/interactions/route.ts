@@ -1,8 +1,7 @@
 /**
  * Canonical LMS learner interaction endpoint.
  * Reads authored lesson experiences from course_lessons.content_json first.
- * Falls back to blueprint interaction specifications when a lesson has not yet
- * been enriched in the Unified Course Builder.
+ * Falls back to optional blueprint interaction specifications.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/requireAuth';
@@ -12,6 +11,8 @@ import type { BlueprintModule } from '@/lib/curriculum/blueprints/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+type ModuleWithInteractions = BlueprintModule & { interactionSpecs?: Record<string, any> };
 
 export async function GET(request: NextRequest) {
   const { user, error: authError } = await requireAuth(request);
@@ -31,7 +32,6 @@ export async function GET(request: NextRequest) {
 
     const contentJson = lesson.content_json && typeof lesson.content_json === 'object' ? lesson.content_json as Record<string, any> : {};
     const authored = contentJson.experience && typeof contentJson.experience === 'object' ? contentJson.experience as Record<string, any> : null;
-
     const { data: progress } = await db.from('interaction_progress').select('*').eq('learner_id', user.id).eq('lesson_slug', lessonSlug);
     const progressRows = progress ?? [];
 
@@ -56,13 +56,29 @@ export async function GET(request: NextRequest) {
     const blueprint = loaded?.blueprint;
     if (!blueprint) return NextResponse.json({ success: true, source: 'none', lessonSlug, interactions: [], flashcards: [] });
 
-    let module: BlueprintModule | undefined;
+    let module: ModuleWithInteractions | undefined;
     for (const candidate of blueprint.modules ?? []) {
-      if (candidate.lessons?.some((l) => l.slug === lessonSlug)) { module = candidate; break; }
+      if (candidate.lessons?.some((lessonRef) => lessonRef.slug === lessonSlug)) {
+        module = candidate as ModuleWithInteractions;
+        break;
+      }
     }
     if (!module) return NextResponse.json({ success: true, source: 'none', lessonSlug, interactions: [], flashcards: [] });
+
     const interactions = blueprintInteractions(lessonSlug, module, progressRows);
-    return NextResponse.json({ success: true, source: 'blueprint', lessonSlug, moduleSlug: module.slug, interactions, flashcards: [], meta: { specs: module.interactionSpecs, totalInteractions: interactions.length, completedInteractions: interactions.filter((i) => i.completed).length } });
+    return NextResponse.json({
+      success: true,
+      source: 'blueprint',
+      lessonSlug,
+      moduleSlug: module.slug,
+      interactions,
+      flashcards: [],
+      meta: {
+        specs: module.interactionSpecs ?? null,
+        totalInteractions: interactions.length,
+        completedInteractions: interactions.filter((interaction) => interaction.completed).length,
+      },
+    });
   } catch (error) {
     console.error('[learner/interactions]', error);
     return NextResponse.json({ error: 'Failed to load interactions' }, { status: 500 });
@@ -76,28 +92,28 @@ function stateFor(id: string, rows: Array<Record<string, any>>) {
   return { completed: !!row?.completed, score: row?.score as number | undefined, attempts: Number(row?.attempts ?? 0) };
 }
 
-function experienceToInteractions(slug: string, e: Record<string, any>, rows: Array<Record<string, any>>): Interaction[] {
+function experienceToInteractions(slug: string, experience: Record<string, any>, rows: Array<Record<string, any>>): Interaction[] {
   const out: Interaction[] = [];
   const add = (suffix: string, type: string, title: string, data: any, position = 'inline') => {
     if (data === undefined || data === null || (Array.isArray(data) && data.length === 0)) return;
     const id = `${slug}-${suffix}`;
     out.push({ id, type, title, position, ...stateFor(id, rows), data: typeof data === 'object' ? data : { value: data } });
   };
-  add('kc', 'knowledge-check', 'Knowledge Check', e.knowledgeChecks);
-  add('scenario', 'scenario', e.scenario?.title ?? 'Workplace Scenario', e.scenario, 'checkpoint');
-  add('hotspots', 'click-to-reveal', 'Interactive Diagram', e.hotspots);
-  add('drag-drop', 'drag-drop', 'Drag and Drop', e.dragDrop);
-  add('matching', 'matching', 'Matching Activity', e.matching);
-  add('case', 'case-study', e.caseStudy?.title ?? 'Case Study', e.caseStudy, 'checkpoint');
-  add('simulation', 'simulation', e.simulation?.title ?? 'Simulation', e.simulation, 'end');
-  add('decision-tree', 'decision-tree', e.decisionTree?.title ?? 'Decision Practice', e.decisionTree, 'checkpoint');
-  add('practical', 'practical', e.practicalTask?.title ?? 'Hands-on Practical', e.practicalTask, 'end');
-  add('interactive-video', 'interactive-video', e.interactiveVideo?.title ?? 'Interactive Video', e.interactiveVideo);
+  add('kc', 'knowledge-check', 'Knowledge Check', experience.knowledgeChecks);
+  add('scenario', 'scenario', experience.scenario?.title ?? 'Workplace Scenario', experience.scenario, 'checkpoint');
+  add('hotspots', 'click-to-reveal', 'Interactive Diagram', experience.hotspots);
+  add('drag-drop', 'drag-drop', 'Drag and Drop', experience.dragDrop);
+  add('matching', 'matching', 'Matching Activity', experience.matching);
+  add('case', 'case-study', experience.caseStudy?.title ?? 'Case Study', experience.caseStudy, 'checkpoint');
+  add('simulation', 'simulation', experience.simulation?.title ?? 'Simulation', experience.simulation, 'end');
+  add('decision-tree', 'decision-tree', 'Decision Practice', experience.decisionTree, 'checkpoint');
+  add('practical', 'practical', experience.practicalTask?.title ?? 'Hands-on Practical', experience.practicalTask, 'end');
+  add('interactive-video', 'interactive-video', experience.interactiveVideo?.title ?? 'Interactive Video', experience.interactiveVideo);
   return out;
 }
 
-function blueprintInteractions(slug: string, module: BlueprintModule, rows: Array<Record<string, any>>): Interaction[] {
-  const specs: any = module.interactionSpecs;
+function blueprintInteractions(slug: string, module: ModuleWithInteractions, rows: Array<Record<string, any>>): Interaction[] {
+  const specs = module.interactionSpecs;
   if (!specs) return [];
   const out: Interaction[] = [];
   const add = (suffix: string, type: string, title: string, data: any, position = 'inline') => {
@@ -105,7 +121,7 @@ function blueprintInteractions(slug: string, module: BlueprintModule, rows: Arra
     out.push({ id, type, title, position, ...stateFor(id, rows), data });
   };
   if (specs.includeKnowledgeChecks) add('kc-1', 'knowledge-check', 'Knowledge Check', { questionCount: specs.knowledgeCheckCount ?? 1 });
-  if (specs.includeScenarios) add('scenario-1', 'scenario', 'Scenario', { competencyKeys: module.competencies?.map((c: any) => c.competencyKey) ?? [] }, 'checkpoint');
+  if (specs.includeScenarios) add('scenario-1', 'scenario', 'Scenario', { competencyKeys: module.competencies?.map((competency) => competency.competencyKey) ?? [] }, 'checkpoint');
   if (specs.includeClickToReveal) add('ctr', 'click-to-reveal', 'Interactive Diagram', { hotspotsRequired: 3 });
   if (specs.includeDragDrop) add('dd', 'drag-drop', 'Drag and Drop', { itemCount: specs.matchingCount ?? 4 });
   if (specs.includeMatching) add('match-1', 'matching', 'Matching Activity', { itemCount: specs.matchingCount ?? 6 });

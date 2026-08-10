@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2, Mic, MicOff, Sparkles, Volume2 } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type FieldKey = 'businessName' | 'industry' | 'services' | 'audience' | 'style' | 'goal' | 'extra';
 
@@ -22,24 +23,6 @@ const fields: InterviewField[] = [
   { key: 'extra', label: 'Anything else', question: 'Tell me anything else you want me to know before I build it.', placeholder: 'Special pages, colors, offers, important details...' },
 ];
 
-function chooseVoice(): SpeechSynthesisVoice | null {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
-  const voices = window.speechSynthesis.getVoices();
-  const preferredNames = [
-    'Microsoft Aria Online (Natural) - English (United States)',
-    'Microsoft Jenny Online (Natural) - English (United States)',
-    'Google US English',
-    'Samantha',
-  ];
-  for (const name of preferredNames) {
-    const match = voices.find((voice) => voice.name === name);
-    if (match) return match;
-  }
-  return voices.find((voice) => voice.lang === 'en-US' && !voice.localService)
-    ?? voices.find((voice) => voice.lang === 'en-US')
-    ?? null;
-}
-
 export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any) => void }) {
   const [values, setValues] = useState<Record<FieldKey, string>>({
     businessName: '', industry: '', services: '', audience: '', style: '', goal: '', extra: '',
@@ -50,25 +33,24 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
   const [error, setError] = useState<string | null>(null);
   const [autoVoice, setAutoVoice] = useState(true);
   const recognitionRef = useRef<any>(null);
+  const naturalVoice = useNaturalVoice();
   const current = fields[step];
 
   const canBuild = useMemo(() => values.businessName.trim() && values.industry.trim() && values.services.trim(), [values]);
 
-  const speakQuestion = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window) || !current) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(step === 0 ? `I'm PARIS. ${current.question}` : current.question);
-    utterance.rate = 0.94;
-    utterance.pitch = 1.02;
-    utterance.lang = 'en-US';
-    const voice = chooseVoice();
-    if (voice) utterance.voice = voice;
-    window.speechSynthesis.speak(utterance);
+  const speakQuestion = async () => {
+    if (!current) return;
+    setError(null);
+    const spoken = step === 0 ? `I'm PARIS. ${current.question}` : current.question;
+    const ok = await naturalVoice.play(spoken, { voice: 'coral', style: 'assistant', rate: 1 });
+    if (!ok && naturalVoice.error) setError(naturalVoice.error);
   };
 
   useEffect(() => {
     if (!autoVoice || !current) return;
-    const timer = window.setTimeout(() => speakQuestion(), 300);
+    const timer = window.setTimeout(() => {
+      void speakQuestion();
+    }, 300);
     return () => window.clearTimeout(timer);
     // current changes with step; autoVoice lets the user silence automatic prompts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -87,7 +69,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
       setListening(false);
       return;
     }
-    window.speechSynthesis?.cancel();
+    naturalVoice.stop();
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
@@ -107,7 +89,7 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
     if (!canBuild) return;
     setBuilding(true);
     setError(null);
-    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
+    naturalVoice.stop();
     try {
       const response = await fetch('/api/apps/website-builder/ai-generate', {
         method: 'POST',
@@ -127,7 +109,6 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
 
   useEffect(() => () => {
     recognitionRef.current?.stop?.();
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();
   }, []);
 
   if (!current) return null;
@@ -140,14 +121,14 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-600">Live PARIS Website Interview</p>
           <h2 className="mt-1 text-2xl font-black text-slate-950">Answer a few questions. PARIS builds the first draft.</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">PARIS asks each question automatically. Speak or type your answer, review it, then continue. Your answers become the site copy, services, SEO and starter design.</p>
+          <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-700">PARIS asks each question with a natural AI voice. Speak or type your answer, review it, then continue. Your answers become the site copy, services, SEO and starter design.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setAutoVoice((value) => !value)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">
+          <button type="button" onClick={() => { setAutoVoice((value) => !value); naturalVoice.stop(); }} className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
             <Volume2 className="h-4 w-4" /> {autoVoice ? 'Auto voice on' : 'Auto voice off'}
           </button>
-          <button type="button" onClick={speakQuestion} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">
-            <Volume2 className="h-4 w-4" /> Repeat
+          <button type="button" onClick={() => void speakQuestion()} disabled={naturalVoice.isLoading} className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50 disabled:opacity-60">
+            {naturalVoice.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Volume2 className="h-4 w-4" />} {naturalVoice.isLoading ? 'Preparing voice' : 'Repeat'}
           </button>
         </div>
       </div>
@@ -158,8 +139,8 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
 
       <div key={current.key} className="paris-question mt-6 rounded-2xl bg-slate-50 p-5">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-500">Question {step + 1} of {fields.length}</span>
-          <span className="text-xs font-bold text-slate-500">{current.label}</span>
+          <span className="text-xs font-black uppercase tracking-wider text-slate-700">Question {step + 1} of {fields.length}</span>
+          <span className="text-xs font-bold text-slate-700">{current.label}</span>
         </div>
         <h3 className="mt-3 text-lg font-black text-slate-950">{current.question}</h3>
         <div className="mt-4 flex gap-2">
@@ -169,12 +150,12 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
             placeholder={current.placeholder}
             rows={3}
             autoFocus
-            className="min-h-[96px] flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none ring-brand-red-500 focus:ring-2"
+            className="min-h-[96px] flex-1 rounded-xl border border-slate-400 bg-white px-4 py-3 font-medium text-slate-950 outline-none ring-brand-red-500 placeholder:text-slate-600 focus:ring-2"
           />
           <button
             type="button"
             onClick={listen}
-            className={`self-stretch rounded-xl px-4 transition ${listening ? 'bg-brand-red-600 text-white shadow-lg' : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}`}
+            className={`self-stretch rounded-xl px-4 transition ${listening ? 'bg-brand-red-600 text-white shadow-lg' : 'border border-slate-400 bg-white text-slate-800 hover:bg-slate-50'}`}
             aria-label={listening ? 'Stop voice input' : 'Answer by voice'}
           >
             {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
@@ -183,11 +164,11 @@ export function ParisWebsiteInterview({ onCreated }: { onCreated?: (website: any
         {listening ? <p className="mt-2 text-xs font-bold text-brand-red-700">Listening… speak your answer.</p> : null}
       </div>
 
-      {error ? <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{error}</div> : null}
+      {error ? <div className="mt-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{error}</div> : null}
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <button type="button" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={step === 0} className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 disabled:opacity-40">Back</button>
-        <div className="flex gap-1.5">{fields.map((field, index) => <button key={field.key} type="button" onClick={() => setStep(index)} aria-label={`Question ${index + 1}`} className={`h-2.5 w-2.5 rounded-full transition-transform ${index === step ? 'scale-125 bg-brand-red-600' : values[field.key].trim() ? 'bg-emerald-500' : 'bg-slate-300'}`} />)}</div>
+        <button type="button" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={step === 0} className="rounded-xl border border-slate-400 px-4 py-2.5 text-sm font-bold text-slate-800 disabled:opacity-40">Back</button>
+        <div className="flex gap-1.5">{fields.map((field, index) => <button key={field.key} type="button" onClick={() => setStep(index)} aria-label={`Question ${index + 1}`} className={`h-2.5 w-2.5 rounded-full transition-transform ${index === step ? 'scale-125 bg-brand-red-600' : values[field.key].trim() ? 'bg-emerald-500' : 'bg-slate-400'}`} />)}</div>
         {step < fields.length - 1 ? (
           <button type="button" onClick={() => setStep((value) => Math.min(fields.length - 1, value + 1))} className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white">Next</button>
         ) : (

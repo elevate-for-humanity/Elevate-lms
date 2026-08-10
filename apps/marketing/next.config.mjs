@@ -49,19 +49,27 @@ const nextConfig = {
         permanent: true,
       },
 
-      // Canonicalize historical barber/beauty public URLs in one hop. These are
-      // compatibility redirects only; current navigation points directly to the
-      // canonical destinations below.
+      // Canonicalize historical barber/beauty public URLs in one hop.
       { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
       { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
 
+      // Retire the old per-trade apprenticeship dashboards. The LMS /apprentice
+      // route is the only operational apprenticeship dashboard.
+      { source: '/portal/barber', destination: 'https://app.elevateforhumanity.org/apprentice?program=barber-apprenticeship', permanent: true },
+      { source: '/portal/cosmetology', destination: 'https://app.elevateforhumanity.org/apprentice?program=cosmetology-apprenticeship', permanent: true },
+      { source: '/portal/esthetician', destination: 'https://app.elevateforhumanity.org/apprentice?program=esthetician-apprenticeship', permanent: true },
+      { source: '/portal/nail-technician', destination: 'https://app.elevateforhumanity.org/apprentice?program=nail-technician-apprenticeship', permanent: true },
+      { source: '/portal/culinary', destination: 'https://app.elevateforhumanity.org/apprentice?program=culinary-apprenticeship', permanent: true },
+      { source: '/portal/electrical', destination: 'https://app.elevateforhumanity.org/apprentice?program=electrical', permanent: true },
+      { source: '/portal/plumbing', destination: 'https://app.elevateforhumanity.org/apprentice?program=plumbing', permanent: true },
+
       // Historical cross-service paths remain as one-hop permanent redirects.
-      // Internal navigation should point directly to the destination hosts.
       { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: true },
       { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
       { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: true },
       { source: '/employer/:path*', destination: 'https://app.elevateforhumanity.org/employer/:path*', permanent: true },
+      { source: '/apprentice', destination: 'https://app.elevateforhumanity.org/apprentice', permanent: true },
       { source: '/apprentice/:path*', destination: 'https://app.elevateforhumanity.org/apprentice/:path*', permanent: true },
       { source: '/parent-portal/:path*', destination: 'https://app.elevateforhumanity.org/parent-portal/:path*', permanent: true },
       { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: true },

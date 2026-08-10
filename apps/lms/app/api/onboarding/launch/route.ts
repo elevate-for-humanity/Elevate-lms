@@ -1,6 +1,4 @@
 // PUBLIC ROUTE: one-shot business launch (workspace + website + optional LMS seed)
-import { db } from '@/lib/db';
-
 import { NextRequest } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError, safeOk } from '@/lib/api/safe-error';
@@ -22,14 +20,8 @@ type LaunchBody = {
   includeLms?: boolean;
 };
 
-/**
- * POST /api/onboarding/launch
- *
- * Vision flow: describe business → provision workspace → AI site config → optional LMS stub.
- */
 async function _POST(request: NextRequest) {
   await hydrateProcessEnv();
-
   const rateLimited = await applyRateLimit(request, 'contact');
   if (rateLimited) return rateLimited;
 
@@ -38,12 +30,8 @@ async function _POST(request: NextRequest) {
     const organizationName = body.organizationName?.trim();
     const ownerEmail = body.ownerEmail?.trim().toLowerCase();
 
-    if (!organizationName || organizationName.length < 2) {
-      return safeError('organizationName is required', 400);
-    }
-    if (!ownerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerEmail)) {
-      return safeError('Valid ownerEmail is required', 400);
-    }
+    if (!organizationName || organizationName.length < 2) return safeError('organizationName is required', 400);
+    if (!ownerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ownerEmail)) return safeError('Valid ownerEmail is required', 400);
 
     const trial = await startWorkspaceTrial({
       organizationName,
@@ -53,9 +41,7 @@ async function _POST(request: NextRequest) {
       plan: 'builder',
     });
 
-    if (!trial.ok) {
-      return safeError(trial.error, trial.status ?? 500);
-    }
+    if (trial.ok === false) return safeError(trial.error, trial.status ?? 500);
 
     let aiSiteEnhanced = false;
     if (body.businessDescription?.trim()) {
@@ -63,15 +49,8 @@ async function _POST(request: NextRequest) {
         const result = await aiChat({
           model: 'gpt-4.1-mini',
           messages: [
-            {
-              role: 'system',
-              content:
-                'You write concise marketing homepage copy for workforce training businesses. Return JSON: {"heroTitle","heroSubtitle","aboutParagraph","services":[{"title","description"}]}',
-            },
-            {
-              role: 'user',
-              content: `Business: ${organizationName}. Industry: ${body.industry ?? 'training'}. Description: ${body.businessDescription}`,
-            },
+            { role: 'system', content: 'You write concise marketing homepage copy for workforce training businesses. Return JSON: {"heroTitle","heroSubtitle","aboutParagraph","services":[{"title","description"}]}' },
+            { role: 'user', content: `Business: ${organizationName}. Industry: ${body.industry ?? 'training'}. Description: ${body.businessDescription}` },
           ],
           temperature: 0.6,
           maxTokens: 800,
@@ -81,30 +60,22 @@ async function _POST(request: NextRequest) {
         const jsonMatch = raw.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
-          const db = await requireAdminClient();
-          const { data: site } = await db
+          const adminDb = await requireAdminClient();
+          const { data: site } = await adminDb
             .from('user_websites')
             .select('id, site_config')
             .eq('organization_id', trial.organizationId)
             .order('updated_at', { ascending: false })
             .limit(1)
             .maybeSingle();
-
           if (site?.id) {
-            const cfg =
-              site.site_config && typeof site.site_config === 'object'
-                ? { ...(site.site_config as object) }
-                : {};
-            await db
+            const cfg = site.site_config && typeof site.site_config === 'object' ? { ...(site.site_config as object) } : {};
+            await adminDb
               .from('user_websites')
               .update({
                 site_config: {
                   ...cfg,
-                  homepage: {
-                    heroTitle: parsed.heroTitle,
-                    heroSubtitle: parsed.heroSubtitle,
-                    aboutParagraph: parsed.aboutParagraph,
-                  },
+                  homepage: { heroTitle: parsed.heroTitle, heroSubtitle: parsed.heroSubtitle, aboutParagraph: parsed.aboutParagraph },
                   services: parsed.services,
                   aiGenerated: true,
                 },
@@ -114,23 +85,22 @@ async function _POST(request: NextRequest) {
             aiSiteEnhanced = true;
           }
         }
-      } catch (e) {
-        logger.warn('[onboarding/launch] AI site enhancement skipped', e);
+      } catch (error) {
+        logger.warn('[onboarding/launch] AI site enhancement skipped', error instanceof Error ? error : String(error));
       }
     }
 
     let lmsSeeded = false;
     if (body.includeLms) {
-      const db = await requireAdminClient();
-      const { data: existing } = await db
+      const adminDb = await requireAdminClient();
+      const { data: existing } = await adminDb
         .from('courses')
         .select('id')
         .eq('organization_id', trial.organizationId)
         .limit(1)
         .maybeSingle();
-
       if (!existing?.id) {
-        await db.from('courses').insert({
+        await adminDb.from('courses').insert({
           title: `${organizationName} Training Program`,
           slug: `${trial.slug}-intro-program`,
           status: 'draft',
@@ -156,10 +126,9 @@ async function _POST(request: NextRequest) {
         { label: 'Choose a plan', href: '/store/plans' },
       ],
     });
-  } catch (err) {
-    return safeInternalError(err, 'Launch failed');
+  } catch (error) {
+    return safeInternalError(error, 'Launch failed');
   }
 }
 
 export const POST = withRuntime(withApiAudit('/api/onboarding/launch', _POST));
-

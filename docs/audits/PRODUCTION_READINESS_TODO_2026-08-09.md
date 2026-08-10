@@ -4,14 +4,24 @@ This checklist captures the remaining production-readiness work identified from 
 
 ## Current assessment
 
+**Current overall readiness estimate after the deeper audit: 6.5–7/10.**
+
+The platform has improved substantially, but multiple generations of Marketing, LMS, Admin, catalog, funding, metadata, and location data are still competing with each other. The primary remaining problem is now source-of-truth consolidation and authorization architecture rather than missing page construction.
+
 | Surface | Current assessment | Remaining concern |
 | --- | --- | --- |
-| Marketing | Major improvement | Legacy routes, stale/duplicate data, partner normalization, contrast/hero consistency |
-| LMS | Improved | Intermittent 503 risk, stale legacy shell data, authenticated portal verification |
-| Admin | Meaningful improvement | Authenticated CRUD/API/workflow verification still required |
+| Marketing homepage | Stronger and functioning | Data architecture / competing sources of truth |
+| Individual major program pages | Mostly substantially improved | Stale indexed variants still need cleanup |
+| Program category hubs | High-risk | SSR/indexing incomplete or client-only |
+| Program catalog | Critical | Multiple sources of truth |
+| Funding classifications | Critical | Contradictory funding language across live surfaces |
+| LMS | Improved | Intermittent 503 risk, employer-route auth inconsistency, authenticated verification |
+| Admin | Critical authorization concern | Inconsistent server-side protection and authenticated CRUD/API/workflow verification |
 | Applications | Major improvement | Must verify submission → Supabase → Admin review end to end |
-| Barber / Host Shops | Major improvement | Normalize names, addresses, maps, phones, imagery, and canonical data source |
-| Duplication / Data integrity | Not finished | Competing public routes and inconsistent records remain |
+| Barber / Host Shops | Strong | Normalize names, addresses, maps, phones, imagery, and canonical data source |
+| SEO / legacy metadata | High | Old templates, unresolved variables, stale routes, crawler policy |
+| Addresses / locations | High | Competing authoritative addresses and unclear location taxonomy |
+| Duplication / data integrity | Not finished | Competing public routes and inconsistent records remain |
 
 ## P0 — Production blockers
 
@@ -20,6 +30,45 @@ This checklist captures the remaining production-readiness work identified from 
   - Verify `/lms/dashboard` repeatedly under load and after deployments.
   - Confirm health checks point at the correct LMS runtime and port.
   - Confirm no stale/unhealthy upstream remains in the active Northflank service.
+
+- [ ] Centralize Program + Funding data into one canonical source of truth.
+  - One authoritative program record must control:
+    - slug / canonical route;
+    - public name;
+    - category;
+    - duration;
+    - tuition / price;
+    - credentials;
+    - delivery type;
+    - funding eligibility by source;
+    - application slug / CTA;
+    - visibility / status;
+    - ETPL / WRG / WIOA classifications where applicable.
+  - Remove competing program/funding logic from page-local arrays, application catalogs, funding copy, and legacy program records.
+  - Resolve the contradiction where `/programs` presents only four confirmed workforce-funded programs while individual descriptions and the student application advertise funding for additional self-pay programs.
+  - Treat the confirmed funding matrix as authoritative until records are explicitly updated.
+  - Ensure CNA, Medical Assistant, Barber, Phlebotomy, IT Help Desk, Bookkeeping, HVAC, CDL, Peer Recovery, Tax Preparation, and every other program display the same funding classification everywhere.
+  - Ensure Workforce Ready Grant statements agree everywhere, including the current confirmed CDL/HVAC treatment unless authoritative records change.
+  - Add a regression test that fails when a program is labeled both self-pay and WIOA/WRG-funded from conflicting sources.
+
+- [ ] Fix Admin server-side authorization globally.
+  - Every private Admin page must require authentication before rendering HTML.
+  - Audit `/applications`, `/students`, `/programs`, `/crm`, surveys, Studio, System Health, Funding, Partners, Compliance, API Keys, and all nested Admin routes.
+  - Do not rely on client-side React guards for private route protection.
+  - Add `noindex, nofollow` to private Admin route metadata/layouts.
+  - Ensure WorkOne Funding Survey UI is not publicly crawlable.
+  - Ensure unauthenticated requests never receive private application-management UI shells such as `Send Survey to All Applicants`, `All Responses`, `Needs Callback`, or `Persuaded Away (Urgent)`.
+  - Apply server-side authorization to administrative APIs as well as pages.
+  - Verify auth middleware coverage with an automated route matrix.
+
+- [ ] Fix program category-page SSR / indexability.
+  - `/programs/healthcare` must server-render its actual catalog/content.
+  - `/programs/skilled-trades` must server-render its actual catalog/content.
+  - `/programs/technology` must server-render its actual catalog/content.
+  - `/programs/business` must server-render its actual catalog/content.
+  - Do not depend on client hydration for primary program descriptions, cards, prices, credentials, funding labels, or CTAs.
+  - Verify Google/Bing/AI crawlers receive substantive HTML, not only the global shell and page heading.
+  - Add SSR smoke assertions for category-page program card content.
 
 - [ ] Verify Admin Studio / Workflow Studio end to end.
   - [ ] `/studio` loads for an authenticated admin.
@@ -42,6 +91,7 @@ This checklist captures the remaining production-readiness work identified from 
   - Keep `/programs/barber-apprenticeship` as the canonical public route.
   - Redirect or remove `/barber-apprenticeship` and any other parallel public aliases.
   - Verify sitemap, internal links, metadata, and search indexing use the canonical route only.
+  - Remove stale indexed barber hour structures that conflict with the current canonical `2,000 OJL + 144 RTI` structure.
 
 - [ ] Normalize Host Site / Host Shop records from one authoritative data source.
   - [ ] `Salon Saloon LLC` / `Salon Saloon` — remove `Salon Salon LLC` typo and `South, Bend` formatting.
@@ -51,7 +101,7 @@ This checklist captures the remaining production-readiness work identified from 
   - [ ] One media policy per shop; no duplicate or canceled images.
 
 - [ ] Authenticated application function test.
-  - [ ] Student application submits successfully.
+  - [ ] Student application submits successfully through all five steps.
   - [ ] Barber application submits successfully.
   - [ ] Transfer-hour evidence upload persists.
   - [ ] Host Site application submits successfully.
@@ -60,8 +110,14 @@ This checklist captures the remaining production-readiness work identified from 
   - [ ] Workers' compensation certificate/exemption upload persists.
   - [ ] Supervisor professional license upload persists.
   - [ ] EIN verification / W-9 upload persists.
+  - [ ] Optional occupancy/business document upload persists.
+  - [ ] Protected identity workflow keeps full SSN outside the ordinary application table.
+  - [ ] Hash / last-four behavior matches the intended protected identity design.
   - [ ] Submitted records appear in the correct Supabase tables only once.
+  - [ ] Account creation completes.
+  - [ ] Enrollment and binder creation complete where required.
   - [ ] Admin can open, review, update, approve/reject, and audit each submission.
+  - [ ] LMS assignment occurs after the correct approval/enrollment event.
 
 ## P1 — Authentication / portal access
 
@@ -71,6 +127,8 @@ This checklist captures the remaining production-readiness work identified from 
 - [ ] Verify session behavior across `www.`, `app.`, and `admin.` subdomains.
 - [ ] Verify redirects preserve the intended destination for apprentice, host shop, employer, workforce, instructor, program-holder, learner, and admin portals.
 - [ ] Verify password reset and magic-link flows for each specialized portal.
+- [ ] Inspect `/employer/dashboard` specifically and make its authentication behavior consistent with Student, Apprentice, Parent, Host Shop, and Workforce routes.
+- [ ] Ensure employer routes do not depend only on client-side hydration to enforce access.
 
 ## P1 — Hero banners / visual system
 
@@ -89,6 +147,9 @@ This checklist captures the remaining production-readiness work identified from 
 - [ ] Verify dark Store sections use readable text and button contrast.
 - [ ] Verify focus states, disabled states, error states, and helper text remain readable.
 - [ ] Verify hero micro-labels, Store badges, cards, tabs, and demo controls meet contrast requirements.
+- [ ] Remove semantic duplicate announcement text from the homepage marquee.
+  - Keep visual repetition for animation if needed.
+  - Mark duplicated animation-only content appropriately so screen readers/crawlers do not receive the same announcement sequence twice.
 
 ## P1 — Store sales / conversion audit
 
@@ -137,6 +198,42 @@ This checklist captures the remaining production-readiness work identified from 
 - [ ] Verify tax behavior matches current business requirements and canonical pricing rules.
 - [ ] Verify trial provisioning and existing-subscription handling.
 
+## P1 — SEO / legacy contamination
+
+- [ ] Remove unresolved template variables from all public/indexable metadata and content.
+  - Search for literal `${PLATFORM_DEFAULTS.orgName}` and related unresolved template strings.
+  - Audit Store metadata, Community Services metadata, old contract pages, training-provider templates, and legacy content factories.
+- [ ] Add a valid primary-domain `/robots.txt`.
+- [ ] Explicitly define crawler policy for Marketing, Admin, LMS, legacy routes, previews, demos, and private application/admin pages.
+- [ ] Ensure sitemap contains only canonical public routes.
+- [ ] Add `noindex` to Admin/LMS/private application surfaces that should not appear in search.
+- [ ] Delete or redirect obsolete `/videos/*` landing pages and other stale indexed content.
+- [ ] Verify canonical URLs and redirects with a crawler after cleanup.
+
+## P1 — Organization locations / address taxonomy
+
+- [ ] Create one authoritative organization-location registry.
+- [ ] Explicitly classify every location as one of:
+  - legal/administrative address;
+  - enrollment office;
+  - instructional/training location;
+  - appointment-only office;
+  - partner/host-site location.
+- [ ] Reconcile `120 E Market St, Suite 930, Indianapolis, IN 46204` with `8888 Keystone Crossing, Suite 1300, Indianapolis, IN 46240` using explicit labels instead of allowing both to appear as an undefined “main” address.
+- [ ] Ensure About, Contact, Locations, maps, footer, structured data, and program pages use the correct address type.
+- [ ] Audit `Supersonic Fast Cash - Main` and remove/replace any placeholder-looking `(317) 555-0300` number unless independently verified as intentional and legitimate.
+- [ ] Remove other 555/test/placeholder contact values from public pages.
+
+## P1 — Claims / evidence / public credibility
+
+- [ ] Audit every quantitative and testimonial claim before production certification.
+- [ ] Verify the public `90%+ credential pass rate` claim against supporting records.
+- [ ] Verify Careers claims such as `100% Free with WIOA`, `50+ Employer Partners`, and specific employee-benefit claims.
+- [ ] Verify named WIOA success stories, wages, life histories, and testimonials have real supporting records and appropriate releases.
+- [ ] Verify Success Stories page narratives and outcomes.
+- [ ] If evidence/releases are unavailable, convert examples to clearly labeled illustrative examples or remove the claim.
+- [ ] Maintain a claims registry linking each public claim to its authoritative evidence source.
+
 ## P2 — Marketing / content integrity
 
 - [ ] Continue consolidation of duplicate public pages and parallel routes.
@@ -144,24 +241,45 @@ This checklist captures the remaining production-readiness work identified from 
 - [ ] Confirm every program has one canonical hero, one canonical CTA path, and one authoritative program record.
 - [ ] Remove duplicate images and repeated hero artwork across program pages.
 - [ ] Verify current organization address, phone, legal name, approvals, and partner facts globally.
+- [ ] Preserve the stronger current individual program pages while eliminating old indexed variants.
+- [ ] Keep Barber’s current `2,000 OJL + 144 RTI` structure canonical unless the authoritative apprenticeship record changes.
+
+## Deep-audit priority order
+
+1. [ ] Centralize program/funding data.
+2. [ ] Fix Admin server-side authorization.
+3. [ ] Fix category-page SSR for Healthcare, Skilled Trades, Business, and Technology.
+4. [ ] Normalize address/location records with explicit location taxonomy.
+5. [ ] Delete/redirect legacy templates, unresolved metadata, stale routes, and indexed placeholders.
+6. [ ] Verify the complete application transaction: public application → Supabase → account → identity → documents → enrollment/binder → Admin review → LMS assignment.
+7. [ ] Test Employer/LMS authentication consistency.
+8. [ ] Complete SEO cleanup: robots, sitemap, canonical URLs, private-route noindex, metadata, redirects, and crawl verification.
 
 ## Production verification gate
 
 Do not mark the platform production-clean until all of the following pass together:
 
 - [ ] Marketing smoke test
+- [ ] Canonical program/funding consistency test
+- [ ] Program category SSR/indexability test
 - [ ] LMS authenticated smoke test
+- [ ] Employer dashboard authentication test
+- [ ] Admin anonymous-route denial test
 - [ ] Admin authenticated CRUD/API smoke test
 - [ ] Studio workflow create/run/log/deploy test
 - [ ] Application submit/upload/review test
+- [ ] Identity/enrollment/binder creation verification
 - [ ] Store trial and checkout test
 - [ ] Website Builder AI-guided create/preview/publish test
 - [ ] Cross-subdomain authentication test
 - [ ] Hero/media lifecycle test
 - [ ] Accessibility/contrast sweep
 - [ ] Canonical route / stale-content crawl
+- [ ] Robots/sitemap/noindex verification
+- [ ] Organization location registry consistency test
+- [ ] Public claims/evidence review
 - [ ] Repeated health checks with no intermittent 500/503 responses
 
 ## Exit criteria
 
-Target condition: one canonical route per feature, one authoritative data source per business record, one authentication model, one Studio control plane, one Website Builder, one Course Builder, no legacy organization data, no intermittent 5xx responses, and all critical mutations verified against production-backed data paths before release certification.
+Target condition: one canonical route per feature, one authoritative Program + Funding source, one authoritative organization/location registry, one authoritative partner record per host site, one authentication model with server-side enforcement, one Studio control plane, one Website Builder, one Course Builder, no unresolved template variables, no placeholder organization data, no private Admin/LMS UI in search results, no intermittent 5xx responses, and all critical mutations verified against production-backed data paths before release certification.

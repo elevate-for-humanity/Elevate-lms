@@ -50,11 +50,11 @@ function numericHours(value: number | string | null | undefined): number {
 
 function approvedHours(row: HourEntryRow): number {
   if (row.approval_status !== 'approved' && row.status !== 'approved') return 0;
-  const accepted = numericHours(row.accepted_hours);
-  if (accepted > 0) return accepted;
-  const canonical = numericHours(row.hours);
-  if (canonical > 0) return canonical;
-  return numericHours(row.hours_claimed);
+  return (
+    numericHours(row.accepted_hours) ||
+    numericHours(row.hours) ||
+    numericHours(row.hours_claimed)
+  );
 }
 
 function isPendingHour(row: HourEntryRow): boolean {
@@ -62,63 +62,62 @@ function isPendingHour(row: HourEntryRow): boolean {
 }
 
 function isEntryForAssignedShop(row: HourEntryRow, shopIds: string[]): boolean {
+  // Legacy rows can be missing host_shop_id. The student id is still safe here
+  // because the student set is derived only from this partner's active placements.
   return !row.host_shop_id || shopIds.includes(row.host_shop_id);
 }
 
-export async function getHostShopBoard(userId: string) {
+async function loadBoardForPartner(
+  partner: PartnerRecord,
+  options: { userId?: string } = {},
+) {
   const db = await requireAdminClient();
 
-  // Tenant boundary: an active partner_users link is mandatory. Never fall
-  // back to profile.role when loading tenant data with the service client.
-  const { data: partnerLink, error: partnerLinkError } = await db
-    .from('partner_users')
-    .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
-    .eq('user_id', userId)
-    .eq('status', 'active')
-    .maybeSingle();
-
-  if (partnerLinkError || !partnerLink?.partner_id || !partnerLink.partners) {
-    throw new Error('HOST_SHOP_ACCESS_DENIED');
-  }
-
-  const partner = partnerLink.partners as unknown as PartnerRecord;
-
-  // Canonical relationship: shops.partner_id → partners.id. shop_staff remains
-  // a compatibility source for assistants/supervisors explicitly assigned to a
-  // shop. Merge both and dedupe by shop id.
-  const [{ data: partnerShops, error: partnerShopError }, { data: shopLinks }] = await Promise.all([
+  const shopQueries: PromiseLike<any>[] = [
     db
       .from('shops')
       .select('id, name, city, state, active, partner_id')
       .eq('partner_id', partner.id)
       .neq('active', false),
-    db
-      .from('shop_staff')
-      .select('shop_id, shops(id, name, city, state, active, partner_id)')
-      .eq('user_id', userId)
-      .neq('active', false),
-  ]);
+  ];
 
-  if (partnerShopError) {
-    throw new Error(`HOST_SHOP_SHOPS_LOAD_FAILED:${partnerShopError.message}`);
+  if (options.userId) {
+    shopQueries.push(
+      db
+        .from('shop_staff')
+        .select('shop_id, shops(id, name, city, state, active, partner_id)')
+        .eq('user_id', options.userId)
+        .neq('active', false),
+    );
+  }
+
+  const shopResults = await Promise.all(shopQueries);
+  const partnerShopResult = shopResults[0];
+  if (partnerShopResult.error) {
+    throw new Error(`HOST_SHOP_SHOPS_LOAD_FAILED:${partnerShopResult.error.message}`);
   }
 
   const shopMap = new Map<string, any>();
-  for (const shop of partnerShops || []) {
-    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
-  }
-  for (const row of shopLinks || []) {
-    const shop = (row as any).shops;
+  for (const shop of partnerShopResult.data || []) {
     if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
   }
 
+  if (options.userId && shopResults[1]?.data) {
+    for (const row of shopResults[1].data) {
+      const shop = row?.shops;
+      if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+    }
+  }
+
   const shops = Array.from(shopMap.values());
-  const shopIds = shops.map((shop: any) => shop.id);
+  const shopIds = shops.map((shop) => shop.id as string);
 
   const { data: placements, error: placementError } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        .select('id, student_id, shop_id, discipline, program_slug, status, start_date, profiles(full_name, email)')
+        .select(
+          'id, student_id, shop_id, discipline, program_slug, status, start_date, profiles(full_name, email)',
+        )
         .in('shop_id', shopIds)
         .eq('status', 'active')
     : { data: [], error: null };
@@ -138,15 +137,17 @@ export async function getHostShopBoard(userId: string) {
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
-  // Canonical OJT source: hour_entries. ojt_placements is an optional legacy
-  // projection and is not authoritative.
+  // hour_entries is the canonical OJT ledger. ojt_placements is not required
+  // for progress and may be empty in production.
   const ojtCompletedByUser: Record<string, number> = {};
   let pendingHoursCount = 0;
 
   if (studentIds.length) {
     const { data: hourRows, error: hourError } = await db
       .from('hour_entries')
-      .select('user_id, host_shop_id, status, approval_status, accepted_hours, hours, hours_claimed')
+      .select(
+        'user_id, host_shop_id, status, approval_status, accepted_hours, hours, hours_claimed',
+      )
       .in('user_id', studentIds);
 
     if (hourError) throw new Error(`HOST_SHOP_HOURS_LOAD_FAILED:${hourError.message}`);
@@ -161,7 +162,9 @@ export async function getHostShopBoard(userId: string) {
     }
   }
 
-  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.discipline });
+  const programType = resolveHostShopProgram(
+    partner ?? { partner_type: apprentices[0]?.discipline },
+  );
   const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
@@ -171,12 +174,14 @@ export async function getHostShopBoard(userId: string) {
     .eq('partner_id', partner.id)
     .is('revoked_at', null);
 
-  const programIds = Array.from(new Set([
-    programType,
-    ...(programAccess || [])
-      .map((row: { program_id?: string }) => row.program_id)
-      .filter((value): value is string => Boolean(value)),
-  ]));
+  const programIds = Array.from(
+    new Set([
+      programType,
+      ...(programAccess || [])
+        .map((row: { program_id?: string }) => row.program_id)
+        .filter((value): value is string => Boolean(value)),
+    ]),
+  );
 
   const { data: dbRequirements } = await db
     .from('partner_document_requirements')
@@ -248,4 +253,42 @@ export async function getHostShopBoard(userId: string) {
     }),
     pendingHoursCount,
   };
+}
+
+/** Host-shop user path: requires the user's active partner assignment. */
+export async function getHostShopBoard(userId: string) {
+  const db = await requireAdminClient();
+  const { data: partnerLink, error: partnerLinkError } = await db
+    .from('partner_users')
+    .select(
+      'partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)',
+    )
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  if (partnerLinkError || !partnerLink?.partner_id || !partnerLink.partners) {
+    throw new Error('HOST_SHOP_ACCESS_DENIED');
+  }
+
+  return loadBoardForPartner(partnerLink.partners as unknown as PartnerRecord, { userId });
+}
+
+/**
+ * Admin-only preview loader. The caller MUST enforce admin authorization before
+ * invoking this function. An explicit partner id is required; there is never an
+ * implicit/random tenant selection.
+ */
+export async function getHostShopBoardForPartner(partnerId: string) {
+  const db = await requireAdminClient();
+  const { data: partner, error } = await db
+    .from('partners')
+    .select(
+      'id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state',
+    )
+    .eq('id', partnerId)
+    .maybeSingle();
+
+  if (error || !partner) throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
+  return loadBoardForPartner(partner as PartnerRecord);
 }

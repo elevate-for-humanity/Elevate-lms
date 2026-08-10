@@ -154,6 +154,14 @@ export const PORTAL_MAP: Record<string, PortalRoute> = {
     defaultPath: '/staff-portal/dashboard',
     redirectPattern: '/staff-portal/:path*',
   },
+  testing: {
+    type: 'admin',
+    subdomain: 'admin',
+    basePath: '/testing-center',
+    host: ADMIN_HOST,
+    defaultPath: '/testing-center',
+    redirectPattern: '/testing-center/:path*',
+  },
 
   workforceboard: {
     type: 'workforceboard',

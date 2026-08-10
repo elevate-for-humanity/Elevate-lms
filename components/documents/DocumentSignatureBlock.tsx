@@ -9,16 +9,11 @@ import { Check, Loader2, Pen, Type, CheckSquare, Lock, AlertCircle } from 'lucid
 interface Props {
   agreementType: string;
   agreementVersion?: string;
-  /** Where to redirect after signing. Defaults to /lms/dashboard */
   nextUrl?: string;
-  /** Label shown on the sign button */
   buttonLabel?: string;
 }
 
 type Method = 'checkbox' | 'typed' | 'drawn';
-
-// Valid agreement types
-type AgreementType = 'handbook' | 'enrollment' | 'background_check' | 'payment_plan' | 'funding_agreement' | 'clinical_agreement' | 'worksite_agreement' | 'oha' | 'iep';
 
 export function DocumentSignatureBlock({
   agreementType,
@@ -29,7 +24,6 @@ export function DocumentSignatureBlock({
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [pad, setPad] = useState<SignatureCanvas | null>(null);
-
   const [method, setMethod] = useState<Method>('checkbox');
   const [signerName, setSignerName] = useState('');
   const [typed, setTyped] = useState('');
@@ -42,39 +36,39 @@ export function DocumentSignatureBlock({
   const [loading, setLoading] = useState(true);
   const [signerEmail, setSignerEmail] = useState('');
 
-  // Pre-fill name and check if already signed
-  useEffect((): void => {
-    import('@/lib/supabase/client').then(({ createClient }) => {
+  useEffect(() => {
+    let cancelled = false;
+    void import('@/lib/supabase/client').then(async ({ createClient }) => {
       const supabase = createClient();
-      supabase?.auth.getUser().then(async ({ data }) => {
-        if (!data?.user) {
-          setLoading(false);
-          return;
-        }
-        setSignerEmail(data.user.email ?? '');
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', data.user.id)
-          .single();
-        if (profile?.full_name) setSignerName(profile.full_name);
-
-        const { data: existing } = await supabase
+      const { data } = await supabase.auth.getUser();
+      if (cancelled) return;
+      if (!data?.user) {
+        setLoading(false);
+        return;
+      }
+      setSignerEmail(data.user.email ?? '');
+      const [{ data: profile }, { data: existing }] = await Promise.all([
+        supabase.from('profiles').select('full_name').eq('id', data.user.id).maybeSingle(),
+        supabase
           .from('license_agreement_acceptances')
           .select('id')
           .eq('user_id', data.user.id)
           .eq('agreement_type', agreementType)
           .eq('document_version', agreementVersion)
-          .maybeSingle();
-        if (existing) setAlreadySigned(true);
-        setLoading(false);
-      });
+          .maybeSingle(),
+      ]);
+      if (cancelled) return;
+      if (profile?.full_name) setSignerName(profile.full_name);
+      if (existing) setAlreadySigned(true);
+      setLoading(false);
     });
+    return () => {
+      cancelled = true;
+    };
   }, [agreementType, agreementVersion]);
 
-  // Init signature pad
-  useEffect((): void => {
-    if (method !== 'drawn' || !canvasRef.current || pad) return;
+  useEffect(() => {
+    if (method !== 'drawn' || !canvasRef.current || pad) return undefined;
     const instance = new SignatureCanvas(canvasRef.current, {
       backgroundColor: 'rgb(255,255,255)',
       penColor: 'rgb(15,23,42)',
@@ -112,24 +106,21 @@ export function DocumentSignatureBlock({
     setSubmitting(true);
     setError(null);
     try {
-      // Use a Server Action — avoids the Gitpod preview proxy's 403 block
-      // on browser fetch requests to /api/* routes with an Origin header.
       const result = await signAgreement({
-        agreementType: agreementType as AgreementType,
+        agreementType,
+        agreementVersion,
         signerName: signerName.trim(),
         signerEmail,
         signatureMethod: method,
         signatureTyped: method === 'typed' ? typed.trim() : undefined,
-        signatureData: method === 'drawn' ? (drawn ?? undefined) : undefined,
+        signatureData: method === 'drawn' ? drawn ?? undefined : undefined,
         context: 'onboarding',
       });
-      if ('error' in result) {
-        throw new Error(result.error || 'Failed to sign');
-      }
+      if ('error' in result && result.error) throw new Error(result.error);
       setSigned(true);
       setTimeout(() => router.push(nextUrl), 1800);
-    } catch (e: any) {
-      setError(e.message || 'Failed to process signature. Please try again.');
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Failed to process signature. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -139,20 +130,14 @@ export function DocumentSignatureBlock({
 
   if (alreadySigned || signed) {
     return (
-      <div className="mt-12 border-t-2 border-brand-green-200 pt-8">
-        <div className="flex items-center gap-3 bg-brand-green-50 border border-brand-green-200 rounded-xl p-5">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-            <Check className="w-5 h-5 text-white" />
+      <div className="mt-12 border-t-2 border-emerald-200 pt-8">
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-700">
+            <Check className="h-5 w-5 text-white" />
           </div>
           <div>
-            <p className="font-bold text-brand-green-800">
-              {signed
-                ? 'Agreement signed successfully.'
-                : 'You have already signed this agreement.'}
-            </p>
-            <p className="text-sm text-brand-green-700 mt-0.5">
-              {signed ? 'Redirecting you now...' : 'Your signature is on file.'}
-            </p>
+            <p className="font-bold text-emerald-900">{signed ? 'Agreement signed successfully.' : 'You have already signed this agreement.'}</p>
+            <p className="mt-0.5 text-sm text-emerald-800">{signed ? 'Redirecting you now...' : 'Your signature is on file.'}</p>
           </div>
         </div>
       </div>
@@ -161,141 +146,63 @@ export function DocumentSignatureBlock({
 
   return (
     <div className="mt-12 border-t-2 border-slate-200 pt-8 print:hidden">
-      <h2 className="text-xl font-bold text-slate-900 mb-1">Sign This Agreement</h2>
-      <p className="text-sm text-slate-500 mb-6">
-        By signing below you confirm you have read and agree to the terms above.
-      </p>
-
-      {error && (
-        <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-red-700 text-sm">{error}</p>
+      <h2 className="mb-1 text-xl font-bold text-slate-900">Sign This Agreement</h2>
+      <p className="mb-6 text-sm text-slate-600">By signing below you confirm you have read and agree to the terms above.</p>
+      {error ? (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-700" />
+          <p className="text-sm text-red-800">{error}</p>
         </div>
-      )}
+      ) : null}
 
       <div className="space-y-5">
-        {/* Full name */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-            Full Legal Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={signerName}
-            onChange={(e) => setSignerName(e.target.value)}
-            placeholder="Enter your full legal name"
-            className="w-full max-w-md px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-          />
+          <label className="mb-1.5 block text-sm font-semibold text-slate-800">Full Legal Name <span className="text-red-600">*</span></label>
+          <input type="text" value={signerName} onChange={(event) => setSignerName(event.target.value)} placeholder="Enter your full legal name" className="w-full max-w-md rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-blue-600 focus:ring-2 focus:ring-blue-500" />
         </div>
 
-        {/* Method selector */}
         <div>
-          <label className="block text-sm font-semibold text-slate-700 mb-2">
-            Signature Method
-          </label>
-          <div className="flex gap-3">
+          <label className="mb-2 block text-sm font-semibold text-slate-800">Signature Method</label>
+          <div className="flex flex-wrap gap-3">
             {[
-              { m: 'checkbox' as Method, Icon: CheckSquare, label: 'Checkbox' },
-              { m: 'typed' as Method, Icon: Type, label: 'Type' },
-              { m: 'drawn' as Method, Icon: Pen, label: 'Draw' },
-            ].map(({ m, Icon, label }) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMethod(m)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 text-sm font-medium transition-colors ${
-                  method === m
-                    ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
-                }`}
-              >
-                <Icon className="w-4 h-4" /> {label}
+              { method: 'checkbox' as Method, Icon: CheckSquare, label: 'Checkbox' },
+              { method: 'typed' as Method, Icon: Type, label: 'Type' },
+              { method: 'drawn' as Method, Icon: Pen, label: 'Draw' },
+            ].map(({ method: option, Icon, label }) => (
+              <button key={option} type="button" onClick={() => setMethod(option)} className={`flex items-center gap-2 rounded-lg border-2 px-4 py-2.5 text-sm font-medium transition-colors ${method === option ? 'border-blue-700 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400'}`}>
+                <Icon className="h-4 w-4" /> {label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Typed */}
-        {method === 'typed' && (
+        {method === 'typed' ? (
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              Type Your Signature <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              placeholder="Type your full name"
-              className="w-full max-w-md px-4 py-3 border border-slate-300 rounded-lg text-2xl focus:ring-2 focus:ring-brand-blue-500"
-              style={{ fontFamily: "'Brush Script MT', cursive" }}
-            />
+            <label className="mb-1.5 block text-sm font-semibold text-slate-800">Type Your Signature <span className="text-red-600">*</span></label>
+            <input type="text" value={typed} onChange={(event) => setTyped(event.target.value)} placeholder="Type your full name" className="w-full max-w-md rounded-lg border border-slate-300 px-4 py-3 text-2xl focus:ring-2 focus:ring-blue-500" style={{ fontFamily: "'Brush Script MT', cursive" }} />
           </div>
-        )}
+        ) : null}
 
-        {/* Drawn */}
-        {method === 'drawn' && (
+        {method === 'drawn' ? (
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-              Draw Your Signature <span className="text-red-500">*</span>
-            </label>
-            <div className="border-2 border-slate-300 rounded-xl overflow-hidden bg-white max-w-md">
-              <canvas
-                ref={canvasRef}
-                style={{ width: '100%', height: '140px', touchAction: 'none' }}
-              />
+            <label className="mb-1.5 block text-sm font-semibold text-slate-800">Draw Your Signature <span className="text-red-600">*</span></label>
+            <div className="max-w-md overflow-hidden rounded-xl border-2 border-slate-300 bg-white">
+              <canvas ref={canvasRef} style={{ width: '100%', height: '140px', touchAction: 'none' }} />
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                pad?.clear();
-                setDrawn(null);
-              }}
-              className="text-xs text-brand-blue-600 hover:underline mt-1.5"
-            >
-              Clear
-            </button>
+            <button type="button" onClick={() => { pad?.clear(); setDrawn(null); }} className="mt-1.5 text-xs font-bold text-blue-700 hover:underline">Clear</button>
           </div>
-        )}
+        ) : null}
 
-        {/* Acknowledgment */}
-        <label className="flex items-start gap-3 cursor-pointer p-4 bg-slate-50 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors max-w-2xl">
-          <input
-            type="checkbox"
-            checked={acknowledged}
-            onChange={(e) => setAcknowledged(e.target.checked)}
-            className="mt-0.5 w-5 h-5 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
-          />
-          <span className="text-sm text-slate-700 leading-relaxed">
-            I have read and understand this agreement in full. I agree to be bound by its terms. I
-            understand this constitutes a legally binding electronic signature under the Electronic
-            Signatures in Global and National Commerce Act (E-SIGN).
-          </span>
+        <label className="flex max-w-2xl cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 hover:bg-slate-100">
+          <input type="checkbox" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} className="mt-0.5 h-5 w-5 rounded border-slate-300 text-blue-700 focus:ring-blue-500" />
+          <span className="text-sm leading-relaxed text-slate-800">I have read and understand this agreement in full. I agree to be bound by its terms and understand this is a legally binding electronic signature.</span>
         </label>
 
-        {/* Submit */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleSign}
-            disabled={!isValid() || submitting}
-            className={`inline-flex items-center gap-2 px-8 py-3 rounded-xl font-semibold text-base transition-colors ${
-              isValid() && !submitting
-                ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            {submitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Signing...
-              </>
-            ) : (
-              <>
-                <Check className="w-5 h-5" /> {buttonLabel}
-              </>
-            )}
+        <div className="flex flex-wrap items-center gap-4">
+          <button type="button" onClick={() => void handleSign()} disabled={!isValid() || submitting} className={`inline-flex items-center gap-2 rounded-xl px-8 py-3 text-base font-semibold ${isValid() && !submitting ? 'bg-blue-700 text-white hover:bg-blue-800' : 'cursor-not-allowed bg-slate-200 text-slate-500'}`}>
+            {submitting ? <><Loader2 className="h-5 w-5 animate-spin" /> Signing...</> : <><Check className="h-5 w-5" /> {buttonLabel}</>}
           </button>
-          <p className="text-xs text-slate-500 flex items-center gap-1.5">
-            <Lock className="w-3 h-3" /> Signature, IP address, and timestamp recorded securely.
-          </p>
+          <p className="flex items-center gap-1.5 text-xs text-slate-600"><Lock className="h-3 w-3" /> Signature, IP address, and timestamp recorded securely.</p>
         </div>
       </div>
     </div>

@@ -1,0 +1,58 @@
+name: Consolidate Completed Environments Once
+
+on:
+  push:
+    branches:
+      - release/consolidated-runtime-20260810
+    paths:
+      - .github/workflows/consolidate-environments-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: release/consolidated-runtime-20260810
+
+      - name: Merge completed environments without replaying stale conflicts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin main fix/platform-studio-auth-hero-a11y audit/production-page-polish-20260809 --no-tags
+
+          # Current main contains the already-green #580 orchestration/subscription layer.
+          # Keep the consolidated release version only where the same hunk conflicts;
+          # unique main files and non-conflicting changes are brought in normally.
+          git merge --no-edit -X ours origin/main
+
+          # Bring in unique completed work from the portal/hero environment while
+          # retaining the newer consolidated runtime on overlapping portal files.
+          git merge --no-edit -X ours origin/fix/platform-studio-auth-hero-a11y
+
+          # Bring in unique completed production-polish/security work while retaining
+          # the consolidated release on overlapping routes/components.
+          git merge --no-edit -X ours origin/audit/production-page-polish-20260809
+
+          # This helper must not remain in the production tree.
+          rm -f .github/workflows/consolidate-environments-once.yml
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "merge: consolidate completed environments"
+          fi
+
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo "Unresolved merge conflicts remain:" >&2
+            git diff --name-only --diff-filter=U >&2
+            exit 1
+          fi
+
+          git push origin HEAD:release/consolidated-runtime-20260810

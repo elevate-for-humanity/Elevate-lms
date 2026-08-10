@@ -6,15 +6,20 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
+function isBlockedExternalTraining(course: { partner_name?: string | null; external_url?: string | null }) {
+  const provider = String(course.partner_name || '').toLowerCase();
+  const url = String(course.external_url || '').toLowerCase();
+  return provider.includes('coursera') || url.includes('coursera.org');
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ program: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const auth = await apiAuthGuard(request);
+  await apiAuthGuard(request);
 
   const { program: slug } = await params;
   const db = await createClient();
 
-  // Resolve slug → program id
   const { data: program, error: progErr } = await db
     .from('programs')
     .select('id')
@@ -35,5 +40,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
   if (error) return safeDbError(error, 'Failed to load external courses');
 
-  return NextResponse.json({ courses: data ?? [] });
+  const courses = (data ?? []).filter((course) => !isBlockedExternalTraining(course));
+  return NextResponse.json({ courses });
 }

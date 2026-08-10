@@ -1,48 +1,82 @@
 #!/usr/bin/env tsx
 /**
- * Schema drift auditor.
+ * Live Supabase schema contract auditor.
  *
- * Scans all TypeScript source files for Supabase .select() calls, extracts
- * column names, and cross-references against the live Supabase schema
- * (via PostgREST OpenAPI) or migration history as fallback.
+ * Scans the three deployed Next.js applications plus shared server code for
+ * PostgREST .from(...).select(...) calls and verifies referenced tables/columns
+ * against the live Supabase OpenAPI schema.
  *
  * Usage:
  *   pnpm audit:schema
- *   pnpm audit:schema:strict          # exit 1 if any drift found (CI)
- *   pnpm tsx scripts/audit-schema-drift.ts --table program_enrollments
- *   pnpm tsx scripts/audit-schema-drift.ts --source migrations  # force migration fallback
+ *   pnpm audit:schema:strict
+ *   pnpm tsx scripts/audit-schema-drift.ts --fail-on-drift --require-live
+ *   pnpm tsx scripts/audit-schema-drift.ts --table applications
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { glob } from 'glob';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '..');
 
 const args = process.argv.slice(2);
-const filterTable = args.find((a, i) => args[i - 1] === '--table') ?? null;
+const filterTable = args.find((arg, index) => args[index - 1] === '--table')?.toLowerCase() ?? null;
 const failOnDrift = args.includes('--fail-on-drift');
+const requireLive = args.includes('--require-live');
 const forceMigrations = args.includes('--source') && args[args.indexOf('--source') + 1] === 'migrations';
 
 type TableSchema = Map<string, Set<string>>;
 
-// --- Live schema via PostgREST OpenAPI (authoritative) ----------------------
+type SelectCall = {
+  file: string;
+  line: number;
+  table: string;
+  columns: string[] | 'dynamic';
+};
+
+type DriftResult = {
+  file: string;
+  line: number;
+  table: string;
+  unknownColumns: string[];
+  tableKnown: boolean;
+};
+
+function readDotEnvLocal() {
+  const result: Record<string, string> = {};
+  try {
+    const env = fs.readFileSync(path.join(ROOT, '.env.local'), 'utf8');
+    for (const line of env.split('\n')) {
+      const match = line.match(/^([^#=\s]+)=(.*)$/);
+      if (!match) continue;
+      result[match[1]] = match[2].trim().replace(/^['"]|['"]$/g, '');
+    }
+  } catch {
+    // CI and production use process.env; local file is optional.
+  }
+  return result;
+}
 
 async function fetchLiveSchema(supabaseUrl: string, serviceKey: string): Promise<TableSchema | null> {
   try {
-    const res = await fetch(`${supabaseUrl}/rest/v1/`, {
-      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    const response = await fetch(`${supabaseUrl.replace(/\/$/, '')}/rest/v1/`, {
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        Accept: 'application/openapi+json, application/json',
+      },
+      signal: AbortSignal.timeout(15_000),
     });
-    if (!res.ok) return null;
-    const swagger = await res.json() as any;
+    if (!response.ok) return null;
+
+    const swagger = (await response.json()) as any;
     const schema: TableSchema = new Map();
-    for (const [tableName, defn] of Object.entries(swagger.definitions ?? {})) {
-      const cols = new Set(
-        Object.keys((defn as any).properties ?? {}).map((c: string) => c.toLowerCase())
-      );
-      schema.set(tableName.toLowerCase(), cols);
+    for (const [tableName, definition] of Object.entries(swagger.definitions ?? {})) {
+      const properties = Object.keys((definition as any)?.properties ?? {});
+      schema.set(tableName.toLowerCase(), new Set(properties.map((column) => column.toLowerCase())));
     }
     return schema;
   } catch {
@@ -50,227 +84,209 @@ async function fetchLiveSchema(supabaseUrl: string, serviceKey: string): Promise
   }
 }
 
-// --- Migration file fallback ------------------------------------------------
-
 function parseMigrations(migrationsDir: string): TableSchema {
   const schema: TableSchema = new Map();
-  const files = fs
-    .readdirSync(migrationsDir)
-    .filter((f) => f.endsWith('.sql'))
-    .sort()
-    .map((f) => path.join(migrationsDir, f));
+  const files = glob.sync('**/*.sql', {
+    cwd: migrationsDir,
+    absolute: true,
+    ignore: ['pending/**', 'archive/**', 'archived/**', 'legacy/**'],
+  }).sort();
 
   for (const file of files) {
     const sql = fs.readFileSync(file, 'utf8');
+    let match: RegExpExecArray | null;
 
-    // CREATE TABLE
-    const createRe = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?(\w+)\s*\(([^;]+?)\);/gis;
-    let m: RegExpExecArray | null;
-    while ((m = createRe.exec(sql)) !== null) {
-      const t = m[1].toLowerCase();
-      if (!schema.has(t)) schema.set(t, new Set());
-      const lineRe = /^\s+"?(\w+)"?\s+\w/gm;
-      let lm: RegExpExecArray | null;
-      while ((lm = lineRe.exec(m[2])) !== null) {
-        const col = lm[1].toLowerCase();
-        if (!['primary','unique','check','foreign','constraint','index'].includes(col))
-          schema.get(t)!.add(col);
+    const createRe = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?"?(\w+)"?\s*\(([^;]+?)\);/gis;
+    while ((match = createRe.exec(sql)) !== null) {
+      const table = match[1].toLowerCase();
+      if (!schema.has(table)) schema.set(table, new Set());
+      const lineRe = /^\s*"?(\w+)"?\s+[A-Za-z][A-Za-z0-9_\s\[\]]*/gm;
+      let lineMatch: RegExpExecArray | null;
+      while ((lineMatch = lineRe.exec(match[2])) !== null) {
+        const column = lineMatch[1].toLowerCase();
+        if (!['primary', 'unique', 'check', 'foreign', 'constraint', 'index'].includes(column)) {
+          schema.get(table)!.add(column);
+        }
       }
     }
 
-    // ALTER TABLE ... ADD COLUMN (single-line)
-    const addRe = /ALTER\s+TABLE\s+(?:public\.)?(\w+)\s+ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
-    while ((m = addRe.exec(sql)) !== null) {
-      const t = m[1].toLowerCase();
-      if (!schema.has(t)) schema.set(t, new Set());
-      schema.get(t)!.add(m[2].toLowerCase());
-    }
-
-    // ALTER TABLE ... (multi-line ADD COLUMN block)
-    const multiRe = /ALTER\s+TABLE\s+(?:public\.)?(\w+)\s*\n([\s\S]*?)(?=;\s*\n|ALTER\s+TABLE|CREATE\s+)/gi;
-    while ((m = multiRe.exec(sql)) !== null) {
-      const t = m[1].toLowerCase();
-      const blockRe = /ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?\s+\w/gi;
-      let lm: RegExpExecArray | null;
-      while ((lm = blockRe.exec(m[2])) !== null) {
-        if (!schema.has(t)) schema.set(t, new Set());
-        schema.get(t)!.add(lm[1].toLowerCase());
-      }
+    const addRe = /ALTER\s+TABLE\s+(?:ONLY\s+)?(?:public\.)?"?(\w+)"?[\s\S]{0,300}?ADD\s+COLUMN\s+(?:IF\s+NOT\s+EXISTS\s+)?"?(\w+)"?/gi;
+    while ((match = addRe.exec(sql)) !== null) {
+      const table = match[1].toLowerCase();
+      if (!schema.has(table)) schema.set(table, new Set());
+      schema.get(table)!.add(match[2].toLowerCase());
     }
   }
+
   return schema;
 }
 
-// --- PostgREST select string parser -----------------------------------------
-//
-// Handles: nested selects `table(col)`, aliases `alias:col`, JSON paths `col->x`,
-// join hints `!inner`, aggregates `count()`.
-
-function parseSelectColumns(selectStr: string): string[] {
-  // Remove nested relational selects iteratively
-  let s = selectStr;
-  let prev = '';
-  while (prev !== s) {
-    prev = s;
-    s = s.replace(/\w+\s*\([^()]*\)/g, '');
+function parseSelectColumns(select: string): string[] {
+  let value = select;
+  let previous = '';
+  while (previous !== value) {
+    previous = value;
+    value = value.replace(/\w+(?:!\w+)?\s*\([^()]*\)/g, '');
   }
-  return s
+
+  return value
     .split(/[\s,\n]+/)
-    .map((t) => {
-      t = t.trim();
-      if (t.includes(':')) t = t.split(':').pop()!;
-      if (t.includes('->')) t = t.split('->')[0];
-      t = t.replace(/^!/, '').replace(/\(.*$/, '').replace(/[^a-z0-9_]/gi, '');
-      return t.toLowerCase();
+    .map((token) => {
+      let cleaned = token.trim();
+      if (cleaned.includes(':')) cleaned = cleaned.split(':').pop()!;
+      if (cleaned.includes('->')) cleaned = cleaned.split('->')[0];
+      cleaned = cleaned.replace(/^!/, '').replace(/\(.*$/, '').replace(/[^A-Za-z0-9_*]/g, '');
+      return cleaned.toLowerCase();
     })
-    .filter(
-      (t) =>
-        t.length > 0 &&
-        !/^(select|from|where|join|on|and|or|inner|left|right|outer|count|sum|avg|min|max|not|null|true|false)$/.test(t),
-    );
+    .filter((column) => column && column !== '*');
 }
 
-// --- Source file scanner ----------------------------------------------------
+function sourceFiles(): string[] {
+  const patterns = [
+    'apps/marketing/**/*.{ts,tsx}',
+    'apps/lms/**/*.{ts,tsx}',
+    'apps/admin/**/*.{ts,tsx}',
+    'lib/**/*.{ts,tsx}',
+    'components/**/*.{ts,tsx}',
+  ];
 
-interface SelectCall {
-  file: string;
-  line: number;
-  table: string;
-  columns: string[] | 'dynamic';
-}
-
-function extractSelectCalls(srcDirs: string[]): SelectCall[] {
-  const results: SelectCall[] = [];
-  const patterns = srcDirs.map((d) => `${d}/**/*.{ts,tsx}`);
-  const files = patterns.flatMap((p) =>
-    glob.sync(p, { ignore: ['**/node_modules/**', '**/.next/**', '**/dist/**'] }),
+  return patterns.flatMap((pattern) =>
+    glob.sync(pattern, {
+      cwd: ROOT,
+      absolute: true,
+      ignore: [
+        '**/node_modules/**',
+        '**/.next/**',
+        '**/dist/**',
+        '**/build/**',
+        '**/coverage/**',
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/__tests__/**',
+        '**/fixtures/**',
+      ],
+    }),
   );
+}
 
-  for (const file of files) {
-    const src = fs.readFileSync(file, 'utf8');
+function extractSelectCalls(): SelectCall[] {
+  const results: SelectCall[] = [];
+
+  for (const file of sourceFiles()) {
+    const source = fs.readFileSync(file, 'utf8');
     const fromRe = /\.from\(\s*['"`](\w+)['"`]\s*\)/g;
-    let fm: RegExpExecArray | null;
-    while ((fm = fromRe.exec(src)) !== null) {
-      const table = fm[1].toLowerCase();
-      if (filterTable && table !== filterTable.toLowerCase()) continue;
-      const lineNum = src.slice(0, fm.index).split('\n').length;
-      const ahead = src.slice(fm.index, fm.index + 500);
-      const selectRe = /\.select\(\s*(`[^`]*`|'[^']*'|"[^"]*"|\w+)\s*\)/;
-      const sm = selectRe.exec(ahead);
-      if (!sm) continue;
-      const raw = sm[1];
-      let columns: string[] | 'dynamic';
-      if (/^[`'"]/.test(raw)) {
-        const inner = raw.slice(1, -1);
-        columns = inner.includes('${') ? 'dynamic' : parseSelectColumns(inner);
-      } else {
-        columns = 'dynamic';
-      }
-      results.push({ file, line: lineNum, table, columns });
+    let match: RegExpExecArray | null;
+
+    while ((match = fromRe.exec(source)) !== null) {
+      const table = match[1].toLowerCase();
+      if (filterTable && table !== filterTable) continue;
+
+      const line = source.slice(0, match.index).split('\n').length;
+      const ahead = source.slice(match.index, match.index + 1200);
+      const selectMatch = ahead.match(/\.select\(\s*(`[^`]*`|'[^']*'|"[^"]*"|[A-Za-z_$][\w$]*)\s*\)/);
+      if (!selectMatch) continue;
+
+      const raw = selectMatch[1];
+      const columns: string[] | 'dynamic' = /^[`'"]/.test(raw)
+        ? raw.includes('${')
+          ? 'dynamic'
+          : parseSelectColumns(raw.slice(1, -1))
+        : 'dynamic';
+
+      results.push({ file, line, table, columns });
     }
   }
+
   return results;
 }
 
-// --- Drift detection --------------------------------------------------------
-
-interface DriftResult {
-  file: string;
-  line: number;
-  table: string;
-  unknownColumns: string[];
-  tableKnown: boolean;
-}
-
 function auditDrift(calls: SelectCall[], schema: TableSchema): DriftResult[] {
-  const drifts: DriftResult[] = [];
+  const drift: DriftResult[] = [];
   for (const call of calls) {
     if (call.columns === 'dynamic') continue;
-    const tableKnown = schema.has(call.table);
-    const knownCols = schema.get(call.table) ?? new Set<string>();
-    const directCols = call.columns.filter((c) => c.length > 0 && !c.includes(' ') && c !== '*');
-    const unknown = directCols.filter((c) => !knownCols.has(c.toLowerCase()));
-    if (!tableKnown || unknown.length > 0) {
-      drifts.push({ file: call.file, line: call.line, table: call.table, unknownColumns: unknown, tableKnown });
+    const knownColumns = schema.get(call.table);
+    if (!knownColumns) {
+      drift.push({ ...call, unknownColumns: call.columns, tableKnown: false });
+      continue;
+    }
+    const unknownColumns = call.columns.filter((column) => !knownColumns.has(column));
+    if (unknownColumns.length) {
+      drift.push({ ...call, unknownColumns, tableKnown: true });
     }
   }
-  return drifts;
+  return drift;
 }
 
-// --- Main -------------------------------------------------------------------
-
 async function main() {
-  const root = path.resolve(__dirname, '..');
-  const migrationsDir = path.join(root, 'supabase', 'migrations');
-  const srcDirs = ['app', 'lib', 'components'].map((d) => path.join(root, d));
+  const localEnv = readDotEnvLocal();
+  const supabaseUrl =
+    process.env.SUPABASE_URL ||
+    process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    localEnv.SUPABASE_URL ||
+    localEnv.NEXT_PUBLIC_SUPABASE_URL ||
+    '';
+  const serviceKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    localEnv.SUPABASE_SERVICE_ROLE_KEY ||
+    '';
 
-  // Load env
-  let supabaseUrl = '';
-  let serviceKey = '';
-  try {
-    const env = fs.readFileSync(path.join(root, '.env.local'), 'utf8');
-    for (const line of env.split('\n')) {
-      const m = line.match(/^([^#=\s]+)=(.+)/);
-      if (!m) continue;
-      if (m[1] === 'NEXT_PUBLIC_SUPABASE_URL') supabaseUrl = m[2].trim();
-      if (m[1] === 'SUPABASE_SERVICE_ROLE_KEY') serviceKey = m[2].trim();
-    }
-  } catch {}
-
-  let schema: TableSchema;
-  let schemaSource: string;
+  let schema: TableSchema | null = null;
+  let source = '';
 
   if (!forceMigrations && supabaseUrl && serviceKey) {
-    process.stdout.write('Fetching live schema from Supabase...');
-    const live = await fetchLiveSchema(supabaseUrl, serviceKey);
-    if (live) {
-      schema = live;
-      schemaSource = `live Supabase (${schema.size} tables)`;
+    process.stdout.write('Fetching live Supabase schema... ');
+    schema = await fetchLiveSchema(supabaseUrl, serviceKey);
+    if (schema) {
+      source = `live Supabase (${schema.size} relations)`;
+      console.log(source);
     } else {
-      process.stdout.write(' failed, falling back to migrations\n');
-      schema = parseMigrations(migrationsDir);
-      schemaSource = `migrations (${schema.size} tables — may have false positives)`;
+      console.log('failed');
     }
-  } else {
-    schema = parseMigrations(migrationsDir);
-    schemaSource = `migrations (${schema.size} tables — may have false positives)`;
-  }
-  console.log(` ${schemaSource}`);
-
-  process.stdout.write('Scanning source files...');
-  const calls = extractSelectCalls(srcDirs);
-  console.log(` ${calls.length} .select() calls found\n`);
-
-  const drifts = auditDrift(calls, schema);
-
-  if (drifts.length === 0) {
-    console.log('No schema drift detected.\n');
-    process.exit(0);
   }
 
-  const byTable = new Map<string, DriftResult[]>();
-  for (const d of drifts) {
-    if (!byTable.has(d.table)) byTable.set(d.table, []);
-    byTable.get(d.table)!.push(d);
-  }
-
-  console.log(`Schema drift detected in ${drifts.length} location(s):\n`);
-  for (const [table, results] of byTable) {
-    const label = results[0].tableKnown ? table : `${table} (TABLE NOT IN SCHEMA)`;
-    console.log(`  Table: ${label}`);
-    console.log(`  ${'─'.repeat(60)}`);
-    for (const r of results) {
-      const relPath = path.relative(root, r.file);
-      if (!r.tableKnown) {
-        console.log(`    ${relPath}:${r.line}  — table not found in schema`);
-      } else {
-        console.log(`    ${relPath}:${r.line}  — unknown columns: ${r.unknownColumns.join(', ')}`);
-      }
+  if (!schema) {
+    if (requireLive) {
+      console.error('FAIL: live Supabase schema is required but could not be loaded.');
+      process.exit(1);
     }
-    console.log('');
+    schema = parseMigrations(path.join(ROOT, 'supabase', 'migrations'));
+    source = `applied-migration files (${schema.size} relations; pending/archive excluded)`;
+    console.log(`Using ${source}.`);
+  }
+
+  const calls = extractSelectCalls();
+  const drift = auditDrift(calls, schema);
+
+  console.log(`Scanned ${calls.length} static Supabase select call(s) against ${source}.`);
+
+  if (!drift.length) {
+    console.log('PASS: no static table/column drift detected.');
+    return;
+  }
+
+  const grouped = new Map<string, DriftResult[]>();
+  for (const item of drift) {
+    if (!grouped.has(item.table)) grouped.set(item.table, []);
+    grouped.get(item.table)!.push(item);
+  }
+
+  console.error(`Schema drift detected in ${drift.length} source location(s):`);
+  for (const [table, items] of grouped) {
+    const tableKnown = items[0].tableKnown;
+    console.error(`\n${table}${tableKnown ? '' : ' (TABLE NOT IN LIVE SCHEMA)'}`);
+    for (const item of items) {
+      const relative = path.relative(ROOT, item.file);
+      const detail = tableKnown
+        ? `unknown column(s): ${item.unknownColumns.join(', ')}`
+        : 'table not found';
+      console.error(`  ${relative}:${item.line} — ${detail}`);
+    }
   }
 
   if (failOnDrift) process.exit(1);
 }
 
-main();
+main().catch((error) => {
+  console.error('Schema audit failed:', error instanceof Error ? error.message : String(error));
+  process.exit(1);
+});

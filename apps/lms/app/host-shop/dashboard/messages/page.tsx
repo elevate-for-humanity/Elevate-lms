@@ -1,198 +1,106 @@
-'use client';
-
-import { useState } from 'react';
 import Link from 'next/link';
-import {
-  Building2,
-  Search,
-  Send,
-  Paperclip,
-  Image,
-  MoreVertical,
-  Clock,
-  Check,
-  CheckCheck,
-} from 'lucide-react';
+import { Inbox, Mail, Send } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { createClient } from '@/lib/supabase/server';
 
-const messages = [
-  {
-    id: 1,
-    name: 'Marcus Johnson',
-    avatar: null,
-    lastMessage: 'Thank you for approving my hours!',
-    time: '2h ago',
-    unread: true,
-    messages: [
-      { from: 'them', text: 'Hi, I wanted to ask about the evaluation scheduled for next week.', time: '10:30 AM' },
-      { from: 'me', text: 'Sure, let me check the schedule and get back to you.', time: '10:35 AM' },
-      { from: 'them', text: 'Thank you for approving my hours!', time: '2h ago' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'DeShawn Williams',
-    avatar: null,
-    lastMessage: 'When is my next competency review?',
-    time: '1d ago',
-    unread: false,
-    messages: [],
-  },
-  {
-    id: 3,
-    name: 'Elevate Admin',
-    avatar: null,
-    lastMessage: 'Monthly report is ready',
-    time: '2d ago',
-    unread: false,
-    messages: [],
-  },
-];
+export const dynamic = 'force-dynamic';
 
-export default function MessagesPage() {
-  const [selectedConversation, setSelectedConversation] = useState<number | null>(1);
-  const [newMessage, setNewMessage] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+export const metadata = {
+  title: 'Messages | Host Shop Portal',
+  description: 'View messages sent to or from the signed-in host-shop account.',
+  robots: { index: false, follow: false },
+};
 
-  const currentConversation = messages.find(m => m.id === selectedConversation);
+export default async function HostShopMessagesPage() {
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const supabase = await createClient();
+
+  const { data: messages, error } = await supabase
+    .from('messages')
+    .select('id, sender_id, recipient_id, subject, body, read, is_read, created_at')
+    .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const rows = messages ?? [];
+  const inbox = rows.filter((message) => message.recipient_id === user.id);
+  const sent = rows.filter((message) => message.sender_id === user.id);
+  const unread = inbox.filter((message) => !(message.is_read ?? message.read)).length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <Link href="/host-shop/dashboard" className="w-10 h-10 bg-gradient-to-br from-brand-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-white" />
-              </Link>
-              <div>
-                <p className="font-bold text-slate-900">Elevate</p>
-                <p className="text-xs text-slate-500">Messages</p>
-              </div>
-            </div>
-          </div>
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Host Shop</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Messages</h1>
+          <p className="mt-2 text-slate-600">Real messages associated with this signed-in account. Demo conversations have been removed.</p>
         </div>
-      </header>
+        <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+          Back to board
+        </Link>
+      </div>
 
-      <div className="max-w-[1600px] mx-auto">
-        <div className="flex h-[calc(100vh-4rem)]">
-          {/* Conversations List */}
-          <div className="w-80 border-r border-slate-200 bg-white flex flex-col">
-            <div className="p-4 border-b border-slate-200">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search messages..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-xl text-sm"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {messages.map((msg) => (
-                <button
-                  key={msg.id}
-                  onClick={() => setSelectedConversation(msg.id)}
-                  className={`w-full p-4 flex items-start gap-3 hover:bg-slate-50 transition border-b border-slate-100 ${
-                    selectedConversation === msg.id ? 'bg-brand-blue-50' : ''
-                  }`}
-                >
-                  <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-brand-blue-600 font-semibold">{msg.name.charAt(0)}</span>
-                  </div>
-                  <div className="flex-1 min-w-0 text-left">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`font-semibold ${msg.unread ? 'text-slate-900' : 'text-slate-700'}`}>{msg.name}</span>
-                      <span className="text-xs text-slate-400">{msg.time}</span>
-                    </div>
-                    <p className={`text-sm truncate ${msg.unread ? 'text-slate-900 font-medium' : 'text-slate-500'}`}>
-                      {msg.lastMessage}
-                    </p>
-                  </div>
-                  {msg.unread && <div className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0 mt-2" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col bg-white">
-            {currentConversation ? (
-              <>
-                {/* Chat Header */}
-                <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-brand-blue-600 font-semibold">{currentConversation.name.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-slate-900">{currentConversation.name}</p>
-                      <p className="text-xs text-slate-500">Active now</p>
-                    </div>
-                  </div>
-                  <button className="p-2 hover:bg-slate-100 rounded-lg">
-                    <MoreVertical className="w-5 h-5 text-slate-400" />
-                  </button>
-                </div>
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {currentConversation.messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[70%] rounded-2xl px-4 py-3 ${
-                        msg.from === 'me' 
-                          ? 'bg-brand-blue-600 text-white rounded-br-md' 
-                          : 'bg-slate-100 text-slate-900 rounded-bl-md'
-                      }`}>
-                        <p className="text-sm">{msg.text}</p>
-                        <div className={`flex items-center gap-1 mt-1 text-xs ${
-                          msg.from === 'me' ? 'text-white/70 justify-end' : 'text-slate-400'
-                        }`}>
-                          {msg.time}
-                          {msg.from === 'me' && <CheckCheck className="w-3 h-3" />}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Input */}
-                <div className="p-4 border-t border-slate-200">
-                  <div className="flex items-center gap-3">
-                    <button className="p-2 hover:bg-slate-100 rounded-lg">
-                      <Paperclip className="w-5 h-5 text-slate-400" />
-                    </button>
-                    <button className="p-2 hover:bg-slate-100 rounded-lg">
-                      <Image className="w-5 h-5 text-slate-400" />
-                    </button>
-                    <input
-                      type="text"
-                      placeholder="Type a message..."
-                      value={newMessage}
-                      onChange={(e) => setNewMessage(e.target.value)}
-                      className="flex-1 px-4 py-2 bg-slate-100 rounded-xl text-sm"
-                    />
-                    <button className="p-2 bg-brand-blue-600 text-white rounded-xl hover:bg-brand-blue-700">
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="flex-1 flex items-center justify-center text-slate-500">
-                <div className="text-center">
-                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-10 h-10" />
-                  </div>
-                  <p className="font-semibold">Select a conversation</p>
-                  <p className="text-sm">Choose a message thread to view</p>
-                </div>
-              </div>
-            )}
-          </div>
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Inbox className="h-5 w-5 text-brand-blue-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{inbox.length}</p>
+          <p className="text-sm text-slate-600">Inbox</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Mail className="h-5 w-5 text-amber-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{unread}</p>
+          <p className="text-sm text-slate-600">Unread</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <Send className="h-5 w-5 text-brand-green-700" />
+          <p className="mt-3 text-3xl font-black text-slate-950">{sent.length}</p>
+          <p className="text-sm text-slate-600">Sent</p>
         </div>
       </div>
-    </div>
+
+      {error ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+          Message data could not be loaded. No sample conversations are being substituted.
+        </div>
+      ) : null}
+
+      <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
+          <h2 className="font-black text-slate-950">Recent activity</h2>
+        </div>
+        {rows.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <Mail className="mx-auto h-10 w-10 text-slate-300" />
+            <h3 className="mt-3 font-bold text-slate-900">No messages yet</h3>
+            <p className="mt-1 text-sm text-slate-500">Messages created for this account will appear here.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-200">
+            {rows.map((message) => {
+              const received = message.recipient_id === user.id;
+              const isUnread = received && !(message.is_read ?? message.read);
+              return (
+                <article key={message.id} className="px-5 py-4 sm:px-6">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black uppercase tracking-wide text-slate-500">{received ? 'Received' : 'Sent'}</span>
+                        {isUnread ? <span className="rounded-full bg-brand-blue-100 px-2 py-0.5 text-xs font-bold text-brand-blue-800">Unread</span> : null}
+                      </div>
+                      <h3 className="mt-1 font-black text-slate-950">{message.subject || 'Message'}</h3>
+                      <p className="mt-1 max-w-3xl whitespace-pre-wrap text-sm text-slate-600">{message.body || 'No message body.'}</p>
+                    </div>
+                    <time className="whitespace-nowrap text-xs text-slate-500">
+                      {message.created_at ? new Date(message.created_at).toLocaleString() : 'Date unavailable'}
+                    </time>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

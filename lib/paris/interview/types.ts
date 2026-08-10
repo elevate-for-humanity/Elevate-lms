@@ -1,4 +1,4 @@
-// Interview Types for PARS Interview Engine
+// Interview Types for PARIS Interview Engine
 
 export interface InterviewQuestion {
   id: string;
@@ -35,11 +35,14 @@ export interface InterviewScore {
   eligibility: 'eligible' | 'review' | 'denied';
 }
 
+/** Dates are Date objects in memory and ISO strings when persisted. */
+export type InterviewTimestamp = Date | string;
+
 export interface ConversationMessage {
   id: string;
   role: 'paris' | 'applicant';
   content: string;
-  timestamp: Date;
+  timestamp: InterviewTimestamp;
   questionId?: string;
   score?: number;
 }
@@ -52,8 +55,8 @@ export interface InterviewSession {
   messages: ConversationMessage[];
   responses: Record<string, string>;
   status: 'not_started' | 'in_progress' | 'completed' | 'abandoned';
-  startedAt: Date;
-  completedAt?: Date;
+  startedAt: InterviewTimestamp;
+  completedAt?: InterviewTimestamp;
 }
 
 export interface FundingOption {

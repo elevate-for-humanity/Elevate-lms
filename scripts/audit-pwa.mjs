@@ -13,12 +13,12 @@ const readJson = (rel) => { try { return JSON.parse(readFileSync(join(ROOT, rel)
 const exists = (rel) => { try { statSync(join(ROOT, rel)); return true; } catch { return false; } };
 
 const APPS = [
-  ['marketing', 'apps/marketing/app/layout.tsx', 'public/manifest-marketing.json', 'public/sw-marketing.js', 'MarketingPwaRegistration'],
+  ['marketing', 'apps/marketing/app/layout.tsx', 'public/manifest-marketing.json', 'public/sw-marketing.js', 'MarketingPwaClient'],
   ['admin', 'apps/admin/app/layout.tsx', 'public/manifest-admin.json', 'public/sw-admin.js', 'AdminPwaRegister'],
   ['lms', 'apps/lms/app/layout.tsx', 'public/manifest-lms.json', 'public/sw-lms.js', 'LmsPwaRegistration'],
   ['app (portal)', 'apps/app/layout.tsx', 'public/manifest-portal.json', 'public/sw-portal.js', 'PortalPwaRegistration'],
 ];
-const PWA_COMPONENTS = ['AdminPwaRegister', 'MarketingPwaRegistration', 'LmsPwaRegistration', 'PortalPwaRegistration', 'ServiceWorkerRegistration', 'PWAManager'];
+const PWA_COMPONENTS = ['AdminPwaRegister', 'MarketingPwaClient', 'MarketingPwaRegistration', 'LmsPwaRegistration', 'PortalPwaRegistration', 'ServiceWorkerRegistration', 'PWAManager'];
 const PERSONAS = [
   ['Learner', 'apps/lms/app/lms/layout.tsx', 'public/manifest-student.json', '/manifest-student.json', '/lms/dashboard', '/lms', 'lms'],
   ['Apprentice', 'apps/lms/app/apprentice/layout.tsx', 'public/manifest-apprentice.json', '/manifest-apprentice.json', '/apprentice', '/apprentice', 'lms'],

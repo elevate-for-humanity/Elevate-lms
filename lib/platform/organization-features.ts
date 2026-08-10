@@ -2,7 +2,6 @@ import type { SupabaseClient } from '@/lib/supabase';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
   ADDON_FEATURE_FALLBACK,
-  FEATURES,
   PLAN_FEATURE_FALLBACK,
   PLAN_LIMITS_FALLBACK,
   normalizeAddonCode,
@@ -25,7 +24,6 @@ export interface OrganizationEntitlements {
 export class FeatureUpgradeRequiredError extends Error {
   readonly statusCode = 403;
   readonly feature: string;
-
   constructor(feature: string) {
     super(`Upgrade required: feature "${feature}" is not on your plan.`);
     this.name = 'FeatureUpgradeRequiredError';
@@ -40,30 +38,19 @@ function addFeature(featureSet: Set<FeatureCode>, raw: string | null | undefined
 }
 
 function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
-  for (const feature of ADDON_FEATURE_FALLBACK[addonCode] ?? []) {
-    featureSet.add(feature);
-  }
+  for (const feature of ADDON_FEATURE_FALLBACK[addonCode] ?? []) featureSet.add(feature);
 }
 
-/**
- * Load merged feature codes for an organization (tenant).
- * DB plan/add-on definitions are preferred; code-side fallbacks keep recently
- * introduced capabilities usable during catalog migration/deployment windows.
- */
 export async function getOrganizationFeatures(
   organizationId: string,
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const supabase = client ?? (await requireAdminClient());
-  if (!supabase) {
-    return emptyEntitlements(organizationId);
-  }
+  if (!supabase) return emptyEntitlements(organizationId);
 
   const { data: orgSub } = await supabase
     .from('organization_subscriptions')
-    .select(
-      'status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )',
-    )
+    .select('status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )')
     .eq('organization_id', organizationId)
     .maybeSingle();
 
@@ -71,7 +58,6 @@ export async function getOrganizationFeatures(
   const planRow = Array.isArray(planJoin) ? planJoin[0] : planJoin;
   const planSlug = planRow?.slug ?? null;
   const planId = orgSub?.plan_id as string | undefined;
-
   const featureSet = new Set<FeatureCode>();
 
   if (planId) {
@@ -80,17 +66,15 @@ export async function getOrganizationFeatures(
       .select('features ( code )')
       .eq('plan_id', planId);
 
-    if (planFeatureRows?.length) {
-      for (const row of planFeatureRows) {
-        const f = row.features as { code: string } | { code: string }[] | null;
-        const codes = Array.isArray(f) ? f : f ? [f] : [];
-        for (const c of codes) addFeature(featureSet, c?.code);
-      }
+    for (const row of planFeatureRows ?? []) {
+      const joined = row.features as { code: string } | { code: string }[] | null;
+      const codes = Array.isArray(joined) ? joined : joined ? [joined] : [];
+      for (const feature of codes) addFeature(featureSet, feature?.code);
     }
   }
 
   if (featureSet.size === 0 && planSlug && planSlug in PLAN_FEATURE_FALLBACK) {
-    PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
+    PLAN_FEATURE_FALLBACK[planSlug].forEach((code) => featureSet.add(code));
   }
 
   const { data: addonRows } = await supabase
@@ -103,8 +87,12 @@ export async function getOrganizationFeatures(
   for (const row of addonRows ?? []) {
     const addonCode = normalizeAddonCode(row.addon_code);
     activeAddonCodes.push(addonCode);
-    const cat = row.saas_addon_catalog as { feature_codes: string[] } | null;
-    const dbFeatureCodes = cat?.feature_codes ?? [];
+    const catalogJoin = row.saas_addon_catalog as
+      | { feature_codes: string[] | null }
+      | { feature_codes: string[] | null }[]
+      | null;
+    const catalog = Array.isArray(catalogJoin) ? catalogJoin[0] : catalogJoin;
+    const dbFeatureCodes = catalog?.feature_codes ?? [];
     for (const code of dbFeatureCodes) addFeature(featureSet, code);
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);
   }
@@ -115,16 +103,16 @@ export async function getOrganizationFeatures(
     .eq('tenant_id', organizationId)
     .eq('status', 'active');
 
-  for (const leg of legacyAddons ?? []) {
-    const code = normalizeAddonCode(leg.addon_slug);
+  for (const legacy of legacyAddons ?? []) {
+    const code = normalizeAddonCode(legacy.addon_slug);
     if (!activeAddonCodes.includes(code)) activeAddonCodes.push(code);
-    const { data: cat } = await supabase
+    const { data: catalog } = await supabase
       .from('saas_addon_catalog')
       .select('feature_codes')
       .eq('code', code)
       .maybeSingle();
-    const dbFeatureCodes = cat?.feature_codes ?? [];
-    for (const c of dbFeatureCodes) addFeature(featureSet, c);
+    const dbFeatureCodes = catalog?.feature_codes ?? [];
+    for (const featureCode of dbFeatureCodes) addFeature(featureSet, featureCode);
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
   }
 
@@ -135,7 +123,7 @@ export async function getOrganizationFeatures(
       .eq('tenant_id', organizationId)
       .eq('status', 'active')
       .maybeSingle();
-    for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
+    for (const feature of (license?.features as string[]) ?? []) addFeature(featureSet, feature);
   }
 
   const limits: PlanLimits =
@@ -167,13 +155,9 @@ function emptyEntitlements(organizationId: string): OrganizationEntitlements {
   };
 }
 
-export function organizationHasFeature(
-  entitlements: OrganizationEntitlements,
-  feature: string,
-): boolean {
+export function organizationHasFeature(entitlements: OrganizationEntitlements, feature: string): boolean {
   const requested = normalizeFeatureCode(feature);
-  if (!requested) return false;
-  return entitlements.features.includes(requested);
+  return requested ? entitlements.features.includes(requested) : false;
 }
 
 export async function requireFeature(
@@ -182,8 +166,6 @@ export async function requireFeature(
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const entitlements = await getOrganizationFeatures(organizationId, client);
-  if (!organizationHasFeature(entitlements, feature)) {
-    throw new FeatureUpgradeRequiredError(feature);
-  }
+  if (!organizationHasFeature(entitlements, feature)) throw new FeatureUpgradeRequiredError(feature);
   return entitlements;
 }

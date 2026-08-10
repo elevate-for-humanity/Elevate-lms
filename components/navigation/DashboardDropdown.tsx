@@ -8,21 +8,23 @@ import {
   Building2,
   ChevronDown,
   GraduationCap,
+  Heart,
   LayoutDashboard,
   Loader2,
   Palette,
   Shield,
   Users,
+  Wrench,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { getRoleDestinationUrl } from '@/lib/auth/role-destinations';
-import { PortalRouter } from '@/lib/routing/portal-router';
-import { MARKETING_HOST } from '@/lib/routing/portal-map';
+import { getRoleDestinationUrl, getRolesForPortal } from '@/lib/auth/role-destinations';
+import { PortalRouter, type PortalKey } from '@/lib/routing/portal-router';
 import { logger } from '@/lib/logger';
 
 interface Dashboard {
   id: string;
+  portalKey: PortalKey;
   name: string;
   href: string;
   icon: string;
@@ -31,6 +33,8 @@ interface Dashboard {
   roles: string[];
   order_index: number;
 }
+
+interface DashboardDefinition extends Omit<Dashboard, 'href' | 'roles'> {}
 
 interface Props {
   className?: string;
@@ -45,144 +49,37 @@ const ICON_MAP: Record<string, LucideIcon> = {
   BookOpen,
   Palette,
   LayoutDashboard,
+  Heart,
+  Wrench,
 };
 
 /**
- * Canonical dashboard inventory. Host/path ownership comes from PortalRouter;
- * there is no second database-driven route registry to drift out of sync.
+ * UI metadata only. Route ownership and role access are derived from the
+ * canonical portal/role registries and are not duplicated here.
  */
-const DEFAULT_DASHBOARDS: Dashboard[] = [
-  {
-    id: 'student',
-    name: 'My Learning',
-    href: PortalRouter.get('lms'),
-    icon: 'GraduationCap',
-    description: 'Courses, progress, and certificates',
-    color: 'text-brand-blue-600',
-    roles: ['student', 'delegate', 'grant_client'],
-    order_index: 1,
-  },
-  {
-    id: 'apprentice',
-    name: 'Apprentice Portal',
-    href: PortalRouter.get('apprentice'),
-    icon: 'BookOpen',
-    description: 'OJT hours, RTI, documents, and competencies',
-    color: 'text-indigo-600',
-    roles: ['apprentice'],
-    order_index: 2,
-  },
-  {
-    id: 'instructor',
-    name: 'Instructor Portal',
-    href: PortalRouter.get('instructor'),
-    icon: 'BookOpen',
-    description: 'Students, submissions, and courses',
-    color: 'text-indigo-600',
-    roles: ['instructor'],
-    order_index: 3,
-  },
-  {
-    id: 'employer',
-    name: 'Employer Portal',
-    href: PortalRouter.get('employer'),
-    icon: 'Briefcase',
-    description: 'Jobs, candidates, and apprentices',
-    color: 'text-brand-orange-600',
-    roles: ['employer', 'sponsor'],
-    order_index: 4,
-  },
-  {
-    id: 'host-shop',
-    name: 'Host Shop Portal',
-    href: PortalRouter.get('hostshop'),
-    icon: 'Building2',
-    description: 'Apprentices, hours, documents, and compliance',
-    color: 'text-purple-600',
-    roles: ['partner', 'host_shop', 'host_shop_admin'],
-    order_index: 5,
-  },
-  {
-    id: 'program-holder',
-    name: 'Program Holder',
-    href: PortalRouter.get('programholder'),
-    icon: 'Building2',
-    description: 'Programs, students, hours, and documents',
-    color: 'text-purple-600',
-    roles: ['program_holder'],
-    order_index: 6,
-  },
-  {
-    id: 'provider',
-    name: 'Provider Portal',
-    href: PortalRouter.get('provider'),
-    icon: 'Building2',
-    description: 'Programs, enrollments, and compliance',
-    color: 'text-purple-600',
-    roles: ['provider_admin'],
-    order_index: 7,
-  },
-  {
-    id: 'case-manager',
-    name: 'Case Manager',
-    href: PortalRouter.get('casemanager'),
-    icon: 'Users',
-    description: 'Caseload and workforce placements',
-    color: 'text-brand-green-600',
-    roles: ['case_manager'],
-    order_index: 8,
-  },
-  {
-    id: 'workforce-board',
-    name: 'Workforce Board',
-    href: PortalRouter.get('workforceboard'),
-    icon: 'LayoutDashboard',
-    description: 'Regional workforce oversight',
-    color: 'text-slate-600',
-    roles: ['workforce_board'],
-    order_index: 9,
-  },
-  {
-    id: 'staff',
-    name: 'Staff Portal',
-    href: PortalRouter.get('staff'),
-    icon: 'Users',
-    description: 'Students, attendance, and operations',
-    color: 'text-brand-green-600',
-    roles: ['staff'],
-    order_index: 10,
-  },
-  {
-    id: 'testing',
-    name: 'Testing Center',
-    href: PortalRouter.get('testing'),
-    icon: 'Shield',
-    description: 'Bookings, sessions, slots, and proctoring',
-    color: 'text-brand-red-600',
-    roles: ['test_admin', 'proctor'],
-    order_index: 11,
-  },
-  {
-    id: 'creator',
-    name: 'Creator Studio',
-    href: `${MARKETING_HOST}/creator/products`,
-    icon: 'Palette',
-    description: 'Build and publish learning products',
-    color: 'text-pink-600',
-    roles: ['creator'],
-    order_index: 12,
-  },
-  {
-    id: 'admin',
-    name: 'Admin',
-    href: PortalRouter.get('admin'),
-    icon: 'Shield',
-    description: 'Platform administration',
-    color: 'text-brand-red-600',
-    roles: ['admin', 'org_admin'],
-    order_index: 13,
-  },
+const DASHBOARD_DEFINITIONS: DashboardDefinition[] = [
+  { id: 'student', portalKey: 'lms', name: 'My Learning', icon: 'GraduationCap', description: 'Courses, progress, and certificates', color: 'text-brand-blue-600', order_index: 1 },
+  { id: 'apprentice', portalKey: 'apprentice', name: 'Apprentice Portal', icon: 'BookOpen', description: 'OJT hours, RTI, documents, and competencies', color: 'text-indigo-600', order_index: 2 },
+  { id: 'host-shop', portalKey: 'hostshop', name: 'Host Shop Portal', icon: 'Building2', description: 'Apprentices, hours, documents, and compliance', color: 'text-purple-600', order_index: 3 },
+  { id: 'employer', portalKey: 'employer', name: 'Employer Portal', icon: 'Briefcase', description: 'Jobs, candidates, and apprentices', color: 'text-brand-orange-600', order_index: 4 },
+  { id: 'parent', portalKey: 'parent', name: 'Parent Portal', icon: 'Heart', description: 'Student progress and communications', color: 'text-pink-600', order_index: 5 },
+  { id: 'workforce', portalKey: 'workforce', name: 'Workforce Portal', icon: 'Wrench', description: 'Workforce development and job training', color: 'text-slate-600', order_index: 6 },
+  { id: 'instructor', portalKey: 'instructor', name: 'Instructor Portal', icon: 'BookOpen', description: 'Students, submissions, and courses', color: 'text-indigo-600', order_index: 7 },
+  { id: 'staff', portalKey: 'staff', name: 'Staff Portal', icon: 'Users', description: 'Students, attendance, and operations', color: 'text-brand-green-600', order_index: 8 },
+  { id: 'testing', portalKey: 'testing', name: 'Testing Center', icon: 'Shield', description: 'Bookings, sessions, slots, and proctoring', color: 'text-brand-red-600', order_index: 9 },
+  { id: 'program-holder', portalKey: 'programholder', name: 'Program Holder', icon: 'Building2', description: 'Programs, students, hours, and documents', color: 'text-purple-600', order_index: 10 },
+  { id: 'provider', portalKey: 'provider', name: 'Provider Portal', icon: 'Building2', description: 'Programs, enrollments, and compliance', color: 'text-purple-600', order_index: 11 },
+  { id: 'case-manager', portalKey: 'casemanager', name: 'Case Manager', icon: 'Users', description: 'Caseload and workforce placements', color: 'text-brand-green-600', order_index: 12 },
+  { id: 'workforce-board', portalKey: 'workforceboard', name: 'Workforce Board', icon: 'LayoutDashboard', description: 'Regional workforce oversight', color: 'text-slate-600', order_index: 13 },
+  { id: 'creator', portalKey: 'creator', name: 'Creator Studio', icon: 'Palette', description: 'Build and publish learning products', color: 'text-pink-600', order_index: 14 },
+  { id: 'admin', portalKey: 'admin', name: 'Admin', icon: 'Shield', description: 'Platform administration', color: 'text-brand-red-600', order_index: 15 },
 ];
+
+const DEFAULT_DASHBOARDS: Dashboard[] = DASHBOARD_DEFINITIONS.map((dashboard) => ({
+  ...dashboard,
+  href: PortalRouter.get(dashboard.portalKey),
+  roles: getRolesForPortal(dashboard.portalKey),
+}));
 
 export function DashboardDropdown({ className }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -224,7 +121,6 @@ export function DashboardDropdown({ className }: Props) {
 
         setPrimaryRole(profileRole);
         setUserRoles(Array.from(new Set([profileRole, ...jsonRoles, ...secondaryRoles])));
-
         setRecentDashboards(
           (recentVisits || [])
             .map((visit: any) => visit.metadata?.dashboard_href)
@@ -241,10 +137,7 @@ export function DashboardDropdown({ className }: Props) {
   }, []);
 
   const filteredDashboards = useMemo(() => {
-    if (userRoles.includes('admin') || userRoles.includes('org_admin')) {
-      return DEFAULT_DASHBOARDS;
-    }
-
+    if (userRoles.includes('admin') || userRoles.includes('org_admin')) return DEFAULT_DASHBOARDS;
     return DEFAULT_DASHBOARDS.filter((dashboard) =>
       dashboard.roles.some((role) => userRoles.includes(role)),
     );
@@ -278,11 +171,11 @@ export function DashboardDropdown({ className }: Props) {
         metadata: { dashboard_href: dashboard.href, dashboard_name: dashboard.name },
       });
     } catch {
-      // Navigation must never fail because telemetry could not be recorded.
+      // Telemetry must never block navigation.
     }
   };
 
-  const myDashboardHref = getRoleDestinationUrl(primaryRole);
+  const myDashboardHref = getRoleDestinationUrl(primaryRole, userRoles);
 
   return (
     <div className={`relative ${className || ''}`}>
@@ -304,32 +197,22 @@ export function DashboardDropdown({ className }: Props) {
                 <span>Your Dashboards</span>
                 {loading && <Loader2 className="w-3 h-3 animate-spin" />}
               </div>
-
               <div className="space-y-1 max-h-96 overflow-y-auto">
                 {sortedDashboards.map((dashboard) => {
                   const Icon = ICON_MAP[dashboard.icon] || LayoutDashboard;
                   const isRecent = recentDashboards.includes(dashboard.href);
-
                   return (
                     <Link
                       key={dashboard.id}
                       href={dashboard.href}
                       onClick={() => void trackVisit(dashboard)}
-                      className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition group ${
-                        isRecent ? 'bg-brand-blue-50/50' : ''
-                      }`}
+                      className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition group ${isRecent ? 'bg-brand-blue-50/50' : ''}`}
                     >
-                      <Icon
-                        className={`w-5 h-5 mt-0.5 ${dashboard.color} group-hover:scale-110 transition`}
-                      />
+                      <Icon className={`w-5 h-5 mt-0.5 ${dashboard.color} group-hover:scale-110 transition`} />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-slate-900 group-hover:text-brand-blue-600 flex items-center gap-2">
                           {dashboard.name}
-                          {isRecent && (
-                            <span className="text-xs bg-brand-blue-100 text-brand-blue-600 px-1.5 py-0.5 rounded">
-                              Recent
-                            </span>
-                          )}
+                          {isRecent && <span className="text-xs bg-brand-blue-100 text-brand-blue-600 px-1.5 py-0.5 rounded">Recent</span>}
                         </div>
                         <div className="text-xs text-slate-500">{dashboard.description}</div>
                       </div>
@@ -338,7 +221,6 @@ export function DashboardDropdown({ className }: Props) {
                 })}
               </div>
             </div>
-
             <div className="border-t border-slate-200 p-2 bg-slate-50">
               <Link
                 href={myDashboardHref}

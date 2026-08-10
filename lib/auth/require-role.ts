@@ -1,6 +1,11 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
+import {
+  hasAnyRole,
+  normalizeRoles,
+  type UserRole,
+} from '@/lib/rbac/role-matrix';
 
 export interface AuthResult {
   user: {
@@ -16,7 +21,7 @@ export interface AuthResult {
     last_name?: string;
     full_name?: string;
   };
-  /** All roles this user holds (profile.role + any user_roles entries). */
+  /** All normalized roles this user holds (profile.role + user_roles). */
   effectiveRoles: string[];
 }
 
@@ -49,19 +54,24 @@ async function resolveCurrentPath(): Promise<string> {
 }
 
 /**
- * Require user to have one of the specified roles.
+ * Canonical role guard for portal pages.
  *
- * Authentication always enters through /login. Marketing /login performs a
- * same-purpose handoff to the canonical LMS login; the LMS owns the login UI.
- * Do not send shared portal code to the removed /admin-login alias.
+ * - Reads both profile.role and user_roles.
+ * - Normalizes historical aliases (sponsor→employer, host_shop_admin→host_shop,
+ *   barber_apprentice→apprentice, etc.).
+ * - Admin/super_admin have platform-wide portal override; tenant-sensitive data
+ *   loaders must still require a concrete tenant/partner context.
  */
-export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
+export async function requireRole(
+  allowedRoles: readonly (UserRole | string)[],
+): Promise<AuthResult> {
   const supabase = await createClient();
   const {
     data: { user },
+    error: authError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !user) {
     const currentPath = await resolveCurrentPath();
     if (currentPath) {
       redirect(`/login?redirect=${encodeURIComponent(currentPath)}`);
@@ -69,26 +79,28 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!profile) redirect('/unauthorized');
+  if (profileError || !profile) redirect('/unauthorized');
 
   const { data: userRoleRows } = await supabase
     .from('user_roles')
     .select('roles(name)')
     .eq('user_id', user.id);
+
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
-    .filter(Boolean) as string[];
+    .filter((role: unknown): role is string => typeof role === 'string');
 
-  const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles]));
-  const allowed = effectiveRoles.some((role) => allowedRoles.includes(role));
+  const effectiveRoles = normalizeRoles([profile.role, ...secondaryRoles]);
 
-  if (!allowed) redirect('/unauthorized');
+  if (!hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true })) {
+    redirect('/unauthorized');
+  }
 
   return {
     user: {
@@ -100,7 +112,7 @@ export async function requireRole(allowedRoles: string[]): Promise<AuthResult> {
   };
 }
 
-export async function hasRole(requiredRole: string): Promise<boolean> {
+export async function hasRole(requiredRole: UserRole | string): Promise<boolean> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -114,15 +126,15 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
     .eq('id', user.id)
     .maybeSingle();
 
-  // Admin is the single platform-wide privileged role.
-  if (profile?.role === requiredRole || profile?.role === 'admin') {
-    return true;
-  }
-
   const { data: userRoleRows } = await supabase
     .from('user_roles')
     .select('roles(name)')
     .eq('user_id', user.id);
 
-  return (userRoleRows || []).some((row: any) => row.roles?.name === requiredRole);
+  const secondaryRoles = (userRoleRows || [])
+    .map((row: any) => row.roles?.name)
+    .filter((role: unknown): role is string => typeof role === 'string');
+  const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
+
+  return hasAnyRole(effectiveRoles, [requiredRole], { adminOverride: true });
 }

@@ -62,36 +62,67 @@ export async function getHostShopBoard(userId: string) {
     .filter((shop: any) => Boolean(shop?.id) && shop.active !== false);
   const shopIds = shops.map((shop: any) => shop.id);
 
-  const { data: placements } = shopIds.length
+  const { data: placements, error: placementsError } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        .select('id, student_id, shop_id, discipline, status, start_date, profiles(full_name, email)')
+        // Live canonical schema uses program_slug; the retired discipline column
+        // is not present and caused this board query to fail at runtime.
+        .select('id, student_id, shop_id, program_slug, status, start_date, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
-    : { data: [] };
+    : { data: [], error: null };
+
+  if (placementsError) {
+    throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
+  }
 
   const apprentices = (placements || []).map((placement: any) => ({
     id: placement.id,
     student_id: placement.student_id,
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
-    discipline: placement.discipline,
+    program_slug: placement.program_slug || null,
+    // Keep the legacy UI property populated while the component contract is
+    // migrated; its value now comes from the canonical placement program_slug.
+    discipline: placement.program_slug || null,
     start_date: placement.start_date,
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
+  const programByStudent = new Map(
+    apprentices.map((apprentice) => [apprentice.student_id, apprentice.program_slug]),
+  );
+
+  // Canonical OJT ledger: approved hour_entries are the same records used by
+  // the apprentice portal. Do not read the empty legacy ojt_placements table,
+  // otherwise Host Shop and Apprentice dashboards disagree for the same user.
   const ojtProgress: Record<string, { completed: number; required: number }> = {};
   if (studentIds.length) {
-    const { data: ojt } = await db
-      .from('ojt_placements')
-      .select('student_id, total_hours_completed, total_hours_required')
-      .in('student_id', studentIds)
-      .eq('status', 'active');
-    for (const row of ojt || []) {
-      ojtProgress[row.student_id] = {
-        completed: Number(row.total_hours_completed || 0),
-        required: Number(row.total_hours_required || 2000),
-      };
+    const { data: approvedHours, error: approvedHoursError } = await db
+      .from('hour_entries')
+      .select('user_id, program_slug, accepted_hours, hours, hours_claimed')
+      .in('user_id', studentIds)
+      .eq('status', 'approved');
+
+    if (approvedHoursError) {
+      throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${approvedHoursError.message}`);
+    }
+
+    for (const studentId of studentIds) {
+      const programSlug = programByStudent.get(studentId) || '';
+      const target = TRADE_TARGETS[programSlug]?.hours ?? 2000;
+      ojtProgress[studentId] = { completed: 0, required: target };
+    }
+
+    for (const row of approvedHours || []) {
+      if (!row.user_id || !ojtProgress[row.user_id]) continue;
+      const expectedProgram = programByStudent.get(row.user_id);
+      if (expectedProgram && row.program_slug && row.program_slug !== expectedProgram) continue;
+
+      const accepted = Number(row.accepted_hours ?? row.hours ?? row.hours_claimed ?? 0);
+      if (Number.isFinite(accepted) && accepted > 0) {
+        ojtProgress[row.user_id].completed += accepted;
+      }
     }
   }
 
@@ -107,7 +138,7 @@ export async function getHostShopBoard(userId: string) {
     pendingHoursCount = count || 0;
   }
 
-  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.discipline });
+  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.program_slug });
   const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 

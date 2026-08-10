@@ -62,8 +62,6 @@ function isPendingHour(row: HourEntryRow): boolean {
 }
 
 function isEntryForAssignedShop(row: HourEntryRow, shopIds: string[]): boolean {
-  // Legacy rows can be missing host_shop_id. The student id is still safe here
-  // because the student set is derived only from this partner's active placements.
   return !row.host_shop_id || shopIds.includes(row.host_shop_id);
 }
 
@@ -137,8 +135,6 @@ async function loadBoardForPartner(
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
-  // hour_entries is the canonical OJT ledger. ojt_placements is not required
-  // for progress and may be empty in production.
   const ojtCompletedByUser: Record<string, number> = {};
   let pendingHoursCount = 0;
 
@@ -190,11 +186,17 @@ async function loadBoardForPartner(
     .in('state', [partner.state || 'Indiana', 'ALL']);
 
   const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
-  const { data: uploadedDocs } = await db
+  const { data: uploadedDocs, error: documentLoadError } = await db
     .from('partner_documents')
-    .select('id, document_type, file_name, status, rejection_reason, expires_at')
+    .select(
+      'id, document_type, display_name, file_name, status, rejection_reason, expires_at:expiration_date, uploaded_at',
+    )
     .eq('partner_id', partner.id)
-    .order('created_at', { ascending: false });
+    .order('uploaded_at', { ascending: false });
+
+  if (documentLoadError) {
+    throw new Error(`HOST_SHOP_DOCUMENTS_LOAD_FAILED:${documentLoadError.message}`);
+  }
 
   const latestDocs = new Map<string, any>();
   for (const doc of uploadedDocs || []) {
@@ -255,7 +257,6 @@ async function loadBoardForPartner(
   };
 }
 
-/** Host-shop user path: requires the user's active partner assignment. */
 export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
   const { data: partnerLink, error: partnerLinkError } = await db
@@ -274,11 +275,6 @@ export async function getHostShopBoard(userId: string) {
   return loadBoardForPartner(partnerLink.partners as unknown as PartnerRecord, { userId });
 }
 
-/**
- * Admin-only preview loader. The caller MUST enforce admin authorization before
- * invoking this function. An explicit partner id is required; there is never an
- * implicit/random tenant selection.
- */
 export async function getHostShopBoardForPartner(partnerId: string) {
   const db = await requireAdminClient();
   const { data: partner, error } = await db

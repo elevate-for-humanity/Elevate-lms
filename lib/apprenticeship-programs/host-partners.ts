@@ -61,7 +61,7 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
   },
   {
     slug: 'cals-kutz-studio',
-    name: "Cal's Kutz Studio",
+    name: 'Cals Kutz Studio',
     businessType: 'BarberShop',
     city: 'Indianapolis',
     state: 'IN',
@@ -75,14 +75,14 @@ export const FEATURED_BEAUTY_HOST_PARTNERS: FeaturedHostPartner[] = [
     media: [
       {
         src: '/images/partners/cals-kutz-confidence-restored.webp',
-        alt: "Cal's Kutz Studio Confidence Restored hair replacement promotion",
+        alt: 'Cals Kutz Studio Confidence Restored hair replacement promotion',
         kind: 'flyer',
       },
     ],
     websiteUrl: 'https://booksy.com/en-us/211056_cal-s-kutz-studio_barber-shop_19577_indianapolis',
-    websiteLabel: 'Book / view Cal’s Kutz online',
+    websiteLabel: 'Book / view Cals Kutz online',
     socialUrl: 'https://www.instagram.com/calskutzstudio/',
-    socialLabel: 'View Cal’s Kutz photos',
+    socialLabel: 'View Cals Kutz photos',
   },
   {
     slug: 'razors-image-barbershop',

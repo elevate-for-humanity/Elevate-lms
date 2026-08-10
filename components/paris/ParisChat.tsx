@@ -1,7 +1,18 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Loader2, Send, User, Bot, GraduationCap, ArrowRight, Stethoscope, Wrench, Scissors, FileCheck } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  ArrowRight,
+  Bot,
+  FileCheck,
+  GraduationCap,
+  Loader2,
+  Scissors,
+  Send,
+  Stethoscope,
+  User,
+  Wrench,
+} from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,48 +26,39 @@ interface ParisChatProps {
 }
 
 const PATHWAYS = [
-  { id: 'healthcare', label: 'Healthcare', icon: Stethoscope, color: 'bg-red-500 hover:bg-red-600', textColor: 'text-white' },
-  { id: 'trades', label: 'Skilled Trades', icon: Wrench, color: 'bg-orange-500 hover:bg-orange-600', textColor: 'text-white' },
-  { id: 'beauty', label: 'Beauty & Cosmo', icon: Scissors, color: 'bg-pink-500 hover:bg-pink-600', textColor: 'text-white' },
-  { id: 'testing', label: 'Testing & Certs', icon: FileCheck, color: 'bg-blue-500 hover:bg-blue-600', textColor: 'text-white' },
-];
+  { id: 'healthcare', label: 'Healthcare', icon: Stethoscope },
+  { id: 'trades', label: 'Skilled Trades', icon: Wrench },
+  { id: 'beauty', label: 'Barber & Beauty', icon: Scissors },
+  { id: 'testing', label: 'Testing & Credentials', icon: FileCheck },
+] as const;
+
+const GREETING: Message = {
+  role: 'assistant',
+  content: `Hi — I'm PARIS, Elevate's public admissions and career-navigation assistant.
+
+I can help you find the current program, funding, apprenticeship, testing, or application page. Program requirements and funding vary, so I will point you to the specific page that controls the details.
+
+Choose a pathway below or type your question.`,
+};
 
 export default function ParisChat({ onComplete, showHeader = true, className = '' }: ParisChatProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([GREETING]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  const greeting: Message = {
-    role: 'assistant',
-    content: `👋 Hi! I'm **Paris** — your career guide at Elevate for Humanity.
-
-I can help you find the right career path. **Just click an option below** or type your interest:
-
-🏥 **Healthcare** — Medical Assistant, Phlebotomy, CNA, Pharmacy Tech
-⚙️ **Skilled Trades** — HVAC, CDL, Building Maintenance, EPA Certs
-✂️ **Beauty & Cosmo** — Barber, Cosmetology, Esthetics
-📝 **Testing** — ACT WorkKeys, OSHA, CPR, NHA Prep
-
-*No pressure, no commitment — just honest guidance.*`,
-  };
-
-  useEffect(() => {
-    setMessages([greeting]);
-  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const sendToApi = useCallback(async (content: string) => {
-    if (!content.trim() || isLoading) return;
+    const trimmed = content.trim();
+    if (!trimmed || isLoading) return;
 
-    const userMsg: Message = { role: 'user', content: content.trim() };
-    const requestMessages = [...messages.slice(-19), userMsg];
-
-    setMessages(prev => [...prev, userMsg]);
+    const userMessage: Message = { role: 'user', content: trimmed };
+    const requestMessages = [...messages, userMessage].slice(-20);
+    setMessages(requestMessages);
     setInput('');
     setIsLoading(true);
 
@@ -64,132 +66,140 @@ I can help you find the right career path. **Just click an option below** or typ
       const response = await fetch('/api/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        cache: 'no-store',
         body: JSON.stringify({ messages: requestMessages }),
       });
 
-      if (!response.ok) throw new Error('Failed');
-      const data = await response.json();
-      const reply = typeof data.reply === 'string' ? data.reply : '';
-      if (!reply) throw new Error('Empty response');
-
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
-
-      if (reply.includes('Next step') || reply.includes('book a free')) {
-        onComplete?.([]);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || typeof data.reply !== 'string') {
+        throw new Error('PARIS unavailable');
       }
+
+      setMessages((previous) => [...previous, { role: 'assistant', content: data.reply }]);
+      onComplete?.([]);
     } catch {
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: `I'm having trouble right now. Please try again or reach us at **info@elevateforhumanity.org** — we're happy to help!`,
-      }]);
+      setMessages((previous) => [
+        ...previous,
+        {
+          role: 'assistant',
+          content: 'I cannot retrieve a verified answer right now. Please use the Program Directory at https://www.elevateforhumanity.org/programs or contact Admissions at https://www.elevateforhumanity.org/contact.',
+        },
+      ]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
   }, [isLoading, messages, onComplete]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendToApi(input);
-  };
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    void sendToApi(input);
+  }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendToApi(input);
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      void sendToApi(input);
     }
-  };
+  }
 
   return (
-    <div className={`flex flex-col h-full ${className}`}>
+    <div className={`flex h-full flex-col ${className}`}>
       {showHeader && (
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-4 shrink-0">
+        <div className="shrink-0 bg-slate-950 px-6 py-4 text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-              <GraduationCap className="w-6 h-6" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10">
+              <GraduationCap className="h-6 w-6" aria-hidden="true" />
             </div>
             <div>
-              <h2 className="font-bold text-lg">Paris</h2>
-              <p className="text-sm text-white/80">Career Guidance Assistant</p>
+              <h2 className="text-lg font-bold">PARIS</h2>
+              <p className="text-sm text-slate-200">Admissions & career navigation</p>
             </div>
           </div>
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4 bg-slate-50">
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${
-              msg.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gradient-to-br from-purple-600 to-blue-600 text-white'
-            }`}>
-              {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+      <div className="flex-1 space-y-4 overflow-y-auto bg-slate-50 px-4 py-4 sm:px-6" aria-live="polite">
+        {messages.map((message, index) => (
+          <div key={`${message.role}-${index}`} className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                message.role === 'user' ? 'bg-brand-blue-700 text-white' : 'bg-slate-950 text-white'
+              }`}
+            >
+              {message.role === 'user' ? <User className="h-4 w-4" aria-hidden="true" /> : <Bot className="h-4 w-4" aria-hidden="true" />}
             </div>
-            <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-              msg.role === 'user'
-                ? 'bg-blue-600 text-white rounded-tr-sm'
-                : 'bg-white text-slate-800 rounded-tl-sm shadow-sm border border-slate-200'
-            }`}>
-              <div className="whitespace-pre-wrap">{msg.content}</div>
+            <div
+              className={`max-w-[82%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                message.role === 'user'
+                  ? 'rounded-tr-sm bg-brand-blue-700 text-white'
+                  : 'rounded-tl-sm border border-slate-200 bg-white text-slate-900 shadow-sm'
+              }`}
+            >
+              {message.content}
             </div>
           </div>
         ))}
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white flex items-center justify-center">
-              <Bot className="w-4 h-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950 text-white">
+              <Bot className="h-4 w-4" aria-hidden="true" />
             </div>
-            <div className="bg-white rounded-2xl rounded-tl-sm shadow-sm border border-slate-200 px-4 py-3">
-              <div className="flex items-center gap-2 text-slate-500">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">Finding your options...</span>
+            <div className="rounded-2xl rounded-tl-sm border border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-2 text-slate-700">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <span className="text-sm">Checking the current guidance…</span>
               </div>
             </div>
           </div>
         )}
 
         {!isLoading && messages.length === 1 && (
-          <div className="space-y-2">
-            {PATHWAYS.map(({ id, label, icon: Icon, color, textColor }) => (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {PATHWAYS.map(({ id, label, icon: Icon }) => (
               <button
+                type="button"
                 key={id}
-                onClick={() => sendToApi(`I'm interested in ${label}`)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${color} ${textColor} font-medium transition-all active:scale-[0.98] shadow-sm`}
+                onClick={() => void sendToApi(`I'm interested in ${label}. Show me the current options and the page I should review.`)}
+                className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-950 shadow-sm transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700"
               >
-                <Icon className="w-5 h-5 shrink-0" />
+                <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                 <span>{label}</span>
-                <ArrowRight className="w-4 h-4 ml-auto" />
+                <ArrowRight className="ml-auto h-4 w-4" aria-hidden="true" />
               </button>
             ))}
           </div>
         )}
-
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-slate-200 bg-white px-4 sm:px-6 py-4 shrink-0">
-        <div className="flex gap-3 items-end">
+      <form onSubmit={handleSubmit} className="shrink-0 border-t border-slate-200 bg-white px-4 py-4 sm:px-6">
+        <label htmlFor="paris-chat-input" className="sr-only">Ask PARIS a question</label>
+        <div className="flex items-end gap-3">
           <textarea
+            id="paris-chat-input"
             ref={inputRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(event) => setInput(event.target.value.slice(0, 2000))}
             onKeyDown={handleKeyDown}
-            placeholder="Or type your interest here..."
-            className="flex-1 resize-none rounded-2xl border-2 border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400 transition-colors min-h-[52px] max-h-40"
+            placeholder="Ask about a program, funding, testing, or apprenticeship…"
+            className="min-h-[52px] max-h-40 flex-1 resize-none rounded-2xl border-2 border-slate-300 px-4 py-3 text-sm text-slate-950 focus:border-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-200"
             rows={2}
             disabled={isLoading}
+            maxLength={2000}
           />
           <button
             type="submit"
+            aria-label="Send message"
             disabled={!input.trim() || isLoading}
-            className="px-5 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl font-semibold hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-brand-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Send className="w-4 h-4" />
+            <Send className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Send</span>
           </button>
         </div>
-        <p className="text-xs text-slate-400 mt-2 text-center">
-          Or click a pathway above — no typing required!
-        </p>
       </form>
     </div>
   );

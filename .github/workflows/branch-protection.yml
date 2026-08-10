@@ -4,10 +4,6 @@ on:
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/branch-protection.yml'
 
 permissions:
   contents: write
@@ -15,145 +11,65 @@ permissions:
 
 concurrency:
   group: branch-protection-cleanup
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  one-time-full-cleanup:
-    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[cleanup-all-stale-branches]')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout canonical main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-
-      - name: Fetch all remote refs
-        run: git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
-
-      - name: Guard against active pull requests
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          open_count=$(gh pr list --state open --limit 100 --json number --jq 'length')
-          echo "Open pull requests: $open_count"
-          test "$open_count" -eq 0 || {
-            echo 'Refusing full cleanup while an open pull request exists.'
-            exit 1
-          }
-
-      - name: Side-by-side branch audit
-        run: |
-          set -euo pipefail
-          {
-            echo '## Full branch cleanup audit'
-            echo
-            echo '| Branch | Ahead of main | Behind main | Latest commit |'
-            echo '|---|---:|---:|---|'
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          mapfile -t branches < <(
-            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
-              | grep -v '^HEAD$' \
-              | grep -v '^main$' \
-              | sort
-          )
-
-          for branch in "${branches[@]}"; do
-            read -r behind ahead < <(git rev-list --left-right --count "origin/main...origin/${branch}")
-            latest=$(git log -1 --format='%h %cs' "origin/${branch}")
-            printf '| `%s` | %s | %s | %s |\n' "$branch" "$ahead" "$behind" "$latest" >> "$GITHUB_STEP_SUMMARY"
-          done
-
-          echo "AUDITED_BRANCH_COUNT=${#branches[@]}" >> "$GITHUB_ENV"
-
-      - name: Bulk delete every non-main branch
-        run: |
-          set -u
-          mapfile -t branches < <(
-            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
-              | grep -v '^HEAD$' \
-              | grep -v '^main$' \
-              | sort
-          )
-
-          if [ "${#branches[@]}" -eq 0 ]; then
-            echo 'No non-main branches remain.'
-            exit 0
-          fi
-
-          echo "Deleting ${#branches[@]} non-main branches in one ref update batch."
-          git push origin --delete "${branches[@]}" || true
-
-          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
-          mapfile -t remaining < <(
-            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
-              | grep -v '^HEAD$' \
-              | grep -v '^main$' \
-              | sort
-          )
-
-          for branch in "${remaining[@]}"; do
-            echo "Retrying deletion: $branch"
-            git push origin --delete "$branch" || echo "GitHub refused deletion of $branch"
-          done
-
-      - name: Verify canonical branch set
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
-          mapfile -t remaining < <(
-            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
-              | grep -v '^HEAD$' \
-              | grep -v '^main$' \
-              | sort
-          )
-
-          {
-            echo
-            echo "Audited before cleanup: ${AUDITED_BRANCH_COUNT:-unknown}"
-            echo "Remaining non-main branches: ${#remaining[@]}"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          if [ "${#remaining[@]}" -gt 0 ]; then
-            printf 'Remaining: %s\n' "${remaining[@]}"
-            exit 1
-          fi
-
-          echo 'Branch cleanup complete: main is the only remote branch.'
-
-  scheduled-stale-cleanup:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+  cleanup-stale-branches:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
-      - name: Delete branches older than 30 days
+      - name: Fetch remote branches
+        run: git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+
+      - name: Delete branches older than 30 days without open PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
           set -u
-          git fetch --all --prune
+          owner="${REPO%%/*}"
+          current_time=$(date +%s)
 
-          for branch in $(git branch -r | grep -v 'main\|HEAD\|dependabot'); do
-            branch_name=$(echo "$branch" | sed 's#origin/##')
-            last_commit=$(git log -1 --format=%ct "origin/$branch_name")
-            current_time=$(date +%s)
+          mapfile -t branches < <(
+            git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+              | grep -v '^HEAD$' \
+              | grep -v '^main$' \
+              | grep -v '^dependabot/' \
+              | sort
+          )
+
+          for branch in "${branches[@]}"; do
+            last_commit=$(git log -1 --format=%ct "origin/${branch}")
             days_old=$(( (current_time - last_commit) / 86400 ))
 
-            if [ "$days_old" -gt 30 ]; then
-              echo "Deleting stale branch: $branch_name (${days_old} days old)"
-              git push origin --delete "$branch_name" || echo "Failed to delete $branch_name"
+            if [ "$days_old" -le 30 ]; then
+              continue
             fi
+
+            open_prs=$(gh api -X GET search/issues \
+              -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
+              --jq '.total_count' 2>/dev/null || echo 0)
+
+            if [ "$open_prs" -gt 0 ]; then
+              echo "Keeping $branch: open pull request exists."
+              continue
+            fi
+
+            echo "Deleting stale branch: $branch (${days_old} days old)"
+            git push origin --delete "$branch" || echo "GitHub refused deletion of $branch"
           done
 
       - name: Report cleanup
         run: |
-          echo 'Branch cleanup complete.'
-          git branch -r | grep -v 'main\|HEAD' | wc -l | xargs echo 'Remaining branches:'
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          remaining=$(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
+            | grep -v '^HEAD$' \
+            | grep -v '^main$' \
+            | wc -l)
+          echo "Branch cleanup complete. Remaining non-main branches: $remaining"

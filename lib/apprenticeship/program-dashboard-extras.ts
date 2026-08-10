@@ -10,7 +10,7 @@ export interface ProgramDashboardExtras {
 
 const EXTRAS: Record<string, ProgramDashboardExtras> = {
   'barber-apprenticeship': {
-    brandSubtitle: 'Prestige Elevation™ — Indiana Barber RTI',
+    brandSubtitle: 'Elevate for Humanity — Indiana Barber RTI',
     rtiCourseTitle: 'Barber Apprenticeship RTI',
     complianceBasePath: '/compliance/competency-verification/barber',
   },

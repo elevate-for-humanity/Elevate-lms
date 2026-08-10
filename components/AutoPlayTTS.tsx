@@ -20,18 +20,18 @@ function isIOS() {
 export default function AutoPlayTTS({ text, voice = 'coral', delay = 1500 }: AutoPlayTTSProps) {
   const [hasPlayed, setHasPlayed] = useState(false);
   const [showPlayButton, setShowPlayButton] = useState(false);
-  const naturalVoice = useNaturalVoice();
+  const { play, isLoading, error } = useNaturalVoice();
 
   const playTTS = useCallback(async () => {
     if (!text.trim()) return;
-    const ok = await naturalVoice.play(text, { voice, style: 'instructor', rate: 1 });
+    const ok = await play(text, { voice, style: 'instructor', rate: 1 });
     if (ok) {
       setHasPlayed(true);
       setShowPlayButton(false);
     } else {
       setShowPlayButton(true);
     }
-  }, [naturalVoice, text, voice]);
+  }, [play, text, voice]);
 
   useEffect(() => {
     if (hasPlayed || !text.trim() || typeof window === 'undefined') return;
@@ -59,18 +59,18 @@ export default function AutoPlayTTS({ text, voice = 'coral', delay = 1500 }: Aut
     };
   }, [delay, hasPlayed, playTTS, text]);
 
-  if ((!showPlayButton && !naturalVoice.error) || hasPlayed) return null;
+  if ((!showPlayButton && !error) || hasPlayed) return null;
 
   return (
     <button
       type="button"
       onClick={() => void playTTS()}
-      disabled={naturalVoice.isLoading}
+      disabled={isLoading}
       className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-[9000] flex min-h-11 min-w-11 items-center justify-center rounded-full bg-brand-blue-700 p-3 text-white shadow-lg hover:bg-brand-blue-800 disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue-700 sm:bottom-6 sm:right-6"
       aria-label="Play natural page narration"
-      title={naturalVoice.error || 'Play natural page narration'}
+      title={error || 'Play natural page narration'}
     >
-      {naturalVoice.isLoading ? (
+      {isLoading ? (
         <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
       ) : (
         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { ROUTES } from '@/lib/navigation/routes';
+import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
 const baseUrl = 'https://www.elevateforhumanity.org';
-const lastModified = new Date('2026-08-09T00:00:00-04:00');
+const lastModified = new Date('2026-08-09T20:55:00-04:00');
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const coreRoutes: Array<{
@@ -17,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: ROUTES.apprenticeshipsHowItWorks, changeFrequency: 'monthly', priority: 0.85 },
     { path: ROUTES.programsBeauty, changeFrequency: 'weekly', priority: 0.95 },
     { path: ROUTES.apprenticeshipsHostShop, changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/host-shops', changeFrequency: 'weekly', priority: 0.9 },
     { path: ROUTES.apprenticeshipSponsor, changeFrequency: 'monthly', priority: 0.85 },
     { path: ROUTES.testing, changeFrequency: 'weekly', priority: 0.9 },
     { path: ROUTES.funding, changeFrequency: 'weekly', priority: 0.9 },
@@ -78,6 +80,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/store/testing',
   ];
 
+  const hostShopRoutes = FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => `/host-shops/${shop.slug}`);
+
   const seen = new Set<string>();
   return [
     ...coreRoutes.map(({ path, changeFrequency, priority }) => ({
@@ -91,6 +95,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'weekly' as const,
       priority: path.includes('apprenticeship') ? 0.95 : 0.8,
+    })),
+    ...hostShopRoutes.map((path) => ({
+      url: `${baseUrl}${path}`,
+      lastModified,
+      changeFrequency: 'weekly' as const,
+      priority: 0.82,
     })),
     ...appStoreRoutes.map((path) => ({
       url: `${baseUrl}${path}`,

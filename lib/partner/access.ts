@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 
 export type PartnerRole =
@@ -9,6 +10,8 @@ export type PartnerRole =
   | 'supervisor'
   | 'admin';
 
+const HOST_SHOP_ADMIN_COOKIE = '__efh_host_shop_partner';
+
 export async function getSessionUser() {
   const supabase = await createClient();
   const { data, error }: any = await supabase.auth.getUser();
@@ -16,15 +19,22 @@ export async function getSessionUser() {
   return data.user ?? null;
 }
 
-// Roles allowed to access the partner portal
-const PARTNER_ROLES = new Set(['partner', 'admin', 'super_admin']);
+// Roles that can legitimately enter partner/host-shop data views.
+const PARTNER_ROLES = new Set([
+  'partner',
+  'host_shop',
+  'host_shop_admin',
+  'program_holder',
+  'admin',
+  'super_admin',
+  'org_admin',
+]);
 
 export async function getMyPartnerContext() {
   const supabase = await createClient();
   const user = await getSessionUser();
   if (!user) return null;
 
-  // Enforce profile role — only partner/admin roles can access partner portal
   const { data: profile } = await supabase
     .from('profiles')
     .select('id, role')
@@ -34,37 +44,76 @@ export async function getMyPartnerContext() {
   const profileRole = (profile?.role ?? null) as string | null;
   if (!profileRole || !PARTNER_ROLES.has(profileRole)) return null;
 
-  // Shops the user belongs to — only active shops
-  // Try with shop_staff.active filter first; fall back if column doesn't exist yet
-  let shops: any[] | null = null;
-  const { data: s1, error: e1 } = await supabase
+  // First honor explicit shop_staff membership when present.
+  const { data: staffRows } = await supabase
     .from('shop_staff')
-    .select('shop_id, role, active, shops:shops!inner(id, name, active)')
+    .select('shop_id, role, active, shops:shops!inner(id, name, active, partner_id)')
     .eq('user_id', user.id)
     .eq('active', true)
     .eq('shops.active', true);
 
-  if (!e1) {
-    shops = s1;
-  } else {
-    // Fallback: shop_staff.active column not yet added
-    const { data: s2 } = await supabase
-      .from('shop_staff')
-      .select('shop_id, role, shops:shops!inner(id, name, active)')
-      .eq('user_id', user.id)
-      .eq('shops.active', true);
-    shops = s2;
+  if (staffRows?.length) {
+    return {
+      user,
+      profileRole,
+      shops: staffRows.map((row: any) => ({
+        shop_id: row.shop_id,
+        staff_role: (row.role || 'staff') as PartnerRole,
+        shop: row.shops,
+      })),
+    };
   }
 
-  if (!shops?.length) return null;
+  // Host-shop owners are commonly linked through partner_users rather than shop_staff.
+  const { data: partnerUser } = await supabase
+    .from('partner_users')
+    .select('partner_id, role, status')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  let partnerId = partnerUser?.partner_id as string | undefined;
+  let partnerRole = (partnerUser?.role || 'owner') as PartnerRole;
+
+  // Platform admins may inspect a tenant selected from the Host Shop board.
+  if (!partnerId && ['admin', 'super_admin', 'org_admin'].includes(profileRole)) {
+    const cookieStore = await cookies();
+    partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
+    partnerRole = 'admin';
+  }
+
+  if (!partnerId) return null;
+
+  const { data: partner } = await supabase
+    .from('partners')
+    .select('id, status, approval_status, is_active')
+    .eq('id', partnerId)
+    .maybeSingle();
+
+  if (
+    !partner ||
+    partner.status !== 'active' ||
+    partner.approval_status !== 'approved' ||
+    partner.is_active === false
+  ) {
+    return null;
+  }
+
+  const { data: partnerShops } = await supabase
+    .from('shops')
+    .select('id, name, active, partner_id')
+    .eq('partner_id', partnerId)
+    .eq('active', true);
+
+  if (!partnerShops?.length) return null;
 
   return {
     user,
     profileRole,
-    shops: shops.map((s: any) => ({
-      shop_id: s.shop_id,
-      staff_role: s.role as PartnerRole,
-      shop: s.shops,
+    shops: partnerShops.map((shop: any) => ({
+      shop_id: shop.id,
+      staff_role: partnerRole,
+      shop,
     })),
   };
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { requireAdmin } from '@/lib/authGuards';
+import { requireRole } from '@/lib/auth/require-role';
+import { TESTING_CENTER_ROLES } from '@/lib/rbac/role-matrix';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import TestingCenterClient from './TestingCenterClient';
@@ -9,14 +10,14 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Testing Center | Admin | Elevate For Humanity',
+  robots: { index: false, follow: false },
 };
 
 export default async function TestingCenterPage() {
-  await requireAdmin();
+  await requireRole(TESTING_CENTER_ROLES);
   const db = await requireAdminClient();
 
   const dateFrom = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
-  const dateTo   = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
 
   const [
     { data: bookings },
@@ -46,29 +47,27 @@ export default async function TestingCenterPage() {
 
   const allSessions = sessions ?? [];
   const allBookings = bookings ?? [];
+  const decidedSessions = allSessions.filter((session: any) => ['pass', 'fail'].includes(session.result));
 
   const stats = {
-    totalBookings:     allBookings.length,
-    confirmedBookings: allBookings.filter((b: any) => b.status === 'confirmed').length,
-    pendingBookings:   allBookings.filter((b: any) => b.status === 'pending').length,
-    totalSessions:     allSessions.length,
-    passed:            allSessions.filter((s: any) => s.result === 'pass').length,
-    failed:            allSessions.filter((s: any) => s.result === 'fail').length,
-    inProgress:        allSessions.filter((s: any) => s.status === 'in_progress').length,
-    flagged:           allSessions.filter((s: any) => ['flagged','under_review'].includes(s.review_status)).length,
-    noShows:           allBookings.filter((b: any) => b.status === 'no_show').length,
-    passRate: allSessions.filter((s: any) => ['pass','fail'].includes(s.result)).length > 0
-      ? Math.round(
-          allSessions.filter((s: any) => s.result === 'pass').length /
-          allSessions.filter((s: any) => ['pass','fail'].includes(s.result)).length * 100,
-        )
+    totalBookings: allBookings.length,
+    confirmedBookings: allBookings.filter((booking: any) => booking.status === 'confirmed').length,
+    pendingBookings: allBookings.filter((booking: any) => booking.status === 'pending').length,
+    totalSessions: allSessions.length,
+    passed: allSessions.filter((session: any) => session.result === 'pass').length,
+    failed: allSessions.filter((session: any) => session.result === 'fail').length,
+    inProgress: allSessions.filter((session: any) => session.status === 'in_progress').length,
+    flagged: allSessions.filter((session: any) => ['flagged', 'under_review'].includes(session.review_status)).length,
+    noShows: allBookings.filter((booking: any) => booking.status === 'no_show').length,
+    passRate: decidedSessions.length
+      ? Math.round((decidedSessions.filter((session: any) => session.result === 'pass').length / decidedSessions.length) * 100)
       : null,
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Testing Center' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Testing Center' }]} />
         <TestingCenterClient
           bookings={allBookings}
           sessions={allSessions}

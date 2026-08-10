@@ -44,7 +44,7 @@ export const revalidate = 600;
 async function getDbPosts(): Promise<BlogPost[]> {
   try {
     const supabase = createPublicClient();
-    const { data } = await db
+    const { data } = await supabase
       .from('blog_posts')
       .select('*')
       .eq('published', true)
@@ -71,7 +71,6 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {' '}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Blog' }]} />
@@ -80,7 +79,7 @@ export default async function BlogPage() {
       <div className="bg-brand-blue-700 text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-3">Blog</h1>
-          <p className="text-lg text-slate-600 max-w-2xl">
+          <p className="text-lg text-slate-200 max-w-2xl">
             Workforce funding guides, credential explainers, and career training insights from
             Elevate for Humanity.
           </p>
@@ -184,19 +183,19 @@ export default async function BlogPage() {
       <section className="bg-brand-blue-700 text-white py-14">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2 className="text-2xl md:text-3xl font-extrabold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-slate-500 mb-7">
-            Check your eligibility for funded career training programs in Indiana.
+          <p className="text-slate-200 mb-7">
+            Check your eligibility for career training programs in Indiana.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/start-trial"
+              href="/apply"
               className="bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-3.5 rounded-lg font-bold transition-colors"
             >
               Apply Now
             </Link>
             <Link
               href="/programs"
-              className="border border-slate-600 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-slate-800 transition-colors"
+              className="border border-slate-300 text-white px-8 py-3.5 rounded-lg font-bold hover:bg-brand-blue-800 transition-colors"
             >
               Browse Programs
             </Link>

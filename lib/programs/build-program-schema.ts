@@ -1,6 +1,10 @@
 /**
- * Build a valid ProgramSchema from partial data (registry entry, DB row, hero banner).
- * Used when no static data/programs/*.ts file exists — still renders via ProgramDetailPage.
+ * Build a complete ProgramSchema from partial registry/DB data when a dedicated
+ * static program file does not exist.
+ *
+ * Important: this builder must never invent public funding, approval,
+ * apprenticeship, credential, salary, or outcome claims. Public verification is
+ * applied later by normalizePublicProgram().
  */
 
 import type { ProgramEntry } from '@/lib/program-registry';
@@ -29,73 +33,59 @@ function sectorFromCategory(category: string | null | undefined): ProgramSchema[
   return 'business';
 }
 
-function programTypeFromSlug(slug: string, weeks: number): ProgramSchema['programType'] {
-  if (slug.includes('apprenticeship')) return 'apprenticeship';
+function provisionalProgramType(slug: string, weeks: number): ProgramSchema['programType'] {
+  // A slug containing "apprenticeship" is not evidence of federal registration.
+  // normalizePublicProgram() upgrades only RAPIDS-verified slugs.
   if (weeks <= 2 || /cpr|first-aid|forklift|osha|bloodborne/.test(slug)) return 'certification';
   return 'workforce';
 }
 
-function defaultCredentials(
-  title: string,
-  credential?: string | null,
-): ProgramSchema['credentials'] {
-  const primary = credential?.trim() || `${title} Credential`;
-  return [
-    {
-      name: primary,
-      issuer: 'Industry-recognized certifying body',
-      description: `Credential earned on successful completion of ${title}.`,
+function safeCredentials(title: string, credential?: string | null): ProgramSchema['credentials'] {
+  const rows: ProgramSchema['credentials'] = [];
+  if (credential?.trim()) {
+    rows.push({
+      name: credential.trim(),
+      issuer: 'See program requirements',
+      description: `Credential or licensing objective associated with ${title}. Verify the issuing body and eligibility requirements on the program page before enrollment.`,
       validity: 'Varies by credential',
-    },
-    {
-      name: 'Elevate Program Completion Certificate',
-      issuer: PLATFORM_DEFAULTS.orgName,
-      description: 'Publicly verifiable completion record issued by Elevate for Humanity.',
-      validity: 'Permanent',
-    },
-    {
-      name: 'Career Readiness Portfolio',
-      issuer: PLATFORM_DEFAULTS.orgName,
-      description: 'Documented competencies and employer-aligned skills verification.',
-      validity: 'Permanent',
-    },
-  ];
+    });
+  }
+  rows.push({
+    name: 'Program Completion Record',
+    issuer: PLATFORM_DEFAULTS.orgName,
+    description: 'Completion record issued after the learner satisfies the program requirements that apply to the enrollment.',
+    validity: 'Permanent record',
+  });
+  return rows;
 }
 
-function defaultOutcomes(title: string): ProgramSchema['outcomes'] {
+function safeOutcomes(title: string): ProgramSchema['outcomes'] {
   return [
-    { statement: `Demonstrate core competencies required for ${title} roles`, assessedAt: 'Mid-program' },
-    { statement: 'Complete structured lessons, labs, and checkpoint assessments', assessedAt: 'Ongoing' },
-    { statement: 'Meet employer-aligned safety and professionalism standards', assessedAt: 'Final week' },
-    { statement: 'Pass required skills evaluations with instructor sign-off where applicable', assessedAt: 'Final assessment' },
-    { statement: 'Complete career readiness and job search preparation activities', assessedAt: 'Program completion' },
+    { statement: `Demonstrate the documented learning objectives for ${title}`, assessedAt: 'Program assessment' },
+    { statement: 'Complete assigned lessons, labs, and checkpoint assessments', assessedAt: 'Ongoing' },
+    { statement: 'Demonstrate required safety and professionalism competencies', assessedAt: 'Program assessment' },
+    { statement: 'Complete required career-readiness activities where included', assessedAt: 'Program completion' },
   ];
 }
 
-/** Institutional defaults — satisfies ProgramDetailPage minimum structure. */
 export function buildProgramSchemaFromPartial(input: PartialProgramInput): ProgramSchema {
   const slug = input.slug;
   const title = input.title.trim();
   const subtitle =
     input.subtitle?.trim() ||
     input.description?.trim()?.slice(0, 200) ||
-    `Workforce training program — ${title}`;
+    `Career training pathway — ${title}`;
   const durationWeeks = Math.max(1, input.durationWeeks ?? 8);
   const hoursPerWeekMin = 10;
   const hoursPerWeekMax = 20;
   const totalHours = durationWeeks * hoursPerWeekMin;
   const category = input.category?.trim() || 'Workforce Training';
   const sector = sectorFromCategory(category);
-  const programType = programTypeFromSlug(slug, durationWeeks);
+  const programType = provisionalProgramType(slug, durationWeeks);
   const heroImage = input.imageUrl?.trim() || getProgramOgImage(slug);
   const applyHref = input.applyHref ?? `/apply?program=${slug}`;
-
-  const descriptionParagraphs =
-    input.description?.trim() ?
-      input.description
-        .trim()
-        .split(/\n\n+/)
-        .filter(Boolean)
+  const descriptionParagraphs = input.description?.trim()
+    ? input.description.trim().split(/\n\n+/).filter(Boolean)
     : [subtitle];
 
   return {
@@ -106,7 +96,7 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     category,
     programType,
     heroImage,
-    heroImageAlt: `${title} training program`,
+    heroImageAlt: `${title} career training`,
     deliveryMode: programType === 'certification' ? 'online' : 'hybrid',
     deliveredBy: 'Elevate',
     durationWeeks,
@@ -118,96 +108,64 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
       examPrep: Math.round(totalHours * 0.15),
       careerPlacement: Math.round(totalHours * 0.1),
     },
-    schedule: 'Flexible / cohort-based — contact admissions for next start date',
-    cohortSize: 'Small cohorts with instructor support',
-    fundingStatement:
-      'WIOA, Workforce Ready Grant, and FSSA IMPACT funding may be available for eligible Indiana residents.',
-    selfPayCost: 'Contact admissions',
-    credentials: defaultCredentials(title, input.credential),
-    outcomes: defaultOutcomes(title),
+    schedule: 'Schedule varies by cohort and program — confirm current availability with admissions',
+    cohortSize: 'Cohort size varies by program and location',
+    fundingStatement: 'Funding is not assumed. Review the program-specific funding disclosure before enrollment.',
+    selfPayCost: 'Contact admissions for current published pricing',
+    credentials: safeCredentials(title, input.credential),
+    outcomes: safeOutcomes(title),
     careerPathway: [
       {
-        title: `${title} (Entry Level)`,
-        timeframe: '0–1 year',
-        requirements: 'Program completion + credential',
-        salaryRange: 'Employer-set',
+        title: `${title} related entry-level roles`,
+        timeframe: 'After program completion',
+        requirements: 'Employer and credential requirements vary',
+        salaryRange: 'Employer- and market-dependent',
       },
       {
-        title: 'Experienced Technician / Specialist',
-        timeframe: '1–3 years',
-        requirements: 'On-the-job experience',
-        salaryRange: 'Employer-set',
-      },
-      {
-        title: 'Supervisor / Lead',
-        timeframe: '3+ years',
-        requirements: 'Experience + additional credentials',
-        salaryRange: 'Employer-set',
+        title: 'Experienced related roles',
+        timeframe: 'With experience',
+        requirements: 'Experience and any additional credentials required by the employer or regulator',
+        salaryRange: 'Employer- and market-dependent',
       },
     ],
     weeklySchedule: [
-      {
-        week: 'Weeks 1–2',
-        title: 'Foundations',
-        competencyMilestone: 'Core concepts and safety fundamentals',
-      },
-      {
-        week: `Weeks 3–${Math.max(3, durationWeeks - 1)}`,
-        title: 'Applied Skills',
-        competencyMilestone: 'Hands-on practice and module checkpoints',
-      },
-      {
-        week: `Week ${durationWeeks}`,
-        title: 'Assessment & Credential',
-        competencyMilestone: 'Final evaluation and career placement support',
-      },
+      { week: 'Opening phase', title: 'Foundations', competencyMilestone: 'Core concepts and safety fundamentals' },
+      { week: 'Middle phase', title: 'Applied Skills', competencyMilestone: 'Practice and checkpoint assessments' },
+      { week: 'Final phase', title: 'Assessment', competencyMilestone: 'Required final evaluations and completion review' },
     ],
     curriculum: [
-      {
-        title: 'Program Core',
-        topics: descriptionParagraphs.slice(0, 3),
-      },
+      { title: 'Program Core', topics: descriptionParagraphs.slice(0, 3) },
     ],
     complianceAlignment: [
       {
-        standard: 'WIOA-Aligned Training Structure',
-        description: 'Structured competency-based training aligned with workforce development standards.',
-      },
-      {
-        standard: 'ETPL-Approved Provider',
-        description: `${PLATFORM_DEFAULTS.orgName} is an Indiana Eligible Training Provider.`,
+        standard: 'Program-specific requirements',
+        description: 'Admissions, funding, licensing, credential, and completion requirements must be verified for the selected program.',
       },
     ],
     laborMarket: {
       medianSalary: 0,
-      salaryRange: 'Varies by employer and region',
-      growthRate: 'See O*NET data below',
-      source: 'O*NET / BLS',
+      salaryRange: 'Varies by employer, occupation, experience, and region',
+      growthRate: 'See current labor-market data for the occupation',
+      source: 'O*NET / BLS where available',
       sourceYear: new Date().getFullYear(),
-      region: 'Indianapolis MSA',
+      region: 'Indiana / relevant service area',
     },
     careers: [
-      { title: `${title} (Entry Level)`, salary: 'Employer-set' },
-      { title: 'Related skilled roles', salary: 'Employer-set' },
+      { title: `${title} related roles`, salary: 'Employer-set' },
     ],
     cta: {
       applyHref,
       requestInfoHref: `/contact?program=${slug}`,
-      careerConnectHref:
-        programType === 'apprenticeship' || programType === 'workforce' ?
-          'https://www.indianacareerconnect.com/'
-        : undefined,
     },
     programDescription: descriptionParagraphs,
     faqs: [
       {
         question: 'What funding is available?',
-        answer:
-          'WIOA, Workforce Ready Grant, and FSSA IMPACT may cover tuition for eligible participants. Use our eligibility checker or contact admissions.',
+        answer: 'Funding is program- and participant-specific. Review the funding disclosure on this program page and obtain written authorization from the responsible funder before relying on third-party funding.',
       },
       {
         question: 'How do I apply?',
-        answer: `Submit an application at ${applyHref}. An enrollment advisor will contact you within 1–2 business days.`,
+        answer: `Submit the program application at ${applyHref}. Admissions will provide the next required steps and current program documents.`,
       },
     ],
     breadcrumbs: [
@@ -218,13 +176,15 @@ export function buildProgramSchemaFromPartial(input: PartialProgramInput): Progr
     metaTitle: `${title} | ${PLATFORM_DEFAULTS.orgName}`,
     metaDescription: subtitle,
     funding: {
-      wioa_eligible: programType !== 'certification',
-      wrg_eligible: programType !== 'certification',
-      fssa_eligible: programType !== 'certification',
+      wioa_eligible: false,
+      wrg_eligible: false,
+      fssa_eligible: false,
+      etpl_approved: false,
+      fundingNotes: 'No funding approval is inferred from the fallback program record.',
     },
     enrollmentType: 'internal',
     deliveryModel: 'internal',
-    fundingOptions: ['wioa', 'wrg', 'impact', 'self_pay'],
+    fundingOptions: ['self_pay'],
   };
 }
 

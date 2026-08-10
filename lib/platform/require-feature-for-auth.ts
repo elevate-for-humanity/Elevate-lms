@@ -53,5 +53,9 @@ export async function requireFeatureForAuth(
     }
   }
 
-  return apiRequireOrganizationFeature(tenantId, feature);
+  const featureAccess = await apiRequireOrganizationFeature(tenantId, feature);
+  if ('ok' in featureAccess && featureAccess.ok) {
+    return { userId, tenantId };
+  }
+  return featureAccess;
 }

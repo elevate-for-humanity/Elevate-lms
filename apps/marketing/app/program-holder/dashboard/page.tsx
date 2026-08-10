@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { requireProgramHolder } from '@/lib/auth/require-program-holder';
+import { getProgramCardImage } from '@/lib/images/programImages';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,7 +79,7 @@ export default async function ProgramHolderDashboard() {
             <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl">
               Manage your training programs and students
             </h1>
-            <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-700">
+            <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-slate-700">
               Review approved programs, student activity, pending training-hour actions, and your current compliance status from one workspace.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -90,7 +91,7 @@ export default async function ProgramHolderDashboard() {
               </Link>
               <Link
                 href="/program-holder/rights-responsibilities"
-                className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-100"
+                className="rounded-lg border border-slate-400 bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-100"
               >
                 Rights & responsibilities
               </Link>
@@ -131,35 +132,48 @@ export default async function ProgramHolderDashboard() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-slate-950">Your programs</h2>
-                <p className="mt-1 text-sm text-slate-600">Programs currently linked to your approved Program Holder record.</p>
+                <p className="mt-1 text-sm font-medium text-slate-700">Programs currently linked to your approved Program Holder record.</p>
               </div>
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-800">
+              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-900">
                 {holder?.status ?? 'active'}
               </span>
             </div>
 
-            <div className="mt-5 divide-y divide-slate-200">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {programs.length ? (
-                programs.map((program: any) => (
-                  <div key={program.id} className="flex items-center justify-between gap-4 py-4">
-                    <div>
-                      <p className="font-bold text-slate-950">{program.title || program.name || 'Program'}</p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        {program.is_active ? 'Active' : program.status || 'Pending'}
-                      </p>
-                    </div>
-                    {program.slug ? (
-                      <Link
-                        href={`/programs/${program.slug}`}
-                        className="text-sm font-bold text-blue-700 hover:underline"
-                      >
-                        View program
-                      </Link>
-                    ) : null}
-                  </div>
-                ))
+                programs.map((program: any) => {
+                  const title = program.title || program.name || 'Program';
+                  const slug = String(program.slug || '');
+                  return (
+                    <article key={program.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                      <div className="relative aspect-[16/9] w-full bg-slate-100">
+                        <Image
+                          src={getProgramCardImage(slug)}
+                          alt={`${title} program`}
+                          fill
+                          sizes="(max-width: 640px) 100vw, 50vw"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <p className="font-bold text-slate-950">{title}</p>
+                        <p className="mt-1 text-sm font-medium text-slate-700">
+                          {program.is_active ? 'Active' : program.status || 'Pending'}
+                        </p>
+                        {slug ? (
+                          <Link
+                            href={`/programs/${slug}`}
+                            className="mt-3 inline-flex text-sm font-bold text-blue-800 hover:underline"
+                          >
+                            View program
+                          </Link>
+                        ) : null}
+                      </div>
+                    </article>
+                  );
+                })
               ) : (
-                <div className="py-8 text-sm text-slate-700">
+                <div className="col-span-full py-8 text-sm font-medium text-slate-700">
                   No active program assignments are linked yet. Contact Elevate if your approved program is missing.
                 </div>
               )}
@@ -201,9 +215,9 @@ export default async function ProgramHolderDashboard() {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-2xl font-bold text-slate-950">Student roster</h2>
-              <p className="mt-1 text-sm text-slate-600">Recent students connected to this Program Holder record.</p>
+              <p className="mt-1 text-sm font-medium text-slate-700">Recent students connected to this Program Holder record.</p>
             </div>
-            <Link href="/support" className="text-sm font-bold text-blue-700 hover:underline">
+            <Link href="/support" className="text-sm font-bold text-blue-800 hover:underline">
               Report a roster issue
             </Link>
           </div>
@@ -211,7 +225,7 @@ export default async function ProgramHolderDashboard() {
           <div className="mt-5 overflow-x-auto">
             <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
               <thead>
-                <tr className="text-slate-700">
+                <tr className="text-slate-800">
                   <th className="px-3 py-3 font-bold">Student</th>
                   <th className="px-3 py-3 font-bold">Status</th>
                   <th className="px-3 py-3 font-bold">Hours</th>
@@ -228,13 +242,13 @@ export default async function ProgramHolderDashboard() {
                       <tr key={student.id}>
                         <td className="px-3 py-4">
                           <p className="font-bold text-slate-950">{name}</p>
-                          {email ? <p className="text-xs text-slate-600">{email}</p> : null}
+                          {email ? <p className="text-xs font-medium text-slate-700">{email}</p> : null}
                         </td>
                         <td className="px-3 py-4 font-semibold text-slate-800">{student.status || 'active'}</td>
-                        <td className="px-3 py-4 text-slate-800">
+                        <td className="px-3 py-4 font-medium text-slate-800">
                           {Number(student.hours_taught ?? 0)} / {Number(student.hours_required ?? 0) || '—'}
                         </td>
-                        <td className="px-3 py-4 text-slate-700">
+                        <td className="px-3 py-4 font-medium text-slate-700">
                           {student.enrolled_at ? new Date(student.enrolled_at).toLocaleDateString('en-US') : '—'}
                         </td>
                       </tr>
@@ -242,7 +256,7 @@ export default async function ProgramHolderDashboard() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-3 py-8 text-center text-slate-700">
+                    <td colSpan={4} className="px-3 py-8 text-center font-medium text-slate-700">
                       No students are currently linked to this Program Holder record.
                     </td>
                   </tr>

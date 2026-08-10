@@ -3,9 +3,7 @@ import { licenseTierForPlan } from '@/lib/store/platform-pricing';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
 import type { OrganizationEntitlements } from '@/lib/platform/organization-features';
 
-/**
- * Keep licenses.features in sync for middleware that still reads licenses table.
- */
+/** Keep licenses.features in sync for middleware that still reads licenses table. */
 export async function syncLicenseFromSaasEntitlements(
   adminSupabase: SupabaseClient,
   organizationId: string,
@@ -18,7 +16,8 @@ export async function syncLicenseFromSaasEntitlements(
   },
 ): Promise<void> {
   const tier = licenseTierForPlan(opts.planSlug, opts.billingInterval);
-  const features = entitlements.features.map((f) => (f === 'bookings' ? 'booking' : f));
+  // Entitlements are already normalized through normalizeFeatureCode().
+  const features = [...entitlements.features];
 
   const payload = {
     tier,

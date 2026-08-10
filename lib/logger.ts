@@ -162,3 +162,12 @@ class Logger {
 }
 
 export const logger = new Logger();
+
+// Backward-compatible convenience API retained for older imports.
+export const log = {
+  debug: (message: string, context?: LogContext) => logger.debug(message, context),
+  info: (message: string, context?: LogContext) => logger.info(message, context),
+  warn: (message: string, context?: LogContext | Error | string) => logger.warn(message, context),
+  error: (message: string, errorOrContext?: unknown, context?: LogContext) =>
+    logger.error(message, errorOrContext, context),
+};

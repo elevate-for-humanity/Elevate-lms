@@ -1,292 +1,240 @@
-import { Metadata } from 'next';
+import type { ElementType } from 'react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { Briefcase, Building2, FileText, Shield, TrendingUp, Users } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { requireRole } from '@/lib/auth/require-role';
+import { EMPLOYER_ROLES, normalizeRoles } from '@/lib/rbac/role-matrix';
+import { loadEmployerApprenticeshipSummary } from '@/lib/employer/apprenticeship-dashboard-data';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Employer Dashboard',
-  description: 'Elevate For Humanity - Career training and workforce development',
+  description: 'Employer jobs, candidates, apprenticeship programs, and workforce tools.',
+  robots: { index: false, follow: false },
 };
-
-import { createClient } from '@/lib/supabase/server';
-import { requireRole } from '@/lib/auth/require-role';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { safeFormatDate } from '@/lib/format-utils';
-import { getEmployerState } from '@/lib/orchestration/state-machine';
-import { StateAwareDashboard, SectionCard } from '@/components/dashboards/StateAwareDashboard';
-import { Briefcase, Users, FileText, Shield, Building2, TrendingUp } from 'lucide-react';
-import WorkforceLiveWidget from '@/components/employer/WorkforceLiveWidget';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * EMPLOYER PORTAL - PROGRESSION LOGIC
- *
- * This is not a feature list. This is an operator.
- *
- * Rules:
- * - Verification gates everything
- * - Hiring tools unlock progressively
- * - Apprenticeship is optional but guided
- * - Platform protects from compliance errors
- */
+type PageProps = {
+  searchParams: Promise<{ employerId?: string }>;
+};
 
-export default async function EmployerDashboardOrchestrated() {
-  // requireRole handles auth + redirect; employer, sponsor, and admins allowed
-  const { user, effectiveRoles } = await requireRole(['employer', 'sponsor', 'admin']);
+async function AdminEmployerSelector() {
+  const db = await requireAdminClient();
+  const { data: employers } = await db
+    .from('employers')
+    .select('id, business_name, company_name, email, approved, accepts_apprentices')
+    .order('created_at', { ascending: false })
+    .limit(100);
+
+  return (
+    <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <section className="rounded-2xl border border-blue-200 bg-blue-50 p-6">
+        <p className="text-xs font-extrabold uppercase tracking-wide text-blue-800">Admin portal override</p>
+        <h1 className="mt-2 text-3xl font-black text-slate-950">Choose an employer to preview</h1>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+          Employer data is tenant-scoped. Admin access requires an explicit employer selection instead of
+          silently treating the administrator profile as an employer.
+        </p>
+      </section>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {(employers || []).map((employer: any) => (
+          <Link
+            key={employer.id}
+            href={`/employer/dashboard?employerId=${encodeURIComponent(employer.id)}`}
+            className="rounded-2xl border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+          >
+            <h2 className="font-black text-slate-950">
+              {employer.business_name || employer.company_name || 'Employer'}
+            </h2>
+            <p className="mt-1 text-sm text-slate-700">{employer.email || 'No email on record'}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
+              <span className={`rounded-full px-2.5 py-1 ${employer.approved ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-900'}`}>
+                {employer.approved ? 'Approved' : 'Pending'}
+              </span>
+              {employer.accepts_apprentices && (
+                <span className="rounded-full bg-blue-100 px-2.5 py-1 text-blue-800">Accepts apprentices</span>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </main>
+  );
+}
+
+export default async function EmployerDashboard({ searchParams }: PageProps) {
+  const { user, effectiveRoles } = await requireRole(EMPLOYER_ROLES);
+  const roles = normalizeRoles(effectiveRoles);
+  const isAdmin = roles.includes('admin') || roles.includes('super_admin');
+  const { employerId } = await searchParams;
+
+  if (isAdmin && !employerId) return <AdminEmployerSelector />;
+
   const supabase = await createClient();
+  const db = await requireAdminClient();
 
-  // Get full employer profile (select * needed for company_name, verified, etc.)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, email, company_name, verified')
     .eq('id', user.id)
     .maybeSingle();
 
   if (!profile) redirect('/unauthorized');
 
-  // requireRole already enforced the role gate — this is just for behavior branching
-  const isEmployer = effectiveRoles.includes('employer') || effectiveRoles.includes('sponsor');
-  const isAdmin = effectiveRoles.includes('admin');
+  const employerQuery = db
+    .from('employers')
+    .select('id, owner_user_id, business_name, company_name, email, approved, accepts_apprentices');
 
-  // Employer account exists but not yet approved — show pending state
-  if (isEmployer && !isAdmin && !profile.verified) {
+  const { data: employerRecord } = isAdmin && employerId
+    ? await employerQuery.eq('id', employerId).maybeSingle()
+    : await employerQuery
+        .eq('owner_user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+  const actingEmployerUserId =
+    isAdmin && employerRecord?.owner_user_id ? employerRecord.owner_user_id : user.id;
+  const isVerified = isAdmin || Boolean(profile.verified || employerRecord?.approved);
+
+  if (!isAdmin && !isVerified) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-          <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-8 h-8 text-brand-blue-600" />
+      <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <section className="w-full max-w-md rounded-2xl border bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+            <Building2 className="h-8 w-8 text-blue-700" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Application Under Review</h1>
-          <p className="text-slate-600 mb-6">
-            Your employer application has been received. Our team will review it and activate your
-            account within 1–2 business days.
+          <h1 className="text-2xl font-black text-slate-950">Application Under Review</h1>
+          <p className="mt-3 text-slate-700">
+            Your employer application has been received. Hiring and apprenticeship operations unlock after approval.
           </p>
-          <p className="text-sm text-slate-500 mb-6">
-            You will receive an email at <strong>{profile?.email}</strong> when your account is
-            approved.
+          <p className="mt-4 text-sm text-slate-600">
+            We will use <strong>{profile.email}</strong> for account updates.
           </p>
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/for-employers"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
-            >
-              Learn About Employer Partnership
-            </Link>
-            <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
-              className="inline-flex items-center justify-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition"
-            >
-              Call {PLATFORM_DEFAULTS.supportPhone}
-            </a>
-          </div>
-        </div>
-      </div>
+          <a
+            href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9+]/g, '')}`}
+            className="mt-6 inline-flex rounded-xl bg-blue-700 px-5 py-3 font-bold text-white hover:bg-blue-800"
+          >
+            Call {PLATFORM_DEFAULTS.supportPhone}
+          </a>
+        </section>
+      </main>
     );
   }
 
-  // Get job postings
-  const { data: postings } = await supabase
-    .from('job_postings')
-    .select('*')
-    .eq('employer_id', user.id)
-    .eq('status', 'active');
+  const [{ data: postings }, { data: applications }, apprenticeship] = await Promise.all([
+    db
+      .from('job_postings')
+      .select('id, title, status, created_at')
+      .eq('employer_id', actingEmployerUserId)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false }),
+    db
+      .from('job_applications')
+      .select('id, status')
+      .eq('employer_id', actingEmployerUserId)
+      .eq('status', 'pending'),
+    loadEmployerApprenticeshipSummary(user.id, {
+      employerId: isAdmin ? employerId : undefined,
+    }),
+  ]);
 
-  // Get pending applications
-  const { data: applications } = await supabase
-    .from('job_applications')
-    .select('*')
-    .eq('employer_id', user.id)
-    .eq('status', 'pending');
-
-  // Check apprenticeship program (maybeSingle — employer may not have one yet)
-  const { data: apprenticeshipProgram } = await supabase
-    .from('apprenticeships')
-    .select('id')
-    .eq('employer_id', user.id)
-    .maybeSingle();
-
-  // Calculate state
-  const stateData = getEmployerState({
-    isVerified: profile.verified || false,
-    activePostings: postings?.length || 0,
-    hasApprenticeshipProgram: !!apprenticeshipProgram,
-    pendingApplications: applications?.length || 0,
-  });
+  const companyName =
+    employerRecord?.business_name ||
+    employerRecord?.company_name ||
+    profile.company_name ||
+    'Your Company';
 
   return (
-    <StateAwareDashboard
-      dominantAction={stateData.dominantAction}
-      availableSections={stateData.availableSections}
-      lockedSections={stateData.lockedSections}
-      alerts={stateData.alerts}
-    >
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content - 2/3 width */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Metrics Dashboard */}
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <div className="flex items-center justify-between mb-2">
-                <Briefcase className="h-11 w-11 text-brand-blue-600" />
-                <span className="text-3xl font-bold text-black">{postings?.length || 0}</span>
-              </div>
-              <div className="text-sm text-black">Active Job Postings</div>
-            </div>
+    <main className="mx-auto max-w-7xl space-y-8 px-4 py-8">
+      {isAdmin && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-950">
+          <span>Admin preview: <strong>{companyName}</strong></span>
+          <Link href="/employer/dashboard" className="font-bold hover:underline">Switch employer</Link>
+        </div>
+      )}
 
-            <div
-              className={`rounded-lg shadow-sm border p-6 ${
-                (applications?.length || 0) > 0
-                  ? 'bg-brand-green-50 border-brand-green-600'
-                  : 'bg-white border-slate-200'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <Users
-                  className={`h-11 w-11 ${
-                    (applications?.length || 0) > 0 ? 'text-brand-green-600' : 'text-slate-400'
-                  }`}
-                />
-                <span
-                  className={`text-3xl font-bold ${
-                    (applications?.length || 0) > 0 ? 'text-brand-green-900' : 'text-black'
-                  }`}
-                >
-                  {applications?.length || 0}
-                </span>
-              </div>
-              <div
-                className={`text-sm ${
-                  (applications?.length || 0) > 0 ? 'text-brand-green-900' : 'text-black'
-                }`}
-              >
-                Pending Applications
-              </div>
-            </div>
-
-            <div
-              className={`rounded-lg shadow-sm border p-6 ${
-                apprenticeshipProgram
-                  ? 'bg-brand-blue-50 border-brand-blue-600'
-                  : 'bg-white border-slate-200'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <TrendingUp
-                  className={`h-11 w-11 ${
-                    apprenticeshipProgram ? 'text-brand-blue-600' : 'text-slate-400'
-                  }`}
-                />
-                <span
-                  className={`text-3xl font-bold ${
-                    apprenticeshipProgram ? 'text-brand-blue-900' : 'text-black'
-                  }`}
-                >
-                  {apprenticeshipProgram ? '1' : '0'}
-                </span>
-              </div>
-              <div
-                className={`text-sm ${
-                  apprenticeshipProgram ? 'text-brand-blue-900' : 'text-black'
-                }`}
-              >
-                Apprenticeship Programs
-              </div>
-            </div>
-          </div>
-
-          {/* Available Sections */}
+      <section className="rounded-3xl bg-slate-950 p-7 text-white sm:p-9">
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-blue-300">Employer Portal</p>
+        <div className="mt-2 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h3 className="text-2xl font-bold text-black mb-6">Available Actions</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {stateData.availableSections.includes('verification') && (
-                <SectionCard
-                  title="Complete Verification"
-                  description="Required before posting jobs"
-                  href="/employer/verification"
-                  icon={<Shield className="h-10 w-10" />}
-                  badge="Required"
-                />
-              )}
+            <h1 className="text-3xl font-black sm:text-4xl">{companyName}</h1>
+            <p className="mt-3 max-w-3xl text-slate-300">
+              Manage hiring, candidates, and only the apprenticeship programs explicitly mapped to your organization.
+            </p>
+          </div>
+          <span className="self-start rounded-full bg-green-100 px-3 py-1.5 text-xs font-extrabold text-green-800 lg:self-auto">
+            Verified Employer
+          </span>
+        </div>
+      </section>
 
-              {stateData.availableSections.includes('postings') && (
-                <SectionCard
-                  title="Manage Job Postings"
-                  description={`${postings?.length || 0} active posting${(postings?.length || 0) !== 1 ? 's' : ''}`}
-                  href="/employer/jobs"
-                  icon={<Briefcase className="h-10 w-10" />}
-                />
-              )}
+      {apprenticeship.sourceState === 'unavailable' && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-900">
+          Apprenticeship metrics are unavailable because the canonical mapping query failed. This is not being shown as zero.
+        </div>
+      )}
 
-              {stateData.availableSections.includes('candidates') && (
-                <SectionCard
-                  title="View Candidates"
-                  description="Browse trained workers"
-                  href="/employer/candidates"
-                  icon={<Users className="h-10 w-10" />}
-                  badge={
-                    (applications?.length || 0) > 0 ? `${applications?.length} New` : undefined
-                  }
-                />
-              )}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Employer metrics">
+        <Metric icon={Briefcase} label="Active job postings" value={String(postings?.length ?? 0)} />
+        <Metric icon={Users} label="Pending applications" value={String(applications?.length ?? 0)} />
+        <Metric
+          icon={TrendingUp}
+          label="Your mapped apprenticeship programs"
+          value={apprenticeship.sourceState === 'unavailable' ? '—' : String(apprenticeship.mappedProgramCount)}
+          detail="Explicit employer_partnerships → programs mappings"
+        />
+        <Metric
+          icon={Building2}
+          label="Available apprenticeship standards"
+          value={apprenticeship.availableStandardsCount == null ? '—' : String(apprenticeship.availableStandardsCount)}
+          detail="Platform catalog; not all standards belong to this employer"
+        />
+      </section>
 
-              {stateData.availableSections.includes('apprenticeship') && (
-                <SectionCard
-                  title={
-                    apprenticeshipProgram ? 'Manage Apprenticeship' : 'Start Apprenticeship Program'
-                  }
-                  description={
-                    apprenticeshipProgram
-                      ? 'Track apprentices and compliance'
-                      : 'Build your talent pipeline'
-                  }
-                  href="/employer/apprenticeships"
-                  icon={<TrendingUp className="h-10 w-10" />}
-                  badge={apprenticeshipProgram ? 'Active' : undefined}
-                />
-              )}
-
-              {stateData.availableSections.includes('compliance') && (
-                <SectionCard
-                  title="Compliance Dashboard"
-                  description="Track apprenticeship requirements"
-                  href="/employer/compliance"
-                  icon={<Shield className="h-10 w-10" />}
-                />
-              )}
-
-              {stateData.availableSections.includes('reports') && (
-                <SectionCard
-                  title="Reports & Analytics"
-                  description="View hiring metrics"
-                  href="/employer/reports"
-                  icon={<FileText className="h-10 w-10" />}
-                />
-              )}
+      <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+        <div className="space-y-6">
+          <div className="rounded-2xl border bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-2xl font-black text-slate-950">Apprenticeship Programs</h2>
+                <p className="mt-1 text-sm text-slate-700">Only explicit employer mappings appear as your programs.</p>
+              </div>
+              <Link href="/employer/apprenticeships" className="rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-800">
+                Manage Apprenticeships
+              </Link>
             </div>
+            {apprenticeship.mappedPrograms.length ? (
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                {apprenticeship.mappedPrograms.map((program) => (
+                  <div key={program.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="font-bold text-slate-950">{program.name}</p>
+                    <p className="mt-1 text-xs text-slate-600">{program.slug || 'Program record'}</p>
+                  </div>
+                ))}
+              </div>
+            ) : apprenticeship.sourceState !== 'unavailable' ? (
+              <div className="mt-5 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-700">
+                No apprenticeship program is currently mapped to this employer. This no longer means the platform catalog is empty.
+              </div>
+            ) : null}
           </div>
 
-          {/* Recent Postings */}
-          {(postings?.length || 0) > 0 && (
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <h3 className="text-xl font-bold text-black mb-4">Active Job Postings</h3>
-              <div className="space-y-3">
-                {postings?.slice(0, 5).map((posting) => (
-                  <div
-                    key={posting.id}
-                    className="flex items-center justify-between p-3 bg-white rounded-lg"
-                  >
+          {(postings?.length ?? 0) > 0 && (
+            <div className="rounded-2xl border bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-black text-slate-950">Active Job Postings</h2>
+              <div className="mt-4 divide-y">
+                {postings?.slice(0, 5).map((posting: any) => (
+                  <div key={posting.id} className="flex items-center justify-between gap-4 py-3">
                     <div>
-                      <div className="font-semibold text-black">{posting.title}</div>
-                      <div className="text-sm text-black">
-                        Posted: {safeFormatDate(posting.created_at)}
-                      </div>
+                      <p className="font-bold text-slate-950">{posting.title}</p>
+                      <p className="text-xs text-slate-600">{new Date(posting.created_at).toLocaleDateString()}</p>
                     </div>
-                    <a
-                      href={`/employer/postings/${posting.id}`}
-                      className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition text-sm"
-                    >
-                      View
-                    </a>
+                    <Link href={`/employer/postings/${posting.id}`} className="text-sm font-bold text-blue-700 hover:underline">View</Link>
                   </div>
                 ))}
               </div>
@@ -294,138 +242,35 @@ export default async function EmployerDashboardOrchestrated() {
           )}
         </div>
 
-        {/* Sidebar - 1/3 width */}
-        <div className="space-y-6">
-          {/* Company Info */}
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Building2 className="h-11 w-11 text-brand-blue-600" />
-              <div>
-                <h3 className="font-bold text-black">{profile.company_name || 'Your Company'}</h3>
-                <div className="text-sm text-black">
-                  {profile.verified ? (
-                    <span className="text-brand-green-600 font-semibold">• Verified</span>
-                  ) : (
-                    <span className="text-yellow-600 font-semibold">Pending Verification</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+        <aside className="space-y-4">
+          <Action href="/employer/jobs" icon={Briefcase} title="Manage jobs" text="Create and manage employer job postings." />
+          <Action href="/employer/candidates" icon={Users} title="Candidates" text="Review trained candidates and applications." />
+          <Action href="/employer/apprenticeships" icon={TrendingUp} title="Apprenticeships" text="Manage mapped programs, apprentices, and compliance." />
+          <Action href="/employer/compliance" icon={Shield} title="Compliance" text="Review required apprenticeship and employer records." />
+          <Action href="/employer/reports" icon={FileText} title="Reports" text="Review hiring and workforce outcomes." />
+        </aside>
+      </section>
+    </main>
+  );
+}
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <h3 className="text-lg font-bold text-black mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              {profile.verified && (
-                <Link
-                  href="/employer/post-job"
-                  className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
-                >
-                  Post New Job
-                </Link>
-              )}
-              <Link
-                href="/employer/candidates"
-                className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300 transition"
-              >
-                Browse Candidates
-              </Link>
-            </div>
-          </div>
+function Metric({ icon: Icon, label, value, detail }: { icon: ElementType; label: string; value: string; detail?: string }) {
+  return (
+    <article className="rounded-2xl border bg-white p-5 shadow-sm">
+      <Icon className="h-6 w-6 text-blue-700" />
+      <p className="mt-4 text-3xl font-black text-slate-950">{value}</p>
+      <p className="mt-1 text-sm font-bold text-slate-800">{label}</p>
+      {detail && <p className="mt-2 text-xs leading-5 text-slate-600">{detail}</p>}
+    </article>
+  );
+}
 
-          {/* Apprenticeship CTA */}
-          {!apprenticeshipProgram && profile.verified && (
-            <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
-              <h3 className="text-lg font-bold text-brand-blue-900 mb-3">
-                Build Your Talent Pipeline
-              </h3>
-              <p className="text-brand-blue-800 mb-4 text-sm">
-                Start an apprenticeship program and train workers specifically for your needs.
-              </p>
-              <Link
-                href="/employer/apprenticeships"
-                className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
-              >
-                View Apprenticeships
-              </Link>
-            </div>
-          )}
-
-          {/* Support Card */}
-          <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
-            <h3 className="text-lg font-bold text-brand-blue-900 mb-3">Need Help?</h3>
-            <p className="text-brand-blue-800 mb-4 text-sm">
-              Our team is here to help you find the right candidates.
-            </p>
-            <a
-              href="/support"
-              className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
-            >
-              Call (317) 314-3757
-            </a>
-          </div>
-
-          {/* Employer Tools */}
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold text-black mb-4">Employer Tools</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Link
-                href="/employer/jobs"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                My Jobs
-              </Link>
-              <Link
-                href="/employer/post-job"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                Post Job
-              </Link>
-              <Link
-                href="/employer/candidates"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                Candidates
-              </Link>
-              <Link
-                href="/employer/placements"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                Placements
-              </Link>
-              <Link
-                href="/employer/opportunities"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                Opportunities
-              </Link>
-              <Link
-                href="/employer/analytics"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                Analytics
-              </Link>
-              <Link
-                href="/employer/settings"
-                aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
-              >
-                Settings
-              </Link>
-            </div>
-          </div>
-
-          {/* Live Workforce Widget */}
-          {profile.verified && <WorkforceLiveWidget />}
-        </div>
-      </div>
-    </StateAwareDashboard>
+function Action({ href, icon: Icon, title, text }: { href: string; icon: ElementType; title: string; text: string }) {
+  return (
+    <Link href={href} className="block rounded-2xl border bg-white p-5 shadow-sm transition hover:border-blue-300 hover:shadow-md">
+      <Icon className="h-5 w-5 text-blue-700" />
+      <h2 className="mt-3 font-black text-slate-950">{title}</h2>
+      <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>
+    </Link>
   );
 }

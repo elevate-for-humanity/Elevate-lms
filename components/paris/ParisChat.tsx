@@ -25,7 +25,6 @@ export default function ParisChat({ onComplete, showHeader = true, className = '
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -55,23 +54,27 @@ I can help you find the right career path. **Just click an option below** or typ
     if (!content.trim() || isLoading) return;
 
     const userMsg: Message = { role: 'user', content: content.trim() };
+    const requestMessages = [...messages.slice(-19), userMsg];
+
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/zora', {
+      const response = await fetch('/api/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: content, history: messages.slice(-20), sessionId }),
+        body: JSON.stringify({ messages: requestMessages }),
       });
 
       if (!response.ok) throw new Error('Failed');
       const data = await response.json();
+      const reply = typeof data.reply === 'string' ? data.reply : '';
+      if (!reply) throw new Error('Empty response');
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
 
-      if (data.response.includes('Next step') || data.response.includes('book a free')) {
+      if (reply.includes('Next step') || reply.includes('book a free')) {
         onComplete?.([]);
       }
     } catch {
@@ -83,7 +86,7 @@ I can help you find the right career path. **Just click an option below** or typ
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [isLoading, messages, sessionId, onComplete]);
+  }, [isLoading, messages, onComplete]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

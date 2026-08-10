@@ -9,47 +9,14 @@ import {
   syncIndividualAppLifecycle,
   syncPlatformSubscriptionLifecycle,
 } from '@/lib/platform/subscription-lifecycle';
-
-function subscriptionPeriod(subscription: Stripe.Subscription) {
-  const firstItem = subscription.items?.data?.[0];
-  return {
-    start: firstItem?.current_period_start
-      ? new Date(firstItem.current_period_start * 1000).toISOString()
-      : null,
-    end: firstItem?.current_period_end
-      ? new Date(firstItem.current_period_end * 1000).toISOString()
-      : null,
-  };
-}
-
-async function persistGenericSubscription(db: any, subscription: Stripe.Subscription) {
-  const period = subscriptionPeriod(subscription);
-  await db.from('subscriptions').upsert(
-    {
-      stripe_subscription_id: subscription.id,
-      customer_id:
-        typeof subscription.customer === 'string'
-          ? subscription.customer
-          : subscription.customer?.id,
-      status: subscription.status,
-      current_period_start: period.start,
-      current_period_end: period.end,
-      cancel_at_period_end: subscription.cancel_at_period_end,
-      canceled_at: subscription.canceled_at
-        ? new Date(subscription.canceled_at * 1000).toISOString()
-        : null,
-      created_at: new Date(subscription.created * 1000).toISOString(),
-      metadata: subscription.metadata,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'stripe_subscription_id' },
-  );
-}
+import { syncHostShopSubscriptionLifecycle } from '@/lib/platform/orchestration/host-shop-subscription';
 
 async function syncAllSubscriptionState(db: any, subscription: Stripe.Subscription) {
-  await persistGenericSubscription(db, subscription);
+  // Domain tables are authoritative. Do not mirror into the legacy generic
+  // `subscriptions` table: that creates a competing source of truth.
   await syncPlatformSubscriptionLifecycle(db, subscription);
   await syncIndividualAppLifecycle(db, subscription);
+  await syncHostShopSubscriptionLifecycle(db, subscription);
 }
 
 async function persistInvoice(db: any, invoice: Stripe.Invoice, status: 'paid' | 'failed') {
@@ -97,8 +64,11 @@ async function persistInvoice(db: any, invoice: Stripe.Invoice, status: 'paid' |
 
 /**
  * Canonical subscription webhook processor used by Marketing and LMS.
- * Stripe should still point to one public endpoint, but duplicate app routes now
- * execute exactly the same lifecycle logic and cannot drift independently.
+ *
+ * All recurring product families flow through this one handler. Individual
+ * lifecycle helpers ignore subscriptions outside their metadata namespace, so
+ * each Stripe event has exactly one domain owner while sharing verification,
+ * invoice auditing, retries, and logging.
  */
 export async function handleSubscriptionWebhook(request: NextRequest) {
   const payload = Buffer.from(await request.arrayBuffer()).toString();
@@ -123,7 +93,6 @@ export async function handleSubscriptionWebhook(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
-  if (!db) return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
 
   try {
     switch (event.type) {
@@ -137,6 +106,7 @@ export async function handleSubscriptionWebhook(request: NextRequest) {
           subscriptionId: subscription.id,
           status: subscription.status,
           checkoutType: subscription.metadata?.checkout_type,
+          type: subscription.metadata?.type,
         });
         break;
       }

@@ -1,56 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getQuestionsForProgram } from '@/lib/paris/interview/question-bank';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * GET /api/paris/interview/questions
- * Get interview questions for a program (without scoring rubric)
+ *
+ * AUTH: Intentionally public. Applicants can enter the pre-enrollment interview
+ * before creating an LMS account. Only question text is exposed; scoring
+ * weights, rubrics, and internal eligibility logic stay server-side.
  */
 export async function GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'pageLoad');
+  if (rateLimited) return rateLimited;
+
   try {
-    const { searchParams } = new URL(request.url);
-    const program = searchParams.get('program');
-
+    const program = request.nextUrl.searchParams.get('program')?.trim() || '';
     if (!program) {
+      return NextResponse.json({ error: 'Missing required parameter: program' }, { status: 400 });
+    }
+
+    const supportedPrograms = new Set([
+      'barber-apprenticeship',
+      'cdl-training',
+      'hvac',
+      'medical-assistant',
+      'cosmetology',
+      'phlebotomy',
+    ]);
+
+    if (!supportedPrograms.has(program)) {
       return NextResponse.json(
-        { error: 'Missing required parameter: program' },
-        { status: 400 }
+        { error: 'Program not supported for PARIS interview', code: 'PROGRAM_NOT_SUPPORTED' },
+        { status: 400 },
       );
     }
 
-    // Validate program is supported
-    const supportedPrograms = ['barber-apprenticeship', 'cdl-training', 'hvac', 'medical-assistant', 'cosmetology', 'phlebotomy'];
-    
-    if (!supportedPrograms.includes(program)) {
-      return NextResponse.json(
-        { error: 'Program not supported for PARS interview', code: 'PROGRAM_NOT_SUPPORTED' },
-        { status: 400 }
-      );
-    }
-
-    // Get questions and strip scoring rubrics (don't expose to client)
     const questions = getQuestionsForProgram(program);
-    
-    const sanitizedQuestions = questions.map(q => ({
-      id: q.id,
-      question: q.question,
-      domain: q.domain,
-      followUps: q.followUps,
-      weight: q.weight,
-      requiredDomain: q.requiredDomain
+    const publicQuestions = questions.map((question) => ({
+      id: question.id,
+      question: question.question,
+      domain: question.domain,
+      followUps: question.followUps,
     }));
 
     return NextResponse.json({
       program,
-      questions: sanitizedQuestions,
-      questionCount: sanitizedQuestions.length,
-      estimatedDuration: `${questions.length * 5}-${questions.length * 8} minutes`
+      questions: publicQuestions,
+      questionCount: publicQuestions.length,
     });
-
-  } catch (error) {
-    console.error('PARS Interview Questions Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', message: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: 'Interview questions are temporarily unavailable.' }, { status: 503 });
   }
 }

@@ -1,59 +1,29 @@
 {
-  "name": "Elevate Partner Shop",
-  "short_name": "Shop Partner",
-  "description": "Manage your apprentices, log their hours, and track training progress at your barbershop.",
-  "start_url": "/pwa/shop-owner",
+  "id": "org.elevateforhumanity.hostshop",
+  "name": "Elevate Host Shop Portal",
+  "short_name": "Host Shop",
+  "description": "Manage apprentices, review hours, record attendance, verify competencies, and maintain host-site records.",
+  "start_url": "/host-shop/dashboard",
+  "scope": "/host-shop/",
   "display": "standalone",
-  "background_color": "#1e40af",
+  "orientation": "any",
+  "background_color": "#ffffff",
   "theme_color": "#1e40af",
-  "orientation": "portrait-primary",
-  "scope": "/pwa/shop-owner",
+  "categories": ["business", "education", "productivity"],
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
     {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-192-maskable.png",
-      "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-384.png",
-      "sizes": "384x384",
-      "type": "image/png"
+      "purpose": "any"
     },
     {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-512-maskable.png",
@@ -62,58 +32,34 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/shop-dashboard.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Dashboard showing apprentice overview"
-    }
-  ],
-  "categories": [
-    "business",
-    "productivity"
-  ],
-  "lang": "en-US",
-  "dir": "ltr",
   "shortcuts": [
     {
-      "name": "Log Apprentice Hours",
-      "short_name": "Log Hours",
-      "description": "Log hours for your apprentices",
-      "url": "/pwa/shop-owner/log-hours",
-      "icons": [
-        {
-          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "name": "Host Shop Dashboard",
+      "short_name": "Dashboard",
+      "url": "/host-shop/dashboard/board"
     },
     {
       "name": "My Apprentices",
       "short_name": "Apprentices",
-      "description": "View your apprentices",
-      "url": "/pwa/shop-owner/apprentices",
-      "icons": [
-        {
-          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "url": "/host-shop/dashboard/apprentices"
     },
     {
-      "name": "Reports",
-      "short_name": "Reports",
-      "description": "View hours and compliance reports",
-      "url": "/pwa/shop-owner/reports",
-      "icons": [
-        {
-          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icon-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "name": "Review Pending Hours",
+      "short_name": "Hours",
+      "url": "/host-shop/dashboard/hours/pending"
+    },
+    {
+      "name": "Record Attendance",
+      "short_name": "Attendance",
+      "url": "/host-shop/dashboard/attendance/record"
+    },
+    {
+      "name": "Competency Sign-Offs",
+      "short_name": "Skills",
+      "url": "/host-shop/dashboard/competencies"
     }
   ],
-  "id": "org.elevateforhumanity.shopowner"
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

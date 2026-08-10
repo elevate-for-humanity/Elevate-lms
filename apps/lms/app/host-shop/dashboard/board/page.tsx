@@ -8,18 +8,13 @@ import MatchRequestsButton from './MatchRequestsButton';
 
 export const dynamic = 'force-dynamic';
 
-type PageProps = {
-  searchParams: Promise<{ partnerId?: string }>;
-};
+export default async function PartnerBoardPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/host-shop/dashboard/board');
 
-async function AdminHostShopSelector() {
-  const db = await requireAdminClient();
-  const { data: partners } = await db
-    .from('partners')
-    .select('id, name, dba, city, state, partner_type, program_type, approval_status, status')
-    .eq('approval_status', 'approved')
-    .in('partner_type', ['barber', 'salon', 'host_shop', 'cosmetology_school', 'training_site'])
-    .order('name');
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  if (!profile || !['partner', 'host_shop', 'host_shop_admin', 'admin', 'staff'].includes(profile.role)) redirect('/unauthorized');
 
   return (
     <div className="space-y-6">

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { TESTING_CENTER_ROLES } from '@/lib/rbac/role-matrix';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import TestingCenterClient from './TestingCenterClient';
@@ -14,16 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function TestingCenterPage() {
-  await requireRole(TESTING_CENTER_ROLES);
+  // The canonical role router sends test_admin and proctor here, so the page
+  // guard must admit those roles in addition to administrative staff.
+  await requireRole(['admin', 'staff', 'test_admin', 'proctor']);
   const db = await requireAdminClient();
 
   const dateFrom = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  const dateTo = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
 
-  const [
-    { data: bookings },
-    { data: sessions },
-    { data: slots },
-  ] = await Promise.all([
+  const [{ data: bookings }, { data: sessions }, { data: slots }] = await Promise.all([
     db
       .from('exam_bookings')
       .select('id,exam_type,exam_name,first_name,last_name,email,status,confirmed_date,confirmed_time,exam_result,payment_status,fee_cents,created_at,slot_id,attempts_used,no_show_fee_paid')
@@ -51,16 +49,20 @@ export default async function TestingCenterPage() {
 
   const stats = {
     totalBookings: allBookings.length,
-    confirmedBookings: allBookings.filter((booking: any) => booking.status === 'confirmed').length,
-    pendingBookings: allBookings.filter((booking: any) => booking.status === 'pending').length,
+    confirmedBookings: allBookings.filter((b: any) => b.status === 'confirmed').length,
+    pendingBookings: allBookings.filter((b: any) => b.status === 'pending').length,
     totalSessions: allSessions.length,
-    passed: allSessions.filter((session: any) => session.result === 'pass').length,
-    failed: allSessions.filter((session: any) => session.result === 'fail').length,
-    inProgress: allSessions.filter((session: any) => session.status === 'in_progress').length,
-    flagged: allSessions.filter((session: any) => ['flagged', 'under_review'].includes(session.review_status)).length,
-    noShows: allBookings.filter((booking: any) => booking.status === 'no_show').length,
-    passRate: decidedSessions.length
-      ? Math.round((decidedSessions.filter((session: any) => session.result === 'pass').length / decidedSessions.length) * 100)
+    passed: allSessions.filter((s: any) => s.result === 'pass').length,
+    failed: allSessions.filter((s: any) => s.result === 'fail').length,
+    inProgress: allSessions.filter((s: any) => s.status === 'in_progress').length,
+    flagged: allSessions.filter((s: any) => ['flagged', 'under_review'].includes(s.review_status)).length,
+    noShows: allBookings.filter((b: any) => b.status === 'no_show').length,
+    passRate: allSessions.filter((s: any) => ['pass', 'fail'].includes(s.result)).length > 0
+      ? Math.round(
+          (allSessions.filter((s: any) => s.result === 'pass').length /
+            allSessions.filter((s: any) => ['pass', 'fail'].includes(s.result)).length) *
+            100,
+        )
       : null,
   };
 

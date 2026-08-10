@@ -6,10 +6,10 @@ import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { getRoleDestination } from '@/lib/auth/role-destinations';
+import { getRoleDestinationUrl } from '@/lib/auth/role-destinations';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 async function _GET(request: Request) {
@@ -29,7 +29,6 @@ async function _GET(request: Request) {
           try {
             cookieStore.set({ name, value, ...options });
           } catch (error) {
-            // Handle cookie setting errors
             logger.error('Error setting cookie:', error);
           }
         },
@@ -37,7 +36,6 @@ async function _GET(request: Request) {
           try {
             cookieStore.set({ name, value: '', ...options });
           } catch (error) {
-            // Handle cookie removal errors
             logger.error('Error removing cookie:', error);
           }
         },
@@ -65,11 +63,14 @@ async function _GET(request: Request) {
       return NextResponse.json({ redirectTo: '/login' });
     }
 
-    const redirectTo = getRoleDestination(profile.role as string);
+    // This endpoint runs on www but roles may belong to app/admin. Always
+    // return the full URL for the application that owns the destination.
+    const redirectTo = getRoleDestinationUrl(profile.role as string);
     return NextResponse.json({ redirectTo });
   } catch (error) {
     logger.error('Auth landing error:', error);
     return NextResponse.json({ error: 'Authentication error' }, { status: 500 });
   }
 }
+
 export const GET = withApiAudit('/api/auth/landing', _GET);

@@ -9,13 +9,14 @@ import {
 export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
   barber: { hours: 2000, label: 'Barber Apprenticeship' },
   'barber-apprenticeship': { hours: 2000, label: 'Barber Apprenticeship' },
-  cosmetology: { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  'cosmetology-apprenticeship': { hours: 1500, label: 'Hairstylist Apprenticeship' },
-  hairstylist: { hours: 1500, label: 'Hairstylist Apprenticeship' },
+  cosmetology: { hours: 2000, label: 'Cosmetology Apprenticeship' },
+  'cosmetology-apprenticeship': { hours: 2000, label: 'Cosmetology Apprenticeship' },
+  hairstylist: { hours: 2000, label: 'Cosmetology Apprenticeship' },
   'nail-tech': { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_tech: { hours: 450, label: 'Nail Technician Apprenticeship' },
   nail_technician: { hours: 450, label: 'Nail Technician Apprenticeship' },
   esthetician: { hours: 700, label: 'Esthetician Apprenticeship' },
+  'esthetician-apprenticeship': { hours: 700, label: 'Esthetician Apprenticeship' },
   training_site: { hours: 2000, label: 'Apprenticeship' },
 };
 
@@ -72,13 +73,12 @@ async function loadBoardForPartner(
 ) {
   const db = await requireAdminClient();
 
-  const shopQueries: PromiseLike<any>[] = [
-    db
-      .from('shops')
-      .select('id, name, city, state, active, partner_id')
-      .eq('partner_id', partner.id)
-      .neq('active', false),
-  ];
+  const { data: partnerLink, error: partnerLinkError } = await db
+    .from('partner_users')
+    .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .maybeSingle();
 
   if (options.userId) {
     shopQueries.push(
@@ -101,28 +101,24 @@ async function loadBoardForPartner(
     if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
   }
 
-  if (options.userId && shopResults[1]?.data) {
-    for (const row of shopResults[1].data) {
-      const shop = row?.shops;
-      if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
-    }
-  }
+  const { data: shopLinks } = await db
+    .from('shop_staff')
+    .select('shop_id, shops(id, name, city, state, active)')
+    .eq('user_id', userId);
 
   const shops = Array.from(shopMap.values());
   const shopIds = shops.map((shop) => shop.id as string);
 
-  const { data: placements, error: placementError } = shopIds.length
+  const { data: placements, error: placementsError } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        .select(
-          'id, student_id, shop_id, discipline, program_slug, status, start_date, profiles(full_name, email)',
-        )
+        .select('id, student_id, shop_id, program_slug, status, start_date, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
     : { data: [], error: null };
 
-  if (placementError) {
-    throw new Error(`HOST_SHOP_PLACEMENTS_LOAD_FAILED:${placementError.message}`);
+  if (placementsError) {
+    throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
   }
 
   const apprentices = (placements || []).map((placement: any) => ({
@@ -130,13 +126,46 @@ async function loadBoardForPartner(
     student_id: placement.student_id,
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
-    discipline: placement.discipline || placement.program_slug,
-    program_slug: placement.program_slug,
+    program_slug: placement.program_slug || null,
+    discipline: placement.program_slug || null,
     start_date: placement.start_date,
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
-  const ojtCompletedByUser: Record<string, number> = {};
+  const programByStudent = new Map(
+    apprentices.map((apprentice) => [apprentice.student_id, apprentice.program_slug]),
+  );
+
+  const ojtProgress: Record<string, { completed: number; required: number }> = {};
+  if (studentIds.length) {
+    const { data: approvedHours, error: approvedHoursError } = await db
+      .from('hour_entries')
+      .select('user_id, program_slug, accepted_hours, hours, hours_claimed')
+      .in('user_id', studentIds)
+      .eq('status', 'approved');
+
+    if (approvedHoursError) {
+      throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${approvedHoursError.message}`);
+    }
+
+    for (const studentId of studentIds) {
+      const programSlug = programByStudent.get(studentId) || '';
+      const target = TRADE_TARGETS[programSlug]?.hours ?? 2000;
+      ojtProgress[studentId] = { completed: 0, required: target };
+    }
+
+    for (const row of approvedHours || []) {
+      if (!row.user_id || !ojtProgress[row.user_id]) continue;
+      const expectedProgram = programByStudent.get(row.user_id);
+      if (expectedProgram && row.program_slug && row.program_slug !== expectedProgram) continue;
+
+      const accepted = Number(row.accepted_hours ?? row.hours ?? row.hours_claimed ?? 0);
+      if (Number.isFinite(accepted) && accepted > 0) {
+        ojtProgress[row.user_id].completed += accepted;
+      }
+    }
+  }
+
   let pendingHoursCount = 0;
 
   if (studentIds.length) {
@@ -159,9 +188,7 @@ async function loadBoardForPartner(
     }
   }
 
-  const programType = resolveHostShopProgram(
-    partner ?? { partner_type: apprentices[0]?.discipline },
-  );
+  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.program_slug });
   const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
@@ -187,16 +214,14 @@ async function loadBoardForPartner(
     .in('state', [partner.state || 'Indiana', 'ALL']);
 
   const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
-  const { data: uploadedDocs, error: documentLoadError } = await db
+  const { data: uploadedDocs, error: uploadedDocsError } = await db
     .from('partner_documents')
-    .select(
-      'id, document_type, display_name, file_name, status, rejection_reason, expires_at:expiration_date, uploaded_at',
-    )
+    .select('id, document_type, display_name, file_name, file_url, status, rejection_reason, expiration_date, uploaded_at')
     .eq('partner_id', partner.id)
     .order('uploaded_at', { ascending: false });
 
-  if (documentLoadError) {
-    throw new Error(`HOST_SHOP_DOCUMENTS_LOAD_FAILED:${documentLoadError.message}`);
+  if (uploadedDocsError) {
+    throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
   }
 
   const latestDocs = new Map<string, any>();

@@ -16,20 +16,23 @@ export default async function ModulesPage() {
   await requireRole(['admin']);
   const supabase = await createClient();
 
-  // Fetch program modules (LMS)
-  const { data: modules, count: totalModules } = await supabase
+  // modules has a programs FK, but there is no direct modules -> scorm_packages
+  // relationship in the live schema. Do not request a phantom nested relation.
+  const { data: modules, count: totalModules, error: modulesError } = await supabase
     .from('modules')
     .select(
       `
       *,
-      program:programs(name, title, slug),
-      scorm_package:scorm_packages(id, title, version)
+      program:programs(name, title, slug)
     `,
       { count: 'exact' },
     )
     .order('created_at', { ascending: false });
 
-  // Fetch staff training modules
+  if (modulesError) {
+    throw new Error(`MODULES_QUERY_FAILED:${modulesError.message}`);
+  }
+
   const { data: trainingModules, count: totalTrainingModules } = await supabase
     .from('training_modules')
     .select('*', { count: 'exact' })
@@ -50,7 +53,6 @@ export default async function ModulesPage() {
     .select('*', { count: 'exact', head: true })
     .eq('module_type', 'assessment');
 
-  // Get programs for filtering
   const { data: programs } = await supabase
     .from('programs')
     .select('id, title, slug')
@@ -59,12 +61,10 @@ export default async function ModulesPage() {
 
   return (
     <div className="min-h-screen bg-white p-8">
-      {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Modules' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Modules' }]} />
       </div>
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -79,7 +79,6 @@ export default async function ModulesPage() {
             </Link>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-sm font-medium text-black mb-1">Program Modules</h3>
@@ -90,27 +89,20 @@ export default async function ModulesPage() {
               <p className="text-base md:text-lg font-bold text-amber-600">{totalTrainingModules || 0}</p>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-4">
-              <h3 className="text-sm font-medium text-black mb-1">SCORM Packages</h3>
-              <p className="text-base md:text-lg font-bold text-brand-blue-600">
-                {scormModules || 0}
-              </p>
+              <h3 className="text-sm font-medium text-black mb-1">SCORM Modules</h3>
+              <p className="text-base md:text-lg font-bold text-brand-blue-600">{scormModules || 0}</p>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-sm font-medium text-black mb-1">Lessons</h3>
-              <p className="text-base md:text-lg font-bold text-brand-green-600">
-                {lessonModules || 0}
-              </p>
+              <p className="text-base md:text-lg font-bold text-brand-green-600">{lessonModules || 0}</p>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-sm font-medium text-black mb-1">Assessments</h3>
-              <p className="text-base md:text-lg font-bold text-brand-blue-600">
-                {assessmentModules || 0}
-              </p>
+              <p className="text-base md:text-lg font-bold text-brand-blue-600">{assessmentModules || 0}</p>
             </div>
           </div>
         </div>
 
-        {/* Staff Training Modules */}
         {(trainingModules?.length ?? 0) > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-bold text-black mb-4">Staff Training Modules</h2>
@@ -140,7 +132,7 @@ export default async function ModulesPage() {
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <Link
-                          href={`/admin/staff-portal/training`}
+                          href="/staff-portal/training"
                           className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                         >
                           View in Staff Portal →
@@ -154,7 +146,6 @@ export default async function ModulesPage() {
           </div>
         )}
 
-        {/* Program Modules Table */}
         <h2 className="text-xl font-bold text-black mb-4">Program Modules (LMS)</h2>
         <ModulesTable modules={modules || []} programs={programs || []} />
       </div>

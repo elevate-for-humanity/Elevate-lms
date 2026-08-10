@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
+import { getEmployerRecord } from '@/lib/employer/employer-context';
 import { Building2, Mail, Phone, MapPin, Globe, Users, Briefcase, GraduationCap } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -9,11 +10,11 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Company Profile | Employer Portal',
   description: 'View your company profile, workforce stats, and contact details.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/employer/company' },
+  robots: { index: false, follow: false },
 };
 
 export default async function EmployerCompanyPage() {
-  const { user } = await requireRole(['employer', 'admin']);
+  const { user } = await requireRole(['employer', 'sponsor', 'admin']);
   const supabase = await createClient();
 
   const { data: profile } = await supabase
@@ -22,13 +23,36 @@ export default async function EmployerCompanyPage() {
     .eq('id', user.id)
     .maybeSingle();
 
-  const { data: employer } = await supabase.from('employers').select('*').eq('user_id', user.id).maybeSingle();
+  const employer = await getEmployerRecord(supabase, user.id);
 
-  const [{ count: jobsCount }, { count: apprenticeshipsCount }, { count: applicationsCount }] = await Promise.all([
-    supabase.from('job_postings').select('*', { head: true, count: 'exact' }).eq('employer_id', user.id),
-    supabase.from('apprenticeships').select('*', { head: true, count: 'exact' }).eq('employer_id', user.id),
-    supabase.from('job_applications').select('*', { head: true, count: 'exact' }).eq('employer_id', user.id),
+  const { data: jobs } = employer
+    ? await supabase
+        .from('job_postings')
+        .select('id')
+        .eq('employer_id', employer.id)
+    : { data: [] };
+  const jobIds = (jobs ?? []).map((job: any) => job.id);
+
+  const [{ count: apprenticeshipsCount }, { count: applicationsCount }] = await Promise.all([
+    employer
+      ? supabase
+          .from('apprenticeships')
+          .select('*', { head: true, count: 'exact' })
+          .eq('employer_id', employer.id)
+      : Promise.resolve({ count: 0 }),
+    jobIds.length
+      ? supabase
+          .from('job_applications')
+          .select('*', { head: true, count: 'exact' })
+          .in('job_posting_id', jobIds)
+      : Promise.resolve({ count: 0 }),
   ]);
+
+  const companyName = employer?.company_name || employer?.business_name || profile?.company_name || 'Not set';
+  const primaryLocation = [employer?.city || profile?.city, employer?.state || profile?.state]
+    .filter(Boolean)
+    .join(', ');
+  const fullLocation = [employer?.city, employer?.state, employer?.zip].filter(Boolean).join(', ');
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -47,8 +71,15 @@ export default async function EmployerCompanyPage() {
           </Link>
         </div>
 
+        {!employer && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+            <p className="font-semibold">Employer profile required</p>
+            <p className="text-sm mt-1">Complete employer onboarding to activate company operations.</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Kpi label="Open + Draft Jobs" value={jobsCount || 0} icon={<Briefcase className="w-5 h-5 text-brand-blue-600" />} />
+          <Kpi label="Open + Draft Jobs" value={jobs?.length || 0} icon={<Briefcase className="w-5 h-5 text-brand-blue-600" />} />
           <Kpi label="Applications" value={applicationsCount || 0} icon={<Users className="w-5 h-5 text-brand-green-600" />} />
           <Kpi label="Apprenticeships" value={apprenticeshipsCount || 0} icon={<GraduationCap aria-label="graduationcap" className="w-5 h-5 text-brand-orange-600" />} />
         </div>
@@ -60,15 +91,12 @@ export default async function EmployerCompanyPage() {
               <h2 className="text-lg font-bold text-slate-900">Organization Details</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <Field label="Company Name" value={employer?.company_name || profile.company_name || 'Not set'} />
+              <Field label="Company Name" value={companyName} />
               <Field label="Industry" value={employer?.industry || 'Not set'} />
               <Field label="Company Size" value={employer?.company_size || 'Not set'} />
-              <Field label="Website" value={employer?.website || 'Not set'} />
-              <Field
-                label="Primary Location"
-                value={[employer?.city || profile.city, employer?.state || profile.state].filter(Boolean).join(', ') || 'Not set'}
-              />
-              <Field label="Verification" value={profile.verified ? 'Verified' : 'Pending verification'} />
+              <Field label="Website" value={employer?.website_url || 'Not set'} />
+              <Field label="Primary Location" value={primaryLocation || 'Not set'} />
+              <Field label="Verification" value={employer?.approved || profile?.verified ? 'Verified' : 'Pending verification'} />
             </div>
             {employer?.description && (
               <div className="mt-5 border-t border-slate-100 pt-4">
@@ -84,29 +112,25 @@ export default async function EmployerCompanyPage() {
               <div className="space-y-3 text-sm text-slate-700">
                 <div className="flex items-center gap-2">
                   <Users className="w-4 h-4 text-slate-500" />
-                  <span>{profile.full_name || 'Not set'}</span>
+                  <span>{profile?.full_name || 'Not set'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-slate-500" />
-                  <span>{profile.email || user.email || 'Not set'}</span>
+                  <span>{profile?.email || user.email || 'Not set'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-slate-500" />
-                  <span>{profile.phone || employer?.phone || 'Not set'}</span>
+                  <span>{profile?.phone || employer?.phone || 'Not set'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-slate-500" />
-                  <span>
-                    {[employer?.address_line1, employer?.city, employer?.state, employer?.zip]
-                      .filter(Boolean)
-                      .join(', ') || 'Address not set'}
-                  </span>
+                  <span>{fullLocation || 'Address not set'}</span>
                 </div>
-                {employer?.website && (
+                {employer?.website_url && (
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4 text-slate-500" />
-                    <a href={employer.website} target="_blank" rel="noreferrer" className="text-brand-blue-700 hover:underline">
-                      {employer.website}
+                    <a href={employer.website_url} target="_blank" rel="noreferrer" className="text-brand-blue-700 hover:underline">
+                      {employer.website_url}
                     </a>
                   </div>
                 )}

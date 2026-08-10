@@ -1,120 +1,111 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { CheckCircle2, Circle, FileSignature, FileUp, Store } from 'lucide-react';
-import { requireCurrentHostShopPartner } from '@/lib/partners/current-host-shop';
+import { CheckCircle2, Circle, FileText, PenLine, ShieldCheck } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 import { getHostShopBoard } from '@/lib/partner/board';
 
 export const dynamic = 'force-dynamic';
-export const metadata = {
-  title: 'Host Shop Onboarding | Elevate LMS',
-  robots: { index: false, follow: false },
-};
-
-async function loadContext() {
-  try {
-    return await requireCurrentHostShopPartner();
-  } catch (error) {
-    const code = error instanceof Error ? error.message : '';
-    if (code === 'HOST_SHOP_UNAUTHENTICATED') {
-      redirect('/host-shop/login?redirect=/host-shop/onboarding');
-    }
-    redirect('/unauthorized');
-  }
-}
-
-function StepCard({
-  title,
-  description,
-  href,
-  complete,
-  icon: Icon,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  complete: boolean;
-  icon: typeof Store;
-}) {
-  return (
-    <Link
-      href={href}
-      className="rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-blue-300 hover:shadow-sm"
-    >
-      <div className="flex items-start justify-between gap-4">
-        <Icon className="h-8 w-8 text-blue-700" />
-        {complete ? (
-          <CheckCircle2 className="h-6 w-6 text-green-700" />
-        ) : (
-          <Circle className="h-6 w-6 text-slate-400" />
-        )}
-      </div>
-      <h2 className="mt-5 text-xl font-black text-slate-950">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-700">{description}</p>
-      <p className="mt-4 text-sm font-black text-blue-700">{complete ? 'Review →' : 'Complete step →'}</p>
-    </Link>
-  );
-}
 
 export default async function HostShopOnboardingPage() {
-  const { user, partner } = await loadContext();
-  const board = await getHostShopBoard(user.id);
-  const docsComplete =
-    board.requiredDocumentCount > 0 &&
-    board.acceptedDocumentCount === board.requiredDocumentCount;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/host-shop/login?redirect=/host-shop/onboarding');
+
+  let board: Awaited<ReturnType<typeof getHostShopBoard>>;
+  try {
+    board = await getHostShopBoard(user.id);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'HOST_SHOP_ACCESS_DENIED') {
+      redirect('https://www.elevateforhumanity.org/partners/host-shop/apply');
+    }
+    throw error;
+  }
+
+  const steps = [
+    {
+      title: 'Host Site approval',
+      complete: board.partner?.approval_status === 'approved',
+      detail:
+        board.partner?.approval_status === 'approved'
+          ? 'Elevate has approved this Host Site.'
+          : 'Your application is still under review.',
+      href: null,
+      icon: ShieldCheck,
+    },
+    {
+      title: 'Sign Host Shop MOU',
+      complete: Boolean(board.partner?.mou_signed),
+      detail: board.partner?.mou_signed
+        ? 'The Host Shop MOU is signed.'
+        : 'Review and electronically sign the worksite agreement.',
+      href: board.onboardingPaths.signMou,
+      icon: PenLine,
+    },
+    {
+      title: 'Required compliance documents',
+      complete: board.requiredDocumentCount > 0 && board.acceptedDocumentCount === board.requiredDocumentCount,
+      detail: `${board.acceptedDocumentCount} of ${board.requiredDocumentCount} required documents accepted.`,
+      href: board.onboardingPaths.documents,
+      icon: FileText,
+    },
+  ];
+
+  const complete = steps.every((step) => step.complete);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10 text-slate-950 sm:px-6">
-      <div className="mx-auto max-w-5xl">
-        <div className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-700">Host Shop onboarding</p>
-          <h1 className="mt-2 text-3xl font-black sm:text-4xl">{partner.dba || partner.name}</h1>
-          <p className="mt-3 max-w-3xl leading-7 text-slate-700">
-            Complete the worksite profile, execute the apprenticeship MOU, and submit the required compliance documents. Each step writes directly to the partner record used by the Host Shop dashboard.
+    <main className="min-h-screen bg-slate-50 py-10">
+      <div className="mx-auto max-w-4xl space-y-6 px-4 sm:px-6">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-sm font-extrabold uppercase tracking-[0.12em] text-brand-red-700">Host Site Onboarding</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">{board.partner?.name || 'Host Shop'}</h1>
+          <p className="mt-2 text-slate-600">
+            Complete the compliance items below. New Host Site applications are submitted only through
+            the public Host Site application; this page does not create a second application record.
           </p>
-        </div>
+        </section>
 
-        <div className="mt-6 grid gap-5 md:grid-cols-3">
-          <StepCard
-            title="Worksite profile"
-            description="Confirm the licensed supervisor, compensation model, workers’ compensation status, insurance, phone, and website."
-            href="/host-shop/onboarding/profile"
-            complete={partner.onboarding_completed === true}
-            icon={Store}
-          />
-          <StepCard
-            title="Host Shop MOU"
-            description="Review the registered-apprenticeship worksite agreement and execute it using an authorized electronic signature."
-            href="/host-shop/onboarding/mou"
-            complete={partner.mou_signed === true}
-            icon={FileSignature}
-          />
-          <StepCard
-            title="Compliance documents"
-            description={`${board.acceptedDocumentCount} of ${board.requiredDocumentCount} required documents are currently accepted.`}
-            href="/host-shop/onboarding/documents"
-            complete={docsComplete}
-            icon={FileUp}
-          />
-        </div>
+        <section className="space-y-3">
+          {steps.map(({ title, complete: isComplete, detail, href, icon: Icon }) => (
+            <article key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex gap-3">
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${isComplete ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-700'}`}>
+                    {isComplete ? <CheckCircle2 className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                  </div>
+                  <div>
+                    <h2 className="font-black text-slate-950">{title}</h2>
+                    <p className="mt-1 text-sm text-slate-600">{detail}</p>
+                  </div>
+                </div>
+                {href && !isComplete && (
+                  <Link href={href} className="rounded-lg bg-brand-blue-700 px-4 py-2 text-center text-sm font-bold text-white hover:bg-brand-blue-800">
+                    Continue
+                  </Link>
+                )}
+              </div>
+            </article>
+          ))}
+        </section>
 
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-          {partner.approval_status !== 'approved' || partner.status !== 'active' ? (
-            <p className="font-bold text-amber-900">
-              Your partner record is awaiting final approval. You can complete onboarding now; apprentice operations become available after approval.
-            </p>
-          ) : docsComplete && partner.mou_signed && partner.onboarding_completed ? (
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <p className="font-black text-green-800">All Host Shop onboarding requirements are complete.</p>
-              <Link href="/host-shop/dashboard/board" className="rounded-xl bg-green-700 px-5 py-3 text-center font-black text-white hover:bg-green-800">
-                Open operational board
+        <section className={`rounded-2xl border p-5 ${complete ? 'border-green-200 bg-green-50' : 'border-slate-200 bg-white'}`}>
+          <div className="flex gap-3">
+            {complete ? <CheckCircle2 className="mt-0.5 h-5 w-5 text-green-700" /> : <Circle className="mt-0.5 h-5 w-5 text-slate-500" />}
+            <div>
+              <h2 className="font-black text-slate-950">{complete ? 'Onboarding requirements complete' : 'Onboarding still in progress'}</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                {complete
+                  ? 'Your core Host Site compliance requirements are on file. Continue to the operational board.'
+                  : 'Complete the remaining items above. Elevate staff reviews submitted compliance documents before they count as accepted.'}
+              </p>
+              <Link href="/host-shop/dashboard/board" className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-900 hover:bg-slate-50">
+                Open Host Shop Board
               </Link>
             </div>
-          ) : (
-            <p className="font-semibold text-slate-700">
-              Complete the unfinished steps above. Documents marked “In review” update after staff review.
-            </p>
-          )}
-        </div>
+          </div>
+        </section>
       </div>
     </main>
   );

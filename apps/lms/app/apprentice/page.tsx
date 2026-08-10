@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
+import { courseOverviewPath } from '@/lib/lms/routes';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -154,7 +155,7 @@ export default async function ApprenticePortalPage() {
 
   const actions = [
     { title: 'Clock hours', text: 'Record and review your on-the-job training hours.', href: '/apprentice/timeclock', icon: Clock3 },
-    { title: 'Open RTI course', text: courseTitle, href: enrollment?.course_id ? `/courses/${enrollment.course_id}` : '/apprentice/course', icon: BookOpen },
+    { title: 'Open RTI course', text: courseTitle, href: enrollment?.course_id ? courseOverviewPath(enrollment.course_id) : '/apprentice/course', icon: BookOpen },
     { title: 'Competencies', text: 'Review required skills and supervisor verification.', href: '/apprentice/competencies', icon: Scissors },
     { title: 'Documents', text: 'Review required agreements and uploaded records.', href: '/apprentice/documents', icon: FileText },
   ] as const;

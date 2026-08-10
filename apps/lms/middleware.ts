@@ -1,73 +1,67 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-type PendingCookie = {
-  name: string;
-  value: string;
-  options?: Record<string, unknown>;
-};
-
-function platformCookieOptions(options: Record<string, unknown> | undefined) {
-  return {
-    ...(options || {}),
-    path: '/',
-    sameSite: 'lax' as const,
-    ...(process.env.NODE_ENV === 'production'
-      ? { domain: '.elevateforhumanity.org', secure: true }
-      : {}),
-  };
-}
-
 /**
- * LMS session synchronizer.
- *
- * Supabase refreshes happen once at the request boundary and refreshed cookies
- * are copied onto the outgoing response. Production auth cookies are written
- * on .elevateforhumanity.org so app. and admin. share one session instead of
- * creating competing host-only refresh tokens.
- *
- * Route authorization remains in the canonical server-side role guards.
+ * Refresh Supabase sessions once at the LMS request boundary and persist any
+ * rotated cookies to the browser. Server Components can read the resulting
+ * session without each component racing to reuse the same refresh token.
  */
-export async function middleware(request: NextRequest) {
-  const pendingCookies: PendingCookie[] = [];
-  const requestHeaders = new Headers(request.headers);
-  const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
-  requestHeaders.set('x-pathname', requestedPath);
+export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
 
-  const response = NextResponse.next({ request: { headers: requestHeaders } });
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseAnonKey) return response;
-
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        for (const cookie of cookiesToSet) {
-          request.cookies.set(cookie.name, cookie.value);
-          pendingCookies.push(cookie as PendingCookie);
-        }
-      },
-    },
-  });
-
-  // One boundary validation/refresh for this request. Do not call getSession()
-  // here; getUser() validates and refreshes when needed.
-  await supabase.auth.getUser();
-
-  for (const cookie of pendingCookies) {
-    response.cookies.set(
-      cookie.name,
-      cookie.value,
-      platformCookieOptions(cookie.options) as any,
-    );
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon') ||
+    /\.[a-z0-9]+$/i.test(pathname)
+  ) {
+    return NextResponse.next();
   }
-  response.cookies.set('__efh_pathname', requestedPath, {
+
+  // Do not make an auth network call for anonymous traffic.
+  const hasSupabaseSession = req.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith('sb-') && name.includes('-auth-token'));
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', pathname);
+
+  let response = NextResponse.next({ request: { headers: requestHeaders } });
+
+  if (hasSupabaseSession) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+
+            // Recreate the response so downstream Server Components see the
+            // updated request cookies, then persist the same cookies client-side.
+            response = NextResponse.next({ request: { headers: requestHeaders } });
+            cookiesToSet.forEach(({ name, value, options }) => {
+              const isAuthCookie = name.startsWith('sb-') && name.includes('-auth-token');
+              response.cookies.set(name, value, {
+                ...options,
+                ...(isAuthCookie ? { domain: '.elevateforhumanity.org' } : {}),
+              });
+            });
+          },
+        },
+      },
+    );
+
+    // getUser() validates the session and performs a refresh only when needed.
+    // Page-level guards remain responsible for authorization/redirects.
+    await supabase.auth.getUser();
+  }
+
+  response.cookies.set('__efh_pathname', pathname, {
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: 'lax',
     path: '/',
     maxAge: 60,
@@ -77,7 +71,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|woff|woff2|ttf|mp4|webm)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

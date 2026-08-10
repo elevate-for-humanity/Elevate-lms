@@ -31,36 +31,35 @@ const PROGRAM_ALIASES: Record<string, HostShopProgramType> = {
 };
 
 /**
- * One canonical onboarding flow serves every Host Shop occupation. Program
- * differences are supplied by the partner record and document requirements;
- * routing never forks into legacy /partners/<trade>/... shells.
+ * One canonical authenticated Host Shop onboarding flow for every trade.
+ * Program is a query parameter, not a parallel route tree.
  */
 export const HOST_SHOP_ONBOARDING_PATHS: Record<
   HostShopProgramType,
   { signMou: string; forms: string; documents: string; dashboard: string }
 > = {
   barber: {
-    signMou: '/host-shop/onboarding/mou',
-    forms: '/host-shop/onboarding/profile',
-    documents: '/host-shop/onboarding/documents',
+    signMou: '/host-shop/mou?program=barber',
+    forms: '/host-shop/onboarding?program=barber',
+    documents: '/host-shop/dashboard/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   cosmetology: {
-    signMou: '/host-shop/onboarding/mou',
-    forms: '/host-shop/onboarding/profile',
-    documents: '/host-shop/onboarding/documents',
+    signMou: '/host-shop/mou?program=cosmetology',
+    forms: '/host-shop/onboarding?program=cosmetology',
+    documents: '/host-shop/dashboard/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   nail_technician: {
-    signMou: '/host-shop/onboarding/mou',
-    forms: '/host-shop/onboarding/profile',
-    documents: '/host-shop/onboarding/documents',
+    signMou: '/host-shop/mou?program=nail',
+    forms: '/host-shop/onboarding?program=nail',
+    documents: '/host-shop/dashboard/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   esthetician: {
-    signMou: '/host-shop/onboarding/mou',
-    forms: '/host-shop/onboarding/profile',
-    documents: '/host-shop/onboarding/documents',
+    signMou: '/host-shop/mou?program=esthetician',
+    forms: '/host-shop/onboarding?program=esthetician',
+    documents: '/host-shop/dashboard/documents',
     dashboard: '/host-shop/dashboard/board',
   },
 };

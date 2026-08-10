@@ -1,9 +1,7 @@
 'use client';
 
-import React from 'react';
-
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 interface Module {
   id: string;
@@ -16,19 +14,15 @@ interface Module {
   is_required: boolean;
   created_at: string;
   program?: {
-    name: string;
+    name?: string;
+    title?: string;
     slug: string;
   };
-  scorm_package?: Array<{
-    id: string;
-    title: string;
-    version: string;
-  }>;
 }
 
 interface Program {
   id: string;
-  name: string;
+  title: string;
   slug: string;
 }
 
@@ -66,37 +60,30 @@ export function ModulesTable({ modules, programs }: { modules: Module[]; program
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      {/* Filters */}
       <div className="p-4 border-b">
         <div className="flex flex-col sm:flex-row gap-4">
           <input
             type="text"
             placeholder="Search modules..."
             value={searchTerm}
-            onChange={(
-              e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-            ) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
             className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
           <select
             value={filterProgram}
-            onChange={(
-              e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-            ) => setFilterProgram(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterProgram(e.target.value)}
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="all">All Programs</option>
-            {programs.map((program: any) => (
+            {programs.map((program) => (
               <option key={program.id} value={program.id}>
-                {program.title || program.name}
+                {program.title}
               </option>
             ))}
           </select>
           <select
             value={filterType}
-            onChange={(
-              e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-            ) => setFilterType(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterType(e.target.value)}
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="all">All Types</option>
@@ -108,40 +95,23 @@ export function ModulesTable({ modules, programs }: { modules: Module[]; program
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-50 border-b">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                Module
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                Program
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                Type
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                Order
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                Duration
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                Required
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-black uppercase tracking-wider">
-                Actions
-              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Module</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Program</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Order</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Duration</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">Required</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-black uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-slate-200">
             {filteredModules.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-black">
-                  No modules found
-                </td>
+                <td colSpan={7} className="px-6 py-12 text-center text-black">No modules found</td>
               </tr>
             ) : (
               filteredModules.map((module) => (
@@ -149,30 +119,17 @@ export function ModulesTable({ modules, programs }: { modules: Module[]; program
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-black">{module.title}</div>
-                      {module.description && (
-                        <div className="text-sm text-black line-clamp-1">{module.description}</div>
-                      )}
-                      {module.scorm_package && module.scorm_package.length > 0 && (
-                        <div className="text-xs text-brand-blue-600 mt-1">
-                          SCORM: {module.scorm_package[0].title}
-                        </div>
-                      )}
+                      {module.description && <div className="text-sm text-black line-clamp-1">{module.description}</div>}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-black">
-                    {module.program?.name || 'Unknown'}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-black">{module.program?.title || module.program?.name || 'Unknown'}</td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-2 text-xs font-semibold rounded-full ${getTypeColor(module.module_type)}`}
-                    >
+                    <span className={`px-2 py-2 text-xs font-semibold rounded-full ${getTypeColor(module.module_type)}`}>
                       {module.module_type}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-black">#{module.order_index}</td>
-                  <td className="px-6 py-4 text-sm text-black">
-                    {module.duration_hours ? `${module.duration_hours}h` : '-'}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-black">{module.duration_hours ? `${module.duration_hours}h` : '-'}</td>
                   <td className="px-6 py-4">
                     {module.is_required ? (
                       <span className="text-brand-green-600 font-medium">• Required</span>
@@ -181,23 +138,9 @@ export function ModulesTable({ modules, programs }: { modules: Module[]; program
                     )}
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/modules/${module.id}`}
-                        className="text-brand-blue-600 hover:text-brand-blue-900"
-                      >
-                        Edit
-                      </Link>
-                      {module.module_type === 'scorm' && (
-                        <Link
-                          href={`/lms/programs/${module.program?.slug}/modules/${module.id}`}
-                          target="_blank"
-                          className="text-black hover:text-black"
-                        >
-                          Preview
-                        </Link>
-                      )}
-                    </div>
+                    <Link href={`/modules/${module.id}`} className="text-brand-blue-600 hover:text-brand-blue-900">
+                      Edit
+                    </Link>
                   </td>
                 </tr>
               ))
@@ -206,7 +149,6 @@ export function ModulesTable({ modules, programs }: { modules: Module[]; program
         </table>
       </div>
 
-      {/* Pagination info */}
       <div className="px-6 py-4 border-t bg-slate-50">
         <p className="text-sm text-black">
           Showing <span className="font-medium">{filteredModules.length}</span> of{' '}

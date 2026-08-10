@@ -9,12 +9,13 @@ import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { program: string };
-}): Promise<Metadata> {
-  const name = params.program
+type ProgramCoursesPageProps = {
+  params: Promise<{ program: string }>;
+};
+
+export async function generateMetadata({ params }: ProgramCoursesPageProps): Promise<Metadata> {
+  const { program } = await params;
+  const name = program
     .split('-')
     .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
@@ -38,7 +39,7 @@ function getCategory(slug: string): string {
   return 'healthcare';
 }
 
-export default async function ProgramCoursesPage({ params }: { params: { program: string } }) {
+export default async function ProgramCoursesPage({ params }: ProgramCoursesPageProps) {
   await requireRole([
     'student',
     'learner',
@@ -50,7 +51,7 @@ export default async function ProgramCoursesPage({ params }: { params: { program
   ]);
 
   const supabase = await createClient();
-  const slug = params.program;
+  const { program: slug } = await params;
 
   const { data: program } = await supabase
     .from('programs')

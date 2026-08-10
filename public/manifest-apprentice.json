@@ -1,0 +1,60 @@
+{
+  "id": "org.elevateforhumanity.apprentice",
+  "name": "Elevate Apprentice Portal",
+  "short_name": "Apprentice",
+  "description": "Track apprenticeship hours, RTI, competencies, documents, and host-site progress.",
+  "start_url": "/apprentice",
+  "scope": "/apprentice/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/student-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Apprentice Dashboard",
+      "short_name": "Dashboard",
+      "url": "/apprentice"
+    },
+    {
+      "name": "Clock Hours",
+      "short_name": "Hours",
+      "url": "/apprentice/timeclock"
+    },
+    {
+      "name": "RTI Course",
+      "short_name": "RTI",
+      "url": "/apprentice/course"
+    },
+    {
+      "name": "Competencies",
+      "short_name": "Skills",
+      "url": "/apprentice/competencies"
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

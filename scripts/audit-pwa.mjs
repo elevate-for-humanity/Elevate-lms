@@ -74,6 +74,7 @@ const PERSONA_PORTALS = [
     manifestHref: '/manifest-student.json',
     startUrl: '/lms/dashboard',
     scope: '/lms',
+    shippedBy: 'lms',
   },
   {
     name: 'Apprentice',
@@ -82,6 +83,7 @@ const PERSONA_PORTALS = [
     manifestHref: '/manifest-apprentice.json',
     startUrl: '/apprentice',
     scope: '/apprentice/',
+    shippedBy: 'lms',
   },
   {
     name: 'Host Shop',
@@ -90,6 +92,7 @@ const PERSONA_PORTALS = [
     manifestHref: '/manifest-shop-owner.json',
     startUrl: '/host-shop/dashboard',
     scope: '/host-shop/',
+    shippedBy: 'lms',
   },
   {
     name: 'Program Holder',
@@ -98,6 +101,7 @@ const PERSONA_PORTALS = [
     manifestHref: '/manifest-program-holder.json',
     startUrl: '/program-holder/dashboard',
     scope: '/program-holder/',
+    shippedBy: 'marketing',
   },
 ];
 
@@ -165,6 +169,29 @@ for (const portal of PERSONA_PORTALS) {
     if (typeof shortcut.url !== 'string' || !shortcut.url.startsWith(portal.scope.replace(/\/$/, ''))) {
       fail(`${portal.name}: shortcut ${shortcut.name || '(unnamed)'} escapes portal scope: ${shortcut.url}`);
     }
+  }
+}
+
+console.log('\n── Production manifest shipping ──');
+const syncSource = readFile('scripts/sync-pwa-public.mjs') || '';
+for (const portal of PERSONA_PORTALS) {
+  const filename = portal.manifestFile.replace('public/', '');
+  if (!syncSource.includes(`'${filename}'`) && !syncSource.includes(`"${filename}"`)) {
+    fail(`${portal.name}: ${filename} is not copied into the ${portal.shippedBy} production public directory`);
+  } else {
+    pass(`${portal.name}: role manifest ships with ${portal.shippedBy} build`);
+  }
+}
+for (const [service, packagePath] of [
+  ['lms', 'apps/lms/package.json'],
+  ['marketing', 'apps/marketing/package.json'],
+]) {
+  const pkg = readJson(packagePath);
+  const scripts = `${pkg?.scripts?.prebuild || ''} ${pkg?.scripts?.prestart || ''}`;
+  if (!scripts.includes(`sync-pwa-public.mjs ${service}`)) {
+    fail(`${service}: production scripts do not invoke persona PWA sync`);
+  } else {
+    pass(`${service}: prebuild/prestart runs PWA asset sync`);
   }
 }
 

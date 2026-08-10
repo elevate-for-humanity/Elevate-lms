@@ -16,10 +16,16 @@ import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
+
+function requestIp(request: NextRequest): string | null {
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0]?.trim() || null;
+  return request.headers.get('x-real-ip');
+}
 
 async function _POST(request: NextRequest) {
   try {
@@ -28,17 +34,9 @@ async function _POST(request: NextRequest) {
 
     const data: OnboardingData = await request.json();
     const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Get authenticated user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Generate all forms
     const w4Form = generateW4Form(data);
     const i9Form = generateI9Form(data);
     const directDepositForm = generateDirectDepositForm(data);
@@ -52,11 +50,8 @@ async function _POST(request: NextRequest) {
       recipientAddress: `${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}`,
     });
     const summary = generateOnboardingSummary(data);
-
-    // Generate onboarding package
     const onboardingPackage = generateCompleteOnboardingPackage(data);
 
-    // Store onboarding data in database
     const { data: onboardingRecord, error: onboardingError } = await supabase
       .from('onboarding_submissions')
       .insert({
@@ -72,12 +67,7 @@ async function _POST(request: NextRequest) {
           email: data.email,
           phone: data.phone,
           dateOfBirth: data.dateOfBirth,
-          address: {
-            street: data.streetAddress,
-            city: data.city,
-            state: data.state,
-            zip: data.zipCode,
-          },
+          address: { street: data.streetAddress, city: data.city, state: data.state, zip: data.zipCode },
         },
         tax_info: {
           filingStatus: data.filingStatus,
@@ -88,7 +78,6 @@ async function _POST(request: NextRequest) {
         banking_info: {
           bankName: data.bankName,
           accountType: data.accountType,
-          // Store encrypted routing and account numbers
           routingNumber: data.routingNumber,
           accountNumber: data.accountNumber,
         },
@@ -112,7 +101,7 @@ async function _POST(request: NextRequest) {
         },
         signature: data.signature,
         signature_date: data.signatureDate,
-        ip_address: data.ipAddress || request.headers.get('x-forwarded-for') || request.ip,
+        ip_address: data.ipAddress || requestIp(request),
         forms_generated: {
           w4: w4Form,
           i9: i9Form,
@@ -122,7 +111,7 @@ async function _POST(request: NextRequest) {
           nda: ndaDocument,
         },
         onboarding_package: onboardingPackage,
-        summary: summary,
+        summary,
         status: onboardingPackage.status.isComplete ? 'complete' : 'in-progress',
         can_start_work: onboardingPackage.status.canStartWork,
         progress_percentage: onboardingPackage.status.overallProgress,
@@ -131,80 +120,27 @@ async function _POST(request: NextRequest) {
       .select()
       .maybeSingle();
 
-    if (onboardingError) {
-      logger.error('Error storing onboarding data:', onboardingError);
-      return NextResponse.json(
-        {
-          error: 'Failed to store onboarding data',
-          details: onboardingError.message,
-        },
-        { status: 500 },
-      );
+    if (onboardingError || !onboardingRecord) {
+      logger.error('Error storing onboarding data', onboardingError || new Error('Onboarding record missing'));
+      return NextResponse.json({ error: 'Failed to store onboarding data', details: onboardingError?.message }, { status: 500 });
     }
 
-    // Send notification emails
     if (onboardingPackage.status.isComplete) {
-      // Send completion email to employee
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/onboarding-complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: data.email,
-          name: `${data.firstName} ${data.lastName}`,
-          startDate: data.startDate,
-        }),
+        body: JSON.stringify({ to: data.email, name: `${data.firstName} ${data.lastName}`, startDate: data.startDate }),
       });
-
-      // Send notification to HR
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/onboarding-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          employeeName: `${data.firstName} ${data.lastName}`,
-          position: data.position,
-          startDate: data.startDate,
-          onboardingId: onboardingRecord.id,
-        }),
+        body: JSON.stringify({ employeeName: `${data.firstName} ${data.lastName}`, position: data.position, startDate: data.startDate, onboardingId: onboardingRecord.id }),
       });
-
-      // Send Slack notification if configured
       if (process.env.SLACK_WEBHOOK_URL) {
         await fetch(process.env.SLACK_WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: `✅ Onboarding Complete: ${data.firstName} ${data.lastName}`,
-            blocks: [
-              {
-                type: 'header',
-                text: {
-                  type: 'plain_text',
-                  text: '✅ New Employee Onboarding Complete',
-                },
-              },
-              {
-                type: 'section',
-                fields: [
-                  {
-                    type: 'mrkdwn',
-                    text: `*Employee:*\\n${data.firstName} ${data.lastName}`,
-                  },
-                  {
-                    type: 'mrkdwn',
-                    text: `*Position:*\\n${data.position}`,
-                  },
-                  {
-                    type: 'mrkdwn',
-                    text: `*Department:*\\n${data.department}`,
-                  },
-                  {
-                    type: 'mrkdwn',
-                    text: `*Start Date:*\\n${data.startDate}`,
-                  },
-                ],
-              },
-            ],
-          }),
+          body: JSON.stringify({ text: `Onboarding Complete: ${data.firstName} ${data.lastName}` }),
         });
       }
     }
@@ -213,19 +149,11 @@ async function _POST(request: NextRequest) {
       success: true,
       onboardingId: onboardingRecord.id,
       status: onboardingPackage.status,
-      message: onboardingPackage.status.isComplete
-        ? 'Onboarding completed successfully!'
-        : 'Onboarding saved. Please complete remaining items.',
+      message: onboardingPackage.status.isComplete ? 'Onboarding completed successfully!' : 'Onboarding saved. Please complete remaining items.',
     });
   } catch (error) {
-    logger.error(
-      'Onboarding submission error:',
-      error instanceof Error ? error : new Error(String(error)),
-    );
-    return NextResponse.json(
-      { error: 'Failed to process onboarding', details: toErrorMessage(error) },
-      { status: 500 },
-    );
+    logger.error('Onboarding submission error', error);
+    return NextResponse.json({ error: 'Failed to process onboarding', details: toErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -233,17 +161,10 @@ async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get user's onboarding status
     const { data: onboarding, error } = await supabase
       .from('onboarding_submissions')
       .select('*')
@@ -253,26 +174,15 @@ async function _GET(request: NextRequest) {
       .maybeSingle();
 
     if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows returned
       logger.error('Error fetching onboarding', normalizeError(error, 'Failed to fetch onboarding'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to fetch onboarding data' }, { status: 500 });
     }
-
-    return NextResponse.json({
-      success: true,
-      onboarding: onboarding || null,
-      hasOnboarding: !!onboarding,
-    });
+    return NextResponse.json({ success: true, onboarding: onboarding || null, hasOnboarding: !!onboarding });
   } catch (error) {
-    logger.error(
-      'Onboarding fetch error:',
-      error instanceof Error ? error : new Error(String(error)),
-    );
-    return NextResponse.json(
-      { error: 'Failed to fetch onboarding', details: toErrorMessage(error) },
-      { status: 500 },
-    );
+    logger.error('Onboarding fetch error', error);
+    return NextResponse.json({ error: 'Failed to fetch onboarding', details: toErrorMessage(error) }, { status: 500 });
   }
 }
+
 export const GET = withApiAudit('/api/onboarding/submit', _GET);
 export const POST = withApiAudit('/api/onboarding/submit', _POST);

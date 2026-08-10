@@ -1,133 +1,77 @@
-import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Users } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
+import { getHostShopBoard } from '@/lib/partner/board';
 import AttendanceRecordForm from './AttendanceRecordForm';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-export const metadata: Metadata = {
-  title: 'Record Attendance | Partner Portal',
+export const metadata = {
+  title: 'Record Attendance | Host Shop Portal',
+  description: 'Record attendance for apprentices actively assigned to this host shop.',
   robots: { index: false, follow: false },
 };
 
 export const dynamic = 'force-dynamic';
 
 export default async function RecordAttendancePage() {
-  const supabase = await createClient();
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/login');
-
-  const db = await requireAdminClient();
-  if (!db) redirect('/login');
-
-  // Resolve role
-  const { data: profile } = await db
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  const allowedRoles = ['partner', 'admin', 'staff'];
-  if (!profile || !allowedRoles.includes(profile.role)) redirect('/unauthorized');
-
-  // Resolve partner_id via partner_users (partners table has no user_id column)
-  const { data: partnerLink } = await db
-    .from('partner_users')
-    .select('partner_id')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .maybeSingle();
-
-  let students: any[] = [];
-  let courses: any[] = [];
-
-  if (partnerLink?.partner_id) {
-    const partnerId = partnerLink.partner_id;
-
-    // Get active apprentices placed at this partner site.
-    // apprentice_placements.shop_id = partners.id (barber shop partner)
-    const { data: placements } = await db
-      .from('apprentice_placements')
-      .select('apprentice_id, profiles:apprentice_id(id, full_name)')
-      .eq('shop_id', partnerId)
-      .eq('status', 'active');
-
-    if (placements) {
-      students = placements.map((a: any) => ({
-        id: a.profiles?.id || a.apprentice_id,
-        name: a.profiles?.full_name || 'Student',
-        present: true,
-      }));
-    }
-
-    // Get active courses linked to this partner
-    const { data: courseData } = await db
-      .from('lms_courses')
-      .select('id, title')
-      .eq('partner_id', partnerId)
-      .eq('is_active', true);
-
-    if (courseData) courses = courseData;
-  }
+  const students = board.apprentices.map((apprentice) => ({
+    placementId: apprentice.id,
+    studentId: apprentice.student_id,
+    name: apprentice.name,
+    email: apprentice.email,
+    programSlug: apprentice.program_slug || board.programType,
+  }));
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/partner-page-3.jpg"
-          alt="Record attendance"
-          fill
-          sizes="100vw"
-          className="object-cover"
-          priority 
-        />
-      </section>
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs
-            items={[
-              { label: 'Partner', href: '/partner/attendance' },
-              { label: 'Attendance', href: '/partner/attendance' },
-              { label: 'Record' },
-            ]}
-          />
-        </div>
-      </div>
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link
-          href="/host-shop/dashboard/attendance"
-          className="inline-flex items-center text-slate-700 hover:text-brand-blue-600 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Attendance
-        </Link>
-        <div className="bg-white rounded-xl shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-6">Record Attendance</h1>
+    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+      <Link
+        href="/host-shop/dashboard/attendance"
+        className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to attendance
+      </Link>
 
-          {students.length > 0 ? (
-            <AttendanceRecordForm students={students} courses={courses} />
-          ) : (
-            <div className="text-center py-12">
-              <Users className="w-16 h-16 text-slate-700 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2">No Students Found</h3>
-              <p className="text-slate-700">
-                No active students are enrolled with your organization.
-              </p>
-            </div>
-          )}
+      <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">
+          {board.partner?.name || 'Host Shop'}
+        </p>
+        <h1 className="mt-2 text-3xl font-black text-slate-950">Record Apprentice Attendance</h1>
+        <p className="mt-2 text-slate-600">
+          Only apprentices with an active placement at this Host Shop can be recorded here.
+        </p>
+
+        {students.length > 0 ? (
+          <div className="mt-7">
+            <AttendanceRecordForm students={students} />
+          </div>
+        ) : (
+          <div className="mt-7 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-12 text-center">
+            <Users className="mx-auto h-12 w-12 text-slate-300" />
+            <h2 className="mt-3 text-xl font-black text-slate-950">No active apprentices assigned</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Attendance cannot be recorded until an approved apprentice placement is active for this shop.
+            </p>
+            <Link
+              href="/host-shop/dashboard/match-requests"
+              className="mt-5 inline-flex rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white hover:bg-brand-blue-800"
+            >
+              Review match requests
+            </Link>
+          </div>
+        )}
+
+        <div className="mt-7 rounded-2xl border border-brand-green-200 bg-brand-green-50 p-4">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 text-brand-green-700" />
+            <p className="text-sm font-semibold text-brand-green-950">
+              The server validates the signed-in Host Shop, active shop location, placement ID, student ID, and tenant before saving attendance.
+            </p>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

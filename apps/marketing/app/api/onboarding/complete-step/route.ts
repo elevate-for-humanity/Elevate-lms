@@ -1,5 +1,8 @@
+import { apiAuthGuard } from '@/lib/admin/guards';
 import { handleLearnerOnboardingStep } from '@/lib/onboarding/complete-step-handler';
 
-// Canonical Marketing-side learner onboarding endpoint. This is intentionally
-// the same handler used by LMS so orientation/doc/agreement state cannot drift.
-export const POST = handleLearnerOnboardingStep;
+export async function POST(request: Request) {
+  const auth = await apiAuthGuard(request);
+  if (auth.error) return auth.error;
+  return handleLearnerOnboardingStep(request);
+}

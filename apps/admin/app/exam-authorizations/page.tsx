@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
+import { TESTING_CENTER_ROLES } from '@/lib/rbac/role-matrix';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { AlertTriangle, Clock, CheckCircle, XCircle, Calendar, RefreshCw } from 'lucide-react';
 import ExamAuthWorkQueue from './ExamAuthWorkQueue';
@@ -9,44 +9,27 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  robots: { index: false },
+  robots: { index: false, follow: false },
   title: 'Exam Authorization Queue | Admin',
 };
 
 export default async function ExamAuthorizationsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-
-  // Guard against null user
-  if (!user) redirect('/login');
+  const { user } = await requireRole(TESTING_CENTER_ROLES);
   const db = await requireAdminClient();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
+  const { data: queue, error: queueError } = await db
+    .from('exam_authorization_queue')
+    .select('*');
 
-  if (!['admin', 'staff'].includes(profile?.role ?? '')) {
-    redirect('/unauthorized');
-  }
-
-  // Work queue — active + recently terminal authorizations
-  const { data: queue } = await supabase.from('exam_authorization_queue').select('*');
-
+  if (queueError) throw new Error(`EXAM_AUTH_QUEUE_LOAD_FAILED:${queueError.message}`);
   const rows = queue ?? [];
 
-  // Summary counts for the header strip
   const counts = {
     needs_scheduling: rows.filter((r) => r.action_needed === 'needs_scheduling').length,
     awaiting_outcome: rows.filter((r) => r.action_needed === 'awaiting_outcome').length,
     needs_result: rows.filter((r) => r.action_needed === 'needs_result_recorded').length,
     eligible_for_reauth: rows.filter((r) => r.action_needed === 'eligible_for_reauth').length,
     expiring_soon: rows.filter((r) => r.expiring_soon).length,
-    // Stuck: authorized > 5 days with no scheduled date
     stuck: rows.filter(
       (r) =>
         r.action_needed === 'needs_scheduling' &&
@@ -58,7 +41,6 @@ export default async function ExamAuthorizationsPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-900">Exam Authorization Queue</h1>
           <p className="mt-1 text-sm text-slate-700">
@@ -66,47 +48,15 @@ export default async function ExamAuthorizationsPage() {
           </p>
         </div>
 
-        {/* Summary strip */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-          <SummaryCard
-            label="Needs Scheduling"
-            count={counts.needs_scheduling}
-            icon={<Calendar className="w-4 h-4" />}
-            color="blue"
-          />
-          <SummaryCard
-            label="Stuck > 5 Days"
-            count={counts.stuck}
-            icon={<AlertTriangle className="w-4 h-4" />}
-            color={counts.stuck > 0 ? 'red' : 'gray'}
-          />
-          <SummaryCard
-            label="Awaiting Outcome"
-            count={counts.awaiting_outcome}
-            icon={<Clock className="w-4 h-4" />}
-            color="yellow"
-          />
-          <SummaryCard
-            label="Needs Result"
-            count={counts.needs_result}
-            icon={<CheckCircle className="w-4 h-4" />}
-            color="green"
-          />
-          <SummaryCard
-            label="Expiring Soon"
-            count={counts.expiring_soon}
-            icon={<XCircle className="w-4 h-4" />}
-            color={counts.expiring_soon > 0 ? 'orange' : 'gray'}
-          />
-          <SummaryCard
-            label="Eligible Re-auth"
-            count={counts.eligible_for_reauth}
-            icon={<RefreshCw className="w-4 h-4" />}
-            color="purple"
-          />
+          <SummaryCard label="Needs Scheduling" count={counts.needs_scheduling} icon={<Calendar className="w-4 h-4" />} color="blue" />
+          <SummaryCard label="Stuck > 5 Days" count={counts.stuck} icon={<AlertTriangle className="w-4 h-4" />} color={counts.stuck > 0 ? 'red' : 'gray'} />
+          <SummaryCard label="Awaiting Outcome" count={counts.awaiting_outcome} icon={<Clock className="w-4 h-4" />} color="yellow" />
+          <SummaryCard label="Needs Result" count={counts.needs_result} icon={<CheckCircle className="w-4 h-4" />} color="green" />
+          <SummaryCard label="Expiring Soon" count={counts.expiring_soon} icon={<XCircle className="w-4 h-4" />} color={counts.expiring_soon > 0 ? 'orange' : 'gray'} />
+          <SummaryCard label="Eligible Re-auth" count={counts.eligible_for_reauth} icon={<RefreshCw className="w-4 h-4" />} color="purple" />
         </div>
 
-        {/* Work queue table */}
         <ExamAuthWorkQueue rows={rows} currentUserId={user.id} />
       </div>
     </div>

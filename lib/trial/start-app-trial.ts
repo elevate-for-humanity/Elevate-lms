@@ -7,6 +7,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { WEBSITE_BUILDER_TRIAL } from '@/lib/apps/website-builder-trial';
 
 const TRIAL_DURATION_DAYS = 14;
 
@@ -76,6 +77,21 @@ export async function startAppTrial(
         message: error.message,
       });
       return { status: 'error', message: error.message };
+    }
+
+    if (appSlug === 'website-builder') {
+      const { error: walletError } = await db.rpc('ensure_app_trial_wallet', {
+        p_user_id: userId,
+        p_app_slug: appSlug,
+        p_trial_credits: WEBSITE_BUILDER_TRIAL.credits,
+      });
+      if (walletError) {
+        logger.warn('[startAppTrial] Website Builder credit wallet will initialize lazily', {
+          appSlug,
+          userId,
+          message: walletError.message,
+        });
+      }
     }
 
     return { status: 'started', trialEndsAt: trialEndsAt.toISOString() };

@@ -6,13 +6,11 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import {
   canEvaluateTransfer,
   type TransferSourceType,
-  TRANSFER_DOCS_BY_SOURCE,
 } from '@/lib/documents';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Map form source values to TransferSourceType
 const SOURCE_TYPE_MAP: Record<string, TransferSourceType> = {
   barber_school: 'in_state_barber_school',
   cosmetology_school: 'in_state_barber_school',
@@ -24,16 +22,14 @@ const SOURCE_TYPE_MAP: Record<string, TransferSourceType> = {
 export const POST = withErrorHandling(async (request: NextRequest) => {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-  const supabase = await createClient();
 
-  // Check authentication
+  const supabase = await createClient();
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
-  if (authError || !user) {
-    throw APIErrors.unauthorized();
-  }
+
+  if (authError || !user) throw APIErrors.unauthorized();
 
   const body = await request.json();
   const {
@@ -46,61 +42,40 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     documentIds,
   } = body;
 
-  // Validate required fields
   if (!apprenticeId || !source || !hoursRequested) {
-    throw APIErrors.validationError('apprenticeId, source, hoursRequested', 'Missing required fields');
+    throw APIErrors.validation('apprenticeId, source, hoursRequested', 'Missing required fields');
   }
 
-  // Validate hours
-  const hours = parseInt(hoursRequested);
-  if (isNaN(hours) || hours <= 0) {
-    throw APIErrors.validationError('hoursRequested', 'Invalid hours value');
+  const hours = Number.parseInt(String(hoursRequested), 10);
+  if (!Number.isFinite(hours) || hours <= 0) {
+    throw APIErrors.validation('hoursRequested', 'Invalid hours value');
   }
 
-  // Verify apprentice belongs to user
   const { data: apprentice, error: apprenticeError } = await supabase
     .from('apprentices')
     .select('id, user_id, program_id, programs(total_hours)')
     .eq('id', apprenticeId)
     .maybeSingle();
 
-  if (apprenticeError || !apprentice) {
-    throw APIErrors.notFound('Apprentice');
-  }
-
+  if (apprenticeError || !apprentice) throw APIErrors.notFound('Apprentice');
   if (apprentice.user_id !== user.id) {
     throw APIErrors.forbidden('You can only submit requests for your own account');
   }
 
-  // Validate hours don't exceed 50% of program total
   const programData = Array.isArray(apprentice.programs) ? apprentice.programs[0] : apprentice.programs;
   const maxHours = Math.floor((programData?.total_hours || 2000) * 0.5);
   if (hours > maxHours) {
-    throw APIErrors.validationError(
-      'hoursRequested',
-      `Hours cannot exceed ${maxHours} (50% of program total)`,
-    );
+    throw APIErrors.validation('hoursRequested', `Hours cannot exceed ${maxHours} (50% of program total)`);
   }
 
-  // Validate at least one document provided
-  if (!documentIds || documentIds.length === 0) {
-    throw APIErrors.validationError('documentIds', 'At least one supporting document is required');
+  if (!Array.isArray(documentIds) || documentIds.length === 0) {
+    throw APIErrors.validation('documentIds', 'At least one supporting document is required');
   }
 
-  // Map source to TransferSourceType
   const sourceType = SOURCE_TYPE_MAP[source] || 'work_experience';
-
-  // Check if documents are verified for auto-evaluation
-  // Transfer requests can be SUBMITTED without verification,
-  // but evaluation/crediting requires verification
   const verificationCheck = await canEvaluateTransfer(user.id, sourceType);
-
-  // Determine initial status based on verification
-  // If docs are verified, can proceed to evaluation
-  // If not verified, status is 'requires_manual_review'
   const initialStatus = verificationCheck.allowed ? 'pending' : 'requires_manual_review';
 
-  // Create transfer request
   const { data: transferRequest, error: insertError } = await supabase
     .from('hour_transfer_requests')
     .insert({
@@ -119,11 +94,12 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     .select()
     .maybeSingle();
 
-  if (insertError) {
-    throw APIErrors.internal('Failed to create transfer request');
+  if (insertError || !transferRequest) {
+    throw APIErrors.internal('Failed to create transfer request', {
+      databaseMessage: insertError?.message,
+    });
   }
 
-  // Audit log
   await auditLog({
     actorId: user.id,
     actorRole: 'student',

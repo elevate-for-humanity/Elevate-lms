@@ -23,6 +23,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       className = '',
       children,
+      onClick,
       ...props
     },
     ref,
@@ -47,16 +48,34 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     } as const;
 
     const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${fullWidth ? 'w-full' : ''} ${className}`;
+    const inactive = disabled || loading;
 
     if (asChild && React.isValidElement(children)) {
-      const child = children as React.ReactElement<{ className?: string }>;
+      const child = children as React.ReactElement<any>;
+      const childOnClick = child.props.onClick as ((event: React.MouseEvent<HTMLElement>) => void) | undefined;
+      const forwardedOnClick = (event: React.MouseEvent<HTMLElement>) => {
+        if (inactive) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        childOnClick?.(event);
+        if (!event.defaultPrevented) {
+          (onClick as ((event: React.MouseEvent<HTMLElement>) => void) | undefined)?.(event);
+        }
+      };
+
       return React.cloneElement(child, {
+        ...props,
         className: [child.props.className, combinedClassName].filter(Boolean).join(' '),
+        'aria-disabled': inactive || undefined,
+        tabIndex: inactive ? -1 : child.props.tabIndex,
+        onClick: forwardedOnClick,
       });
     }
 
     return (
-      <button ref={ref} className={combinedClassName} disabled={disabled || loading} {...props}>
+      <button ref={ref} className={combinedClassName} disabled={inactive} onClick={onClick} {...props}>
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {children}
       </button>

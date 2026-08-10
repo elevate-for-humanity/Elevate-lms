@@ -1,5 +1,6 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import {
+  canonicalHostShopDocumentType,
   getHostShopOnboardingPaths,
   mergeHostShopDocumentRequirements,
   resolveHostShopProgram,
@@ -200,7 +201,9 @@ async function loadBoardForPartner(
 
   const latestDocs = new Map<string, any>();
   for (const doc of uploadedDocs || []) {
-    if (!latestDocs.has(doc.document_type)) latestDocs.set(doc.document_type, doc);
+    const documentType = canonicalHostShopDocumentType(doc.document_type);
+    if (!documentType || documentType === 'mou') continue;
+    if (!latestDocs.has(documentType)) latestDocs.set(documentType, doc);
   }
 
   const documentStatuses = requirements.map((requirement: any) => {

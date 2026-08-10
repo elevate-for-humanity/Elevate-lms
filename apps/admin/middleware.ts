@@ -15,7 +15,8 @@ import {
  * Every non-public route on admin.elevateforhumanity.org is private. Supabase
  * refresh cookies are copied to every response, including redirects, so a
  * successful middleware refresh cannot be lost and retried by parallel
- * requests.
+ * requests. Production auth cookies are always written on the shared parent
+ * domain so Admin and LMS do not create competing host-only refresh tokens.
  */
 
 const PUBLIC_PATHS = [
@@ -45,6 +46,17 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith('/favicon') ||
     /[a-z0-9]+\.[a-z]+$/i.test(pathname)
   );
+}
+
+function platformCookieOptions(options: Record<string, unknown> | undefined) {
+  return {
+    ...(options || {}),
+    path: '/',
+    sameSite: 'lax' as const,
+    ...(process.env.NODE_ENV === 'production'
+      ? { domain: '.elevateforhumanity.org', secure: true }
+      : {}),
+  };
 }
 
 export async function middleware(req: NextRequest) {
@@ -79,11 +91,15 @@ export async function middleware(req: NextRequest) {
 
   const withCookies = (response: NextResponse) => {
     for (const cookie of pendingCookies) {
-      response.cookies.set(cookie.name, cookie.value, cookie.options as any);
+      response.cookies.set(
+        cookie.name,
+        cookie.value,
+        platformCookieOptions(cookie.options) as any,
+      );
     }
     response.cookies.set('__efh_pathname', `${pathname}${search}`, {
       httpOnly: false,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 60,

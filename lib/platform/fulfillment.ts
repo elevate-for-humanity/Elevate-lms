@@ -1,44 +1,66 @@
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
-import { getOrganizationFeatures } from '@/lib/platform/organization-features';
+import {
+  getOrganizationFeatures,
+  resolveBillingOrganizationId,
+} from '@/lib/platform/organization-features';
 import { syncLicenseFromSaasEntitlements } from '@/lib/platform/sync-license-from-saas';
 import { normalizeAddonCode } from '@/lib/platform/feature-catalog';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
+import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
 
 export interface PlatformSaasCheckoutMetadata {
   user_id: string;
+  /** Canonical tenants.id, never organizations.id. */
   tenant_id?: string;
   plan_id: BasePlanId;
   billing_interval: BillingInterval;
   addon_slugs?: string;
   stripe_subscription_id?: string;
   stripe_customer_id?: string;
+  current_period_start?: string;
   current_period_end?: string;
 }
 
+function databaseBillingInterval(interval: BillingInterval): 'month' | 'year' {
+  return interval === 'annual' ? 'year' : 'month';
+}
+
 /**
- * Apply plan + add-ons to organization_subscriptions, addon_subscriptions,
- * and sync licenses.features for existing middleware.
+ * Apply the purchased platform plan to the billing organization and add-ons to
+ * the canonical tenant. This function is the checkout fulfillment boundary and
+ * must never treat organizations.id and tenants.id as interchangeable.
  */
 export async function fulfillPlatformSaasSubscription(
   adminSupabase: SupabaseClient,
   meta: PlatformSaasCheckoutMetadata,
 ): Promise<{ ok: boolean; error?: string }> {
-  const organizationId = meta.tenant_id;
-  if (!organizationId) {
+  const tenantId = meta.tenant_id;
+  if (!tenantId) {
     logger.warn('platform_saas fulfillment: no tenant_id', { user_id: meta.user_id });
-    return { ok: false, error: 'No organization linked to this account' };
+    return { ok: false, error: 'No tenant linked to this account' };
   }
 
-  const addonSlugs = (meta.addon_slugs || '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map(normalizeAddonCode);
+  const billingOrganizationId = await resolveBillingOrganizationId(tenantId, adminSupabase);
+  if (!billingOrganizationId) {
+    logger.warn('platform_saas fulfillment: billing organization not found', {
+      user_id: meta.user_id,
+      tenant_id: tenantId,
+    });
+    return { ok: false, error: 'No billing organization linked to this workspace' };
+  }
+
+  const addonSlugs = [...new Set(
+    (meta.addon_slugs || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map(normalizeAddonCode),
+  )];
 
   const { data: planRow, error: planErr } = await adminSupabase
     .from('subscription_plans')
-    .select('id, monthly_price')
+    .select('id, slug, monthly_price')
     .eq('slug', meta.plan_id)
     .eq('active', true)
     .maybeSingle();
@@ -47,44 +69,73 @@ export async function fulfillPlatformSaasSubscription(
     return { ok: false, error: planErr?.message ?? 'Plan not found in catalog' };
   }
 
-  const periodEnd = meta.current_period_end ?? null;
-
+  const now = new Date().toISOString();
   const { error: subErr } = await adminSupabase.from('organization_subscriptions').upsert(
     {
-      organization_id: organizationId,
+      organization_id: billingOrganizationId,
       plan_id: planRow.id,
+      plan_type: planRow.slug,
       stripe_subscription_id: meta.stripe_subscription_id ?? null,
       stripe_customer_id: meta.stripe_customer_id ?? null,
-      billing_interval: meta.billing_interval,
+      billing_interval: databaseBillingInterval(meta.billing_interval),
       status: 'active',
-      current_period_end: periodEnd,
-      updated_at: new Date().toISOString(),
-      metadata: { plan_slug: meta.plan_id, addon_slugs: addonSlugs },
+      current_period_start: meta.current_period_start ?? null,
+      current_period_end: meta.current_period_end ?? null,
+      updated_at: now,
+      metadata: {
+        tenant_id: tenantId,
+        plan_slug: meta.plan_id,
+        addon_slugs: addonSlugs,
+      },
     },
     { onConflict: 'organization_id' },
   );
 
   if (subErr) {
-    logger.error('organization_subscriptions upsert failed', subErr);
+    logger.error('organization_subscriptions upsert failed', subErr, {
+      tenantId,
+      billingOrganizationId,
+    });
     return { ok: false, error: subErr.message };
   }
 
+  // The checkout represents the desired full add-on set on the platform
+  // subscription. Retire previously selected add-ons before reactivating the
+  // current set so downgrades/removals do not leave stale entitlements behind.
+  await adminSupabase
+    .from('addon_subscriptions')
+    .update({ active: false, canceled_at: now, updated_at: now })
+    .eq('organization_id', tenantId);
+
+  await adminSupabase
+    .from('organization_addons')
+    .update({ status: 'inactive' })
+    .eq('tenant_id', tenantId);
+
   for (const code of addonSlugs) {
-    const { data: catalog } = await adminSupabase
+    const { data: catalog, error: catalogError } = await adminSupabase
       .from('saas_addon_catalog')
-      .select('monthly_price')
+      .select('code, monthly_price, active')
       .eq('code', code)
       .maybeSingle();
 
+    if (catalogError || !catalog?.active) {
+      logger.warn('platform_saas fulfillment: add-on unavailable', {
+        code,
+        error: catalogError?.message,
+      });
+      continue;
+    }
+
     const { error: addonErr } = await adminSupabase.from('addon_subscriptions').upsert(
       {
-        organization_id: organizationId,
+        organization_id: tenantId,
         addon_code: code,
-        monthly_price: catalog?.monthly_price ?? null,
+        monthly_price: catalog.monthly_price ?? null,
         active: true,
-        activated_at: new Date().toISOString(),
+        activated_at: now,
         canceled_at: null,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       },
       { onConflict: 'organization_id,addon_code' },
     );
@@ -95,23 +146,43 @@ export async function fulfillPlatformSaasSubscription(
 
     await adminSupabase.from('organization_addons').upsert(
       {
-        tenant_id: organizationId,
+        tenant_id: tenantId,
         addon_slug: code,
         status: 'active',
-        activated_at: new Date().toISOString(),
+        activated_at: now,
       },
       { onConflict: 'tenant_id,addon_slug' },
     );
   }
 
-  const entitlements = await getOrganizationFeatures(organizationId, adminSupabase);
+  const entitlements = await getOrganizationFeatures(tenantId, adminSupabase);
 
-  await syncLicenseFromSaasEntitlements(adminSupabase, organizationId, entitlements, {
+  await syncLicenseFromSaasEntitlements(adminSupabase, tenantId, entitlements, {
     planSlug: meta.plan_id,
     billingInterval: meta.billing_interval,
     stripeSubscriptionId: meta.stripe_subscription_id,
     stripeCustomerId: meta.stripe_customer_id,
   });
+
+  if (meta.stripe_subscription_id) {
+    await emitPlatformEvent(adminSupabase, {
+      eventType: PlatformEventType.ENTITLEMENT_REFRESHED,
+      category: 'entitlement',
+      source: 'platform.fulfillment',
+      actorId: meta.user_id || null,
+      actorType: 'user',
+      tenantId,
+      subjectType: 'tenant',
+      subjectId: tenantId,
+      correlationId: meta.stripe_subscription_id,
+      idempotencyKey: `platform-checkout-entitlement:${meta.stripe_subscription_id}:${meta.plan_id}:${addonSlugs.join(',')}`,
+      payload: {
+        plan_slug: meta.plan_id,
+        addon_codes: addonSlugs,
+        features: entitlements.features,
+      },
+    });
+  }
 
   return { ok: true };
 }

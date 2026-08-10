@@ -1,19 +1,20 @@
 /**
  * Admin Enrollment V2 API
- * Server-only endpoint using service-role key
- * Lists and manages enrollment_v2_applications
+ * Server-only endpoint using service-role key.
+ * Lists and manages enrollment_v2_applications.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
+import { ADMIN_ROLES } from '@/lib/rbac/role-matrix';
 
 export const dynamic = 'force-dynamic';
 
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 }
 
@@ -125,30 +126,9 @@ const handlePost: AuthHandler = async (req: NextRequest) => {
   return NextResponse.json({ success: true, application: data, action });
 };
 
-// Export handlers
-export async function GET(req: NextRequest) {
-  try {
-    return await withAuth(req, handleGet);
-  } catch (err: any) {
-    if (err.status) return NextResponse.json({ error: err.message }, { status: err.status });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-}
-
-export async function PATCH(req: NextRequest) {
-  try {
-    return await withAuth(req, handlePatch);
-  } catch (err: any) {
-    if (err.status) return NextResponse.json({ error: err.message }, { status: err.status });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    return await withAuth(req, handlePost);
-  } catch (err: any) {
-    if (err.status) return NextResponse.json({ error: err.message }, { status: err.status });
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-}
+// withAuth is a handler factory. Export the wrapped handlers directly so the
+// Next.js route module always returns Response/Promise<Response>, never a
+// function object. These service-role operations are Admin-only.
+export const GET = withAuth(handleGet, { roles: ADMIN_ROLES });
+export const PATCH = withAuth(handlePatch, { roles: ADMIN_ROLES });
+export const POST = withAuth(handlePost, { roles: ADMIN_ROLES });

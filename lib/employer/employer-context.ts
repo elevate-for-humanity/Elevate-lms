@@ -58,5 +58,5 @@ export async function getEmployerRecord(
     throw new Error(`Unable to resolve employer account: ${error.message}`);
   }
 
-  return (data as EmployerRecord | null) ?? null;
+  return (data as unknown as EmployerRecord | null) ?? null;
 }

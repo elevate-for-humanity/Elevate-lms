@@ -1,87 +1,96 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { CreditCard, Calendar, Loader2 } from 'lucide-react';
-import { BARBER_PRICING } from '@/lib/programs/pricing';
-import UnifiedPaymentFlow from '@/components/payments/UnifiedPaymentFlow';
+import { Calendar, CreditCard, Loader2 } from 'lucide-react';
+import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
+import { BARBER_PRICING, calculateWeeklyPayment } from '@/lib/programs/pricing';
 
-// Program pricing configuration
-const PROGRAM_PRICING = {
+type PaymentOption = 'full' | 'deposit' | 'installment';
+
+type ProgramPricing = {
+  fullPrice: number;
+  deposit: number;
+  name: string;
+  weeks: number;
+  weeklyPayment: number;
+};
+
+const barberWeekly = calculateWeeklyPayment(
+  40,
+  0,
+  BARBER_PRICING.defaultDownPayment,
+).weeklyPaymentDollars;
+
+// Display values are dollars. Checkout amounts remain server-authoritative.
+const PROGRAM_PRICING: Record<string, ProgramPricing> = {
   'barber-apprenticeship': {
     fullPrice: BARBER_PRICING.fullPrice,
-    deposit: BARBER_PRICING.setupFee,
+    deposit: BARBER_PRICING.defaultDownPayment,
     name: 'Barber Apprenticeship Program',
-    weeklyPayment: BARBER_PRICING.weeklyPayment,
-    weeks: BARBER_PRICING.weeks,
+    weeklyPayment: barberWeekly,
+    weeks: BARBER_PRICING.paymentTermWeeks,
   },
   'esthetician-apprenticeship': {
-    fullPrice: 550000, // $5,500
-    deposit: 60000,   // $600 BNPL start
+    fullPrice: 5500,
+    deposit: 600,
     name: 'Esthetician Apprenticeship Program',
-    weeklyPayment: 20500, // ~$205/week for 24 weeks
+    weeklyPayment: 205,
     weeks: 24,
   },
   'cosmetology-apprenticeship': {
-    fullPrice: 550000, // $5,500
-    deposit: 60000,   // $600 BNPL start
+    fullPrice: 5500,
+    deposit: 600,
     name: 'Cosmetology Apprenticeship Program',
-    weeklyPayment: 20500, // ~$205/week
+    weeklyPayment: 205,
     weeks: 24,
   },
   'nail-technician-apprenticeship': {
-    fullPrice: 350000, // $3,500
-    deposit: 35000,   // $350 BNPL start
+    fullPrice: 3500,
+    deposit: 350,
     name: 'Nail Technician Apprenticeship Program',
-    weeklyPayment: 13000, // ~$130/week
+    weeklyPayment: 130,
     weeks: 24,
   },
 };
 
-type PaymentOption = 'full' | 'deposit' | 'installment';
-
-function EnrollPaymentContent() {
+export default function EnrollPaymentPage() {
   const searchParams = useSafeSearchParams();
-  const router = useRouter();
   const applicationId = searchParams.get('application_id');
   const canceled = searchParams.get('canceled');
-  const programSlug = searchParams.get('program') || 'barber-apprenticeship';
-
-  // Get pricing for the program (default to barber if not found)
-  const pricing = PROGRAM_PRICING[programSlug as keyof typeof PROGRAM_PRICING] || PROGRAM_PRICING['barber-apprenticeship'];
+  const requestedProgram = searchParams.get('program') || 'barber-apprenticeship';
+  const pricing = PROGRAM_PRICING[requestedProgram] || PROGRAM_PRICING['barber-apprenticeship'];
 
   const [selectedOption, setSelectedOption] = useState<PaymentOption>('deposit');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(true);
   const [applicationValid, setApplicationValid] = useState(false);
-  const [applicationData, setApplicationData] = useState<{program_slug?: string} | null>(null);
 
-  // Pricing derived from canonical source
-  const PRICING = {
-    full: {
-      amount: pricing.fullPrice,
-      label: 'Full Payment',
-      description: 'Pay in full today',
-      savings: 'Best value',
-    },
-    deposit: {
-      amount: pricing.deposit,
-      label: 'BNPL Deposit',
-      description: `$${(pricing.deposit / 100).toLocaleString()} now, balance paid weekly during training`,
-      savings: 'Reserve your spot',
-    },
-    installment: {
-      amount: pricing.fullPrice,
-      label: 'Payment Plan',
-      description: `Split into ${pricing.weeks} weekly payments`,
-      savings: 'Flexible payments',
-    },
-  };
+  const options = useMemo(
+    () => [
+      {
+        id: 'full' as const,
+        label: 'Pay in Full',
+        amount: pricing.fullPrice,
+        description: 'One payment for the full program balance.',
+      },
+      {
+        id: 'deposit' as const,
+        label: 'Down Payment',
+        amount: pricing.deposit,
+        description: `Pay $${pricing.deposit.toLocaleString()} now; the remaining approved balance is billed under your enrollment payment schedule.`,
+      },
+      {
+        id: 'installment' as const,
+        label: 'Payment Plan',
+        amount: pricing.weeklyPayment,
+        description: `Approximately $${pricing.weeklyPayment.toLocaleString(undefined, { maximumFractionDigits: 2 })} per week for ${pricing.weeks} weeks after the required down payment. Final schedule is confirmed at checkout.`,
+      },
+    ],
+    [pricing],
+  );
 
-  // Verify application exists before showing payment options
   useEffect(() => {
     async function verifyApplication() {
       if (!applicationId) {
@@ -91,43 +100,37 @@ function EnrollPaymentContent() {
       }
 
       try {
-        const res = await fetch(`/api/applications/${applicationId}/verify`);
-        if (res.ok) {
-          const data = await res.json();
-          setApplicationData(data);
+        const verifyResponse = await fetch(`/api/applications/${applicationId}/verify`, { cache: 'no-store' });
+        if (verifyResponse.ok) {
           setApplicationValid(true);
         } else {
-          // If no verification endpoint, try to fetch application directly
-          const appRes = await fetch(`/api/applications/${applicationId}`);
-          if (appRes.ok) {
-            const appData = await appRes.json();
-            setApplicationData(appData);
-            setApplicationValid(true);
-          } else {
-            setError('We could not verify this application for payment. Please confirm your details or submit a new application.');
+          const applicationResponse = await fetch(`/api/applications/${applicationId}`, { cache: 'no-store' });
+          setApplicationValid(applicationResponse.ok);
+          if (!applicationResponse.ok) {
+            setError('We could not verify this application for payment. Please confirm your application before continuing.');
           }
         }
       } catch {
-        // If verification endpoint doesn't exist, allow proceeding
-        setApplicationValid(true);
+        setApplicationValid(false);
+        setError('Application verification is temporarily unavailable. Please try again.');
+      } finally {
+        setVerifying(false);
       }
-      setVerifying(false);
     }
 
-    verifyApplication();
+    void verifyApplication();
   }, [applicationId]);
 
-  const handlePayment = async () => {
-    if (!applicationId) {
-      setError('No application found. Please apply first.');
+  async function handlePayment() {
+    if (!applicationId || !applicationValid) {
+      setError('A verified application is required before payment.');
       return;
     }
 
     setLoading(true);
     setError(null);
-
     try {
-      const res = await fetch('/api/apprenticeship/enroll/checkout', {
+      const response = await fetch('/api/apprenticeship/enroll/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -135,27 +138,23 @@ function EnrollPaymentContent() {
           payment_option: selectedOption,
         }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to create checkout session');
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || typeof data.checkout_url !== 'string') {
+        throw new Error(data.error || 'Unable to create checkout session.');
       }
-
-      // Redirect to Stripe Checkout
       window.location.href = data.checkout_url;
     } catch (err) {
-      setError('An error occurred');
+      setError(err instanceof Error ? err.message : 'Unable to start checkout.');
       setLoading(false);
     }
-  };
+  }
 
   if (verifying) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600 mx-auto mb-4" />
-          <p className="text-slate-600">Verifying your application...</p>
+          <p className="text-slate-700">Verifying your application…</p>
         </div>
       </div>
     );
@@ -165,18 +164,18 @@ function EnrollPaymentContent() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-3">Enroll</h1>
-          <p className="text-slate-600 mb-6">
-            To enroll in the {pricing.name}, start by submitting an application.
-            Payment happens after your application is reviewed.
+          <h1 className="text-2xl font-bold text-slate-900 mb-3">Enrollment Payment</h1>
+          <p className="text-slate-700 mb-6">
+            Payment is available after we can verify your application.
           </p>
+          {error ? <p role="alert" className="mb-4 text-sm font-medium text-red-700">{error}</p> : null}
           <Link
-            href={`/programs/${programSlug}/apply`}
-            className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition"
+            href={`/programs/${requestedProgram}/apply`}
+            className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-semibold rounded-lg transition"
           >
-            Start Application
+            Start or Review Application
           </Link>
-          <Link href="/programs" className="block mt-3 text-sm text-slate-500 hover:text-slate-700">
+          <Link href="/programs" className="block mt-3 text-sm text-slate-600 hover:text-slate-900">
             View all programs
           </Link>
         </div>
@@ -185,243 +184,72 @@ function EnrollPaymentContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
+    <main className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Enroll</h1>
-          <p className="text-slate-600">
-            {pricing.name} — choose a payment option to secure your spot.
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Enrollment Payment</h1>
+          <p className="text-slate-700">{pricing.name}</p>
         </div>
 
-        {/* Canceled notice */}
-        {canceled && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-            <p className="text-amber-800 text-sm">
-              Payment was canceled. You can try again when you're ready.
-            </p>
+        {canceled ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-amber-900">
+            Checkout was canceled. No new payment was completed.
           </div>
-        )}
+        ) : null}
 
-        {/* Critical messaging */}
-        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
-          <p className="text-brand-blue-900 font-medium text-center">
-            Payment secures your enrollment. Training access unlocks after approval and shop
-            assignment.
-          </p>
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5 mb-7 text-brand-blue-950">
+          Payment does not by itself activate training access. Enrollment approval and any required placement/compliance steps must also be complete.
         </div>
 
-        {/* Payment Options */}
-        <div className="space-y-4 mb-8">
-          {/* Full Payment */}
-          <button
-            onClick={() => setSelectedOption('full')}
-            className={`w-full p-6 rounded-xl border-2 text-left transition ${
-              selectedOption === 'full'
-                ? 'border-brand-blue-600 bg-brand-blue-50'
-                : 'border-slate-200 bg-white hover:border-slate-300'
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    selectedOption === 'full'
-                      ? 'border-brand-blue-600 bg-brand-blue-600'
-                      : 'border-slate-300'
-                  }`}
-                >
-                  {selectedOption === 'full' && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
-                  )}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-slate-600" />
-                    <span className="font-semibold text-slate-900">{PRICING.full.label}</span>
-                    <span className="text-xs bg-brand-green-100 text-brand-green-700 px-2 py-0.5 rounded-full">
-                      {PRICING.full.savings}
-                    </span>
+        <div className="space-y-4">
+          {options.map((option) => {
+            const selected = selectedOption === option.id;
+            return (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => setSelectedOption(option.id)}
+                className={`w-full rounded-xl border-2 bg-white p-5 text-left transition ${selected ? 'border-brand-blue-700 ring-2 ring-brand-blue-100' : 'border-slate-200 hover:border-slate-400'}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      {option.id === 'installment' ? <Calendar className="h-5 w-5 text-brand-blue-700" /> : <CreditCard className="h-5 w-5 text-brand-blue-700" />}
+                      <span className="font-bold text-slate-900">{option.label}</span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-slate-700">{option.description}</p>
                   </div>
-                  <p className="text-slate-600 text-sm mt-1">{PRICING.full.description}</p>
-                </div>
-              </div>
-              <span className="text-2xl font-bold text-slate-900">
-                ${PRICING.full.amount.toLocaleString()}
-              </span>
-            </div>
-          </button>
-
-          {/* Deposit */}
-          <button
-            onClick={() => setSelectedOption('deposit')}
-            className={`w-full p-6 rounded-xl border-2 text-left transition ${
-              selectedOption === 'deposit'
-                ? 'border-brand-blue-600 bg-brand-blue-50'
-                : 'border-slate-200 bg-white hover:border-slate-300'
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    selectedOption === 'deposit'
-                      ? 'border-brand-blue-600 bg-brand-blue-600'
-                      : 'border-slate-300'
-                  }`}
-                >
-                  {selectedOption === 'deposit' && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
-                  )}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-slate-600" />
-                    <span className="font-semibold text-slate-900">{PRICING.deposit.label}</span>
-                    <span className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded-full">
-                      {PRICING.deposit.savings}
-                    </span>
+                  <div className="shrink-0 text-right">
+                    <p className="text-xl font-bold text-slate-900">
+                      ${option.amount.toLocaleString(undefined, { minimumFractionDigits: option.id === 'installment' ? 2 : 0, maximumFractionDigits: 2 })}
+                    </p>
+                    {option.id === 'installment' ? <p className="text-xs text-slate-500">estimated weekly</p> : null}
                   </div>
-                  <p className="text-slate-600 text-sm mt-1">{PRICING.deposit.description}</p>
                 </div>
-              </div>
-              <span className="text-2xl font-bold text-slate-900">
-                ${PRICING.deposit.amount.toLocaleString()}
-              </span>
-            </div>
-          </button>
-
-          {/* Installments */}
-          <button
-            onClick={() => setSelectedOption('installment')}
-            className={`w-full p-6 rounded-xl border-2 text-left transition ${
-              selectedOption === 'installment'
-                ? 'border-brand-blue-600 bg-brand-blue-50'
-                : 'border-slate-200 bg-white hover:border-slate-300'
-            }`}
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-4">
-                <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    selectedOption === 'installment'
-                      ? 'border-brand-blue-600 bg-brand-blue-600'
-                      : 'border-slate-300'
-                  }`}
-                >
-                  {selectedOption === 'installment' && (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
-                  )}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-slate-600" />
-                    <span className="font-semibold text-slate-900">{PRICING.installment.label}</span>
-                    <span className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded-full">
-                      {PRICING.installment.savings}
-                    </span>
-                  </div>
-                  <p className="text-slate-600 text-sm mt-1">{PRICING.installment.description}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl font-bold text-slate-900">
-                  ${PRICING.installment.amount.toLocaleString()}
-                </span>
-                <p className="text-xs text-slate-500">total</p>
-              </div>
-            </div>
-          </button>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Error message */}
-        {error && (
-          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 mb-6">
-            <p className="text-brand-red-800 text-sm">{error}</p>
+        {error ? (
+          <div role="alert" className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-800">
+            {error}
           </div>
-        )}
+        ) : null}
 
-        {/* Submit button */}
         <button
+          type="button"
           onClick={handlePayment}
           disabled={loading}
-          className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-brand-blue-400 text-white font-bold text-lg rounded-xl transition flex items-center justify-center gap-2"
+          className="mt-7 w-full rounded-xl bg-brand-blue-700 py-4 text-lg font-bold text-white hover:bg-brand-blue-800 disabled:opacity-60"
         >
-          {loading ? (
-            <>
-              <Loader2 className="w-5 h-5 animate-spin" />
-              Processing...
-            </>
-          ) : (
-            <>Continue to Payment</>
-          )}
+          {loading ? 'Opening secure checkout…' : 'Continue to Secure Checkout'}
         </button>
 
-        {/* Agreement checkbox would go here in production */}
-        <p className="text-center text-slate-500 text-sm mt-4">
-          By continuing, you agree to the enrollment terms and conditions.
-        </p>
-
-        {/* What happens next */}
-        <div className="mt-8 bg-white rounded-xl border border-slate-200 p-6">
-          <h3 className="font-semibold text-slate-900 mb-4">What happens after payment?</h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-brand-green-100 text-brand-green-600 flex items-center justify-center text-sm font-bold">
-                •
-              </span>
-              <span className="text-slate-700">Enrollment confirmed</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
-                ⏳
-              </span>
-              <span className="text-slate-700">Shop assignment (1-2 weeks)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
-                ⏳
-              </span>
-              <span className="text-slate-700">Compliance approval</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-sm">
-                🔒
-              </span>
-              <span className="text-slate-500">Training access unlocks after approval</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Unified Payment Flow */}
-        <div className="mt-8">
-          <UnifiedPaymentFlow
-            programId={programSlug}
-            programName={pricing.name}
-            programSlug={programSlug}
-            price={pricing.fullPrice}
-          />
-        </div>
-
-        {/* Contact */}
-        <p className="text-center text-slate-500 text-sm mt-6">
-          Questions?{' '}
-          <a href="/faq" className="text-brand-blue-600 underline">
-            Check our FAQ
-          </a>{' '}
-          or{' '}
-          <a href="/support" className="text-brand-blue-600 underline">
-            contact support
-          </a>
+        <p className="mt-5 text-center text-sm text-slate-600">
+          Questions? <Link href="/contact" className="font-semibold text-brand-blue-700 underline">Contact Admissions</Link>.
         </p>
       </div>
-    </div>
-  );
-}
-
-export default function EnrollPaymentPage() {
-  return (
-          <EnrollPaymentContent />
+    </main>
   );
 }

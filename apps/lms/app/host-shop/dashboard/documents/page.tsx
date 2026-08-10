@@ -1,39 +1,19 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { Building2, FileText } from 'lucide-react';
-import { createClient } from '@/lib/supabase/server';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
 import HostShopDocumentsClient from './HostShopDocumentsClient';
 
 export const dynamic = 'force-dynamic';
+export const metadata = {
+  title: 'Host Shop Documents | Elevate LMS',
+  robots: { index: false, follow: false },
+};
 
 export default async function DocumentsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect('/host-shop/login?redirect=/host-shop/dashboard/documents');
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile || !['partner', 'host_shop', 'host_shop_admin', 'admin', 'staff'].includes(profile.role)) {
-    redirect('/unauthorized');
-  }
-
-  let board: Awaited<ReturnType<typeof getHostShopBoard>>;
-  try {
-    board = await getHostShopBoard(user.id);
-  } catch (error) {
-    if (error instanceof Error && error.message === 'HOST_SHOP_ACCESS_DENIED') {
-      redirect('/unauthorized');
-    }
-    throw error;
-  }
+  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const board = await getHostShopBoard(user.id);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -69,8 +49,7 @@ export default async function DocumentsPage() {
           </div>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Required Documents</h1>
           <p className="mt-2 text-slate-600">
-            Upload the documents required for {board.tradeInfo.label}. New or replacement files are
-            submitted for review and remain private.
+            Upload the documents required for {board.tradeInfo.label}. New or replacement files are submitted for review and remain private.
           </p>
         </div>
 

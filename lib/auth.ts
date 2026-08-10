@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
-import type { UserRole } from '@/types/database';
+import type { UserRole } from '@/lib/rbac/role-matrix';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -122,7 +122,7 @@ export async function getCurrentUser() {
 
 export async function getUserRole(): Promise<UserRole | null> {
   const user = await getCurrentUser();
-  return user?.profile?.role || null;
+  return (user?.profile?.role as UserRole | null | undefined) ?? null;
 }
 
 export type AuthUser = {
@@ -206,7 +206,7 @@ export async function requireStudent() {
 
 export async function requireAdmin() {
   const adminUrl = getAdminUrl();
-  return requireRole(['admin', 'super_admin', 'staff', 'org_admin'] as UserRole[], '/admin/dashboard', adminUrl);
+  return requireRole(['admin', 'super_admin', 'staff', 'org_admin'], '/admin/dashboard', adminUrl);
 }
 
 export async function requireProgramHolder() {
@@ -224,19 +224,22 @@ export async function requireAdminOrDelegate() {
 export async function canAccessStudent(studentId: string): Promise<boolean> {
   const user = await getCurrentUser();
   if (!user) return false;
-  const role = user.profile?.role;
+  const role = user.profile?.role as UserRole | undefined;
   if (role === 'admin' || role === 'super_admin') return true;
   if (role === 'student') return user.id === studentId;
 
   const supabase = await createServerSupabaseClient();
   if (!supabase) return false;
 
+  // program_enrollments identifies learners by user_id. Historical helpers that
+  // queried a nonexistent student_id silently denied valid delegate/holder access.
   if (role === 'delegate') {
     const { data } = await supabase
       .from('program_enrollments')
       .select('id')
-      .eq('student_id', studentId)
+      .eq('user_id', studentId)
       .eq('delegate_id', user.id)
+      .limit(1)
       .maybeSingle();
     return !!data;
   }
@@ -245,8 +248,9 @@ export async function canAccessStudent(studentId: string): Promise<boolean> {
     const { data } = await supabase
       .from('program_enrollments')
       .select('id')
-      .eq('student_id', studentId)
+      .eq('user_id', studentId)
       .eq('program_holder_id', user.profile.id)
+      .limit(1)
       .maybeSingle();
     return !!data;
   }
@@ -267,7 +271,7 @@ export async function canAccessEnrollment(enrollmentId: string): Promise<boolean
     .maybeSingle();
 
   if (!enrollment) return false;
-  const role = user.profile?.role;
+  const role = user.profile?.role as UserRole | undefined;
   if (role === 'admin' || role === 'super_admin') return true;
   if (role === 'student' && enrollment.user_id === user.id) return true;
   if (role === 'delegate' && enrollment.delegate_id === user.id) return true;

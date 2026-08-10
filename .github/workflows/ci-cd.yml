@@ -18,6 +18,8 @@ on:
       - 'config/**'
       - 'content/**'
       - 'utils/**'
+      - 'supabase/migrations/**'
+      - '.github/workflows/ci-cd.yml'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -32,6 +34,10 @@ on:
       - 'packages/**'
       - 'lib/**'
       - 'components/**'
+      - 'types/**'
+      - 'config/**'
+      - 'supabase/migrations/**'
+      - '.github/workflows/ci-cd.yml'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -40,19 +46,17 @@ on:
       - 'pnpm-lock.yaml'
       - 'package.json'
 
-
-# Prevent multiple CI runs from conflicting - wait for pending runs to complete
 concurrency:
   group: ci-cd-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Hard quality gate: install + test + build must pass
+  # HARD QUALITY GATE. TypeScript, tests, smoke, and build must all pass.
   test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout exact commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
@@ -60,6 +64,7 @@ jobs:
           clean: true
 
       - name: Verify source commit SHA
+        shell: bash
         run: |
           set -euo pipefail
           ACTUAL_SHA="$(git rev-parse HEAD)"
@@ -68,7 +73,6 @@ jobs:
           echo "Actual SHA:   $ACTUAL_SHA"
           test "$ACTUAL_SHA" = "$EXPECTED_SHA"
           test "$(git status --porcelain)" = ""
-          echo "SHA verification passed"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -81,22 +85,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # tsconfig.json writes tsBuildInfoFile to .next/cache/tsbuildinfo.json.
-      # Caching that path (not the root .tsbuildinfo) lets tsc skip unchanged files.
-      # webpack cache lives alongside it - restoring both makes incremental builds fast.
-      - name: Cache Next.js build artifacts
+      - name: Cache Next.js/TypeScript artifacts
         uses: actions/cache@v4
         with:
           path: |
             .next/cache/tsbuildinfo.json
             .next/cache/webpack
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.mjs') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.mjs') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
             ${{ runner.os }}-nextjs-
 
       - name: System invariants
-        run: npm run verify:system || echo "System invariants check failed but continuing"
+        run: npm run verify:system || echo "System invariants reported non-blocking legacy findings"
         continue-on-error: true
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -115,30 +116,17 @@ jobs:
 
       - name: Run unit tests
         run: npm run test || echo "No unit tests found"
-        continue-on-error: false
 
       - name: Run smoke tests
         run: bash scripts/smoke-test.sh
-        continue-on-error: false
 
-      - name: Generate TypeScript baseline
-        run: npm run typecheck:baseline || true
-
-      - name: Commit updated baseline if it changed
-        run: |
-          if git diff --quiet docs/typecheck-baseline.txt; then
-            echo "Baseline unchanged."
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add docs/typecheck-baseline.txt
-            git commit -m "chore: sync typecheck baseline [skip ci]"
-            git push origin HEAD:${{ github.ref_name }} || echo "Push skipped (PR or protected branch)"
-          fi
-
-      - name: Type check
+      # CRITICAL: this is intentionally blocking. Do not add continue-on-error,
+      # `|| true`, or a baseline exception. A successful CI run now proves the
+      # checked commit completed full repository tsc --noEmit with zero errors.
+      - name: Full TypeScript gate
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
         run: npm run typecheck:full
-        continue-on-error: true
 
       - name: Route governance (strict)
         run: npm run platform:doctor:strict
@@ -155,14 +143,11 @@ jobs:
       - name: Install Playwright browsers
         continue-on-error: true
         run: |
-          # Retry logic for flaky network issues in GitHub Actions
           for i in 1 2 3; do
             npm exec playwright install --with-deps chromium 2>&1 | tail -5 && break
             echo "Retrying Playwright install ($i/3)..."
             sleep 30
           done || true
-          # Ensure playwright is available
-          which playwright || true
 
       - name: Browser E2E (CI-safe)
         continue-on-error: true
@@ -183,10 +168,8 @@ jobs:
       - name: Clear Next.js cache
         run: rm -rf .next
 
-      - name: Build
+      - name: Build LMS
         env:
-          # 6 GB heap - ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB
-          # without this flag the SWC compiler OOMs on large page counts.
           NODE_OPTIONS: '--max-old-space-size=6144'
           GENERATE_SOURCEMAP: 'false'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -204,7 +187,6 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
         run: npm run build:lms:phased
 
-      # Upload build artifacts for deploy workflows to use instead of rebuilding
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -217,158 +199,105 @@ jobs:
           retention-days: 1
           compression-level: 9
 
-  # Non-blocking legacy lint.
-  # 896k lines, 2500+ files, pre-existing violations across the codebase.
-  # This job NEVER blocks merge. Failure = lint found something, not build broken.
-  # Scoped to files changed in the commit/PR to surface new regressions only.
+  # Legacy lint remains informational until existing repository-wide lint debt is removed.
   legacy-lint:
     runs-on: ubuntu-latest
     continue-on-error: true
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 2
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
       - name: Lint changed files only
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE="${{ github.event.pull_request.base.sha }}"
           else
             BASE="HEAD~1"
           fi
-
-          # Build newline-delimited list (safer than space-delimited; avoids word-splitting issues)
-          CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' \
-            | grep -v node_modules \
-            | grep -v '\.next' \
-            || true)
-
+          CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' | grep -v node_modules | grep -v '\.next' || true)
           if [ -z "$CHANGED" ]; then
-            echo "No TS/JS files changed. Skipping lint."
+            echo "No TS/JS files changed."
             exit 0
           fi
-
-          # Keep only existing files (skip deleted/renamed-away files)
-          EXISTING_FILES=$(echo "$CHANGED" | while IFS= read -r file; do
-            [ -f "$file" ] && echo "$file"
-          done)
-
-          if [ -z "$EXISTING_FILES" ]; then
-            echo "No existing TS/JS files to lint (changed files were deleted)."
-            exit 0
-          fi
-
-          echo "Linting changed files:"
-          echo "$EXISTING_FILES"
-
-          # Pass files via xargs to avoid argv length limits (exit code 249 was caused by
-          # a huge space-delimited argument list exceeding the OS exec limit)
-          # NOTE: This is non-blocking legacy lint - failures don't block deployment
+          EXISTING_FILES=$(echo "$CHANGED" | while IFS= read -r file; do [ -f "$file" ] && echo "$file"; done)
+          if [ -z "$EXISTING_FILES" ]; then exit 0; fi
           echo "$EXISTING_FILES" | xargs npx eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored || true
 
-  # Deployment verification (runs after successful merge to main)
   post-deployment-check:
     runs-on: ubuntu-latest
     needs: [test-and-build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Wait for deployment to propagate
         run: sleep 90
-
       - name: Check health endpoint
         id: health
+        shell: bash
         run: |
           HEALTH_URL="https://www.elevateforhumanity.org/api/health"
-          echo "Checking: $HEALTH_URL"
-          # Retry up to 3 times with 30s backoff
           for attempt in 1 2 3; do
             response=$(curl -s -w "\n%{http_code}" --max-time 15 "$HEALTH_URL")
             status_code=$(echo "$response" | tail -n1)
             body=$(echo "$response" | head -n-1)
             echo "Attempt $attempt - Status: $status_code"
             if [ "$status_code" = "200" ]; then
-              echo "Health check passed"
-              echo "healthy=true" >> $GITHUB_OUTPUT
+              echo "healthy=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            echo "Not healthy yet (got $status_code), waiting 30s..."
             sleep 30
           done
-          echo "Health check failed after 3 attempts (last status: $status_code)"
+          echo "healthy=false" >> "$GITHUB_OUTPUT"
           echo "Response: $body"
-          echo "healthy=false" >> $GITHUB_OUTPUT
           exit 1
-
       - name: Run production smoke tests
         run: bash scripts/smoke-test-portal.sh https://www.elevateforhumanity.org
-
       - name: Auto-rollback on health failure
         if: failure() && steps.health.outputs.healthy == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Health check failed - initiating rollback to previous commit"
-          PREV_SHA=$(git rev-parse HEAD~1)
-          echo "Rolling back to: $PREV_SHA"
-          # Create a revert commit and push
           git config user.email "ci@elevateforhumanity.org"
           git config user.name "Elevate CI"
           git revert --no-edit HEAD
           git push origin main
-          echo "Rollback pushed. Previous commit: $PREV_SHA"
-
       - name: Notify deployment failure
         if: failure()
-        run: |
-          echo "Deployment verification failed"
-          echo "Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: echo "Deployment verification failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-  # Clean up old branches automatically
   cleanup-branches:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Delete merged branches
         run: |
           git fetch --prune
           for branch in $(git branch -r --merged origin/main | grep -v 'main\|HEAD\|dependabot'); do
-            branch_name=$(echo $branch | sed 's/origin\///')
-            echo "Deleting merged branch: $branch_name"
-            git push origin --delete $branch_name || true
+            branch_name=$(echo "$branch" | sed 's/origin\///')
+            git push origin --delete "$branch_name" || true
           done
 
-  # Notify on build failure
   notify-on-failure:
     runs-on: ubuntu-latest
     needs: [test-and-build]
     if: failure()
-
     steps:
       - name: Send notification
-        run: |
-          echo "Build failed! Check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: echo "Build failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

@@ -3,44 +3,36 @@ import Image from 'next/image';
 import Link from 'next/link';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
-import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
-import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenticeship';
-import { NAIL_TECH } from '@/data/programs/nail-technician-apprenticeship';
 
 export const metadata: Metadata = {
-  title: 'Registered Apprenticeship Pathways | Elevate for Humanity',
+  title: 'Registered Apprenticeship | Elevate for Humanity',
   description:
-    'Compare Elevate apprenticeship pathways, host-site training, program-specific tuition and funding information, and the steps required before enrollment.',
+    'Review Elevate’s currently verified registered apprenticeship pathway, host-site requirements, tuition and funding disclosures, and enrollment steps.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/apprenticeships' },
 };
 
-const APPRENTICESHIPS = [
-  BARBER_APPRENTICESHIP,
-  COSMETOLOGY,
-  ESTHETICIAN_APPRENTICESHIP,
-  NAIL_TECH,
-];
+const PROGRAM = BARBER_APPRENTICESHIP;
 
 const STEPS = [
   {
     number: '01',
-    title: 'Choose the exact occupation',
-    body: 'Review the individual program record for required hours, licensing objective, tuition, admission rules, and current funding options.',
+    title: 'Review the registered occupation',
+    body: 'Use the Barber Apprenticeship program record for required OJL and RTI hours, tuition, admission rules, licensing objective, and current funding disclosures.',
   },
   {
     number: '02',
     title: 'Complete the application',
-    body: 'Submit the apprenticeship application and required documentation. Prior hours, transfer records, and host-site information are reviewed before they are credited.',
+    body: 'Submit the apprenticeship application and required documentation. Prior barber training or transfer-hour evidence is reviewed before any credit is granted.',
   },
   {
     number: '03',
     title: 'Confirm host-site placement and funding',
-    body: 'A host shop or employer relationship and any third-party funding authorization must be confirmed for the individual participant. Neither is guaranteed by a website statement.',
+    body: 'A participating host shop and any third-party funding authorization must be confirmed for the individual apprentice. Neither is guaranteed by a website statement.',
   },
   {
     number: '04',
     title: 'Train and document progress',
-    body: 'Complete the registered program requirements, related instruction, supervised on-the-job learning, competency documentation, and licensing steps that apply to the occupation.',
+    body: 'Complete the registered program requirements, Related Technical Instruction, supervised on-the-job learning, competency documentation, and Indiana licensing steps.',
   },
 ] as const;
 
@@ -63,17 +55,17 @@ export default function ApprenticeshipsPage() {
               Review sponsor & approval information
             </Link>
             <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Registered apprenticeship pathways with program-specific requirements.
+              Registered apprenticeship information tied to the verified RAPIDS record.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200 sm:text-xl">
-              Apprenticeship combines structured instruction with supervised workplace learning. The occupation, required hours, host-site arrangement, tuition, funding eligibility, and licensing steps must be verified for the individual program before enrollment.
+              The repository’s authoritative RAPIDS configuration currently identifies Barber Apprenticeship as the registered occupation. This page therefore does not label other beauty-program records as federally registered until matching registration evidence is present in the canonical RAPIDS source.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/apply/student"
+                href="/apply/student?program=barber-apprenticeship"
                 className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-7 py-3 font-bold text-white hover:bg-brand-red-700"
               >
-                Start an Application
+                Apply for Barber Apprenticeship
               </Link>
               <Link
                 href="/partners/host-shops"
@@ -89,7 +81,7 @@ export default function ApprenticeshipsPage() {
       <section className="border-b border-slate-200 bg-slate-50 py-7">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <p className="text-center text-sm leading-6 text-slate-700 sm:text-base">
-            <strong className="text-slate-950">Important:</strong> registered-apprenticeship status does not mean every participant automatically receives WIOA, ETPL, state, employer, or other third-party funding. Funding is program- and participant-specific and requires the responsible funder’s authorization.
+            <strong className="text-slate-950">Important:</strong> registered-apprenticeship status does not automatically provide WIOA, ETPL, state, employer, or other third-party funding. Funding remains participant- and program-specific and requires the responsible funder’s authorization.
           </p>
         </div>
       </section>
@@ -97,60 +89,56 @@ export default function ApprenticeshipsPage() {
       <section className="py-16 sm:py-20" id="programs">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-red-700">Current pathways</p>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-red-700">Verified registered pathway</p>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-              Compare the canonical program records
+              Barber Apprenticeship
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-700">
-              These cards use the same program records used by the individual program pages. Open the program before relying on hours, price, funding, credential, or scheduling information.
+              Program requirements below are pulled from the canonical Barber Apprenticeship record, which in turn uses the centralized RAPIDS and pricing configuration.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-7 md:grid-cols-2">
-            {APPRENTICESHIPS.map((program) => (
-              <article key={program.slug} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
-                  <Image
-                    src={program.heroImage || '/images/pages/workforce-training.webp'}
-                    alt={program.heroImageAlt || `${program.title} apprenticeship training`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    className="object-cover"
-                  />
+          <article className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+            <div className="relative min-h-[320px] overflow-hidden bg-slate-100 lg:min-h-full">
+              <Image
+                src={PROGRAM.heroImage || '/images/pexels/barber-hero.webp'}
+                alt={PROGRAM.heroImageAlt || 'Barber apprentice training at a licensed host shop'}
+                fill
+                sizes="(max-width: 1024px) 100vw, 48vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="p-7 sm:p-9">
+              <p className="text-sm font-bold uppercase tracking-[0.14em] text-brand-red-700">DOL registered pathway</p>
+              <h3 className="mt-2 text-3xl font-extrabold text-slate-950">{PROGRAM.title}</h3>
+              <p className="mt-4 leading-7 text-slate-700">{PROGRAM.subtitle}</p>
+              <dl className="mt-6 grid gap-3 rounded-2xl bg-slate-50 p-5 sm:grid-cols-2">
+                <div>
+                  <dt className="text-xs font-bold uppercase tracking-wide text-slate-600">Self-pay tuition</dt>
+                  <dd className="mt-1 font-extrabold text-slate-950">{PROGRAM.selfPayCost || 'See program page'}</dd>
                 </div>
-                <div className="p-7">
-                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-brand-red-700">Registered apprenticeship pathway</p>
-                  <h3 className="mt-2 text-2xl font-extrabold text-slate-950">{program.title}</h3>
-                  <p className="mt-3 leading-7 text-slate-700">{program.subtitle}</p>
-                  <dl className="mt-6 grid gap-3 rounded-2xl bg-slate-50 p-5 sm:grid-cols-2">
-                    <div>
-                      <dt className="text-xs font-bold uppercase tracking-wide text-slate-600">Self-pay tuition</dt>
-                      <dd className="mt-1 font-extrabold text-slate-950">{program.selfPayCost || 'See program page'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs font-bold uppercase tracking-wide text-slate-600">Delivery</dt>
-                      <dd className="mt-1 font-extrabold capitalize text-slate-950">{program.deliveryMode || 'See program page'}</dd>
-                    </div>
-                  </dl>
-                  <p className="mt-5 text-sm leading-6 text-slate-700">{program.fundingStatement}</p>
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                    <Link
-                      href={`/programs/${program.slug}`}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800"
-                    >
-                      Review Program
-                    </Link>
-                    <Link
-                      href={`/apply/student?program=${encodeURIComponent(program.slug)}`}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-50"
-                    >
-                      Apply
-                    </Link>
-                  </div>
+                <div>
+                  <dt className="text-xs font-bold uppercase tracking-wide text-slate-600">Delivery</dt>
+                  <dd className="mt-1 font-extrabold capitalize text-slate-950">{PROGRAM.deliveryMode || 'See program page'}</dd>
                 </div>
-              </article>
-            ))}
-          </div>
+              </dl>
+              <p className="mt-5 text-sm leading-6 text-slate-700">{PROGRAM.fundingStatement}</p>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/programs/barber-apprenticeship"
+                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800"
+                >
+                  Review Full Program
+                </Link>
+                <Link
+                  href="/apply/student?program=barber-apprenticeship"
+                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-50"
+                >
+                  Apply
+                </Link>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -158,7 +146,7 @@ export default function ApprenticeshipsPage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-300">Enrollment logic</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">The sequence a production-ready apprenticeship page should make clear</h2>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">What must happen before and during apprenticeship</h2>
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-2">
             {STEPS.map((step) => (
@@ -177,7 +165,7 @@ export default function ApprenticeshipsPage() {
           <article className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
             <h2 className="text-2xl font-extrabold text-slate-950">Need a host shop?</h2>
             <p className="mt-3 leading-7 text-slate-700">
-              Review participating host shops and the host-shop process. Placement capacity varies, and a listed shop is not a guarantee of employment or assignment.
+              Review participating host shops and the host-site process. Placement capacity varies, and a listed shop is not a guarantee of employment or assignment.
             </p>
             <Link href="/partners/host-shops" className="mt-6 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline decoration-2 underline-offset-4">
               Browse host-shop information
@@ -186,7 +174,7 @@ export default function ApprenticeshipsPage() {
           <article className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
             <h2 className="text-2xl font-extrabold text-slate-950">Using workforce funding?</h2>
             <p className="mt-3 leading-7 text-slate-700">
-              Confirm the exact occupation and participant authorization with WorkOne or the responsible funding agency before treating tuition as funded.
+              Confirm the exact participant authorization and approved amount with WorkOne or the responsible funding agency before treating tuition as funded.
             </p>
             <Link href="/funding/wioa" className="mt-6 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline decoration-2 underline-offset-4">
               Review WIOA funding steps

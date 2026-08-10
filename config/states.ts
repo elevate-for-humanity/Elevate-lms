@@ -5,7 +5,7 @@ export interface StateConfig {
   slug: string;
   name: string;
   abbreviation: string;
-  demonym: string; // e.g., "Hoosiers" for Indiana
+  demonym: string;
   majorCities: string[];
   careerTraining: {
     headline: string;
@@ -36,27 +36,26 @@ export const STATES: Record<string, StateConfig> = {
     careerTraining: {
       headline: 'Career Training & Workforce Programs in Indiana',
       description:
-        'Workforce development and career training programs in Indiana. WIOA-eligible training, apprenticeships, and certification programs serving Indianapolis, Fort Wayne, and Central Indiana. Free for qualifying residents.',
+        'Workforce development and career training programs in Indiana, including funded training pathways, apprenticeships, and certification preparation. Funding eligibility varies by participant and program.',
       features: [
-        'WIOA-eligible training programs',
+        'Workforce-funded training pathways',
         'Registered apprenticeships',
-        'Industry certifications',
-        'Job placement assistance',
+        'Industry certification preparation',
+        'Career and placement support',
       ],
+    },
+    communityServices: {
+      headline: 'Workforce & Community Services in Indiana',
+      description:
+        'Career navigation, testing, apprenticeship support, employer connections, and community workforce services coordinated through Elevate for Humanity and participating partners.',
     },
   },
 };
 
-/**
- * Get state configuration by slug
- */
 export function getStateConfig(slug: string): StateConfig | undefined {
   return STATES[slug];
 }
 
-/**
- * Get all states except the specified one
- */
 export function getOtherStates(excludeSlug: string): StateConfig[] {
   return Object.values(STATES).filter((state) => state.slug !== excludeSlug);
 }

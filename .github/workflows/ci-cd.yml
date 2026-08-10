@@ -40,14 +40,11 @@ on:
       - 'pnpm-lock.yaml'
       - 'package.json'
 
-
-# Prevent multiple CI runs from conflicting - wait for pending runs to complete
 concurrency:
   group: ci-cd-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Hard quality gate: install + test + build must pass
   test-and-build:
     runs-on: ubuntu-latest
 
@@ -81,9 +78,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # tsconfig.json writes tsBuildInfoFile to .next/cache/tsbuildinfo.json.
-      # Caching that path (not the root .tsbuildinfo) lets tsc skip unchanged files.
-      # webpack cache lives alongside it - restoring both makes incremental builds fast.
       - name: Cache Next.js build artifacts
         uses: actions/cache@v4
         with:
@@ -121,24 +115,10 @@ jobs:
         run: bash scripts/smoke-test.sh
         continue-on-error: false
 
-      - name: Generate TypeScript baseline
-        run: npm run typecheck:baseline || true
-
-      - name: Commit updated baseline if it changed
-        run: |
-          if git diff --quiet docs/typecheck-baseline.txt; then
-            echo "Baseline unchanged."
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add docs/typecheck-baseline.txt
-            git commit -m "chore: sync typecheck baseline [skip ci]"
-            git push origin HEAD:${{ github.ref_name }} || echo "Push skipped (PR or protected branch)"
-          fi
-
-      - name: Type check
-        run: npm run typecheck:full
-        continue-on-error: true
+      - name: TypeScript — production applications
+        run: npm run typecheck:all
+        env:
+          NODE_OPTIONS: '--max-old-space-size=6144'
 
       - name: Route governance (strict)
         run: npm run platform:doctor:strict
@@ -155,13 +135,11 @@ jobs:
       - name: Install Playwright browsers
         continue-on-error: true
         run: |
-          # Retry logic for flaky network issues in GitHub Actions
           for i in 1 2 3; do
             npm exec playwright install --with-deps chromium 2>&1 | tail -5 && break
             echo "Retrying Playwright install ($i/3)..."
             sleep 30
           done || true
-          # Ensure playwright is available
           which playwright || true
 
       - name: Browser E2E (CI-safe)
@@ -185,8 +163,6 @@ jobs:
 
       - name: Build
         env:
-          # 6 GB heap - ubuntu-latest has 7 GB RAM; the LMS build peaks ~3 GB
-          # without this flag the SWC compiler OOMs on large page counts.
           NODE_OPTIONS: '--max-old-space-size=6144'
           GENERATE_SOURCEMAP: 'false'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -204,7 +180,6 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
         run: npm run build:lms:phased
 
-      # Upload build artifacts for deploy workflows to use instead of rebuilding
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -217,10 +192,6 @@ jobs:
           retention-days: 1
           compression-level: 9
 
-  # Non-blocking legacy lint.
-  # 896k lines, 2500+ files, pre-existing violations across the codebase.
-  # This job NEVER blocks merge. Failure = lint found something, not build broken.
-  # Scoped to files changed in the commit/PR to surface new regressions only.
   legacy-lint:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -250,7 +221,6 @@ jobs:
             BASE="HEAD~1"
           fi
 
-          # Build newline-delimited list (safer than space-delimited; avoids word-splitting issues)
           CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' \
             | grep -v node_modules \
             | grep -v '\.next' \
@@ -261,7 +231,6 @@ jobs:
             exit 0
           fi
 
-          # Keep only existing files (skip deleted/renamed-away files)
           EXISTING_FILES=$(echo "$CHANGED" | while IFS= read -r file; do
             [ -f "$file" ] && echo "$file"
           done)
@@ -273,13 +242,8 @@ jobs:
 
           echo "Linting changed files:"
           echo "$EXISTING_FILES"
-
-          # Pass files via xargs to avoid argv length limits (exit code 249 was caused by
-          # a huge space-delimited argument list exceeding the OS exec limit)
-          # NOTE: This is non-blocking legacy lint - failures don't block deployment
           echo "$EXISTING_FILES" | xargs npx eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored || true
 
-  # Deployment verification (runs after successful merge to main)
   post-deployment-check:
     runs-on: ubuntu-latest
     needs: [test-and-build]
@@ -299,7 +263,6 @@ jobs:
         run: |
           HEALTH_URL="https://www.elevateforhumanity.org/api/health"
           echo "Checking: $HEALTH_URL"
-          # Retry up to 3 times with 30s backoff
           for attempt in 1 2 3; do
             response=$(curl -s -w "\n%{http_code}" --max-time 15 "$HEALTH_URL")
             status_code=$(echo "$response" | tail -n1)
@@ -329,7 +292,6 @@ jobs:
           echo "Health check failed - initiating rollback to previous commit"
           PREV_SHA=$(git rev-parse HEAD~1)
           echo "Rolling back to: $PREV_SHA"
-          # Create a revert commit and push
           git config user.email "ci@elevateforhumanity.org"
           git config user.name "Elevate CI"
           git revert --no-edit HEAD
@@ -342,7 +304,6 @@ jobs:
           echo "Deployment verification failed"
           echo "Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-  # Clean up old branches automatically
   cleanup-branches:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -362,7 +323,6 @@ jobs:
             git push origin --delete $branch_name || true
           done
 
-  # Notify on build failure
   notify-on-failure:
     runs-on: ubuntu-latest
     needs: [test-and-build]

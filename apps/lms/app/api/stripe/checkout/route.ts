@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-
-import { getStripe, stripe } from '@/lib/stripe/client';
+import type Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { getCatalogProduct } from '@/lib/store/db';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
 import { createClient } from '@/lib/supabase/server';
@@ -12,41 +12,28 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 async function handler(req: Request) {
-  // Define URLs outside try block so they're accessible in catch
-  const siteUrl = ((process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl);
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl;
   const storeUrl = `${siteUrl}/store`;
 
   try {
-
     const injected = injectFailureRedirect(req, `${storeUrl}?error=checkout-failed`);
     if (injected) return injected;
 
-    // Rate limiting
     if (paymentRateLimit) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
       const limiter = paymentRateLimit.get();
-      const { success: rateLimitOk } = limiter ? await limiter.limit(ip) : { success: true };
-
-      if (!rateLimitOk) {
-        return NextResponse.redirect(new URL(`${storeUrl}?error=rate-limited`, req.url), 303);
-      }
+      const { success } = limiter ? await limiter.limit(ip) : { success: true };
+      if (!success) return NextResponse.redirect(new URL(`${storeUrl}?error=rate-limited`, req.url), 303);
     }
 
-    // Check if Stripe is configured
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.redirect(new URL(`${storeUrl}?error=payment-unavailable`, req.url), 303);
-    }
+    const stripe = getStripe();
+    if (!stripe) return NextResponse.redirect(new URL(`${storeUrl}?error=payment-unavailable`, req.url), 303);
 
-    // Get authenticated user and tenant
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     let tenantId: string | null = null;
     if (user) {
       const { data: membership } = await supabase
@@ -61,12 +48,7 @@ async function handler(req: Request) {
     let productId: string | null = null;
     let customerEmail: string | null = null;
     let couponCode: string | null = null;
-
-    // Support both form POST and JSON
-    if (
-      contentType.includes('application/x-www-form-urlencoded') ||
-      contentType.includes('multipart/form-data')
-    ) {
+    if (contentType.includes('application/x-www-form-urlencoded') || contentType.includes('multipart/form-data')) {
       const form = await req.formData();
       productId = String(form.get('productId') || '');
       customerEmail = form.get('customerEmail') ? String(form.get('customerEmail')) : null;
@@ -78,58 +60,25 @@ async function handler(req: Request) {
       couponCode = body?.couponCode ?? null;
     }
 
-    if (!productId) {
-      return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
-    }
+    if (!productId) return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
 
-    // DB-backed product lookup
     let product: Awaited<ReturnType<typeof getCatalogProduct>> = null;
-    try {
-      product = await getCatalogProduct(productId);
-    } catch {
-      return NextResponse.redirect(new URL(`${storeUrl}?error=payment-unavailable`, req.url), 303);
-    }
-    if (!product) {
-      return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
-    }
+    try { product = await getCatalogProduct(productId); } catch { /* handled below */ }
+    if (!product) return NextResponse.redirect(new URL(`${storeUrl}?error=invalid-product`, req.url), 303);
 
-    // From here we have a product slug — use it for error redirects
     const productUrl = `${siteUrl}/platform/${product.slug}`;
-
-    // Check if Stripe Price ID is configured
-    if (!isPriceConfigured(productId)) {
-      return NextResponse.redirect(
-        new URL(`${productUrl}?error=payment-unavailable`, req.url),
-        303,
-      );
-    }
+    if (!isPriceConfigured(productId)) return NextResponse.redirect(new URL(`${productUrl}?error=payment-unavailable`, req.url), 303);
 
     const priceId = STRIPE_PRICE_IDS[productId];
+    const planName = ({ starter: 'starter', professional: 'professional', enterprise: 'enterprise' } as Record<string, string>)[productId] || 'starter';
 
-    // Map product slug to plan name for license activation
-    const planNameMap: Record<string, string> = {
-      starter: 'starter',
-      professional: 'professional',
-      enterprise: 'enterprise',
-    };
-    const planName = planNameMap[productId] || 'starter';
-
-    // Create Stripe Checkout session
-    const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: product.billingType === 'subscription' ? 'subscription' : 'payment',
-      // Let Stripe automatically handle payment methods (includes cards + BNPL)
-      // DO NOT set payment_method_types - this enables Klarna, Afterpay, Zip, etc.
       customer_email: customerEmail || undefined,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${siteUrl}/dashboard/onboarding?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/platform/${product.slug}`,
+      cancel_url: productUrl,
       metadata: {
-        // Standardized metadata for grant/license compliance
         payment_type: 'license_purchase',
         funding_source: 'self_pay',
         productId: product.id,
@@ -140,28 +89,16 @@ async function handler(req: Request) {
         stripe_price_id: priceId,
         coupon_code: couponCode || '',
       },
-      // Enable automatic tax calculation if configured
-      automatic_tax: {
-        enabled: true, // Set to true after configuring Stripe Tax
-      },
+      automatic_tax: { enabled: true },
+      ...(couponCode ? { discounts: [{ coupon: couponCode }] } : {}),
     };
 
-    // Apply coupon if provided
-    if (couponCode) {
-      sessionParams.discounts = [{ coupon: couponCode }];
-    }
-
     const session = await stripe.checkout.sessions.create(sessionParams);
-
-    if (!session.url) {
-      return NextResponse.redirect(new URL(`${productUrl}?error=checkout-failed`, req.url), 303);
-    }
-
-    // Redirect to Stripe Checkout
+    if (!session.url) return NextResponse.redirect(new URL(`${productUrl}?error=checkout-failed`, req.url), 303);
     return NextResponse.redirect(session.url, 303);
-  } catch (err: unknown) {
-    const fallbackUrl = `${siteUrl || PLATFORM_DEFAULTS.siteUrl}/store`;
-    return NextResponse.redirect(new URL(`${fallbackUrl}?error=checkout-failed`, req.url), 303);
+  } catch {
+    return NextResponse.redirect(new URL(`${storeUrl}?error=checkout-failed`, req.url), 303);
   }
 }
+
 export const POST = withRuntime(withApiAudit('/api/stripe/checkout', handler));

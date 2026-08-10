@@ -31,7 +31,10 @@ export async function requireFeatureForAuth(
   const auth = await apiAuthGuard(request);
   if (auth.error) return auth.error;
 
-  const userId = auth.user.id;
+  // apiAuthGuard returns the canonical GuardedUser shape directly. There is
+  // no nested `user` property; using auth.user.id caused authenticated agent
+  // requests to fail before tenant/feature resolution.
+  const userId = auth.id;
   const tenantId = await resolveTenantIdForUser(userId);
 
   if (!tenantId) {

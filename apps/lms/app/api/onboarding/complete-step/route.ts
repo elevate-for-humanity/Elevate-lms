@@ -4,9 +4,13 @@ import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 
+const STEP_ORDER = ['profile', 'agreements', 'orientation', 'documents'] as const;
+type LearnerStep = (typeof STEP_ORDER)[number] | 'handbook' | 'funding' | 'schedule';
+
 // POST /api/onboarding/complete-step
-// Marks a single onboarding step complete for the authenticated user.
-// Writes to onboarding_progress and updates profiles if step is 'agreements' or 'all'.
+// Canonical learner onboarding completion endpoint.
+// The live onboarding_progress table is one row per user with milestone booleans;
+// it is NOT a per-step event table and does not have `completed` or `data` columns.
 export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -21,18 +25,33 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { step, data: stepData = {} } = await req.json();
-    if (!step) {
-      return NextResponse.json({ error: 'Missing step' }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const step = String(body?.step || '') as LearnerStep;
+    const stepData = body?.data && typeof body.data === 'object' ? body.data : {};
+    const allowedSteps = new Set<LearnerStep>([
+      'profile',
+      'agreements',
+      'orientation',
+      'documents',
+      'handbook',
+      'funding',
+      'schedule',
+    ]);
+
+    if (!allowedSteps.has(step)) {
+      return NextResponse.json({ error: 'Invalid onboarding step' }, { status: 400 });
     }
 
-    // Guard: program holders and employers have separate onboarding flows.
-    // They must not write to the learner onboarding_progress table.
-    const { data: profile } = await supabase
+    const { data: profile, error: profileReadError } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, orientation_completed, orientation_completed_at, documents_submitted_at, agreements_signed_at')
       .eq('id', user.id)
       .maybeSingle();
+
+    if (profileReadError) {
+      logger.warn('[onboarding/complete-step] profile read failed', profileReadError);
+      return NextResponse.json({ error: 'Unable to verify learner profile' }, { status: 503 });
+    }
 
     const blockedRoles = ['program_holder', 'employer', 'partner', 'admin', 'super_admin', 'staff'];
     if (profile?.role && blockedRoles.includes(profile.role)) {
@@ -43,93 +62,126 @@ export async function POST(req: Request) {
     }
 
     const now = new Date().toISOString();
+    const progressUpdates: Record<string, unknown> = {
+      user_id: user.id,
+      role: profile?.role || 'student',
+      step,
+      status: 'in_progress',
+      updated_at: now,
+    };
 
-    // Upsert into onboarding_progress
-    const { error: progressError } = await supabase.from('onboarding_progress').upsert(
-      {
-        user_id: user.id,
-        step,
-        completed: true,
-        data: stepData,
-        completed_at: now,
-        updated_at: now,
-      },
-      { onConflict: 'user_id,step' },
-    );
-
-    if (progressError) {
-      logger.warn('[onboarding/complete-step] onboarding_progress upsert failed', progressError);
+    if (step === 'profile') {
+      progressUpdates.profile_completed = true;
+      progressUpdates.profile_completed_at = now;
     }
-
-    // Mirror critical steps to profiles columns
-    const profileUpdates: Record<string, unknown> = { updated_at: now };
-
     if (step === 'agreements') {
-      profileUpdates.agreements_signed_at = now;
+      progressUpdates.agreements_completed = true;
+      progressUpdates.agreements_completed_at = now;
+    }
+    if (step === 'handbook') {
+      progressUpdates.handbook_acknowledged = true;
+      progressUpdates.handbook_acknowledged_at = now;
     }
     if (step === 'documents') {
-      profileUpdates.documents_submitted_at = now;
+      progressUpdates.documents_uploaded = true;
+      progressUpdates.documents_uploaded_at = now;
     }
+
+    const { error: progressError } = await supabase
+      .from('onboarding_progress')
+      .upsert(progressUpdates, { onConflict: 'user_id' });
+
+    if (progressError) {
+      logger.error('[onboarding/complete-step] onboarding progress write failed', progressError);
+      return NextResponse.json({ error: 'Unable to save onboarding progress' }, { status: 503 });
+    }
+
+    const profileUpdates: Record<string, unknown> = { updated_at: now };
+    if (step === 'agreements') profileUpdates.agreements_signed_at = now;
+    if (step === 'documents') profileUpdates.documents_submitted_at = now;
+    if (step === 'handbook') profileUpdates.handbook_acknowledged_at = now;
     if (step === 'orientation') {
       profileUpdates.orientation_completed = true;
       profileUpdates.orientation_completed_at = now;
-      // Canonical gate: advance enrollment_state so document gate reads one source of truth.
-      // Only advance if currently in 'confirmed' state — do not overwrite later states.
-      await supabase
-        .from('program_enrollments')
-        .update({
-          enrollment_state: 'orientation_complete',
-          orientation_completed_at: now,
-          next_required_action: 'DOCUMENTS',
-        })
-        .eq('user_id', user.id)
-        .eq('enrollment_state', 'confirmed');
-    }
-    if (step === 'handbook') {
-      profileUpdates.handbook_acknowledged_at = now;
     }
     if (step === 'funding') {
       profileUpdates.funding_confirmed = true;
-      profileUpdates.funding_source = stepData.funding_source || 'self_pay';
+      profileUpdates.funding_source = String((stepData as Record<string, unknown>).funding_source || 'self_pay');
     }
     if (step === 'schedule') {
       profileUpdates.schedule_selected = true;
-      profileUpdates.cohort_start_date = stepData.cohort_start_date || null;
-      profileUpdates.schedule_preference = stepData.schedule_preference || null;
+      profileUpdates.cohort_start_date = (stepData as Record<string, unknown>).cohort_start_date || null;
+      profileUpdates.schedule_preference = (stepData as Record<string, unknown>).schedule_preference || null;
     }
 
-    if (Object.keys(profileUpdates).length > 1) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update(profileUpdates)
-        .eq('id', user.id);
+    const { error: profileWriteError } = await supabase
+      .from('profiles')
+      .update(profileUpdates)
+      .eq('id', user.id);
 
-      if (profileError) {
-        logger.warn('[onboarding/complete-step] profiles update failed (non-fatal)', profileError);
+    if (profileWriteError) {
+      logger.error('[onboarding/complete-step] profile update failed', profileWriteError);
+      return NextResponse.json({ error: 'Unable to save onboarding milestone' }, { status: 503 });
+    }
+
+    if (step === 'orientation') {
+      const { error: enrollmentError } = await supabase
+        .from('program_enrollments')
+        .update({
+          enrollment_state: 'orientation',
+          orientation_completed_at: now,
+          next_required_action: 'DOCUMENTS',
+          updated_at: now,
+        })
+        .eq('user_id', user.id)
+        .in('enrollment_state', ['applied', 'onboarding', 'orientation']);
+
+      if (enrollmentError) {
+        logger.error('[onboarding/complete-step] enrollment orientation update failed', enrollmentError);
+        return NextResponse.json({ error: 'Unable to advance enrollment' }, { status: 503 });
       }
     }
 
-    // Check if all steps are now complete
-    const { data: allSteps } = await supabase
-      .from('onboarding_progress')
-      .select('step, completed')
-      .eq('user_id', user.id)
-      .eq('completed', true);
+    const [{ data: progress }, { data: refreshedProfile }] = await Promise.all([
+      supabase
+        .from('onboarding_progress')
+        .select('profile_completed, agreements_completed, documents_uploaded')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('profiles')
+        .select('orientation_completed')
+        .eq('id', user.id)
+        .maybeSingle(),
+    ]);
 
-    const completedSteps = allSteps?.map((s) => s.step) ?? [];
-    const requiredSteps = ['profile', 'documents', 'agreements', 'orientation'];
-    const allComplete = requiredSteps.every((s) => completedSteps.includes(s));
+    const allComplete = Boolean(
+      progress?.profile_completed &&
+      progress?.agreements_completed &&
+      progress?.documents_uploaded &&
+      refreshedProfile?.orientation_completed,
+    );
 
     if (allComplete) {
-      await supabase
-        .from('profiles')
-        .update({ onboarding_completed: true, onboarding_completed_at: now })
-        .eq('id', user.id);
+      await Promise.all([
+        supabase
+          .from('onboarding_progress')
+          .update({ is_complete: true, status: 'completed', completed_at: now, updated_at: now })
+          .eq('user_id', user.id),
+        supabase
+          .from('profiles')
+          .update({ onboarding_completed: true, onboarding_completed_at: now, updated_at: now })
+          .eq('id', user.id),
+      ]);
     }
 
     return NextResponse.json({ success: true, step, allComplete });
   } catch (error) {
-    logger.error('[onboarding/complete-step] error', normalizeError(error, 'Complete step failed'), getErrorContext(error));
-    return NextResponse.json({ error: 'Failed to complete step' }, { status: 500 });
+    logger.error(
+      '[onboarding/complete-step] error',
+      normalizeError(error, 'Complete step failed'),
+      getErrorContext(error),
+    );
+    return NextResponse.json({ error: 'Failed to complete onboarding step' }, { status: 500 });
   }
 }

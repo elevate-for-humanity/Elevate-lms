@@ -17,7 +17,7 @@ export type PortalKey =
   | 'jri';
 
 export const PORTAL_PATHS: Record<PortalKey, string> = {
-  apprentice: '/portal/apprentice',
+  apprentice: '/apprentice',
   healthcare: '/portal/healthcare',
   technology: '/portal/technology',
   business: '/portal/business',
@@ -27,6 +27,22 @@ export const PORTAL_PATHS: Record<PortalKey, string> = {
   hospitality: '/portal/hospitality',
   jri: '/portal/jri',
 };
+
+/** Legacy occupation-specific profile values all resolve to the canonical apprentice portal. */
+const LEGACY_APPRENTICE_PORTAL_TYPES = new Set([
+  'barber',
+  'barber-apprentice',
+  'barber_apprentice',
+  'cosmetology',
+  'cosmetology-apprentice',
+  'cosmetology_apprentice',
+  'esthetician',
+  'nail-technician',
+  'nail_technician',
+  'culinary',
+  'electrical',
+  'plumbing',
+]);
 
 /** Canonical fallback for a learner with no specialized portal. */
 export const PORTAL_FALLBACK = '/lms/dashboard';
@@ -54,20 +70,26 @@ export async function resolvePortalForUser(
   try {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('portal_type')
+      .select('portal_type, role')
       .eq('id', userId)
       .maybeSingle();
 
-    if (profile?.portal_type) {
-      const path = PORTAL_PATHS[profile.portal_type as PortalKey];
+    const cachedPortalType = String(profile?.portal_type || '').trim().toLowerCase();
+    if (cachedPortalType) {
+      if (LEGACY_APPRENTICE_PORTAL_TYPES.has(cachedPortalType)) return PORTAL_PATHS.apprentice;
+      const path = PORTAL_PATHS[cachedPortalType as PortalKey];
       if (path) return path;
+    }
+
+    if (['apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(String(profile?.role || ''))) {
+      return PORTAL_PATHS.apprentice;
     }
 
     const { data: enrollment } = await supabase
       .from('program_enrollments')
       .select('program_id')
       .eq('user_id', userId)
-      .eq('enrollment_state', 'active')
+      .in('enrollment_state', ['active', 'enrolled', 'onboarding', 'confirmed', 'orientation_complete', 'documents_complete'])
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -101,7 +123,7 @@ export function derivePortalKey(
   category: string | null | undefined,
 ): PortalKey | null {
   if (programType) {
-    const byType = PROGRAM_TYPE_TO_PORTAL[programType];
+    const byType = PROGRAM_TYPE_TO_PORTAL[programType.toLowerCase().trim()];
     if (byType) return byType;
   }
 

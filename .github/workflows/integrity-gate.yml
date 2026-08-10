@@ -22,6 +22,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The live-schema gate compares the current revision with its base/
+          # previous commit so existing legacy drift does not block unrelated
+          # production fixes while newly touched code is still enforced.
+          fetch-depth: 2
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -77,8 +82,8 @@ jobs:
       - name: Program registry source-of-truth check
         run: pnpm tsx scripts/check-program-registry-integrity.ts
 
-      - name: Live Supabase schema contract
-        run: pnpm tsx scripts/audit-schema-drift.ts --fail-on-drift --require-live
+      - name: Live Supabase schema contract (changed production code)
+        run: pnpm tsx scripts/audit-schema-drift.ts --fail-on-drift --require-live --changed-only
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}

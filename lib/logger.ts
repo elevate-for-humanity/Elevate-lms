@@ -125,8 +125,21 @@ class Logger {
     this.log('info', message, context);
   }
 
-  warn(message: string, context?: LogContext) {
-    this.log('warn', message, context);
+  /**
+   * Backward-compatible warning logger. Historical callers pass a context
+   * object, an Error, or a detail string. Normalize those forms centrally so
+   * logging cannot become a compile/runtime failure path.
+   */
+  warn(message: string, contextOrError?: LogContext | Error | string) {
+    if (contextOrError instanceof Error) {
+      this.log('warn', message, undefined, contextOrError);
+      return;
+    }
+    if (typeof contextOrError === 'string') {
+      this.log('warn', message, { detail: contextOrError });
+      return;
+    }
+    this.log('warn', message, contextOrError);
   }
 
   /**
@@ -149,11 +162,3 @@ class Logger {
 }
 
 export const logger = new Logger();
-
-export const log = {
-  debug: (message: string, context?: LogContext) => logger.debug(message, context),
-  info: (message: string, context?: LogContext) => logger.info(message, context),
-  warn: (message: string, context?: LogContext) => logger.warn(message, context),
-  error: (message: string, errorOrContext?: unknown, context?: LogContext) =>
-    logger.error(message, errorOrContext, context),
-};

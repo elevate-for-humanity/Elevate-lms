@@ -5,6 +5,7 @@ import { Briefcase, Users, FileText, Shield, Building2, TrendingUp } from 'lucid
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import { getEmployerRecord } from '@/lib/employer/employer-context';
+import { loadEmployerApprenticeshipData } from '@/lib/employer/apprenticeship-dashboard-data';
 import { MARKETING_HOST } from '@/lib/routing/portal-map';
 import { safeFormatDate } from '@/lib/format-utils';
 import { getEmployerState } from '@/lib/orchestration/state-machine';
@@ -29,28 +30,20 @@ export default async function EmployerDashboardOrchestrated() {
     .select('id, email, full_name, company_name, verified')
     .eq('id', user.id)
     .maybeSingle();
-
   if (!profile) redirect('/unauthorized');
 
   const isEmployer = effectiveRoles.includes('employer') || effectiveRoles.includes('sponsor');
-  const isAdmin = effectiveRoles.includes('admin');
+  const isAdmin = effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin');
   const employer = await getEmployerRecord(supabase, user.id);
 
   if (isEmployer && !isAdmin && !employer) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-          <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-8 h-8 text-amber-700" />
-          </div>
+          <Building2 className="w-12 h-12 text-amber-700 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Complete Employer Onboarding</h1>
-          <p className="text-slate-600 mb-6">
-            Your login is active, but no employer organization record is linked to this account yet.
-          </p>
-          <Link
-            href={`${MARKETING_HOST}/onboarding/employer`}
-            className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
-          >
+          <p className="text-slate-600 mb-6">Your login is active, but no employer organization record is linked to this account yet.</p>
+          <Link href={`${MARKETING_HOST}/onboarding/employer`} className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700">
             Continue Employer Setup
           </Link>
         </div>
@@ -65,20 +58,10 @@ export default async function EmployerDashboardOrchestrated() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8 text-center">
-          <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-8 h-8 text-brand-blue-600" />
-          </div>
+          <Building2 className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Application Under Review</h1>
-          <p className="text-slate-600 mb-6">
-            Your employer record is pending approval. Hiring and apprenticeship controls unlock after verification.
-          </p>
-          <p className="text-sm text-slate-500 mb-6">
-            We will use <strong>{profile.email}</strong> for account notifications.
-          </p>
-          <a
-            href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
-            className="inline-flex items-center justify-center border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50"
-          >
+          <p className="text-slate-600 mb-6">Your employer record is pending approval. Hiring and apprenticeship controls unlock after verification.</p>
+          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="inline-flex items-center justify-center border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50">
             Call {PLATFORM_DEFAULTS.supportPhone}
           </a>
         </div>
@@ -87,63 +70,40 @@ export default async function EmployerDashboardOrchestrated() {
   }
 
   const { data: postings } = employerId
-    ? await supabase
-        .from('job_postings')
-        .select('id, title, status, created_at')
-        .eq('employer_id', employerId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
+    ? await supabase.from('job_postings').select('id, title, status, created_at').eq('employer_id', employerId).eq('status', 'active').order('created_at', { ascending: false })
     : { data: [] };
 
   const jobIds = (postings ?? []).map((posting: any) => posting.id);
   const { data: applications } = jobIds.length
-    ? await supabase
-        .from('job_applications')
-        .select('id, job_posting_id, status, applied_at')
-        .in('job_posting_id', jobIds)
-        .eq('status', 'pending')
+    ? await supabase.from('job_applications').select('id, job_posting_id, status, applied_at').in('job_posting_id', jobIds).eq('status', 'pending')
     : { data: [] };
 
-  const { data: apprenticeships } = employerId
-    ? await supabase
-        .from('apprenticeships')
-        .select('id, status')
-        .eq('employer_id', employerId)
-    : { data: [] };
+  const apprenticeshipData = employerId
+    ? await loadEmployerApprenticeshipData(supabase, employerId)
+    : { partnerships: [], mappedPrograms: [], availablePrograms: [], draftProposals: [] };
 
-  const apprenticeshipCount = apprenticeships?.length || 0;
+  const mappedProgramCount = apprenticeshipData.mappedPrograms.length;
+  const availableProgramCount = apprenticeshipData.availablePrograms.length;
   const stateData = getEmployerState({
     isVerified,
     activePostings: postings?.length || 0,
-    hasApprenticeshipProgram: apprenticeshipCount > 0,
+    hasApprenticeshipProgram: mappedProgramCount > 0,
     pendingApplications: applications?.length || 0,
   });
 
   const companyName = employer?.company_name || employer?.business_name || profile.company_name || 'Your Company';
 
   return (
-    <StateAwareDashboard
-      dominantAction={stateData.dominantAction}
-      availableSections={stateData.availableSections}
-      lockedSections={stateData.lockedSections}
-      alerts={stateData.alerts}
-    >
+    <StateAwareDashboard dominantAction={stateData.dominantAction} availableSections={stateData.availableSections} lockedSections={stateData.lockedSections} alerts={stateData.alerts}>
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="grid md:grid-cols-3 gap-4">
+            <MetricCard label="Active Job Postings" value={postings?.length || 0} icon={<Briefcase className="h-11 w-11 text-brand-blue-600" />} />
+            <MetricCard label="Pending Applications" value={applications?.length || 0} icon={<Users className="h-11 w-11 text-brand-green-600" />} />
             <MetricCard
-              label="Active Job Postings"
-              value={postings?.length || 0}
-              icon={<Briefcase className="h-11 w-11 text-brand-blue-600" />}
-            />
-            <MetricCard
-              label="Pending Applications"
-              value={applications?.length || 0}
-              icon={<Users className="h-11 w-11 text-brand-green-600" />}
-            />
-            <MetricCard
-              label="Apprenticeship Programs"
-              value={apprenticeshipCount}
+              label="Mapped Apprenticeship Programs"
+              value={mappedProgramCount}
+              note={`${availableProgramCount} active apprenticeship pathways available`}
               icon={<TrendingUp className="h-11 w-11 text-brand-blue-600" />}
             />
           </div>
@@ -151,57 +111,20 @@ export default async function EmployerDashboardOrchestrated() {
           <div>
             <h3 className="text-2xl font-bold text-black mb-6">Available Actions</h3>
             <div className="grid md:grid-cols-2 gap-4">
-              {stateData.availableSections.includes('verification') && (
-                <SectionCard
-                  title="Complete Verification"
-                  description="Required before posting jobs"
-                  href="/employer/verification"
-                  icon={<Shield className="h-10 w-10" />}
-                  badge="Required"
-                />
-              )}
-              {stateData.availableSections.includes('postings') && (
-                <SectionCard
-                  title="Manage Job Postings"
-                  description={`${postings?.length || 0} active posting${(postings?.length || 0) === 1 ? '' : 's'}`}
-                  href="/employer/jobs"
-                  icon={<Briefcase className="h-10 w-10" />}
-                />
-              )}
-              {stateData.availableSections.includes('candidates') && (
-                <SectionCard
-                  title="View Candidates"
-                  description="Review applicants and trained candidates"
-                  href="/employer/applications"
-                  icon={<Users className="h-10 w-10" />}
-                  badge={(applications?.length || 0) > 0 ? `${applications?.length} New` : undefined}
-                />
-              )}
+              {stateData.availableSections.includes('verification') && <SectionCard title="Complete Verification" description="Required before posting jobs" href="/employer/verification" icon={<Shield className="h-10 w-10" />} badge="Required" />}
+              {stateData.availableSections.includes('postings') && <SectionCard title="Manage Job Postings" description={`${postings?.length || 0} active posting${(postings?.length || 0) === 1 ? '' : 's'}`} href="/employer/jobs" icon={<Briefcase className="h-10 w-10" />} />}
+              {stateData.availableSections.includes('candidates') && <SectionCard title="View Candidates" description="Review applicants and trained candidates" href="/employer/applications" icon={<Users className="h-10 w-10" />} badge={(applications?.length || 0) > 0 ? `${applications?.length} New` : undefined} />}
               {stateData.availableSections.includes('apprenticeship') && (
                 <SectionCard
-                  title={apprenticeshipCount > 0 ? 'Manage Apprenticeships' : 'Start Apprenticeship Program'}
-                  description={apprenticeshipCount > 0 ? 'Review employer apprenticeship records' : 'Create a draft for review'}
+                  title={mappedProgramCount > 0 ? 'Manage Apprenticeships' : 'Explore Apprenticeship Programs'}
+                  description={mappedProgramCount > 0 ? `${mappedProgramCount} employer program mapping${mappedProgramCount === 1 ? '' : 's'}` : `${availableProgramCount} active pathways available for employer mapping`}
                   href="/employer/apprenticeships"
                   icon={<TrendingUp className="h-10 w-10" />}
-                  badge={apprenticeshipCount > 0 ? 'Active' : undefined}
+                  badge={mappedProgramCount > 0 ? 'Mapped' : undefined}
                 />
               )}
-              {stateData.availableSections.includes('compliance') && (
-                <SectionCard
-                  title="Compliance Dashboard"
-                  description="Track employer and apprenticeship requirements"
-                  href="/employer/compliance"
-                  icon={<Shield className="h-10 w-10" />}
-                />
-              )}
-              {stateData.availableSections.includes('reports') && (
-                <SectionCard
-                  title="Reports & Analytics"
-                  description="View hiring metrics"
-                  href="/employer/reports"
-                  icon={<FileText className="h-10 w-10" />}
-                />
-              )}
+              {stateData.availableSections.includes('compliance') && <SectionCard title="Compliance Dashboard" description="Track employer and apprenticeship requirements" href="/employer/compliance" icon={<Shield className="h-10 w-10" />} />}
+              {stateData.availableSections.includes('reports') && <SectionCard title="Reports & Analytics" description="View hiring metrics" href="/employer/reports" icon={<FileText className="h-10 w-10" />} />}
             </div>
           </div>
 
@@ -215,12 +138,7 @@ export default async function EmployerDashboardOrchestrated() {
                       <div className="font-semibold text-black">{posting.title}</div>
                       <div className="text-sm text-slate-600">Posted: {safeFormatDate(posting.created_at)}</div>
                     </div>
-                    <Link
-                      href={`/employer/postings/${posting.id}`}
-                      className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 text-sm"
-                    >
-                      View
-                    </Link>
+                    <Link href={`/employer/postings/${posting.id}`} className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 text-sm">View</Link>
                   </div>
                 ))}
               </div>
@@ -239,44 +157,16 @@ export default async function EmployerDashboardOrchestrated() {
                 <div className="text-sm text-brand-green-700 font-semibold">Verified employer</div>
               </div>
             </div>
-            <Link href="/employer/company" className="text-sm text-brand-blue-700 hover:underline">
-              View company profile
-            </Link>
+            <Link href="/employer/company" className="text-sm text-brand-blue-700 hover:underline">View company profile</Link>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <h3 className="text-lg font-bold text-black mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <Link
-                href="/employer/post-job"
-                className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700"
-              >
-                Post New Job
-              </Link>
-              <Link
-                href="/employer/applications"
-                className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300"
-              >
-                Review Applications
-              </Link>
-              <Link
-                href="/employer/apprenticeships"
-                className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300"
-              >
-                Apprenticeships
-              </Link>
+              <Link href="/employer/post-job" className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700">Post New Job</Link>
+              <Link href="/employer/applications" className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300">Review Applications</Link>
+              <Link href="/employer/apprenticeships" className="block w-full text-center px-4 py-3 bg-slate-200 text-black rounded-lg font-semibold hover:bg-slate-300">Apprenticeships</Link>
             </div>
-          </div>
-
-          <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
-            <h3 className="text-lg font-bold text-brand-blue-900 mb-3">Need Help?</h3>
-            <p className="text-brand-blue-800 mb-4 text-sm">Our workforce team can assist with hiring and apprenticeship setup.</p>
-            <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
-              className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700"
-            >
-              Call {PLATFORM_DEFAULTS.supportPhone}
-            </a>
           </div>
         </div>
       </div>
@@ -284,22 +174,15 @@ export default async function EmployerDashboardOrchestrated() {
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-}) {
+function MetricCard({ label, value, icon, note }: { label: string; value: number; icon: React.ReactNode; note?: string }) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
       <div className="flex items-center justify-between mb-2">
         {icon}
         <span className="text-3xl font-bold text-black">{value}</span>
       </div>
-      <div className="text-sm text-black">{label}</div>
+      <div className="text-sm font-semibold text-black">{label}</div>
+      {note ? <div className="mt-1 text-xs text-slate-600">{note}</div> : null}
     </div>
   );
 }

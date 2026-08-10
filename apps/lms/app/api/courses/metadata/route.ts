@@ -1,5 +1,4 @@
 // PUBLIC ROUTE: public course metadata for SEO
-
 // AUTH: Intentionally public — no authentication required
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,7 +12,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
 async function _GET(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -23,42 +21,31 @@ async function _GET(req: NextRequest) {
     const course = searchParams.get('course');
     const repo = searchParams.get('repo') || 'elevateforhumanity/fix2';
     const branch = searchParams.get('branch') || 'main';
-
-    if (!course) {
-      return NextResponse.json({ error: 'Missing course parameter' }, { status: 400 });
-    }
+    if (!course) return NextResponse.json({ error: 'Missing course parameter' }, { status: 400 });
 
     const client = gh();
     const { owner, name } = parseRepo(repo);
-    const path = `courses/${course}/metadata.json`;
-
     const response = await client.repos.getContent({
       owner,
       repo: name,
-      path,
+      path: `courses/${course}/metadata.json`,
       ref: branch,
     });
 
-    // Handle array response (directory)
-    if (Array.isArray(response.data)) {
-      return NextResponse.json({ error: 'Path is a directory, not a file' }, { status: 400 });
+    if (Array.isArray(response.data) || response.data.type !== 'file' || !('content' in response.data)) {
+      return NextResponse.json({ error: 'Metadata path is not a file' }, { status: 400 });
     }
 
     const raw = Buffer.from(response.data.content || '', 'base64').toString('utf8');
-    const metadata = JSON.parse(raw);
-
-    return NextResponse.json(metadata);
-  } catch (error) {
-    logger.error('Get metadata error:', error instanceof Error ? error : new Error(String(error)));
-
-    if (error.status === 404) {
-      return NextResponse.json({ error: 'Metadata file not found' }, { status: 404 });
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to fetch metadata', message: toErrorMessage(error) },
-      { status: 500 },
-    );
+    return NextResponse.json(JSON.parse(raw));
+  } catch (error: unknown) {
+    logger.error('Get metadata error', error);
+    const status = typeof error === 'object' && error !== null && 'status' in error
+      ? Number((error as { status?: unknown }).status)
+      : undefined;
+    if (status === 404) return NextResponse.json({ error: 'Metadata file not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Failed to fetch metadata', message: toErrorMessage(error) }, { status: 500 });
   }
 }
+
 export const GET = withApiAudit('/api/courses/metadata', _GET);

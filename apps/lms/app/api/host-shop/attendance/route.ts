@@ -176,15 +176,19 @@ export async function POST(req: NextRequest) {
 
   const placementById = new Map((placements as any[]).map((placement) => [String(placement.id), placement]));
   const now = new Date().toISOString();
-  const rows = normalized.map((input) => {
+  const rows: any[] = [];
+
+  for (const input of normalized) {
     const placement = placementById.get(input.placementId);
     if (!placement || String(placement.student_id) !== input.studentId) {
-      throw new Error('PLACEMENT_STUDENT_MISMATCH');
+      return NextResponse.json({ error: 'Placement/student validation failed.' }, { status: 403 });
     }
     const shop = shopById.get(String(placement.shop_id));
-    if (!shop?.tenant_id) throw new Error('SHOP_TENANT_MISSING');
+    if (!shop?.tenant_id) {
+      return NextResponse.json({ error: 'Shop tenant configuration is incomplete.' }, { status: 500 });
+    }
 
-    return {
+    rows.push({
       partner_id: partnerId,
       shop_id: placement.shop_id,
       tenant_id: shop.tenant_id,
@@ -195,27 +199,14 @@ export async function POST(req: NextRequest) {
       notes: input.notes,
       recorded_by: user.id,
       updated_at: now,
-    };
-  });
-
-  let savedRows;
-  try {
-    const { data, error } = await db
-      .from('host_shop_attendance_records')
-      .upsert(rows, { onConflict: 'placement_id,attendance_date' })
-      .select('id, placement_id, student_id, attendance_date, status, updated_at');
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    savedRows = data ?? [];
-  } catch (error) {
-    const code = error instanceof Error ? error.message : '';
-    if (code === 'PLACEMENT_STUDENT_MISMATCH') {
-      return NextResponse.json({ error: 'Placement/student validation failed.' }, { status: 403 });
-    }
-    if (code === 'SHOP_TENANT_MISSING') {
-      return NextResponse.json({ error: 'Shop tenant configuration is incomplete.' }, { status: 500 });
-    }
-    throw error;
+    });
   }
 
-  return NextResponse.json({ saved: savedRows.length, records: savedRows });
+  const { data: savedRows, error: saveError } = await db
+    .from('host_shop_attendance_records')
+    .upsert(rows, { onConflict: 'placement_id,attendance_date' })
+    .select('id, placement_id, student_id, attendance_date, status, updated_at');
+
+  if (saveError) return NextResponse.json({ error: saveError.message }, { status: 500 });
+  return NextResponse.json({ saved: savedRows?.length ?? 0, records: savedRows ?? [] });
 }

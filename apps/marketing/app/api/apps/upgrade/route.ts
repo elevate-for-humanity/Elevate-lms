@@ -3,6 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { getIndividualAppCatalog } from '@/lib/apps/individual-app-plans';
+import { individualAppPriceLookupKey } from '@/lib/platform/orchestration/commerce';
+import { resolveCanonicalStripePrice } from '@/lib/stripe/resolve-canonical-price';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,11 +45,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Stripe is not configured' }, { status: 503 });
   }
 
+  const lookupKey = individualAppPriceLookupKey(catalog.slug, plan.id);
+  let stripePrice;
+  try {
+    stripePrice = await resolveCanonicalStripePrice(stripe, {
+      lookupKey,
+      unitAmount: Math.round(plan.priceMonthly * 100),
+      recurringInterval: 'month',
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Stripe catalog is not configured';
+    return NextResponse.json(
+      { error: 'Subscription catalog is temporarily unavailable', detail: message },
+      { status: 503 },
+    );
+  }
+
   const metadata = {
     checkout_type: 'individual_app',
     user_id: user.id,
     app_slug: catalog.slug,
     plan_id: plan.id,
+    price_lookup_key: lookupKey,
   };
 
   const session = await stripe.checkout.sessions.create({
@@ -55,29 +76,37 @@ export async function POST(request: NextRequest) {
     allow_promotion_codes: true,
     metadata,
     subscription_data: { metadata },
-    line_items: [
-      {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: `${catalog.displayName} — ${plan.name}`,
-            metadata: {
-              app_slug: catalog.slug,
-              plan_id: plan.id,
-            },
-          },
-          unit_amount: Math.round(plan.priceMonthly * 100),
-          recurring: { interval: 'month' },
-        },
-        quantity: 1,
-      },
-    ],
+    line_items: [{ price: stripePrice.id, quantity: 1 }],
     success_url: `${SITE_URL}/store/apps/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${SITE_URL}/store/apps/${catalog.slug}?checkout=cancelled`,
   });
 
   if (!session.url) {
     return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
+  }
+
+  try {
+    const admin = await requireAdminClient();
+    await emitPlatformEvent(admin, {
+      eventType: PlatformEventType.COMMERCE_CHECKOUT_CREATED,
+      category: 'commerce',
+      source: 'marketing.api.apps.upgrade',
+      actorId: user.id,
+      actorType: 'user',
+      subjectType: 'individual_app_subscription',
+      subjectId: session.id,
+      correlationId: session.id,
+      idempotencyKey: `stripe-checkout-created:${session.id}`,
+      dispatch: false,
+      payload: {
+        app_slug: catalog.slug,
+        plan_id: plan.id,
+        stripe_price_id: stripePrice.id,
+        price_lookup_key: lookupKey,
+      },
+    });
+  } catch {
+    // Checkout must not fail because audit/event telemetry is unavailable.
   }
 
   return NextResponse.json({ checkoutUrl: session.url });

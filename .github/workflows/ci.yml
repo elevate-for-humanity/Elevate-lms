@@ -32,13 +32,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      # HARD BLOCKING GATE. This workflow is used by PR validation, so a green
-      # CI check now certifies that the exact PR commit completed full tsc
-      # --noEmit successfully. Do not add continue-on-error or `|| true` here.
-      - name: Full TypeScript gate
+      # HARD BLOCKING GATE. Root tsconfig intentionally does not own the three
+      # standalone Next applications, so each production project is checked
+      # explicitly and sequentially to keep peak memory bounded.
+      - name: TypeScript — shared/root
         env:
           NODE_OPTIONS: '--max-old-space-size=8192'
-        run: pnpm run typecheck:full
+        run: pnpm exec tsc --noEmit -p tsconfig.json
+
+      - name: TypeScript — Marketing
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm exec tsc --noEmit -p apps/marketing/tsconfig.json
+
+      - name: TypeScript — LMS
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm exec tsc --noEmit -p apps/lms/tsconfig.json
+
+      - name: TypeScript — Admin
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm exec tsc --noEmit -p apps/admin/tsconfig.json
 
       - name: Lint
         run: pnpm lint

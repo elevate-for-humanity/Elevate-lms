@@ -8,24 +8,11 @@
     ]
   },
   "include": [
-    "../../components/**/*.ts",
-    "../../components/**/*.tsx",
-    "../../data/**/*.ts",
-    "../../data/**/*.tsx",
-    "../../lib/**/*.ts",
-    "../../lib/**/*.tsx",
-    "../../lms-data/**/*.ts",
-    "../../lms-data/**/*.tsx",
-    "../../packages/db/**/*.ts",
-    "../../packages/db/**/*.tsx",
-    "../../packages/shared/**/*.ts",
-    "../../packages/shared/**/*.tsx",
+    "next-env.d.ts",
     "./**/*.js",
     "./**/*.mjs",
     "./**/*.ts",
     "./**/*.tsx",
-    "app/**/*.ts",
-    "app/**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [
@@ -33,6 +20,16 @@
     "../../app-legacy",
     "../../apps/admin",
     "../../apps/marketing",
-    "../../packages/ui"
+    "../../packages/ui",
+    "../../scripts",
+    "../../server",
+    "../../supabase",
+    "../../tests",
+    "../../tools",
+    "../../workers",
+    "../../**/*.test.ts",
+    "../../**/*.test.tsx",
+    "../../**/*.spec.ts",
+    "../../**/*.spec.tsx"
   ]
 }

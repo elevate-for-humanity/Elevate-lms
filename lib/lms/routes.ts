@@ -7,9 +7,6 @@
  * Current canonical paths:
  *   Authenticated learner experience → /lms/courses/[courseId]
  *   Public program catalog           → /lms/programs
- *
- * When the rename is complete, update COURSE_BASE to '/lms/programs'
- * and all callers will follow automatically.
  */
 
 const COURSE_BASE = '/lms/courses';
@@ -19,6 +16,9 @@ const PROGRAM_BASE = '/lms/programs';
 export function getCoursePath(courseId: string): string {
   return `${COURSE_BASE}/${courseId}`;
 }
+
+/** Compatibility name used by apprentice and dashboard surfaces. */
+export const courseOverviewPath = getCoursePath;
 
 /** Authenticated lesson page */
 export function getLessonPath(courseId: string, lessonId: string): string {

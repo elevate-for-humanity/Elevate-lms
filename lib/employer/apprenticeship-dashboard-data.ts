@@ -18,36 +18,45 @@ export type EmployerApprenticeshipSummary = {
  * - apprenticeship_programs is the larger apprenticeship standards/catalog
  *   layer and is reported separately; it is never treated as if one employer
  *   sponsors every catalog record.
+ *
+ * `employerId` is an explicit admin-preview context. Callers must authorize the
+ * administrator before supplying it; normal employer users are always resolved
+ * through owner_user_id.
  */
 export async function loadEmployerApprenticeshipSummary(
   userId: string,
+  options: { employerId?: string } = {},
 ): Promise<EmployerApprenticeshipSummary> {
   const db = await requireAdminClient();
 
-  const { data: employer, error: employerError } = await db
-    .from('employers')
-    .select('id')
-    .eq('owner_user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  let employerId = options.employerId ?? null;
+  if (!employerId) {
+    const { data: employer, error: employerError } = await db
+      .from('employers')
+      .select('id')
+      .eq('owner_user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-  if (employerError) {
-    return {
-      employerId: null,
-      mappedProgramCount: 0,
-      mappedPrograms: [],
-      availableStandardsCount: null,
-      sourceState: 'unavailable',
-      error: employerError.message,
-    };
+    if (employerError) {
+      return {
+        employerId: null,
+        mappedProgramCount: 0,
+        mappedPrograms: [],
+        availableStandardsCount: null,
+        sourceState: 'unavailable',
+        error: employerError.message,
+      };
+    }
+    employerId = employer?.id ?? null;
   }
 
   const { count: availableStandardsCount, error: standardsError } = await db
     .from('apprenticeship_programs')
     .select('id', { count: 'exact', head: true });
 
-  if (!employer?.id) {
+  if (!employerId) {
     return {
       employerId: null,
       mappedProgramCount: 0,
@@ -61,11 +70,11 @@ export async function loadEmployerApprenticeshipSummary(
   const { data: mappings, error: mappingError } = await db
     .from('employer_partnerships')
     .select('program_id, status, end_date')
-    .eq('employer_id', employer.id);
+    .eq('employer_id', employerId);
 
   if (mappingError) {
     return {
-      employerId: employer.id,
+      employerId,
       mappedProgramCount: 0,
       mappedPrograms: [],
       availableStandardsCount: standardsError ? null : (availableStandardsCount ?? 0),
@@ -99,7 +108,7 @@ export async function loadEmployerApprenticeshipSummary(
 
     if (programError) {
       return {
-        employerId: employer.id,
+        employerId,
         mappedProgramCount: 0,
         mappedPrograms: [],
         availableStandardsCount: standardsError ? null : (availableStandardsCount ?? 0),
@@ -116,7 +125,7 @@ export async function loadEmployerApprenticeshipSummary(
   }
 
   return {
-    employerId: employer.id,
+    employerId,
     mappedProgramCount: mappedPrograms.length,
     mappedPrograms,
     availableStandardsCount: standardsError ? null : (availableStandardsCount ?? 0),

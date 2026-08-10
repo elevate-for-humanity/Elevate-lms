@@ -4,7 +4,7 @@
   "short_name": "Apprentice",
   "description": "Track apprenticeship hours, RTI, competencies, documents, and host-site progress.",
   "start_url": "/apprentice",
-  "scope": "/apprentice/",
+  "scope": "/apprentice",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#ffffff",

@@ -1,30 +1,30 @@
 'use client';
-import { logger } from '@/lib/logger';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 import {
-  LayoutDashboard,
-  GraduationCap,
-  Users,
-  Building2,
-  Briefcase,
   BookOpen,
+  Briefcase,
+  Building2,
+  ChevronDown,
+  GraduationCap,
+  LayoutDashboard,
+  Loader2,
   Palette,
   Shield,
-  ShoppingBag,
-  ChevronDown,
-  Sparkles,
-  Loader2,
+  Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { getRoleDestinationUrl } from '@/lib/auth/role-destinations';
+import { PortalRouter } from '@/lib/routing/portal-router';
+import { MARKETING_HOST } from '@/lib/routing/portal-map';
+import { logger } from '@/lib/logger';
 
 interface Dashboard {
   id: string;
   name: string;
   href: string;
-  hrefByRole?: Record<string, string>; // role-specific destination override
   icon: string;
   description: string;
   color: string;
@@ -44,174 +44,149 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Briefcase,
   BookOpen,
   Palette,
-  Sparkles,
-  ShoppingBag,
   LayoutDashboard,
 };
 
+/**
+ * Canonical dashboard inventory. Host/path ownership comes from PortalRouter;
+ * there is no second database-driven route registry to drift out of sync.
+ */
 const DEFAULT_DASHBOARDS: Dashboard[] = [
-  // ── Hub (all roles) ───────────────────────────────────────────────────────
   {
-    id: '0',
-    name: 'My Dashboard',
-    href: '/learner/dashboard',
-    icon: 'LayoutDashboard',
-    description: 'Your home hub',
-    color: 'text-brand-blue-600',
-    roles: [
-      'user',
-      'student',
-      'instructor',
-      'mentor',
-      'creator',
-      'employer',
-      'partner',
-      'program_holder',
-      'provider_admin',
-      'staff',
-      'case_manager',
-      'workforce_board',
-      'org_admin',
-      'admin',
-      'admin',
-    ],
-    order_index: 0,
-  },
-
-  // ── Learner ───────────────────────────────────────────────────────────────
-  {
-    id: '1',
+    id: 'student',
     name: 'My Learning',
-    href: '/learner/dashboard',
+    href: PortalRouter.get('lms'),
     icon: 'GraduationCap',
-    description: 'Courses, progress, certificates',
+    description: 'Courses, progress, and certificates',
     color: 'text-brand-blue-600',
-    roles: ['student'],
+    roles: ['student', 'delegate', 'grant_client'],
     order_index: 1,
   },
   {
-    id: '2',
-    name: 'My Programs',
-    href: '/lms/dashboard',
+    id: 'apprentice',
+    name: 'Apprentice Portal',
+    href: PortalRouter.get('apprentice'),
     icon: 'BookOpen',
-    description: 'LMS course content',
+    description: 'OJT hours, RTI, documents, and competencies',
     color: 'text-indigo-600',
-    roles: ['student'],
+    roles: ['apprentice'],
     order_index: 2,
   },
-
-  // ── Education staff ───────────────────────────────────────────────────────
   {
-    id: '3',
+    id: 'instructor',
     name: 'Instructor Portal',
-    href: '/admin/instructor/dashboard',
+    href: PortalRouter.get('instructor'),
     icon: 'BookOpen',
-    description: 'Students, submissions, courses',
+    description: 'Students, submissions, and courses',
     color: 'text-indigo-600',
-    roles: ['instructor', 'admin'],
+    roles: ['instructor'],
     order_index: 3,
   },
   {
-    id: '5',
-    name: 'Creator Studio',
-    href: '/creator/products',
-    icon: 'Palette',
-    description: 'Build and publish courses',
-    color: 'text-pink-600',
-    roles: ['creator', 'admin'],
+    id: 'employer',
+    name: 'Employer Portal',
+    href: PortalRouter.get('employer'),
+    icon: 'Briefcase',
+    description: 'Jobs, candidates, and apprentices',
+    color: 'text-brand-orange-600',
+    roles: ['employer', 'sponsor'],
+    order_index: 4,
+  },
+  {
+    id: 'host-shop',
+    name: 'Host Shop Portal',
+    href: PortalRouter.get('hostshop'),
+    icon: 'Building2',
+    description: 'Apprentices, hours, documents, and compliance',
+    color: 'text-purple-600',
+    roles: ['partner', 'host_shop', 'host_shop_admin'],
     order_index: 5,
   },
-
-  // ── Employer & partners ───────────────────────────────────────────────────
   {
-    id: '6',
-    name: 'Employer Portal',
-    href: '/employer/dashboard',
-    icon: 'Briefcase',
-    description: 'Jobs, candidates, apprentices',
-    color: 'text-brand-orange-600',
-    roles: ['employer', 'admin'],
+    id: 'program-holder',
+    name: 'Program Holder',
+    href: PortalRouter.get('programholder'),
+    icon: 'Building2',
+    description: 'Programs, students, hours, and documents',
+    color: 'text-purple-600',
+    roles: ['program_holder'],
     order_index: 6,
   },
   {
-    id: '7',
-    name: 'Partners & Providers',
-    // Route to the correct portal based on the user's role.
-    // provider_admin → /provider/dashboard, partner → /partner/dashboard
-    href: '/partner/dashboard',
-    hrefByRole: {
-      provider_admin: '/provider/dashboard',
-      partner: '/partner/dashboard',
-      program_holder: '/program-holder/dashboard',
-      sponsor: '/program-holder/dashboard',
-    },
+    id: 'provider',
+    name: 'Provider Portal',
+    href: PortalRouter.get('provider'),
     icon: 'Building2',
-    description: 'Programs, attendance, and compliance',
+    description: 'Programs, enrollments, and compliance',
     color: 'text-purple-600',
-    roles: ['partner', 'provider_admin', 'program_holder', 'sponsor', 'admin'],
+    roles: ['provider_admin'],
     order_index: 7,
   },
-
-  // ── Workforce & case management ───────────────────────────────────────────
   {
-    id: '10',
+    id: 'case-manager',
     name: 'Case Manager',
-    href: '/case-manager/dashboard',
+    href: PortalRouter.get('casemanager'),
     icon: 'Users',
-    description: 'Caseload and WIOA placements',
+    description: 'Caseload and workforce placements',
     color: 'text-brand-green-600',
-    roles: ['case_manager', 'staff', 'admin'],
+    roles: ['case_manager'],
+    order_index: 8,
+  },
+  {
+    id: 'workforce-board',
+    name: 'Workforce Board',
+    href: PortalRouter.get('workforceboard'),
+    icon: 'LayoutDashboard',
+    description: 'Regional workforce oversight',
+    color: 'text-slate-600',
+    roles: ['workforce_board'],
+    order_index: 9,
+  },
+  {
+    id: 'staff',
+    name: 'Staff Portal',
+    href: PortalRouter.get('staff'),
+    icon: 'Users',
+    description: 'Students, attendance, and operations',
+    color: 'text-brand-green-600',
+    roles: ['staff'],
     order_index: 10,
   },
   {
-    id: '11',
-    name: 'Workforce Board',
-    href: '/workforce-board/dashboard',
-    icon: 'LayoutDashboard',
-    description: 'Regional workforce data',
-    color: 'text-slate-600',
-    roles: ['workforce_board', 'admin'],
+    id: 'testing',
+    name: 'Testing Center',
+    href: PortalRouter.get('testing'),
+    icon: 'Shield',
+    description: 'Bookings, sessions, slots, and proctoring',
+    color: 'text-brand-red-600',
+    roles: ['test_admin', 'proctor'],
     order_index: 11,
   },
-
-  // ── Internal staff ────────────────────────────────────────────────────────
   {
-    id: '12',
-    name: 'Staff Portal',
-    href: '/admin/staff-portal/dashboard',
-    icon: 'Users',
-    description: 'Students, attendance, ops',
-    color: 'text-brand-green-600',
-    roles: ['staff', 'admin'],
+    id: 'creator',
+    name: 'Creator Studio',
+    href: `${MARKETING_HOST}/creator/products`,
+    icon: 'Palette',
+    description: 'Build and publish learning products',
+    color: 'text-pink-600',
+    roles: ['creator'],
     order_index: 12,
   },
   {
-    id: '13',
+    id: 'admin',
     name: 'Admin',
-    href: '/admin/dashboard',
+    href: PortalRouter.get('admin'),
     icon: 'Shield',
-    description: 'Full site management',
+    description: 'Platform administration',
     color: 'text-brand-red-600',
-    roles: ['admin'],
+    roles: ['admin', 'org_admin'],
     order_index: 13,
-  },
-
-  // ── Tools ─────────────────────────────────────────────────────────────────
-  {
-    id: '14',
-    name: 'AI Studio',
-    href: '/ai-studio',
-    icon: 'Sparkles',
-    description: 'AI video and media tools',
-    color: 'text-purple-600',
-    roles: ['instructor', 'creator', 'admin'],
-    order_index: 14,
   },
 ];
 
 export function DashboardDropdown({ className }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [dashboards, setDashboards] = useState<Dashboard[]>(DEFAULT_DASHBOARDS);
+  const [primaryRole, setPrimaryRole] = useState<string>('student');
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [recentDashboards, setRecentDashboards] = useState<string[]>([]);
@@ -221,97 +196,93 @@ export function DashboardDropdown({ className }: Props) {
 
     async function fetchData() {
       try {
-        // Get current user and their roles
         const {
           data: { user },
         } = await supabase.auth.getUser();
 
-        if (user) {
-          // Fetch user profile with roles
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role, roles')
-            .eq('id', user.id)
-            .single();
+        if (!user) return;
 
-          if (profile) {
-            const roles = profile.roles || [profile.role || 'user'];
-            setUserRoles(Array.isArray(roles) ? roles : [roles]);
-          }
-
-          // Fetch recent dashboard visits
-          const { data: recentVisits } = await supabase
+        const [{ data: profile }, { data: roleRows }, { data: recentVisits }] = await Promise.all([
+          supabase.from('profiles').select('role, roles').eq('id', user.id).maybeSingle(),
+          supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
+          supabase
             .from('user_activity')
             .select('metadata')
             .eq('user_id', user.id)
             .eq('activity_type', 'dashboard_visit')
             .order('created_at', { ascending: false })
-            .limit(3);
+            .limit(3),
+        ]);
 
-          if (recentVisits) {
-            const recent = recentVisits.map((v: any) => v.metadata?.dashboard_href).filter(Boolean);
-            setRecentDashboards(recent);
-          }
-        }
+        const profileRole = typeof profile?.role === 'string' ? profile.role : 'student';
+        const jsonRoles = Array.isArray(profile?.roles)
+          ? profile.roles.filter((role: unknown): role is string => typeof role === 'string')
+          : [];
+        const secondaryRoles = (roleRows || [])
+          .map((row: any) => row.roles?.name)
+          .filter((role: unknown): role is string => typeof role === 'string');
 
-        // Try to fetch dashboards from database
-        const { data: dbDashboards, error } = await supabase
-          .from('dashboards')
-          .select('*')
-          .eq('is_active', true)
-          .order('order_index', { ascending: true });
+        setPrimaryRole(profileRole);
+        setUserRoles(Array.from(new Set([profileRole, ...jsonRoles, ...secondaryRoles])));
 
-        if (!error && dbDashboards && dbDashboards.length > 0) {
-          setDashboards(dbDashboards);
-        }
-      } catch (err) {
-        logger.error('Error fetching dashboard data:', err);
+        setRecentDashboards(
+          (recentVisits || [])
+            .map((visit: any) => visit.metadata?.dashboard_href)
+            .filter((href: unknown): href is string => typeof href === 'string'),
+        );
+      } catch (error) {
+        logger.error('Error fetching dashboard navigation data:', error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchData();
+    void fetchData();
   }, []);
 
-  // Track dashboard visit
-  const trackVisit = async (dashboard: Dashboard) => {
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) {
-      await supabase
-        .from('user_activity')
-        .insert({
-          user_id: user.id,
-          activity_type: 'dashboard_visit',
-          metadata: { dashboard_href: dashboard.href, dashboard_name: dashboard.name },
-        })
-        .catch(() => {}); // Ignore errors
+  const filteredDashboards = useMemo(() => {
+    if (userRoles.includes('admin') || userRoles.includes('org_admin')) {
+      return DEFAULT_DASHBOARDS;
     }
 
+    return DEFAULT_DASHBOARDS.filter((dashboard) =>
+      dashboard.roles.some((role) => userRoles.includes(role)),
+    );
+  }, [userRoles]);
+
+  const sortedDashboards = useMemo(
+    () =>
+      [...filteredDashboards].sort((a, b) => {
+        const aRecent = recentDashboards.indexOf(a.href);
+        const bRecent = recentDashboards.indexOf(b.href);
+        if (aRecent !== -1 && bRecent === -1) return -1;
+        if (bRecent !== -1 && aRecent === -1) return 1;
+        if (aRecent !== -1 && bRecent !== -1) return aRecent - bRecent;
+        return a.order_index - b.order_index;
+      }),
+    [filteredDashboards, recentDashboards],
+  );
+
+  const trackVisit = async (dashboard: Dashboard) => {
     setIsOpen(false);
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await supabase.from('user_activity').insert({
+        user_id: user.id,
+        activity_type: 'dashboard_visit',
+        metadata: { dashboard_href: dashboard.href, dashboard_name: dashboard.name },
+      });
+    } catch {
+      // Navigation must never fail because telemetry could not be recorded.
+    }
   };
 
-  // Filter dashboards based on user roles (show all if admin or no roles set)
-  const filteredDashboards =
-    userRoles.includes('admin') || userRoles.includes('admin')
-      ? dashboards
-      : dashboards.filter(
-          (d) => d.roles.some((role) => userRoles.includes(role)) || d.roles.includes('user'),
-        );
-
-  // Sort with recent dashboards first
-  const sortedDashboards = [...filteredDashboards].sort((a, b) => {
-    const aRecent = recentDashboards.indexOf(a.href);
-    const bRecent = recentDashboards.indexOf(b.href);
-    if (aRecent !== -1 && bRecent === -1) return -1;
-    if (bRecent !== -1 && aRecent === -1) return 1;
-    if (aRecent !== -1 && bRecent !== -1) return aRecent - bRecent;
-    return a.order_index - b.order_index;
-  });
+  const myDashboardHref = getRoleDestinationUrl(primaryRole);
 
   return (
     <div className={`relative ${className || ''}`}>
@@ -326,10 +297,7 @@ export function DashboardDropdown({ className }: Props) {
 
       {isOpen && (
         <>
-          {/* Backdrop */}
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-
-          {/* Dropdown */}
           <div className="absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 z-20 overflow-hidden">
             <div className="p-2">
               <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center justify-between">
@@ -337,32 +305,16 @@ export function DashboardDropdown({ className }: Props) {
                 {loading && <Loader2 className="w-3 h-3 animate-spin" />}
               </div>
 
-              {recentDashboards.length > 0 && (
-                <div className="px-3 py-1 text-xs text-brand-blue-600 font-medium">
-                  Recently visited
-                </div>
-              )}
-
               <div className="space-y-1 max-h-96 overflow-y-auto">
                 {sortedDashboards.map((dashboard) => {
                   const Icon = ICON_MAP[dashboard.icon] || LayoutDashboard;
-                  // Use role-specific href if defined — e.g. Partners & Providers
-                  // routes provider_admin to /provider/dashboard, partner to /partner/dashboard
-                  const resolvedHref =
-                    dashboard.hrefByRole
-                      ? userRoles.reduce<string>((found, role) => {
-                          return found !== dashboard.href
-                            ? found
-                            : dashboard.hrefByRole?.[role] ?? found;
-                        }, dashboard.href)
-                      : dashboard.href;
-                  const isRecent = recentDashboards.includes(resolvedHref);
+                  const isRecent = recentDashboards.includes(dashboard.href);
 
                   return (
                     <Link
                       key={dashboard.id}
-                      href={resolvedHref}
-                      onClick={() => trackVisit({ ...dashboard, href: resolvedHref })}
+                      href={dashboard.href}
+                      onClick={() => void trackVisit(dashboard)}
                       className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition group ${
                         isRecent ? 'bg-brand-blue-50/50' : ''
                       }`}
@@ -389,7 +341,7 @@ export function DashboardDropdown({ className }: Props) {
 
             <div className="border-t border-slate-200 p-2 bg-slate-50">
               <Link
-                href="/apply/success"
+                href={myDashboardHref}
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-brand-blue-600 hover:bg-white rounded-lg transition"
               >

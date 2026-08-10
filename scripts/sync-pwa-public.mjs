@@ -8,11 +8,23 @@ const service = process.argv[2];
 const config = {
   marketing: {
     appDir: 'apps/marketing',
-    files: ['sw-marketing.js', 'manifest-marketing.json', 'offline.html'],
+    files: [
+      'sw-marketing.js',
+      'manifest-marketing.json',
+      'manifest-program-holder.json',
+      'offline.html',
+    ],
   },
   lms: {
     appDir: 'apps/lms',
-    files: ['sw-lms.js', 'manifest-lms.json', 'offline.html'],
+    files: [
+      'sw-lms.js',
+      'manifest-lms.json',
+      'manifest-student.json',
+      'manifest-apprentice.json',
+      'manifest-shop-owner.json',
+      'offline.html',
+    ],
   },
   admin: {
     appDir: 'apps/admin',
@@ -31,8 +43,7 @@ let copied = 0;
 for (const filename of config[service].files) {
   const source = join(root, 'public', filename);
   if (!existsSync(source)) {
-    console.warn(`[sync-pwa-public] ${filename} missing at canonical public root — skipped`);
-    continue;
+    throw new Error(`[sync-pwa-public] Required PWA asset is missing: public/${filename}`);
   }
   copyFileSync(source, join(targetDir, filename));
   copied += 1;

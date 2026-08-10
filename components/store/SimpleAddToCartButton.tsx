@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
 import { useState } from 'react';
 import { ShoppingCart, Check } from 'lucide-react';
 import { addToCart } from '@/lib/store/cart';
-import { StoreProduct } from '@/lib/store/products';
+import type { StoreProduct } from '@/lib/store/products';
 
 interface SimpleAddToCartButtonProps {
   productId: string;
@@ -26,20 +25,22 @@ export function SimpleAddToCartButton({
 
   const handleAddToCart = () => {
     setIsAdding(true);
-    
-    // Create a minimal product object for the cart
+
     const product: StoreProduct = {
       id: productId,
       name: productName,
       slug: productId,
-      price: price,
+      price,
+      description: `${productName} digital product`,
+      image: '/images/pages/course-create-hero.webp',
       inStock: true,
+      featured: false,
       digital: true,
       category: 'certification-prep',
     };
 
     addToCart(product, 1);
-    
+
     setTimeout(() => {
       setIsAdding(false);
       setAdded(true);
@@ -47,32 +48,7 @@ export function SimpleAddToCartButton({
     }, 500);
   };
 
-  if (variant === 'secondary') {
-    return (
-      <button
-        onClick={handleAddToCart}
-        disabled={isAdding}
-        className={`inline-flex items-center gap-1.5 transition-all ${className}`}
-      >
-        {added ? (
-          <>
-            <Check className="w-4 h-4" />
-            Added!
-          </>
-        ) : isAdding ? (
-          <>
-            <ShoppingCart className="w-4 h-4 animate-pulse" />
-            Adding...
-          </>
-        ) : (
-          <>
-            <ShoppingCart className="w-4 h-4" />
-            Add
-          </>
-        )}
-      </button>
-    );
-  }
+  const iconClass = variant === 'secondary' ? 'w-4 h-4' : 'w-5 h-5';
 
   return (
     <button
@@ -81,20 +57,11 @@ export function SimpleAddToCartButton({
       className={`inline-flex items-center gap-2 transition-all ${className}`}
     >
       {added ? (
-        <>
-          <Check className="w-5 h-5" />
-          Added to Cart
-        </>
+        <><Check className={iconClass} />{variant === 'secondary' ? 'Added!' : 'Added to Cart'}</>
       ) : isAdding ? (
-        <>
-          <ShoppingCart className="w-5 h-5 animate-pulse" />
-          Adding...
-        </>
+        <><ShoppingCart className={`${iconClass} animate-pulse`} />Adding...</>
       ) : (
-        <>
-          <ShoppingCart className="w-5 h-5" />
-          Add to Cart
-        </>
+        <><ShoppingCart className={iconClass} />{variant === 'secondary' ? 'Add' : 'Add to Cart'}</>
       )}
     </button>
   );

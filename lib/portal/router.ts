@@ -1,6 +1,8 @@
 /**
- * Portal Router
- * Single source of truth for field-based learner portal routing.
+ * Field-based learner portal routing.
+ *
+ * Role → service/dashboard routing lives in lib/routing/dashboard-resolver.ts.
+ * This module only chooses specialized learner experiences from program data.
  */
 
 import type { SupabaseClient } from '@/lib/supabase';
@@ -17,7 +19,7 @@ export type PortalKey =
   | 'jri';
 
 export const PORTAL_PATHS: Record<PortalKey, string> = {
-  apprentice: '/portal/apprentice',
+  apprentice: '/apprentice',
   healthcare: '/portal/healthcare',
   technology: '/portal/technology',
   business: '/portal/business',
@@ -28,7 +30,6 @@ export const PORTAL_PATHS: Record<PortalKey, string> = {
   jri: '/portal/jri',
 };
 
-/** Canonical fallback for a learner with no specialized portal. */
 export const PORTAL_FALLBACK = '/lms/dashboard';
 
 const PROGRAM_TYPE_TO_PORTAL: Record<string, PortalKey> = {
@@ -85,11 +86,7 @@ export async function resolvePortalForUser(
     const portalKey = derivePortalKey(program.program_type, program.category);
     if (!portalKey) return PORTAL_FALLBACK;
 
-    await supabase
-      .from('profiles')
-      .update({ portal_type: portalKey })
-      .eq('id', userId);
-
+    await supabase.from('profiles').update({ portal_type: portalKey }).eq('id', userId);
     return PORTAL_PATHS[portalKey];
   } catch {
     return PORTAL_FALLBACK;
@@ -127,14 +124,9 @@ export async function cachePortalTypeForEnrollment(
       .maybeSingle();
 
     if (!program) return;
-
     const portalKey = derivePortalKey(program.program_type, program.category);
     if (!portalKey) return;
-
-    await supabase
-      .from('profiles')
-      .update({ portal_type: portalKey })
-      .eq('id', userId);
+    await supabase.from('profiles').update({ portal_type: portalKey }).eq('id', userId);
   } catch {
     // portal_type is a cache, not an enrollment gate
   }

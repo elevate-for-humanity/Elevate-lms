@@ -34,7 +34,7 @@ interface Dashboard {
   order_index: number;
 }
 
-interface DashboardDefinition extends Omit<Dashboard, 'href' | 'roles'> {}
+type DashboardDefinition = Omit<Dashboard, 'href' | 'roles'>;
 
 interface Props {
   className?: string;
@@ -53,10 +53,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Wrench,
 };
 
-/**
- * UI metadata only. Route ownership and role access are derived from the
- * canonical portal/role registries and are not duplicated here.
- */
 const DASHBOARD_DEFINITIONS: DashboardDefinition[] = [
   { id: 'student', portalKey: 'lms', name: 'My Learning', icon: 'GraduationCap', description: 'Courses, progress, and certificates', color: 'text-brand-blue-600', order_index: 1 },
   { id: 'apprentice', portalKey: 'apprentice', name: 'Apprentice Portal', icon: 'BookOpen', description: 'OJT hours, RTI, documents, and competencies', color: 'text-indigo-600', order_index: 2 },
@@ -93,22 +89,13 @@ export function DashboardDropdown({ className }: Props) {
 
     async function fetchData() {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
         const [{ data: profile }, { data: roleRows }, { data: recentVisits }] = await Promise.all([
           supabase.from('profiles').select('role, roles').eq('id', user.id).maybeSingle(),
           supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
-          supabase
-            .from('user_activity')
-            .select('metadata')
-            .eq('user_id', user.id)
-            .eq('activity_type', 'dashboard_visit')
-            .order('created_at', { ascending: false })
-            .limit(3),
+          supabase.from('user_activity').select('metadata').eq('user_id', user.id).eq('activity_type', 'dashboard_visit').order('created_at', { ascending: false }).limit(3),
         ]);
 
         const profileRole = typeof profile?.role === 'string' ? profile.role : 'student';
@@ -138,21 +125,18 @@ export function DashboardDropdown({ className }: Props) {
 
   const filteredDashboards = useMemo(() => {
     if (userRoles.includes('admin') || userRoles.includes('org_admin')) return DEFAULT_DASHBOARDS;
-    return DEFAULT_DASHBOARDS.filter((dashboard) =>
-      dashboard.roles.some((role) => userRoles.includes(role)),
-    );
+    return DEFAULT_DASHBOARDS.filter((dashboard) => dashboard.roles.some((role) => userRoles.includes(role)));
   }, [userRoles]);
 
   const sortedDashboards = useMemo(
-    () =>
-      [...filteredDashboards].sort((a, b) => {
-        const aRecent = recentDashboards.indexOf(a.href);
-        const bRecent = recentDashboards.indexOf(b.href);
-        if (aRecent !== -1 && bRecent === -1) return -1;
-        if (bRecent !== -1 && aRecent === -1) return 1;
-        if (aRecent !== -1 && bRecent !== -1) return aRecent - bRecent;
-        return a.order_index - b.order_index;
-      }),
+    () => [...filteredDashboards].sort((a, b) => {
+      const aRecent = recentDashboards.indexOf(a.href);
+      const bRecent = recentDashboards.indexOf(b.href);
+      if (aRecent !== -1 && bRecent === -1) return -1;
+      if (bRecent !== -1 && aRecent === -1) return 1;
+      if (aRecent !== -1 && bRecent !== -1) return aRecent - bRecent;
+      return a.order_index - b.order_index;
+    }),
     [filteredDashboards, recentDashboards],
   );
 
@@ -160,11 +144,8 @@ export function DashboardDropdown({ className }: Props) {
     setIsOpen(false);
     try {
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
       await supabase.from('user_activity').insert({
         user_id: user.id,
         activity_type: 'dashboard_visit',

@@ -1,0 +1,44 @@
+name: Fix Final LMS Mapping Once
+
+on:
+  push:
+    branches:
+      - release/final-union-20260810
+    paths:
+      - .github/workflows/fix-final-lms-mapping-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release/final-union-20260810
+      - name: Align compiled lesson mapping
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('lib/db/courses.ts')
+          text = path.read_text()
+          replacements = {
+              'learning_objectives: compiled.learning_objectives,': 'learning_objectives: compiled.lesson_objectives,',
+              'examples: compiled.examples,': 'examples: compiled.practice_exercise,',
+              'quiz_questions: compiled.quiz_questions,': 'quiz_questions: compiled.knowledge_check,',
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f'missing expected mapping: {old}')
+              text = text.replace(old, new, 1)
+          path.write_text(text)
+          PY
+          rm .github/workflows/fix-final-lms-mapping-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/db/courses.ts .github/workflows/fix-final-lms-mapping-once.yml
+          git commit -m "fix(lms): align compiled lesson persistence fields"
+          git push origin HEAD:release/final-union-20260810

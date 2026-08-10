@@ -1,136 +1,124 @@
 /**
- * /api/ai-chat - PARIS AI Chat API for Marketing Site
- * 
- * Handles chat messages from the LiveChatWidget and returns AI responses.
+ * /api/ai-chat — public admissions chat for the Marketing site.
+ *
+ * AUTH: Intentionally public. This endpoint is used before account creation by
+ * the public LiveChatWidget. It is IP rate-limited and must not perform
+ * privileged operations or expose internal data.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+const MAX_MESSAGE_LENGTH = 2000;
 
-// PARIS AI System Prompt
-const PARIS_SYSTEM_PROMPT = `You are PARIS, the AI assistant for ${PLATFORM_DEFAULTS.orgName}.
+const PARIS_SYSTEM_PROMPT = `You are PARIS, the public admissions assistant for ${PLATFORM_DEFAULTS.orgName}.
 
-**About Us:**
-- Workforce development nonprofit in Indianapolis, Indiana  
-- DOL Registered Apprenticeship Sponsor
-- Training is FREE for eligible participants through WIOA, Workforce Ready Grant, and Job Ready Indy
+Your job is to help visitors navigate the public website. Use cautious, evidence-based language.
 
-**Our Programs:**
-- Healthcare: CNA, Phlebotomy, Medical Assistant
-- Skilled Trades: HVAC, CDL Truck Driving, Electrical, Plumbing
-- Professional: Barbering, Cosmetology, Esthetics, Nail Tech
-- Technology: IT Fundamentals, Cybersecurity
+Rules you must follow:
+- Never promise that training is free, fully funded, guaranteed, approved, licensed, accredited, or job-placing unless the exact program page supplied to the visitor says so.
+- Funding is participant- and program-specific. WorkOne or the responsible funding agency determines eligibility, available funds, covered costs, and authorization.
+- Do not invent pass rates, placement rates, wages, employer counts, approvals, start dates, deadlines, or success stories.
+- Do not tell a visitor that every program has the same credential, funding source, delivery mode, or approval.
+- For program details, direct visitors to https://www.elevateforhumanity.org/programs.
+- For WIOA information, direct visitors to https://www.elevateforhumanity.org/funding/wioa.
+- For apprenticeship status, direct visitors to https://www.elevateforhumanity.org/apprenticeships and https://www.elevateforhumanity.org/approvals.
+- For an application, direct visitors to https://www.elevateforhumanity.org/apply/student.
+- Keep answers concise, professional, and under 150 words.`;
 
-**Funding Options:**
-- WIOA: 100% free for low-income adults
-- Workforce Ready Grant: Indiana residents
-- Job Ready Indy: Justice-involved individuals
-- Payment plans available
-
-**Contact:**
-- Phone: ${PLATFORM_DEFAULTS.supportPhone}
-- Email: info@${PLATFORM_DEFAULTS.canonicalDomain}
-- Website: ${PLATFORM_DEFAULTS.canonicalDomain}
-
-**Response Guidelines:**
-- Be warm, encouraging, and helpful
-- Answer the specific question directly
-- Use bullet points for lists
-- Always provide a clear next step
-- Keep responses under 150 words
-- End with an action or helpful resource`;
-
-function getSmartFallback(userMessage: string): string {
+function fallbackReply(userMessage: string): string {
   const lower = userMessage.toLowerCase();
-  
-  if (lower.includes('apply') || lower.includes('application')) {
-    return `To apply for our programs:\n\n1. Visit elevateforhumanity.org/apply\n2. Fill out our quick eligibility check (3-5 minutes)\n3. Our team will contact you within 24 hours\n\nThe application is free and takes just a few minutes. We accept WIOA, Workforce Ready Grant, and offer payment plans.\n\nReady to apply? Click here: https://www.elevateforhumanity.org/apply`;
-  }
-  
-  if (lower.includes('free') || lower.includes('cost') || lower.includes('price') || lower.includes('funding')) {
-    return `Great news! Many of our programs are completely FREE for eligible participants:\n\n• WIOA funding - 100% tuition coverage for low-income adults\n• Workforce Ready Grant - Indiana residents\n• Job Ready Indy - Justice-involved individuals\n\nMost students pay $0 out of pocket!\n\nCheck your eligibility in just 2 minutes: https://www.elevateforhumanity.org/apply`;
-  }
-  
-  if (lower.includes('program') || lower.includes('course') || lower.includes('training')) {
-    return `We offer programs in:\n\n**Healthcare:** CNA, Phlebotomy, Medical Assistant\n**Trades:** HVAC, CDL, Electrical, Plumbing\n**Beauty:** Barber, Cosmetology, Esthetics, Nails\n**Tech:** IT Fundamentals, Cybersecurity\n\nAll programs include:\n• Hands-on training\n• Job placement assistance\n• Industry certifications\n• Career coaching\n\nView all programs: https://www.elevateforhumanity.org/programs`;
-  }
-  
-  if (lower.includes('barber') || lower.includes('apprentice')) {
-    return `Our Barber Apprenticeship is a DOL-registered program where you:\n\n• Earn while you learn (paid on-the-job training)\n• Get 2,000+ hours of hands-on experience\n• Pay $0 tuition (sponsor covers costs)\n• Earn your Barber License in 12-18 months\n• Work in real barbershops from day one\n\nApply now: https://www.elevateforhumanity.org/programs/barber-apprenticeship/apply`;
-  }
-  
-  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-    return `Hi there! 👋 I'm PARIS, your AI assistant at Elevate for Humanity.\n\nI can help you:\n• Learn about our free training programs\n• Check your funding eligibility\n• Navigate the application process\n• Find the right career path\n\nWhat would you like to know?`;
-  }
-  
-  if (lower.includes('phone') || lower.includes('call') || lower.includes('contact')) {
-    return `You can reach us at:\n\n📞 ${PLATFORM_DEFAULTS.supportPhone}\n📧 info@${PLATFORM_DEFAULTS.canonicalDomain}\n🌐 ${PLATFORM_DEFAULTS.canonicalDomain}\n\nOur office is in Indianapolis, Indiana. We're here Monday-Friday 8am-6pm!`;
-  }
-  
-  return `Thanks for your question! I can help you learn about:\n\n• Our training programs\n• Funding options (many are FREE!)\n• The application process\n• Apprenticeship opportunities\n\nWhat would you like to explore? You can also visit https://www.elevateforhumanity.org/programs to see all our offerings, or call us at ${PLATFORM_DEFAULTS.supportPhone}.`;
-}
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
+  if (lower.includes('apply') || lower.includes('application')) {
+    return 'You can start the student application at https://www.elevateforhumanity.org/apply/student. Review the individual program page first so you have the current admission, schedule, tuition, credential, and document requirements.';
+  }
+
+  if (lower.includes('free') || lower.includes('cost') || lower.includes('price') || lower.includes('funding') || lower.includes('wioa')) {
+    return 'Funding depends on the participant, the exact program, available funds, and the responsible agency’s written authorization. A website funding label is not a funding guarantee. Review https://www.elevateforhumanity.org/funding and https://www.elevateforhumanity.org/funding/wioa, then confirm the approved amount with WorkOne or your funding agency.';
+  }
+
+  if (lower.includes('barber') || lower.includes('apprentice')) {
+    return 'The current registered-apprenticeship information is published at https://www.elevateforhumanity.org/apprenticeships and the Barber program record is at https://www.elevateforhumanity.org/programs/barber-apprenticeship. Use those pages for current hours, tuition, host-shop, funding, and licensing information.';
+  }
+
+  if (lower.includes('program') || lower.includes('course') || lower.includes('training')) {
+    return 'The current program directory is https://www.elevateforhumanity.org/programs. Open the specific program before relying on tuition, duration, funding, credential, licensing, or schedule information because those details vary by program.';
+  }
+
+  if (lower.includes('contact') || lower.includes('phone') || lower.includes('call')) {
+    return `Admissions can be reached at ${PLATFORM_DEFAULTS.supportPhone}. You can also use https://www.elevateforhumanity.org/contact.`;
+  }
+
+  return 'I can help you find current program, funding, apprenticeship, application, testing, or contact information. For the most accurate details, start with https://www.elevateforhumanity.org/programs and open the exact program you are considering.';
 }
 
 export async function POST(req: NextRequest) {
+  const rateLimited = await applyRateLimit(req, 'public');
+  if (rateLimited) return rateLimited;
+
+  let body: unknown;
   try {
-    const body = await req.json();
-    const messages: Message[] = body.messages || [];
-    
-    const userMessage = messages.length > 0 ? messages[messages.length - 1].content : '';
-    
-    if (!userMessage) {
-      return NextResponse.json({ error: 'No message provided' }, { status: 400 });
-    }
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
-    // Try Anthropic API first
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
-    
-    if (anthropicKey) {
-      try {
-        const response = await fetch(ANTHROPIC_API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': anthropicKey,
-            'anthropic-version': '2023-06-01',
-          },
-          body: JSON.stringify({
-            model: 'claude-3-haiku-20240307',
-            max_tokens: 500,
-            system: PARIS_SYSTEM_PROMPT,
-            messages: [{ role: 'user', content: userMessage }],
-          }),
-        });
+  const messages = (body as { messages?: Array<{ role?: string; content?: unknown }> })?.messages;
+  const rawMessage = Array.isArray(messages) && messages.length
+    ? messages[messages.length - 1]?.content
+    : '';
+  const userMessage = typeof rawMessage === 'string'
+    ? rawMessage.trim().slice(0, MAX_MESSAGE_LENGTH)
+    : '';
 
-        if (response.ok) {
-          const data = await response.json();
-          return NextResponse.json({ 
-            reply: data.content?.[0]?.text || 'Thanks for chatting with us!' 
-          });
-        }
-      } catch (apiError) {
-        console.error('Anthropic API error:', apiError);
-      }
-    }
+  if (!userMessage) {
+    return NextResponse.json({ error: 'No message provided' }, { status: 400 });
+  }
 
-    // Fallback to smart keyword-based responses
-    const reply = getSmartFallback(userMessage);
-    return NextResponse.json({ reply });
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (!anthropicKey) {
+    return NextResponse.json({ reply: fallbackReply(userMessage), source: 'verified-fallback' });
+  }
 
-  } catch (error) {
-    console.error('AI Chat error:', error);
-    return NextResponse.json({ 
-      reply: `I'm having trouble right now. Please call us at ${PLATFORM_DEFAULTS.supportPhone} or visit elevateforhumanity.org/apply to get started!` 
+  try {
+    const response = await fetch(ANTHROPIC_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 500,
+        system: PARIS_SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userMessage }],
+      }),
+      signal: AbortSignal.timeout(20_000),
+      cache: 'no-store',
     });
+
+    if (!response.ok) {
+      return NextResponse.json({ reply: fallbackReply(userMessage), source: 'verified-fallback' });
+    }
+
+    const data = await response.json();
+    const reply = typeof data?.content?.[0]?.text === 'string'
+      ? data.content[0].text.trim()
+      : '';
+
+    if (!reply) {
+      return NextResponse.json({ reply: fallbackReply(userMessage), source: 'verified-fallback' });
+    }
+
+    return NextResponse.json({ reply, source: 'ai' });
+  } catch {
+    return NextResponse.json({ reply: fallbackReply(userMessage), source: 'verified-fallback' });
   }
 }

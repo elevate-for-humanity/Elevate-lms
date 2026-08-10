@@ -31,35 +31,36 @@ const PROGRAM_ALIASES: Record<string, HostShopProgramType> = {
 };
 
 /**
- * Onboarding steps may remain program-specific, but there is exactly one
- * operational Host Shop dashboard after onboarding: /host-shop/dashboard/board.
+ * One canonical onboarding flow serves every Host Shop occupation. Program
+ * differences are supplied by the partner record and document requirements;
+ * routing never forks into legacy /partners/<trade>/... shells.
  */
 export const HOST_SHOP_ONBOARDING_PATHS: Record<
   HostShopProgramType,
   { signMou: string; forms: string; documents: string; dashboard: string }
 > = {
   barber: {
-    signMou: '/partners/barber-host-shop/sign-mou',
-    forms: '/partners/barber-host-shop/forms',
-    documents: '/partners/barber-host-shop/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   cosmetology: {
-    signMou: '/partners/cosmetology-host-shop/sign-mou',
-    forms: '/partners/cosmetology-host-shop/forms',
-    documents: '/partners/cosmetology-host-shop/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   nail_technician: {
-    signMou: '/partners/nail-technician-apprenticeship/sign-mou',
-    forms: '/partners/nail-technician-apprenticeship/forms',
-    documents: '/partners/nail-technician-apprenticeship/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
   esthetician: {
-    signMou: '/partners/esthetician-apprenticeship/sign-mou',
-    forms: '/partners/esthetician-apprenticeship/forms',
-    documents: '/partners/esthetician-apprenticeship/documents',
+    signMou: '/host-shop/onboarding/mou',
+    forms: '/host-shop/onboarding/profile',
+    documents: '/host-shop/onboarding/documents',
     dashboard: '/host-shop/dashboard/board',
   },
 };

@@ -8,9 +8,6 @@
  * - No headline, subheadline, paragraph, or CTA on top of the image.
  * - Only allowed on-image elements: micro-label (2–4 words max), brand bug.
  * - All primary messaging renders in the below-hero content slot.
- *
- * Use this when a high-quality still image is available and video is not
- * required. Accepts the same prop shape as HeroVideo for easy swapping.
  */
 
 import Image from 'next/image';
@@ -24,36 +21,20 @@ export interface HeroPictureCta {
 }
 
 export interface HeroPictureProps {
-  /** Path to the hero image (relative to /public) */
   src: string;
-  /** Alt text — describe the scene, not the brand */
   alt: string;
-  /** 2–4 word micro-label rendered in bottom-left corner of image */
   microLabel?: string;
-  /** Show small brand bug in top-left corner */
   showBrandBug?: boolean;
-  /** Below-hero headline */
   belowHeroHeadline?: string;
-  /** Below-hero supporting line */
   belowHeroSubheadline?: string;
-  /** CTA buttons rendered below the hero */
   ctas?: HeroPictureCta[];
-  /** Optional trust indicator row below CTAs */
   trustIndicators?: string[];
-  /** Voiceover / image transcript — rendered in expandable section below the fold */
   transcript?: string;
-  /** Analytics name for tracking */
   analyticsName?: string;
-  /** Additional className for the outer wrapper */
   className?: string;
-  /** Render below-hero content as children instead of structured props */
   children?: React.ReactNode;
-  /**
-   * Image height class — defaults to 'clamp(260px, 40vw, 480px)' matching HeroVideo.
-   * Pass a Tailwind height class to override, e.g. 'h-[360px]'.
-   */
+  /** Canonical default is 38vh / 260–520px. Override only intentionally. */
   heightStyle?: string;
-  /** Next/Image priority — true for above-the-fold heroes (default: true) */
   priority?: boolean;
 }
 
@@ -75,33 +56,26 @@ export default function HeroPicture({
 }: HeroPictureProps) {
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const transcriptId = useId();
-
-  const frameStyle = heightStyle ? undefined : { height: 'clamp(400px, 56vw, 780px)' };
+  const canonicalHeight = 'h-[38vh] min-h-[260px] max-h-[520px]';
 
   return (
     <div className={`w-full ${className}`}>
-      {/* IMAGE FRAME */}
       <section
-        className={`relative w-full overflow-hidden ${heightStyle ?? ''}`}
-        style={frameStyle}
+        className={`relative w-full overflow-hidden bg-slate-900 ${heightStyle ?? canonicalHeight}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero image'}
       >
-        {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
         <Image
           src={src}
           alt={alt}
           fill
           sizes="100vw"
           className="object-cover object-center"
-          priority={priority} placeholder="empty"
+          priority={priority}
+          placeholder="empty"
         />
 
-        {/* ON-IMAGE ELEMENTS (only these two are allowed) */}
-
-        {/* Brand bug — top-left, only when requested */}
         {showBrandBug && (
-          <div className="absolute top-4 left-4 z-10">
-            {/* IMAGE-CONTRACT: allow raw img because legacy markup */}
+          <div className="absolute left-4 top-4 z-10">
             <img
               src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg"
               alt={PLATFORM_DEFAULTS.orgName}
@@ -110,44 +84,42 @@ export default function HeroPicture({
           </div>
         )}
 
-        {/* Micro-label — bottom-left, 2–4 words max */}
         {microLabel && (
           <div className="absolute bottom-4 left-4 z-10">
-            <span className="text-white text-xs font-semibold tracking-widest uppercase bg-black/30 backdrop-blur-sm px-2.5 py-1 rounded">
+            <span className="rounded bg-slate-950/90 px-2.5 py-1 text-xs font-semibold uppercase tracking-widest text-white">
               {microLabel}
             </span>
           </div>
         )}
       </section>
 
-      {/* BELOW-HERO CONTENT */}
       {(belowHeroHeadline || belowHeroSubheadline || ctas || trustIndicators || children) && (
         <section className="border-b border-slate-100 py-10 sm:py-14">
-          <div className="max-w-4xl mx-auto px-6">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6">
             {children ? (
               children
             ) : (
               <>
                 {belowHeroHeadline && (
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+                  <h1 className="mb-4 text-3xl font-extrabold leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
                     {belowHeroHeadline}
                   </h1>
                 )}
                 {belowHeroSubheadline && (
-                  <p className="text-slate-600 text-lg leading-relaxed mb-8 max-w-2xl">
+                  <p className="mb-8 max-w-2xl text-lg leading-relaxed text-slate-700">
                     {belowHeroSubheadline}
                   </p>
                 )}
                 {ctas && ctas.length > 0 && (
-                  <div className="flex flex-wrap gap-3 mb-6">
+                  <div className="mb-6 flex flex-col gap-3 sm:flex-row">
                     {ctas.map((cta) => (
                       <a
-                        key={cta.href}
+                        key={`${cta.href}-${cta.label}`}
                         href={cta.href}
                         className={
                           cta.variant === 'secondary'
-                            ? 'border border-slate-300 text-slate-700 font-bold px-7 py-3 rounded-lg hover:bg-slate-50 transition-colors text-sm'
-                            : 'bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-7 py-3 rounded-lg transition-colors text-sm'
+                            ? 'rounded-lg border border-slate-300 px-7 py-3.5 text-center text-sm font-bold text-slate-900 transition-colors hover:bg-slate-50'
+                            : 'rounded-lg bg-brand-red-600 px-7 py-3.5 text-center text-sm font-bold text-white transition-colors hover:bg-brand-red-700'
                         }
                       >
                         {cta.label}
@@ -156,10 +128,10 @@ export default function HeroPicture({
                   </div>
                 )}
                 {trustIndicators && trustIndicators.length > 0 && (
-                  <ul className="flex flex-wrap gap-x-6 gap-y-1.5 mt-2">
-                    {trustIndicators.map((item) => (
-                      <li key={item} className="flex items-center gap-1.5 text-slate-700 text-sm">
-                        <span className="w-1 h-1 rounded-full bg-brand-red-400 flex-shrink-0" />
+                  <ul className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+                    {Array.from(new Set(trustIndicators)).map((item) => (
+                      <li key={item} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-600" />
                         {item}
                       </li>
                     ))}
@@ -171,24 +143,21 @@ export default function HeroPicture({
         </section>
       )}
 
-      {/* TRANSCRIPT CAPTION */}
       {transcript && (
-        <div className="bg-slate-50 border-b border-slate-100">
-          <div className="max-w-4xl mx-auto px-6 py-3">
+        <div className="border-b border-slate-100 bg-slate-50">
+          <div className="mx-auto max-w-4xl px-4 py-3 sm:px-6">
             <button
-              onClick={() => setTranscriptOpen((o) => !o)}
+              type="button"
+              onClick={() => setTranscriptOpen((open) => !open)}
               aria-expanded={transcriptOpen}
               aria-controls={transcriptId}
-              className="flex items-center gap-2 rounded text-xs font-semibold text-slate-500 transition-colors hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+              className="flex min-h-11 items-center gap-2 rounded text-xs font-semibold text-slate-700 transition-colors hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
             >
               <span>{transcriptOpen ? '▲' : '▼'}</span>
               Image transcript
             </button>
             {transcriptOpen && (
-              <p
-                id={transcriptId}
-                className="mt-3 text-slate-600 text-sm leading-relaxed max-w-2xl"
-              >
+              <p id={transcriptId} className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-800">
                 {transcript}
               </p>
             )}

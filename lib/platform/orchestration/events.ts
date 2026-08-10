@@ -29,10 +29,32 @@ export const PlatformEventType = {
   WORKFLOW_TRIGGERED: 'workflow.triggered',
 } as const;
 
-export type PlatformEventTypeValue = (typeof PlatformEventType)[keyof typeof PlatformEventType];
-export type PlatformEventCategory = 'identity' | 'commerce' | 'billing' | 'entitlement' | 'provisioning' | 'application' | 'enrollment' | 'lms' | 'credential' | 'workforce' | 'testing' | 'workflow' | 'ai' | 'deployment';
+export type PlatformEventTypeValue =
+  (typeof PlatformEventType)[keyof typeof PlatformEventType];
+
+export type PlatformEventCategory =
+  | 'identity'
+  | 'commerce'
+  | 'billing'
+  | 'entitlement'
+  | 'provisioning'
+  | 'application'
+  | 'enrollment'
+  | 'lms'
+  | 'credential'
+  | 'workforce'
+  | 'testing'
+  | 'workflow'
+  | 'ai'
+  | 'deployment';
+
 export type PlatformEventSeverity = 'info' | 'warning' | 'error' | 'critical';
-export type PlatformEventProcessingStatus = 'observed' | 'pending' | 'processing' | 'processed' | 'failed';
+export type PlatformEventProcessingStatus =
+  | 'observed'
+  | 'pending'
+  | 'processing'
+  | 'processed'
+  | 'failed';
 
 export interface EmitPlatformEventInput {
   eventType: PlatformEventTypeValue | string;
@@ -52,9 +74,22 @@ export interface EmitPlatformEventInput {
   availableAt?: string | null;
 }
 
-export interface PlatformEventWriteResult { id: string | null; duplicate: boolean; }
+export interface PlatformEventWriteResult {
+  id: string | null;
+  duplicate: boolean;
+}
 
-export async function emitPlatformEvent(db: SupabaseClient, input: EmitPlatformEventInput): Promise<PlatformEventWriteResult> {
+/**
+ * Canonical durable event writer for cross-platform orchestration.
+ *
+ * Business flows should write one stable event here rather than directly
+ * triggering multiple downstream systems. Consumers can process `pending`
+ * events idempotently; telemetry-only events remain `observed`.
+ */
+export async function emitPlatformEvent(
+  db: SupabaseClient,
+  input: EmitPlatformEventInput,
+): Promise<PlatformEventWriteResult> {
   const row = {
     event_type: input.eventType,
     category: input.category,
@@ -73,29 +108,88 @@ export async function emitPlatformEvent(db: SupabaseClient, input: EmitPlatformE
     processing_status: input.dispatch === false ? 'observed' : 'pending',
     available_at: input.availableAt ?? new Date().toISOString(),
   };
-  const { data, error } = await db.from('platform_events').insert(row).select('id').maybeSingle();
-  if (!error) return { id: data?.id ?? null, duplicate: false };
+
+  const { data, error } = await db
+    .from('platform_events')
+    .insert(row)
+    .select('id')
+    .maybeSingle();
+
+  if (!error) {
+    return { id: data?.id ?? null, duplicate: false };
+  }
+
   if (error.code === '23505' && input.idempotencyKey) {
-    const { data: existing } = await db.from('platform_events').select('id').eq('idempotency_key', input.idempotencyKey).maybeSingle();
+    const { data: existing } = await db
+      .from('platform_events')
+      .select('id')
+      .eq('idempotency_key', input.idempotencyKey)
+      .maybeSingle();
     return { id: existing?.id ?? null, duplicate: true };
   }
-  logger.error('[orchestration] platform event insert failed', error, { eventType: input.eventType, category: input.category, source: input.source, correlationId: input.correlationId });
+
+  logger.error('[orchestration] platform event insert failed', error, {
+    eventType: input.eventType,
+    category: input.category,
+    source: input.source,
+    correlationId: input.correlationId,
+  });
   throw error;
 }
 
-export async function markPlatformEventProcessing(db: SupabaseClient, eventId: string): Promise<void> {
-  const { error } = await db.from('platform_events').update({ processing_status: 'processing', attempts: 1, last_error: null }).eq('id', eventId).eq('processing_status', 'pending');
+export async function markPlatformEventProcessing(
+  db: SupabaseClient,
+  eventId: string,
+): Promise<void> {
+  const { error } = await db
+    .from('platform_events')
+    .update({
+      processing_status: 'processing',
+      attempts: 1,
+      last_error: null,
+    })
+    .eq('id', eventId)
+    .eq('processing_status', 'pending');
   if (error) throw error;
 }
 
-export async function markPlatformEventProcessed(db: SupabaseClient, eventId: string): Promise<void> {
-  const { error } = await db.from('platform_events').update({ processing_status: 'processed', processed_at: new Date().toISOString(), resolved: true, last_error: null }).eq('id', eventId);
+export async function markPlatformEventProcessed(
+  db: SupabaseClient,
+  eventId: string,
+): Promise<void> {
+  const { error } = await db
+    .from('platform_events')
+    .update({
+      processing_status: 'processed',
+      processed_at: new Date().toISOString(),
+      resolved: true,
+      last_error: null,
+    })
+    .eq('id', eventId);
   if (error) throw error;
 }
 
-export async function markPlatformEventFailed(db: SupabaseClient, eventId: string, errorMessage: string, retryAt?: Date): Promise<void> {
-  const { data: current } = await db.from('platform_events').select('attempts').eq('id', eventId).maybeSingle();
+export async function markPlatformEventFailed(
+  db: SupabaseClient,
+  eventId: string,
+  errorMessage: string,
+  retryAt?: Date,
+): Promise<void> {
+  const { data: current } = await db
+    .from('platform_events')
+    .select('attempts')
+    .eq('id', eventId)
+    .maybeSingle();
+
   const attempts = Number(current?.attempts ?? 0) + 1;
-  const { error } = await db.from('platform_events').update({ processing_status: 'failed', attempts, last_error: errorMessage.slice(0, 4000), available_at: (retryAt ?? new Date(Date.now() + 5 * 60_000)).toISOString() }).eq('id', eventId);
+  const { error } = await db
+    .from('platform_events')
+    .update({
+      processing_status: 'failed',
+      attempts,
+      last_error: errorMessage.slice(0, 4000),
+      available_at: (retryAt ?? new Date(Date.now() + 5 * 60_000)).toISOString(),
+    })
+    .eq('id', eventId);
   if (error) throw error;
 }

@@ -21,18 +21,23 @@ export function AIInstructorClient({
   const [isVisible, setIsVisible] = useState(false);
   const [currentMessage, setCurrentMessage] = useState('');
   const [isMuted, setIsMuted] = useState(false);
-  const naturalVoice = useNaturalVoice();
-  const isSpeaking = naturalVoice.isPlaying || naturalVoice.isPaused || naturalVoice.isLoading;
+  const {
+    play,
+    stop,
+    isPlaying,
+    isPaused,
+    isLoading,
+    error: voiceError,
+  } = useNaturalVoice();
+  const isSpeaking = isPlaying || isPaused || isLoading;
 
   const speak = useCallback(async (text: string) => {
     const clean = text.trim();
     if (isMuted || !clean) return;
     setIsVisible(true);
     setCurrentMessage(clean);
-    await naturalVoice.play(clean, { voice: 'shimmer', style: 'instructor', rate: 1 });
-  }, [isMuted, naturalVoice]);
-
-  const stopSpeaking = () => naturalVoice.stop();
+    await play(clean, { voice: 'shimmer', style: 'instructor', rate: 1 });
+  }, [isMuted, play]);
 
   useEffect(() => {
     const handleSpeakEvent = (event: Event) => {
@@ -80,7 +85,7 @@ export function AIInstructorClient({
           <div>
             <h3 className="text-sm font-black text-slate-950">AI Instructor</h3>
             <p className="text-xs font-medium text-slate-700">
-              {naturalVoice.isLoading ? 'Preparing natural voice…' : isSpeaking ? 'Speaking…' : 'Ready to help'}
+              {isLoading ? 'Preparing natural voice…' : isSpeaking ? 'Speaking…' : 'Ready to help'}
             </p>
           </div>
           <div className="flex gap-1">
@@ -90,7 +95,7 @@ export function AIInstructorClient({
               className="h-11 w-11 p-0"
               onClick={() => {
                 setIsMuted((value) => !value);
-                stopSpeaking();
+                stop();
               }}
               aria-label={isMuted ? 'Enable natural voice' : 'Mute natural voice'}
             >
@@ -101,7 +106,7 @@ export function AIInstructorClient({
               size="sm"
               className="h-11 w-11 p-0"
               onClick={() => {
-                stopSpeaking();
+                stop();
                 setIsVisible(false);
               }}
               aria-label="Close AI Instructor"
@@ -128,11 +133,11 @@ export function AIInstructorClient({
         )}
 
         {isSpeaking && (
-          <Button variant="outline" size="sm" className="mt-3 w-full" onClick={stopSpeaking}>
+          <Button variant="outline" size="sm" className="mt-3 w-full" onClick={stop}>
             Stop Speaking
           </Button>
         )}
-        {naturalVoice.error ? <p className="mt-3 text-xs font-semibold text-red-800">Natural narration is temporarily unavailable. Written guidance remains available.</p> : null}
+        {voiceError ? <p className="mt-3 text-xs font-semibold text-red-800">Natural narration is temporarily unavailable. Written guidance remains available.</p> : null}
       </div>
     </Card>
   );

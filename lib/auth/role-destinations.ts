@@ -1,63 +1,31 @@
 /**
- * Canonical post-authentication destination by role.
+ * @deprecated Prefer resolveDashboardUrl() from '@/lib/routing/dashboard-resolver'.
  *
- * Paths are the actual pathnames on their deployed application. Admin routes
- * therefore use root paths on admin.elevateforhumanity.org and never encode a
- * synthetic /admin prefix.
+ * This compatibility module intentionally derives its values from the canonical
+ * dashboard resolver so historical imports cannot drift into a second routing
+ * table.
  */
+import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
+import { ALL_AUTHENTICATED_ROLES, type UserRole } from '@/lib/rbac/role-matrix';
 
-export type UserRole =
-  | 'student'
-  | 'instructor'
-  | 'admin'
-  | 'org_admin'
-  | 'staff'
-  | 'program_holder'
-  | 'delegate'
-  | 'partner'
-  | 'host_shop'
-  | 'host_shop_admin'
-  | 'sponsor'
-  | 'employer'
-  | 'creator'
-  | 'workforce_board'
-  | 'case_manager'
-  | 'provider_admin'
-  | 'grant_client'
-  | 'apprentice'
-  | 'test_admin'
-  | 'proctor';
-
-export const ROLE_DESTINATIONS: Record<string, string> = {
-  admin: '/dashboard',
-  org_admin: '/dashboard',
-  staff: '/staff-portal/dashboard',
-  instructor: '/instructor/dashboard',
-
-  creator: '/creator/products',
-  case_manager: '/case-manager/dashboard',
-  workforce_board: '/workforce-board/dashboard',
-  program_holder: '/program-holder/dashboard',
-  provider_admin: '/provider/dashboard',
-
-  sponsor: '/employer/dashboard',
-  employer: '/employer/dashboard',
-
-  partner: '/host-shop/dashboard',
-  host_shop: '/host-shop/dashboard',
-  host_shop_admin: '/host-shop/dashboard',
-
-  student: '/lms/dashboard',
-  delegate: '/lms/dashboard',
-  grant_client: '/lms/dashboard',
-
-  apprentice: '/apprentice',
-
-  test_admin: '/testing-center',
-  proctor: '/testing-center',
-};
-
-export function getRoleDestination(role: string | null | undefined): string {
-  if (!role) return '/lms/dashboard';
-  return ROLE_DESTINATIONS[role] ?? '/lms/dashboard';
+function pathnameForRole(role: string): string {
+  const resolved = resolveDashboardUrl(role);
+  try {
+    return new URL(resolved).pathname || '/lms/dashboard';
+  } catch {
+    return resolved.startsWith('/') ? resolved : '/lms/dashboard';
+  }
 }
+
+/** @deprecated Compatibility export; values are generated from dashboard-resolver.ts. */
+export const ROLE_DESTINATIONS: Record<string, string> = Object.fromEntries(
+  ALL_AUTHENTICATED_ROLES.map((role) => [role, pathnameForRole(role)]),
+);
+
+/** @deprecated Use resolveDashboardUrl() when a cross-domain URL is required. */
+export function getRoleDestination(role: UserRole | string | null | undefined): string {
+  if (!role) return '/lms/dashboard';
+  return pathnameForRole(role);
+}
+
+export type { UserRole };

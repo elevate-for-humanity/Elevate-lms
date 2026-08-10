@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient as getAdminDb } from '@/lib/supabase/admin';
 import { AdminAction, logAdminAudit } from '@/lib/admin/audit-log';
+import { getAdminUrl } from '@/lib/utils/siteUrl';
 
 async function requireAdminClient() {
   const supabase = await createClient();

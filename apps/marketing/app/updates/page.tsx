@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import {
   Calendar,
@@ -36,7 +35,7 @@ const updates = [
     title: 'New Employer Partnership Program',
     description:
       'Introducing employer-sponsored training with post-hire reimbursement. Companies can now sponsor student tuition with flexible payment terms.',
-    href: '/employer/dashboard',
+    href: 'https://app.elevateforhumanity.org/employer/dashboard',
     category: 'Partnerships',
     icon: Building2,
   },
@@ -78,21 +77,12 @@ const updates = [
   },
 ];
 
-export default async function UpdatesPage() {
-  const supabase = await createClient();
-
-  // Fetch updates
-  const { data: dbUpdates } = await supabase
-    .from('updates')
-    .select('*')
-    .order('date', { ascending: false });
-
+export default function UpdatesPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: 'Updates' }]} />
       </div>
-      {/* Header */}
       <div className="bg-white border-b">
         <div className="max-w-5xl mx-auto px-6 py-12">
           <div className="flex items-center gap-3 mb-4">
@@ -110,7 +100,6 @@ export default async function UpdatesPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Subscribe Banner */}
         <div className="bg-brand-blue-700 rounded-xl p-6 mb-8 text-white">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
@@ -131,7 +120,6 @@ export default async function UpdatesPage() {
           </div>
         </div>
 
-        {/* Updates List */}
         <div className="space-y-4">
           {updates.map((update, index) => (
             <Link
@@ -161,7 +149,6 @@ export default async function UpdatesPage() {
           ))}
         </div>
 
-        {/* Archive Link */}
         <div className="mt-12 text-center">
           <p className="text-slate-700 mb-4">Looking for older announcements?</p>
           <Link

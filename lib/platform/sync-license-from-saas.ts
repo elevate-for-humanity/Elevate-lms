@@ -22,9 +22,7 @@ export async function syncLicenseFromSaasEntitlements(
 ): Promise<void> {
   const active = opts.active !== false;
   const tier = licenseTierForPlan(opts.planSlug, opts.billingInterval);
-  const features = active
-    ? entitlements.features.map((f) => (f === 'bookings' ? 'booking' : f))
-    : [];
+  const features = active ? [...entitlements.features] : [];
 
   const payload = {
     tier,

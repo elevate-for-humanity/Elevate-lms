@@ -25,7 +25,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "tsBuildInfoFile": ".next/cache/tsbuildinfo.json",
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {

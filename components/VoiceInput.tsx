@@ -42,12 +42,12 @@ export function VoiceInput({ onCommand, className = '' }: VoiceInputProps) {
   const [isSupported, setIsSupported] = useState(false);
   const recognitionRef = useRef<any>(null);
   const router = useRouter();
-  const naturalVoice = useNaturalVoice();
-  const isSpeaking = naturalVoice.isPlaying || naturalVoice.isLoading;
+  const { play, stop, isPlaying, isLoading, error: voiceError } = useNaturalVoice();
+  const isSpeaking = isPlaying || isLoading;
 
   const speak = useCallback((text: string) => {
-    void naturalVoice.play(text, { voice: 'coral', style: 'assistant', rate: 1 });
-  }, [naturalVoice]);
+    void play(text, { voice: 'coral', style: 'assistant', rate: 1 });
+  }, [play]);
 
   const processCommand = useCallback((command: string) => {
     const lowerCommand = command.toLowerCase().trim();
@@ -118,7 +118,7 @@ export function VoiceInput({ onCommand, className = '' }: VoiceInputProps) {
       return;
     }
 
-    naturalVoice.stop();
+    stop();
     setTranscript('');
     try {
       recognitionRef.current?.start();
@@ -151,7 +151,7 @@ export function VoiceInput({ onCommand, className = '' }: VoiceInputProps) {
       </button>
       {transcript ? <div className="max-w-xs text-center text-xs font-medium text-slate-950">“{transcript}”</div> : null}
       {isListening ? <div className="text-xs font-semibold text-slate-700">Listening...</div> : null}
-      {naturalVoice.error ? <div className="max-w-xs text-center text-xs font-semibold text-red-800">Natural voice is temporarily unavailable.</div> : null}
+      {voiceError ? <div className="max-w-xs text-center text-xs font-semibold text-red-800">Natural voice is temporarily unavailable.</div> : null}
     </div>
   );
 }

@@ -6,6 +6,8 @@
  * synthetic /admin prefix.
  */
 
+import { ADMIN_HOST, LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
+
 export type UserRole =
   | 'student'
   | 'instructor'
@@ -57,7 +59,46 @@ export const ROLE_DESTINATIONS: Record<string, string> = {
   proctor: '/testing-center',
 };
 
+const ADMIN_HOST_ROLES = new Set([
+  'admin',
+  'org_admin',
+  'staff',
+  'instructor',
+  'test_admin',
+  'proctor',
+]);
+
+const LMS_HOST_ROLES = new Set([
+  'student',
+  'delegate',
+  'grant_client',
+  'apprentice',
+  'sponsor',
+  'employer',
+  'partner',
+  'host_shop',
+  'host_shop_admin',
+]);
+
 export function getRoleDestination(role: string | null | undefined): string {
   if (!role) return '/lms/dashboard';
   return ROLE_DESTINATIONS[role] ?? '/lms/dashboard';
+}
+
+/**
+ * Full cross-application destination for login/global navigation.
+ * Use this when the caller may be running on a different Elevate subdomain.
+ */
+export function getRoleDestinationUrl(role: string | null | undefined): string {
+  const normalizedRole = role ?? 'student';
+  const path = getRoleDestination(normalizedRole);
+
+  if (ADMIN_HOST_ROLES.has(normalizedRole)) return `${ADMIN_HOST}${path}`;
+  if (LMS_HOST_ROLES.has(normalizedRole)) return `${LMS_HOST}${path}`;
+
+  // Workforce-board, case-manager, provider, program-holder, and creator
+  // currently live in the Marketing application by design.
+  if (normalizedRole in ROLE_DESTINATIONS) return `${MARKETING_HOST}${path}`;
+
+  return `${LMS_HOST}/lms/dashboard`;
 }

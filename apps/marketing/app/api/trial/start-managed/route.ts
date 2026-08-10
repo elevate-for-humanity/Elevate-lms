@@ -163,7 +163,10 @@ async function _POST(request: NextRequest) {
         }, { onConflict: 'id' }).then(() => undefined, () => undefined);
       }
     } catch (authErr) {
-      logger.warn('[trial] magic-link generation failed; using login page fallback', authErr as Error, { reference });
+      logger.warn('[trial] magic-link generation failed; using login page fallback', {
+        reference,
+        error: authErr instanceof Error ? authErr.message : String(authErr),
+      });
     }
 
     await db.from('license_events').insert({
@@ -175,7 +178,10 @@ async function _POST(request: NextRequest) {
     try {
       await sendWelcome({ email, orgName: organization.name || orgName, loginUrl, publicPreviewUrl, trialEndsAt, reference });
     } catch (mailErr) {
-      logger.warn('[trial] welcome email failed', mailErr as Error, { reference });
+      logger.warn('[trial] welcome email failed', {
+        reference,
+        error: mailErr instanceof Error ? mailErr.message : String(mailErr),
+      });
     }
 
     return NextResponse.json({

@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
+  STAFF_ROLES,
   TESTING_CENTER_ROLES,
   hasAnyRole,
   normalizeRoles,
@@ -12,11 +13,10 @@ import {
 /**
  * Admin middleware.
  *
- * Every non-public route on admin.elevateforhumanity.org is private. Supabase
- * refresh cookies are copied to every response, including redirects, so a
- * successful middleware refresh cannot be lost and retried by parallel
- * requests. Production auth cookies are always written on the shared parent
- * domain so Admin and LMS do not create competing host-only refresh tokens.
+ * Every non-public route on admin.elevateforhumanity.org is private. Role
+ * authorization is route-scoped: testing/proctor users cannot browse general
+ * Admin pages simply because their portal happens to live on the Admin host.
+ * Production auth cookies are shared across .elevateforhumanity.org.
  */
 
 const PUBLIC_PATHS = [
@@ -28,10 +28,6 @@ const PUBLIC_PATHS = [
   '/auth/reset-password',
   '/admin/install',
 ];
-
-const ADMIN_APP_ROLES = Array.from(
-  new Set([...ADMIN_ROLES, ...INSTRUCTOR_ROLES, ...TESTING_CENTER_ROLES]),
-);
 
 type PendingCookie = {
   name: string;
@@ -46,6 +42,38 @@ function isPublicPath(pathname: string): boolean {
     pathname.startsWith('/favicon') ||
     /[a-z0-9]+\.[a-z]+$/i.test(pathname)
   );
+}
+
+function allowedRolesForAdminPath(pathname: string): readonly string[] {
+  if (
+    pathname === '/testing-center' ||
+    pathname.startsWith('/testing-center/') ||
+    pathname === '/proctor' ||
+    pathname.startsWith('/proctor/') ||
+    pathname.startsWith('/api/testing') ||
+    pathname.startsWith('/api/proctor') ||
+    pathname.startsWith('/api/admin/testing')
+  ) {
+    return TESTING_CENTER_ROLES;
+  }
+
+  if (
+    pathname === '/instructor' ||
+    pathname.startsWith('/instructor/') ||
+    pathname.startsWith('/api/instructor')
+  ) {
+    return INSTRUCTOR_ROLES;
+  }
+
+  if (
+    pathname === '/staff-portal' ||
+    pathname.startsWith('/staff-portal/') ||
+    pathname.startsWith('/api/staff')
+  ) {
+    return STAFF_ROLES;
+  }
+
+  return ADMIN_ROLES;
 }
 
 function platformCookieOptions(options: Record<string, unknown> | undefined) {
@@ -127,8 +155,9 @@ export async function middleware(req: NextRequest) {
     .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
     .filter((role): role is string => typeof role === 'string');
   const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
+  const routeRoles = allowedRolesForAdminPath(pathname);
 
-  if (!hasAnyRole(effectiveRoles, ADMIN_APP_ROLES, { adminOverride: true })) {
+  if (!hasAnyRole(effectiveRoles, routeRoles, { adminOverride: true })) {
     return withCookies(NextResponse.redirect(new URL('/unauthorized', req.url)));
   }
 

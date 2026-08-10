@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '0 6 * * *' # daily at 06:00 UTC
+    - cron: '0 6 * * *'
 
 concurrency:
   group: integrity-${{ github.ref }}
@@ -74,9 +74,9 @@ jobs:
       - name: No legacy studio shell wiring
         run: node scripts/verify-no-studio-shell.mjs
 
-      # This is the authoritative database contract check. It must use the
-      # live Supabase OpenAPI schema; migration files are not accepted as proof
-      # that a table/column exists in production.
+      - name: Program registry source-of-truth check
+        run: pnpm tsx scripts/check-program-registry-integrity.ts
+
       - name: Live Supabase schema contract
         run: pnpm tsx scripts/audit-schema-drift.ts --fail-on-drift --require-live
         env:

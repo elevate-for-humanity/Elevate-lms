@@ -89,7 +89,7 @@ export const STATIC_PROGRAM_MAP: ReadonlyMap<string, ProgramSchema> = new Map(
   STATIC_PROGRAMS.map((program) => [program.slug, program]),
 );
 
-const VERIFIED_RAPIDS_SLUGS = new Set(
+const VERIFIED_RAPIDS_SLUGS = new Set<string>(
   Object.values(RAPIDS_CONFIG.programs).map((program) => program.slug),
 );
 
@@ -118,17 +118,6 @@ function publicTitle(program: ProgramSchema): string {
   return program.title.replace(/\s*Apprenticeship\b/gi, ' Training Pathway').replace(/\s+/g, ' ').trim();
 }
 
-/**
- * Public-safe ProgramSchema.
- *
- * Funding source of truth:
- * - WIOA/WRG labels only when the explicit verified funding registry says yes.
- *
- * Registered-apprenticeship source of truth:
- * - Federal/RAPIDS language only for slugs present in RAPIDS_CONFIG.
- * - Old files and DB rows may contain stale apprenticeship flags; those claims
- *   are normalized before they reach a public page.
- */
 export function normalizePublicProgram(program: ProgramSchema): ProgramSchema {
   const verifiedFunding = getVerifiedProgramFunding(program.slug);
   const workforceFunded = isStrictWorkforceFundedProgram(program.slug);

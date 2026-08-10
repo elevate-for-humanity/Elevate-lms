@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play, Scissors } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Pause, Play } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
 
@@ -79,10 +79,9 @@ export default function HostShopShowcase() {
                   className={image.kind === 'flyer' ? 'object-contain bg-white p-4' : 'object-cover'}
                 />
               ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-black px-8 text-center">
-                  <Scissors className="h-14 w-14 text-red-300" aria-hidden="true" />
-                  <p className="mt-5 text-3xl font-black">{shop.dba ?? shop.name}</p>
-                  <p className="mt-2 text-slate-300">{shop.city}, {shop.state}</p>
+                <div className="absolute inset-0 flex flex-col justify-end bg-[radial-gradient(circle_at_top_left,rgba(185,28,28,0.32),transparent_42%),linear-gradient(145deg,#1e293b,#020617)] px-8 py-10 sm:px-12 sm:py-12">
+                  <p className="max-w-xl text-4xl font-black tracking-tight sm:text-5xl">{shop.dba ?? shop.name}</p>
+                  <p className="mt-3 text-lg font-semibold text-slate-300">Local business • {shop.city}, {shop.state}</p>
                 </div>
               )}
             </div>

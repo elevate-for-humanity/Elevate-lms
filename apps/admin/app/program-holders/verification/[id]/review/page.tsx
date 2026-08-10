@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   description: 'Review and verify program holder application',
 };
 
-export default async function ReviewVerificationPage({ params }: { params: { id: string } }) {
+type Params = Promise<{ id: string }>;
+
+export default async function ReviewVerificationPage({ params }: { params: Params }) {
+  const { id } = await params;
   const { user, profile } = await requireRole(['admin']);
   const supabase = await requireAdminClient();
 
@@ -19,7 +22,7 @@ export default async function ReviewVerificationPage({ params }: { params: { id:
   const { data: rawHolder } = await supabase
     .from('program_holders')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .maybeSingle();
 
   if (!rawHolder) {

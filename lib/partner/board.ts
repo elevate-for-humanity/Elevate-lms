@@ -34,6 +34,30 @@ type PartnerRecord = {
   state?: string | null;
 };
 
+type HourRow = {
+  user_id: string | null;
+  host_shop_id: string | null;
+  program_slug: string | null;
+  status: string | null;
+  approval_status: string | null;
+  accepted_hours: number | string | null;
+  hours: number | string | null;
+  hours_claimed: number | string | null;
+};
+
+function numericHours(value: number | string | null | undefined) {
+  const parsed = Number(value ?? 0);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function isApproved(row: HourRow) {
+  return row.approval_status === 'approved' || row.status === 'approved';
+}
+
+function isPending(row: HourRow) {
+  return row.approval_status === 'pending' || row.status === 'pending';
+}
+
 export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
 
@@ -50,15 +74,33 @@ export async function getHostShopBoard(userId: string) {
 
   const partner = partnerLink.partners as unknown as PartnerRecord;
 
-  const { data: shopLinks } = await db
-    .from('shop_staff')
-    .select('shop_id, shops(id, name, city, state, active)')
-    .eq('user_id', userId);
+  const [{ data: partnerShops, error: partnerShopError }, { data: staffLinks, error: staffError }] =
+    await Promise.all([
+      db
+        .from('shops')
+        .select('id, name, city, state, active, partner_id')
+        .eq('partner_id', partner.id)
+        .neq('active', false),
+      db
+        .from('shop_staff')
+        .select('shop_id, shops(id, name, city, state, active, partner_id)')
+        .eq('user_id', userId),
+    ]);
 
-  const shops = (shopLinks || [])
-    .map((row: any) => row.shops)
-    .filter((shop: any) => Boolean(shop?.id) && shop.active !== false);
-  const shopIds = shops.map((shop: any) => shop.id);
+  if (partnerShopError) throw new Error(`HOST_SHOP_SHOPS_QUERY_FAILED:${partnerShopError.message}`);
+  if (staffError) throw new Error(`HOST_SHOP_STAFF_QUERY_FAILED:${staffError.message}`);
+
+  const shopMap = new Map<string, any>();
+  for (const shop of partnerShops || []) {
+    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+  }
+  for (const row of staffLinks || []) {
+    const shop = (row as any).shops;
+    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+  }
+
+  const shops = Array.from(shopMap.values());
+  const shopIds = shops.map((shop) => shop.id as string);
 
   const { data: placements, error: placementsError } = shopIds.length
     ? await db
@@ -68,13 +110,12 @@ export async function getHostShopBoard(userId: string) {
         .eq('status', 'active')
     : { data: [], error: null };
 
-  if (placementsError) {
-    throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
-  }
+  if (placementsError) throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
 
   const apprentices = (placements || []).map((placement: any) => ({
     id: placement.id,
     student_id: placement.student_id,
+    shop_id: placement.shop_id,
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
     program_slug: placement.program_slug || null,
@@ -82,52 +123,47 @@ export async function getHostShopBoard(userId: string) {
     start_date: placement.start_date,
   }));
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
-
-  const programByStudent = new Map(
-    apprentices.map((apprentice) => [apprentice.student_id, apprentice.program_slug]),
+  const placementByStudent = new Map(
+    apprentices.map((apprentice) => [
+      apprentice.student_id,
+      { shopId: apprentice.shop_id, programSlug: apprentice.program_slug },
+    ]),
   );
 
   const ojtProgress: Record<string, { completed: number; required: number }> = {};
-  if (studentIds.length) {
-    const { data: approvedHours, error: approvedHoursError } = await db
-      .from('hour_entries')
-      .select('user_id, program_slug, accepted_hours, hours, hours_claimed')
-      .in('user_id', studentIds)
-      .eq('status', 'approved');
+  let pendingHoursCount = 0;
 
-    if (approvedHoursError) {
-      throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${approvedHoursError.message}`);
-    }
+  if (studentIds.length) {
+    const { data: hourRows, error: hourError } = await db
+      .from('hour_entries')
+      .select('user_id, host_shop_id, program_slug, status, approval_status, accepted_hours, hours, hours_claimed')
+      .in('user_id', studentIds);
+
+    if (hourError) throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${hourError.message}`);
 
     for (const studentId of studentIds) {
-      const programSlug = programByStudent.get(studentId) || '';
-      const target = TRADE_TARGETS[programSlug]?.hours ?? 2000;
+      const placement = placementByStudent.get(studentId);
+      const target = TRADE_TARGETS[placement?.programSlug || '']?.hours ?? 2000;
       ojtProgress[studentId] = { completed: 0, required: target };
     }
 
-    for (const row of approvedHours || []) {
+    for (const row of (hourRows || []) as HourRow[]) {
       if (!row.user_id || !ojtProgress[row.user_id]) continue;
-      const expectedProgram = programByStudent.get(row.user_id);
-      if (expectedProgram && row.program_slug && row.program_slug !== expectedProgram) continue;
+      const placement = placementByStudent.get(row.user_id);
+      if (!placement) continue;
+      if (row.host_shop_id && row.host_shop_id !== placement.shopId) continue;
+      if (placement.programSlug && row.program_slug && row.program_slug !== placement.programSlug) continue;
 
-      const accepted = Number(row.accepted_hours ?? row.hours ?? row.hours_claimed ?? 0);
-      if (Number.isFinite(accepted) && accepted > 0) {
-        ojtProgress[row.user_id].completed += accepted;
-      }
+      if (isPending(row)) pendingHoursCount += 1;
+      if (!isApproved(row)) continue;
+
+      const accepted =
+        numericHours(row.accepted_hours) || numericHours(row.hours) || numericHours(row.hours_claimed);
+      ojtProgress[row.user_id].completed += accepted;
     }
   }
 
-  let pendingHoursCount = 0;
-  if (studentIds.length) {
-    const { count } = await db
-      .from('hour_entries')
-      .select('id', { count: 'exact', head: true })
-      .in('user_id', studentIds)
-      .eq('status', 'pending');
-    pendingHoursCount = count || 0;
-  }
-
-  const programType = resolveHostShopProgram(partner ?? { partner_type: apprentices[0]?.program_slug });
+  const programType = resolveHostShopProgram(partner);
   const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
@@ -155,9 +191,7 @@ export async function getHostShopBoard(userId: string) {
     .eq('partner_id', partner.id)
     .order('uploaded_at', { ascending: false });
 
-  if (uploadedDocsError) {
-    throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
-  }
+  if (uploadedDocsError) throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
 
   const latestDocs = new Map<string, any>();
   for (const doc of uploadedDocs || []) {

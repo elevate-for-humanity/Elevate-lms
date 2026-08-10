@@ -62,9 +62,6 @@ function isPendingHour(row: HourEntryRow): boolean {
 }
 
 function isEntryForAssignedShop(row: HourEntryRow, shopIds: string[]): boolean {
-  // Legacy hour entries may not yet carry host_shop_id. They are still safe to
-  // include because the query is already restricted to apprentices assigned to
-  // this authenticated host shop. When host_shop_id is present, require a match.
   return !row.host_shop_id || shopIds.includes(row.host_shop_id);
 }
 
@@ -72,7 +69,7 @@ export async function getHostShopBoard(userId: string) {
   const db = await requireAdminClient();
 
   // Tenant boundary: an active partner_users link is mandatory. Never fall
-  // back to profile.role when loading host-shop data with the service client.
+  // back to profile.role when loading tenant data with the service client.
   const { data: partnerLink, error: partnerLinkError } = await db
     .from('partner_users')
     .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
@@ -86,24 +83,49 @@ export async function getHostShopBoard(userId: string) {
 
   const partner = partnerLink.partners as unknown as PartnerRecord;
 
-  // Only shop assignments belonging to this authenticated user are eligible.
-  const { data: shopLinks } = await db
-    .from('shop_staff')
-    .select('shop_id, shops(id, name, city, state, active)')
-    .eq('user_id', userId);
+  // Canonical relationship: shops.partner_id → partners.id. shop_staff remains
+  // a compatibility source for assistants/supervisors explicitly assigned to a
+  // shop. Merge both and dedupe by shop id.
+  const [{ data: partnerShops, error: partnerShopError }, { data: shopLinks }] = await Promise.all([
+    db
+      .from('shops')
+      .select('id, name, city, state, active, partner_id')
+      .eq('partner_id', partner.id)
+      .neq('active', false),
+    db
+      .from('shop_staff')
+      .select('shop_id, shops(id, name, city, state, active, partner_id)')
+      .eq('user_id', userId)
+      .neq('active', false),
+  ]);
 
-  const shops = (shopLinks || [])
-    .map((row: any) => row.shops)
-    .filter((shop: any) => Boolean(shop?.id) && shop.active !== false);
+  if (partnerShopError) {
+    throw new Error(`HOST_SHOP_SHOPS_LOAD_FAILED:${partnerShopError.message}`);
+  }
+
+  const shopMap = new Map<string, any>();
+  for (const shop of partnerShops || []) {
+    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+  }
+  for (const row of shopLinks || []) {
+    const shop = (row as any).shops;
+    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+  }
+
+  const shops = Array.from(shopMap.values());
   const shopIds = shops.map((shop: any) => shop.id);
 
-  const { data: placements } = shopIds.length
+  const { data: placements, error: placementError } = shopIds.length
     ? await db
         .from('apprentice_placements')
         .select('id, student_id, shop_id, discipline, program_slug, status, start_date, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
-    : { data: [] };
+    : { data: [], error: null };
+
+  if (placementError) {
+    throw new Error(`HOST_SHOP_PLACEMENTS_LOAD_FAILED:${placementError.message}`);
+  }
 
   const apprentices = (placements || []).map((placement: any) => ({
     id: placement.id,
@@ -117,8 +139,7 @@ export async function getHostShopBoard(userId: string) {
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
 
   // Canonical OJT source: hour_entries. ojt_placements is an optional legacy
-  // projection and is not authoritative; production may legitimately have no
-  // rows there while approved hours exist.
+  // projection and is not authoritative.
   const ojtCompletedByUser: Record<string, number> = {};
   let pendingHoursCount = 0;
 
@@ -152,7 +173,9 @@ export async function getHostShopBoard(userId: string) {
 
   const programIds = Array.from(new Set([
     programType,
-    ...(programAccess || []).map((row: { program_id?: string }) => row.program_id).filter((value): value is string => Boolean(value)),
+    ...(programAccess || [])
+      .map((row: { program_id?: string }) => row.program_id)
+      .filter((value): value is string => Boolean(value)),
   ]));
 
   const { data: dbRequirements } = await db
@@ -183,7 +206,9 @@ export async function getHostShopBoard(userId: string) {
     };
   });
   const missingDocuments = documentStatuses.filter(
-    (document: any) => document.is_required && (!document.uploaded || ['missing', 'rejected', 'expired'].includes(document.status)),
+    (document: any) =>
+      document.is_required &&
+      (!document.uploaded || ['missing', 'rejected', 'expired'].includes(document.status)),
   );
   const pendingDocuments = documentStatuses.filter(
     (document: any) => document.is_required && document.status === 'pending',
@@ -191,7 +216,9 @@ export async function getHostShopBoard(userId: string) {
   const acceptedDocumentCount = documentStatuses.filter(
     (document: any) => document.is_required && document.status === 'accepted',
   ).length;
-  const requiredDocumentCount = documentStatuses.filter((document: any) => document.is_required).length;
+  const requiredDocumentCount = documentStatuses.filter(
+    (document: any) => document.is_required,
+  ).length;
 
   return {
     partner,
@@ -213,7 +240,8 @@ export async function getHostShopBoard(userId: string) {
       return {
         ...apprentice,
         ojt: {
-          completed: Math.round((ojtCompletedByUser[apprentice.student_id] || 0) * 100) / 100,
+          completed:
+            Math.round((ojtCompletedByUser[apprentice.student_id] || 0) * 100) / 100,
           required: apprenticeTrade.hours,
         },
       };

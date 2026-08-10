@@ -3,8 +3,8 @@
 import HeroVideo from '@/components/marketing/HeroVideo';
 
 /**
- * PageVideoHero — wrapper providing backwards-compatible props for heroMedia.ts config.
- * Maps legacy `size` prop to HeroVideo's below-hero content.
+ * PageVideoHero — wrapper providing backwards-compatible props for heroMedia config.
+ * Every size maps to an explicit media-frame height; wrapper max-height hacks are prohibited.
  */
 
 export type HeroSize = 'primary' | 'marketing' | 'compact' | 'full';
@@ -19,10 +19,17 @@ export interface PageVideoHeroProps {
   children?: React.ReactNode;
 }
 
+const HEIGHT_BY_SIZE: Record<HeroSize, string> = {
+  compact: 'h-[30vh] min-h-[220px] max-h-[360px]',
+  marketing: 'h-[38vh] min-h-[260px] max-h-[520px]',
+  primary: 'h-[42vh] min-h-[280px] max-h-[560px]',
+  full: 'h-[46vh] min-h-[300px] max-h-[600px]',
+};
+
 export default function PageVideoHero({
   videoSrc,
   posterSrc,
-  posterAlt,
+  posterAlt: _posterAlt,
   size = 'marketing',
   headline,
   subheadline,
@@ -34,7 +41,7 @@ export default function PageVideoHero({
       posterImage={posterSrc}
       belowHeroHeadline={headline}
       belowHeroSubheadline={subheadline}
-      className={size === 'compact' ? 'max-h-96' : ''}
+      heightClassName={HEIGHT_BY_SIZE[size]}
     >
       {children}
     </HeroVideo>

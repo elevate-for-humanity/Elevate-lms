@@ -2,19 +2,18 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  HelpCircle, 
-  CheckCircle, 
-  Users, 
-  DollarSign, 
-  Clock, 
-  Briefcase, 
+import {
+  HelpCircle,
+  Users,
+  DollarSign,
+  Clock,
+  Briefcase,
   GraduationCap,
   Heart,
   Shield,
   ArrowRight,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useScrollAnimation } from '@/hooks/useAnimatedCounter';
 
@@ -31,102 +30,97 @@ interface Question {
 }
 
 const QUESTIONS: Question[] = [
-  // About
   {
     id: 'what-is',
-    icon: <HelpCircle className="w-5 h-5" />,
+    icon: <HelpCircle className="h-5 w-5" aria-hidden="true" />,
     question: 'What is Elevate for Humanity?',
-    answer: 'Elevate for Humanity is a workforce development organization that guides people from unemployment to employment. We partner with government agencies, employers, and training providers to offer paid apprenticeships, funded training, and career pathways in healthcare, skilled trades, beauty, and logistics. Our mission is to help individuals transform their lives through career education.',
+    answer:
+      'Elevate for Humanity is a career and technical education and workforce-development organization. The public site explains training programs, registered-apprenticeship pathways, testing options, career services, and funding pathways. Program, approval, credential, and funding details are published separately so applicants can verify what applies to the program they select.',
     category: 'about',
   },
   {
     id: 'who-is-for',
-    icon: <Users className="w-5 h-5" />,
-    question: 'Who is Elevate for?',
-    answer: 'Elevate serves anyone seeking to start or advance a career. Whether you are unemployed, underemployed, a career changer, a veteran, a person with a disability, or someone looking to gain new skills, we have programs and funding options designed to help you succeed. Our programs are available throughout Indiana.',
+    icon: <Users className="h-5 w-5" aria-hidden="true" />,
+    question: 'Who can apply?',
+    answer:
+      'Adults and other eligible learners may apply to the programs for which they meet the stated admission requirements. Eligibility, age requirements, licensing requirements, funding rules, and available locations vary by program. The application and program pages control rather than a general website statement.',
     category: 'about',
   },
-  
-  // Trust
   {
     id: 'why-trust',
-    icon: <Shield className="w-5 h-5" />,
-    question: 'Why should I trust Elevate?',
-    answer: 'Elevate is a DOL-registered apprenticeship sponsor, WIOA-approved training provider, and WorkOne partner. Our 98% license exam pass rate and partnerships with 40+ employers demonstrate our commitment to your success. We provide hands-on training with job placement support.',
+    icon: <Shield className="h-5 w-5" aria-hidden="true" />,
+    question: 'How can I verify Elevate’s claims?',
+    answer:
+      'Use the Approvals, Funding, Testing, and individual program pages. Apprenticeship status, training-list eligibility, credential preparation, host-site relationships, and funding are program-specific. Elevate does not treat a logo, a general provider relationship, or an unsupported outcome percentage as proof that every program has the same approval or result.',
     category: 'trust',
   },
-  
-  // Programs
   {
     id: 'what-programs',
-    icon: <GraduationCap className="w-5 h-5" />,
+    icon: <GraduationCap className="h-5 w-5" aria-hidden="true" />,
     question: 'What programs are available?',
-    answer: 'We offer programs in: Barbering (with apprenticeship), HVAC/R Technician, CNA with Medication Aide, CDL Training, and Medical Billing. Each program includes classroom instruction, hands-on training, and job placement support. Programs range from 8 weeks to 18 months depending on the career path.',
+    answer:
+      'Current offerings are listed in the Program Directory and include pathways in healthcare, skilled trades, transportation, business, technology, barbering, and beauty. Availability changes, so use the program directory rather than an older static list when choosing a course.',
     category: 'programs',
   },
   {
     id: 'how-long',
-    icon: <Clock className="w-5 h-5" />,
+    icon: <Clock className="h-5 w-5" aria-hidden="true" />,
     question: 'How long does training take?',
-    answer: 'Program lengths vary by career path. CDL training takes 8-12 weeks. CNA programs are 4-8 months. HVAC technician training is 10-14 months. Barbering with apprenticeship is 12-18 months. Most programs offer flexible scheduling to accommodate work and family commitments.',
+    answer:
+      'Program length depends on required instructional hours, apprenticeship or clinical requirements, delivery schedule, transfer-credit decisions, and the credential or license pathway. The duration shown on the individual program page is the applicable estimate for that program.',
     category: 'programs',
   },
-  
-  // Funding
   {
     id: 'how-much',
-    icon: <DollarSign className="w-5 h-5" />,
+    icon: <DollarSign className="h-5 w-5" aria-hidden="true" />,
     question: 'How much does it cost?',
-    answer: 'Most students pay $0 to $500 out of pocket. Through WIOA funding, Vocational Rehabilitation, and Pell Grants, up to 100% of tuition may be covered. We also offer 0% interest payment plans starting at $29/month. Your funding coordinator will help you explore all options.',
+    answer:
+      'Tuition and required fees vary by program. Some eligible participants may receive workforce or vocational-rehabilitation funding, while other programs are self-pay or use an approved payment arrangement. Funding is never guaranteed by a website label; the responsible agency determines participant eligibility and the amount authorized.',
     category: 'funding',
   },
   {
     id: 'can-funding',
-    icon: <DollarSign className="w-5 h-5" />,
+    icon: <DollarSign className="h-5 w-5" aria-hidden="true" />,
     question: 'Can I get funding for training?',
-    answer: 'Yes! 85% of our students receive some form of funding. WIOA funding may cover up to 100% based on eligibility. Vocational Rehabilitation provides individualized support. Pell Grants are available for those who qualify. Employer sponsorships are also available in some programs. Complete our eligibility check to see what you qualify for.',
+    answer:
+      'Possibly. WIOA, state workforce programs, vocational rehabilitation, employer sponsorship, or other assistance may apply depending on the participant, program, location, available funds, and agency rules. Complete the preliminary eligibility process and obtain written authorization from the responsible funder before relying on funding.',
     category: 'funding',
   },
-  
-  // Outcomes
   {
     id: 'what-careers',
-    icon: <Briefcase className="w-5 h-5" />,
+    icon: <Briefcase className="h-5 w-5" aria-hidden="true" />,
     question: 'What career opportunities exist?',
-    answer: 'Our graduates work as licensed barbers, HVAC technicians, certified nursing assistants, CDL drivers, and medical billing specialists. Starting salaries range from $30,000-$50,000 annually, with experienced professionals earning $60,000-$90,000+. 85% of graduates find employment within 6 months of completing their program.',
+    answer:
+      'Each program is tied to a specific occupational pathway and credential or licensing objective where applicable. Job titles, openings, wages, and licensing rules vary by occupation and location. Review the individual program page and current labor-market information for the occupation you are considering.',
     category: 'outcomes',
   },
   {
     id: 'what-earn',
-    icon: <DollarSign className="w-5 h-5" />,
+    icon: <DollarSign className="h-5 w-5" aria-hidden="true" />,
     question: 'What will I earn after graduation?',
-    answer: 'Graduate salaries vary by field and experience. Entry-level barbers earn $35,000-$45,000. HVAC technicians start at $42,000-$55,000. CNAs earn $30,000-$38,000. CDL drivers earn $50,000-$72,000. With experience, you can earn significantly more—senior barbers and shop owners can earn $75,000+ annually.',
+    answer:
+      'Elevate does not guarantee a wage. Earnings depend on occupation, geography, employer, experience, schedule, licensing status, and market conditions. When wage information is shown on a program page, treat it as labor-market information rather than a promise of an individual outcome.',
     category: 'outcomes',
   },
   {
     id: 'can-job',
-    icon: <Heart className="w-5 h-5" />,
+    icon: <Heart className="h-5 w-5" aria-hidden="true" />,
     question: 'Will you help me get a job?',
-    answer: 'Yes! Job placement is built into every program. Our employer partnerships mean most graduates have job offers before or shortly after completing their credentials. We assist with resume writing, interview preparation, and job searches. Many employers actively recruit from our programs.',
+    answer:
+      'Career-support services can include resume preparation, interview practice, employer referrals, and job-search assistance when those services are part of the learner’s program. Employment is not guaranteed, and hiring decisions remain with employers.',
     category: 'outcomes',
   },
 ];
 
 const CATEGORY_CONFIG = {
-  about: { label: 'About Elevate', color: 'bg-blue-100 text-blue-700' },
-  trust: { label: 'Trust & Credibility', color: 'bg-purple-100 text-purple-700' },
-  programs: { label: 'Programs', color: 'bg-emerald-100 text-emerald-700' },
-  funding: { label: 'Funding & Cost', color: 'bg-amber-100 text-amber-700' },
-  outcomes: { label: 'Careers & Jobs', color: 'bg-rose-100 text-rose-700' },
+  about: { label: 'About Elevate', color: 'bg-blue-100 text-blue-800' },
+  trust: { label: 'Trust & Credibility', color: 'bg-purple-100 text-purple-800' },
+  programs: { label: 'Programs', color: 'bg-emerald-100 text-emerald-800' },
+  funding: { label: 'Funding & Cost', color: 'bg-amber-100 text-amber-900' },
+  outcomes: { label: 'Careers & Jobs', color: 'bg-rose-100 text-rose-800' },
 };
 
-function QuestionCard({ 
-  question, 
-  index 
-}: { 
-  question: Question; 
-  index: number;
-}) {
+function QuestionCard({ question, index }: { question: Question; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const config = CATEGORY_CONFIG[question.category];
 
@@ -136,42 +130,38 @@ function QuestionCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.05 }}
-      className="bg-white rounded-xl border border-slate-200 hover:border-brand-red-200 hover:shadow-md transition-all"
+      className="rounded-xl border border-slate-200 bg-white transition-all hover:border-brand-red-200 hover:shadow-md"
     >
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-5 flex items-start gap-4 text-left"
+        aria-expanded={expanded}
+        className="flex w-full items-start gap-4 p-5 text-left"
       >
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${config.color}`}>
+        <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg ${config.color}`}>
           {question.icon}
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-slate-900">{question.question}</p>
-          <p className={`text-sm text-slate-500 mt-1 ${expanded ? 'line-clamp-none' : 'line-clamp-2'}`}>
+          <p className="font-semibold text-slate-950">{question.question}</p>
+          <p className={`mt-1 text-sm text-slate-600 ${expanded ? 'line-clamp-none' : 'line-clamp-2'}`}>
             {question.answer}
           </p>
         </div>
-        <div className="flex-shrink-0 text-slate-400">
-          {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        <div className="flex-shrink-0 text-slate-600" aria-hidden="true">
+          {expanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </div>
       </button>
-      
+
       {expanded && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="px-5 pb-5"
-        >
-          <div className="pt-4 border-t border-slate-100">
-            <p className="text-slate-600 text-sm leading-relaxed">
-              {question.answer}
-            </p>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-5 pb-5">
+          <div className="border-t border-slate-100 pt-4">
+            <p className="text-sm leading-relaxed text-slate-700">{question.answer}</p>
             <a
               href="/contact"
-              className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-brand-red-600 hover:text-brand-red-700"
+              className="mt-3 inline-flex min-h-10 items-center gap-1 text-sm font-bold text-brand-red-700 hover:text-brand-red-800"
             >
               Still have questions? Contact us
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </div>
         </motion.div>
@@ -183,91 +173,68 @@ function QuestionCard({
 export function VisitorQuestions({ className = '' }: VisitorQuestionsProps) {
   const { ref, isVisible } = useScrollAnimation(0.1);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-  const filteredQuestions = activeCategory
-    ? QUESTIONS.filter(q => q.category === activeCategory)
-    : QUESTIONS;
+  const filteredQuestions = activeCategory ? QUESTIONS.filter((question) => question.category === activeCategory) : QUESTIONS;
 
   return (
-    <section 
-      ref={ref as React.RefObject<HTMLElement>}
-      className={`py-20 bg-slate-50 ${className}`}
-    >
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        {/* Header */}
+    <section ref={ref as React.RefObject<HTMLElement>} className={`bg-slate-50 py-20 ${className}`}>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          className="text-center mb-8"
+          className="mb-8 text-center"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-100 border border-brand-red-200 rounded-full text-brand-red-700 text-sm font-medium mb-4">
-            <HelpCircle className="w-4 h-4" />
-            Answers Before You Ask
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-red-200 bg-brand-red-100 px-4 py-2 text-sm font-bold text-brand-red-800">
+            <HelpCircle className="h-4 w-4" aria-hidden="true" />
+            Answers Before You Apply
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
-            Everything You Need to Know
-          </h2>
-          <p className="text-slate-600 max-w-2xl mx-auto">
-            We answer your questions before you have to search for them. 
-            Here's what visitors most want to know about Elevate.
+          <h2 className="mb-4 text-3xl font-extrabold text-slate-950 sm:text-4xl">Questions Applicants Ask Most</h2>
+          <p className="mx-auto max-w-2xl text-slate-700">
+            These answers explain the general process. Program-specific requirements, funding decisions, and written enrollment documents control when they differ.
           </p>
         </motion.div>
 
-        {/* Category Filter */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.1 }}
-          className="flex flex-wrap justify-center gap-2 mb-8"
+          className="mb-8 flex flex-wrap justify-center gap-2"
         >
           <button
+            type="button"
             onClick={() => setActiveCategory(null)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              !activeCategory
-                ? 'bg-brand-red-600 text-white'
-                : 'bg-white text-slate-600 hover:bg-slate-100'
-            }`}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${!activeCategory ? 'bg-brand-red-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'}`}
           >
             All Questions
           </button>
           {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
             <button
+              type="button"
               key={key}
               onClick={() => setActiveCategory(key)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeCategory === key
-                  ? 'bg-brand-red-600 text-white'
-                  : 'bg-white text-slate-600 hover:bg-slate-100'
-              }`}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${activeCategory === key ? 'bg-brand-red-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'}`}
             >
               {config.label}
             </button>
           ))}
         </motion.div>
 
-        {/* Questions */}
         <div className="space-y-3">
-          {filteredQuestions.map((question, index) => (
-            <QuestionCard key={question.id} question={question} index={index} />
-          ))}
+          {filteredQuestions.map((question, index) => <QuestionCard key={question.id} question={question} index={index} />)}
         </div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3 }}
-          className="text-center mt-10"
+          className="mt-10 text-center"
         >
-          <p className="text-slate-600 mb-4">
-            Still have questions? We're here to help.
-          </p>
+          <p className="mb-4 text-slate-700">Ready to compare a program, its requirements, and possible funding?</p>
           <a
-            href="/apply"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-xl hover:bg-brand-red-700 transition-colors shadow-lg shadow-brand-red-600/30"
+            href="/programs"
+            className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-red-600 px-8 py-4 font-bold text-white shadow-lg shadow-brand-red-600/20 transition-colors hover:bg-brand-red-700"
           >
-            Start Your Journey
-            <ArrowRight className="w-5 h-5" />
+            Review Programs
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </a>
         </motion.div>
       </div>

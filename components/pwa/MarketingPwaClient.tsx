@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { MarketingPwaRegistration } from './MarketingPwaRegistration';
 
 const PwaInstallBanner = dynamic(
-  () => import('./PwaInstallBanner').then((m) => m.PwaInstallBanner || m),
+  () => import('./PwaInstallBanner').then((module) => module.PwaInstallBanner),
   { ssr: false },
 );
 

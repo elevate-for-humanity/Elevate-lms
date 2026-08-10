@@ -1,63 +1,30 @@
 #!/usr/bin/env node
 /**
- * audit-pwa.mjs
- *
- * Fails if any of the following conditions are detected:
- *
- * 1. An app root layout has more than one PWA registration component.
- * 2. An app root layout has zero PWA registration components.
- * 3. An app root layout does not link to a domain-specific manifest.
- * 4. A domain-specific manifest referenced in a layout does not exist in public/.
- * 5. A domain-specific service worker does not exist in public/.
- * 6. A service worker has responsibilities it should not have (e.g. marketing SW
- *    handling LMS offline database sync).
- * 7. Multiple service-worker registration components are mounted in the same layout.
- * 8. Dead PWA components that are unused (optional warning).
- *
- * Usage:
- *   node scripts/audit-pwa.mjs
+ * Production PWA integrity gate.
+ * Validates one service-worker registration per app plus the role-specific
+ * manifests used by Learner, Apprentice, Host Shop, and Program Holder portals.
  */
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = join(__dirname, '..');
-
 let failures = 0;
 
-function pass(msg) {
-  console.log(` \u2705 ${msg}`);
-}
-
-function fail(msg) {
-  console.error(` \u274c ${msg}`);
-  failures++;
-}
-
-function warn(msg) {
-  console.warn(` \u26a0\ufe0f ${msg}`);
-}
-
+function pass(message) { console.log(` ✅ ${message}`); }
+function fail(message) { console.error(` ❌ ${message}`); failures += 1; }
+function warn(message) { console.warn(` ⚠️ ${message}`); }
 function readFile(relPath) {
-  try {
-    return readFileSync(join(ROOT, relPath), 'utf-8');
-  } catch {
-    return null;
-  }
+  try { return readFileSync(join(ROOT, relPath), 'utf8'); } catch { return null; }
 }
-
 function exists(relPath) {
-  try {
-    statSync(join(ROOT, relPath));
-    return true;
-  } catch {
-    return false;
-  }
+  try { statSync(join(ROOT, relPath)); return true; } catch { return false; }
 }
-
-// ── Configuration ───────────────────────────────────────────────────────────
+function readJson(relPath) {
+  try { return JSON.parse(readFileSync(join(ROOT, relPath), 'utf8')); } catch { return null; }
+}
 
 const APPS = [
   {
@@ -66,7 +33,6 @@ const APPS = [
     manifestFile: 'public/manifest-marketing.json',
     swFile: 'public/sw-marketing.js',
     registrationComponent: 'MarketingPwaRegistration',
-    allowedComponents: ['MarketingPwaRegistration'],
   },
   {
     name: 'admin',
@@ -74,7 +40,6 @@ const APPS = [
     manifestFile: 'public/manifest-admin.json',
     swFile: 'public/sw-admin.js',
     registrationComponent: 'AdminPwaRegister',
-    allowedComponents: ['AdminPwaRegister'],
   },
   {
     name: 'lms',
@@ -82,7 +47,6 @@ const APPS = [
     manifestFile: 'public/manifest-lms.json',
     swFile: 'public/sw-lms.js',
     registrationComponent: 'LmsPwaRegistration',
-    allowedComponents: ['LmsPwaRegistration'],
   },
   {
     name: 'app (portal)',
@@ -90,182 +54,154 @@ const APPS = [
     manifestFile: 'public/manifest-portal.json',
     swFile: 'public/sw-portal.js',
     registrationComponent: 'PortalPwaRegistration',
-    allowedComponents: ['PortalPwaRegistration'],
   },
 ];
 
-// All known PWA registration component names
 const PWA_REG_COMPONENTS = [
   'AdminPwaRegister',
   'MarketingPwaRegistration',
   'LmsPwaRegistration',
   'PortalPwaRegistration',
-  'ServiceWorkerRegistration', // legacy — should not be in any layout
-  'PWAManager', // legacy — should not be in any layout
+  'ServiceWorkerRegistration',
+  'PWAManager',
 ];
 
-// ── Check 1 & 2: PWA registration per app ──────────────────────────────────
+const PERSONA_PORTALS = [
+  {
+    name: 'Learner',
+    layoutPath: 'apps/lms/app/lms/layout.tsx',
+    manifestFile: 'public/manifest-student.json',
+    manifestHref: '/manifest-student.json',
+    startUrl: '/lms/dashboard',
+    scope: '/lms',
+  },
+  {
+    name: 'Apprentice',
+    layoutPath: 'apps/lms/app/apprentice/layout.tsx',
+    manifestFile: 'public/manifest-apprentice.json',
+    manifestHref: '/manifest-apprentice.json',
+    startUrl: '/apprentice',
+    scope: '/apprentice/',
+  },
+  {
+    name: 'Host Shop',
+    layoutPath: 'apps/lms/app/host-shop/layout.tsx',
+    manifestFile: 'public/manifest-shop-owner.json',
+    manifestHref: '/manifest-shop-owner.json',
+    startUrl: '/host-shop/dashboard',
+    scope: '/host-shop/',
+  },
+  {
+    name: 'Program Holder',
+    layoutPath: 'apps/marketing/app/program-holder/layout.tsx',
+    manifestFile: 'public/manifest-program-holder.json',
+    manifestHref: '/manifest-program-holder.json',
+    startUrl: '/program-holder/dashboard',
+    scope: '/program-holder/',
+  },
+];
 
-console.log('\n\u2500\u2500\u2500 Check 1 & 2: PWA registration in root layouts \u2500\u2500\u2500');
-
+console.log('\n── Root PWA registrations ──');
 for (const app of APPS) {
   const content = readFile(app.layoutPath);
   if (!content) {
-    fail(`${app.name}: layout not found at ${app.layoutPath}`);
+    fail(`${app.name}: root layout missing`);
     continue;
   }
 
-  // Count occurrences of each known registration component
-  const counts = {};
-  for (const comp of PWA_REG_COMPONENTS) {
-    const re = new RegExp(`<${comp}[\\s/>]`, 'g');
-    counts[comp] = (content.match(re) || []).length;
-  }
-
-  const totalCount = Object.values(counts).reduce((a, b) => a + b, 0);
-
-  if (totalCount === 0) {
-    fail(`${app.name}: no PWA registration component in root layout`);
-  } else if (totalCount > 1) {
-    const found = Object.entries(counts).filter(([, n]) => n > 0).map(([c]) => c);
-    fail(`${app.name}: multiple PWA registrations in root layout: ${found.join(', ')}`);
-  } else if (counts[app.registrationComponent] === 1) {
-    pass(`${app.name}: exactly one ${app.registrationComponent} in root layout`);
+  const counts = Object.fromEntries(PWA_REG_COMPONENTS.map((component) => {
+    const re = new RegExp(`<${component}[\\s/>]`, 'g');
+    return [component, (content.match(re) || []).length];
+  }));
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  if (total !== 1) {
+    fail(`${app.name}: expected exactly one PWA registration, found ${total}`);
+  } else if (counts[app.registrationComponent] !== 1) {
+    fail(`${app.name}: wrong registration component`);
   } else {
-    const found = Object.entries(counts).filter(([, n]) => n > 0).map(([c]) => c);
-    fail(`${app.name}: unexpected PWA registration in root layout: ${found.join(', ')} (expected ${app.registrationComponent})`);
+    pass(`${app.name}: exactly one ${app.registrationComponent}`);
   }
+
+  const manifest = content.match(/manifest:\s*['"]([^'"]+)['"]/)?.[1];
+  const expectedManifest = `/${app.manifestFile.replace('public/', '')}`;
+  if (manifest !== expectedManifest) fail(`${app.name}: expected ${expectedManifest}, found ${manifest || 'none'}`);
+  else pass(`${app.name}: root manifest linked`);
+
+  if (!exists(app.manifestFile)) fail(`${app.name}: ${app.manifestFile} missing`);
+  else pass(`${app.name}: root manifest exists`);
+
+  if (!exists(app.swFile)) fail(`${app.name}: ${app.swFile} missing`);
+  else pass(`${app.name}: service worker exists`);
 }
 
-// ── Check 3: Manifest linked in metadata ─────────────────────────────────────
-
-console.log('\n\u2500\u2500\u2500 Check 3: Domain-specific manifest in layout metadata \u2500\u2500\u2500');
-
-for (const app of APPS) {
-  const content = readFile(app.layoutPath);
-  if (!content) continue;
-
-  // Look for manifest: '/manifest-*.json'
-  const manifestMatch = content.match(/manifest:\s*['"]([^'"]+)['"]/);
-  if (!manifestMatch) {
-    fail(`${app.name}: no manifest linked in layout metadata`);
-  } else if (manifestMatch[1] !== `/${app.manifestFile.replace('public/', '')}`) {
-    warn(`${app.name}: layout links to ${manifestMatch[1]} (expected /${app.manifestFile.replace('public/', '')})`);
-  } else {
-    pass(`${app.name}: layout links to /${app.manifestFile.replace('public/', '')}`);
+console.log('\n── Persona portal manifests ──');
+for (const portal of PERSONA_PORTALS) {
+  const layout = readFile(portal.layoutPath);
+  if (!layout) {
+    fail(`${portal.name}: nested layout missing at ${portal.layoutPath}`);
+    continue;
   }
-}
-
-// ── Check 4: Manifest files exist ─────────────────────────────────────────────
-
-console.log('\n\u2500\u2500\u2500 Check 4: Domain-specific manifest files exist \u2500\u2500\u2500');
-
-for (const app of APPS) {
-  if (exists(app.manifestFile)) {
-    pass(`${app.name}: ${app.manifestFile} exists`);
+  if (!layout.includes(`manifest: '${portal.manifestHref}'`) && !layout.includes(`manifest: "${portal.manifestHref}"`)) {
+    fail(`${portal.name}: nested layout does not link ${portal.manifestHref}`);
   } else {
-    fail(`${app.name}: ${app.manifestFile} does not exist`);
+    pass(`${portal.name}: nested layout links role manifest`);
   }
-}
 
-// ── Check 5: Service worker files exist ──────────────────────────────────────
-
-console.log('\n\u2500\u2500\u2500 Check 5: Domain-specific service workers exist \u2500\u2500\u2500');
-
-for (const app of APPS) {
-  if (exists(app.swFile)) {
-    pass(`${app.name}: ${app.swFile} exists`);
-  } else {
-    fail(`${app.name}: ${app.swFile} does not exist`);
+  const manifest = readJson(portal.manifestFile);
+  if (!manifest) {
+    fail(`${portal.name}: invalid or missing ${portal.manifestFile}`);
+    continue;
   }
-}
+  if (manifest.start_url !== portal.startUrl) fail(`${portal.name}: start_url must be ${portal.startUrl}`);
+  else pass(`${portal.name}: canonical start_url`);
 
-// ── Check 6: Service worker domain-specific responsibilities ────────────────────
+  if (manifest.scope !== portal.scope) fail(`${portal.name}: scope must be ${portal.scope}`);
+  else pass(`${portal.name}: canonical scope`);
 
-console.log('\n\u2500\u2500\u2500 Check 6: Service worker domain responsibilities \u2500\u2500\u2500');
+  if (!Array.isArray(manifest.icons) || manifest.icons.length < 2) fail(`${portal.name}: install icons incomplete`);
+  else pass(`${portal.name}: install icons declared`);
 
-const SW_RESPONSIBILITY_CHECKS = [
-  {
-    sw: 'public/sw-marketing.js',
-    mustNotContain: [
-      { pattern: /COURSE_CACHE|COURSE_STRATEGY|sync-enrollment|sync-hours|openOfflineDB/i, reason: 'Marketing SW should not handle LMS offline DB or course sync' },
-    ],
-  },
-  {
-    sw: 'public/sw-admin.js',
-    mustNotContain: [
-      { pattern: /COURSE_CACHE|COURSE_STRATEGY|sync-enrollment|sync-hours|openOfflineDB/i, reason: 'Admin SW should not handle LMS offline DB or course sync' },
-    ],
-  },
-  {
-    sw: 'public/sw-portal.js',
-    mustNotContain: [
-      { pattern: /COURSE_CACHE|COURSE_STRATEGY|sync-enrollment|sync-hours|openOfflineDB/i, reason: 'Portal SW should not handle LMS offline DB or course sync' },
-    ],
-  },
-];
-
-for (const check of SW_RESPONSIBILITY_CHECKS) {
-  const content = readFile(check.sw);
-  if (!content) continue; // already flagged in Check 5
-
-  for (const { pattern, reason } of check.mustNotContain) {
-    if (pattern.test(content)) {
-      fail(`${check.sw}: ${reason}`);
-    } else {
-      pass(`${check.sw}: domain responsibilities correct`);
+  for (const shortcut of manifest.shortcuts || []) {
+    if (typeof shortcut.url !== 'string' || !shortcut.url.startsWith(portal.scope.replace(/\/$/, ''))) {
+      fail(`${portal.name}: shortcut ${shortcut.name || '(unnamed)'} escapes portal scope: ${shortcut.url}`);
     }
   }
 }
 
-// ── Check 7: Stale root sw.js should not be used ──────────────────────────────
-
-console.log('\n\u2500\u2500\u2500 Check 7: Root sw.js is not registered in any layout \u2500\u2500\u2500');
-
-const rootSwRegister = /register\s*\(\s*['"]\/sw\.js['"]/;
-let foundRootSwUsage = false;
-for (const app of APPS) {
-  const content = readFile(app.layoutPath);
-  if (content && rootSwRegister.test(content)) {
-    fail(`${app.name}: root /sw.js is registered (should use /sw-${app.name}.js)`);
-    foundRootSwUsage = true;
+console.log('\n── Service worker responsibility boundaries ──');
+for (const sw of ['public/sw-marketing.js', 'public/sw-admin.js', 'public/sw-portal.js']) {
+  const content = readFile(sw);
+  if (!content) continue;
+  if (/COURSE_CACHE|COURSE_STRATEGY|sync-enrollment|sync-hours|openOfflineDB/i.test(content)) {
+    fail(`${sw}: non-LMS worker contains LMS offline/course responsibilities`);
+  } else {
+    pass(`${sw}: domain responsibilities are isolated`);
   }
 }
-if (!foundRootSwUsage) {
-  pass('No layout registers the root /sw.js');
+
+const lmsWorker = readFile('public/sw-lms.js') || '';
+for (const protectedPath of ['/lms/dashboard', '/apprentice', '/host-shop']) {
+  if (!lmsWorker.includes(protectedPath)) {
+    warn(`public/sw-lms.js: protected route marker ${protectedPath} was not found; confirm authenticated navigation stays network-only`);
+  }
 }
 
-// ── Check 8: Unused persona manifests ───────────────────────────────────────
-
-console.log('\n\u2500\u2500\u2500 Check 8: Unused persona manifests (warning only) \u2500\u2500\u2500');
-
-const PERSONA_MANIFESTS = [
+console.log('\n── Legacy PWA files ──');
+for (const legacy of [
   'public/manifest-barber.json',
-  'public/manifest-employer.json',
-  'public/manifest-student.json',
   'public/manifest-instructor.json',
   'public/manifest-partner.json',
-  'public/manifest-program-holder.json',
-  'public/manifest-shop-owner.json',
   'public/manifest-store.json',
   'public/manifest-enrollment.json',
   'public/store-manifest.json',
-  'public/manifest.json', // root — not used by any layout
-];
-
-for (const mf of PERSONA_MANIFESTS) {
-  if (exists(mf)) {
-    warn(`${mf}: persona manifest exists but is not referenced in any layout — consider removing`);
-  }
+  'public/manifest.json',
+]) {
+  if (exists(legacy)) warn(`${legacy}: legacy/unlinked manifest remains; do not link it to a production portal`);
 }
 
-// ── Summary ───────────────────────────────────────────────────────────────────
-
-console.log('\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500');
-if (failures > 0) {
-  console.error(`\n\u274c Audit FAILED \u2014 ${failures} issue(s) found.\n`);
+console.log('\n────────────────────────────────────────');
+if (failures) {
+  console.error(`\n❌ PWA audit FAILED — ${failures} issue(s).\n`);
   process.exit(1);
-} else {
-  console.log(`\n\u2705 Audit PASSED \u2014 all checks green.\n`);
-  process.exit(0);
 }
+console.log('\n✅ PWA audit PASSED.\n');

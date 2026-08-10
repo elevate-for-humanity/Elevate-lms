@@ -1,292 +1,120 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
-import { destinationTours, GUIDE_STORAGE_KEYS, GUIDE_ANALYTICS } from '@/lib/guide/flows';
+import { useCallback, useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, RotateCcw, X } from 'lucide-react';
+import { destinationTours, GUIDE_STORAGE_KEYS } from '@/lib/guide/flows';
 
-interface GuidedTourProps {
+type Props = {
   tourId: string;
   onComplete?: () => void;
   onSkip?: () => void;
   autoStart?: boolean;
-}
+};
 
-export default function GuidedTour({
-  tourId,
-  onComplete,
-  onSkip,
-  autoStart = false,
-}: GuidedTourProps) {
+export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = false }: Props) {
+  const tour = destinationTours[tourId];
+  const steps = tour?.steps ?? [];
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  const tour = destinationTours[tourId];
-  const steps = tour?.steps || [];
-  const currentStepData = steps[currentStep];
-
-  // Check if tour was already completed
-  useEffect((): void => {
-    if (typeof window === 'undefined') return;
-
-    const completed = localStorage.getItem(GUIDE_STORAGE_KEYS.TOUR_COMPLETED(tourId));
-    if (completed && !autoStart) return;
-
-    if (autoStart) {
-      startTour();
-    }
-  }, [tourId, autoStart, startTour]);
-
-  // Update target element position
-  useEffect((): void => {
-    if (!isActive || !currentStepData) return;
-
-    const updatePosition = () => {
-      const target = document.querySelector(currentStepData.target);
-      if (target) {
-        const rect = target.getBoundingClientRect();
-        setTargetRect(rect);
-
-        // Calculate tooltip position
-        const tooltipWidth = 320;
-        const tooltipHeight = 180;
-        const padding = 16;
-        const arrowSize = 12;
-
-        let top = 0;
-        let left = 0;
-
-        switch (currentStepData.placement) {
-          case 'bottom':
-            top = rect.bottom + arrowSize + padding;
-            left = rect.left + rect.width / 2 - tooltipWidth / 2;
-            break;
-          case 'top':
-            top = rect.top - tooltipHeight - arrowSize - padding;
-            left = rect.left + rect.width / 2 - tooltipWidth / 2;
-            break;
-          case 'left':
-            top = rect.top + rect.height / 2 - tooltipHeight / 2;
-            left = rect.left - tooltipWidth - arrowSize - padding;
-            break;
-          case 'right':
-            top = rect.top + rect.height / 2 - tooltipHeight / 2;
-            left = rect.right + arrowSize + padding;
-            break;
-        }
-
-        // Keep tooltip in viewport
-        left = Math.max(padding, Math.min(left, window.innerWidth - tooltipWidth - padding));
-        top = Math.max(padding, Math.min(top, window.innerHeight - tooltipHeight - padding));
-
-        setTooltipPosition({ top, left });
-
-        // Scroll target into view if needed
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    };
-
-    updatePosition();
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition);
-
-    return () => {
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition);
-    };
-  }, [isActive, currentStep, currentStepData]);
 
   const startTour = useCallback(() => {
-    setIsActive(true);
     setCurrentStep(0);
+    setIsActive(true);
   }, []);
 
-  const endTour = useCallback(
-    (completed: boolean) => {
-      setIsActive(false);
-      setCurrentStep(0);
-      setTargetRect(null);
-
-      if (completed) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(GUIDE_STORAGE_KEYS.TOUR_COMPLETED(tourId), 'true');
-        }
-        onComplete?.();
-      } else {
-        onSkip?.();
-      }
-    },
-    [tourId, onComplete, onSkip],
-  );
-
-  const nextStep = useCallback(() => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+  const endTour = useCallback((completed: boolean) => {
+    setIsActive(false);
+    setCurrentStep(0);
+    setTargetRect(null);
+    if (completed) {
+      localStorage.setItem(GUIDE_STORAGE_KEYS.TOUR_COMPLETED(tourId), 'true');
+      onComplete?.();
     } else {
-      endTour(true);
+      onSkip?.();
     }
+  }, [tourId, onComplete, onSkip]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const completed = localStorage.getItem(GUIDE_STORAGE_KEYS.TOUR_COMPLETED(tourId));
+    if (autoStart && !completed) startTour();
+  }, [autoStart, startTour, tourId]);
+
+  const current = steps[currentStep];
+
+  useEffect(() => {
+    if (!isActive || !current) return;
+    const update = () => {
+      const target = document.querySelector(current.target);
+      if (!target) {
+        setTargetRect(null);
+        return;
+      }
+      const rect = target.getBoundingClientRect();
+      setTargetRect(rect);
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('scroll', update, { passive: true });
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('scroll', update);
+    };
+  }, [isActive, current]);
+
+  const next = useCallback(() => {
+    if (currentStep >= steps.length - 1) endTour(true);
+    else setCurrentStep((value) => value + 1);
   }, [currentStep, steps.length, endTour]);
 
-  const prevStep = useCallback(() => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  }, [currentStep]);
+  const previous = useCallback(() => setCurrentStep((value) => Math.max(0, value - 1)), []);
 
-  const restartTour = useCallback(() => {
-    setCurrentStep(0);
-  }, []);
-
-  // Handle keyboard navigation
-  useEffect((): void => {
+  useEffect(() => {
     if (!isActive) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      switch (e.key) {
-        case 'Escape':
-          endTour(false);
-          break;
-        case 'ArrowRight':
-        case 'Enter':
-          nextStep();
-          break;
-        case 'ArrowLeft':
-          prevStep();
-          break;
-      }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') endTour(false);
+      if (event.key === 'ArrowRight' || event.key === 'Enter') next();
+      if (event.key === 'ArrowLeft') previous();
     };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isActive, endTour, next, previous]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isActive, nextStep, prevStep, endTour]);
+  if (!isActive || !tour || !current) return null;
 
-  if (!isActive || !tour) return null;
+  const top = targetRect ? Math.min(window.innerHeight - 220, Math.max(16, targetRect.bottom + 18)) : window.innerHeight / 2 - 100;
+  const left = targetRect ? Math.min(window.innerWidth - 336, Math.max(16, targetRect.left + targetRect.width / 2 - 160)) : window.innerWidth / 2 - 160;
 
   return (
     <>
-      {/* Overlay with spotlight cutout */}
-      <div className="fixed inset-0 z-[100] pointer-events-none">
-        {/* Dark overlay */}
-        <svg className="absolute inset-0 w-full h-full">
-          <defs>
-            <mask id="spotlight-mask">
-              <rect x="0" y="0" width="100%" height="100%" fill="white" />
-              {targetRect && (
-                <rect
-                  x={targetRect.left - 8}
-                  y={targetRect.top - 8}
-                  width={targetRect.width + 16}
-                  height={targetRect.height + 16}
-                  rx="12"
-                  fill="black"
-                />
-              )}
-            </mask>
-          </defs>
-          <rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            fill="rgba(0, 0, 0, 0.7)"
-            mask="url(#spotlight-mask)"
-          />
-        </svg>
-
-        {/* Spotlight border */}
-        {targetRect && (
-          <div
-            className="absolute border-2 border-brand-orange-500 rounded-xl pointer-events-none animate-pulse"
-            style={{
-              top: targetRect.top - 8,
-              left: targetRect.left - 8,
-              width: targetRect.width + 16,
-              height: targetRect.height + 16,
-            }}
-          />
-        )}
-      </div>
-
-      {/* Tooltip */}
-      <div
-        ref={tooltipRef}
-        className="fixed z-[101] w-80 bg-white rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
-        style={{
-          top: tooltipPosition.top,
-          left: tooltipPosition.left,
-        }}
-        role="dialog"
-        aria-label={`Tour step ${currentStep + 1} of ${steps.length}`}
-      >
-        {/* Header */}
-        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-900">{tour.name}</span>
-            <span className="text-xs text-slate-500">
-              {currentStep + 1} / {steps.length}
-            </span>
+      <div className="fixed inset-0 z-[100] bg-black/60" aria-hidden="true" />
+      {targetRect ? (
+        <div
+          className="fixed z-[101] rounded-xl ring-4 ring-brand-orange-500 pointer-events-none"
+          style={{ top: targetRect.top - 6, left: targetRect.left - 6, width: targetRect.width + 12, height: targetRect.height + 12 }}
+        />
+      ) : null}
+      <div className="fixed z-[102] w-80 rounded-2xl bg-white shadow-2xl" style={{ top, left }} role="dialog" aria-modal="true">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+          <div>
+            <p className="text-xs font-semibold text-slate-500">Step {currentStep + 1} of {steps.length}</p>
+            <p className="font-bold text-slate-950">{tour.name}</p>
           </div>
-          <button
-            onClick={() => endTour(false)}
-            className="p-1 hover:bg-slate-100 rounded transition"
-            aria-label="Close tour"
-          >
-            <X className="w-4 h-4 text-slate-600" />
-          </button>
+          <button type="button" onClick={() => endTour(false)} aria-label="Close tour"><X className="h-4 w-4" /></button>
         </div>
-
-        {/* Content */}
         <div className="p-4">
-          <h3 className="font-bold text-black text-lg mb-2">{currentStepData?.title}</h3>
-          <p className="text-slate-700 text-sm leading-relaxed">{currentStepData?.content}</p>
+          <h3 className="text-lg font-bold text-slate-950">{current.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-700">{current.content}</p>
         </div>
-
-        {/* Progress dots */}
-        <div className="flex justify-center gap-1.5 pb-3">
-          {steps.map((_, index) => (
-            <div
-              key={index}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentStep
-                  ? 'bg-brand-orange-500 w-4'
-                  : index < currentStep
-                    ? 'bg-brand-green-500'
-                    : 'bg-slate-300'
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Navigation */}
-        <div className="bg-slate-50 px-4 py-3 flex items-center justify-between border-t border-slate-200">
-          <div className="flex items-center gap-2">
-            {currentStep > 0 && (
-              <button
-                onClick={prevStep}
-                className="flex items-center gap-1 text-sm text-slate-700 hover:text-slate-900 transition"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </button>
-            )}
-            {currentStep === steps.length - 1 && (
-              <button
-                onClick={restartTour}
-                className="flex items-center gap-1 text-sm text-slate-700 hover:text-slate-900 transition"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Restart
-              </button>
-            )}
+        <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3">
+          <div className="flex gap-2">
+            {currentStep > 0 ? <button type="button" onClick={previous} className="inline-flex items-center gap-1 text-sm font-semibold"><ChevronLeft className="h-4 w-4" />Back</button> : null}
+            {currentStep === steps.length - 1 ? <button type="button" onClick={() => setCurrentStep(0)} className="inline-flex items-center gap-1 text-sm font-semibold"><RotateCcw className="h-4 w-4" />Restart</button> : null}
           </div>
-          <button
-            onClick={nextStep}
-            className="flex items-center gap-1 px-4 py-2 bg-brand-orange-600 text-white rounded-lg text-sm font-medium hover:bg-brand-orange-700 transition"
-          >
-            {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
-            {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4" />}
+          <button type="button" onClick={next} className="inline-flex items-center gap-1 rounded-lg bg-brand-orange-600 px-4 py-2 text-sm font-bold text-white">
+            {currentStep === steps.length - 1 ? 'Finish' : 'Next'}{currentStep < steps.length - 1 ? <ChevronRight className="h-4 w-4" /> : null}
           </button>
         </div>
       </div>
@@ -294,17 +122,11 @@ export default function GuidedTour({
   );
 }
 
-// Export a hook for programmatic tour control
 export function useTour() {
   const [activeTourId, setActiveTourId] = useState<string | null>(null);
-
-  const startTour = useCallback((tourId: string) => {
-    setActiveTourId(tourId);
-  }, []);
-
-  const endTour = useCallback(() => {
-    setActiveTourId(null);
-  }, []);
-
-  return { activeTourId, startTour, endTour };
+  return {
+    activeTourId,
+    startTour: (tourId: string) => setActiveTourId(tourId),
+    endTour: () => setActiveTourId(null),
+  };
 }

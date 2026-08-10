@@ -4,6 +4,7 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -78,6 +79,15 @@ export async function POST(
         .filter((message: any) => message.content)
     : [];
 
+  const credit = await consumeWebsiteBuilderCredits(supabase, user.id, 'paris_edit');
+  if (!credit.allowed) {
+    return NextResponse.json({
+      error: credit.error || 'Not enough Website Builder credits',
+      creditsRemaining: credit.balance,
+      upgradeUrl: credit.upgradeUrl || '/store/apps/website-builder',
+    }, { status: 402 });
+  }
+
   const base = buildDefaultSiteConfig({ organizationName: site.site_name || 'My Website' });
   const currentConfig = site.site_config && typeof site.site_config === 'object'
     ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>)
@@ -127,6 +137,8 @@ export async function POST(
   } catch (error) {
     return NextResponse.json({
       error: error instanceof Error ? error.message : 'PARIS could not update the website',
+      creditsCharged: credit.charged,
+      creditsRemaining: credit.balance,
     }, { status: 502 });
   }
 
@@ -197,11 +209,17 @@ export async function POST(
     .maybeSingle();
 
   if (saveError || !saved) {
-    return NextResponse.json({ error: saveError?.message || 'Could not save PARIS changes' }, { status: 500 });
+    return NextResponse.json({
+      error: saveError?.message || 'Could not save PARIS changes',
+      creditsCharged: credit.charged,
+      creditsRemaining: credit.balance,
+    }, { status: 500 });
   }
 
   return NextResponse.json({
     message: safeString(generated?.message, 500) || 'I updated your website draft.',
     website: saved,
+    creditsCharged: credit.charged,
+    creditsRemaining: credit.balance,
   });
 }

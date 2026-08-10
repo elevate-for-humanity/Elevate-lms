@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
@@ -8,12 +9,24 @@ export const revalidate = 3600;
 export default async function CosmetologyApprenticeshipPage() {
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   if (!loaded) return notFound();
-  return (
-    <ProgramDetailPage
-      program={loaded.program}
-      banner={heroBanners['cosmetology-apprenticeship'] ?? null}
+  const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const heroOverride = banner?.videoSrcDesktop ? (
+    <HeroVideo
+      videoSrcDesktop={banner.videoSrcDesktop}
+      videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
+      posterImage={banner.posterImage || loaded.program.heroImage}
+      voiceoverSrc={banner.voiceoverSrc}
+      microLabel={banner.microLabel}
+      analyticsName={banner.analyticsName}
+      belowHeroHeadline={banner.belowHeroHeadline}
+      belowHeroSubheadline={banner.belowHeroSubheadline}
+      ctas={[banner.primaryCta, banner.secondaryCta].filter(Boolean) as any}
+      trustIndicators={banner.trustIndicators}
+      transcript={banner.transcript}
     />
-  );
+  ) : undefined;
+
+  return <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride} />;
 }
 
 export async function generateMetadata() {

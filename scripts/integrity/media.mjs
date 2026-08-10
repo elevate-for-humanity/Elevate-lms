@@ -1,135 +1,152 @@
 #!/usr/bin/env node
 /**
- * Media Integrity Check
+ * Media / visual integrity gate.
  *
- * Scans source files for image/video references and verifies they exist.
- * Fails CI if any broken media references are found.
- *
- * Output: reports/media_report.json
+ * Validates local media references, canonical program imagery, key portal
+ * picture coverage, and the production rule that browser SpeechSynthesis may
+ * not be used for spoken output.
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
-const reportsDir = path.join(rootDir, 'reports');
 const publicDir = path.join(rootDir, 'public');
+let failures = 0;
 
-// Ensure reports directory exists
-if (!fs.existsSync(reportsDir)) {
-  fs.mkdirSync(reportsDir, { recursive: true });
-}
+function pass(message) { console.log(`✅ ${message}`); }
+function fail(message) { console.error(`❌ ${message}`); failures += 1; }
 
-// Extract media URLs from source files
-function extractMediaUrls(dir) {
-  const mediaUrls = new Set();
-
-  function scanFile(filePath) {
-    const content = fs.readFileSync(filePath, 'utf-8');
-
-    // Match src="/images/..." or src="/videos/..." patterns
-    const srcMatches = content.matchAll(/src=["'](\/(images|videos)[^"']+)["']/g);
-    for (const match of srcMatches) {
-      mediaUrls.add(match[1]);
-    }
-
-    // Match videoUrl: "/videos/..." patterns
-    const videoUrlMatches = content.matchAll(/videoUrl:\s*["']([^"']+)["']/g);
-    for (const match of videoUrlMatches) {
-      if (match[1].startsWith('/')) {
-        mediaUrls.add(match[1]);
-      }
-    }
-  }
-
+function scanSourceFiles(relativeRoots, visitor) {
+  const seen = new Set();
   function scanDir(dirPath) {
     if (!fs.existsSync(dirPath)) return;
-
-    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-
+    for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.') || entry.name === 'docs' || entry.name === 'reports') continue;
       const fullPath = path.join(dirPath, entry.name);
       if (entry.isDirectory()) {
         scanDir(fullPath);
-      } else if (
-        entry.name.endsWith('.tsx') ||
-        entry.name.endsWith('.jsx') ||
-        entry.name.endsWith('.ts') ||
-        entry.name.endsWith('.js')
-      ) {
-        scanFile(fullPath);
+      } else if (/\.(tsx?|jsx?|mjs|cjs)$/.test(entry.name)) {
+        const relative = path.relative(rootDir, fullPath);
+        if (seen.has(relative)) continue;
+        seen.add(relative);
+        visitor(fullPath, relative, fs.readFileSync(fullPath, 'utf8'));
       }
     }
   }
-
-  // Scan app directory
-  scanDir(path.join(rootDir, 'app'));
-  // Scan lms-data directory
-  scanDir(path.join(rootDir, 'lms-data'));
-  // Scan components directory
-  scanDir(path.join(rootDir, 'components'));
-
-  return Array.from(mediaUrls);
+  for (const rel of relativeRoots) scanDir(path.join(rootDir, rel));
 }
 
-// Check if media file exists
-function checkMediaExists(url) {
-  const filePath = path.join(publicDir, url);
-  return fs.existsSync(filePath);
-}
-
-// Videos are served from Cloudflare R2 (not committed to public/).
-// Only check images for local existence — skip /videos/* entirely.
-function isRemoteAsset(url) {
-  return url.startsWith('/videos/');
-}
-
-// Main execution
-const mediaUrls = extractMediaUrls(rootDir);
-
-const brokenMedia = [];
-const validMedia = [];
-
-for (const url of mediaUrls) {
-  if (isRemoteAsset(url)) {
-    // R2-hosted — existence verified at runtime, not in CI
-    validMedia.push({ url, status: 'remote' });
-  } else if (checkMediaExists(url)) {
-    validMedia.push({ url, status: 'valid' });
-  } else {
-    brokenMedia.push({ url, status: 'missing' });
+console.log('\n── Local media references ──');
+const mediaReferences = new Map();
+scanSourceFiles(['app', 'apps', 'components', 'data', 'lib'], (_file, relative, content) => {
+  const patterns = [
+    /(?:src|poster|imageSrc|image|heroImage|cardImage|thumbnailUrl|videoUrl)\s*[=:]\s*["'`](\/(?:images|videos)\/[^"'`$}]+)["'`]/g,
+    /["'`](\/(?:images|videos)\/[^"'`$}]+\.(?:png|jpe?g|webp|gif|svg|mp4|webm|mov))["'`]/g,
+  ];
+  for (const pattern of patterns) {
+    for (const match of content.matchAll(pattern)) {
+      const url = match[1];
+      if (!mediaReferences.has(url)) mediaReferences.set(url, new Set());
+      mediaReferences.get(url).add(relative);
+    }
   }
+});
+
+const missingLocalMedia = [];
+for (const [url, owners] of mediaReferences) {
+  if (url.startsWith('/videos/')) continue; // video production media is mirrored/R2-backed.
+  const localPath = path.join(publicDir, url.replace(/^\//, ''));
+  if (!fs.existsSync(localPath)) missingLocalMedia.push({ url, owners: [...owners] });
+}
+if (missingLocalMedia.length) {
+  for (const item of missingLocalMedia) fail(`Missing image ${item.url} referenced by ${item.owners.slice(0, 3).join(', ')}`);
+} else {
+  pass(`${[...mediaReferences.keys()].filter((url) => url.startsWith('/images/')).length} local image references resolve in public/`);
 }
 
-// Generate report
-const report = {
-  timestamp: new Date().toISOString(),
-  summary: {
-    totalMedia: mediaUrls.length,
-    validMedia: validMedia.length,
-    brokenMedia: brokenMedia.length,
-  },
-  brokenMedia,
-  validMedia: validMedia.slice(0, 50), // Limit output size
-};
+console.log('\n── Static program image coverage ──');
+const indexSource = fs.readFileSync(path.join(rootDir, 'data/programs/index.ts'), 'utf8');
+const importedProgramFiles = [...indexSource.matchAll(/from ['"]\.\/([^'"]+)['"]/g)].map((match) => match[1]);
+const staticSlugs = [];
+for (const file of importedProgramFiles) {
+  const programPath = path.join(rootDir, 'data/programs', `${file}.ts`);
+  if (!fs.existsSync(programPath)) continue;
+  const source = fs.readFileSync(programPath, 'utf8');
+  const slug = source.match(/\bslug:\s*['"]([^'"]+)['"]/)?.[1];
+  if (slug) staticSlugs.push(slug);
+}
 
-fs.writeFileSync(path.join(reportsDir, 'media_report.json'), JSON.stringify(report, null, 2));
+const imageRegistrySource = fs.readFileSync(path.join(rootDir, 'lib/images/programImages.ts'), 'utf8');
+const registryBody = imageRegistrySource.split('export const PROGRAM_IMAGES')[1]?.split('export function getProgramCardImage')[0] || '';
+const registrySlugs = new Set(
+  [...registryBody.matchAll(/^\s*(?:'([^']+)'|([A-Za-z0-9_-]+)):\s*\{/gm)]
+    .map((match) => match[1] || match[2])
+    .filter(Boolean),
+);
+const unmappedPrograms = [...new Set(staticSlugs)].filter((slug) => !registrySlugs.has(slug));
+if (unmappedPrograms.length) fail(`Static programs missing PROGRAM_IMAGES entries: ${unmappedPrograms.join(', ')}`);
+else pass(`${new Set(staticSlugs).size} static program slugs have canonical card/hero imagery`);
 
-console.log('Media Integrity Report');
-console.log('======================');
-console.log(`Total media references: ${report.summary.totalMedia}`);
-console.log(`Valid media: ${report.summary.validMedia}`);
-console.log(`Broken media: ${report.summary.brokenMedia}`);
+const imageAssignments = [];
+for (const match of registryBody.matchAll(/\b(card|hero):\s*(?:`([^`]+)`|'([^']+)'|"([^"]+)")/g)) {
+  const role = match[1];
+  const raw = match[2] || match[3] || match[4] || '';
+  const resolved = raw.replace(/\$\{P\}/g, '/images/pages');
+  if (resolved.startsWith('/images/')) imageAssignments.push({ role, path: resolved });
+}
+const assignmentOwners = new Map();
+for (const assignment of imageAssignments) {
+  const current = assignmentOwners.get(assignment.path) || [];
+  current.push(assignment.role);
+  assignmentOwners.set(assignment.path, current);
+}
+const duplicateProgramImages = [...assignmentOwners.entries()].filter(([, roles]) => roles.length > 1);
+if (duplicateProgramImages.length) {
+  fail(`Duplicate image assignments inside PROGRAM_IMAGES: ${duplicateProgramImages.map(([src]) => src).join(', ')}`);
+} else {
+  pass('PROGRAM_IMAGES does not reuse a card/hero asset across unrelated entries');
+}
 
-if (brokenMedia.length > 0) {
-  console.log('\nBroken media found:');
-  brokenMedia.forEach(({ url }) => console.log(`  ❌ ${url}`));
-  console.log('\nReport saved to: reports/media_report.json');
+console.log('\n── Portal picture coverage ──');
+const portalRequirements = [
+  ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'learningTools']],
+  ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Your workspaces']],
+  ['Host Shop', 'apps/lms/app/host-shop/dashboard/board/page.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
+  ['Program Holder', 'apps/marketing/app/program-holder/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
+];
+for (const [name, relPath, markers] of portalRequirements) {
+  const source = fs.readFileSync(path.join(rootDir, relPath), 'utf8');
+  const missing = markers.filter((marker) => !source.includes(marker));
+  if (missing.length) fail(`${name} dashboard missing picture contract markers: ${missing.join(', ')}`);
+  else pass(`${name} dashboard has picture-backed hero/program/workspace treatment`);
+}
+
+console.log('\n── Natural voice policy ──');
+const roboticSpeechUses = [];
+scanSourceFiles(['apps', 'components', 'lib'], (_file, relative, content) => {
+  if (
+    /new\s+SpeechSynthesisUtterance\s*\(/.test(content) ||
+    /(?:window\.)?speechSynthesis\.speak\s*\(/.test(content)
+  ) {
+    roboticSpeechUses.push(relative);
+  }
+});
+if (roboticSpeechUses.length) {
+  fail(`Browser SpeechSynthesis output remains in production source: ${roboticSpeechUses.join(', ')}`);
+} else {
+  pass('No production source uses browser SpeechSynthesis for spoken output');
+}
+
+const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
+if (!naturalRoute.includes("model: 'gpt-4o-mini-tts'")) fail('Natural voice handler is not using the configured natural TTS model');
+else pass('Shared natural AI voice handler is configured');
+
+console.log('\n────────────────────────────');
+if (failures) {
+  console.error(`\n❌ Media integrity FAILED — ${failures} issue(s).\n`);
   process.exit(1);
 }
-
-console.log('\n✅ All media valid');
-process.exit(0);
+console.log('\n✅ Media / visual integrity PASSED.\n');

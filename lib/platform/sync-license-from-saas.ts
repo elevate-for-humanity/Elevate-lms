@@ -3,7 +3,11 @@ import { licenseTierForPlan } from '@/lib/store/platform-pricing';
 import type { BasePlanId, BillingInterval } from '@/lib/store/platform-pricing';
 import type { OrganizationEntitlements } from '@/lib/platform/organization-features';
 
-/** Keep licenses.features in sync for middleware that still reads licenses table. */
+/**
+ * Keep licenses.features in sync for middleware that still reads licenses table.
+ * The SaaS subscription remains authoritative; compatibility licenses must never
+ * resurrect access after recurring billing is past due or canceled.
+ */
 export async function syncLicenseFromSaasEntitlements(
   adminSupabase: SupabaseClient,
   organizationId: string,
@@ -13,23 +17,28 @@ export async function syncLicenseFromSaasEntitlements(
     billingInterval: BillingInterval;
     stripeSubscriptionId?: string;
     stripeCustomerId?: string;
+    active?: boolean;
   },
 ): Promise<void> {
+  const active = opts.active !== false;
   const tier = licenseTierForPlan(opts.planSlug, opts.billingInterval);
-  // Entitlements are already normalized through normalizeFeatureCode().
-  const features = [...entitlements.features];
+  const features = active
+    ? entitlements.features.map((f) => (f === 'bookings' ? 'booking' : f))
+    : [];
 
   const payload = {
     tier,
-    status: 'active',
+    status: active ? 'active' : 'suspended',
     features,
-    max_users: entitlements.limits.users ?? 1,
+    max_users: active ? entitlements.limits.users ?? 1 : 0,
     stripe_subscription_id: opts.stripeSubscriptionId ?? null,
     stripe_customer_id: opts.stripeCustomerId ?? null,
     metadata: {
       saas_plan_slug: opts.planSlug,
-      limits: entitlements.limits,
-      addon_codes: entitlements.activeAddonCodes,
+      limits: active ? entitlements.limits : { users: 0 },
+      addon_codes: active ? entitlements.activeAddonCodes : [],
+      subscription_authority: 'organization_subscriptions',
+      billing_access: active,
     },
     updated_at: new Date().toISOString(),
   };

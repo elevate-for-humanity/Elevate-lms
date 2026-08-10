@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
+import { courseOverviewPath } from '@/lib/lms/routes';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -27,7 +28,7 @@ export default async function ApprenticePortalPage() {
   if (!user) redirect('/login?redirect=/apprentice');
 
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
-  if (!programSlug) redirect('/learner/dashboard?notice=apprentice-access-required');
+  if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
   const [profileRes, enrollmentRes, apprenticeRes, hoursRes, docsRes, certsRes] = await Promise.all([
     supabase.from('profiles').select('full_name, first_name, last_name').eq('id', user.id).maybeSingle(),
@@ -86,7 +87,7 @@ export default async function ApprenticePortalPage() {
 
   const actions = [
     { title: 'Clock hours', text: 'Record and review your on-the-job training hours.', href: '/apprentice/timeclock', icon: Clock3 },
-    { title: 'Open RTI course', text: courseTitle, href: enrollment?.course_id ? `/courses/${enrollment.course_id}` : '/apprentice/course', icon: BookOpen },
+    { title: 'Open RTI course', text: courseTitle, href: enrollment?.course_id ? courseOverviewPath(enrollment.course_id) : '/apprentice/course', icon: BookOpen },
     { title: 'Competencies', text: 'Review required skills and supervisor verification.', href: '/apprentice/competencies', icon: Scissors },
     { title: 'Documents', text: 'Review required agreements and uploaded records.', href: '/apprentice/documents', icon: FileText },
   ] as const;

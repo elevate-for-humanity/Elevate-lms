@@ -3,7 +3,6 @@ export const dynamic = 'force-static';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, PlayCircle, Sparkles } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
 import heroBanners from '@/content/heroBanners';
 import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
@@ -22,28 +21,48 @@ export const metadata: Metadata = {
 
 export default function StorePage() {
   const hero = heroBanners.store;
+  const storeVideo = hero.videoSrcDesktop || hero.videoSrcMobile || '';
 
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
-      <HeroVideo
-        videoSrcDesktop={hero.videoSrcDesktop}
-        videoSrcMobile={hero.videoSrcMobile}
-        posterImage={hero.posterImage}
-        voiceoverSrc={hero.voiceoverSrc}
-        microLabel="Elevate Business Operating Platform"
-        transcript={hero.transcript}
-        analyticsName={hero.analyticsName}
-        mediaFit="cover"
-        heightClassName="h-[46vh] min-h-[320px] max-h-[620px]"
-        belowHeroHeadline="Start with what you need. Add more when your business is ready."
-        belowHeroSubheadline="Website, CRM, AI assistants, education, workforce, testing and operations in one platform."
-        ctas={[
-          { label: 'Start 14-Day Free Trial', href: '/store/trial' },
-          { label: 'Watch Website Builder Commercial', href: '#website-builder-commercial', variant: 'secondary' },
-          { label: 'Browse Product Demos', href: '#marketplace', variant: 'secondary' },
-        ]}
-        trustIndicators={hero.trustIndicators}
-      />
+      <section className="border-b border-slate-300 bg-slate-950 py-6 sm:py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="overflow-hidden rounded-2xl border border-white/20 bg-black shadow-2xl">
+            <video
+              src={storeVideo}
+              autoPlay
+              muted
+              playsInline
+              controls
+              preload="metadata"
+              className="aspect-video w-full bg-black object-cover"
+              aria-label="Elevate Store platform commercial"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-300 bg-white py-10 sm:py-12">
+        <div className="mx-auto max-w-5xl px-5 text-center">
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-700">Elevate Business Operating Platform</p>
+          <h1 className="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">Start with what you need. Add more when your business is ready.</h1>
+          <p className="mx-auto mt-4 max-w-3xl text-base font-semibold leading-7 text-slate-800 sm:text-lg">
+            Website, CRM, AI assistants, education, workforce, testing and operations in one connected platform.
+          </p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Link href="/store/trial" className="rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">Start 14-Day Free Trial</Link>
+            <Link href="#website-builder-commercial" className="rounded-xl border-2 border-slate-800 px-6 py-3 font-black text-slate-950 hover:bg-slate-100">Watch Website Builder Commercial</Link>
+            <Link href="#marketplace" className="rounded-xl border-2 border-slate-800 px-6 py-3 font-black text-slate-950 hover:bg-slate-100">Browse Product Demos</Link>
+          </div>
+          {hero.trustIndicators?.length ? (
+            <div className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2">
+              {Array.from(new Set(hero.trustIndicators)).map((item) => (
+                <span key={item} className="text-sm font-bold text-slate-900">• {item}</span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </section>
 
       <section className="border-b border-slate-300 bg-slate-50 py-10">
         <div className="mx-auto grid max-w-6xl gap-6 px-5 md:grid-cols-3">

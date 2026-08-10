@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { WebsiteBuilderApp } from './WebsiteBuilderApp';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
+import { startAppTrial } from '@/lib/trial/start-app-trial';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,10 +24,20 @@ export default async function WebsiteBuilderPage() {
     redirect('/login?redirect=/apps/website-builder&message=login-required');
   }
 
-  const subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
+  let subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
+
+  // First authenticated visit provisions the free trial automatically. The
+  // customer should land in the product, not bounce through another setup page.
+  if (!subscription) {
+    const trial = await startAppTrial(user.id, 'website-builder', supabase);
+    if (trial.status === 'error') {
+      redirect('/store/apps/website-builder?error=trial-start-failed');
+    }
+    subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
+  }
 
   if (!subscription) {
-    redirect('/apps/website-builder/start-trial');
+    redirect('/store/apps/website-builder?error=subscription-unavailable');
   }
 
   if (subscription.status === 'trial' && subscription.trial_ends_at) {

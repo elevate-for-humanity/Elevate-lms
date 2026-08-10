@@ -6,6 +6,9 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+// AUTH: Enforced inside handler — handleCommercialAgentChat calls
+// requireFeatureForAuth, which requires a valid Supabase session and tenant
+// feature/trial entitlement before any AI task is executed.
 async function _POST(request: NextRequest) {
   return handleCommercialAgentChat(request);
 }

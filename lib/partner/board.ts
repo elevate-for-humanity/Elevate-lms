@@ -1,9 +1,13 @@
+import { cookies } from 'next/headers';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { normalizeRole } from '@/lib/rbac/role-matrix';
 import {
   getHostShopOnboardingPaths,
   mergeHostShopDocumentRequirements,
   resolveHostShopProgram,
 } from '@/lib/partners/host-shop-onboarding';
+
+export const HOST_SHOP_ADMIN_COOKIE = '__efh_host_shop_partner';
 
 export const TRADE_TARGETS: Record<string, { hours: number; label: string }> = {
   barber: { hours: 2000, label: 'Barber Apprenticeship' },
@@ -58,9 +62,7 @@ function isPending(row: HourRow) {
   return row.approval_status === 'pending' || row.status === 'pending';
 }
 
-export async function getHostShopBoard(userId: string) {
-  const db = await requireAdminClient();
-
+async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
   const { data: partnerLink, error: partnerLinkError } = await db
     .from('partner_users')
     .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
@@ -68,11 +70,61 @@ export async function getHostShopBoard(userId: string) {
     .eq('status', 'active')
     .maybeSingle();
 
-  if (partnerLinkError || !partnerLink?.partner_id || !partnerLink.partners) {
-    throw new Error('HOST_SHOP_ACCESS_DENIED');
+  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) {
+    return partnerLink.partners as unknown as PartnerRecord;
   }
 
-  const partner = partnerLink.partners as unknown as PartnerRecord;
+  const { data: profile } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+  const role = normalizeRole(profile?.role);
+  const isPlatformAdmin = role === 'admin' || role === 'super_admin' || role === 'org_admin';
+  if (!isPlatformAdmin) throw new Error('HOST_SHOP_ACCESS_DENIED');
+
+  const cookieStore = await cookies();
+  const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
+  if (!selectedPartnerId) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
+
+  const { data: selectedPartner, error: selectedPartnerError } = await db
+    .from('partners')
+    .select('id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state')
+    .eq('id', selectedPartnerId)
+    .maybeSingle();
+
+  if (selectedPartnerError || !selectedPartner) {
+    throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
+  }
+
+  return selectedPartner as PartnerRecord;
+}
+
+export async function getHostShopAdminPartnerOptions() {
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('partners')
+    .select('id, name, partner_type, program_type, programs, approval_status, status, city, state')
+    .order('name', { ascending: true });
+
+  if (error) throw new Error(`HOST_SHOP_PARTNER_OPTIONS_FAILED:${error.message}`);
+
+  return (data ?? []).filter((partner: any) => {
+    const values = [
+      partner.partner_type,
+      partner.program_type,
+      ...(Array.isArray(partner.programs) ? partner.programs : []),
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(values);
+  });
+}
+
+export async function getHostShopBoard(userId: string) {
+  const db = await requireAdminClient();
+  const partner = await resolvePartnerForBoard(db, userId);
 
   const [{ data: partnerShops, error: partnerShopError }, { data: staffLinks, error: staffError }] =
     await Promise.all([
@@ -96,7 +148,7 @@ export async function getHostShopBoard(userId: string) {
   }
   for (const row of staffLinks || []) {
     const shop = (row as any).shops;
-    if (shop?.id && shop.active !== false) shopMap.set(shop.id, shop);
+    if (shop?.id && shop.active !== false && shop.partner_id === partner.id) shopMap.set(shop.id, shop);
   }
 
   const shops = Array.from(shopMap.values());
@@ -175,7 +227,9 @@ export async function getHostShopBoard(userId: string) {
 
   const programIds = Array.from(new Set([
     programType,
-    ...(programAccess || []).map((row: { program_id?: string }) => row.program_id).filter((value): value is string => Boolean(value)),
+    ...(programAccess || [])
+      .map((row: { program_id?: string }) => row.program_id)
+      .filter((value): value is string => Boolean(value)),
   ]));
 
   const { data: dbRequirements } = await db
@@ -208,7 +262,9 @@ export async function getHostShopBoard(userId: string) {
     };
   });
   const missingDocuments = documentStatuses.filter(
-    (document: any) => document.is_required && (!document.uploaded || ['missing', 'rejected', 'expired'].includes(document.status)),
+    (document: any) =>
+      document.is_required &&
+      (!document.uploaded || ['missing', 'rejected', 'expired'].includes(document.status)),
   );
   const pendingDocuments = documentStatuses.filter(
     (document: any) => document.is_required && document.status === 'pending',

@@ -17,19 +17,19 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
  */
 
 export type ProviderFetchStrategy =
-  | 'public_api'      // Free public API, no key required
-  | 'api_key'         // Requires API key in env
-  | 'oauth'           // Requires OAuth flow
-  | 'static_catalog'  // Pre-imported static catalog in codebase
-  | 'manual_import';  // Admin manually imports content via upload
+  | 'public_api'
+  | 'api_key'
+  | 'oauth'
+  | 'static_catalog'
+  | 'manual_import';
 
 export type ContentLicense =
-  | 'cc_by'           // Creative Commons Attribution
-  | 'cc_by_sa'        // CC Attribution-ShareAlike
-  | 'cc_by_nc'        // CC Attribution-NonCommercial
-  | 'free_to_use'     // Free but not CC (e.g. Microsoft Learn)
-  | 'licensed'        // Requires license agreement
-  | 'proprietary';    // Elevate-owned content
+  | 'cc_by'
+  | 'cc_by_sa'
+  | 'cc_by_nc'
+  | 'free_to_use'
+  | 'licensed'
+  | 'proprietary';
 
 export interface ApprovedProvider {
   id: string;
@@ -38,27 +38,17 @@ export interface ApprovedProvider {
   description: string;
   fetchStrategy: ProviderFetchStrategy;
   license: ContentLicense;
-  /** Program category slugs this provider is approved for */
   approvedCategories: string[];
-  /** Certiport exam codes this provider maps to (if any) */
   certiportExamCodes?: string[];
-  /** Whether this provider's content counts toward compliance hours */
   countsForComplianceHours: boolean;
-  /** Whether content from this provider can be used in WIOA-funded programs */
   wioaEligible: boolean;
-  /** API base URL for fetch strategy */
   apiBase?: string;
-  /** Env var name for API key (if required) */
   apiKeyEnvVar?: string;
-  /** Whether this provider is currently active */
   active: boolean;
-  /** Notes for instructional designers */
   notes?: string;
 }
 
 export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
-
-  // ── Microsoft Learn ────────────────────────────────────────────────────────
   'microsoft-learn': {
     id: 'microsoft-learn',
     name: 'Microsoft Learn',
@@ -75,22 +65,6 @@ export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
     notes: 'Public catalog API. No key required. Cache 24h. Use for IT, Office, and Azure programs.',
   },
 
-  // ── Google Career Certificates ─────────────────────────────────────────────
-  'google-career-certificates': {
-    id: 'google-career-certificates',
-    name: 'Google Career Certificates',
-    url: 'https://grow.google/certificates',
-    description: 'Google-authored career certificates in IT, data analytics, cybersecurity, UX, and project management.',
-    fetchStrategy: 'static_catalog',
-    license: 'free_to_use',
-    approvedCategories: ['technology', 'it-help-desk', 'cybersecurity', 'data-analytics', 'project-management', 'ux-design'],
-    countsForComplianceHours: false,
-    wioaEligible: true,
-    active: true,
-    notes: 'No public API. Use static catalog mapping. Content available via Coursera partnership.',
-  },
-
-  // ── IBM SkillsBuild ────────────────────────────────────────────────────────
   'ibm-skillsbuild': {
     id: 'ibm-skillsbuild',
     name: 'IBM SkillsBuild',
@@ -105,8 +79,7 @@ export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
     notes: 'No public API. Use static catalog. Strong for AI literacy and workforce readiness modules.',
   },
 
-  // ── Certiport (via static catalog) ────────────────────────────────────────
-  'certiport': {
+  certiport: {
     id: 'certiport',
     name: 'Certiport / Pearson VUE',
     url: 'https://certiport.pearsonvue.com',
@@ -121,15 +94,14 @@ export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
     notes: 'Exam objectives are the authoritative content source. Elevate is CATC — students test on-site.',
   },
 
-  // ── O*NET / DOL ────────────────────────────────────────────────────────────
-  'onet': {
+  onet: {
     id: 'onet',
     name: 'O*NET OnLine (DOL)',
     url: 'https://www.onetonline.org',
     description: 'US Department of Labor occupational data: skills, tasks, wages, and workforce outcomes by SOC code.',
     fetchStrategy: 'public_api',
     license: 'cc_by',
-    approvedCategories: ['*'], // All programs — used for workforce outcome alignment
+    approvedCategories: ['*'],
     countsForComplianceHours: false,
     wioaEligible: true,
     apiBase: 'https://services.onetcenter.org/ws',
@@ -138,7 +110,6 @@ export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
     notes: 'Use for workforce outcome alignment on all programs. Free API with registration.',
   },
 
-  // ── Indiana DOL / ETPL ─────────────────────────────────────────────────────
   'indiana-etpl': {
     id: 'indiana-etpl',
     name: 'Indiana ETPL',
@@ -153,7 +124,6 @@ export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
     notes: 'Elevate programs must be on ETPL for WIOA funding. Manual import from DWD portal.',
   },
 
-  // ── Elevate Proprietary Content ────────────────────────────────────────────
   'elevate-proprietary': {
     id: 'elevate-proprietary',
     name: 'Elevate for Humanity (Proprietary)',
@@ -169,23 +139,18 @@ export const APPROVED_PROVIDERS: Record<string, ApprovedProvider> = {
   },
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-/** Get all active providers approved for a given program category */
 export function getApprovedProvidersForCategory(category: string): ApprovedProvider[] {
   return Object.values(APPROVED_PROVIDERS).filter(
     (p) => p.active && (p.approvedCategories.includes('*') || p.approvedCategories.includes(category)),
   );
 }
 
-/** Get providers that map to a specific Certiport exam code */
 export function getProvidersForExam(examCode: string): ApprovedProvider[] {
   return Object.values(APPROVED_PROVIDERS).filter(
     (p) => p.active && p.certiportExamCodes?.includes(examCode),
   );
 }
 
-/** Build a context string listing approved providers for the AI orchestrator */
 export function buildProviderConstraintPrompt(category: string): string {
   const providers = getApprovedProvidersForCategory(category);
   const list = providers.map((p) => `- ${p.name}: ${p.description}`).join('\n');

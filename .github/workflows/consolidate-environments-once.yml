@@ -1,5 +1,6 @@
 name: Consolidate Completed Environments Once
 
+# Retriggered after all parallel environments completed.
 on:
   push:
     branches:

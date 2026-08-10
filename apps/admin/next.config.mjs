@@ -1,11 +1,7 @@
 /**
  * apps/admin/next.config.mjs
- *
  * Standalone Next.js app for admin/instructor/staff/internal APIs.
- * Shared code (lib/, components/, types/) lives at the repo root and is
- * imported via the @/* path alias which resolves to ../../*.
  */
-
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { sharedStandaloneTraceExcludes } from '../../scripts/next-standalone-trace-excludes.mjs';
@@ -31,7 +27,7 @@ const adminConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: process.env.BUILD_TIMESTAMP ?? 'unknown',
   },
 
-  typescript: { ignoreBuildErrors: true },
+  typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
 
   experimental: {
@@ -65,13 +61,8 @@ const adminConfig = {
 
   async redirects() {
     return [
-      // Canonical staff workspace lives directly under /staff-portal on the
-      // Admin hostname. Preserve old /admin/staff-portal bookmarks without
-      // keeping a second operational URL hierarchy.
       { source: '/admin/staff-portal', destination: '/staff-portal/dashboard', permanent: true },
       { source: '/admin/staff-portal/:path*', destination: '/staff-portal/:path*', permanent: true },
-
-      // Only genuine cross-application redirects belong here.
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
       { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },

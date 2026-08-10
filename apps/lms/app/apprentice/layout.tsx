@@ -11,7 +11,13 @@ import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
   title: 'Apprentice Portal',
-  description: 'Apprentice dashboard, hours, documents, and training.',
+  description: 'Apprentice dashboard, hours, RTI, competencies, documents, and host-site progress.',
+  manifest: '/manifest-apprentice.json',
+  appleWebApp: {
+    capable: true,
+    title: 'Elevate Apprentice',
+    statusBarStyle: 'black-translucent',
+  },
 };
 export const dynamic = 'force-dynamic';
 
@@ -35,8 +41,6 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
   const privileged = ['admin', 'super_admin', 'staff'].includes(String(profile?.role || ''));
 
-  // Authentication alone is not sufficient. A normal learner must have an
-  // active/recognized apprenticeship assignment before entering this portal.
   if (!privileged && !programSlug) {
     redirect('/learner/dashboard?notice=apprentice-access-required');
   }

@@ -18,10 +18,8 @@ const nextConfig = {
   },
 
   images: { unoptimized: true },
-  typescript: {
-    // Disable type checking during build — run separately via `pnpm --filter @elevate/lms exec tsc --noEmit`
-    ignoreBuildErrors: true,
-  },
+  // TypeScript is a release gate. Direct LMS builds must not bypass compiler errors.
+  typescript: { ignoreBuildErrors: false },
   eslint: {
     ignoreDuringBuilds: true,
   },

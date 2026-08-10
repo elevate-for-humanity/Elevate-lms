@@ -23,6 +23,9 @@ export async function handleCommercialAgentChat(request: NextRequest) {
   const agent = getCommercialAgent(typeof body.agent === 'string' ? body.agent.toLowerCase() : '');
   if (!agent) return NextResponse.json({ error: 'Unknown AI assistant' }, { status: 400 });
 
+  const message = typeof body.message === 'string' ? body.message.trim().slice(0, 6000) : '';
+  if (!message) return NextResponse.json({ error: 'message is required' }, { status: 400 });
+
   let access = await requireFeatureForAuth(request, agent.feature);
   let trialCredits: { charged: number; balance: number | null } | null = null;
 
@@ -57,9 +60,6 @@ export async function handleCommercialAgentChat(request: NextRequest) {
     trialCredits = { charged: credit.charged, balance: credit.balance };
     access = { userId: user.id, tenantId: 'website-builder-trial' };
   }
-
-  const message = typeof body.message === 'string' ? body.message.trim().slice(0, 6000) : '';
-  if (!message) return NextResponse.json({ error: 'message is required' }, { status: 400 });
 
   const history: ChatMessage[] = Array.isArray(body.history)
     ? body.history

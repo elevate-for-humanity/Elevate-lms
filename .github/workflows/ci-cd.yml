@@ -51,7 +51,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # HARD QUALITY GATE. TypeScript, tests, smoke, and build must all pass.
   test-and-build:
     runs-on: ubuntu-latest
 
@@ -120,13 +119,23 @@ jobs:
       - name: Run smoke tests
         run: bash scripts/smoke-test.sh
 
-      # CRITICAL: this is intentionally blocking. Do not add continue-on-error,
-      # `|| true`, or a baseline exception. A successful CI run now proves the
-      # checked commit completed full repository tsc --noEmit with zero errors.
-      - name: Full TypeScript gate
+      # HARD BLOCKING RELEASE GATE. Each deployed application owns its own
+      # TypeScript project. Shared code imported by the app is checked
+      # transitively, avoiding the old misleading root-only `typecheck:full`.
+      - name: TypeScript — Marketing
         env:
           NODE_OPTIONS: '--max-old-space-size=8192'
-        run: npm run typecheck:full
+        run: pnpm exec tsc --noEmit -p apps/marketing/tsconfig.json
+
+      - name: TypeScript — LMS
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm exec tsc --noEmit -p apps/lms/tsconfig.json
+
+      - name: TypeScript — Admin
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm exec tsc --noEmit -p apps/admin/tsconfig.json
 
       - name: Route governance (strict)
         run: npm run platform:doctor:strict
@@ -199,7 +208,6 @@ jobs:
           retention-days: 1
           compression-level: 9
 
-  # Legacy lint remains informational until existing repository-wide lint debt is removed.
   legacy-lint:
     runs-on: ubuntu-latest
     continue-on-error: true

@@ -168,7 +168,6 @@ export default async function LicensingPage() {
                       </td>
                       <td className="p-4 text-center">
                         {row.generic === true ? <CheckCircle className="w-5 h-5 text-emerald-500 mx-auto" /> :
-                         row.generic === 'partial' ? <Minus className="w-5 h-5 text-yellow-500 mx-auto" /> :
                          <XCircle className="w-5 h-5 text-slate-300 mx-auto" />}
                       </td>
                       <td className="p-4 text-center">

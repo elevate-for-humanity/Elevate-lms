@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plus, ExternalLink, Pencil, Globe2, Upload, Sparkles } from 'lucide-react';
+import { Plus, ExternalLink, Pencil, Globe2, Upload, Sparkles, X } from 'lucide-react';
 import { ParisWebsiteInterview } from '@/components/store/ParisWebsiteInterview';
 
 type WebsiteRow = {
@@ -31,6 +31,7 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
   const [websites, setWebsites] = useState(initialWebsites);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showInterview, setShowInterview] = useState(initialWebsites.length === 0);
 
   const createWebsite = async () => {
     setCreating(true);
@@ -59,20 +60,30 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
             <p className="text-sm font-bold uppercase tracking-widest text-brand-red-700">Elevate Apps</p>
             <h1 className="mt-1 text-3xl font-black text-slate-900">AI Website Builder</h1>
             <p className="mt-2 max-w-2xl text-slate-600">
-              Build with PARIS, import an existing website, or start manually. Then edit, preview and publish from one workspace.
+              PARIS interviews you, turns your answers into a website brief, generates the first draft, and opens it in the editor for review and publishing.
             </p>
           </div>
-          {websites.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={createWebsite}
-              disabled={creating}
-              className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700 disabled:opacity-60"
+              onClick={() => setShowInterview(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700"
             >
-              <Plus className="h-5 w-5" />
-              {creating ? 'Creating…' : 'New Website'}
+              <Sparkles className="h-5 w-5" />
+              Build with PARIS
             </button>
-          ) : null}
+            {websites.length > 0 ? (
+              <button
+                type="button"
+                onClick={createWebsite}
+                disabled={creating}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-800 hover:bg-slate-50 disabled:opacity-60"
+              >
+                <Plus className="h-5 w-5" />
+                {creating ? 'Creating…' : 'Blank Website'}
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -91,25 +102,44 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
 
         {error && <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">{error}</div>}
 
+        {showInterview ? (
+          <section id="paris-website-interview" className="mt-8 rounded-3xl border border-brand-red-200 bg-brand-red-50/40 p-3 sm:p-5">
+            {websites.length > 0 ? (
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowInterview(false)}
+                  className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-bold text-slate-600 hover:bg-white hover:text-slate-900"
+                  aria-label="Close PARIS interview"
+                >
+                  <X className="h-4 w-4" /> Close
+                </button>
+              </div>
+            ) : null}
+            <ParisWebsiteInterview
+              onCreated={(website) => {
+                setWebsites((current) => [website, ...current]);
+                setShowInterview(false);
+              }}
+            />
+          </section>
+        ) : null}
+
         {websites.length === 0 ? (
-          <div className="mt-8 space-y-6">
-            <ParisWebsiteInterview onCreated={(website) => setWebsites((current) => [website, ...current])} />
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            <Link href="/apps/website-builder/import" className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-brand-red-300 hover:shadow-md">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Upload className="h-5 w-5" /></div>
+              <h2 className="mt-4 text-xl font-black text-slate-950">Import an existing website</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Bring a public site into the Elevate builder, let AI map its content and branding, then review everything before publishing.</p>
+              <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start import →</span>
+            </Link>
 
-            <div className="grid gap-5 md:grid-cols-2">
-              <Link href="/apps/website-builder/import" className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-brand-red-300 hover:shadow-md">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-red-50 text-brand-red-700"><Upload className="h-5 w-5" /></div>
-                <h2 className="mt-4 text-xl font-black text-slate-950">Import an existing website</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">Bring a public site into the Elevate builder, let AI map its content and branding, then review everything before publishing.</p>
-                <span className="mt-5 inline-flex font-black text-brand-red-700 group-hover:underline">Start import →</span>
-              </Link>
-
-              <button type="button" onClick={createWebsite} disabled={creating} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-slate-300 hover:shadow-md disabled:opacity-60">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-800"><Globe2 className="h-5 w-5" /></div>
-                <h2 className="mt-4 text-xl font-black text-slate-950">Start manually</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-600">Open a clean starter website and edit the branding, homepage, SEO and publishing settings yourself.</p>
-                <span className="mt-5 inline-flex font-black text-slate-950">{creating ? 'Creating…' : 'Create blank starter →'}</span>
-              </button>
-            </div>
+            <button type="button" onClick={createWebsite} disabled={creating} className="group rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm hover:border-slate-300 hover:shadow-md disabled:opacity-60">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-800"><Globe2 className="h-5 w-5" /></div>
+              <h2 className="mt-4 text-xl font-black text-slate-950">Start manually</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Open a clean starter website and edit the branding, homepage, SEO and publishing settings yourself.</p>
+              <span className="mt-5 inline-flex font-black text-slate-950">{creating ? 'Creating…' : 'Create blank starter →'}</span>
+            </button>
           </div>
         ) : (
           <section className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -151,9 +181,9 @@ export function WebsiteBuilderApp({ subscription, websites: initialWebsites, tri
 
         <div className="mt-10 grid gap-5 md:grid-cols-2">
           <div className="rounded-2xl border border-brand-red-200 bg-brand-red-50 p-6">
-            <div className="flex items-center gap-2 text-brand-red-700"><Sparkles className="h-5 w-5" /><h2 className="text-lg font-black">Upgrade your AI team</h2></div>
-            <p className="mt-2 text-sm leading-6 text-slate-700">Add PARIS for sales and intake, ELLIE for support, LIZZY for operations, and ZORA for compliance as your organization grows.</p>
-            <Link href="/store#marketplace" className="mt-4 inline-flex font-black text-brand-red-700 hover:underline">Explore AI assistants →</Link>
+            <div className="flex items-center gap-2 text-brand-red-700"><Sparkles className="h-5 w-5" /><h2 className="text-lg font-black">Build another site with PARIS</h2></div>
+            <p className="mt-2 text-sm leading-6 text-slate-700">Run the interview again for another business, program, service, or campaign. PARIS creates a separate draft instead of overwriting an existing site.</p>
+            <button type="button" onClick={() => setShowInterview(true)} className="mt-4 inline-flex font-black text-brand-red-700 hover:underline">Start another interview →</button>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 className="text-lg font-black text-slate-900">Need more sites or advanced capacity?</h2>

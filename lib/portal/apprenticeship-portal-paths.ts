@@ -1,19 +1,23 @@
 /**
- * Per-program apprenticeship portal URLs.
- * Used by login, learner dashboard, and portal router — keep in sync.
+ * Canonical apprenticeship portal destinations.
+ *
+ * All apprenticeship occupations use the LMS /apprentice workspace. The
+ * program query parameter is context only; the authenticated enrollment record
+ * remains authoritative. Historical /portal/<trade> URLs are compatibility
+ * redirects in the Marketing Next config.
  */
 
 export const APPRENTICESHIP_SLUG_TO_PORTAL_PATH: Record<string, string> = {
-  'barber-apprenticeship': '/portal/barber',
-  'cosmetology-apprenticeship': '/portal/cosmetology',
-  'esthetician-apprenticeship': '/portal/esthetician',
-  'nail-technician-apprenticeship': '/portal/nail-technician',
-  'culinary-apprenticeship': '/portal/culinary',
-  electrical: '/portal/electrical',
-  plumbing: '/portal/plumbing',
+  'barber-apprenticeship': '/apprentice?program=barber-apprenticeship',
+  'cosmetology-apprenticeship': '/apprentice?program=cosmetology-apprenticeship',
+  'esthetician-apprenticeship': '/apprentice?program=esthetician-apprenticeship',
+  'nail-technician-apprenticeship': '/apprentice?program=nail-technician-apprenticeship',
+  'culinary-apprenticeship': '/apprentice?program=culinary-apprenticeship',
+  electrical: '/apprentice?program=electrical',
+  plumbing: '/apprentice?program=plumbing',
 };
 
-/** program_slug → profiles.portal_type value (see migration 20260526000002) */
+/** program_slug → profiles.portal_type compatibility value. */
 export const APPRENTICESHIP_SLUG_TO_PORTAL_TYPE: Record<string, string> = {
   'barber-apprenticeship': 'barber',
   'cosmetology-apprenticeship': 'cosmetology',

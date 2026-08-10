@@ -176,7 +176,11 @@ export async function getOrganizationFeatures(
   for (const row of addonRows ?? []) {
     const addonCode = normalizeAddonCode(row.addon_code);
     activeAddonCodes.push(addonCode);
-    const cat = row.saas_addon_catalog as { feature_codes: string[] } | null;
+    const catalogJoin = row.saas_addon_catalog as
+      | { feature_codes: string[] }
+      | { feature_codes: string[] }[]
+      | null;
+    const cat = Array.isArray(catalogJoin) ? catalogJoin[0] : catalogJoin;
     const dbFeatureCodes = cat?.feature_codes ?? [];
     for (const code of dbFeatureCodes) addFeature(featureSet, code);
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);

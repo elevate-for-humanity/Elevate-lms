@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - authenticated testing-center operation; apiRequireTestingCenter runs before the privileged exam_scheduling insert.
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { apiRequireTestingCenter } from '@/lib/admin/guards';

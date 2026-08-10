@@ -19,14 +19,9 @@ case "$core_pm" in
   *)    npm ci || npm install ;;
 esac
 
-# Ensure design system CSS is imported
-if ! grep -q "design-system.css" ./src/main.tsx 2>/dev/null; then
-  echo "🎨 Design system CSS already configured in main.tsx"
-fi
-
-# Ensure Tailwind config exists (already configured with EFH design system)
+# Ensure Tailwind config exists (configured for the Elevate design system)
 if [ -f tailwind.config.js ]; then
-  echo "✅ Tailwind config found (EFH design system)"
+  echo "✅ Tailwind config found"
 else
   echo "⚠️  Warning: tailwind.config.js not found"
 fi
@@ -49,9 +44,6 @@ VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY:-}
 
 # Application Form URL (optional)
 VITE_APPLICATION_FORM_URL=${VITE_APPLICATION_FORM_URL:-https://www.indianacareerconnect.com}
-
-# Analytics (optional)
-VITE_GA_MEASUREMENT_ID=${VITE_GA_MEASUREMENT_ID:-G-EFHWORKFORCE01}
 ENV
 
   if [ "${VITE_SUPABASE_URL:-your_supabase_url_here}" = "your_supabase_url_here" ]; then

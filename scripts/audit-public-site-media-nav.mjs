@@ -20,12 +20,20 @@ const HERO_OPTIONAL = [
   /^\/accessibility(?:\/|$)/,
 ];
 
-const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
-const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
+const abs = (rel) => path.join(ROOT, rel);
+const exists = (rel) => fs.existsSync(abs(rel));
+const isFile = (rel) => {
+  try {
+    return fs.statSync(abs(rel)).isFile();
+  } catch {
+    return false;
+  }
+};
+const read = (rel) => fs.readFileSync(abs(rel), 'utf8');
 const lineNumber = (source, index) => source.slice(0, index).split('\n').length;
 
 function walk(relDir) {
-  const absDir = path.join(ROOT, relDir);
+  const absDir = abs(relDir);
   if (!fs.existsSync(absDir)) return [];
   const out = [];
   for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
@@ -42,7 +50,11 @@ const ALL_PAGE_FILES = ALL_MARKETING_FILES.filter((file) => PAGE_NAMES.has(path.
 
 function routeSegmentsForPage(file) {
   const rel = file.slice(MARKETING_APP.length).replace(/^\//, '');
-  return rel.split('/').slice(0, -1).filter(Boolean).filter((segment) => !/^\(.*\)$/.test(segment) && !segment.startsWith('@'));
+  return rel
+    .split('/')
+    .slice(0, -1)
+    .filter(Boolean)
+    .filter((segment) => !/^\(.*\)$/.test(segment) && !segment.startsWith('@'));
 }
 
 function pathSegments(href) {
@@ -89,24 +101,26 @@ function routeExists(href) {
 
 function publicAssetExists(assetPath) {
   const clean = assetPath.replace(/^\//, '').split(/[?#]/)[0];
-  return exists(`public/${clean}`) || exists(`apps/marketing/public/${clean}`);
+  return isFile(`public/${clean}`) || isFile(`apps/marketing/public/${clean}`);
 }
 
 function resolveSourceImport(fromFile, specifier) {
   if (!specifier || (!specifier.startsWith('.') && !specifier.startsWith('@/'))) return null;
-  let base;
-  if (specifier.startsWith('@/')) base = specifier.slice(2);
-  else base = path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier));
-  const candidates = [base];
-  if (!path.extname(base)) {
+  const base = specifier.startsWith('@/')
+    ? specifier.slice(2)
+    : path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier));
+
+  const candidates = [];
+  if (path.extname(base)) candidates.push(base);
+  else {
     for (const ext of SOURCE_EXTS) candidates.push(`${base}${ext}`);
     for (const ext of SOURCE_EXTS) candidates.push(`${base}/index${ext}`);
   }
-  return candidates.find((candidate) => exists(candidate)) ?? null;
+  return candidates.find((candidate) => isFile(candidate)) ?? null;
 }
 
 function directDependencies(file) {
-  if (!exists(file) || !SOURCE_EXTS.includes(path.extname(file))) return [];
+  if (!isFile(file) || !SOURCE_EXTS.includes(path.extname(file))) return [];
   const source = read(file);
   const deps = new Set();
   const patterns = [
@@ -128,7 +142,7 @@ function dependencyClosure(seeds) {
   const queue = [...seeds].filter(Boolean);
   while (queue.length) {
     const file = queue.shift();
-    if (!file || seen.has(file) || !exists(file)) continue;
+    if (!file || seen.has(file) || !isFile(file)) continue;
     seen.add(file);
     for (const dep of directDependencies(file)) if (!seen.has(dep)) queue.push(dep);
   }
@@ -137,7 +151,7 @@ function dependencyClosure(seeds) {
 
 function parseRouteConstants() {
   const routesFile = 'lib/navigation/routes.ts';
-  if (!exists(routesFile)) return new Map();
+  if (!isFile(routesFile)) return new Map();
   const source = read(routesFile);
   const routes = new Map();
   for (const match of source.matchAll(/^\s*([A-Za-z0-9_]+):\s*'([^']+)'/gm)) routes.set(match[1], match[2]);
@@ -156,7 +170,7 @@ function parseRouteConstants() {
 
 function collectNavItems(routeConstants) {
   const navFile = 'lib/navigation.ts';
-  if (!exists(navFile)) return [];
+  if (!isFile(navFile)) return [];
   const source = read(navFile);
   const items = [];
   const itemPattern = /\{\s*name:\s*'([^']+)'\s*,([^{}]*?)\}/g;
@@ -174,7 +188,7 @@ function collectNavItems(routeConstants) {
 
 function collectSitemapHrefs(routeConstants) {
   const sitemapFile = `${MARKETING_APP}/sitemap.ts`;
-  if (!exists(sitemapFile)) return new Set();
+  if (!isFile(sitemapFile)) return new Set();
   const source = read(sitemapFile);
   const hrefs = new Set();
   for (const match of source.matchAll(/ROUTES\.([A-Za-z0-9_]+)/g)) {
@@ -192,7 +206,7 @@ function pageSourceBundle(href) {
   const page = routePageFile(href);
   if (!page) return { page: null, files: new Set(), source: '' };
   const files = dependencyClosure([page]);
-  const source = [...files].filter(exists).map((file) => read(file)).join('\n');
+  const source = [...files].map((file) => read(file)).join('\n');
   return { page, files, source };
 }
 
@@ -200,14 +214,14 @@ function collectCanonicalFiles(sitemapHrefs, publicNavItems) {
   const seeds = [];
   for (const href of sitemapHrefs) seeds.push(routePageFile(href));
   for (const item of publicNavItems) seeds.push(routePageFile(item.href));
-  for (const layout of [`${MARKETING_APP}/layout.tsx`, `${MARKETING_APP}/layout.ts`]) if (exists(layout)) seeds.push(layout);
+  for (const layout of [`${MARKETING_APP}/layout.tsx`, `${MARKETING_APP}/layout.ts`]) if (isFile(layout)) seeds.push(layout);
   return dependencyClosure(seeds);
 }
 
 function collectImageRefs(files) {
   const refs = [];
   for (const file of files) {
-    if (!exists(file)) continue;
+    if (!isFile(file)) continue;
     const source = read(file);
     for (const match of source.matchAll(ASSET_RE)) refs.push({ file, path: match[1], line: lineNumber(source, match.index ?? 0) });
   }
@@ -245,7 +259,7 @@ function collectImageComponentFindings(files) {
   const badSizing = [];
   const rawImgMissingAlt = [];
   for (const file of files) {
-    if (!exists(file) || !['.tsx', '.jsx'].includes(path.extname(file))) continue;
+    if (!isFile(file) || !['.tsx', '.jsx'].includes(path.extname(file))) continue;
     const source = read(file);
     if (importsNextImage(source)) {
       for (const match of source.matchAll(/<Image\b[\s\S]*?\/>/g)) {
@@ -295,7 +309,7 @@ function collectActionFindings(files, routeConstants) {
   const deadActions = [];
   const inertButtons = [];
   for (const file of files) {
-    if (!exists(file) || !['.tsx', '.jsx'].includes(path.extname(file))) continue;
+    if (!isFile(file) || !['.tsx', '.jsx'].includes(path.extname(file))) continue;
     const source = read(file);
     for (const match of source.matchAll(/<(?:Link|a)\b[^>]*\bhref\s*=\s*(?:["']([^"']+)["']|\{ROUTES\.([A-Za-z0-9_]+)\})/g)) {
       const href = match[2] ? routeConstants.get(match[2]) : match[1];
@@ -333,7 +347,7 @@ function collectContrastRisks(files) {
   const darkBg = /\bbg-(?:black|slate-800|slate-900|slate-950|gray-900|gray-950|brand-blue-700|brand-blue-800|brand-blue-900)\b/;
   const weakOnDark = /\btext-(?:black|slate|gray|zinc|neutral|stone)-(?:600|700|800|900|950)\b/;
   for (const file of files) {
-    if (!exists(file) || !['.tsx', '.jsx'].includes(path.extname(file))) continue;
+    if (!isFile(file) || !['.tsx', '.jsx'].includes(path.extname(file))) continue;
     const source = read(file);
     for (const match of source.matchAll(classPattern)) {
       const classes = baseTailwindClasses(match[1]);

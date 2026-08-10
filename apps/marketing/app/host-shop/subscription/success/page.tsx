@@ -10,13 +10,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Host Shop Subscription Confirmed | Elevate', robots: { index: false, follow: false } };
 
+const HOST_SHOP_DASHBOARD_URL = 'https://app.elevateforhumanity.org/host-shop/dashboard';
+
 export default async function HostShopSubscriptionSuccess({
   searchParams,
 }: {
   searchParams: Promise<{ session_id?: string }>;
 }) {
   const { session_id: sessionId } = await searchParams;
-  if (!sessionId) redirect('/host-shop/dashboard/subscription');
+  if (!sessionId) redirect(HOST_SHOP_DASHBOARD_URL);
 
   await hydrateProcessEnv();
   const supabase = await createClient();
@@ -65,7 +67,7 @@ export default async function HostShopSubscriptionSuccess({
         <p className="text-sm font-black uppercase tracking-widest text-emerald-700">Subscription confirmed</p>
         <h1 className="mt-3 text-3xl font-black text-slate-950">Host Shop access is synchronized</h1>
         <p className="mt-4 leading-7 text-slate-600">Your Stripe subscription and Elevate Host Shop partnership now use the same billing status.</p>
-        <Link href="https://app.elevateforhumanity.org/host-shop/dashboard" className="mt-8 inline-flex rounded-xl bg-slate-950 px-6 py-3 font-bold text-white">
+        <Link href={HOST_SHOP_DASHBOARD_URL} className="mt-8 inline-flex rounded-xl bg-slate-950 px-6 py-3 font-bold text-white">
           Open Host Shop Dashboard
         </Link>
       </div>
@@ -79,8 +81,8 @@ function Failure({ message }: { message: string }) {
       <div className="mx-auto max-w-xl rounded-2xl border border-amber-200 bg-white p-8 text-center shadow-sm">
         <h1 className="text-2xl font-black text-slate-950">Subscription verification pending</h1>
         <p className="mt-3 text-slate-600">{message}</p>
-        <Link href="/host-shop/dashboard/subscription" className="mt-6 inline-flex rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">
-          Return to subscription settings
+        <Link href={HOST_SHOP_DASHBOARD_URL} className="mt-6 inline-flex rounded-xl bg-slate-950 px-5 py-3 font-bold text-white">
+          Return to Host Shop Dashboard
         </Link>
       </div>
     </main>

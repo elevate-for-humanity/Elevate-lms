@@ -54,19 +54,12 @@ function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
   }
 }
 
-/**
- * Normalize either identifier used historically by billing:
- * - tenants.id (canonical application identity)
- * - organizations.id (legacy Stripe metadata / billing identity)
- */
 export async function resolveOrganizationIdentity(
   tenantOrOrganizationId: string,
   client?: SupabaseClient,
 ): Promise<OrganizationIdentity> {
   const supabase = client ?? (await requireAdminClient());
-  if (!supabase) {
-    return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
-  }
+  if (!supabase) return { tenantId: tenantOrOrganizationId, billingOrganizationId: null };
 
   const { data: byTenant } = await supabase
     .from('organizations')
@@ -99,23 +92,15 @@ export async function resolveBillingOrganizationId(
   tenantOrOrganizationId: string,
   client?: SupabaseClient,
 ): Promise<string | null> {
-  const identity = await resolveOrganizationIdentity(tenantOrOrganizationId, client);
-  return identity.billingOrganizationId;
+  return (await resolveOrganizationIdentity(tenantOrOrganizationId, client)).billingOrganizationId;
 }
 
-/**
- * Load merged feature codes for a SaaS tenant. Legacy organizations.id callers
- * are normalized at this boundary so downstream feature checks always operate
- * on tenants.id.
- */
 export async function getOrganizationFeatures(
   tenantOrOrganizationId: string,
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const supabase = client ?? (await requireAdminClient());
-  if (!supabase) {
-    return emptyEntitlements(tenantOrOrganizationId);
-  }
+  if (!supabase) return emptyEntitlements(tenantOrOrganizationId);
 
   const identity = await resolveOrganizationIdentity(tenantOrOrganizationId, supabase);
   const tenantId = identity.tenantId;
@@ -125,9 +110,7 @@ export async function getOrganizationFeatures(
   if (billingOrganizationId) {
     const { data } = await supabase
       .from('organization_subscriptions')
-      .select(
-        'status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )',
-      )
+      .select('status, current_period_end, billing_interval, plan_id, subscription_plans ( slug, name, limits )')
       .eq('organization_id', billingOrganizationId)
       .maybeSingle();
     orgSub = data;
@@ -138,7 +121,6 @@ export async function getOrganizationFeatures(
   const planSlug = planRow?.slug ?? null;
   const planId = orgSub?.plan_id as string | undefined;
   const subscriptionHasAccess = ACCESSIBLE_SUBSCRIPTION_STATUSES.has(orgSub?.status ?? '');
-
   const featureSet = new Set<FeatureCode>();
 
   if (subscriptionHasAccess && planId) {
@@ -146,26 +128,17 @@ export async function getOrganizationFeatures(
       .from('plan_features')
       .select('features ( code )')
       .eq('plan_id', planId);
-
-    if (planFeatureRows?.length) {
-      for (const row of planFeatureRows) {
-        const f = row.features as { code: string } | { code: string }[] | null;
-        const codes = Array.isArray(f) ? f : f ? [f] : [];
-        for (const c of codes) addFeature(featureSet, c?.code);
-      }
+    for (const row of planFeatureRows ?? []) {
+      const f = row.features as { code: string } | { code: string }[] | null;
+      const codes = Array.isArray(f) ? f : f ? [f] : [];
+      for (const c of codes) addFeature(featureSet, c?.code);
     }
   }
 
-  if (
-    subscriptionHasAccess &&
-    featureSet.size === 0 &&
-    planSlug &&
-    planSlug in PLAN_FEATURE_FALLBACK
-  ) {
-    PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
+  if (subscriptionHasAccess && featureSet.size === 0 && planSlug && planSlug in PLAN_FEATURE_FALLBACK) {
+    PLAN_FEATURE_FALLBACK[planSlug].forEach((code) => featureSet.add(code));
   }
 
-  // Add-ons are tenant-keyed and may be sold independently of a base plan.
   const { data: addonRows } = await supabase
     .from('addon_subscriptions')
     .select('addon_code, saas_addon_catalog ( feature_codes )')
@@ -176,8 +149,12 @@ export async function getOrganizationFeatures(
   for (const row of addonRows ?? []) {
     const addonCode = normalizeAddonCode(row.addon_code);
     activeAddonCodes.push(addonCode);
-    const cat = row.saas_addon_catalog as { feature_codes: string[] } | null;
-    const dbFeatureCodes = cat?.feature_codes ?? [];
+    const catalogJoin = row.saas_addon_catalog as
+      | { feature_codes: string[] | null }
+      | { feature_codes: string[] | null }[]
+      | null;
+    const catalogRow = Array.isArray(catalogJoin) ? catalogJoin[0] : catalogJoin;
+    const dbFeatureCodes = catalogRow?.feature_codes ?? [];
     for (const code of dbFeatureCodes) addFeature(featureSet, code);
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);
   }
@@ -188,22 +165,19 @@ export async function getOrganizationFeatures(
     .eq('tenant_id', tenantId)
     .eq('status', 'active');
 
-  for (const leg of legacyAddons ?? []) {
-    const code = normalizeAddonCode(leg.addon_slug);
+  for (const legacy of legacyAddons ?? []) {
+    const code = normalizeAddonCode(legacy.addon_slug);
     if (!activeAddonCodes.includes(code)) activeAddonCodes.push(code);
-    const { data: cat } = await supabase
+    const { data: catalog } = await supabase
       .from('saas_addon_catalog')
       .select('feature_codes')
       .eq('code', code)
       .maybeSingle();
-    const dbFeatureCodes = cat?.feature_codes ?? [];
-    for (const c of dbFeatureCodes) addFeature(featureSet, c);
+    const dbFeatureCodes = catalog?.feature_codes ?? [];
+    for (const feature of dbFeatureCodes) addFeature(featureSet, feature);
     if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
   }
 
-  // A legacy/manual license is a compatibility source only when there is no
-  // recurring organization subscription. It must never resurrect features for
-  // a canceled or past-due Stripe subscription.
   if (featureSet.size === 0 && !orgSub) {
     const { data: license } = await supabase
       .from('licenses')
@@ -211,7 +185,7 @@ export async function getOrganizationFeatures(
       .eq('tenant_id', tenantId)
       .eq('status', 'active')
       .maybeSingle();
-    for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
+    for (const feature of (license?.features as string[]) ?? []) addFeature(featureSet, feature);
   }
 
   const limits: PlanLimits =
@@ -245,13 +219,9 @@ function emptyEntitlements(tenantId: string): OrganizationEntitlements {
   };
 }
 
-export function organizationHasFeature(
-  entitlements: OrganizationEntitlements,
-  feature: string,
-): boolean {
+export function organizationHasFeature(entitlements: OrganizationEntitlements, feature: string): boolean {
   const requested = normalizeFeatureCode(feature);
-  if (!requested) return false;
-  return entitlements.features.includes(requested);
+  return requested ? entitlements.features.includes(requested) : false;
 }
 
 export async function requireFeature(
@@ -260,8 +230,6 @@ export async function requireFeature(
   client?: SupabaseClient,
 ): Promise<OrganizationEntitlements> {
   const entitlements = await getOrganizationFeatures(tenantId, client);
-  if (!organizationHasFeature(entitlements, feature)) {
-    throw new FeatureUpgradeRequiredError(feature);
-  }
+  if (!organizationHasFeature(entitlements, feature)) throw new FeatureUpgradeRequiredError(feature);
   return entitlements;
 }

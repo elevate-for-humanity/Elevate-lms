@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: branch-protection-cleanup
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   one-time-full-cleanup:
@@ -87,7 +87,6 @@ jobs:
           echo "Deleting ${#branches[@]} non-main branches in one ref update batch."
           git push origin --delete "${branches[@]}" || true
 
-          # Retry any refs GitHub refused in the batch, but never abort the whole sweep.
           git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
           mapfile -t remaining < <(
             git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \

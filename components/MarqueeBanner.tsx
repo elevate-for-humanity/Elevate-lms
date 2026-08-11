@@ -2,14 +2,14 @@
 
 /**
  * MarqueeBanner - announcement bar with accessible semantic structure.
- * Uses ul/li for screen readers and proper list semantics.
- * Marquee animation for visual interest.
+ * Keeps the existing visual treatment while describing Elevate as the broader
+ * AI-powered humanitarian workforce hub rather than as a traditional institute.
  */
 export default function MarqueeBanner() {
   const announcements = [
     'Enrolling Now — Indianapolis Healthcare & Trades Training',
     'WIOA Funding Available — Apply Today',
-    "Indiana's Premier Career & Technical Institute",
+    'AI-Powered Training • Testing • Apprenticeship • Workforce Support',
   ];
 
   return (
@@ -27,11 +27,11 @@ export default function MarqueeBanner() {
             {text}
           </li>
         ))}
-        {/* Duplicate for seamless loop */}
+        {/* Duplicate for a seamless visual loop; hidden from assistive tech. */}
         {announcements.map((text, i) => (
           <li
             key={`dup-${i}`}
-            className="shrink-0 px-8 text-sm font-medium text-brand-red-700 whitespace-nowrap aria-hidden"
+            className="shrink-0 px-8 text-sm font-medium text-brand-red-700 whitespace-nowrap"
             aria-hidden="true"
           >
             {text}

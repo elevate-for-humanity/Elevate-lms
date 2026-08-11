@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 
 export default function ApplyBarberRedirect() {
-  redirect('/partners/barber-host-shop/apply');
+  redirect('/partners/host-shop/apply?program=barber');
 }
 
 export const metadata = {

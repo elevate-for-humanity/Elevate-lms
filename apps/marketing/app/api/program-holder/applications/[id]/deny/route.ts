@@ -1,33 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    const supabase = await createClient();
-    const body = await request.json();
-    const { reason } = body;
-
-    const { data, error } = await supabase
-      .from('program_holder_applications')
-      .update({
-        status: 'denied',
-        denied_at: new Date().toISOString(),
-        denial_reason: reason || null,
-      })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, data });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+/**
+ * Program Holder denial is an Admin-only mutation.
+ *
+ * The public Marketing endpoint is intentionally closed. Review actions belong
+ * to the authenticated Admin service, which also owns applicant notification
+ * and audit logging.
+ */
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Program Holder application review is available only in the Admin portal.' },
+    { status: 410 },
+  );
 }

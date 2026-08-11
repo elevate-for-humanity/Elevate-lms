@@ -199,4 +199,4 @@ async function _POST(request: NextRequest) {
   }
 }
 
-export const POST = withRuntime(withApiAudit(_POST));
+export const POST = withRuntime(withApiAudit('/api/trial/start-managed', _POST));

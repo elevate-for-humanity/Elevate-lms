@@ -17,7 +17,7 @@ begin
   update public.program_holders
   set mou_signed = true,
       mou_signed_at = coalesce(mou_signed_at, new.accepted_at, now()),
-      updated_at = now()
+      mou_status = 'signed'
   where user_id = new.user_id;
 
   if not found then
@@ -40,11 +40,12 @@ for each row
 when (new.agreement_type = 'program_holder_mou')
 execute function public.sync_program_holder_mou_acceptance_v1();
 
--- Backfill any already-recorded Program Holder MOU acceptances.
+-- Backfill any already-recorded Program Holder MOU acceptances without touching
+-- the immutable legal acceptance rows themselves.
 update public.program_holders ph
 set mou_signed = true,
     mou_signed_at = coalesce(ph.mou_signed_at, accepted.accepted_at),
-    updated_at = now()
+    mou_status = 'signed'
 from (
   select user_id, min(accepted_at) as accepted_at
   from public.license_agreement_acceptances

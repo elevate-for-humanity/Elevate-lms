@@ -154,14 +154,14 @@ export default function WebsiteBuilderStorePage() {
     <main className="min-h-screen bg-white text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <section className="border-b border-slate-200 bg-slate-950 px-4 py-10 text-white sm:py-14">
+      <section className="border-b border-cyan-100 bg-gradient-to-br from-cyan-50 via-white to-rose-50 px-4 py-10 sm:py-14">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <p className="text-sm font-black uppercase tracking-widest text-cyan-300">Talk it. Type it. Build it.</p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl">
+            <p className="text-sm font-black uppercase tracking-widest text-brand-red-700">Talk it. Type it. Build it.</p>
+            <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
               A Website Builder You Can Actually Talk To
             </h1>
-            <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-slate-100 sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-slate-700 sm:text-lg">
               Tell PARIS what you want and watch the website take shape. Keep talking or typing as you go—PARIS stays in the builder, changes the saved draft, and helps you move from idea to publishable website without code.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -173,30 +173,30 @@ export default function WebsiteBuilderStorePage() {
               </Link>
               <Link
                 href="#commercial"
-                className="rounded-xl border-2 border-white px-6 py-3 font-black text-white hover:bg-white/10"
+                className="rounded-xl border-2 border-slate-900 bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-50"
               >
                 Watch commercial
               </Link>
               <Link
                 href={catalog.appHref}
-                className="rounded-xl border-2 border-white/70 px-6 py-3 font-bold text-white hover:bg-white/10"
+                className="rounded-xl border-2 border-cyan-700 bg-cyan-50 px-6 py-3 font-bold text-cyan-900 hover:bg-cyan-100"
               >
                 Open Website Builder
               </Link>
             </div>
           </div>
 
-          <div className="relative min-h-[300px] overflow-hidden rounded-2xl border border-white/20 bg-slate-800 shadow-2xl sm:min-h-[380px]">
+          <div className="relative min-h-[300px] overflow-hidden rounded-3xl border border-white bg-white shadow-2xl shadow-cyan-900/10 ring-1 ring-slate-200 sm:min-h-[380px]">
             <Image
               src="/images/pages/platform-page-12.webp"
               alt="Elevate AI Website Builder workspace"
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 52vw"
-              className="object-cover"
+              className="object-contain p-2"
             />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/95 to-transparent p-5 pt-16">
-              <p className="text-sm font-bold text-white">Interview → first draft → talk or type changes → preview → publish → upgrade.</p>
+            <div className="absolute inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 p-4 backdrop-blur">
+              <p className="text-sm font-bold text-slate-800">Interview → first draft → talk or type changes → preview → publish → upgrade.</p>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function WebsiteBuilderStorePage() {
       <div id="walkthrough">
         <ProductWalkthrough
           title="From business idea to a publishable website"
-          subtitle="See the customer journey the Website Builder is designed around. Let it play automatically or choose a step."
+          subtitle="Click through the builder workflow, switch desktop and mobile preview, and use PARIS-style quick edits to see how the website changes."
           steps={walkthrough}
           tryHref={catalog.appHref}
         />

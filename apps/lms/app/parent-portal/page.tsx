@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -15,7 +14,7 @@ import {
   ArrowRight,
   Phone,
   GraduationCap,
-  Clock,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
   title: 'Parent & Guardian Portal',
   description:
     "Monitor your student's progress, attendance, and grades. Communicate with instructors and stay informed about program updates.",
-  alternates: { canonical: 'https://www.elevateforhumanity.org/parent-portal' },
+  robots: { index: false, follow: false },
 };
 
 const FEATURES = [
@@ -32,44 +31,42 @@ const FEATURES = [
     icon: Eye,
     title: 'Monitor Progress',
     desc: 'View lesson completion, quiz scores, and credential milestones in real time.',
-    image: '/images/pages/learner/dashboard-page-2.webp',
+    image: '/images/pages/training-classroom.webp',
   },
   {
     icon: Calendar,
     title: 'Track Attendance',
-    desc: 'See daily attendance records and receive alerts for absences or tardiness.',
-    image: '/images/pages/learner/dashboard-page-3.webp',
+    desc: 'See attendance records and stay current on participation requirements.',
+    image: '/images/pages/apprenticeship-structure.webp',
   },
   {
     icon: MessageSquare,
     title: 'Message Instructors',
-    desc: "Send and receive messages directly with your student's instructors and advisors.",
-    image: '/images/pages/learner/dashboard-page-4.jpg',
+    desc: "Communicate with your student's instructors and program support team.",
+    image: '/images/pages/business-meeting.webp',
   },
   {
     icon: Bell,
     title: 'Notifications',
-    desc: 'Get alerts for grades, attendance events, upcoming exams, and program announcements.',
-    image: '/images/pages/learner/dashboard-page-5.webp',
+    desc: 'See important program, attendance, assignment, and account updates.',
+    image: '/images/pages/admin-campaigns-hero.webp',
   },
   {
     icon: BarChart3,
     title: 'Progress Reports',
-    desc: 'Download detailed progress and performance reports at any time.',
-    image: '/images/pages/learner/dashboard-page-6.webp',
+    desc: 'Review learner progress and program milestones from one secure workspace.',
+    image: '/images/pages/admin-wioa-hero.webp',
   },
   {
     icon: Shield,
     title: 'Secure & Private',
-    desc: "FERPA-compliant access. Your student's data is protected and never shared.",
-    image: '/images/pages/learner/dashboard-page-7.webp',
+    desc: 'Student records are restricted to authenticated users with an approved parent or guardian relationship.',
+    image: '/images/pages/platform-page-4.webp',
   },
-];
+] as const;
 
 export default async function ParentPortalPage() {
   const supabase = await createClient();
-
-  // Check if user is already logged in — show their linked student data if so
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -80,6 +77,7 @@ export default async function ParentPortalPage() {
     program: string;
     enrollment_state: string;
   }[] = [];
+
   if (user) {
     const { data } = await supabase
       .from('parent_student_links')
@@ -88,6 +86,7 @@ export default async function ParentPortalPage() {
       )
       .eq('parent_id', user.id)
       .limit(10);
+
     if (data) {
       linkedStudents = data.map((row: any) => ({
         id: row.student_id,
@@ -100,79 +99,46 @@ export default async function ParentPortalPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="mx-auto max-w-7xl px-4 py-4">
         <Breadcrumbs items={[{ label: 'Parent & Guardian Portal' }]} />
       </div>
 
-      {/* Hero — image only, title below */}
-      <section className="relative w-full">
-        <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-            src="/images/pages/about-career-training.webp"
-            alt="Parent and guardian portal"
-            fill
-            className="object-cover object-center"
-            priority
-            sizes="100vw" 
-          />
-        </div>
-        <div className="bg-white border-t py-10 text-center px-4">
-          <p className="text-brand-blue-600 font-bold text-xs uppercase tracking-widest mb-3">
-            For Parents &amp; Guardians
-          </p>
-          <h1 className="text-4xl md:text-5xl font-black text-black mb-4">
-            Parent &amp; Guardian Portal
-          </h1>
-          <p className="text-black text-lg max-w-2xl mx-auto mb-8">
-            Stay connected to your student&apos;s training journey. Monitor progress, attendance,
-            and grades. Communicate directly with instructors.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/login?redirect=/parent-portal/dashboard"
-              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-4 rounded-xl transition-colors"
-            >
-              Access Portal
-            </Link>
-            <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
-              className="border-2 border-black text-black font-bold px-8 py-4 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-2"
-            >
-              <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.supportPhone}
-            </a>
+      <section className="relative overflow-hidden border-y border-slate-200 bg-gradient-to-br from-blue-50 via-white to-violet-50">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-8 lg:grid-cols-[1fr_1.05fr] lg:px-6 lg:py-10">
+          <div className="order-2 lg:order-1">
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-xs font-black uppercase tracking-wider text-emerald-900">
+              <ShieldCheck className="h-4 w-4" /> Secure parent access
+            </span>
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-brand-blue-700">For Parents & Guardians</p>
+            <h1 className="mt-2 text-4xl font-black text-slate-950 md:text-5xl">Stay connected to your student&apos;s training journey.</h1>
+            <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-slate-700">
+              Monitor progress, attendance and milestones, then communicate with the people supporting the learner. Student records only open after secure sign-in and relationship verification.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/login?redirect=/parent-portal/dashboard" className="rounded-xl bg-brand-blue-700 px-7 py-3.5 font-black text-white hover:bg-brand-blue-800">Access Secure Dashboard</Link>
+              <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="flex items-center gap-2 rounded-xl border-2 border-slate-800 bg-white px-7 py-3.5 font-black text-slate-950 hover:bg-slate-50"><Phone className="h-4 w-4" /> {PLATFORM_DEFAULTS.supportPhone}</a>
+            </div>
+          </div>
+          <div className="relative order-1 min-h-[260px] overflow-hidden rounded-3xl shadow-xl lg:order-2 lg:min-h-[380px]">
+            <Image src="/images/pages/about-career-training.webp" alt="Parent and guardian support for career training" fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 50vw" />
           </div>
         </div>
       </section>
 
-      {/* If logged in and linked — show student cards */}
       {user && linkedStudents.length > 0 && (
-        <section className="py-12 px-4 bg-brand-blue-50 border-b border-brand-blue-100">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-xl font-black text-black mb-6">Your Linked Students</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {linkedStudents.map((s) => (
-                <div
-                  key={s.id}
-                  className="bg-white rounded-2xl border border-slate-200 p-5 flex items-start gap-4"
-                >
-                  <div className="w-10 h-10 rounded-full bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
-                    <GraduationCap aria-label="graduationcap" className="w-5 h-5 text-brand-blue-600" />
+        <section className="border-b border-brand-blue-100 bg-brand-blue-50 px-4 py-12">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-6 text-xl font-black text-slate-950">Your Linked Students</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {linkedStudents.map((student) => (
+                <div key={student.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-blue-100"><GraduationCap className="h-5 w-5 text-brand-blue-700" /></div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-black text-slate-950">{student.full_name}</p>
+                    <p className="truncate text-sm font-medium text-slate-700">{student.program}</p>
+                    <span className="mt-1 inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold capitalize text-emerald-800">{student.enrollment_state.replace(/_/g, ' ')}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-black truncate">{s.full_name}</p>
-                    <p className="text-black text-sm truncate">{s.program}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-brand-green-100 text-brand-green-800 capitalize">
-                      {s.enrollment_state.replace(/_/g, ' ')}
-                    </span>
-                  </div>
-                  <Link
-                    href={`/parent-portal/student/${s.id}`}
-                    className="text-brand-blue-600 hover:text-brand-blue-700 flex-shrink-0"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
+                  <Link href={`/parent-portal/student/${student.id}`} className="shrink-0 text-brand-blue-700" aria-label={`Open ${student.full_name}'s record`}><ArrowRight className="h-5 w-5" /></Link>
                 </div>
               ))}
             </div>
@@ -180,109 +146,49 @@ export default async function ParentPortalPage() {
         </section>
       )}
 
-      {/* Features grid — real images, no generic icons alone */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-black text-black text-center mb-3">What You Can Do</h2>
-          <p className="text-black text-center mb-10 max-w-xl mx-auto">
-            Available for parents and guardians of students enrolled in apprenticeship and career
-            training programs.
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map((f) => {
-              const Icon = f.icon;
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-black text-slate-950">What You Can Do</h2>
+          <p className="mx-auto mb-10 mt-3 max-w-xl text-center font-medium text-slate-700">Each area gives the parent or guardian a clear next step instead of a blank portal shell.</p>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feature) => {
+              const Icon = feature.icon;
               return (
-                <div
-                  key={f.title}
-                  className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col"
-                >
-                  <div className="relative h-40 flex-shrink-0">
-                    <Image
-                      src={f.image}
-                      alt={f.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 100vw, 33vw" 
-                    />
-                    <div className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow">
-                      <Icon className="w-4 h-4 text-brand-blue-600" />
-                    </div>
+                <article key={feature.title} className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <div className="relative h-40 shrink-0">
+                    <Image src={feature.image} alt={feature.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 33vw" />
+                    <div className="absolute left-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow"><Icon className="h-5 w-5 text-brand-blue-700" /></div>
                   </div>
-                  <div className="p-5 flex-1">
-                    <h3 className="font-bold text-black text-base mb-2">{f.title}</h3>
-                    <p className="text-black text-sm leading-relaxed">{f.desc}</p>
+                  <div className="flex-1 p-5">
+                    <h3 className="font-black text-slate-950">{feature.title}</h3>
+                    <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{feature.desc}</p>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* How to get access */}
-      <section className="py-16 px-4 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-black text-black mb-4">How to Get Access</h2>
-              <p className="text-black mb-6 leading-relaxed">
-                Portal access is available for parents and guardians of minor students enrolled in
-                apprenticeship programs. Contact your student&apos;s program coordinator to request
-                access.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Your student must be actively enrolled in a program',
-                  "Contact us with your student's name and your email address",
-                  "We'll create your account and send login instructions within 1 business day",
-                  'Access is free — no fees or subscriptions',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-black text-sm">
-                    <span className="w-4 h-4 rounded-full bg-brand-blue-600 inline-block flex-shrink-0 mt-0.5" aria-hidden="true" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/contact"
-                  className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-colors"
-                >
-                  Request Access
-                </Link>
-                <a
-                  href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
-                  className="border-2 border-black text-black font-bold px-6 py-3 rounded-xl hover:bg-slate-100 transition-colors flex items-center gap-2"
-                >
-                  <Phone className="w-4 h-4" /> Call Us
-                </a>
-              </div>
-            </div>
-            <div className="relative h-72 rounded-2xl overflow-hidden">
-              <Image
-                src="/images/pages/about-supportive-services.webp"
-                alt="Supportive services for students and families"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" 
-              />
+      <section className="border-t border-slate-200 bg-slate-50 px-4 py-16">
+        <div className="mx-auto grid max-w-4xl items-center gap-12 md:grid-cols-2">
+          <div>
+            <h2 className="text-3xl font-black text-slate-950">How to Get Access</h2>
+            <p className="mt-4 font-medium leading-7 text-slate-700">Portal access is for approved parents and guardians linked to an enrolled learner. Sign-in alone does not grant access to a student record.</p>
+            <ol className="mt-6 space-y-3 text-sm font-semibold text-slate-800">
+              <li>1. The learner must be actively enrolled.</li>
+              <li>2. Your account must be linked to that learner.</li>
+              <li>3. Sign in and open the secure Parent Dashboard.</li>
+            </ol>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/contact" className="rounded-xl bg-brand-blue-700 px-6 py-3 font-black text-white hover:bg-brand-blue-800">Request Access</Link>
+              <Link href="/login?redirect=/parent-portal/dashboard" className="rounded-xl border-2 border-slate-800 bg-white px-6 py-3 font-black text-slate-950">Sign In</Link>
             </div>
           </div>
+          <div className="relative h-72 overflow-hidden rounded-3xl shadow-lg">
+            <Image src="/images/pages/about-supportive-services.webp" alt="Supportive services for learners and families" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+          </div>
         </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-14 bg-slate-900 text-center px-4">
-        <h2 className="text-3xl font-black text-white mb-4">Already Have Access?</h2>
-        <p className="text-white text-lg mb-8 max-w-xl mx-auto">
-          Log in to view your student&apos;s progress, attendance, and grades.
-        </p>
-        <Link
-          href="/login?redirect=/parent-portal/dashboard"
-          className="inline-flex items-center gap-2 bg-white text-black font-bold px-10 py-4 rounded-xl hover:bg-slate-100 transition-colors text-lg"
-        >
-          Log In to Portal <ArrowRight className="w-5 h-5" />
-        </Link>
       </section>
     </div>
   );

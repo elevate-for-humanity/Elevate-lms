@@ -85,7 +85,7 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
     provider = resolveChatProvider();
   }
 
-  return withResilience(() => provider.chat(options), {
+  const result = await withResilience(() => provider.chat(options), {
     circuitBreaker: breakers.openai,
     attempts: 2,
     baseDelayMs: 1000,
@@ -95,6 +95,7 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
       return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
     },
   });
+  return { ...result, provider: provider.name };
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
@@ -212,18 +213,13 @@ function preferredReasoningProvider(): 'anthropic' | 'azure' | 'default' {
   return 'default';
 }
 
-/**
- * Advanced reasoning route. Claude is preferred when configured for complex
- * admin, compliance, document, reporting, and planning work. Azure reasoning
- * remains a supported fallback, followed by the normal provider chain.
- */
 export async function aiReason(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
   const preferred = preferredReasoningProvider();
 
   if (preferred === 'anthropic') {
     const provider = new AnthropicProvider();
     try {
-      return await withResilience(() => provider.chat({ ...options, provider: 'anthropic' }), {
+      const result = await withResilience(() => provider.chat({ ...options, provider: 'anthropic' }), {
         circuitBreaker: breakers.openai,
         attempts: 2,
         baseDelayMs: 1500,
@@ -233,6 +229,7 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
           return !msg.includes('401') && !msg.includes('400');
         },
       });
+      return { ...result, provider: provider.name };
     } catch (error) {
       logger.warn('[aiReason] Claude reasoning failed; trying fallback', {
         error: error instanceof Error ? error.message : String(error),
@@ -244,7 +241,7 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
     const provider = new AzureProvider();
     if (provider.isAvailable()) {
       try {
-        return await withResilience(() => provider.reason(options), {
+        const result = await withResilience(() => provider.reason(options), {
           circuitBreaker: breakers.openai,
           attempts: 2,
           baseDelayMs: 2000,
@@ -254,6 +251,7 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
             return !msg.includes('401') && !msg.includes('400');
           },
         });
+        return { ...result, provider: provider.name };
       } catch (error) {
         logger.warn('[aiReason] Azure reasoning failed; falling back to standard AI', {
           error: error instanceof Error ? error.message : String(error),
@@ -282,7 +280,6 @@ export type ToolStreamEvent =
   | { type: 'delta'; content: string }
   | { type: 'tool_call'; name: string; args: Record<string, unknown>; callId?: string };
 
-/** Use native tool selection on OpenAI or Claude; other providers fall back to text. */
 export async function* aiChatWithTools(options: {
   messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
   tools: ToolDefinition[];

@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: 'Could not start demo session.' }, { status: 500 });
+    return NextResponse.json({ error: 'Could not start sandbox session.' }, { status: 500 });
   }
 
   return NextResponse.json({ demo: data }, { status: 201 });
@@ -65,7 +65,7 @@ export async function PATCH(request: NextRequest) {
   const db = await requireAdminClient();
   const body = await request.json().catch(() => ({}));
   const token = clip(body.token, 100);
-  if (!token) return NextResponse.json({ error: 'Demo token required.' }, { status: 400 });
+  if (!token) return NextResponse.json({ error: 'Sandbox token required.' }, { status: 400 });
 
   const { data: existing, error: lookupError } = await db
     .from('demo_sales_sessions')
@@ -74,20 +74,20 @@ export async function PATCH(request: NextRequest) {
     .maybeSingle();
 
   if (lookupError || !existing) {
-    return NextResponse.json({ error: 'Demo session not found.' }, { status: 404 });
+    return NextResponse.json({ error: 'Sandbox session not found.' }, { status: 404 });
   }
   if (existing.converted_at) {
-    return NextResponse.json({ error: 'Demo session has already been converted.' }, { status: 409 });
+    return NextResponse.json({ error: 'Sandbox session has already been converted.' }, { status: 409 });
   }
   if (existing.expires_at && new Date(existing.expires_at) <= new Date()) {
-    return NextResponse.json({ error: 'Demo session expired.' }, { status: 410 });
+    return NextResponse.json({ error: 'Sandbox session expired.' }, { status: 410 });
   }
 
   const statePatch = safeObject(body.state, MAX_STATE_BYTES);
   const currentState = safeObject(existing.state, MAX_STATE_BYTES);
   const nextState = { ...currentState, ...statePatch };
   if (Buffer.byteLength(JSON.stringify(nextState), 'utf8') > MAX_STATE_BYTES) {
-    return NextResponse.json({ error: 'Demo state is too large.' }, { status: 413 });
+    return NextResponse.json({ error: 'Sandbox payload is too large.' }, { status: 413 });
   }
 
   const currentEvents = Array.isArray(existing.events) ? existing.events.slice(-MAX_EVENTS) : [];
@@ -106,6 +106,6 @@ export async function PATCH(request: NextRequest) {
     })
     .eq('id', existing.id);
 
-  if (error) return NextResponse.json({ error: 'Could not save demo progress.' }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Could not save sandbox progress.' }, { status: 500 });
   return NextResponse.json({ ok: true, state: nextState, eventCount: nextEvents.length });
 }

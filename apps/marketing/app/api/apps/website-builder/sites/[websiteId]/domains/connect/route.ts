@@ -1,4 +1,5 @@
 // pre-auth-registry: exempt - authenticated route resolves the current user and owned website before any RLS-scoped website_domains write.
+// AUTH: Enforced inside handler by resolveOwnedSite(), which requires a Supabase user and ownership of websiteId.
 /** Connect a customer-owned domain to a published Website Builder site. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -84,6 +85,6 @@ export async function POST(
     });
   } catch (err) {
     logger.error('domainee connect failed', err instanceof Error ? err : undefined, { hostname });
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Failed to connect domain' }, { status: 502 });
+    return NextResponse.json({ error: 'Failed to connect domain.' }, { status: 502 });
   }
 }

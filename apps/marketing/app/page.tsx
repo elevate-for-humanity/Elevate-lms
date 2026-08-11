@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { HomeHumanitarianHub } from '@/components/home/HomeHumanitarianHub';
+import { HomeHumanitarianHubV2 } from '@/components/home/HomeHumanitarianHubV2';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 import StructuredData from '@/components/StructuredData';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -50,7 +50,7 @@ export default function HomePage() {
   return (
     <>
       <StructuredData />
-      <HomeHumanitarianHub />
+      <HomeHumanitarianHubV2 />
       <ParisFloatingButton />
     </>
   );

@@ -1,5 +1,5 @@
 # Trigger Northflank VCS build
-# Production deploy requested after PR #596 and PR #597 merge
-merge_sha=1d319795e00af7503d2ce4317bb5655f4915233a
-requested_at=2026-08-11T16:39:30-04:00
-services=marketing,admin
+# Production deploy requested after PR #598 merge
+merge_sha=32d1dfeea2960cdac9a517555d346bd7179c583d
+requested_at=2026-08-11T17:24:00-04:00
+services=marketing

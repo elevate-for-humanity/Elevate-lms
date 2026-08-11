@@ -67,7 +67,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Hire Graduates', href: ROUTES.employersHireGraduates, isSectionLink: true },
       { name: 'Become a Host Site', href: ROUTES.apprenticeshipsHostShop, isSectionLink: true },
       { name: 'Post a Job', href: ROUTES.employersPostJob, isSectionLink: true },
-      { name: 'Employer Portal', href: ROUTES.employerPortal, isSectionLink: true, isAuth: true },
       { name: 'Workforce Agency Tools', href: ROUTES.forAgencies, isSectionLink: true },
       { name: 'Request Demo', href: ROUTES.storeDemo, isSectionLink: true },
     ],
@@ -102,7 +101,6 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.about,
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
-      { name: 'Rise Forward Foundation', href: '/rise-forward-foundation', isSectionLink: true },
       { name: 'Approvals', href: ROUTES.aboutApprovals, isSectionLink: true },
       { name: 'Apprenticeship Sponsor of Record', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
       { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },

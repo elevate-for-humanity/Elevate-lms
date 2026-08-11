@@ -1,700 +1,136 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { redirect, notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { logger } from '@/lib/logger';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  FileText,
-  BookOpen,
-  ArrowLeft,
-  ShieldAlert,
-  AlertTriangle,
-} from 'lucide-react';
+import { Building2, Mail, Phone, ShieldCheck, Users, BookOpen, ArrowLeft } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const metadata: Metadata = { title: 'Program Holder | Admin', robots: { index: false, follow: false } };
 
-export const metadata: Metadata = {
-  robots: { index: false },
-  title: 'Review Program Holder | Admin',
-};
-
-interface Props {
+export default async function ProgramHolderDetailPage({
+  params,
+  searchParams,
+}: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ error?: string; success?: string }>;
-}
-
-type AdminRole = 'admin' | 'admin' | 'staff';
-
-function canApprove(role: AdminRole): boolean {
-  return role === 'admin' || role === 'admin';
-}
-
-/** Re-verify caller is admin/admin. Returns caller ID + admin client, or redirects with error. */
-async function verifyApprovalCaller(
-  holderId: string,
-): Promise<{ callerId: string; adb: SupabaseClient }> {
-  const supa = await createClient();
-  const adb = await requireAdminClient();
-  const sdb = adb;
-
-  const {
-    data: { user: caller },
-  } = await supa.auth.getUser();
-  if (!caller) {
-
-  // Guard against null user
-  if (!user) redirect('/login');
-    redirect(`/program-holders/${holderId}?error=${encodeURIComponent('Session expired')}`);
-  }
-
-  const { data: callerProfile } = await sdb
-    .from('profiles')
-    .select('role')
-    .eq('id', caller.id)
-    .maybeSingle();
-
-  if (!callerProfile || !canApprove(callerProfile.role as AdminRole)) {
-    redirect(
-      `/program-holders/${holderId}?error=${encodeURIComponent('Approval requires admin or admin role')}`,
-    );
-  }
-
-  if (!adb) {
-    redirect(
-      `/program-holders/${holderId}?error=${encodeURIComponent('Database not configured')}`,
-    );
-  }
-
-  return { callerId: caller.id, adb };
-}
-
-export default async function AdminProgramHolderDetailPage({ params, searchParams }: Props) {
+  searchParams: Promise<{ success?: string; error?: string }>;
+}) {
+  const { profile } = await requireRole(['admin', 'staff']);
   const { id } = await params;
-  const { error: pageError, success: pageSuccess } = await searchParams;
-  const supabase = await createClient();
+  const messages = await searchParams;
+  const db = await requireAdminClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-
-  // Guard against null user
-  if (!user) redirect('/login');
-  const { data: adminProfile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  const viewRoles: AdminRole[] = ['admin', 'staff'];
-  if (!adminProfile || !viewRoles.includes(adminProfile.role as AdminRole)) {
-    redirect('/unauthorized');
-  }
-
-  const adminRole = adminProfile.role as AdminRole;
-  const hasApprovalAuthority = canApprove(adminRole);
-
-  // Fetch program holder
-  const { data: holder, error } = await supabase
+  const { data: holder, error } = await db
     .from('program_holders')
     .select('*')
     .eq('id', id)
     .maybeSingle();
-
   if (error || !holder) notFound();
 
-  // Fetch assigned programs
-  const { data: assignments } = await supabase
+  const { data: assignments } = await db
     .from('program_holder_programs')
     .select('id, program_id, role_in_program, is_primary, status, created_at')
-    .eq('program_holder_id', id);
+    .eq('program_holder_id', id)
+    .order('created_at', { ascending: false });
 
-  const assignedProgramIds = (assignments || []).map((a: any) => a.program_id);
+  const programIds = (assignments ?? []).map((row: any) => row.program_id).filter(Boolean);
+  const { data: programs } = programIds.length
+    ? await db.from('programs').select('id, title, name, slug').in('id', programIds)
+    : { data: [] as any[] };
+  const programById = new Map((programs ?? []).map((program: any) => [program.id, program]));
 
-  // Fetch program details for assigned programs
-  const { data: assignedPrograms } =
-    assignedProgramIds.length > 0
-      ? await supabase.from('programs').select('id, name, title, slug').in('id', assignedProgramIds)
-      : { data: [] };
+  const canDecide = ['admin', 'super_admin'].includes(String(profile.role ?? ''));
 
-  const programMap: Record<string, any> = {};
-  (assignedPrograms || []).forEach((p: any) => {
-    programMap[p.id] = p;
-  });
-
-  // Fetch all active programs for dropdowns
-  const { data: allPrograms } = await supabase
-    .from('programs')
-    .select('id, name, title, slug, is_active')
-    .eq('is_active', true)
-    .order('name', { ascending: true });
-
-  const unassignedPrograms = (allPrograms || []).filter(
-    (p: any) => !assignedProgramIds.includes(p.id),
-  );
-
-  // Fetch linked user profile
-  const { data: holderProfile } = holder.user_id
-    ? await supabase
-        .from('profiles')
-        .select('id, email, full_name, role')
-        .eq('id', holder.user_id)
-        .maybeSingle()
-    : { data: null };
-
-  // Fetch audit events for this holder
-  const { data: auditEvents } = await supabase
-    .from('admin_audit_events')
-    .select('action, actor_user_id, metadata, created_at')
-    .eq('target_type', 'program_holder')
-    .eq('target_id', id)
-    .order('created_at', { ascending: false })
-    .limit(10);
-
-  const isPending = holder.status === 'pending';
-  const isActive = holder.status === 'active';
-  const isInactive = holder.status === 'rejected' || holder.status === 'suspended';
-  const hasLinkedUser = !!holder.user_id;
-  const assignmentCount = (assignments || []).length;
-
-  // ── Server actions (all use RPC for atomicity) ──
-
-  async function approveAndProvision(formData: FormData) {
+  async function updateStatus(formData: FormData) {
     'use server';
-    const programId = formData.get('program_id') as string;
-    if (!programId) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Program selection is required')}`,
-      );
-    }
+    const { user: actor, profile: actorProfile } = await requireRole(['admin']);
+    const nextStatus = String(formData.get('status') ?? '');
+    if (!['active', 'rejected', 'suspended'].includes(nextStatus)) redirect(`/program-holders/${id}?error=Invalid+status`);
+    if (!['admin', 'super_admin'].includes(String(actorProfile.role ?? ''))) redirect('/unauthorized');
 
-    const { callerId, adb } = await verifyApprovalCaller(id);
-
-    const { data, error: rpcError } = await adb.rpc('approve_and_provision_program_holder', {
-      p_holder_id: id,
-      p_program_id: programId,
-      p_actor_id: callerId,
-    });
-
-    if (rpcError) {
-      logger.error('[PH Approve RPC] Database error', undefined, { id, error: rpcError });
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Database error during approval — check server logs')}`,
-      );
-    }
-
-    if (data && !data.success) {
-      logger.warn('[PH Approve RPC] Validation failed', { id, result: data });
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent(data.error || 'Approval validation failed')}`,
-      );
-    }
-
-    logger.info('[PH Approve] Success via RPC', { holderId: id, programId, approvedBy: callerId });
-
-    // Send approval notification email (non-blocking)
-    try {
-      const { data: holderData } = await adb
-        .from('program_holders')
-        .select('contact_email, contact_name, organization_name')
-        .eq('id', id)
-        .maybeSingle();
-
-      const { data: programData } = await adb
-        .from('programs')
-        .select('name')
-        .eq('id', programId)
-        .maybeSingle();
-
-      if (holderData?.contact_email) {
-        const { sendProgramHolderApprovalEmail } = await import('@/lib/email/sendgrid');
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-        await sendProgramHolderApprovalEmail({
-          email: holderData.contact_email,
-          name: holderData.contact_name || holderData.organization_name || 'Partner',
-          organizationName: holderData.organization_name || 'Your Organization',
-          programName: programData?.name || 'Your Program',
-          portalUrl: `${siteUrl}/program-holder/dashboard`,
-        });
-        logger.info('[PH Approve] Notification email sent', { email: holderData.contact_email });
-      }
-    } catch (emailErr) {
-      logger.warn('[PH Approve] Email notification failed (non-critical)', emailErr);
-    }
-
-    redirect(
-      `/program-holders/${id}?success=${encodeURIComponent('Holder approved and program provisioned')}`,
-    );
-  }
-
-  async function rejectHolder() {
-    'use server';
-    const { callerId, adb } = await verifyApprovalCaller(id);
-
-    const { error: updateErr, count } = await adb
+    const adminDb = await requireAdminClient();
+    const { error: updateError } = await adminDb
       .from('program_holders')
-      .update({ status: 'rejected' })
-      .eq('id', id)
-      .eq('status', 'pending'); // optimistic concurrency
+      .update({ status: nextStatus, updated_at: new Date().toISOString() })
+      .eq('id', id);
+    if (updateError) redirect(`/program-holders/${id}?error=Status+update+failed`);
 
-    if (updateErr) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Failed to reject — check server logs')}`,
-      );
-    }
-
-    // Audit event
-    await adb.from('admin_audit_events').insert({
-      action: 'program_holder.rejected',
-      actor_user_id: callerId,
+    await adminDb.from('admin_audit_events').insert({
+      action: `program_holder.${nextStatus}`,
+      actor_user_id: actor.id,
       target_type: 'program_holder',
       target_id: id,
-      metadata: {},
+      metadata: { previous_status: holder.status },
     });
-
-    logger.info('[PH Reject]', { holderId: id, rejectedBy: callerId });
-    redirect(`/program-holders/${id}?success=${encodeURIComponent('Holder rejected')}`);
+    redirect(`/program-holders/${id}?success=Status+updated`);
   }
 
-  async function suspendHolder() {
-    'use server';
-    const { callerId, adb } = await verifyApprovalCaller(id);
-
-    const { error: updateErr } = await adb
-      .from('program_holders')
-      .update({ status: 'suspended' })
-      .eq('id', id)
-      .eq('status', 'active'); // optimistic concurrency
-
-    if (updateErr) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Failed to suspend — check server logs')}`,
-      );
-    }
-
-    await adb.from('admin_audit_events').insert({
-      action: 'program_holder.suspended',
-      actor_user_id: callerId,
-      target_type: 'program_holder',
-      target_id: id,
-      metadata: {},
-    });
-
-    logger.info('[PH Suspend]', { holderId: id, suspendedBy: callerId });
-    redirect(`/program-holders/${id}?success=${encodeURIComponent('Holder suspended')}`);
-  }
-
-  async function provisionProgram(formData: FormData) {
-    'use server';
-    const programId = formData.get('program_id') as string;
-    if (!programId) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Program selection is required')}`,
-      );
-    }
-
-    const { callerId, adb } = await verifyApprovalCaller(id);
-
-    const { data, error: rpcError } = await adb.rpc('provision_additional_program', {
-      p_holder_id: id,
-      p_program_id: programId,
-      p_actor_id: callerId,
-    });
-
-    if (rpcError) {
-      logger.error('[PH Provision RPC] Database error', undefined, { id, programId, error: rpcError });
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Database error during provisioning — check server logs')}`,
-      );
-    }
-
-    if (data && !data.success) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent(data.error || 'Provisioning validation failed')}`,
-      );
-    }
-
-    redirect(`/program-holders/${id}?success=${encodeURIComponent('Program provisioned')}`);
-  }
-
-  async function removeProgram(formData: FormData) {
-    'use server';
-    const assignmentId = formData.get('assignment_id') as string;
-    if (!assignmentId) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Assignment ID is required')}`,
-      );
-    }
-
-    const { callerId, adb } = await verifyApprovalCaller(id);
-
-    const { data, error: rpcError } = await adb.rpc('deprovision_program', {
-      p_assignment_id: assignmentId,
-      p_actor_id: callerId,
-    });
-
-    if (rpcError) {
-      logger.error('[PH Deprovision RPC] Database error', undefined, { id, assignmentId, error: rpcError });
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent('Database error during deprovisioning — check server logs')}`,
-      );
-    }
-
-    if (data && !data.success) {
-      redirect(
-        `/program-holders/${id}?error=${encodeURIComponent(data.error || 'Deprovisioning failed')}`,
-      );
-    }
-
-    redirect(`/program-holders/${id}?success=${encodeURIComponent('Program removed')}`);
-  }
-
-  const statusColor: Record<string, string> = {
-    active: 'bg-brand-green-100 text-brand-green-800 border-brand-green-200',
-    pending: 'bg-amber-100 text-amber-800 border-amber-200',
-    rejected: 'bg-brand-red-100 text-brand-red-800 border-brand-red-200',
-    suspended: 'bg-slate-100 text-slate-700 border-slate-200',
-  };
+  const displayName = holder.organization_name || holder.name || holder.contact_name || 'Program Holder';
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="mb-4">
-          <Breadcrumbs
-            items={[
-              { label: 'Admin', href: '/dashboard' },
-              { label: 'Program Holders', href: '/admin/program-holders' },
-              { label: holder.organization_name || holder.name || 'Detail' },
-            ]}
-          />
-        </div>
-
-        <Link
-          href="/program-holders"
-          className="inline-flex items-center gap-1 text-sm text-slate-700 hover:text-slate-900 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to list
-        </Link>
-
-        {/* Flash messages */}
-        {pageError && (
-          <div className="mb-4 bg-brand-red-50 border border-brand-red-200 rounded-lg p-3 text-sm text-brand-red-800">
-            <strong>Error:</strong> {pageError}
-          </div>
-        )}
-        {pageSuccess && (
-          <div className="mb-4 bg-brand-green-50 border border-brand-green-200 rounded-lg p-3 text-sm text-brand-green-800">
-            {pageSuccess}
-          </div>
-        )}
-
-        {/* Header + Status */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div className="flex items-start justify-between flex-wrap gap-4">
+    <main className="min-h-screen bg-slate-50">
+      <section className="relative overflow-hidden bg-gradient-to-r from-indigo-700 via-violet-700 to-fuchsia-700 px-6 py-8 text-white">
+        <div className="mx-auto max-w-6xl">
+          <Breadcrumbs dark items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Program Holders', href: '/program-holders' }, { label: displayName }]} />
+          <Link href="/program-holders" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white"><ArrowLeft className="h-4 w-4" />Back to program holders</Link>
+          <div className="mt-5 flex flex-wrap items-end justify-between gap-5">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                {holder.organization_name || holder.name || 'Unnamed Organization'}
-              </h1>
-              <span
-                className={`inline-block mt-2 text-xs font-medium px-3 py-1 rounded border ${statusColor[holder.status] || 'bg-slate-100 text-slate-700'}`}
-              >
-                {holder.status?.toUpperCase()}
-              </span>
+              <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-violet-100"><Building2 className="h-5 w-5" />Partner administration</div>
+              <h1 className="mt-2 text-3xl font-black">{displayName}</h1>
+              <p className="mt-2 max-w-2xl text-sm font-medium text-violet-50">Review organization access, assigned programs, and the current approval state from one workspace.</p>
             </div>
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase tracking-wide">{holder.status || 'pending'}</span>
+          </div>
+        </div>
+      </section>
 
-            <div className="flex gap-2">
-              {hasApprovalAuthority && isActive && (
-                <form action={suspendHolder}>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-slate-600 text-white text-sm font-medium rounded-lg hover:bg-slate-700 transition"
-                  >
-                    Suspend
-                  </button>
-                </form>
-              )}
-              {hasApprovalAuthority && isPending && (
-                <form action={rejectHolder}>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-brand-red-600 text-white text-sm font-medium rounded-lg hover:bg-brand-red-700 transition"
-                  >
-                    Reject
-                  </button>
-                </form>
-              )}
-              {!hasApprovalAuthority && (
-                <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg">
-                  <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                  <span>Review only — approval requires admin or admin role</span>
-                </div>
-              )}
+      <div className="mx-auto max-w-6xl space-y-6 px-6 py-7">
+        {messages.error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-bold text-rose-800">{messages.error}</div>}
+        {messages.success && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-emerald-800">{messages.success}</div>}
+
+        <section className="grid gap-4 md:grid-cols-4">
+          {[
+            ['Organization', displayName, Building2],
+            ['Programs', String(assignments?.length ?? 0), BookOpen],
+            ['Contact email', holder.contact_email || 'Not provided', Mail],
+            ['Contact phone', holder.contact_phone || 'Not provided', Phone],
+          ].map(([label, value, Icon]) => {
+            const CardIcon = Icon as typeof Building2;
+            return <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><CardIcon className="h-5 w-5 text-violet-700" /><div className="mt-3 text-xs font-black uppercase tracking-wide text-slate-500">{String(label)}</div><div className="mt-1 break-words text-sm font-black text-slate-950">{String(value)}</div></div>;
+          })}
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-[1fr_340px]">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2"><BookOpen className="h-5 w-5 text-indigo-700" /><h2 className="text-lg font-black text-slate-950">Assigned programs</h2></div>
+            <div className="mt-4 space-y-3">
+              {(assignments ?? []).length ? (assignments ?? []).map((assignment: any) => {
+                const program = programById.get(assignment.program_id) as any;
+                return <div key={assignment.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4"><div className="font-black text-slate-950">{program?.title || program?.name || 'Program'}</div><div className="mt-1 text-xs font-semibold text-slate-500">{assignment.role_in_program || 'Program holder'} · {assignment.status || 'active'}</div></div>;
+              }) : <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-500">No programs assigned yet.</div>}
             </div>
           </div>
 
-          {/* Integrity warnings */}
-          {!hasLinkedUser && (
-            <div className="mt-4 bg-brand-red-50 border border-brand-red-200 rounded-lg p-3 text-sm text-brand-red-800 flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-              <div>
-                <strong>Missing linked user.</strong> This holder has no user_id — approval is
-                blocked until a user account is linked.
-              </div>
+          <aside className="space-y-5">
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+              <div className="flex items-center gap-2 font-black text-indigo-950"><ShieldCheck className="h-5 w-5" />Reviewer direction</div>
+              <ol className="mt-3 space-y-2 text-sm font-medium text-indigo-950"><li>1. Verify organization and contact details.</li><li>2. Confirm the correct programs are assigned.</li><li>3. Approve only when access and program ownership are verified.</li><li>4. Suspend or reject access when requirements are not met.</li></ol>
             </div>
-          )}
 
-          {/* Details grid */}
-          <dl className="grid sm:grid-cols-2 gap-4 mt-6 text-sm">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-slate-700" />
-              <dt className="text-slate-700">Contact:</dt>
-              <dd className="font-medium">{holder.contact_name || '—'}</dd>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-slate-700" />
-              <dt className="text-slate-700">Email:</dt>
-              <dd className="font-medium">{holder.contact_email || '—'}</dd>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4 text-slate-700" />
-              <dt className="text-slate-700">Phone:</dt>
-              <dd className="font-medium">{holder.contact_phone || '—'}</dd>
-            </div>
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-slate-700" />
-              <dt className="text-slate-700">Applied:</dt>
-              <dd className="font-medium">{new Date(holder.created_at).toLocaleDateString()}</dd>
-            </div>
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-slate-700" />
-              <dt className="text-slate-700">MOU:</dt>
-              <dd className="font-medium">{holder.mou_signed ? 'Signed' : 'Not signed'}</dd>
-            </div>
-            {holderProfile && (
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-slate-700" />
-                <dt className="text-slate-700">Account:</dt>
-                <dd className="font-medium">
-                  {holderProfile.email} ({holderProfile.role})
-                </dd>
-              </div>
-            )}
-            {holder.approved_by && (
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-slate-700" />
-                <dt className="text-slate-700">Approved by:</dt>
-                <dd className="font-medium">{holder.approved_by}</dd>
-              </div>
-            )}
-          </dl>
-        </div>
-
-        {/* PENDING: Approve & Provision (atomic RPC) */}
-        {(isPending || isInactive) && hasApprovalAuthority && hasLinkedUser && (
-          <div className="bg-white rounded-lg shadow-sm border-2 border-amber-300 p-6 mb-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-1">
-              {isPending ? 'Approve & Provision' : 'Reactivate & Provision'}
-            </h2>
-            <p className="text-sm text-slate-700 mb-4">
-              Select the primary program this holder will manage. Approval and program provisioning
-              execute as a single database transaction — the holder cannot be activated without a
-              program.
-            </p>
-
-            {unassignedPrograms.length > 0 ? (
-              <form action={approveAndProvision} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="approve_program_id"
-                    className="block text-sm font-medium text-slate-900 mb-1"
-                  >
-                    Primary program to provision
-                  </label>
-                  <select
-                    name="program_id"
-                    id="approve_program_id"
-                    required
-                    defaultValue=""
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-green-500 focus:border-brand-green-500"
-                  >
-                    <option value="" disabled>
-                      Select a program...
-                    </option>
-                    {unassignedPrograms.map((p: any) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name || p.title} ({p.slug})
-                      </option>
-                    ))}
+            {canDecide && (
+              <form action={updateStatus} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <label className="text-sm font-black text-slate-900">Change status
+                  <select name="status" defaultValue={holder.status || 'active'} className="mt-2 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
+                    <option value="active">Active</option><option value="suspended">Suspended</option><option value="rejected">Rejected</option>
                   </select>
-                </div>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-brand-green-600 text-white text-sm font-semibold rounded-lg hover:bg-brand-green-700 transition"
-                >
-                  {isPending ? 'Approve & Provision Program' : 'Reactivate & Provision Program'}
-                </button>
-              </form>
-            ) : (
-              <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-3 text-sm text-brand-red-800">
-                No active programs available to provision. Create a program first.
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Provisioned Programs */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-1 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-brand-blue-600" />
-            Provisioned Programs
-          </h2>
-          <p className="text-xs text-slate-700 mb-4">
-            Each program grants scoped access to student records, grades, and analytics for that
-            program only.
-          </p>
-
-          {assignmentCount > 0 ? (
-            <div className="space-y-3 mb-6">
-              {(assignments || []).map((a: any) => {
-                const prog = programMap[a.program_id];
-                return (
-                  <div
-                    key={a.id}
-                    className="flex items-center justify-between py-2 px-3 bg-slate-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium text-slate-900">
-                        {prog?.name || prog?.title || a.program_id}
-                        {a.is_primary && (
-                          <span className="ml-2 text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded">
-                            Primary
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-xs text-slate-700">
-                        Role: {a.role_in_program} | Since{' '}
-                        {new Date(a.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    {hasApprovalAuthority && (
-                      <form action={removeProgram}>
-                        <input type="hidden" name="assignment_id" value={a.id} />
-                        <button
-                          type="submit"
-                          className="text-xs text-brand-red-600 hover:underline"
-                        >
-                          Remove
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-              <p className="text-amber-800 text-sm font-medium">No programs provisioned</p>
-              <p className="text-amber-600 text-xs mt-1">
-                {isPending
-                  ? 'Use the approval form above to activate this holder with a primary program.'
-                  : 'This holder cannot access the portal until at least one program is provisioned.'}
-              </p>
-            </div>
-          )}
-
-          {/* Additional provisioning — only for active holders */}
-          {isActive && hasApprovalAuthority && unassignedPrograms.length > 0 && (
-            <form action={provisionProgram} className="flex items-end gap-3 pt-4 border-t">
-              <div className="flex-1">
-                <label
-                  htmlFor="provision_program_id"
-                  className="block text-sm font-medium text-slate-900 mb-1"
-                >
-                  Provision additional program
                 </label>
-                <select
-                  name="program_id"
-                  id="provision_program_id"
-                  required
-                  defaultValue=""
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-                >
-                  <option value="" disabled>
-                    Select a program to provision...
-                  </option>
-                  {unassignedPrograms.map((p: any) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name || p.title} ({p.slug})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-brand-blue-600 text-white text-sm font-medium rounded-lg hover:bg-brand-blue-700 transition whitespace-nowrap"
-              >
-                Provision Program
-              </button>
-            </form>
-          )}
-
-          {!hasApprovalAuthority && unassignedPrograms.length > 0 && (
-            <p className="text-xs text-slate-700 mt-2">
-              Program provisioning requires admin or admin role.
-            </p>
-          )}
-        </div>
-
-        {/* Audit Trail */}
-        {(auditEvents || []).length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Audit Trail</h2>
-            <div className="space-y-2">
-              {(auditEvents || []).map((evt: any, i: number) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 text-sm py-2 border-b border-slate-100 last:border-0"
-                >
-                  <span className="text-slate-700 whitespace-nowrap text-xs mt-0.5">
-                    {new Date(evt.created_at).toLocaleString()}
-                  </span>
-                  <div>
-                    <span className="font-medium text-slate-900">
-                      {evt.action.replace('program_holder.', '')}
-                    </span>
-                    {evt.metadata?.program_name && (
-                      <span className="text-slate-700"> — {evt.metadata.program_name}</span>
-                    )}
-                    <p className="text-xs text-slate-700">by {evt.actor_user_id}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* MOU section */}
-        {isActive && !holder.mou_signed && (
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">MOU</h2>
-            <p className="text-sm text-slate-700 mb-4">This holder has not signed the MOU yet.</p>
-            <Link
-              href={`/program-holders/${id}/countersign-mou`}
-              className="text-sm text-brand-blue-600 hover:underline font-medium"
-            >
-              Go to MOU management →
-            </Link>
-          </div>
-        )}
+                <button type="submit" className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-700 px-4 py-2.5 text-sm font-black text-white hover:bg-indigo-800"><Users className="h-4 w-4" />Save status</button>
+              </form>
+            )}
+          </aside>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { siteConfig } from '@/content/site';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { LEGAL_ENTITY_OPERATING_LINE } from '@/lib/config/legal-entity';
 import { ROUTES } from '@/lib/navigation/routes';
 import { PORTAL_MAP } from '@/lib/routing/portal-map';
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, ExternalLink } from 'lucide-react';
@@ -36,6 +37,12 @@ export function SiteFooter() {
           <div>
             <p className="text-lg font-black text-slate-950">{siteConfig.name}</p>
             <p className="mt-2 text-base leading-7 text-slate-700">{siteConfig.description}</p>
+            <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold leading-6 text-emerald-950">
+              Career programs are supported by our nonprofit partner, Selfish Inc. d/b/a Rise Forward Foundation, through available community and wraparound resources. Support is subject to eligibility and program availability.
+            </p>
+            <Link href="/rise-forward-foundation" className="mt-3 inline-flex text-sm font-black text-emerald-800 hover:underline">
+              Learn about Rise Forward Foundation
+            </Link>
             <div className="mt-5 flex gap-3">
               <a href="https://facebook.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-white hover:bg-blue-800" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
               <a href="https://twitter.com/elevatefh" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-white hover:bg-sky-700" aria-label="Twitter"><Twitter className="h-5 w-5" /></a>
@@ -85,6 +92,7 @@ export function SiteFooter() {
         <div className="mt-10 grid gap-9 border-t border-slate-200 pt-10 md:grid-cols-5">
           <FooterGroup title="About">
             <li><Link href={ROUTES.about} className={linkClass}>About / Mission</Link></li>
+            <li><Link href="/rise-forward-foundation" className="text-base font-bold text-emerald-800 hover:underline">Rise Forward Foundation</Link></li>
             <li><Link href={ROUTES.aboutApprovals} className={linkClass}>Approvals</Link></li>
             <li><Link href={ROUTES.apprenticeshipSponsor} className={linkClass}>Apprenticeship Sponsor of Record</Link></li>
             <li><Link href={ROUTES.successStories} className={linkClass}>Success Stories</Link></li>
@@ -122,6 +130,9 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 border-t border-slate-200 pt-6">
+          <p className="mb-5 text-sm font-semibold leading-6 text-slate-700">
+            <span className="font-black text-slate-950">Operating structure:</span> {LEGAL_ENTITY_OPERATING_LINE}. Training, public funding, and charitable support remain separate functions with separate eligibility and authorization requirements.
+          </p>
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-700">
               <Link href="/privacy" className="hover:text-slate-950 hover:underline">Privacy Policy</Link>

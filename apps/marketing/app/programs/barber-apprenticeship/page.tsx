@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberApprenticeshipExtras';
+import BeautyProgramSearchSection from '@/components/programs/beauty/BeautyProgramSearchSection';
 import ProgramSeoStructuredData from '@/components/programs/ProgramSeoStructuredData';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
@@ -24,6 +25,7 @@ export default async function BarberApprenticeshipPage() {
         program={loaded.program}
         banner={heroBanners['barber-apprenticeship'] ?? null}
       >
+        <BeautyProgramSearchSection program={loaded.program} />
         <BarberApprenticeshipExtras />
       </ProgramDetailPage>
     </>

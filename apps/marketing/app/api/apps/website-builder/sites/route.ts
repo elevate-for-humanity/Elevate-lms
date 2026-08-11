@@ -16,6 +16,10 @@ function stringValue(value: unknown, fallback = '', max = 1200) {
   return typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : fallback;
 }
 
+function optionalString(value: unknown, max = 1200) {
+  return typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
+}
+
 function normalizeProvidedConfig(
   provided: unknown,
   fallback: TenantSiteConfig,
@@ -23,13 +27,37 @@ function normalizeProvidedConfig(
   if (!provided || typeof provided !== 'object' || Array.isArray(provided)) return fallback;
   const incoming = provided as Record<string, any>;
 
+  const products = Array.isArray(incoming.products)
+    ? incoming.products.slice(0, 60).map((item: any) => ({
+        name: stringValue(item?.name, 'Product', 180),
+        description: stringValue(item?.description, '', 1800),
+        price: optionalString(item?.price, 40),
+        compareAtPrice: optionalString(item?.compareAtPrice, 40),
+        image: optionalString(item?.image, 1600),
+        imageAlt: optionalString(item?.imageAlt, 220),
+        href: optionalString(item?.href, 1600),
+        category: optionalString(item?.category, 120),
+        badge: optionalString(item?.badge, 80),
+      }))
+    : fallback.products;
+
   return {
     ...fallback,
+    template:
+      incoming.template && typeof incoming.template === 'object' && !Array.isArray(incoming.template)
+        ? {
+            ...fallback.template,
+            ...incoming.template,
+            id: stringValue(incoming.template.id, fallback.template.id, 80),
+            name: stringValue(incoming.template.name, fallback.template.name, 120),
+          }
+        : fallback.template,
     branding: {
       ...fallback.branding,
       ...(incoming.branding && typeof incoming.branding === 'object' ? incoming.branding : {}),
       logoText: stringValue(incoming.branding?.logoText, fallback.branding.logoText, 120),
       tagline: stringValue(incoming.branding?.tagline, fallback.branding.tagline || '', 240),
+      logoImage: optionalString(incoming.branding?.logoImage, 1600),
     },
     homepage: {
       ...fallback.homepage,
@@ -37,10 +65,15 @@ function normalizeProvidedConfig(
       heroTitle: stringValue(incoming.homepage?.heroTitle, fallback.homepage.heroTitle, 180),
       heroSubtitle: stringValue(incoming.homepage?.heroSubtitle, fallback.homepage.heroSubtitle, 500),
       heroCtaText: stringValue(incoming.homepage?.heroCtaText, fallback.homepage.heroCtaText, 80),
+      heroCtaHref: optionalString(incoming.homepage?.heroCtaHref, 600),
+      heroImage: optionalString(incoming.homepage?.heroImage, 1600),
+      heroImageAlt: optionalString(incoming.homepage?.heroImageAlt, 220),
+      announcement: optionalString(incoming.homepage?.announcement, 240),
       features: Array.isArray(incoming.homepage?.features)
         ? incoming.homepage.features.slice(0, 12).map((item: any) => ({
             title: stringValue(item?.title, 'Service', 120),
             description: stringValue(item?.description, '', 500),
+            image: optionalString(item?.image, 1600),
           }))
         : fallback.homepage.features,
     },
@@ -50,12 +83,26 @@ function normalizeProvidedConfig(
           description: stringValue(item?.description, '', 1000),
           duration: stringValue(item?.duration, '', 80),
           level: stringValue(item?.level, '', 80),
+          image: optionalString(item?.image, 1600),
         }))
       : fallback.programs,
+    products,
+    contact:
+      incoming.contact && typeof incoming.contact === 'object' && !Array.isArray(incoming.contact)
+        ? {
+            email: optionalString(incoming.contact.email, 180),
+            phone: optionalString(incoming.contact.phone, 80),
+            address: optionalString(incoming.contact.address, 300),
+            bookingUrl: optionalString(incoming.contact.bookingUrl, 1600),
+            hours: Array.isArray(incoming.contact.hours)
+              ? incoming.contact.hours.map((value: unknown) => stringValue(value, '', 120)).filter(Boolean).slice(0, 14)
+              : undefined,
+          }
+        : fallback.contact,
     navigation: Array.isArray(incoming.navigation)
-      ? incoming.navigation.slice(0, 12).map((item: any) => ({
+      ? incoming.navigation.slice(0, 16).map((item: any) => ({
           label: stringValue(item?.label, 'Page', 60),
-          href: stringValue(item?.href, '/', 240),
+          href: stringValue(item?.href, '/', 1600),
         }))
       : fallback.navigation,
     footer: {
@@ -79,6 +126,12 @@ function normalizeProvidedConfig(
   };
 }
 
+async function getAdminRole(userId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
+  return data?.role === 'admin' || data?.role === 'super_admin';
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const {
@@ -87,6 +140,7 @@ export async function POST(request: NextRequest) {
 
   if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
+  const adminTesting = await getAdminRole(user.id);
   const { data: subscription } = await supabase
     .from('user_app_subscriptions')
     .select('plan, status, trial_ends_at')
@@ -94,15 +148,15 @@ export async function POST(request: NextRequest) {
     .eq('app_slug', 'website-builder')
     .maybeSingle();
 
-  if (!subscription || !['trial', 'active'].includes(subscription.status || '')) {
+  if (!adminTesting && (!subscription || !['trial', 'active'].includes(subscription.status || ''))) {
     return NextResponse.json({ error: 'Website Builder subscription required' }, { status: 403 });
   }
 
-  if (subscription.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
+  if (!adminTesting && subscription?.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
     return NextResponse.json({ error: 'Website Builder trial has expired' }, { status: 403 });
   }
 
-  const plan = subscription.plan || 'starter';
+  const plan = adminTesting ? 'enterprise' : (subscription?.plan || 'starter');
   const limit = PLAN_SITE_LIMITS[plan] ?? 1;
   if (limit !== null) {
     const { count } = await supabase

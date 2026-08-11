@@ -12,7 +12,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+async function isPlatformAdmin(userId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
+  return data?.role === 'admin' || data?.role === 'super_admin';
+}
+
 async function hasIndividualWebsiteImport(userId: string) {
+  if (await isPlatformAdmin(userId)) return true;
+
   const supabase = await createClient();
   const { data: appSub } = await supabase
     .from('user_app_subscriptions')

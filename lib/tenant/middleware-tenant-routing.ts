@@ -18,7 +18,8 @@ export function isTenantAppSubdomainHost(host: string): boolean {
 
 /**
  * Rewrite public tenant traffic to the tenant-site App Router segment.
- * Admin paths on the same host still rewrite to /admin/*.
+ * Only explicit /admin paths route to the tenant admin area. The tenant
+ * subdomain root is the published customer-facing website.
  */
 export function rewriteTenantAppHostRequest(
   request: NextRequest,
@@ -30,8 +31,8 @@ export function rewriteTenantAppHostRequest(
   requestHeadersWithTenant.set('x-tenant-slug', tenantSlug);
   requestHeadersWithTenant.set('x-pathname', pathname);
 
-  if (pathname === '/' || pathname === '/admin' || pathname.startsWith('/admin/')) {
-    const adminPath = pathname === '/' || pathname === '/admin' ? '/admin/dashboard' : pathname;
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    const adminPath = pathname === '/admin' ? '/admin/dashboard' : pathname;
     const rewriteUrl = request.nextUrl.clone();
     rewriteUrl.pathname = adminPath;
     return NextResponse.rewrite(rewriteUrl, {

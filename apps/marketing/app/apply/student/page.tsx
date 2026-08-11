@@ -292,6 +292,39 @@ export default async function StudentApplicationPage({
         </div>
       </section>
 
+      <section className="border-b border-emerald-200 bg-emerald-50 px-4 py-14" aria-labelledby="foundation-support-title">
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <div>
+              <p className="mb-2 text-xs font-black uppercase tracking-widest text-emerald-800">Support Beyond Tuition</p>
+              <h2 id="foundation-support-title" className="text-2xl font-extrabold text-slate-950 sm:text-3xl">
+                Rise Forward Foundation may help connect eligible participants to additional support.
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-slate-700">
+                Selfish Inc. d/b/a Rise Forward Foundation works alongside Elevate as a nonprofit community-support partner. Available support is separate from tuition funding and depends on the Foundation's programs, resources, and participant eligibility.
+              </p>
+              <Link href="/rise-forward-foundation" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-emerald-800 px-5 py-3 text-sm font-black text-white hover:bg-emerald-900">
+                Learn About Rise Forward Foundation
+              </Link>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <article className="rounded-2xl border border-emerald-200 bg-white p-5">
+                <h3 className="text-sm font-black text-slate-950">Training costs</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">Public or third-party funding must be separately approved by the responsible funder for the participant and program.</p>
+              </article>
+              <article className="rounded-2xl border border-emerald-200 bg-white p-5">
+                <h3 className="text-sm font-black text-slate-950">Wraparound resources</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">Eligible participants may be referred for available community resources, financial-capability support, or other barrier-reduction services.</p>
+              </article>
+              <article className="rounded-2xl border border-emerald-200 bg-white p-5">
+                <h3 className="text-sm font-black text-slate-950">No automatic benefit</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">Submitting this application does not guarantee a voucher, reimbursement, books, equipment, counseling, or another specific charitable benefit.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="application-form" className="px-4 py-14">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">

@@ -1,107 +1,115 @@
-import { logger } from '@/lib/logger';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
-import { getIdentifier, createRateLimitHeaders } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
+import {
+  authRateLimit,
+  paymentRateLimit,
+  contactRateLimit,
+  apiRateLimit,
+  strictRateLimit,
+  publicRateLimit,
+  pageLoadRateLimit,
+  getIdentifier,
+  createRateLimitHeaders,
+  getRetryAfterSeconds,
+} from '@/lib/rate-limit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type RateLimiterGetter = { get: () => Ratelimit | null };
+type CanonicalTier = 'strict' | 'contact' | 'api' | 'auth' | 'payment' | 'public' | 'pageLoad';
+
+function canonicalTierFor(limiter: Ratelimit | null | RateLimiterGetter): CanonicalTier | null {
+  if (limiter === strictRateLimit) return 'strict';
+  if (limiter === contactRateLimit) return 'contact';
+  if (limiter === apiRateLimit) return 'api';
+  if (limiter === authRateLimit) return 'auth';
+  if (limiter === paymentRateLimit) return 'payment';
+  if (limiter === publicRateLimit) return 'public';
+  if (limiter === pageLoadRateLimit) return 'pageLoad';
+  return null;
+}
 
 /**
- * Rate limit middleware for API routes
- *
- * Usage:
- * export const POST = withRateLimit(handler, { limiter: authRateLimit });
+ * Compatibility wrapper for older routes.
+ * Shared Elevate limiters are delegated to the canonical applyRateLimit()
+ * implementation so Redis failures, IP resolution, reset timestamps, and local
+ * fallback behavior are identical across both historical import paths.
  */
 export function withRateLimit<T = any>(
   handler: (request: NextRequest, context?: any) => Promise<NextResponse>,
   options: {
     limiter: Ratelimit | null | RateLimiterGetter;
-    skipOnMissing?: boolean; // Skip rate limiting if Redis not configured
+    skipOnMissing?: boolean;
   },
 ) {
   return async (request: NextRequest, context?: any): Promise<NextResponse> => {
-    const { skipOnMissing = true } = options;
+    const canonicalTier = canonicalTierFor(options.limiter);
 
-    // Get limiter (support both direct and getter patterns)
+    if (canonicalTier) {
+      const rateLimited = await applyRateLimit(request, canonicalTier);
+      if (rateLimited) return rateLimited;
+      return handler(request, context);
+    }
+
+    const { skipOnMissing = true } = options;
     const limiter =
       typeof (options.limiter as any)?.get === 'function'
         ? (options.limiter as RateLimiterGetter).get()
         : (options.limiter as Ratelimit | null);
 
-    // Skip if rate limiter not configured
     if (!limiter) {
       if (skipOnMissing) {
-        logger.warn('⚠️ Rate limiting skipped - Redis not configured');
+        logger.warn('[rate-limit] Custom limiter not configured; request allowed');
         return handler(request, context);
-      } else {
-        return NextResponse.json({ error: 'Rate limiting not configured' }, { status: 503 });
       }
+      return NextResponse.json({ error: 'Rate limiting not configured' }, { status: 503 });
     }
 
-    // Get identifier (IP address)
     const identifier = getIdentifier(request);
 
     try {
-      // Check rate limit
       const result = await limiter.limit(identifier);
-
-      // Add rate limit headers
       const headers = createRateLimitHeaders(result);
 
-      // If rate limit exceeded
       if (!result.success) {
+        const retryAfter = getRetryAfterSeconds(result.reset);
         return NextResponse.json(
           {
             error: 'Too many requests',
             message: 'You have exceeded the rate limit. Please try again later.',
-            retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
+            retryAfter,
           },
           {
             status: 429,
             headers: {
               ...headers,
-              'Retry-After': Math.ceil((result.reset - Date.now()) / 1000).toString(),
+              'Retry-After': retryAfter.toString(),
             },
           },
         );
       }
 
-      // Execute handler
       const response = await handler(request, context);
-
-      // Add rate limit headers to successful response
-      Object.entries(headers).forEach(([key, value]) => {
-        response.headers.set(key, value);
-      });
-
+      Object.entries(headers).forEach(([key, value]) => response.headers.set(key, value));
       return response;
     } catch (error) {
-      logger.error('Rate limit error:', error);
-
-      // On error, allow request but log
-      if (skipOnMissing) {
-        return handler(request, context);
-      } else {
-        return NextResponse.json({ error: 'Rate limiting error' }, { status: 500 });
-      }
+      logger.error('Custom rate limit error:', error);
+      if (skipOnMissing) return handler(request, context);
+      return NextResponse.json({ error: 'Rate limiting error' }, { status: 500 });
     }
   };
 }
 
-/**
- * Combined rate limit and auth middleware
- */
 export function withRateLimitAndAuth<T = any>(
   handler: (request: NextRequest, context: any, user: any) => Promise<NextResponse>,
   options: {
-    limiter: Ratelimit | null;
+    limiter: Ratelimit | null | RateLimiterGetter;
     roles?: string[];
     skipOnMissing?: boolean;
   },
 ) {
   return withRateLimit(
     async (request: NextRequest, context: any) => {
-      // Import auth check
       const { createClient } = await import('@/lib/supabase/server');
       const supabase = await createClient();
 
@@ -114,7 +122,6 @@ export function withRateLimitAndAuth<T = any>(
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
-      // Check roles if specified
       if (options.roles && options.roles.length > 0) {
         const { data: profile } = await supabase
           .from('profiles')

@@ -37,19 +37,22 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
 
+# Capture a real build timestamp even when Northflank does not inject one.
+RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); fs.writeFileSync('/tmp/elevate-build-timestamp', ts); console.log('Marketing build timestamp:', ts)"
+
 # Northflank injects NF_GIT_SHA for Git builds. Use it as the only immutable
 # build identity so deployment does not require a config PATCH per commit.
 RUN EFFECTIVE_SHA="${NF_GIT_SHA}" && \
+    EFFECTIVE_BUILT_AT="$(cat /tmp/elevate-build-timestamp)" && \
     test -n "${EFFECTIVE_SHA}" && \
     test "${EFFECTIVE_SHA}" != "unknown" && \
     echo "${EFFECTIVE_SHA}" | grep -qE '^[a-f0-9]{7,40}$' && \
     echo "Marketing build SHA validated: ${EFFECTIVE_SHA}" && \
     printf '{"service":"marketing","commit":"%s","builtAt":"%s"}\n' \
-      "${EFFECTIVE_SHA}" "${BUILD_TIMESTAMP}" > /workspace/public/version.json
+      "${EFFECTIVE_SHA}" "${EFFECTIVE_BUILT_AT}" > /workspace/public/version.json
 
 RUN node scripts/stamp-sw.mjs
 
-# Fail fast if any production worker still contains the unstamped placeholder.
 RUN echo "Verifying marketing service-worker cache versions..." && \
     ! grep -R -q '__CACHE_VERSION__' /workspace/public/sw.js /workspace/public/sw-marketing.js 2>/dev/null && \
     echo "Marketing service workers stamped correctly"
@@ -89,15 +92,11 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
-# Keep public assets in both locations supported by the standalone monorepo
-# runtime. This prevents stale/missing PWA and image assets when server.js is
-# executed from /app/apps/marketing/server.js but process.cwd() is /app.
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./apps/marketing/public/
 
-# Refuse to publish an image that cannot prove its PWA assets and build identity.
 RUN test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
@@ -112,8 +111,6 @@ USER nextjs
 
 EXPOSE 3000
 
-# Container health is pure liveness. /api/version is reserved for deployment
-# identity verification and /api/health is reserved for Northflank readiness.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
 

@@ -94,6 +94,77 @@ function bestImageSrc($: cheerio.CheerioAPI, el: any, baseUrl: string): string |
   return undefined;
 }
 
+function canonicalImageKey(value?: string): string | undefined {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    const pathname = decodeURIComponent(url.pathname)
+      .replace(/_(?:pico|icon|thumb|small|compact|medium|large|grande|original|master|\d+x\d*|x\d+)(?=\.[a-z0-9]+$)/i, '')
+      .toLowerCase();
+    return `${url.hostname.toLowerCase()}${pathname}`;
+  } catch {
+    return value.split('?')[0].split('#')[0].trim().toLowerCase() || undefined;
+  }
+}
+
+function looksLikeSharedChromeImage(value?: string): boolean {
+  if (!value) return false;
+  const normalized = value.toLowerCase();
+  return /(?:favicon|logo|payment|shopify|icon|badge|placeholder|spinner)/.test(normalized);
+}
+
+function dedupeProductMedia(products: ScrapedWebsiteProduct[], reservedImages: string[] = []): ScrapedWebsiteProduct[] {
+  const used = new Set<string>();
+  for (const image of reservedImages) {
+    const key = canonicalImageKey(image);
+    if (key) used.add(key);
+  }
+
+  return products.map((product) => {
+    const key = canonicalImageKey(product.image);
+    if (!key || looksLikeSharedChromeImage(product.image)) {
+      return { ...product, image: undefined };
+    }
+    if (used.has(key)) {
+      return { ...product, image: undefined };
+    }
+    used.add(key);
+    return product;
+  });
+}
+
+function dedupeConfiguredImages(config: any) {
+  const used = new Set<string>();
+  const reserve = (value?: string) => {
+    const key = canonicalImageKey(value);
+    if (key) used.add(key);
+  };
+  const uniqueItems = (items: any[] | undefined) =>
+    (items || []).map((item) => {
+      if (!item?.image) return item;
+      const key = canonicalImageKey(item.image);
+      if (!key || looksLikeSharedChromeImage(item.image) || used.has(key)) {
+        const { image: _image, ...rest } = item;
+        return rest;
+      }
+      used.add(key);
+      return item;
+    });
+
+  reserve(config?.branding?.logoImage);
+  reserve(config?.homepage?.heroImage);
+
+  return {
+    ...config,
+    homepage: {
+      ...(config?.homepage || {}),
+      features: uniqueItems(config?.homepage?.features),
+    },
+    products: uniqueItems(config?.products),
+    programs: uniqueItems(config?.programs),
+  };
+}
+
 function currencyValues(text: string): string[] {
   return [...text.matchAll(/\$\s*([0-9]+(?:\.[0-9]{1,2})?)/g)].map((match) => match[1]);
 }
@@ -170,10 +241,13 @@ async function enrichProduct(product: ScrapedWebsiteProduct, origin: string): Pr
       .slice(0, 1600);
     const text = $('main').text().replace(/\s+/g, ' ');
     const prices = currencyValues(text);
-    const image =
-      toAbsoluteUrl($('meta[property="og:image"]').attr('content'), productUrl.href) ||
-      bestImageSrc($, $('main img').first(), productUrl.href) ||
-      product.image;
+
+    const productMedia = $(
+      '.product__media img, .product-media img, .product-gallery img, [data-media-id] img, [class*="product__media"] img, [class*="product-media"] img',
+    ).first();
+    const productMediaImage = productMedia.length ? bestImageSrc($, productMedia, productUrl.href) : undefined;
+    const ogImage = toAbsoluteUrl($('meta[property="og:image"]').attr('content'), productUrl.href);
+    const image = [ogImage, productMediaImage, product.image].find((candidate) => candidate && !looksLikeSharedChromeImage(candidate));
 
     return {
       ...product,
@@ -311,7 +385,9 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedWebs
 
     $('h2, h3, .card-title, .program-title, .course-title, .service-title').each((_, el) => {
       const name = $(el).text().replace(/\s+/g, ' ').trim();
-      const description = $(el).next('p').text().replace(/\s+/g, ' ').trim() || $(el).parent().find('p').first().text().replace(/\s+/g, ' ').trim();
+      const description =
+        $(el).next('p').text().replace(/\s+/g, ' ').trim() ||
+        $(el).parent().find('p').first().text().replace(/\s+/g, ' ').trim();
       if (name && name.length > 3 && name.length < 120) {
         result.programs.push({ name, description: description.slice(0, 500) });
       }
@@ -354,8 +430,15 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedWebs
         result.pages.push({
           url: pageUrl.href,
           title: page$('title').text().trim() || page$('h1').first().text().trim(),
-          headings: page$('h1, h2, h3').map((_, el) => page$(el).text().replace(/\s+/g, ' ').trim()).get().slice(0, 20),
-          paragraphs: page$('p').map((_, el) => page$(el).text().replace(/\s+/g, ' ').trim()).get().filter((p) => p.length > 40).slice(0, 16),
+          headings: page$('h1, h2, h3')
+            .map((_, el) => page$(el).text().replace(/\s+/g, ' ').trim())
+            .get()
+            .slice(0, 20),
+          paragraphs: page$('p')
+            .map((_, el) => page$(el).text().replace(/\s+/g, ' ').trim())
+            .get()
+            .filter((p) => p.length > 40)
+            .slice(0, 16),
           images: pageImages.slice(0, 30),
         });
         result.images.push(...pageImages);
@@ -378,7 +461,10 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedWebs
     result.images = [...new Set(result.images)].slice(0, 120);
     if (result.products.length) {
       const enriched = await Promise.all(result.products.slice(0, 30).map((product) => enrichProduct(product, origin)));
-      result.products = enriched.filter((product) => product.name && product.href);
+      result.products = dedupeProductMedia(
+        enriched.filter((product) => product.name && product.href),
+        [result.logo || '', result.heroImage || ''].filter(Boolean),
+      );
     }
 
     result.success = true;
@@ -390,17 +476,21 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedWebs
 }
 
 async function analyzeAndGenerateConfig(scrapedData: ScrapedWebsiteData): Promise<any> {
-  const sourceProducts = scrapedData.products.slice(0, 30).map((product) => ({
-    name: product.name,
-    description: product.description,
-    price: product.price,
-    compareAtPrice: product.compareAtPrice,
-    image: product.image,
-    href: product.href,
-    category: product.category,
-  }));
+  const sourceProducts = dedupeProductMedia(
+    scrapedData.products.slice(0, 30).map((product) => ({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      compareAtPrice: product.compareAtPrice,
+      image: product.image,
+      href: product.href,
+      category: product.category,
+    })),
+    [scrapedData.logo || '', scrapedData.heroImage || ''].filter(Boolean),
+  );
+  const isStore = sourceProducts.length > 0;
 
-  const prompt = `Analyze this public website and generate an Elevate website configuration that preserves the organization's factual content, brand voice, products, imagery and calls to action. Do not collapse a retail or service business into a generic training-provider website.\n\nTitle: ${scrapedData.title}\nDescription: ${scrapedData.description}\nNavigation: ${JSON.stringify(scrapedData.navigation)}\nColors: ${scrapedData.colors.join(', ')}\nFonts: ${scrapedData.fonts.join(', ')}\nHero image: ${scrapedData.heroImage || ''}\nServices/programs: ${JSON.stringify(scrapedData.programs.slice(0, 12))}\nProducts: ${JSON.stringify(sourceProducts)}\nContact: ${JSON.stringify(scrapedData.contactInfo)}\nPage titles: ${scrapedData.pages.map((p) => p.title).join(', ')}\n\nReturn ONLY JSON with template, branding, homepage, programs, products, contact, navigation, footer, seo and meta. Use homepage.heroImage when a source hero image exists. For a retail site set meta.siteKind to "store" and use a shop-focused CTA. Preserve source product names, prices, image URLs and links. Never invent licenses, accreditations, testimonials, ratings, outcomes, addresses, medical claims or legal claims.`;
+  const prompt = `Analyze this public website and generate an Elevate website configuration that preserves the organization's factual content, brand voice, products, imagery and calls to action. Do not collapse a retail or service business into a generic training-provider website.\n\nTitle: ${scrapedData.title}\nDescription: ${scrapedData.description}\nNavigation: ${JSON.stringify(scrapedData.navigation)}\nColors: ${scrapedData.colors.join(', ')}\nFonts: ${scrapedData.fonts.join(', ')}\nHero image: ${scrapedData.heroImage || ''}\nServices/programs: ${JSON.stringify(scrapedData.programs.slice(0, 12))}\nProducts: ${JSON.stringify(sourceProducts)}\nContact: ${JSON.stringify(scrapedData.contactInfo)}\nPage titles: ${scrapedData.pages.map((p) => p.title).join(', ')}\n\nReturn ONLY JSON with template, branding, homepage, programs, products, contact, navigation, footer, seo and meta. Use homepage.heroImage when a source hero image exists. For a retail site set meta.siteKind to "store" and use a shop-focused CTA. Preserve source product names, prices, image URLs and links. Do not copy retail products into programs. Do not reuse one image for multiple unrelated cards. Never invent licenses, accreditations, testimonials, ratings, outcomes, addresses, medical claims or legal claims.`;
 
   try {
     const completion = await aiChat({
@@ -412,8 +502,19 @@ async function analyzeAndGenerateConfig(scrapedData: ScrapedWebsiteData): Promis
       maxTokens: 5200,
     });
     const parsed = JSON.parse((completion.content || '').replace(/```json\n?|\n?```/g, '').trim());
-    return {
+    const parsedMeta = { ...(parsed.meta || {}) };
+    delete parsedMeta.products;
+
+    const normalizedNavigation = (parsed.navigation || scrapedData.navigation || []).map((item: any) => {
+      if (isStore && item?.label === 'Shop' && item?.href === '/programs') {
+        return { ...item, href: '/shop' };
+      }
+      return item;
+    });
+
+    return dedupeConfiguredImages({
       ...parsed,
+      programs: isStore ? [] : parsed.programs || [],
       products: sourceProducts,
       contact: {
         ...(parsed.contact || {}),
@@ -424,19 +525,27 @@ async function analyzeAndGenerateConfig(scrapedData: ScrapedWebsiteData): Promis
       homepage: {
         ...(parsed.homepage || {}),
         heroImage: scrapedData.heroImage || parsed.homepage?.heroImage,
+        features: parsed.homepage?.features || [],
       },
       branding: {
         ...(parsed.branding || {}),
         logoImage: scrapedData.logo || parsed.branding?.logoImage,
       },
+      navigation: normalizedNavigation,
       meta: {
-        ...(parsed.meta || {}),
-        siteKind: sourceProducts.length ? 'store' : parsed.meta?.siteKind,
+        ...parsedMeta,
+        siteKind: isStore ? 'store' : parsedMeta.siteKind,
       },
-    };
+    });
   } catch {
-    const isStore = sourceProducts.length > 0;
-    return {
+    const normalizedNavigation = scrapedData.navigation.slice(0, 12).map((item) => {
+      if (isStore && item.label === 'Shop' && item.href.endsWith('/programs')) {
+        return { ...item, href: '/shop' };
+      }
+      return item;
+    });
+
+    return dedupeConfiguredImages({
       branding: {
         primaryColor: scrapedData.colors[0] || '#7c3f58',
         secondaryColor: scrapedData.colors[1] || '#6f7f56',
@@ -451,15 +560,17 @@ async function analyzeAndGenerateConfig(scrapedData: ScrapedWebsiteData): Promis
         heroCtaText: isStore ? 'Shop Products' : 'Get Started',
         heroCtaHref: isStore ? '/shop' : '/programs',
         heroImage: scrapedData.heroImage,
-        features: scrapedData.programs.slice(0, 4).map((item) => ({ title: item.name, description: item.description })),
+        features: isStore
+          ? []
+          : scrapedData.programs.slice(0, 4).map((item) => ({ title: item.name, description: item.description })),
       },
-      programs: scrapedData.programs.slice(0, 20).map((item) => ({ name: item.name, description: item.description })),
+      programs: isStore ? [] : scrapedData.programs.slice(0, 20).map((item) => ({ name: item.name, description: item.description })),
       products: sourceProducts,
       contact: scrapedData.contactInfo,
-      navigation: scrapedData.navigation.slice(0, 12),
+      navigation: normalizedNavigation,
       footer: { description: scrapedData.description.slice(0, 220), contactEmail: scrapedData.contactInfo.email || '' },
       seo: { title: scrapedData.title, description: scrapedData.description, keywords: [] },
       meta: { siteKind: isStore ? 'store' : 'business' },
-    };
+    });
   }
 }

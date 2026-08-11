@@ -5,6 +5,7 @@ import MarqueeBanner from '@/components/MarqueeBanner';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
+import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
 import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
@@ -28,6 +29,10 @@ export const metadata: Metadata = {
     'Indiana ETPL training provider',
     'career training Indiana',
     'apprenticeship programs Indianapolis',
+    'Indiana barber apprenticeship',
+    'Indiana cosmetology apprenticeship',
+    'Indiana nail technician apprenticeship',
+    'earn while you learn beauty apprenticeship',
     'HVAC training Indianapolis',
     'CNA training Indianapolis',
     'CDL training Indiana',
@@ -38,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `${PLATFORM_DEFAULTS.orgName} | Workforce Training, Apprenticeships & Career Programs`,
     description:
-      'DOL-registered apprenticeship sponsor and Indiana ETPL-listed training provider. Career programs in healthcare, skilled trades, CDL, technology, and beauty — funding options may be available.',
+      'Registered apprenticeships and career programs across healthcare, skilled trades, beauty, CDL, technology, and business. Funding eligibility varies by program and participant.',
     url: 'https://www.elevateforhumanity.org',
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
@@ -60,6 +65,7 @@ export default function HomePage() {
     <>
       <StructuredData />
       <HomeHeroVideo banner={banner} />
+      <HomeBeautyPriority />
       <MarqueeBanner />
       <HomeCareerPathways />
       <HomeHowItWorks />

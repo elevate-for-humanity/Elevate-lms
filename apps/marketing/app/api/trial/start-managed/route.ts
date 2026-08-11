@@ -178,25 +178,30 @@ async function _POST(request: NextRequest) {
       tenantId: trial.tenantId,
       organizationId: trial.organizationId,
       workspaceId: trial.workspaceId,
-      slug: trial.slug,
-      workspaceUrl: trial.workspaceUrl,
+      tenantUrl: trial.dashboardUrl,
       publicPreviewUrl: trial.publicPreviewUrl,
-      dashboardUrl: trial.dashboardUrl,
-      loginUrl,
+      subdomain: trial.slug,
       trialEndsAt: trial.trialEndsAt,
-      status: trial.status,
       correlationId: reference,
+      loginUrl,
+      message: 'Trial workspace created.',
     });
   } catch (error) {
-    logger.error('[trial] unhandled managed trial start failure', error, { reference });
+    logger.error(
+      '[trial] provisioning failed',
+      error instanceof Error ? error : new Error(String(error)),
+      { reference },
+    );
     return NextResponse.json(
-      {
-        error: 'We could not start your trial right now. Please try again or contact support.',
-        correlationId: reference,
-      },
+      { error: 'Trial workspace could not be created.', correlationId: reference },
       { status: 500 },
     );
   }
 }
 
-export const POST = withRuntime(withApiAudit('/api/trial/start-managed', _POST));
+const auditedPost = withApiAudit('/api/trial/start-managed', _POST);
+
+export const POST = withRuntime(
+  { secrets: ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'] },
+  async (request) => auditedPost(request),
+);

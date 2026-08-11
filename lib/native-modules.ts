@@ -1,291 +1,176 @@
 /**
- * Native Modules Wrapper
- * 
- * Provides safe access to native dependencies (sharp, canvas, pdfkit)
- * with error handling and graceful fallbacks to prevent segfaults.
+ * Native module boundary.
+ * Dynamic CJS/ESM imports are normalized here so the rest of the app never
+ * depends on package-loader shape differences in Node/Northflank.
  */
 
-// Track initialization state
-let sharpInstance: typeof import('sharp') | null = null;
-let canvasInstance: typeof import('@napi-rs/canvas') | null = null;
-let pdfkitInstance: typeof import('pdfkit') | null = null;
-let fontkitInstance: unknown = null;
+let sharpInstance: any = null;
+let canvasInstance: any = null;
+let pdfkitInstance: any = null;
+let fontkitInstance: any = null;
+let initializationError: string | null = null;
 
-/**
- * Wrapper for operations that might cause segfaults
- * Forces garbage collection and catches any errors
- */
+function moduleDefault<T = any>(module: any): T {
+  return (module?.default ?? module) as T;
+}
+
 export async function withSegfaultProtection<T>(
   operation: () => Promise<T>,
   fallback?: () => Promise<T>,
-  operationName?: string
+  operationName = 'operation',
 ): Promise<{ result: T | null; error?: string }> {
-  const name = operationName || 'operation';
-  
   try {
-    // Suggest GC before heavy operation
-    if (global.gc) {
-      global.gc();
-    }
-    
-    const result = await operation();
-    return { result };
-  } catch (e) {
-    console.error(`[NativeModules] ${name} failed:`, e);
-    
-    // Force GC after failure
-    if (global.gc) {
-      global.gc();
-    }
-    
+    global.gc?.();
+    return { result: await operation() };
+  } catch (error) {
+    console.error(`[NativeModules] ${operationName} failed:`, error);
+    global.gc?.();
     if (fallback) {
       try {
-        const fallbackResult = await fallback();
-        return { result: fallbackResult };
+        return { result: await fallback() };
       } catch (fallbackError) {
-        return { result: null, error: `${String(e)}; Fallback also failed: ${String(fallbackError)}` };
+        return { result: null, error: `${String(error)}; fallback failed: ${String(fallbackError)}` };
       }
     }
-    
-    return { result: null, error: String(e) };
+    return { result: null, error: String(error) };
   }
 }
 
-/**
- * Execute PDFKit operations with segfault protection
- */
-export async function withPDFKit<T>(
-  setup: (doc: unknown) => void,
-  finish: (doc: unknown) => Promise<T>,
-  options?: Record<string, unknown>
-): Promise<{ result: T | null; error?: string }> {
-  const { PDFDocument, available } = await getPDFKit();
-  
-  if (!available || !PDFDocument) {
-    return { result: null, error: 'PDFKit not available' };
-  }
-  
-  return withSegfaultProtection(
-    async () => {
-      const doc = new PDFDocument(options);
-      const chunks: Buffer[] = [];
-      
-      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
-      
-      setup(doc);
-      
-      return finish(doc).then(async (result) => {
-        return new Promise<T>((resolve, reject) => {
-          doc.end();
-          doc.on('end', () => {
-            resolve(result);
-          });
-          doc.on('error', reject);
-        });
-      });
-    },
-    undefined,
-    'PDFKit operation'
-  );
-}
-
-/**
- * Safely initialize native modules
- * Call this at app startup to catch any initialization errors early
- */
 export async function initializeNativeModules(): Promise<{
   success: boolean;
   errors: Record<string, string>;
-  modules: {
-    sharp: boolean;
-    canvas: boolean;
-    pdfkit: boolean;
-    fontkit: boolean;
-  };
+  modules: { sharp: boolean; canvas: boolean; pdfkit: boolean; fontkit: boolean };
 }> {
   const errors: Record<string, string> = {};
-  const modules = {
-    sharp: false,
-    canvas: false,
-    pdfkit: false,
-    fontkit: false,
-  };
+  const modules = { sharp: false, canvas: false, pdfkit: false, fontkit: false };
 
-  // Try sharp
   try {
-    sharpInstance = await import('sharp');
-    modules.sharp = true;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    errors.sharp = msg;
-    console.warn('[NativeModules] sharp initialization failed:', msg);
+    sharpInstance = moduleDefault(await import('sharp'));
+    modules.sharp = typeof sharpInstance === 'function';
+  } catch (error) {
+    errors.sharp = error instanceof Error ? error.message : String(error);
   }
-
-  // Try canvas
   try {
     canvasInstance = await import('@napi-rs/canvas');
-    modules.canvas = true;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    errors.canvas = msg;
-    console.warn('[NativeModules] canvas initialization failed:', msg);
+    modules.canvas = Boolean(canvasInstance?.Canvas);
+  } catch (error) {
+    errors.canvas = error instanceof Error ? error.message : String(error);
   }
-
-  // Try pdfkit
   try {
-    pdfkitInstance = await import('pdfkit');
-    modules.pdfkit = true;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    errors.pdfkit = msg;
-    console.warn('[NativeModules] pdfkit initialization failed:', msg);
+    pdfkitInstance = moduleDefault(await import('pdfkit'));
+    modules.pdfkit = typeof pdfkitInstance === 'function';
+  } catch (error) {
+    errors.pdfkit = error instanceof Error ? error.message : String(error);
   }
-
-  // Try fontkit (required by pdfkit for font embedding)
   try {
-    fontkitInstance = await import('fontkit');
-    modules.fontkit = true;
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    errors.fontkit = msg;
-    console.warn('[NativeModules] fontkit initialization failed:', msg);
+    fontkitInstance = moduleDefault(await import('fontkit'));
+    modules.fontkit = Boolean(fontkitInstance);
+  } catch (error) {
+    errors.fontkit = error instanceof Error ? error.message : String(error);
   }
 
+  initializationError = Object.keys(errors).length ? Object.entries(errors).map(([name, message]) => `${name}: ${message}`).join('; ') : null;
   const success = modules.sharp && modules.canvas && modules.pdfkit && modules.fontkit;
   return { success, errors, modules };
 }
 
-/**
- * Get sharp instance with error handling
- */
-export async function getSharp(): Promise<{
-  sharp: typeof import('sharp');
-  available: boolean;
-}> {
-  if (sharpInstance) {
-    return { sharp: sharpInstance, available: true };
-  }
-
+export async function getSharp(): Promise<{ sharp: any; available: boolean }> {
+  if (typeof sharpInstance === 'function') return { sharp: sharpInstance, available: true };
   try {
-    const sharpModule = await import('sharp');
-    sharpInstance = sharpModule;
-    return { sharp: sharpModule, available: true };
-  } catch (e) {
-    console.error('[NativeModules] sharp not available:', e);
-    return {
-      sharp: null as unknown as typeof import('sharp'),
-      available: false,
-    };
+    sharpInstance = moduleDefault(await import('sharp'));
+    return { sharp: sharpInstance, available: typeof sharpInstance === 'function' };
+  } catch (error) {
+    console.error('[NativeModules] sharp not available:', error);
+    return { sharp: null, available: false };
   }
 }
 
-/**
- * Get canvas instance with error handling
- */
-export async function getCanvas(): Promise<{
-  canvas: typeof import('@napi-rs/canvas') | null;
-  available: boolean;
-}> {
-  if (canvasInstance) {
-    return { canvas: canvasInstance, available: true };
-  }
-
+export async function getCanvas(): Promise<{ canvas: any; available: boolean }> {
+  if (canvasInstance?.Canvas) return { canvas: canvasInstance, available: true };
   try {
-    const canvas = await import('@napi-rs/canvas');
-    canvasInstance = canvas;
-    return { canvas, available: true };
-  } catch (e) {
-    console.error('[NativeModules] canvas not available:', e);
+    canvasInstance = await import('@napi-rs/canvas');
+    return { canvas: canvasInstance, available: Boolean(canvasInstance?.Canvas) };
+  } catch (error) {
+    console.error('[NativeModules] canvas not available:', error);
     return { canvas: null, available: false };
   }
 }
 
-/**
- * Get PDFKit constructor with error handling
- */
-export async function getPDFKit(): Promise<{
-  PDFDocument: typeof import('pdfkit');
-  available: boolean;
-}> {
-  if (pdfkitInstance) {
-    return { PDFDocument: pdfkitInstance, available: true };
-  }
-
+export async function getPDFKit(): Promise<{ PDFDocument: any; available: boolean }> {
+  if (typeof pdfkitInstance === 'function') return { PDFDocument: pdfkitInstance, available: true };
   try {
-    const pdfkit = await import('pdfkit');
-    pdfkitInstance = pdfkit;
-    return { PDFDocument: pdfkit, available: true };
-  } catch (e) {
-    console.error('[NativeModules] pdfkit not available:', e);
-    return {
-      PDFDocument: null as unknown as typeof import('pdfkit'),
-      available: false,
-    };
+    pdfkitInstance = moduleDefault(await import('pdfkit'));
+    return { PDFDocument: pdfkitInstance, available: typeof pdfkitInstance === 'function' };
+  } catch (error) {
+    console.error('[NativeModules] pdfkit not available:', error);
+    return { PDFDocument: null, available: false };
   }
 }
 
-/**
- * Safe sharp image processing with fallback
- */
+export async function withPDFKit<T>(
+  setup: (doc: any) => void,
+  finish: (doc: any) => Promise<T>,
+  options?: Record<string, unknown>,
+): Promise<{ result: T | null; error?: string }> {
+  const { PDFDocument, available } = await getPDFKit();
+  if (!available || !PDFDocument) return { result: null, error: 'PDFKit not available' };
+
+  return withSegfaultProtection(async () => {
+    const doc = new PDFDocument(options);
+    setup(doc);
+    const result = await finish(doc);
+    return await new Promise<T>((resolve, reject) => {
+      doc.once('end', () => resolve(result));
+      doc.once('error', reject);
+      doc.end();
+    });
+  }, undefined, 'PDFKit operation');
+}
+
 export async function processImageWithSharp(
   input: Buffer | string,
-  operations: (pipeline: unknown) => unknown,
-  fallback?: () => Promise<Buffer>
+  operations: (pipeline: any) => any,
+  fallback?: () => Promise<Buffer>,
 ): Promise<{ result: Buffer | null; error?: string }> {
   try {
     const { sharp, available } = await getSharp();
-    if (!available) {
-      if (fallback) {
-        const result = await fallback();
-        return { result };
-      }
-      return { result: null, error: 'sharp not available' };
+    if (!available || typeof sharp !== 'function') {
+      return fallback ? { result: await fallback() } : { result: null, error: 'sharp not available' };
     }
-
-    // sharp(input) creates a pipeline
-    const sharpFn = (sharp as unknown as { default?: unknown }).default || sharp;
-    let pipeline = sharpFn(input);
-    pipeline = operations(pipeline);
-    const result = await pipeline.toBuffer();
-    return { result };
-  } catch (e) {
-    console.error('[NativeModules] sharp processing failed:', e);
+    const pipeline = operations(sharp(input));
+    return { result: await pipeline.toBuffer() };
+  } catch (error) {
+    console.error('[NativeModules] sharp processing failed:', error);
     if (fallback) {
       try {
-        const result = await fallback();
-        return { result };
+        return { result: await fallback() };
       } catch (fallbackError) {
         return { result: null, error: String(fallbackError) };
       }
     }
-    return { result: null, error: String(e) };
+    return { result: null, error: String(error) };
   }
 }
 
-/**
- * Safe canvas operations with fallback
- */
 export async function withCanvas(
   width: number,
   height: number,
-  operation: (canvas: unknown) => void,
-  fallback?: () => Promise<void>
+  operation: (canvas: any) => void,
+  fallback?: () => Promise<void>,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { canvas, available } = await getCanvas();
-    if (!available) {
+    if (!available || !canvas?.Canvas) {
       if (fallback) {
         await fallback();
         return { success: true };
       }
       return { success: false, error: 'canvas not available' };
     }
-
-    const c = new canvas.Canvas(width, height);
-    operation(c);
+    operation(new canvas.Canvas(width, height));
     return { success: true };
-  } catch (e) {
-    console.error('[NativeModules] canvas operation failed:', e);
+  } catch (error) {
+    console.error('[NativeModules] canvas operation failed:', error);
     if (fallback) {
       try {
         await fallback();
@@ -294,71 +179,40 @@ export async function withCanvas(
         return { success: false, error: String(fallbackError) };
       }
     }
-    return { success: false, error: String(e) };
+    return { success: false, error: String(error) };
   }
 }
 
-/**
- * Safe PDF document creation with fallback
- */
 export async function createPDFDocument(
   options?: Record<string, unknown>,
-  fallback?: () => Promise<Buffer>
-): Promise<{
-  doc: unknown;
-  available: boolean;
-  error?: string;
-}> {
+  fallback?: () => Promise<Buffer>,
+): Promise<{ doc: any; available: boolean; error?: string }> {
   try {
     const { PDFDocument, available } = await getPDFKit();
-    if (!available) {
-      if (fallback) {
-        const buffer = await fallback();
-        return { doc: null, available: false };
-      }
+    if (!available || !PDFDocument) {
+      if (fallback) await fallback();
       return { doc: null, available: false, error: 'pdfkit not available' };
     }
-
-    const doc = new PDFDocument(options);
-    return { doc, available: true };
-  } catch (e) {
-    console.error('[NativeModules] PDFDocument creation failed:', e);
+    return { doc: new PDFDocument(options), available: true };
+  } catch (error) {
+    console.error('[NativeModules] PDFDocument creation failed:', error);
     if (fallback) {
-      try {
-        await fallback();
-        return { doc: null, available: false };
-      } catch (fallbackError) {
-        return { doc: null, available: false, error: String(fallbackError) };
-      }
+      try { await fallback(); } catch (fallbackError) { return { doc: null, available: false, error: String(fallbackError) }; }
     }
-    return { doc: null, available: false, error: String(e) };
+    return { doc: null, available: false, error: String(error) };
   }
 }
 
-/**
- * Get initialization error if any
- */
 export function getInitializationError(): string | null {
   return initializationError;
 }
 
-/**
- * Check if native modules are available
- */
 export function isNativeModuleAvailable(module: 'sharp' | 'canvas' | 'pdfkit'): boolean {
-  switch (module) {
-    case 'sharp':
-      return sharpInstance !== null;
-    case 'canvas':
-      return canvasInstance !== null;
-    case 'pdfkit':
-      return pdfkitInstance !== null;
-    default:
-      return false;
-  }
+  if (module === 'sharp') return typeof sharpInstance === 'function';
+  if (module === 'canvas') return Boolean(canvasInstance?.Canvas);
+  return typeof pdfkitInstance === 'function';
 }
 
-// Admin health route: checkNativeModules
 export type NativeModuleName = 'sharp' | 'canvas' | 'fontkit' | 'pdfkit';
 export type NativeModuleResult = {
   success: boolean;
@@ -370,12 +224,7 @@ export async function checkNativeModules(): Promise<NativeModuleResult> {
   const init = await initializeNativeModules();
   return {
     success: init.success,
-    modules: {
-      sharp: init.modules.sharp,
-      canvas: init.modules.canvas,
-      fontkit: init.modules.fontkit ?? false,
-      pdfkit: init.modules.pdfkit,
-    },
+    modules: { sharp: init.modules.sharp, canvas: init.modules.canvas, fontkit: init.modules.fontkit, pdfkit: init.modules.pdfkit },
     errors: init.errors as Partial<Record<NativeModuleName, string>>,
   };
 }

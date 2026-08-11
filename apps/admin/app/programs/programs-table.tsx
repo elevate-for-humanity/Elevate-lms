@@ -56,9 +56,7 @@ export function ProgramsTable({
           />
           <select
             value={filterStatus}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setFilterStatus(e.target.value as ProgramFilter)
-            }
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value as ProgramFilter)}
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="published">Published</option>
@@ -83,49 +81,28 @@ export function ProgramsTable({
           </thead>
           <tbody className="bg-white divide-y divide-slate-200">
             {filteredPrograms.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-black">No programs found</td>
-              </tr>
+              <tr><td colSpan={7} className="px-6 py-12 text-center text-black">No programs found</td></tr>
             ) : (
               filteredPrograms.map((program) => (
                 <tr key={program.id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4">
-                    <div>
-                      <div className="font-medium text-black">{program.title || program.name}</div>
-                      <div className="text-sm text-black">{program.slug}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {program.published ? (
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-brand-green-100 text-brand-green-800">Published</span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Unpublished</span>
-                      )}
-                      {program.featured && (
-                        <span className="px-2 py-1 text-xs font-semibold rounded-full bg-brand-blue-100 text-brand-blue-800">Featured</span>
-                      )}
-                    </div>
-                  </td>
+                  <td className="px-6 py-4"><div><div className="font-medium text-black">{program.title || program.name}</div><div className="text-sm text-black">{program.slug}</div></div></td>
+                  <td className="px-6 py-4"><div className="flex items-center gap-2 flex-wrap">
+                    {program.published ? <span className="px-2 py-1 text-xs font-semibold rounded-full bg-brand-green-100 text-brand-green-800">Published</span> : <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Unpublished</span>}
+                    {program.featured && <span className="px-2 py-1 text-xs font-semibold rounded-full bg-brand-blue-100 text-brand-blue-800">Featured</span>}
+                  </div></td>
                   <td className="px-6 py-4 text-sm text-black">{program.modules?.[0]?.count || 0}</td>
-                  <td className="px-6 py-4 text-sm text-black">
-                    {program.hours ? `${program.hours}h` : program.duration_weeks ? `${program.duration_weeks}wk` : '-'}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-black">{program.hours ? `${program.hours}h` : program.duration_weeks ? `${program.duration_weeks}wk` : '-'}</td>
                   <td className="px-6 py-4 text-sm text-black">{program.price ? `$${program.price.toLocaleString()}` : 'Free'}</td>
-                  <td className="px-6 py-4 text-sm text-black">
-                    {new Date(program.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-                  </td>
-                  <td className="px-6 py-4 text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link href={`/admin/studio?program=${program.id}`} className="inline-flex items-center gap-1 rounded-lg bg-brand-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-700 transition-colors">✦ Build Course</Link>
-                      <Link href={`/programs/${program.slug}/manage`} className="text-brand-blue-600 hover:text-brand-blue-900">Edit</Link>
-                      {programCourseMap[program.id] ? (
-                        <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/lms/courses/${programCourseMap[program.id]}`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-800 font-medium" title="View LMS course">Course</Link>
-                      ) : (
-                        <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/programs/${program.slug}`} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-slate-700" title="View public program page">View</Link>
-                      )}
-                    </div>
-                  </td>
+                  <td className="px-6 py-4 text-sm text-black">{new Date(program.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}</td>
+                  <td className="px-6 py-4 text-right text-sm font-medium"><div className="flex items-center justify-end gap-2">
+                    <Link href={`/admin/studio?program=${program.id}`} className="inline-flex items-center gap-1 rounded-lg bg-brand-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-700 transition-colors">✦ Build Course</Link>
+                    <Link href={`/programs/${program.slug}/manage`} className="text-brand-blue-600 hover:text-brand-blue-900">Edit</Link>
+                    {programCourseMap[program.id] ? (
+                      <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/lms/courses/${programCourseMap[program.id]}`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-800 font-medium" title="View LMS course">Course</Link>
+                    ) : (
+                      <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/programs/${program.slug}`} target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-slate-700" title="View public program page">View</Link>
+                    )}
+                  </div></td>
                 </tr>
               ))
             )}

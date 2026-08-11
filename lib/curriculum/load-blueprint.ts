@@ -1,31 +1,23 @@
 import 'server-only';
 
-/**
- * Lazy blueprint loader.
- *
- * Replaces top-level blueprint imports so each blueprint module is only
- * loaded when actually needed, keeping them out of the shared bundle.
- */
+/** Lazy blueprint loader. */
 export async function loadBlueprint(programSlug: string) {
   switch (programSlug) {
     case 'hvac-epa608-v1':
-    case 'hvac-technician': {
-      // Blueprint migrated to DB — no static file
+    case 'hvac-technician':
       return null;
-    }
     case 'barber':
     case 'barber-apprenticeship': {
       const mod = await import('@/lib/curriculum/blueprints/barber-apprenticeship');
-      return mod.barberApprenticeshipBlueprint ?? mod.default ?? null;
+      return mod.barberApprenticeshipBlueprint ?? null;
     }
     case 'crs-indiana': {
       const mod = await import('@/lib/curriculum/blueprints/crs-indiana');
-      return mod.crsIndianaBlueprint ?? mod.default ?? null;
+      return mod.crsIndianaBlueprint ?? null;
     }
     default: {
-      // Try dynamic import by slug as fallback
       try {
-        const mod = await import(`@/lib/curriculum/blueprints/${programSlug}`);
+        const mod = await import(`@/lib/curriculum/blueprints/${programSlug}`) as Record<string, unknown>;
         return mod.default ?? Object.values(mod)[0] ?? null;
       } catch {
         return null;

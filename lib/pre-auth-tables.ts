@@ -38,8 +38,6 @@
 import type { SupabaseClient } from '@/lib/supabase';
 import { logger } from '@/lib/logger';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 interface ReconcilableTable {
   table: string;
   mode: 'reconcile';
@@ -55,11 +53,7 @@ interface AnonymousTable {
 
 export type PreAuthTableConfig = ReconcilableTable | AnonymousTable;
 
-// ── Registry ──────────────────────────────────────────────────────────────────
-
 export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
-  // ── Reconcilable ───────────────────────────────────────────────────────────
-
   {
     table: 'program_enrollments',
     mode: 'reconcile',
@@ -78,9 +72,6 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
     emailColumn: 'customer_email',
     userIdColumn: 'user_id',
   },
-
-  // ── Anonymous ──────────────────────────────────────────────────────────────
-
   {
     table: 'newsletter_subscribers',
     mode: 'anonymous',
@@ -228,61 +219,72 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
     mode: 'anonymous',
     reason: 'Route is authenticated via createServerSupabaseClient.',
   },
-
   {
     table: 'funding_applications',
     mode: 'anonymous',
-    reason:
-      'Written by funding admin confirm route (createRouteHandlerClient). user_id set from application record.',
+    reason: 'Written by funding admin confirm route. user_id comes from the application record.',
   },
   {
     table: 'funding_cases',
     mode: 'anonymous',
-    reason: 'Written by funding update route (x-user-id header). user_id set at write time.',
+    reason: 'Written by funding update route. user_id is set at write time.',
   },
   {
     table: 'studio_deploy_tokens',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_favorites',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_pr_tracking',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_recent_files',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_repos',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_sessions',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_settings',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'studio_workflow_tracking',
     mode: 'anonymous',
-    reason: 'Written by studio route (x-user-id header). user_id set at write time.',
+    reason: 'Written by authenticated studio route. user_id is set at write time.',
+  },
+  {
+    table: 'tenant_orders',
+    mode: 'anonymous',
+    reason: 'Public connected-account Checkout creates a pending order before buyer authentication. Stripe checkout_session_id and customer_email provide the reconciliation/audit key; the table has no user_id column.',
+  },
+  {
+    table: 'community_groups',
+    mode: 'anonymous',
+    reason: 'Demo-to-trial conversion seeds tenant-owned starter groups after the workspace and tenant are created. These rows are workspace content, not user-owned records.',
+  },
+  {
+    table: 'community_posts',
+    mode: 'anonymous',
+    reason: 'Demo-to-trial conversion can seed a tenant-owned welcome post before the new owner completes first login. Tenant ownership is the authority for this generated starter content.',
   },
 ];
-
-// ── Derived sets (used by CI scanner) ────────────────────────────────────────
 
 export const RECONCILABLE_TABLES = new Set(
   PRE_AUTH_TABLES.filter((t): t is ReconcilableTable => t.mode === 'reconcile').map((t) => t.table),
@@ -294,12 +296,6 @@ export const ANONYMOUS_TABLES = new Set(
 
 export const ALL_REGISTERED_TABLES = new Set(PRE_AUTH_TABLES.map((t) => t.table));
 
-// ── Runtime reconciliation ────────────────────────────────────────────────────
-
-/**
- * Reconcile all 'reconcile'-mode pre-auth tables for a given email address.
- * Called from auth/callback and auth/confirm on every login. Idempotent.
- */
 export async function reconcilePreAuthRows(
   supabase: SupabaseClient,
   email: string,
@@ -358,8 +354,3 @@ export async function reconcilePreAuthRows(
 
   return summary;
 }
-
-// NOTE: The following entries were added by the CI scanner on first run.
-// These tables use x-user-id header auth (studio routes) or createRouteHandlerClient
-// (funding routes). They set user_id at write time — no orphan risk.
-// Registered as anonymous to satisfy the CI guard.

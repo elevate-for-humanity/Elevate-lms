@@ -1,11 +1,9 @@
 'use client';
-import { logger } from '@/lib/logger';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AlertCircle, CheckCircle2, Circle, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { Circle, Loader2, AlertCircle, Clock, Users, TrendingUp, Zap } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface WorkflowStep {
   id: string;
@@ -15,45 +13,19 @@ interface WorkflowStep {
   status: 'completed' | 'in_progress' | 'pending' | 'failed' | 'skipped';
   automated: boolean;
   completed_at?: string;
-  error_message?: string;
 }
-
 interface EnrollmentData {
   id: string;
   user_id: string;
-  program_id?: string;
-  course_id?: string;
+  program_id?: string | null;
+  course_id?: string | null;
   status: string;
   created_at: string;
-  updated_at?: string;
-  student?: { full_name: string; email: string };
-  program?: { name: string };
-  course?: { title: string };
+  updated_at?: string | null;
+  student?: { full_name: string | null; email: string | null } | null;
+  program?: { name: string | null } | null;
+  course?: { title: string | null } | null;
 }
-
-// Supabase enrollment with relations
-interface EnrollmentWithRelations {
-  id: string;
-  user_id: string;
-  program_id?: string;
-  course_id?: string;
-  status: string;
-  created_at: string;
-  updated_at?: string;
-  profiles?: { full_name: string; email: string };
-  training_programs?: { name: string };
-  courses?: { title: string };
-}
-
-interface EnrollmentStats {
-  enrollmentsToday: number;
-  enrollmentsYesterday: number;
-  avgProcessingTimeMinutes: number;
-  successRate: number;
-  pendingCount: number;
-  failedCount: number;
-}
-
 interface Props {
   enrollmentId?: string;
   showStats?: boolean;
@@ -61,559 +33,165 @@ interface Props {
   onWorkflowComplete?: (enrollment: EnrollmentData) => void;
 }
 
-const DEFAULT_WORKFLOW_STEPS: Omit<WorkflowStep, 'id'>[] = [
-  {
-    step_number: 1,
-    title: 'Application Received',
-    description: 'Student submitted enrollment application',
-    status: 'pending',
-    automated: true,
-  },
-  {
-    step_number: 2,
-    title: 'Eligibility Verification',
-    description: 'Checking funding eligibility (WIOA, WRG, JRI)',
-    status: 'pending',
-    automated: true,
-  },
-  {
-    step_number: 3,
-    title: 'Document Collection',
-    description: 'Required documents uploaded and verified',
-    status: 'pending',
-    automated: false,
-  },
-  {
-    step_number: 4,
-    title: 'Background Check',
-    description: 'Background verification if required by program',
-    status: 'pending',
-    automated: true,
-  },
-  {
-    step_number: 5,
-    title: 'Payment Processing',
-    description: 'Payment or funding authorization processed',
-    status: 'pending',
-    automated: true,
-  },
-  {
-    step_number: 6,
-    title: 'Course Access Provisioned',
-    description: 'LMS access and materials assigned',
-    status: 'pending',
-    automated: true,
-  },
-  {
-    step_number: 7,
-    title: 'Welcome Communication',
-    description: 'Welcome email and orientation info sent',
-    status: 'pending',
-    automated: true,
-  },
-  {
-    step_number: 8,
-    title: 'Enrollment Complete',
-    description: 'Student fully enrolled and ready to begin',
-    status: 'pending',
-    automated: true,
-  },
-];
+const STEP_DEFS = [
+  ['Application Received', 'Application record exists and is ready for review'],
+  ['Eligibility / Funding Review', 'Funding or self-pay evidence is reviewed'],
+  ['Document Collection', 'Required enrollment documents are complete'],
+  ['Approval', 'Program admission decision is recorded'],
+  ['Payment / Authorization', 'Payment or workforce authorization is verified'],
+  ['Course Access', 'LMS access is provisioned'],
+  ['Orientation', 'Orientation and next steps are completed'],
+  ['Enrollment Complete', 'Learner is active and ready to begin'],
+] as const;
 
-export default function AutomatedEnrollmentWorkflow({
-  enrollmentId,
-  showStats = true,
-  onStepComplete,
-  onWorkflowComplete,
-}: Props) {
-  const [workflow, setWorkflow] = useState<WorkflowStep[]>([]);
-  const [enrollment, setEnrollment] = useState<EnrollmentData | null>(null);
-  const [stats, setStats] = useState<EnrollmentStats>({
-    enrollmentsToday: 0,
-    enrollmentsYesterday: 0,
-    avgProcessingTimeMinutes: 0,
-    successRate: 0,
-    pendingCount: 0,
-    failedCount: 0,
+function deriveWorkflow(status: string): WorkflowStep[] {
+  const normalized = status || 'pending';
+  let completedThrough = 0;
+  let current = 1;
+  if (['submitted', 'pending', 'in_review', 'pending_admin_review'].includes(normalized)) { completedThrough = 1; current = 2; }
+  else if (['documents_pending'].includes(normalized)) { completedThrough = 2; current = 3; }
+  else if (['approved'].includes(normalized)) { completedThrough = 4; current = 5; }
+  else if (['payment_pending'].includes(normalized)) { completedThrough = 4; current = 5; }
+  else if (['enrolled', 'active', 'completed'].includes(normalized)) { completedThrough = 8; current = 8; }
+  else if (['rejected', 'cancelled', 'revoked'].includes(normalized)) { completedThrough = 2; current = 0; }
+
+  return STEP_DEFS.map(([title, description], index) => {
+    const stepNumber = index + 1;
+    const isTerminalFailure = ['rejected', 'cancelled', 'revoked'].includes(normalized);
+    const stepStatus: WorkflowStep['status'] = stepNumber <= completedThrough
+      ? 'completed'
+      : isTerminalFailure
+        ? 'skipped'
+        : stepNumber === current
+          ? 'in_progress'
+          : 'pending';
+    return {
+      id: `step-${stepNumber}`,
+      step_number: stepNumber,
+      title,
+      description,
+      status: stepStatus,
+      automated: [1, 5, 6, 8].includes(stepNumber),
+      completed_at: stepStatus === 'completed' ? new Date().toISOString() : undefined,
+    };
   });
-  const [loading, setLoading] = useState(true);
+}
+
+export default function AutomatedEnrollmentWorkflow({ enrollmentId, showStats = true, onStepComplete, onWorkflowComplete }: Props) {
+  const [workflow, setWorkflow] = useState<WorkflowStep[]>(deriveWorkflow('pending'));
+  const [enrollment, setEnrollment] = useState<EnrollmentData | null>(null);
+  const [counts, setCounts] = useState({ active: 0, pending: 0, failed: 0, today: 0 });
+  const [loading, setLoading] = useState(Boolean(enrollmentId));
   const [error, setError] = useState<string | null>(null);
   const [processingStep, setProcessingStep] = useState<number | null>(null);
 
-  const supabase = createClient();
-
-  const deriveWorkflowFromStatus = useCallback((status: string): WorkflowStep[] => {
-    return DEFAULT_WORKFLOW_STEPS.map((step, index) => {
-      let derivedStatus: WorkflowStep['status'];
-
-      switch (status) {
-        case 'completed':
-        case 'active':
-          derivedStatus = 'completed';
-          break;
-        case 'approved':
-          derivedStatus =
-            step.step_number <= 6
-              ? 'completed'
-              : step.step_number === 7
-                ? 'in_progress'
-                : 'pending';
-          break;
-        case 'payment_pending':
-          derivedStatus =
-            step.step_number <= 4
-              ? 'completed'
-              : step.step_number === 5
-                ? 'in_progress'
-                : 'pending';
-          break;
-        case 'documents_pending':
-          derivedStatus =
-            step.step_number <= 2
-              ? 'completed'
-              : step.step_number === 3
-                ? 'in_progress'
-                : 'pending';
-          break;
-        case 'pending':
-        case 'submitted':
-          derivedStatus =
-            step.step_number === 1
-              ? 'completed'
-              : step.step_number === 2
-                ? 'in_progress'
-                : 'pending';
-          break;
-        case 'rejected':
-        case 'cancelled':
-          derivedStatus = step.step_number <= 2 ? 'completed' : 'skipped';
-          break;
-        default:
-          derivedStatus = 'pending';
-      }
-
-      return {
-        ...step,
-        id: `step-${index}`,
-        status: derivedStatus,
-        completed_at: derivedStatus === 'completed' ? new Date().toISOString() : undefined,
-      };
-    });
-  }, []);
-
-  const fetchEnrollmentData = useCallback(async () => {
+  const loadEnrollment = useCallback(async () => {
     if (!enrollmentId) {
-      setWorkflow(DEFAULT_WORKFLOW_STEPS.map((s, i) => ({ ...s, id: `step-${i}` })));
+      setWorkflow(deriveWorkflow('pending'));
       setLoading(false);
       return;
     }
-
+    const supabase = createClient();
     try {
-      const { data: enrollmentData, error: enrollmentError } = await supabase
+      const { data, error: queryError } = await supabase
         .from('program_enrollments')
-        .select(
-          `
-          id,
-          user_id,
-          program_id,
-          course_id,
-          status,
-          created_at,
-          updated_at,
-          profiles!enrollments_user_id_fkey(full_name, email),
-          training_programs(name),
-          courses(title)
-        `,
-        )
+        .select('id,user_id,program_id,course_id,status,created_at,updated_at,profiles:user_id(full_name,email),training_programs:program_id(name),courses:course_id(title)')
         .eq('id', enrollmentId)
-        .single();
-
-      if (enrollmentError) throw enrollmentError;
-
-      const data = enrollmentData as EnrollmentWithRelations;
-      const formattedEnrollment: EnrollmentData = {
-        id: data.id,
-        user_id: data.user_id,
-        program_id: data.program_id,
-        course_id: data.course_id,
-        status: data.status,
-        created_at: data.created_at,
-        updated_at: data.updated_at,
-        student: data.profiles,
-        program: data.training_programs,
-        course: data.courses,
+        .maybeSingle();
+      if (queryError || !data) throw queryError || new Error('Enrollment not found');
+      const row = data as any;
+      const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+      const program = Array.isArray(row.training_programs) ? row.training_programs[0] : row.training_programs;
+      const course = Array.isArray(row.courses) ? row.courses[0] : row.courses;
+      const normalized: EnrollmentData = {
+        id: row.id,
+        user_id: row.user_id,
+        program_id: row.program_id,
+        course_id: row.course_id,
+        status: row.status || 'pending',
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+        student: profile ?? null,
+        program: program ?? null,
+        course: course ?? null,
       };
-      setEnrollment(formattedEnrollment);
-
-      const derivedWorkflow = deriveWorkflowFromStatus(enrollmentData.status);
-      setWorkflow(derivedWorkflow);
-    } catch (err: any) {
-      logger.error('Error fetching enrollment:', err);
-      setError('Failed to load enrollment');
-      setWorkflow(DEFAULT_WORKFLOW_STEPS.map((s, i) => ({ ...s, id: `step-${i}` })));
+      setEnrollment(normalized);
+      setWorkflow(deriveWorkflow(normalized.status));
+      setError(null);
+    } catch (loadError) {
+      logger.error('[enrollment-workflow] failed to load enrollment', loadError instanceof Error ? loadError : new Error(String(loadError)));
+      setError('Enrollment workflow data is temporarily unavailable.');
+    } finally {
+      setLoading(false);
     }
-  }, [enrollmentId, supabase, deriveWorkflowFromStatus]);
+  }, [enrollmentId]);
 
-  const fetchStats = useCallback(async () => {
+  const loadStats = useCallback(async () => {
     if (!showStats) return;
+    const supabase = createClient();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const [active, pending, failed, createdToday] = await Promise.all([
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).in('status', ['active', 'enrolled', 'completed']),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).in('status', ['pending', 'submitted', 'in_review', 'documents_pending', 'payment_pending']),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).in('status', ['rejected', 'cancelled', 'revoked']),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).gte('created_at', today.toISOString()),
+    ]);
+    setCounts({ active: active.count ?? 0, pending: pending.count ?? 0, failed: failed.count ?? 0, today: createdToday.count ?? 0 });
+  }, [showStats]);
 
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  useEffect(() => { void Promise.all([loadEnrollment(), loadStats()]); }, [loadEnrollment, loadStats]);
 
-      const { count: todayCount } = await supabase
-        .from('program_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', today.toISOString());
-
-      const { count: yesterdayCount } = await supabase
-        .from('program_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', yesterday.toISOString())
-        .lt('created_at', today.toISOString());
-
-      const { count: totalCount } = await supabase
-        .from('program_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', thirtyDaysAgo.toISOString());
-
-      const { count: completedCount } = await supabase
-        .from('program_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['active', 'completed'])
-        .gte('created_at', thirtyDaysAgo.toISOString());
-
-      const { count: pendingCount } = await supabase
-        .from('program_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['pending', 'submitted', 'documents_pending', 'payment_pending']);
-
-      const { count: failedCount } = await supabase
-        .from('program_enrollments')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['rejected', 'cancelled', 'failed']);
-
-      setStats({
-        enrollmentsToday: todayCount || 0,
-        enrollmentsYesterday: yesterdayCount || 0,
-        avgProcessingTimeMinutes: 15,
-        successRate: totalCount ? Math.round(((completedCount || 0) / totalCount) * 100) : 0,
-        pendingCount: pendingCount || 0,
-        failedCount: failedCount || 0,
-      });
-    } catch (err) {
-      logger.error('Error fetching stats:', err);
-    }
-  }, [showStats, supabase]);
-
-  const processStep = async (stepNumber: number) => {
+  useEffect(() => {
     if (!enrollmentId) return;
+    const supabase = createClient();
+    const channel = supabase.channel(`program-enrollment-${enrollmentId}`).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'program_enrollments', filter: `id=eq.${enrollmentId}` }, (payload: any) => {
+      const status = payload.new?.status;
+      if (status) {
+        setWorkflow(deriveWorkflow(status));
+        setEnrollment((current) => current ? { ...current, status } : current);
+      }
+    }).subscribe();
+    return () => { void supabase.removeChannel(channel); };
+  }, [enrollmentId]);
 
+  async function completeStep(stepNumber: number) {
+    if (!enrollmentId || !enrollment) return;
     setProcessingStep(stepNumber);
-
     try {
-      const updatedWorkflow = workflow.map((step) => {
-        if (step.step_number === stepNumber) {
-          return { ...step, status: 'completed' as const, completed_at: new Date().toISOString() };
-        }
-        if (step.step_number === stepNumber + 1) {
-          return { ...step, status: 'in_progress' as const };
-        }
-        return step;
-      });
-
-      setWorkflow(updatedWorkflow);
-
-      const statusMap: Record<number, string> = {
-        2: 'documents_pending',
-        3: 'approved',
-        4: 'payment_pending',
-        5: 'approved',
-        6: 'active',
-        7: 'active',
-        8: 'active',
-      };
-
-      if (statusMap[stepNumber]) {
-        await supabase
-          .from('program_enrollments')
-          .update({ status: statusMap[stepNumber], updated_at: new Date().toISOString() })
-          .eq('id', enrollmentId);
-      }
-
-      const completedStep = updatedWorkflow.find((s) => s.step_number === stepNumber);
-      if (completedStep && onStepComplete) {
-        onStepComplete(completedStep);
-      }
-
-      const allComplete = updatedWorkflow.every(
-        (s) => s.status === 'completed' || s.status === 'skipped',
-      );
-      if (allComplete && enrollment && onWorkflowComplete) {
-        onWorkflowComplete(enrollment);
-      }
-    } catch (err) {
-      logger.error('Error processing step:', err);
+      const statusMap: Record<number, string> = { 2: 'documents_pending', 3: 'in_review', 4: 'approved', 5: 'approved', 6: 'enrolled', 7: 'active', 8: 'active' };
+      const nextStatus = statusMap[stepNumber] || enrollment.status;
+      const supabase = createClient();
+      const { error: updateError } = await supabase.from('program_enrollments').update({ status: nextStatus, updated_at: new Date().toISOString() }).eq('id', enrollmentId);
+      if (updateError) throw updateError;
+      const nextWorkflow = deriveWorkflow(nextStatus);
+      setWorkflow(nextWorkflow);
+      const completed = nextWorkflow.find((step) => step.step_number === stepNumber);
+      if (completed) onStepComplete?.(completed);
+      const nextEnrollment = { ...enrollment, status: nextStatus };
+      setEnrollment(nextEnrollment);
+      if (stepNumber === 8) onWorkflowComplete?.(nextEnrollment);
+    } catch (stepError) {
+      logger.error('[enrollment-workflow] step update failed', stepError instanceof Error ? stepError : new Error(String(stepError)));
+      setError('Could not update this enrollment step.');
     } finally {
       setProcessingStep(null);
     }
-  };
-
-  useEffect((): void => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([fetchEnrollmentData(), fetchStats()]);
-      setLoading(false);
-    };
-    loadData();
-  }, [fetchEnrollmentData, fetchStats]);
-
-  useEffect((): void => {
-    if (!enrollmentId) return;
-
-    const channel = supabase
-      .channel(`enrollment-${enrollmentId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'enrollments',
-          filter: `id=eq.${enrollmentId}`,
-        },
-        (payload: { new?: { status?: string } }) => {
-          if (payload.new) {
-            const newStatus = payload.new.status;
-            if (newStatus) {
-              const derivedWorkflow = deriveWorkflowFromStatus(newStatus);
-              setWorkflow(derivedWorkflow);
-            }
-          }
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [enrollmentId, supabase, deriveWorkflowFromStatus]);
-
-  const getStatusIcon = (status: WorkflowStep['status']) => {
-    switch (status) {
-      case 'completed':
-        return <span className="text-slate-400 flex-shrink-0">•</span>;
-      case 'in_progress':
-        return <Loader2 className="w-5 h-5 text-brand-blue-500 animate-spin" />;
-      case 'failed':
-        return <AlertCircle className="w-5 h-5 text-brand-red-500" />;
-      case 'skipped':
-        return <Circle className="w-5 h-5 text-slate-700" />;
-      default:
-        return <Circle className="w-5 h-5 text-slate-700" />;
-    }
-  };
-
-  const getStatusBg = (status: WorkflowStep['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-brand-green-50 border-brand-green-200';
-      case 'in_progress':
-        return 'bg-brand-blue-50 border-brand-blue-200';
-      case 'failed':
-        return 'bg-brand-red-50 border-brand-red-200';
-      default:
-        return 'bg-slate-50 border-slate-200';
-    }
-  };
-
-  const percentChange =
-    stats.enrollmentsYesterday > 0
-      ? Math.round(
-          ((stats.enrollmentsToday - stats.enrollmentsYesterday) / stats.enrollmentsYesterday) *
-            100,
-        )
-      : stats.enrollmentsToday > 0
-        ? 100
-        : 0;
-
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="animate-pulse">
-          <div className="h-8 bg-slate-200 rounded w-1/3 mb-6"></div>
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-20 bg-slate-100 rounded mb-3"></div>
-          ))}
-        </div>
-      </div>
-    );
   }
 
+  const completeCount = useMemo(() => workflow.filter((step) => step.status === 'completed').length, [workflow]);
+
+  if (loading) return <div className="flex justify-center py-10"><Loader2 className="h-7 w-7 animate-spin text-brand-blue-700" /></div>;
+
   return (
-    <div className="space-y-6">
-      {enrollment && (
-        <Card className="p-4 bg-gradient-to-r from-brand-blue-50 to-indigo-50 border-brand-blue-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-slate-900">
-                {enrollment.student?.full_name || 'Student'}
-              </h3>
-              <p className="text-sm text-slate-700">
-                {enrollment.program?.name || enrollment.course?.title || 'Program'}
-              </p>
-            </div>
-            <div className="text-right">
-              <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  enrollment.status === 'active'
-                    ? 'bg-brand-green-100 text-brand-green-800'
-                    : enrollment.status === 'pending'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-slate-100 text-slate-900'
-                }`}
-              >
-                {enrollment.status.replace('_', ' ').toUpperCase()}
-              </span>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-900">Enrollment Workflow</h2>
-          <span className="text-sm text-slate-700">
-            {workflow.filter((s) => s.status === 'completed').length} / {workflow.length} steps
-            complete
-          </span>
-        </div>
-
-        <div className="space-y-3">
-          {workflow.map((step, index) => (
-            <div
-              key={step.id}
-              className={`p-4 rounded-lg border transition-all ${getStatusBg(step.status)}`}
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 mt-0.5">
-                  {processingStep === step.step_number ? (
-                    <Loader2 className="w-5 h-5 text-brand-blue-500 animate-spin" />
-                  ) : (
-                    getStatusIcon(step.status)
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-slate-700">
-                      STEP {step.step_number}
-                    </span>
-                    {step.automated && (
-                      <span className="inline-flex items-center gap-1 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
-                        <Zap className="w-3 h-3" /> Auto
-                      </span>
-                    )}
-                  </div>
-                  <h4 className="font-semibold text-slate-900">{step.title}</h4>
-                  <p className="text-sm text-slate-700">{step.description}</p>
-
-                  {step.completed_at && step.status === 'completed' && (
-                    <p className="text-xs text-slate-700 mt-1">
-                      Completed {new Date(step.completed_at).toLocaleString('en-US')}
-                    </p>
-                  )}
-
-                  {step.error_message && (
-                    <p className="text-xs text-brand-red-600 mt-1">{step.error_message}</p>
-                  )}
-                </div>
-
-                {!step.automated && step.status === 'in_progress' && enrollmentId && (
-                  <Button
-                    size="sm"
-                    onClick={() => processStep(step.step_number)}
-                    disabled={processingStep !== null}
-                  >
-                    {processingStep === step.step_number ? 'Processing...' : 'Complete'}
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {showStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-brand-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-brand-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{stats.enrollmentsToday}</p>
-                <p className="text-xs text-slate-700">Today</p>
-              </div>
-            </div>
-            <p
-              className={`text-xs mt-2 ${percentChange >= 0 ? 'text-brand-green-600' : 'text-brand-red-600'}`}
-            >
-              {percentChange >= 0 ? '↑' : '↓'} {Math.abs(percentChange)}% vs yesterday
-            </p>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-brand-orange-100 rounded-lg">
-                <Clock className="w-5 h-5 text-brand-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">
-                  {stats.avgProcessingTimeMinutes}m
-                </p>
-                <p className="text-xs text-slate-700">Avg Time</p>
-              </div>
-            </div>
-            <p className="text-xs mt-2 text-slate-700">Processing time</p>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-brand-green-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-brand-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{stats.successRate}%</p>
-                <p className="text-xs text-slate-700">Success</p>
-              </div>
-            </div>
-            <p className="text-xs mt-2 text-slate-700">30-day rate</p>
-          </Card>
-
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <AlertCircle className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{stats.pendingCount}</p>
-                <p className="text-xs text-slate-700">Pending</p>
-              </div>
-            </div>
-            <p className="text-xs mt-2 text-brand-red-500">{stats.failedCount} failed</p>
-          </Card>
-        </div>
-      )}
-
-      {error && (
-        <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
-          <p className="text-sm text-brand-red-600">{error}</p>
-        </div>
-      )}
-    </div>
+    <section className="space-y-5">
+      {showStats && <div className="grid gap-3 sm:grid-cols-4">{[
+        ['Active', counts.active], ['Pending', counts.pending], ['Exceptions', counts.failed], ['Created today', counts.today],
+      ].map(([label, value]) => <div key={String(label)} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><p className="text-2xl font-black text-slate-950">{value}</p><p className="text-xs font-bold text-slate-500">{label}</p></div>)}</div>}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-xl font-black text-slate-950">Enrollment Workflow</h2><p className="text-sm text-slate-600">{enrollment ? `${enrollment.student?.full_name || enrollment.student?.email || 'Learner'} · ${enrollment.program?.name || enrollment.course?.title || 'Program'}` : 'Select an enrollment to inspect its live workflow.'}</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-700">{completeCount}/{workflow.length} complete</span></div>
+        {error && <div className="mt-4 flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-900"><AlertCircle className="h-4 w-4" />{error}</div>}
+        <div className="mt-5 space-y-3">{workflow.map((step) => <div key={step.id} className="flex items-center gap-3 rounded-xl border border-slate-200 p-4"><div>{step.status === 'completed' ? <CheckCircle2 className="h-5 w-5 text-emerald-600" /> : step.status === 'in_progress' ? <Loader2 className="h-5 w-5 animate-spin text-brand-blue-600" /> : <Circle className="h-5 w-5 text-slate-400" />}</div><div className="min-w-0 flex-1"><p className="font-bold text-slate-900">{step.step_number}. {step.title}</p><p className="text-xs text-slate-500">{step.description}</p></div>{enrollmentId && step.status === 'in_progress' && <button type="button" disabled={processingStep === step.step_number} onClick={() => void completeStep(step.step_number)} className="rounded-lg bg-brand-blue-700 px-3 py-2 text-xs font-black text-white disabled:opacity-50">{processingStep === step.step_number ? 'Saving…' : 'Complete step'}</button>}</div>)}</div>
+      </div>
+    </section>
   );
 }

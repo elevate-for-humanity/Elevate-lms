@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { createAiTask } from '@/lib/devstudio/os/task-runner';
 import { isMissingTable, jsonOk, tableNotReadyResponse } from '@/lib/devstudio/os/api-helpers';
+import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const db = await requireAdminClient();
     let query = db
       .from('ai_tasks')
-      .select('id, title, description, status, priority, agent_id, trace_id, requires_approval, risk_tags, created_at, updated_at, completed_at')
+      .select('id, title, description, status, priority, agent_id, agent_type, trace_id, tool_name, requires_approval, approval_status, risk_tags, result_json, error_message, created_at, updated_at, completed_at')
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -54,15 +55,26 @@ export async function POST(request: NextRequest) {
     if (!title) return safeError('title is required', 400);
 
     const db = await requireAdminClient();
-    const task = await createAiTask(db, {
-      title,
-      description: body.description ? String(body.description) : undefined,
-      agentSlug: body.agentSlug ? String(body.agentSlug) : undefined,
-      command: body.command ? String(body.command) : undefined,
-      requestedBy: auth.id,
-      priority: typeof body.priority === 'number' ? body.priority : undefined,
-      traceId: body.traceId ? String(body.traceId) : undefined,
-    });
+    const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
+    const task = await createAiTask(
+      db,
+      {
+        title,
+        description: body.description ? String(body.description) : undefined,
+        agentSlug: body.agentSlug ? String(body.agentSlug) : undefined,
+        command: body.command ? String(body.command) : undefined,
+        requestedBy: auth.id,
+        priority: typeof body.priority === 'number' ? body.priority : undefined,
+        traceId: body.traceId ? String(body.traceId) : undefined,
+      },
+      {
+        actorRoles: auth.effectiveRoles,
+        tenantId,
+        requestHeaders: request.headers,
+        adminOrigin: request.nextUrl.origin,
+        appOrigin: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
+      },
+    );
 
     return jsonOk({ task }, { status: 201 });
   } catch (err) {

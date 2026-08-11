@@ -15,29 +15,34 @@ export default async function FERPATrainingPage() {
   const { id: userId } = await requireAdmin();
   const db = await requireAdminClient();
 
-  const [{ data: profile }, { data: trainingRecords }, { data: pendingUsers }] = await Promise.all([
+  const [{ data: profile }, { data: trainingRows }, { data: pendingRows }] = await Promise.all([
     db.from('profiles').select('role, full_name').eq('id', userId).maybeSingle(),
     db
       .from('ferpa_training_records')
       .select(
-        'id, user_id, status, quiz_score, completed_at, expires_at, training_acknowledged, created_at',
+        'id, user_id, status, quiz_score, completed_at, expires_at, profiles:user_id(full_name,email,role)',
       )
       .order('created_at', { ascending: false }),
     db
       .from('profiles')
-      .select('id, full_name, email, role')
-      .not('id', 'in', `(SELECT user_id FROM ferpa_training_records WHERE status = 'completed')`)
-      .in('role', ['staff', 'instructor', 'admin'])
+      .select('id, full_name, email, role, created_at')
+      .in('role', ['staff', 'instructor', 'admin', 'super_admin'])
       .order('full_name'),
   ]);
 
+  const trainingRecords = (trainingRows ?? []).map((row: any) => ({
+    ...row,
+    profiles: Array.isArray(row.profiles) ? row.profiles[0] ?? null : row.profiles ?? null,
+  })).filter((row: any) => row.profiles);
+
+  const trainedIds = new Set(trainingRecords.map((row: any) => row.user_id));
+  const pendingUsers = (pendingRows ?? []).filter((row: any) => !trainedIds.has(row.id));
+
   return (
-    <>
-      <FERPATrainingDashboard
-        trainingRecords={trainingRecords ?? []}
-        pendingUsers={pendingUsers ?? []}
-        currentUser={profile}
-      />
-    </>
+    <FERPATrainingDashboard
+      trainingRecords={trainingRecords as any}
+      pendingUsers={pendingUsers as any}
+      currentUser={profile}
+    />
   );
 }

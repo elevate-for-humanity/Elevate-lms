@@ -1,10 +1,10 @@
 /**
- * HomeCareerPathways — visual priority pathways with explicit crawlable beauty links.
+ * HomeCareerPathways — visual priority pathways.
  */
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Scissors, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const PATHWAYS = [
   {
@@ -59,24 +59,6 @@ const PATHWAYS = [
   },
 ] as const;
 
-const BEAUTY_PATHWAYS = [
-  {
-    title: 'Registered Barber Apprenticeship',
-    href: '/programs/barber-apprenticeship',
-    detail: 'Host-shop OJL + related technical instruction',
-  },
-  {
-    title: 'Cosmetology Apprenticeship',
-    href: '/programs/cosmetology-apprenticeship',
-    detail: 'Supervised salon training + licensing preparation',
-  },
-  {
-    title: 'Nail Technician & Manicurist Apprenticeship',
-    href: '/programs/nail-technician-apprenticeship',
-    detail: 'Supervised nail-salon training + technical instruction',
-  },
-] as const;
-
 export function HomeCareerPathways() {
   return (
     <section className="bg-white px-4 py-16 sm:py-20" aria-labelledby="featured-pathways-heading">
@@ -128,29 +110,6 @@ export function HomeCareerPathways() {
               </Link>
             </article>
           ))}
-        </div>
-
-        <div className="mt-10 rounded-3xl border border-rose-200 bg-gradient-to-r from-rose-50 via-white to-fuchsia-50 p-6 sm:p-8" aria-labelledby="beauty-grooming-pathways-heading">
-          <div className="flex items-start gap-3">
-            <div className="rounded-2xl bg-rose-700 p-3 text-white"><Scissors className="h-5 w-5" /></div>
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">Beauty & Grooming Pathways</p>
-              <h3 id="beauty-grooming-pathways-heading" className="mt-1 text-2xl font-black text-slate-950">Choose the exact Indiana license pathway you want.</h3>
-              <p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">
-                These are separate, crawlable program pages so applicants and search engines can identify Barbering, Cosmetology, and Nail Technology without digging through a generic beauty category.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 grid gap-3 lg:grid-cols-3">
-            {BEAUTY_PATHWAYS.map((pathway) => (
-              <Link key={pathway.href} href={pathway.href} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-rose-300 hover:shadow-md">
-                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-rose-700"><Sparkles className="h-4 w-4" /> Indiana pathway</div>
-                <div className="mt-2 text-lg font-black text-slate-950">{pathway.title}</div>
-                <div className="mt-2 text-sm font-medium leading-6 text-slate-600">{pathway.detail}</div>
-                <span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-rose-700">View program <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
-              </Link>
-            ))}
-          </div>
         </div>
 
         <div className="mt-10 flex justify-center">

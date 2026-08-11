@@ -16,7 +16,7 @@ export default async function ReviewVerificationPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole(['admin']);
+  const { user } = await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
 
@@ -26,11 +26,8 @@ export default async function ReviewVerificationPage({
     .eq('id', id)
     .maybeSingle();
 
-  if (!rawVerification) {
-    redirect('/verifications/review');
-  }
+  if (!rawVerification) redirect('/verifications/review');
 
-  // Hydrate profile separately (id_verifications.user_id → auth.users, no FK to profiles)
   const { data: verifReviewProfile } = rawVerification.user_id
     ? await supabase
         .from('profiles')
@@ -42,13 +39,10 @@ export default async function ReviewVerificationPage({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Image */}
       <section className="border-b py-8">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl font-bold text-black mb-2">Review ID Verification</h1>
-          <p className="text-lg text-black">
-            Review and approve or reject this identity verification
-          </p>
+          <p className="text-lg text-black">Review and approve or reject this identity verification</p>
         </div>
       </section>
 

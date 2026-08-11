@@ -1,31 +1,12 @@
 /**
- * lib/course-builder/assessment-generator.ts
- *
- * Generates assessment question banks for module quizzes and final exams.
- *
- * Supports:
- *   - multiple_choice  — 4-option MC with explanation
- *   - true_false       — binary with explanation
- *   - short_answer     — open-ended prompt (instructor-graded)
- *   - scenario         — applied situation question
- *
- * Rules (spec §9):
- *   - Module quizzes: 8–15 questions, passing score 70
- *   - Final exam: 50–75 questions, passing score 80
- *   - Domain-balanced final exam: questions distributed per domainDistribution
- *   - Placeholder questions are generated when no content is available;
- *     the hydrator replaces them with real content
- *
- * The generator writes to assessment_questions table (first-class storage).
- * It also writes quiz_questions jsonb on course_lessons for backward compat
- * with the existing quiz player.
+ * Assessment question generation and persistence.
+ * assessment_questions is canonical; course_lessons.quiz_questions is a
+ * backwards-compatible projection for the legacy quiz player.
  */
 
 import type { SupabaseClient } from '@/lib/supabase';
 import type { QuizQuestion } from './schema';
 import { logger } from '@/lib/logger';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type QuestionType = 'multiple_choice' | 'true_false' | 'short_answer' | 'scenario';
 export type Difficulty = 'easy' | 'medium' | 'hard';
@@ -41,7 +22,6 @@ export type GeneratedQuestion = {
   difficulty: Difficulty;
   domainKey?: string;
   sortOrder: number;
-  /** True when this is a placeholder pending hydration */
   isPlaceholder: boolean;
 };
 
@@ -61,7 +41,6 @@ export type FinalExamSpec = {
   courseTitle: string;
   questionCount: number;
   passingScore: number;
-  /** Domain key → percentage (must sum to 100) */
   domainDistribution?: Record<string, number>;
   allDomainKeys?: string[];
 };
@@ -73,184 +52,148 @@ export type AssessmentGeneratorResult = {
   errors: string[];
 };
 
-// ─── Question builders ────────────────────────────────────────────────────────
-
-function buildMCPlaceholder(
-  index: number,
-  context: string,
-  domainKey?: string,
-  competencyKey?: string,
-  difficulty: Difficulty = 'medium',
+function buildQuestion(
+  id: string,
+  questionType: QuestionType,
+  prompt: string,
+  sortOrder: number,
+  options: {
+    choices?: string[];
+    correctAnswer?: number | boolean | string;
+    explanation?: string;
+    competencyKey?: string;
+    difficulty?: Difficulty;
+    domainKey?: string;
+  } = {},
 ): GeneratedQuestion {
   return {
-    id: `placeholder-mc-${index}`,
-    questionType: 'multiple_choice',
-    prompt: `[Placeholder MC question ${index + 1} — ${context}]`,
-    choices: ['Option A', 'Option B', 'Option C', 'Option D'],
-    correctAnswer: 0,
-    explanation: 'Replace this placeholder with a real question via the content hydrator.',
-    competencyKey,
-    difficulty,
-    domainKey,
-    sortOrder: index,
+    id,
+    questionType,
+    prompt,
+    choices: options.choices,
+    correctAnswer: options.correctAnswer,
+    explanation: options.explanation,
+    competencyKey: options.competencyKey,
+    difficulty: options.difficulty ?? 'medium',
+    domainKey: options.domainKey,
+    sortOrder,
     isPlaceholder: true,
   };
 }
 
-function buildTFPlaceholder(
+function buildPlaceholder(
   index: number,
-  context: string,
-  domainKey?: string,
-  difficulty: Difficulty = 'easy',
-): GeneratedQuestion {
-  return {
-    id: `placeholder-tf-${index}`,
-    questionType: 'true_false',
-    prompt: `[Placeholder T/F question ${index + 1} — ${context}]`,
-    choices: ['True', 'False'],
-    correctAnswer: true,
-    explanation: 'Replace this placeholder with a real question via the content hydrator.',
-    difficulty,
-    domainKey,
-    sortOrder: index,
-    isPlaceholder: true,
-  };
-}
-
-function buildScenarioPlaceholder(
-  index: number,
+  type: QuestionType,
   context: string,
   domainKey?: string,
   competencyKey?: string,
 ): GeneratedQuestion {
-  return {
-    id: `placeholder-scenario-${index}`,
-    questionType: 'scenario',
-    prompt: `[Placeholder scenario question ${index + 1} — ${context}. Describe a situation and ask the learner to identify the correct response.]`,
-    choices: ['Response A', 'Response B', 'Response C', 'Response D'],
-    correctAnswer: 0,
-    explanation: 'Replace this placeholder with a real scenario via the content hydrator.',
-    competencyKey,
-    difficulty: 'hard',
-    domainKey,
-    sortOrder: index,
-    isPlaceholder: true,
-  };
+  const prefix = type === 'true_false' ? 'T/F' : type === 'scenario' ? 'scenario' : 'MC';
+  const choices = type === 'true_false'
+    ? ['True', 'False']
+    : type === 'short_answer'
+      ? undefined
+      : ['Option A', 'Option B', 'Option C', 'Option D'];
+  const correctAnswer = type === 'true_false' ? true : type === 'short_answer' ? '' : 0;
+  return buildQuestion(
+    `placeholder-${type}-${index}`,
+    type,
+    `[Placeholder ${prefix} question ${index + 1} — ${context}]`,
+    index,
+    {
+      choices,
+      correctAnswer,
+      explanation: 'Replace this placeholder with a real question before publishing.',
+      competencyKey,
+      difficulty: type === 'scenario' ? 'hard' : type === 'true_false' ? 'easy' : 'medium',
+      domainKey,
+    },
+  );
 }
 
-// ─── Module quiz generator ────────────────────────────────────────────────────
-
-/**
- * Generates a module quiz question bank.
- * Mix: 60% MC, 20% T/F, 20% scenario (rounded to whole questions).
- */
 export function generateModuleQuiz(spec: ModuleQuizSpec): GeneratedQuestion[] {
   const count = Math.min(Math.max(spec.questionCount ?? 10, 8), 15);
-  const context = spec.moduleTitle;
-  const domain = spec.domainKey;
-  const compKey = spec.competencyKeys?.[0];
-
   const mcCount = Math.round(count * 0.6);
   const tfCount = Math.round(count * 0.2);
   const scenarioCount = count - mcCount - tfCount;
+  const result: GeneratedQuestion[] = [];
+  let index = 0;
 
-  const questions: GeneratedQuestion[] = [];
-
-  for (let i = 0; i < mcCount; i++) {
-    questions.push(buildMCPlaceholder(i, context, domain, compKey, i < 2 ? 'easy' : 'medium'));
+  for (let i = 0; i < mcCount; i++, index++) {
+    result.push(buildPlaceholder(index, 'multiple_choice', spec.moduleTitle, spec.domainKey, spec.competencyKeys?.[0]));
   }
-  for (let i = 0; i < tfCount; i++) {
-    questions.push(buildTFPlaceholder(mcCount + i, context, domain));
+  for (let i = 0; i < tfCount; i++, index++) {
+    result.push(buildPlaceholder(index, 'true_false', spec.moduleTitle, spec.domainKey));
   }
-  for (let i = 0; i < scenarioCount; i++) {
-    questions.push(buildScenarioPlaceholder(mcCount + tfCount + i, context, domain, compKey));
+  for (let i = 0; i < scenarioCount; i++, index++) {
+    result.push(buildPlaceholder(index, 'scenario', spec.moduleTitle, spec.domainKey, spec.competencyKeys?.[0]));
   }
-
-  return questions.map((q, idx) => ({ ...q, sortOrder: idx }));
+  return result;
 }
 
-// ─── Final exam generator ─────────────────────────────────────────────────────
-
-/**
- * Generates a domain-balanced final exam question bank.
- * When domainDistribution is provided, questions are allocated proportionally.
- * Without distribution, questions are spread evenly across all domains.
- */
 export function generateFinalExam(spec: FinalExamSpec): GeneratedQuestion[] {
   const count = Math.min(Math.max(spec.questionCount, 50), 75);
-  const questions: GeneratedQuestion[] = [];
+  const result: GeneratedQuestion[] = [];
+  let index = 0;
 
-  if (spec.domainDistribution && Object.keys(spec.domainDistribution).length > 0) {
-    // Domain-balanced generation
-    let sortOrder = 0;
-    for (const [domainKey, pct] of Object.entries(spec.domainDistribution)) {
-      const domainCount = Math.round((pct / 100) * count);
-      const mcCount = Math.round(domainCount * 0.6);
-      const tfCount = Math.round(domainCount * 0.2);
-      const scenarioCount = domainCount - mcCount - tfCount;
+  const distributions = spec.domainDistribution && Object.keys(spec.domainDistribution).length
+    ? Object.entries(spec.domainDistribution)
+    : (spec.allDomainKeys?.length
+        ? spec.allDomainKeys.map((key) => [key, 100 / spec.allDomainKeys!.length] as [string, number])
+        : [['general', 100] as [string, number]]);
 
-      for (let i = 0; i < mcCount; i++) {
-        questions.push({
-          ...buildMCPlaceholder(
-            sortOrder,
-            `${spec.courseTitle} — ${domainKey}`,
-            domainKey,
-            undefined,
-            'medium',
-          ),
-          sortOrder,
-        });
-        sortOrder++;
-      }
-      for (let i = 0; i < tfCount; i++) {
-        questions.push({
-          ...buildTFPlaceholder(sortOrder, `${spec.courseTitle} — ${domainKey}`, domainKey),
-          sortOrder,
-        });
-        sortOrder++;
-      }
-      for (let i = 0; i < scenarioCount; i++) {
-        questions.push({
-          ...buildScenarioPlaceholder(sortOrder, `${spec.courseTitle} — ${domainKey}`, domainKey),
-          sortOrder,
-        });
-        sortOrder++;
-      }
-    }
-  } else {
-    // Flat generation — no domain distribution
-    const mcCount = Math.round(count * 0.6);
-    const tfCount = Math.round(count * 0.15);
-    const scenarioCount = count - mcCount - tfCount;
+  for (let domainIndex = 0; domainIndex < distributions.length; domainIndex++) {
+    const [domainKey, percentage] = distributions[domainIndex];
+    const remaining = count - result.length;
+    const domainCount = domainIndex === distributions.length - 1
+      ? remaining
+      : Math.min(remaining, Math.round(count * (percentage / 100)));
+    const mcCount = Math.round(domainCount * 0.6);
+    const tfCount = Math.round(domainCount * 0.2);
+    const scenarioCount = Math.max(0, domainCount - mcCount - tfCount);
 
-    for (let i = 0; i < mcCount; i++) {
-      questions.push(
-        buildMCPlaceholder(
-          i,
-          spec.courseTitle,
-          undefined,
-          undefined,
-          i < 10 ? 'easy' : i < 30 ? 'medium' : 'hard',
-        ),
-      );
+    for (let i = 0; i < mcCount; i++, index++) {
+      result.push(buildPlaceholder(index, 'multiple_choice', `${spec.courseTitle} — ${domainKey}`, domainKey));
     }
-    for (let i = 0; i < tfCount; i++) {
-      questions.push(buildTFPlaceholder(mcCount + i, spec.courseTitle));
+    for (let i = 0; i < tfCount; i++, index++) {
+      result.push(buildPlaceholder(index, 'true_false', `${spec.courseTitle} — ${domainKey}`, domainKey));
     }
-    for (let i = 0; i < scenarioCount; i++) {
-      questions.push(buildScenarioPlaceholder(mcCount + tfCount + i, spec.courseTitle));
+    for (let i = 0; i < scenarioCount; i++, index++) {
+      result.push(buildPlaceholder(index, 'scenario', `${spec.courseTitle} — ${domainKey}`, domainKey));
     }
   }
 
-  return questions.map((q, idx) => ({ ...q, sortOrder: idx }));
+  while (result.length < count) {
+    result.push(buildPlaceholder(result.length, 'multiple_choice', spec.courseTitle));
+  }
+  return result.slice(0, count).map((question, sortOrder) => ({ ...question, sortOrder }));
 }
 
-// ─── DB write ─────────────────────────────────────────────────────────────────
+function toLegacyQuizQuestion(question: GeneratedQuestion): QuizQuestion | null {
+  if (question.questionType !== 'multiple_choice' && question.questionType !== 'true_false') return null;
+  const options = question.choices ?? ['True', 'False'];
+  let correctAnswer: string | string[] | undefined;
 
-/**
- * Writes generated questions to assessment_questions table.
- * Also updates course_lessons.quiz_questions jsonb for backward compat.
- */
+  if (typeof question.correctAnswer === 'number') {
+    correctAnswer = options[question.correctAnswer] ?? options[0] ?? '';
+  } else if (typeof question.correctAnswer === 'boolean') {
+    correctAnswer = question.correctAnswer ? 'True' : 'False';
+  } else if (typeof question.correctAnswer === 'string') {
+    correctAnswer = question.correctAnswer;
+  }
+
+  return {
+    id: question.id,
+    prompt: question.prompt,
+    type: question.questionType,
+    options,
+    correctAnswer,
+    explanation: question.explanation,
+    domainKey: question.domainKey,
+    competencyKeys: question.competencyKey ? [question.competencyKey] : undefined,
+  };
+}
+
 export async function persistAssessmentQuestions(
   db: SupabaseClient,
   lessonId: string,
@@ -260,78 +203,56 @@ export async function persistAssessmentQuestions(
   const errors: string[] = [];
 
   if (opts.replaceExisting) {
-    const { error: delErr } = await db
-      .from('assessment_questions')
-      .delete()
-      .eq('lesson_id', lessonId);
-    if (delErr) {
-      errors.push(`Failed to clear existing questions: ${delErr.message}`);
-      return { lessonId, questions, writtenToDb: 0, errors };
-    }
+    const { error } = await db.from('assessment_questions').delete().eq('lesson_id', lessonId);
+    if (error) return { lessonId, questions, writtenToDb: 0, errors: [`Failed to clear existing questions: ${error.message}`] };
   }
 
-  const rows = questions.map((q) => ({
+  const rows = questions.map((question) => ({
     lesson_id: lessonId,
-    question_type: q.questionType,
-    prompt: q.prompt,
-    choices: q.choices ? JSON.stringify(q.choices) : null,
-    correct_answer: q.correctAnswer !== undefined ? JSON.stringify(q.correctAnswer) : null,
-    explanation: q.explanation ?? null,
-    competency_key: q.competencyKey ?? null,
-    difficulty: q.difficulty,
-    domain_key: q.domainKey ?? null,
-    sort_order: q.sortOrder,
+    question_type: question.questionType,
+    prompt: question.prompt,
+    choices: question.choices ? JSON.stringify(question.choices) : null,
+    correct_answer: question.correctAnswer !== undefined ? JSON.stringify(question.correctAnswer) : null,
+    explanation: question.explanation ?? null,
+    competency_key: question.competencyKey ?? null,
+    difficulty: question.difficulty,
+    domain_key: question.domainKey ?? null,
+    sort_order: question.sortOrder,
   }));
 
-  const { error: insertErr } = await db.from('assessment_questions').insert(rows);
-
-  if (insertErr) {
-    errors.push(`Failed to insert questions: ${insertErr.message}`);
-    return { lessonId, questions, writtenToDb: 0, errors };
+  const { error: insertError } = await db.from('assessment_questions').insert(rows);
+  if (insertError) {
+    return { lessonId, questions, writtenToDb: 0, errors: [`Failed to insert questions: ${insertError.message}`] };
   }
 
-  // Also write quiz_questions jsonb on course_lessons for backward compat
-  const quizQuestionsJsonb: QuizQuestion[] = questions
-    .filter((q) => q.questionType === 'multiple_choice' || q.questionType === 'true_false')
-    .map((q, idx) => ({
-      id: q.id,
-      question: q.prompt,
-      options: q.choices ?? ['True', 'False'],
-      correctAnswer:
-        typeof q.correctAnswer === 'number' ? q.correctAnswer : q.correctAnswer === true ? 0 : 1,
-      explanation: q.explanation,
-    }));
+  const quizQuestionsJsonb = questions
+    .map(toLegacyQuizQuestion)
+    .filter((question): question is QuizQuestion => question !== null);
 
-  const { error: updateErr } = await db
+  const { error: updateError } = await db
     .from('course_lessons')
     .update({ quiz_questions: quizQuestionsJsonb })
     .eq('id', lessonId);
-
-  if (updateErr) {
-    logger.warn('[assessment-generator] Failed to sync quiz_questions jsonb', {
+  if (updateError) {
+    logger.warn('[assessment-generator] Failed to sync legacy quiz_questions projection', {
       lessonId,
-      error: updateErr.message,
+      error: updateError.message,
     });
-    // Non-fatal — assessment_questions is the source of truth
   }
 
   return { lessonId, questions, writtenToDb: rows.length, errors };
 }
 
-// ─── Convenience: generate + persist ─────────────────────────────────────────
-
 export async function generateAndPersistModuleQuiz(
   db: SupabaseClient,
   spec: ModuleQuizSpec,
 ): Promise<AssessmentGeneratorResult> {
-  const questions = generateModuleQuiz(spec);
-  return persistAssessmentQuestions(db, spec.lessonId, questions, { replaceExisting: true });
+  return persistAssessmentQuestions(db, spec.lessonId, generateModuleQuiz(spec), { replaceExisting: true });
 }
 
 export async function generateAndPersistFinalExam(
   db: SupabaseClient,
   spec: FinalExamSpec,
 ): Promise<AssessmentGeneratorResult> {
-  const questions = generateFinalExam(spec);
-  return persistAssessmentQuestions(db, spec.lessonId, questions, { replaceExisting: true });
+  return persistAssessmentQuestions(db, spec.lessonId, generateFinalExam(spec), { replaceExisting: true });
 }

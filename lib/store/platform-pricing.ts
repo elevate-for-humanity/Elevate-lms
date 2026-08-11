@@ -214,6 +214,27 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     bullets: ['Unlimited courses', 'Certificates', 'Student tracking'],
   },
   {
+    slug: 'community-hub',
+    name: 'Community Hub',
+    priceMonthly: 39,
+    description: 'Branded community with posts, discussions, groups, events, memberships and gamification.',
+    features: [
+      PlatformFeature.COMMUNITY,
+      PlatformFeature.COMMUNITY_GROUPS,
+      PlatformFeature.COMMUNITY_EVENTS,
+      PlatformFeature.COMMUNITY_GAMIFICATION,
+      PlatformFeature.COMMUNITY_MEMBERSHIPS,
+    ],
+    bullets: [
+      'Community feed and comments',
+      'Groups and discussions',
+      'Events and RSVP',
+      'Points, badges and leaderboards',
+      'Free and paid membership tiers',
+      'AI Team community roles',
+    ],
+  },
+  {
     slug: 'course-builder',
     name: 'Course Builder',
     priceMonthly: 29,

@@ -1,7 +1,7 @@
 /**
- * Races a promise-like value against a timeout.
- * Accepting PromiseLike also supports Supabase PostgREST builders, which are
- * thenable but intentionally do not expose Promise.catch/finally methods.
+ * Races a promise-like operation against a timeout.
+ * Rejects with an Error if the operation does not settle within `ms` milliseconds.
+ * Accepting PromiseLike keeps this compatible with Supabase Postgrest builders.
  */
 export async function withTimeout<T>(
   promise: PromiseLike<T>,

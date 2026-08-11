@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
-import ProgramSeoStructuredData from '@/components/programs/ProgramSeoStructuredData';
-import BeautyProgramSearchSection from '@/components/programs/beauty/BeautyProgramSearchSection';
+import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
@@ -12,6 +11,7 @@ export default async function CosmetologyApprenticeshipPage() {
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   if (!loaded) return notFound();
   const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const structuredData = buildBeautyProgramStructuredData(loaded.program);
   const heroOverride = banner?.videoSrcDesktop ? (
     <HeroVideo
       videoSrcDesktop={banner.videoSrcDesktop}
@@ -30,12 +30,12 @@ export default async function CosmetologyApprenticeshipPage() {
 
   return (
     <>
-      <ProgramSeoStructuredData
-        program={loaded.program}
-        canonicalPath="/programs/cosmetology-apprenticeship"
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
       <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride}>
-        <BeautyProgramSearchSection program={loaded.program} />
+        <BeautyApprenticeshipAuthority program={loaded.program} />
       </ProgramDetailPage>
     </>
   );
@@ -43,26 +43,24 @@ export default async function CosmetologyApprenticeshipPage() {
 
 export async function generateMetadata() {
   return {
-    title: 'Registered Cosmetology Apprenticeship in Indiana | Elevate for Humanity',
+    title: 'Cosmetology Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Indiana cosmetology apprenticeship with supervised salon training, related technical instruction, host-shop placement pathways and sponsor oversight. Funding eligibility is reviewed separately and is not guaranteed.',
+      'Indiana cosmetology apprenticeship pathway with 2,000 hours of supervised salon training, related instruction, host-site placement, progress tracking and licensing preparation. Current funding status is verified per program before enrollment.',
     keywords: [
-      'cosmetology apprenticeship',
       'cosmetology apprenticeship Indiana',
       'Indiana cosmetology apprenticeship program',
-      'paid cosmetology apprenticeship',
-      'registered cosmetology apprenticeship',
-      'salon apprenticeship Indiana',
-      'cosmetology license apprenticeship',
+      'hair stylist apprenticeship Indiana',
+      'salon apprenticeship Indianapolis',
       'earn while you learn cosmetology',
+      'cosmetology training Indiana',
+      'Indiana cosmetology license pathway',
     ],
     alternates: {
       canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
     },
     openGraph: {
-      title: 'Registered Cosmetology Apprenticeship in Indiana',
-      description:
-        'Explore supervised salon training, related technical instruction, host-shop pathways and the verified funding status for Elevate’s Indiana cosmetology apprenticeship.',
+      title: 'Cosmetology Apprenticeship Program | Indiana',
+      description: 'Complete supervised salon training and related instruction with Elevate’s cosmetology apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
       url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
       type: 'website',
     },

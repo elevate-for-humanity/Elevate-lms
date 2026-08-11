@@ -1,6 +1,11 @@
 import { getRecommendedTemplate } from '@/lib/templates/designs';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 
+export type TenantSiteConfigPatch = Omit<Partial<TenantSiteConfig>, 'homepage' | 'branding'> & {
+  homepage?: Partial<TenantSiteConfig['homepage']>;
+  branding?: Partial<TenantSiteConfig['branding']>;
+};
+
 export function buildDefaultSiteConfig(params: {
   organizationName: string;
   organizationType?: string;
@@ -104,10 +109,7 @@ export function buildDefaultSiteConfig(params: {
 
 export function mergeSiteConfig(
   base: TenantSiteConfig,
-  partial: Partial<TenantSiteConfig> & {
-    homepage?: Partial<TenantSiteConfig['homepage']>;
-    branding?: Partial<TenantSiteConfig['branding']>;
-  },
+  partial: TenantSiteConfigPatch,
 ): TenantSiteConfig {
   return {
     ...base,

@@ -1,8 +1,9 @@
 /**
  * HomeTrustBar
  *
- * Institutional validation strip. Organization-level approvals are worded so
- * they do not imply that every individual program is funded or separately approved.
+ * Institutional validation strip — DOL registration, WIOA/ETPL approval,
+ * RAPIDS tracking, JRI funding, WorkOne alignment. Each badge links to
+ * the relevant proof/detail page. Rendered near the bottom of the homepage.
  */
 
 import Image from 'next/image';
@@ -11,38 +12,38 @@ import Link from 'next/link';
 const TRUST_ITEMS = [
   {
     img: '/images/pages/about-career-pathways.webp',
-    label: 'DOL Registered Sponsor',
-    sub: 'Federal apprenticeship sponsor registration',
+    label: 'DOL Registered',
+    sub: 'Federal apprenticeship sponsor',
     href: '/compliance/apprenticeship-structure',
   },
   {
     img: '/images/pages/wioa-meeting.webp',
-    label: 'Indiana ETPL Provider',
-    sub: 'Verified listed programs may qualify for WIOA funding',
+    label: 'ETPL Approved',
+    sub: 'WIOA-funded tuition eligible',
     href: '/federal-compliance',
   },
   {
     img: '/images/pages/about-career-training.webp',
-    label: 'Workforce Funding Ready',
-    sub: 'Eligibility and covered costs vary by program and participant',
+    label: 'WIOA Aligned',
+    sub: 'Title I & II compliant',
     href: '/eligibility',
   },
   {
     img: '/images/pages/comp-state-career-hero.webp',
     label: 'RAPIDS Tracked',
-    sub: 'Registered apprenticeship records and sponsor oversight',
+    sub: 'DOL apprenticeship system',
     href: '/compliance/apprenticeship-structure',
   },
   {
     img: '/images/pages/about-team-hero.webp',
-    label: 'Indiana Workforce Network',
-    sub: 'Works with WorkOne and workforce partners',
+    label: 'WorkOne Partner',
+    sub: 'Indiana DWD aligned',
     href: '/partners/workforce',
   },
   {
     img: '/images/pages/funding-impact-2.jpg',
-    label: 'JRI Partner',
-    sub: 'Eligible services and participants are reviewed separately',
+    label: 'JRI Approved',
+    sub: 'Marion County free tuition',
     href: '/partners/jri',
   },
 ];
@@ -64,7 +65,7 @@ const PARTNER_LOGOS = [
     href: '/partners/workforce',
   },
   { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
-  { src: '/images/pages/about-hero.webp', alt: 'OSHA training alignment', href: '/compliance' },
+  { src: '/images/pages/about-hero.webp', alt: 'OSHA Authorized', href: '/compliance' },
 ];
 
 export function HomeTrustBar() {
@@ -73,60 +74,52 @@ export function HomeTrustBar() {
       className="bg-slate-50 border-t border-slate-200"
       aria-label="Institutional credentials and partnerships"
     >
-      <div className="mx-auto max-w-6xl px-4 py-10 md:py-12">
-        <div className="mx-auto mb-7 max-w-4xl rounded-2xl border border-slate-300 bg-slate-950 px-5 py-5 text-center text-white shadow-sm">
-          <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-300">Verified institutional status</p>
-          <p className="mt-2 text-base font-black sm:text-lg">
-            Elevate for Humanity operates as a U.S. Department of Labor Registered Apprenticeship sponsor and an Indiana ETPL-listed training provider.
-          </p>
-          <p className="mt-2 text-xs font-medium leading-5 text-slate-300">
-            Program funding, participant eligibility, licensing requirements, and covered costs are verified at the individual program level before enrollment.
-          </p>
-        </div>
-
-        <p className="mb-6 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-600">
-          Institutional credentials &amp; workforce alignment
+      {/* Credential badges — 2 cols mobile, 3 cols sm, 6 cols lg */}
+      <div className="max-w-6xl mx-auto px-4 py-10 md:py-12">
+        <p className="text-center text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-6">
+          Accreditations &amp; Approvals
         </p>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {TRUST_ITEMS.map(({ img, label, sub, href }) => (
             <Link
               key={label}
               href={href}
-              className="group flex flex-col items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition-all hover:border-brand-blue-200 hover:shadow-md"
+              className="flex flex-col items-center gap-3 px-3 py-5 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-brand-blue-200 hover:shadow-md transition-all text-center group"
             >
-              <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-100 bg-white p-2">
+              <div className="relative w-16 h-16 rounded-lg bg-white border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden p-2">
                 <Image
                   src={img}
                   alt=""
                   width={56}
                   height={56}
-                  className="h-full w-full object-contain"
+                  className="object-contain w-full h-full"
                   sizes="64px"
                 />
               </div>
               <div>
-                <p className="text-xs font-bold leading-tight text-slate-900 group-hover:text-brand-blue-700">
+                <p className="text-xs font-bold text-slate-900 leading-tight group-hover:text-brand-blue-700">
                   {label}
                 </p>
-                <p className="mt-1 text-[10px] leading-snug text-slate-600">{sub}</p>
+                <p className="text-[10px] text-slate-600 leading-snug mt-1">{sub}</p>
               </div>
             </Link>
           ))}
         </div>
       </div>
 
-      <div className="border-t border-slate-200 bg-white px-4 py-8">
-        <div className="mx-auto max-w-6xl">
-          <p className="mb-6 text-center text-[11px] font-semibold uppercase tracking-widest text-slate-600">
-            Workforce and compliance ecosystem
+      {/* Partner logos */}
+      <div className="border-t border-slate-200 bg-white py-8 px-4">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-center text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-6">
+            Aligned with workforce development partners
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
             {PARTNER_LOGOS.map((logo) => (
               <Link
                 key={logo.src}
                 href={logo.href}
                 aria-label={logo.alt}
-                className="relative h-12 w-28 opacity-80 transition-opacity duration-300 hover:opacity-100 md:h-14 md:w-32"
+                className="relative h-12 w-28 md:h-14 md:w-32 opacity-80 hover:opacity-100 transition-opacity duration-300"
               >
                 <Image
                   src={logo.src}

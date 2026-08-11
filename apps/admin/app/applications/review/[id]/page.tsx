@@ -60,12 +60,17 @@ type ReviewApplication = {
   created_at?: string | null;
   updated_at?: string | null;
   revoked_at?: string | null;
+  payment_status?: string | null;
   _source?: 'apprenticeship_intake';
 };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default async function ReviewApplicationPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ReviewApplicationPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   const isUuid = UUID_RE.test(id);
   const isLegacyIntakeId = id.startsWith('intake-');
@@ -74,16 +79,15 @@ export default async function ReviewApplicationPage({ params }: { params: Promis
   let application: ReviewApplication | null = null;
 
   if (isUuid) {
-    try {
-      const result = await withTimeout(
-        db.from('applications').select('*').eq('id', id).maybeSingle(),
-        8000,
-        'applications lookup',
-      );
-      if (!result.error && result.data) application = result.data as ReviewApplication;
-    } catch (error) {
+    const lookup = await withTimeout(
+      db.from('applications').select('*').eq('id', id).maybeSingle(),
+      8000,
+      'applications lookup',
+    ).catch((error) => {
       logger.error('[application-review] applications lookup failed', error instanceof Error ? error : undefined, { id });
-    }
+      return { data: null, error } as const;
+    });
+    if (!lookup.error && lookup.data) application = lookup.data as ReviewApplication;
   }
 
   if (!application && isLegacyIntakeId) {
@@ -98,32 +102,53 @@ export default async function ReviewApplicationPage({ params }: { params: Promis
 
   if (!application) notFound();
 
-  const status = application.revoked_at ? 'revoked' : (application.status || 'pending');
+  const status = application.revoked_at ? 'revoked' : application.status || 'pending';
   const resolvedProgram = await resolveProgram(
     db,
     application.program_id || application.program_slug || application.program_interest || '',
   );
-  const displayName = application.full_name || [application.first_name, application.last_name].filter(Boolean).join(' ') || 'Applicant';
+  const displayName =
+    application.full_name ||
+    [application.first_name, application.last_name].filter(Boolean).join(' ') ||
+    'Applicant';
+  const applicantEmail = application.email || '';
   const programInterest = resolvedProgram?.title || application.program_interest || application.program_slug || 'Not selected';
-  const canMutateCanonicalApplication = application._source !== 'apprenticeship_intake';
 
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Applications', href: '/applications' }, { label: displayName }]} />
+        <Breadcrumbs
+          items={[
+            { label: 'Admin', href: '/dashboard' },
+            { label: 'Applications', href: '/applications' },
+            { label: displayName },
+          ]}
+        />
 
         <div className="mt-5 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
           <div className="relative min-h-[230px] overflow-hidden bg-slate-900 px-6 py-8 sm:px-8">
-            <Image src="/images/pages/admin-applications-hero.webp" alt="Admissions team reviewing applications" fill priority className="object-cover opacity-35" />
+            <Image
+              src="/images/pages/admin-applications-hero.webp"
+              alt="Admissions team reviewing applications"
+              fill
+              priority
+              className="object-cover opacity-35"
+            />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-brand-blue-900/45" />
             <div className="relative z-10 max-w-3xl">
-              <Link href="/applications" className="inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to applications</Link>
+              <Link href="/applications" className="inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white">
+                <ArrowLeft className="h-4 w-4" /> Back to applications
+              </Link>
               <div className="mt-7 flex flex-wrap items-center gap-3">
-                <span className={`rounded-full border px-3 py-1 text-xs font-black ${statusColors[status] || 'border-slate-300 bg-slate-100 text-slate-800'}`}>{statusLabels[status] || status}</span>
+                <span className={`rounded-full border px-3 py-1 text-xs font-black ${statusColors[status] || 'border-slate-300 bg-slate-100 text-slate-800'}`}>
+                  {statusLabels[status] || status}
+                </span>
                 <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">Application #{application.id}</span>
               </div>
               <h1 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl">{displayName}</h1>
-              <p className="mt-2 text-sm font-medium text-slate-100 sm:text-base">Review the applicant record, verify program fit and funding information, then record the next decision.</p>
+              <p className="mt-2 text-sm font-medium text-slate-100 sm:text-base">
+                Review the applicant record, verify program fit and funding information, then record the next decision.
+              </p>
             </div>
           </div>
 
@@ -133,7 +158,7 @@ export default async function ReviewApplicationPage({ params }: { params: Promis
                 <h2 className="text-lg font-black text-slate-950">Applicant details</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {[
-                    [Mail, 'Email', application.email || 'Not provided'],
+                    [Mail, 'Email', applicantEmail || 'Not provided'],
                     [Phone, 'Phone', application.phone || 'Not provided'],
                     [MapPin, 'Location', [application.city, application.zip].filter(Boolean).join(' ') || 'Not provided'],
                     [Calendar, 'Submitted', application.created_at ? new Date(application.created_at).toLocaleString() : 'Not available'],
@@ -143,7 +168,9 @@ export default async function ReviewApplicationPage({ params }: { params: Promis
                     const ItemIcon = Icon as typeof Mail;
                     return (
                       <div key={String(label)} className="rounded-xl bg-white p-4 shadow-sm">
-                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-500"><ItemIcon className="h-4 w-4" /> {String(label)}</div>
+                        <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-500">
+                          <ItemIcon className="h-4 w-4" /> {String(label)}
+                        </div>
                         <div className="mt-2 break-words text-sm font-bold text-slate-900">{String(value)}</div>
                       </div>
                     );
@@ -154,21 +181,17 @@ export default async function ReviewApplicationPage({ params }: { params: Promis
               {(application.support_notes || application.review_notes) && (
                 <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
                   <h2 className="text-sm font-black uppercase tracking-wide text-amber-950">Review notes</h2>
-                  <p className="mt-2 whitespace-pre-wrap text-sm font-medium text-amber-950">{application.review_notes || application.support_notes}</p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm font-medium text-amber-950">
+                    {application.review_notes || application.support_notes}
+                  </p>
                 </section>
               )}
 
-              {canMutateCanonicalApplication ? (
-                <EditApplicationForm
-                  applicationId={application.id}
-                  currentStatus={status}
-                  currentNotes={application.review_notes || application.support_notes || null}
-                />
-              ) : (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-700">
-                  This legacy intake record is read-only here. Convert it into the canonical applications table before changing status or review notes.
-                </div>
-              )}
+              <EditApplicationForm
+                applicationId={application.id}
+                currentStatus={status}
+                currentNotes={application.review_notes || application.support_notes || null}
+              />
             </div>
 
             <aside className="space-y-5">
@@ -181,20 +204,18 @@ export default async function ReviewApplicationPage({ params }: { params: Promis
                   <li>4. Approve, reject, or leave the application in review with clear notes.</li>
                 </ol>
               </div>
-
-              {canMutateCanonicalApplication ? (
-                <ApplicationActions
-                  applicationId={application.id}
-                  currentStatus={status}
-                  programId={resolvedProgram?.id || application.program_id || null}
-                  programInterest={programInterest}
-                  applicantEmail={application.email || ''}
-                  applicantName={displayName}
-                />
-              ) : null}
-
+              <ApplicationActions
+                applicationId={application.id}
+                currentStatus={status}
+                programId={resolvedProgram?.id || application.program_id || null}
+                programInterest={programInterest}
+                applicantEmail={applicantEmail}
+                applicantName={displayName}
+              />
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-500"><Hash className="h-4 w-4" /> Record ID</div>
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-500">
+                  <Hash className="h-4 w-4" /> Record ID
+                </div>
                 <p className="mt-2 break-all text-xs font-semibold text-slate-700">{application.id}</p>
               </div>
             </aside>

@@ -5,10 +5,6 @@
  * and the AI routing/orchestration infrastructure.
  */
 
-// ============================================================
-// Core Enums
-// ============================================================
-
 export enum AIAgent {
   PARS = 'PARS',
   ELLIE = 'ELLIE',
@@ -79,10 +75,6 @@ export enum EventType {
   COMPLIANCE_ALERT = 'COMPLIANCE_ALERT',
 }
 
-// ============================================================
-// Agent Configuration
-// ============================================================
-
 export interface AgentCapabilities {
   intents: AgentIntent[];
   maxConcurrentTasks: number;
@@ -103,10 +95,6 @@ export interface AgentConfig {
   metadata?: Record<string, unknown>;
 }
 
-// ============================================================
-// Message Types
-// ============================================================
-
 export interface AgentMessage {
   id: string;
   type: MessageType;
@@ -125,10 +113,6 @@ export interface MessageBusSubscription {
   handler: (message: AgentMessage) => void;
   unsubscribe: () => void;
 }
-
-// ============================================================
-// Task Types
-// ============================================================
 
 export interface TaskPayload {
   id: string;
@@ -158,10 +142,6 @@ export interface TaskCreationOptions {
   maxAttempts?: number;
 }
 
-// ============================================================
-// Intent Classification
-// ============================================================
-
 export interface IntentClassification {
   intent: AgentIntent;
   confidence: number;
@@ -175,10 +155,6 @@ export interface RoutingDecision {
   task: TaskPayload;
   confidence: number;
 }
-
-// ============================================================
-// Event Types
-// ============================================================
 
 export interface EventPayload {
   id: string;
@@ -195,10 +171,6 @@ export interface EventSubscription {
   handler: (event: EventPayload) => void;
   unsubscribe: () => void;
 }
-
-// ============================================================
-// Request/Response Types
-// ============================================================
 
 export interface AIRequest {
   message: string;
@@ -246,10 +218,6 @@ export interface TaskFilterOptions {
   offset?: number;
 }
 
-// ============================================================
-// Webhook Types
-// ============================================================
-
 export interface WebhookConfig {
   id: string;
   url: string;
@@ -273,10 +241,6 @@ export interface WebhookDelivery {
   createdAt: number;
 }
 
-// ============================================================
-// Correlation and Tracing
-// ============================================================
-
 export interface CorrelationContext {
   correlationId: string;
   spanId?: string;
@@ -291,10 +255,6 @@ export interface ExecutionContext {
   agent?: AIAgent;
   intent?: AgentIntent;
 }
-
-// ============================================================
-// AI Service Types
-// ============================================================
 
 export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'azure' | 'groq' | 'none';
 export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';
@@ -315,6 +275,7 @@ export interface ChatCompletionOptions {
 export interface ChatCompletionResult {
   content: string;
   model: string;
+  provider?: string;
   usage?: {
     promptTokens: number;
     completionTokens: number;

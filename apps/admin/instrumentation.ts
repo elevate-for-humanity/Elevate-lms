@@ -37,11 +37,23 @@ export async function register(): Promise<void> {
 // Required by @sentry/nextjs 8+ to capture server-side request errors.
 export const onRequestError = async (
   err: unknown,
-  request: { path: string; method: string },
+  request: { path: string; method: string; headers?: Headers },
   context: { routerKind: string; routePath: string; routeType: string },
 ) => {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const { captureRequestError } = await import('@sentry/nextjs');
-    captureRequestError(err, request, context);
+    const headers = request.headers
+      ? Object.fromEntries(request.headers.entries())
+      : {};
+
+    captureRequestError(
+      err,
+      {
+        path: request.path,
+        method: request.method,
+        headers,
+      },
+      context,
+    );
   }
 };

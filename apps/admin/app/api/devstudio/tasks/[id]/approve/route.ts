@@ -5,6 +5,7 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeInternalError } from '@/lib/api/safe-error';
 import { approveTask } from '@/lib/devstudio/os/task-runner';
 import { jsonOk, tableNotReadyResponse } from '@/lib/devstudio/os/api-helpers';
+import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -22,7 +23,15 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const db = await requireAdminClient();
-    await approveTask(db, id, auth.id);
+    const tenantId = await resolveTenantIdForUser(auth.id).catch(() => null);
+    await approveTask(db, id, auth.id, {
+      actorRoles: auth.effectiveRoles,
+      tenantId,
+      requestHeaders: request.headers,
+      adminOrigin: request.nextUrl.origin,
+      appOrigin: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
+      approvalGranted: true,
+    });
     const { data: task } = await db.from('ai_tasks').select('*').eq('id', id).single();
     return jsonOk({ task, approved: true });
   } catch (err) {

@@ -3,6 +3,7 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { analyzeWorkforceDocument } from '@/lib/ai/document-intelligence';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -27,6 +28,12 @@ export async function POST(request: NextRequest) {
 
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
+
+  await hydrateProcessEnv().catch((error) => {
+    logger.warn('[document-intelligence] secret hydration failed; using runtime environment', {
+      error: String(error),
+    });
+  });
 
   const form = await request.formData().catch(() => null);
   if (!form) return NextResponse.json({ error: 'Multipart form data is required.' }, { status: 400 });

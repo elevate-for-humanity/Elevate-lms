@@ -2,20 +2,28 @@
 
 import { FormEvent, Suspense, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Loader2, Shield, Globe, Link2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { ArrowRight, CheckCircle2, Loader2, Shield, Globe, Link2, Sparkles } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface TrialResult {
-  tenantUrl: string;
+  tenantUrl?: string;
+  dashboardUrl?: string;
   publicPreviewUrl?: string;
-  subdomain: string;
-  trialEndsAt: string;
+  subdomain?: string;
+  workspaceId?: string;
+  tenantId?: string;
+  trialEndsAt?: string;
   message?: string;
   correlationId?: string;
   connectionMode?: string;
+  keptDemoBuild?: boolean;
 }
 
 function TrialForm() {
+  const searchParams = useSearchParams();
+  const demoToken = searchParams.get('demo');
+  const demoProduct = searchParams.get('product');
   const [orgName, setOrgName] = useState('');
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
@@ -31,14 +39,30 @@ function TrialForm() {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('/api/trial/start-managed', {
+      const response = await fetch(demoToken ? '/api/store/demo/convert' : '/api/trial/start-managed', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orgName, adminName, adminEmail, websiteMode, existingUrl: existingUrl || undefined, programs: programs || undefined }),
+        body: JSON.stringify(
+          demoToken
+            ? {
+                demoToken,
+                organizationName: orgName,
+                ownerName: adminName,
+                ownerEmail: adminEmail,
+              }
+            : {
+                orgName,
+                adminName,
+                adminEmail,
+                websiteMode,
+                existingUrl: existingUrl || undefined,
+                programs: programs || undefined,
+              },
+        ),
       });
       const data = await response.json();
       if (!response.ok) {
-        if (response.status === 409 && data.tenantUrl) {
+        if (!demoToken && response.status === 409 && data.tenantUrl) {
           setResult({ ...data, trialEndsAt: data.trialEndsAt || new Date().toISOString() });
           return;
         }
@@ -54,18 +78,25 @@ function TrialForm() {
 
   if (result) {
     const trialEnd = result.trialEndsAt ? new Date(result.trialEndsAt).toLocaleDateString() : 'See your account';
+    const workspaceTarget = result.dashboardUrl || result.tenantUrl || '/dashboard';
     return (
       <main className="min-h-[70vh] bg-slate-50 px-4 py-16">
         <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100"><CheckCircle2 className="h-8 w-8 text-green-700" /></div>
           <h1 className="mt-5 text-center text-3xl font-black text-slate-950">Your organization trial is created</h1>
-          <p className="mt-3 text-center text-slate-600">Workspace: <strong>{result.subdomain}</strong> · Trial end: <strong>{trialEnd}</strong></p>
+          <p className="mt-3 text-center text-slate-600">{result.subdomain ? <>Workspace: <strong>{result.subdomain}</strong> · </> : null}Trial end: <strong>{trialEnd}</strong></p>
+          {result.keptDemoBuild ? (
+            <div className="mt-5 rounded-xl border border-violet-200 bg-violet-50 p-4 text-sm font-semibold text-violet-950">
+              <div className="flex items-center gap-2 font-black"><Sparkles className="h-4 w-4" /> Your demo build was carried into the real workspace.</div>
+              <p className="mt-1 text-xs leading-5">The workspace metadata and supported demo configuration were preserved so you do not have to start from zero.</p>
+            </div>
+          ) : null}
           <div className="mt-7 rounded-xl bg-slate-50 p-5 text-sm text-slate-700">
             <p><strong>Next step:</strong> use the platform login with the same email address you entered here. If your account requires verification, complete the email verification step before entering the workspace.</p>
             {result.correlationId && <p className="mt-2 text-xs text-slate-500">Reference: {result.correlationId}</p>}
           </div>
           <div className="mt-7 grid gap-3 sm:grid-cols-2">
-            <a href={`https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(result.tenantUrl)}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Open Login <ArrowRight className="h-4 w-4" /></a>
+            <a href={`https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(workspaceTarget)}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-bold text-white hover:bg-brand-red-700">Open Login <ArrowRight className="h-4 w-4" /></a>
             {result.publicPreviewUrl ? <a href={result.publicPreviewUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-800 hover:bg-slate-50">Open Public Preview</a> : <Link href="/store/demos" className="inline-flex items-center justify-center rounded-xl border border-slate-300 px-5 py-3 font-bold text-slate-800 hover:bg-slate-50">View Demos</Link>}
           </div>
         </div>
@@ -80,9 +111,10 @@ function TrialForm() {
         <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-brand-red-100 px-4 py-2 text-sm font-bold text-brand-red-700"><Shield className="h-4 w-4" />14-day organization trial</span>
-            <h1 className="mt-5 text-4xl font-black text-slate-950">Test the platform with your own workspace</h1>
-            <p className="mt-4 text-lg leading-7 text-slate-600">No card is required. Choose whether you need a new training site or want to connect an existing website.</p>
+            <h1 className="mt-5 text-4xl font-black text-slate-950">{demoToken ? 'Keep what you just built' : 'Test the platform with your own workspace'}</h1>
+            <p className="mt-4 text-lg leading-7 text-slate-600">{demoToken ? `Convert your ${demoProduct || 'Elevate'} demo into a real workspace without rebuilding from zero. No card is required.` : 'No card is required. Choose whether you need a new training site or want to connect an existing website.'}</p>
             <div className="mt-7 space-y-3 text-sm text-slate-700">
+              {demoToken ? <p className="flex gap-2"><Sparkles className="mt-0.5 h-4 w-4 flex-none text-violet-600" />Demo configuration is preserved into the workspace where supported</p> : null}
               <p className="flex gap-2"><Globe className="mt-0.5 h-4 w-4 flex-none text-brand-red-600" />Organization workspace and public preview</p>
               <p className="flex gap-2"><Link2 className="mt-0.5 h-4 w-4 flex-none text-brand-red-600" />Existing-site connection path</p>
               <p className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-brand-red-600" />Trial data can be used for evaluation before subscribing</p>
@@ -96,12 +128,16 @@ function TrialForm() {
                 <label className="block text-sm font-bold text-slate-800">Your name<input required minLength={2} value={adminName} onChange={(e) => setAdminName(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-3 font-normal" /></label>
                 <label className="block text-sm font-bold text-slate-800">Work email<input required type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-3 font-normal" /></label>
               </div>
-              <fieldset><legend className="text-sm font-bold text-slate-800">Website setup</legend><div className="mt-2 grid gap-2 sm:grid-cols-2"><button type="button" onClick={() => setWebsiteMode('new')} className={`rounded-xl border p-3 text-left text-sm font-semibold ${websiteMode === 'new' ? 'border-brand-red-500 bg-brand-red-50' : 'border-slate-300'}`}>Build a new site</button><button type="button" onClick={() => setWebsiteMode('existing')} className={`rounded-xl border p-3 text-left text-sm font-semibold ${websiteMode === 'existing' ? 'border-brand-red-500 bg-brand-red-50' : 'border-slate-300'}`}>Connect existing site</button></div></fieldset>
-              {websiteMode === 'existing' && <label className="block text-sm font-bold text-slate-800">Existing website URL<input required type="url" value={existingUrl} onChange={(e) => setExistingUrl(e.target.value)} placeholder="https://example.org" className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-3 font-normal" /></label>}
-              <label className="block text-sm font-bold text-slate-800">Programs offered <span className="font-normal text-slate-400">(optional)</span><input value={programs} onChange={(e) => setPrograms(e.target.value)} placeholder="CNA, HVAC, Barber…" className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-3 font-normal" /></label>
+              {!demoToken ? (
+                <>
+                  <fieldset><legend className="text-sm font-bold text-slate-800">Website setup</legend><div className="mt-2 grid gap-2 sm:grid-cols-2"><button type="button" onClick={() => setWebsiteMode('new')} className={`rounded-xl border p-3 text-left text-sm font-semibold ${websiteMode === 'new' ? 'border-brand-red-500 bg-brand-red-50' : 'border-slate-300'}`}>Build a new site</button><button type="button" onClick={() => setWebsiteMode('existing')} className={`rounded-xl border p-3 text-left text-sm font-semibold ${websiteMode === 'existing' ? 'border-brand-red-500 bg-brand-red-50' : 'border-slate-300'}`}>Connect existing site</button></div></fieldset>
+                  {websiteMode === 'existing' && <label className="block text-sm font-bold text-slate-800">Existing website URL<input required type="url" value={existingUrl} onChange={(e) => setExistingUrl(e.target.value)} placeholder="https://example.org" className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-3 font-normal" /></label>}
+                  <label className="block text-sm font-bold text-slate-800">Programs offered <span className="font-normal text-slate-400">(optional)</span><input value={programs} onChange={(e) => setPrograms(e.target.value)} placeholder="CNA, HVAC, Barber…" className="mt-1.5 w-full rounded-lg border border-slate-300 px-4 py-3 font-normal" /></label>
+                </>
+              ) : null}
             </div>
             {error && <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
-            <button type="submit" disabled={loading} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3.5 font-bold text-white hover:bg-brand-red-700 disabled:opacity-60">{loading ? <><Loader2 className="h-5 w-5 animate-spin" />Creating workspace…</> : <>Start Trial <ArrowRight className="h-4 w-4" /></>}</button>
+            <button type="submit" disabled={loading} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3.5 font-bold text-white hover:bg-brand-red-700 disabled:opacity-60">{loading ? <><Loader2 className="h-5 w-5 animate-spin" />Creating workspace…</> : <>{demoToken ? 'Keep This Build & Start Trial' : 'Start Trial'} <ArrowRight className="h-4 w-4" /></>}</button>
             <p className="mt-3 text-center text-xs text-slate-500">No credit card required for the 14-day trial.</p>
           </form>
         </div>

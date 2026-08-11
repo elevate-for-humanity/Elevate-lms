@@ -2,17 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { startWorkspaceTrial } from '@/lib/workspace/start-workspace-trial';
-import { mergeSiteConfig } from '@/lib/tenant/default-site-config';
+import { mergeSiteConfig, type TenantSiteConfigPatch } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig, TenantSiteProduct } from '@/lib/tenant/site-types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-type SitePatch = Partial<TenantSiteConfig> & {
-  branding?: Partial<TenantSiteConfig['branding']>;
-  homepage?: Partial<TenantSiteConfig['homepage']>;
-};
+type SitePatch = TenantSiteConfigPatch;
 
 function text(value: unknown, max = 200): string {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -270,8 +267,9 @@ export async function POST(request: NextRequest) {
     industry,
   });
 
-  if (!trial.ok) {
-    return NextResponse.json({ error: trial.error }, { status: trial.status ?? 500 });
+  if (trial.ok === false) {
+    const status = typeof trial.status === 'number' ? trial.status : 500;
+    return NextResponse.json({ error: trial.error }, { status });
   }
 
   const { data: workspace } = await db

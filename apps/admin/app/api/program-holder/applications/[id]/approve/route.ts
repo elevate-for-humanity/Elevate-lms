@@ -8,12 +8,23 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 const ADMIN_ROLES = new Set(['admin', 'super_admin', 'staff', 'org_admin']);
 const PORTAL_BASE = 'https://www.elevateforhumanity.org';
 
+type AuthUserSummary = { id: string; email?: string | null };
+
 function splitName(fullName: string) {
   const parts = fullName.trim().split(/\s+/).filter(Boolean);
   return {
     firstName: parts.shift() || fullName,
     lastName: parts.join(' ') || null,
   };
+}
+
+function escapeHtml(value: unknown) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 async function requireAdminActor() {
@@ -30,7 +41,7 @@ async function requireAdminActor() {
   if (!profile || !ADMIN_ROLES.has(String(profile.role || ''))) {
     return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) } as const;
   }
-  return { db, user, profile } as const;
+  return { db, user } as const;
 }
 
 async function findOrCreateUser(
@@ -45,12 +56,17 @@ async function findOrCreateUser(
     .eq('email', normalizedEmail)
     .maybeSingle();
   if (existingProfile?.id) {
-    return { userId: String(existingProfile.id), isNewUser: false, existingRole: String(existingProfile.role || '') };
+    return {
+      userId: String(existingProfile.id),
+      isNewUser: false,
+      existingRole: String(existingProfile.role || ''),
+    };
   }
 
   const { data: listed } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  const existingAuthUser = (listed?.users ?? []).find(
-    (candidate: { id: string; email?: string | null }) => candidate.email?.toLowerCase() === normalizedEmail,
+  const users = (listed?.users ?? []) as AuthUserSummary[];
+  const existingAuthUser = users.find(
+    (candidate) => candidate.email?.toLowerCase() === normalizedEmail,
   );
   if (existingAuthUser?.id) {
     return { userId: existingAuthUser.id, isNewUser: false, existingRole: '' };
@@ -63,7 +79,9 @@ async function findOrCreateUser(
     email_confirm: true,
     user_metadata: { full_name: fullName, role: 'program_holder' },
   });
-  if (error || !data.user?.id) throw new Error(error?.message || 'Unable to create Program Holder account.');
+  if (error || !data.user?.id) {
+    throw new Error(error?.message || 'Unable to create Program Holder account.');
+  }
   return { userId: data.user.id, isNewUser: true, existingRole: '' };
 }
 
@@ -125,8 +143,8 @@ export async function POST(
 
     if (applicationError) throw applicationError;
     if (!application) return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
-    if (application.status === 'denied') {
-      return NextResponse.json({ error: 'Denied applications must be reopened before approval.' }, { status: 409 });
+    if (application.status === 'rejected') {
+      return NextResponse.json({ error: 'Rejected applications must be reopened before approval.' }, { status: 409 });
     }
 
     const email = String(application.email || '').toLowerCase().trim();
@@ -134,42 +152,52 @@ export async function POST(
     if (!email) return NextResponse.json({ error: 'Application has no email address.' }, { status: 400 });
 
     const identity = await findOrCreateUser(db, email, contactName);
+    const { data: priorMou } = await db
+      .from('license_agreement_acceptances')
+      .select('accepted_at')
+      .eq('user_id', identity.userId)
+      .eq('agreement_type', 'program_holder_mou')
+      .order('accepted_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
 
     const { data: existingHolder } = await db
       .from('program_holders')
-      .select('id, user_id, status, approved_at, mou_signed')
+      .select('id, user_id, status, approved_at, mou_signed, mou_signed_at')
       .or(`user_id.eq.${identity.userId},contact_email.eq.${email}`)
       .limit(1)
       .maybeSingle();
 
     const now = new Date().toISOString();
-    let holderId = existingHolder?.id as string | undefined;
+    const alreadySigned = Boolean(existingHolder?.mou_signed || priorMou?.accepted_at);
     const holderPayload = {
-      tenant_id: application.tenant_id || null,
       user_id: identity.userId,
       organization_name: application.organization_name,
+      name: application.organization_name,
       contact_name: contactName,
       contact_email: email,
       contact_phone: application.phone || null,
       status: 'approved',
-      onboarding_completed: false,
-      approved_at: now,
+      approved_at: existingHolder?.approved_at || now,
       approved_by: adminUser.id,
-      source: 'program_holder_application',
-      updated_at: now,
+      mou_signed: alreadySigned,
+      mou_signed_at: existingHolder?.mou_signed_at || priorMou?.accepted_at || null,
+      mou_status: alreadySigned ? 'signed' : 'pending_signature',
     };
 
-    if (holderId) {
+    let holderId: string;
+    if (existingHolder?.id) {
+      holderId = String(existingHolder.id);
       const { error } = await db.from('program_holders').update(holderPayload).eq('id', holderId);
       if (error) throw error;
     } else {
       const { data, error } = await db
         .from('program_holders')
-        .insert({ ...holderPayload, created_at: now })
+        .insert(holderPayload)
         .select('id')
         .single();
       if (error || !data?.id) throw error || new Error('Program Holder record was not created.');
-      holderId = data.id;
+      holderId = String(data.id);
     }
 
     const { firstName, lastName } = splitName(contactName);
@@ -220,11 +248,12 @@ export async function POST(
 
     const accessLink = await secureAccessLink(db, email, identity.isNewUser);
     const portalUrl = `${PORTAL_BASE}/program-holder/dashboard`;
+    const nextUrl = alreadySigned ? portalUrl : `${PORTAL_BASE}/program-holder/sign-mou`;
     const subject = 'Program Holder Application Approved — Complete Your Onboarding | Elevate for Humanity';
     const result = await sendEmail({
       to: email,
       subject,
-      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#0f172a"><h2>Your Program Holder application is approved</h2><p>Hello ${contactName},</p><p><strong>${application.organization_name}</strong> has been approved to continue Program Holder onboarding with Elevate for Humanity.</p><p><strong>Username:</strong> ${email}</p><p>For security, Elevate does not email a plaintext password.</p><p><a href="${accessLink || portalUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">${identity.isNewUser ? 'Set Password & Continue Onboarding' : 'Secure Sign In & Continue Onboarding'}</a></p><h3>Next steps</h3><ol><li>Sign the required Program Holder MOU.</li><li>Complete your organization profile and required verification documents.</li><li>Elevate links only the programs you are authorized to manage.</li><li>Use the Program Holder portal for approved programs, students, documents, training-hour actions, and reporting.</li></ol><p>Portal: <a href="${portalUrl}">${portalUrl}</a></p><p>Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;color:#0f172a"><h2>Your Program Holder application is approved</h2><p>Hello ${escapeHtml(contactName)},</p><p><strong>${escapeHtml(application.organization_name)}</strong> has been approved to continue Program Holder onboarding with Elevate for Humanity.</p><p><strong>Username:</strong> ${escapeHtml(email)}</p><p>For security, Elevate does not email a plaintext password.</p><p><a href="${accessLink || nextUrl}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">${identity.isNewUser ? 'Set Password & Continue Onboarding' : 'Secure Sign In & Continue Onboarding'}</a></p><h3>Next steps</h3><ol>${alreadySigned ? '' : '<li>Sign the required Program Holder MOU.</li>'}<li>Complete your organization verification requirements.</li><li>Elevate links only the programs you are authorized to manage.</li><li>Use the Program Holder portal for approved programs, students, documents, training-hour actions, and reporting.</li></ol><p>Portal: <a href="${portalUrl}">${portalUrl}</a></p><p>Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
     });
     await auditEmail(db, {
       recipient: email,
@@ -234,7 +263,9 @@ export async function POST(
       error: result.success ? undefined : result.error,
     });
 
-    if (!result.success) {
+    if (result.success) {
+      await db.from('program_holders').update({ welcome_email_sent: true }).eq('id', holderId);
+    } else {
       await db.from('staff_notifications').insert({
         type: 'program_holder_approval_email_failed',
         title: `Program Holder approved but onboarding email failed: ${application.organization_name}`,
@@ -249,6 +280,7 @@ export async function POST(
       applicationId: id,
       programHolderId: holderId,
       userId: identity.userId,
+      mouSigned: alreadySigned,
       emailStatus: result.success ? 'sent' : 'failed',
     });
   } catch (error) {

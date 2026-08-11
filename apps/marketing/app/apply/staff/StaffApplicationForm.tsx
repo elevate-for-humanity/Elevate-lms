@@ -28,21 +28,18 @@ export default function StaffApplicationForm() {
     setResult(null);
 
     try {
-      const res = await fetch('/api/applications', {
+      const res = await fetch('/api/staff/apply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, source: 'staff-application' }),
+        body: JSON.stringify(form),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
         setResult({ success: true, message: 'Application received! Our HR team will review and contact you within 3-5 business days.' });
-        const ref = data.referenceNumber || '';
-        const prog = data.program || '';
-        const q = new URLSearchParams();
+        const ref = data.referenceNumber || data.applicationId || '';
+        const q = new URLSearchParams({ type: 'staff' });
         if (ref) q.set('ref', ref);
-        if (prog) q.set('program', prog);
-        const suffix = q.toString() ? '?' + q.toString() : '';
-        setTimeout(() => router.push('/apply/success' + suffix), 2000);
+        setTimeout(() => router.push('/apply/success?' + q.toString()), 2000);
       } else {
         setResult({ success: false, error: data.error || 'Something went wrong.' });
       }

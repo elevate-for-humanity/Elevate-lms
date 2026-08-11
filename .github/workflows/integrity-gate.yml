@@ -95,6 +95,9 @@ jobs:
       - name: Media integrity check
         run: pnpm run integrity:media
 
+      - name: Public UX and media acceptance check
+        run: pnpm run audit:public-media-nav
+
       - name: LMS course integrity check
         run: pnpm run integrity:lms
         env:
@@ -107,6 +110,12 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Stripe route and webhook integrity check
+        run: pnpm run integrity:stripe
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: Analytics integrity check
         run: pnpm run integrity:analytics

@@ -3,6 +3,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { notifyApplicationSubmission } from '@/lib/applications/submission-notifications';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,10 @@ function clean(value: unknown, max = 2000): string {
 
 function validEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function escapeHtml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
 export async function POST(request: Request) {
@@ -80,12 +85,30 @@ export async function POST(request: Request) {
       );
     }
 
+    const safeCompany = escapeHtml(companyName);
+    const safeName = escapeHtml(contactName);
+    const safeEmail = escapeHtml(email);
+    const safeRef = escapeHtml(data.id);
+    const notifications = await notifyApplicationSubmission({
+      db: admin,
+      applicationId: data.id,
+      applicationType: 'employer',
+      applicantName: contactName,
+      applicantEmail: email,
+      applicantSubject: 'Employer Partnership Application Received | Elevate for Humanity',
+      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Employer Partnership Application Received</h2><p>Hello ${safeName},</p><p>We received the employer partnership application for <strong>${safeCompany}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><h3>What happens next</h3><ol><li>Our workforce team reviews your hiring, OJT, WEX, apprenticeship, and training needs.</li><li>If additional employer verification or agreements are needed, we will send the exact next step.</li><li>Once the partnership is approved, your employer/partner portal access and onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+      staffSubject: `[EMPLOYER APPLICATION] ${companyName}`,
+      staffHtml: `<h2>New Employer Partnership Application</h2><p><strong>${safeCompany}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Industry:</strong> ${escapeHtml(industry || 'Not provided')}</p><p><strong>Hiring/workforce needs:</strong> ${escapeHtml(hiringNeeds || 'Not provided')}</p><p>Review the application and initiate employer onboarding when approved.</p>`,
+      metadata: { company_name: companyName, industry },
+    });
+
     return NextResponse.json(
       {
         ok: true,
         applicationId: data.id,
         referenceNumber: data.id,
         applicationType: 'employer',
+        notificationStatus: notifications,
       },
       { status: 201 },
     );

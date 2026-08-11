@@ -1,291 +1,106 @@
 'use client';
 
-import Image from 'next/image';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Send, Bell, Users, Megaphone } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { ArrowLeft, Bell, Megaphone, Send, Users } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-interface Announcement {
-  id: string;
-  title: string;
-  content: string;
-  created_at: string;
-  author?: { full_name: string };
-}
+type Announcement = { id: string; title: string; content: string; created_at: string; author?: { full_name: string | null } | null };
+
+type Program = { id: string; title?: string | null; name?: string | null };
 
 export default function InstructorProgramAnnouncementsPage() {
   const params = useParams();
   const router = useRouter();
-  const programId = params.programId as string;
-
-  const [program, setProgram] = useState<any>(null);
+  const programId = String(params.programId || '');
+  const [program, setProgram] = useState<Program | null>(null);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [enrolledCount, setEnrolledCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [enrolledCount, setEnrolledCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [programId]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
+    setLoading(true);
     const supabase = createClient();
-
-    // Check auth
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      router.push('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
       return;
     }
 
-    // Load program
-    const { data: programData } = await supabase
-      .from('programs')
-      .select('id, title, name')
-      .eq('id', programId)
-      .maybeSingle();
+    const [{ data: programData }, { data: announcementRows }, { count }] = await Promise.all([
+      supabase.from('programs').select('id,title,name').eq('id', programId).maybeSingle(),
+      supabase.from('program_announcements').select('id,title,content,created_at,author:profiles!author_id(full_name)').eq('program_id', programId).order('created_at', { ascending: false }),
+      supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('program_id', programId),
+    ]);
 
     if (!programData) {
       router.push('/instructor/programs');
       return;
     }
-
     setProgram(programData);
-
-    // Load announcements for this program
-    const { data: announcementsData } = await supabase
-      .from('program_announcements')
-      .select(
-        `
-        id,
-        title,
-        content,
-        created_at,
-        author:profiles!author_id(full_name)
-      `,
-      )
-      .eq('program_id', programId)
-      .order('created_at', { ascending: false });
-
-    setAnnouncements(announcementsData || []);
-
-    // Get enrolled count
-    const { count } = await supabase
-      .from('program_enrollments')
-      .select('*', { count: 'exact', head: true })
-      .eq('program_id', programId);
-
-    setEnrolledCount(count || 0);
+    setAnnouncements((announcementRows ?? []).map((row: any) => ({
+      id: row.id,
+      title: row.title,
+      content: row.content,
+      created_at: row.created_at,
+      author: Array.isArray(row.author) ? row.author[0] ?? null : row.author ?? null,
+    })));
+    setEnrolledCount(count ?? 0);
     setLoading(false);
-  }
+  }, [programId, router]);
 
-  async function postAnnouncement(e: React.FormEvent) {
-    e.preventDefault();
+  useEffect(() => { void loadData(); }, [loadData]);
+
+  async function postAnnouncement(event: React.FormEvent) {
+    event.preventDefault();
     if (!title.trim() || !content.trim()) return;
-
     setPosting(true);
-    const supabase = createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      router.push('/login?redirect=' + encodeURIComponent(window.location.pathname));
-      return;
+    setError(null);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
+      const { error: insertError } = await supabase.from('program_announcements').insert({ program_id: programId, author_id: user.id, title: title.trim(), content: content.trim() });
+      if (insertError) throw insertError;
+      setTitle(''); setContent(''); setShowForm(false);
+      await loadData();
+    } catch {
+      setError('Could not post the announcement.');
+    } finally {
+      setPosting(false);
     }
-
-    const { error } = await supabase.from('program_announcements').insert({
-      program_id: programId,
-      author_id: user.id,
-      title,
-      content,
-    });
-
-    if (!error) {
-      setTitle('');
-      setContent('');
-      setShowForm(false);
-      loadData();
-    } else {
-      alert('Failed to post announcement');
-    }
-
-    setPosting(false);
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        {/* Hero Image */}
-        <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-          <Image
-            src="/images/pages/instructor-page-10.webp"
-            alt="Instructor portal"
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-        </section>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
-      </div>
-    );
-  }
+  if (loading) return <div className="flex min-h-[360px] items-center justify-center"><div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-brand-blue-600" /></div>;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs
-          items={[{ label: 'Instructor', href: '/admin/instructor' }, { label: 'Announcements' }]}
-        />
+    <main className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-5xl px-4 py-6">
+        <Breadcrumbs items={[{ label: 'Instructor', href: '/instructor' }, { label: 'Programs', href: '/instructor/programs' }, { label: 'Announcements' }]} />
+        <Link href="/instructor/programs" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-brand-blue-700"><ArrowLeft className="h-4 w-4" />Back to programs</Link>
+
+        <section className="mt-5 overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-700 p-6 text-white shadow-lg">
+          <div className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-widest text-blue-100">Instructor communication</p><h1 className="mt-2 text-3xl font-black">Program Announcements</h1><p className="mt-1 text-blue-100">{program?.title || program?.name || 'Program'}</p></div><button type="button" onClick={() => setShowForm(true)} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-indigo-800"><Megaphone className="h-4 w-4" />New announcement</button></div>
+        </section>
+
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-slate-200 bg-white p-4"><Bell className="h-5 w-5 text-brand-blue-700" /><p className="mt-2 text-2xl font-black text-slate-950">{announcements.length}</p><p className="text-xs font-bold text-slate-500">Announcements</p></div>
+          <div className="rounded-xl border border-slate-200 bg-white p-4"><Users className="h-5 w-5 text-emerald-700" /><p className="mt-2 text-2xl font-black text-slate-950">{enrolledCount}</p><p className="text-xs font-bold text-slate-500">Students in program</p></div>
+        </div>
+
+        {showForm && <form onSubmit={postAnnouncement} className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="font-black text-slate-950">Post announcement</h2><input value={title} onChange={(event) => setTitle(event.target.value)} className="w-full rounded-xl border border-slate-300 px-4 py-3" placeholder="Announcement title" required /><textarea value={content} onChange={(event) => setContent(event.target.value)} className="min-h-32 w-full rounded-xl border border-slate-300 px-4 py-3" placeholder="Message to students" required />{error && <p className="text-sm font-bold text-rose-700">{error}</p>}<div className="flex gap-3"><button disabled={posting} className="inline-flex items-center gap-2 rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-black text-white disabled:opacity-50"><Send className="h-4 w-4" />{posting ? 'Posting…' : 'Post to students'}</button><button type="button" onClick={() => setShowForm(false)} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700">Cancel</button></div></form>}
+
+        <section className="mt-5 space-y-3">
+          {announcements.length ? announcements.map((announcement) => <article key={announcement.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex flex-wrap justify-between gap-3"><h2 className="text-lg font-black text-slate-950">{announcement.title}</h2><span className="text-xs font-bold text-slate-500">{new Date(announcement.created_at).toLocaleDateString()}</span></div><p className="mt-3 whitespace-pre-wrap text-sm text-slate-700">{announcement.content}</p><p className="mt-4 text-xs font-bold text-slate-500">Posted by {announcement.author?.full_name || 'Instructor'}</p></article>) : <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center"><Megaphone className="mx-auto h-8 w-8 text-slate-400" /><p className="mt-3 font-bold text-slate-700">No announcements yet.</p></div>}
+        </section>
       </div>
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/instructor/programs"
-            className="inline-flex items-center text-brand-blue-600 hover:text-brand-blue-700 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Programs
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">Program Announcements</h1>
-              <p className="text-slate-700 mt-1">{program?.title || program?.name}</p>
-            </div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
-            >
-              <Megaphone className="w-4 h-4" />
-              New Announcement
-            </button>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-brand-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{announcements.length}</p>
-                <p className="text-sm text-slate-700">Announcements</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl border p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-brand-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{enrolledCount}</p>
-                <p className="text-sm text-slate-700">Students in Program</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* New Announcement Form */}
-        {showForm && (
-          <div className="bg-white rounded-xl border p-6 mb-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Post Program Announcement</h2>
-            <form onSubmit={postAnnouncement} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-900 mb-2">Title</label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Announcement title..."
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-900 mb-2">Content</label>
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Write your announcement..."
-                  rows={5}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  disabled={posting}
-                  className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50"
-                >
-                  <Send className="w-4 h-4" />
-                  {posting ? 'Posting...' : 'Post to All Students'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="px-6 py-2 bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 transition"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* Announcements List */}
-        <div className="space-y-4">
-          {announcements.length > 0 ? (
-            announcements.map((announcement) => (
-              <div key={announcement.id} className="bg-white rounded-xl border p-6">
-                <h3 className="text-lg font-semibold text-slate-900">{announcement.title}</h3>
-                <p className="text-slate-700 mt-2 whitespace-pre-wrap">{announcement.content}</p>
-                <div className="flex items-center gap-2 mt-4 text-sm text-slate-700">
-                  <span>Posted by {announcement.author?.full_name || 'Instructor'}</span>
-                  <span>•</span>
-                  <span>
-                    {new Date(announcement.created_at).toLocaleDateString('en-US', {
-                      timeZone: 'UTC',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="bg-white rounded-xl border p-12 text-center">
-              <Megaphone className="w-12 h-12 text-slate-700 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">No announcements yet</h3>
-              <p className="text-slate-700 mb-6">
-                Keep all students in this program informed with announcements.
-              </p>
-              <button
-                onClick={() => setShowForm(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
-              >
-                <Plus className="w-4 h-4" />
-                Create First Announcement
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+    </main>
   );
 }

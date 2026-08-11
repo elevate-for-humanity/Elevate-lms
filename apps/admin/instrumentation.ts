@@ -34,14 +34,16 @@ export async function register(): Promise<void> {
   }
 }
 
-// Required by @sentry/nextjs 8+ to capture server-side request errors.
+// Required by @sentry/nextjs to capture server-side request errors. Next and
+// Sentry publish slightly different instrumentation request shapes, so keep the
+// public hook narrow and cast only at the SDK boundary.
 export const onRequestError = async (
   err: unknown,
-  request: { path: string; method: string },
+  request: { path: string; method: string; headers?: Record<string, string | string[] | undefined> },
   context: { routerKind: string; routePath: string; routeType: string },
 ) => {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const { captureRequestError } = await import('@sentry/nextjs');
-    captureRequestError(err, request, context);
+    captureRequestError(err, request as any, context as any);
   }
 };

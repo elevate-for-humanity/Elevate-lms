@@ -31,7 +31,6 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '1920x1080',
         type: 'image/jpeg',
         label: 'Dashboard view',
-        // @ts-expect-error — form_factor is valid per spec, not yet in Next.js types
         form_factor: 'wide',
       },
       {
@@ -39,7 +38,6 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: '1080x1920',
         type: 'image/jpeg',
         label: 'Home screen',
-        // @ts-expect-error — form_factor is valid per spec, not yet in Next.js types
         form_factor: 'narrow',
       },
     ],

@@ -24,6 +24,36 @@ function money(value?: string) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(parsed);
 }
 
+function canonicalImageKey(value?: string) {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    const pathname = decodeURIComponent(url.pathname)
+      .replace(/_(?:pico|icon|thumb|small|compact|medium|large|grande|original|master|\d+x\d*|x\d+)(?=\.[a-z0-9]+$)/i, '')
+      .toLowerCase();
+    return `${url.hostname.toLowerCase()}${pathname}`;
+  } catch {
+    return value.split('?')[0].split('#')[0].trim().toLowerCase() || undefined;
+  }
+}
+
+function uniqueProductImages(products: TenantSiteProduct[], reservedImages: Array<string | undefined>) {
+  const used = new Set<string>();
+  for (const image of reservedImages) {
+    const key = canonicalImageKey(image);
+    if (key) used.add(key);
+  }
+
+  return products.map((product) => {
+    const key = canonicalImageKey(product.image);
+    if (!key || !used.has(key)) {
+      if (key) used.add(key);
+      return product;
+    }
+    return { ...product, image: undefined };
+  });
+}
+
 function ProductCard({ product, accent, textColor }: { product: TenantSiteProduct; accent: string; textColor: string }) {
   const content = (
     <article className="group h-full overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
@@ -86,9 +116,10 @@ export function PublicTenantSite({
   const headingFont = config.template.fonts?.heading || 'inherit';
   const bodyFont = config.template.fonts?.body || 'inherit';
   const isStore = config.meta?.siteKind === 'store' || Boolean(config.products?.length);
-  const products = config.products || [];
+  const products = uniqueProductImages(config.products || [], [config.branding.logoImage, config.homepage.heroImage]);
   const catalogHref = isStore ? '/shop' : '/programs';
   const ctaHref = config.homepage.heroCtaHref || catalogHref;
+  const storeName = config.branding.logoText || site.siteName || 'Store';
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: background, color: textColor, fontFamily: bodyFont }}>
@@ -167,7 +198,7 @@ export function PublicTenantSite({
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-6 pt-24 text-white">
-                      <p className="text-sm font-black uppercase tracking-[0.16em]">{isStore ? 'Shop the collection' : config.branding.logoText}</p>
+                      <p className="text-sm font-black uppercase tracking-[0.16em]">{isStore ? `Shop ${storeName}` : config.branding.logoText}</p>
                     </div>
                   </div>
                 ) : null}
@@ -199,7 +230,7 @@ export function PublicTenantSite({
                   <div className="flex flex-wrap items-end justify-between gap-4">
                     <div>
                       <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: accent }}>Featured products</p>
-                      <h2 className="mt-2 text-3xl font-black" style={{ fontFamily: headingFont }}>Shop the Curvature collection</h2>
+                      <h2 className="mt-2 text-3xl font-black" style={{ fontFamily: headingFont }}>Shop {storeName}</h2>
                     </div>
                     <Link href="/shop" className="font-black" style={{ color: primary }}>View all products →</Link>
                   </div>
@@ -215,10 +246,10 @@ export function PublicTenantSite({
         {page === 'catalog' && (
           <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">
             <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: accent }}>{isStore ? 'Curvature shop' : 'Programs'}</p>
-              <h1 className="mt-2 text-4xl font-black" style={{ fontFamily: headingFont }}>{isStore ? 'Wellness products' : 'Training programs'}</h1>
+              <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: accent }}>{isStore ? `${storeName} shop` : 'Programs'}</p>
+              <h1 className="mt-2 text-4xl font-black" style={{ fontFamily: headingFont }}>{isStore ? 'Shop products' : 'Training programs'}</h1>
               <p className="mt-3 text-base font-medium leading-7 text-slate-600">
-                {isStore ? 'Browse products imported from the original Curvature storefront. Review product details before purchasing.' : 'Explore available programs and services.'}
+                {isStore ? 'Browse available products, review the details, and continue to the original product page when you are ready to purchase.' : 'Explore available programs and services.'}
               </p>
             </div>
             {isStore ? (

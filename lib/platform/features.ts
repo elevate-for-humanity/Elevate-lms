@@ -47,6 +47,13 @@ export const PlatformFeature = {
   INSTRUCTOR_TOOLS: 'instructor_tools',
   MEDIA_STUDIO: 'media_studio',
 
+  // Community / memberships
+  COMMUNITY: 'community',
+  COMMUNITY_GROUPS: 'community_groups',
+  COMMUNITY_EVENTS: 'community_events',
+  COMMUNITY_GAMIFICATION: 'community_gamification',
+  COMMUNITY_MEMBERSHIPS: 'community_memberships',
+
   // Workforce / regulated operations
   WORKFORCE: 'workforce',
   APPRENTICESHIP: 'apprenticeship',

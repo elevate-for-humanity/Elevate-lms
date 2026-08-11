@@ -11,6 +11,7 @@ export type AIToolDefinition = {
   requiredRoles: string[];
   allowedAgents: ElevateAgent[];
   timeoutMs: number;
+  inputSchema: Record<string, unknown>;
 };
 
 export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
@@ -23,6 +24,16 @@ export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
     requiredRoles: ['admin', 'super_admin', 'staff'],
     allowedAgents: ['PARIS', 'LIZZY', 'ZORA', 'ROUTER'],
     timeoutMs: 10000,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string' },
+        program: { type: 'string' },
+        query: { type: 'string' },
+        limit: { type: 'integer', minimum: 1, maximum: 100 },
+      },
+      additionalProperties: false,
+    },
   },
   'applications.read': {
     name: 'applications.read',
@@ -33,6 +44,12 @@ export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
     requiredRoles: ['admin', 'super_admin', 'staff'],
     allowedAgents: ['PARIS', 'LIZZY', 'ZORA', 'ROUTER'],
     timeoutMs: 10000,
+    inputSchema: {
+      type: 'object',
+      properties: { id: { type: 'string' } },
+      required: ['id'],
+      additionalProperties: false,
+    },
   },
   'applications.updateStatus': {
     name: 'applications.updateStatus',
@@ -43,6 +60,19 @@ export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
     requiredRoles: ['admin', 'super_admin'],
     allowedAgents: ['PARIS', 'ZORA', 'ROUTER'],
     timeoutMs: 10000,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        status: {
+          type: 'string',
+          enum: ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review', 'approved', 'rejected', 'enrolled'],
+        },
+        reviewNotes: { type: 'string' },
+      },
+      required: ['id', 'status'],
+      additionalProperties: false,
+    },
   },
   'programs.search': {
     name: 'programs.search',
@@ -53,6 +83,14 @@ export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
     requiredRoles: ['admin', 'super_admin', 'staff', 'instructor'],
     allowedAgents: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA', 'ROUTER'],
     timeoutMs: 10000,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' },
+        limit: { type: 'integer', minimum: 1, maximum: 100 },
+      },
+      additionalProperties: false,
+    },
   },
   'enrollments.search': {
     name: 'enrollments.search',
@@ -63,6 +101,16 @@ export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
     requiredRoles: ['admin', 'super_admin', 'staff'],
     allowedAgents: ['PARIS', 'ELLIE', 'LIZZY', 'ZORA', 'ROUTER'],
     timeoutMs: 10000,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        status: { type: 'string' },
+        program: { type: 'string' },
+        query: { type: 'string' },
+        limit: { type: 'integer', minimum: 1, maximum: 100 },
+      },
+      additionalProperties: false,
+    },
   },
   'operations.alerts': {
     name: 'operations.alerts',
@@ -73,6 +121,11 @@ export const AI_TOOL_REGISTRY: Record<string, AIToolDefinition> = {
     requiredRoles: ['admin', 'super_admin', 'staff'],
     allowedAgents: ['PARIS', 'LIZZY', 'ZORA', 'ROUTER'],
     timeoutMs: 10000,
+    inputSchema: {
+      type: 'object',
+      properties: { limit: { type: 'integer', minimum: 1, maximum: 100 } },
+      additionalProperties: false,
+    },
   },
 };
 

@@ -16,7 +16,7 @@ begin
 
   update public.program_holders
   set mou_signed = true,
-      mou_signed_at = coalesce(mou_signed_at, new.created_at, now()),
+      mou_signed_at = coalesce(mou_signed_at, new.accepted_at, now()),
       updated_at = now()
   where user_id = new.user_id;
 
@@ -46,7 +46,7 @@ set mou_signed = true,
     mou_signed_at = coalesce(ph.mou_signed_at, accepted.accepted_at),
     updated_at = now()
 from (
-  select user_id, min(created_at) as accepted_at
+  select user_id, min(accepted_at) as accepted_at
   from public.license_agreement_acceptances
   where agreement_type = 'program_holder_mou'
   group by user_id

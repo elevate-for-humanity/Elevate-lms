@@ -39,6 +39,12 @@ export interface OrchestrationProcessResult {
   eventIds: string[];
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
 function matchesFilterValue(actual: string | null | undefined, expected: unknown): boolean {
   if (expected === undefined || expected === null || expected === '') return true;
   if (Array.isArray(expected)) return expected.map(String).includes(String(actual ?? ''));
@@ -55,7 +61,10 @@ function triggerMatches(event: PlatformEventRow, trigger: WorkflowTriggerRow): b
   );
 }
 
-async function hydrateEventContext(db: Awaited<ReturnType<typeof requireAdminClient>>, event: PlatformEventRow) {
+async function hydrateEventContext(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  event: PlatformEventRow,
+): Promise<Record<string, unknown>> {
   const base: Record<string, unknown> = {
     event_id: event.id,
     event_type: event.event_type,
@@ -77,7 +86,8 @@ async function hydrateEventContext(db: Awaited<ReturnType<typeof requireAdminCli
       ? 'id,user_id,first_name,last_name,email,phone,status,program_id,program_slug,program_interest,reference_number,source,funding_source,funding_type'
       : 'id,shop_name,business_name,owner_name,email,contact_email,phone,status,course_slug,approved_at,stripe_session_id';
     const { data } = await db.from(table).select(fields).eq('id', event.subject_id).maybeSingle();
-    if (data) return { ...base, ...data, record: data };
+    const record = asRecord(data);
+    if (record) return { ...base, ...record, record };
   }
 
   if (event.subject_type === 'program_enrollment') {
@@ -86,7 +96,8 @@ async function hydrateEventContext(db: Awaited<ReturnType<typeof requireAdminCli
       .select('id,user_id,student_id,email,full_name,phone,status,enrollment_state,program_id,program_slug,course_id,tenant_id,host_shop_id,orientation_completed_at,funding_source,next_required_action')
       .eq('id', event.subject_id)
       .maybeSingle();
-    if (data) return { ...base, ...data, record: data };
+    const record = asRecord(data);
+    if (record) return { ...base, ...record, record };
   }
 
   if (event.subject_type === 'certificate') {
@@ -95,7 +106,8 @@ async function hydrateEventContext(db: Awaited<ReturnType<typeof requireAdminCli
       .select('id,user_id,student_id,student_email,student_name,course_id,course_title,course_name,program_id,program_name,enrollment_id,certificate_number,verification_url,certificate_url,tenant_id,status,issued_at')
       .eq('id', event.subject_id)
       .maybeSingle();
-    if (data) return { ...base, ...data, record: data };
+    const record = asRecord(data);
+    if (record) return { ...base, ...record, record };
   }
 
   if (event.subject_type === 'exam_session') {
@@ -104,7 +116,8 @@ async function hydrateEventContext(db: Awaited<ReturnType<typeof requireAdminCli
       .select('id,tenant_id,student_id,student_name,student_email,provider,exam_name,exam_code,status,program_slug,is_retest,created_at')
       .eq('id', event.subject_id)
       .maybeSingle();
-    if (data) return { ...base, ...data, record: data };
+    const record = asRecord(data);
+    if (record) return { ...base, ...record, record };
   }
 
   if (event.subject_type === 'individual_app') {
@@ -117,11 +130,12 @@ async function hydrateEventContext(db: Awaited<ReturnType<typeof requireAdminCli
         .eq('user_id', userId)
         .eq('app_slug', appSlug)
         .maybeSingle();
-      if (data) return { ...base, ...data, record: data };
+      const record = asRecord(data);
+      if (record) return { ...base, ...record, record };
     }
   }
 
-  if (event.subject_type === 'tenant' && event.subject_id) {
+  if (event.subject_type === 'tenant') {
     const entitlements = await getOrganizationFeatures(event.subject_id, db);
     return { ...base, entitlements };
   }
@@ -134,7 +148,7 @@ async function handleProvisioningRequested(
   event: PlatformEventRow,
   context: Record<string, unknown>,
 ): Promise<void> {
-  const payload = (event.payload ?? {}) as Record<string, unknown>;
+  const payload = event.payload ?? {};
   const kind = String(payload.kind ?? 'workspace');
 
   if (event.subject_type === 'individual_app') {
@@ -189,15 +203,8 @@ async function runCoreOrchestration(
   event: PlatformEventRow,
   context: Record<string, unknown>,
 ): Promise<void> {
-  switch (event.event_type) {
-    case PlatformEventType.PROVISIONING_REQUESTED:
-      await handleProvisioningRequested(db, event, context);
-      break;
-    default:
-      // Most domain routes already own their immediate atomic side effects.
-      // The dispatcher coordinates optional cross-system workflows without
-      // duplicating those canonical writes.
-      break;
+  if (event.event_type === PlatformEventType.PROVISIONING_REQUESTED) {
+    await handleProvisioningRequested(db, event, context);
   }
 }
 
@@ -225,10 +232,7 @@ async function runMatchingWorkflows(
 
   const activeIds = new Set(
     (workflows ?? [])
-      .filter((workflow) =>
-        workflow.status === 'active' &&
-        (!workflow.tenant_id || !event.tenant_id || workflow.tenant_id === event.tenant_id),
-      )
+      .filter((workflow) => workflow.status === 'active' && (!workflow.tenant_id || !event.tenant_id || workflow.tenant_id === event.tenant_id))
       .map((workflow) => workflow.id),
   );
 
@@ -254,10 +258,11 @@ async function runMatchingWorkflows(
     );
 
     if (result.runId) {
-      await db
+      const { error: updateError } = await db
         .from('workflow_runs')
         .update({ platform_event_id: event.id })
         .eq('id', result.runId);
+      if (updateError) throw updateError;
       runs++;
     }
 
@@ -272,13 +277,7 @@ async function runMatchingWorkflows(
 async function markProcessed(db: Awaited<ReturnType<typeof requireAdminClient>>, eventId: string) {
   const { error } = await db
     .from('platform_events')
-    .update({
-      processing_status: 'processed',
-      processed_at: new Date().toISOString(),
-      resolved: true,
-      locked_at: null,
-      last_error: null,
-    })
+    .update({ processing_status: 'processed', processed_at: new Date().toISOString(), resolved: true, locked_at: null, last_error: null })
     .eq('id', eventId);
   if (error) throw error;
 }
@@ -289,18 +288,13 @@ async function markFailed(
   errorMessage: string,
 ) {
   const attempts = Math.max(1, Number(event.attempts ?? 1));
-  const retryMinutes = Math.min(60, Math.pow(2, Math.max(0, attempts - 1)));
+  const retryMinutes = Math.min(60, 2 ** Math.max(0, attempts - 1));
   const retryAt = new Date(Date.now() + retryMinutes * 60_000).toISOString();
-  await db
+  const { error } = await db
     .from('platform_events')
-    .update({
-      processing_status: 'failed',
-      available_at: retryAt,
-      locked_at: null,
-      last_error: errorMessage.slice(0, 4000),
-      resolved: false,
-    })
+    .update({ processing_status: 'failed', available_at: retryAt, locked_at: null, last_error: errorMessage.slice(0, 4000), resolved: false })
     .eq('id', event.id);
+  if (error) logger.error('[orchestration] failed to persist event failure', error instanceof Error ? error : undefined, { eventId: event.id });
 }
 
 export async function processPendingPlatformEvents(limit = 20): Promise<OrchestrationProcessResult> {

@@ -1,11 +1,30 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, Search, Menu, ChevronDown, LogOut, Settings, User, ExternalLink } from 'lucide-react';
-import type { UserRole, NavSection, BreadcrumbItem, ActionItem } from '@/lib/navigation/navigation-config';
-import { getNavigationForRole, generateBreadcrumbs, ROLE_DISPLAY_NAMES } from '@/lib/navigation/navigation-config';
+import {
+  Bell,
+  Search,
+  Menu,
+  ChevronDown,
+  LogOut,
+  Settings,
+  User,
+  ExternalLink,
+  ShieldCheck,
+} from 'lucide-react';
+import type {
+  UserRole,
+  NavSection,
+  BreadcrumbItem,
+  ActionItem,
+} from '@/lib/navigation/navigation-config';
+import {
+  getNavigationForRole,
+  generateBreadcrumbs,
+  ROLE_DISPLAY_NAMES,
+} from '@/lib/navigation/navigation-config';
 
 interface PlatformShellProps {
   user: {
@@ -24,7 +43,12 @@ interface PlatformShellProps {
 }
 
 function isActiveHref(href: string, pathname: string): boolean {
-  return pathname === href || pathname.startsWith(href + '/');
+  try {
+    const url = new URL(href, 'https://local.invalid');
+    return pathname === url.pathname || pathname.startsWith(`${url.pathname}/`);
+  } catch {
+    return pathname === href || pathname.startsWith(`${href}/`);
+  }
 }
 
 export function PlatformShell({
@@ -46,152 +70,160 @@ export function PlatformShell({
   const sections = getNavigationForRole(role);
   const autoBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
 
-  const userInitials = user.first_name && user.last_name
-    ? `${user.first_name[0]}${user.last_name[0]}`
-    : user.full_name
-      ? user.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)
-      : 'U';
+  const userInitials =
+    user.first_name && user.last_name
+      ? `${user.first_name[0]}${user.last_name[0]}`
+      : user.full_name
+        ? user.full_name
+            .split(' ')
+            .map((name) => name[0])
+            .join('')
+            .slice(0, 2)
+        : 'U';
 
-  const userName = user.full_name || (user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : 'User');
+  const userName =
+    user.full_name ||
+    (user.first_name && user.last_name
+      ? `${user.first_name} ${user.last_name}`
+      : 'User');
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-          {/* Left: Logo + Menu */}
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+        <div className="flex h-16 items-center justify-between px-4 lg:px-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
-              aria-label="Toggle menu"
+              className="rounded-lg p-2 transition-colors hover:bg-slate-100 lg:hidden"
+              aria-label="Toggle portal navigation"
+              aria-expanded={sidebarOpen}
             >
               {sidebarOpen ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <Menu className="w-5 h-5" />
+                <Menu className="h-5 w-5" />
               )}
             </button>
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-brand-red-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">E</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-red-600 shadow-sm">
+                <span className="text-sm font-black text-white">E</span>
               </div>
-              <span className="font-bold text-slate-900 hidden md:block">{ROLE_DISPLAY_NAMES[role]}</span>
+              <div className="hidden md:block">
+                <span className="block font-black text-slate-950">{ROLE_DISPLAY_NAMES[role]}</span>
+                <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                  <ShieldCheck className="h-3 w-3" /> Secure role-restricted session
+                </span>
+              </div>
             </Link>
           </div>
 
-          {/* Center: Search */}
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
+          <div className="mx-8 hidden max-w-md flex-1 md:flex">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="search"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2 bg-slate-100 border-0 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:bg-white transition-all"
+                placeholder="Search your portal..."
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-10 pr-4 text-sm font-medium text-slate-950 transition-all placeholder:text-slate-500 focus:bg-white focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
           </div>
 
-          {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            {/* Actions */}
             {actions.length > 0 && (
-              <div className="hidden lg:flex items-center gap-2 mr-4">
-                {actions.slice(0, 2).map((action) => (
+              <div className="mr-4 hidden items-center gap-2 lg:flex">
+                {actions.slice(0, 2).map((action) =>
                   action.href ? (
                     <Link
                       key={action.id}
                       href={action.href}
-                      className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors ${
                         action.variant === 'primary'
                           ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
                       }`}
                     >
-                      {action.icon && <action.icon className="w-4 h-4" />}
+                      {action.icon && <action.icon className="h-4 w-4" />}
                       {action.label}
                     </Link>
                   ) : (
                     <button
                       key={action.id}
                       onClick={action.onClick}
-                      className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors ${
                         action.variant === 'primary'
                           ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
-                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
                       }`}
                     >
-                      {action.icon && <action.icon className="w-4 h-4" />}
+                      {action.icon && <action.icon className="h-4 w-4" />}
                       {action.label}
                     </button>
-                  )
-                ))}
+                  ),
+                )}
               </div>
             )}
 
-            {/* Notifications */}
             <Link
               href="/notifications"
-              className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              className="relative rounded-lg p-2 transition-colors hover:bg-slate-100"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-slate-600" />
+              <Bell className="h-5 w-5 text-slate-700" />
               {notifications > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-brand-red-600 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-red-600 text-xs text-white">
                   {notifications > 9 ? '9+' : notifications}
                 </span>
               )}
             </Link>
 
-            {/* User Menu */}
-            <div className="relative group">
-              <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-100 transition-colors">
-                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+            <div className="group relative">
+              <button className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-slate-100" aria-label="Open account menu">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">
                   {userInitials}
                 </div>
-                <ChevronDown className="w-4 h-4 text-slate-400 hidden lg:block" />
+                <ChevronDown className="hidden h-4 w-4 text-slate-500 lg:block" />
               </button>
-              
-              {/* Dropdown */}
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                <div className="px-4 py-2 border-b border-slate-100">
-                  <p className="font-medium text-slate-900">{userName}</p>
-                  <p className="text-sm text-slate-500">{user.email}</p>
+
+              <div className="invisible absolute right-0 z-50 mt-2 w-64 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-xl transition-all group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <div className="border-b border-slate-100 px-4 py-3">
+                  <p className="font-bold text-slate-950">{userName}</p>
+                  <p className="truncate text-sm text-slate-600">{user.email}</p>
+                  <p className="mt-2 flex items-center gap-1 text-xs font-bold text-emerald-700">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Authenticated with Supabase
+                  </p>
                 </div>
-                <Link href="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
-                  <User className="w-4 h-4" />
-                  Profile
+                <Link href="/profile" className="flex items-center gap-2 px-4 py-2 font-medium text-slate-800 hover:bg-slate-50">
+                  <User className="h-4 w-4" /> Profile
                 </Link>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
-                  <Settings className="w-4 h-4" />
-                  Settings
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2 font-medium text-slate-800 hover:bg-slate-50">
+                  <Settings className="h-4 w-4" /> Settings
                 </Link>
                 <hr className="my-2 border-slate-100" />
-                <button className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700 w-full text-left">
-                  <LogOut className="w-4 h-4" />
-                  Sign out
-                </button>
+                <form action="/api/auth/signout" method="post">
+                  <button type="submit" className="flex w-full items-center gap-2 px-4 py-2 text-left font-bold text-red-700 hover:bg-red-50">
+                    <LogOut className="h-4 w-4" /> Sign out securely
+                  </button>
+                </form>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Breadcrumbs */}
         {autoBreadcrumbs.length > 0 && (
-          <div className="px-4 py-2 border-t border-slate-100 bg-slate-50">
-            <nav className="flex items-center gap-2 text-sm max-w-7xl mx-auto">
-              <Link href="/" className="text-slate-500 hover:text-slate-700">Home</Link>
-              {autoBreadcrumbs.map((crumb, i) => (
-                <React.Fragment key={i}>
+          <div className="border-t border-slate-100 bg-slate-50 px-4 py-2">
+            <nav className="mx-auto flex max-w-7xl items-center gap-2 text-sm" aria-label="Breadcrumb">
+              <Link href="/" className="font-medium text-slate-600 hover:text-slate-900">Home</Link>
+              {autoBreadcrumbs.map((crumb, index) => (
+                <React.Fragment key={`${crumb.label}-${index}`}>
                   <span className="text-slate-300">/</span>
-                  {crumb.href && i < autoBreadcrumbs.length - 1 ? (
-                    <Link href={crumb.href} className="text-slate-500 hover:text-slate-700">
+                  {crumb.href && index < autoBreadcrumbs.length - 1 ? (
+                    <Link href={crumb.href} className="font-medium text-slate-600 hover:text-slate-900">
                       {crumb.label}
                     </Link>
                   ) : (
-                    <span className="text-slate-900 font-medium">{crumb.label}</span>
+                    <span className="font-bold text-slate-950">{crumb.label}</span>
                   )}
                 </React.Fragment>
               ))}
@@ -201,30 +233,28 @@ export function PlatformShell({
       </header>
 
       <div className="flex">
-        {/* Mobile Overlay */}
         {sidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          <div
+            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
             onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
           />
         )}
 
-        {/* Sidebar */}
-        <aside className={`
-          fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white transform transition-transform duration-200 ease-in-out
-          lg:translate-x-0 lg:static lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:shrink-0
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}>
-          <div className="flex flex-col h-full">
-            {/* Sidebar Header */}
-            <div className="p-4 border-b border-slate-700">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+        <aside
+          className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-slate-950 text-white transition-transform duration-200 ease-in-out lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:shrink-0 lg:translate-x-0 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex h-full flex-col">
+            <div className="border-b border-slate-800 p-4">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-300">
                 {ROLE_DISPLAY_NAMES[role]}
               </h2>
+              <p className="mt-1 text-xs text-slate-400">Use this menu to move through your workspace.</p>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 overflow-y-auto py-4">
+            <nav className="flex-1 overflow-y-auto py-4" aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}>
               {sections.map((section) => (
                 <div key={section.id} className="mb-4">
                   {section.label && (
@@ -240,17 +270,16 @@ export function PlatformShell({
                         key={item.id}
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
-                        className={`
-                          flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg transition-colors
-                          ${active 
-                            ? 'bg-brand-blue-600 text-white' 
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'}
-                        `}
+                        className={`mx-2 flex items-center gap-3 rounded-lg px-4 py-2.5 font-semibold transition-colors ${
+                          active
+                            ? 'bg-brand-blue-600 text-white shadow-sm'
+                            : 'text-slate-200 hover:bg-slate-800 hover:text-white'
+                        }`}
                       >
-                        <Icon className="w-5 h-5 shrink-0" />
+                        <Icon className="h-5 w-5 shrink-0" />
                         <span className="flex-1">{item.label}</span>
                         {item.badge && (
-                          <span className="px-2 py-0.5 bg-brand-red-600 text-xs rounded-full">
+                          <span className="rounded-full bg-brand-red-600 px-2 py-0.5 text-xs">
                             {item.badge}
                           </span>
                         )}
@@ -261,31 +290,33 @@ export function PlatformShell({
               ))}
             </nav>
 
-            {/* Sidebar Footer */}
-            <div className="p-4 border-t border-slate-700 space-y-1">
-              <Link href="/support" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2">
-                <Bell className="w-4 h-4" />
-                Support
+            <div className="space-y-1 border-t border-slate-800 p-4">
+              <div className="mb-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-100">
+                <div className="flex items-center gap-2 font-black"><ShieldCheck className="h-4 w-4" /> Secure workspace</div>
+                <p className="mt-1 leading-5 text-emerald-100/90">Your session is authenticated and portal access is role-restricted.</p>
+              </div>
+              <Link href="/support" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
+                <Bell className="h-4 w-4" /> Support
               </Link>
-              <Link href="/help" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2">
-                <ExternalLink className="w-4 h-4" />
-                Help Center
+              <Link href="/help" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
+                <ExternalLink className="h-4 w-4" /> Help Center
               </Link>
             </div>
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 min-w-0">
+        <main className="min-w-0 flex-1">
           <div className="p-4 lg:p-6">
-            {mounted ? children : (
+            {mounted ? (
+              children
+            ) : (
               <div className="animate-pulse space-y-4">
-                <div className="h-8 bg-slate-200 rounded w-1/4" />
-                <div className="h-4 bg-slate-200 rounded w-1/2" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                  <div className="h-32 bg-slate-200 rounded" />
-                  <div className="h-32 bg-slate-200 rounded" />
-                  <div className="h-32 bg-slate-200 rounded" />
+                <div className="h-8 w-1/4 rounded bg-slate-200" />
+                <div className="h-4 w-1/2 rounded bg-slate-200" />
+                <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div className="h-32 rounded bg-slate-200" />
+                  <div className="h-32 rounded bg-slate-200" />
+                  <div className="h-32 rounded bg-slate-200" />
                 </div>
               </div>
             )}
@@ -296,5 +327,4 @@ export function PlatformShell({
   );
 }
 
-// Re-export types
 export type { UserRole, NavSection, BreadcrumbItem, ActionItem } from '@/lib/navigation/navigation-config';

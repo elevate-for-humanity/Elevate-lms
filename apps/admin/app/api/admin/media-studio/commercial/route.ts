@@ -9,6 +9,8 @@ import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import {
   createCommercialPlan,
   commercialBriefSchema,
+  commercialPlanSchema,
+  reviseCommercialPlan,
 } from '@/lib/media/commercial-plan';
 import {
   cleanupCommercialRender,
@@ -27,7 +29,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 const requestSchema = commercialBriefSchema.extend({
-  action: z.enum(['plan', 'render']).default('render'),
+  action: z.enum(['plan', 'revise', 'render']).default('render'),
+  existingPlan: commercialPlanSchema.optional(),
+  instruction: z.string().trim().min(3).max(1_500).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -58,12 +62,23 @@ export async function POST(request: NextRequest) {
 
   try {
     await hydrateProcessEnv();
-    const { action: _action, ...briefInput } = parsed.data;
-    const { brief, plan } = await createCommercialPlan(briefInput);
+    const { action, existingPlan, instruction, ...briefInput } = parsed.data;
+    const brief = commercialBriefSchema.parse(briefInput);
 
-    if (parsed.data.action === 'plan') {
+    if (action === 'plan') {
+      const created = await createCommercialPlan(brief);
+      return NextResponse.json({ ok: true, brief: created.brief, plan: created.plan });
+    }
+
+    if (action === 'revise') {
+      if (!existingPlan || !instruction) {
+        return safeError('A storyboard and edit instruction are required to revise a commercial.', 400);
+      }
+      const plan = await reviseCommercialPlan({ brief, plan: existingPlan, instruction });
       return NextResponse.json({ ok: true, brief, plan });
     }
+
+    const plan = existingPlan ?? (await createCommercialPlan(brief)).plan;
 
     const job = await createJob({
       organizationId: actor.organizationId,

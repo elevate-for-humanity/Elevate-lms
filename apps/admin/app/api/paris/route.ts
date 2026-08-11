@@ -33,7 +33,7 @@ async function _POST(req: NextRequest) {
       return NextResponse.json({ error: 'Message too long (max 2000 characters)' }, { status: 400 });
     }
 
-    const contextUserId = auth.user.id;
+    const contextUserId = auth.id;
     let userContext = '';
     try {
       const supabase = await createClient();

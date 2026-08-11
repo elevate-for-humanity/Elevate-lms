@@ -46,6 +46,11 @@ export type ProvisionHostShopApplicationResult = {
   onboardingUrl: string;
 };
 
+type AuthUserSummary = {
+  id: string;
+  email?: string | null;
+};
+
 function numericOrNull(value: string | number | null | undefined) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
@@ -77,7 +82,8 @@ async function resolveOrCreateUser(
 
   try {
     const { data: users } = await db.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    const existing = users?.users?.find(
+    const authUsers = (users?.users ?? []) as AuthUserSummary[];
+    const existing = authUsers.find(
       (user) => user.email?.toLowerCase() === normalizedEmail,
     );
     if (existing?.id) return { userId: existing.id, isNewUser: false };

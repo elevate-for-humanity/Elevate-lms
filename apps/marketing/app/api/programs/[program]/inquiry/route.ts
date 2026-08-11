@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { safeError, safeInternalError, safeDbError } from '@/lib/api/safe-error';
+import { safeError, safeDbError } from '@/lib/api/safe-error';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { notifyApplicationSubmission } from '@/lib/applications/submission-notifications';

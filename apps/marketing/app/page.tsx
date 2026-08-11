@@ -58,44 +58,43 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const banner = heroBanners.home;
+  const currentBanner = heroBanners.home;
+  const banner = {
+    ...currentBanner,
+    microLabel: 'AI-Powered 360° Humanitarian Workforce Hub',
+    eyebrow: 'Training • Testing • LMS • Hands-On Learning • Workforce',
+    belowHeroHeadline: 'One connected hub for learning, credentials, work, and advancement.',
+    belowHeroSubheadline:
+      'Elevate for Humanity connects career training, an integrated LMS, hands-on learning, testing, credentials, registered apprenticeship, workforce funding, employers, employment pathways, and supportive services through one AI-powered ecosystem.',
+    primaryCta: { label: 'Get Started', href: '/apply' },
+    secondaryCta: {
+      label: 'Explore Programs & Pathways',
+      href: '/programs',
+      variant: 'secondary' as const,
+    },
+    trustIndicators: [
+      'DOL Apprenticeship Sponsor',
+      'Indiana ETPL Provider',
+      'Testing & Proctoring',
+      'Integrated LMS',
+    ],
+    transcript:
+      'Elevate for Humanity is an AI-powered 360-degree humanitarian workforce hub connecting training, a learning management system, hands-on learning, testing, credentials, registered apprenticeship, workforce funding, employers, employment pathways, and supportive services in one connected ecosystem.',
+  };
 
   return (
     <>
       <StructuredData />
-
-      {/* Keep the existing premium video hero and its current asset pipeline. */}
       <HomeHeroVideo banner={banner} />
-
-      {/* Keep the existing animated announcement treatment, but let the broad hub
-          story appear before any single apprenticeship specialty. */}
       <MarqueeBanner />
-
-      {/* Show breadth first: the visitor sees multiple career and workforce doors
-          before specialty content. */}
       <HomeCareerPathways />
-
-      {/* State/federal and workforce trust should be established early, not buried
-          at the bottom of the page. */}
       <HomeTrustBar />
-
-      {/* Explain the connected participant journey before diving into individual
-          funding, apprenticeship, or employer workflows. */}
       <HomeHowItWorks />
-
-      {/* Humanitarian / wraparound mission remains a major part of the homepage,
-          but now sits inside the broader 360-degree journey instead of looking
-          like a separate organization inserted above the career pathways. */}
       <HomeFoundationPartner />
-
       <HomeFunding />
       <HomeApprenticeshipInfra />
       <HomeEmployerStrip />
-
-      {/* Beauty remains important and retains its existing imagery and cards, but
-          is presented as one high-value pathway inside the full Elevate hub. */}
       <HomeBeautyPriority />
-
       <HomeFinalCTA />
       <ParisFloatingButton />
     </>

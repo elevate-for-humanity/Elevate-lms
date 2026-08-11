@@ -29,4 +29,10 @@ describe('SiteHeader', () => {
     expect(src).toContain('HeaderDesktopNav');
     expect(src).toContain('NAV_ITEMS');
   });
+
+  it('keeps compact laptop widths on desktop navigation', () => {
+    expect(src).toContain('min-[900px]:flex');
+    expect(src).toContain('min-[900px]:hidden');
+    expect(src).toContain('below 900px use the dedicated drawer');
+  });
 });

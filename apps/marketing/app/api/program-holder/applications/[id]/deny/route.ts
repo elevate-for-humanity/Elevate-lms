@@ -1,15 +1,6 @@
-import { NextResponse } from 'next/server';
+import { publicProgramHolderReviewDisabled } from '@/lib/program-holders/public-review-disabled';
 
-/**
- * Program Holder denial is an Admin-only mutation.
- *
- * The public Marketing endpoint is intentionally closed. Review actions belong
- * to the authenticated Admin service, which also owns applicant notification
- * and audit logging.
- */
+/** Public Marketing review mutation is closed; authenticated Admin owns rejection. */
 export async function POST() {
-  return NextResponse.json(
-    { error: 'Program Holder application review is available only in the Admin portal.' },
-    { status: 410 },
-  );
+  return publicProgramHolderReviewDisabled('rejection');
 }

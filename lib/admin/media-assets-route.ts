@@ -48,6 +48,19 @@ const createSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
+type CreatedMediaAsset = {
+  id: string;
+  org_id: string;
+  storage_path: string;
+  type: z.infer<typeof mediaTypeSchema>;
+  mime_type: string | null;
+  duration_seconds: number | null;
+  title: string | null;
+  status: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+};
+
 function getQueryInput(request: NextRequest) {
   const url = new URL(request.url);
   return {
@@ -275,20 +288,22 @@ export async function createMediaAsset(request: NextRequest) {
       return safeInternalError(error, 'Failed to create media asset');
     }
 
+    const created = data as unknown as CreatedMediaAsset;
+
     await writePlatformAuditEvent({
       organizationId: actor.organizationId,
       actorUserId: actor.userId,
       action: 'media.create',
       resourceType: 'media_asset',
-      resourceId: data.id,
+      resourceId: created.id,
       status: 'succeeded',
       metadata: {
-        type: data.type,
-        storagePath: data.storage_path,
+        type: created.type,
+        storagePath: created.storage_path,
       },
     });
 
-    return NextResponse.json({ ok: true, asset: data }, { status: 201 });
+    return NextResponse.json({ ok: true, asset: created }, { status: 201 });
   } catch (error) {
     await writePlatformAuditFailure(
       {

@@ -18,7 +18,7 @@ const PUBLIC_PATHS = [
   '/api/ping',
   '/auth/confirm',
   '/auth/reset-password',
-  '/admin/install',
+  '/install',
 ];
 
 function isPublicPath(pathname: string): boolean {

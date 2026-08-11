@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Building2, GraduationCap, Users, Heart, Phone, Mail, ArrowRight } from 'lucide-react';
+import { Building2, GraduationCap, Users, Heart, Phone, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Apply for Partnership | Elevate for Humanity',
@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 };
 
 const partnershipOptions = [
-  { icon: Building2, title: 'Employer Partnership', desc: 'Hire graduates, sponsor apprenticeships, or participate in OJT reimbursement.', href: '/onboarding/employer' },
-  { icon: GraduationCap, title: 'Training Provider', desc: 'Join our network of credentialed training providers.', href: '/onboarding/provider' },
-  { icon: Users, title: 'Host Shop', desc: 'Host beauty apprentices in your salon or barbershop.', href: '/partners/barber-host-shop/apply' },
+  { icon: Building2, title: 'Employer Partnership', desc: 'Hire graduates, sponsor apprenticeships, or participate in OJT reimbursement.', href: '/apply/employer' },
+  { icon: GraduationCap, title: 'Training Provider', desc: 'Join our network of credentialed training providers.', href: '/apply/program-holder' },
+  { icon: Users, title: 'Host Shop', desc: 'Host beauty apprentices in your salon, barbershop, spa, or nail salon.', href: '/partners/host-shop/apply' },
   { icon: Heart, title: 'Community Partner', desc: 'Refer participants from your organization or community group.', href: '/contact' },
 ];
 
@@ -23,7 +23,7 @@ export default function Page() {
             <span className="bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium">Partnership Application</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Apply to Partner with Elevate</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">Complete our partner application to join the Elevate network. We'll review your application and contact you within 2-3 business days.</p>
+          <p className="text-xl text-blue-100 max-w-2xl">Choose the partnership type that matches your organization. Each option routes to the canonical application for that role so your submission, acknowledgment, review, and onboarding stay in one workflow.</p>
         </div>
       </section>
       
@@ -57,28 +57,28 @@ export default function Page() {
                   <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">1</div>
                   <div>
                     <h4 className="font-semibold text-slate-900">Submit Application</h4>
-                    <p className="text-slate-600 text-sm">Complete the application form for your partnership type.</p>
+                    <p className="text-slate-600 text-sm">Complete the application for your partnership type and receive a reference/receipt.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">2</div>
                   <div>
-                    <h4 className="font-semibold text-slate-900">Review Period</h4>
-                    <p className="text-slate-600 text-sm">Our team reviews your application within 2-3 business days.</p>
+                    <h4 className="font-semibold text-slate-900">Review &amp; Verification</h4>
+                    <p className="text-slate-600 text-sm">Elevate reviews the application and any required business, credential, or compliance documentation.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">3</div>
                   <div>
-                    <h4 className="font-semibold text-slate-900">Onboarding Call</h4>
-                    <p className="text-slate-600 text-sm">We'll schedule a call to discuss next steps and answer questions.</p>
+                    <h4 className="font-semibold text-slate-900">Onboarding</h4>
+                    <p className="text-slate-600 text-sm">You receive the role-specific agreements, portal access, and exact next steps required for approval.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">4</div>
                   <div>
-                    <h4 className="font-semibold text-slate-900">Get Started</h4>
-                    <p className="text-slate-600 text-sm">Access your partner portal and start connecting with students.</p>
+                    <h4 className="font-semibold text-slate-900">Operate in the Portal</h4>
+                    <p className="text-slate-600 text-sm">Approved partners use the correct portal for apprentices, participants, programs, documents, and reporting.</p>
                   </div>
                 </div>
               </div>

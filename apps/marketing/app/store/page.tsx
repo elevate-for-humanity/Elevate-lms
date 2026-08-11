@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, PlayCircle, Sparkles } from 'lucide-react';
 import heroBanners from '@/content/heroBanners';
+import HeroVideo from '@/components/marketing/HeroVideo';
 import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { UnifiedSalesMarketplace } from '@/components/store/UnifiedSalesMarketplace';
@@ -21,22 +22,20 @@ export const metadata: Metadata = {
 
 export default function StorePage() {
   const hero = heroBanners.store;
-  const storeVideo = hero.videoSrcDesktop || hero.videoSrcMobile || '';
 
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
       <section className="border-b border-slate-300 bg-slate-950 py-6 sm:py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="overflow-hidden rounded-2xl border border-white/20 bg-black shadow-2xl">
-            <video
-              src={storeVideo}
-              autoPlay
-              muted
-              playsInline
-              controls
-              preload="metadata"
-              className="aspect-video w-full bg-black object-cover"
-              aria-label="Elevate Store platform commercial"
+            <HeroVideo
+              videoSrcDesktop={hero.videoSrcDesktop}
+              videoSrcMobile={hero.videoSrcMobile}
+              posterImage={hero.posterImage || '/images/pages/store-licensing-hero.webp'}
+              voiceoverSrc={hero.voiceoverSrc}
+              analyticsName="store-commercial"
+              mediaFit="cover"
+              heightClassName="aspect-video h-auto min-h-[260px] max-h-none"
             />
           </div>
         </div>

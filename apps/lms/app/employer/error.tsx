@@ -14,8 +14,8 @@ export default function EmployerError({
       error={error}
       reset={reset}
       title="Employer Portal Error"
-      backHref="/employer"
-      backLabel="Back to Employer Portal"
+      backHref="/employer/dashboard"
+      backLabel="Back to Employer Dashboard"
     />
   );
 }

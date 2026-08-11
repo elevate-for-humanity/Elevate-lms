@@ -1,336 +1,92 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { ArrowLeft, Award, Briefcase, Calendar, Clock, Mail, MapPin, Phone, User } from 'lucide-react';
 import { requireRole } from '@/lib/auth/require-role';
 import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import {
-  ArrowLeft,
-  User,
-  Mail,
-  Phone,
-  Calendar,
-  Briefcase,
-  MapPin,
-  DollarSign,
-  Clock,
-  Edit,
-  FileText,
-  Award,
-} from 'lucide-react';
-import Image from 'next/image';
 import PayRateEditor from './PayRateEditor';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'Employee Details | HR | Admin' };
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return {
-    title: 'Employee Details | HR | Admin',
-  };
-}
-
-export default async function EmployeeDetailPage({ params }: Props) {
+export default async function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireRole(['admin']);
   const { id } = await params;
   const supabase = await createClient();
 
-  // Fetch employee
   const { data: employee, error } = await supabase
     .from('employees')
-    .select(
-      `
-      *,
-      profiles (id, first_name, last_name, email, phone, avatar_url),
-      departments (id, name),
-      managers:employees!employees_manager_id_fkey (
-        profiles (first_name, last_name)
-      )
-    `,
-    )
+    .select('*,profiles(id,first_name,last_name,email,phone,avatar_url),departments(id,name),managers:employees!employees_manager_id_fkey(profiles(first_name,last_name))')
     .eq('id', id)
     .maybeSingle();
+  if (error || !employee) notFound();
 
-  if (error || !employee) {
-    notFound();
-  }
+  const [timeOffResult, reviewsResult, payrollResult, historyResult] = await Promise.all([
+    supabase.from('time_off_requests').select('*').eq('user_id', employee.user_id).order('created_at', { ascending: false }).limit(5),
+    supabase.from('performance_reviews').select('*').eq('employee_id', id).order('review_date', { ascending: false }).limit(3),
+    supabase.from('payroll_profiles').select('rate,payment_type,payout_method,payroll_provider,tax_id_uploaded').eq('user_id', employee.user_id ?? '').maybeSingle(),
+    supabase.from('pay_rate_history').select('rate,payment_type,effective_date,notes,created_at').eq('employee_id', id).order('created_at', { ascending: false }).limit(10),
+  ]);
 
-  // Fetch time off requests (time_off_requests uses user_id, not employee PK)
-  const { data: timeOffRequests } = await supabase
-    .from('time_off_requests')
-    .select('*')
-    .eq('user_id', employee.user_id)
-    .order('created_at', { ascending: false })
-    .limit(5);
-
-  // Fetch performance reviews
-  const { data: reviews } = await supabase
-    .from('performance_reviews')
-    .select('*')
-    .eq('employee_id', id)
-    .order('review_date', { ascending: false })
-    .limit(3);
-
-  // Fetch payroll profile + pay rate history
-  const { data: payrollProfile } = await supabase
-    .from('payroll_profiles')
-    .select('rate, payment_type, payout_method, payroll_provider, tax_id_uploaded')
-    .eq('user_id', employee.user_id ?? '')
-    .maybeSingle();
-
-  const { data: payRateHistory } = await supabase
-    .from('pay_rate_history')
-    .select('rate, payment_type, effective_date, notes, created_at')
-    .eq('employee_id', id)
-    .order('created_at', { ascending: false })
-    .limit(10)
-    .catch(() => ({ data: [] })) as { data: unknown[] };
-
-  const profile = employee.profiles as any;
-  const department = employee.departments as any;
-  const manager = employee.managers?.profiles as any;
-
-  const statusColors: Record<string, string> = {
-    active: 'bg-brand-green-100 text-brand-green-800',
-    on_leave: 'bg-yellow-100 text-yellow-800',
-    terminated: 'bg-brand-red-100 text-brand-red-800',
-    probation: 'bg-brand-blue-100 text-brand-blue-800',
-  };
+  const profile = Array.isArray(employee.profiles) ? employee.profiles[0] : employee.profiles;
+  const department = Array.isArray(employee.departments) ? employee.departments[0] : employee.departments;
+  const managerEmployee = Array.isArray(employee.managers) ? employee.managers[0] : employee.managers;
+  const managerProfile = Array.isArray(managerEmployee?.profiles) ? managerEmployee?.profiles[0] : managerEmployee?.profiles;
+  const timeOffRequests = timeOffResult.data ?? [];
+  const reviews = reviewsResult.data ?? [];
+  const payrollProfile = payrollResult.data;
+  const payRateHistory = historyResult.error ? [] : historyResult.data ?? [];
+  const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Employee';
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Hero Image */}
-      {/* Header */}
-      <div className="mb-6">
-        <Link
-          href="/hr/employees"
-          className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Employees
-        </Link>
+    <main className="mx-auto max-w-7xl space-y-6 p-6">
+      <Link href="/hr/employees" className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-950"><ArrowLeft className="h-4 w-4" />Back to employees</Link>
 
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
-              {profile?.avatar_url ? (
-                <Image sizes="100vw"
-                  src={profile.avatar_url}
-                  alt={`${profile?.first_name} ${profile?.last_name}`}
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-              ) : (
-                <User className="w-8 h-8 text-brand-blue-600" />
-              )}
+      <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+        <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-700 p-6 text-white">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="relative h-20 w-20 overflow-hidden rounded-2xl bg-white/15">
+              {profile?.avatar_url ? <Image src={profile.avatar_url} alt={displayName} fill sizes="80px" className="object-cover" /> : <User className="absolute inset-0 m-auto h-9 w-9" />}
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                {profile?.first_name} {profile?.last_name}
-              </h1>
-              <p className="text-slate-600">{employee.job_title || 'Employee'}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    statusColors[employee.status] || 'bg-slate-100 text-slate-900'
-                  }`}
-                >
-                  {employee.status?.replace('_', ' ') || 'Active'}
-                </span>
-                {department && <span className="text-xs text-slate-500">{department.name}</span>}
-              </div>
-            </div>
-          </div>
-          <Link
-            href={`/admin/hr/employees/${id}/edit`}
-            className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50"
-          >
-            <Edit className="w-4 h-4" />
-            Edit Employee
-          </Link>
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Employment Details */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Employment Details</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-brand-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Job Title</p>
-                  <p className="font-medium text-slate-900">{employee.job_title || 'N/A'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-brand-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Start Date</p>
-                  <p className="font-medium text-slate-900">
-                    {employee.start_date
-                      ? new Date(employee.start_date).toLocaleDateString()
-                      : 'N/A'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-brand-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Employment Type</p>
-                  <p className="font-medium text-slate-900">
-                    {employee.employment_type || 'Full-time'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-brand-orange-100 rounded-lg flex items-center justify-center">
-                  <User className="w-5 h-5 text-brand-orange-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600">Reports To</p>
-                  <p className="font-medium text-slate-900">
-                    {manager ? `${manager.first_name} ${manager.last_name}` : 'N/A'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Time Off */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-slate-900">Time Off Requests</h2>
-              <Link
-                href={`/admin/hr/time?employee=${id}`}
-                className="text-sm text-brand-blue-600 hover:underline"
-              >
-                View All
-              </Link>
-            </div>
-            {timeOffRequests && timeOffRequests.length > 0 ? (
-              <div className="space-y-3">
-                {timeOffRequests.map((request: any) => (
-                  <div
-                    key={request.id}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium text-slate-900">{request.type}</p>
-                      <p className="text-sm text-slate-600">
-                        {new Date(request.start_date).toLocaleDateString()} -{' '}
-                        {new Date(request.end_date).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        request.status === 'approved'
-                          ? 'bg-brand-green-100 text-brand-green-800'
-                          : request.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-brand-red-100 text-brand-red-800'
-                      }`}
-                    >
-                      {request.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-500 text-center py-4">No time off requests</p>
-            )}
-          </div>
-
-          {/* Performance Reviews */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-slate-900">Performance Reviews</h2>
-              <Link
-                href={`/admin/hr/employees/${id}`}
-                className="text-sm text-brand-blue-600 hover:underline"
-              >
-                View All
-              </Link>
-            </div>
-            {reviews && reviews.length > 0 ? (
-              <div className="space-y-3">
-                {reviews.map((review: any) => (
-                  <div
-                    key={review.id}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Award className="w-5 h-5 text-yellow-600" />
-                      <div>
-                        <p className="font-medium text-slate-900">{review.review_period}</p>
-                        <p className="text-sm text-slate-600">
-                          {new Date(review.review_date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-slate-900">{review.rating}/5</p>
-                      <p className="text-xs text-slate-500">Rating</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-500 text-center py-4">No performance reviews</p>
-            )}
+            <div><p className="text-xs font-black uppercase tracking-widest text-blue-100">Employee record</p><h1 className="mt-1 text-3xl font-black">{displayName}</h1><p className="text-blue-100">{employee.job_title || 'Employee'}{department?.name ? ` · ${department.name}` : ''}</p></div>
+            <span className="ml-auto rounded-full bg-white/15 px-3 py-1 text-xs font-black uppercase">{String(employee.status || 'active').replaceAll('_', ' ')}</span>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Contact Info */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Contact Information</h2>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-slate-400" />
-                <div>
-                  <p className="text-sm text-slate-600">Email</p>
-                  <p className="text-slate-900">{profile?.email || 'N/A'}</p>
-                </div>
+        <div className="grid gap-6 p-6 lg:grid-cols-[1.3fr_.7fr]">
+          <div className="space-y-6">
+            <section className="rounded-2xl bg-slate-50 p-5">
+              <h2 className="font-black text-slate-950">Employment details</h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                {[
+                  [Briefcase, 'Job title', employee.job_title || 'Not recorded'],
+                  [Calendar, 'Start date', employee.start_date ? new Date(employee.start_date).toLocaleDateString() : 'Not recorded'],
+                  [Clock, 'Employment type', employee.employment_type || 'Not recorded'],
+                  [User, 'Reports to', managerProfile ? [managerProfile.first_name, managerProfile.last_name].filter(Boolean).join(' ') : 'Not assigned'],
+                  [MapPin, 'Work location', employee.work_location || 'Not recorded'],
+                ].map(([Icon, label, value]) => { const ItemIcon = Icon as typeof User; return <div key={String(label)} className="rounded-xl bg-white p-4"><ItemIcon className="h-4 w-4 text-brand-blue-700" /><p className="mt-2 text-xs font-bold uppercase text-slate-500">{String(label)}</p><p className="mt-1 font-bold text-slate-900">{String(value)}</p></div>; })}
               </div>
-              {profile?.phone && (
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-slate-400" />
-                  <div>
-                    <p className="text-sm text-slate-600">Phone</p>
-                    <p className="text-slate-900">{profile.phone}</p>
-                  </div>
-                </div>
-              )}
-              {employee.work_location && (
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-slate-400" />
-                  <div>
-                    <p className="text-sm text-slate-600">Work Location</p>
-                    <p className="text-slate-900">{employee.work_location}</p>
-                  </div>
-                </div>
-              )}
-            </div>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="font-black text-slate-950">Time off requests</h2>
+              <div className="mt-4 space-y-3">{timeOffRequests.length ? timeOffRequests.map((request: any) => <div key={request.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 p-3"><div><p className="font-bold text-slate-900">{request.type || 'Time off'}</p><p className="text-xs text-slate-600">{request.start_date ? new Date(request.start_date).toLocaleDateString() : '—'} – {request.end_date ? new Date(request.end_date).toLocaleDateString() : '—'}</p></div><span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-slate-700">{request.status || 'pending'}</span></div>) : <p className="text-sm text-slate-500">No time off requests.</p>}</div>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="font-black text-slate-950">Performance reviews</h2>
+              <div className="mt-4 space-y-3">{reviews.length ? reviews.map((review: any) => <div key={review.id} className="flex items-center justify-between rounded-xl bg-slate-50 p-3"><div className="flex items-center gap-3"><Award className="h-5 w-5 text-amber-600" /><div><p className="font-bold text-slate-900">{review.review_period || 'Performance review'}</p><p className="text-xs text-slate-600">{review.review_date ? new Date(review.review_date).toLocaleDateString() : '—'}</p></div></div><span className="font-black text-slate-950">{review.rating ?? '—'}/5</span></div>) : <p className="text-sm text-slate-500">No performance reviews.</p>}</div>
+            </section>
           </div>
 
-          {/* Compensation */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Compensation</h2>
-            <div className="space-y-4">
-              {/* Pay Rate Editor */}
+          <aside className="space-y-6">
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="font-black text-slate-950">Contact</h2>
+              <div className="mt-4 space-y-3 text-sm"><p className="flex items-center gap-2"><Mail className="h-4 w-4 text-slate-500" />{profile?.email || 'No email recorded'}</p><p className="flex items-center gap-2"><Phone className="h-4 w-4 text-slate-500" />{profile?.phone || 'No phone recorded'}</p></div>
+            </section>
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="mb-4 font-black text-slate-950">Compensation</h2>
               <PayRateEditor
                 employeeId={id}
                 currentRate={payrollProfile?.rate ?? employee.hourly_rate ?? employee.salary ?? null}
@@ -338,57 +94,12 @@ export default async function EmployeeDetailPage({ params }: Props) {
                 payoutMethod={payrollProfile?.payout_method ?? null}
                 payrollProvider={payrollProfile?.payroll_provider ?? null}
                 w9OnFile={payrollProfile?.tax_id_uploaded ?? false}
-                history={(payRateHistory as any[]) ?? []}
+                history={payRateHistory as any[]}
               />
-
-              {employee.salary && (
-                <div className="flex items-center gap-3">
-                  <DollarSign className="w-5 h-5 text-brand-green-600" />
-                  <div>
-                    <p className="text-sm text-slate-600">Annual Salary</p>
-                    <p className="text-xl font-bold text-slate-900">
-                      ${employee.salary.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <div className="pt-4 border-t border-slate-200">
-                <p className="text-sm text-slate-600 mb-2">Benefits</p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-xs">
-                    Health Insurance
-                  </span>
-                  <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-xs">
-                    401(k)
-                  </span>
-                  <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-xs">
-                    PTO
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Documents */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Documents</h2>
-            <div className="space-y-2">
-              <button className="w-full flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg text-left">
-                <FileText className="w-5 h-5 text-slate-500" />
-                <span className="text-slate-700">Employment Contract</span>
-              </button>
-              <button className="w-full flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg text-left">
-                <FileText className="w-5 h-5 text-slate-500" />
-                <span className="text-slate-700">W-4 Form</span>
-              </button>
-              <button className="w-full flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg text-left">
-                <FileText className="w-5 h-5 text-slate-500" />
-                <span className="text-slate-700">I-9 Form</span>
-              </button>
-            </div>
-          </div>
+            </section>
+          </aside>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

@@ -1,3 +1,5 @@
+import type { Instrumentation } from 'next';
+
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { registerConnectionGuards } = await import('./lib/server/register-connection-guards.cjs');
@@ -61,19 +63,9 @@ export async function register() {
   }
 }
 
-export const onRequestError = async (
-  err: unknown,
-  request: { path: string; method: string; headers?: Record<string, string | string[] | undefined> },
-  context: { routerKind: string; routePath: string; routeType: string },
-) => {
+export const onRequestError: Instrumentation.onRequestError = async (err, request, context) => {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const { captureRequestError } = await import('@sentry/nextjs');
-    type CaptureRequest = Parameters<typeof captureRequestError>[1];
-    type CaptureContext = Parameters<typeof captureRequestError>[2];
-    captureRequestError(
-      err,
-      request as unknown as CaptureRequest,
-      context as unknown as CaptureContext,
-    );
+    captureRequestError(err, request, context);
   }
 };

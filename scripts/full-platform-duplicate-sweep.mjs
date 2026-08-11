@@ -262,3 +262,10 @@ if (exactWithinRoot.length > 0) {
   }
   process.exit(1);
 }
+if (clonedImplementations.length > 0) {
+  console.error(`Found ${clonedImplementations.length} cloned implementation group(s). Consolidate business logic into one shared handler/component and keep only thin host adapters where same-origin routes are required.`);
+  for (const group of clonedImplementations.slice(0, 25)) {
+    for (const item of group) console.error(`  ${item.app}:${item.url} -> ${item.file}`);
+  }
+  process.exit(1);
+}

@@ -6,6 +6,7 @@
  * Phone number for direct contact.
  */
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -13,59 +14,69 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export function HomeFinalCTA() {
   return (
     <section
-      className="relative bg-brand-red-700 py-6 sm:py-8 px-4"
+      className="relative overflow-hidden bg-brand-red-700 px-4 py-8 sm:py-10"
       aria-labelledby="final-cta-heading"
     >
-      <div className="relative max-w-2xl mx-auto text-center">
-        <p
-          className="text-[10px] font-bold uppercase tracking-widest mb-2"
-          style={{ color: '#ffffff' }}
-        >
-          Ready to start?
-        </p>
-        <h2
-          id="final-cta-heading"
-          className="text-lg sm:text-xl font-extrabold text-white mb-2 leading-snug"
-        >
-          The Infrastructure for the Next Economy.
-        </h2>
-        <p
-          className="text-red-50 text-xs sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto"
-          style={{ color: '#fef2f2' }}
-        >
-          Apply once for training, funding, apprenticeship, certification, and employment — all in
-          one system.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-2 justify-center mb-4">
-          <Link
-            href="/apply"
-            className="inline-flex items-center justify-center gap-1.5 bg-white text-brand-red-700 font-bold px-5 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm"
-          >
-            Apply Now <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-          <Link
-            href="/check-eligibility"
-            className="inline-flex items-center justify-center gap-1.5 border border-white/70 text-white font-semibold px-5 py-2 rounded-lg hover:bg-white/10 transition-colors text-sm"
-          >
-            Check Eligibility
-          </Link>
+      <div className="relative mx-auto grid max-w-5xl overflow-hidden rounded-2xl border border-white/20 bg-brand-red-800 shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="relative min-h-[220px] lg:min-h-[320px]">
+          <Image
+            src="/images/pages/about-supportive-services.webp"
+            alt="Elevate for Humanity learner support and career training"
+            fill
+            sizes="(max-width: 1024px) 100vw, 45vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent" aria-hidden="true" />
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-white text-[11px]">
-          <a
-            href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
-            className="inline-flex items-center gap-1.5 text-white font-bold hover:text-red-50 transition-colors"
+        <div className="flex flex-col justify-center px-6 py-7 text-center sm:px-8 lg:px-10 lg:text-left">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-white">
+            Ready to start?
+          </p>
+          <h2
+            id="final-cta-heading"
+            className="mt-2 text-2xl font-extrabold leading-tight text-white sm:text-3xl"
           >
-            <Phone className="w-3.5 h-3.5" aria-hidden="true" />
-            {PLATFORM_DEFAULTS.supportPhone}
-          </a>
-          <span className="hidden sm:block text-red-100" aria-hidden="true">·</span>
-          <span>Call or text — Mon–Fri, 9am–5pm ET</span>
-          <span className="hidden sm:block text-red-100" aria-hidden="true">·</span>
-          <Link href="/contact" className="text-white font-semibold underline underline-offset-2 hover:text-red-50 transition-colors">
-            Send a message
-          </Link>
+            The Infrastructure for the Next Economy.
+          </h2>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-red-50 sm:text-base">
+            Apply once for training, funding, apprenticeship, certification, and employment — all in
+            one system.
+          </p>
+
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row lg:justify-start">
+            <Link
+              href="/apply"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-white px-5 py-2.5 text-sm font-bold text-brand-red-700 transition-colors hover:bg-red-50"
+            >
+              Apply Now <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <Link
+              href="/check-eligibility"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/70 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            >
+              Check Eligibility
+            </Link>
+          </div>
+
+          <div className="mt-5 flex flex-col items-center gap-2 text-[11px] text-white sm:flex-row sm:flex-wrap lg:justify-start">
+            <a
+              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
+              className="inline-flex items-center gap-1.5 font-bold text-white transition-colors hover:text-red-50"
+            >
+              <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+              {PLATFORM_DEFAULTS.supportPhone}
+            </a>
+            <span className="hidden text-red-100 sm:block" aria-hidden="true">·</span>
+            <span>Call or text — Mon–Fri, 9am–5pm ET</span>
+            <span className="hidden text-red-100 sm:block" aria-hidden="true">·</span>
+            <Link
+              href="/contact"
+              className="font-semibold text-white underline underline-offset-2 transition-colors hover:text-red-50"
+            >
+              Send a message
+            </Link>
+          </div>
         </div>
       </div>
     </section>

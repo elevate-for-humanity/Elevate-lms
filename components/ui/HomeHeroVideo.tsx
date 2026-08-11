@@ -29,9 +29,9 @@ export interface HomeHeroVideoProps {
  * and route cleanup all live in components/marketing/HeroVideo.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
-  const ctas = [banner.primaryCta, banner.secondaryCta].filter(
-    (cta): cta is NonNullable<typeof cta> => Boolean(cta),
-  );
+  const ctas = banner.secondaryCta
+    ? [banner.primaryCta, banner.secondaryCta]
+    : [banner.primaryCta];
 
   return (
     <HeroVideo

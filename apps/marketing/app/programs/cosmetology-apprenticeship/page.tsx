@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
+import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
@@ -10,6 +11,7 @@ export default async function CosmetologyApprenticeshipPage() {
   const loaded = await loadProgramForPage('cosmetology-apprenticeship');
   if (!loaded) return notFound();
   const banner = heroBanners['cosmetology-apprenticeship'] ?? null;
+  const structuredData = buildBeautyProgramStructuredData(loaded.program);
   const heroOverride = banner?.videoSrcDesktop ? (
     <HeroVideo
       videoSrcDesktop={banner.videoSrcDesktop}
@@ -26,25 +28,41 @@ export default async function CosmetologyApprenticeshipPage() {
     />
   ) : undefined;
 
-  return <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+      />
+      <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride}>
+        <BeautyApprenticeshipAuthority program={loaded.program} />
+      </ProgramDetailPage>
+    </>
+  );
 }
 
 export async function generateMetadata() {
   return {
-    title: 'Cosmetology & Hair Stylist Apprenticeship | Earn While You Learn',
+    title: 'Cosmetology Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Cosmetology and hair stylist apprenticeship pathway with structured on-the-job learning, related technical instruction, employer training sites, progress tracking and apprenticeship sponsor oversight.',
+      'Indiana cosmetology apprenticeship pathway with 2,000 hours of supervised salon training, related instruction, host-site placement, progress tracking and licensing preparation. Current funding status is verified per program before enrollment.',
     keywords: [
-      'cosmetology apprenticeship',
-      'hair stylist apprenticeship',
-      'hairstylist apprenticeship',
       'cosmetology apprenticeship Indiana',
-      'paid cosmetology apprenticeship',
-      'salon apprenticeship',
-      'cosmetology training',
+      'Indiana cosmetology apprenticeship program',
+      'hair stylist apprenticeship Indiana',
+      'salon apprenticeship Indianapolis',
+      'earn while you learn cosmetology',
+      'cosmetology training Indiana',
+      'Indiana cosmetology license pathway',
     ],
     alternates: {
       canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
+    },
+    openGraph: {
+      title: 'Cosmetology Apprenticeship Program | Indiana',
+      description: 'Complete supervised salon training and related instruction with Elevate’s cosmetology apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+      url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
+      type: 'website',
     },
   };
 }

@@ -2,7 +2,8 @@
 
 /**
  * Environment Variables Audit Script
- * Tests all API connections and generates a status report
+ * Tests required platform connections and reports optional integrations as
+ * skipped when they are intentionally not configured.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -18,15 +19,7 @@ const results = {
 };
 
 function logTest(service, status, message, details = null) {
-  const icon = status === 'success' ? '✅' : status === 'failed' ? '❌' : '⚠️';
-
-  results.services[service] = {
-    status,
-    message,
-    details,
-    tested_at: new Date().toISOString(),
-  };
-
+  results.services[service] = { status, message, details, tested_at: new Date().toISOString() };
   results.summary.total++;
   if (status === 'success') results.summary.working++;
   else if (status === 'failed') results.summary.failed++;
@@ -40,39 +33,25 @@ async function testSupabase() {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!url || !anonKey) {
-      logTest('Supabase', 'failed', 'Missing URL or anon key');
+      logTest('Supabase', 'failed', 'Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
       return;
     }
 
-    // Test anon key
     const supabaseAnon = createClient(url, anonKey);
-    const { data: anonData, error: anonError } = await supabaseAnon
-      .from('programs')
-      .select('count')
-      .limit(1);
+    const { error: anonError } = await supabaseAnon.from('programs').select('count').limit(1);
 
-    if (anonError) {
-      logTest('Supabase (Anon)', 'failed', anonError.message);
-    } else {
-      logTest('Supabase (Anon)', 'success', 'Connected successfully');
+    if (anonError) logTest('Supabase (Anon)', 'failed', anonError.message);
+    else logTest('Supabase (Anon)', 'success', 'Connected successfully');
+
+    if (!serviceKey) {
+      logTest('Supabase (Service Role)', 'failed', 'SUPABASE_SERVICE_ROLE_KEY is required for server workflows');
+      return;
     }
 
-    // Test service role key
-    if (serviceKey) {
-      const supabaseService = createClient(url, serviceKey);
-      const { data: serviceData, error: serviceError } = await supabaseService
-        .from('programs')
-        .select('count')
-        .limit(1);
-
-      if (serviceError) {
-        logTest('Supabase (Service Role)', 'failed', serviceError.message);
-      } else {
-        logTest('Supabase (Service Role)', 'success', 'Connected successfully');
-      }
-    } else {
-      logTest('Supabase (Service Role)', 'skipped', 'Service role key not set');
-    }
+    const supabaseService = createClient(url, serviceKey);
+    const { error: serviceError } = await supabaseService.from('programs').select('count').limit(1);
+    if (serviceError) logTest('Supabase (Service Role)', 'failed', serviceError.message);
+    else logTest('Supabase (Service Role)', 'success', 'Connected successfully');
   } catch (error) {
     logTest('Supabase', 'failed', error.message);
   }
@@ -84,13 +63,11 @@ async function testStripe() {
     const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
     if (!secretKey) {
-      logTest('Stripe', 'failed', 'Missing secret key');
+      logTest('Stripe', 'failed', 'Missing STRIPE_SECRET_KEY');
       return;
     }
 
     const stripe = new Stripe(secretKey, { apiVersion: '2024-12-18.acacia' });
-
-    // Test by retrieving account info
     const account = await stripe.accounts.retrieve();
 
     logTest(
@@ -101,7 +78,7 @@ async function testStripe() {
         account_id: account.id,
         charges_enabled: account.charges_enabled,
         payouts_enabled: account.payouts_enabled,
-        publishable_key_set: !!publishableKey,
+        publishable_key_set: Boolean(publishableKey),
       },
     );
   } catch (error) {
@@ -110,43 +87,32 @@ async function testStripe() {
 }
 
 async function testResend() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    logTest('Resend', 'skipped', 'Not configured; SendGrid/SMTP may be the active email provider');
+    return;
+  }
+
   try {
-    const apiKey = process.env.RESEND_API_KEY;
-
-    if (!apiKey) {
-      logTest('Resend', 'failed', 'Missing API key');
-      return;
-    }
-
     const resend = new Resend(apiKey);
-
-    // Test by listing domains (doesn't send email)
     const { data, error } = await resend.domains.list();
-
-    if (error) {
-      logTest('Resend', 'failed', error.message);
-    } else {
-      logTest('Resend', 'success', `Connected successfully. Domains: ${data?.data?.length || 0}`);
-    }
+    if (error) logTest('Resend', 'failed', error.message);
+    else logTest('Resend', 'success', `Connected successfully. Domains: ${data?.data?.length || 0}`);
   } catch (error) {
     logTest('Resend', 'failed', error.message);
   }
 }
 
 async function testOpenAI() {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    logTest('OpenAI', 'skipped', 'Not configured; other configured AI providers may be active');
+    return;
+  }
+
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-
-    if (!apiKey) {
-      logTest('OpenAI', 'failed', 'Missing API key');
-      return;
-    }
-
     const openai = new OpenAI({ apiKey });
-
-    // Test by listing models
     const models = await openai.models.list();
-
     logTest('OpenAI', 'success', `Connected successfully. Models available: ${models.data.length}`);
   } catch (error) {
     logTest('OpenAI', 'failed', error.message);
@@ -154,63 +120,60 @@ async function testOpenAI() {
 }
 
 async function testUpstash() {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!url || !token) {
+    logTest(
+      'Upstash Redis',
+      'skipped',
+      'Distributed rate limiting not configured; bounded local fallback is active',
+    );
+    return;
+  }
+
   try {
-    const url = process.env.UPSTASH_REDIS_REST_URL;
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-    if (!url || !token) {
-      logTest('Upstash Redis', 'failed', 'Missing URL or token');
-      return;
-    }
-
     const redis = new Redis({ url, token });
-
-    // Test by pinging
     const testKey = `audit_test_${Date.now()}`;
     await redis.set(testKey, 'test', { ex: 10 });
     const value = await redis.get(testKey);
     await redis.del(testKey);
 
-    if (value === 'test') {
-      logTest('Upstash Redis', 'success', 'Connected and tested read/write');
-    } else {
-      logTest('Upstash Redis', 'failed', 'Connection succeeded but read/write failed');
-    }
+    if (value === 'test') logTest('Upstash Redis', 'success', 'Connected and tested read/write');
+    else logTest('Upstash Redis', 'failed', 'Connection succeeded but read/write failed');
   } catch (error) {
     logTest('Upstash Redis', 'failed', error.message);
   }
 }
 
 async function testDatabase() {
-  try {
-    const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+  const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!dbUrl) {
-      logTest('PostgreSQL', 'failed', 'Missing database URL');
-      return;
-    }
-
-    // Use Supabase client to test database
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!url || !serviceKey) {
-      logTest('PostgreSQL', 'skipped', 'Using Supabase test instead');
-      return;
-    }
-
-    const supabase = createClient(url, serviceKey);
-
-    // Test by counting programs
-    const { count, error } = await supabase
-      .from('programs')
-      .select('*', { count: 'exact', head: true });
-
-    if (error) {
-      logTest('PostgreSQL', 'failed', error.message);
+  if (!dbUrl) {
+    if (url && serviceKey) {
+      logTest(
+        'PostgreSQL (Direct)',
+        'skipped',
+        'Direct DATABASE_URL/POSTGRES_URL is not configured; Supabase API is the active database connection',
+      );
     } else {
-      logTest('PostgreSQL', 'success', `Connected. Programs in database: ${count || 0}`);
+      logTest('PostgreSQL (Direct)', 'skipped', 'Direct database URL not configured');
     }
+    return;
+  }
+
+  if (!url || !serviceKey) {
+    logTest('PostgreSQL (Direct)', 'skipped', 'Direct URL exists; Supabase service connection is tested separately');
+    return;
+  }
+
+  try {
+    const supabase = createClient(url, serviceKey);
+    const { count, error } = await supabase.from('programs').select('*', { count: 'exact', head: true });
+    if (error) logTest('PostgreSQL', 'failed', error.message);
+    else logTest('PostgreSQL', 'success', `Connected. Programs in database: ${count || 0}`);
   } catch (error) {
     logTest('PostgreSQL', 'failed', error.message);
   }
@@ -232,6 +195,9 @@ async function testEnvironmentVariables() {
     'RESEND_API_KEY',
     'UPSTASH_REDIS_REST_URL',
     'UPSTASH_REDIS_REST_TOKEN',
+    'REDIS_URL',
+    'DATABASE_URL',
+    'POSTGRES_URL',
     'AFFIRM_PUBLIC_KEY',
     'AFFIRM_PRIVATE_KEY',
   ];
@@ -246,9 +212,7 @@ async function testEnvironmentVariables() {
       optional_missing: optionalMissing,
     });
   } else {
-    logTest('Environment Variables', 'failed', `Missing ${missing.length} required variables`, {
-      missing,
-    });
+    logTest('Environment Variables', 'failed', `Missing ${missing.length} required variables`, { missing });
   }
 }
 
@@ -261,20 +225,13 @@ async function runAudit() {
   await testOpenAI();
   await testUpstash();
 
-  // Save results to file
   const fs = await import('fs');
-  const reportPath = './audit-report.json';
-  fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
+  fs.writeFileSync('./audit-report.json', JSON.stringify(results, null, 2));
 
-  // Exit with error code if any tests failed
-  if (results.summary.failed > 0) {
-    process.exit(1);
-  } else {
-    process.exit(0);
-  }
+  process.exit(results.summary.failed > 0 ? 1 : 0);
 }
 
 runAudit().catch((error) => {
-  console.error('\n❌ Audit failed:', error);
+  console.error('\nAudit failed:', error);
   process.exit(1);
 });

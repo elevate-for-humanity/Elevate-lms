@@ -3,15 +3,12 @@ import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/hos
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
 import { RAPIDS_CONFIG, isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { buildProgramSearchFaqs, getProgramTotalHours } from '@/lib/seo/program-search-faqs';
 
 const SITE = 'https://www.elevateforhumanity.org';
 
 function isoDurationFromWeeks(weeks: number) {
   return Number.isFinite(weeks) && weeks > 0 ? `P${Math.round(weeks)}W` : undefined;
-}
-
-function totalProgramHours(program: ProgramSchema) {
-  return Object.values(program.hoursBreakdown ?? {}).reduce((sum, value) => sum + (Number(value) || 0), 0);
 }
 
 export default function ProgramSeoStructuredData({
@@ -27,8 +24,9 @@ export default function ProgramSeoStructuredData({
     program.complianceAlignment?.some((item) => /DOL Registered Apprenticeship/i.test(item.standard));
   const hostShops = FEATURED_BEAUTY_HOST_PARTNERS.filter((shop) => shop.programs.includes(program.slug));
   const cities = [...new Set(hostShops.map((shop) => shop.city))];
-  const hours = totalProgramHours(program);
+  const hours = getProgramTotalHours(program);
   const rapidsProgram = Object.values(RAPIDS_CONFIG.programs).find((item) => item.slug === program.slug);
+  const faqs = buildProgramSearchFaqs(program);
 
   const provider = {
     '@type': 'EducationalOrganization',
@@ -126,11 +124,11 @@ export default function ProgramSeoStructuredData({
     },
   };
 
-  const faqSchema = program.faqs?.length
+  const faqSchema = faqs.length
     ? {
         '@type': 'FAQPage',
         '@id': `${canonical}#faq`,
-        mainEntity: program.faqs.map((faq) => ({
+        mainEntity: faqs.map((faq) => ({
           '@type': 'Question',
           name: faq.question,
           acceptedAnswer: {

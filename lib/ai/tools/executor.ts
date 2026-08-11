@@ -19,9 +19,9 @@ export type AIToolExecutionResult = {
   error?: string;
 };
 
-function clampLimit(value: unknown, fallback = 25): number {
+function clampLimit(value: unknown, fallback = 25, max = 100): number {
   const parsed = Number(value);
-  return Number.isFinite(parsed) ? Math.min(Math.max(Math.trunc(parsed), 1), 100) : fallback;
+  return Number.isFinite(parsed) ? Math.min(Math.max(Math.trunc(parsed), 1), max) : fallback;
 }
 
 function roleAllowed(actor: AIToolActor, requiredRoles: string[]): boolean {
@@ -33,6 +33,25 @@ function cleanSearch(value: unknown): string {
   return typeof value === 'string'
     ? value.replace(/[,%()]/g, ' ').trim().slice(0, 180)
     : '';
+}
+
+function safeIsoDate(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+function rate(numerator: number, denominator: number): number {
+  return denominator > 0 ? Math.round((numerator / denominator) * 1000) / 10 : 0;
+}
+
+function median(values: number[]): number | null {
+  if (!values.length) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2
+    ? sorted[middle]
+    : Math.round(((sorted[middle - 1] + sorted[middle]) / 2) * 100) / 100;
 }
 
 async function runImplementation(
@@ -142,6 +161,121 @@ async function runImplementation(
       const { data, error } = await query;
       if (error) throw error;
       return { enrollments: data ?? [], count: data?.length ?? 0 };
+    }
+
+    case 'wioa.followups.search': {
+      let query = db
+        .from('follow_ups')
+        .select('id,participant_id,case_worker_id,type,due_date,status,notes,completed_at,created_at')
+        .order('due_date', { ascending: true })
+        .limit(clampLimit(input.limit, 50));
+
+      const status = typeof input.status === 'string' ? input.status.trim() : '';
+      if (status) query = query.eq('status', status);
+      else query = query.neq('status', 'completed');
+
+      const type = cleanSearch(input.type);
+      if (type) query = query.ilike('type', `%${type}%`);
+
+      const dueBefore = safeIsoDate(input.dueBefore);
+      if (dueBefore) query = query.lte('due_date', dueBefore);
+      else if (input.overdueOnly === true) query = query.lt('due_date', new Date().toISOString());
+
+      const { data: followups, error } = await query;
+      if (error) throw error;
+
+      const participantIds = [...new Set((followups ?? []).map((row: any) => row.participant_id).filter(Boolean))];
+      const caseWorkerIds = [...new Set((followups ?? []).map((row: any) => row.case_worker_id).filter(Boolean))];
+
+      const participants = participantIds.length
+        ? (await db
+            .from('wioa_participants')
+            .select('id,first_name,last_name,email,status,wioa_program,program_id,case_manager_id')
+            .in('id', participantIds)).data ?? []
+        : [];
+
+      const participantCaseManagers = participants.map((row: any) => row.case_manager_id).filter(Boolean);
+      const allManagerIds = [...new Set([...caseWorkerIds, ...participantCaseManagers])];
+      const managers = allManagerIds.length
+        ? (await db
+            .from('case_managers')
+            .select('id,name,agency,email')
+            .in('id', allManagerIds)).data ?? []
+        : [];
+
+      const participantById = new Map(participants.map((row: any) => [row.id, row]));
+      const managerById = new Map(managers.map((row: any) => [row.id, row]));
+
+      const rows = (followups ?? []).map((followup: any) => {
+        const participant = participantById.get(followup.participant_id) as any;
+        const manager = managerById.get(followup.case_worker_id || participant?.case_manager_id) as any;
+        return {
+          ...followup,
+          participant: participant
+            ? {
+                id: participant.id,
+                name: [participant.first_name, participant.last_name].filter(Boolean).join(' '),
+                email: participant.email,
+                status: participant.status,
+                wioaProgram: participant.wioa_program,
+                programId: participant.program_id,
+              }
+            : null,
+          caseManager: manager
+            ? { id: manager.id, name: manager.name, agency: manager.agency, email: manager.email }
+            : null,
+          overdue: Boolean(followup.due_date && new Date(followup.due_date).getTime() < Date.now() && followup.status !== 'completed'),
+        };
+      });
+
+      return { followups: rows, count: rows.length };
+    }
+
+    case 'wioa.performance.summary': {
+      let query = db
+        .from('wioa_participant_records')
+        .select('participant_id,program_id,reporting_period_start,reporting_period_end,program_entry_date,program_exit_date,employed_q2_after_exit,employed_q4_after_exit,median_earnings_q2,credential_attained,measurable_skill_gain')
+        .order('reporting_period_end', { ascending: false })
+        .limit(clampLimit(input.limit, 250, 500));
+
+      if (actor.tenantId) query = query.eq('tenant_id', actor.tenantId);
+      if (typeof input.programId === 'string' && input.programId) query = query.eq('program_id', input.programId);
+      if (typeof input.periodStart === 'string' && input.periodStart) query = query.gte('reporting_period_start', input.periodStart);
+      if (typeof input.periodEnd === 'string' && input.periodEnd) query = query.lte('reporting_period_end', input.periodEnd);
+
+      const { data: rows, error } = await query;
+      if (error) throw error;
+      const records = rows ?? [];
+      const exited = records.filter((row: any) => Boolean(row.program_exit_date));
+      const q2Eligible = exited.filter((row: any) => row.employed_q2_after_exit !== null);
+      const q4Eligible = exited.filter((row: any) => row.employed_q4_after_exit !== null);
+      const credentialEligible = exited.filter((row: any) => row.credential_attained !== null);
+      const msgEligible = records.filter((row: any) => row.measurable_skill_gain !== null);
+      const earnings = records
+        .map((row: any) => Number(row.median_earnings_q2))
+        .filter((value: number) => Number.isFinite(value) && value >= 0);
+
+      const q2Employed = q2Eligible.filter((row: any) => row.employed_q2_after_exit === true).length;
+      const q4Employed = q4Eligible.filter((row: any) => row.employed_q4_after_exit === true).length;
+      const credentialAttained = credentialEligible.filter((row: any) => row.credential_attained === true).length;
+      const skillGain = msgEligible.filter((row: any) => row.measurable_skill_gain === true).length;
+
+      return {
+        reporting: {
+          records: records.length,
+          exitedParticipants: exited.length,
+          periodStart: input.periodStart ?? null,
+          periodEnd: input.periodEnd ?? null,
+          programId: input.programId ?? null,
+        },
+        outcomes: {
+          employedQ2: { numerator: q2Employed, denominator: q2Eligible.length, ratePercent: rate(q2Employed, q2Eligible.length) },
+          employedQ4: { numerator: q4Employed, denominator: q4Eligible.length, ratePercent: rate(q4Employed, q4Eligible.length) },
+          credentialAttainment: { numerator: credentialAttained, denominator: credentialEligible.length, ratePercent: rate(credentialAttained, credentialEligible.length) },
+          measurableSkillGain: { numerator: skillGain, denominator: msgEligible.length, ratePercent: rate(skillGain, msgEligible.length) },
+          medianEarningsQ2: median(earnings),
+        },
+      };
     }
 
     case 'operations.alerts': {

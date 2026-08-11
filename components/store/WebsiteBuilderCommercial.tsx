@@ -1,42 +1,42 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bot,
-  BriefcaseBusiness,
   Check,
-  FileText,
+  ChevronRight,
   Globe2,
-  GraduationCap,
-  ImageIcon,
-  Megaphone,
+  LayoutTemplate,
   Mic,
+  Monitor,
+  Palette,
   Pause,
   Play,
   Rocket,
+  Search,
+  Send,
+  Smartphone,
   Sparkles,
-  Video,
 } from 'lucide-react';
 
 const SCENES = [
-  { start: 0, label: 'The problem' },
-  { start: 8, label: 'Meet PARIS' },
-  { start: 17, label: 'Talk or type' },
-  { start: 27, label: 'It keeps building' },
-  { start: 38, label: 'Add business power' },
-  { start: 50, label: 'Try the whole system' },
-  { start: 61, label: 'Publish and grow' },
-  { start: 72, label: 'Start building' },
+  { start: 0, label: 'Describe the business' },
+  { start: 8, label: 'Generate the first draft' },
+  { start: 17, label: 'Edit with PARIS' },
+  { start: 27, label: 'Change the brand' },
+  { start: 38, label: 'Add conversion tools' },
+  { start: 50, label: 'Preview every screen' },
+  { start: 61, label: 'Publish' },
+  { start: 72, label: 'Keep growing' },
 ] as const;
 
-const UPGRADES = [
-  { icon: Megaphone, label: 'Marketing' },
-  { icon: FileText, label: 'Grant Writer' },
-  { icon: ImageIcon, label: 'Image Builder' },
-  { icon: Video, label: 'Commercial Video' },
-  { icon: GraduationCap, label: 'Course Builder' },
-  { icon: BriefcaseBusiness, label: 'AI Assistants' },
+const QUICK_COMMANDS = [
+  'Make the hero brighter',
+  'Add online booking',
+  'Rewrite my services',
+  'Make it feel more premium',
 ];
 
 function sceneFromTime(seconds: number) {
@@ -45,6 +45,193 @@ function sceneFromTime(seconds: number) {
     if (seconds >= SCENES[i].start) index = i;
   }
   return index;
+}
+
+function SitePreview({ scene }: { scene: number }) {
+  const showGenerated = scene >= 1;
+  const showBrandEdit = scene >= 3;
+  const showBooking = scene >= 4;
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-rose-300" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+        <div className="ml-2 flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-500">
+          <Globe2 className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">preview.elevate.site/harbor-home-health</span>
+        </div>
+      </div>
+
+      {!showGenerated ? (
+        <div className="grid min-h-[360px] place-items-center bg-gradient-to-br from-cyan-50 via-white to-rose-50 p-6 text-center">
+          <div className="max-w-md">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-red-100 text-brand-red-700">
+              <LayoutTemplate className="h-7 w-7" />
+            </div>
+            <p className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">Blank canvas avoided</p>
+            <h4 className="mt-2 text-2xl font-black text-slate-950">Describe the business and PARIS starts the site.</h4>
+            <p className="mt-3 text-sm font-medium leading-6 text-slate-600">The buyer sees what they are building before they ever enter the full editor.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white">
+          <div className={`relative overflow-hidden ${showBrandEdit ? 'bg-gradient-to-r from-cyan-50 via-white to-rose-50' : 'bg-gradient-to-r from-sky-50 to-cyan-50'}`}>
+            <div className="grid min-h-[220px] gap-5 p-5 md:grid-cols-[1.05fr_0.95fr] md:items-center md:p-7">
+              <div>
+                <div className="inline-flex rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-brand-red-700 shadow-sm">
+                  Indianapolis home healthcare
+                </div>
+                <h4 className="mt-4 text-3xl font-black leading-tight text-slate-950">
+                  Compassionate care that keeps families moving forward.
+                </h4>
+                <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-700">
+                  Skilled support, personal care, respite services, and simple online consultation requests.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <button type="button" className="rounded-lg bg-brand-red-700 px-4 py-2 text-xs font-black text-white">Book a consultation</button>
+                  <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-black text-slate-800">View services</button>
+                </div>
+              </div>
+              <div className="relative min-h-[170px] overflow-hidden rounded-2xl border border-white/70 bg-white shadow-lg">
+                <Image
+                  src="/images/pages/platform-page-12.webp"
+                  alt="Website preview inside the Elevate Website Builder demo"
+                  fill
+                  sizes="(max-width: 768px) 90vw, 40vw"
+                  className="object-cover object-center"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 p-5 sm:grid-cols-3">
+            {['Personal care', 'Respite support', 'Care coordination'].map((service) => (
+              <div key={service} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="h-8 w-8 rounded-lg bg-cyan-100" />
+                <div className="mt-3 text-xs font-black text-slate-900">{service}</div>
+                <div className="mt-2 h-1.5 w-full rounded bg-slate-200" />
+                <div className="mt-1.5 h-1.5 w-3/4 rounded bg-slate-200" />
+              </div>
+            ))}
+          </div>
+
+          {showBooking ? (
+            <div className="mx-5 mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-wider text-emerald-700">New conversion block added</p>
+                <p className="mt-1 text-sm font-black text-slate-950">Consultation booking is now on the homepage.</p>
+              </div>
+              <button type="button" className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-black text-white">Request appointment</button>
+            </div>
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BuilderWorkspace({ scene, setScene }: { scene: number; setScene: (scene: number) => void }) {
+  const prompt =
+    scene === 0
+      ? 'Build a professional home-healthcare website in Indianapolis with services, booking, and a strong call to action.'
+      : QUICK_COMMANDS[Math.min(Math.max(scene - 2, 0), QUICK_COMMANDS.length - 1)];
+
+  return (
+    <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-2xl shadow-slate-300/50">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:px-5">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-red-700 text-white">
+            <Sparkles className="h-4.5 w-4.5" />
+          </div>
+          <div>
+            <p className="text-sm font-black text-slate-950">Elevate Website Builder</p>
+            <p className="text-[11px] font-semibold text-emerald-700">Draft saved automatically</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={() => setScene(5)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-800 hover:bg-slate-50">
+            <Monitor className="h-3.5 w-3.5" /> Preview
+          </button>
+          <button type="button" onClick={() => setScene(6)} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-red-700 px-3 py-2 text-xs font-black text-white hover:bg-brand-red-800">
+            <Rocket className="h-3.5 w-3.5" /> Publish
+          </button>
+        </div>
+      </div>
+
+      <div className="grid lg:grid-cols-[190px_minmax(0,1fr)_260px]">
+        <aside className="hidden border-r border-slate-200 bg-slate-50 p-3 lg:block">
+          <p className="px-2 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Build</p>
+          {[
+            { label: 'Pages', icon: LayoutTemplate, target: 1 },
+            { label: 'Brand', icon: Palette, target: 3 },
+            { label: 'SEO', icon: Search, target: 4 },
+            { label: 'Mobile', icon: Smartphone, target: 5 },
+          ].map(({ label, icon: Icon, target }) => (
+            <button
+              key={label}
+              type="button"
+              onClick={() => setScene(target)}
+              className={`mb-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-black transition ${scene === target ? 'bg-white text-brand-red-700 shadow-sm' : 'text-slate-700 hover:bg-white'}`}
+            >
+              <Icon className="h-4 w-4" /> {label}
+            </button>
+          ))}
+        </aside>
+
+        <div className="min-w-0 bg-slate-100 p-3 sm:p-4">
+          <SitePreview scene={scene} />
+        </div>
+
+        <aside className="border-t border-slate-200 bg-white p-4 lg:border-l lg:border-t-0">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-800">
+              <Bot className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-950">PARIS</p>
+              <p className="text-[11px] font-semibold text-slate-500">Build by voice or text</p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl bg-slate-100 p-3 text-xs font-semibold leading-5 text-slate-700">
+            {prompt}
+          </div>
+
+          <div className="mt-3 flex items-center gap-2 rounded-xl border border-slate-300 bg-white p-2">
+            <button type="button" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-800" aria-label="Use voice command">
+              <Mic className="h-4 w-4" />
+            </button>
+            <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-500">Tell PARIS what to change…</span>
+            <button type="button" onClick={() => setScene(Math.min(scene + 1, SCENES.length - 1))} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-red-700 text-white" aria-label="Send demo command">
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            {QUICK_COMMANDS.map((command, index) => (
+              <button
+                key={command}
+                type="button"
+                onClick={() => setScene(Math.min(index + 2, 5))}
+                className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left text-[11px] font-bold text-slate-700 hover:border-cyan-300 hover:bg-cyan-50"
+              >
+                <span>{command}</span>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+              </button>
+            ))}
+          </div>
+
+          {scene >= 1 ? (
+            <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-[11px] font-black text-emerald-800">
+              <Check className="h-3.5 w-3.5" /> Changes saved to this draft
+            </div>
+          ) : null}
+        </aside>
+      </div>
+    </div>
+  );
 }
 
 export default function WebsiteBuilderCommercial() {
@@ -56,248 +243,77 @@ export default function WebsiteBuilderCommercial() {
 
   useEffect(() => {
     if (playing) return;
-    const timer = window.setInterval(() => {
-      setScene((current) => (current + 1) % SCENES.length);
-    }, 4200);
+    const timer = window.setInterval(() => setScene((current) => (current + 1) % SCENES.length), 5200);
     return () => window.clearInterval(timer);
   }, [playing]);
 
-  const sceneLabel = SCENES[scene]?.label ?? SCENES[0].label;
-  const percent = Math.max(0, Math.min(100, progress));
   const narrated = useMemo(() => !voiceError, [voiceError]);
 
   async function togglePlayback() {
     const audio = audioRef.current;
     if (!audio) return;
-
     try {
-      if (audio.paused) {
-        await audio.play();
-      } else {
-        audio.pause();
-      }
+      if (audio.paused) await audio.play();
+      else audio.pause();
     } catch {
       setVoiceError(true);
       setPlaying(false);
     }
   }
 
-  function renderScene() {
-    if (scene === 0) {
-      return (
-        <div className="grid h-full place-items-center px-5 text-center sm:px-10">
-          <div>
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10">
-              <Globe2 className="h-8 w-8" />
-            </div>
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.28em] text-cyan-300">Running a business is already a full-time job</p>
-            <h3 className="mx-auto mt-3 max-w-3xl text-3xl font-black tracking-tight sm:text-5xl">
-              Your website should not become another one.
-            </h3>
-            <div className="mx-auto mt-6 flex max-w-lg items-center justify-center gap-3 text-sm text-slate-300">
-              <span className="rounded-full border border-white/15 px-3 py-2">No blank canvas</span>
-              <span className="rounded-full border border-white/15 px-3 py-2">No code</span>
-              <span className="rounded-full border border-white/15 px-3 py-2">No guessing</span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (scene === 1) {
-      return (
-        <div className="grid h-full gap-5 p-5 sm:grid-cols-[0.8fr_1.2fr] sm:p-8">
-          <div className="flex flex-col justify-center rounded-3xl border border-white/10 bg-white/5 p-6">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-red-600 shadow-xl shadow-brand-red-950/30">
-              <Bot className="h-7 w-7" />
-            </div>
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Meet PARIS</p>
-            <h3 className="mt-2 text-3xl font-black">Tell her what you want.</h3>
-            <p className="mt-3 leading-7 text-slate-300">PARIS turns the conversation into a working website draft instead of sending you back to a pile of settings.</p>
-          </div>
-          <div className="flex flex-col justify-center rounded-3xl bg-white p-5 text-slate-950 shadow-2xl">
-            <div className="rounded-2xl bg-slate-100 p-4 text-sm font-semibold">“Build a professional website for my healthcare business. I need services, booking, and a strong call to action.”</div>
-            <div className="mt-4 flex items-center gap-3 rounded-2xl border border-slate-200 p-4">
-              <Sparkles className="h-5 w-5 text-brand-red-700" />
-              <div>
-                <p className="font-black">PARIS is building…</p>
-                <div className="mt-2 flex gap-1">
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.2s]" />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400 [animation-delay:-0.1s]" />
-                  <span className="h-2 w-2 animate-bounce rounded-full bg-slate-400" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (scene === 2) {
-      return (
-        <div className="grid h-full place-items-center p-5 sm:p-8">
-          <div className="w-full max-w-4xl rounded-3xl border border-white/10 bg-white/5 p-5 sm:p-7">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Talk or type</p>
-                <h3 className="mt-2 text-3xl font-black">Build by conversation.</h3>
-              </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-950/30">
-                <Mic className="h-6 w-6 animate-pulse" />
-              </div>
-            </div>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {['Make it more professional.', 'Change the colors.', 'Add online booking.', 'Rewrite my services.'].map((text, index) => (
-                <div key={text} className="translate-y-0 rounded-2xl border border-white/10 bg-slate-950/70 p-4 font-semibold transition hover:-translate-y-1 hover:border-cyan-400/50" style={{ transitionDelay: `${index * 80}ms` }}>
-                  “{text}”
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (scene === 3) {
-      return (
-        <div className="grid h-full gap-4 p-5 sm:grid-cols-2 sm:p-8">
-          <div className="rounded-3xl bg-white p-5 text-slate-950 shadow-2xl">
-            <div className="flex gap-2 border-b border-slate-200 pb-3">
-              <span className="h-3 w-3 rounded-full bg-slate-300" />
-              <span className="h-3 w-3 rounded-full bg-slate-300" />
-              <span className="h-3 w-3 rounded-full bg-slate-300" />
-            </div>
-            <div className="mt-5 h-20 rounded-2xl bg-slate-950 p-4 text-white">
-              <div className="h-3 w-36 animate-pulse rounded bg-white/80" />
-              <div className="mt-3 h-2 w-56 animate-pulse rounded bg-white/40" />
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-3">
-              {[1, 2, 3].map((item) => <div key={item} className="h-20 rounded-xl bg-slate-100" />)}
-            </div>
-          </div>
-          <div className="flex flex-col justify-center rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">It keeps building</p>
-            <h3 className="mt-2 text-3xl font-black">PARIS stays with the user.</h3>
-            <p className="mt-3 leading-7 text-slate-300">The first draft is only the beginning. The customer keeps talking, PARIS keeps changing the saved site, and the preview keeps moving with them.</p>
-            <div className="mt-5 flex items-center gap-2 text-sm font-bold text-emerald-300"><Check className="h-4 w-4" /> Changes saved to the draft</div>
-          </div>
-        </div>
-      );
-    }
-
-    if (scene === 4) {
-      return (
-        <div className="h-full p-5 sm:p-8">
-          <div className="mx-auto max-w-5xl text-center">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">The website is only the beginning</p>
-            <h3 className="mt-2 text-3xl font-black sm:text-4xl">Upgrade the business from the same journey.</h3>
-          </div>
-          <div className="mx-auto mt-6 grid max-w-5xl grid-cols-2 gap-3 sm:grid-cols-3">
-            {UPGRADES.map(({ icon: Icon, label }, index) => (
-              <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:scale-[1.03] hover:bg-white/10" style={{ transitionDelay: `${index * 60}ms` }}>
-                <Icon className="h-5 w-5 text-cyan-300" />
-                <p className="mt-3 font-black">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    if (scene === 5) {
-      return (
-        <div className="grid h-full place-items-center p-5 sm:p-8">
-          <div className="w-full max-w-4xl overflow-hidden rounded-3xl border border-cyan-400/30 bg-cyan-400/10 p-6 sm:p-8">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">14-day trial</p>
-                <h3 className="mt-2 text-4xl font-black">Try the whole experience.</h3>
-                <p className="mt-3 max-w-2xl leading-7 text-slate-200">One website, up to five pages, publishing on an Elevate web address, limited previews of the upgrade tools, and a shared pool of 500 AI credits.</p>
-              </div>
-              <div className="min-w-44 rounded-3xl bg-white p-5 text-center text-slate-950 shadow-2xl">
-                <p className="text-5xl font-black">500</p>
-                <p className="mt-1 text-sm font-black uppercase tracking-widest text-slate-500">trial credits</p>
-              </div>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-2 text-xs font-bold text-slate-100">
-              {['PARIS', 'Marketing', 'Grant Writer', 'Images', 'Video', 'Courses', 'AI Team'].map((item) => <span key={item} className="rounded-full border border-white/15 bg-slate-950/40 px-3 py-2">{item}</span>)}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (scene === 6) {
-      return (
-        <div className="grid h-full gap-5 p-5 sm:grid-cols-[1.1fr_0.9fr] sm:p-8">
-          <div className="flex flex-col justify-center rounded-3xl border border-white/10 bg-white/5 p-6">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Publish when ready</p>
-            <h3 className="mt-2 text-4xl font-black">Start small. Add power as the business grows.</h3>
-            <p className="mt-3 leading-7 text-slate-300">Use an Elevate web address during the trial. Upgrade for custom domains, more sites, more credits, additional assistants, advanced automation, and premium business tools.</p>
-          </div>
-          <div className="flex items-center justify-center rounded-3xl bg-white p-6 text-slate-950 shadow-2xl">
-            <div className="w-full rounded-2xl border border-slate-200 p-5">
-              <div className="flex items-center gap-2 font-black"><Globe2 className="h-5 w-5 text-brand-red-700" /> mybusiness.app.elevateforhumanity.org</div>
-              <div className="mt-5 h-3 w-full rounded-full bg-slate-100"><div className="h-3 w-4/5 rounded-full bg-emerald-500" /></div>
-              <p className="mt-3 text-sm font-semibold text-slate-600">Preview complete. Ready to publish.</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid h-full place-items-center px-5 text-center sm:px-10">
-        <div>
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-red-600 shadow-2xl shadow-brand-red-950/30">
-            <Rocket className="h-8 w-8" />
-          </div>
-          <p className="mt-5 text-xs font-black uppercase tracking-[0.28em] text-cyan-300">Start with a conversation</p>
-          <h3 className="mx-auto mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">Build with PARIS. Build with Elevate.</h3>
-          <Link href="/apps/website-builder/start-trial" className="mt-7 inline-flex items-center rounded-2xl bg-white px-7 py-4 font-black text-slate-950 transition hover:scale-105">
-            Start the 14-day trial
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <section className="border-y border-slate-800 bg-slate-950 px-4 py-14 text-white sm:py-18">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <section className="border-y border-cyan-100 bg-gradient-to-b from-cyan-50 via-white to-rose-50 px-4 py-14 text-slate-950 sm:py-16">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-300">Website Builder Commercial</p>
-            <h2 className="mt-2 text-3xl font-black sm:text-4xl">Watch the builder sell itself.</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">A live animated demo with a natural AI voiceover. The visuals continue even when sound is off.</p>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-brand-red-700">Interactive Website Builder Demo</p>
+            <h2 className="mt-2 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">See the builder. Click the controls. Hear the commercial.</h2>
+            <p className="mt-3 max-w-3xl text-sm font-semibold leading-7 text-slate-700 sm:text-base">
+              This is a visual product walkthrough, not a slide deck. Move through the builder workspace, change the preview, use PARIS commands, switch to mobile, and walk the site all the way to publish.
+            </p>
           </div>
-          <button type="button" onClick={togglePlayback} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 font-black text-white hover:bg-brand-red-700">
-            {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            {playing ? 'Pause commercial' : 'Play commercial with voice'}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={togglePlayback} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white shadow-sm hover:bg-brand-red-800">
+              {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+              {playing ? 'Pause narration' : 'Play with natural voice'}
+            </button>
+            <Link href="/apps/website-builder/start-trial" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-5 font-black text-slate-950 hover:bg-slate-50">
+              Try the real builder
+            </Link>
+          </div>
         </div>
 
-        <div className="relative min-h-[470px] overflow-hidden rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.16),_transparent_35%),linear-gradient(135deg,#020617,#0f172a_55%,#111827)] shadow-2xl sm:min-h-[520px]">
-          <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-brand-red-600/10 blur-3xl" />
-          <div className="pointer-events-none absolute -right-16 bottom-10 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="mb-4 flex gap-2 overflow-x-auto pb-1" aria-label="Website Builder demo steps">
+          {SCENES.map((item, index) => (
+            <button
+              key={item.label}
+              type="button"
+              aria-pressed={scene === index}
+              onClick={() => {
+                setScene(index);
+                setPlaying(false);
+                audioRef.current?.pause();
+              }}
+              className={`shrink-0 rounded-full border px-4 py-2 text-xs font-black transition ${scene === index ? 'border-brand-red-700 bg-brand-red-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-cyan-400 hover:bg-cyan-50'}`}
+            >
+              {index + 1}. {item.label}
+            </button>
+          ))}
+        </div>
 
-          <div key={scene} className="relative z-10 h-full min-h-[470px] animate-[commercialFade_.45s_ease-out] sm:min-h-[520px]">
-            {renderScene()}
+        <BuilderWorkspace scene={scene} setScene={setScene} />
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-xs font-bold text-slate-600">
+            {narrated ? 'Natural voice narration available' : 'Visual demo mode'} · Step {scene + 1} of {SCENES.length}
           </div>
-
-          <div className="absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-slate-950/85 px-4 py-3 backdrop-blur sm:px-6">
-            <div className="flex items-center justify-between gap-4 text-xs font-bold text-slate-300">
-              <span>{sceneLabel}</span>
-              <span>{narrated ? 'Natural voice narration' : 'Visual demo mode'}</span>
-            </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-              <div className="h-full rounded-full bg-cyan-400 transition-[width] duration-300" style={{ width: `${playing ? percent : ((scene + 1) / SCENES.length) * 100}%` }} />
-            </div>
+          <div className="h-2 w-full max-w-md overflow-hidden rounded-full bg-slate-200">
+            <div className="h-full rounded-full bg-cyan-500 transition-[width] duration-300" style={{ width: `${playing ? Math.max(0, Math.min(100, progress)) : ((scene + 1) / SCENES.length) * 100}%` }} />
           </div>
         </div>
 
         {voiceError ? (
-          <p className="mt-3 text-sm font-semibold text-amber-300">The visual commercial is still available. Natural narration will play when the configured voice service is available.</p>
+          <p className="mt-3 text-sm font-semibold text-amber-800">The click-through visual demo remains available. Narration will resume when the configured voice service is available.</p>
         ) : null}
 
         <audio
@@ -306,8 +322,15 @@ export default function WebsiteBuilderCommercial() {
           src="/api/store/website-builder/commercial-voice"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          onEnded={() => { setPlaying(false); setProgress(100); setScene(SCENES.length - 1); }}
-          onError={() => { setVoiceError(true); setPlaying(false); }}
+          onEnded={() => {
+            setPlaying(false);
+            setProgress(100);
+            setScene(SCENES.length - 1);
+          }}
+          onError={() => {
+            setVoiceError(true);
+            setPlaying(false);
+          }}
           onTimeUpdate={(event) => {
             const audio = event.currentTarget;
             setScene(sceneFromTime(audio.currentTime));
@@ -315,13 +338,6 @@ export default function WebsiteBuilderCommercial() {
           }}
         />
       </div>
-
-      <style jsx>{`
-        @keyframes commercialFade {
-          from { opacity: 0; transform: translateY(10px) scale(.995); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
     </section>
   );
 }

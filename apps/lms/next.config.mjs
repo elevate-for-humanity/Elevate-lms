@@ -1,4 +1,5 @@
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
+import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -21,6 +22,13 @@ const nextConfig = {
   },
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  async rewrites() {
+    return {
+      beforeFiles: legacyImageRewrites(),
+      afterFiles: [],
+      fallback: [],
+    };
   },
   async redirects() {
     return [

@@ -4,11 +4,10 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
-import type { UserRole } from '@/types/database';
+import { normalizeRole, type UserRole } from '@/lib/rbac/role-matrix';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -27,6 +26,12 @@ export function createBuildTimeSupabaseClient() {
 // SERVER-SIDE AUTH
 // =====================================================
 
+/**
+ * Server Supabase client using the current @supabase/ssr cookie contract.
+ * Middleware owns request-boundary refreshes for Admin/LMS. Route handlers can
+ * persist refreshed cookies through setAll; Server Components may reject writes,
+ * which is expected after middleware has synchronized the request.
+ */
 export async function createServerSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -42,51 +47,49 @@ export async function createServerSupabaseClient() {
 
   return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.get(name)?.value;
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        } catch {
+          // Expected in Server Components. Middleware propagates refreshed
+          // cookies before protected Admin/LMS pages execute.
+        }
       },
     },
   });
 }
 
-// Alias for compatibility with old code using createRouteHandlerClient
-// Old API: createRouteHandlerClient({ cookies })
-// New API: createServerSupabaseClient() - cookies are handled internally
 export async function createRouteHandlerClient(_options?: Record<string, any>) {
   return await createServerSupabaseClient();
 }
 
 export async function getSession() {
   const supabase = await createServerSupabaseClient();
-
-  if (!supabase) {
-    return null;
-  }
+  if (!supabase) return null;
 
   try {
-    // Use getUser() instead of getSession() — getUser() validates the JWT
-    // with the Supabase server, while getSession() only reads from cookies
-    // and can be spoofed.
     const {
       data: { user },
       error,
     } = await supabase.auth.getUser();
 
     if (error || !user) {
-      // AuthSessionMissingError is expected for unauthenticated visitors — don't log as error
       if (error && error.name !== 'AuthSessionMissingError') {
         logger.error('Error getting session', error as Error);
       }
       return null;
     }
 
-    // Reconstruct a session-like object for backward compatibility
     const {
       data: { session },
     } = await supabase.auth.getSession();
     if (session) return session;
 
-    // If getUser succeeds but getSession doesn't, build a minimal session
     return {
       user,
       access_token: '',
@@ -95,7 +98,6 @@ export async function getSession() {
       token_type: 'bearer' as const,
     } as any;
   } catch (error) {
-    // Don't log auth session errors — they're expected for unauthenticated visitors
     const errName = (error as any)?.name || '';
     if (errName !== 'AuthSessionMissingError') {
       logger.error('Exception getting session', error as Error);
@@ -130,7 +132,7 @@ export async function getCurrentUser() {
 
 export async function getUserRole(): Promise<UserRole | null> {
   const user = await getCurrentUser();
-  return user?.profile?.role || null;
+  return normalizeRole(user?.profile?.role);
 }
 
 // =====================================================
@@ -158,19 +160,19 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       .eq('id', session.user.id)
       .maybeSingle();
 
-    if (!profile) return null;
+    const role = normalizeRole(profile?.role);
+    if (!profile || !role) return null;
 
     return {
       id: session.user.id,
       email: session.user.email || '',
-      role: profile.role as UserRole,
+      role,
       full_name:
         profile.first_name && profile.last_name
           ? `${profile.first_name} ${profile.last_name}`
           : undefined,
     };
   } catch (error) {
-    /* Error handled silently */
     logger.error('Error getting auth user', error as Error);
     return null;
   }
@@ -180,9 +182,6 @@ export async function getAuthUser(): Promise<AuthUser | null> {
 // ROLE CHECKING
 // =====================================================
 
-/**
- * Custom error class for API authentication failures
- */
 export class APIAuthError extends Error {
   constructor(message: string = 'Auth session missing!') {
     super(message);
@@ -190,26 +189,16 @@ export class APIAuthError extends Error {
   }
 }
 
-/**
- * Require auth for API routes - throws APIAuthError instead of redirecting
- * Use this in API routes instead of requireAuth()
- */
 export async function requireApiAuth() {
   const session = await getSession();
-  if (!session) {
-    throw new APIAuthError('Auth session missing!');
-  }
+  if (!session) throw new APIAuthError('Auth session missing!');
   return session;
 }
 
-/**
- * Require auth for pages - redirects to login if not authenticated
- */
 export async function requireAuth(redirectTo?: string, loginBase?: string) {
   const session = await getSession();
   if (!session) {
-    const base =
-      loginBase ?? process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
+    const base = loginBase ?? process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
     const loginUrl = redirectTo
       ? `${base}/login?redirect=${encodeURIComponent(redirectTo)}`
       : `${base}/login`;
@@ -219,13 +208,12 @@ export async function requireAuth(redirectTo?: string, loginBase?: string) {
 }
 
 export async function requireRole(
-  allowedRoles: UserRole | UserRole[],
+  allowedRoles: UserRole | readonly UserRole[],
   redirectTo?: string,
   loginBase?: string,
 ) {
   const session = await requireAuth(redirectTo, loginBase);
   const role = await getUserRole();
-
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
   if (!role || !roles.includes(role)) {
@@ -240,8 +228,6 @@ export async function requireStudent() {
 }
 
 export async function requireAdmin() {
-  // Admin app has its own /login page — redirect there, not the main site login.
-  // Role set must match ADMIN_ROLES in lib/rbac/role-matrix.ts, admin-login route, and admin layout.
   const adminUrl = getAdminUrl();
   return requireRole(['admin', 'super_admin', 'staff', 'org_admin'], '/admin/dashboard', adminUrl);
 }
@@ -266,41 +252,34 @@ export async function canAccessStudent(studentId: string): Promise<boolean> {
   const user = await getCurrentUser();
   if (!user) return false;
 
-  const role = user.profile?.role;
+  const role = normalizeRole(user.profile?.role);
+  if (role === 'admin' || role === 'super_admin') return true;
+  if (role === 'student' || role === 'learner') return user.id === studentId;
 
-  // Admins can access all students
-  if (role === 'admin') return true;
+  const supabase = await createServerSupabaseClient();
+  if (!supabase) return false;
 
-  // Students can only access their own data
-  if (role === 'student') {
-    return user.id === studentId;
-  }
-
-  // Delegates can access their assigned students
+  // program_enrollments identifies learners by user_id. Historical helpers
+  // queried a nonexistent student_id column and silently denied valid access.
   if (role === 'delegate') {
-    const supabase = await createServerSupabaseClient();
-    if (!supabase) return false;
-
-    const { data }: any = await supabase
+    const { data } = await supabase
       .from('program_enrollments')
       .select('id')
-      .eq('student_id', studentId)
+      .eq('user_id', studentId)
       .eq('delegate_id', user.id)
+      .limit(1)
       .maybeSingle();
 
     return !!data;
   }
 
-  // Program holders can access their enrolled students
   if (role === 'program_holder') {
-    const supabase = await createServerSupabaseClient();
-    if (!supabase) return false;
-
-    const { data }: any = await supabase
+    const { data } = await supabase
       .from('program_enrollments')
       .select('id')
-      .eq('student_id', studentId)
+      .eq('user_id', studentId)
       .eq('program_holder_id', user.profile.id)
+      .limit(1)
       .maybeSingle();
 
     return !!data;
@@ -316,7 +295,6 @@ export async function canAccessEnrollment(enrollmentId: string): Promise<boolean
   const supabase = await createServerSupabaseClient();
   if (!supabase) return false;
 
-  // program_enrollments has no student_id column — identity is user_id
   const { data: enrollment } = await supabase
     .from('program_enrollments')
     .select('user_id, delegate_id, program_holder_id')
@@ -325,18 +303,10 @@ export async function canAccessEnrollment(enrollmentId: string): Promise<boolean
 
   if (!enrollment) return false;
 
-  const role = user.profile?.role;
-
-  // Admins can access all enrollments
-  if (role === 'admin') return true;
-
-  // Students can access their own enrollments
-  if (role === 'student' && enrollment.user_id === user.id) return true;
-
-  // Delegates can access their assigned enrollments
+  const role = normalizeRole(user.profile?.role);
+  if (role === 'admin' || role === 'super_admin') return true;
+  if ((role === 'student' || role === 'learner') && enrollment.user_id === user.id) return true;
   if (role === 'delegate' && enrollment.delegate_id === user.id) return true;
-
-  // Program holders can access their enrollments
   if (role === 'program_holder' && enrollment.program_holder_id === user.profile.id) return true;
 
   return false;
@@ -348,7 +318,7 @@ export async function canAccessEnrollment(enrollmentId: string): Promise<boolean
 
 export async function signOut() {
   const supabase = await createServerSupabaseClient();
-  await supabase.auth.signOut();
+  if (supabase) await supabase.auth.signOut();
   const mainSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
   redirect(`${mainSiteUrl}/login`);
 }

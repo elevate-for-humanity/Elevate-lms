@@ -39,8 +39,8 @@ async function auditEmail(
     error_message: params.error || null,
     error: params.error || null,
     sent_at: params.success ? new Date().toISOString() : null,
-    details: { application_id: params.applicationId, application_type: 'program_holder', event: 'denied' },
-    metadata: { application_id: params.applicationId, application_type: 'program_holder', event: 'denied' },
+    details: { application_id: params.applicationId, application_type: 'program_holder', event: 'rejected' },
+    metadata: { application_id: params.applicationId, application_type: 'program_holder', event: 'rejected' },
   }).then(({ error }) => {
     if (error) logger.warn('[program-holder/deny] email audit failed', { error: error.message });
   });
@@ -76,12 +76,12 @@ export async function POST(
     const { error: updateError } = await db
       .from('program_holder_applications')
       .update({
-        status: 'denied',
+        status: 'rejected',
         data: {
           ...existingData,
-          denied_at: now,
-          denied_by: adminUser.id,
-          denial_reason: reason || null,
+          rejected_at: now,
+          rejected_by: adminUser.id,
+          rejection_reason: reason || null,
         },
         updated_at: now,
       })
@@ -108,15 +108,15 @@ export async function POST(
       if (!result.success) {
         await db.from('staff_notifications').insert({
           type: 'program_holder_denial_email_failed',
-          title: `Program Holder denial email failed: ${application.organization_name}`,
-          message: `Application ${id} was denied, but the applicant email to ${email} failed: ${result.error || 'unknown error'}`,
+          title: `Program Holder rejection email failed: ${application.organization_name}`,
+          message: `Application ${id} was rejected, but the applicant email to ${email} failed: ${result.error || 'unknown error'}`,
           severity: 'error',
           metadata: { application_id: id, email, error: result.error || null },
         });
       }
     }
 
-    return NextResponse.json({ success: true, applicationId: id, emailStatus });
+    return NextResponse.json({ success: true, applicationId: id, status: 'rejected', emailStatus });
   } catch (error) {
     logger.error('[admin/program-holder/deny] failed', error instanceof Error ? error : undefined);
     return NextResponse.json(

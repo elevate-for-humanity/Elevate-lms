@@ -4,7 +4,8 @@
  * Copy/configuration is loaded from public/data/hero-banners.json. Video media
  * is resolved through lib/video/registry so pages cannot silently reuse the
  * same generic hero film. Raw banner videos are accepted only when the URL is
- * unique across the banner dataset; otherwise the page receives a picture.
+ * unique across the banner dataset; otherwise the page receives a relevant
+ * picture fallback.
  */
 
 import { loadJsonOnce } from '@/lib/data/json-cache';
@@ -65,7 +66,68 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   'micro-programs': '/images/micro-classes-hero.webp',
   'skilled-trades': '/images/hero/hero-skilled-trades.webp',
   'home-health-aide': '/images/healthcare/hero-program-patient-care.webp',
+  learner: '/images/pages/training-classroom.webp',
+  mission: '/images/pages/about-hero.webp',
+  partners: '/images/pages/business-meeting.webp',
+  training: '/images/pages/workforce-training.webp',
+  jri: '/images/pages/admin-wioa-hero.webp',
+  'about-team': '/images/pages/business-meeting.webp',
+  'about-partners': '/images/pages/admin-campaigns-hero.webp',
+  blog: '/images/pages/admin-videos-hero.webp',
+  'career-services': '/images/pages/training-classroom.webp',
+  careers: '/images/pages/workforce-training.webp',
+  contact: '/images/pages/about-supportive-services.webp',
+  funding: '/images/pages/admin-wioa-hero.webp',
+  pricing: '/images/heroes/lms-analytics.webp',
+  'program-holder': '/images/pages/business-meeting.webp',
+  'student-support': '/images/pages/about-supportive-services.webp',
+  employer: '/images/pages/business-meeting.webp',
+  'for-employers': '/images/pages/admin-campaigns-hero.webp',
+  'for-students': '/images/pages/training-classroom.webp',
+  'workforce-partners': '/images/pages/business-meeting.webp',
+  'apprenticeship-sponsor': '/images/pages/apprenticeship-structure.webp',
 };
+
+/**
+ * Last-resort picture selection for banners that only had a duplicated generic
+ * video. These are intentionally topical rather than one universal fallback so
+ * the page still looks like its subject when the video is removed.
+ */
+function topicalPictureForKey(key: string): string {
+  const value = key.toLowerCase();
+
+  if (/barber|cosmet|esthetic|nail|salon|beauty/.test(value)) {
+    return '/images/pages/barber-apprenticeship-hero.jpg';
+  }
+  if (/cna|medical|health|phleb|pharm|patient|cpr|emt|dental|dsp|recovery|peer|care/.test(value)) {
+    return '/images/pages/healthcare-hero.webp';
+  }
+  if (/hvac|electr|weld|plumb|construction|building|forklift|solar|manufactur|trade/.test(value)) {
+    return '/images/hero/hero-skilled-trades.webp';
+  }
+  if (/cyber|technology|tech|software|web|network|it-|digital|ai-/.test(value)) {
+    return '/images/pages/programs-it-hero.webp';
+  }
+  if (/business|bookkeep|tax|administrat|entrepreneur|finance|office|project|insurance/.test(value)) {
+    return '/images/business/team-4.webp';
+  }
+  if (/hospital|guest|servsafe|food|culinary/.test(value)) {
+    return '/images/pages/comp-layout-hero.webp';
+  }
+  if (/fund|wioa|grant|financial|workforce|partner|employer|agency|provider/.test(value)) {
+    return '/images/pages/admin-wioa-hero.webp';
+  }
+  if (/student|learner|career|training|course|credential|certif|pathway|enroll|support/.test(value)) {
+    return '/images/pages/training-classroom.webp';
+  }
+  if (/about|mission|founder|impact|team|community|volunteer|donate/.test(value)) {
+    return '/images/pages/about-hero.webp';
+  }
+  if (/news|press|blog|event|media/.test(value)) {
+    return '/images/pages/admin-campaigns-hero.webp';
+  }
+  return '/images/pages/workforce-training.webp';
+}
 
 function mediaKey(value?: string): string | undefined {
   if (!value) return undefined;
@@ -90,9 +152,9 @@ function buildRawVideoUseCounts(raw: Record<string, RawHeroBannerConfig>) {
   return counts;
 }
 
-function uniquePictureFor(key: string, banner: RawHeroBannerConfig): string | undefined {
+function pictureFor(key: string, banner: RawHeroBannerConfig): string {
   if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
-  return PAGE_PICTURE_OVERRIDES[key] ?? banner.posterImage;
+  return PAGE_PICTURE_OVERRIDES[key] ?? banner.posterImage ?? topicalPictureForKey(key);
 }
 
 function normalizeMedia(
@@ -102,17 +164,15 @@ function normalizeMedia(
   rawVideoUseCounts: Map<string, number>,
 ): HeroBannerConfig {
   const registryVideo = getHeroVideoForPageKey(key);
-  const picture = uniquePictureFor(key, banner) ?? registryVideo?.thumbnail_url;
+  const picture = pictureFor(key, banner);
 
-  // A registry assignment always wins. It is the explicit one-page/one-video
-  // contract and prevents page components from bypassing dedupe rules.
   if (registryVideo) {
     const src = getVideoCacheUrl(registryVideo);
     return {
       ...normalized,
       videoSrcDesktop: src,
       videoSrcMobile: src,
-      posterImage: picture,
+      posterImage: picture || registryVideo.thumbnail_url,
     };
   }
 
@@ -123,14 +183,12 @@ function normalizeMedia(
   const desktopUnique = Boolean(desktop && desktopKey && rawVideoUseCounts.get(desktopKey) === 1);
   const mobileUnique = Boolean(mobile && mobileKey && rawVideoUseCounts.get(mobileKey) === 1);
 
-  // Keep only page-specific raw video media. If a mobile fallback is duplicated,
-  // reuse the unique desktop film rather than showing an unrelated generic clip.
   if (desktopUnique) {
     return {
       ...normalized,
       videoSrcDesktop: desktop,
       videoSrcMobile: mobileUnique ? mobile : desktop,
-      posterImage: picture ?? normalized.posterImage,
+      posterImage: picture,
     };
   }
 
@@ -139,17 +197,15 @@ function normalizeMedia(
       ...normalized,
       videoSrcDesktop: mobile,
       videoSrcMobile: mobile,
-      posterImage: picture ?? normalized.posterImage,
+      posterImage: picture,
     };
   }
 
-  // Duplicated/unassigned videos are intentionally removed. A relevant still
-  // image is safer than showing the same generic film on unrelated pages.
   return {
     ...normalized,
     videoSrcDesktop: undefined,
     videoSrcMobile: undefined,
-    posterImage: picture ?? normalized.posterImage,
+    posterImage: picture,
   };
 }
 
@@ -178,8 +234,6 @@ function normalizeBanner(
 
   normalized = normalizeMedia(key, banner, normalized, rawVideoUseCounts);
 
-  // Preserve the current production homepage sales copy, but keep media in the
-  // canonical registry instead of hard-coding it in apps/marketing/app/page.tsx.
   if (key === 'home') {
     return {
       ...normalized,
@@ -224,7 +278,7 @@ function normalizeBanner(
         href: '/programs/barber-apprenticeship/request-info',
         variant: 'secondary',
       },
-      transcript: `The Barber Apprenticeship combines ${barber.totalHours.toLocaleString('en-US')} hours of supervised on-the-job learning with ${barber.relatedInstructionHours} hours of Related Technical Instruction. Apprentices complete documented workplace training, coursework, progress reviews, and licensing preparation through the registered program.`,
+      transcript: `The Barber Apprenticeship combines ${barber.totalHours.toLocaleString('en-US')} hours of supervised on-the-job learning with ${barber.relatedInstructionHours} hours of Related Technical Instruction. Apprentices complete documented workplace training and licensing preparation for the Indiana Barber License. The published salary range is $28,000 to $52,000.`,
     };
   }
 

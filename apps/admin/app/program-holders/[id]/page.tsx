@@ -72,7 +72,7 @@ export default async function ProgramHolderDetailPage({
     <main className="min-h-screen bg-slate-50">
       <section className="relative overflow-hidden bg-gradient-to-r from-indigo-700 via-violet-700 to-fuchsia-700 px-6 py-8 text-white">
         <div className="mx-auto max-w-6xl">
-          <Breadcrumbs dark items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Program Holders', href: '/program-holders' }, { label: displayName }]} />
+          <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Program Holders', href: '/program-holders' }, { label: displayName }]} />
           <Link href="/program-holders" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white"><ArrowLeft className="h-4 w-4" />Back to program holders</Link>
           <div className="mt-5 flex flex-wrap items-end justify-between gap-5">
             <div>

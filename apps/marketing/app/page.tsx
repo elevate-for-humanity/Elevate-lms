@@ -9,6 +9,7 @@ import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInf
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
+import { HomeFoundationPartner } from '@/components/home/HomeFoundationPartner';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 import StructuredData from '@/components/StructuredData';
@@ -61,6 +62,7 @@ export default function HomePage() {
       <StructuredData />
       <HomeHeroVideo banner={banner} />
       <MarqueeBanner />
+      <HomeFoundationPartner />
       <HomeCareerPathways />
       <HomeHowItWorks />
       <HomeFunding />

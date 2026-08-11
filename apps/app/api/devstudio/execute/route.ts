@@ -3,60 +3,25 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
+import {
+  getAITool,
+  getAIToolCatalogForPrompt,
+  listAIToolsForAgent,
+} from '@/lib/ai/tools/registry';
+import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
-import { requireTypedConfirmation, getConfirmationPhrase } from '@/lib/security/require-confirmation';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
-type CommandAction = {
-  name: string;
-  args: Record<string, unknown>;
+type PlannedCommand = {
+  tool: string | null;
+  input: Record<string, unknown>;
   explanation?: string;
+  answer?: string;
 };
-
-type ActionTarget = {
-  method: 'GET' | 'POST';
-  path: string | ((args: Record<string, unknown>) => string);
-  body?: (args: Record<string, unknown>) => Record<string, unknown>;
-};
-
-const ACTIONS: Record<string, ActionTarget> = {
-  generate_course: { method: 'POST', path: '/api/admin/courses/generate', body: (args) => args },
-  generate_video: { method: 'POST', path: '/api/video/generate', body: (args) => args },
-  run_report: { method: 'GET', path: (args) => `/api/admin/reports/${encodeURIComponent(String(args.type ?? 'overview'))}` },
-  get_analytics: { method: 'GET', path: '/api/admin/analytics' },
-  list_applications: { method: 'GET', path: '/api/admin/applications' },
-  approve_application: { method: 'POST', path: (args) => `/api/admin/applications/${encodeURIComponent(String(args.id ?? ''))}/approve`, body: (args) => args },
-  list_students: { method: 'GET', path: '/api/admin/students' },
-  list_enrollments: { method: 'GET', path: '/api/admin/enrollments' },
-  enroll_student: { method: 'POST', path: '/api/admin/enrollments', body: (args) => args },
-  issue_certificate: { method: 'POST', path: '/api/admin/certificates/bulk', body: (args) => args },
-  list_cohorts: { method: 'GET', path: '/api/admin/cohorts' },
-  list_wioa: { method: 'GET', path: '/api/admin/wioa' },
-  run_export: { method: 'GET', path: (args) => `/api/admin/export/${encodeURIComponent(String(args.type ?? 'participants'))}` },
-  list_programs: { method: 'GET', path: '/api/admin/programs' },
-  flag_at_risk: { method: 'POST', path: '/api/admin/at-risk/flag', body: (args) => args },
-  send_reminder: { method: 'POST', path: '/api/admin/send-reminder', body: (args) => args },
-  list_payout_queue: { method: 'GET', path: '/api/admin/enrollments/payout-queue' },
-  mark_payout_paid: { method: 'POST', path: '/api/admin/enrollments/mark-payout-paid', body: (args) => args },
-  send_document_for_sign: { method: 'POST', path: '/api/admin/sign-documents/send', body: (args) => args },
-  send_test_email: { method: 'POST', path: '/api/admin/test-email', body: (args) => args },
-  check_system_health: { method: 'GET', path: '/api/admin/platform-health' },
-  build_courses: { method: 'POST', path: '/api/autopilots/build-courses', body: (args) => args },
-  deploy_autopilot: { method: 'POST', path: '/api/autopilots/deploy', body: (args) => args },
-  run_tests: { method: 'POST', path: '/api/autopilots/run-tests', body: (args) => args },
-  manage_app_trial: { method: 'POST', path: '/api/apps/trial/start', body: (args) => args },
-  run_migration: { method: 'POST', path: '/api/admin/migrations/run', body: (args) => args },
-  apply_all_pending_migrations: { method: 'POST', path: '/api/admin/migrations/apply-all', body: (args) => args },
-  rollback: { method: 'POST', path: '/api/admin/migrations/rollback', body: (args) => args },
-  send_bulk_email: { method: 'POST', path: '/api/admin/email/bulk', body: (args) => args },
-  git_push: { method: 'POST', path: '/api/devstudio/git/push', body: (args) => args },
-};
-
-const ALLOWED_ACTIONS = [...Object.keys(ACTIONS), 'ask_question'] as const;
 
 function sseLine(text: string): Uint8Array {
   return new TextEncoder().encode(`data: ${JSON.stringify({ line: text })}\n\n`);
@@ -69,12 +34,13 @@ function asRecord(value: unknown): Record<string, unknown> {
     ? value as Record<string, unknown>
     : {};
 }
-
+function extractUuid(text: string): string | null {
+  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
+}
 function extractJsonObject(text: string): Record<string, unknown> | null {
   const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
   try {
-    const direct = JSON.parse(cleaned);
-    return asRecord(direct);
+    return asRecord(JSON.parse(cleaned));
   } catch {
     const first = cleaned.indexOf('{');
     const last = cleaned.lastIndexOf('}');
@@ -87,27 +53,39 @@ function extractJsonObject(text: string): Record<string, unknown> | null {
   }
 }
 
-function heuristicAction(command: string): CommandAction | null {
+function heuristicPlan(command: string): PlannedCommand | null {
   const lower = command.toLowerCase();
-  if (/health|system status|platform status/.test(lower)) return { name: 'check_system_health', args: {} };
-  if (/list|show/.test(lower) && /application/.test(lower)) return { name: 'list_applications', args: {} };
-  if (/list|show/.test(lower) && /student/.test(lower)) return { name: 'list_students', args: {} };
-  if (/list|show/.test(lower) && /enrollment/.test(lower)) return { name: 'list_enrollments', args: {} };
-  if (/list|show/.test(lower) && /program/.test(lower)) return { name: 'list_programs', args: {} };
-  if (/payout/.test(lower) && /queue|pending|list/.test(lower)) return { name: 'list_payout_queue', args: {} };
-  if (/run.*test|test.*platform/.test(lower)) return { name: 'run_tests', args: {} };
+  const id = extractUuid(command);
+
+  if (/health|system status|platform status/.test(lower)) return { tool: 'system.health', input: {} };
+  if (/\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower)) return { tool: 'applications.search', input: {} };
+  if (/\bapprove\b.*\bapplication\b/.test(lower)) return { tool: 'applications.approve', input: id ? { id } : {} };
+  if (/\b(list|show|find|search)\b.*\bstudents?\b/.test(lower)) return { tool: 'students.search', input: {} };
+  if (/\b(list|show|find|search)\b.*\benrollments?\b/.test(lower)) return { tool: 'enrollments.search', input: {} };
+  if (/\b(list|show|find)\b.*\bprograms?\b/.test(lower)) return { tool: 'programs.list', input: {} };
+  if (/\banalytics|metrics\b/.test(lower)) return { tool: 'analytics.read', input: {} };
+  if (/\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)) return { tool: 'payouts.list', input: {} };
+  if (/\bmark\b.*\bpayout\b.*\bpaid\b/.test(lower)) return { tool: 'payouts.markPaid', input: id ? { enrollmentId: id } : {} };
+  if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) return { tool: 'courses.generate', input: { prompt: command } };
+  if (/\brun\b.*\btests?\b/.test(lower)) return { tool: 'workflows.runTests', input: {} };
+  if (/\bdeploy\b/.test(lower)) return { tool: 'deployments.autopilot', input: {} };
+  if (/\bapply\b.*\ball\b.*\bmigrations?\b/.test(lower)) return { tool: 'migrations.applyAll', input: {} };
+  if (/\brollback\b.*\bmigration/.test(lower)) return { tool: 'migrations.rollback', input: {} };
+  if (/\brun\b.*\bmigration/.test(lower)) return { tool: 'migrations.run', input: {} };
+  if (/\bgit\b.*\bpush\b|\bpush\b.*\bbranch\b/.test(lower)) return { tool: 'devstudio.gitPush', input: {} };
   return null;
 }
 
-async function classifyCommand(command: string): Promise<CommandAction> {
-  const heuristic = heuristicAction(command);
+async function classifyCommand(command: string): Promise<PlannedCommand> {
+  const heuristic = heuristicPlan(command);
   if (heuristic) return heuristic;
 
+  const toolCatalog = getAIToolCatalogForPrompt('LIZZY');
   const result = await aiChat({
     messages: [
       {
         role: 'system',
-        content: `You route an authenticated Elevate Dev Studio command to exactly one action. Allowed actions: ${ALLOWED_ACTIONS.join(', ')}. Return JSON only with shape {"name":"action","args":{},"explanation":"short"}. If the request is informational and should not mutate or query a dedicated endpoint, use ask_question and put a concise answer in args.answer. Never invent identifiers.`,
+        content: `You are the Elevate Dev Studio command router. Choose one registered tool only when the user's request clearly maps to that tool. Never invent IDs or tool names. If no tool should execute, return tool:null and a concise answer. Return JSON only: {"tool":"name-or-null","input":{},"explanation":"short","answer":"optional"}.\n\nRegistered tools:\n${toolCatalog}`,
       },
       { role: 'user', content: command },
     ],
@@ -116,76 +94,24 @@ async function classifyCommand(command: string): Promise<CommandAction> {
   });
 
   const parsed = extractJsonObject(result.content);
-  const name = typeof parsed?.name === 'string' ? parsed.name : 'ask_question';
-  const args = asRecord(parsed?.args);
-  const explanation = typeof parsed?.explanation === 'string' ? parsed.explanation : undefined;
-  if (!ALLOWED_ACTIONS.includes(name as (typeof ALLOWED_ACTIONS)[number])) {
-    return { name: 'ask_question', args: { answer: result.content }, explanation: 'No supported action matched.' };
-  }
-  return { name, args, explanation };
+  const tool = typeof parsed?.tool === 'string' && getAITool(parsed.tool) ? parsed.tool : null;
+  return {
+    tool,
+    input: asRecord(parsed?.input),
+    explanation: typeof parsed?.explanation === 'string' ? parsed.explanation : undefined,
+    answer: typeof parsed?.answer === 'string' ? parsed.answer : tool ? undefined : result.content,
+  };
 }
 
 function summarizePayload(payload: unknown): string {
   if (payload == null) return 'Completed with no response body.';
-  if (typeof payload === 'string') return payload.slice(0, 1800);
+  if (typeof payload === 'string') return payload.slice(0, 2200);
   try {
     const json = JSON.stringify(payload, null, 2);
-    return json.length > 1800 ? `${json.slice(0, 1800)}\n…` : json;
+    return json.length > 2200 ? `${json.slice(0, 2200)}\n…` : json;
   } catch {
     return 'Completed.';
   }
-}
-
-async function executeAction(
-  request: NextRequest,
-  action: CommandAction,
-  confirmationInput: unknown,
-): Promise<{ ok: boolean; status: number; payload: unknown; url?: string }> {
-  const target = ACTIONS[action.name];
-  if (!target) return { ok: false, status: 400, payload: { error: `Unsupported action: ${action.name}` } };
-
-  const requiredPhrase = getConfirmationPhrase(action.name);
-  if (requiredPhrase) {
-    const confirmation = requireTypedConfirmation(confirmationInput, action.name);
-    if (!confirmation.ok) {
-      return {
-        ok: false,
-        status: 409,
-        payload: {
-          error: 'Typed confirmation required',
-          required: confirmation.required,
-        },
-      };
-    }
-  }
-
-  const path = typeof target.path === 'function' ? target.path(action.args) : target.path;
-  if (!path || path.includes('/undefined')) {
-    return { ok: false, status: 400, payload: { error: 'Required action identifier is missing.' } };
-  }
-
-  const adminOrigin = getAdminUrl().replace(/\/$/, '');
-  const origin = path.startsWith('/api/admin/') ? adminOrigin : request.nextUrl.origin;
-  const url = `${origin}${path}`;
-  const headers = new Headers();
-  const cookie = request.headers.get('cookie');
-  const authorization = request.headers.get('authorization');
-  if (cookie) headers.set('cookie', cookie);
-  if (authorization) headers.set('authorization', authorization);
-  headers.set('accept', 'application/json');
-
-  const init: RequestInit = { method: target.method, headers, signal: AbortSignal.timeout(90_000) };
-  if (target.method === 'POST') {
-    headers.set('content-type', 'application/json');
-    init.body = JSON.stringify(target.body ? target.body(action.args) : action.args);
-  }
-
-  const response = await fetch(url, init);
-  const contentType = response.headers.get('content-type') || '';
-  const payload = contentType.includes('application/json')
-    ? await response.json().catch(() => ({ error: `HTTP ${response.status}` }))
-    : await response.text().catch(() => '');
-  return { ok: response.ok, status: response.status, payload, url };
 }
 
 export async function POST(request: NextRequest) {
@@ -207,22 +133,25 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  const correlationId = request.headers.get('x-correlation-id') ?? crypto.randomUUID();
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const write = (text: string) => controller.enqueue(sseLine(text));
       try {
         write(`Command: ${command}`);
-        const action = await classifyCommand(command);
-        write(`Action: ${action.name}${action.explanation ? ` — ${action.explanation}` : ''}`);
+        const plan = await classifyCommand(command);
 
-        if (action.name === 'ask_question') {
-          const supplied = typeof action.args.answer === 'string' ? action.args.answer : '';
-          if (supplied) {
-            write(supplied);
+        if (!plan.tool) {
+          write('Mode: analysis only — no tool executed.');
+          if (plan.answer) {
+            write(plan.answer);
           } else {
             const answer = await aiChat({
               messages: [
-                { role: 'system', content: 'You are Ellie, the Elevate platform operations assistant. Answer from the user request only and do not claim an operation ran unless an endpoint was executed.' },
+                {
+                  role: 'system',
+                  content: `You are LIZZY, the Elevate Dev Studio operations assistant. Answer concisely. Do not claim an action ran. Available registered tools:\n${getAIToolCatalogForPrompt('LIZZY')}`,
+                },
                 { role: 'user', content: command },
               ],
               temperature: 0.2,
@@ -231,24 +160,47 @@ export async function POST(request: NextRequest) {
             write(answer.content || 'No answer was returned.');
           }
         } else {
-          const requiredPhrase = getConfirmationPhrase(action.name);
-          const confirmationInput = typeof body.confirmationText === 'string'
+          const tool = getAITool(plan.tool)!;
+          write(`Tool: ${tool.name} · ${tool.classification} · risk ${tool.risk}${plan.explanation ? ` — ${plan.explanation}` : ''}`);
+
+          const required = tool.confirmationPhrase;
+          const confirmationText = typeof body.confirmationText === 'string'
             ? body.confirmationText
-            : requiredPhrase && command.includes(requiredPhrase)
-              ? requiredPhrase
+            : required && command.includes(required)
+              ? required
               : undefined;
 
-          if (requiredPhrase && confirmationInput !== requiredPhrase) {
-            write(`Blocked: type exactly "${requiredPhrase}" with the command to authorize this action.`);
+          const result = await executeRegisteredAITool(tool.name, {
+            ...plan.input,
+            ...asRecord(body.toolInput),
+          }, {
+            agent: 'LIZZY',
+            actorId: auth.id,
+            actorRoles: auth.effectiveRoles,
+            tenantId: typeof body.tenantId === 'string' ? body.tenantId : null,
+            correlationId,
+            confirmationText,
+            requestHeaders: request.headers,
+            adminOrigin: getAdminUrl(),
+            appOrigin: request.nextUrl.origin,
+            idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : null,
+          });
+
+          if (result.status === 'approval_required') {
+            write(`Blocked pending human approval. Type exactly: "${result.requiredConfirmation}"`);
+          } else if (!result.ok) {
+            write(`Failed · HTTP ${result.httpStatus} · ${result.error ?? 'Tool execution failed.'}`);
+            if (result.payload !== undefined) write(summarizePayload(result.payload));
           } else {
-            write('Executing…');
-            const result = await executeAction(request, action, confirmationInput);
-            write(`${result.ok ? 'Completed' : 'Failed'} · HTTP ${result.status}${result.url ? ` · ${result.url}` : ''}`);
+            write(`Completed · ${result.tool} · HTTP ${result.httpStatus}`);
             write(summarizePayload(result.payload));
           }
         }
       } catch (error) {
-        logger.error('[devstudio/execute] command failed', error instanceof Error ? error : undefined, { command });
+        logger.error('[devstudio/execute] command failed', error instanceof Error ? error : undefined, {
+          command,
+          correlationId,
+        });
         write(`Failed: ${error instanceof Error ? error.message : 'Unknown command error'}`);
       } finally {
         controller.enqueue(sseDone());
@@ -263,5 +215,18 @@ export async function POST(request: NextRequest) {
       'Cache-Control': 'no-cache, no-transform',
       Connection: 'keep-alive',
     },
+  });
+}
+
+export async function GET() {
+  return Response.json({
+    agent: 'LIZZY',
+    tools: listAIToolsForAgent('LIZZY').map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      classification: tool.classification,
+      risk: tool.risk,
+      approvalRequired: tool.approvalRequired,
+    })),
   });
 }

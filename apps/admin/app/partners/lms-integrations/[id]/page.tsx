@@ -1,397 +1,110 @@
 import { Metadata } from 'next';
-import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { ArrowLeft, BookOpen, ExternalLink, Globe, Users, Activity } from 'lucide-react';
+import { requireRole } from '@/lib/auth/require-role';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import LmsIntegrationClientShell from './LmsIntegrationClientShell';
-import {
-  ArrowLeft,
-  Globe,
-  Key,
-  RefreshCw,
-  XCircle,
-  AlertCircle,
-  Settings,
-  Users,
-  BookOpen,
-  Activity,
-  Edit,
-  Trash2,
-  ExternalLink,
-  CheckCircle,
-} from 'lucide-react';
-import Image from 'next/image';
 
 export const dynamic = 'force-dynamic';
+export const metadata: Metadata = { title: 'LMS Integration Details | Admin', robots: { index: false, follow: false } };
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  return {
-    title: 'LMS Integration Details | Partners | Admin',
-  };
-}
-
-export default async function LMSIntegrationDetailPage({ params }: Props) {
-  await requireRole(['admin']);
+export default async function LMSIntegrationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { user } = await requireRole(['admin', 'staff']);
   const { id } = await params;
-  const supabase = await createClient();
+  const db = await requireAdminClient();
 
-  // Fetch LMS provider
-  const { data: provider, error } = await supabase
+  const { data: provider, error } = await db
     .from('partner_lms_providers')
     .select('*')
     .eq('id', id)
     .maybeSingle();
+  if (error || !provider) notFound();
 
-  if (error || !provider) {
-    notFound();
-  }
-
-  // Fetch courses from this provider
-  const { data: courses, count: courseCount } = await supabase
+  const { data: courses } = await db
     .from('partner_lms_courses')
-    .select('*', { count: 'exact' })
+    .select('id, course_name, course_url, status, created_at')
     .eq('provider_id', id)
     .order('course_name');
 
-  // Fetch enrollments count
-  const { count: enrollmentCount } = await supabase
-    .from('partner_lms_enrollments')
-    .select('*', { count: 'exact', head: true })
-    .in('course_id', courses?.map((c) => c.id) || []);
+  const courseIds = (courses ?? []).map((course: any) => course.id).filter(Boolean);
+  const { count: enrollmentCount } = courseIds.length
+    ? await db.from('partner_lms_enrollments').select('id', { count: 'exact', head: true }).in('course_id', courseIds)
+    : { count: 0 };
 
-  // Fetch recent sync logs
-  const { data: syncLogs } = await supabase
+  const { data: syncLogs } = await db
     .from('partner_lms_sync_logs')
-    .select('*')
+    .select('id, status, message, created_at')
     .eq('provider_id', id)
     .order('created_at', { ascending: false })
-    .limit(5);
+    .limit(8);
 
-  const statusColors: Record<string, string> = {
-    active: 'bg-brand-green-100 text-brand-green-800',
-    inactive: 'bg-slate-100 text-slate-900',
-    error: 'bg-brand-red-100 text-brand-red-800',
-    pending: 'bg-yellow-100 text-yellow-800',
-  };
+  const firstPlayable = (courses ?? []).find((course: any) => Boolean(course.course_url));
+  const providerName = provider.provider_name || provider.name || 'LMS Provider';
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Hero Image */}
-      {/* Header */}
-      <div className="mb-6">
-        <Link
-          href="/partners/lms-integrations"
-          className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to LMS Integrations
-        </Link>
-
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-              {provider.logo_url ? (
-                <Image
-                  src={provider.logo_url}
-                  alt={`${provider.provider_name} logo`}
-                  width={48}
-                  height={48}
-                  className="w-12 h-12 object-contain"
-                />
-              ) : (
-                <Globe className="w-8 h-8 text-brand-blue-600" />
-              )}
-            </div>
+    <main className="min-h-screen bg-slate-50">
+      <section className="bg-gradient-to-r from-sky-700 via-blue-700 to-indigo-800 px-6 py-8 text-white">
+        <div className="mx-auto max-w-6xl">
+          <Link href="/partners/lms-integrations" className="inline-flex items-center gap-2 text-sm font-bold text-white/90 hover:text-white"><ArrowLeft className="h-4 w-4" />Back to LMS integrations</Link>
+          <div className="mt-5 flex flex-wrap items-end justify-between gap-5">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">{provider.provider_name}</h1>
-              <p className="text-slate-600">{provider.provider_type || 'LMS Provider'}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                    statusColors[provider.status] || 'bg-slate-100 text-slate-900'
-                  }`}
-                >
-                  {provider.status === 'active' ? (
-                    <span className="text-slate-400 flex-shrink-0">•</span>
-                  ) : (
-                    <XCircle className="w-3 h-3" />
-                  )}
-                  {provider.status || 'Active'}
-                </span>
-              </div>
+              <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-sky-100"><Globe className="h-5 w-5" />Partner LMS</div>
+              <h1 className="mt-2 text-3xl font-black">{providerName}</h1>
+              <p className="mt-2 max-w-2xl text-sm font-medium text-sky-50">Review provider status, available courses, enrollment volume, and recent sync activity.</p>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
-              <RefreshCw className="w-4 h-4" />
-              Sync Now
-            </button>
-            <Link
-              href={`/admin/partners/lms-integrations/${id}/edit`}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50"
-            >
-              <Edit className="w-4 h-4" />
-              Edit
-            </Link>
+            <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-black uppercase">{provider.status || 'configured'}</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-brand-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">{courseCount || 0}</p>
-              <p className="text-sm text-slate-600">Courses</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-green-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-brand-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">{enrollmentCount || 0}</p>
-              <p className="text-sm text-slate-600">Enrollments</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-              <Activity className="w-5 h-5 text-brand-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">
-                {provider.last_sync ? 'Active' : 'Never'}
-              </p>
-              <p className="text-sm text-slate-600">Last Sync</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl border border-slate-200 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <AlertCircle className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">
-                {syncLogs?.filter((l) => l.status === 'error').length || 0}
-              </p>
-              <p className="text-sm text-slate-600">Sync Errors</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="mx-auto max-w-6xl space-y-6 px-6 py-7">
+        <section className="grid gap-4 sm:grid-cols-3">
+          {[
+            ['Courses', String(courses?.length ?? 0), BookOpen],
+            ['Enrollments', String(enrollmentCount ?? 0), Users],
+            ['Recent sync events', String(syncLogs?.length ?? 0), Activity],
+          ].map(([label, value, Icon]) => {
+            const CardIcon = Icon as typeof BookOpen;
+            return <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><CardIcon className="h-5 w-5 text-blue-700" /><div className="mt-3 text-xs font-black uppercase tracking-wide text-slate-500">{String(label)}</div><div className="mt-1 text-2xl font-black text-slate-950">{String(value)}</div></div>;
+          })}
+        </section>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Courses */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-slate-900">Courses</h2>
-              <Link
-                href={`/admin/partners/lms-integrations/${id}/courses`}
-                className="text-sm text-brand-blue-600 hover:underline"
-              >
-                View All
-              </Link>
-            </div>
-            {courses && courses.length > 0 ? (
-              <div className="space-y-3">
-                {courses.slice(0, 5).map((course: any) => (
-                  <div
-                    key={course.id}
-                    className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
-                  >
-                    <div>
-                      <p className="font-medium text-slate-900">{course.course_name}</p>
-                      <p className="text-sm text-slate-600">
-                        {course.hours ? `${course.hours} hours` : 'Duration not set'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          course.active
-                            ? 'bg-brand-green-100 text-brand-green-800'
-                            : 'bg-slate-100 text-slate-900'
-                        }`}
-                      >
-                        {course.active ? 'Active' : 'Inactive'}
-                      </span>
-                      {course.course_url && (
-                        <a
-                          href={course.course_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1 text-slate-500 hover:text-brand-blue-600"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-500 text-center py-4">No courses configured</p>
-            )}
-          </div>
-
-          {/* Course Preview */}
-          {courses && courses.length > 0 && courses[0].course_url && (
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Course Preview</h2>
-              <LmsIntegrationClientShell
-                courseId={courses[0].id}
-                courseName={courses[0].course_name}
-                partnerName={provider.provider_name}
-                courseUrl={courses[0].course_url}
-                userId={user.id}
-                enrollmentId={courses[0].id}
-              />
-            </div>
-          )}
-
-          {/* Sync History */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Sync History</h2>
-            {syncLogs && syncLogs.length > 0 ? (
-              <div className="space-y-3">
-                {syncLogs.map((log: any) => (
-                  <div
-                    key={log.id}
-                    className="flex items-center justify-between p-3 border border-slate-100 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          log.status === 'success'
-                            ? 'bg-brand-green-100'
-                            : log.status === 'error'
-                              ? 'bg-brand-red-100'
-                              : 'bg-yellow-100'
-                        }`}
-                      >
-                        {log.status === 'success' ? (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
-                        ) : log.status === 'error' ? (
-                          <XCircle className="w-4 h-4 text-brand-red-600" />
-                        ) : (
-                          <RefreshCw className="w-4 h-4 text-yellow-600" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-slate-900">{log.sync_type || 'Full Sync'}</p>
-                        <p className="text-sm text-slate-600">
-                          {new Date(log.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-slate-900">{log.records_synced || 0} records</p>
-                      {log.error_message && (
-                        <p className="text-xs text-brand-red-600 truncate max-w-[200px]">
-                          {log.error_message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-slate-500 text-center py-4">No sync history</p>
-            )}
-          </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Connection Details */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Connection Details</h2>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Globe className="w-5 h-5 text-slate-400" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-slate-600">API Endpoint</p>
-                  <p className="text-slate-900 truncate">{provider.api_url || 'Not configured'}</p>
+        <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="text-lg font-black text-slate-950">Courses</h2>
+            <div className="mt-4 space-y-3">
+              {(courses ?? []).length ? (courses ?? []).map((course: any) => (
+                <div key={course.id} className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <div><div className="font-black text-slate-950">{course.course_name || 'Untitled course'}</div><div className="mt-1 text-xs font-semibold text-slate-500">{course.status || 'active'}</div></div>
+                  {course.course_url && <a href={course.course_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-black text-blue-700"><ExternalLink className="h-4 w-4" />Open</a>}
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Key className="w-5 h-5 text-slate-400" />
-                <div>
-                  <p className="text-sm text-slate-600">API Key</p>
-                  <p className="text-slate-900">
-                    {provider.api_key ? '••••••••' + provider.api_key.slice(-4) : 'Not configured'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <RefreshCw className="w-5 h-5 text-slate-400" />
-                <div>
-                  <p className="text-sm text-slate-600">Sync Frequency</p>
-                  <p className="text-slate-900">{provider.sync_frequency || 'Manual'}</p>
-                </div>
-              </div>
+              )) : <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-500">No partner courses configured.</div>}
             </div>
           </div>
 
-          {/* Settings */}
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Settings</h2>
-            <div className="space-y-3">
-              <label className="flex items-center justify-between">
-                <span className="text-slate-700">Auto-sync enabled</span>
-                <input
-                  type="checkbox"
-                  defaultChecked={provider.auto_sync}
-                  className="w-4 h-4 text-brand-blue-600 rounded"
-                />
-              </label>
-              <label className="flex items-center justify-between">
-                <span className="text-slate-700">Send completion notifications</span>
-                <input
-                  type="checkbox"
-                  defaultChecked={provider.send_notifications}
-                  className="w-4 h-4 text-brand-blue-600 rounded"
-                />
-              </label>
-              <label className="flex items-center justify-between">
-                <span className="text-slate-700">Track progress</span>
-                <input
-                  type="checkbox"
-                  defaultChecked={provider.track_progress !== false}
-                  className="w-4 h-4 text-brand-blue-600 rounded"
-                />
-              </label>
+          <aside className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h2 className="text-lg font-black text-slate-950">Sync history</h2>
+            <div className="mt-4 space-y-3">
+              {(syncLogs ?? []).length ? (syncLogs ?? []).map((log: any) => <div key={log.id} className="rounded-xl bg-slate-50 p-3"><div className="text-sm font-black text-slate-900">{log.status || 'Sync event'}</div><div className="mt-1 text-xs font-medium text-slate-500">{log.message || 'No message'}{log.created_at ? ` · ${new Date(log.created_at).toLocaleString()}` : ''}</div></div>) : <p className="text-sm font-semibold text-slate-500">No sync activity recorded.</p>}
             </div>
-          </div>
+          </aside>
+        </section>
 
-          {/* Danger Zone */}
-          <div className="bg-white rounded-xl border border-brand-red-200 p-6">
-            <h2 className="text-lg font-semibold text-brand-red-900 mb-4">Danger Zone</h2>
-            <p className="text-sm text-slate-600 mb-4">
-              Removing this integration will disconnect all courses and enrollments.
-            </p>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700">
-              <Trash2 className="w-4 h-4" />
-              Remove Integration
-            </button>
-          </div>
-        </div>
+        {firstPlayable?.course_url && (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-black text-slate-950">Course preview</h2>
+            <LmsIntegrationClientShell
+              courseId={firstPlayable.id}
+              courseName={firstPlayable.course_name || 'Course'}
+              partnerName={providerName}
+              courseUrl={firstPlayable.course_url}
+              userId={user.id}
+              enrollmentId={firstPlayable.id}
+            />
+          </section>
+        )}
       </div>
-    </div>
+    </main>
   );
 }

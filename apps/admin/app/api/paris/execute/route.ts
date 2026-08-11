@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { executeAiTask, type AITask } from '@/lib/ai/execute-ai-task';
-import { aiReason } from '@/lib/ai/ai-service';
-import {
-  getAITool,
-  getAIToolCatalogForPrompt,
-  type AIAgentId,
-} from '@/lib/ai/tools/registry';
-import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
+import { executeAICommand } from '@/lib/ai/runtime/command-executor';
+import type { AIAgentId } from '@/lib/ai/tools/registry';
+import type { AITask } from '@/lib/ai/execute-ai-task';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolveTenantIdForUser } from '@/lib/platform/resolve-tenant-for-user';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 
@@ -28,134 +25,15 @@ const AGENT_MAP: Record<string, { agent: AIAgentId; label: string; task: AITask;
   'media-designer': { agent: 'LIZZY', label: 'Media Designer', task: 'general_chat', role: 'media production and accessibility operations' },
 };
 
-type PlannedTool = { name: string; input: Record<string, unknown> };
-
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
     : {};
 }
 
-function extractUuid(text: string): string | null {
-  return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
-}
-
-function extractNamedFilter(command: string, label: string): string | null {
-  const match = command.match(new RegExp(`\\b${label}\\s+([a-z0-9_-]+)`, 'i'));
-  return match?.[1]?.trim() || null;
-}
-
-function wioaFollowupInput(command: string, context: Record<string, unknown>): Record<string, unknown> {
-  const input = { ...asRecord(context.toolInput) };
-  const lower = command.toLowerCase();
-  if (/30\s*[- ]?day/.test(lower)) input.type = '30-day';
-  if (/\b(overdue|past due|missing|missed)\b/.test(lower)) input.overdue = true;
-  const sector = extractNamedFilter(command, 'sector');
-  const program = extractNamedFilter(command, 'program');
-  if (sector) input.sector = sector;
-  if (program) input.program = program;
-  return input;
-}
-
-function planToolFromCommand(command: string, context: Record<string, unknown>): PlannedTool | null {
-  const explicitTool = typeof context.toolName === 'string' ? context.toolName : null;
-  if (explicitTool && getAITool(explicitTool)) {
-    return { name: explicitTool, input: asRecord(context.toolInput) };
-  }
-
-  const lower = command.toLowerCase();
-  const contextId = typeof context.id === 'string' ? context.id : null;
-  const id = contextId ?? extractUuid(command);
-
-  if (/\bwioa\b/.test(lower) && /\b(follow[- ]?ups?|30\s*[- ]?day|overdue|past due|missing|missed)\b/.test(lower)) {
-    return { name: 'wioa.followups', input: wioaFollowupInput(command, context) };
-  }
-  if (/\bwioa\b/.test(lower) && /\b(performance|outcomes?|metrics?|narrative|report|earnings|credential|skill gain)\b/.test(lower)) {
-    return { name: 'wioa.performance', input: asRecord(context.toolInput) };
-  }
-  if (/\bwioa\b/.test(lower) && /\b(list|show|find|search|participants?)\b/.test(lower)) {
-    return { name: 'wioa.list', input: asRecord(context.toolInput) };
-  }
-  if (/\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower) || /\bpending applications?\b/.test(lower)) {
-    return { name: 'applications.search', input: {} };
-  }
-  if (/\bapprove\b.*\bapplication\b/.test(lower)) {
-    return { name: 'applications.approve', input: id ? { id } : {} };
-  }
-  if (/\b(list|show|find|search)\b.*\bstudents?\b/.test(lower)) {
-    return { name: 'students.search', input: {} };
-  }
-  if (/\b(list|show|find|search)\b.*\benrollments?\b/.test(lower)) {
-    return { name: 'enrollments.search', input: {} };
-  }
-  if (/\b(list|show|find)\b.*\bprograms?\b/.test(lower)) {
-    return { name: 'programs.list', input: {} };
-  }
-  if (/\b(system|platform)\b.*\b(health|status)\b|\bhealth check\b/.test(lower)) {
-    return { name: 'system.health', input: {} };
-  }
-  if (/\b(analytics|metrics|dashboard numbers)\b/.test(lower)) {
-    return { name: 'analytics.read', input: {} };
-  }
-  if (/\bpayout\b.*\b(queue|pending|list|show)\b|\b(queue|pending|list|show)\b.*\bpayout/.test(lower)) {
-    return { name: 'payouts.list', input: {} };
-  }
-  if (/\bmark\b.*\bpayout\b.*\bpaid\b/.test(lower)) {
-    return { name: 'payouts.markPaid', input: id ? { enrollmentId: id } : {} };
-  }
-  if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) {
-    return { name: 'courses.generate', input: { ...asRecord(context.toolInput), prompt: command } };
-  }
-  if (/\brun\b.*\btests?\b/.test(lower)) {
-    return { name: 'workflows.runTests', input: asRecord(context.toolInput) };
-  }
-
-  return null;
-}
-
-function confirmationFromRequest(command: string, body: Record<string, unknown>, toolName: string): unknown {
-  if (typeof body.confirmationText === 'string') return body.confirmationText;
-  const required = getAITool(toolName)?.confirmationPhrase;
-  if (required && command.includes(required)) return required;
-  return undefined;
-}
-
-function safeToolData(payload: unknown): string {
-  if (payload === null || payload === undefined) return 'No result body.';
-  if (typeof payload === 'string') return payload.slice(0, 20_000);
-  try {
-    return JSON.stringify(payload, null, 2).slice(0, 20_000);
-  } catch {
-    return String(payload).slice(0, 20_000);
-  }
-}
-
-function shouldSynthesize(command: string, toolName: string): boolean {
-  if (toolName.startsWith('wioa.')) return true;
-  return /\b(draft|write|summari[sz]e|narrative|report|analy[sz]e|explain|email|reminder|recommend|what does|tell me)\b/i.test(command);
-}
-
-async function synthesizeReadResult(params: {
-  agentLabel: string;
-  command: string;
-  tool: string;
-  payload: unknown;
-}): Promise<{ message: string; provider?: string }> {
-  const result = await aiReason({
-    temperature: 0.2,
-    maxTokens: 1800,
-    messages: [
-      {
-        role: 'system',
-        content: `You are ${params.agentLabel}, an Elevate workforce/admin AI. The data below came from an authenticated live platform tool. Answer only from that data. Do not invent missing records, eligibility, funding decisions, compliance conclusions, or contact information. If asked to draft an email/reminder, draft it but do not claim it was sent. If asked for a performance narrative, clearly label it as a draft for staff review.`,
-      },
-      {
-        role: 'user',
-        content: `Admin request:\n${params.command}\n\nLive tool: ${params.tool}\n\nLive result:\n${safeToolData(params.payload)}`,
-      },
-    ],
-  });
-  return { message: result.content, provider: result.provider };
+function titleFromCommand(command: string): string {
+  const oneLine = command.replace(/\s+/g, ' ').trim();
+  return oneLine.length > 120 ? `${oneLine.slice(0, 117)}…` : oneLine;
 }
 
 export async function POST(req: NextRequest) {
@@ -188,21 +66,87 @@ export async function POST(req: NextRequest) {
     role: 'authorized platform assistance',
   };
   const correlationId = req.headers.get('x-correlation-id') ?? crypto.randomUUID();
-  const plannedTool = planToolFromCommand(command, context);
+  const tenantId = typeof context.tenantId === 'string'
+    ? context.tenantId
+    : await resolveTenantIdForUser(auth.id).catch(() => null);
+  const db = await requireAdminClient();
 
-  if (plannedTool) {
-    const result = await executeRegisteredAITool(plannedTool.name, plannedTool.input, {
+  const { data: durableTask } = await db
+    .from('ai_tasks')
+    .insert({
+      task_id: correlationId,
+      title: titleFromCommand(command),
+      description: `PARIS Admin OS command routed through ${agentConfig.label}`,
+      command,
+      status: 'running',
+      priority: 'medium',
+      requested_by: auth.id,
+      created_by: auth.id,
+      user_id: auth.id,
+      tenant_id: tenantId,
+      agent_type: agentConfig.agent,
+      intent: agentType,
+      correlation_id: correlationId,
+      trace_id: correlationId,
+      payload: { agentType, context },
+      metadata: { source: '/api/paris/execute', label: agentConfig.label },
+      started_at: new Date().toISOString(),
+    })
+    .select('id')
+    .maybeSingle();
+
+  try {
+    const result = await executeAICommand(command, {
       agent: agentConfig.agent,
+      agentLabel: agentConfig.label,
+      agentRole: agentConfig.role,
+      advisoryTask: agentConfig.task,
       actorId: auth.id,
       actorRoles: auth.effectiveRoles,
-      tenantId: typeof context.tenantId === 'string' ? context.tenantId : null,
+      tenantId,
       correlationId,
-      confirmationText: confirmationFromRequest(command, body, plannedTool.name),
+      confirmationText: body.confirmationText,
       requestHeaders: req.headers,
       adminOrigin: req.nextUrl.origin,
-      appOrigin: req.nextUrl.origin,
-      idempotencyKey: typeof body.idempotencyKey === 'string' ? body.idempotencyKey : null,
+      appOrigin: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
+      idempotencyKey: typeof body.idempotencyKey === 'string'
+        ? body.idempotencyKey
+        : `paris:${correlationId}`,
+      commandContext: context,
     });
+
+    if (durableTask?.id) {
+      await db.from('ai_tasks').update({
+        status: result.status === 'approval_required'
+          ? 'awaiting_approval'
+          : result.ok ? 'completed' : 'failed',
+        requires_approval: result.status === 'approval_required',
+        approval_status: result.status === 'approval_required' ? 'pending' : null,
+        approval_reason: result.status === 'approval_required'
+          ? `Human confirmation required for ${result.tool ?? 'protected tool'}`
+          : null,
+        tool_name: result.tool ?? null,
+        tool_output: result.payload ?? null,
+        result: {
+          ok: result.ok,
+          executed: result.executed,
+          message: result.message,
+          tool: result.tool ?? null,
+        },
+        result_json: {
+          ok: result.ok,
+          executed: result.executed,
+          status: result.status,
+          message: result.message,
+          tool: result.tool ?? null,
+          provider: result.provider ?? null,
+          trace_id: result.traceId ?? null,
+        },
+        error_message: result.ok ? null : result.message,
+        completed_at: result.status === 'approval_required' ? null : new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }).eq('id', durableTask.id);
+    }
 
     if (result.status === 'approval_required') {
       return NextResponse.json({
@@ -213,8 +157,11 @@ export async function POST(req: NextRequest) {
         agent: agentConfig.label,
         tool: result.tool,
         risk: result.risk,
-        message: `Human approval is required. Type exactly: ${result.requiredConfirmation}`,
-        traceId: result.traceId,
+        message: result.requiredConfirmation
+          ? `Human approval is required. Type exactly: ${result.requiredConfirmation}`
+          : result.message,
+        traceId: result.traceId ?? correlationId,
+        taskId: durableTask?.id ?? null,
       }, { status: 409 });
     }
 
@@ -225,84 +172,45 @@ export async function POST(req: NextRequest) {
         agent: agentConfig.label,
         tool: result.tool,
         risk: result.risk,
-        message: result.error ?? 'Tool execution failed.',
+        message: result.message,
         data: result.payload ?? null,
-        traceId: result.traceId,
-      }, { status: result.httpStatus >= 400 ? result.httpStatus : 500 });
+        traceId: result.traceId ?? correlationId,
+        taskId: durableTask?.id ?? null,
+      }, { status: result.status === 'blocked' ? 403 : 500 });
     }
 
-    let message = `${agentConfig.label} executed ${result.tool}.`;
-    let provider: string | undefined;
-    if (result.classification === 'read' && shouldSynthesize(command, result.tool)) {
-      try {
-        const synthesis = await synthesizeReadResult({
-          agentLabel: agentConfig.label,
-          command,
-          tool: result.tool,
-          payload: result.payload,
-        });
-        message = synthesis.message || message;
-        provider = synthesis.provider;
-      } catch (error) {
-        logger.warn('[paris/execute] live-data synthesis failed; returning raw tool result', {
-          tool: result.tool,
-          error: String(error),
-        });
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      executed: true,
-      agent: agentConfig.label,
-      tool: result.tool,
-      risk: result.risk,
-      message,
-      provider,
-      data: result.payload ?? null,
-      traceId: result.traceId,
-    });
-  }
-
-  try {
-    const toolCatalog = getAIToolCatalogForPrompt(agentConfig.agent);
-    const prompt = [
-      `You are ${agentConfig.label}, operating as the ${agentConfig.role} specialist inside Elevate.`,
-      'You may explain, analyze, draft, or recommend. Do not claim that a business action was executed unless a registered tool actually ran.',
-      'Do not invent application status, funding approval, enrollment status, payment status, compliance outcomes, or current system state.',
-      `Registered tools currently authorized for this agent:\n${toolCatalog || 'No tools assigned.'}`,
-      `User command:\n${command}`,
-    ].join('\n\n');
-
-    const aiResult = await executeAiTask({
-      task: agentConfig.task,
-      prompt,
-      context: {
-        userId: auth.id,
-        sessionId: typeof context.sessionId === 'string' ? context.sessionId : correlationId,
-      },
-      maxTokens: 1200,
-      temperature: 0.2,
-    });
-
-    logger.info('[paris/execute] canonical AI guidance completed', {
+    logger.info('[paris/execute] canonical command completed', {
       actorId: auth.id,
       agent: agentConfig.agent,
       agentType,
-      provider: aiResult.provider,
+      executed: result.executed,
+      tool: result.tool ?? null,
+      provider: result.provider ?? null,
       correlationId,
     });
 
     return NextResponse.json({
       success: true,
-      executed: false,
+      executed: result.executed,
       agent: agentConfig.label,
-      message: aiResult.content,
-      provider: aiResult.provider,
-      availableTools: toolCatalog.split('\n').filter(Boolean),
-      correlationId,
+      tool: result.tool ?? null,
+      risk: result.risk ?? null,
+      message: result.message,
+      provider: result.provider ?? null,
+      data: result.payload ?? null,
+      traceId: result.traceId ?? correlationId,
+      taskId: durableTask?.id ?? null,
     });
   } catch (error) {
+    if (durableTask?.id) {
+      await db.from('ai_tasks').update({
+        status: 'failed',
+        error_message: error instanceof Error ? error.message : String(error),
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }).eq('id', durableTask.id);
+    }
+
     logger.error('[paris/execute] canonical execution failed', error instanceof Error ? error : new Error(String(error)), {
       actorId: auth.id,
       agentType,
@@ -313,6 +221,7 @@ export async function POST(req: NextRequest) {
       executed: false,
       message: 'The AI execution service could not complete this request.',
       correlationId,
+      taskId: durableTask?.id ?? null,
     }, { status: 500 });
   }
 }

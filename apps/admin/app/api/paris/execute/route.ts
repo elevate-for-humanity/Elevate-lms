@@ -1,96 +1,74 @@
-import { NextRequest, NextResponse } from "next/server";
-import { requireAdminClient } from "@/lib/supabase/admin";
+import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { runAdminAgentCommand } from '@/lib/ai/agent-runtime';
+import type { ElevateAgent } from '@/lib/ai/tools/registry';
 
-export const dynamic = "force-dynamic";
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
-const AGENT_MAP: Record<string, string> = {
-  "course-orchestrator": "Course Orchestrator",
-  "instructional-designer": "Instructional Designer",
-  "qa-designer": "QA Designer",
-  "marketing-content": "Marketing Content Creator",
-  "marketing-social": "Social Media Manager",
-  "marketing-video": "Video Script Writer",
-  "workforce-agent": "Workforce Agent Manager",
-  "admissions-agent": "Admissions Agent",
-  "media-designer": "Media Designer",
-};
-
-const AGENT_DESCRIPTIONS: Record<string, string> = {
-  "course-orchestrator": "You are a Course Orchestrator for Elevate LMS. Help admins create and manage training programs, set up curricula, manage enrollments, and coordinate instructional resources.",
-  "instructional-designer": "You are an Instructional Designer for Elevate LMS. Create effective learning objectives, design engaging activities, build assessments, and ensure curriculum alignment with industry standards.",
-  "qa-designer": "You are a QA Designer for Elevate LMS. Review course content for quality, check accessibility, validate quiz questions, and ensure all materials meet educational standards.",
-  "marketing-content": "You are a Marketing Content Creator for Elevate LMS. Write compelling copy for program pages, create hero banners, craft CTAs, and optimize content for SEO and conversions.",
-  "marketing-social": "You are a Social Media Manager for Elevate LMS. Create engaging social posts, write LinkedIn and Twitter content, and build community engagement campaigns.",
-  "marketing-video": "You are a Video Script Writer for Elevate LMS. Write compelling video scripts with hooks, structure, and strong CTAs for training program promotions.",
-  "workforce-agent": "You are a Workforce Agent Manager for Elevate LMS. Manage apprenticeship programs, coordinate host shops, track competency records, and ensure DOL compliance.",
-  "admissions-agent": "You are an Admissions Agent for Elevate LMS. Review applications, check eligibility, schedule interviews, manage enrollment steps, and guide students through the admission process.",
-  "media-designer": "You are a Media Designer for Elevate LMS. Create visual assets, optimize images for web, generate alt text for accessibility, and design thumbnails and promotional graphics.",
+const AGENT_MAP: Record<string, ElevateAgent> = {
+  paris: 'PARIS',
+  pars: 'PARIS',
+  'course-orchestrator': 'PARIS',
+  'instructional-designer': 'PARIS',
+  'qa-designer': 'ZORA',
+  'marketing-content': 'PARIS',
+  'marketing-social': 'PARIS',
+  'marketing-video': 'PARIS',
+  'workforce-agent': 'ZORA',
+  'admissions-agent': 'PARIS',
+  'media-designer': 'PARIS',
+  ellie: 'ELLIE',
+  lizzy: 'LIZZY',
+  zora: 'ZORA',
 };
 
 export async function POST(req: NextRequest) {
-  const db = await requireAdminClient();
+  const limited = await applyRateLimit(req, 'api');
+  if (limited) return limited;
 
-  const { agentType, command, context } = await req.json();
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
 
-  if (!command || typeof command !== "string") {
-    return NextResponse.json({ success: false, message: "command is required" }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const command = typeof body.command === 'string' ? body.command.trim() : '';
+  if (!command) {
+    return NextResponse.json({ success: false, message: 'command is required' }, { status: 400 });
+  }
+  if (command.length > 8000) {
+    return NextResponse.json({ success: false, message: 'command is too long' }, { status: 400 });
   }
 
-  const agentName = AGENT_MAP[agentType] ?? "PARS AI";
-  const systemPrompt = AGENT_DESCRIPTIONS[agentType] ?? "You are PARS, the Professional Automation and Reasoning System for Elevate LMS. Help admins with course creation, marketing content, student admissions, workforce management, and system operations.";
+  const agentType = typeof body.agentType === 'string' ? body.agentType.toLowerCase() : 'paris';
+  const agent = AGENT_MAP[agentType] ?? 'PARIS';
 
-  const openaiKey = process.env.OPENAI_API_KEY;
-  if (!openaiKey) {
-    // Fall back to structured response without real AI
-    return NextResponse.json({
-      success: true,
-      message: `PARS ${agentName} received: "${command}". Configure OPENAI_API_KEY to enable AI responses.`,
-      actions: [`Command acknowledged: ${command.slice(0, 50)}`],
-      data: { agent: agentType, mode: "no-api-key" },
-    });
-  }
+  const db: any = await requireAdminClient();
+  const { data: profile } = await db
+    .from('profiles')
+    .select('tenant_id,organization_id')
+    .eq('id', auth.id)
+    .maybeSingle();
 
-  try {
-    const completion = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + openaiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: command },
-        ],
-        max_tokens: 400,
-        temperature: 0.7,
-      }),
-    });
+  const context = body.context && typeof body.context === 'object' && !Array.isArray(body.context)
+    ? body.context as Record<string, unknown>
+    : {};
 
-    if (!completion.ok) {
-      return NextResponse.json({
-        success: false,
-        message: "AI service error: " + completion.status,
-      }, { status: 500 });
-    }
+  const result = await runAdminAgentCommand({
+    agent,
+    command,
+    actor: {
+      id: auth.id,
+      roles: auth.effectiveRoles,
+      tenantId: profile?.tenant_id ?? null,
+    },
+    context: {
+      ...context,
+      organizationId: profile?.organization_id ?? null,
+    },
+  });
 
-    const data = await completion.json();
-    const message = data.choices?.[0]?.message?.content ?? "No response received.";
-
-    // Log to ai_tasks table
-    await db.from("ai_tasks").insert({
-      agent_id: agentType,
-      task_type: "paris_command",
-      command,
-      status: "completed",
-      result: { message } as any,
-      quality_score: null,
-    });
-
-    return NextResponse.json({ success: true, message, agent: agentName });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ success: false, message: "Error: " + msg }, { status: 500 });
-  }
+  return NextResponse.json(result, { status: result.success ? 200 : 500 });
 }

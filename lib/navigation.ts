@@ -55,6 +55,11 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
+    id: 'foundation',
+    name: 'Foundation',
+    href: '/rise-forward-foundation',
+  },
+  {
     id: 'employers',
     name: 'Employers',
     href: ROUTES.employers,
@@ -97,6 +102,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: ROUTES.about,
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
+      { name: 'Rise Forward Foundation', href: '/rise-forward-foundation', isSectionLink: true },
       { name: 'Approvals', href: ROUTES.aboutApprovals, isSectionLink: true },
       { name: 'Apprenticeship Sponsor of Record', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
       { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },

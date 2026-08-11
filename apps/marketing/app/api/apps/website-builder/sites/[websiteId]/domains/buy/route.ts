@@ -1,4 +1,5 @@
 // pre-auth-registry: exempt - authenticated route resolves the current user and owned website before any RLS-scoped website_domains write.
+// AUTH: Enforced inside handler by resolveOwnedSite(), which requires a Supabase user and ownership of websiteId.
 /**
  * Payment-first domain purchase. Quotes Domainee, charges the customer through
  * Stripe, then the canonical Stripe webhook fulfills the Domainee registration.
@@ -159,6 +160,6 @@ export async function POST(
     return NextResponse.json({ checkoutUrl: session.url, retailCents, providerCostCents: quote.pricing.totalCents, hostname });
   } catch (err) {
     logger.error('domain checkout creation failed', err instanceof Error ? err : undefined, { hostname });
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Failed to prepare domain checkout.' }, { status: 502 });
+    return NextResponse.json({ error: 'Failed to prepare domain checkout.' }, { status: 502 });
   }
 }

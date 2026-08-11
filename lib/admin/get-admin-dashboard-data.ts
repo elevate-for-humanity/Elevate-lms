@@ -176,7 +176,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }, {});
   const topPrograms = Object.entries(programCounts).map(([id, value]) => ({
     id,
-    title: programTitleById.get(id) ?? value.slug || 'Program',
+    title: programTitleById.get(id) ?? value.slug ?? 'Program',
     slug: value.slug || undefined,
     learners: value.learners,
     completed: value.completed,

@@ -1,14 +1,8 @@
-import type { Metadata } from 'next';
-
-import { requireAdmin } from '@/lib/authGuards';
-import PageClient from '../../../admin/studio/workflows/new/PageClient';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = { title: 'New Workflow | Dev Studio' };
-
-/** Canonical workflow creation page for the Admin-owned Studio. */
-export default async function NewWorkflowPage() {
-  await requireAdmin();
-  return <PageClient />;
+/** Compatibility entry only; the implementation lives at /studio/workflows/new. */
+export default function LegacyNewWorkflowPage() {
+  redirect('/studio/workflows/new');
 }

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const audit = auditCourseTemplate(body);
     if (!audit.ok) return NextResponse.json({ ok: false, error: 'Audit failed', audit }, { status: 400 });
     const adapted = adaptProgramTemplateForPublish(body);
-    const db = getServiceDb();
+    const db = await getServiceDb();
     const result = await runCoursePublishPipeline({ template: adapted as any, db, mode: 'missing-only' });
     return NextResponse.json({ ok: result.success, audit, result });
   } catch (error) {

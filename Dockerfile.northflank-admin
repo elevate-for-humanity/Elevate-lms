@@ -9,6 +9,7 @@
 # 4. Native module health check in builder stage (fails build if modules unavailable)
 # 5. Standalone output used correctly (preserves directory structure)
 # 6. Deterministic build identity from Northflank's injected NF_GIT_SHA
+# 7. FFmpeg + DejaVu fonts available in runtime for Media Studio commercial rendering
 
 ARG BUILD_TIMESTAMP=unknown
 
@@ -156,7 +157,7 @@ ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl fontconfig libfontconfig1 libfreetype6 libjpeg62-turbo libpng16-16 libwebp7 && \
+    ca-certificates curl ffmpeg fontconfig fonts-dejavu-core libfontconfig1 libfreetype6 libjpeg62-turbo libpng16-16 libwebp7 && \
     rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home nextjs
@@ -171,7 +172,10 @@ RUN set -eux; \
     test -d /app/node_modules/sharp; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \
-    test -d /app/node_modules/pdfkit
+    test -d /app/node_modules/pdfkit; \
+    command -v ffmpeg; \
+    command -v ffprobe; \
+    fc-match 'DejaVu Sans'
 USER nextjs
 EXPOSE 3000
 

@@ -1,49 +1,36 @@
 'use client';
 
-/**
- * CurriculumPanel — wraps LessonManagerClient.
- * Reads modules/lessons from CourseProvider, writes via upsertLesson.
- *
- * Normalizer: StudioLesson (20+ fields) → LessonManagerClient.Lesson (8 fields).
- * Reverse normalizer merges the saved result back over the existing StudioLesson
- * so fields like lesson_type, module_id, is_published, approved are preserved.
- */
-
 import dynamic from 'next/dynamic';
+import { BookOpen } from 'lucide-react';
 import { useCourse } from '../CourseProvider';
 import type { StudioLesson } from '@/lib/studio/course-session';
-import { BookOpen } from 'lucide-react';
 import { PanelHeader, PanelSkeleton } from './BlueprintPanel';
 
 const LessonManagerClient = dynamic(
-  () => import('@/apps/admin/app/admin/studio/courses/[courseId]/content/LessonManagerClient').then((m) => m.default || m),
-  { ssr: false, loading: () => <PanelSkeleton label="Curriculum" /> }
+  () => import('@/apps/admin/app/admin/studio/courses/[courseId]/content/LessonManagerClient').then((module) => module.default),
+  { ssr: false, loading: () => <PanelSkeleton label="Curriculum" /> },
 );
 
-// StudioLesson (20+ fields) → LessonManagerClient.Lesson (8 required fields)
-function toClientLesson(l: StudioLesson) {
+function toClientLesson(value: StudioLesson) {
+  const lesson = value as StudioLesson & { content?: string | null };
   return {
-    id: l.id,
-    course_id: l.course_id,
-    title: l.title,
-    content: l.content ?? null,
-    video_url: l.video_url ?? null,
-    order_index: l.order_index,
-    duration_minutes: l.duration_minutes ?? null,
-    created_at: l.created_at,
+    id: lesson.id,
+    course_id: lesson.course_id,
+    title: lesson.title,
+    content: lesson.content ?? null,
+    video_url: lesson.video_url ?? null,
+    order_index: lesson.order_index,
+    duration_minutes: lesson.duration_minutes ?? null,
+    created_at: lesson.created_at,
   };
 }
 
-// LessonManagerClient.Lesson → StudioLesson: merge saved fields back over
-// the existing StudioLesson so lesson_type, module_id, is_published, approved
-// and all other StudioLesson fields are preserved rather than silently dropped.
 function mergeBackToStudio(
   saved: { id: string; title: string; content: string | null; video_url: string | null; order_index: number; duration_minutes: number | null; created_at: string },
   existing: StudioLesson | undefined,
   courseId: string,
 ): StudioLesson {
   return {
-    // Defaults for a brand-new lesson (existing is undefined on create)
     lesson_type: 'lesson',
     module_id: null,
     is_published: false,
@@ -55,9 +42,7 @@ function mergeBackToStudio(
     passing_score: null,
     ai_generated: false,
     updated_at: new Date().toISOString(),
-    // Spread existing StudioLesson fields (preserves lesson_type, module_id, etc.)
     ...(existing ?? {}),
-    // Spread the freshly-saved fields (authoritative from DB)
     ...saved,
     course_id: courseId,
   } as StudioLesson;
@@ -69,31 +54,19 @@ export function CurriculumPanel() {
 
   return (
     <div className="p-6">
-      <PanelHeader
-        icon={<BookOpen className="w-5 h-5" />}
-        title="Curriculum"
-        subtitle={`${lessons.length} lesson${lessons.length !== 1 ? 's' : ''} across ${modules.length} module${modules.length !== 1 ? 's' : ''}`}
-      />
+      <PanelHeader icon={<BookOpen className="w-5 h-5" />} title="Curriculum" subtitle={`${lessons.length} lesson${lessons.length !== 1 ? 's' : ''} across ${modules.length} module${modules.length !== 1 ? 's' : ''}`} />
       <LessonManagerClient
         course={course}
         courseId={course.id}
         initialLessons={lessons.map(toClientLesson)}
         onLessonSaved={(saved) => {
-          const existing = lessons.find(l => l.id === saved.id);
+          const existing = lessons.find((lesson) => lesson.id === saved.id);
           upsertLesson(mergeBackToStudio(saved, existing, course.id));
-          appendAIMemory({
-            role: 'action',
-            content: `Lesson saved: "${saved.title}"`,
-            source: 'curriculum',
-          });
+          appendAIMemory({ role: 'action', content: `Lesson saved: "${saved.title}"`, source: 'curriculum' });
         }}
         onLessonDeleted={(lessonId) => {
           deleteLesson(lessonId);
-          appendAIMemory({
-            role: 'action',
-            content: `Lesson deleted: ${lessonId}`,
-            source: 'curriculum',
-          });
+          appendAIMemory({ role: 'action', content: `Lesson deleted: ${lessonId}`, source: 'curriculum' });
         }}
       />
     </div>

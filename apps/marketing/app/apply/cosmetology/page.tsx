@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function ApplyCosmetologyRedirect() {
-  redirect('/partners/cosmetology-host-shop');
+  redirect('/partners/host-shop/apply?program=cosmetology');
 }

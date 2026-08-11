@@ -4,21 +4,21 @@ import { hydrateProcessEnv } from '@/lib/secrets';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
 
-// Build-safe: lazily create the admin client at runtime.
-// This prevents 'supabaseKey is required' errors during Next.js static build.
-let _supabase: ReturnType<typeof createClient> | null = null;
-function getSupabaseAdmin() {
+// Build-safe: lazily create the service-role client at runtime. This table is
+// intentionally not part of the generated public Database type, so keep the
+// client unparameterized here rather than manufacturing a false schema type.
+let _supabase: any = null;
+function getSupabaseAdmin(): any {
   if (!_supabase) {
     hydrateProcessEnv();
     _supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
     );
   }
   return _supabase;
 }
 
-// Agent Templates
 const AGENT_TEMPLATES = {
   recruiter: {
     name: 'Recruiter AI',
@@ -84,7 +84,6 @@ Always cite sources and follow grant guidelines exactly.`,
 
 const handleGet: AuthHandler = async () => {
   try {
-    // List all agents
     const { data: agents, error } = await getSupabaseAdmin()
       .from('ai_agents')
       .select('*')
@@ -92,41 +91,34 @@ const handleGet: AuthHandler = async () => {
 
     if (error) throw error;
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       agents: agents || [],
       templates: Object.keys(AGENT_TEMPLATES),
     });
   } catch (error) {
     console.error('Error fetching agents:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to fetch agents' 
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to fetch agents',
     }, { status: 500 });
   }
 };
 
-// Wrap handlers with admin authentication
 export const GET = withAuth(handleGet, { roles: ['admin', 'super_admin', 'staff'] });
 
 const handlePost: AuthHandler = async (req) => {
   try {
     const body = await req.json();
-    const { action, role, name, ownerId, config } = body;
+    const { action, role, name, ownerId } = body;
 
     if (action === 'create') {
-      // Get template
       const template = AGENT_TEMPLATES[role as keyof typeof AGENT_TEMPLATES];
       if (!template) {
-        return NextResponse.json({ 
-          success: false, 
-          error: `Unknown agent role: ${role}` 
-        }, { status: 400 });
+        return NextResponse.json({ success: false, error: `Unknown agent role: ${role}` }, { status: 400 });
       }
 
-      const agentId = `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-      // Create agent
+      const agentId = `agent_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
       const { data, error } = await getSupabaseAdmin()
         .from('ai_agents')
         .insert({
@@ -153,46 +145,30 @@ const handlePost: AuthHandler = async (req) => {
         .single();
 
       if (error) throw error;
-
-      return NextResponse.json({ 
-        success: true, 
-        agent: data,
-        message: `${template.name} created successfully!`,
-      });
+      return NextResponse.json({ success: true, agent: data, message: `${template.name} created successfully!` });
     }
 
     if (action === 'update') {
       const { agentId, updates } = body;
-      
       const { data, error } = await getSupabaseAdmin()
         .from('ai_agents')
         .update(updates)
         .eq('id', agentId)
         .select()
         .single();
-
       if (error) throw error;
-
       return NextResponse.json({ success: true, agent: data });
     }
 
     if (action === 'delete') {
       const { agentId } = body;
-      
-      const { error } = await getSupabaseAdmin()
-        .from('ai_agents')
-        .delete()
-        .eq('id', agentId);
-
+      const { error } = await getSupabaseAdmin().from('ai_agents').delete().eq('id', agentId);
       if (error) throw error;
-
       return NextResponse.json({ success: true, message: 'Agent deleted' });
     }
 
     if (action === 'clone') {
-      const { agentId, newOwnerId, name } = body;
-      
-      // Get original
+      const { agentId, newOwnerId, name: cloneName } = body;
       const { data: original, error: fetchError } = await getSupabaseAdmin()
         .from('ai_agents')
         .select('*')
@@ -200,23 +176,21 @@ const handlePost: AuthHandler = async (req) => {
         .single();
 
       if (fetchError || !original) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Original agent not found' 
-        }, { status: 404 });
+        return NextResponse.json({ success: false, error: 'Original agent not found' }, { status: 404 });
       }
 
-      // Create clone
+      const originalConfig = (original.config && typeof original.config === 'object') ? original.config : {};
+      const originalPrompt = typeof originalConfig.systemPrompt === 'string' ? originalConfig.systemPrompt : '';
       const { data: clone, error: cloneError } = await getSupabaseAdmin()
         .from('ai_agents')
         .insert({
-          id: `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          name: name || `${original.name} (Clone)`,
+          id: `agent_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
+          name: cloneName || `${original.name} (Clone)`,
           role: original.role,
           status: 'training',
           config: {
-            ...original.config,
-            systemPrompt: `${original.config.systemPrompt}\n\nNote: You are a clone of ${original.name}.`,
+            ...originalConfig,
+            systemPrompt: `${originalPrompt}\n\nNote: You are a clone of ${original.name}.`,
           },
           permissions: original.permissions,
           owner_id: newOwnerId,
@@ -227,27 +201,14 @@ const handlePost: AuthHandler = async (req) => {
         .single();
 
       if (cloneError) throw cloneError;
-
-      return NextResponse.json({ 
-        success: true, 
-        agent: clone,
-        message: 'Agent cloned successfully!',
-      });
+      return NextResponse.json({ success: true, agent: clone, message: 'Agent cloned successfully!' });
     }
 
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Invalid action' 
-    }, { status: 400 });
-
+    return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
   } catch (error) {
     console.error('Agent API error:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Internal server error' 
-    }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 };
 
-// Wrap POST handler with admin authentication
 export const POST = withAuth(handlePost, { roles: ['admin', 'super_admin'] });

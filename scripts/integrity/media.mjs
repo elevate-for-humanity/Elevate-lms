@@ -3,13 +3,14 @@
  * Media / visual integrity gate.
  *
  * Validates local media references, canonical program imagery, key portal
- * picture coverage, and the production rule that browser SpeechSynthesis may
- * not be used for spoken output.
+ * picture coverage, production-safe legacy image rewrites, and the production
+ * rule that browser SpeechSynthesis may not be used for spoken output.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { LEGACY_IMAGE_ALIASES } from '../../lib/media/legacy-image-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
@@ -56,15 +57,49 @@ scanSourceFiles(['app', 'apps', 'components', 'data', 'lib'], (_file, relative, 
 });
 
 const missingLocalMedia = [];
+const aliasedLocalMedia = [];
 for (const [url, owners] of mediaReferences) {
   if (url.startsWith('/videos/')) continue; // video production media is mirrored/R2-backed.
   const localPath = path.join(publicDir, url.replace(/^\//, ''));
-  if (!fs.existsSync(localPath)) missingLocalMedia.push({ url, owners: [...owners] });
+  if (fs.existsSync(localPath)) continue;
+
+  const aliasTarget = LEGACY_IMAGE_ALIASES[url];
+  if (aliasTarget) {
+    if (aliasTarget === url) {
+      missingLocalMedia.push({ url, owners: [...owners], reason: 'alias points to itself' });
+      continue;
+    }
+    const aliasPath = path.join(publicDir, aliasTarget.replace(/^\//, ''));
+    if (fs.existsSync(aliasPath)) {
+      aliasedLocalMedia.push({ url, target: aliasTarget });
+      continue;
+    }
+    missingLocalMedia.push({
+      url,
+      owners: [...owners],
+      reason: `alias target ${aliasTarget} does not exist`,
+    });
+    continue;
+  }
+
+  missingLocalMedia.push({ url, owners: [...owners] });
 }
 if (missingLocalMedia.length) {
-  for (const item of missingLocalMedia) fail(`Missing image ${item.url} referenced by ${item.owners.slice(0, 3).join(', ')}`);
+  for (const item of missingLocalMedia) {
+    const suffix = item.reason ? ` (${item.reason})` : '';
+    fail(`Missing image ${item.url} referenced by ${item.owners.slice(0, 3).join(', ')}${suffix}`);
+  }
 } else {
-  pass(`${[...mediaReferences.keys()].filter((url) => url.startsWith('/images/')).length} local image references resolve in public/`);
+  pass(`${[...mediaReferences.keys()].filter((url) => url.startsWith('/images/')).length} local image references resolve in public/ (${aliasedLocalMedia.length} historical paths use verified canonical rewrites)`);
+}
+
+for (const [source, destination] of Object.entries(LEGACY_IMAGE_ALIASES)) {
+  if (!source.startsWith('/images/') || !destination.startsWith('/images/')) {
+    fail(`Invalid legacy image rewrite ${source} -> ${destination}`);
+    continue;
+  }
+  const destinationPath = path.join(publicDir, destination.replace(/^\//, ''));
+  if (!fs.existsSync(destinationPath)) fail(`Legacy image rewrite target is missing: ${source} -> ${destination}`);
 }
 
 console.log('\n── Static program image coverage ──');

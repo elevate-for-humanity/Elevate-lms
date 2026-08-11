@@ -1,17 +1,19 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import Image from 'next/image';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { BookOpen, Clock, CheckCircle, AlertCircle, Users } from 'lucide-react';
+import { BookOpen, Clock, CheckCircle, AlertCircle, Users, ArrowRight, Store, BadgeDollarSign } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 import { DOLCompetencyTracker } from '@/components/dashboard/DOLCompetencyTracker';
 
 export const metadata: Metadata = {
-  title: 'Apprenticeship Host Shop Dashboard - Elevate',
-  description: 'Manage your apprenticeship host shop, apprentices, and OJT tracking',
+  title: 'Host Shop Dashboard | Elevate',
+  description: 'Manage apprentices, OJT hours, compliance, and host shop activity.',
+  robots: { index: false, follow: false },
 };
-
 export const dynamic = 'force-dynamic';
 
-interface ApprenticeProgress {
+type ApprenticeProgress = {
   id: string;
   name: string;
   email: string;
@@ -19,297 +21,141 @@ interface ApprenticeProgress {
   program_slug: string;
   ojt_hours: number;
   ojt_required: number;
-  rti_lessons: number;
-  rti_total: number;
   completion_percentage: number;
-  last_activity: string;
   status: string;
-  dol_appendix_a_url?: string;
   user_id: string;
   enrollment_id: string;
-}
+};
 
 async function getHostShopData(userId: string) {
   const supabase = await createClient();
-  
-  // Get profile to verify host shop role
   const { data: profile } = await supabase
     .from('profiles')
-    .select('*, organizations(*)')
+    .select('id, role, organization_id, full_name, organizations(name)')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
-  if (!profile || profile.role !== 'host_shop') {
-    return null;
-  }
-
+  if (!profile || !['host_shop', 'host_shop_admin', 'partner', 'admin', 'super_admin'].includes(String(profile.role))) return null;
   const orgId = profile.organization_id;
 
-  // Get apprentices with their progress
-  const { data: enrollments } = await supabase
-    .from('program_enrollments')
-    .select(`
-      *,
-      profiles:user_id (full_name, email),
-      programs (id, title, slug, ojt_hours_required, rti_hours_required)
-    `)
-    .eq('host_shop_id', orgId)
-    .in('status', ['active', 'enrolled', 'paused']);
+  const { data: enrollmentRows } = orgId
+    ? await supabase
+        .from('program_enrollments')
+        .select('id, user_id, status, created_at, updated_at, profiles:user_id(full_name,email), programs:program_id(id,title,slug,ojt_hours_required,rti_hours_required)')
+        .eq('host_shop_id', orgId)
+        .in('status', ['active', 'enrolled', 'paused'])
+    : { data: [] as any[] };
 
-  // Get OJT hours per apprentice
-  const { data: ojtData } = await supabase
-    .from('ojt_hours')
-    .select('user_id, hours')
-    .eq('host_shop_id', orgId);
+  const { data: ojtRows } = orgId
+    ? await supabase.from('ojt_hours').select('user_id, hours').eq('host_shop_id', orgId)
+    : { data: [] as any[] };
 
-  // Calculate progress for each apprentice
   const ojtByUser: Record<string, number> = {};
-  ojtData?.forEach(h => {
-    ojtByUser[h.user_id] = (ojtByUser[h.user_id] || 0) + h.hours;
-  });
+  for (const row of (ojtRows ?? []) as any[]) {
+    if (!row?.user_id) continue;
+    ojtByUser[row.user_id] = (ojtByUser[row.user_id] || 0) + Number(row.hours || 0);
+  }
 
-  // Get RTI progress (lessons completed)
-  const { data: rtiProgress } = await supabase
-    .from('lesson_progress')
-    .select('user_id, lessons:lesson_id(count)')
-    .in('user_id', enrollments?.map(e => e.user_id) || []);
-
-  const rtiByUser: Record<string, number> = {};
-  rtiProgress?.forEach(p => {
-    rtiByUser[p.user_id] = (rtiByUser[p.user_id] || 0) + 1;
-  });
-
-  const apprentices: ApprenticeProgress[] = (enrollments || []).map(enrollment => {
-    const ojtHours = ojtByUser[enrollment.user_id] || 0;
-    const rtiCompleted = rtiByUser[enrollment.user_id] || 0;
-    const rtiTotal = enrollment.programs?.rti_hours_required || 500;
-    const ojtRequired = enrollment.programs?.ojt_hours_required || 2000;
-    
-    const ojtPct = Math.min(100, (ojtHours / ojtRequired) * 100);
-    const rtiPct = Math.min(100, (rtiCompleted / rtiTotal) * 100);
-    const completionPct = Math.round((ojtPct + rtiPct) / 2);
-
+  const apprentices: ApprenticeProgress[] = ((enrollmentRows ?? []) as any[]).map((row) => {
+    const profileRow = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+    const programRow = Array.isArray(row.programs) ? row.programs[0] : row.programs;
+    const required = Number(programRow?.ojt_hours_required || 2000);
+    const completed = Number(ojtByUser[row.user_id] || 0);
     return {
-      id: enrollment.id,
-      name: enrollment.profiles?.full_name || 'Unknown',
-      email: enrollment.profiles?.email || '',
-      program: enrollment.programs?.title || 'Apprenticeship',
-      program_slug: enrollment.programs?.slug || '',
-      ojt_hours: ojtHours,
-      ojt_required: ojtRequired,
-      rti_lessons: rtiCompleted,
-      rti_total: rtiTotal,
-      completion_percentage: completionPct,
-      last_activity: enrollment.updated_at || enrollment.created_at,
-      status: enrollment.status,
-      dol_appendix_a_url: `/programs/${enrollment.programs?.slug}/syllabus`,
-      user_id: enrollment.user_id,
-      enrollment_id: enrollment.id,
+      id: String(row.id),
+      name: profileRow?.full_name || 'Apprentice',
+      email: profileRow?.email || '',
+      program: programRow?.title || 'Apprenticeship',
+      program_slug: programRow?.slug || 'barber-apprenticeship',
+      ojt_hours: completed,
+      ojt_required: required,
+      completion_percentage: required > 0 ? Math.min(100, Math.round((completed / required) * 100)) : 0,
+      status: row.status || 'active',
+      user_id: row.user_id,
+      enrollment_id: row.id,
     };
   });
 
-  // Get WOTC credits
-  const { data: wotcCredits } = await supabase
-    .from('wotc_credits')
-    .select('*')
-    .eq('host_shop_id', orgId)
-    .in('status', ['pending', 'approved']);
+  const { data: wotcCredits } = orgId
+    ? await supabase.from('wotc_credits').select('id, status, amount').eq('host_shop_id', orgId).in('status', ['pending', 'approved'])
+    : { data: [] as any[] };
 
-  return {
-    profile,
-    apprentices,
-    wotcCredits: wotcCredits || [],
-  };
+  return { profile, apprentices, wotcCredits: (wotcCredits ?? []) as any[] };
 }
 
 export default async function HostShopDashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?redirect=/admin/host-shop/dashboard');
-  }
+  if (!user) redirect('/login?redirect=/host-shop/dashboard');
 
   const data = await getHostShopData(user.id);
-
-  if (!data) {
-    redirect('/unauthorized');
-  }
+  if (!data) redirect('/unauthorized');
 
   const { profile, apprentices, wotcCredits } = data;
-
-  // Calculate stats
-  const totalOJT = apprentices.reduce((sum, a) => sum + a.ojt_hours, 0);
-  const totalRTI = apprentices.reduce((sum, a) => sum + a.rti_lessons, 0);
-  const completedCount = apprentices.filter(a => a.completion_percentage >= 100).length;
-  const pendingWOTC = wotcCredits.filter(w => w.status === 'pending').length;
-  const approvedWOTC = wotcCredits.filter(w => w.status === 'approved').reduce((sum, w) => sum + (w.amount || 0), 0);
+  const org = Array.isArray((profile as any).organizations) ? (profile as any).organizations[0] : (profile as any).organizations;
+  const shopName = org?.name || profile.full_name || 'Your Host Shop';
+  const totalOjt = apprentices.reduce((sum, apprentice) => sum + apprentice.ojt_hours, 0);
+  const approvedWotc = wotcCredits.filter((credit) => credit.status === 'approved').reduce((sum, credit) => sum + Number(credit.amount || 0), 0);
+  const selected = apprentices[0];
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Apprenticeship Host Shop Dashboard</h1>
-        <p className="text-slate-500">{profile.organizations?.name || 'Your Host Shop'}</p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-5 gap-4 mb-8">
-        <div className="bg-white rounded-xl border p-4">
-          <p className="text-3xl font-bold text-blue-600">{apprentices.length}</p>
-          <p className="text-sm text-slate-500">Active Apprentices</p>
-        </div>
-        <div className="bg-white rounded-xl border p-4">
-          <p className="text-3xl font-bold text-green-600">{totalOJT}</p>
-          <p className="text-sm text-slate-500">Total OJT Hours</p>
-        </div>
-        <div className="bg-white rounded-xl border p-4">
-          <p className="text-3xl font-bold text-purple-600">{totalRTI}</p>
-          <p className="text-sm text-slate-500">RTI Lessons Done</p>
-        </div>
-        <div className="bg-white rounded-xl border p-4">
-          <p className="text-3xl font-bold text-amber-600">${approvedWOTC.toLocaleString()}</p>
-          <p className="text-sm text-slate-500">WOTC Credits Earned</p>
-        </div>
-        <div className="bg-white rounded-xl border p-4">
-          <p className="text-3xl font-bold text-emerald-600">{completedCount}</p>
-          <p className="text-sm text-slate-500">Completed</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6">
-        {/* Apprentice Progress Table */}
-        <div className="bg-white rounded-xl border">
-          <div className="px-4 py-3 border-b flex justify-between items-center">
-            <h2 className="font-semibold text-slate-900 flex items-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              Apprentice Progress & Syllabus
-            </h2>
-            <a href="/host-shop/apprentices" className="text-sm text-blue-600 hover:underline">
-              View All
-            </a>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b">
-                <tr>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">Apprentice</th>
-                  <th className="text-left px-4 py-3 text-sm font-semibold text-slate-700">Program</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-slate-700">OJT Progress</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-slate-700">RTI Progress</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-slate-700">Overall</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-slate-700">Status</th>
-                  <th className="text-center px-4 py-3 text-sm font-semibold text-slate-700">DOL Appendix A</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {apprentices.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                      No apprentices assigned yet
-                    </td>
-                  </tr>
-                ) : (
-                  apprentices.map(apprentice => (
-                    <tr key={apprentice.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-slate-900">{apprentice.name}</p>
-                        <p className="text-xs text-slate-400">{apprentice.email}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-slate-700">{apprentice.program}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-slate-200 rounded-full h-2">
-                            <div 
-                              className="bg-green-500 h-2 rounded-full"
-                              style={{ width: `${Math.min(100, (apprentice.ojt_hours / apprentice.ojt_required) * 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-slate-600">
-                            {apprentice.ojt_hours}/{apprentice.ojt_required} hrs
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-slate-200 rounded-full h-2">
-                            <div 
-                              className="bg-purple-500 h-2 rounded-full"
-                              style={{ width: `${Math.min(100, (apprentice.rti_lessons / apprentice.rti_total) * 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-slate-600">
-                            {apprentice.rti_lessons}/{apprentice.rti_total} lessons
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex items-center justify-center gap-2">
-                          <span className={`font-bold ${apprentice.completion_percentage >= 100 ? 'text-green-600' : 'text-slate-700'}`}>
-                            {apprentice.completion_percentage}%
-                          </span>
-                          {apprentice.completion_percentage >= 100 && (
-                            <CheckCircle className="w-4 h-4 text-green-500" />
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          apprentice.status === 'active' ? 'bg-green-100 text-green-700' :
-                          apprentice.status === 'enrolled' ? 'bg-blue-100 text-blue-700' :
-                          'bg-slate-100 text-slate-600'
-                        }`}>
-                          {apprentice.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <a 
-                          href={apprentice.dol_appendix_a_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded hover:bg-amber-200 inline-flex items-center gap-1"
-                        >
-                          <BookOpen className="w-3 h-3" />
-                          Syllabus
-                        </a>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+    <main className="min-h-screen bg-slate-50">
+      <section className="relative isolate overflow-hidden px-6 py-10 text-white">
+        <Image src="/images/pages/barber-apprenticeship-hero.jpg" alt="Barber apprenticeship host shop" fill priority className="-z-20 object-cover" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-slate-900/80 to-emerald-900/60" />
+        <div className="mx-auto max-w-7xl">
+          <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-emerald-200"><Store className="h-5 w-5" />Host Shop Portal</div>
+          <h1 className="mt-3 text-3xl font-black sm:text-4xl">{shopName}</h1>
+          <p className="mt-3 max-w-2xl text-sm font-medium text-slate-100">Supervise apprentices, approve OJT activity, review DOL competencies, and keep your shop’s apprenticeship records current.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/host-shop/ojt" className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-black text-slate-950">Log OJT Hours <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/host-shop/apprentices" className="rounded-xl bg-white/15 px-4 py-2.5 text-sm font-black text-white ring-1 ring-white/30">View Apprentices</Link>
           </div>
         </div>
+      </section>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-4 gap-4">
-          <a href="/host-shop/ojt" className="p-4 bg-blue-50 rounded-xl text-center hover:bg-blue-100 border border-blue-200">
-            <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-            <p className="font-medium text-blue-700">Log OJT Hours</p>
-          </a>
-          <a href="/host-shop/apprentices" className="p-4 bg-green-50 rounded-xl text-center hover:bg-green-100 border border-green-200">
-            <BookOpen className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <p className="font-medium text-green-700">View Apprentices</p>
-          </a>
-          <a href="/host-shop/compliance" className="p-4 bg-purple-50 rounded-xl text-center hover:bg-purple-100 border border-purple-200">
-            <AlertCircle className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-            <p className="font-medium text-purple-700">DOL Compliance</p>
-          </a>
-          <a href="/host-shop/reports" className="p-4 bg-amber-50 rounded-xl text-center hover:bg-amber-100 border border-amber-200">
-            <CheckCircle className="w-6 h-6 text-amber-600 mx-auto mb-2" />
-            <p className="font-medium text-amber-700">Progress Reports</p>
-          </a>
-        </div>
+      <div className="mx-auto max-w-7xl space-y-7 px-6 py-7">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['Active apprentices', apprentices.length, Users, 'text-blue-700 bg-blue-50'],
+            ['OJT hours logged', totalOjt, Clock, 'text-emerald-700 bg-emerald-50'],
+            ['WOTC credits', `$${approvedWotc.toLocaleString()}`, BadgeDollarSign, 'text-amber-700 bg-amber-50'],
+            ['Completed', apprentices.filter((a) => a.completion_percentage >= 100).length, CheckCircle, 'text-violet-700 bg-violet-50'],
+          ].map(([label, value, Icon, tone]) => {
+            const CardIcon = Icon as typeof Users;
+            return <div key={String(label)} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className={`inline-flex rounded-xl p-2.5 ${String(tone)}`}><CardIcon className="h-5 w-5" /></div><div className="mt-4 text-2xl font-black text-slate-950">{String(value)}</div><div className="mt-1 text-xs font-black uppercase tracking-wide text-slate-500">{String(label)}</div></div>;
+          })}
+        </section>
 
-        {/* DOL Competency Tracker */}
-        <DOLCompetencyTracker 
-          userId={user.id}
-          organizationId={profile.organization_id}
-          apprenticeshipProgram="barber"
-        />
+        <section className="grid gap-6 lg:grid-cols-[1fr_340px]">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center gap-2"><BookOpen className="h-5 w-5 text-blue-700" /><h2 className="text-lg font-black text-slate-950">Apprentice progress</h2></div>
+            <div className="mt-4 space-y-3">
+              {apprentices.length ? apprentices.map((apprentice) => <div key={apprentice.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4"><div className="flex items-center justify-between gap-4"><div><div className="font-black text-slate-950">{apprentice.name}</div><div className="mt-1 text-xs font-semibold text-slate-500">{apprentice.program} · {apprentice.ojt_hours}/{apprentice.ojt_required} OJT hours</div></div><span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-700">{apprentice.completion_percentage}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-emerald-500" style={{ width: `${apprentice.completion_percentage}%` }} /></div></div>) : <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm font-semibold text-slate-500">No active apprentices assigned to this shop yet.</div>}
+            </div>
+          </div>
+
+          <aside className="space-y-4">
+            <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5"><div className="flex items-center gap-2 font-black text-blue-950"><AlertCircle className="h-5 w-5" />What to do next</div><ol className="mt-3 space-y-2 text-sm font-medium text-blue-950"><li>1. Log hours after supervised work.</li><li>2. Verify competencies only after demonstration.</li><li>3. Review apprentices who are behind schedule.</li><li>4. Keep compliance records current before reporting.</li></ol></div>
+            <div className="grid gap-2">
+              <Link href="/host-shop/compliance" className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-800 shadow-sm">DOL Compliance</Link>
+              <Link href="/host-shop/reports" className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-black text-slate-800 shadow-sm">Progress Reports</Link>
+            </div>
+          </aside>
+        </section>
+
+        {selected && (
+          <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-black text-slate-950">DOL Competency Tracker — {selected.name}</h2>
+            <DOLCompetencyTracker
+              userId={selected.user_id || user.id}
+              programSlug={selected.program_slug || 'barber-apprenticeship'}
+              isHostShop
+              enrollmentId={selected.enrollment_id}
+            />
+          </section>
+        )}
       </div>
-    </div>
+    </main>
   );
 }

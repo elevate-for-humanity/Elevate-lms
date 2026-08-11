@@ -54,6 +54,8 @@ export type BlueprintLessonTypeRule = {
 export type BlueprintModule = {
   slug: string;
   title: string;
+  /** Optional module summary persisted by the publisher when a blueprint provides one. */
+  description?: string;
   orderIndex: number;
   minLessons: number;
   maxLessons: number;
@@ -118,72 +120,30 @@ export type BlueprintVideoConfig = {
   instructorName: string;
   instructorTitle: string;
   instructorImagePath: string;
-  topBarColor: string;
-  accentColor: string;
-  backgroundColor: string;
-  ttsVoice: 'onyx' | 'alloy' | 'echo' | 'fable' | 'nova' | 'shimmer';
-  ttsSpeed: number;
-  slideCount: 5;
-  segments: ['intro', 'concept', 'visual', 'application', 'wrapup'];
-  generateDalleImage: boolean;
-  dalleImageStyle: 'natural' | 'vivid';
-  /** Resolution was added after the earliest blueprints; generator supplies defaults. */
-  width?: 1920;
-  height?: 1080;
+  brandName?: string;
+  brandColor?: string;
+  logoPath?: string;
+  backgroundMusic?: boolean;
+  captions?: boolean;
 };
 
 export type CredentialBlueprint = {
   id: string;
-  version: string;
-  credentialSlug: string;
-  credentialTitle: string;
-  state: string;
   programSlug: string;
-  credentialCode: string;
-  certiportExamCodes?: string[];
-  externalCourses?: Array<{
-    title: string;
-    provider: string;
-    url: string;
-    required: boolean;
-  }>;
-  socCode?: string;
-  trackVariants: string[];
-  status: 'active' | 'draft' | 'archived';
-  credentialTarget?: 'IC&RC' | 'NAADAC' | 'STATE_BOARD' | 'DOL_APPRENTICESHIP' | 'INTERNAL';
-  minimumHours?: number;
-  requiresFinalExam?: boolean;
-  finalExam?: BlueprintFinalExamConfig;
-  certificateRequirements?: BlueprintCertificateRequirements;
-  generationRules: BlueprintGenerationRules;
-  skipLqs?: boolean;
+  credentialSlug: string;
+  title: string;
+  version: string;
+  sourceAuthority: string;
+  sourceReference: string;
+  effectiveDate: string;
+  programType: string;
+  targetRole: string;
   expectedModuleCount: number;
   expectedLessonCount: number;
   modules: BlueprintModule[];
-  assessmentRules?: BlueprintAssessmentRule[];
+  assessmentRules: BlueprintAssessmentRule[];
+  generationRules: BlueprintGenerationRules;
+  finalExam?: BlueprintFinalExamConfig;
+  certificateRequirements?: BlueprintCertificateRequirements;
   videoConfig?: BlueprintVideoConfig;
-  certificationPathway?: {
-    certificationBodyId: string;
-    credentialName: string;
-    credentialAbbrev: string;
-    examFeeCents?: number;
-    feePayer?: 'student' | 'elevate' | 'grant';
-    eligibilityReview?: boolean;
-    isPrimary?: boolean;
-  };
-  contentSource?: 'blueprint' | 'curriculum_lessons';
-};
-
-export type BlueprintAuditViolation = {
-  severity: 'error' | 'warning';
-  moduleSlug?: string;
-  rule: string;
-  detail: string;
-};
-
-export type BlueprintAuditResult = {
-  blueprintSlug: string;
-  passed: boolean;
-  violations: BlueprintAuditViolation[];
-  warnings: BlueprintAuditViolation[];
 };

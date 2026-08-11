@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { executeAiTask, type AITask } from '@/lib/ai/execute-ai-task';
+import { aiReason } from '@/lib/ai/ai-service';
 import {
   getAITool,
   getAIToolCatalogForPrompt,
   type AIAgentId,
 } from '@/lib/ai/tools/registry';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -15,60 +17,15 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 120;
 
 const AGENT_MAP: Record<string, { agent: AIAgentId; label: string; task: AITask; role: string }> = {
-  'course-orchestrator': {
-    agent: 'LIZZY',
-    label: 'Course Orchestrator',
-    task: 'general_chat',
-    role: 'course operations and curriculum execution',
-  },
-  'instructional-designer': {
-    agent: 'LIZZY',
-    label: 'Instructional Designer',
-    task: 'general_chat',
-    role: 'instructional design and curriculum quality',
-  },
-  'qa-designer': {
-    agent: 'ZORA',
-    label: 'QA Designer',
-    task: 'diagnostics',
-    role: 'quality assurance, accessibility, and compliance review',
-  },
-  'marketing-content': {
-    agent: 'PARIS',
-    label: 'Marketing Content Creator',
-    task: 'social_generation',
-    role: 'sales and marketing content',
-  },
-  'marketing-social': {
-    agent: 'PARIS',
-    label: 'Social Media Manager',
-    task: 'social_generation',
-    role: 'social marketing and audience conversion',
-  },
-  'marketing-video': {
-    agent: 'PARIS',
-    label: 'Video Script Writer',
-    task: 'social_generation',
-    role: 'commercial video scripting and conversion copy',
-  },
-  'workforce-agent': {
-    agent: 'ZORA',
-    label: 'Workforce Agent',
-    task: 'general_chat',
-    role: 'workforce, apprenticeship, funding, and compliance operations',
-  },
-  'admissions-agent': {
-    agent: 'PARIS',
-    label: 'Admissions Agent',
-    task: 'career_counseling',
-    role: 'admissions, intake, and enrollment guidance',
-  },
-  'media-designer': {
-    agent: 'LIZZY',
-    label: 'Media Designer',
-    task: 'general_chat',
-    role: 'media production and accessibility operations',
-  },
+  'course-orchestrator': { agent: 'LIZZY', label: 'Course Orchestrator', task: 'general_chat', role: 'course operations and curriculum execution' },
+  'instructional-designer': { agent: 'LIZZY', label: 'Instructional Designer', task: 'general_chat', role: 'instructional design and curriculum quality' },
+  'qa-designer': { agent: 'ZORA', label: 'QA Designer', task: 'diagnostics', role: 'quality assurance, accessibility, and compliance review' },
+  'marketing-content': { agent: 'PARIS', label: 'Marketing Content Creator', task: 'social_generation', role: 'sales and marketing content' },
+  'marketing-social': { agent: 'PARIS', label: 'Social Media Manager', task: 'social_generation', role: 'social marketing and audience conversion' },
+  'marketing-video': { agent: 'PARIS', label: 'Video Script Writer', task: 'social_generation', role: 'commercial video scripting and conversion copy' },
+  'workforce-agent': { agent: 'ZORA', label: 'Workforce Agent', task: 'general_chat', role: 'workforce, apprenticeship, funding, and compliance operations' },
+  'admissions-agent': { agent: 'PARIS', label: 'Admissions Agent', task: 'career_counseling', role: 'admissions, intake, and enrollment guidance' },
+  'media-designer': { agent: 'LIZZY', label: 'Media Designer', task: 'general_chat', role: 'media production and accessibility operations' },
 };
 
 type PlannedTool = { name: string; input: Record<string, unknown> };
@@ -83,6 +40,23 @@ function extractUuid(text: string): string | null {
   return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
 }
 
+function extractNamedFilter(command: string, label: string): string | null {
+  const match = command.match(new RegExp(`\\b${label}\\s+([a-z0-9_-]+)`, 'i'));
+  return match?.[1]?.trim() || null;
+}
+
+function wioaFollowupInput(command: string, context: Record<string, unknown>): Record<string, unknown> {
+  const input = { ...asRecord(context.toolInput) };
+  const lower = command.toLowerCase();
+  if (/30\s*[- ]?day/.test(lower)) input.type = '30-day';
+  if (/\b(overdue|past due|missing|missed)\b/.test(lower)) input.overdue = true;
+  const sector = extractNamedFilter(command, 'sector');
+  const program = extractNamedFilter(command, 'program');
+  if (sector) input.sector = sector;
+  if (program) input.program = program;
+  return input;
+}
+
 function planToolFromCommand(command: string, context: Record<string, unknown>): PlannedTool | null {
   const explicitTool = typeof context.toolName === 'string' ? context.toolName : null;
   if (explicitTool && getAITool(explicitTool)) {
@@ -93,6 +67,15 @@ function planToolFromCommand(command: string, context: Record<string, unknown>):
   const contextId = typeof context.id === 'string' ? context.id : null;
   const id = contextId ?? extractUuid(command);
 
+  if (/\bwioa\b/.test(lower) && /\b(follow[- ]?ups?|30\s*[- ]?day|overdue|past due|missing|missed)\b/.test(lower)) {
+    return { name: 'wioa.followups', input: wioaFollowupInput(command, context) };
+  }
+  if (/\bwioa\b/.test(lower) && /\b(performance|outcomes?|metrics?|narrative|report|earnings|credential|skill gain)\b/.test(lower)) {
+    return { name: 'wioa.performance', input: asRecord(context.toolInput) };
+  }
+  if (/\bwioa\b/.test(lower) && /\b(list|show|find|search|participants?)\b/.test(lower)) {
+    return { name: 'wioa.list', input: asRecord(context.toolInput) };
+  }
   if (/\b(list|show|review|find|search)\b.*\bapplications?\b/.test(lower) || /\bpending applications?\b/.test(lower)) {
     return { name: 'applications.search', input: {} };
   }
@@ -121,13 +104,7 @@ function planToolFromCommand(command: string, context: Record<string, unknown>):
     return { name: 'payouts.markPaid', input: id ? { enrollmentId: id } : {} };
   }
   if (/\b(generate|build|create)\b.*\bcourse\b/.test(lower)) {
-    return {
-      name: 'courses.generate',
-      input: {
-        ...asRecord(context.toolInput),
-        prompt: command,
-      },
-    };
+    return { name: 'courses.generate', input: { ...asRecord(context.toolInput), prompt: command } };
   }
   if (/\brun\b.*\btests?\b/.test(lower)) {
     return { name: 'workflows.runTests', input: asRecord(context.toolInput) };
@@ -143,15 +120,42 @@ function confirmationFromRequest(command: string, body: Record<string, unknown>,
   return undefined;
 }
 
-function summarizeToolPayload(payload: unknown): string {
-  if (payload === null || payload === undefined) return 'The tool completed without a response body.';
-  if (typeof payload === 'string') return payload.slice(0, 3000);
+function safeToolData(payload: unknown): string {
+  if (payload === null || payload === undefined) return 'No result body.';
+  if (typeof payload === 'string') return payload.slice(0, 20_000);
   try {
-    const text = JSON.stringify(payload, null, 2);
-    return text.length > 3000 ? `${text.slice(0, 3000)}\n…` : text;
+    return JSON.stringify(payload, null, 2).slice(0, 20_000);
   } catch {
-    return 'The tool completed successfully.';
+    return String(payload).slice(0, 20_000);
   }
+}
+
+function shouldSynthesize(command: string, toolName: string): boolean {
+  if (toolName.startsWith('wioa.')) return true;
+  return /\b(draft|write|summari[sz]e|narrative|report|analy[sz]e|explain|email|reminder|recommend|what does|tell me)\b/i.test(command);
+}
+
+async function synthesizeReadResult(params: {
+  agentLabel: string;
+  command: string;
+  tool: string;
+  payload: unknown;
+}): Promise<{ message: string; provider?: string }> {
+  const result = await aiReason({
+    temperature: 0.2,
+    maxTokens: 1800,
+    messages: [
+      {
+        role: 'system',
+        content: `You are ${params.agentLabel}, an Elevate workforce/admin AI. The data below came from an authenticated live platform tool. Answer only from that data. Do not invent missing records, eligibility, funding decisions, compliance conclusions, or contact information. If asked to draft an email/reminder, draft it but do not claim it was sent. If asked for a performance narrative, clearly label it as a draft for staff review.`,
+      },
+      {
+        role: 'user',
+        content: `Admin request:\n${params.command}\n\nLive tool: ${params.tool}\n\nLive result:\n${safeToolData(params.payload)}`,
+      },
+    ],
+  });
+  return { message: result.content, provider: result.provider };
 }
 
 export async function POST(req: NextRequest) {
@@ -160,6 +164,10 @@ export async function POST(req: NextRequest) {
 
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
+
+  await hydrateProcessEnv().catch((error) => {
+    logger.warn('[paris/execute] secret hydration failed; using runtime environment', { error: String(error) });
+  });
 
   const body = asRecord(await req.json().catch(() => ({})));
   const command = typeof body.command === 'string' ? body.command.trim() : '';
@@ -223,14 +231,34 @@ export async function POST(req: NextRequest) {
       }, { status: result.httpStatus >= 400 ? result.httpStatus : 500 });
     }
 
+    let message = `${agentConfig.label} executed ${result.tool}.`;
+    let provider: string | undefined;
+    if (result.classification === 'read' && shouldSynthesize(command, result.tool)) {
+      try {
+        const synthesis = await synthesizeReadResult({
+          agentLabel: agentConfig.label,
+          command,
+          tool: result.tool,
+          payload: result.payload,
+        });
+        message = synthesis.message || message;
+        provider = synthesis.provider;
+      } catch (error) {
+        logger.warn('[paris/execute] live-data synthesis failed; returning raw tool result', {
+          tool: result.tool,
+          error: String(error),
+        });
+      }
+    }
+
     return NextResponse.json({
       success: true,
       executed: true,
       agent: agentConfig.label,
       tool: result.tool,
       risk: result.risk,
-      message: `${agentConfig.label} executed ${result.tool}.`,
-      summary: summarizeToolPayload(result.payload),
+      message,
+      provider,
       data: result.payload ?? null,
       traceId: result.traceId,
     });

@@ -26,7 +26,7 @@ export default async function SignMouPage() {
     .eq('id', user.id)
     .maybeSingle();
   if (!profile?.program_holder_id) {
-    redirect('/program-holder?error=pending-approval');
+    redirect('/apply/program-holder?status=pending');
   }
 
   const { data: holder } = await db
@@ -35,7 +35,7 @@ export default async function SignMouPage() {
     .eq('id', profile.program_holder_id)
     .maybeSingle();
   if (!holder || !holder.approved_at || !['approved', 'active'].includes(String(holder.status || ''))) {
-    redirect('/program-holder?error=pending-approval');
+    redirect('/apply/program-holder?status=pending');
   }
   if (holder.mou_signed) {
     redirect('/program-holder/dashboard');

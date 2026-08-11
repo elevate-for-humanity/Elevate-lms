@@ -1,6 +1,6 @@
 import 'server-only';
 
-import mammoth from 'mammoth';
+import * as mammoth from 'mammoth';
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
 const API_VERSION = '2023-06-01';

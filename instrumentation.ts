@@ -66,6 +66,10 @@ export async function register() {
 export const onRequestError: Instrumentation.onRequestError = async (err, request, context) => {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const { captureRequestError } = await import('@sentry/nextjs');
-    captureRequestError(err, request, context);
+    const sentryRequest = {
+      ...request,
+      headers: Object.fromEntries(request.headers.entries()),
+    };
+    captureRequestError(err, sentryRequest, context);
   }
 };

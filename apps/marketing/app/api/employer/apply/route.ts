@@ -60,38 +60,83 @@ export async function POST(request: Request) {
       company_name: companyName,
       contact_name: contactName,
       email,
-      phone,
-      industry,
-      employee_count: employeeCount,
-      hiring_needs: hiringNeeds,
-      notes,
+      phone: phone || null,
+      industry: industry || null,
+      employee_count: employeeCount || null,
+      hiring_needs: hiringNeeds || null,
+      notes: notes || null,
     };
 
-    const { data, error } = await admin
+    // Preserve the universal intake/audit record, but do not depend on an Edge
+    // Function to move it into the canonical Admin review table. Production does
+    // not currently have process-intake deployed.
+    const { data: intake, error: intakeError } = await admin
       .from('application_intake')
       .insert({
         application_type: 'employer',
         payload,
         source: 'public_form',
       })
-      .select('id, created_at')
-      .maybeSingle();
+      .select('id')
+      .single();
 
-    if (error || !data?.id) {
-      logger.error('[employer/apply] intake insert failed', error ?? undefined, { email, companyName });
+    if (intakeError || !intake?.id) {
+      logger.error('[employer/apply] intake insert failed', intakeError ?? undefined, { email, companyName });
       return NextResponse.json(
         { ok: false, error: 'We could not save the employer application. Please try again.' },
         { status: 500 },
       );
     }
 
+    const { data: application, error: applicationError } = await admin
+      .from('employer_applications')
+      .insert({
+        company_name: companyName,
+        contact_name: contactName,
+        email,
+        phone: phone || null,
+        status: 'pending',
+        state: 'submitted',
+        data: payload,
+        intake: payload,
+      })
+      .select('id')
+      .single();
+
+    if (applicationError || !application?.id) {
+      await admin
+        .from('application_intake')
+        .update({ status: 'rejected', error: applicationError?.message || 'Canonical employer application insert failed.' })
+        .eq('id', intake.id);
+      logger.error('[employer/apply] canonical insert failed', applicationError ?? undefined, {
+        intakeId: intake.id,
+        email,
+        companyName,
+      });
+      return NextResponse.json(
+        { ok: false, error: 'We could not place the employer application into review. Please try again.' },
+        { status: 500 },
+      );
+    }
+
+    await admin
+      .from('application_intake')
+      .update({
+        status: 'processed',
+        processed_at: new Date().toISOString(),
+        destination_table: 'employer_applications',
+        destination_id: application.id,
+        error: null,
+      })
+      .eq('id', intake.id);
+
     const safeCompany = escapeHtml(companyName);
     const safeName = escapeHtml(contactName);
     const safeEmail = escapeHtml(email);
-    const safeRef = escapeHtml(data.id);
+    const safeRef = escapeHtml(application.id);
     const notifications = await notifyApplicationSubmission({
       db: admin,
-      applicationId: data.id,
+      applicationId: application.id,
       applicationType: 'employer',
       applicantName: contactName,
       applicantEmail: email,
@@ -99,14 +144,15 @@ export async function POST(request: Request) {
       applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Employer Partnership Application Received</h2><p>Hello ${safeName},</p><p>We received the employer partnership application for <strong>${safeCompany}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><h3>What happens next</h3><ol><li>Our workforce team reviews your hiring, OJT, WEX, apprenticeship, and training needs.</li><li>If additional employer verification or agreements are needed, we will send the exact next step.</li><li>Once the partnership is approved, your employer/partner portal access and onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
       staffSubject: `[EMPLOYER APPLICATION] ${companyName}`,
       staffHtml: `<h2>New Employer Partnership Application</h2><p><strong>${safeCompany}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Industry:</strong> ${escapeHtml(industry || 'Not provided')}</p><p><strong>Hiring/workforce needs:</strong> ${escapeHtml(hiringNeeds || 'Not provided')}</p><p>Review the application and initiate employer onboarding when approved.</p>`,
-      metadata: { company_name: companyName, industry },
+      metadata: { company_name: companyName, industry, intake_id: intake.id },
     });
 
     return NextResponse.json(
       {
         ok: true,
-        applicationId: data.id,
-        referenceNumber: data.id,
+        applicationId: application.id,
+        referenceNumber: application.id,
+        intakeId: intake.id,
         applicationType: 'employer',
         notificationStatus: notifications,
       },

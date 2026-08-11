@@ -155,7 +155,6 @@ export async function runAdminAgentCommand(params: {
           },
         ],
       });
-      provider = synthesis.provider || provider;
       message = synthesis.content.trim() || message;
     }
 
@@ -169,7 +168,6 @@ export async function runAdminAgentCommand(params: {
           { role: 'user', content: command },
         ],
       });
-      provider = response.provider || provider;
       message = response.content;
     }
 

@@ -26,6 +26,46 @@ function safeObject(value: unknown, maxBytes: number): Record<string, unknown> {
   }
 }
 
+function invalidSessionResponse(existing: { converted_at?: string | null; expires_at?: string | null } | null) {
+  if (!existing) return NextResponse.json({ error: 'Sandbox session not found.' }, { status: 404 });
+  if (existing.converted_at) {
+    return NextResponse.json({ error: 'Sandbox session has already been converted.' }, { status: 409 });
+  }
+  if (existing.expires_at && new Date(existing.expires_at) <= new Date()) {
+    return NextResponse.json({ error: 'Sandbox session expired.' }, { status: 410 });
+  }
+  return null;
+}
+
+export async function GET(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const token = clip(request.nextUrl.searchParams.get('token'), 100);
+  if (!token) return NextResponse.json({ error: 'Sandbox token required.' }, { status: 400 });
+
+  const db = await requireAdminClient();
+  const { data: existing, error } = await db
+    .from('demo_sales_sessions')
+    .select('session_token,product_key,scenario_key,state,expires_at,converted_at')
+    .eq('session_token', token)
+    .maybeSingle();
+
+  if (error) return NextResponse.json({ error: 'Could not load sandbox session.' }, { status: 500 });
+  const invalid = invalidSessionResponse(existing);
+  if (invalid) return invalid;
+
+  return NextResponse.json({
+    demo: {
+      session_token: existing!.session_token,
+      product_key: existing!.product_key,
+      scenario_key: existing!.scenario_key,
+      state: safeObject(existing!.state, MAX_STATE_BYTES),
+      expires_at: existing!.expires_at,
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'contact');
   if (rateLimited) return rateLimited;
@@ -73,24 +113,18 @@ export async function PATCH(request: NextRequest) {
     .eq('session_token', token)
     .maybeSingle();
 
-  if (lookupError || !existing) {
-    return NextResponse.json({ error: 'Sandbox session not found.' }, { status: 404 });
-  }
-  if (existing.converted_at) {
-    return NextResponse.json({ error: 'Sandbox session has already been converted.' }, { status: 409 });
-  }
-  if (existing.expires_at && new Date(existing.expires_at) <= new Date()) {
-    return NextResponse.json({ error: 'Sandbox session expired.' }, { status: 410 });
-  }
+  if (lookupError) return NextResponse.json({ error: 'Could not load sandbox session.' }, { status: 500 });
+  const invalid = invalidSessionResponse(existing);
+  if (invalid) return invalid;
 
   const statePatch = safeObject(body.state, MAX_STATE_BYTES);
-  const currentState = safeObject(existing.state, MAX_STATE_BYTES);
+  const currentState = safeObject(existing!.state, MAX_STATE_BYTES);
   const nextState = { ...currentState, ...statePatch };
   if (Buffer.byteLength(JSON.stringify(nextState), 'utf8') > MAX_STATE_BYTES) {
     return NextResponse.json({ error: 'Sandbox payload is too large.' }, { status: 413 });
   }
 
-  const currentEvents = Array.isArray(existing.events) ? existing.events.slice(-MAX_EVENTS) : [];
+  const currentEvents = Array.isArray(existing!.events) ? existing!.events.slice(-MAX_EVENTS) : [];
   const eventInput = safeObject(body.event, MAX_EVENT_BYTES);
   const hasEvent = Object.keys(eventInput).length > 0;
   const nextEvents = hasEvent
@@ -104,7 +138,7 @@ export async function PATCH(request: NextRequest) {
       events: nextEvents,
       last_activity_at: new Date().toISOString(),
     })
-    .eq('id', existing.id);
+    .eq('id', existing!.id);
 
   if (error) return NextResponse.json({ error: 'Could not save sandbox progress.' }, { status: 500 });
   return NextResponse.json({ ok: true, state: nextState, eventCount: nextEvents.length });

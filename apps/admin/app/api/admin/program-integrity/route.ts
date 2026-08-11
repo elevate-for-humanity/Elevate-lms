@@ -62,8 +62,10 @@ async function groupedCount(
     const { data, error } = await query;
     if (error || !Array.isArray(data)) return new Map();
     const counts = new Map<string, number>();
-    for (const row of data as Array<Record<string, unknown>>) {
-      const id = row[groupColumn];
+    for (const row of data as unknown[]) {
+      if (!row || typeof row !== 'object') continue;
+      const record = row as Record<string, unknown>;
+      const id = record[groupColumn];
       if (typeof id === 'string') counts.set(id, (counts.get(id) ?? 0) + 1);
     }
     return counts;
@@ -103,7 +105,7 @@ async function fallbackProgramIntegrity(
   let courseRows: unknown[] | null;
   try {
     const { data } = await db.from('courses').select('program_id, id');
-    courseRows = data ?? null;
+    courseRows = Array.isArray(data) ? (data as unknown[]) : null;
   } catch {
     courseRows = null;
   }
@@ -115,7 +117,7 @@ async function fallbackProgramIntegrity(
       .from('completion_rules')
       .select('entity_id, entity_type')
       .eq('entity_type', 'program');
-    completionRuleRows = data ?? null;
+    completionRuleRows = Array.isArray(data) ? (data as unknown[]) : null;
   } catch {
     completionRuleRows = null;
   }
@@ -125,7 +127,8 @@ async function fallbackProgramIntegrity(
       .filter((value): value is string => typeof value === 'string'),
   );
 
-  return (programs as Array<Record<string, unknown>>)
+  return (programs as unknown[])
+    .filter((program): program is Record<string, unknown> => Boolean(program && typeof program === 'object'))
     .map((program) => {
       const id = String(program.id);
       const slug = typeof program.slug === 'string' ? program.slug : null;

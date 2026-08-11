@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2 } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export interface HeroVideoCta {
@@ -45,8 +45,10 @@ export interface HeroVideoProps {
  * Contract:
  * - one renderer for Marketing video heroes;
  * - video plays once and never loops;
- * - autoplay begins muted when the hero is substantially visible;
- * - sound is user initiated, using recorded voiceover when supplied;
+ * - video/audio sources are attached only as the hero approaches the viewport;
+ * - playback pauses while the hero is offscreen and resumes when it returns;
+ * - audio-on playback is attempted first; browsers that block audible autoplay
+ *   fall back to muted playback with a positive "Play audio" control;
  * - mobile switches to the page's assigned mobile source without a reload;
  * - the poster stays mounted behind video until a renderable frame is ready;
  * - media errors fail to the page-specific poster instead of a broken/black frame;
@@ -81,11 +83,13 @@ export default function HeroVideo({
   const demoStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const demoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [hasEnded, setHasEnded] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const [mediaActivated, setMediaActivated] = useState(false);
+  const [inView, setInView] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop || videoSrcMobile || '');
   const [demoActive, setDemoActive] = useState(false);
   const [demoSlideIndex, setDemoSlideIndex] = useState(0);
@@ -113,7 +117,7 @@ export default function HeroVideo({
     setVideoReady(false);
     setHasEnded(false);
     setHasStarted(false);
-    setMuted(true);
+    setMuted(false);
   }, [videoSrc]);
 
   const clearDemoTimers = useCallback(() => {
@@ -131,6 +135,11 @@ export default function HeroVideo({
     }
     if (videoRef.current) videoRef.current.muted = true;
     setMuted(true);
+  }, []);
+
+  const pauseMedia = useCallback(() => {
+    videoRef.current?.pause();
+    audioRef.current?.pause();
   }, []);
 
   const stopAllMedia = useCallback(() => {
@@ -170,42 +179,71 @@ export default function HeroVideo({
 
   const startOrResume = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || hasEnded || videoFailed) return;
+    if (!video || hasEnded || videoFailed || !mediaActivated || !inView) return;
 
     startDemoSequence();
     video.loop = false;
-    video.muted = true;
+    video.volume = 1;
+
     try {
+      if (voiceoverSrc && audioRef.current) {
+        video.muted = true;
+        const currentTime = video.currentTime || 0;
+        if (Number.isFinite(audioRef.current.duration) && audioRef.current.duration > 0) {
+          audioRef.current.currentTime = Math.min(currentTime, audioRef.current.duration);
+        }
+        await Promise.all([video.play(), audioRef.current.play()]);
+      } else {
+        video.muted = false;
+        await video.play();
+      }
+      setHasStarted(true);
+      setMuted(false);
+      return;
+    } catch {
+      audioRef.current?.pause();
+    }
+
+    try {
+      video.muted = true;
       await video.play();
       setHasStarted(true);
       setMuted(true);
     } catch {
       // Stable poster remains visible until the browser allows media playback.
     }
-  }, [hasEnded, startDemoSequence, videoFailed]);
+  }, [hasEnded, inView, mediaActivated, startDemoSequence, videoFailed, voiceoverSrc]);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
-    if (!wrapper || !videoSrc || videoFailed || hasStarted || hasEnded) return undefined;
+    if (!wrapper || (!videoSrc && !voiceoverSrc) || videoFailed || hasEnded) return undefined;
 
     if (typeof IntersectionObserver === 'undefined') {
-      void startOrResume();
+      setMediaActivated(true);
+      setInView(true);
       return undefined;
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
-          void startOrResume();
-          observer.disconnect();
-        }
+        const visible = entry.isIntersecting && entry.intersectionRatio >= 0.15;
+        setInView(visible);
+        if (entry.isIntersecting) setMediaActivated(true);
+        if (!visible) pauseMedia();
       },
-      { threshold: [0, 0.35, 0.75] },
+      {
+        threshold: [0, 0.15, 0.35, 0.75],
+        rootMargin: '220px 0px 220px 0px',
+      },
     );
 
     observer.observe(wrapper);
     return () => observer.disconnect();
-  }, [hasEnded, hasStarted, startOrResume, videoFailed, videoSrc]);
+  }, [hasEnded, pauseMedia, videoFailed, videoSrc, voiceoverSrc]);
+
+  useEffect(() => {
+    if (mediaActivated && inView && !hasEnded && !videoFailed) void startOrResume();
+  }, [hasEnded, inView, mediaActivated, startOrResume, videoFailed, videoSrc]);
 
   useEffect(() => {
     if (pathname !== initialPathRef.current) stopAllMedia();
@@ -219,9 +257,10 @@ export default function HeroVideo({
       try {
         if (video) video.muted = true;
         const currentTime = video?.currentTime || 0;
-        audioRef.current.currentTime = Number.isFinite(audioRef.current.duration)
-          ? Math.min(currentTime, audioRef.current.duration || 0)
-          : 0;
+        if (Number.isFinite(audioRef.current.duration) && audioRef.current.duration > 0) {
+          audioRef.current.currentTime = Math.min(currentTime, audioRef.current.duration);
+        }
+        if (video?.paused) await video.play();
         await audioRef.current.play();
         setMuted(false);
         return;
@@ -260,7 +299,7 @@ export default function HeroVideo({
 
   const showVideo = Boolean(videoSrc) && !videoFailed;
   const showPoster = Boolean(posterImage);
-  const hasSoundControl = Boolean(voiceoverSrc || showVideo);
+  const hasSoundControl = mediaActivated && Boolean(voiceoverSrc || showVideo);
   const activeSlide = demoActive ? demoSlides[demoSlideIndex] : null;
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
 
@@ -276,6 +315,8 @@ export default function HeroVideo({
             src={posterImage}
             alt=""
             aria-hidden="true"
+            loading="eager"
+            fetchPriority="high"
             className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
           />
         ) : null}
@@ -283,10 +324,9 @@ export default function HeroVideo({
         {showVideo ? (
           <video
             ref={videoRef}
-            src={videoSrc}
-            preload="metadata"
+            src={mediaActivated ? videoSrc : undefined}
+            preload={mediaActivated ? 'metadata' : 'none'}
             playsInline
-            muted
             loop={false}
             onCanPlay={() => setVideoReady(true)}
             onPlaying={() => setVideoReady(true)}
@@ -295,7 +335,7 @@ export default function HeroVideo({
               setVideoFailed(true);
               setVideoReady(false);
               setHasStarted(false);
-              setMuted(true);
+              setMuted(false);
             }}
             className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
@@ -325,8 +365,8 @@ export default function HeroVideo({
         {voiceoverSrc ? (
           <audio
             ref={audioRef}
-            src={voiceoverSrc}
-            preload="metadata"
+            src={mediaActivated ? voiceoverSrc : undefined}
+            preload={mediaActivated ? 'metadata' : 'none'}
             aria-hidden="true"
             className="hidden"
             onEnded={() => setMuted(true)}
@@ -357,11 +397,11 @@ export default function HeroVideo({
             <button
               type="button"
               onClick={() => void toggleSound()}
-              aria-label={muted ? 'Turn on hero audio' : 'Turn off hero audio'}
-              className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-slate-950/90 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
+              className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-white/95 px-3 py-2 text-xs font-bold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-600"
             >
-              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-              <span className="hidden sm:inline">{muted ? 'Sound on' : 'Sound off'}</span>
+              <Volume2 className="h-4 w-4" />
+              <span className="hidden sm:inline">{muted ? 'Play audio' : 'Audio playing'}</span>
             </button>
           </div>
         ) : null}

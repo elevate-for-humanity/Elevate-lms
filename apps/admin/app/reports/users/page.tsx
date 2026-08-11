@@ -14,35 +14,24 @@ export const metadata: Metadata = {
 export default async function UsersReportPage() {
   await requireRole(['admin', 'staff']);
   const supabase = await createClient();
-  
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [
-    { data: users },
-    { count: totalUsers },
-  ] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50),
+  const [{ data: users }, { count: totalUsers }] = await Promise.all([
+    supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(50),
     supabase.from('profiles').select('*', { count: 'exact', head: true }),
   ]);
 
-  const recentUsers = users?.filter(u => 
-    new Date(u.created_at) > new Date(thirtyDaysAgo)
-  ) || [];
+  const recentUsers = users?.filter((u) => new Date(u.created_at) > new Date(thirtyDaysAgo)) || [];
 
-  // Count by role
   const usersByRole: Record<string, number> = {};
-  users?.forEach(u => {
+  users?.forEach((u) => {
     const role = u.role || 'user';
     usersByRole[role] = (usersByRole[role] || 0) + 1;
   });
 
   const roleColors: Record<string, { bg: string; text: string; icon: typeof Users }> = {
     admin: { bg: 'bg-brand-red-100', text: 'text-brand-red-700', icon: Shield },
-    admin: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: Shield },
+    super_admin: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: Shield },
     instructor: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: GraduationCap },
     student: { bg: 'bg-brand-green-100', text: 'text-brand-green-700', icon: Users },
     user: { bg: 'bg-slate-100', text: 'text-slate-900', icon: Users },
@@ -50,7 +39,7 @@ export default async function UsersReportPage() {
 
   const roleLabels: Record<string, string> = {
     admin: 'Admin',
-    admin: 'Admin',
+    super_admin: 'Super Admin',
     instructor: 'Instructor',
     student: 'Student',
     user: 'User',
@@ -58,16 +47,10 @@ export default async function UsersReportPage() {
 
   return (
     <div className="min-h-screen bg-white p-8">
-
-      {/* Hero Image */}
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <Link 
-            href="/reports"
-            className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Reports
+          <Link href="/reports" className="inline-flex items-center gap-2 text-slate-700 hover:text-slate-900 mb-4">
+            <ArrowLeft className="w-4 h-4" /> Back to Reports
           </Link>
           <h1 className="text-2xl font-bold text-slate-900">User Activity Report</h1>
           <p className="text-slate-700">User registrations, roles, and platform engagement</p>
@@ -76,44 +59,36 @@ export default async function UsersReportPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-brand-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-brand-blue-600" />
-              </div>
+              <div className="p-2 bg-brand-blue-100 rounded-lg"><Users className="w-5 h-5 text-brand-blue-600" /></div>
               <span className="text-sm text-slate-700">Total Users</span>
             </div>
             <p className="text-3xl font-bold text-slate-900">{totalUsers || 0}</p>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-brand-green-100 rounded-lg">
-                <UserPlus className="w-5 h-5 text-brand-green-600" />
-              </div>
+              <div className="p-2 bg-brand-green-100 rounded-lg"><UserPlus className="w-5 h-5 text-brand-green-600" /></div>
               <span className="text-sm text-slate-700">New This Month</span>
             </div>
             <p className="text-3xl font-bold text-slate-900">{recentUsers.length}</p>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-brand-blue-100 rounded-lg">
-                <Shield className="w-5 h-5 text-brand-blue-600" />
-              </div>
+              <div className="p-2 bg-brand-blue-100 rounded-lg"><Shield className="w-5 h-5 text-brand-blue-600" /></div>
               <span className="text-sm text-slate-700">Admins</span>
             </div>
             <p className="text-3xl font-bold text-slate-900">
-              {(usersByRole['admin'] || 0) + (usersByRole['admin'] || 0)}
+              {(usersByRole.admin || 0) + (usersByRole.super_admin || 0)}
             </p>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-brand-orange-100 rounded-lg">
-                <GraduationCap className="w-5 h-5 text-brand-orange-600" />
-              </div>
+              <div className="p-2 bg-brand-orange-100 rounded-lg"><GraduationCap className="w-5 h-5 text-brand-orange-600" /></div>
               <span className="text-sm text-slate-700">Students</span>
             </div>
-            <p className="text-3xl font-bold text-slate-900">{usersByRole['student'] || 0}</p>
+            <p className="text-3xl font-bold text-slate-900">{usersByRole.student || 0}</p>
           </div>
         </div>
 
@@ -121,9 +96,7 @@ export default async function UsersReportPage() {
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">Recent Users</h2>
-              <Link href="/students" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
-                View All
-              </Link>
+              <Link href="/students" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">View All</Link>
             </div>
             {users && users.length > 0 ? (
               <div className="overflow-x-auto">
@@ -142,19 +115,13 @@ export default async function UsersReportPage() {
                       return (
                         <tr key={user.id} className="border-b last:border-0">
                           <td className="py-3 px-2">
-                            <p className="font-medium text-slate-900">
-                              {user.first_name || 'Unknown'} {user.last_name || ''}
-                            </p>
+                            <p className="font-medium text-slate-900">{user.first_name || 'Unknown'} {user.last_name || ''}</p>
                             <p className="text-sm text-slate-700">{user.email}</p>
                           </td>
                           <td className="py-3 px-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${roleStyle.bg} ${roleStyle.text}`}>
-                              {roleLabels[role] || role}
-                            </span>
+                            <span className={`px-2 py-1 text-xs rounded-full ${roleStyle.bg} ${roleStyle.text}`}>{roleLabels[role] || role}</span>
                           </td>
-                          <td className="py-3 px-2 text-sm text-slate-700">
-                            {new Date(user.created_at).toLocaleDateString()}
-                          </td>
+                          <td className="py-3 px-2 text-sm text-slate-700">{new Date(user.created_at).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -170,31 +137,24 @@ export default async function UsersReportPage() {
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Users by Role</h2>
             {Object.keys(usersByRole).length > 0 ? (
               <div className="space-y-4">
-                {Object.entries(usersByRole)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([role, count]) => {
-                    const roleStyle = roleColors[role] || roleColors.user;
-                    const Icon = roleStyle.icon;
-                    return (
-                      <div key={role} className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${roleStyle.bg}`}>
-                          <Icon className={`w-4 h-4 ${roleStyle.text}`} />
+                {Object.entries(usersByRole).sort((a, b) => b[1] - a[1]).map(([role, count]) => {
+                  const roleStyle = roleColors[role] || roleColors.user;
+                  const Icon = roleStyle.icon;
+                  return (
+                    <div key={role} className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${roleStyle.bg}`}><Icon className={`w-4 h-4 ${roleStyle.text}`} /></div>
+                      <div className="flex-1">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-slate-900">{roleLabels[role] || role}</span>
+                          <span className="font-medium text-slate-900">{count}</span>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-slate-900">{roleLabels[role] || role}</span>
-                            <span className="font-medium text-slate-900">{count}</span>
-                          </div>
-                          <div className="w-full bg-slate-100 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full ${roleStyle.bg.replace('100', '500')}`}
-                              style={{ width: `${(count / (totalUsers || 1)) * 100}%` }}
-                            />
-                          </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2">
+                          <div className={`h-2 rounded-full ${roleStyle.bg.replace('100', '500')}`} style={{ width: `${(count / (totalUsers || 1)) * 100}%` }} />
                         </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-slate-700 text-center py-8">No data available</p>

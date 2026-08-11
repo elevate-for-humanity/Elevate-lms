@@ -138,7 +138,7 @@ export function InteractiveCommunityDemo() {
           </div>
           <h2 className="mt-5 text-3xl font-black tracking-tight sm:text-4xl">Build a community. Keep what you build.</h2>
           <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-violet-50 sm:text-base">
-            This demo saves your sandbox state. Create a community, post, group, sample member, starter course, AI response, and paid membership — then convert the same build into a real Elevate workspace.
+            This sandbox saves your work. Create a community, post, group, sample member, starter course, AI response, and paid membership — then convert the same build into a real Elevate workspace.
           </p>
 
           <div className="mt-6 rounded-2xl bg-white/10 p-4">
@@ -155,7 +155,7 @@ export function InteractiveCommunityDemo() {
             {[
               'Sandbox data only — never touches production learner/community records',
               'Persistent during this browser session',
-              'Demo state carries into the trial workspace',
+              'Sandbox configuration carries into the trial workspace',
               'Paid membership checkout activates after the owner connects Stripe',
             ].map((item) => (
               <div key={item} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0" /> {item}</div>
@@ -170,7 +170,7 @@ export function InteractiveCommunityDemo() {
               <h3 className="mt-1 text-2xl font-black text-slate-950">{community.name}</h3>
             </div>
             <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">
-              {ready ? (token ? 'Demo session saved' : 'Demo ready') : 'Starting demo…'}
+              {ready ? (token ? 'Sandbox session saved' : 'Sandbox ready') : 'Starting sandbox…'}
             </div>
           </div>
 

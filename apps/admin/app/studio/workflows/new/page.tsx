@@ -1,8 +1,14 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import PageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
 
-/** Compatibility entry only; the implementation lives at /studio/workflows/new. */
-export default function LegacyNewWorkflowPage() {
-  redirect('/studio/workflows/new');
+export const metadata: Metadata = {
+  title: 'New Workflow | Dev Studio',
+  robots: { index: false, follow: false },
+};
+
+/** Canonical workflow-creation route. */
+export default function NewWorkflowPage() {
+  return <PageClient />;
 }

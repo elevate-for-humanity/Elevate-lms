@@ -35,6 +35,9 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/apps/lms/node_modules ./apps/lms/node_modules
 COPY . .
 
+# Capture a real build timestamp even when the platform does not inject one.
+RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('LMS build timestamp:', ts)"
+
 RUN pnpm --filter @elevate/lms build
 RUN test -d /app/apps/lms/.next
 RUN test -f /app/apps/lms/.next/BUILD_ID

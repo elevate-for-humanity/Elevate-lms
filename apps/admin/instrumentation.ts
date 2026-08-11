@@ -42,12 +42,16 @@ export const onRequestError = async (
 ) => {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const { captureRequestError } = await import('@sentry/nextjs');
+    const headers = request.headers
+      ? Object.fromEntries(request.headers.entries())
+      : {};
+
     captureRequestError(
       err,
       {
         path: request.path,
         method: request.method,
-        headers: request.headers ?? new Headers(),
+        headers,
       },
       context,
     );

@@ -1,6 +1,7 @@
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
+import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 
@@ -10,6 +11,7 @@ export default async function NailTechnicianApprenticeshipPage() {
   const loaded = await loadProgramForPage('nail-technician-apprenticeship');
   if (!loaded) return notFound();
   const banner = heroBanners['nail-technician-apprenticeship'] ?? null;
+  const structuredData = buildBeautyProgramStructuredData(loaded.program);
   const heroOverride = banner?.videoSrcDesktop ? (
     <HeroVideo
       videoSrcDesktop={banner.videoSrcDesktop}
@@ -26,23 +28,38 @@ export default async function NailTechnicianApprenticeshipPage() {
     />
   ) : undefined;
 
-  return <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+      />
+      <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride}>
+        <BeautyApprenticeshipAuthority program={loaded.program} />
+      </ProgramDetailPage>
+    </>
+  );
 }
 
 export async function generateMetadata() {
   return {
-    title: 'Nail Technician & Manicuring Apprenticeship | Earn While You Learn',
+    title: 'Nail Technician Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Nail technician and manicuring apprenticeship pathway with supervised on-the-job learning, related technical instruction, salon training sites, progress tracking and sponsor oversight.',
+      'Indiana nail technician and manicurist apprenticeship pathway with 600 supervised hours, salon/spa training, related instruction, progress tracking and licensing preparation. Funding status is reviewed before enrollment.',
     keywords: [
-      'nail technician apprenticeship',
-      'nail tech apprenticeship',
-      'manicuring apprenticeship',
-      'manicurist apprenticeship',
-      'nail apprenticeship Indiana',
-      'paid nail apprenticeship',
-      'nail technician training',
+      'nail technician apprenticeship Indiana',
+      'nail tech apprenticeship Indiana',
+      'manicurist apprenticeship Indiana',
+      'nail salon apprenticeship Indianapolis',
+      'earn while you learn nail technician',
+      'Indiana nail technician license pathway',
     ],
     alternates: { canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship' },
+    openGraph: {
+      title: 'Nail Technician Apprenticeship Program | Indiana',
+      description: 'Complete supervised salon/spa training and related instruction through Elevate’s nail technician apprenticeship pathway. Funding eligibility varies and is reviewed before enrollment.',
+      url: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship',
+      type: 'website',
+    },
   };
 }

@@ -94,10 +94,10 @@ async function _POST(request: NextRequest) {
       plan: 'builder',
     });
 
-    if (!trial.ok) {
+    if ('error' in trial) {
       return NextResponse.json(
         { error: trial.error, correlationId: reference },
-        { status: trial.status ?? 500 },
+        { status: typeof trial.status === 'number' ? trial.status : 500 },
       );
     }
 

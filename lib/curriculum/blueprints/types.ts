@@ -6,6 +6,7 @@ export type BlueprintQuizQuestion = {
   options: string[];
   correctAnswer: number;
   explanation?: string;
+  [key: string]: unknown;
 };
 
 export type BlueprintCompetencyCheck = {
@@ -14,13 +15,14 @@ export type BlueprintCompetencyCheck = {
   description?: string;
   isCritical?: boolean;
   requiresInstructorSignoff?: boolean;
+  [key: string]: unknown;
 };
 
 export type BlueprintLessonRef = {
   slug: string;
   title: string;
   order: number;
-  domainKey: string;
+  domainKey?: string;
   competencyKeys?: string[];
   objective?: string;
   learningObjectives?: string[];
@@ -32,6 +34,7 @@ export type BlueprintLessonRef = {
   partnerExamCode?: string;
   instructorNotes?: string | string[];
   competencyChecks?: Array<string | BlueprintCompetencyCheck>;
+  [key: string]: unknown;
 };
 
 export type BlueprintCompetency = {
@@ -41,11 +44,13 @@ export type BlueprintCompetency = {
   assessmentMethod?: 'quiz' | 'lab' | 'exam' | 'observation' | 'assignment';
   domainKey?: string;
   requiresInstructorSignoff?: boolean;
+  [key: string]: unknown;
 };
 
 export type BlueprintLessonTypeRule = {
   lessonType: string;
   requiredCount: number;
+  [key: string]: unknown;
 };
 
 export type BlueprintModule = {
@@ -64,6 +69,7 @@ export type BlueprintModule = {
   lessons?: BlueprintLessonRef[];
   domainKey?: string;
   interactionSpecs?: unknown[];
+  [key: string]: unknown;
 };
 
 export type BlueprintAssessmentRule = {
@@ -73,6 +79,7 @@ export type BlueprintAssessmentRule = {
   maxQuestions: number;
   passingThreshold: number;
   distributionConstraints?: Record<string, number>;
+  [key: string]: unknown;
 };
 
 export type BlueprintGenerationRules = {
@@ -90,12 +97,14 @@ export type BlueprintGenerationRules = {
   requireFinalExam?: boolean;
   passingScore?: number;
   allowedLessonTypes?: string[];
+  [key: string]: unknown;
 };
 
 export type BlueprintFinalExamConfig = {
   questionCount: number;
   passingScore: number;
   domainDistribution?: Record<string, number>;
+  [key: string]: unknown;
 };
 
 export type BlueprintCertificateRequirements = {
@@ -105,6 +114,7 @@ export type BlueprintCertificateRequirements = {
   includeCompletionDate?: boolean;
   includeVerificationUrl?: boolean;
   requireAllCriticalCompetencies?: boolean;
+  [key: string]: unknown;
 };
 
 export type BlueprintVideoConfig = {
@@ -122,6 +132,7 @@ export type BlueprintVideoConfig = {
   logoPath?: string;
   backgroundMusic?: boolean;
   captions?: boolean;
+  [key: string]: unknown;
 };
 
 export type BlueprintExternalCourse = {
@@ -159,20 +170,21 @@ export type CredentialBlueprint = {
   credentialCode: string;
   state: string;
   status: string;
-  title: string;
   version: string;
-  sourceAuthority: string;
-  sourceReference: string;
-  effectiveDate: string;
-  programType: string;
-  targetRole: string;
   expectedModuleCount: number;
   expectedLessonCount: number;
   modules: BlueprintModule[];
   assessmentRules: BlueprintAssessmentRule[];
   generationRules: BlueprintGenerationRules;
+  title?: string;
+  sourceAuthority?: string;
+  sourceReference?: string;
+  effectiveDate?: string;
+  programType?: string;
+  targetRole?: string;
   finalExam?: BlueprintFinalExamConfig;
   certificateRequirements?: BlueprintCertificateRequirements;
   videoConfig?: BlueprintVideoConfig;
   externalCourses?: BlueprintExternalCourse[];
+  [key: string]: unknown;
 };

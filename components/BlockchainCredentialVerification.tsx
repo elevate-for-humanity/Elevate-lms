@@ -1,380 +1,122 @@
 'use client';
 
-import React from 'react';
-
 import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 interface Credential {
   id: string;
-  type: 'certificate' | 'badge' | 'degree';
   title: string;
   issuer: string;
   issueDate: string;
-  blockchainHash: string;
   verificationUrl: string;
   status: 'verified' | 'pending' | 'revoked';
-  metadata: {
-    skills: string[];
-    grade?: string;
-    credits?: number;
-  };
+  skills: string[];
 }
 
 export function BlockchainCredentialVerification() {
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationResult, setVerificationResult] = useState<Credential | null>(null);
-  const [activeTab, setActiveTab] = useState<'verify' | 'my-credentials'>('verify');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  const myCredentials: Credential[] = [
-    {
-      id: '1',
-      type: 'certificate',
-      title: 'Full-Stack Web Development',
-      issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      issueDate: '2024-01-15',
-      blockchainHash: '0x7f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ead7c2c2eb7b11a91385',
-      verificationUrl: 'https://verify.elevateforhumanity.com/cert/abc123',
-      status: 'verified',
-      metadata: {
-        skills: ['React', 'Node.js', 'MongoDB', 'TypeScript'],
-        grade: 'A',
-      },
-    },
-    {
-      id: '2',
-      type: 'badge',
-      title: 'JavaScript Expert',
-      issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-      issueDate: '2024-01-10',
-      blockchainHash: '0x3c2c2eb7b11a91385f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ea',
-      verificationUrl: 'https://verify.elevateforhumanity.com/badge/xyz789',
-      status: 'verified',
-      metadata: {
-        skills: ['ES6+', 'Async Programming', 'Design Patterns'],
-      },
-    },
-    {
-      id: '3',
-      type: 'certificate',
-      title: 'AWS Cloud Practitioner',
-      issuer: 'Amazon Web Services',
-      issueDate: '2023-12-20',
-      blockchainHash: '0x91385f9fade1c0d57a7af66ab4ead79fade1c0d57a7af66ab4ea3c2c2eb7b11a',
-      verificationUrl: 'https://verify.aws.com/cert/def456',
-      status: 'verified',
-      metadata: {
-        skills: ['Cloud Computing', 'AWS Services', 'Security'],
-      },
-    },
-  ];
-
-  const handleVerify = async () => {
-    if (!verificationCode.trim()) return;
+  async function handleVerify() {
+    const code = verificationCode.trim();
+    if (!code) return;
     setIsVerifying(true);
+    setMessage(null);
+    setVerificationResult(null);
+
     try {
       const supabase = createClient();
-      const { data: cert } = await supabase
+      const { data: cert, error } = await supabase
         .from('certificates')
-        .select('id, certificate_number, course_id, issued_at, metadata, user_id')
-        .eq('certificate_number', verificationCode.trim())
+        .select('id, certificate_number, issued_at, metadata, status')
+        .eq('certificate_number', code)
         .maybeSingle();
 
-      if (cert) {
-        setVerificationResult({
-          id: cert.id,
-          type: 'certificate',
-          title: cert.metadata?.course_name || 'Program Certificate',
-          issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
-          issueDate: cert.issued_at?.split('T')[0] || '',
-          blockchainHash: '',
-          verificationUrl: `https://${PLATFORM_DEFAULTS.canonicalDomain}/verify/${cert.certificate_number}`,
-          status: 'verified',
-          metadata: cert.metadata || {},
-        });
-      } else {
-        setVerificationResult(null);
+      if (error || !cert) {
+        setMessage('No credential matched that verification code.');
+        return;
       }
+
+      const metadata = cert.metadata && typeof cert.metadata === 'object'
+        ? cert.metadata as Record<string, unknown>
+        : {};
+      const skills = Array.isArray(metadata.skills)
+        ? metadata.skills.filter((value): value is string => typeof value === 'string')
+        : [];
+      const status = cert.status === 'revoked' ? 'revoked' : cert.status === 'pending' ? 'pending' : 'verified';
+
+      setVerificationResult({
+        id: cert.id,
+        title: typeof metadata.course_name === 'string' ? metadata.course_name : 'Program Certificate',
+        issuer: `${PLATFORM_DEFAULTS.orgName} Career & Technical Institute`,
+        issueDate: cert.issued_at?.split('T')[0] || '',
+        verificationUrl: `https://${PLATFORM_DEFAULTS.canonicalDomain}/verify/${cert.certificate_number}`,
+        status,
+        skills,
+      });
     } catch {
-      setVerificationResult(null);
+      setMessage('Credential verification is temporarily unavailable.');
     } finally {
       setIsVerifying(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="   text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">
-            Blockchain Credential Verification
-          </h1>
-          <p className="text-white">Secure, tamper-proof credential verification</p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Card className="p-6 mb-8   ">
-          <div className="flex items-start gap-4">
-            <div className="text-5xl text-3xl md:text-4xl lg:text-5xl">🔐</div>
-            <div>
-              <h3 className="text-xl font-bold mb-2">Blockchain-Secured Credentials</h3>
-              <p className="text-black mb-3">
-                All credentials issued through ${PLATFORM_DEFAULTS.orgName} are recorded on the blockchain,
-                ensuring they cannot be forged, altered, or falsified. Employers and institutions
-                can instantly verify authenticity.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-brand-green-600">•</span>
-                  <span>Immutable records</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-brand-green-600">•</span>
-                  <span>Instant verification</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-brand-green-600">•</span>
-                  <span>Globally accessible</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        <div className="bg-white border-b mb-8 rounded-lg">
-          <div className="flex gap-8 px-6">
-            {(['verify', 'my-credentials'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab
-                    ? 'border-brand-red-600 text-brand-orange-600'
-                    : 'border-transparent text-slate-500'
-                }`}
-              >
-                {tab === 'verify' ? 'Verify Credential' : 'My Credentials'}
-              </button>
-            ))}
-          </div>
+    <div className="min-h-screen bg-slate-50 py-10">
+      <div className="mx-auto max-w-3xl px-4">
+        <div className="mb-6">
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">Credential verification</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-950">Verify an Elevate credential</h1>
+          <p className="mt-2 text-sm text-slate-600">Enter the certificate number shown on the issued credential. The result is read from the live credential record.</p>
         </div>
 
-        {activeTab === 'verify' && (
-          <div className="max-w-2xl mx-auto">
-            <Card className="p-8">
-              <h2 className="text-2xl font-bold mb-6 text-center">Verify a Credential</h2>
-              <p className="text-black text-center mb-6">
-                Enter the verification code or blockchain hash to verify authenticity
-              </p>
+        <Card className="p-6">
+          <label className="block text-sm font-bold text-slate-800" htmlFor="verification-code">Certificate number</label>
+          <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+            <input
+              id="verification-code"
+              type="text"
+              value={verificationCode}
+              onChange={(event) => setVerificationCode(event.target.value)}
+              onKeyDown={(event) => { if (event.key === 'Enter') void handleVerify(); }}
+              className="min-w-0 flex-1 rounded-xl border border-slate-300 px-4 py-3 text-slate-950 focus:border-brand-blue-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-200"
+              placeholder="Enter certificate number"
+            />
+            <Button onClick={() => void handleVerify()} disabled={isVerifying || !verificationCode.trim()}>
+              {isVerifying ? 'Verifying…' : 'Verify'}
+            </Button>
+          </div>
 
-              <div className="space-y-4">
+          {message && <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-900">{message}</p>}
+
+          {verificationResult && (
+            <div className={`mt-6 rounded-2xl border p-5 ${verificationResult.status === 'verified' ? 'border-emerald-200 bg-emerald-50' : verificationResult.status === 'revoked' ? 'border-rose-200 bg-rose-50' : 'border-amber-200 bg-amber-50'}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Verification Code or Hash
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 border rounded-lg"
-                    placeholder="e.g., ABC123 or 0x7f9fade1c0d57a7af66ab4ead79fade..."
-                    value={verificationCode}
-                    onChange={(
-                      e: React.ChangeEvent<
-                        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-                      >,
-                    ) => setVerificationCode(e.target.value)}
-                  />
+                  <p className="text-xs font-black uppercase tracking-wide text-slate-600">Verification result</p>
+                  <h2 className="mt-1 text-xl font-black text-slate-950">{verificationResult.title}</h2>
+                  <p className="mt-1 text-sm text-slate-700">{verificationResult.issuer}</p>
                 </div>
-
-                <Button onClick={handleVerify} className="w-full">
-                  Verify Credential
-                </Button>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase text-slate-800 shadow-sm">{verificationResult.status}</span>
               </div>
-
-              {verificationResult && (
-                <div className="mt-8 p-6 bg-brand-green-50 border-2 border-brand-green-500 rounded-lg">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl text-2xl md:text-3xl lg:text-4xl">•</div>
-                    <div>
-                      <h3 className="text-xl font-bold text-brand-green-900">
-                        Credential Verified
-                      </h3>
-                      <p className="text-sm text-brand-green-700">
-                        This credential is authentic and valid
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between py-2 border-b border-brand-green-200">
-                      <span className="text-brand-green-700 font-medium">Type:</span>
-                      <span className="text-brand-green-900 capitalize">
-                        {verificationResult.type}
-                      </span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-brand-green-200">
-                      <span className="text-brand-green-700 font-medium">Title:</span>
-                      <span className="text-brand-green-900">{verificationResult.title}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-brand-green-200">
-                      <span className="text-brand-green-700 font-medium">Issuer:</span>
-                      <span className="text-brand-green-900">{verificationResult.issuer}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-brand-green-200">
-                      <span className="text-brand-green-700 font-medium">Issue Date:</span>
-                      <span className="text-brand-green-900">{verificationResult.issueDate}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-brand-green-200">
-                      <span className="text-brand-green-700 font-medium">Status:</span>
-                      <span className="text-brand-green-900 capitalize">
-                        {verificationResult.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 p-3 bg-white rounded">
-                    <p className="text-xs font-semibold text-black mb-1">Blockchain Hash:</p>
-                    <p className="text-xs text-black font-mono break-all">
-                      {verificationResult.blockchainHash}
-                    </p>
-                  </div>
-
-                  {verificationResult.metadata.skills && (
-                    <div className="mt-4">
-                      <p className="text-sm font-semibold text-brand-green-900 mb-2">
-                        Skills Verified:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {verificationResult.metadata.skills.map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-3 py-2 bg-brand-green-200 text-brand-green-800 text-xs rounded"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
+                <div><dt className="font-bold text-slate-600">Issued</dt><dd className="text-slate-950">{verificationResult.issueDate || 'Not recorded'}</dd></div>
+                <div><dt className="font-bold text-slate-600">Record ID</dt><dd className="break-all text-slate-950">{verificationResult.id}</dd></div>
+              </dl>
+              {verificationResult.skills.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {verificationResult.skills.map((skill) => <span key={skill} className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700">{skill}</span>)}
                 </div>
               )}
-            </Card>
-
-            <Card className="p-6 mt-6">
-              <h3 className="font-bold mb-3">How It Works</h3>
-              <div className="space-y-3">
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                    1
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm">Credential Issued</h4>
-                    <p className="text-xs text-black">
-                      When you earn a credential, it's recorded on the blockchain with a unique hash
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                    2
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm">Verification Code Generated</h4>
-                    <p className="text-xs text-black">
-                      A unique verification code is created and linked to the blockchain record
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                    3
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm">Instant Verification</h4>
-                    <p className="text-xs text-black">
-                      Anyone can verify the credential by entering the code or blockchain hash
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'my-credentials' && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">My Verified Credentials</h2>
-              <Button variant="secondary">Export All</Button>
+              <a href={verificationResult.verificationUrl} className="mt-5 inline-block text-sm font-bold text-brand-blue-700 hover:underline">Open public verification record</a>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {myCredentials.map((credential) => (
-                <Card key={credential.id} className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="text-4xl text-2xl md:text-3xl lg:text-4xl">
-                      {credential.type === 'certificate'
-                        ? '📜'
-                        : credential.type === 'badge'
-                          ? '🏆'
-                          : '🎓'}
-                    </div>
-                    <span
-                      className={`px-3 py-2 rounded text-xs font-medium ${
-                        credential.status === 'verified'
-                          ? 'bg-brand-green-100 text-brand-green-700'
-                          : credential.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-brand-red-100 text-brand-red-700'
-                      }`}
-                    >
-                      {credential.status}
-                    </span>
-                  </div>
-
-                  <h3 className="text-lg font-bold mb-2">{credential.title}</h3>
-                  <p className="text-sm text-black mb-1">{credential.issuer}</p>
-                  <p className="text-xs text-slate-500 mb-4">Issued: {credential.issueDate}</p>
-
-                  {credential.metadata.skills && (
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-black mb-2">Skills:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {credential.metadata.skills.slice(0, 3).map((skill) => (
-                          <span
-                            key={skill}
-                            className="px-2 py-0.5 bg-brand-orange-100 text-brand-orange-700 text-xs rounded"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="mb-4 p-2 bg-slate-50 rounded">
-                    <p className="text-xs font-semibold text-black mb-1">Blockchain Hash:</p>
-                    <p className="text-xs text-black font-mono truncate">
-                      {credential.blockchainHash}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Button size="sm" className="w-full">
-                      Share on LinkedIn
-                    </Button>
-                    <Button size="sm" variant="secondary" className="w-full">
-                      Copy Verification Link
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+          )}
+        </Card>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Loader2, Mic, MicOff, Send, Sparkles, Volume2 } from 'lucide-react';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { DomainPanel } from '@/components/website-builder/DomainPanel';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 interface Props {
   websiteId: string;
@@ -39,7 +40,11 @@ export function WebsiteEditorClient({
   const [seoTitle, setSeoTitle] = useState(initialConfig.seo?.title || initialSiteName);
   const [seoDescription, setSeoDescription] = useState(initialConfig.seo?.description || '');
   const [published, setPublished] = useState(initiallyPublished);
-  const [publicUrl, setPublicUrl] = useState(initialSubdomain && initiallyPublished ? `https://${initialSubdomain}.app.elevateforhumanity.org` : '');
+  const [publicUrl, setPublicUrl] = useState(
+    initialSubdomain && initiallyPublished
+      ? `https://${initialSubdomain}.app.elevateforhumanity.org`
+      : '',
+  );
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,10 +56,12 @@ export function WebsiteEditorClient({
   const [parisMessages, setParisMessages] = useState<ParisMessage[]>([
     {
       role: 'assistant',
-      content: 'I’m PARIS. Keep telling me what you want as you build. I can change your branding, homepage copy, services, navigation, footer and SEO while you watch the preview update.',
+      content:
+        'I’m PARIS. Keep telling me what you want as you build. I can change your branding, homepage copy, services, navigation, footer and SEO while you watch the preview update.',
     },
   ]);
   const recognitionRef = useRef<any>(null);
+  const naturalVoice = useNaturalVoice();
 
   function applyConfigToEditor(config: TenantSiteConfig, nextSiteName?: string | null) {
     setBaseConfig(config);
@@ -112,7 +119,10 @@ export function WebsiteEditorClient({
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save website');
       if (data.website?.site_config) {
-        applyConfigToEditor(data.website.site_config as TenantSiteConfig, data.website.site_name);
+        applyConfigToEditor(
+          data.website.site_config as TenantSiteConfig,
+          data.website.site_name,
+        );
       }
       if (publish) setPublished(true);
       if (data.publicUrl) setPublicUrl(data.publicUrl);
@@ -137,8 +147,6 @@ export function WebsiteEditorClient({
     setError(null);
 
     try {
-      // Persist any manual fields the user changed before asking PARIS so the AI
-      // always edits the newest version instead of an older database snapshot.
       const currentConfig = buildCurrentConfig();
       const syncResponse = await fetch(`/api/apps/website-builder/sites/${websiteId}`, {
         method: 'PATCH',
@@ -146,7 +154,9 @@ export function WebsiteEditorClient({
         body: JSON.stringify({ siteName, siteConfig: currentConfig }),
       });
       const syncBody = await syncResponse.json();
-      if (!syncResponse.ok) throw new Error(syncBody.error || 'Could not prepare the current website for PARIS');
+      if (!syncResponse.ok) {
+        throw new Error(syncBody.error || 'Could not prepare the current website for PARIS');
+      }
       if (syncBody.website?.site_config) {
         setBaseConfig(syncBody.website.site_config as TenantSiteConfig);
       }
@@ -154,48 +164,56 @@ export function WebsiteEditorClient({
       const response = await fetch(`/api/apps/website-builder/sites/${websiteId}/paris`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          instruction,
-          conversation: priorConversation,
-        }),
+        body: JSON.stringify({ instruction, conversation: priorConversation }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'PARIS could not update the website');
 
       if (data.website?.site_config) {
-        applyConfigToEditor(data.website.site_config as TenantSiteConfig, data.website.site_name);
+        applyConfigToEditor(
+          data.website.site_config as TenantSiteConfig,
+          data.website.site_name,
+        );
       }
       setParisMessages((current) => [
         ...current,
         {
           role: 'assistant',
-          content: data.message || 'I updated your website draft. Keep telling me what you want next.',
+          content:
+            data.message || 'I updated your website draft. Keep telling me what you want next.',
         },
       ]);
       setMessage('PARIS updated and saved your draft.');
     } catch (err) {
       const text = err instanceof Error ? err.message : 'PARIS could not update the website';
       setParisError(text);
-      setParisMessages((current) => [...current, { role: 'assistant', content: `I could not make that change: ${text}` }]);
+      setParisMessages((current) => [
+        ...current,
+        { role: 'assistant', content: `I could not make that change: ${text}` },
+      ]);
     } finally {
       setParisBusy(false);
     }
   }
 
-  function speakLastParisMessage() {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  async function speakLastParisMessage() {
     const last = [...parisMessages].reverse().find((item) => item.role === 'assistant');
     if (!last) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(last.content);
-    utterance.rate = 0.96;
-    utterance.lang = 'en-US';
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find((voice) => /Aria|Jenny|Samantha|Google US English/i.test(voice.name))
-      || voices.find((voice) => voice.lang === 'en-US')
-      || voices.find((voice) => voice.lang.startsWith('en'));
-    if (preferred) utterance.voice = preferred;
-    window.speechSynthesis.speak(utterance);
+
+    setParisError(null);
+    if (naturalVoice.isPlaying || naturalVoice.isPaused || naturalVoice.isLoading) {
+      naturalVoice.stop();
+      return;
+    }
+
+    const played = await naturalVoice.play(last.content, {
+      voice: 'coral',
+      style: 'assistant',
+      rate: 0.96,
+    });
+    if (!played) {
+      setParisError(naturalVoice.error || 'Natural PARIS voice is temporarily unavailable.');
+    }
   }
 
   function toggleParisVoice() {
@@ -206,9 +224,12 @@ export function WebsiteEditorClient({
       return;
     }
 
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      setParisError('Voice input is not supported in this browser. Type your request to PARIS instead.');
+      setParisError(
+        'Voice input is not supported in this browser. Type your request to PARIS instead.',
+      );
       return;
     }
 
@@ -319,8 +340,14 @@ export function WebsiteEditorClient({
                   <p className="text-xs font-semibold text-slate-600">Tell me. I build it. Your draft saves automatically.</p>
                 </div>
               </div>
-              <button type="button" onClick={speakLastParisMessage} className="rounded-lg border border-brand-red-200 bg-white p-2 text-brand-red-700" aria-label="Read PARIS response aloud">
-                <Volume2 className="h-4 w-4" />
+              <button
+                type="button"
+                onClick={() => void speakLastParisMessage()}
+                disabled={naturalVoice.isLoading}
+                className="rounded-lg border border-brand-red-200 bg-white p-2 text-brand-red-700 disabled:opacity-50"
+                aria-label={naturalVoice.isPlaying || naturalVoice.isPaused ? 'Stop PARIS voice' : 'Read PARIS response aloud'}
+              >
+                {naturalVoice.isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Volume2 className="h-4 w-4" />}
               </button>
             </div>
 
@@ -342,7 +369,7 @@ export function WebsiteEditorClient({
             </div>
 
             <div className="border-t border-slate-200 p-4">
-              {parisError && <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">{parisError}</div>}
+              {(parisError || naturalVoice.error) && <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800">{parisError || naturalVoice.error}</div>}
               <div className="mb-3 flex flex-wrap gap-2">
                 {suggestions.map((suggestion) => (
                   <button key={suggestion} type="button" disabled={parisBusy} onClick={() => void runParisInstruction(suggestion)} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-left text-xs font-semibold text-slate-600 hover:border-brand-red-300 hover:text-brand-red-700 disabled:opacity-50">
@@ -440,5 +467,3 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
     </label>
   );
 }
-
-export default WebsiteEditorClient;

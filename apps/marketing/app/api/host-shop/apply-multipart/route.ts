@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
-import { sendEmail } from '@/lib/email/sendgrid';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { notifyApplicationSubmission } from '@/lib/applications/submission-notifications';
+import { provisionHostShopApplication } from '@/lib/partners/provision-host-shop-application';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -55,6 +56,15 @@ function safeExtension(file: File): string {
   if (file.type === 'image/png') return 'png';
   if (file.type === 'image/webp') return 'webp';
   return 'jpg';
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 async function uploadFile(
@@ -235,20 +245,134 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'We could not save the Host Site application. Please try again.' }, { status: 500 });
     }
 
-    await Promise.allSettled([
-      sendEmail({
-        to: email,
-        subject: 'Host Site Application Received | Elevate for Humanity',
-        html: `<p>Hello ${contactName},</p><p>We received the Host Site application for <strong>${businessName}</strong>.</p><p>Reference: <strong>${data.id}</strong></p><p>Our team will verify licensing, insurance, workers' compensation/exemption documentation, supervisor credentials, worksite capacity, and program fit before approval.</p>`,
-      }),
-      sendEmail({
-        to: process.env.PARTNER_NOTIFICATION_EMAIL || PLATFORM_DEFAULTS.supportEmail,
-        subject: `[HOST SITE APPLICATION] ${businessName}`,
-        html: `<p>New Host Site application.</p><p><strong>${businessName}</strong><br>${contactName}<br>${email}<br>${phone}</p><p>Programs: ${programs.join(', ')}</p><p>Reference: ${data.id}</p>`,
-      }),
-    ]);
+    let provisioned: Awaited<ReturnType<typeof provisionHostShopApplication>> | null = null;
+    let provisioningError: string | null = null;
+    try {
+      provisioned = await provisionHostShopApplication({
+        db,
+        applicationId: data.id,
+        businessName,
+        legalBusinessName,
+        ownerName,
+        contactName,
+        email,
+        phone,
+        address1,
+        address2: address2 || null,
+        city,
+        state,
+        zip,
+        businessType,
+        licenseNumber,
+        supervisorName,
+        supervisorLicenseNumber,
+        supervisorYearsLicensed,
+        workersCompStatus,
+        compensationModel,
+        numberOfEmployees: numberOfEmployees || null,
+        programs,
+        documents: {
+          shopLicense: uploaded.shopLicense,
+          insurance: uploaded.insurance,
+          workersComp: uploaded.workersComp,
+          supervisorLicense: uploaded.supervisorLicense,
+          ein: uploaded.ein,
+          localBusiness: uploaded.localBusiness || null,
+        },
+      });
+    } catch (caught) {
+      provisioningError = caught instanceof Error ? caught.message : String(caught);
+      logger.error('[host-shop/apply-multipart] conditional portal provisioning failed', caught instanceof Error ? caught : undefined, {
+        applicationId: data.id,
+        email,
+      });
+      await db.from('staff_notifications').insert({
+        type: 'host_shop_provisioning_failed',
+        title: `Host Shop portal provisioning failed: ${businessName}`,
+        message: `Application ${data.id} was saved, but conditional portal access could not be provisioned. ${provisioningError}`,
+        severity: 'error',
+        metadata: { application_id: data.id, email, business_name: businessName, error: provisioningError },
+      });
+    }
 
-    return NextResponse.json({ ok: true, applicationId: data.id, referenceNumber: data.id }, { status: 201 });
+    const safeContact = escapeHtml(contactName);
+    const safeBusiness = escapeHtml(businessName);
+    const safeEmail = escapeHtml(email);
+    const safeReference = escapeHtml(data.id);
+    const portalUrl = provisioned?.portalUrl || 'https://app.elevateforhumanity.org/host-shop/login';
+    const accessLink = provisioned?.accessLink || portalUrl;
+    const requestedPrograms = programs.map(escapeHtml).join(', ');
+
+    const applicantHtml = `
+      <div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;color:#0f172a">
+        <h2>Host Site Application Received</h2>
+        <p>Hello ${safeContact},</p>
+        <p>Elevate received the Host Site application for <strong>${safeBusiness}</strong>.</p>
+        <p><strong>Reference:</strong> ${safeReference}</p>
+        <p><strong>Programs requested:</strong> ${requestedPrograms}</p>
+        ${provisioned ? `
+          <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:18px;margin:20px 0">
+            <h3 style="margin-top:0">Your Host Shop portal is ready for onboarding</h3>
+            <p><strong>Username:</strong> ${safeEmail}</p>
+            <p>For security, Elevate does not email a plaintext password. Use the secure button below to access your account or set your password.</p>
+            <p><a href="${accessLink}" style="display:inline-block;background:#1d4ed8;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Secure Host Shop Access</a></p>
+            <p>If the secure link expires, use the magic-link option at <a href="${portalUrl}">${portalUrl}</a>.</p>
+          </div>` : `
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:18px;margin:20px 0">
+            <strong>Your application is saved.</strong> Elevate staff has also been alerted that portal provisioning needs attention. You do not need to submit the application again.
+          </div>`}
+        <h3>What happens next</h3>
+        <ol>
+          <li>Sign in to the Host Shop portal and review your business profile.</li>
+          <li>Complete the Host Site onboarding/MOU items shown in the portal.</li>
+          <li>Elevate reviews the license, insurance, workers' compensation/exemption, supervisor credential, EIN/W-9 record, and worksite capacity you uploaded.</li>
+          <li>Portal access is conditional while compliance review is pending; submission does not mean final Host Site approval.</li>
+          <li>After approval and apprentice matching, assigned apprentices appear in your Host Shop board.</li>
+          <li>The Host Shop supervises on-the-job learning, verifies hours and competencies, and responds to Elevate compliance requests through the portal.</li>
+        </ol>
+        <p>If additional documentation is required, Elevate will identify the exact item in the portal or by email.</p>
+        <p>Questions? Reply to this email or call ${PLATFORM_DEFAULTS.supportPhone}.</p>
+      </div>`;
+
+    const staffHtml = `
+      <h2>New Host Site Application</h2>
+      <p><strong>${safeBusiness}</strong><br>${safeContact}<br>${safeEmail}<br>${escapeHtml(phone)}</p>
+      <p><strong>Reference:</strong> ${safeReference}</p>
+      <p><strong>Programs:</strong> ${requestedPrograms}</p>
+      <p><strong>Supervisor:</strong> ${escapeHtml(supervisorName)} — ${escapeHtml(supervisorLicenseNumber)}</p>
+      <p><strong>Conditional portal provisioning:</strong> ${provisioned ? `completed (Partner ${escapeHtml(provisioned.partnerId)})` : `FAILED — ${escapeHtml(provisioningError || 'unknown error')}`}</p>
+      <p>All required application uploads were saved. Review the Host Shop compliance queue before changing the application to approved.</p>`;
+
+    const notifications = await notifyApplicationSubmission({
+      db,
+      applicationId: data.id,
+      applicationType: 'host_shop',
+      applicantName: contactName,
+      applicantEmail: email,
+      applicantSubject: 'Host Site Application Received + Portal Next Steps | Elevate for Humanity',
+      applicantHtml,
+      staffSubject: `[HOST SITE APPLICATION] ${businessName}`,
+      staffHtml,
+      metadata: {
+        business_name: businessName,
+        programs,
+        partner_id: provisioned?.partnerId || null,
+        portal_provisioned: Boolean(provisioned),
+        provisioning_error: provisioningError,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        ok: true,
+        applicationId: data.id,
+        referenceNumber: data.id,
+        portalProvisioned: Boolean(provisioned),
+        partnerId: provisioned?.partnerId || null,
+        notificationStatus: notifications,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     if (db) await cleanup(db, uploadedPaths);
     logger.error('[host-shop/apply-multipart] unexpected error', error instanceof Error ? error : undefined);

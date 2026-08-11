@@ -3,7 +3,7 @@ import 'server-only';
 import { executeAiTask, type AITask } from '@/lib/ai/execute-ai-task';
 import { logger } from '@/lib/logger';
 import { executeRegisteredAITool, type AIToolExecutionContext } from '@/lib/ai/tools/executor';
-import { getAIToolCatalogForPrompt, type AIAgentId } from '@/lib/ai/tools/registry';
+import { getAITool, getAIToolCatalogForPrompt, type AIAgentId } from '@/lib/ai/tools/registry';
 import { planAIToolFromCommand } from '@/lib/ai/tools/planner';
 
 export type AICommandExecutionContext = Omit<AIToolExecutionContext, 'agent'> & {
@@ -12,6 +12,7 @@ export type AICommandExecutionContext = Omit<AIToolExecutionContext, 'agent'> & 
   agentRole?: string;
   advisoryTask?: AITask;
   commandContext?: Record<string, unknown>;
+  approvalGranted?: boolean;
 };
 
 export type AICommandExecutionResult = {
@@ -84,7 +85,15 @@ export async function executeAICommand(
   const plannedTool = planAIToolFromCommand(command, context.commandContext ?? {});
 
   if (plannedTool) {
-    const toolResult = await executeRegisteredAITool(plannedTool.name, plannedTool.input, context);
+    const tool = getAITool(plannedTool.name);
+    const executionContext: AIToolExecutionContext = {
+      ...context,
+      confirmationText:
+        context.approvalGranted && tool?.approvalRequired
+          ? tool.confirmationPhrase ?? `CONFIRM ${tool.name.toUpperCase()}`
+          : context.confirmationText,
+    };
+    const toolResult = await executeRegisteredAITool(plannedTool.name, plannedTool.input, executionContext);
 
     if (toolResult.status === 'approval_required') {
       return {

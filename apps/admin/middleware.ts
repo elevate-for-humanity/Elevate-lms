@@ -16,6 +16,7 @@ const PUBLIC_PATHS = [
   '/unauthorized',
   '/api/health',
   '/api/ping',
+  '/api/version',
   '/auth/confirm',
   '/auth/reset-password',
   '/install',

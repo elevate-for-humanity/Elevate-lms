@@ -23,7 +23,6 @@ export type BlueprintLessonRef = {
   domainKey: string;
   competencyKeys?: string[];
   objective?: string;
-  /** Newer barber curricula carry a list in addition to the canonical objective. */
   learningObjectives?: string[];
   content?: string;
   quizQuestions?: BlueprintQuizQuestion[];
@@ -31,9 +30,7 @@ export type BlueprintLessonRef = {
   durationMinutes?: number;
   videoFile?: string;
   partnerExamCode?: string;
-  /** Accept both legacy single-note payloads and the canonical list. */
   instructorNotes?: string | string[];
-  /** Practical curricula may use either labels or structured sign-off checks. */
   competencyChecks?: Array<string | BlueprintCompetencyCheck>;
 };
 
@@ -54,7 +51,6 @@ export type BlueprintLessonTypeRule = {
 export type BlueprintModule = {
   slug: string;
   title: string;
-  /** Optional module summary persisted by the publisher when a blueprint provides one. */
   description?: string;
   orderIndex: number;
   minLessons: number;
@@ -67,7 +63,6 @@ export type BlueprintModule = {
   suggestedLessonSkeleton?: string[];
   lessons?: BlueprintLessonRef[];
   domainKey?: string;
-  /** Optional interaction metadata used by interactive lesson blueprints. */
   interactionSpecs?: unknown[];
 };
 
@@ -80,11 +75,6 @@ export type BlueprintAssessmentRule = {
   distributionConstraints?: Record<string, number>;
 };
 
-/**
- * Generation policy supports both the canonical generator controls and the
- * earlier bounds-based curriculum format. They describe the same build intent
- * and are normalized by the generator at runtime.
- */
 export type BlueprintGenerationRules = {
   allowRemediation?: boolean;
   allowExpansionLessons?: boolean;
@@ -112,6 +102,9 @@ export type BlueprintCertificateRequirements = {
   includeHours: boolean;
   includeCompetencies: boolean;
   includeInstructorVerification: boolean;
+  includeCompletionDate?: boolean;
+  includeVerificationUrl?: boolean;
+  requireAllCriticalCompetencies?: boolean;
 };
 
 export type BlueprintVideoConfig = {
@@ -122,15 +115,50 @@ export type BlueprintVideoConfig = {
   instructorImagePath: string;
   brandName?: string;
   brandColor?: string;
+  topBarColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  accentColor?: string;
   logoPath?: string;
   backgroundMusic?: boolean;
   captions?: boolean;
+};
+
+export type BlueprintExternalCourse = {
+  provider?: string;
+  title?: string;
+  url?: string;
+  courseId?: string;
+  examCode?: string;
+  required?: boolean;
+  notes?: string;
+  [key: string]: unknown;
+};
+
+export type BlueprintAuditViolation = {
+  code: string;
+  message: string;
+  severity?: 'info' | 'warning' | 'error';
+  path?: string;
+  [key: string]: unknown;
+};
+
+export type BlueprintAuditResult = {
+  ok: boolean;
+  violations: BlueprintAuditViolation[];
+  warnings?: BlueprintAuditViolation[];
+  score?: number;
+  [key: string]: unknown;
 };
 
 export type CredentialBlueprint = {
   id: string;
   programSlug: string;
   credentialSlug: string;
+  credentialTitle: string;
+  credentialCode: string;
+  state: string;
+  status: string;
   title: string;
   version: string;
   sourceAuthority: string;
@@ -146,4 +174,5 @@ export type CredentialBlueprint = {
   finalExam?: BlueprintFinalExamConfig;
   certificateRequirements?: BlueprintCertificateRequirements;
   videoConfig?: BlueprintVideoConfig;
+  externalCourses?: BlueprintExternalCourse[];
 };

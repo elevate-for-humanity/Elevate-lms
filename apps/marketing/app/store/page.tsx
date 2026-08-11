@@ -25,9 +25,9 @@ export default function StorePage() {
 
   return (
     <main className="min-h-screen bg-white font-medium text-slate-950">
-      <section className="border-b border-slate-300 bg-slate-950 py-6 sm:py-8">
+      <section className="border-b border-cyan-100 bg-gradient-to-b from-cyan-50 via-white to-rose-50 py-6 sm:py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="overflow-hidden rounded-2xl border border-white/20 bg-black shadow-2xl">
+          <div className="overflow-hidden rounded-3xl border border-white bg-white shadow-2xl shadow-cyan-900/10 ring-1 ring-slate-200">
             <HeroVideo
               videoSrcDesktop={hero.videoSrcDesktop}
               videoSrcMobile={hero.videoSrcMobile}
@@ -41,7 +41,7 @@ export default function StorePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-300 bg-white py-10 sm:py-12">
+      <section className="border-b border-slate-200 bg-white py-10 sm:py-12">
         <div className="mx-auto max-w-5xl px-5 text-center">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-700">Elevate Business Operating Platform</p>
           <h1 className="mt-3 text-3xl font-black text-slate-950 sm:text-5xl">Start with what you need. Add more when your business is ready.</h1>
@@ -64,7 +64,7 @@ export default function StorePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-300 bg-slate-50 py-10">
+      <section className="border-b border-slate-200 bg-slate-50 py-10">
         <div className="mx-auto grid max-w-6xl gap-6 px-5 md:grid-cols-3">
           {[
             {
@@ -114,35 +114,35 @@ export default function StorePage() {
         </div>
       </section>
 
-      <section className="bg-slate-950 py-16 text-white">
+      <section className="border-y border-cyan-100 bg-gradient-to-br from-cyan-50 via-white to-rose-50 py-16 text-slate-950">
         <div className="mx-auto max-w-6xl px-5">
           <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-300">Interactive proof</p>
-              <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">See how the platform works, then open the real portals</h2>
-              <p className="mt-4 max-w-2xl font-semibold leading-7 text-slate-100">
-                Capability pages provide interactive feature and subscription demonstrations. They are labeled as demos, not recorded product video, unless an actual video asset is present. You can also open role-based portal experiences and live proof links from the Online Apps page.
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-700">Interactive proof</p>
+              <h2 className="mt-3 text-3xl font-black sm:text-4xl">See the product move, then open the real portals.</h2>
+              <p className="mt-4 max-w-2xl font-semibold leading-7 text-slate-700">
+                Product demos should show the working experience—not bury it in dark slides. Use the interactive product walkthroughs, then open role-based portal experiences and live proof links from Online Apps.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link href="#marketplace" className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black hover:bg-brand-red-500">
+                <Link href="#marketplace" className="inline-flex items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 font-black text-white hover:bg-brand-red-800">
                   <PlayCircle className="h-5 w-5" /> Browse Product Demos
                 </Link>
-                <Link href="/online-apps" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Open Online Apps</Link>
-                <Link href="/store/demo/admin" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Admin Demo</Link>
-                <Link href="/store/demo/student" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Student Demo</Link>
-                <Link href="/store/demo/employer" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Employer Demo</Link>
+                <Link href="/online-apps" className="rounded-xl border-2 border-slate-800 bg-white px-5 py-3 font-black hover:bg-slate-50">Open Online Apps</Link>
+                <Link href="/store/demo/admin" className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black hover:bg-slate-50">Admin Demo</Link>
+                <Link href="/store/demo/student" className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black hover:bg-slate-50">Student Demo</Link>
+                <Link href="/store/demo/employer" className="rounded-xl border-2 border-slate-300 bg-white px-5 py-3 font-black hover:bg-slate-50">Employer Demo</Link>
               </div>
             </div>
-            <div className="rounded-3xl border border-white/20 bg-white/10 p-7">
-              <h3 className="text-xl font-black text-white">Ready for a real workspace?</h3>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-100">
+            <div className="rounded-3xl border border-white bg-white p-7 shadow-xl shadow-cyan-900/10 ring-1 ring-slate-200">
+              <h3 className="text-xl font-black">Ready for a real workspace?</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
                 Start the 14-day trial, build or import a website, then activate the business and education tools you need.
               </p>
               <div className="mt-6 space-y-3">
-                <Link href="/store/trial" className="flex items-center justify-between rounded-xl bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">
+                <Link href="/store/trial" className="flex items-center justify-between rounded-xl bg-brand-red-700 px-5 py-3 font-black text-white hover:bg-brand-red-800">
                   Start Free Trial <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href="/store/plans" className="flex items-center justify-between rounded-xl border border-white/35 px-5 py-3 font-black text-white hover:bg-white/10">
+                <Link href="/store/plans" className="flex items-center justify-between rounded-xl border-2 border-slate-800 px-5 py-3 font-black text-slate-950 hover:bg-slate-50">
                   Compare Plans <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

@@ -63,34 +63,36 @@ export const HOST_SHOP_ONBOARDING_PATHS: Record<
 
 const DEFAULT_REQUIREMENTS: Record<HostShopProgramType, HostShopDocumentRequirement[]> = {
   barber: [
-    requirement('barber', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the shop EIN.'),
-    requirement('barber', 'w9', 'IRS W-9', 'Completed W-9 for partner payout and tax records.'),
+    requirement('barber', 'ein_letter', 'EIN / W-9 Business Identity Record', 'IRS CP 575/147C EIN verification or an acceptable W-9 business identity record.'),
     requirement('barber', 'barbershop_license', 'Indiana Barbershop License', 'Current Indiana barbershop establishment license.', true),
     requirement('barber', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
     requirement('barber', 'liability_insurance', 'General Liability Insurance Certificate', 'Certificate of general liability insurance for the host shop.', true),
     requirement('barber', 'supervisor_license', 'Supervising Barber License', 'Indiana barber license for the direct apprentice supervisor.', true),
+    requirement('barber', 'business_license', 'City/County Business or Occupancy Document', 'Local business license or occupancy document, if applicable.', false, false),
   ],
   cosmetology: [
-    requirement('cosmetology', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the salon EIN.'),
-    requirement('cosmetology', 'w9', 'IRS W-9', 'Completed W-9 for partner payout and tax records.'),
+    requirement('cosmetology', 'ein_letter', 'EIN / W-9 Business Identity Record', 'IRS CP 575/147C EIN verification or an acceptable W-9 business identity record.'),
     requirement('cosmetology', 'salon_license', 'Indiana Cosmetology Salon License', 'Current Indiana cosmetology salon license.', true),
     requirement('cosmetology', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
     requirement('cosmetology', 'liability_insurance', 'General Liability Insurance Certificate', 'Certificate of general liability insurance for the host salon.', true),
     requirement('cosmetology', 'supervisor_license', 'Supervising Cosmetologist License', 'Indiana cosmetology license for the designated apprentice supervisor.', true),
+    requirement('cosmetology', 'business_license', 'City/County Business or Occupancy Document', 'Local business license or occupancy document, if applicable.', false, false),
   ],
   nail_technician: [
-    requirement('nail_technician', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the salon EIN.'),
+    requirement('nail_technician', 'ein_letter', 'EIN / W-9 Business Identity Record', 'IRS CP 575/147C EIN verification or an acceptable W-9 business identity record.'),
     requirement('nail_technician', 'salon_license', 'Indiana Nail Salon License', 'Current Indiana nail salon license.', true),
     requirement('nail_technician', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
+    requirement('nail_technician', 'liability_insurance', 'General Liability Insurance Certificate', 'Certificate of general liability insurance for the host salon.', true),
     requirement('nail_technician', 'supervisor_license', 'Supervising Nail Technician License', 'Indiana nail technician license for the apprentice supervisor.', true),
-    requirement('nail_technician', 'business_license', 'City/County Business License', 'Local business license or occupancy permit, if applicable.', false),
+    requirement('nail_technician', 'business_license', 'City/County Business License', 'Local business license or occupancy permit, if applicable.', false, false),
   ],
   esthetician: [
-    requirement('esthetician', 'ein_letter', 'IRS EIN Assignment Letter', 'IRS CP 575 or 147C letter confirming the spa EIN.'),
+    requirement('esthetician', 'ein_letter', 'EIN / W-9 Business Identity Record', 'IRS CP 575/147C EIN verification or an acceptable W-9 business identity record.'),
     requirement('esthetician', 'salon_license', 'Indiana Esthetician Establishment License', 'Current Indiana esthetics establishment license.', true),
     requirement('esthetician', 'workers_comp', "Workers' Compensation Certificate", "Workers' compensation certificate or valid Indiana exemption."),
+    requirement('esthetician', 'liability_insurance', 'General Liability Insurance Certificate', 'Certificate of general liability insurance for the host spa.', true),
     requirement('esthetician', 'supervisor_license', 'Supervising Esthetician License', 'Indiana esthetician license for the apprentice supervisor.', true),
-    requirement('esthetician', 'business_license', 'City/County Business License', 'Local business license or occupancy permit, if applicable.', false),
+    requirement('esthetician', 'business_license', 'City/County Business License', 'Local business license or occupancy permit, if applicable.', false, false),
   ],
 };
 
@@ -144,6 +146,47 @@ export function getDefaultHostShopDocumentRequirements(program: HostShopProgramT
   return DEFAULT_REQUIREMENTS[program];
 }
 
+function normalizeLegacyRequirement(
+  raw: Record<string, unknown>,
+  program: HostShopProgramType,
+): Record<string, unknown> | null {
+  const rawType = String(raw.document_type ?? '').trim();
+  if (!rawType || rawType === 'mou') return null;
+
+  let documentType = rawType;
+  if (rawType === 'establishment_license') {
+    documentType = program === 'barber' ? 'barbershop_license' : 'salon_license';
+  } else if (rawType === 'insurance_coi') {
+    documentType = 'liability_insurance';
+  } else if (rawType === 'w9') {
+    // The public Host Site application accepts EIN verification OR W-9 in one
+    // tax-identity upload. Treat the legacy global W-9 requirement as that same
+    // canonical record so the portal does not demand a duplicate upload.
+    documentType = 'ein_letter';
+  }
+
+  const normalized = {
+    ...raw,
+    id: raw.id ?? `${program}-${documentType}`,
+    document_type: documentType,
+    program_id: program,
+  };
+
+  if (documentType === 'ein_letter') {
+    normalized.document_name = 'EIN / W-9 Business Identity Record';
+    normalized.description = 'IRS CP 575/147C EIN verification or an acceptable W-9 business identity record.';
+    normalized.is_required = true;
+  }
+  if (documentType === 'business_license') {
+    // The public application explicitly treats the local business/occupancy
+    // document as optional. Do not turn an optional upload into a second
+    // approval blocker because of an older requirement row.
+    normalized.is_required = false;
+  }
+
+  return normalized;
+}
+
 export function mergeHostShopDocumentRequirements(
   dbRequirements: Array<Record<string, unknown>> | null | undefined,
   program: HostShopProgramType,
@@ -152,10 +195,13 @@ export function mergeHostShopDocumentRequirements(
   const byType = new Map<string, Record<string, unknown>>();
 
   for (const req of defaults) byType.set(req.document_type, req);
-  for (const req of dbRequirements ?? []) {
+  for (const raw of dbRequirements ?? []) {
+    const req = normalizeLegacyRequirement(raw, program);
+    if (!req) continue;
     const documentType = String(req.document_type ?? '');
     if (!documentType) continue;
-    byType.set(documentType, { ...req, id: req.id ?? `${program}-${documentType}` });
+    const existing = byType.get(documentType) ?? {};
+    byType.set(documentType, { ...existing, ...req, id: req.id ?? `${program}-${documentType}` });
   }
   return Array.from(byType.values());
 }

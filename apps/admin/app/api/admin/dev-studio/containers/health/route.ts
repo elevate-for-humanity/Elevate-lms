@@ -12,13 +12,15 @@ export async function GET(request: NextRequest) {
     const shellUrl = process.env.STUDIO_SHELL_WS_URL ?? '';
     const shellSecret = process.env.STUDIO_SHELL_SECRET ?? '';
     const tokenSecret = process.env.STUDIO_TOKEN_SECRET ?? '';
-    const probe = shellUrl ? await probeStudioShell(shellUrl) : { ready: false, message: 'Shell URL is missing.' };
+    const probe = shellUrl
+      ? await probeStudioShell(shellUrl)
+      : { reachable: false, ready: false, status: 'missing-url', error: 'Shell URL is missing.' };
 
     return buildCapabilityHealth('containers', [
       { name: 'shell-url', passed: Boolean(shellUrl), required: true, message: shellUrl ? 'Studio shell URL is configured.' : 'STUDIO_SHELL_WS_URL is missing.' },
       { name: 'shell-secret', passed: Boolean(shellSecret), required: true, message: shellSecret ? 'Studio shell secret is configured.' : 'STUDIO_SHELL_SECRET is missing.' },
       { name: 'token-secret', passed: Boolean(tokenSecret), required: true, message: tokenSecret ? 'Studio token secret is configured.' : 'STUDIO_TOKEN_SECRET is missing.' },
-      { name: 'shell-probe', passed: Boolean(probe.ready), required: true, message: probe.ready ? 'Studio shell probe succeeded.' : probe.message || 'Studio shell probe failed.' },
+      { name: 'shell-probe', passed: Boolean(probe.ready), required: true, message: probe.ready ? 'Studio shell probe succeeded.' : probe.error || probe.status || 'Studio shell probe failed.' },
     ]);
   });
 }

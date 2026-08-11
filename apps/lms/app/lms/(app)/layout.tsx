@@ -19,7 +19,6 @@ export default async function LearnerWorkspaceLayout({ children }: { children: R
         full_name: profile?.full_name || undefined,
         first_name: profile?.first_name || undefined,
         last_name: profile?.last_name || undefined,
-        avatar_url: profile?.avatar_url || undefined,
       }}
       role="student"
     >

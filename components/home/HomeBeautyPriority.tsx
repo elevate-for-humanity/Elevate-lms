@@ -5,7 +5,7 @@ import { ArrowRight, BadgeCheck, Building2, Scissors, Sparkles } from 'lucide-re
 const TRACKS = [
   {
     title: 'Barbering Apprenticeship',
-    hours: '2,000-hour registered apprenticeship track',
+    hours: '2,000 OJL hours + 144 hours of Related Technical Instruction',
     focus: 'Fades, clipper work, shaving, sanitation, shop operations',
     image: '/images/pages/barber-hero-main.webp',
     href: '/barber-apprenticeship',
@@ -23,7 +23,7 @@ const TRACKS = [
     title: 'Nail Technician Apprenticeship',
     hours: '600 hours of supervised training',
     focus: 'Manicuring, pedicuring, nail enhancements, sanitation',
-    image: '/images/pages/nail-technician-hero.webp',
+    image: '/images/pexels/nail-tech.webp',
     href: '/nail-technician-apprenticeship',
     icon: BadgeCheck,
   },

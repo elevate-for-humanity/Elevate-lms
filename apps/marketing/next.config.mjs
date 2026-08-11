@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
 
 /** @type {import("next").NextConfig} */
 
@@ -37,6 +38,14 @@ const nextConfig = {
     BUILD_TIMESTAMP:
       process.env.BUILD_TIMESTAMP ??
       new Date().toISOString(),
+  },
+
+  async rewrites() {
+    return {
+      beforeFiles: legacyImageRewrites(),
+      afterFiles: [],
+      fallback: [],
+    };
   },
 
   async redirects() {

@@ -1,6 +1,6 @@
 /**
  * Elevate OS Unified Workspace Registry
- * 
+ *
  * Canonical workspace definitions for the Dev Studio interface.
  * All workspaces must be registered here and validated against permissions.
  */
@@ -29,7 +29,11 @@ export type WorkspaceId =
   | 'evaluations'
   | 'cfd-simulation'
   | 'settings'
-  | 'audit-log';
+  | 'audit-log'
+  | 'workflows'
+  | 'agents'
+  | 'tasks'
+  | 'memory';
 
 export interface StudioWorkspace {
   id: WorkspaceId;
@@ -38,22 +42,14 @@ export interface StudioWorkspace {
   href: string;
   permission: WorkspacePermission;
   enabled: boolean;
-  /** Whether this workspace is embedded in the main Dev Studio UI */
   embedded?: boolean;
-  /** External workspace that opens in a new page */
   external?: boolean;
-  /** Health check endpoint for status display */
   healthEndpoint?: string;
-  /** Icon name from lucide-react */
   icon?: string;
-  /** Category for grouping */
   category?: 'core' | 'ai' | 'devops' | 'content' | 'specialized';
 }
 
 export const STUDIO_WORKSPACES: StudioWorkspace[] = [
-  // ============================================
-  // CORE WORKSPACES (embedded in main Dev Studio)
-  // ============================================
   {
     id: 'overview',
     label: 'Overview',
@@ -147,10 +143,6 @@ export const STUDIO_WORKSPACES: StudioWorkspace[] = [
     category: 'core',
     icon: 'Settings',
   },
-
-  // ============================================
-  // EXTERNAL AI STUDIOS (open in new page)
-  // ============================================
   {
     id: 'content-studio',
     label: 'PARIS Content',
@@ -186,10 +178,6 @@ export const STUDIO_WORKSPACES: StudioWorkspace[] = [
     category: 'specialized',
     icon: 'FlaskConical',
   },
-
-  // ============================================
-  // ADMIN STUDIO TOOLS (embedded)
-  // ============================================
   {
     id: 'audit-log',
     label: 'Audit Log',
@@ -247,102 +235,69 @@ export const STUDIO_WORKSPACES: StudioWorkspace[] = [
   },
 ];
 
-/**
- * Get workspace by ID
- */
 export function getWorkspace(id: WorkspaceId): StudioWorkspace | undefined {
-  return STUDIO_WORKSPACES.find(w => w.id === id);
+  return STUDIO_WORKSPACES.find((workspace) => workspace.id === id);
 }
 
-/**
- * Get all workspaces for a given permission
- */
-export function getWorkspacesForPermission(permission: WorkspacePermission): StudioWorkspace[] {
-  return STUDIO_WORKSPACES.filter(w => w.enabled);
+export function getWorkspacesForPermission(
+  permission: WorkspacePermission,
+): StudioWorkspace[] {
+  return STUDIO_WORKSPACES.filter(
+    (workspace) => workspace.enabled && workspace.permission === permission,
+  );
 }
 
-/**
- * Get workspaces by category
- */
-export function getWorkspacesByCategory(category: StudioWorkspace['category']): StudioWorkspace[] {
-  return STUDIO_WORKSPACES.filter(w => w.category === category && w.enabled);
+export function getWorkspacesByCategory(
+  category: StudioWorkspace['category'],
+): StudioWorkspace[] {
+  return STUDIO_WORKSPACES.filter(
+    (workspace) => workspace.category === category && workspace.enabled,
+  );
 }
 
-/**
- * Check if workspace requires external navigation
- */
 export function isExternalWorkspace(id: WorkspaceId): boolean {
-  const workspace = getWorkspace(id);
-  return workspace?.external === true;
+  return getWorkspace(id)?.external === true;
 }
 
-/**
- * Get health status for a workspace
- */
 export function getWorkspaceHealthEndpoint(id: WorkspaceId): string | undefined {
-  const workspace = getWorkspace(id);
-  return workspace?.healthEndpoint;
+  return getWorkspace(id)?.healthEndpoint;
 }
 
-/**
- * Workspace categories for UI grouping
- */
 export const WORKSPACE_CATEGORIES = {
-  core: {
-    label: 'Core',
-    description: 'Essential platform tools',
-  },
-  ai: {
-    label: 'AI Studios',
-    description: 'AI-powered content and automation',
-  },
-  devops: {
-    label: 'DevOps',
-    description: 'Development and deployment tools',
-  },
-  content: {
-    label: 'Content',
-    description: 'Content creation and management',
-  },
-  specialized: {
-    label: 'Specialized',
-    description: 'Technical simulation tools',
-  },
+  core: { label: 'Core', description: 'Essential platform tools' },
+  ai: { label: 'AI Studios', description: 'AI-powered content and automation' },
+  devops: { label: 'DevOps', description: 'Development and deployment tools' },
+  content: { label: 'Content', description: 'Content creation and management' },
+  specialized: { label: 'Specialized', description: 'Technical simulation tools' },
 } as const;
 
-/**
- * Map workspace IDs to tab/workspace params for DevStudioUnifiedClient
- */
-export const WORKSPACE_PARAM_MAP: Record<WorkspaceId, { workspace?: string; tab?: string }> = {
-  'overview': { workspace: 'studio' },
+export const WORKSPACE_PARAM_MAP: Record<
+  WorkspaceId,
+  { workspace?: string; tab?: string }
+> = {
+  overview: { workspace: 'studio' },
   'ai-chat': { workspace: 'studio' },
   'course-builder': { tab: 'courses' },
-  'content-studio': {}, // External
-  'media-library': {}, // External page
-  'development': { workspace: 'files' },
-  'deployments': { workspace: 'deploy' },
-  'containers': { workspace: 'environments' },
-  'evaluations': {}, // External
-  'cfd-simulation': {}, // External
-  'settings': {}, // External page
-  'audit-log': {}, // External page
-  'workflows': {}, // External page
-  'agents': {}, // External page
-  'tasks': {}, // External page
-  'memory': {}, // External page
+  'content-studio': {},
+  'media-library': {},
+  development: { workspace: 'files' },
+  deployments: { workspace: 'deploy' },
+  containers: { workspace: 'environments' },
+  evaluations: {},
+  'cfd-simulation': {},
+  settings: {},
+  'audit-log': {},
+  workflows: {},
+  agents: {},
+  tasks: {},
+  memory: {},
 };
 
-/**
- * Convert workspace ID to Dev Studio URL params
- */
 export function workspaceToUrlParams(id: WorkspaceId): string {
   const params = WORKSPACE_PARAM_MAP[id];
-  if (!params) return '/admin/studio';
-  
   const searchParams = new URLSearchParams();
   if (params.workspace) searchParams.set('workspace', params.workspace);
   if (params.tab) searchParams.set('tab', params.tab);
-  
   const query = searchParams.toString();
   return query ? `/admin/studio?${query}` : '/admin/studio';
 }

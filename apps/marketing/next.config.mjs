@@ -58,8 +58,12 @@ const nextConfig = {
         permanent: true,
       },
 
-      // Canonicalize historical barber/beauty public URLs in one hop.
+      // Search-friendly aliases resolve in one hop to the canonical /programs URLs.
+      // This keeps external campaign links short without creating duplicate indexable pages.
       { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
+      { source: '/cosmetology-apprenticeship', destination: '/programs/cosmetology-apprenticeship', permanent: true },
+      { source: '/nail-technician-apprenticeship', destination: '/programs/nail-technician-apprenticeship', permanent: true },
+      { source: '/manicurist-apprenticeship', destination: '/programs/nail-technician-apprenticeship', permanent: true },
       { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       // The former IPLA signup page had hard-coded 2025 dates and referenced a

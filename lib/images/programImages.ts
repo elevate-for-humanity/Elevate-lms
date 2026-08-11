@@ -99,6 +99,10 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     card: `${P}/cosmetology.webp`, hero: `${P}/barber-styling-hair.webp`,
     alt: 'Cosmetology student practicing hair styling techniques',
   },
+  esthetician: {
+    card: '/images/beauty/esthetics-hero.webp', hero: `${P}/cosmetology-hero.webp`,
+    alt: 'Esthetics learner practicing professional skincare and client services',
+  },
   'esthetician-apprenticeship': {
     card: '/images/beauty/esthetician.webp', hero: '/images/pexels/esthetician.webp',
     alt: 'Esthetician apprentice providing a professional skincare treatment',

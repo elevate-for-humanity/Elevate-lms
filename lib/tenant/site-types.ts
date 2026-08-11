@@ -1,3 +1,23 @@
+export type TenantSiteProduct = {
+  name: string;
+  description?: string;
+  price?: string;
+  compareAtPrice?: string;
+  image?: string;
+  imageAlt?: string;
+  href?: string;
+  category?: string;
+  badge?: string;
+};
+
+export type TenantSiteContact = {
+  email?: string;
+  phone?: string;
+  address?: string;
+  bookingUrl?: string;
+  hours?: string[];
+};
+
 export type TenantSiteConfig = {
   template: {
     id: string;
@@ -14,19 +34,27 @@ export type TenantSiteConfig = {
     textColor?: string;
     logoText: string;
     tagline?: string;
+    logoImage?: string;
   };
   homepage: {
     heroTitle: string;
     heroSubtitle: string;
     heroCtaText: string;
-    features: Array<{ title: string; description: string }>;
+    heroCtaHref?: string;
+    heroImage?: string;
+    heroImageAlt?: string;
+    announcement?: string;
+    features: Array<{ title: string; description: string; image?: string }>;
   };
   programs: Array<{
     name: string;
     description: string;
     duration?: string;
     level?: string;
+    image?: string;
   }>;
+  products?: TenantSiteProduct[];
+  contact?: TenantSiteContact;
   stats?: {
     students?: number;
     completionRate?: string;

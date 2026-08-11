@@ -4,22 +4,38 @@
 import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
+import {
+  ADMIN_ROLES,
+  ALL_AUTHENTICATED_ROLES,
+  APPRENTICE_ROLES,
+  EMPLOYER_ROLES,
+  HOST_SHOP_ROLES,
+  INSTRUCTOR_ROLES,
+  PROGRAM_HOLDER_ROLES,
+  STAFF_ROLES,
+  TESTING_CENTER_ROLES,
+  WORKFORCE_ROLES,
+  hasAnyRole,
+  normalizeRole,
+  normalizeRoles,
+} from '@/lib/rbac/role-matrix';
 
-const PORTAL_ROLE_MAP: Record<string, string[]> = {
-  '/admin': ['admin', 'super_admin', 'org_admin', 'staff', 'instructor', 'test_admin', 'proctor'],
-  '/lms': ['admin', 'super_admin', 'student', 'program_holder', 'instructor', 'apprentice', 'grant_client'],
-  '/apprentice': ['admin', 'super_admin', 'apprentice', 'instructor'],
-  '/portal': ['admin', 'super_admin', 'student', 'apprentice'],
-  '/instructor': ['admin', 'super_admin', 'instructor'],
-  '/employer': ['admin', 'super_admin', 'employer', 'sponsor', 'org_admin'],
-  '/staff-portal': ['admin', 'super_admin', 'staff', 'case_manager'],
-  '/case-manager': ['admin', 'super_admin', 'staff', 'case_manager'],
-  '/host-shop': ['admin', 'super_admin', 'staff', 'host_shop', 'host_shop_admin', 'partner'],
-  '/workforce': ['admin', 'super_admin', 'staff', 'workforce', 'workforce_partner'],
-  '/workforce-board': ['admin', 'super_admin', 'staff', 'case_manager', 'workforce_board', 'workforce_board_admin'],
-  '/provider': ['admin', 'super_admin', 'provider', 'provider_admin'],
-  '/program-holder': ['admin', 'super_admin', 'program_holder'],
-  '/proctor': ['admin', 'super_admin', 'test_admin', 'proctor'],
+const PORTAL_ROLE_MAP: Record<string, readonly string[]> = {
+  '/admin': ADMIN_ROLES,
+  '/lms': ALL_AUTHENTICATED_ROLES,
+  '/apprentice': APPRENTICE_ROLES,
+  '/portal': ['super_admin', 'admin', 'student', 'learner', 'apprentice'],
+  '/instructor': INSTRUCTOR_ROLES,
+  '/employer': EMPLOYER_ROLES,
+  '/staff-portal': STAFF_ROLES,
+  '/case-manager': WORKFORCE_ROLES,
+  '/host-shop': HOST_SHOP_ROLES,
+  '/workforce': WORKFORCE_ROLES,
+  '/workforce-board': [...WORKFORCE_ROLES, 'workforce_board', 'workforce_board_admin'],
+  '/provider': ['super_admin', 'admin', 'provider', 'provider_admin'],
+  '/program-holder': PROGRAM_HOLDER_ROLES,
+  '/proctor': TESTING_CENTER_ROLES,
+  '/testing-center': TESTING_CENTER_ROLES,
 };
 
 const ROUTE_REDIRECTS: Record<string, string> = {
@@ -37,6 +53,7 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/provider': '/provider/dashboard',
   '/program-holder': '/program-holder/dashboard',
   '/proctor': '/testing-center',
+  '/testing-center': '/testing-center',
 };
 
 const BILLING_EXEMPT_PREFIXES = [
@@ -55,35 +72,7 @@ export function isBillingExempt(pathname: string): boolean {
   return BILLING_EXEMPT_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-export function normalizeRole(role: string): string {
-  const roleMap: Record<string, string> = {
-    admin: 'admin',
-    super_admin: 'super_admin',
-    org_admin: 'org_admin',
-    student: 'student',
-    apprentice: 'apprentice',
-    barber_apprentice: 'apprentice',
-    cosmetology_apprentice: 'apprentice',
-    instructor: 'instructor',
-    employer: 'employer',
-    sponsor: 'sponsor',
-    partner: 'partner',
-    host_shop: 'host_shop',
-    host_shop_admin: 'host_shop_admin',
-    staff: 'staff',
-    case_manager: 'case_manager',
-    workforce: 'workforce',
-    workforce_partner: 'workforce_partner',
-    workforce_board: 'workforce_board',
-    workforce_board_admin: 'workforce_board_admin',
-    program_holder: 'program_holder',
-    provider: 'provider',
-    provider_admin: 'provider_admin',
-    test_admin: 'test_admin',
-    proctor: 'proctor',
-  };
-  return roleMap[role] || role;
-}
+export { normalizeRole };
 
 export function getRedirectForRole(role: string | null | undefined): string {
   if (!role) return '/login';
@@ -100,7 +89,7 @@ export function canAccessPortal(role: string | null | undefined, pathname: strin
   const basePath = getBasePath(pathname);
   const allowedRoles = PORTAL_ROLE_MAP[basePath];
   if (!allowedRoles) return true;
-  return allowedRoles.includes(normalizeRole(role));
+  return hasAnyRole([role], allowedRoles, { adminOverride: true });
 }
 
 async function resolveCurrentPath(): Promise<string> {
@@ -129,16 +118,10 @@ async function loadEffectiveRoles(userId: string): Promise<{ profile: any; effec
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .maybeSingle();
-
-  const { data: roleRows } = await supabase
-    .from('user_roles')
-    .select('roles(name)')
-    .eq('user_id', userId);
+  const [{ data: profile }, { data: roleRows }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', userId).maybeSingle(),
+    supabase.from('user_roles').select('roles(name)').eq('user_id', userId),
+  ]);
 
   const secondaryRoles = (roleRows ?? [])
     .map((row: any) => row.roles?.name)
@@ -146,14 +129,17 @@ async function loadEffectiveRoles(userId: string): Promise<{ profile: any; effec
 
   return {
     profile,
-    effectiveRoles: Array.from(new Set([profile?.role, ...secondaryRoles].filter(Boolean))) as string[],
+    effectiveRoles: normalizeRoles([profile?.role, ...secondaryRoles]),
   };
 }
 
 export async function requireAuth() {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
     const pathname = await resolveCurrentPath();
@@ -163,12 +149,11 @@ export async function requireAuth() {
   return user;
 }
 
-export async function requireRoles(allowedRoles: string[]) {
+export async function requireRoles(allowedRoles: readonly string[]) {
   const user = await requireAuth();
   const { profile, effectiveRoles } = await loadEffectiveRoles(user.id);
-  const normalizedAllowed = allowedRoles.map(normalizeRole);
 
-  if (!effectiveRoles.map(normalizeRole).some((role) => normalizedAllowed.includes(role))) {
+  if (!hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true })) {
     redirect('/unauthorized');
   }
 
@@ -181,7 +166,7 @@ export async function requirePortalAccess() {
   const { profile, effectiveRoles } = await loadEffectiveRoles(user.id);
   const basePath = getBasePath(pathname);
   const allowedRoles = PORTAL_ROLE_MAP[basePath];
-  const canAccess = !allowedRoles || effectiveRoles.map(normalizeRole).some((role) => allowedRoles.includes(role));
+  const canAccess = !allowedRoles || hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
   if (!canAccess) {
     redirect(resolveDashboardUrl(profile?.role, effectiveRoles));
@@ -189,8 +174,13 @@ export async function requirePortalAccess() {
 
   const { getAdminClient } = await import('@/lib/supabase/admin');
   const db = await getAdminClient();
+  const hasApprenticeBillingRole = hasAnyRole(
+    effectiveRoles,
+    ['apprentice', 'barber_apprentice', 'cosmetology_apprentice'],
+    { adminOverride: false },
+  );
 
-  if (db && !isBillingExempt(pathname) && effectiveRoles.map(normalizeRole).includes('apprentice')) {
+  if (db && !isBillingExempt(pathname) && hasApprenticeBillingRole) {
     const { data: barberSub } = await db
       .from('barber_subscriptions')
       .select('payment_status, suspension_deadline')
@@ -214,7 +204,9 @@ export async function requirePortalAccess() {
 export async function checkAuth() {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return null;
 
   const { profile, effectiveRoles } = await loadEffectiveRoles(user.id);

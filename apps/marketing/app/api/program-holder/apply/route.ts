@@ -3,6 +3,7 @@ import { getAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { notifyApplicationSubmission } from '@/lib/applications/submission-notifications';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,10 @@ function clean(value: unknown, max = 2000): string {
 
 function validEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function escapeHtml(value: string): string {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
 export async function POST(request: Request) {
@@ -81,12 +86,31 @@ export async function POST(request: Request) {
       );
     }
 
+    const safeOrganization = escapeHtml(organizationName);
+    const safeName = escapeHtml(contactName);
+    const safeEmail = escapeHtml(email);
+    const safeRef = escapeHtml(data.id);
+    const safePrograms = programTypes.length ? programTypes.map(escapeHtml).join(', ') : 'Not specified';
+    const notifications = await notifyApplicationSubmission({
+      db: admin,
+      applicationId: data.id,
+      applicationType: 'program_holder',
+      applicantName: contactName,
+      applicantEmail: email,
+      applicantSubject: 'Program Holder Application Received | Elevate for Humanity',
+      applicantHtml: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>Program Holder Application Received</h2><p>Hello ${safeName},</p><p>We received the Program Holder application for <strong>${safeOrganization}</strong>.</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Programs/services listed:</strong> ${safePrograms}</p><h3>What happens next</h3><ol><li>Elevate reviews organizational eligibility, program scope, required credentials, and operating documents.</li><li>If documents or an agreement are required, we will send a specific checklist.</li><li>After approval, portal access and Program Holder onboarding instructions will be issued to <strong>${safeEmail}</strong>.</li><li>Approved Program Holders can then manage authorized programs, documents, participants, and reporting from the partner portal.</li></ol><p>You do not need to submit another application. Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+      staffSubject: `[PROGRAM HOLDER APPLICATION] ${organizationName}`,
+      staffHtml: `<h2>New Program Holder Application</h2><p><strong>${safeOrganization}</strong><br>${safeName}<br>${safeEmail}<br>${escapeHtml(phone || 'No phone')}</p><p><strong>Reference:</strong> ${safeRef}</p><p><strong>Program types:</strong> ${safePrograms}</p><p><strong>Website:</strong> ${escapeHtml(website || 'Not provided')}</p><p>Review eligibility/documents and initiate Program Holder onboarding when approved.</p>`,
+      metadata: { organization_name: organizationName, program_types: programTypes },
+    });
+
     return NextResponse.json(
       {
         ok: true,
         applicationId: data.id,
         referenceNumber: data.id,
         applicationType: 'program_holder',
+        notificationStatus: notifications,
       },
       { status: 201 },
     );

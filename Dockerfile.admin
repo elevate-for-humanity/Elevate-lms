@@ -35,6 +35,9 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/apps/admin/node_modules ./apps/admin/node_modules
 COPY . .
 
+# Capture a real build timestamp even when the platform does not inject one.
+RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('Admin build timestamp:', ts)"
+
 # Stamp the admin service worker with the current deployment SHA before build.
 RUN node scripts/stamp-sw.mjs
 RUN ! grep -q '__CACHE_VERSION__' /app/public/sw-admin.js || \

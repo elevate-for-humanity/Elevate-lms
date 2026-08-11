@@ -1,16 +1,6 @@
-import { NextResponse } from 'next/server';
+import { publicProgramHolderReviewDisabled } from '@/lib/program-holders/public-review-disabled';
 
-/**
- * Program Holder review is an Admin-only mutation.
- *
- * This public Marketing endpoint previously changed application status without
- * enforcing Admin authorization and also wrote columns that do not exist in
- * the production application table. Keep the route closed so old bookmarks or
- * clients cannot mutate review state through the public site.
- */
+/** Public Marketing review mutation is closed; authenticated Admin owns approval. */
 export async function POST() {
-  return NextResponse.json(
-    { error: 'Program Holder application review is available only in the Admin portal.' },
-    { status: 410 },
-  );
+  return publicProgramHolderReviewDisabled('approval');
 }

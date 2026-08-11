@@ -1,34 +1,27 @@
 'use client';
 
-/**
- * MediaPanel — wraps VideoManagerClient + MediaStudioClient
- * Reads videos from CourseProvider. Attaching a video to a lesson
- * writes back via upsertLesson so curriculum stays in sync.
- */
+/** MediaPanel — Studio video upload/attachment workspace. */
 
 import dynamic from 'next/dynamic';
 import { useCourse } from '../CourseProvider';
 import { Video } from 'lucide-react';
 import { PanelHeader, PanelSkeleton } from './BlueprintPanel';
 
-// VideoManagerClient was consolidated into the Studio media tab.
-// Inline a lightweight video list here; full management is at /admin/studio.
 const VideoManagerClient = dynamic(
-  () => import('@/components/admin/AdvancedVideoUploader').then(m => ({ default: m.default ?? m })),
-  { ssr: false, loading: () => <PanelSkeleton label="Media" /> }
+  () => import('@/components/admin/AdvancedVideoUploader').then((module) => module.default),
+  { ssr: false, loading: () => <PanelSkeleton label="Media" /> },
 );
 
 export function MediaPanel() {
   const { state, appendAIMemory } = useCourse();
   const { videos } = state;
 
-  // Map StudioVideo → VideoRecord shape expected by VideoManagerClient
-  const initialVideos = videos.map(v => ({
-    id: v.id,
-    title: v.title,
-    url: v.url ?? v.video_url ?? '',
-    created_at: v.created_at,
-    duration_minutes: v.duration_seconds != null ? Math.round(v.duration_seconds / 60) : null,
+  const initialVideos = videos.map((video) => ({
+    id: video.id,
+    title: video.title,
+    url: video.url ?? video.video_url ?? '',
+    created_at: video.created_at,
+    duration_minutes: video.duration_seconds != null ? Math.round(video.duration_seconds / 60) : null,
   }));
 
   return (

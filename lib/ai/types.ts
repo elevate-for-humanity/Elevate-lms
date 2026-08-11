@@ -296,7 +296,7 @@ export interface ExecutionContext {
 // AI Service Types
 // ============================================================
 
-export type AIProviderName = 'openai' | 'gemini' | 'azure' | 'groq' | 'none';
+export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'azure' | 'groq' | 'none';
 export type AIImageProviderName = 'dalle' | 'stability' | 'azure' | 'none';
 
 export interface ChatMessage {

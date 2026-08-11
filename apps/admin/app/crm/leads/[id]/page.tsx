@@ -13,6 +13,11 @@ export async function generateMetadata({
 }: {
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const { id } = await params;
+  return {
+    title: `Lead ${id} | CRM | Admin`,
+    robots: { index: false, follow: false },
+  };
 }
 
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
@@ -75,7 +80,6 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Contact Info */}
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
               <User className="w-4 h-4 text-slate-400" /> Contact Information
@@ -88,7 +92,6 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </div>
           </div>
 
-          {/* Lead Details */}
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Tag className="w-4 h-4 text-slate-400" /> Lead Details
@@ -102,7 +105,6 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </div>
           </div>
 
-          {/* Activity */}
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-slate-400" /> Activity
@@ -114,7 +116,6 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </div>
           </div>
 
-          {/* Notes */}
           {lead.notes && (
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <h2 className="text-sm font-bold text-slate-900 mb-3">Notes</h2>
@@ -123,7 +124,6 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           )}
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3 mt-6">
           {lead.email && (
             <a

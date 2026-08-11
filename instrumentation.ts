@@ -37,17 +37,22 @@ export async function register() {
         const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http');
         const { Resource } = await import('@opentelemetry/resources');
         const { SEMRESATTRS_SERVICE_NAME, SEMRESATTRS_SERVICE_VERSION } = await import('@opentelemetry/semantic-conventions');
+        const traceExporter = new OTLPTraceExporter({
+          url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+          headers: process.env.OTEL_EXPORTER_OTLP_HEADERS
+            ? Object.fromEntries(process.env.OTEL_EXPORTER_OTLP_HEADERS.split(',').map((header) => header.split('=')))
+            : {},
+        });
+        type NodeSdkConfig = NonNullable<ConstructorParameters<typeof NodeSDK>[0]>;
         const sdk = new NodeSDK({
           resource: new Resource({
             [SEMRESATTRS_SERVICE_NAME]: process.env.OTEL_SERVICE_NAME ?? 'elevate-lms',
             [SEMRESATTRS_SERVICE_VERSION]: process.env.npm_package_version ?? '0.0.0',
           }),
-          traceExporter: new OTLPTraceExporter({
-            url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-            headers: process.env.OTEL_EXPORTER_OTLP_HEADERS
-              ? Object.fromEntries(process.env.OTEL_EXPORTER_OTLP_HEADERS.split(',').map((header) => header.split('=')))
-              : {},
-          }),
+          // OpenTelemetry 0.220 can resolve duplicate internal exporter type copies in
+          // a pnpm workspace. Runtime interfaces are compatible; normalize only the
+          // compile-time boundary expected by NodeSDK.
+          traceExporter: traceExporter as unknown as NodeSdkConfig['traceExporter'],
           instrumentations: [],
         });
         sdk.start();

@@ -14,7 +14,7 @@ export default function StaffPortalError({
       error={error}
       reset={reset}
       title="Staff Portal Error"
-      backHref="/admin/staff-portal"
+      backHref="/staff-portal/dashboard"
       backLabel="Back to Staff Portal"
     />
   );

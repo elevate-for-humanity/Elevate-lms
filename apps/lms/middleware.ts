@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 /**
  * Authenticated LMS namespaces. Authorization remains enforced by the route
  * layouts/pages, but these paths must never render for an anonymous request.
+ * Public portal landing/login pages are intentionally excluded.
  */
 const PROTECTED_PREFIXES = [
   '/lms/dashboard',
@@ -17,7 +18,8 @@ const PROTECTED_PREFIXES = [
   '/learner',
   '/apprentice',
   '/host-shop/dashboard',
-  '/parent-portal',
+  '/parent-portal/dashboard',
+  '/parent-portal/student',
   '/employer',
   '/workforce',
 ] as const;
@@ -120,7 +122,6 @@ export async function middleware(req: NextRequest) {
     maxAge: 60,
   });
 
-  // Authenticated portal pages must not be cached by a shared intermediary.
   if (protectedPath) {
     response.headers.set('Cache-Control', 'private, no-store, max-age=0');
   }

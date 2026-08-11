@@ -145,3 +145,35 @@ export async function createCommercialPlan(input: unknown): Promise<{ brief: Com
     return { brief, plan: fallbackPlan(brief) };
   }
 }
+
+export async function reviseCommercialPlan(input: {
+  brief: CommercialBrief;
+  plan: CommercialPlan;
+  instruction: string;
+}): Promise<CommercialPlan> {
+  const brief = commercialBriefSchema.parse(input.brief);
+  const currentPlan = commercialPlanSchema.parse(input.plan);
+  const instruction = z.string().trim().min(3).max(1_500).parse(input.instruction);
+
+  const response = await aiChat({
+    temperature: 0.35,
+    maxTokens: 3_500,
+    messages: [
+      {
+        role: 'system',
+        content: `You edit an existing commercial storyboard from a plain-language direction. Return only the complete revised JSON storyboard. Preserve accurate product claims. Never add unsupported approvals, guarantees, statistics, testimonials, prices, legal claims, or features that were not in the supplied brief. Keep practical stock-search queries and visually specific generative prompts.`,
+      },
+      {
+        role: 'user',
+        content: `Commercial brief:\n${JSON.stringify(brief)}\n\nCurrent storyboard:\n${JSON.stringify(currentPlan)}\n\nEdit instruction:\n${instruction}\n\nReturn the entire storyboard in the same JSON shape.`,
+      },
+    ],
+  });
+
+  try {
+    const revised = commercialPlanSchema.parse(JSON.parse(stripFences(response.content)));
+    return normalizePlan(revised, brief);
+  } catch {
+    return currentPlan;
+  }
+}

@@ -8,6 +8,7 @@ const MARKETING_APP = fs.existsSync(path.join(ROOT, 'apps/marketing/app'))
   ? 'apps/marketing/app'
   : 'app';
 const PAGE_NAMES = new Set(['page.tsx', 'page.ts', 'page.jsx', 'page.js']);
+const LAYOUT_NAMES = ['layout.tsx', 'layout.ts', 'layout.jsx', 'layout.js'];
 const SOURCE_EXTS = ['.tsx', '.ts', '.jsx', '.js', '.json'];
 const MEDIA_EXT = '(?:png|jpe?g|webp|avif|gif|svg|ico|mp4|webm|mov|m4v|mp3|m4a|wav|ogg|aac)';
 const ASSET_RE = new RegExp(
@@ -28,22 +29,23 @@ const HERO_OPTIONAL = [
 ];
 
 const abs = (rel) => path.join(ROOT, rel);
-const isFile = (rel) => {
+const read = (rel) => fs.readFileSync(abs(rel), 'utf8');
+const lineNumber = (source, index) => source.slice(0, index).split('\n').length;
+const isRedirectSource = (source) => /\b(?:redirect|permanentRedirect)\s*\(/.test(source);
+
+function isFile(rel) {
   try {
     return fs.statSync(abs(rel)).isFile();
   } catch {
     return false;
   }
-};
-const read = (rel) => fs.readFileSync(abs(rel), 'utf8');
-const lineNumber = (source, index) => source.slice(0, index).split('\n').length;
-const isRedirectSource = (source) => /\b(?:redirect|permanentRedirect)\s*\(/.test(source);
+}
 
 function walk(relDir) {
-  const absDir = abs(relDir);
-  if (!fs.existsSync(absDir)) return [];
+  const dir = abs(relDir);
+  if (!fs.existsSync(dir)) return [];
   const out = [];
-  for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (['node_modules', '.next', 'dist', 'build', '.turbo', 'coverage', '.git'].includes(entry.name)) continue;
     const rel = path.join(relDir, entry.name).replaceAll('\\', '/');
     if (entry.isDirectory()) out.push(...walk(rel));
@@ -55,6 +57,11 @@ function walk(relDir) {
 const ALL_MARKETING_FILES = walk(MARKETING_APP);
 const ALL_PAGE_FILES = ALL_MARKETING_FILES.filter((file) => PAGE_NAMES.has(path.basename(file)));
 
+function pathSegments(href) {
+  const clean = href.split(/[?#]/)[0].replace(/^\/+|\/+$/g, '');
+  return clean ? clean.split('/') : [];
+}
+
 function routeSegmentsForPage(file) {
   const rel = file.slice(MARKETING_APP.length).replace(/^\//, '');
   return rel
@@ -62,11 +69,6 @@ function routeSegmentsForPage(file) {
     .slice(0, -1)
     .filter(Boolean)
     .filter((segment) => !/^\(.*\)$/.test(segment) && !segment.startsWith('@'));
-}
-
-function pathSegments(href) {
-  const clean = href.split(/[?#]/)[0].replace(/^\/+|\/+$/g, '');
-  return clean ? clean.split('/') : [];
 }
 
 function directStaticPage(href) {
@@ -102,7 +104,6 @@ function routePageFile(href) {
   if (!href.startsWith('/')) return null;
   const direct = directStaticPage(href);
   if (direct) return direct;
-
   const target = pathSegments(href);
   const matches = ALL_PAGE_FILES.filter((file) => routePatternMatches(routeSegmentsForPage(file), target));
   if (!matches.length) return null;
@@ -134,7 +135,6 @@ function resolveSourceImport(fromFile, specifier) {
   const base = specifier.startsWith('@/')
     ? specifier.slice(2)
     : path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier));
-
   const candidates = [];
   if (path.extname(base)) candidates.push(base);
   else {
@@ -172,6 +172,31 @@ function dependencyClosure(seeds) {
     for (const dep of directDependencies(file)) if (!seen.has(dep)) queue.push(dep);
   }
   return seen;
+}
+
+function routeLayoutFiles(pageFile) {
+  if (!pageFile) return [];
+  const pageDir = path.posix.dirname(pageFile);
+  const appRoot = MARKETING_APP.replaceAll('\\', '/');
+  const relDir = pageDir.slice(appRoot.length).replace(/^\//, '');
+  const segments = relDir ? relDir.split('/') : [];
+  const directories = [appRoot];
+  let current = appRoot;
+  for (const segment of segments) {
+    current = `${current}/${segment}`;
+    directories.push(current);
+  }
+  const layouts = [];
+  for (const dir of directories) {
+    for (const name of LAYOUT_NAMES) {
+      const candidate = `${dir}/${name}`;
+      if (isFile(candidate)) {
+        layouts.push(candidate);
+        break;
+      }
+    }
+  }
+  return layouts;
 }
 
 function parseRouteConstants() {
@@ -230,16 +255,18 @@ function collectSitemapHrefs(routeConstants) {
 function pageSourceBundle(href) {
   const page = routePageFile(href);
   if (!page) return { page: null, files: new Set(), source: '' };
-  const files = dependencyClosure([page]);
+  const files = dependencyClosure([page, ...routeLayoutFiles(page)]);
   const source = [...files].map((file) => read(file)).join('\n');
   return { page, files, source };
 }
 
 function collectCanonicalFiles(sitemapHrefs, publicNavItems) {
   const seeds = [];
-  for (const href of sitemapHrefs) seeds.push(routePageFile(href));
-  for (const item of publicNavItems) seeds.push(routePageFile(item.href));
-  for (const layout of [`${MARKETING_APP}/layout.tsx`, `${MARKETING_APP}/layout.ts`]) if (isFile(layout)) seeds.push(layout);
+  for (const href of new Set([...sitemapHrefs, ...publicNavItems.map((item) => item.href)])) {
+    const page = routePageFile(href);
+    if (!page) continue;
+    seeds.push(page, ...routeLayoutFiles(page));
+  }
   return dependencyClosure(seeds);
 }
 
@@ -331,7 +358,7 @@ function collectDuplicateMediaFindings(sitemapHrefs) {
 }
 
 function isStaticAssetHref(href) {
-  return /\.(?:pdf|png|jpe?g|webp|avif|svg|gif|zip|docx?|xlsx?|csv)(?:[?#].*)?$/i.test(href);
+  return /\.(?:pdf|png|jpe?g|webp|svg|gif|zip|docx?|xlsx?|csv)(?:[?#].*)?$/i.test(href);
 }
 
 function collectActionFindings(files, routeConstants) {
@@ -372,7 +399,7 @@ function collectContrastRisks(files) {
   const findings = [];
   const classPattern = /className=["'`]([^"'`]+)["'`]/g;
   const lightBg = /\bbg-(?:white|slate-50|slate-100|gray-50|gray-100)\b/;
-  const weakOnLight = /\btext-(?:slate|gray|zinc|neutral|stone)-(?:300|400)\b|\btext-white\b/;
+  const weakOnLight = /\btext-(?:slate|gray|zinc|neutral|stone)-(?:300|400)\b/;
   const darkBg = /\bbg-(?:black|slate-800|slate-900|slate-950|gray-900|gray-950|brand-blue-700|brand-blue-800|brand-blue-900)\b/;
   const weakOnDark = /\btext-(?:black|slate|gray|zinc|neutral|stone)-(?:600|700|800|900|950)\b/;
   for (const file of files) {

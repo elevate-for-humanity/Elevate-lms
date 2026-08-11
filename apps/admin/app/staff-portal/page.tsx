@@ -11,7 +11,6 @@ import {
   ClipboardList,
   BarChart2,
   Calendar,
-  FileText,
   DollarSign,
   BookOpen,
   Star,
@@ -19,24 +18,28 @@ import {
   ChevronRight,
   CheckCircle,
   AlertCircle,
-  Video,
+  BriefcaseBusiness,
+  GraduationCap,
 } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Staff Portal',
   description: 'Manage students, track enrollments, and access administrative tools.',
+  robots: { index: false, follow: false },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/staff-portal' },
 };
+
+const MARKETING_URL = process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl;
 
 export default async function StaffPortalLanding() {
   const { user } = await requireStaffPortalAccess();
   const supabase = await createClient();
 
-  // Fetch completion state if logged in
   let payrollDone = false;
   let handbookDone = false;
   let skillsCount = 0;
-  let profile: any = null;
+  let profile: { full_name?: string | null; role?: string | null } | null = null;
 
   if (user) {
     const [{ data: pp }, { data: ha }, { data: us }, { data: pr }] = await Promise.all([
@@ -52,83 +55,72 @@ export default async function StaffPortalLanding() {
   }
 
   const quickLinks = [
-    { label: 'Students', href: '/students', icon: Users, desc: 'Manage enrollments' },
-    {
-      label: 'Attendance',
-      href: '/admin/attendance',
-      icon: ClipboardList,
-      desc: 'Record & export',
-    },
-    { label: 'Reports', href: '/admin/reports', icon: BarChart2, desc: 'Progress & outcomes' },
-    { label: 'Scheduling', href: '/admin/scheduling', icon: Calendar, desc: 'Classes & sessions' },
-    { label: 'Documents', href: '/employee/documents', icon: FileText, desc: 'Forms & uploads' },
-    { label: 'My Payroll', href: '/employee/payroll', icon: DollarSign, desc: 'Pay stubs & W-2' },
-    {
-      label: 'Handbook',
-      href: '/employee/handbook',
-      icon: BookOpen,
-      desc: 'Policies & procedures',
-    },
-    { label: 'My Skills', href: '/admin/staff-portal/skills', icon: Star, desc: 'Track competencies' },
-    { label: 'Interviews', href: '/careers', icon: Video, desc: 'Hiring pipeline' },
-    { label: 'Settings', href: '/admin/staff-portal/settings', icon: Settings, desc: 'Preferences' },
+    { label: 'Students', href: '/staff-portal/students', icon: Users, desc: 'Manage enrollments' },
+    { label: 'Attendance', href: '/staff-portal/attendance', icon: ClipboardList, desc: 'Record & export' },
+    { label: 'Reports', href: '/staff-portal/reports', icon: BarChart2, desc: 'Progress & outcomes' },
+    { label: 'Scheduling', href: '/crm/appointments', icon: Calendar, desc: 'Appointments & sessions' },
+    { label: 'My Payroll', href: '/hr/payroll', icon: DollarSign, desc: 'Payroll administration' },
+    { label: 'Handbook', href: `${MARKETING_URL}/handbook`, icon: BookOpen, desc: 'Policies & procedures' },
+    { label: 'My Skills', href: '/staff-portal/skills', icon: Star, desc: 'Track competencies' },
+    { label: 'Cases', href: '/staff-portal/cases', icon: BriefcaseBusiness, desc: 'Assigned cases' },
+    { label: 'Training', href: '/staff-portal/training', icon: GraduationCap, desc: 'Staff development' },
+    { label: 'Settings', href: '/staff-portal/settings', icon: Settings, desc: 'Preferences' },
   ];
 
   const onboardingItems = [
-    { label: 'Orientation Video', href: '/onboarding/staff/orientation', done: !!user },
-    { label: 'Employee Handbook', href: '/employee/handbook', done: handbookDone },
-    { label: 'Payroll & W-9 Setup', href: '/onboarding/payroll-setup', done: payrollDone },
-    { label: 'Skills Assessment', href: '/admin/staff-portal/skills', done: skillsCount >= 5 },
+    { label: 'Staff Orientation', href: `${MARKETING_URL}/onboarding/staff`, done: !!user },
+    { label: 'Employee Handbook', href: `${MARKETING_URL}/handbook`, done: handbookDone },
+    { label: 'Payroll & W-9 Setup', href: `${MARKETING_URL}/onboarding/payroll-setup`, done: payrollDone },
+    { label: 'Skills Assessment', href: '/staff-portal/skills', done: skillsCount >= 5 },
   ];
-  const onboardingComplete = onboardingItems.filter((i) => i.done).length;
+  const onboardingComplete = onboardingItems.filter((item) => item.done).length;
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Staff Portal' }]} />
         </div>
       </div>
 
-      {/* Hero */}
       <section className="relative h-[220px] sm:h-[260px]">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/staff-portal-page-1.webp"
+        <Image
+          placeholder="blur"
+          blurDataURL={blurDataURL}
+          src="/images/pages/admin/staff-portal-page-1.webp"
           alt="Staff Portal"
           fill
           sizes="100vw"
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 flex flex-col justify-end pb-8 px-6 max-w-6xl mx-auto w-full">
-          <h1 className="text-3xl font-bold text-slate-900 mb-1">
+        <div className="absolute inset-0 mx-auto flex w-full max-w-6xl flex-col justify-end px-6 pb-8">
+          <h1 className="mb-1 text-3xl font-bold text-slate-900">
             {user && profile?.full_name
               ? `Welcome, ${profile.full_name.split(' ')[0]}`
               : 'Staff Portal'}
           </h1>
-          <p className="text-slate-600 text-sm">
-            ${PLATFORM_DEFAULTS.orgName} · Staff &amp; Instructor Tools
+          <p className="text-sm text-slate-600">
+            {PLATFORM_DEFAULTS.orgName} · Staff &amp; Instructor Tools
           </p>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Onboarding progress (only if logged in and not complete) */}
+      <div className="mx-auto max-w-6xl px-4 py-8">
         {user && onboardingComplete < onboardingItems.length && (
-          <div className="bg-white rounded-xl border mb-8 overflow-hidden">
-            <div className="px-6 py-4 border-b flex items-center justify-between">
+          <div className="mb-8 overflow-hidden rounded-xl border bg-white">
+            <div className="flex items-center justify-between border-b px-6 py-4">
               <div>
                 <h2 className="font-bold text-slate-900">Complete Your Onboarding</h2>
                 <p className="text-xs text-slate-500">
                   {onboardingComplete}/{onboardingItems.length} steps done
                 </p>
               </div>
-              <Link href="/staff-portal"
-                className="text-sm text-brand-blue-600 hover:underline font-medium flex items-center gap-1"
+              <Link
+                href={`${MARKETING_URL}/onboarding/staff`}
+                className="flex items-center gap-1 text-sm font-medium text-brand-blue-600 hover:underline"
               >
-                View All <ChevronRight className="w-3.5 h-3.5" />
+                View onboarding <ChevronRight className="h-3.5 w-3.5" />
               </Link>
             </div>
             <div className="divide-y">
@@ -136,64 +128,58 @@ export default async function StaffPortalLanding() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="flex items-center gap-4 px-6 py-3.5 hover:bg-white transition"
+                  className="flex items-center gap-4 px-6 py-3.5 transition hover:bg-slate-50"
                 >
                   {item.done ? (
-                    <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 flex-shrink-0 text-brand-green-500" />
                   ) : (
-                    <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                    <AlertCircle className="h-5 w-5 flex-shrink-0 text-amber-500" />
                   )}
                   <span
-                    className={`text-sm font-medium flex-1 ${item.done ? 'text-slate-400 line-through' : 'text-slate-800'}`}
+                    className={`flex-1 text-sm font-medium ${item.done ? 'text-slate-500 line-through' : 'text-slate-800'}`}
                   >
                     {item.label}
                   </span>
-                  {!item.done && <ChevronRight className="w-4 h-4 text-slate-300" />}
+                  {!item.done && <ChevronRight className="h-4 w-4 text-slate-400" />}
                 </Link>
               ))}
             </div>
           </div>
         )}
 
-        {/* Quick links grid */}
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
-          Quick Access
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8">
+        <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-500">Quick Access</h2>
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
           {quickLinks.map(({ label, href, icon: Icon, desc }) => (
             <Link
               key={href}
               href={href}
-              className="bg-white rounded-xl border p-4 flex flex-col items-center text-center hover:border-brand-blue-300 hover:bg-brand-blue-50 transition group"
+              className="group flex flex-col items-center rounded-xl border bg-white p-4 text-center transition hover:border-brand-blue-300 hover:bg-brand-blue-50"
             >
-              <div className="w-10 h-10 bg-white group-hover:bg-brand-blue-100 rounded-xl flex items-center justify-center mb-2 transition">
-                <Icon className="w-5 h-5 text-slate-500 group-hover:text-brand-blue-600" />
+              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 transition group-hover:bg-brand-blue-100">
+                <Icon className="h-5 w-5 text-slate-600 group-hover:text-brand-blue-600" />
               </div>
-              <p className="text-sm font-semibold text-slate-800 group-hover:text-brand-blue-700">
-                {label}
-              </p>
-              <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
+              <p className="text-sm font-semibold text-slate-800 group-hover:text-brand-blue-700">{label}</p>
+              <p className="mt-0.5 text-xs text-slate-600">{desc}</p>
             </Link>
           ))}
         </div>
 
-        {/* Not logged in CTA */}
         {!user && (
-          <div className="bg-white rounded-xl border p-8 text-center">
-            <h2 className="text-xl font-bold text-slate-900 mb-2">Sign In to Access Staff Tools</h2>
-            <p className="text-slate-500 mb-6">
-              Your dashboard, payroll, handbook, and student management tools are available after
-              signing in.
+          <div className="rounded-xl border bg-white p-8 text-center">
+            <h2 className="mb-2 text-xl font-bold text-slate-900">Sign In to Access Staff Tools</h2>
+            <p className="mb-6 text-slate-600">
+              Your dashboard, payroll, handbook, and student management tools are available after signing in.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
-                href="/login?redirect=/admin/staff-portal"
-                className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-xl hover:bg-brand-blue-700"
+                href="/login?redirect=/staff-portal"
+                className="rounded-xl bg-brand-blue-600 px-6 py-3 font-bold text-white hover:bg-brand-blue-700"
               >
                 Sign In
               </Link>
-              <Link href="/staff-portal"
-                className="px-6 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200"
+              <Link
+                href={`${MARKETING_URL}/onboarding/staff`}
+                className="rounded-xl bg-slate-100 px-6 py-3 font-bold text-slate-900 hover:bg-slate-200"
               >
                 New Staff Onboarding
               </Link>

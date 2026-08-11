@@ -5,8 +5,8 @@ import { PERMISSIONS } from '@/lib/rbac/role-matrix';
 
 export const metadata = { robots: { index: false } };
 
-// This route is kept for backward compatibility — all workflows now live in the unified engine at /admin/studio/workflows
+// Backward-compatible alias. Canonical workflow UI lives in Dev Studio.
 export default async function WorkflowsPage() {
-  await requireRole(PERMISSIONS.access_devstudio);
+  await requireRole(PERMISSIONS.access_dev_tools);
   redirect('/admin/studio/workflows');
 }

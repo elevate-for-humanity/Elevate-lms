@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { sharedStandaloneTraceExcludes } from '../../scripts/next-standalone-trace-excludes.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
+import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -57,6 +58,14 @@ const adminConfig = {
       }
     }
     return config;
+  },
+
+  async rewrites() {
+    return {
+      beforeFiles: legacyImageRewrites(),
+      afterFiles: [],
+      fallback: [],
+    };
   },
 
   async redirects() {

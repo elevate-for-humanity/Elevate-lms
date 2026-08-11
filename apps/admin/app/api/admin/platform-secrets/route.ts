@@ -2,10 +2,7 @@
  * /api/admin/platform-secrets
  *
  * CRUD for platform_secrets table. Values are stored encrypted in DB.
- * Only admin / admin can read or write.
- * GET  — list all keys (values masked, show last 4 chars only)
- * POST — upsert a key/value
- * DELETE — remove a key
+ * Only authenticated admins can read or write.
  */
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -30,7 +27,6 @@ async function requireSuperAdmin() {
   return { user, profile };
 }
 
-// GET — list all secrets (values masked)
 async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
@@ -45,15 +41,12 @@ async function _GET(request: Request) {
       .order('category')
       .order('key');
     if (error) return safeError('Failed to load secrets', 500);
-
-    // Mask values — never return raw encrypted blobs to client
     return NextResponse.json({ secrets: data ?? [] });
   } catch (err) {
     return safeInternalError(err, 'Failed to load secrets');
   }
 }
 
-// POST — upsert a secret
 async function _POST(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
@@ -66,24 +59,19 @@ async function _POST(request: Request) {
 
     if (!key || typeof key !== 'string') return safeError('key is required', 400);
     if (value === undefined || value === null) return safeError('value is required', 400);
-
-    // Validate key format — uppercase letters, digits, underscores only
     if (!/^[A-Z0-9_]+$/.test(key)) {
       return safeError('key must be uppercase letters, digits, and underscores only', 400);
     }
 
     const db = await requireAdminClient();
-
-    // Store value — use pgp_sym_encrypt via RPC if passphrase is configured,
-    // otherwise store as-is (Supabase vault handles encryption at rest)
     const { error } = await db
       .from('platform_secrets')
       .upsert({
         key,
-        value_enc: value,   // stored as-is; pgcrypto encryption via DB function
+        value_enc: value,
         description: description ?? null,
         category: category ?? 'general',
-        updated_by: auth.id,
+        updated_by: auth.user.id,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'key' });
 
@@ -92,14 +80,13 @@ async function _POST(request: Request) {
       return safeError('Failed to save secret', 500);
     }
 
-    logger.info('[platform-secrets] upserted', { key, actor: auth.id });
+    logger.info('[platform-secrets] upserted', { key, actor: auth.user.id });
     return NextResponse.json({ success: true, key });
   } catch (err) {
     return safeInternalError(err, 'Failed to save secret');
   }
 }
 
-// DELETE — remove a secret by key
 async function _DELETE(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
@@ -115,14 +102,13 @@ async function _DELETE(request: Request) {
     const { error } = await db.from('platform_secrets').delete().eq('key', key);
     if (error) return safeError('Failed to delete secret', 500);
 
-    logger.info('[platform-secrets] deleted', { key, actor: auth.id });
+    logger.info('[platform-secrets] deleted', { key, actor: auth.user.id });
     return NextResponse.json({ success: true });
   } catch (err) {
     return safeInternalError(err, 'Failed to delete secret');
   }
 }
 
-// PATCH — test a secret (ping the relevant API)
 async function _PATCH(request: Request) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
@@ -153,8 +139,6 @@ async function _PATCH(request: Request) {
           status = 'ok';
           message = `HTTP ${r.status}`;
         } else if (r.status === 429) {
-          // Groq rate-limits the models endpoint aggressively; a 429 means
-          // the key is valid but the quota is temporarily exhausted.
           status = 'ok';
           message = 'Key valid (rate limited — quota temporarily exhausted)';
         } else {
@@ -202,7 +186,7 @@ async function _PATCH(request: Request) {
   }
 }
 
-export const GET    = withApiAudit('/api/admin/platform-secrets', _GET);
-export const POST   = withApiAudit('/api/admin/platform-secrets', _POST);
+export const GET = withApiAudit('/api/admin/platform-secrets', _GET);
+export const POST = withApiAudit('/api/admin/platform-secrets', _POST);
 export const DELETE = withApiAudit('/api/admin/platform-secrets', _DELETE);
-export const PATCH  = withApiAudit('/api/admin/platform-secrets', _PATCH);
+export const PATCH = withApiAudit('/api/admin/platform-secrets', _PATCH);

@@ -1,3 +1,4 @@
+// AUTH: Enforced inside handler by resolveOwnedSite(), which requires a Supabase user and ownership of websiteId.
 /** List domains attached to an owned Website Builder site. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -24,7 +25,7 @@ export async function GET(
     .eq('user_id', user.id)
     .neq('status', 'deleted')
     .order('created_at', { ascending: false });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Could not load domains.' }, { status: 500 });
 
   return NextResponse.json({
     domains: domains ?? [],

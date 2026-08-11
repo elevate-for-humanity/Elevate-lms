@@ -2,8 +2,6 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,13 +13,6 @@ export default async function PartnerEnrollmentsPage() {
   await requireRole(['admin']);
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'admin') redirect('/unauthorized');
-
   const { data: enrollments, count } = await supabase
     .from('partner_course_enrollments')
     .select('*, student:profiles(full_name, email), course:partner_lms_courses(course_name)', {
@@ -31,7 +22,6 @@ export default async function PartnerEnrollmentsPage() {
 
   return (
     <div className="min-h-screen bg-white p-8">
-      {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[{ label: 'Admin', href: '/admin' }, { label: 'Partner Enrollments' }]}
@@ -45,18 +35,10 @@ export default async function PartnerEnrollmentsPage() {
             <table className="min-w-full">
               <thead className="bg-slate-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                    Course
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">
-                    Progress
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Student</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Course</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase">Progress</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">

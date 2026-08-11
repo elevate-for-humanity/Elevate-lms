@@ -12,22 +12,37 @@ export interface BreadcrumbItem {
 interface BreadcrumbsProps {
   items: BreadcrumbItem[];
   className?: string;
+  dark?: boolean;
 }
 
-export function Breadcrumbs({ items, className = '' }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, className = '', dark = false }: BreadcrumbsProps) {
+  const base = dark ? 'text-white/80' : 'text-slate-600';
+  const separator = dark ? 'text-white/45' : 'text-slate-400';
+  const current = dark ? 'text-white' : 'text-slate-900';
+  const hover = dark ? 'hover:text-white' : 'hover:text-brand-blue-600';
+
   return (
-    <nav aria-label="Breadcrumb" className={`flex items-center text-sm text-slate-600 ${className}`}>
+    <nav aria-label="Breadcrumb" className={`flex items-center text-sm ${base} ${className}`}>
       <ol className="flex items-center flex-wrap gap-1">
         <li className="flex items-center">
-          <Link href="/" className="hover:text-brand-blue-600 transition-colors flex items-center gap-1" aria-label="Home"><Home className="w-4 h-4" /></Link>
+          <Link href="/" className={`${hover} transition-colors flex items-center gap-1`} aria-label="Home">
+            <Home className="w-4 h-4" />
+          </Link>
         </li>
         {items.map((item, index) => (
-          <li key={index} className="flex items-center">
-            <ChevronRight className="w-4 h-4 mx-1 text-slate-400" aria-hidden="true" />
+          <li key={`${item.label}-${index}`} className="flex items-center">
+            <ChevronRight className={`w-4 h-4 mx-1 ${separator}`} aria-hidden="true" />
             {item.href && index < items.length - 1 ? (
-              <Link href={item.href} className={`${item.className ?? ''} hover:text-brand-blue-600 transition-colors`}>{item.label}</Link>
+              <Link href={item.href} className={`${item.className ?? ''} ${hover} transition-colors`}>
+                {item.label}
+              </Link>
             ) : (
-              <span className={`${item.className ?? ''} ${index === items.length - 1 ? 'text-slate-900 font-medium' : ''}`} aria-current={index === items.length - 1 ? 'page' : undefined}>{item.label}</span>
+              <span
+                className={`${item.className ?? ''} ${index === items.length - 1 ? `${current} font-medium` : ''}`}
+                aria-current={index === items.length - 1 ? 'page' : undefined}
+              >
+                {item.label}
+              </span>
             )}
           </li>
         ))}

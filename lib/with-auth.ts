@@ -39,7 +39,8 @@ async function getAuthedUser(): Promise<AuthedUser | null> {
 
 /**
  * Wrap a Next.js route handler with canonical Supabase authentication and RBAC.
- * The route receives resolved Next 15 params plus the authenticated user.
+ * The route receives resolved Next 15 params plus the authenticated user on the
+ * context and as the compatibility third argument.
  */
 export function withAuth<TParams = Record<string, string>>(
   handler: AuthHandler<TParams>,
@@ -60,6 +61,6 @@ export function withAuth<TParams = Record<string, string>>(
     }
 
     const params = await context.params;
-    return handler(req, { params, user });
+    return handler(req, { params, user }, user);
   };
 }

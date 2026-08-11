@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  const { role } = await requireRole(['admin', 'staff']);
-  requireDevToolsAccess(role);
+  const { profile } = await requireRole(['admin', 'staff']);
+  requireDevToolsAccess(profile.role);
   return <>{children}</>;
 }

@@ -17,7 +17,10 @@ export function HomeFinalCTA() {
       aria-labelledby="final-cta-heading"
     >
       <div className="relative max-w-2xl mx-auto text-center">
-        <p className="text-white/90 text-[10px] font-bold uppercase tracking-widest mb-2">
+        <p
+          className="text-[10px] font-bold uppercase tracking-widest mb-2"
+          style={{ color: '#ffffff' }}
+        >
           Ready to start?
         </p>
         <h2
@@ -28,7 +31,7 @@ export function HomeFinalCTA() {
         </h2>
         <p
           className="text-red-50 text-xs sm:text-sm leading-relaxed mb-4 max-w-lg mx-auto"
-          style={{ color: "#fef2f2" }}
+          style={{ color: '#fef2f2' }}
         >
           Apply once for training, funding, apprenticeship, certification, and employment — all in
           one system.
@@ -51,7 +54,7 @@ export function HomeFinalCTA() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-white text-[11px]">
           <a
-            href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
+            href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`}
             className="inline-flex items-center gap-1.5 text-white font-bold hover:text-red-50 transition-colors"
           >
             <Phone className="w-3.5 h-3.5" aria-hidden="true" />

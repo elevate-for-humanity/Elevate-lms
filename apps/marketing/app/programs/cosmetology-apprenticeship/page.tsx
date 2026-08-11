@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
+import ProgramSeoStructuredData from '@/components/programs/ProgramSeoStructuredData';
+import BeautyProgramSearchSection from '@/components/programs/beauty/BeautyProgramSearchSection';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
@@ -26,25 +28,43 @@ export default async function CosmetologyApprenticeshipPage() {
     />
   ) : undefined;
 
-  return <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride} />;
+  return (
+    <>
+      <ProgramSeoStructuredData
+        program={loaded.program}
+        canonicalPath="/programs/cosmetology-apprenticeship"
+      />
+      <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride}>
+        <BeautyProgramSearchSection program={loaded.program} />
+      </ProgramDetailPage>
+    </>
+  );
 }
 
 export async function generateMetadata() {
   return {
-    title: 'Cosmetology & Hair Stylist Apprenticeship | Earn While You Learn',
+    title: 'Registered Cosmetology Apprenticeship in Indiana | Elevate for Humanity',
     description:
-      'Cosmetology and hair stylist apprenticeship pathway with structured on-the-job learning, related technical instruction, employer training sites, progress tracking and apprenticeship sponsor oversight.',
+      'Indiana cosmetology apprenticeship with supervised salon training, related technical instruction, host-shop placement pathways and sponsor oversight. Funding eligibility is reviewed separately and is not guaranteed.',
     keywords: [
       'cosmetology apprenticeship',
-      'hair stylist apprenticeship',
-      'hairstylist apprenticeship',
       'cosmetology apprenticeship Indiana',
+      'Indiana cosmetology apprenticeship program',
       'paid cosmetology apprenticeship',
-      'salon apprenticeship',
-      'cosmetology training',
+      'registered cosmetology apprenticeship',
+      'salon apprenticeship Indiana',
+      'cosmetology license apprenticeship',
+      'earn while you learn cosmetology',
     ],
     alternates: {
       canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
+    },
+    openGraph: {
+      title: 'Registered Cosmetology Apprenticeship in Indiana',
+      description:
+        'Explore supervised salon training, related technical instruction, host-shop pathways and the verified funding status for Elevate’s Indiana cosmetology apprenticeship.',
+      url: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
+      type: 'website',
     },
   };
 }

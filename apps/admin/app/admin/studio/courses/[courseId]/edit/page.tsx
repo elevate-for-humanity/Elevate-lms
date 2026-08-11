@@ -22,8 +22,6 @@ export default async function EditCoursePage({
     data: { user },
   } = await supabase.auth.getUser();
 
-
-  // Guard against null user
   if (!user) redirect('/login');
   const { data: profile } = await supabase
     .from('profiles')
@@ -35,7 +33,6 @@ export default async function EditCoursePage({
     redirect('/unauthorized');
   }
 
-  // Try canonical courses table first, fall back to legacy training_courses
   let course: Record<string, unknown> | null = null;
 
   const { data: canonicalCourse } = await supabase
@@ -58,10 +55,10 @@ export default async function EditCoursePage({
   if (!course) notFound();
 
   const { data: programs } = await supabase.from('programs').select('id, title').order('title');
+  const courseTitle = typeof course.title === 'string' && course.title.trim() ? course.title : 'Course';
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Image */}
       <div className="max-w-3xl mx-auto px-4 py-8">
         <nav className="text-sm mb-6">
           <ol className="flex items-center space-x-2 text-slate-700">
@@ -81,7 +78,7 @@ export default async function EditCoursePage({
           </ol>
         </nav>
 
-        <h1 className="text-2xl font-bold text-slate-900 mb-6">Edit: {course.title}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 mb-6">Edit: {courseTitle}</h1>
 
         <EditCourseForm course={course} programs={programs || []} />
       </div>

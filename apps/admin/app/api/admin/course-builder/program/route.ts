@@ -12,7 +12,7 @@ const bodySchema = z.object({
   id: z.string().uuid().optional(), title: z.string().min(1), slug: z.string().min(1),
   credentialTarget: z.enum(['INTERNAL','STATE_BOARD','IC&RC','NAADAC','CUSTOM','DOL_APPRENTICESHIP']),
   minimumHours: z.number().positive(), requiresFinalExam: z.boolean(),
-  finalExam: z.object({ required: z.boolean(), questionCount: z.number().optional(), passingScore: z.number().optional(), timeLimitMinutes: z.number().optional(), domainDistribution: z.record(z.number()).optional(), competencyKeys: z.array(z.string()).optional() }),
+  finalExam: z.object({ required: z.boolean(), questionCount: z.number().optional(), passingScore: z.number().optional(), timeLimitMinutes: z.number().optional(), domainDistribution: z.record(z.string(), z.number()).optional(), competencyKeys: z.array(z.string()).optional() }),
   certificateRequirements: z.object({ includeHours: z.boolean(), includeCompetencies: z.boolean(), includeInstructorVerification: z.boolean(), includeCompletionDate: z.boolean(), includeVerificationUrl: z.boolean(), requireAllCriticalCompetencies: z.boolean().optional() }),
   regulatory: z.object({ complianceProfileKey: z.string().min(1), credentialTarget: z.enum(['INTERNAL','STATE_BOARD','IC&RC','NAADAC','CUSTOM','DOL_APPRENTICESHIP']), governingBody: z.string().nullable().optional(), governingRegion: z.string().nullable().optional(), governingStandardVersion: z.string().nullable().optional(), retentionPolicyDays: z.number().nullable().optional(), auditNotes: z.string().nullable().optional() }),
   status: z.enum(['draft','published']).default('draft'),

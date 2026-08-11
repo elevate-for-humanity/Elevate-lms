@@ -61,12 +61,10 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       setConfirmKey(workflow.key);
       return;
     }
-
     setConfirmKey(null);
     setRunningKey(workflow.key);
     setError(null);
     setRun(null);
-
     try {
       const res = await fetch('/api/devstudio/shell', {
         method: 'POST',
@@ -95,13 +93,11 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
     }
   }
 
-
   async function pushCurrentBranchToMain() {
     if (gitPushState !== 'confirm') {
       setGitPushState('confirm');
       return;
     }
-
     setGitPushState('loading');
     setError(null);
     try {
@@ -132,7 +128,6 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       setDeployAllState('confirm');
       return;
     }
-
     setDeployAllState('loading');
     setError(null);
     try {
@@ -151,10 +146,10 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
     }
   }
 
-  useEffect((): void => {
+  useEffect(() => {
     if (!lastResult?.runId) return;
-    refreshRun();
-    const timer = window.setInterval(refreshRun, 5000);
+    void refreshRun();
+    const timer = window.setInterval(() => void refreshRun(), 5000);
     return () => window.clearInterval(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastResult?.runId]);
@@ -176,39 +171,16 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={pushCurrentBranchToMain}
-              disabled={gitPushState === 'loading'}
-              className="inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-semibold text-white transition hover:border-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
-              style={{ borderColor: gitPushState === 'confirm' ? '#f59e0b' : '#3c3c3c', background: gitPushState === 'confirm' ? '#92400e' : '#1f2937' }}
-              title="Configure git origin and push this container branch to main using GITHUB_TOKEN/GH_TOKEN/GITHUB_PAT."
-            >
+            <button type="button" onClick={() => void pushCurrentBranchToMain()} disabled={gitPushState === 'loading'} className="inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-semibold text-white transition hover:border-brand-blue-400 disabled:cursor-not-allowed disabled:opacity-60" style={{ borderColor: gitPushState === 'confirm' ? '#f59e0b' : '#3c3c3c', background: gitPushState === 'confirm' ? '#92400e' : '#1f2937' }}>
               {gitPushState === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <GitBranch className="h-3.5 w-3.5" />}
               {gitPushState === 'confirm' ? 'Confirm Push Main' : 'Push Main'}
             </button>
-            <button
-              type="button"
-              onClick={deployAll}
-              disabled={deployAllState === 'loading'}
-              className="inline-flex h-8 items-center gap-1.5 rounded px-2 text-[11px] font-semibold disabled:opacity-50"
-              style={{
-                background: deployAllState === 'confirm' ? '#f59e0b' : '#0078d4',
-                color: deployAllState === 'confirm' ? '#111827' : '#ffffff',
-              }}
-            >
+            <button type="button" onClick={() => void deployAll()} disabled={deployAllState === 'loading'} className="inline-flex h-8 items-center gap-1.5 rounded px-2 text-[11px] font-semibold disabled:opacity-50" style={{ background: deployAllState === 'confirm' ? '#f59e0b' : '#0078d4', color: deployAllState === 'confirm' ? '#111827' : '#ffffff' }}>
               {deployAllState === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Rocket className="h-3.5 w-3.5" />}
               {deployAllState === 'confirm' ? 'Confirm Deploy All' : 'Deploy All'}
             </button>
-            <button
-              type="button"
-              onClick={refreshRun}
-              disabled={!lastResult?.runId}
-              className="inline-flex h-8 items-center gap-1.5 rounded border px-2 text-[11px] disabled:opacity-40"
-              style={{ borderColor: '#3c3c3c', color: '#cccccc' }}
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              Refresh
+            <button type="button" onClick={() => void refreshRun()} disabled={!lastResult?.runId} className="inline-flex h-8 items-center gap-1.5 rounded border px-2 text-[11px] disabled:opacity-40" style={{ borderColor: '#3c3c3c', color: '#cccccc' }}>
+              <RefreshCw className="h-3.5 w-3.5" /> Refresh
             </button>
           </div>
         </div>
@@ -217,8 +189,7 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
       <div className="min-h-0 flex-1 overflow-y-auto p-4">
         {error && (
           <div className="mb-4 flex items-start gap-2 rounded border px-3 py-2 text-xs" style={{ borderColor: '#7f1d1d', background: 'rgba(127,29,29,0.22)', color: '#fecaca' }}>
-            <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
-            <span>{error}</span>
+            <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" /><span>{error}</span>
           </div>
         )}
 
@@ -229,32 +200,13 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
             return (
               <div key={workflow.key} className="rounded-md border p-3" style={{ borderColor: needsConfirm ? '#f59e0b' : '#3c3c3c', background: '#252526' }}>
                 <div className="mb-3 flex min-h-12 items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-white">{workflow.label}</p>
-                    <p className="mt-1 text-[11px] leading-relaxed" style={{ color: '#9ca3af' }}>{workflow.description}</p>
-                  </div>
+                  <div className="min-w-0"><p className="truncate text-sm font-semibold text-white">{workflow.label}</p><p className="mt-1 text-[11px] leading-relaxed" style={{ color: '#9ca3af' }}>{workflow.description}</p></div>
                   <Rocket className="h-4 w-4 flex-shrink-0" style={{ color: '#4ec9b0' }} />
                 </div>
-
-                {needsConfirm && (
-                  <p className="mb-2 rounded border px-2 py-1.5 text-[11px]" style={{ borderColor: '#f59e0b', color: '#fcd34d', background: 'rgba(245,158,11,0.08)' }}>
-                    Click again to deploy production.
-                  </p>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => dispatchWorkflow(workflow)}
-                  disabled={pending}
-                  className="inline-flex h-9 w-full items-center justify-center gap-2 rounded text-xs font-semibold transition disabled:opacity-50"
-                  style={{ background: needsConfirm ? '#f59e0b' : '#0078d4', color: needsConfirm ? '#111827' : '#ffffff' }}
-                >
+                {needsConfirm && <p className="mb-2 rounded border px-2 py-1.5 text-[11px]" style={{ borderColor: '#f59e0b', color: '#fcd34d', background: 'rgba(245,158,11,0.08)' }}>Click again to deploy production.</p>}
+                <button type="button" onClick={() => void dispatchWorkflow(workflow)} disabled={pending} className="inline-flex h-9 w-full items-center justify-center gap-2 rounded text-xs font-semibold transition disabled:opacity-50" style={{ background: needsConfirm ? '#f59e0b' : '#0078d4', color: needsConfirm ? '#111827' : '#ffffff' }}>
                   {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
-                  {workflow.key.startsWith('deploy-')
-                    ? needsConfirm
-                      ? 'Confirm Deploy'
-                      : 'Deploy'
-                    : 'Run'}
+                  {workflow.key.startsWith('deploy-') ? needsConfirm ? 'Confirm Deploy' : 'Deploy' : 'Run'}
                 </button>
               </div>
             );
@@ -269,52 +221,19 @@ export default function DeployPanel({ workflowButtons }: { workflowButtons?: Wor
               <div className="flex items-center gap-2">
                 <ActiveIcon className={`h-4 w-4 ${activeStatus.Icon === Loader2 ? 'animate-spin' : ''}`} style={{ color: activeStatus.color }} />
                 <span className="text-xs font-semibold text-white">{run?.name ?? lastResult?.workflow}</span>
-                <span className="rounded px-1.5 py-0.5 text-[10px]" style={{ color: activeStatus.color, background: '#1e1e1e' }}>
-                  {activeStatus.label}
-                </span>
+                <span className="rounded px-1.5 py-0.5 text-[10px]" style={{ color: activeStatus.color, background: '#1e1e1e' }}>{activeStatus.label}</span>
               </div>
-              {(run?.url || lastResult?.runUrl) && (
-                <a
-                  href={run?.url || lastResult?.runUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px]"
-                  style={{ color: '#4ec9b0' }}
-                >
-                  <ExternalLink className="h-3 w-3" />
-                  GitHub Actions
-                </a>
-              )}
+              {(run?.url || lastResult?.runUrl) && <a href={run?.url || lastResult?.runUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-[11px]" style={{ color: '#4ec9b0' }}><ExternalLink className="h-3 w-3" />GitHub Actions</a>}
             </div>
-
             {run?.jobs?.length ? (
               <div className="divide-y" style={{ borderColor: '#3c3c3c' }}>
                 {run.jobs.map((job) => {
                   const tone = statusTone(job.status, job.conclusion);
                   const JobIcon = tone.Icon;
-                  return (
-                    <a
-                      key={job.id}
-                      href={job.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-between gap-3 px-3 py-2 text-xs"
-                      style={{ color: '#cccccc', borderColor: '#3c3c3c' }}
-                    >
-                      <span className="truncate">{job.name}</span>
-                      <span className="inline-flex items-center gap-1.5" style={{ color: tone.color }}>
-                        <JobIcon className={`h-3.5 w-3.5 ${JobIcon === Loader2 ? 'animate-spin' : ''}`} />
-                        {tone.label}
-                      </span>
-                    </a>
-                  );
+                  return <a key={job.id} href={job.url} target="_blank" rel="noreferrer" className="flex items-center justify-between gap-3 px-3 py-2 text-xs" style={{ color: '#cccccc', borderColor: '#3c3c3c' }}><span className="truncate">{job.name}</span><span className="inline-flex items-center gap-1.5" style={{ color: tone.color }}><JobIcon className={`h-3.5 w-3.5 ${JobIcon === Loader2 ? 'animate-spin' : ''}`} />{tone.label}</span></a>;
                 })}
               </div>
-            ) : (
-              <p className="px-3 py-3 text-[11px]" style={{ color: '#858585' }}>
-                Workflow queued. Job details will appear when GitHub reports the run.
-              </p>
-            )}
+            ) : <p className="px-3 py-3 text-[11px]" style={{ color: '#858585' }}>Workflow queued. Job details will appear when GitHub reports the run.</p>}
           </section>
         )}
       </div>

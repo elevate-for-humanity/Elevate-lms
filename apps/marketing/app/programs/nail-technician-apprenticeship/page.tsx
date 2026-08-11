@@ -1,6 +1,8 @@
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
+import ProgramSeoStructuredData from '@/components/programs/ProgramSeoStructuredData';
+import BeautyProgramSearchSection from '@/components/programs/beauty/BeautyProgramSearchSection';
 import heroBanners from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 
@@ -26,23 +28,43 @@ export default async function NailTechnicianApprenticeshipPage() {
     />
   ) : undefined;
 
-  return <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride} />;
+  return (
+    <>
+      <ProgramSeoStructuredData
+        program={loaded.program}
+        canonicalPath="/programs/nail-technician-apprenticeship"
+      />
+      <ProgramDetailPage program={loaded.program} banner={banner} heroOverride={heroOverride}>
+        <BeautyProgramSearchSection program={loaded.program} />
+      </ProgramDetailPage>
+    </>
+  );
 }
 
 export async function generateMetadata() {
   return {
-    title: 'Nail Technician & Manicuring Apprenticeship | Earn While You Learn',
+    title: 'Nail Technician & Manicurist Apprenticeship in Indiana | Elevate for Humanity',
     description:
-      'Nail technician and manicuring apprenticeship pathway with supervised on-the-job learning, related technical instruction, salon training sites, progress tracking and sponsor oversight.',
+      'Indiana nail technician and manicurist apprenticeship with supervised salon training, technical instruction, host-shop pathways and sponsor oversight. Funding eligibility is reviewed separately and is not guaranteed.',
     keywords: [
       'nail technician apprenticeship',
-      'nail tech apprenticeship',
-      'manicuring apprenticeship',
-      'manicurist apprenticeship',
-      'nail apprenticeship Indiana',
+      'nail tech apprenticeship Indiana',
+      'manicurist apprenticeship Indiana',
+      'Indiana nail technician apprenticeship',
       'paid nail apprenticeship',
-      'nail technician training',
+      'registered nail apprenticeship',
+      'nail salon apprenticeship',
+      'Indiana manicurist license apprenticeship',
     ],
-    alternates: { canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship' },
+    alternates: {
+      canonical: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship',
+    },
+    openGraph: {
+      title: 'Nail Technician & Manicurist Apprenticeship in Indiana',
+      description:
+        'Explore supervised salon training, technical instruction, host-shop pathways and the verified funding status for Elevate’s Indiana nail technician apprenticeship.',
+      url: 'https://www.elevateforhumanity.org/programs/nail-technician-apprenticeship',
+      type: 'website',
+    },
   };
 }

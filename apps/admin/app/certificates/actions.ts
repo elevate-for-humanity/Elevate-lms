@@ -22,7 +22,7 @@ export async function issueCertificate(formData: FormData) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'admin') redirect('/unauthorized');
+  if (!['admin', 'super_admin'].includes(String(profile?.role ?? ''))) redirect('/unauthorized');
 
   const recipientName = formData.get('recipientName') as string;
   const email = formData.get('email') as string;
@@ -38,13 +38,11 @@ export async function issueCertificate(formData: FormData) {
 
   const certNumber = generateCertificateNumber('EFH', user.id);
 
-  // Build description from metadata the table doesn't have dedicated columns for
   const descParts: string[] = [];
   if (courseId) descParts.push(`Course: ${courseId}`);
   if (expirationDate) descParts.push(`Expires: ${expirationDate}`);
   if (notes) descParts.push(notes);
 
-  // Insert into issued_certificates — matches actual schema
   const { data: cert, error } = await db
     .from('issued_certificates')
     .insert({
@@ -64,18 +62,15 @@ export async function issueCertificate(formData: FormData) {
     redirect('/certificates/issue?error=insert_failed');
   }
 
-  // Log to audit (non-blocking - don't fail cert issuance if audit fails)
-  db
-    .from('audit_logs')
-    .insert({
+  void Promise.resolve(
+    db.from('audit_logs').insert({
       user_id: user.id,
       action: 'certificate_issued',
       resource_type: 'certificate',
       resource_id: cert?.id || null,
       details: { recipientName, email, certNumber, courseId: courseId || null },
-    })
-    .then(() => {})
-    .catch((err: unknown) => console.error('[audit] certificate_issued failed:', err));
+    }),
+  ).catch((err: unknown) => console.error('[audit] certificate_issued failed:', err));
 
   redirect('/certificates?success=issued&cert=' + certNumber);
 }
@@ -96,7 +91,6 @@ export async function revokeCertificate(formData: FormData) {
 
   if (!certId) redirect('/certificates?error=missing_id');
 
-  // Update status and append revocation reason to description
   const { data: existing } = await db
     .from('issued_certificates')
     .select('description')
@@ -112,18 +106,15 @@ export async function revokeCertificate(formData: FormData) {
     .update({ status: 'revoked', description: desc })
     .eq('id', certId);
 
-  // Log to audit (non-blocking)
-  db
-    .from('audit_logs')
-    .insert({
+  void Promise.resolve(
+    db.from('audit_logs').insert({
       user_id: user.id,
       action: 'certificate_revoked',
       resource_type: 'certificate',
       resource_id: certId,
       details: { reason },
-    })
-    .then(() => {})
-    .catch((err: unknown) => console.error('[audit] certificate_revoked failed:', err));
+    }),
+  ).catch((err: unknown) => console.error('[audit] certificate_revoked failed:', err));
 
   redirect('/certificates?success=revoked');
 }

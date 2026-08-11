@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   const cookieStore = await cookies();
 
   const supabase = createServerClient(
@@ -19,15 +19,17 @@ export async function GET(request: Request) {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(name, value, options) {
+        setAll(cookiesToSet) {
           try {
-            cookieStore.set(name, value, options);
+            for (const { name, value, options } of cookiesToSet) {
+              cookieStore.set(name, value, options);
+            }
           } catch {
-            // Ignore errors in read-only contexts
+            // Ignore errors in read-only server component contexts.
           }
         },
       },
-    }
+    },
   );
 
   const { data: { user }, error } = await supabase.auth.getUser();
@@ -39,6 +41,6 @@ export async function GET(request: Request) {
   return NextResponse.json({
     user,
     session: { expires_at: user.app_metadata?.exp },
-    service: process.env.SERVICE_NAME ?? 'admin'
+    service: process.env.SERVICE_NAME ?? 'admin',
   });
 }

@@ -1,14 +1,14 @@
 /**
  * GET /api/admin/promo-codes
  * Returns active promo codes for admin management.
- * Protected: requires authentication.
  */
 import { withAuth } from '@/lib/with-auth';
+import { API_ADMIN_ROLES } from '@/lib/rbac/role-matrix';
 import type { AuthHandler } from '@/types/auth';
 
 const handleGet: AuthHandler = async () => {
-  // TODO: Replace with real database query when promo-codes table is implemented
+  // Promo-code persistence is not implemented yet; return a truthful empty state.
   return Response.json([]);
 };
 
-export const GET = withAuth(handleGet);
+export const GET = withAuth(handleGet, { roles: API_ADMIN_ROLES });

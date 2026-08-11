@@ -12,6 +12,12 @@ export async function generateMetadata({
 }: {
   params: Promise<{ courseId: string; quizId: string }>;
 }): Promise<Metadata> {
+  const { quizId } = await params;
+  return {
+    title: 'Quiz | Elevate For Humanity',
+    description: `Manage quiz ${quizId} questions, scoring, and publishing settings.`,
+    robots: { index: false, follow: false },
+  };
 }
 
 const QUESTION_TYPE_LABELS: Record<string, string> = {
@@ -94,7 +100,6 @@ export default async function QuizPage({
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        {/* Quiz settings */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'Questions', value: questionRows.length, icon: CheckSquare },
@@ -106,17 +111,13 @@ export default async function QuizPage({
               icon: Clock,
             },
           ].map((s) => (
-            <div
-              key={s.label}
-              className="bg-white rounded-xl border border-slate-200 p-5 text-center"
-            >
+            <div key={s.label} className="bg-white rounded-xl border border-slate-200 p-5 text-center">
               <p className="text-3xl font-bold text-blue-600">{s.value}</p>
               <p className="text-sm text-slate-500 mt-1">{s.label}</p>
             </div>
           ))}
         </div>
 
-        {/* Settings detail */}
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <h2 className="font-semibold text-slate-800 mb-4">Quiz Settings</h2>
           <dl className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -128,26 +129,16 @@ export default async function QuizPage({
               <dt className="text-slate-400 text-xs flex items-center gap-1">
                 <Shuffle className="w-3 h-3" /> Shuffle Questions
               </dt>
-              <dd className="font-medium text-slate-900 mt-0.5">
-                {quiz.shuffle_questions ? 'Yes' : 'No'}
-              </dd>
+              <dd className="font-medium text-slate-900 mt-0.5">{quiz.shuffle_questions ? 'Yes' : 'No'}</dd>
             </div>
             <div>
               <dt className="text-slate-400 text-xs">Show Correct Answers</dt>
-              <dd className="font-medium text-slate-900 mt-0.5">
-                {quiz.show_correct_answers ? 'Yes' : 'No'}
-              </dd>
+              <dd className="font-medium text-slate-900 mt-0.5">{quiz.show_correct_answers ? 'Yes' : 'No'}</dd>
             </div>
             <div>
               <dt className="text-slate-400 text-xs">Published</dt>
               <dd className="mt-0.5">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    quiz.is_published
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
-                >
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${quiz.is_published ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                   {quiz.is_published ? 'Published' : 'Draft'}
                 </span>
               </dd>
@@ -155,38 +146,27 @@ export default async function QuizPage({
           </dl>
         </div>
 
-        {/* Question type breakdown */}
         {Object.keys(byType).length > 0 && (
           <div className="flex flex-wrap gap-2">
             {Object.entries(byType).map(([type, count]) => (
-              <span
-                key={type}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm font-medium"
-              >
+              <span key={type} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 text-sm font-medium">
                 {QUESTION_TYPE_LABELS[type] ?? type} ({count})
               </span>
             ))}
           </div>
         )}
 
-        {/* Questions list */}
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-semibold text-slate-800">Questions ({questionRows.length})</h2>
-            <Link
-              href={`/admin/courses/${courseId}/quizzes/${quizId}/questions`}
-              className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
-            >
+            <Link href={`/admin/courses/${courseId}/quizzes/${quizId}/questions`} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
               Full editor <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           {questionRows.length === 0 ? (
             <div className="p-8 text-center text-slate-400">
               No questions yet.{' '}
-              <Link
-                href={`/admin/courses/${courseId}/quizzes/${quizId}/questions/new`}
-                className="text-blue-600 hover:underline"
-              >
+              <Link href={`/admin/courses/${courseId}/quizzes/${quizId}/questions/new`} className="text-blue-600 hover:underline">
                 Add one
               </Link>
               .
@@ -197,25 +177,15 @@ export default async function QuizPage({
                 <div key={q.id} className="px-6 py-4 hover:bg-slate-50 transition-colors">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <span className="shrink-0 w-6 h-6 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold flex items-center justify-center mt-0.5">
-                        {i + 1}
-                      </span>
+                      <span className="shrink-0 w-6 h-6 rounded-full bg-slate-100 text-slate-500 text-xs font-semibold flex items-center justify-center mt-0.5">{i + 1}</span>
                       <div>
                         <div className="font-medium text-slate-900">{q.question_text}</div>
-                        {q.explanation && (
-                          <div className="text-xs text-slate-400 mt-1">
-                            Explanation: {q.explanation}
-                          </div>
-                        )}
+                        {q.explanation && <div className="text-xs text-slate-400 mt-1">Explanation: {q.explanation}</div>}
                       </div>
                     </div>
                     <div className="shrink-0 flex items-center gap-2">
-                      <span className="text-xs text-slate-400">
-                        {q.points ?? 1} pt{(q.points ?? 1) !== 1 ? 's' : ''}
-                      </span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">
-                        {QUESTION_TYPE_LABELS[q.question_type] ?? q.question_type}
-                      </span>
+                      <span className="text-xs text-slate-400">{q.points ?? 1} pt{(q.points ?? 1) !== 1 ? 's' : ''}</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-slate-100 text-slate-600">{QUESTION_TYPE_LABELS[q.question_type] ?? q.question_type}</span>
                     </div>
                   </div>
                 </div>

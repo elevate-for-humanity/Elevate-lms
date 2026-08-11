@@ -1,3 +1,4 @@
+// AUTH: Enforced inside handler by resolveOwnedSite(), which requires a Supabase user and ownership of websiteId.
 /** No-charge live Domainee availability/cost quote plus Elevate retail price. */
 import { NextRequest, NextResponse } from 'next/server';
 import { hydrateProcessEnv } from '@/lib/secrets';
@@ -28,19 +29,23 @@ export async function GET(
   const hostname = validateHostname(request.nextUrl.searchParams.get('hostname') ?? '');
   if (!hostname) return NextResponse.json({ error: 'Enter a valid domain.' }, { status: 400 });
 
-  const quote = await checkDomainPurchase(hostname);
-  const markupCents = Math.max(0, Number(process.env.DOMAIN_RETAIL_MARKUP_CENTS ?? 1000) || 1000);
-  const retailCents = quote.pricing.totalCents + markupCents;
-  return NextResponse.json({
-    hostname: quote.hostname,
-    available: quote.available,
-    premium: quote.premium,
-    currency: quote.pricing.currency,
-    providerCostCents: quote.pricing.totalCents,
-    retailCents,
-    retailFormatted: new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: quote.pricing.currency || 'USD',
-    }).format(retailCents / 100),
-  });
+  try {
+    const quote = await checkDomainPurchase(hostname);
+    const markupCents = Math.max(0, Number(process.env.DOMAIN_RETAIL_MARKUP_CENTS ?? 1000) || 1000);
+    const retailCents = quote.pricing.totalCents + markupCents;
+    return NextResponse.json({
+      hostname: quote.hostname,
+      available: quote.available,
+      premium: quote.premium,
+      currency: quote.pricing.currency,
+      providerCostCents: quote.pricing.totalCents,
+      retailCents,
+      retailFormatted: new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: quote.pricing.currency || 'USD',
+      }).format(retailCents / 100),
+    });
+  } catch {
+    return NextResponse.json({ error: 'Domain quote is temporarily unavailable.' }, { status: 502 });
+  }
 }

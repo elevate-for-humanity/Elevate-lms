@@ -1,10 +1,10 @@
 /**
- * Races a promise against a timeout.
- * Rejects with an Error if the promise does not settle within `ms` milliseconds.
- * The timer is always cleared after settlement to avoid leaking handles.
+ * Races a promise-like value against a timeout.
+ * Accepting PromiseLike also supports Supabase PostgREST builders, which are
+ * thenable but intentionally do not expose Promise.catch/finally methods.
  */
 export async function withTimeout<T>(
-  promise: Promise<T>,
+  promise: PromiseLike<T>,
   ms: number,
   label = 'Operation',
 ): Promise<T> {
@@ -17,7 +17,7 @@ export async function withTimeout<T>(
   });
 
   try {
-    return await Promise.race([promise, timeout]);
+    return await Promise.race([Promise.resolve(promise), timeout]);
   } finally {
     clearTimeout(timer);
   }

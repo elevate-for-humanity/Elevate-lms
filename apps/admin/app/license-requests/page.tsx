@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { ChevronRight, Clock, CheckCircle, XCircle, Key } from 'lucide-react';
+import { ChevronRight, Clock, CheckCircle, Key } from 'lucide-react';
 import LicenseRequestsClient from './LicenseRequestsClient';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +26,11 @@ export default async function LicenseRequestsPage() {
       .order('created_at', { ascending: false })
       .limit(100),
   ]);
+
+  const normalizedRequests = (requests ?? []).map((request: any) => ({
+    ...request,
+    profiles: Array.isArray(request.profiles) ? (request.profiles[0] ?? null) : request.profiles ?? null,
+  }));
 
   const stats = [
     { label: 'Pending', value: pending ?? 0, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
@@ -62,7 +67,7 @@ export default async function LicenseRequestsPage() {
         })}
       </div>
 
-      <LicenseRequestsClient initialRequests={requests ?? []} />
+      <LicenseRequestsClient initialRequests={normalizedRequests} />
     </div>
   );
 }

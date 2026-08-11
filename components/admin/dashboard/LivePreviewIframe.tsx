@@ -8,7 +8,7 @@ export type PreviewDevice = 'desktop' | 'tablet' | 'mobile';
 function useEmbedCheck(url: string) {
   const [state, setState] = useState<{ embeddable: boolean | null; reason?: string }>({ embeddable: null });
 
-  useEffect((): void => {
+  useEffect(() => {
     if (!url) return;
     setState({ embeddable: null });
     const controller = new AbortController();
@@ -31,22 +31,18 @@ export function LivePreviewIframe({
   url: string;
   device?: PreviewDevice;
   minHeight?: number;
-  /** Bump to force iframe reload (same URL). */
   refreshKey?: number;
 }) {
   const { embeddable, reason } = useEmbedCheck(url);
   const [loading, setLoading] = useState(true);
 
-  useEffect((): void => {
+  useEffect(() => {
     setLoading(true);
   }, [url, refreshKey]);
 
   if (!url) {
     return (
-      <div
-        className="flex h-full items-center justify-center text-xs text-slate-400"
-        style={{ minHeight }}
-      >
+      <div className="flex h-full items-center justify-center text-xs text-slate-400" style={{ minHeight }}>
         Enter a URL above, or pick a preview target
       </div>
     );
@@ -63,26 +59,15 @@ export function LivePreviewIframe({
 
   if (embeddable === false) {
     return (
-      <div
-        className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center"
-        style={{ minHeight }}
-      >
+      <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center" style={{ minHeight }}>
         <AlertTriangle className="h-8 w-8 text-amber-500" />
         <p className="text-sm font-semibold text-slate-800">Live preview cannot embed this URL</p>
         <p className="max-w-md text-xs text-slate-500">
-          Production pages block iframes for security ({reason ?? 'X-Frame-Options / CSP'}). Use{' '}
-          <strong>Open in new tab</strong> above, or in development run the public site locally and
-          select <strong>Local Website</strong> from the preview targets.
+          Production pages block iframes for security ({reason ?? 'X-Frame-Options / CSP'}). Use <strong>Open in new tab</strong> instead.
         </p>
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700"
-        >
+        <a href={url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-700">
           <ExternalLink className="h-4 w-4" />
-          Open {url.replace(/^https?:\/\//, '').slice(0, 48)}
-          {url.length > 56 ? '…' : ''}
+          Open {url.replace(/^https?:\/\//, '').slice(0, 48)}{url.length > 56 ? '…' : ''}
         </a>
       </div>
     );
@@ -116,9 +101,7 @@ export function LivePreviewIframe({
             {iframe}
           </div>
         </div>
-      ) : (
-        iframe
-      )}
+      ) : iframe}
     </div>
   );
 }

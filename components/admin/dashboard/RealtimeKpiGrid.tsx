@@ -27,7 +27,7 @@ function patchKpi(cards: KPICard[], labelFragment: string, updater: (v: number) 
 export function RealtimeKpiGrid({ kpis: initialKpis }: Props) {
   const [kpis, setKpis] = useState<KPICard[]>(initialKpis);
 
-  useEffect((): void => {
+  useEffect(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     if (!url || !key) return;
@@ -68,9 +68,7 @@ export function RealtimeKpiGrid({ kpis: initialKpis }: Props) {
         .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'program_completion_certificates' },
-          () => {
-            setKpis((k) => patchKpi(k, 'certificate', (v) => v + 1));
-          },
+          () => setKpis((k) => patchKpi(k, 'certificate', (v) => v + 1)),
         )
         .subscribe();
     } catch {
@@ -78,7 +76,7 @@ export function RealtimeKpiGrid({ kpis: initialKpis }: Props) {
     }
 
     return () => {
-      if (channel) sb.removeChannel(channel);
+      if (channel) void sb.removeChannel(channel);
     };
   }, []);
 

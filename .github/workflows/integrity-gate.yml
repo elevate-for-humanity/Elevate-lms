@@ -15,9 +15,6 @@ concurrency:
 jobs:
   integrity:
     runs-on: ubuntu-latest
-    # Integrity checks analyse source files — they do not require a webpack
-    # build. The full build runs in ci-cd.yml. Timeout raised to 30 min to
-    # accommodate the daily scheduled run which starts cold.
     timeout-minutes: 30
     env:
       NODE_OPTIONS: '--max-old-space-size=6144'
@@ -50,40 +47,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      # Pre-auth registry check — runs before build, no secrets needed.
-      # Fails if any public-write route inserts into a table not declared in
-      # lib/pre-auth-tables.ts. Blocks merge on unregistered pre-auth tables.
-      # To fix: register the table or add // pre-auth-registry: exempt — <reason>
       - name: Pre-auth registry check
         run: node scripts/check-pre-auth-registry.cjs
 
-      # Grants audit context check — no secrets needed.
-      # Fails if any function writes to an auditable grants table without
-      # calling setAuditContext() first. Blocks merge on missing audit attribution.
-      # To add a new auditable table: update AUDITABLE_TABLES in the script.
-      # To exempt a read-only or user-action write: add // grants-audit: exempt — <reason>
       - name: Grants audit context check
         run: node scripts/check-grants-audit-context.cjs
 
-      # Migration lint — runs before any other check, no secrets needed
       - name: Migration lint
         run: node scripts/lint-migrations.cjs
 
-      # Repository structure integrity — verifies required files, pnpm version, and admin native deps
       - name: Repository integrity check
         run: node scripts/verify-repository-integrity.cjs
 
-      # Admin native module check — verifies sharp, canvas, fontkit, pdfkit are loadable
       - name: Admin native modules check
         run: pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
-
-      # Deployment anti-drift gates — must pass before any build
       - name: Next.js version parity check
         run: pnpm run verify:next-parity
 
       - name: Build identity configuration check
         run: pnpm run verify:build-identity
+
       - name: No AWS ECS deploy artifacts
         run: node scripts/verify-no-aws-deploy.mjs
 
@@ -102,7 +86,9 @@ jobs:
       - name: API admin guard check
         run: bash scripts/audit-api-auth-guards.sh
 
-      # Integrity checks - each fails the build if issues found
+      - name: Canonical hero system check
+        run: pnpm run audit:hero-banners
+
       - name: Link integrity check
         run: pnpm run integrity:links
 

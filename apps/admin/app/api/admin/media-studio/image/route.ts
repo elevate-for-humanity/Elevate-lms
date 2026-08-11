@@ -23,7 +23,7 @@ const schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const limited = await applyRateLimit(request, 'ai');
+  const limited = await applyRateLimit(request, 'api');
   if (limited) return limited;
 
   const auth = await apiRequireAdmin(request);

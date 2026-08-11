@@ -1,253 +1,142 @@
-/**
- * validator.ts
- * 
- * Course validation for the Course Factory.
- * Replaces: lib/course-builder/audit.ts
- * 
- * Validates blueprint structure and content before publishing.
- */
-
-import type { CredentialBlueprint, BlueprintModule } from '@/lib/curriculum/blueprints/types';
 import { logger } from '@/lib/logger';
+import type { CredentialBlueprint, BlueprintModule } from '@/lib/curriculum/blueprints/types';
 
-// ─── Validation Result ─────────────────────────────────────────────────────────
-
-export interface ValidationError {
-  type: 'error' | 'warning';
-  module?: string;
-  lesson?: string;
-  field: string;
+export interface ValidationIssue {
+  code: string;
   message: string;
+  path?: string;
+  severity?: 'error' | 'warning';
 }
 
 export interface ValidationResult {
   ok: boolean;
   valid: boolean;
-  errors: ValidationError[];
-  warnings: ValidationError[];
+  errors: ValidationIssue[];
+  warnings: ValidationIssue[];
   errorCount: number;
   warningCount: number;
 }
 
-// ─── Step Type Inference ────────────────────────────────────────────────────────
-
-export function inferStepType(slug: string): string {
-  const lower = slug.toLowerCase();
-  if (lower.includes('checkpoint')) return 'checkpoint';
-  if (lower.includes('exam') || lower.includes('final')) return 'exam';
-  if (lower.includes('quiz')) return 'quiz';
-  if (lower.includes('lab')) return 'lab';
-  if (lower.includes('assignment')) return 'assignment';
-  return 'lesson';
+function issue(code: string, message: string, path?: string, severity: 'error' | 'warning' = 'error'): ValidationIssue {
+  return { code, message, path, severity };
 }
 
-// ─── Content Validation ─────────────────────────────────────────────────────────
+function validateModule(module: BlueprintModule, index: number): { errors: ValidationIssue[]; warnings: ValidationIssue[] } {
+  const errors: ValidationIssue[] = [];
+  const warnings: ValidationIssue[] = [];
+  const path = `modules[${index}]`;
 
-function visibleTextLength(html: string): number {
-  return html.replace(/<[^>]*>/g, '').trim().length;
+  if (!module.slug?.trim()) errors.push(issue('MODULE_SLUG_REQUIRED', 'Module slug is required.', `${path}.slug`));
+  if (!module.title?.trim()) errors.push(issue('MODULE_TITLE_REQUIRED', 'Module title is required.', `${path}.title`));
+  if (!Number.isFinite(module.orderIndex)) errors.push(issue('MODULE_ORDER_REQUIRED', 'Module orderIndex must be numeric.', `${path}.orderIndex`));
+
+  const minLessons = Number(module.minLessons ?? 0);
+  const maxLessons = Number(module.maxLessons ?? 0);
+  if (minLessons < 0 || maxLessons < 0 || (maxLessons > 0 && minLessons > maxLessons)) {
+    errors.push(issue('MODULE_LESSON_RANGE_INVALID', 'Module lesson-count bounds are invalid.', path));
+  }
+
+  const lessons = Array.isArray(module.lessons) ? module.lessons : [];
+  if (minLessons > 0 && lessons.length && lessons.length < minLessons) {
+    warnings.push(issue('MODULE_BELOW_MIN_LESSONS', `Module contains ${lessons.length} lesson(s); blueprint minimum is ${minLessons}.`, `${path}.lessons`, 'warning'));
+  }
+  if (maxLessons > 0 && lessons.length > maxLessons) {
+    errors.push(issue('MODULE_ABOVE_MAX_LESSONS', `Module contains ${lessons.length} lesson(s); blueprint maximum is ${maxLessons}.`, `${path}.lessons`));
+  }
+
+  const seenLessonSlugs = new Set<string>();
+  lessons.forEach((lesson, lessonIndex) => {
+    const lessonPath = `${path}.lessons[${lessonIndex}]`;
+    if (!lesson.slug?.trim()) errors.push(issue('LESSON_SLUG_REQUIRED', 'Lesson slug is required.', `${lessonPath}.slug`));
+    if (lesson.slug && seenLessonSlugs.has(lesson.slug)) errors.push(issue('LESSON_SLUG_DUPLICATE', `Duplicate lesson slug: ${lesson.slug}`, `${lessonPath}.slug`));
+    if (lesson.slug) seenLessonSlugs.add(lesson.slug);
+    if (!lesson.title?.trim()) errors.push(issue('LESSON_TITLE_REQUIRED', 'Lesson title is required.', `${lessonPath}.title`));
+    if (!Number.isFinite(lesson.order)) errors.push(issue('LESSON_ORDER_REQUIRED', 'Lesson order must be numeric.', `${lessonPath}.order`));
+  });
+
+  return { errors, warnings };
 }
-
-function validateLesson(
-  lesson: { slug: string; title: string; objective?: string; content?: string; quizQuestions?: unknown[]; passingScore?: number },
-  moduleSlug: string,
-): ValidationError[] {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationError[] = [];
-  const stepType = inferStepType(lesson.slug);
-
-  // Check required fields based on step type
-  const needsContent = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
-  const needsQuiz = ['checkpoint', 'quiz', 'exam'].includes(stepType);
-  const needsObjective = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
-
-  // Objective validation
-  if (needsObjective && !lesson.objective?.trim()) {
-    errors.push({
-      type: 'error',
-      module: moduleSlug,
-      lesson: lesson.slug,
-      field: 'objective',
-      message: 'Lesson objective is required',
-    });
-  }
-
-  // Content validation
-  if (needsContent) {
-    if (!lesson.content?.trim()) {
-      errors.push({
-        type: 'error',
-        module: moduleSlug,
-        lesson: lesson.slug,
-        field: 'content',
-        message: 'Lesson content is required',
-      });
-    } else if (visibleTextLength(lesson.content) < 200) {
-      warnings.push({
-        type: 'warning',
-        module: moduleSlug,
-        lesson: lesson.slug,
-        field: 'content',
-        message: `Content may be too short (${visibleTextLength(lesson.content)} chars, minimum 200)`,
-      });
-    }
-  }
-
-  // Quiz validation
-  if (needsQuiz) {
-    const quizCount = lesson.quizQuestions?.length ?? 0;
-    const minQuestions = stepType === 'exam' ? 10 : 5;
-    
-    if (quizCount < minQuestions) {
-      errors.push({
-        type: 'error',
-        module: moduleSlug,
-        lesson: lesson.slug,
-        field: 'quizQuestions',
-        message: `${stepType} requires at least ${minQuestions} questions, found ${quizCount}`,
-      });
-    }
-  }
-
-  // Passing score validation
-  if (needsQuiz && (lesson.passingScore === undefined || lesson.passingScore < 0 || lesson.passingScore > 100)) {
-    warnings.push({
-      type: 'warning',
-      module: moduleSlug,
-      lesson: lesson.slug,
-      field: 'passingScore',
-      message: 'Valid passing score (0-100) should be set',
-    });
-  }
-
-  return errors.length > 0 ? errors : warnings;
-}
-
-// ─── Module Validation ─────────────────────────────────────────────────────────
-
-function validateModule(module: BlueprintModule): ValidationError[] {
-  const errors: ValidationError[] = [];
-  const warnings: ValidationError[] = [];
-
-  // Check required fields
-  if (!module.slug?.trim()) {
-    errors.push({
-      type: 'error',
-      module: module.slug || 'unknown',
-      field: 'slug',
-      message: 'Module slug is required',
-    });
-  }
-
-  if (!module.title?.trim()) {
-    errors.push({
-      type: 'error',
-      module: module.slug || 'unknown',
-      field: 'title',
-      message: 'Module title is required',
-    });
-  }
-
-  if (!module.lessons || module.lessons.length === 0) {
-    warnings.push({
-      type: 'warning',
-      module: module.slug || 'unknown',
-      field: 'lessons',
-      message: 'Module has no lessons',
-    });
-  }
-
-  // Validate lessons
-  for (const lesson of module.lessons ?? []) {
-    const lessonErrors = validateLesson(lesson, module.slug);
-    for (const err of lessonErrors) {
-      if (err.type === 'error') errors.push(err);
-      else warnings.push(err);
-    }
-  }
-
-  return errors.length > 0 ? errors : warnings;
-}
-
-// ─── Main Validator ─────────────────────────────────────────────────────────────
 
 export function validateBlueprint(blueprint: CredentialBlueprint): ValidationResult {
-  const allErrors: ValidationError[] = [];
-  const allWarnings: ValidationError[] = [];
+  const errors: ValidationIssue[] = [];
+  const warnings: ValidationIssue[] = [];
 
-  // Validate top-level
-  if (!blueprint.programSlug?.trim()) {
-    allErrors.push({
-      type: 'error',
-      field: 'programSlug',
-      message: 'Program slug is required',
-    });
+  if (!blueprint.programSlug?.trim()) errors.push(issue('PROGRAM_SLUG_REQUIRED', 'programSlug is required.', 'programSlug'));
+  if (!blueprint.credentialTitle?.trim()) errors.push(issue('CREDENTIAL_TITLE_REQUIRED', 'credentialTitle is required.', 'credentialTitle'));
+  if (!Array.isArray(blueprint.modules) || blueprint.modules.length === 0) {
+    errors.push(issue('MODULES_REQUIRED', 'At least one module is required.', 'modules'));
   }
 
-  if (!blueprint.credentialTitle?.trim()) {
-    allErrors.push({
-      type: 'error',
-      field: 'credentialTitle',
-      message: 'Credential title is required',
-    });
-  }
-
-  if (!blueprint.modules || blueprint.modules.length === 0) {
-    allErrors.push({
-      type: 'error',
-      field: 'modules',
-      message: 'Blueprint must have at least one module',
-    });
-  }
-
-  // Validate modules
-  let lessonCount = 0;
-  for (const mod of blueprint.modules ?? []) {
-    const moduleErrors = validateModule(mod);
-    for (const err of moduleErrors) {
-      if (err.type === 'error') allErrors.push(err);
-      else allWarnings.push(err);
+  const seenModuleSlugs = new Set<string>();
+  (blueprint.modules ?? []).forEach((module, index) => {
+    if (module.slug && seenModuleSlugs.has(module.slug)) {
+      errors.push(issue('MODULE_SLUG_DUPLICATE', `Duplicate module slug: ${module.slug}`, `modules[${index}].slug`));
     }
-    lessonCount += mod.lessons?.length ?? 0;
+    if (module.slug) seenModuleSlugs.add(module.slug);
+    const validated = validateModule(module, index);
+    errors.push(...validated.errors);
+    warnings.push(...validated.warnings);
+  });
+
+  const expectedModules = Number(blueprint.expectedModuleCount ?? 0);
+  if (expectedModules > 0 && blueprint.modules?.length !== expectedModules) {
+    warnings.push(issue(
+      'MODULE_COUNT_MISMATCH',
+      `Expected ${expectedModules} module(s); found ${blueprint.modules?.length ?? 0}.`,
+      'expectedModuleCount',
+      'warning',
+    ));
   }
 
-  // Check expected counts
-  if (blueprint.expectedLessonCount && lessonCount < blueprint.expectedLessonCount) {
-    allWarnings.push({
-      type: 'warning',
-      field: 'expectedLessonCount',
-      message: `Expected ${blueprint.expectedLessonCount} lessons, found ${lessonCount}`,
-    });
+  const lessonCount = (blueprint.modules ?? []).reduce((sum, module) => sum + (module.lessons?.length ?? 0), 0);
+  const expectedLessons = Number(blueprint.expectedLessonCount ?? 0);
+  if (expectedLessons > 0 && lessonCount > 0 && lessonCount !== expectedLessons) {
+    warnings.push(issue(
+      'LESSON_COUNT_MISMATCH',
+      `Expected ${expectedLessons} lesson(s); found ${lessonCount}.`,
+      'expectedLessonCount',
+      'warning',
+    ));
   }
 
   const result: ValidationResult = {
-    ok: allErrors.length === 0,
-    valid: allErrors.length === 0,
-    errors: allErrors,
-    warnings: allWarnings,
-    errorCount: allErrors.length,
-    warningCount: allWarnings.length,
+    ok: errors.length === 0,
+    valid: errors.length === 0,
+    errors,
+    warnings,
+    errorCount: errors.length,
+    warningCount: warnings.length,
   };
 
   if (!result.ok) {
     logger.warn('[validator] Blueprint validation failed', {
-      errors: allErrors.length,
-      warnings: allWarnings.length,
+      errors: errors.length,
+      warnings: warnings.length,
     });
   }
 
   return result;
 }
 
-// ─── Simple API ────────────────────────────────────────────────────────────────
-
+// Simple wrapper for legacy callers that only provide module arrays. This is a
+// structural validation path, so synthesize the minimum canonical blueprint
+// fields rather than asserting an incomplete object directly.
 export function validateCourseTemplate(template: { modules?: BlueprintModule[] }): ValidationResult {
-  // Simple wrapper for backward compatibility
+  const modules = template.modules ?? [];
   return validateBlueprint({
+    id: 'legacy-template-validation',
     programSlug: 'unknown',
+    credentialSlug: 'unknown',
     credentialTitle: 'Unknown',
-    modules: template.modules ?? [],
-    expectedModuleCount: 0,
-    expectedLessonCount: 0,
+    credentialCode: 'UNKNOWN',
+    state: 'NA',
+    status: 'draft',
+    version: 'legacy',
+    modules,
+    expectedModuleCount: modules.length,
+    expectedLessonCount: modules.reduce((sum, module) => sum + (module.lessons?.length ?? 0), 0),
+    assessmentRules: [],
+    generationRules: {},
     contentSource: 'blueprint',
-  } as CredentialBlueprint);
+  });
 }

@@ -86,6 +86,32 @@ async function generateNarration(text: string, voice: CommercialBrief['voice'], 
   await fs.writeFile(outputPath, Buffer.from(await response.arrayBuffer()));
 }
 
+function formatSrtTime(seconds: number) {
+  const safe = Math.max(0, seconds);
+  const hours = Math.floor(safe / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
+  const secs = Math.floor(safe % 60);
+  const millis = Math.floor((safe - Math.floor(safe)) * 1000);
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')},${String(millis).padStart(3, '0')}`;
+}
+
+function wrapCaption(text: string, width = 44) {
+  const words = text.trim().split(/\s+/);
+  const lines: string[] = [];
+  let line = '';
+  for (const word of words) {
+    const next = line ? `${line} ${word}` : word;
+    if (next.length > width && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.join('\n');
+}
+
 async function acquireVisual(
   scene: CommercialScene,
   brief: CommercialBrief,
@@ -93,8 +119,6 @@ async function acquireVisual(
   outputPath: string,
 ): Promise<'generative' | 'stock'> {
   const canUseRunway = Boolean(process.env.RUNWAY_API_KEY);
-  // Hybrid intentionally spends generative compute on the opening and CTA shots;
-  // the middle stays fast, stable, and economical with licensed stock discovery.
   const wantsGenerative =
     brief.sourceMode === 'generative' ||
     (brief.sourceMode === 'hybrid' && (index === 0 || index === 1));
@@ -112,8 +136,8 @@ async function acquireVisual(
       );
       return 'generative';
     } catch {
-      // Commercial rendering must remain useful when a generative provider is
-      // unavailable, rate-limited, or slower than the web request budget.
+      // A commercial remains renderable if the generative provider is slow,
+      // rate-limited, or temporarily unavailable.
     }
   }
 
@@ -138,7 +162,8 @@ async function renderScene(
   const sourcePath = path.join(tempDir, `scene-${index + 1}-source.mp4`);
   const narrationPath = path.join(tempDir, `scene-${index + 1}-voice.mp3`);
   const outputPath = path.join(tempDir, `scene-${index + 1}-rendered.mp4`);
-  const captionPath = path.join(tempDir, `scene-${index + 1}-caption.txt`);
+  const headlinePath = path.join(tempDir, `scene-${index + 1}-headline.txt`);
+  const subtitlePath = path.join(tempDir, `scene-${index + 1}.srt`);
 
   const visualSource = await acquireVisual(scene, brief, index, sourcePath);
   await generateNarration(scene.narration, brief.voice, narrationPath);
@@ -146,17 +171,21 @@ async function renderScene(
   const duration = Math.max(scene.durationSeconds, voiceDuration + 0.35);
   const { width, height } = dimensionsFor(brief.aspectRatio);
 
+  await fs.writeFile(headlinePath, scene.onScreenText, 'utf8');
+
   const filters = [
     `scale=${width}:${height}:force_original_aspect_ratio=increase`,
     `crop=${width}:${height}`,
     'fps=30',
     'format=yuv420p',
+    `drawtext=textfile=${headlinePath}:fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontcolor=white:fontsize=${Math.max(25, Math.round(width / 38))}:box=1:boxcolor=black@0.42:boxborderw=14:x=(w-text_w)/2:y=${Math.max(28, Math.round(height * 0.06))}`,
   ];
 
   if (brief.includeCaptions) {
-    await fs.writeFile(captionPath, scene.onScreenText, 'utf8');
+    const subtitle = `1\n${formatSrtTime(0)} --> ${formatSrtTime(duration)}\n${wrapCaption(scene.narration, brief.aspectRatio === '9:16' ? 30 : 48)}\n`;
+    await fs.writeFile(subtitlePath, subtitle, 'utf8');
     filters.push(
-      `drawtext=textfile=${captionPath}:fontcolor=white:fontsize=${Math.max(28, Math.round(width / 32))}:font='DejaVu Sans':box=1:boxcolor=black@0.58:boxborderw=18:x=(w-text_w)/2:y=h-text_h-${Math.max(44, Math.round(height * 0.08))}`,
+      `subtitles=${subtitlePath}:force_style='FontName=DejaVu Sans,FontSize=${brief.aspectRatio === '9:16' ? 15 : 18},PrimaryColour=&H00FFFFFF,OutlineColour=&H88000000,BackColour=&H66000000,BorderStyle=3,Outline=1,Shadow=0,Alignment=2,MarginV=${brief.aspectRatio === '9:16' ? 58 : 34}'`,
     );
   }
 

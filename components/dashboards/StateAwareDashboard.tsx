@@ -1,18 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AlertCircle, Lock, ArrowRight } from 'lucide-react';
+import { AlertCircle, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 
 /**
  * STATE-AWARE DASHBOARD COMPONENT
  *
  * This component enforces progression and makes dashboards act like staff.
- *
- * Rules:
- * - ONE dominant action (cannot be missed)
- * - Locked sections (greyed out, not clickable)
- * - Progress banner (you are here)
- * - Alerts surfaced prominently
+ * Every portal gets a bright, picture-backed directional hero rather than a
+ * blank shell or a generic dark banner.
  */
 
 interface DominantAction {
@@ -43,6 +39,17 @@ interface StateAwareDashboardProps {
   children?: React.ReactNode;
 }
 
+function portalHeroImage(href: string): string {
+  const value = href.toLowerCase();
+  if (value.includes('employer')) return '/images/pages/business-meeting.webp';
+  if (value.includes('case-manager') || value.includes('workforce')) return '/images/pages/admin-wioa-hero.webp';
+  if (value.includes('provider') || value.includes('program-holder')) return '/images/pages/training-classroom.webp';
+  if (value.includes('host-shop') || value.includes('apprentice')) return '/images/pages/barber-training.webp';
+  if (value.includes('parent')) return '/images/pages/about-supportive-services.webp';
+  if (value.includes('student') || value.includes('/lms')) return '/images/pages/training-classroom.webp';
+  return '/images/pages/workforce-training.webp';
+}
+
 export function StateAwareDashboard({
   dominantAction,
   availableSections,
@@ -51,90 +58,105 @@ export function StateAwareDashboard({
   alerts,
   children,
 }: StateAwareDashboardProps) {
+  const heroImage = portalHeroImage(dominantAction.href);
+
   return (
     <div className="min-h-screen bg-white">
-      {/* DOMINANT ACTION BANNER - Cannot Be Missed */}
-      <section className="bg-brand-blue-700   text-white py-8 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-white mb-1">NEXT STEP</div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">{dominantAction.label}</h2>
-              <p className="text-white text-lg">{dominantAction.description}</p>
-            </div>
-            <Link
-              href={dominantAction.href}
-              className="flex-shrink-0 ml-6 px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold text-lg hover:bg-slate-50 transition shadow-xl flex items-center gap-2"
-            >
-              <span>{dominantAction.label}</span>
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
+      <section className="mx-auto max-w-7xl px-4 pt-4 sm:pt-6">
+        <div className="overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-blue-50 via-white to-rose-50 shadow-lg">
+          <div className="grid min-h-[280px] lg:grid-cols-[1.08fr_0.92fr]">
+            <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-900">
+                  <ShieldCheck className="h-4 w-4" /> Secure workspace
+                </span>
+                <span className="rounded-full bg-blue-100 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-blue-900">
+                  Your next step
+                </span>
+              </div>
+              <h1 className="mt-5 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+                {dominantAction.label}
+              </h1>
+              <p className="mt-3 max-w-2xl text-base font-medium leading-7 text-slate-700">
+                {dominantAction.description}
+              </p>
+              <div className="mt-6">
+                <Link
+                  href={dominantAction.href}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-blue-700 px-6 py-3 font-black text-white shadow-sm transition hover:bg-brand-blue-800"
+                >
+                  {dominantAction.label}
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </div>
 
-          {/* Progress Bar */}
-          {progressPercentage !== undefined && (
-            <div className="mt-6">
-              <div className="flex items-center justify-between text-sm text-white mb-2">
-                <span>Your Progress</span>
-                <span className="font-bold">{progressPercentage}%</span>
-              </div>
-              <div className="w-full bg-white rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-white h-full rounded-full transition-all duration-500"
-                  style={{ width: `${progressPercentage}%` }}
-                />
+              {progressPercentage !== undefined && (
+                <div className="mt-7 max-w-2xl">
+                  <div className="mb-2 flex items-center justify-between text-sm font-bold text-slate-700">
+                    <span>Your Progress</span>
+                    <span>{progressPercentage}%</span>
+                  </div>
+                  <div className="h-3 w-full overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={progressPercentage} aria-valuemin={0} aria-valuemax={100}>
+                    <div className="h-full rounded-full bg-brand-blue-600 transition-all duration-500" style={{ width: `${progressPercentage}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="relative min-h-[240px] lg:min-h-full">
+              <Image
+                src={heroImage}
+                alt="Portal work and next-step guidance"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent" />
+              <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/50 bg-white/90 p-4 shadow-lg backdrop-blur-sm">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-red-700">Use your navigation</p>
+                <p className="mt-1 font-black text-slate-950">Complete the highlighted action, then move through the tools available for your role.</p>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* ALERTS - Surfaced Prominently */}
       {alerts.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-6">
+        <section className="mx-auto max-w-7xl px-4 py-6">
           <div className="space-y-3">
             {alerts.map((alert, index) => (
               <div
                 key={index}
-                className={`rounded-lg p-4 flex items-start gap-4 ${
+                className={`flex items-start gap-4 rounded-xl border-2 p-4 ${
                   alert.type === 'error'
-                    ? 'bg-brand-red-50 border-2 border-brand-red-600'
+                    ? 'border-brand-red-600 bg-brand-red-50'
                     : alert.type === 'warning'
-                      ? 'bg-yellow-50 border-2 border-yellow-600'
-                      : 'bg-brand-blue-50 border-2 border-brand-blue-600'
+                      ? 'border-yellow-600 bg-yellow-50'
+                      : 'border-brand-blue-600 bg-brand-blue-50'
                 }`}
               >
                 <AlertCircle
-                  className={`h-10 w-10 flex-shrink-0 mt-0.5 ${
+                  className={`mt-0.5 h-6 w-6 shrink-0 ${
                     alert.type === 'error'
                       ? 'text-brand-red-600'
                       : alert.type === 'warning'
-                        ? 'text-yellow-600'
-                        : 'text-brand-blue-600'
+                        ? 'text-yellow-700'
+                        : 'text-brand-blue-700'
                   }`}
                 />
                 <div className="flex-1">
-                  <p
-                    className={`font-semibold ${
-                      alert.type === 'error'
-                        ? 'text-brand-red-900'
-                        : alert.type === 'warning'
-                          ? 'text-yellow-900'
-                          : 'text-brand-blue-900'
-                    }`}
-                  >
-                    {alert.message}
-                  </p>
+                  <p className="font-semibold text-slate-950">{alert.message}</p>
                 </div>
                 {alert.actionLabel && alert.actionHref && (
                   <Link
                     href={alert.actionHref}
-                    className={`flex-shrink-0 px-4 py-2 rounded-lg font-semibold transition ${
+                    className={`shrink-0 rounded-lg px-4 py-2 font-semibold text-white transition ${
                       alert.type === 'error'
-                        ? 'bg-brand-red-600 text-white hover:bg-brand-red-700'
+                        ? 'bg-brand-red-600 hover:bg-brand-red-700'
                         : alert.type === 'warning'
-                          ? 'bg-yellow-600 text-white hover:bg-yellow-700'
-                          : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
+                          ? 'bg-yellow-700 hover:bg-yellow-800'
+                          : 'bg-brand-blue-700 hover:bg-brand-blue-800'
                     }`}
                   >
                     {alert.actionLabel}
@@ -146,24 +168,22 @@ export function StateAwareDashboard({
         </section>
       )}
 
-      {/* MAIN CONTENT */}
-      <section className="max-w-7xl mx-auto px-4 py-8">{children}</section>
+      <section className="mx-auto max-w-7xl px-4 py-8">{children}</section>
 
-      {/* LOCKED SECTIONS - Visible But Not Accessible */}
       {lockedSections.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-8">
-          <h3 className="text-xl font-bold text-black mb-6">Locked Until Prerequisites Complete</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <section className="mx-auto max-w-7xl px-4 py-8">
+          <h3 className="mb-6 text-xl font-bold text-slate-950">Locked Until Prerequisites Complete</h3>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {lockedSections.map((section) => (
               <div
                 key={section.id}
-                className="bg-slate-100 border-2 border-slate-300 rounded-lg p-6 opacity-60 cursor-not-allowed"
+                className="cursor-not-allowed rounded-xl border-2 border-slate-300 bg-slate-100 p-6 opacity-70"
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <Lock className="h-5 w-5 text-slate-500 flex-shrink-0 mt-0.5" />
-                  <h4 className="font-bold text-black">{section.label}</h4>
+                <div className="mb-3 flex items-start gap-3">
+                  <Lock className="mt-0.5 h-5 w-5 shrink-0 text-slate-500" />
+                  <h4 className="font-bold text-slate-950">{section.label}</h4>
                 </div>
-                <p className="text-sm text-black">{section.reason}</p>
+                <p className="text-sm font-medium text-slate-700">{section.reason}</p>
               </div>
             ))}
           </div>
@@ -173,9 +193,6 @@ export function StateAwareDashboard({
   );
 }
 
-/**
- * SECTION CARD - Image-based cards for available sections
- */
 interface SectionCardProps {
   title: string;
   description: string;
@@ -189,7 +206,7 @@ export function SectionCard({ title, description, href, image, icon, badge }: Se
   return (
     <Link
       href={href}
-      className="group bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:border-brand-blue-400 transition-all duration-300"
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-brand-blue-400 hover:shadow-xl"
     >
       {image ? (
         <div className="relative h-36 overflow-hidden">
@@ -197,37 +214,33 @@ export function SectionCard({ title, description, href, image, icon, badge }: Se
             src={image}
             alt={title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="100vw"
           />
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-black/50" />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/70 to-transparent" />
           {badge && (
-            <span className="absolute top-3 right-3 px-3 py-1 bg-brand-red-600 text-white text-xs font-bold rounded-full shadow-lg">
+            <span className="absolute right-3 top-3 rounded-full bg-brand-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
               {badge}
             </span>
           )}
           <div className="absolute bottom-3 left-4 right-4">
-            <h4 className="font-bold text-slate-900 text-lg drop-shadow-lg">{title}</h4>
+            <h4 className="text-lg font-bold text-white drop-shadow-lg">{title}</h4>
           </div>
         </div>
       ) : (
         <div className="flex items-start justify-between p-4 pb-0">
           <div className="flex items-center gap-3">
             {icon && <div className="text-brand-blue-600">{icon}</div>}
-            <h4 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition">
-              {title}
-            </h4>
+            <h4 className="font-bold text-slate-950 transition group-hover:text-brand-blue-700">{title}</h4>
           </div>
           {badge && (
-            <span className="px-3 py-1 bg-brand-red-100 text-brand-red-700 text-xs font-bold rounded-full">
-              {badge}
-            </span>
+            <span className="rounded-full bg-brand-red-100 px-3 py-1 text-xs font-bold text-brand-red-700">{badge}</span>
           )}
         </div>
       )}
       <div className="p-4">
-        <p className="text-slate-600 text-sm mb-3 line-clamp-2">{description}</p>
-        <div className="flex items-center gap-2 text-brand-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
+        <p className="mb-3 line-clamp-2 text-sm font-medium text-slate-700">{description}</p>
+        <div className="flex items-center gap-2 text-sm font-semibold text-brand-blue-700 transition-all group-hover:gap-3">
           <span>Open</span>
           <ArrowRight className="h-4 w-4" />
         </div>
@@ -236,9 +249,6 @@ export function SectionCard({ title, description, href, image, icon, badge }: Se
   );
 }
 
-/**
- * PROGRESS INDICATOR - Shows Where User Is
- */
 interface ProgressIndicatorProps {
   steps: Array<{
     label: string;
@@ -249,13 +259,13 @@ interface ProgressIndicatorProps {
 export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
   if (!steps || !Array.isArray(steps)) return null;
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-      <h3 className="text-lg font-bold text-black mb-6">Your Journey</h3>
+    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="mb-6 text-lg font-bold text-slate-950">Your Journey</h3>
       <div className="space-y-4">
         {steps.map((step, index) => (
           <div key={index} className="flex items-center gap-4">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold ${
                 step.status === 'completed'
                   ? 'bg-brand-green-600 text-white'
                   : step.status === 'current'
@@ -264,7 +274,7 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
               }`}
             >
               {step.status === 'completed' ? (
-                <span className="w-3 h-3 rounded-full bg-white inline-block" />
+                <span className="inline-block h-3 w-3 rounded-full bg-white" />
               ) : step.status === 'locked' ? (
                 <Lock className="h-5 w-5" />
               ) : (
@@ -284,7 +294,7 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
                 {step.label}
               </div>
               {step.status === 'current' && (
-                <div className="text-sm text-brand-blue-600 font-semibold">Current Step</div>
+                <div className="text-sm font-semibold text-brand-blue-700">Current Step</div>
               )}
             </div>
           </div>

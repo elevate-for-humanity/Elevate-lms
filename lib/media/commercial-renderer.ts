@@ -145,6 +145,7 @@ async function acquireVisual(
     minDuration: 4,
     maxDuration: 30,
     perPage: 12,
+    orientation: brief.aspectRatio === '9:16' ? 'portrait' : 'landscape',
   });
   if (!stockUrl) {
     throw new Error(`No usable stock or generative video was available for scene: ${scene.title}`);

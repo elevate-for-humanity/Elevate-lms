@@ -50,8 +50,9 @@ export default function StorePage() {
           </p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
             <Link href="/store/trial" className="rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800">Start 14-Day Free Trial</Link>
-            <Link href="#website-builder-commercial" className="rounded-xl border-2 border-slate-800 px-6 py-3 font-black text-slate-950 hover:bg-slate-100">Watch Website Builder Commercial</Link>
+            <Link href="#website-builder-commercial" className="rounded-xl border-2 border-slate-800 px-6 py-3 font-black text-slate-950 hover:bg-slate-100">See Website Builder Demo</Link>
             <Link href="#marketplace" className="rounded-xl border-2 border-slate-800 px-6 py-3 font-black text-slate-950 hover:bg-slate-100">Browse Product Demos</Link>
+            <Link href="/online-apps" className="rounded-xl border-2 border-brand-red-700 px-6 py-3 font-black text-brand-red-800 hover:bg-brand-red-50">Open Live Apps & Portals</Link>
           </div>
           {hero.trustIndicators?.length ? (
             <div className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2">
@@ -117,15 +118,16 @@ export default function StorePage() {
         <div className="mx-auto max-w-6xl px-5">
           <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-300">Interactive selling</p>
-              <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">See the platform before you buy it</h2>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-brand-red-300">Interactive proof</p>
+              <h2 className="mt-3 text-3xl font-black text-white sm:text-4xl">See how the platform works, then open the real portals</h2>
               <p className="mt-4 max-w-2xl font-semibold leading-7 text-slate-100">
-                Every sellable capability now has its own product demo and subscription explanation. You can also use sample-data Admin, Student and Employer experiences. Trial users receive real product access; demos never modify production records.
+                Capability pages provide interactive feature and subscription demonstrations. They are labeled as demos, not recorded product video, unless an actual video asset is present. You can also open role-based portal experiences and live proof links from the Online Apps page.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link href="#marketplace" className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black hover:bg-brand-red-500">
                   <PlayCircle className="h-5 w-5" /> Browse Product Demos
                 </Link>
+                <Link href="/online-apps" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Open Online Apps</Link>
                 <Link href="/store/demo/admin" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Admin Demo</Link>
                 <Link href="/store/demo/student" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Student Demo</Link>
                 <Link href="/store/demo/employer" className="rounded-xl border border-white/35 px-5 py-3 font-black hover:bg-white/10">Employer Demo</Link>

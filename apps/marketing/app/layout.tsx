@@ -25,26 +25,25 @@ const logoUrl = `${siteUrl}/images/logo.png`;
 
 export const metadata: Metadata = {
   title: {
-    default: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
+    default: 'Elevate for Humanity | AI-Powered 360° Humanitarian Workforce Hub',
     template: '%s | Elevate for Humanity',
   },
   description:
-    'Elevate for Humanity Career & Technical Institute provides workforce training and registered apprenticeship pathways in barbering, cosmetology, esthetics, nail technology, healthcare, skilled trades, CDL, technology and business.',
+    'Elevate for Humanity is an AI-powered 360° humanitarian workforce hub connecting training, an integrated LMS, hands-on learning, testing, credentials, registered apprenticeships, workforce funding, employment, employers, supportive services, and public-sector partners.',
   applicationName: 'Elevate for Humanity',
   metadataBase: new URL(siteUrl),
   manifest: '/manifest-marketing.json',
   keywords: [
+    'humanitarian workforce hub',
+    'AI workforce platform',
+    'learning management system',
     'registered apprenticeship',
-    'barber apprenticeship',
-    'cosmetology apprenticeship',
-    'hair stylist apprenticeship',
-    'esthetician apprenticeship',
-    'nail technician apprenticeship',
-    'manicuring apprenticeship',
-    'career training',
     'workforce training',
-    'WIOA training',
-    'apprenticeship sponsor',
+    'ETPL training provider',
+    'career testing and proctoring',
+    'workforce funding',
+    'employer workforce development',
+    'supportive services',
   ],
   icons: {
     icon: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
@@ -55,16 +54,16 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Elevate for Humanity',
     url: siteUrl,
-    title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
+    title: 'Elevate for Humanity | AI-Powered 360° Humanitarian Workforce Hub',
     description:
-      'Career training, registered apprenticeships, workforce funding and employer partnerships from Elevate for Humanity Career & Technical Institute.',
+      'One connected ecosystem for learning, training, testing, apprenticeships, credentials, workforce funding, employment, employers, supportive services, and advancement.',
     images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
   },
   twitter: {
     card: 'summary',
-    title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
+    title: 'Elevate for Humanity | AI-Powered 360° Humanitarian Workforce Hub',
     description:
-      'Career training, registered apprenticeships, workforce funding and employer partnerships.',
+      'Training, LMS learning, testing, apprenticeships, workforce funding, employment, employers, supportive services, and AI-enabled operations in one connected hub.',
     images: [logoUrl],
   },
   robots: {
@@ -84,8 +83,8 @@ const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': ['Organization', 'EducationalOrganization'],
   '@id': `${siteUrl}/#organization`,
-  name: 'Elevate for Humanity Career & Technical Institute',
-  alternateName: 'Elevate for Humanity',
+  name: 'Elevate for Humanity',
+  alternateName: 'AI-Powered 360° Humanitarian Workforce Hub',
   legalName: '2Exclusive LLC-S',
   url: siteUrl,
   logo: {
@@ -104,17 +103,18 @@ const organizationJsonLd = {
     addressCountry: 'US',
   },
   description:
-    'Career and technical training provider and U.S. Department of Labor Registered Apprenticeship sponsor serving learners, employers and workforce partners.',
+    'AI-powered humanitarian workforce hub connecting education, an integrated LMS, testing and credentialing, registered apprenticeship, workforce funding, employment, employer services, supportive services, and partner operations.',
   knowsAbout: [
+    'Learning Management Systems',
     'Registered Apprenticeship',
-    'Barbering',
-    'Cosmetology',
-    'Hair Styling',
-    'Esthetics',
-    'Nail Technology',
-    'Manicuring',
+    'Career and Technical Training',
+    'Testing and Proctoring',
+    'Credentialing',
     'Workforce Development',
+    'Work-Based Learning',
     'WIOA',
+    'Employer Services',
+    'Supportive Services',
   ],
 };
 

@@ -13,46 +13,43 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export default function Header() {
   return (
     <header
-      className="relative z-[100] isolate h-[68px] overflow-visible border-b border-slate-200 bg-white shadow-sm"
+      className="relative z-[100] isolate h-[72px] overflow-visible border-b border-slate-200 bg-white shadow-sm"
       role="banner"
       data-site-header
       data-header-owner="marketing-root"
     >
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 min-[900px]:gap-1 min-[900px]:px-2 xl:gap-3 xl:px-4 2xl:px-6">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 min-[900px]:px-5 xl:px-6 2xl:px-8">
         <Link
           href="/"
-          className="flex min-w-0 flex-shrink-0 items-center gap-2"
+          className="flex min-w-0 flex-shrink-0 items-center gap-2.5"
           aria-label={`${PLATFORM_DEFAULTS.orgName} home`}
         >
-          <LogoImage alt="Elevate" width={44} height={56} className="h-10 w-auto" />
-          <span className="hidden whitespace-nowrap text-sm font-extrabold tracking-tight text-slate-950 2xl:inline">
-            Elevate
+          <LogoImage alt="Elevate for Humanity" width={44} height={56} className="h-10 w-auto" />
+          <span className="hidden whitespace-nowrap text-sm font-black tracking-tight text-slate-950 xl:inline">
+            Elevate for Humanity
           </span>
         </Link>
 
-        {/* One canonical desktop navigation row. Keep it available on compact
-            laptop viewports instead of falling back to the mobile drawer. */}
         <div className="hidden min-w-0 justify-center overflow-visible min-[900px]:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
-        <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          <div className="hidden flex-nowrap items-center gap-1 min-[900px]:flex">
+        <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-2">
+          <div className="hidden flex-nowrap items-center gap-2 min-[900px]:flex">
             <Link
               href={ROUTES.login}
-              className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"
+              className="inline-flex whitespace-nowrap px-2 py-2 text-[13px] font-bold text-slate-700 hover:text-slate-950 xl:text-sm"
             >
               Sign In
             </Link>
             <Link
               href={ROUTES.apply}
-              className="inline-flex whitespace-nowrap rounded-lg bg-brand-red-600 px-2.5 py-2 text-[13px] font-bold text-white hover:bg-brand-red-700 xl:px-3 xl:text-sm"
+              className="inline-flex whitespace-nowrap rounded-xl bg-brand-red-600 px-3.5 py-2.5 text-[13px] font-extrabold text-white shadow-sm transition hover:bg-brand-red-700 xl:px-4 xl:text-sm"
             >
-              Apply
+              Get Started
             </Link>
           </div>
 
-          {/* Phones and compact tablets below 900px use the dedicated drawer. */}
           <div className="flex flex-nowrap items-center gap-1 min-[900px]:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu

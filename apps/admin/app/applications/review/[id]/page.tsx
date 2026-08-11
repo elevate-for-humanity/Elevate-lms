@@ -10,9 +10,6 @@ import { withTimeout } from '@/lib/utils/withTimeout';
 import ApplicationActions from './ApplicationActions';
 import EditApplicationForm from './EditApplicationForm';
 import { resolveProgram } from '@/lib/programs/resolve';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || '').trim() || PLATFORM_DEFAULTS.siteUrl;
 
 export const dynamic = 'force-dynamic';
 
@@ -22,26 +19,26 @@ export const metadata: Metadata = {
 };
 
 const statusLabels: Record<string, string> = {
-  pending:              'Pending',
-  submitted:            'Submitted',
-  approved:             'Approved',
-  rejected:             'Rejected',
-  in_review:            'In Review',
-  under_review:         'Under Review',
+  pending: 'Pending',
+  submitted: 'Submitted',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  in_review: 'In Review',
+  under_review: 'Under Review',
   pending_admin_review: 'Pending Review',
-  enrolled:             'Enrolled',
+  enrolled: 'Enrolled',
 };
 
 const statusColors: Record<string, string> = {
-  pending:              'bg-yellow-100 text-yellow-800 border-yellow-300',
-  submitted:            'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
-  approved:             'bg-brand-green-100 text-brand-green-800 border-brand-green-300',
-  rejected:             'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
-  in_review:            'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
-  under_review:         'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
+  pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+  submitted: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
+  approved: 'bg-brand-green-100 text-brand-green-800 border-brand-green-300',
+  rejected: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
+  in_review: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
+  under_review: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
   pending_admin_review: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  enrolled:             'bg-emerald-100 text-emerald-800 border-emerald-300',
-  revoked:              'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
+  enrolled: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+  revoked: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
 };
 
 type ReviewApplication = {
@@ -82,19 +79,15 @@ export default async function ReviewApplicationPage({
   let application: ReviewApplication | null = null;
 
   if (isUuid) {
-    const { data, error } = await withTimeout(
-      db
-        .from('applications')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle(),
+    const lookup = await withTimeout(
+      db.from('applications').select('*').eq('id', id).maybeSingle(),
       8000,
-      'applications lookup timed out',
+      'applications lookup',
     ).catch((error) => {
       logger.error('[application-review] applications lookup failed', error instanceof Error ? error : undefined, { id });
       return { data: null, error } as const;
     });
-    if (!error && data) application = data as ReviewApplication;
+    if (!lookup.error && lookup.data) application = lookup.data as ReviewApplication;
   }
 
   if (!application && isLegacyIntakeId) {
@@ -109,9 +102,17 @@ export default async function ReviewApplicationPage({
 
   if (!application) notFound();
 
-  const status = application.revoked_at ? 'revoked' : (application.status || 'pending');
-  const resolvedProgram = resolveProgram(application.program_slug || application.program_interest || '');
-  const displayName = application.full_name || [application.first_name, application.last_name].filter(Boolean).join(' ') || 'Applicant';
+  const status = application.revoked_at ? 'revoked' : application.status || 'pending';
+  const resolvedProgram = await resolveProgram(
+    db,
+    application.program_id || application.program_slug || application.program_interest || '',
+  );
+  const displayName =
+    application.full_name ||
+    [application.first_name, application.last_name].filter(Boolean).join(' ') ||
+    'Applicant';
+  const applicantEmail = application.email || '';
+  const programInterest = resolvedProgram?.title || application.program_interest || application.program_slug || 'Not selected';
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -157,11 +158,11 @@ export default async function ReviewApplicationPage({
                 <h2 className="text-lg font-black text-slate-950">Applicant details</h2>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {[
-                    [Mail, 'Email', application.email || 'Not provided'],
+                    [Mail, 'Email', applicantEmail || 'Not provided'],
                     [Phone, 'Phone', application.phone || 'Not provided'],
                     [MapPin, 'Location', [application.city, application.zip].filter(Boolean).join(' ') || 'Not provided'],
                     [Calendar, 'Submitted', application.created_at ? new Date(application.created_at).toLocaleString() : 'Not available'],
-                    [BookOpen, 'Program', resolvedProgram?.title || application.program_interest || application.program_slug || 'Not selected'],
+                    [BookOpen, 'Program', programInterest],
                     [Tag, 'Source', application.source || 'Application form'],
                   ].map(([Icon, label, value]) => {
                     const ItemIcon = Icon as typeof Mail;
@@ -186,7 +187,11 @@ export default async function ReviewApplicationPage({
                 </section>
               )}
 
-              <EditApplicationForm application={application as any} />
+              <EditApplicationForm
+                applicationId={application.id}
+                currentStatus={status}
+                currentNotes={application.review_notes || application.support_notes || null}
+              />
             </div>
 
             <aside className="space-y-5">
@@ -199,7 +204,14 @@ export default async function ReviewApplicationPage({
                   <li>4. Approve, reject, or leave the application in review with clear notes.</li>
                 </ol>
               </div>
-              <ApplicationActions application={application as any} siteUrl={SITE_URL} />
+              <ApplicationActions
+                applicationId={application.id}
+                currentStatus={status}
+                programId={resolvedProgram?.id || application.program_id || null}
+                programInterest={programInterest}
+                applicantEmail={applicantEmail}
+                applicantName={displayName}
+              />
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-slate-500">
                   <Hash className="h-4 w-4" /> Record ID

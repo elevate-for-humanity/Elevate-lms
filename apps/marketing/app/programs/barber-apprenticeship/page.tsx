@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import BarberApprenticeshipExtras from '@/components/programs/beauty/BarberApprenticeshipExtras';
+import ProgramSeoStructuredData from '@/components/programs/ProgramSeoStructuredData';
 import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
@@ -14,29 +15,43 @@ export default async function BarberApprenticeshipPage() {
   if (!loaded) return notFound();
 
   return (
-    <ProgramDetailPage
-      program={loaded.program}
-      banner={heroBanners['barber-apprenticeship'] ?? null}
-    >
-      <BarberApprenticeshipExtras />
-    </ProgramDetailPage>
+    <>
+      <ProgramSeoStructuredData
+        program={loaded.program}
+        canonicalPath="/programs/barber-apprenticeship"
+      />
+      <ProgramDetailPage
+        program={loaded.program}
+        banner={heroBanners['barber-apprenticeship'] ?? null}
+      >
+        <BarberApprenticeshipExtras />
+      </ProgramDetailPage>
+    </>
   );
 }
 
 export async function generateMetadata() {
   return {
-    title: 'Barber Apprenticeship | Earn While You Learn Barbering',
+    title: 'Registered Barber Apprenticeship Program | Indiana | Elevate for Humanity',
     description:
-      'Registered barber apprenticeship pathway from Elevate for Humanity in Indiana. Complete structured on-the-job learning with approved host shops, related technical instruction, hour tracking and sponsor oversight.',
+      'Indiana registered barber apprenticeship pathway with approved host shops, supervised on-the-job learning, related technical instruction, progress tracking and sponsor oversight. Funding is not guaranteed; self-pay and other eligible options are reviewed separately.',
     keywords: [
       'barber apprenticeship',
       'barber apprenticeship Indiana',
-      'barber apprentice program',
+      'Indiana barber apprenticeship program',
       'paid barber apprenticeship',
       'registered barber apprenticeship',
-      'barber training',
+      'barber training Indiana',
       'barber license apprenticeship',
+      'host barbershop apprenticeship',
     ],
     alternates: { canonical: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship' },
+    openGraph: {
+      title: 'Registered Barber Apprenticeship Program | Indiana',
+      description:
+        'Train in an approved Indiana host shop through a registered barber apprenticeship with supervised OJL, RTI, progress tracking and sponsor oversight.',
+      url: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship',
+      type: 'website',
+    },
   };
 }

@@ -98,6 +98,9 @@ jobs:
       - name: Public UX and media acceptance check
         run: pnpm run audit:public-media-nav
 
+      - name: Homepage section media uniqueness check
+        run: node scripts/audit-homepage-section-media.mjs
+
       - name: LMS course integrity check
         run: pnpm run integrity:lms
         env:

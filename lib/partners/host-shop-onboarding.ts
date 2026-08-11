@@ -165,7 +165,7 @@ function normalizeLegacyRequirement(
     documentType = 'ein_letter';
   }
 
-  const normalized = {
+  const normalized: Record<string, unknown> = {
     ...raw,
     id: raw.id ?? `${program}-${documentType}`,
     document_type: documentType,

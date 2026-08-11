@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { LEGACY_IMAGE_ALIASES } from '../lib/media/legacy-image-aliases.mjs';
 
 const ROOT = process.cwd();
-const MARKETING_APP = fs.existsSync(path.join(ROOT, 'apps/marketing/app')) ? 'apps/marketing/app' : 'app';
+const MARKETING_APP = fs.existsSync(path.join(ROOT, 'apps/marketing/app'))
+  ? 'apps/marketing/app'
+  : 'app';
 const PAGE_NAMES = new Set(['page.tsx', 'page.ts', 'page.jsx', 'page.js']);
 const SOURCE_EXTS = ['.tsx', '.ts', '.jsx', '.js', '.json'];
-const ASSET_RE = /['"](\/(?:images|uploads|media)\/[^'"\s)]+)['"]/g;
+const MEDIA_EXT = '(?:png|jpe?g|webp|avif|gif|svg|ico|mp4|webm|mov|m4v|mp3|m4a|wav|ogg|aac)';
+const ASSET_RE = new RegExp(
+  `["'](\\/(?:images|uploads|media)\\/[^"'\\s)]+\\.${MEDIA_EXT}(?:[?#][^"'\\s)]*)?)["']`,
+  'gi',
+);
 const REUSABLE_MEDIA = /(?:logo|favicon|icon|badge|seal|partner|sponsor|credential|certification|qr|avatar|placeholder)/i;
 const HERO_OPTIONAL = [
   /^\/apply(?:\/|$)/,
@@ -21,7 +28,6 @@ const HERO_OPTIONAL = [
 ];
 
 const abs = (rel) => path.join(ROOT, rel);
-const exists = (rel) => fs.existsSync(abs(rel));
 const isFile = (rel) => {
   try {
     return fs.statSync(abs(rel)).isFile();
@@ -31,6 +37,7 @@ const isFile = (rel) => {
 };
 const read = (rel) => fs.readFileSync(abs(rel), 'utf8');
 const lineNumber = (source, index) => source.slice(0, index).split('\n').length;
+const isRedirectSource = (source) => /\b(?:redirect|permanentRedirect)\s*\(/.test(source);
 
 function walk(relDir) {
   const absDir = abs(relDir);
@@ -62,6 +69,16 @@ function pathSegments(href) {
   return clean ? clean.split('/') : [];
 }
 
+function directStaticPage(href) {
+  const segments = pathSegments(href);
+  const base = segments.length ? `${MARKETING_APP}/${segments.join('/')}` : MARKETING_APP;
+  for (const pageName of PAGE_NAMES) {
+    const candidate = `${base}/${pageName}`;
+    if (isFile(candidate)) return candidate;
+  }
+  return null;
+}
+
 function routePatternMatches(pageSegments, hrefSegments) {
   let i = 0;
   let j = 0;
@@ -83,6 +100,9 @@ function routePatternMatches(pageSegments, hrefSegments) {
 
 function routePageFile(href) {
   if (!href.startsWith('/')) return null;
+  const direct = directStaticPage(href);
+  if (direct) return direct;
+
   const target = pathSegments(href);
   const matches = ALL_PAGE_FILES.filter((file) => routePatternMatches(routeSegmentsForPage(file), target));
   if (!matches.length) return null;
@@ -99,9 +119,14 @@ function routeExists(href) {
   return Boolean(routePageFile(href));
 }
 
+function canonicalAssetPath(assetPath) {
+  const cleanPath = assetPath.split(/[?#]/)[0];
+  return LEGACY_IMAGE_ALIASES[cleanPath] ?? cleanPath;
+}
+
 function publicAssetExists(assetPath) {
-  const clean = assetPath.replace(/^\//, '').split(/[?#]/)[0];
-  return isFile(`public/${clean}`) || isFile(`apps/marketing/public/${clean}`);
+  const resolved = canonicalAssetPath(assetPath).replace(/^\//, '');
+  return isFile(`public/${resolved}`) || isFile(`apps/marketing/public/${resolved}`);
 }
 
 function resolveSourceImport(fromFile, specifier) {
@@ -223,7 +248,9 @@ function collectImageRefs(files) {
   for (const file of files) {
     if (!isFile(file)) continue;
     const source = read(file);
-    for (const match of source.matchAll(ASSET_RE)) refs.push({ file, path: match[1], line: lineNumber(source, match.index ?? 0) });
+    for (const match of source.matchAll(ASSET_RE)) {
+      refs.push({ file, path: match[1], line: lineNumber(source, match.index ?? 0) });
+    }
   }
   return refs;
 }
@@ -238,8 +265,8 @@ function collectVisualFindings(hrefs) {
   const textHeavy = [];
   for (const href of hrefs) {
     const { page, source } = pageSourceBundle(href);
-    if (!page || /\bredirect\s*\(/.test(read(page))) continue;
-    const hasHero = /HeroVideo|HomeHeroVideo|HeroPicture|QualityHero|PictureFirstPageHero|ProgramPageLayout|ProgramCategoryPage|MarketingPageHero|PageHero|heroBanners|(?:hero|banner)(?:Image|Media|Src)|<Image\b|<img\b|<video\b|min-h-\[(?:3|4|5|6)\d{2}px\]/i.test(source);
+    if (!page || isRedirectSource(read(page))) continue;
+    const hasHero = /HeroVideo|HomeHeroVideo|HeroPicture|QualityHero|PictureFirstPageHero|ProgramPageLayout|ProgramCategoryPage|MarketingPageHero|PageHero|heroBanners|(?:hero|banner)(?:Image|Media|Src)|<Image\b|<img\b|<video\b|min-h-\[(?:2|3|4|5|6)\d{2}px\]/i.test(source);
     if (!hasHero && requiresHero(href)) heroMissing.push({ href, file: page });
     const hasAction = /<(?:Link|a)\b[^>]*href\s*=|<button\b|<form\b|\bonClick\s*=|(?:primary|secondary)?Cta\b|cta(?:Href|Url)\b/i.test(source);
     if (!hasAction) noAction.push({ href, file: page });
@@ -284,9 +311,11 @@ function collectDuplicateMediaFindings(sitemapHrefs) {
   const leadUse = new Map();
   for (const href of sitemapHrefs) {
     const page = routePageFile(href);
-    if (!page || /\bredirect\s*\(/.test(read(page))) continue;
+    if (!page || isRedirectSource(read(page))) continue;
     const source = read(page);
-    const images = [...source.matchAll(ASSET_RE)].map((match) => match[1]).filter((img) => !REUSABLE_MEDIA.test(img));
+    const images = [...source.matchAll(ASSET_RE)]
+      .map((match) => canonicalAssetPath(match[1]))
+      .filter((img) => !REUSABLE_MEDIA.test(img));
     const counts = new Map();
     for (const image of images) counts.set(image, (counts.get(image) ?? 0) + 1);
     for (const [image, count] of counts) if (count > 1) withinPage.push({ href, file: page, image, count });
@@ -302,7 +331,7 @@ function collectDuplicateMediaFindings(sitemapHrefs) {
 }
 
 function isStaticAssetHref(href) {
-  return /\.(?:pdf|png|jpe?g|webp|svg|gif|zip|docx?|xlsx?|csv)(?:[?#].*)?$/i.test(href);
+  return /\.(?:pdf|png|jpe?g|webp|avif|svg|gif|zip|docx?|xlsx?|csv)(?:[?#].*)?$/i.test(href);
 }
 
 function collectActionFindings(files, routeConstants) {
@@ -343,7 +372,7 @@ function collectContrastRisks(files) {
   const findings = [];
   const classPattern = /className=["'`]([^"'`]+)["'`]/g;
   const lightBg = /\bbg-(?:white|slate-50|slate-100|gray-50|gray-100)\b/;
-  const weakOnLight = /\btext-(?:slate|gray|zinc|neutral|stone)-(?:300|400)\b/;
+  const weakOnLight = /\btext-(?:slate|gray|zinc|neutral|stone)-(?:300|400)\b|\btext-white\b/;
   const darkBg = /\bbg-(?:black|slate-800|slate-900|slate-950|gray-900|gray-950|brand-blue-700|brand-blue-800|brand-blue-900)\b/;
   const weakOnDark = /\btext-(?:black|slate|gray|zinc|neutral|stone)-(?:600|700|800|900|950)\b/;
   for (const file of files) {

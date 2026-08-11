@@ -63,11 +63,17 @@ export async function register() {
 
 export const onRequestError = async (
   err: unknown,
-  request: { path: string; method: string; headers: Record<string, string | string[] | undefined> },
+  request: { path: string; method: string; headers?: Record<string, string | string[] | undefined> },
   context: { routerKind: string; routePath: string; routeType: string },
 ) => {
   if (process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN) {
     const { captureRequestError } = await import('@sentry/nextjs');
-    captureRequestError(err, request, context);
+    type CaptureRequest = Parameters<typeof captureRequestError>[1];
+    type CaptureContext = Parameters<typeof captureRequestError>[2];
+    captureRequestError(
+      err,
+      request as unknown as CaptureRequest,
+      context as unknown as CaptureContext,
+    );
   }
 };

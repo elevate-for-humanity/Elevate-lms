@@ -1,61 +1,35 @@
 # Hero Video Standard
 
-## Rule
+## Canonical implementation
 
-Hero videos play unmuted by default. No mute button is shown.
+Marketing hero media must render through `components/marketing/HeroVideo.tsx`.
+Compatibility wrappers such as `HomeHeroVideo` and `PageVideoHero` may adapt props, but they must not implement their own playback, looping, mute, resize, or error-fallback logic.
 
-Browsers that block unmuted autoplay (first load, no prior user interaction) fall back
-to muted silently. The user never sees a mute toggle.
+Hero video assignments are resolved through `lib/video/registry.ts` and `content/heroBanners.ts`. Page components must not hard-code hero MP4 URLs.
 
-## Implementation
+## Media rules
 
-All hero video components use `useHeroVideo` from `hooks/useHeroVideo.ts`.
+1. A marketing page receives one dedicated hero video only when that video is explicitly assigned to the page key in `HERO_VIDEO_BY_PAGE_KEY` or the raw banner URL is unique across the banner dataset.
+2. A video already reused by unrelated banner entries is removed at runtime for those entries. The page uses its page/program-specific picture instead.
+3. Mobile uses the page's dedicated mobile source when one exists; otherwise it reuses that same page's desktop source. It must never substitute an unrelated generic mobile video.
+4. Video plays once and never loops.
+5. Playback begins muted when the hero is substantially visible. Sound is user initiated. When a recorded `voiceoverSrc` exists, the sound control plays that narration instead of creating competing audio tracks.
+6. A video load/playback failure falls back to `posterImage`. A failed MP4 must never leave a broken or permanently black hero.
+7. Route changes and unmounts stop video, voiceover audio, and demo timers.
+8. No primary sales copy or full-screen gradient is placed over hero media. Identity copy and CTAs render in the content panel below the media.
 
-The hook:
+## Canonical data flow
 
-1. Attempts `el.muted = false; el.play()`
-2. On failure, falls back to `el.muted = true; el.play()`
-3. Pauses when scrolled off-screen (configurable via `pauseOffScreen`)
+`public/data/hero-banners.json` → `content/heroBanners.ts` → `lib/video/registry.ts` media assignment → `components/marketing/HeroVideo.tsx`
 
-```ts
-const { videoRef } = useHeroVideo();
-```
-
-## Video Element Rules
-
-- No `muted` attribute on the `<video>` element — the hook sets it programmatically
-- No `autoPlay` attribute — the hook calls `.play()` directly
-- Marketing heroes use `HeroVideo` + `CanonicalVideo` (not raw `<video>` tags)
-- **No poster images** on banner-driven heroes — `hero-banners.json` stores video URLs only; frame uses `bg-slate-900` until the video plays
-
-## Hero Container Rules
-
-- Height: `h-[45vh] min-h-[280px] max-h-[560px]`
-- No gradient overlay
-- No text, badges, or CTAs on top of the video
-- All identity content renders in a white panel **below** the hero
-
-## Voiceover (VoiceoverWithMusic)
-
-Program pages with a separate voiceover audio track use `VoiceoverWithMusic`.
-It auto-plays on first scroll. Pass `audioSrc` to `PageVideoHero` or render
-`<VoiceoverWithMusic audioSrc="..." />` directly.
-
-## Components That Use This Standard
-
-| Component                                     | Used By                                            |
-| --------------------------------------------- | -------------------------------------------------- |
-| `components/ui/HomeHeroVideo.tsx`             | Home page                                          |
-| `components/ProgramHeroBanner.tsx`            | Programs index, ProgramPageLayout, ProgramTemplate |
-| `components/ui/PageVideoHero.tsx`             | ProgramDetailPage                                  |
-| `components/ui/VideoHeroBanner.tsx`           | Mission page                                       |
-| `components/programs/ProgramCategoryPage.tsx` | Healthcare, Trades, Tech category pages            |
-| `hooks/useHeroVideo.ts`                       | All of the above                                   |
+The copy JSON may exist in app public output for packaging, but runtime normalization is authoritative. Any generated/copy file must stay byte-equivalent to the canonical source and must not be hand-edited independently.
 
 ## Prohibited
 
-- `muted` attribute on hero `<video>` elements
-- `autoPlay` attribute on hero `<video>` elements
-- Mute/unmute toggle buttons on hero sections
-- Gradient overlays on hero media
-- Text rendered on top of hero video or image
+- raw `<video>` hero implementations in Marketing pages
+- page-level hard-coded hero MP4 overrides
+- looping marketing hero videos
+- generic mobile video fallbacks on unrelated pages
+- multiple independent hero playback implementations
+- silent failure without a relevant poster/picture fallback
+- duplicate hero-video assignments that bypass the canonical registry

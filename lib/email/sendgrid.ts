@@ -22,21 +22,79 @@ export interface EmailOptions {
   attachments?: EmailAttachment[];
 }
 
+type EmailSendResult = {
+  success: boolean;
+  error?: string;
+  data?: { provider: string };
+  from?: string;
+};
+
+async function auditTransportDelivery(
+  options: EmailOptions,
+  result: EmailSendResult,
+  resolvedFrom: string,
+  provider: 'sendgrid' | 'unconfigured' = 'sendgrid',
+): Promise<void> {
+  try {
+    // Dynamic import avoids making the email transport part of the Supabase
+    // bootstrap dependency graph. If the service-role client is unavailable
+    // (build-time/local tooling), email sending still behaves exactly as before.
+    const { getAdminClient } = await import('@/lib/supabase/admin');
+    const db = await getAdminClient();
+    if (!db) return;
+
+    const recipients = Array.isArray(options.to) ? options.to : [options.to];
+    const now = new Date().toISOString();
+    const rows = recipients
+      .map((recipient) => String(recipient || '').trim())
+      .filter(Boolean)
+      .map((recipient) => ({
+        action: 'email_transport_send',
+        recipient_email: recipient,
+        recipient,
+        to: recipient,
+        subject: options.subject,
+        provider,
+        status: result.success ? 'sent' : 'failed',
+        error_message: result.error ?? null,
+        error: result.error ?? null,
+        sent_at: result.success ? now : null,
+        details: {
+          transport: provider,
+          from: resolvedFrom,
+          has_attachments: Boolean(options.attachments?.length),
+          bcc_count: options.bcc ? (Array.isArray(options.bcc) ? options.bcc.length : 1) : 0,
+        },
+        metadata: {
+          transport: provider,
+          from: resolvedFrom,
+        },
+      }));
+
+    if (!rows.length) return;
+    const { error } = await db.from('email_logs').insert(rows);
+    if (error) {
+      logger.warn('[Email] delivery audit insert failed', { error: error.message });
+    }
+  } catch (error) {
+    logger.warn('[Email] delivery audit unavailable', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 /**
  * Send email via SendGrid HTTP API (no SDK — direct fetch).
  * All email in the app routes through this single function.
  * Hydrates secrets from Supabase app_secrets on first call.
+ *
+ * Every runtime send attempt is also written to email_logs when the service-role
+ * database client is available. That makes student/application emails auditable
+ * even when the calling feature does not maintain its own delivery log.
  */
-export async function sendEmail(options: EmailOptions) {
+export async function sendEmail(options: EmailOptions): Promise<EmailSendResult> {
   // Ensure runtime secrets (SENDGRID_API_KEY, EMAIL_FROM, etc.) are in process.env
   await hydrateProcessEnv();
-
-  const sendgridKey = process.env.SENDGRID_API_KEY;
-
-  if (!sendgridKey) {
-    logger.warn('[Email] SENDGRID_API_KEY not configured — email not sent');
-    return { success: false, error: 'Email service not configured. Set SENDGRID_API_KEY.' };
-  }
 
   const FROM_EMAIL =
     process.env.EMAIL_FROM ||
@@ -53,7 +111,26 @@ export async function sendEmail(options: EmailOptions) {
       : [options.bcc]
     : undefined;
 
-  return sendViaSendGrid(sendgridKey, { ...options, from, replyTo, to: toArr, bcc: bccArr });
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (!sendgridKey) {
+    logger.warn('[Email] SENDGRID_API_KEY not configured — email not sent');
+    const result: EmailSendResult = {
+      success: false,
+      error: 'Email service not configured. Set SENDGRID_API_KEY.',
+    };
+    await auditTransportDelivery(options, result, from, 'unconfigured');
+    return result;
+  }
+
+  const result = await sendViaSendGrid(sendgridKey, {
+    ...options,
+    from,
+    replyTo,
+    to: toArr,
+    bcc: bccArr,
+  });
+  await auditTransportDelivery(options, result, from, 'sendgrid');
+  return result;
 }
 
 async function sendViaSendGrid(
@@ -68,7 +145,7 @@ async function sendViaSendGrid(
     bcc?: string[];
     attachments?: EmailAttachment[];
   },
-) {
+): Promise<EmailSendResult> {
   try {
     const personalization: Record<string, unknown> = {
       to: opts.to.map((email) => ({ email })),

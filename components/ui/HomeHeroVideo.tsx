@@ -23,6 +23,12 @@ export interface HomeHeroVideoProps {
   banner: HeroBanner;
 }
 
+const BEAUTY_FAST_LINKS = [
+  { label: 'Barbering', href: '/programs/barber-apprenticeship' },
+  { label: 'Cosmetology', href: '/programs/cosmetology-apprenticeship' },
+  { label: 'Nail Technician', href: '/programs/nail-technician-apprenticeship' },
+] as const;
+
 /**
  * Homepage compatibility wrapper.
  * Media playback, mobile source selection, error fallback, narration controls,
@@ -53,6 +59,31 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
           <p className="mb-4 text-sm font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
             {banner.eyebrow}
           </p>
+
+          <div className="mb-5 rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 via-white to-fuchsia-50 p-4 shadow-sm">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-700">
+                  Beauty &amp; Grooming Apprenticeships in Indiana
+                </p>
+                <p className="mt-1 text-sm font-bold text-slate-900">
+                  Earn while you learn in an approved host shop. Funding eligibility is reviewed by program and participant.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {BEAUTY_FAST_LINKS.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2 text-sm font-black text-white transition hover:bg-rose-700"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
             {banner.belowHeroHeadline}
           </h1>

@@ -48,6 +48,7 @@ export interface HeroVideoProps {
  * - autoplay begins muted when the hero is substantially visible;
  * - sound is user initiated, using recorded voiceover when supplied;
  * - mobile switches to the page's assigned mobile source without a reload;
+ * - the poster stays mounted behind video until a renderable frame is ready;
  * - media errors fail to the page-specific poster instead of a broken/black frame;
  * - route changes stop all video/audio/timers immediately.
  */
@@ -84,6 +85,7 @@ export default function HeroVideo({
   const [hasEnded, setHasEnded] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop || videoSrcMobile || '');
   const [demoActive, setDemoActive] = useState(false);
   const [demoSlideIndex, setDemoSlideIndex] = useState(0);
@@ -108,6 +110,7 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
+    setVideoReady(false);
     setHasEnded(false);
     setHasStarted(false);
     setMuted(true);
@@ -177,7 +180,7 @@ export default function HeroVideo({
       setHasStarted(true);
       setMuted(true);
     } catch {
-      // Poster remains visible until the browser allows media playback.
+      // Stable poster remains visible until the browser allows media playback.
     }
   }, [hasEnded, startDemoSequence, videoFailed]);
 
@@ -256,9 +259,10 @@ export default function HeroVideo({
   }
 
   const showVideo = Boolean(videoSrc) && !videoFailed;
-  const showPoster = Boolean(posterImage) && !showVideo;
+  const showPoster = Boolean(posterImage);
   const hasSoundControl = Boolean(voiceoverSrc || showVideo);
   const activeSlide = demoActive ? demoSlides[demoSlideIndex] : null;
+  const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
 
   return (
     <div ref={wrapperRef} className={`w-full ${className}`}>
@@ -266,32 +270,35 @@ export default function HeroVideo({
         className={`relative w-full overflow-hidden bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero media` : 'Hero media'}
       >
-        {showVideo ? (
-          <video
-            ref={videoRef}
-            key={videoSrc}
-            src={videoSrc}
-            poster={posterImage}
-            preload="metadata"
-            playsInline
-            muted
-            loop={false}
-            onEnded={handleEnded}
-            onError={() => {
-              setVideoFailed(true);
-              setHasStarted(false);
-              setMuted(true);
-            }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
-            aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
-          />
-        ) : showPoster ? (
+        {showPoster ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={posterImage}
             alt=""
             aria-hidden="true"
-            className={`absolute inset-0 z-10 h-full w-full ${mediaFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
+            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
+          />
+        ) : null}
+
+        {showVideo ? (
+          <video
+            ref={videoRef}
+            src={videoSrc}
+            preload="metadata"
+            playsInline
+            muted
+            loop={false}
+            onCanPlay={() => setVideoReady(true)}
+            onPlaying={() => setVideoReady(true)}
+            onEnded={handleEnded}
+            onError={() => {
+              setVideoFailed(true);
+              setVideoReady(false);
+              setHasStarted(false);
+              setMuted(true);
+            }}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           />
         ) : null}
 

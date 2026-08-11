@@ -1,12 +1,9 @@
 /**
  * GET /api/version
- *
- * Returns deterministic build identity: commit SHA, BUILD_ID, timestamp.
- * This endpoint is the source of truth for production parity checks.
- * NEVER cache this response — use Cache-Control: no-store.
+ * Returns deterministic build identity and never caches the response.
  */
-
 import { NextResponse } from 'next/server';
+import { getBuildTimestamp } from '@/lib/version/getAppVersion';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,9 +14,7 @@ function val(input: string | undefined, fallback = 'unknown'): string {
 
 export async function GET() {
   const commitSha = val(
-    process.env.GIT_SHA ??
-      process.env.GITHUB_SHA ??
-      process.env.NEXT_PUBLIC_GIT_SHA,
+    process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? process.env.NEXT_PUBLIC_GIT_SHA,
   );
 
   const buildId = val(
@@ -32,7 +27,7 @@ export async function GET() {
       service: 'lms',
       commitSha,
       buildId,
-      builtAt: val(process.env.BUILD_TIMESTAMP),
+      builtAt: getBuildTimestamp(),
       nodeEnvironment: val(process.env.NODE_ENV),
       timestamp: new Date().toISOString(),
     },

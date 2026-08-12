@@ -1,5 +1,5 @@
 /**
- * Shared Northflank API helpers for Elevate LMS migration scripts.
+ * Shared Northflank API helpers for Elevate production scripts.
  */
 
 import dotenv from 'dotenv';
@@ -22,7 +22,7 @@ export function getToken(): string {
     process.env.NF_API_TOKEN;
   if (!token) {
     throw new Error(
-      'Missing NORTHFLANK_API_TOKEN. Add it in Cursor → https://cursor.com/dashboard/cloud-agents (Secrets), then restart the agent.',
+      'Missing NORTHFLANK_API_TOKEN. Configure it in the runtime secret store before running Northflank scripts.',
     );
   }
   return token;
@@ -71,6 +71,10 @@ export function resolveProjectId(): string | undefined {
   return process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 }
 
+export function resolveMarketingServiceId(): string | undefined {
+  return process.env.NORTHFLANK_MARKETING_SERVICE_ID;
+}
+
 export function resolveLmsServiceId(): string | undefined {
   return process.env.NORTHFLANK_LMS_SERVICE_ID;
 }
@@ -84,10 +88,7 @@ export function projectApiPath(projectId: string, suffix: string): string {
   return `/projects/${projectId}${suffix}`;
 }
 
-/**
- * Northflank "combined" = build+deploy in one service resource (not one service for LMS+admin).
- * Elevate uses two combined services: elevate-lms and elevate-admin.
- */
+/** Northflank "combined" means build+deploy in one service resource. */
 export function combinedServiceCreatePath(projectId: string): string {
   return projectApiPath(projectId, '/services/combined');
 }
@@ -97,20 +98,15 @@ export function serviceGetPath(projectId: string, serviceId: string): string {
   return projectApiPath(projectId, `/services/${serviceId}`);
 }
 
-/** PATCH combined CI/CD service — must use /services/combined/{id} (plain /services/{id} returns 405). */
+/** PATCH combined CI/CD service — use /services/combined/{id}. */
 export function combinedServicePatchPath(projectId: string, serviceId: string): string {
   return projectApiPath(projectId, `/services/combined/${serviceId}`);
 }
 
 /**
- * GET combined service status — uses /services/{id} (not /services/combined/{id}).
- * The /services/combined/{id} endpoint only supports PATCH, not GET (returns 405).
- * For GET operations (status polling, build wait), use the regular service path.
- *
- * @deprecated Use serviceGetPath() for GET operations. Only use this for PATCH via combinedServicePatchPath().
+ * GET combined service status uses /services/{id}; /services/combined/{id} is PATCH-only.
+ * @deprecated Use serviceGetPath() for GET operations.
  */
 export function combinedServicePath(projectId: string, serviceId: string): string {
-  // BUGFIX: Was returning /services/combined/{id} which returns 405 for GET.
-  // Northflank combined services use /services/{id} for GET, /services/combined/{id} for PATCH only.
   return serviceGetPath(projectId, serviceId);
 }

@@ -15,6 +15,11 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/marketing/package.json ./apps/marketing/package.json
 COPY packages ./packages
 
+# Marketing never imports ffmpeg-static; runtime video tooling resolves FFmpeg
+# through @ffmpeg-installer/ffmpeg. Do not allow ffmpeg-static's postinstall to
+# download a GitHub-hosted binary during every production image build. That
+# external download has caused ECONNRESET/socket-hang-up failures on Northflank.
+RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\\n');"
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder

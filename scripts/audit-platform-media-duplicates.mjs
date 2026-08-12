@@ -102,6 +102,7 @@ function assetOccurrences(file) {
       out.push({
         asset,
         line: i + 1,
+        absFile: file,
         file: sourceLabel(file),
         hero: HERO_PATH.test(asset) || HERO_CONTEXT.test(context),
       });
@@ -113,15 +114,20 @@ function assetOccurrences(file) {
 
 const routeRecords = [];
 const routeAssetUses = new Map();
-const heroRouteUses = new Map();
+const ownedHeroRouteUses = new Map();
 const withinRouteDuplicates = [];
+const sharedComponentDuplicateAdvisory = [];
 
 for (const app of APPS) {
   const appRoot = path.join(ROOT, 'apps', app, 'app');
   for (const pageFile of walk(appRoot)) {
     const route = routeFor(appRoot, pageFile);
+    const routeDir = path.dirname(pageFile);
     const tree = collectTree(pageFile, appRoot);
-    const occurrences = [...tree].flatMap(assetOccurrences);
+    const occurrences = [...tree].flatMap(assetOccurrences).map((occ) => ({
+      ...occ,
+      ownedByRoute: occ.absFile === pageFile || occ.absFile.startsWith(`${routeDir}${path.sep}`),
+    }));
     const byAsset = new Map();
 
     for (const occ of occurrences) {
@@ -134,23 +140,23 @@ for (const app of APPS) {
       routes.add(key);
       routeAssetUses.set(occ.asset, routes);
 
-      if (occ.hero) {
-        const heroRoutes = heroRouteUses.get(occ.asset) ?? new Set();
+      if (occ.hero && occ.ownedByRoute) {
+        const heroRoutes = ownedHeroRouteUses.get(occ.asset) ?? new Set();
         heroRoutes.add(key);
-        heroRouteUses.set(occ.asset, heroRoutes);
+        ownedHeroRouteUses.set(occ.asset, heroRoutes);
       }
     }
 
     for (const [asset, uses] of byAsset) {
-      const distinctLocations = new Set(uses.map((use) => `${use.file}:${use.line}`));
-      if (distinctLocations.size > 1) {
-        withinRouteDuplicates.push({
-          app,
-          route,
-          asset,
-          locations: [...distinctLocations],
-        });
-      }
+      const locations = [...new Set(uses.map((use) => `${use.file}:${use.line}`))];
+      if (locations.length <= 1) continue;
+      const ownedLocations = [...new Set(
+        uses.filter((use) => use.ownedByRoute).map((use) => `${use.file}:${use.line}`),
+      )];
+
+      const finding = { app, route, asset, locations, ownedLocations };
+      if (ownedLocations.length > 1) withinRouteDuplicates.push(finding);
+      else sharedComponentDuplicateAdvisory.push(finding);
     }
 
     routeRecords.push({
@@ -159,12 +165,15 @@ for (const app of APPS) {
       page: sourceLabel(pageFile),
       componentFiles: tree.size,
       imageRefs: new Set(occurrences.map((occ) => occ.asset)).size,
-      heroRefs: new Set(occurrences.filter((occ) => occ.hero).map((occ) => occ.asset)).size,
+      ownedImageRefs: new Set(occurrences.filter((occ) => occ.ownedByRoute).map((occ) => occ.asset)).size,
+      ownedHeroRefs: new Set(
+        occurrences.filter((occ) => occ.ownedByRoute && occ.hero).map((occ) => occ.asset),
+      ).size,
     });
   }
 }
 
-const crossRouteHeroDuplicates = [...heroRouteUses.entries()]
+const crossRouteHeroDuplicates = [...ownedHeroRouteUses.entries()]
   .filter(([, routes]) => routes.size > 1)
   .map(([asset, routes]) => ({ asset, routes: [...routes].sort() }))
   .sort((a, b) => b.routes.length - a.routes.length || a.asset.localeCompare(b.asset));
@@ -180,13 +189,10 @@ if (fs.existsSync(heroConfigPath)) {
   const config = JSON.parse(fs.readFileSync(heroConfigPath, 'utf8'));
   const uses = new Map();
   for (const [key, value] of Object.entries(config)) {
-    const candidates = [
-      value?.posterImage,
-      value?.image,
-      value?.heroImage,
-      value?.videoSrcDesktop,
-      value?.videoSrcMobile,
-    ].filter((item) => typeof item === 'string' && item.trim());
+    // This gate is for duplicate imagery. Shared category videos are allowed and
+    // are already reported separately by audit-hero-banners.mjs.
+    const candidates = [value?.posterImage, value?.image, value?.heroImage]
+      .filter((item) => typeof item === 'string' && item.trim());
     for (const raw of candidates) {
       const asset = raw.split(/[?#]/)[0];
       if (REUSABLE_MEDIA.test(asset)) continue;
@@ -209,6 +215,7 @@ const report = {
     withinRouteDuplicates: withinRouteDuplicates.length,
     crossRouteHeroDuplicates: crossRouteHeroDuplicates.length,
     heroRegistryDuplicates: heroRegistryDuplicates.length,
+    sharedComponentDuplicateAdvisory: sharedComponentDuplicateAdvisory.length,
     crossRouteImageReuseAdvisory: crossRouteImageReuse.length,
   },
   blocking: {
@@ -217,6 +224,7 @@ const report = {
     heroRegistryDuplicates,
   },
   advisory: {
+    sharedComponentDuplicateAdvisory,
     crossRouteImageReuse,
   },
   routes: routeRecords,
@@ -233,31 +241,37 @@ function mdTable(headers, rows) {
 let md = `# Platform media duplicate audit\n\nGenerated: ${report.generatedAt}\n\n`;
 md += `## Summary\n\n`;
 md += `- Routes scanned: **${report.summary.routesScanned}**\n`;
-md += `- Duplicate non-brand media inside a route: **${report.summary.withinRouteDuplicates}**\n`;
-md += `- Hero media reused across active routes: **${report.summary.crossRouteHeroDuplicates}**\n`;
-md += `- Duplicate media entries in canonical hero registry: **${report.summary.heroRegistryDuplicates}**\n`;
-md += `- Cross-route non-hero image reuse (advisory): **${report.summary.crossRouteImageReuseAdvisory}**\n\n`;
+md += `- Duplicate non-brand media inside a route-owned page/component: **${report.summary.withinRouteDuplicates}**\n`;
+md += `- Route-owned hero images reused across active routes: **${report.summary.crossRouteHeroDuplicates}**\n`;
+md += `- Duplicate poster/image entries in canonical hero registry: **${report.summary.heroRegistryDuplicates}**\n`;
+md += `- Shared-component duplicate candidates (advisory): **${report.summary.sharedComponentDuplicateAdvisory}**\n`;
+md += `- Other cross-route image reuse (advisory): **${report.summary.crossRouteImageReuseAdvisory}**\n\n`;
 md += `## Blocking: duplicates inside one route\n\n`;
 md += mdTable(
-  ['App', 'Route', 'Asset', 'Locations'],
-  withinRouteDuplicates.map((item) => [item.app, item.route, item.asset, item.locations.join('<br>')]),
+  ['App', 'Route', 'Asset', 'Route-owned locations'],
+  withinRouteDuplicates.map((item) => [item.app, item.route, item.asset, item.ownedLocations.join('<br>')]),
 );
-md += `\n## Blocking: hero media reused across routes\n\n`;
+md += `\n## Blocking: route-owned hero images reused across routes\n\n`;
 md += mdTable(
   ['Asset', 'Routes'],
   crossRouteHeroDuplicates.map((item) => [item.asset, item.routes.join('<br>')]),
 );
-md += `\n## Blocking: duplicate canonical hero-registry media\n\n`;
+md += `\n## Blocking: duplicate canonical hero-registry poster/images\n\n`;
 md += mdTable(
   ['Asset', 'Hero keys'],
   heroRegistryDuplicates.map((item) => [item.asset, item.keys.join(', ')]),
+);
+md += `\n## Advisory: duplicate assets inside shared component trees\n\n`;
+md += mdTable(
+  ['App', 'Route', 'Asset', 'Locations'],
+  sharedComponentDuplicateAdvisory.slice(0, 250).map((item) => [item.app, item.route, item.asset, item.locations.join('<br>')]),
 );
 md += `\n## Advisory: other image reuse across routes\n\n`;
 md += mdTable(
   ['Asset', 'Routes'],
   crossRouteImageReuse.slice(0, 250).map((item) => [item.asset, item.routes.join('<br>')]),
 );
-md += `\n> Shared logos, icons, badges, seals, partner/sponsor assets, credentials, avatars, headshots, placeholders, QR codes, and watermarks are excluded from duplicate enforcement.\n`;
+md += `\n> Shared logos, icons, badges, seals, partner/sponsor assets, credentials, avatars, headshots, placeholders, QR codes, and watermarks are excluded. Shared category videos are reported by the existing hero audit but are not treated as duplicate-image failures here.\n`;
 
 fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
 fs.writeFileSync(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`);
@@ -265,9 +279,10 @@ fs.writeFileSync(OUT_MD, md);
 
 console.log('Platform media duplicate audit');
 console.log(`- routes scanned: ${report.summary.routesScanned}`);
-console.log(`- within-route duplicates: ${report.summary.withinRouteDuplicates}`);
-console.log(`- cross-route hero duplicates: ${report.summary.crossRouteHeroDuplicates}`);
-console.log(`- hero-registry duplicates: ${report.summary.heroRegistryDuplicates}`);
+console.log(`- route-owned within-route duplicates: ${report.summary.withinRouteDuplicates}`);
+console.log(`- route-owned cross-route hero duplicates: ${report.summary.crossRouteHeroDuplicates}`);
+console.log(`- hero-registry poster/image duplicates: ${report.summary.heroRegistryDuplicates}`);
+console.log(`- shared-component duplicate advisory: ${report.summary.sharedComponentDuplicateAdvisory}`);
 console.log(`- cross-route image reuse advisory: ${report.summary.crossRouteImageReuseAdvisory}`);
 
 const blockers =
@@ -276,8 +291,8 @@ const blockers =
   report.summary.heroRegistryDuplicates;
 
 if (blockers > 0) {
-  console.error(`FAIL: ${blockers} blocking duplicate-media findings. See ${sourceLabel(OUT_MD)}.`);
+  console.error(`FAIL: ${blockers} blocking duplicate-image findings. See ${sourceLabel(OUT_MD)}.`);
   process.exit(1);
 }
 
-console.log('PASS: no blocking duplicate non-brand imagery or hero media was found across active platform routes.');
+console.log('PASS: no blocking duplicate non-brand imagery or route-owned hero images were found across active platform routes.');

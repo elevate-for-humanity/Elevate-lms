@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
     ca-certificates \
+    ffmpeg \
     libcairo2-dev \
     libpango1.0-dev \
     libjpeg-dev \
@@ -40,6 +41,7 @@ RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"
+ENV FFMPEG_BIN=/usr/bin/ffmpeg
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
@@ -57,6 +59,7 @@ ENV BUILD_SCOPE=LMS
 ENV CI=true
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
+RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
 
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -111,6 +114,7 @@ FROM node:22-bookworm-slim AS runner
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    ffmpeg \
     fonts-liberation \
     libcairo2 \
     libpango-1.0-0 \
@@ -129,6 +133,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 ENV NODE_OPTIONS="--max-old-space-size=8192"
+ENV FFMPEG_BIN=/usr/bin/ffmpeg
 ENV NF_GIT_SHA=$NF_GIT_SHA
 ENV GIT_SHA=$NF_GIT_SHA
 ENV GITHUB_SHA=$NF_GIT_SHA
@@ -162,6 +167,7 @@ COPY --from=builder /app/public ./apps/lms/public
 COPY --from=builder /app/apps/lms/public ./apps/lms/public
 
 RUN test -d /app/apps/lms/public/images
+RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 
 EXPOSE 3000
 

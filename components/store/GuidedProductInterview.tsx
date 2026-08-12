@@ -72,7 +72,8 @@ export function GuidedProductInterview() {
   }
 
   function sendToDemo() {
-    const prompt = starterPrompt || messages.findLast((message) => message.role === 'user')?.text || '';
+    const lastUserMessage = [...messages].reverse().find((message) => message.role === 'user')?.text || '';
+    const prompt = starterPrompt || lastUserMessage;
     if (!prompt) return;
     window.dispatchEvent(new CustomEvent('elevate:paris-demo', { detail: { prompt } }));
     document.getElementById('website-builder-commercial')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

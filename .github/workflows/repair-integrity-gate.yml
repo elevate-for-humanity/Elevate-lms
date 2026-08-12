@@ -43,7 +43,6 @@ jobs:
               'apps/marketing/app/store/testing/page.tsx',
           ]:
               text = read(path)
-              # Add sizes only to fill Image blocks that do not already have one.
               text2 = re.sub(
                   r'(<Image\b(?:(?!/>)[\s\S])*?\bfill\b)(?=(?:(?!/>)[\s\S])*?/>)',
                   lambda m: m.group(1) if 'sizes=' in m.group(0) else m.group(1) + '\n          sizes="100vw"',
@@ -68,10 +67,9 @@ jobs:
           # 4-5: Testing page — keep the hero unique; WorkKeys and fallback get distinct images.
           path = 'apps/marketing/app/testing/page.tsx'
           text = read(path)
-          text = replace_nth(text, "'/images/pages/career-services-page-1.webp'", "'/images/pages/career-counseling-page-1.webp'", 1)
-          # First occurrence above is the WorkKeys provider map; hero uses double quotes and remains unchanged.
-          text = text.replace("'/images/pages/career-services-page-1.webp'\n                      }", "'/images/pages/certifications-page-1.webp'\n                      }", 1)
-          text = replace_nth(text, "'/images/pages/comp-pathway-classroom.webp'", "'/images/pages/healthcare-grad.jpg'", 2)
+          text = replace_nth(text, '/images/pages/career-services-page-1.webp', '/images/pages/career-counseling-page-1.webp', 1)
+          text = replace_nth(text, '/images/pages/career-services-page-1.webp', '/images/pages/certifications-page-1.webp', 2)
+          text = replace_nth(text, '/images/pages/comp-pathway-classroom.webp', '/images/pages/healthcare-grad.jpg', 2)
           write(path, text)
 
           # 6-7: Funding page — canonical hero constant + distinct WRG card image.
@@ -81,19 +79,19 @@ jobs:
           text = text.replace(hero, 'FUNDING_HERO')
           anchor = "import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';\n"
           text = text.replace(anchor, anchor + "\nconst FUNDING_HERO = '/images/pages/funding-page-5.webp';\n", 1)
-          text = replace_nth(text, "'/images/pages/funding-page-3.webp'", "'/images/pages/certifications-page-1.webp'", 2)
+          text = replace_nth(text, '/images/pages/funding-page-3.webp', '/images/pages/certifications-page-1.webp', 2)
           write(path, text)
 
           # 8: Success stories — second duplicate counseling image gets distinct graduate imagery.
           path = 'apps/marketing/app/success-stories/page.tsx'
           text = read(path)
-          text = replace_nth(text, "'/images/pages/career-counseling.jpg'", "'/images/pages/healthcare-grad.jpg'", 2)
+          text = replace_nth(text, '/images/pages/career-counseling.jpg', '/images/pages/healthcare-grad.jpg', 2)
           write(path, text)
 
           # 9: Blog — second repeated campaign hero gets a distinct editorial image.
           path = 'apps/marketing/app/blog/page.tsx'
           text = read(path)
-          text = replace_nth(text, "'/images/pages/admin-campaigns-hero.webp'", "'/images/pages/certifications-page-1.webp'", 2)
+          text = replace_nth(text, '/images/pages/admin-campaigns-hero.webp', '/images/pages/certifications-page-1.webp', 2)
           write(path, text)
 
           # 10: Cross-page hero collision: hire-graduates gets employer-specific imagery.

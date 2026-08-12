@@ -1,11 +1,10 @@
-// RLS-safe admin login — uses service role key to read profiles and effective roles.
+// PUBLIC ROUTE: authenticate first, then authorize from the authenticated session.
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
 import { getServerSupabaseEnvMisconfigurationReason } from '@/lib/supabase/server-env';
 import { applyNormalizedSupabaseUrlToEnv } from '@/lib/supabase/normalize-url';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { ADMIN_ROLES } from '@/lib/rbac/role-matrix';
+import { ADMIN_ROLES, normalizeRoles } from '@/lib/rbac/role-matrix';
 
 const ADMIN_PORTAL_LOGIN_ROLES = [
   ...ADMIN_ROLES,
@@ -17,7 +16,7 @@ const ADMIN_PORTAL_LOGIN_ROLES = [
 function jsonError(error: unknown): NextResponse {
   const message = error instanceof Error ? error.message : String(error ?? '');
   const configurationFailure =
-    /SUPABASE_SERVICE_ROLE_KEY|NEXT_PUBLIC_SUPABASE_URL|MISSING_ENV|createAdminClient|requireAdminClient/i.test(
+    /NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_ANON_KEY|SUPABASE_URL|SUPABASE_ANON_KEY|MISSING_ENV/i.test(
       message,
     );
 
@@ -32,8 +31,18 @@ function jsonError(error: unknown): NextResponse {
         ? 'Admin authentication is temporarily unavailable because the server authentication configuration is incomplete.'
         : 'Admin authentication failed unexpectedly. Please retry.',
     },
-    { status: configurationFailure ? 503 : 500 },
+    {
+      status: configurationFailure ? 503 : 500,
+      headers: { 'Cache-Control': 'no-store, private' },
+    },
   );
+}
+
+function json(body: Record<string, unknown>, status = 200): NextResponse {
+  return NextResponse.json(body, {
+    status,
+    headers: { 'Cache-Control': 'no-store, private' },
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -47,26 +56,32 @@ export async function POST(req: NextRequest) {
     const email = typeof body?.email === 'string' ? body.email.trim() : '';
     const password = typeof body?.password === 'string' ? body.password : '';
 
+    // This also serves as the production route-contract probe: an anonymous
+    // POST with an empty body must reach this handler and return JSON 400,
+    // never a middleware redirect or Next.js HTML document.
     if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password required.' }, { status: 400 });
+      return json({ error: 'Email and password required.' }, 400);
     }
 
     try {
       const { hydrateProcessEnv } = await import('@/lib/secrets');
       await hydrateProcessEnv();
     } catch {
-      // platform_secrets hydration unavailable — continue with injected env
+      // Secret hydration is optional for this route. Admin login only needs the
+      // public Supabase URL/anon key; authorization is evaluated through the
+      // newly authenticated user's own session and RLS policies.
     }
     applyNormalizedSupabaseUrlToEnv();
 
     const misconfigured = getServerSupabaseEnvMisconfigurationReason();
     if (misconfigured) {
-      return NextResponse.json(
+      console.error('[admin-login] Supabase public auth configuration invalid', { misconfigured });
+      return json(
         {
           error:
-            'Admin authentication is misconfigured on this server. Contact engineering to update Supabase keys in Northflank.',
+            'Admin authentication is misconfigured on this server. Contact engineering to update the Supabase public auth configuration in Northflank.',
         },
-        { status: 503 },
+        503,
       );
     }
 
@@ -79,21 +94,20 @@ export async function POST(req: NextRequest) {
     if (authError || !authData?.user) {
       const raw = authError?.message || 'Invalid email or password.';
       const invalidApiKey = /invalid api key/i.test(raw);
-      return NextResponse.json(
+      return json(
         {
           error: invalidApiKey
             ? 'Admin authentication is misconfigured (invalid Supabase anon key on this deployment). Contact engineering.'
             : raw,
         },
-        { status: invalidApiKey ? 503 : 401 },
+        invalidApiKey ? 503 : 401,
       );
     }
 
-    // requireAdminClient can throw on a cold start or missing service-role secret.
-    // Keep it inside this route-level try/catch so the client always receives JSON,
-    // never Next.js' HTML error document.
-    const db = await requireAdminClient();
-    const { data: profile, error: profileError } = await db
+    // Do not depend on SUPABASE_SERVICE_ROLE_KEY for interactive sign-in.
+    // The authenticated browser/server session must be able to read its own
+    // profile; the rest of the platform's route guards use the same RLS path.
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', authData.user.id)
@@ -101,47 +115,58 @@ export async function POST(req: NextRequest) {
 
     if (profileError) {
       await supabase.auth.signOut();
-      return NextResponse.json(
-        { error: `Profile load failed: ${profileError.message}. Contact support.` },
-        { status: 500 },
+      console.error('[admin-login] authenticated profile read failed', {
+        userId: authData.user.id,
+        code: profileError.code,
+        message: profileError.message,
+      });
+      return json(
+        { error: 'Your account authenticated, but its profile could not be verified. Please retry or contact support.' },
+        503,
       );
     }
 
-    if (!profile) {
+    if (!profile?.role) {
       await supabase.auth.signOut();
-      return NextResponse.json(
-        { error: 'No profile found for your account. Contact support.' },
-        { status: 403 },
-      );
+      return json({ error: 'No profile or role was found for your account. Contact support.' }, 403);
     }
 
-    const { data: roleRows, error: rolesError } = await db
+    const { data: roleRows, error: rolesError } = await supabase
       .from('user_roles')
       .select('roles(name)')
       .eq('user_id', authData.user.id);
 
-    if (rolesError) {
+    const secondaryRoles = rolesError
+      ? []
+      : (roleRows ?? [])
+          .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
+          .filter((role): role is string => typeof role === 'string');
+
+    const effectiveRoles = normalizeRoles([profile.role, ...secondaryRoles]);
+    const primaryRoleAllowed = ADMIN_PORTAL_LOGIN_ROLES.includes(profile.role);
+    const effectiveRoleAllowed = effectiveRoles.some((role) =>
+      ADMIN_PORTAL_LOGIN_ROLES.includes(role),
+    );
+
+    // If the primary profile role already grants Admin access, a secondary-role
+    // RLS failure must not block login. If access depends on a secondary role,
+    // however, fail closed because that role could not be verified.
+    if (rolesError && !primaryRoleAllowed) {
       await supabase.auth.signOut();
-      return NextResponse.json(
-        { error: 'Unable to verify your admin roles. Please retry.' },
-        { status: 500 },
-      );
+      console.error('[admin-login] secondary role verification failed', {
+        userId: authData.user.id,
+        code: rolesError.code,
+        message: rolesError.message,
+      });
+      return json({ error: 'Unable to verify your Admin portal role. Please retry.' }, 503);
     }
 
-    const secondaryRoles = (roleRows ?? [])
-      .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
-      .filter((role): role is string => typeof role === 'string');
-    const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles].filter(Boolean))) as string[];
-
-    if (!effectiveRoles.some((role) => ADMIN_PORTAL_LOGIN_ROLES.includes(role))) {
+    if (!primaryRoleAllowed && !effectiveRoleAllowed) {
       await supabase.auth.signOut();
-      return NextResponse.json(
-        { error: 'You do not have permission to access the admin portal.' },
-        { status: 403 },
-      );
+      return json({ error: 'You do not have permission to access the admin portal.' }, 403);
     }
 
-    return NextResponse.json({ ok: true, role: profile.role, effectiveRoles });
+    return json({ ok: true, role: profile.role, effectiveRoles });
   } catch (error) {
     return jsonError(error);
   }

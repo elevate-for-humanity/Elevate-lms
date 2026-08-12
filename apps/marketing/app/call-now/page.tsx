@@ -32,7 +32,7 @@ const START_OPTIONS = [
       'Not sure which program is right for you? Submit an inquiry and get a personalized response within 24 hours.',
     href: '/inquiry',
     action: 'Get Info',
-    image: '/images/pages/about-supportive-services.webp',
+    image: '/images/pages/career-counseling.jpg',
     imageAlt: 'Student receiving advising and support',
   },
   {
@@ -113,11 +113,11 @@ export default function GetStartedPage() {
                   />
                 </div>
                 <div className="p-8">
-                  <h3 className="mb-2 text-xl font-bold text-slate-900 transition-colors group-hover:text-brand-blue-600">
+                  <h3 className="mb-2 text-xl font-bold text-slate-950 transition-colors group-hover:text-brand-blue-700">
                     {option.title}
                   </h3>
-                  <p className="mb-4 text-slate-700">{option.description}</p>
-                  <span className="flex items-center gap-2 font-semibold text-brand-blue-600">
+                  <p className="mb-4 text-slate-800">{option.description}</p>
+                  <span className="flex items-center gap-2 font-semibold text-brand-blue-700">
                     {option.action} <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </span>
                 </div>
@@ -129,7 +129,7 @@ export default function GetStartedPage() {
 
       <section className="py-16">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="mb-8 text-2xl font-bold">Everything Is Self-Service</h2>
+          <h2 className="mb-8 text-2xl font-bold text-slate-950">Everything Is Self-Service</h2>
           <div className="grid gap-6 md:grid-cols-3">
             {[
               'Apply online in minutes',
@@ -140,10 +140,10 @@ export default function GetStartedPage() {
               'Enroll and start training',
             ].map((item) => (
               <div key={item} className="flex items-center justify-center gap-2">
-                <span className="flex-shrink-0 text-slate-400" aria-hidden="true">
+                <span className="flex-shrink-0 text-slate-600" aria-hidden="true">
                   •
                 </span>
-                <span className="text-slate-900">{item}</span>
+                <span className="text-slate-950">{item}</span>
               </div>
             ))}
           </div>

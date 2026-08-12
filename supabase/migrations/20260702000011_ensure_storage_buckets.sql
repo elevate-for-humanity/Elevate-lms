@@ -1,5 +1,6 @@
 -- Ensure all storage buckets referenced in application code exist.
 -- Uses ON CONFLICT DO NOTHING so re-running is safe.
+-- Canonical bucket naming is enforced here to prevent underscore/hyphen duplicates.
 
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES
@@ -12,25 +13,27 @@ VALUES
   ('files',                 'files',                 false, 104857600, NULL),
   ('media',                 'media',                 true,  104857600, ARRAY['image/jpeg','image/png','image/webp','image/gif','video/mp4','audio/mpeg']),
   ('avatars',               'avatars',               true,  5242880,   ARRAY['image/jpeg','image/png','image/webp']),
-  -- Course content (canonical names: course-content and course-videos, hyphenated)
+
+  -- Course content: canonical hyphenated bucket names only.
   ('course-content',        'course-content',        false, 524288000, NULL),
-  ('course_content',        'course_content',        false, 524288000, NULL),  -- legacy alias
   ('course-videos',         'course-videos',         false, 524288000, ARRAY['video/mp4','video/webm','video/quicktime']),
-  ('course_videos',         'course_videos',         false, 524288000, ARRAY['video/mp4','video/webm','video/quicktime']),  -- legacy alias
   ('curriculum',            'curriculum',            false, 104857600, NULL),
-  ('scorm_packages',        'scorm_packages',        false, 524288000, ARRAY['application/zip','application/x-zip-compressed']),
+  ('scorm-packages',        'scorm-packages',        false, 524288000, ARRAY['application/zip','application/x-zip-compressed']),
   ('videos',                'videos',                false, 524288000, ARRAY['video/mp4','video/webm','video/quicktime']),
-  -- Program holder / partner documents
-  ('program_holder_documents', 'program_holder_documents', false, 52428800, ARRAY['application/pdf','image/jpeg','image/png']),
+
+  -- Program holder / partner documents: canonical hyphenated name.
+  ('program-holder-documents', 'program-holder-documents', false, 52428800, ARRAY['application/pdf','image/jpeg','image/png']),
   ('provider_exports',      'provider_exports',      false, 104857600, ARRAY['application/pdf','text/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']),
+
+  -- SAM.gov integration currently uses this underscore bucket in runtime code.
   ('sam_documents',         'sam_documents',         false, 52428800,  ARRAY['application/pdf','image/jpeg','image/png']),
+
   -- Enrollment / apprenticeship
   ('enrollment-documents',  'enrollment-documents',  false, 52428800,  ARRAY['application/pdf','image/jpeg','image/png']),
   ('apprentice-uploads',    'apprentice-uploads',    false, 52428800,  NULL)
 ON CONFLICT (id) DO NOTHING;
 
--- RLS: authenticated users can upload to their own folder in documents bucket
--- (policy may already exist from 20260417000013 — use IF NOT EXISTS guard)
+-- RLS: authenticated users can upload to their own folder in documents bucket.
 DO $$
 BEGIN
   IF NOT EXISTS (

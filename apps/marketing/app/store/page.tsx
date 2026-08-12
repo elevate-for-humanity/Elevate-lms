@@ -1,4 +1,6 @@
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
 
 import type { Metadata } from 'next';
 import Link from 'next/link';

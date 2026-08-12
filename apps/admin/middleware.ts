@@ -14,6 +14,10 @@ import {
 const PUBLIC_PATHS = [
   '/login',
   '/unauthorized',
+  // The credential endpoint must be reachable before a Supabase session exists.
+  // If middleware redirects this POST to /login, Next.js returns HTML and the
+  // login form sees "Unexpected token '<' / <!DOCTYPE ... is not valid JSON".
+  '/api/auth/admin-login',
   '/api/health',
   '/api/ping',
   '/api/version',

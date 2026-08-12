@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, Save, ShieldCheck } from 'lucide-react';
 import CourseOperationsPanel from './CourseOperationsPanel';
+import CourseAutomationSummary from './CourseAutomationSummary';
 
 type Program = { id: string; title: string };
 type Course = {
@@ -294,6 +295,8 @@ export default function CourseGovernancePanel({
           await loadReadiness();
         }}
       />
+
+      <CourseAutomationSummary courseId={course.id} />
 
       <style jsx>{`
         .control{width:100%;border:1px solid rgb(51 65 85);border-radius:.5rem;background:rgb(2 6 23);padding:.55rem .75rem;color:white;font-size:.875rem}

@@ -8,6 +8,8 @@ import heroBanners from '@/content/heroBanners';
 
 export const revalidate = 3600;
 
+const HOW_IT_WORKS_HERO = '/images/pages/how-it-works-hero.webp';
+
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/how-it-works' },
   title: 'How It Works | Elevate For Humanity',
@@ -21,7 +23,7 @@ export const metadata: Metadata = {
     siteName: 'Elevate for Humanity',
     images: [
       {
-        url: '/images/pages/how-it-works-hero.webp',
+        url: HOW_IT_WORKS_HERO,
         width: 1200,
         height: 630,
         alt: 'How Elevate career training works',
@@ -33,7 +35,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'How It Works | Elevate for Humanity',
     description: 'From assessment to employment and follow-up support.',
-    images: ['/images/pages/how-it-works-hero.webp'],
+    images: [HOW_IT_WORKS_HERO],
   },
 };
 
@@ -79,7 +81,7 @@ export default function HowItWorksPage() {
                 step: '2',
                 title: 'Training & Certification',
                 desc: 'Enroll in an industry-recognized credential program matched to your career goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Programs run 4-16 weeks with instructor oversight. Some programs offer earn-while-you-learn apprenticeship pathways.',
-                image: '/images/pages/how-it-works-hero.webp',
+                image: '/images/pages/certifications-page-1.webp',
                 cta: 'View Programs',
                 href: '/programs',
                 external: false,

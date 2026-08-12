@@ -218,7 +218,7 @@ export default async function SuccessStoriesPage() {
         accentText="Stories"
         subheadline="Lives transformed through training and opportunity"
         description="Real people who transformed their lives through education, determination, and the right support at the right time."
-        imageSrc="/images/learners/reentry-coaching.jpg"
+        imageSrc="/images/pages/healthcare-grad.jpg"
         imageAlt="Success Stories"
         primaryCTA={{ text: 'Read Stories', href: '#stories' }}
         secondaryCTA={{ text: 'Start Your Journey', href: '/apply' }}

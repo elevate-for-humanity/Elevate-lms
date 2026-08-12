@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
+import {
   Shield, Lock, Eye, Database, Trash2, Download, Clock,
   Users, FileCheck, AlertTriangle, CheckCircle, ChevronDown,
   ChevronRight, Mail, Phone
@@ -19,7 +19,8 @@ export default function PrivacyPage() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-slate-900 via-brand-blue-900 to-brand-blue-800 text-white py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <Image src="/images/pages/privacy-hero.webp" alt="" fill className="object-cover" />
+          <Image src="/images/pages/privacy-hero.webp" alt="" fill
+          sizes="100vw" className="object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -34,7 +35,7 @@ export default function PrivacyPage() {
               Last updated: January 15, 2025
             </p>
             <p className="text-xl text-blue-100 leading-relaxed mb-8">
-              We take the protection of your personal data seriously. This policy explains how we collect, 
+              We take the protection of your personal data seriously. This policy explains how we collect,
               use, and safeguard your information while providing workforce development services.
             </p>
             <div className="flex flex-wrap gap-4">
@@ -235,7 +236,7 @@ export default function PrivacyPage() {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-800">
-                <strong>We never sell your data.</strong> Your personal information is never sold, rented, 
+                <strong>We never sell your data.</strong> Your personal information is never sold, rented,
                 or traded to third parties for marketing purposes.
               </p>
             </div>
@@ -263,7 +264,7 @@ export default function PrivacyPage() {
                 </span>
               </div>
               <p className="text-slate-600 text-sm">
-                Maintained for federal financial aid compliance, apprenticeship documentation, and 
+                Maintained for federal financial aid compliance, apprenticeship documentation, and
                 credential verification purposes.
               </p>
             </div>
@@ -276,7 +277,7 @@ export default function PrivacyPage() {
                 </span>
               </div>
               <p className="text-slate-600 text-sm">
-                OJL logs, RTI records, and competency documentation retained per Department of Labor 
+                OJL logs, RTI records, and competency documentation retained per Department of Labor
                 apprenticeship regulations.
               </p>
             </div>
@@ -301,7 +302,7 @@ export default function PrivacyPage() {
                 </span>
               </div>
               <p className="text-slate-600 text-sm">
-                Credentials and certification records are maintained permanently for verification 
+                Credentials and certification records are maintained permanently for verification
                 and employer reference purposes.
               </p>
             </div>
@@ -515,7 +516,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="font-bold text-slate-900 mb-1">Legal Review</h3>
                 <p className="text-slate-600 text-sm">
-                  We check for any legal hold requirements or regulatory retention mandates 
+                  We check for any legal hold requirements or regulatory retention mandates
                   that may affect deletion timing.
                 </p>
               </div>
@@ -556,7 +557,7 @@ export default function PrivacyPage() {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-amber-800">
-                <strong>Note:</strong> Some data may be retained longer due to legal requirements 
+                <strong>Note:</strong> Some data may be retained longer due to legal requirements
                 (e.g., financial records for tax purposes, apprenticeship records for DOL compliance).
                 We'll inform you of any such requirements.
               </p>

@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: 'Blog | Elevate For Humanity',
     description:
       'Workforce development insights, funding guides, credential explainers, and career training tips from Elevate for Humanity.',
-    images: ['/images/pages/social-media-1.jpg'],
+    images: ['/images/pages/certifications-page-1.webp'],
   },
 };
 

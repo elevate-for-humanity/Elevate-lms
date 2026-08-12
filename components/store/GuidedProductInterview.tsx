@@ -218,7 +218,7 @@ export function GuidedProductInterview() {
           <div className="rounded-3xl bg-slate-950 p-6 text-white md:p-8">
             <p className="text-sm font-black uppercase tracking-wider text-brand-red-300">Your recommended setup</p>
             {!goal || !org ? (
-              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-300">
+              <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-950 p-6 text-slate-100">
                 Choose a goal and organization type. Elevate will explain what to start with and why.
               </div>
             ) : (

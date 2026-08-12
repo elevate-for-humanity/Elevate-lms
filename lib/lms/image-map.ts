@@ -12,7 +12,7 @@ export const LMS_HEROES = {
   quizzes: '/images/pages/competency-test-hero.webp',
   schedule: '/images/pages/comp-home-highlight-success.webp',
   messages: '/images/pages/contact-hero.webp',
-  certificates: '/images/pages/certifications-hero.webp',
+  certificates: '/images/pages/comp-home-highlight-success.webp',
   assignments: '/images/pages/office-admin-desk.jpg',
   grades: '/images/pages/bookkeeping-ledger.webp',
   resources: '/images/pages/admin-courses-partners-hero.webp',

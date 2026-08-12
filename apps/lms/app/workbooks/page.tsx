@@ -99,7 +99,7 @@ export default function WorkbooksPage() {
           <p className="text-slate-600 mb-4">
             Having trouble accessing your workbooks? Contact our support team.
           </p>
-          <Link href="/support" className="inline-block bg-brand-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-brand-blue-700">
+          <Link href="/lms/support" className="inline-block bg-brand-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-brand-blue-700">
             Get Help
           </Link>
         </div>

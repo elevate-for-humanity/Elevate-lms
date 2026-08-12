@@ -192,7 +192,7 @@ export default async function PartnerBoardPage() {
           ? 'Complete'
           : 'Review',
       detail: 'Maintain the MOU, licenses, insurance, and required host-site files.',
-      image: '/images/pages/certifications-hero.webp',
+      image: '/images/pages/comp-home-highlight-success.webp',
     },
   ];
 

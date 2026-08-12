@@ -363,7 +363,7 @@ export default async function LibraryPage() {
               <span>Resources</span>
             </Link>
             <Link
-              href="/support"
+              href="/lms/support"
               className="flex items-center gap-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition"
             >
               <Star className="w-5 h-5" />

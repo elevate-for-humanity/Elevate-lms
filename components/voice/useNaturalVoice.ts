@@ -13,6 +13,7 @@ type PlayOptions = {
 export function useNaturalVoice() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const objectUrlRef = useRef<string | null>(null);
+  const browserSpeechRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -26,6 +27,10 @@ export function useNaturalVoice() {
   }, []);
 
   const stop = useCallback(() => {
+    if (typeof window !== 'undefined' && browserSpeechRef.current) {
+      window.speechSynthesis.cancel();
+      browserSpeechRef.current = null;
+    }
     const audio = audioRef.current;
     if (audio) {
       audio.pause();
@@ -102,6 +107,31 @@ export function useNaturalVoice() {
       await audio.play();
       return true;
     } catch (cause) {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.rate = Math.min(2, Math.max(0.5, options.rate || 1));
+        utterance.onstart = () => {
+          setIsLoading(false);
+          setIsPlaying(true);
+          setIsPaused(false);
+          setError(null);
+        };
+        utterance.onend = () => {
+          browserSpeechRef.current = null;
+          setIsPlaying(false);
+          setIsPaused(false);
+        };
+        utterance.onerror = () => {
+          browserSpeechRef.current = null;
+          setIsLoading(false);
+          setIsPlaying(false);
+          setIsPaused(false);
+          setError('Natural voice and browser narration are temporarily unavailable.');
+        };
+        browserSpeechRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
+        return true;
+      }
       setIsLoading(false);
       setIsPlaying(false);
       setIsPaused(false);

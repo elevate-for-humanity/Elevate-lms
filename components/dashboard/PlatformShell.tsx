@@ -360,7 +360,7 @@ export function PlatformShell({
 
             {/* Sidebar Footer */}
             <div className="p-4 border-t border-slate-700">
-              <Link href="/support" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm">
+              <Link href="/lms/support" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm">
                 <Bell className="w-4 h-4" />
                 Support
               </Link>

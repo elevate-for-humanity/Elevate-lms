@@ -329,7 +329,7 @@ export default async function ResourcesPage() {
                   Contact Support
                 </Link>
                 <Link
-                  href="/support"
+                  href="/lms/support"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-500 text-white rounded-lg font-semibold hover:bg-brand-blue-400 transition-colors"
                 >
                   <BookOpen className="w-5 h-5" />

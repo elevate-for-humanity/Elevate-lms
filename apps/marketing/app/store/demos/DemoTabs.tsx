@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   Shield,
@@ -9,9 +9,6 @@ import {
   BarChart3,
   ArrowRight,
   Play,
-  Pause,
-  Volume2,
-  VolumeX,
   ExternalLink,
   CheckCircle2,
   Layers3,
@@ -24,7 +21,6 @@ const DEMOS = [
     id: 'admin',
     label: 'Admin Dashboard',
     icon: Shield,
-    video: '/videos/dashboard-admin-narrated.mp4',
     liveHref: '/store/demo/admin',
     description:
       'Run enrollment, courses, compliance, funding and intervention work from one operating view instead of bouncing between disconnected systems.',
@@ -46,7 +42,6 @@ const DEMOS = [
     id: 'employer',
     label: 'Employer Portal',
     icon: Briefcase,
-    video: '/videos/dashboard-employer-narrated.mp4',
     liveHref: '/store/demo/employer',
     description:
       'Give employers one place to find talent, manage apprenticeship participation, review workforce activity and complete required documents.',
@@ -68,7 +63,6 @@ const DEMOS = [
     id: 'learner',
     label: 'Student Portal',
     icon: GraduationCap,
-    video: '/videos/dashboard-student-narrated.mp4',
     liveHref: '/store/demo/student',
     description:
       'Give learners one guided place for courses, progress, apprenticeship activity, credentials and next-step career support.',
@@ -90,8 +84,7 @@ const DEMOS = [
     id: 'workforce',
     label: 'Workforce Board',
     icon: BarChart3,
-    video: '/videos/dashboard-analytics-narrated.mp4',
-    liveHref: '/store/demo/admin?view=workforce',
+    liveHref: '/store/demo/institutional',
     description:
       'Manage eligibility, funding, provider activity, compliance and outcomes from the same data used to operate programs day to day.',
     buyer: 'Workforce boards, funded-program operators, agencies and provider networks',
@@ -112,41 +105,12 @@ const DEMOS = [
 
 export default function DemoTabs() {
   const [activeTab, setActiveTab] = useState('admin');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const active = DEMOS.find((demo) => demo.id === activeTab) || DEMOS[0];
 
-  const switchTab = useCallback((id: string) => {
+  const switchTab = (id: string) => {
     setActiveTab(id);
-    setIsPlaying(false);
-    setIsMuted(true);
-    const video = videoRef.current;
-    if (video) {
-      video.pause();
-      video.currentTime = 0;
-      video.muted = true;
-    }
-  }, []);
-
-  const togglePlay = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.play().then(() => setIsPlaying(true)).catch(() => {});
-    } else {
-      video.pause();
-      setIsPlaying(false);
-    }
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
-  }, []);
+  };
 
   return (
     <div>
@@ -171,60 +135,14 @@ export default function DemoTabs() {
 
       <div className="grid gap-7 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <div className="relative aspect-video overflow-hidden rounded-2xl bg-slate-950 shadow-xl">
-            <video
-              ref={videoRef}
-              key={active.video}
-              className="absolute inset-0 h-full w-full object-cover"
-              src={active.video}
-              muted
-              playsInline
-              preload="metadata"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => setIsPlaying(false)}
-            />
-
-            {!isPlaying && (
-              <button
-                type="button"
-                onClick={togglePlay}
-                className="absolute inset-0 z-10 flex cursor-pointer flex-col items-center justify-center bg-black/55 transition-colors hover:bg-black/65"
-                aria-label={`Play ${active.label} narrated walkthrough`}
-              >
-                <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg">
-                  <Play className="ml-1 h-7 w-7 text-brand-red-700" />
-                </div>
-                <span className="text-sm font-bold text-white">Watch the benefit-focused walkthrough</span>
-              </button>
-            )}
-
-            {isPlaying && (
-              <div className="absolute bottom-3 left-3 z-20 flex gap-2">
-                <button
-                  type="button"
-                  onClick={togglePlay}
-                  className="rounded-full bg-black/75 p-2 transition-colors hover:bg-black"
-                  aria-label="Pause demo"
-                >
-                  <Pause className="h-5 w-5 text-white" />
-                </button>
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                  className="rounded-full bg-black/75 p-2 transition-colors hover:bg-black"
-                  aria-label={isMuted ? 'Turn demo sound on' : 'Turn demo sound off'}
-                >
-                  {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
-                </button>
-              </div>
-            )}
-
-            <div className="absolute left-3 top-3 z-10">
-              <span className="rounded bg-black/80 px-2.5 py-1 text-xs font-bold text-white">
-                {active.label} Demo
-              </span>
-            </div>
+          <div className="flex aspect-video flex-col items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-8 text-center text-white shadow-xl">
+            <active.icon className="h-16 w-16 text-brand-red-400" />
+            <span className="mt-4 rounded bg-white/10 px-3 py-1 text-xs font-bold">Interactive sample workspace</span>
+            <h2 className="mt-4 text-3xl font-black">{active.label}</h2>
+            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-300">Open the working sample portal and use its guided controls. No missing video or prerecorded screen is required.</p>
+            <Link href={active.liveHref} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black hover:bg-brand-red-500">
+              <Play className="h-5 w-5" /> Launch interactive demo
+            </Link>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">

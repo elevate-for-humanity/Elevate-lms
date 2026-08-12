@@ -295,10 +295,10 @@ export function PlatformShell({
                 <div className="flex items-center gap-2 font-black"><ShieldCheck className="h-4 w-4" /> Secure workspace</div>
                 <p className="mt-1 leading-5 text-emerald-100/90">Your session is authenticated and portal access is role-restricted.</p>
               </div>
-              <Link href="/support" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
+              <Link href="/lms/support" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
                 <Bell className="h-4 w-4" /> Support
               </Link>
-              <Link href="/help" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
+              <Link href="/lms/help" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
                 <ExternalLink className="h-4 w-4" /> Help Center
               </Link>
             </div>

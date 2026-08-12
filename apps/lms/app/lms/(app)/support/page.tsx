@@ -207,7 +207,7 @@ export default async function SupportPage() {
               <h3 className="font-bold text-slate-900 mb-4">Other Ways to Reach Us</h3>
               <div className="space-y-4">
                 <a
-                  href="/support"
+                  href="/lms/support"
                   className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600"
                 >
                   <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">

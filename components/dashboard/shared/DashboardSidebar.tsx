@@ -85,11 +85,11 @@ export function DashboardSidebar({ role, sections, isOpen, onClose }: DashboardS
 
           {/* Sidebar Footer */}
           <div className="p-4 border-t border-slate-700 space-y-1">
-            <Link href="/support" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2">
+            <Link href="/lms/support" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2">
               <Bell className="w-4 h-4" />
               Support
             </Link>
-            <Link href="/help" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2">
+            <Link href="/lms/help" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2">
               <ExternalLink className="w-4 h-4" />
               Help Center
             </Link>

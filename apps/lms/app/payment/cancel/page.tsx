@@ -74,7 +74,7 @@ export default async function PaymentCancelPage() {
           <div className="mt-8 pt-8 border-t border-slate-200">
             <p className="text-sm text-black">
               Questions? Contact us at{' '}
-              <a href="/support" className="text-brand-orange-600 hover:underline">
+              <a href="/lms/support" className="text-brand-orange-600 hover:underline">
                 support center
               </a>{' '}
               or{' '}

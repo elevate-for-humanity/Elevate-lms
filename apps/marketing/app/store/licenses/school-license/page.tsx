@@ -5,7 +5,6 @@ import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Check, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
-import AvatarVideoOverlay from '@/components/AvatarVideoOverlay';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export default function SchoolLicensePage() {
@@ -13,15 +12,6 @@ export default function SchoolLicensePage() {
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Avatar Guide */}
-      <AvatarVideoOverlay 
-        videoSrc="/videos/avatars/store-assistant.mp4"
-        avatarName="Sales Guide"
-        position="top-right"
-        autoPlay={true}
-        showOnLoad={true}
-      />
-
       {/* Hero - Clean */}
       <section className="relative h-[clamp(190px,32vw,360px)] overflow-hidden">
           <Image

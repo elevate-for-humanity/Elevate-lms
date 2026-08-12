@@ -58,7 +58,7 @@ export default function AdminDemoPage() {
       <header className="sticky top-0 z-40 bg-slate-950 text-white shadow">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-3">
-            <Link href="/store" aria-label="Back to store" className="rounded-lg p-2 hover:bg-white/10">
+            <Link href="/store/demos" aria-label="Back to demo center" className="rounded-lg p-2 hover:bg-white/10">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>

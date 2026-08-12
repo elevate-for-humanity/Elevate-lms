@@ -42,7 +42,7 @@ export default async function ErrorPage({
               Go Home
             </Link>
             <Link
-              href="/support"
+              href="/lms/support"
               className="px-6 py-3 border border-slate-300 text-slate-900 rounded-lg hover:bg-white font-medium"
             >
               Contact Support

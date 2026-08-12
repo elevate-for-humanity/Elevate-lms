@@ -150,7 +150,7 @@ export default async function HelpPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-6">
             <a
-              href="/support"
+              href="/lms/support"
               className="flex items-center gap-4 p-4 rounded-xl hover:bg-white transition-colors"
             >
               <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center">

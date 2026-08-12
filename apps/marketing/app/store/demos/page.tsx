@@ -15,7 +15,7 @@ const demoLinks = [
   { title: 'Admin Dashboard', href: '/store/demo/admin', icon: Shield, description: 'Explore sample enrollment, course, and compliance views.' },
   { title: 'Employer Portal', href: '/store/demo/employer', icon: Briefcase, description: 'Explore sample jobs, candidates, and employer workflows.' },
   { title: 'Student Portal', href: '/store/demo/student', icon: GraduationCap, description: 'Explore sample courses, progress, and lesson navigation.' },
-  { title: 'Workforce View', href: '/store/demo/admin?view=workforce', icon: BarChart3, description: 'Explore the sample reporting and compliance perspective.' },
+  { title: 'Workforce View', href: '/store/demo/institutional', icon: BarChart3, description: 'Explore the sample reporting and compliance perspective.' },
 ];
 
 export default function StoreDemosPage() {
@@ -29,7 +29,7 @@ export default function StoreDemosPage() {
         <div className="mx-auto max-w-3xl">
           <span className="inline-flex items-center gap-2 rounded-full bg-brand-red-100 px-4 py-2 text-sm font-bold text-brand-red-700"><Play className="h-4 w-4" />Sample-data demos</span>
           <h1 className="mt-4 text-4xl font-black text-slate-950">See how the platform works</h1>
-          <p className="mt-4 text-lg text-slate-600">Narrated walkthroughs and interactive sample screens. Demo actions never write to production data.</p>
+          <p className="mt-4 text-lg text-slate-600">Guided interactive sample workspaces. Demo actions never write to production data.</p>
         </div>
       </section>
 

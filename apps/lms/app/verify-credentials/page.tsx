@@ -353,7 +353,7 @@ export default function VerifyCredentialsPage() {
                   <div>
                     <p className="text-sm text-slate-700">Phone</p>
                     <a
-                      href="/support"
+                      href="/lms/support"
                       className="font-medium text-slate-900 hover:text-brand-blue-600"
                     >
                       {PLATFORM_DEFAULTS.supportPhone}

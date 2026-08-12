@@ -56,7 +56,7 @@ const getAvatarConfig = (pathname: string) => {
   }
   if (pathname.includes('/store') || pathname.includes('/shop')) {
     return {
-      video: '/videos/avatars/store-assistant.mp4',
+      video: '',
       name: 'Store Assistant',
       message: 'Looking for courses, licenses, or tools? I can help you find what you need!',
     };
@@ -240,17 +240,23 @@ export default function AvatarChatBar() {
           {/* Avatar Video Section */}
           <div className="relative w-full lg:w-64 flex-shrink-0">
             <div className="relative aspect-video lg:aspect-square rounded-xl overflow-hidden shadow-lg bg-slate-900">
-              <video
-                ref={videoRef}
-                src={video}
-                className="w-full h-full object-cover"
-                loop
-                muted={isMuted}
-                playsInline
-              />
+              {video ? (
+                <video
+                  ref={videoRef}
+                  src={video}
+                  className="w-full h-full object-cover"
+                  loop
+                  muted={isMuted}
+                  playsInline
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-800 to-brand-blue-950">
+                  <MessageCircle className="h-14 w-14 text-white" aria-hidden="true" />
+                </div>
+              )}
 
               {/* Play/Pause Overlay */}
-              <button
+              {video ? <button
                 onClick={togglePlay}
                 className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
               >
@@ -261,7 +267,7 @@ export default function AvatarChatBar() {
                     <Play className="w-6 h-6 text-white" fill="white" />
                   )}
                 </div>
-              </button>
+              </button> : null}
 
               {/* Bottom Controls */}
               <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/55">

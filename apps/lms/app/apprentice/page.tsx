@@ -165,7 +165,7 @@ export default async function ApprenticePortalPage() {
       title: 'Documents',
       text: 'Review required agreements and uploaded records.',
       href: '/apprentice/documents',
-      image: '/images/pages/certifications-hero.webp',
+      image: '/images/pages/comp-home-highlight-success.webp',
     },
   ] as const;
 

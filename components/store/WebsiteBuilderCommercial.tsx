@@ -19,6 +19,7 @@ import {
   Sparkles,
   Star,
 } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type BuilderState = {
   generated: boolean;
@@ -70,7 +71,8 @@ const INITIAL_SITE: BuilderState = {
   location: 'Indianapolis, Indiana',
   tone: 'Modern',
   heroHeadline: 'Tell PARIS what you want to build.',
-  heroSubhead: 'Describe the business, services, style, and customer action. The preview will change from your instruction.',
+  heroSubhead:
+    'Describe the business, services, style, and customer action. The preview will change from your instruction.',
   primaryColor: '#b91c1c',
   secondaryColor: '#ecfeff',
   services: ['Service one', 'Service two', 'Service three'],
@@ -123,7 +125,8 @@ function SitePreview({ site }: { site: BuilderState }) {
           <Globe2 className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">
             {site.published ? 'www.' : 'preview.elevate.site/'}
-            {site.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'your-business'}
+            {site.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
+              'your-business'}
             {site.published ? '.com' : ''}
           </span>
         </div>
@@ -135,7 +138,9 @@ function SitePreview({ site }: { site: BuilderState }) {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-red-100 text-brand-red-700">
               <Sparkles className="h-8 w-8" />
             </div>
-            <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">Start with a conversation</p>
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">
+              Start with a conversation
+            </p>
             <h3 className="mt-2 text-3xl font-black text-slate-950">No blank canvas.</h3>
             <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
               Type or speak what you want. PARIS will turn the instruction into visible changes in this preview.
@@ -153,8 +158,12 @@ function SitePreview({ site }: { site: BuilderState }) {
                 >
                   {site.location} · {site.industry}
                 </span>
-                <h3 className="mt-4 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">{site.heroHeadline}</h3>
-                <p className="mt-3 max-w-xl text-sm font-semibold leading-6 text-slate-700">{site.heroSubhead}</p>
+                <h3 className="mt-4 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">
+                  {site.heroHeadline}
+                </h3>
+                <p className="mt-3 max-w-xl text-sm font-semibold leading-6 text-slate-700">
+                  {site.heroSubhead}
+                </p>
                 <div className="mt-5 flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -163,7 +172,10 @@ function SitePreview({ site }: { site: BuilderState }) {
                   >
                     {site.booking ? 'Book an appointment' : 'Get started'}
                   </button>
-                  <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-slate-800">
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-slate-800"
+                  >
                     View services
                   </button>
                 </div>
@@ -177,7 +189,10 @@ function SitePreview({ site }: { site: BuilderState }) {
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-black transition-opacity duration-500" style={{ opacity: site.brightness }} />
+                <div
+                  className="absolute inset-0 bg-black transition-opacity duration-500"
+                  style={{ opacity: site.brightness }}
+                />
               </div>
             </div>
           </section>
@@ -187,7 +202,9 @@ function SitePreview({ site }: { site: BuilderState }) {
               <article key={service} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="h-1.5 w-12 rounded-full" style={{ backgroundColor: site.primaryColor }} />
                 <h4 className="mt-3 text-sm font-black text-slate-950">{service}</h4>
-                <p className="mt-2 text-xs font-medium leading-5 text-slate-600">Professional information and a clear next action for customers.</p>
+                <p className="mt-2 text-xs font-medium leading-5 text-slate-600">
+                  Professional information and a clear next action for customers.
+                </p>
               </article>
             ))}
           </section>
@@ -245,9 +262,12 @@ function SitePreview({ site }: { site: BuilderState }) {
 export default function WebsiteBuilderCommercial() {
   const commercialAudioRef = useRef<HTMLAudioElement | null>(null);
   const recognitionRef = useRef<RecognitionLike | null>(null);
+  const naturalVoice = useNaturalVoice();
   const [site, setSite] = useState<BuilderState>(INITIAL_SITE);
   const [command, setCommand] = useState(EXAMPLE_PROMPT);
-  const [reply, setReply] = useState('Tell me what you want to build. I will update the preview from your instruction.');
+  const [reply, setReply] = useState(
+    'Tell me what you want to build. I will update the preview from your instruction.',
+  );
   const [history, setHistory] = useState<string[]>([]);
   const [working, setWorking] = useState(false);
   const [stage, setStage] = useState(0);
@@ -260,7 +280,10 @@ export default function WebsiteBuilderCommercial() {
       setStage(0);
       return;
     }
-    const timer = window.setInterval(() => setStage((current) => (current + 1) % BUILD_STAGES.length), 700);
+    const timer = window.setInterval(
+      () => setStage((current) => (current + 1) % BUILD_STAGES.length),
+      700,
+    );
     return () => window.clearInterval(timer);
   }, [working]);
 
@@ -279,15 +302,6 @@ export default function WebsiteBuilderCommercial() {
     if (site.generated) return 'Draft saved automatically';
     return 'Ready for your instruction';
   }, [site.generated, site.published, stage, working]);
-
-  function speak(text: string) {
-    if (!voiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.03;
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
-  }
 
   async function runCommand(value: string) {
     const message = value.trim();
@@ -309,12 +323,17 @@ export default function WebsiteBuilderCommercial() {
         setSite((current) => ({
           ...current,
           ...data.actions,
-          services: Array.isArray(data.actions?.services) && data.actions.services.length ? data.actions.services : current.services,
+          services:
+            Array.isArray(data.actions?.services) && data.actions.services.length
+              ? data.actions.services
+              : current.services,
         }));
       }
       const nextReply = data.reply || 'Done. The preview has been updated.';
       setReply(nextReply);
-      speak(nextReply);
+      if (voiceEnabled) {
+        void naturalVoice.play(nextReply, { voice: 'coral', style: 'assistant', rate: 1.03 });
+      }
     } catch (requestError) {
       console.error(requestError);
       setError('PARIS could not process that command. Try one of the quick commands below.');
@@ -360,17 +379,25 @@ export default function WebsiteBuilderCommercial() {
     recognition.start();
   }
 
+  function toggleParisVoice() {
+    if (voiceEnabled) naturalVoice.stop();
+    setVoiceEnabled((current) => !current);
+  }
+
   return (
     <section className="border-y border-cyan-100 bg-gradient-to-b from-cyan-50 via-white to-rose-50 px-4 py-14 text-slate-950 sm:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="mb-7 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-brand-red-700">Live PARIS Website Builder Demo</p>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-brand-red-700">
+              Live PARIS Website Builder Demo
+            </p>
             <h2 className="mt-2 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
               Tell PARIS what you want. Watch the website respond.
             </h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-7 text-slate-700 sm:text-base">
-              This demo now uses your actual instruction. Type or speak a request, then watch PARIS change the business, hero, brand, services, booking, financing, testimonials, mobile preview, and publish state.
+              This demo uses your actual instruction. Type or speak a request, then watch PARIS change the business,
+              hero, brand, services, booking, financing, testimonials, mobile preview, and publish state.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -384,7 +411,10 @@ export default function WebsiteBuilderCommercial() {
             >
               <Play className="h-5 w-5" /> Run dental example
             </button>
-            <Link href="/apps/website-builder/start-trial" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-5 font-black text-slate-950 hover:bg-slate-50">
+            <Link
+              href="/apps/website-builder/start-trial"
+              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-5 font-black text-slate-950 hover:bg-slate-50"
+            >
               Open the real builder
             </Link>
           </div>
@@ -436,9 +466,9 @@ export default function WebsiteBuilderCommercial() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setVoiceEnabled((current) => !current)}
+                  onClick={toggleParisVoice}
                   className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
-                  aria-label={voiceEnabled ? 'Mute PARIS voice' : 'Enable PARIS voice'}
+                  aria-label={voiceEnabled ? 'Mute PARIS natural voice' : 'Enable PARIS natural voice'}
                 >
                   {voiceEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
                 </button>
@@ -449,12 +479,19 @@ export default function WebsiteBuilderCommercial() {
                   <span className="flex items-center gap-2 font-black text-cyan-800">
                     <Loader2 className="h-4 w-4 animate-spin" /> {BUILD_STAGES[stage]}
                   </span>
+                ) : naturalVoice.isLoading ? (
+                  <span className="flex items-center gap-2 font-black text-cyan-800">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Preparing PARIS natural voice…
+                  </span>
                 ) : (
                   reply
                 )}
               </div>
 
-              <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500" htmlFor="paris-builder-command">
+              <label
+                className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500"
+                htmlFor="paris-builder-command"
+              >
                 Tell PARIS what to build or change
               </label>
               <textarea
@@ -470,7 +507,11 @@ export default function WebsiteBuilderCommercial() {
                 <button
                   type="button"
                   onClick={startListening}
-                  className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-black ${listening ? 'border-brand-red-300 bg-brand-red-50 text-brand-red-800' : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50'}`}
+                  className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-black ${
+                    listening
+                      ? 'border-brand-red-300 bg-brand-red-50 text-brand-red-800'
+                      : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50'
+                  }`}
                 >
                   {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                   {listening ? 'Listening…' : 'Speak'}
@@ -486,7 +527,11 @@ export default function WebsiteBuilderCommercial() {
                 </button>
               </div>
 
-              {error && <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-bold leading-5 text-amber-900">{error}</p>}
+              {(error || naturalVoice.error) && (
+                <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-bold leading-5 text-amber-900">
+                  {error || naturalVoice.error}
+                </p>
+              )}
 
               <div className="mt-5">
                 <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Try a real change</p>
@@ -513,7 +558,10 @@ export default function WebsiteBuilderCommercial() {
                   <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Recent instructions</p>
                   <div className="mt-2 space-y-2">
                     {history.slice(-3).reverse().map((item, index) => (
-                      <div key={`${item}-${index}`} className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] font-semibold leading-5 text-slate-600">
+                      <div
+                        key={`${item}-${index}`}
+                        className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] font-semibold leading-5 text-slate-600"
+                      >
                         “{item}”
                       </div>
                     ))}
@@ -526,7 +574,8 @@ export default function WebsiteBuilderCommercial() {
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-3xl text-xs font-bold leading-5 text-slate-600">
-            This is a public interactive product demonstration. It applies PARIS-generated demo actions to the preview; the authenticated Website Builder is the production workspace that saves and publishes customer sites.
+            This is a public interactive product demonstration. It applies PARIS-generated demo actions to the preview;
+            the authenticated Website Builder is the production workspace that saves and publishes customer sites.
           </p>
           <button
             type="button"

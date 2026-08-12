@@ -157,6 +157,31 @@ jobs:
           cat /tmp/admin-health.json 2>/dev/null || true
           exit 1
 
+      - name: Smoke Admin login API contract
+        run: |
+          set -euo pipefail
+          headers=/tmp/admin-login-headers.txt
+          body=/tmp/admin-login-body.json
+          status=$(curl -sk --max-time 15 \
+            -D "$headers" \
+            -o "$body" \
+            -w "%{http_code}" \
+            -X POST \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            --data '{}' \
+            https://admin.elevateforhumanity.org/api/auth/admin-login || true)
+          content_type=$(awk 'BEGIN{IGNORECASE=1} /^content-type:/ {print $2}' "$headers" | tr -d '\r' | tail -1)
+          echo "Admin login contract: status=${status} content-type=${content_type}"
+          cat "$body" || true
+          test "$status" = "400"
+          echo "$content_type" | grep -qi '^application/json'
+          grep -q '"error":"Email and password required."' "$body"
+          if grep -qi '<!DOCTYPE\|<html' "$body"; then
+            echo 'Admin login endpoint returned HTML instead of JSON.'
+            exit 1
+          fi
+
       - name: Verify deployed SHA matches main
         env:
           EXPECTED_SHA: ${{ github.sha }}

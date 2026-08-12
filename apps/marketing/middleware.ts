@@ -65,18 +65,10 @@ function isStaticRequest(pathname: string) {
 function isCustomTenantHost(host: string) {
   if (!host || host === 'localhost' || host === '127.0.0.1' || host === '::1') return false;
   if (ELEVATE_PUBLIC_HOSTS.has(host)) return false;
-  // Named Elevate service hosts are not customer domains. Wildcard tenant
-  // subdomains are handled separately by tenantSlugFromAppHost().
   if (host.endsWith('.elevateforhumanity.org')) return false;
   return true;
 }
 
-/**
- * Marketing is public, but it also serves Website Builder tenant sites.
- * Host routing must happen before portal authentication so a published tenant
- * domain resolves to /tenant-site while Elevate's own public routes remain
- * untouched.
- */
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
@@ -86,14 +78,17 @@ export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
-  // {subdomain}.app.elevateforhumanity.org → public Website Builder site.
+  // Tenant forms/analytics APIs must execute as API routes on the tenant host;
+  // they resolve the published tenant from Host/x-forwarded-host themselves.
+  if (pathname.startsWith('/api/tenant-sites/')) {
+    return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
   const tenantSlug = tenantSlugFromAppHost(host);
   if (tenantSlug) {
     return rewriteTenantAppHostRequest(req, tenantSlug, pathname, requestHeaders);
   }
 
-  // Customer-owned domains routed to the Marketing service are resolved by
-  // hostname in the tenant loader. Unknown domains safely end at tenant 404.
   if (isCustomTenantHost(host)) {
     return rewriteCustomDomainRequest(req, host, pathname, requestHeaders);
   }

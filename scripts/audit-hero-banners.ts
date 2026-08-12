@@ -1,10 +1,9 @@
 /**
  * Hero-system pre-merge gate.
  *
- * Verifies both program-banner copy contracts and the production hero-media
- * architecture: one assigned video per page, no duplicate effective video URLs,
- * picture fallback for pages without video, one canonical renderer, and synced
- * packaged hero JSON.
+ * Verifies program-banner copy contracts, production hero media, packaged
+ * image existence, canonical renderer delegation, and critical active Marketing
+ * route coverage.
  */
 
 import fs from 'node:fs';
@@ -13,10 +12,7 @@ import heroBanners, {
   internalProgramHeroBanners,
   type ProgramHeroBannerConfig,
 } from '../content/heroBanners';
-import {
-  HERO_VIDEO_BY_PAGE_KEY,
-  VIDEO_REGISTRY,
-} from '../lib/video/registry';
+import { HERO_VIDEO_BY_PAGE_KEY, VIDEO_REGISTRY } from '../lib/video/registry';
 
 const BANNED_PHRASES = [
   'rewarding career',
@@ -30,6 +26,8 @@ const BANNED_PHRASES = [
   'bright future',
   'take the next step',
 ];
+
+const root = process.cwd();
 
 function auditBanner(slug: string, b: ProgramHeroBannerConfig): string[] {
   const issues: string[] = [];
@@ -94,6 +92,20 @@ function mediaKey(value?: string): string | undefined {
   }
 }
 
+function localPublicAssetExists(value?: string): boolean {
+  if (!value || !value.startsWith('/')) return true;
+  const clean = value.split(/[?#]/)[0].replace(/^\//, '');
+  return [
+    path.join(root, 'public', clean),
+    path.join(root, 'apps/marketing/public', clean),
+  ].some((candidate) => fs.existsSync(candidate));
+}
+
+function readIfPresent(relative: string): string | null {
+  const absolute = path.join(root, relative);
+  return fs.existsSync(absolute) ? fs.readFileSync(absolute, 'utf8') : null;
+}
+
 let failures = 0;
 
 for (const [slug, banner] of Object.entries(internalProgramHeroBanners)) {
@@ -124,7 +136,8 @@ for (const [pageKey, videoId] of Object.entries(HERO_VIDEO_BY_PAGE_KEY)) {
   }
 }
 
-// Effective normalized hero media must not repeat across page keys.
+// Effective normalized hero media must not repeat across page keys and local
+// poster paths must exist in a public source that is packaged into Marketing.
 const effectiveUses = new Map<string, string[]>();
 for (const [pageKey, banner] of Object.entries(heroBanners)) {
   const src = banner.videoSrcDesktop || banner.videoSrcMobile;
@@ -134,8 +147,14 @@ for (const [pageKey, banner] of Object.entries(heroBanners)) {
     list.push(pageKey);
     effectiveUses.set(key, list);
   }
+
   if (!src && !banner.posterImage) {
     console.error(`FAIL ${pageKey} has neither hero video nor poster image`);
+    failures += 1;
+  }
+
+  if (banner.posterImage && !localPublicAssetExists(banner.posterImage)) {
+    console.error(`FAIL ${pageKey} poster image does not exist: ${banner.posterImage}`);
     failures += 1;
   }
 }
@@ -147,10 +166,17 @@ for (const [media, pageKeys] of effectiveUses) {
   }
 }
 
-// Root source and packaged Marketing copy must remain identical.
-const root = process.cwd();
+// Root source and packaged Marketing copy must both exist and remain identical.
 const canonicalJson = path.join(root, 'public/data/hero-banners.json');
 const marketingJson = path.join(root, 'apps/marketing/public/data/hero-banners.json');
+if (!fs.existsSync(canonicalJson)) {
+  console.error('FAIL public/data/hero-banners.json is missing');
+  failures += 1;
+}
+if (!fs.existsSync(marketingJson)) {
+  console.error('FAIL apps/marketing/public/data/hero-banners.json is missing');
+  failures += 1;
+}
 if (fs.existsSync(canonicalJson) && fs.existsSync(marketingJson)) {
   const canonical = fs.readFileSync(canonicalJson, 'utf8').trim();
   const packaged = fs.readFileSync(marketingJson, 'utf8').trim();
@@ -161,20 +187,48 @@ if (fs.existsSync(canonicalJson) && fs.existsSync(marketingJson)) {
 }
 
 // Compatibility wrappers must delegate playback to the canonical renderer.
-const wrapperChecks = [
-  'components/ui/HomeHeroVideo.tsx',
-  'components/ui/PageVideoHero.tsx',
-];
+const wrapperChecks = ['components/ui/HomeHeroVideo.tsx', 'components/ui/PageVideoHero.tsx'];
 for (const relative of wrapperChecks) {
-  const absolute = path.join(root, relative);
-  if (!fs.existsSync(absolute)) continue;
-  const source = fs.readFileSync(absolute, 'utf8');
+  const source = readIfPresent(relative);
+  if (source === null) continue;
   if (!source.includes("@/components/marketing/HeroVideo")) {
     console.error(`FAIL ${relative} does not delegate to canonical HeroVideo`);
     failures += 1;
   }
   if (/<video\b/i.test(source)) {
     console.error(`FAIL ${relative} contains its own <video> playback implementation`);
+    failures += 1;
+  }
+}
+
+// Critical public routes must not regress back to hand-built hero sections.
+const criticalRouteChecks = [
+  {
+    file: 'apps/marketing/app/call-now/page.tsx',
+    description: 'Get Started',
+    acceptedMarkers: ["@/components/marketing/HeroPicture", "@/components/marketing/HeroVideo"],
+  },
+  {
+    file: 'apps/marketing/app/page.tsx',
+    description: 'Homepage',
+    acceptedMarkers: ['HomeHeroVideo', "@/components/marketing/HeroVideo"],
+  },
+  {
+    file: 'apps/marketing/app/programs/[program]/page.tsx',
+    description: 'Program detail renderer',
+    acceptedMarkers: ['ProgramDetailPage', 'HeroPicture', 'HeroVideo'],
+  },
+];
+
+for (const check of criticalRouteChecks) {
+  const source = readIfPresent(check.file);
+  if (source === null) {
+    console.error(`FAIL ${check.description} route is missing: ${check.file}`);
+    failures += 1;
+    continue;
+  }
+  if (!check.acceptedMarkers.some((marker) => source.includes(marker))) {
+    console.error(`FAIL ${check.description} bypasses the canonical hero system: ${check.file}`);
     failures += 1;
   }
 }
@@ -188,10 +242,11 @@ if (fs.existsSync(storeHeroLegacy)) {
 console.log(`Audited ${Object.keys(heroBanners).length} normalized hero entries.`);
 console.log(`Audited ${Object.keys(HERO_VIDEO_BY_PAGE_KEY).length} dedicated hero video assignments.`);
 console.log(`Audited ${Object.keys(internalProgramHeroBanners).length} internal program banner contracts.`);
+console.log(`Audited ${criticalRouteChecks.length} critical active Marketing hero routes.`);
 
 if (failures > 0) {
   console.error(`\n${failures} hero-system failure(s). Fix before merging.\n`);
   process.exit(1);
 }
 
-console.log('Hero system passes canonical renderer/media checks.');
+console.log('Hero system passes renderer, media, asset, and route checks.');

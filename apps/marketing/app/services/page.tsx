@@ -83,7 +83,7 @@ export default function ServicesPage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image
-            src="/images/pages/services-page-1.webp"
+            src="/images/pages/career-services-page-12.webp"
             alt="Support Services"
             fill
             className="object-cover"

@@ -126,7 +126,7 @@ export default async function PartnerBoardPage() {
         <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-52 w-full">
-              <Image src="/images/pages/apprenticeship-structure.webp" alt="Host Shop apprenticeship workspace" fill priority className="object-cover" sizes="100vw" />
+              <Image src="/images/pages/workforce-board-page-7.webp" alt="Host Shop apprenticeship workspace" fill priority className="object-cover" sizes="100vw" />
             </div>
             <div className="p-7 sm:p-9">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Admin portal access</p>

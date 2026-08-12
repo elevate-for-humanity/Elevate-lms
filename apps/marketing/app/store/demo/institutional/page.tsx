@@ -55,7 +55,7 @@ export default function InstitutionalDemoPage() {
       {/* Header */}
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/store" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors">
+          <Link href="/store/demos" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Licenses
           </Link>

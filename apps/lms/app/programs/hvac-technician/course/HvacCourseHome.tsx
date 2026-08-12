@@ -61,15 +61,15 @@ const MODULE_PHOTO: string[] = [
   '/images/pages/hvac-technician.webp', // 4  Heating — HVAC tech at work
   '/images/pages/hvac-technician.webp', // 5  Cooling — technician on unit
   '/images/pages/hvac-unit.webp', // 6  EPA Core — HVAC overview
-  '/images/hvac/hvac-service-tech.jpg', // 7  EPA Type I — service tech
-  '/images/hvac/hvac-commercial.jpg', // 8  EPA Type II — commercial system
+  '/images/pexels/hvac.webp', // 7  EPA Type I — service tech
+  '/images/pages/programs-hvac-course-hero.webp', // 8  EPA Type II — commercial system
   '/images/pages/electrical.webp', // 9  EPA Type III — electrical/controls
-  '/images/hvac/hvac-tools-equipment.jpg', // 10 EPA Final — tools & testing
+  '/images/pages/hvac-tools.webp', // 10 EPA Final — tools & testing
   '/images/pages/plumbing.jpg', // 11 Refrigerant — piping/lines
   '/images/pages/construction-trades.webp', // 12 Installation — construction site
   '/images/pages/electrical-wiring.jpg', // 13 Troubleshooting — diagnostics
   '/images/pages/construction-trades.webp', // 14 OSHA — safety/trades
-  '/images/healthcare/cpr-certification-group.jpg', // 15 CPR — group certification
+  '/images/pages/cpr-training-real.webp', // 15 CPR — group certification
   '/images/career-coaching-new.jpg', // 16 Career — coaching session
 ];
 

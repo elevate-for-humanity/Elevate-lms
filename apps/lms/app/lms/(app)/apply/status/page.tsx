@@ -213,7 +213,7 @@ export default function ApplicationStatusPage() {
       <div className="mt-6 text-center">
         <p className="text-slate-700">
           Questions? Contact us at{' '}
-          <a href="/support" className="text-emerald-600 font-medium">
+          <a href="/lms/support" className="text-emerald-600 font-medium">
             support center
           </a>
         </p>

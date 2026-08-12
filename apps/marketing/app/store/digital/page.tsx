@@ -5,8 +5,6 @@ import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import LazyVideo from '@/components/ui/LazyVideo';
-import StoreProductVideo from '../StoreProductVideo';
 import { 
   Download, FileText, Video, BookOpen, Check, ArrowRight, Zap, 
   Shield, MessageCircle, Play, Sparkles, Users, Building2, DollarSign 
@@ -39,8 +37,7 @@ export default function StoreDigitalPage() {
 {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-          <LazyVideo src="/videos/store-marketplace.mp4" poster="/images/pages/programs-hero.webp"
-            className="absolute inset-0 w-full h-full object-cover" />
+          <Image src="/images/pages/programs-hero.webp" alt="Elevate digital tools and resources" fill priority className="object-cover" sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -71,45 +68,30 @@ export default function StoreDigitalPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-black text-slate-900 mb-4">See Our Tools in Action</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">Watch quick demos of our most popular digital resources</p>
+            <p className="text-slate-600 max-w-2xl mx-auto">Open working previews of our most popular digital resources</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl overflow-hidden">
-              <StoreProductVideo
-                src="/videos/store/store-ai-studio.mp4"
-                poster="/images/pages/store-digital-hero.webp"
-                alt="AI Studio demo"
-                label="AI Studio Demo"
-              />
+            <Link href="/store/demo/ai-studio" className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg">
+              <div className="relative aspect-video"><Image src="/images/pages/store-digital-hero.webp" alt="AI Studio interactive demo" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" /></div>
               <div className="p-4">
                 <h3 className="font-bold text-slate-900">AI Studio Demo</h3>
                 <p className="text-sm text-slate-600">Generate videos, images & voiceovers</p>
               </div>
-            </div>
-            <div className="bg-white rounded-2xl overflow-hidden">
-              <StoreProductVideo
-                src="/videos/store/store-sam-gov.mp4"
-                poster="/images/pages/store-digital-detail1.webp"
-                alt="SAM.gov Assistant demo"
-                label="SAM.gov Walkthrough"
-              />
+            </Link>
+            <Link href="/store/sam-gov-assistant" className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg">
+              <div className="relative aspect-video"><Image src="/images/pages/store-digital-detail1.webp" alt="SAM.gov Assistant walkthrough" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" /></div>
               <div className="p-4">
                 <h3 className="font-bold text-slate-900">SAM.gov Walkthrough</h3>
                 <p className="text-sm text-slate-600">Step-by-step registration guide</p>
               </div>
-            </div>
-            <div className="bg-white rounded-2xl overflow-hidden">
-              <StoreProductVideo
-                src="/videos/store/store-digital-resources.mp4"
-                poster="/images/pages/store-digital-detail2.webp"
-                alt="Digital resources demo"
-                label="Digital Resources Overview"
-              />
+            </Link>
+            <Link href="#ai-tools" className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg">
+              <div className="relative aspect-video"><Image src="/images/pages/store-digital-detail2.webp" alt="Digital resources catalog" fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" /></div>
               <div className="p-4">
                 <h3 className="font-bold text-slate-900">Digital Resources</h3>
                 <p className="text-sm text-slate-600">Toolkits, guides & templates</p>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

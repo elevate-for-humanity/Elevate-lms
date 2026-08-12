@@ -230,9 +230,9 @@ export default async function StudentDashboard() {
   const learningTools = [
     { href: '/lms/courses', label: 'My Courses', text: 'Open your assigned courses and curriculum.', image: '/images/pages/training-classroom.webp' },
     { href: '/lms/assignments', label: 'Assignments', text: 'Review work, activities, and required submissions.', image: '/images/pages/office-admin-desk.jpg' },
-    { href: '/lms/certificates', label: 'Certificates', text: 'View earned and verified training credentials.', image: '/images/pages/certifications-hero.webp' },
+    { href: '/lms/certificates', label: 'Certificates', text: 'View earned and verified training credentials.', image: '/images/pages/comp-home-highlight-success.webp' },
     { href: '/lms/calendar', label: 'Schedule', text: 'Review classes, deadlines, and upcoming activity.', image: '/images/pages/career-counseling.jpg' },
-    { href: '/lms/messages', label: 'Messages', text: 'Open learner communications and program messages.', image: '/images/pages/contact-hero.webp' },
+    { href: '/lms/messages', label: 'Messages', text: 'Open learner communications and program messages.', image: '/images/pages/contact-hero.jpg' },
     { href: '/lms/support', label: 'Get Help', text: 'Reach learner support when you need assistance.', image: '/images/pages/about-hero.webp' },
   ];
 

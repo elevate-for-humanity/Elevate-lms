@@ -160,7 +160,7 @@ export default function OrientationPage() {
             Reach out to our student support team anytime. Paris AI is also available 24/7.
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Link href="/support" className="bg-slate-200 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-300 transition-colors">
+            <Link href="/lms/support" className="bg-slate-200 text-slate-700 font-semibold py-3 px-6 rounded-lg hover:bg-slate-300 transition-colors">
               Contact Support
             </Link>
             <Link href="/lms" className="bg-brand-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-brand-blue-700 transition-colors">

@@ -47,21 +47,29 @@ export async function handleNaturalVoiceRequest(request: Request) {
     return Response.json({ error: 'Natural voice service is not configured.' }, { status: 503 });
   }
 
-  const openai = getOpenAIClient();
-  const speech = await openai.audio.speech.create({
-    model: 'gpt-4o-mini-tts',
-    voice: voice as any,
-    input: text,
-    instructions,
-    response_format: 'mp3',
-  });
+  try {
+    const openai = getOpenAIClient();
+    const speech = await openai.audio.speech.create({
+      model: 'gpt-4o-mini-tts',
+      voice: voice as any,
+      input: text,
+      instructions,
+      response_format: 'mp3',
+    });
 
-  const audio = await speech.arrayBuffer();
-  return new Response(audio, {
-    headers: {
-      'Content-Type': 'audio/mpeg',
-      'Cache-Control': 'private, no-store, max-age=0',
-      'Content-Disposition': 'inline; filename="elevate-natural-voice.mp3"',
-    },
-  });
+    const audio = await speech.arrayBuffer();
+    return new Response(audio, {
+      headers: {
+        'Content-Type': 'audio/mpeg',
+        'Cache-Control': 'private, no-store, max-age=0',
+        'Content-Disposition': 'inline; filename="elevate-natural-voice.mp3"',
+      },
+    });
+  } catch (cause) {
+    console.error('[natural-voice] Speech generation failed', cause instanceof Error ? cause.message : 'unknown provider error');
+    return Response.json(
+      { error: 'Natural voice is temporarily unavailable.', fallback: 'browser' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
 }

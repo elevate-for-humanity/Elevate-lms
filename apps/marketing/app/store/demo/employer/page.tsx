@@ -56,7 +56,7 @@ export default function EmployerDemoPage() {
     <main className="min-h-screen bg-slate-100">
       <header className="sticky top-0 z-40 bg-emerald-800 text-white shadow">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4">
-          <div className="flex items-center gap-3"><Link href="/store" className="rounded-lg p-2 hover:bg-white/10" aria-label="Back to store"><ArrowLeft className="h-5 w-5" /></Link><div><p className="text-xs font-bold uppercase tracking-wider text-emerald-200">Sample data · Interactive demo</p><h1 className="font-black">Employer Portal</h1></div></div>
+          <div className="flex items-center gap-3"><Link href="/store/demos" className="rounded-lg p-2 hover:bg-white/10" aria-label="Back to demo center"><ArrowLeft className="h-5 w-5" /></Link><div><p className="text-xs font-bold uppercase tracking-wider text-emerald-200">Sample data · Interactive demo</p><h1 className="font-black">Employer Portal</h1></div></div>
           <Link href="/store/trial" className="rounded-lg bg-white px-4 py-2 text-sm font-bold text-emerald-900">Start Trial</Link>
         </div>
       </header>

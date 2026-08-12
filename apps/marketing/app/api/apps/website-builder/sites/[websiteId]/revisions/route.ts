@@ -41,12 +41,13 @@ export async function GET(
   const { websiteId } = await params;
   const auth = await authorize(websiteId);
   if (auth.response) return auth.response;
+  if (!auth.user || !auth.site) return NextResponse.json({ error: 'Website authorization failed' }, { status: 500 });
 
   const { data, error } = await auth.supabase
     .from('website_revisions')
     .select('id, site_name, subdomain, is_published, reason, created_at')
     .eq('website_id', websiteId)
-    .eq('user_id', auth.user!.id)
+    .eq('user_id', auth.user.id)
     .order('created_at', { ascending: false })
     .limit(30);
 
@@ -61,6 +62,7 @@ export async function POST(
   const { websiteId } = await params;
   const auth = await authorize(websiteId);
   if (auth.response) return auth.response;
+  if (!auth.user || !auth.site) return NextResponse.json({ error: 'Website authorization failed' }, { status: 500 });
 
   const body = await request.json().catch(() => ({}));
   const revisionId = typeof body.revisionId === 'string' ? body.revisionId : '';
@@ -71,16 +73,15 @@ export async function POST(
     .select('id, site_name, subdomain, site_config, is_published')
     .eq('id', revisionId)
     .eq('website_id', websiteId)
-    .eq('user_id', auth.user!.id)
+    .eq('user_id', auth.user.id)
     .maybeSingle();
 
   if (revisionError) return NextResponse.json({ error: revisionError.message }, { status: 500 });
   if (!revision) return NextResponse.json({ error: 'Revision not found' }, { status: 404 });
 
-  // Preserve the current state so a restore can itself be undone.
   await auth.supabase.from('website_revisions').insert({
     website_id: websiteId,
-    user_id: auth.user!.id,
+    user_id: auth.user.id,
     site_name: auth.site.site_name,
     subdomain: auth.site.subdomain,
     site_config: auth.site.site_config || {},
@@ -99,7 +100,7 @@ export async function POST(
       updated_at: new Date().toISOString(),
     })
     .eq('id', websiteId)
-    .eq('user_id', auth.user!.id)
+    .eq('user_id', auth.user.id)
     .select('id, site_name, subdomain, site_config, is_published')
     .maybeSingle();
 

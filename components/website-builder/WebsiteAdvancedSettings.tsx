@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 
 function lines(value?: string[]) {
@@ -36,8 +37,31 @@ export function WebsiteAdvancedSettings({
   const [testimonialQuote, setTestimonialQuote] = useState(initialConfig.testimonial?.quote || '');
   const [testimonialAuthor, setTestimonialAuthor] = useState(initialConfig.testimonial?.author || '');
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState<'logo' | 'hero' | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  async function uploadImage(kind: 'logo' | 'hero', file: File) {
+    setUploading(kind); setMessage(''); setError('');
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('kind', kind);
+      const response = await fetch(`/api/apps/website-builder/sites/${websiteId}/assets`, {
+        method: 'POST',
+        body: form,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not upload image');
+      if (kind === 'logo') setLogoImage(data.url);
+      else setHeroImage(data.url);
+      setMessage(`${kind === 'logo' ? 'Logo' : 'Hero image'} uploaded. Save advanced settings to apply it.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not upload image');
+    } finally {
+      setUploading(null);
+    }
+  }
 
   async function save() {
     setBusy(true); setMessage(''); setError('');
@@ -100,14 +124,16 @@ export function WebsiteAdvancedSettings({
       <div className="mx-auto max-w-7xl px-4 py-5">
         <details className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
           <summary className="cursor-pointer text-lg font-black text-slate-950">Advanced site settings</summary>
-          <p className="mt-2 text-sm text-slate-600">Manage images, contact details, booking, accessibility text, search keywords, and the additional brand fields already supported by the published-site renderer.</p>
+          <p className="mt-2 text-sm text-slate-600">Manage uploaded media, contact details, booking, accessibility text, search keywords, and the additional brand fields supported by the published site.</p>
           {(message || error) ? <div className={`mt-4 rounded-xl border p-3 text-sm font-semibold ${error ? 'border-red-200 bg-red-50 text-red-800' : 'border-emerald-200 bg-emerald-50 text-emerald-800'}`}>{error || message}</div> : null}
 
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
               <h2 className="font-black text-slate-950">Brand & media</h2>
-              <Field label="Logo image URL" value={logoImage} onChange={setLogoImage} placeholder="https://…" />
-              <Field label="Hero image URL" value={heroImage} onChange={setHeroImage} placeholder="https://…" />
+              <UploadField label="Logo image" kind="logo" currentUrl={logoImage} uploading={uploading} onUpload={uploadImage} />
+              <Field label="Logo image URL" value={logoImage} onChange={setLogoImage} placeholder="Upload above or paste https://…" />
+              <UploadField label="Hero image" kind="hero" currentUrl={heroImage} uploading={uploading} onUpload={uploadImage} />
+              <Field label="Hero image URL" value={heroImage} onChange={setHeroImage} placeholder="Upload above or paste https://…" />
               <Field label="Hero image alt text" value={heroImageAlt} onChange={setHeroImageAlt} placeholder="Describe the image for accessibility" />
               <Field label="Hero button destination" value={heroCtaHref} onChange={setHeroCtaHref} placeholder="/contact or https://…" />
               <Field label="Announcement bar" value={announcement} onChange={setAnnouncement} placeholder="Optional announcement" />
@@ -141,12 +167,35 @@ export function WebsiteAdvancedSettings({
             </div>
           </div>
 
-          <button type="button" onClick={() => void save()} disabled={busy} className="mt-6 rounded-xl bg-slate-950 px-6 py-3 font-black text-white disabled:opacity-50">
+          <button type="button" onClick={() => void save()} disabled={busy || Boolean(uploading)} className="mt-6 rounded-xl bg-slate-950 px-6 py-3 font-black text-white disabled:opacity-50">
             {busy ? 'Saving…' : 'Save advanced settings'}
           </button>
         </details>
       </div>
     </section>
+  );
+}
+
+function UploadField({ label, kind, currentUrl, uploading, onUpload }: { label: string; kind: 'logo' | 'hero'; currentUrl: string; uploading: 'logo' | 'hero' | null; onUpload: (kind: 'logo' | 'hero', file: File) => Promise<void> }) {
+  function changed(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) void onUpload(kind, file);
+    event.target.value = '';
+  }
+  return (
+    <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-slate-700">{label}</p>
+          <p className="text-xs text-slate-500">JPG, PNG, WebP or GIF · max 10 MB</p>
+        </div>
+        <label className="cursor-pointer rounded-lg bg-white px-3 py-2 text-xs font-black text-slate-800 ring-1 ring-slate-300">
+          {uploading === kind ? 'Uploading…' : 'Choose image'}
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={Boolean(uploading)} onChange={changed} />
+        </label>
+      </div>
+      {currentUrl ? <p className="mt-2 truncate text-xs text-slate-400">{currentUrl}</p> : null}
+    </div>
   );
 }
 

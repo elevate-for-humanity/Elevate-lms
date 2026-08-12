@@ -1,12 +1,9 @@
 /**
  * Resolve GITHUB_TOKEN for Dev Studio GitHub API routes.
- * Precedence: hydrate platform_secrets → process.env (see lib/secrets.ts).
+ * Canonical platform_secrets values are hydrated before process.env fallback.
  */
 
 import { getSecret, hydrateProcessEnv } from '@/lib/secrets';
-
-let tokenCache: { token: string; expiresAt: number } | null = null;
-const CACHE_MS = 5 * 60 * 1000;
 
 function looksLikeToken(value: string | undefined | null): value is string {
   if (!value) return false;
@@ -16,39 +13,34 @@ function looksLikeToken(value: string | undefined | null): value is string {
   return true;
 }
 
-/** Load platform_secrets into process.env before GitHub calls. */
+/** Load current runtime secrets into process.env before GitHub calls. */
 export async function ensureDevStudioSecrets(): Promise<void> {
   await hydrateProcessEnv();
 }
 
+/**
+ * Do not keep a second token cache here. lib/secrets already owns the runtime
+ * cache and refreshSecrets() invalidates it after Studio rotations. A duplicate
+ * cache made a newly-rotated GitHub token remain stale for up to five minutes.
+ */
 export async function getGitHubToken(): Promise<string | null> {
   await ensureDevStudioSecrets();
 
-  if (tokenCache && tokenCache.expiresAt > Date.now()) {
-    return tokenCache.token;
-  }
-
-  const fromEnv = process.env.GITHUB_TOKEN;
-  if (looksLikeToken(fromEnv)) {
-    tokenCache = { token: fromEnv.trim(), expiresAt: Date.now() + CACHE_MS };
-    return tokenCache.token;
-  }
-
-  const fromDb = await getSecret('GITHUB_TOKEN');
-  if (looksLikeToken(fromDb)) {
-    const token = fromDb.trim();
+  const fromCanonicalStore = await getSecret('GITHUB_TOKEN');
+  if (looksLikeToken(fromCanonicalStore)) {
+    const token = fromCanonicalStore.trim();
     process.env.GITHUB_TOKEN = token;
-    tokenCache = { token, expiresAt: Date.now() + CACHE_MS };
     return token;
   }
 
-  return null;
+  const fromEnv = process.env.GITHUB_TOKEN;
+  return looksLikeToken(fromEnv) ? fromEnv.trim() : null;
 }
 
 export async function getGitHubHeaders(): Promise<HeadersInit> {
   const token = await getGitHubToken();
   if (!token) {
-    throw new Error('GITHUB_TOKEN is not configured. Add it in Dev Studio > Secrets tab.');
+    throw new Error('GITHUB_TOKEN is not configured. Add it in Dev Studio > Secrets.');
   }
   return {
     Authorization: `Bearer ${token}`,
@@ -60,13 +52,13 @@ export async function getGitHubHeaders(): Promise<HeadersInit> {
 
 export function githubApiErrorMessage(status: number): string {
   if (status === 401) {
-    return 'GitHub token rejected (401). Rotate GITHUB_TOKEN in Dev Studio > Secrets with repo + workflow scopes.';
+    return 'GitHub token rejected (401). Rotate GITHUB_TOKEN in Dev Studio > Secrets.';
   }
   if (status === 403) {
-    return 'GitHub API forbidden (403). Ensure GITHUB_TOKEN has contents:read/write on elevate-for-humanity/Elevate-lms.';
+    return 'GitHub API forbidden (403). Ensure GITHUB_TOKEN has contents read/write permission on elevate-for-humanity/Elevate-lms.';
   }
   if (status === 404) {
-    return 'devcontainer.json not found in repo';
+    return 'Requested GitHub resource was not found in elevate-for-humanity/Elevate-lms.';
   }
   return `GitHub API error (${status}) — check GITHUB_TOKEN in Dev Studio > Secrets`;
 }

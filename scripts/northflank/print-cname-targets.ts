@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Print Northflank CNAME targets for Durable DNS (after TXT verification).
+ * Print canonical Northflank CNAME targets for DNS verification.
  *
  *   npx tsx scripts/northflank/print-cname-targets.ts
  */
@@ -22,36 +22,27 @@ async function printDomain(domain: string) {
   console.log(`${row.fullName ?? domain}`);
   console.log(`  CNAME host: @ (or ${domain})`);
   console.log(`  Target:     ${row.content ?? '(unknown)'}`);
-  console.log(`  Verified:   ${row.verified ? 'yes' : 'no — update DNS in Durable, wait ~15–60 min'}`);
+  console.log(`  Verified:   ${row.verified ? 'yes' : 'no — update DNS and allow propagation'}`);
   console.log('');
 }
 
-async function resolveNorthflankApexIp(cnameTarget: string): Promise<string | null> {
-  try {
-    const { execSync } = await import('child_process');
-    const out = execSync(`dig +short ${cnameTarget} A | head -1`, { encoding: 'utf8' }).trim();
-    return out || null;
-  } catch {
-    return null;
-  }
-}
-
 async function main() {
-  console.log('\n=== Northflank CNAME records for Durable ===\n');
+  console.log('\n=== Canonical Northflank CNAME records ===\n');
   await printDomain('www.elevateforhumanity.org');
+  await printDomain('app.elevateforhumanity.org');
   await printDomain('admin.elevateforhumanity.org');
-  await printDomain('lms.elevateforhumanity.org');
-  console.log('=== Apex (Durable — URL redirect, NOT Northflank CNAME) ===\n');
+
+  console.log('=== Apex redirect (not an application service CNAME) ===\n');
   console.log('elevateforhumanity.org');
-  console.log('  Use Durable URL forward / 301 redirect @ → https://www.elevateforhumanity.org');
-  console.log('  Do NOT use A record to Northflank IP (breaks mobile TLS).\n');
+  console.log('  Permanent redirect -> https://www.elevateforhumanity.org');
+  console.log('  Do not attach the apex to Marketing, LMS, or Admin as a service fallback.\n');
 
   console.log('Full runbook: docs/northflank-dns-durable.md');
   console.log('After DNS propagates:');
   console.log('  npx tsx scripts/northflank/configure-domains.ts --execute\n');
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

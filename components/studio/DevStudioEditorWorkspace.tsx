@@ -6,15 +6,14 @@ import { FolderOpen, GitBranch, Loader2, Save, Upload } from 'lucide-react';
 
 const CodeEditor = dynamic(
   () => import('@/components/studio/CodeEditor').then((m) => m.default || m),
-  { ssr: false }
+  { ssr: false },
 );
 const GitPanel = dynamic(
   () => import('@/components/studio/GitPanel').then((m) => m.default || m),
-  { ssr: false }
+  { ssr: false },
 );
 
 type TreeNode = { type: string; path: string; name: string; children?: TreeNode[] };
-
 type SidebarMode = 'files' | 'git';
 
 const MAX_UPLOAD_BYTES = 512 * 1024;
@@ -40,12 +39,11 @@ export default function DevStudioEditorWorkspace({
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
-  const [uploadPath, setUploadPath] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshFiles = useCallback(async () => {
     try {
-      const res = await fetch('/api/devstudio/files');
+      const res = await fetch('/api/devstudio/files', { cache: 'no-store' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setFiles(walkFiles(data.tree ?? []));
@@ -67,7 +65,9 @@ export default function DevStudioEditorWorkspace({
     setLoading(true);
     setStatus('');
     try {
-      const res = await fetch(`/api/devstudio/files?path=${encodeURIComponent(path)}`);
+      const res = await fetch(`/api/devstudio/files?path=${encodeURIComponent(path)}`, {
+        cache: 'no-store',
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setContent(data.content ?? '');
@@ -82,18 +82,24 @@ export default function DevStudioEditorWorkspace({
 
   async function saveFile() {
     if (!selected) return;
+    const updating = Boolean(sha);
     setLoading(true);
-    setStatus('');
+    setStatus(updating ? 'Committing update…' : 'Creating file…');
     try {
       const res = await fetch('/api/devstudio/files', {
-        method: 'POST',
+        method: updating ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: selected, content, message, sha }),
+        body: JSON.stringify({
+          path: selected,
+          content,
+          message,
+          ...(updating ? { sha } : {}),
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       setSha(data.sha ?? sha);
-      setStatus('Committed');
+      setStatus(data.commit ? 'Committed to GitHub' : 'Committed');
       await refreshFiles();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Save failed');
@@ -110,16 +116,14 @@ export default function DevStudioEditorWorkspace({
           onClick={() => setSidebar('files')}
           className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] ${sidebar === 'files' ? 'bg-[#094771] text-white' : ''}`}
         >
-          <FolderOpen className="h-3.5 w-3.5" />
-          Files
+          <FolderOpen className="h-3.5 w-3.5" /> Files
         </button>
         <button
           type="button"
           onClick={() => setSidebar('git')}
           className={`inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] ${sidebar === 'git' ? 'bg-[#094771] text-white' : ''}`}
         >
-          <GitBranch className="h-3.5 w-3.5" />
-          Git
+          <GitBranch className="h-3.5 w-3.5" /> Git
         </button>
         <span className="ml-auto truncate text-[10px] text-[#858585]">{status}</span>
         <button
@@ -135,16 +139,22 @@ export default function DevStudioEditorWorkspace({
           ref={fileInputRef}
           type="file"
           className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (!file || file.size > MAX_UPLOAD_BYTES) return;
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            if (file.size > MAX_UPLOAD_BYTES) {
+              setStatus('Upload exceeds the 512 KB repository editor limit.');
+              event.currentTarget.value = '';
+              return;
+            }
             void file.text().then((text) => {
-              const path = uploadPath || `devstudio-uploads/${file.name}`;
-              setSelected(path);
+              setSelected(`devstudio-uploads/${file.name}`);
               setContent(text);
               setSha('');
-              setMessage(`chore: add ${path}`);
+              setMessage(`chore: add devstudio-uploads/${file.name}`);
+              setStatus('Uploaded locally — commit to create the repository file');
             });
+            event.currentTarget.value = '';
           }}
         />
         <button
@@ -152,8 +162,7 @@ export default function DevStudioEditorWorkspace({
           onClick={() => fileInputRef.current?.click()}
           className="inline-flex items-center gap-1 rounded border border-[#555] px-2 py-1 text-[11px]"
         >
-          <Upload className="h-3 w-3" />
-          Upload
+          <Upload className="h-3 w-3" /> Upload
         </button>
       </div>
 
@@ -179,7 +188,7 @@ export default function DevStudioEditorWorkspace({
         </div>
         <div className="min-w-0 flex-1">
           {selected ? (
-            <CodeEditor value={content} onChange={(v) => setContent(v ?? '')} filePath={selected} />
+            <CodeEditor value={content} onChange={(value) => setContent(value ?? '')} filePath={selected} />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-[#858585]">
               Select a file or switch to Git

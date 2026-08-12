@@ -9,6 +9,18 @@ function clean(value: string): string {
   return value.replace(/\/$/, '');
 }
 
+/** Registrable/root domain used when code derives service hosts such as admin.*. */
+function canonicalDomain(value: string): string {
+  const domain = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .split('/')[0]
+    .replace(/\.$/, '')
+    .replace(/^www\./, '');
+  return domain || 'elevateforhumanity.org';
+}
+
 const SITE_URL = clean(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org');
 const APP_URL = clean(
   process.env.NEXT_PUBLIC_APP_URL ||
@@ -16,7 +28,9 @@ const APP_URL = clean(
     'https://app.elevateforhumanity.org',
 );
 const ADMIN_URL = clean(process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org');
-const CANONICAL_DOMAIN = process.env.NEXT_PUBLIC_CANONICAL_DOMAIN || 'www.elevateforhumanity.org';
+const CANONICAL_DOMAIN = canonicalDomain(
+  process.env.NEXT_PUBLIC_CANONICAL_DOMAIN || 'elevateforhumanity.org',
+);
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@elevateforhumanity.org';
 const INFO_EMAIL = process.env.NEXT_PUBLIC_INFO_EMAIL || 'info@elevateforhumanity.org';
 const FROM_EMAIL = process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS || 'noreply@elevateforhumanity.org';

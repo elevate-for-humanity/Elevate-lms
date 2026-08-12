@@ -153,8 +153,22 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
+# There are two historical public trees in this monorepo. Marketing-specific
+# files are copied first, then the repository-level public/ tree is overlaid as
+# the canonical source of truth. This prevents stale duplicate files under
+# apps/marketing/public from shadowing corrected images and ensures root public
+# assets referenced by current pages/heroes are actually present in production.
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/public \
+    ./public/
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/public \
+    ./public/
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/apps/marketing/public \
+    ./apps/marketing/public/
+COPY --from=builder --chown=nextjs:nodejs \
+    /workspace/public \
     ./apps/marketing/public/
 
 # =============================================================================
@@ -165,6 +179,10 @@ RUN set -eux; \
     test -f /app/apps/marketing/server.js && echo "✓ server.js exists"; \
     test -d /app/apps/marketing/.next/static && echo "✓ Static dir exists"; \
     test -d /app/apps/marketing/public && echo "✓ Public dir exists"; \
+    test -s /app/apps/marketing/public/images/heroes/hero-homepage.webp; \
+    test -s /app/apps/marketing/public/images/pages/about-supportive-services.webp; \
+    test -s /app/apps/marketing/public/images/pages/about-employer-partners.webp; \
+    echo "✓ Canonical Marketing hero/homepage assets packaged"; \
     echo "=== RUNTIME VERIFICATION PASSED ==="
 
 USER nextjs

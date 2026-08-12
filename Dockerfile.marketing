@@ -92,10 +92,13 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
-COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
+# Keep one deterministic asset precedence across every Marketing image path.
+# The app-specific tree is copied first; repository-level public/ is canonical
+# and copied last so stale duplicate files cannot shadow corrected assets.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./public/
-COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./apps/marketing/public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
 
 RUN test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \
@@ -108,6 +111,8 @@ RUN test -f /app/public/version.json && \
     test -s /app/apps/marketing/public/images/heroes/hero-homepage.webp && \
     test -s /app/public/images/pages/barber-apprenticeship-hero.jpg && \
     test -s /app/public/images/pages/workforce-training.webp && \
+    test -s /app/public/images/pages/about-supportive-services.webp && \
+    test -s /app/public/images/pages/about-employer-partners.webp && \
     (test -f /app/public/sw.js || test -f /app/public/sw-marketing.js) && \
     echo "Marketing runtime assets verified"
 

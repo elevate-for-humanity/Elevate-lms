@@ -57,16 +57,15 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-async function staleWhileRevalidate(request) {
+async function networkFirst(request) {
   const cache = await caches.open(STATIC_CACHE);
-  const cached = await cache.match(request);
-  const network = fetch(request)
-    .then(async (response) => {
-      await safeCachePut(cache, request, response);
-      return response;
-    })
-    .catch(() => null);
-  return cached || network;
+  try {
+    const response = await fetch(request, { cache: 'no-store', redirect: 'follow' });
+    await safeCachePut(cache, request, response);
+    return response;
+  } catch {
+    return (await cache.match(request)) || null;
+  }
 }
 
 self.addEventListener('fetch', (event) => {
@@ -102,8 +101,11 @@ self.addEventListener('fetch', (event) => {
 
   if (!isStaticAsset) return;
 
+  // Always ask the network for Marketing imagery first. This prevents old
+  // cached images from appearing after a deploy when a path is reused for a
+  // different asset. Cached content is strictly an offline fallback.
   event.respondWith(
-    staleWhileRevalidate(request).then((response) => response || fetch(request)),
+    networkFirst(request).then((response) => response || fetch(request, { cache: 'no-store' })),
   );
 });
 

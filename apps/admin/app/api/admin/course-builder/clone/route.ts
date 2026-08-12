@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
     }
 
     await logAdminAudit({
-      action: AdminAction.CAREER_COURSE_CREATED,
+      action: AdminAction.COURSE_SEED_RUN,
       actorId: auth.id,
       entityType: 'courses',
       entityId: clone.id,

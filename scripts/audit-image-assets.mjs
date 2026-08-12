@@ -4,11 +4,9 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 
-// Scan both the legacy root app tree and the active monorepo services.
-// The previous audit omitted apps/marketing, apps/lms, and apps/admin, which
-// allowed production image regressions to report as a false green.
+// Active production services. The previous audit only scanned the legacy root
+// app tree and therefore missed the deployed monorepo applications.
 const SCAN_DIRS = [
-  'app',
   'apps/marketing/app',
   'apps/lms/app',
   'apps/admin/app',
@@ -29,10 +27,13 @@ const SERVICE_PUBLIC_ROOTS = {
   shared: ['public'],
 };
 
+// These are the canonical Dockerfiles configured/validated for each deployed
+// service. Marketing uses Dockerfile.marketing; LMS/Admin use their Northflank
+// service Dockerfiles.
 const PACKAGING_CONTRACTS = [
   {
     service: 'marketing',
-    dockerfile: 'Dockerfile.northflank-marketing',
+    dockerfile: 'Dockerfile.marketing',
     requiredSource: '/workspace/public',
     runtimeTarget: 'apps/marketing/public',
   },
@@ -105,7 +106,7 @@ const refs = [];
 
 for (const file of files) {
   const text = fs.readFileSync(file, 'utf8');
-  const relFile = path.relative(ROOT, file);
+  const relFile = path.relative(ROOT, file).replaceAll('\\', '/');
   const service = serviceFor(relFile);
   IMAGE_REF_RE.lastIndex = 0;
 
@@ -173,7 +174,7 @@ const serviceSummary = Object.entries(byService)
       `- ${service}: ${counts.imageRefs} refs, ${counts.missingRefs} missing`,
   )
   .join('\n');
-const md = `# Image Assets Audit\n\n- Scanned files: ${report.scannedFiles}\n- Image refs (/images/*): ${report.imageRefs}\n- Missing runtime refs: ${report.missingRefs}\n- Legacy pexels refs: ${report.pexelsRefs}\n- Runtime packaging failures: ${report.packagingFailures}\n\n## Service coverage\n${serviceSummary}\n\n## Missing runtime refs\n${missing
+const md = `# Image Assets Audit — active platform\n\n- Scanned files: ${report.scannedFiles}\n- Image refs (/images/*): ${report.imageRefs}\n- Missing runtime refs: ${report.missingRefs}\n- Legacy pexels refs: ${report.pexelsRefs}\n- Runtime packaging failures: ${report.packagingFailures}\n\n## Service coverage\n${serviceSummary}\n\n## Missing runtime refs\n${missing
   .slice(0, 300)
   .map((r) => `- ${r.ref} in \`${r.file}\` (${r.service}); checked: ${r.checkedPaths.join(', ')}`)
   .join('\n') || 'None'}\n\n## Runtime packaging failures\n${packagingFailures

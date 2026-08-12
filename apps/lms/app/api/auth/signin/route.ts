@@ -1,9 +1,11 @@
 // PUBLIC ROUTE: sign-in endpoint — no auth possible
-import { safeInternalError } from '@/lib/api/safe-error';
 /**
  * Auth API - Sign In
- * Authenticates user with email and password
- * Protected with rate limiting and input validation
+ * Authenticates user with email and password.
+ * Protected with rate limiting and input validation.
+ *
+ * Session tokens are persisted only through Supabase's HttpOnly/shared-domain
+ * cookie response. They are intentionally not echoed into JSON.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,29 +21,27 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
 
   const supabase = await createClient();
 
-  // Parse and validate request body
   let body;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json(
       { error: 'Invalid JSON in request body', code: 'BAD_REQUEST' },
-      { status: 400 }
+      { status: 400 },
     );
   }
-  
+
   let validatedData;
   try {
     validatedData = signInSchema.parse(body);
   } catch (err) {
     return NextResponse.json(
       { error: 'Invalid request data', code: 'VALIDATION_ERROR', details: (err as Error).message },
-      { status: 400 }
+      { status: 400 },
     );
   }
   const { email, password } = validatedData;
 
-  // Sign in
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -61,19 +61,22 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.internal('Authentication failed');
   }
 
-  return NextResponse.json({
-    success: true,
-    user: {
-      id: data.user.id,
-      email: data.user.email,
-      firstName: data.user.user_metadata?.first_name,
-      lastName: data.user.user_metadata?.last_name,
+  return NextResponse.json(
+    {
+      success: true,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        firstName: data.user.user_metadata?.first_name,
+        lastName: data.user.user_metadata?.last_name,
+      },
     },
-    session: {
-      accessToken: data.session.access_token,
-      expiresAt: data.session.expires_at,
+    {
+      headers: {
+        'Cache-Control': 'no-store, private, max-age=0',
+      },
     },
-  });
+  );
 });
 
 export const runtime = 'nodejs';

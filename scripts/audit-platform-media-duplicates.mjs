@@ -13,9 +13,8 @@ const PAGE_NAMES = new Set(['page.tsx', 'page.ts', 'page.jsx', 'page.js']);
 const IMPORT_RE = /from\s+['"]([^'"]+)['"]/g;
 const ASSET_RE = /['"](\/(?:images|uploads|media)\/[^'"\s)]+)['"]/g;
 const REUSABLE_MEDIA = /(?:logo|favicon|icon|badge|seal|partner|sponsor|credential|certification|qr|avatar|headshot|placeholder|watermark)/i;
-const HERO_PATH = /(?:\/heroes?\/|hero|banner)/i;
 const VISUAL_CONTEXT = /(?:\bsrc\s*=|\bimage(?:Src)?\s*[:=]|\bheroImage\s*[:=]|\bposter(?:Image)?\s*[:=]|\bbackgroundImage\s*[:=]|<Image\b|<img\b|HeroPicture|HeroVideo|PictureFirstPageHero|ModernLandingHero)/i;
-const HERO_CONTEXT = /(?:HeroPicture|HeroVideo|PictureFirstPageHero|ModernLandingHero|heroImage|posterImage|heroSrc|heroMedia|\bhero\b|\bbanner\b)/i;
+const HERO_CONTEXT = /(?:HeroPicture|HeroVideo|PictureFirstPageHero|ModernLandingHero|\bheroImage\b|\bposterImage\b|\bheroSrc\b|\bheroMedia\b|\/\*\s*(?:VIDEO\s+)?Hero(?:\s+Section)?[^*]*\*\/|\bHero Section\b|\bpriority\b)/i;
 
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out;
@@ -98,13 +97,17 @@ function assetOccurrences(file) {
     for (const match of line.matchAll(ASSET_RE)) {
       const asset = match[1].split(/[?#]/)[0];
       if (REUSABLE_MEDIA.test(asset)) continue;
-      const context = lines.slice(Math.max(0, i - 2), Math.min(lines.length, i + 3)).join(' ');
+      const context = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5)).join(' ');
+      // Remove the literal asset path before hero classification so filenames such
+      // as `admin-compliance-audit-hero.webp` do not turn ordinary feature cards
+      // into false hero findings. Hero status comes from rendering structure only.
+      const structuralContext = context.replaceAll(asset, '');
       out.push({
         asset,
         line: i + 1,
         absFile: file,
         file: sourceLabel(file),
-        hero: HERO_PATH.test(asset) || HERO_CONTEXT.test(context),
+        hero: HERO_CONTEXT.test(structuralContext),
       });
     }
   }
@@ -271,7 +274,7 @@ md += mdTable(
   ['Asset', 'Routes'],
   crossRouteImageReuse.slice(0, 250).map((item) => [item.asset, item.routes.join('<br>')]),
 );
-md += `\n> Shared logos, icons, badges, seals, partner/sponsor assets, credentials, avatars, headshots, placeholders, QR codes, and watermarks are excluded. Shared category videos are reported by the existing hero audit but are not treated as duplicate-image failures here.\n`;
+md += `\n> Shared logos, icons, badges, seals, partner/sponsor assets, credentials, avatars, headshots, placeholders, QR codes, and watermarks are excluded. Shared category videos are reported by the existing hero audit but are not treated as duplicate-image failures here. Hero classification is based on render structure, never filenames.\n`;
 
 fs.mkdirSync(path.dirname(OUT_JSON), { recursive: true });
 fs.writeFileSync(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`);

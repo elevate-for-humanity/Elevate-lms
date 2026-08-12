@@ -13,7 +13,11 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) redirect('/login?redirect=/dashboard');
+  // `/dashboard` is owned by the Admin deployment. The previous redirect
+  // preserved that ambiguous path and caused a student who signed in on the LMS
+  // host to be sent to admin.elevateforhumanity.org. Keep the login return path
+  // explicitly inside the LMS application instead.
+  if (!user) redirect('/login?redirect=/lms/dashboard');
 
   const { data: profile } = await supabase
     .from('profiles')

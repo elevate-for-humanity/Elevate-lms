@@ -163,12 +163,16 @@ RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home nextjs
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
+# Shared root public assets are used by shared components and must ship with Admin.
+COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
+# App-specific public assets override shared files when paths overlap.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
 RUN set -eux; \
     test -f /app/apps/admin/server.js; \
     test -d /app/apps/admin/.next/static; \
     test -d /app/apps/admin/public; \
+    test -d /app/apps/admin/public/images; \
     test -d /app/node_modules/sharp; \
     test -d /app/node_modules/@napi-rs/canvas; \
     test -d /app/node_modules/fontkit; \

@@ -21,31 +21,31 @@ export default function WritingCenterPage() {
       title: 'Resume & Cover Letter Writing',
       description:
         'Build a professional resume tailored to your target industry. Learn how to highlight certifications, skills, and training. Cover letter templates and customization for specific job postings.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: '/images/business/office-admin.webp',
     },
     {
       title: 'Professional Communication',
       description:
         'Email etiquette, business letter formatting, workplace communication norms, and professional tone. Essential for office administration students and anyone entering a professional environment.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: '/images/business/professional-2.jpg',
     },
     {
       title: 'Scholarship & Application Essays',
       description:
         'Craft compelling personal statements for scholarship applications, program admissions, and funding requests. Tutors help you tell your story effectively and meet word count requirements.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: '/images/pages/about-funding-nav.webp',
     },
     {
       title: 'Citation & Research Formatting',
       description:
         'APA and MLA formatting, in-text citations, reference pages, and avoiding plagiarism. Required for students completing research-based assignments or capstone projects.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: '/images/pages/about-career-pathways.webp',
     },
     {
       title: 'GED Writing Preparation',
       description:
         'Extended response practice for the GED Reasoning Through Language Arts test. Learn the scoring rubric, practice timed essays, and build confidence in written argumentation.',
-      image: '/images/pages/writing-center-page-1.jpg',
+      image: '/images/pages/about-career-training.webp',
     },
   ];
 
@@ -99,7 +99,7 @@ export default function WritingCenterPage() {
       {/* Hero Image */}
       <section className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] overflow-hidden">
         <Image
-          src="/images/pages/writing-center-page-1.jpg"
+          src="/images/pages/homepage-why-elevate.webp"
           alt="Student receiving writing assistance at the Elevate Writing Center"
           fill
           sizes="100vw"

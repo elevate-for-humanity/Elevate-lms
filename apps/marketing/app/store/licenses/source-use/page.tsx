@@ -50,7 +50,7 @@ export default function SourceUseLicensePage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-                  src="/images/heroes/lms-analytics.webp"
+                  src="/images/pages/store-checkout-cancel-hero.webp"
                   alt="Elevate platform overview"
                   fill
                   className="object-cover"

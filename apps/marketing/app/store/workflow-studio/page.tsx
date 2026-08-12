@@ -45,7 +45,7 @@ export default function WorkflowStudioPage() {
       </div>
 
       <PictureFirstPageHero
-        image="/images/pages/admin-automation-qa-hero.webp"
+        image="/images/pages/admin-grants-workflow-detail.webp"
         alt="Workflow automation studio interface"
         eyebrow="Workflow Studio"
         title="Automate Business Processes"

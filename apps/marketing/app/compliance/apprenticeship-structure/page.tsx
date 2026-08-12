@@ -18,7 +18,7 @@ export default function ApprenticeshipStructurePage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/store-compliance-ferpa-hero.webp"
+        image="/images/pages/apprenticeship-structure.webp"
         alt="Apprenticeship compliance records and training documentation"
         eyebrow="Compliance"
         title="Registered Apprenticeship Structure"

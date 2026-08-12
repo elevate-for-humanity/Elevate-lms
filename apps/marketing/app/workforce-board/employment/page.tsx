@@ -52,7 +52,7 @@ export default async function WorkforceEmploymentPage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/ojt-and-funding-page-1.webp"
+        image="/images/pages/workforce-board-page-1.webp"
         alt="Workforce employment and employer connection services"
         eyebrow="Workforce Employment"
         title="Employment Opportunities"

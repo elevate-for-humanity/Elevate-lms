@@ -41,7 +41,7 @@ const START_OPTIONS = [
       'See if you qualify for funded training through WIOA, WRG, or Job Ready Indy. Takes less than 2 minutes.',
     href: '/wioa-eligibility',
     action: 'Check Eligibility',
-    image: '/images/pages/admin-wioa-hero.webp',
+    image: '/images/pages/ferpa-page-1.jpg',
     imageAlt: 'Workforce funding and eligibility support',
   },
   {

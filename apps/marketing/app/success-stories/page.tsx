@@ -141,7 +141,7 @@ const successStories = [
     name: 'Lisa Anderson',
     age: 38,
     program: 'Medical Assistant',
-    image: '/images/programs/workforce-readiness-hero.webp',
+    image: '/images/pages/success-stories-hero.jpg',
     beforeJob: 'Restaurant server, $25,000/year',
     afterJob: 'Medical Assistant at Family Practice',
     salary: '$40,000/year',

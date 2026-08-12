@@ -174,14 +174,14 @@ export default async function PartnerBoardPage() {
       title: 'Hours pending review',
       value: board.pendingHoursCount,
       detail: 'Review OJT hours that require Host Shop verification.',
-      image: '/images/pages/apprenticeship-structure.webp',
+      image: '/images/pages/barber-shop-interior.webp',
     },
     {
       href: '/host-shop/dashboard/competencies',
       title: 'Competency sign-offs',
       value: `${board.tradeInfo.hours.toLocaleString()}h`,
       detail: 'Review required skills and complete supervisor verification.',
-      image: '/images/pages/competency-test-hero.webp',
+      image: '/images/pages/shop-hero.webp',
     },
     {
       href: '/host-shop/dashboard/documents',

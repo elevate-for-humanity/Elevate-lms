@@ -21,7 +21,7 @@ export default async function OfflinePage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/about-hero.webp"
+          src="/images/pages/about-team-hero.webp"
           alt="Offline"
           fill
           className="object-cover"

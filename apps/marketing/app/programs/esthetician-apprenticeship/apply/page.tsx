@@ -51,7 +51,7 @@ export default function EstheticianApplyIndexPage() {
 
       <section className="mx-auto grid max-w-4xl gap-6 px-4 py-10 md:grid-cols-2">
         <ApplicationCard
-          image="/images/beauty/esthetics-hero.webp"
+          image="/images/beauty/esthetician.jpg"
           title="I’m an Apprentice"
           description="Complete the full student application for the Esthetician Apprenticeship, including funding and background information."
           href="/apply/student?program=esthetician-apprenticeship"

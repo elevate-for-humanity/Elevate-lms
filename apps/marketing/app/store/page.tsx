@@ -33,7 +33,7 @@ export default function StorePage() {
             <HeroVideo
               videoSrcDesktop={hero.videoSrcDesktop}
               videoSrcMobile={hero.videoSrcMobile}
-              posterImage={hero.posterImage || '/images/pages/store-licensing-hero.webp'}
+              posterImage={hero.posterImage || '/images/pages/store-licensing-hero.jpg'}
               voiceoverSrc={hero.voiceoverSrc}
               analyticsName="store-commercial"
               mediaFit="cover"

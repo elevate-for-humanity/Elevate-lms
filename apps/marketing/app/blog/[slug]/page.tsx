@@ -201,7 +201,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                 >
                   <div className="relative h-48 overflow-hidden">
                     <Image
-                      src={related.image || '/images/pages/social-media-1.webp'}
+                      src={related.image || '/images/pages/admin-email-campaigns-new-detail.webp'}
                       alt={related.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

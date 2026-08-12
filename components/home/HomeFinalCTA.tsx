@@ -20,8 +20,8 @@ export function HomeFinalCTA() {
       <div className="relative mx-auto grid max-w-5xl overflow-hidden rounded-2xl border border-white/20 bg-brand-red-800 shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
         <div className="relative min-h-[220px] lg:min-h-[320px]">
           <Image
-            src="/images/pages/about-supportive-services.webp"
-            alt="Elevate for Humanity learner support and career training"
+            src="/images/pages/workforce-training.webp"
+            alt="Elevate for Humanity workforce training and career advancement"
             fill
             sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover"

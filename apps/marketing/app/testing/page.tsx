@@ -148,7 +148,7 @@ export default function TestingPage() {
                 >
                   <Link href={`/testing/${provider.key}`} className="relative block h-56 overflow-hidden">
                     <Image
-                      src={PROVIDER_IMAGES[provider.key] || '/images/pages/testing-hero.webp'}
+                      src={PROVIDER_IMAGES[provider.key] || '/images/pages/tech-classroom.webp'}
                       alt={provider.name}
                       fill
                       sizes="(max-width: 1024px) 100vw, 50vw"

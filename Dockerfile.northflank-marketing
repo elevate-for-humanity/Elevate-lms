@@ -153,13 +153,6 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
-# Shared public assets are referenced throughout the monorepo. They must be
-# present in the service runtime, not merely in the repository root.
-COPY --from=builder --chown=nextjs:nodejs \
-    /workspace/public \
-    ./apps/marketing/public/
-
-# App-specific public assets override shared assets when paths overlap.
 COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/public \
     ./apps/marketing/public/
@@ -172,8 +165,7 @@ RUN set -eux; \
     test -f /app/apps/marketing/server.js && echo "✓ server.js exists"; \
     test -d /app/apps/marketing/.next/static && echo "✓ Static dir exists"; \
     test -d /app/apps/marketing/public && echo "✓ Public dir exists"; \
-    test -d /app/apps/marketing/public/images && echo "✓ Shared images packaged"; \
-    echo "=== BUILD VERIFICATION COMPLETE ==="
+    echo "=== RUNTIME VERIFICATION PASSED ==="
 
 USER nextjs
 

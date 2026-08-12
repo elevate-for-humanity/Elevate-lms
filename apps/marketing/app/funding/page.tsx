@@ -14,6 +14,8 @@ export const dynamic = 'force-dynamic';
 import EligibilityScreener from '@/components/funding/EligibilityScreenerClient';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
+const FUNDING_HERO = '/images/pages/funding-page-5.webp';
+
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
   title: 'Workforce Funding',
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
       {
-        url: '/images/pages/funding-page-5.webp',
+        url: FUNDING_HERO,
         width: 1200,
         height: 630,
         alt: 'Career training funding options',
@@ -67,7 +69,7 @@ const FUNDING_OPTIONS = [
       'The agency determines the authorized amount',
     ],
     bulletColor: 'bg-brand-orange-500',
-    image: '/images/pages/funding-page-3.webp',
+    image: '/images/pages/certifications-page-1.webp',
     imageAlt: 'Workforce Ready Grant',
     link: 'https://www.nextleveljobs.org',
     linkText: 'Learn about WRG at Next Level Jobs',
@@ -126,7 +128,7 @@ export default function FundingPage() {
         <Image
           placeholder="blur"
           blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/funding-page-5.webp"
+          src={FUNDING_HERO}
           alt="Workforce funding options for career training"
           fill
           sizes="100vw"

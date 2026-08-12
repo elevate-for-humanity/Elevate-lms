@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - Public tenant contact form intentionally captures anonymous leads before account creation; rows are website-owned and do not require user reconciliation.
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';

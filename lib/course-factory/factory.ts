@@ -11,10 +11,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
-import {
-  loadBlueprintWithProgram,
-  resolveProgram,
-} from './blueprint-loader';
+import { loadBlueprintWithProgram, resolveProgram } from './blueprint-loader';
 import { publishCourse } from './publisher';
 import { generateAssessment, generateLessonContent } from './content-generator';
 import { validateBlueprint } from './validator';
@@ -61,9 +58,7 @@ async function mapWithConcurrency<T, R>(
       results[index] = await worker(items[index], index);
     }
   }
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, () => runWorker()),
-  );
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => runWorker()));
   return results;
 }
 
@@ -245,6 +240,7 @@ export async function courseFactory(
 
     progress.emit('publish', 'Persisting canonical course draft…', 85);
     const publishResult = await publishCourse({
+      courseId: input.courseId,
       programId: program.id,
       courseSlug: blueprint.programSlug || `course-${Date.now().toString(36)}`,
       courseTitle: blueprint.credentialTitle,
@@ -261,7 +257,7 @@ export async function courseFactory(
       };
     }
 
-    let videoWarnings: string[] = [];
+    const videoWarnings: string[] = [];
     if (input.videoMode === 'queue' && publishResult.courseId) {
       progress.emit('publish', 'Queueing missing lesson videos…', 95);
       try {

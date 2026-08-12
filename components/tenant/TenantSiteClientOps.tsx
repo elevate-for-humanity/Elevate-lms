@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { CSSProperties, FormEvent, ReactNode } from 'react';
 
 function sessionKey() {
   if (typeof window === 'undefined') return '';
@@ -44,9 +45,9 @@ export function TenantTrackedLink({
 }: {
   href: string;
   eventName: 'cta_click' | 'booking_click' | 'product_click';
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   external?: boolean;
 }) {
   function track() {

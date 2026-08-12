@@ -136,7 +136,7 @@ export default async function MobilePage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/pages/success-stories-hero.webp"
+                  src="/images/pages/mobile-app-page-1.webp"
                   alt="Mobile"
                   fill
                   className="object-cover"

@@ -56,7 +56,7 @@ export default async function CompliancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-wioa-hero.webp" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+                <Image src="/images/pages/store-compliance-wioa-detail.webp" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">WIOA Compliance</h3>
@@ -93,7 +93,7 @@ export default async function CompliancePage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-compliance-hero.webp" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+                <Image src="/images/pages/store-compliance-wcag-hero.jpg" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">FERPA Protection</h3>
@@ -166,7 +166,7 @@ export default async function CompliancePage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
               <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-compliance-hero.webp" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
+                <Image src="/images/pages/admin-compliance-audit-hero.jpg" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-4">Grant Reporting</h3>

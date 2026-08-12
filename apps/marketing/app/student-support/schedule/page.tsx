@@ -15,7 +15,7 @@ export default function StudentSupportSchedulePage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/orientation-page-1.webp"
+        image="/images/pages/support-page-1.webp"
         alt="Student receiving one-on-one academic support"
         eyebrow="Student Support"
         title="Request Tutoring & Academic Support"

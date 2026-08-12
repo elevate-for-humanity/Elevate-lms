@@ -227,9 +227,9 @@ export default function WIOACompliancePage() {
           <h2 className="text-3xl font-black text-black mb-8 text-center">How It Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/pages/wioa-meeting.webp' },
+              { step: '1', title: 'Setup', desc: 'Configure your program and eligibility criteria', image: '/images/pages/store-compliance-wioa-hero.jpg' },
               { step: '2', title: 'Enroll', desc: 'Participants complete digital intake forms', image: '/images/pages/adult-learner.webp' },
-              { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/pages/store-recommendations.webp' },
+              { step: '3', title: 'Track', desc: 'Automatic performance metric tracking', image: '/images/pages/compliance-page-1.webp' },
               { step: '4', title: 'Report', desc: 'Generate PIRL exports and quarterly reports', image: '/images/pages/graduation-ceremony.webp' },
             ].map((item) => (
               <div key={item.step} className="text-center">

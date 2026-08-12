@@ -24,7 +24,7 @@ export default function LicensesPage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/store-licensing-enterprise-hero.webp"
+        image="/images/pages/admin-licensing-hero.webp"
         alt="Workforce training platform licensing and administration"
         eyebrow="Platform Licensing"
         title="License the Elevate Platform"

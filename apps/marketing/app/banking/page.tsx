@@ -29,7 +29,6 @@ export default function BankingPage() {
           className="object-cover"
           priority
           sizes="100vw"
-          
         />
       </section>
 
@@ -70,12 +69,11 @@ export default function BankingPage() {
             <div className="bg-white border-2 border-brand-blue-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative w-full aspect-[4/3]" style={{ aspectRatio: '16/10' }}>
                 <Image
-                  src="/images/pages/banking-page-2.webp"
+                  src="/images/pages/banking-page-1.webp"
                   alt="Program payment access support"
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  
                 />
               </div>
               <div className="p-7">
@@ -104,7 +102,9 @@ export default function BankingPage() {
                 <Link
                   href="/contact"
                   className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-colors"
-                >Ask About Banking</Link>
+                >
+                  Ask About Banking
+                </Link>
               </div>
             </div>
 
@@ -116,7 +116,6 @@ export default function BankingPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  
                 />
               </div>
               <div className="p-7">
@@ -145,7 +144,9 @@ export default function BankingPage() {
                 <Link
                   href="/banking/direct-deposit"
                   className="block w-full bg-brand-green-600 hover:bg-brand-green-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-colors"
-                >See Details</Link>
+                >
+                  See Details
+                </Link>
               </div>
             </div>
 
@@ -157,7 +158,6 @@ export default function BankingPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  
                 />
               </div>
               <div className="p-7">
@@ -186,7 +186,9 @@ export default function BankingPage() {
                 <Link
                   href="/banking/prepaid-card"
                   className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-colors"
-                >See Details</Link>
+                >
+                  See Details
+                </Link>
               </div>
             </div>
           </div>
@@ -241,12 +243,11 @@ export default function BankingPage() {
               style={{ aspectRatio: '4/3' }}
             >
               <Image
-                src="/images/pages/pathways-page-7.webp"
+                src="/images/pages/funding-page-1.webp"
                 alt="Banking partner support for program payments"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
-                
               />
             </div>
             <div>

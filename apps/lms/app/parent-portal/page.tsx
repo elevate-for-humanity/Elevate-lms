@@ -55,7 +55,7 @@ const FEATURES = [
     icon: BarChart3,
     title: 'Progress Reports',
     desc: 'Review learner progress and program milestones from one secure workspace.',
-    image: '/images/pages/admin-wioa-hero.webp',
+    image: '/images/pages/card-wioa.webp',
   },
   {
     icon: Shield,

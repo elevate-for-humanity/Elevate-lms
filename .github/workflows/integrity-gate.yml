@@ -119,6 +119,10 @@ jobs:
         if: ${{ always() }}
         run: node scripts/audit-homepage-section-media.mjs
 
+      - name: Platform media duplicate check
+        if: ${{ always() }}
+        run: node scripts/audit-platform-media-duplicates.mjs
+
       - name: LMS course integrity check
         run: pnpm run integrity:lms
         env:
@@ -168,4 +172,6 @@ jobs:
             docs/audits/IMAGE_ASSETS_AUDIT.md
             docs/audits/VISUAL_LAYOUT_AUDIT.json
             docs/audits/VISUAL_LAYOUT_AUDIT.md
+            docs/audits/PLATFORM_MEDIA_DUPLICATES.json
+            docs/audits/PLATFORM_MEDIA_DUPLICATES.md
           retention-days: 30

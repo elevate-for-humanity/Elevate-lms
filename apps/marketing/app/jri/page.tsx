@@ -59,7 +59,7 @@ export default function JRIPage() {
 
       <section className="relative min-h-[300px] overflow-hidden bg-slate-950 text-white">
         <Image
-          src="/images/pages/jri-hero.webp"
+          src="/images/programs/workforce-readiness-hero.webp"
           alt="Workforce readiness training"
           fill
           className="object-cover opacity-35"

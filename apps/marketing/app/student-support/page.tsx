@@ -79,7 +79,7 @@ const services = [
     description:
       'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.',
     link: '/student-support/accessibility',
-    image: '/images/pages/accessibility-hero.jpg',
+    image: '/images/pages/student-support-hero.webp',
   },
   {
     title: 'Scheduling & Advising',

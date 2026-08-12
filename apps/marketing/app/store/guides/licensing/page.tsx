@@ -24,7 +24,7 @@ const STEPS = [
     num: '1',
     color: 'bg-brand-blue-600',
     title: 'Choose Your License Type',
-    image: '/images/pages/admin-licensing-hero.webp',
+    image: '/images/pages/store-guides-hero.webp',
     imageAlt: 'License tier comparison — managed vs source-use',
     content: null, // rendered inline below
   },
@@ -55,7 +55,7 @@ const STEPS = [
     num: '3',
     color: 'bg-brand-blue-600',
     title: 'Tenant Provisioning',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: '/images/pages/store-licensing-hero.jpg',
     imageAlt: 'Admin dashboard showing tenant provisioning and organization setup',
     content: (
       <>
@@ -81,7 +81,7 @@ const STEPS = [
     num: '4',
     color: 'bg-brand-blue-600',
     title: 'Invite Team & Assign Roles',
-    image: '/images/pages/admin-employers-hero.webp',
+    image: '/images/pages/store-licensing-enterprise-hero.webp',
     imageAlt: 'Admin user management interface showing role assignment',
     content: (
       <>
@@ -151,7 +151,7 @@ const STEPS = [
     num: '7',
     color: 'bg-amber-500',
     title: 'Billing & Enforcement',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: '/images/pages/project-management.webp',
     imageAlt: 'Billing and subscription management interface',
     content: null, // rendered inline below
   },
@@ -227,7 +227,7 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-square" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/admin-licensing-hero.webp"
+                src="/images/pages/store-guides-licensing-hero.jpg"
                 alt="License tier comparison — managed vs source-use"
                 fill
                 className="object-cover"
@@ -292,7 +292,7 @@ export default function LicensingGuidePage() {
             </div>
             <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
               <Image
-                src="/images/pages/admin-analytics-hero.webp"
+                src="/images/pages/store-licensing-hero.webp"
                 alt="Billing and subscription management"
                 fill
                 className="object-cover"

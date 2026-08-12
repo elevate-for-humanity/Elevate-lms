@@ -22,7 +22,7 @@ export default function JobReadyIndyPage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/jri-hero.webp"
+          src="/images/funding/funding-jri-program-v2.jpg"
           alt="Job Ready Indy workforce training"
           fill
           className="object-cover"

@@ -40,7 +40,7 @@ export default function ApprenticeshipsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <HeroPicture
-        src="/images/pages/barber-apprenticeship-hero.jpg"
+        src="/images/pages/admin-apprenticeships-hero.webp"
         alt="Barber apprentice providing a supervised client service in a professional shop"
         analyticsName="registered-apprenticeships"
       />

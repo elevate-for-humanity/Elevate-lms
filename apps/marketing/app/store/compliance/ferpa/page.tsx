@@ -28,7 +28,7 @@ const features = [
   {
     title: 'Access Controls',
     description: 'Role-based access control ensures only authorized users see student data.',
-    image: '/images/pages/admin-ferpa-training-hero.webp',
+    image: '/images/pages/ferpa-page-1.jpg',
     items: ['Role-based permissions', 'Multi-factor authentication', 'Session management', 'IP restrictions'],
   },
   {
@@ -40,7 +40,7 @@ const features = [
   {
     title: 'Consent Management',
     description: 'Digital consent forms and parent/guardian authorization workflows.',
-    image: '/images/pages/adult-learner.webp',
+    image: '/images/pages/admin-compliance-audit-hero.webp',
     items: ['Digital consent forms', 'Parent authorization', 'Opt-out tracking', 'Consent expiration'],
   },
 ];

@@ -47,7 +47,7 @@ export default async function SponsorLicensingPage() {
         accentText="Infrastructure"
         subheadline="Operate Compliant, Funded Programs Without Building From Scratch"
         description="The platform serves as the system of record for programs. Program activation is driven by required signatures. Tasks, milestones, and reporting are initialized automatically. All actions are logged for audit and reimbursement purposes."
-        imageSrc="/images/pages/apply-employer-hero.jpg"
+        imageSrc="/images/pages/platform-page-11.webp"
         imageAlt="Apprenticeship Licensing Partnership"
         primaryCTA={{ text: "View Pricing Tiers", href: "#pricing" }}
         secondaryCTA={{ text: "Contact Sales", href: "#contact" }}
@@ -76,7 +76,7 @@ export default async function SponsorLicensingPage() {
             <div className="bg-white rounded-3xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                  <Image src="/images/heroes/hero-homepage.webp" alt="Starter" width={24} height={24} className="w-6 h-6 text-brand-blue-600" />
+                  <Image src="/images/pages/platform-page-10.webp" alt="Starter" width={24} height={24} className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">Starter</h3>
@@ -158,7 +158,7 @@ export default async function SponsorLicensingPage() {
 
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Image src="/images/heroes/hero-homepage.webp" alt="Growth" width={24} height={24} className="w-6 h-6 text-white" />
+                  <Image src="/images/pages/platform-page-1.webp" alt="Growth" width={24} height={24} className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-slate-900">

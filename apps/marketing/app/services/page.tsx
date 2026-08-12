@@ -22,7 +22,7 @@ const services = [
     title: 'Tax Operations',
     description: 'Professional filing support and refund advance options',
     href: '/programs/tax-preparation',
-    image: '/images/pages/apply-employer-hero.webp',
+    image: '/images/pages/career-services-page-10.webp',
   },
   {
     title: 'Career Services',
@@ -40,7 +40,7 @@ const services = [
     title: 'Career Fairs',
     description: 'Meet employers hiring our graduates',
     href: '/career-fair',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/homepage-why-elevate.webp',
   },
   {
     title: 'Academic Advising',
@@ -58,13 +58,13 @@ const services = [
     title: 'Support Services',
     description: 'Transportation, childcare, barrier removal',
     href: '/support',
-    image: '/images/pages/career-services.jpg',
+    image: '/images/pages/career-services-hero.webp',
   },
   {
     title: 'Help Center',
     description: 'FAQs, guides, and support resources',
     href: '/help',
-    image: '/images/pages/career-services.jpg',
+    image: '/images/pages/career-services-page-1.webp',
   },
 ];
 
@@ -83,7 +83,7 @@ export default function ServicesPage() {
       <section className="relative w-full">
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image
-            src="/images/pages/services-page-1.webp"
+            src="/images/pages/career-services-page-12.webp"
             alt="Support Services"
             fill
             className="object-cover"

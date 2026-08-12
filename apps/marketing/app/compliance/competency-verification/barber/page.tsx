@@ -38,7 +38,7 @@ export default function BarberCompetencyRubricPage() {
 
       <section className="relative isolate min-h-[420px] overflow-hidden bg-slate-950">
         <Image
-          src="/images/pages/admin-compliance-agreements-hero.webp"
+          src="/images/barber-hero-new.webp"
           alt="Barber apprentice demonstrating a supervised technical skill"
           fill
           priority

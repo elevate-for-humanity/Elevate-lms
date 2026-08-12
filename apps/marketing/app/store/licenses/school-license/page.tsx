@@ -17,7 +17,7 @@ export default function SchoolLicensePage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
-          src="/images/pages/about-hero.webp"
+          src="/images/pages/about-career-pathways.webp"
           alt="School License Platform"
           fill
           className="object-cover"

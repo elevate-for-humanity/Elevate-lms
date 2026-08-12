@@ -33,13 +33,13 @@ const features = [
   {
     title: 'Outcome Tracking',
     description: 'Track employment, wages, credentials, and other grant outcomes.',
-    image: '/images/pages/workforce-training.webp',
+    image: '/images/pages/admin-compliance-deletions-detail.webp',
     items: ['Employment tracking', 'Wage verification', 'Credential attainment', 'Follow-up automation'],
   },
   {
     title: 'One-Click Exports',
     description: 'Export reports in any format required by your funders.',
-    image: '/images/pages/funding-page-1.webp',
+    image: '/images/pages/admin-compliance-exports-detail.webp',
     items: ['Excel exports', 'PDF reports', 'CSV data files', 'API integrations'],
   },
 ];

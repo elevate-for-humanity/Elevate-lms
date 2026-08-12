@@ -22,7 +22,7 @@ export default function TrainingCertificationsPage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/orientation-page-2.webp"
+        image="/images/heroes/training-provider-2.webp"
         alt="Learners preparing for industry certification testing"
         eyebrow="Testing & Credentials"
         title="Industry Certifications"

@@ -28,7 +28,7 @@ const GUIDES = [
     originalPrice: '$497',
     badge: 'Best Seller',
     badgeColor: 'bg-brand-blue-600',
-    image: '/images/pages/admin-compliance-hero.webp',
+    image: '/images/pages/store-guides-capital-hero.jpg',
     imageAlt: 'Compliance audit dashboard showing documentation readiness',
     features: [
       '150+ page practical guide',
@@ -54,7 +54,7 @@ const GUIDES = [
     originalPrice: null,
     badge: 'Included with License',
     badgeColor: 'bg-brand-green-600',
-    image: '/images/pages/admin-analytics-hero.webp',
+    image: '/images/pages/admin-licensing-hero.webp',
     imageAlt: 'Platform analytics dashboard showing license usage and feature access',
     features: [
       'License tier comparison',

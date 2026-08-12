@@ -37,7 +37,7 @@ export default function StoreDigitalPage() {
 {/* Hero */}
       <section className="relative w-full">
         <div className="relative h-[clamp(190px,32vw,360px)] w-full overflow-hidden">
-          <Image src="/images/pages/programs-hero.webp" alt="Elevate digital tools and resources" fill priority className="object-cover" sizes="100vw" />
+          <Image src="/images/pages/hvac-tools.webp" alt="Elevate digital tools and resources" fill priority className="object-cover" sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">
@@ -206,7 +206,7 @@ export default function StoreDigitalPage() {
               >
                 <div className="relative h-40 overflow-hidden">
                   <Image
-                    src={product.image || '/images/pages/comp-universal-hero.webp'}
+                    src={product.image || '/images/pages/store-digital-detail1.jpg'}
                     alt={product.name}
                     fill
                     quality={85} className="object-cover"

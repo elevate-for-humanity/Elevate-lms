@@ -19,11 +19,11 @@ export default function TransparencyPage() {
       value: '10+',
       image: '/images/pages/comp-home-pathways-support.webp',
     },
-    { label: 'Placement Goal', value: '85%', image: '/images/pages/about-hero.webp' },
-    { label: 'Training Cost', value: '$0', image: '/images/pages/about-hero.webp' },
+    { label: 'Placement Goal', value: '85%', image: '/images/pages/about-funding-nav.webp' },
+    { label: 'Training Cost', value: '$0', image: '/images/pages/comp-home-pathways-train.webp' },
     { label: 'Support', value: '24/7', image: '/images/pages/healthcare-grad.jpg' },
-    { label: 'Funding Sources', value: '5+', image: '/images/pages/about-hero.webp' },
-    { label: 'Indiana Locations', value: '3+', image: '/images/pages/healthcare-grad.jpg' },
+    { label: 'Funding Sources', value: '5+', image: '/images/pages/about-career-pathways.webp' },
+    { label: 'Indiana Locations', value: '3+', image: '/images/pages/about-career-training.webp' },
   ];
 
   const financials = [

@@ -179,7 +179,7 @@ export default function EmploymentSupportPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="relative rounded-2xl overflow-hidden h-[300px] md:h-auto min-h-[300px]">
               <Image
-                src="/images/pages/admin-campaigns-hero.webp"
+                src="/images/pages/student-support-page-1.webp"
                 alt="Participants in a training session"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"

@@ -126,7 +126,7 @@ export default async function PartnerBoardPage() {
         <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
           <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="relative h-52 w-full">
-              <Image src="/images/pages/apprenticeship-structure.webp" alt="Host Shop apprenticeship workspace" fill priority className="object-cover" sizes="100vw" />
+              <Image src="/images/pages/workforce-board-page-7.webp" alt="Host Shop apprenticeship workspace" fill priority className="object-cover" sizes="100vw" />
             </div>
             <div className="p-7 sm:p-9">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Admin portal access</p>
@@ -174,14 +174,14 @@ export default async function PartnerBoardPage() {
       title: 'Hours pending review',
       value: board.pendingHoursCount,
       detail: 'Review OJT hours that require Host Shop verification.',
-      image: '/images/pages/apprenticeship-structure.webp',
+      image: '/images/pages/barber-shop-interior.webp',
     },
     {
       href: '/host-shop/dashboard/competencies',
       title: 'Competency sign-offs',
       value: `${board.tradeInfo.hours.toLocaleString()}h`,
       detail: 'Review required skills and complete supervisor verification.',
-      image: '/images/pages/competency-test-hero.webp',
+      image: '/images/pages/shop-hero.webp',
     },
     {
       href: '/host-shop/dashboard/documents',

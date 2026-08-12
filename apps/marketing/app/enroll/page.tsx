@@ -42,7 +42,7 @@ export default async function EnrollPage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
-          src="/images/pages/programs-hero.webp"
+          src="/images/pages/training-page-1.webp"
           alt="Enroll in Training"
           fill
           className="object-cover"

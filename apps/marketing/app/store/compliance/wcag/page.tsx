@@ -22,13 +22,13 @@ const features = [
   {
     title: 'Screen Reader Support',
     description: 'Full compatibility with JAWS, NVDA, VoiceOver, and other assistive technologies.',
-    image: '/images/pages/accessibility-hero.jpg',
+    image: '/images/pages/admin-compliance-agreements-hero.webp',
     items: ['ARIA labels', 'Semantic HTML', 'Alt text automation', 'Focus management'],
   },
   {
     title: 'Keyboard Navigation',
     description: 'Complete keyboard accessibility for all interactive elements.',
-    image: '/images/pages/accessibility-hero.jpg',
+    image: '/images/pages/compliance-page-1.webp',
     items: ['Tab order optimization', 'Skip links', 'Focus indicators', 'Shortcut keys'],
   },
   {
@@ -40,7 +40,7 @@ const features = [
   {
     title: 'Multimedia Accessibility',
     description: 'Captions, transcripts, and audio descriptions for all media.',
-    image: '/images/pages/tech-classroom.webp',
+    image: '/images/pages/admin-compliance-audit-hero.jpg',
     items: ['Closed captions', 'Transcripts', 'Audio descriptions', 'Sign language'],
   },
 ];
@@ -103,7 +103,7 @@ export default function WCAGCompliancePage() {
         <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
           <Image
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/admin-compliance-hero.webp" alt="WCAG" fill className="object-cover" priority sizes="100vw" />
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/store-compliance-hero.jpg" alt="WCAG" fill className="object-cover" priority sizes="100vw" />
         </div>
         <div className="bg-slate-900 py-10">
           <div className="max-w-5xl mx-auto px-4 text-center">

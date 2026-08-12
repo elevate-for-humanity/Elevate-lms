@@ -10,29 +10,22 @@ export type NavSection = {
   items?: NavItem[];
 };
 
-// helper: find a section by id or title
 function itemsFrom(key: string): NavItem[] {
   const section =
     siteMapSections.find((s) => s.id === key) || siteMapSections.find((s) => s.title === key);
   return section ? section.items : [];
 }
 
-/**
- * HEADER NAV - Clean & Simple (Primary Entry Points Only)
- * - NO standalone portals (Admin, Staff Portal, LMS are separate apps)
- * - NO stub pages (Blog, Events, Webinars, News should be INSIDE parent pages)
- * - NO duplicate sections
- */
 export const headerNav: NavSection[] = [
   {
     label: 'Testing',
     href: '/testing',
     items: [
       { label: 'Testing Center', href: '/testing' },
-      { label: 'Schedule Exam', href: '/testing/book' },
+      { label: 'Choose an Exam', href: '/testing' },
       { label: 'Certiport', href: '/testing/certiport' },
       { label: 'WorkKeys', href: '/testing/workkeys' },
-      { label: 'Policies', href: '/testing#policies' },
+      { label: 'Policies', href: '/testing/policies' },
     ],
   },
   {
@@ -90,12 +83,6 @@ export const headerNav: NavSection[] = [
   },
 ];
 
-/**
- * FOOTER NAV - Clean Footer
- * - Only essential links for public site
- * - NO program links (they're in header)
- * - NO internal/portal links
- */
 export const footerSections = [
   {
     id: 'company',
@@ -114,7 +101,7 @@ export const footerSections = [
       { label: 'Help Center', href: '/help', description: 'FAQs and support' },
       { label: 'Funding', href: '/funding', description: 'Financial assistance' },
       { label: 'Career Services', href: '/career-services', description: 'Job placement help' },
-      { label: 'Testing Center', href: '/testing', description: 'Schedule exams' },
+      { label: 'Testing Center', href: '/testing', description: 'View credential exams' },
     ],
   },
   {
@@ -128,3 +115,6 @@ export const footerSections = [
     ],
   },
 ];
+
+void itemsFrom;
+void canonicalRoutes;

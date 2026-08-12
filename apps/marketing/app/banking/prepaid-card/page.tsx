@@ -45,7 +45,7 @@ export default function PrepaidCardPage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/card-hvac.webp"
+          src="/images/pages/banking-page-3.jpg"
           alt="Prepaid Card"
           fill
           className="object-cover"

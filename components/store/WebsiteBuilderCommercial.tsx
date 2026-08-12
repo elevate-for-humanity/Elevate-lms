@@ -6,337 +6,543 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bot,
   Check,
-  ChevronRight,
+  CircleDollarSign,
   Globe2,
-  LayoutTemplate,
+  Loader2,
   Mic,
+  MicOff,
   Monitor,
-  Palette,
-  Pause,
   Play,
   Rocket,
-  Search,
   Send,
   Smartphone,
   Sparkles,
+  Star,
 } from 'lucide-react';
 
-const SCENES = [
-  { start: 0, label: 'Describe the business' },
-  { start: 8, label: 'Generate the first draft' },
-  { start: 17, label: 'Edit with PARIS' },
-  { start: 27, label: 'Change the brand' },
-  { start: 38, label: 'Add conversion tools' },
-  { start: 50, label: 'Preview every screen' },
-  { start: 61, label: 'Publish' },
-  { start: 72, label: 'Keep growing' },
-] as const;
+type BuilderState = {
+  generated: boolean;
+  businessName: string;
+  industry: string;
+  location: string;
+  tone: string;
+  heroHeadline: string;
+  heroSubhead: string;
+  primaryColor: string;
+  secondaryColor: string;
+  services: string[];
+  imageKey: string;
+  brightness: number;
+  booking: boolean;
+  financing: boolean;
+  testimonials: boolean;
+  mobilePreview: boolean;
+  published: boolean;
+};
+
+type ParisResponse = {
+  reply?: string;
+  actions?: Partial<BuilderState>;
+};
+
+type RecognitionResultListLike = {
+  length: number;
+  [index: number]: { [index: number]: { transcript: string } };
+};
+
+type RecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: { results: RecognitionResultListLike }) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
+type RecognitionConstructor = new () => RecognitionLike;
+
+const INITIAL_SITE: BuilderState = {
+  generated: false,
+  businessName: 'Your Business',
+  industry: 'Business website',
+  location: 'Indianapolis, Indiana',
+  tone: 'Modern',
+  heroHeadline: 'Tell PARIS what you want to build.',
+  heroSubhead: 'Describe the business, services, style, and customer action. The preview will change from your instruction.',
+  primaryColor: '#b91c1c',
+  secondaryColor: '#ecfeff',
+  services: ['Service one', 'Service two', 'Service three'],
+  imageKey: 'general',
+  brightness: 0.14,
+  booking: false,
+  financing: false,
+  testimonials: false,
+  mobilePreview: false,
+  published: false,
+};
+
+const EXAMPLE_PROMPT =
+  'Build me a luxury dental website in Indianapolis with online booking, financing, implants, Invisalign, testimonials, white and gold branding, and a strong mobile version.';
 
 const QUICK_COMMANDS = [
   'Make the hero brighter',
   'Add online booking',
-  'Rewrite my services',
+  'Add financing and testimonials',
+  'Show me the mobile version',
   'Make it feel more premium',
+  'Publish it',
 ];
 
-function sceneFromTime(seconds: number) {
-  let index = 0;
-  for (let i = 0; i < SCENES.length; i += 1) {
-    if (seconds >= SCENES[i].start) index = i;
-  }
-  return index;
-}
+const IMAGE_BY_KEY: Record<string, string> = {
+  dental: '/images/healthcare/video-thumbnail-dental-assistant.jpg',
+  'home-health': '/images/pages/platform-page-12.webp',
+  beauty: '/images/beauty/program-barber-training.jpg',
+  training: '/images/pages/certifications-page-1.webp',
+  general: '/images/pages/platform-page-12.webp',
+};
 
-function SitePreview({ scene }: { scene: number }) {
-  const showGenerated = scene >= 1;
-  const showBrandEdit = scene >= 3;
-  const showBooking = scene >= 4;
+const BUILD_STAGES = [
+  'Understanding your request…',
+  'Planning the page structure…',
+  'Applying brand and conversion tools…',
+  'Rendering the preview…',
+];
 
-  return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3">
+function SitePreview({ site }: { site: BuilderState }) {
+  const image = IMAGE_BY_KEY[site.imageKey] || IMAGE_BY_KEY.general;
+
+  const preview = (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+      <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2.5">
         <span className="h-2.5 w-2.5 rounded-full bg-rose-300" />
         <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
         <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
-        <div className="ml-2 flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-500">
+        <div className="ml-2 flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-500">
           <Globe2 className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">preview.elevate.site/harbor-home-health</span>
+          <span className="truncate">
+            {site.published ? 'www.' : 'preview.elevate.site/'}
+            {site.businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'your-business'}
+            {site.published ? '.com' : ''}
+          </span>
         </div>
       </div>
 
-      {!showGenerated ? (
-        <div className="grid min-h-[360px] place-items-center bg-gradient-to-br from-cyan-50 via-white to-rose-50 p-6 text-center">
-          <div className="max-w-md">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-red-100 text-brand-red-700">
-              <LayoutTemplate className="h-7 w-7" />
+      {!site.generated ? (
+        <div className="grid min-h-[430px] place-items-center bg-gradient-to-br from-cyan-50 via-white to-rose-50 p-8 text-center">
+          <div className="max-w-lg">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-red-100 text-brand-red-700">
+              <Sparkles className="h-8 w-8" />
             </div>
-            <p className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">Blank canvas avoided</p>
-            <h4 className="mt-2 text-2xl font-black text-slate-950">Describe the business and PARIS starts the site.</h4>
-            <p className="mt-3 text-sm font-medium leading-6 text-slate-600">The buyer sees what they are building before they ever enter the full editor.</p>
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-brand-red-700">Start with a conversation</p>
+            <h3 className="mt-2 text-3xl font-black text-slate-950">No blank canvas.</h3>
+            <p className="mt-3 text-sm font-semibold leading-6 text-slate-600">
+              Type or speak what you want. PARIS will turn the instruction into visible changes in this preview.
+            </p>
           </div>
         </div>
       ) : (
         <div className="bg-white">
-          <div className={`relative overflow-hidden ${showBrandEdit ? 'bg-gradient-to-r from-cyan-50 via-white to-rose-50' : 'bg-gradient-to-r from-sky-50 to-cyan-50'}`}>
-            <div className="grid min-h-[220px] gap-5 p-5 md:grid-cols-[1.05fr_0.95fr] md:items-center md:p-7">
-              <div>
-                <div className="inline-flex rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-brand-red-700 shadow-sm">
-                  Indianapolis home healthcare
-                </div>
-                <h4 className="mt-4 text-3xl font-black leading-tight text-slate-950">
-                  Compassionate care that keeps families moving forward.
-                </h4>
-                <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-700">
-                  Skilled support, personal care, respite services, and simple online consultation requests.
-                </p>
+          <section className="relative overflow-hidden" style={{ backgroundColor: site.secondaryColor }}>
+            <div className="grid min-h-[300px] md:grid-cols-[1.02fr_0.98fr]">
+              <div className="flex flex-col justify-center p-6 sm:p-8">
+                <span
+                  className="w-fit rounded-full border bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+                  style={{ borderColor: `${site.primaryColor}33`, color: site.primaryColor }}
+                >
+                  {site.location} · {site.industry}
+                </span>
+                <h3 className="mt-4 text-3xl font-black leading-tight text-slate-950 sm:text-4xl">{site.heroHeadline}</h3>
+                <p className="mt-3 max-w-xl text-sm font-semibold leading-6 text-slate-700">{site.heroSubhead}</p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <button type="button" className="rounded-lg bg-brand-red-700 px-4 py-2 text-xs font-black text-white">Book a consultation</button>
-                  <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-black text-slate-800">View services</button>
+                  <button
+                    type="button"
+                    className="rounded-lg px-4 py-2.5 text-xs font-black text-white shadow-sm"
+                    style={{ backgroundColor: site.primaryColor }}
+                  >
+                    {site.booking ? 'Book an appointment' : 'Get started'}
+                  </button>
+                  <button type="button" className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-slate-800">
+                    View services
+                  </button>
                 </div>
               </div>
-              <div className="relative min-h-[170px] overflow-hidden rounded-2xl border border-white/70 bg-white shadow-lg">
+
+              <div className="relative min-h-[240px] overflow-hidden bg-slate-100 md:min-h-[300px]">
                 <Image
-                  src="/images/pages/platform-page-12.webp"
-                  alt="Website preview inside the Elevate Website Builder demo"
+                  src={image}
+                  alt={`${site.businessName} website hero preview`}
                   fill
-                  sizes="(max-width: 768px) 90vw, 40vw"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover object-center"
                 />
+                <div className="absolute inset-0 bg-black transition-opacity duration-500" style={{ opacity: site.brightness }} />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="grid gap-3 p-5 sm:grid-cols-3">
-            {['Personal care', 'Respite support', 'Care coordination'].map((service) => (
-              <div key={service} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="h-8 w-8 rounded-lg bg-cyan-100" />
-                <div className="mt-3 text-xs font-black text-slate-900">{service}</div>
-                <div className="mt-2 h-1.5 w-full rounded bg-slate-200" />
-                <div className="mt-1.5 h-1.5 w-3/4 rounded bg-slate-200" />
-              </div>
+          <section className="grid gap-3 p-5 sm:grid-cols-3">
+            {site.services.slice(0, 3).map((service) => (
+              <article key={service} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <div className="h-1.5 w-12 rounded-full" style={{ backgroundColor: site.primaryColor }} />
+                <h4 className="mt-3 text-sm font-black text-slate-950">{service}</h4>
+                <p className="mt-2 text-xs font-medium leading-5 text-slate-600">Professional information and a clear next action for customers.</p>
+              </article>
             ))}
-          </div>
+          </section>
 
-          {showBooking ? (
-            <div className="mx-5 mb-5 flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-black uppercase tracking-wider text-emerald-700">New conversion block added</p>
-                <p className="mt-1 text-sm font-black text-slate-950">Consultation booking is now on the homepage.</p>
-              </div>
-              <button type="button" className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-black text-white">Request appointment</button>
+          {(site.booking || site.financing || site.testimonials) && (
+            <section className="grid gap-3 border-t border-slate-100 p-5 sm:grid-cols-3">
+              {site.booking && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                  <Check className="h-5 w-5 text-emerald-700" />
+                  <p className="mt-2 text-xs font-black uppercase tracking-wider text-emerald-800">Booking added</p>
+                  <p className="mt-1 text-sm font-bold text-slate-950">Schedule online</p>
+                </div>
+              )}
+              {site.financing && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                  <CircleDollarSign className="h-5 w-5 text-amber-700" />
+                  <p className="mt-2 text-xs font-black uppercase tracking-wider text-amber-800">Financing added</p>
+                  <p className="mt-1 text-sm font-bold text-slate-950">Payment options section</p>
+                </div>
+              )}
+              {site.testimonials && (
+                <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-4">
+                  <Star className="h-5 w-5 text-cyan-700" />
+                  <p className="mt-2 text-xs font-black uppercase tracking-wider text-cyan-800">Social proof added</p>
+                  <p className="mt-1 text-sm font-bold text-slate-950">Testimonials section</p>
+                </div>
+              )}
+            </section>
+          )}
+
+          {site.published && (
+            <div className="border-t border-emerald-200 bg-emerald-50 px-5 py-4 text-center text-sm font-black text-emerald-900">
+              Published preview · the demo has reached the final go-live step.
             </div>
-          ) : null}
+          )}
         </div>
       )}
     </div>
   );
-}
-
-function BuilderWorkspace({ scene, setScene }: { scene: number; setScene: (scene: number) => void }) {
-  const prompt =
-    scene === 0
-      ? 'Build a professional home-healthcare website in Indianapolis with services, booking, and a strong call to action.'
-      : QUICK_COMMANDS[Math.min(Math.max(scene - 2, 0), QUICK_COMMANDS.length - 1)];
 
   return (
-    <div className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-2xl shadow-slate-300/50">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:px-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-red-700 text-white">
-            <Sparkles className="h-4.5 w-4.5" />
+    <div className="flex min-h-[500px] items-start justify-center bg-slate-100 p-3 sm:p-5">
+      <div className={`w-full transition-all duration-500 ${site.mobilePreview ? 'max-w-[390px]' : 'max-w-none'}`}>
+        {site.mobilePreview && (
+          <div className="mb-2 flex items-center justify-center gap-2 text-xs font-black text-slate-600">
+            <Smartphone className="h-4 w-4" /> Mobile preview
           </div>
-          <div>
-            <p className="text-sm font-black text-slate-950">Elevate Website Builder</p>
-            <p className="text-[11px] font-semibold text-emerald-700">Draft saved automatically</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={() => setScene(5)} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-800 hover:bg-slate-50">
-            <Monitor className="h-3.5 w-3.5" /> Preview
-          </button>
-          <button type="button" onClick={() => setScene(6)} className="inline-flex items-center gap-1.5 rounded-lg bg-brand-red-700 px-3 py-2 text-xs font-black text-white hover:bg-brand-red-800">
-            <Rocket className="h-3.5 w-3.5" /> Publish
-          </button>
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-[190px_minmax(0,1fr)_260px]">
-        <aside className="hidden border-r border-slate-200 bg-slate-50 p-3 lg:block">
-          <p className="px-2 py-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Build</p>
-          {[
-            { label: 'Pages', icon: LayoutTemplate, target: 1 },
-            { label: 'Brand', icon: Palette, target: 3 },
-            { label: 'SEO', icon: Search, target: 4 },
-            { label: 'Mobile', icon: Smartphone, target: 5 },
-          ].map(({ label, icon: Icon, target }) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => setScene(target)}
-              className={`mb-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-black transition ${scene === target ? 'bg-white text-brand-red-700 shadow-sm' : 'text-slate-700 hover:bg-white'}`}
-            >
-              <Icon className="h-4 w-4" /> {label}
-            </button>
-          ))}
-        </aside>
-
-        <div className="min-w-0 bg-slate-100 p-3 sm:p-4">
-          <SitePreview scene={scene} />
-        </div>
-
-        <aside className="border-t border-slate-200 bg-white p-4 lg:border-l lg:border-t-0">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-100 text-cyan-800">
-              <Bot className="h-4.5 w-4.5" />
-            </div>
-            <div>
-              <p className="text-sm font-black text-slate-950">PARIS</p>
-              <p className="text-[11px] font-semibold text-slate-500">Build by voice or text</p>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-xl bg-slate-100 p-3 text-xs font-semibold leading-5 text-slate-700">
-            {prompt}
-          </div>
-
-          <div className="mt-3 flex items-center gap-2 rounded-xl border border-slate-300 bg-white p-2">
-            <button type="button" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-800" aria-label="Use voice command">
-              <Mic className="h-4 w-4" />
-            </button>
-            <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-slate-500">Tell PARIS what to change…</span>
-            <button type="button" onClick={() => setScene(Math.min(scene + 1, SCENES.length - 1))} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-red-700 text-white" aria-label="Send demo command">
-              <Send className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="mt-4 space-y-2">
-            {QUICK_COMMANDS.map((command, index) => (
-              <button
-                key={command}
-                type="button"
-                onClick={() => setScene(Math.min(index + 2, 5))}
-                className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left text-[11px] font-bold text-slate-700 hover:border-cyan-300 hover:bg-cyan-50"
-              >
-                <span>{command}</span>
-                <ChevronRight className="h-3.5 w-3.5 shrink-0" />
-              </button>
-            ))}
-          </div>
-
-          {scene >= 1 ? (
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-[11px] font-black text-emerald-800">
-              <Check className="h-3.5 w-3.5" /> Changes saved to this draft
-            </div>
-          ) : null}
-        </aside>
+        )}
+        {preview}
       </div>
     </div>
   );
 }
 
 export default function WebsiteBuilderCommercial() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [scene, setScene] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [voiceError, setVoiceError] = useState(false);
+  const commercialAudioRef = useRef<HTMLAudioElement | null>(null);
+  const recognitionRef = useRef<RecognitionLike | null>(null);
+  const [site, setSite] = useState<BuilderState>(INITIAL_SITE);
+  const [command, setCommand] = useState(EXAMPLE_PROMPT);
+  const [reply, setReply] = useState('Tell me what you want to build. I will update the preview from your instruction.');
+  const [history, setHistory] = useState<string[]>([]);
+  const [working, setWorking] = useState(false);
+  const [stage, setStage] = useState(0);
+  const [listening, setListening] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (playing) return;
-    const timer = window.setInterval(() => setScene((current) => (current + 1) % SCENES.length), 5200);
-    return () => window.clearInterval(timer);
-  }, [playing]);
-
-  const narrated = useMemo(() => !voiceError, [voiceError]);
-
-  async function togglePlayback() {
-    const audio = audioRef.current;
-    if (!audio) return;
-    try {
-      if (audio.paused) await audio.play();
-      else audio.pause();
-    } catch {
-      setVoiceError(true);
-      setPlaying(false);
+    if (!working) {
+      setStage(0);
+      return;
     }
+    const timer = window.setInterval(() => setStage((current) => (current + 1) % BUILD_STAGES.length), 700);
+    return () => window.clearInterval(timer);
+  }, [working]);
+
+  useEffect(() => {
+    const handleStarter = (event: Event) => {
+      const detail = (event as CustomEvent<{ prompt?: string }>).detail;
+      if (detail?.prompt) setCommand(detail.prompt);
+    };
+    window.addEventListener('elevate:paris-demo', handleStarter);
+    return () => window.removeEventListener('elevate:paris-demo', handleStarter);
+  }, []);
+
+  const status = useMemo(() => {
+    if (working) return BUILD_STAGES[stage];
+    if (site.published) return 'Published';
+    if (site.generated) return 'Draft saved automatically';
+    return 'Ready for your instruction';
+  }, [site.generated, site.published, stage, working]);
+
+  function speak(text: string) {
+    if (!voiceEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.03;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  async function runCommand(value: string) {
+    const message = value.trim();
+    if (!message || working) return;
+
+    setWorking(true);
+    setError('');
+    setHistory((current) => [...current.slice(-3), message]);
+
+    try {
+      const response = await fetch('/api/store/website-builder/paris', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'builder', message, current: site }),
+      });
+      if (!response.ok) throw new Error(`PARIS returned ${response.status}`);
+      const data = (await response.json()) as ParisResponse;
+      if (data.actions) {
+        setSite((current) => ({
+          ...current,
+          ...data.actions,
+          services: Array.isArray(data.actions?.services) && data.actions.services.length ? data.actions.services : current.services,
+        }));
+      }
+      const nextReply = data.reply || 'Done. The preview has been updated.';
+      setReply(nextReply);
+      speak(nextReply);
+    } catch (requestError) {
+      console.error(requestError);
+      setError('PARIS could not process that command. Try one of the quick commands below.');
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  function startListening() {
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const speechWindow = window as Window & {
+      SpeechRecognition?: RecognitionConstructor;
+      webkitSpeechRecognition?: RecognitionConstructor;
+    };
+    const Recognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+    if (!Recognition) {
+      setError('Voice input is not supported by this browser. Type the same instruction instead.');
+      return;
+    }
+
+    const recognition = new Recognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript?.trim();
+      if (transcript) {
+        setCommand(transcript);
+        void runCommand(transcript);
+      }
+    };
+    recognition.onerror = () => {
+      setListening(false);
+      setError('I could not hear that clearly. Try again or type the instruction.');
+    };
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    setListening(true);
+    recognition.start();
   }
 
   return (
     <section className="border-y border-cyan-100 bg-gradient-to-b from-cyan-50 via-white to-rose-50 px-4 py-14 text-slate-950 sm:py-16">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-7 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-7 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-brand-red-700">Interactive Website Builder Demo</p>
-            <h2 className="mt-2 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">See the builder. Click the controls. Hear the commercial.</h2>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-brand-red-700">Live PARIS Website Builder Demo</p>
+            <h2 className="mt-2 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl">
+              Tell PARIS what you want. Watch the website respond.
+            </h2>
             <p className="mt-3 max-w-3xl text-sm font-semibold leading-7 text-slate-700 sm:text-base">
-              This is a visual product walkthrough, not a slide deck. Move through the builder workspace, change the preview, use PARIS commands, switch to mobile, and walk the site all the way to publish.
+              This demo now uses your actual instruction. Type or speak a request, then watch PARIS change the business, hero, brand, services, booking, financing, testimonials, mobile preview, and publish state.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={togglePlayback} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white shadow-sm hover:bg-brand-red-800">
-              {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-              {playing ? 'Pause narration' : 'Play with natural voice'}
+            <button
+              type="button"
+              onClick={() => {
+                setCommand(EXAMPLE_PROMPT);
+                void runCommand(EXAMPLE_PROMPT);
+              }}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-5 font-black text-white shadow-sm hover:bg-brand-red-800"
+            >
+              <Play className="h-5 w-5" /> Run dental example
             </button>
             <Link href="/apps/website-builder/start-trial" className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-5 font-black text-slate-950 hover:bg-slate-50">
-              Try the real builder
+              Open the real builder
             </Link>
           </div>
         </div>
 
-        <div className="mb-4 flex gap-2 overflow-x-auto pb-1" aria-label="Website Builder demo steps">
-          {SCENES.map((item, index) => (
-            <button
-              key={item.label}
-              type="button"
-              aria-pressed={scene === index}
-              onClick={() => {
-                setScene(index);
-                setPlaying(false);
-                audioRef.current?.pause();
-              }}
-              className={`shrink-0 rounded-full border px-4 py-2 text-xs font-black transition ${scene === index ? 'border-brand-red-700 bg-brand-red-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-cyan-400 hover:bg-cyan-50'}`}
-            >
-              {index + 1}. {item.label}
-            </button>
-          ))}
-        </div>
+        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-2xl shadow-slate-300/50">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-red-700 text-white">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-black">Elevate Website Builder</p>
+                <p className={`text-[11px] font-bold ${working ? 'text-cyan-700' : 'text-emerald-700'}`}>{status}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSite((current) => ({ ...current, mobilePreview: !current.mobilePreview }))}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-black hover:bg-slate-50"
+              >
+                {site.mobilePreview ? <Monitor className="h-4 w-4" /> : <Smartphone className="h-4 w-4" />}
+                {site.mobilePreview ? 'Desktop' : 'Mobile'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void runCommand('Publish it')}
+                className="inline-flex items-center gap-2 rounded-lg bg-brand-red-700 px-3 py-2 text-xs font-black text-white hover:bg-brand-red-800"
+              >
+                <Rocket className="h-4 w-4" /> Publish
+              </button>
+            </div>
+          </div>
 
-        <BuilderWorkspace scene={scene} setScene={setScene} />
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_330px]">
+            <SitePreview site={site} />
+
+            <aside className="border-t border-slate-200 bg-white p-4 sm:p-5 lg:border-l lg:border-t-0">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-100 text-cyan-800">
+                    <Bot className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black">PARIS</p>
+                    <p className="text-[11px] font-semibold text-slate-500">Website interview + live edits</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setVoiceEnabled((current) => !current)}
+                  className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+                  aria-label={voiceEnabled ? 'Mute PARIS voice' : 'Enable PARIS voice'}
+                >
+                  {voiceEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                </button>
+              </div>
+
+              <div className="mt-4 min-h-[92px] rounded-2xl bg-slate-100 p-4 text-sm font-semibold leading-6 text-slate-700">
+                {working ? (
+                  <span className="flex items-center gap-2 font-black text-cyan-800">
+                    <Loader2 className="h-4 w-4 animate-spin" /> {BUILD_STAGES[stage]}
+                  </span>
+                ) : (
+                  reply
+                )}
+              </div>
+
+              <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500" htmlFor="paris-builder-command">
+                Tell PARIS what to build or change
+              </label>
+              <textarea
+                id="paris-builder-command"
+                value={command}
+                onChange={(event) => setCommand(event.target.value)}
+                rows={5}
+                className="mt-2 w-full resize-none rounded-xl border border-slate-300 bg-white p-3 text-sm font-semibold leading-6 text-slate-800 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                placeholder="Example: Build a luxury dental website with booking, financing, implants, testimonials, and a brighter hero."
+              />
+
+              <div className="mt-3 grid grid-cols-[auto_1fr] gap-2">
+                <button
+                  type="button"
+                  onClick={startListening}
+                  className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-black ${listening ? 'border-brand-red-300 bg-brand-red-50 text-brand-red-800' : 'border-slate-300 bg-white text-slate-800 hover:bg-slate-50'}`}
+                >
+                  {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  {listening ? 'Listening…' : 'Speak'}
+                </button>
+                <button
+                  type="button"
+                  disabled={working || !command.trim()}
+                  onClick={() => void runCommand(command)}
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-700 px-4 text-sm font-black text-white hover:bg-brand-red-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {working ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                  Send to PARIS
+                </button>
+              </div>
+
+              {error && <p className="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-bold leading-5 text-amber-900">{error}</p>}
+
+              <div className="mt-5">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Try a real change</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {QUICK_COMMANDS.map((quick) => (
+                    <button
+                      key={quick}
+                      type="button"
+                      disabled={working}
+                      onClick={() => {
+                        setCommand(quick);
+                        void runCommand(quick);
+                      }}
+                      className="rounded-full border border-slate-200 bg-white px-3 py-2 text-left text-[11px] font-bold text-slate-700 hover:border-cyan-300 hover:bg-cyan-50 disabled:opacity-50"
+                    >
+                      {quick}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {history.length > 0 && (
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">Recent instructions</p>
+                  <div className="mt-2 space-y-2">
+                    {history.slice(-3).reverse().map((item, index) => (
+                      <div key={`${item}-${index}`} className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] font-semibold leading-5 text-slate-600">
+                        “{item}”
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </aside>
+          </div>
+        </div>
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-xs font-bold text-slate-600">
-            {narrated ? 'Natural voice narration available' : 'Visual demo mode'} · Step {scene + 1} of {SCENES.length}
-          </div>
-          <div className="h-2 w-full max-w-md overflow-hidden rounded-full bg-slate-200">
-            <div className="h-full rounded-full bg-cyan-500 transition-[width] duration-300" style={{ width: `${playing ? Math.max(0, Math.min(100, progress)) : ((scene + 1) / SCENES.length) * 100}%` }} />
-          </div>
+          <p className="max-w-3xl text-xs font-bold leading-5 text-slate-600">
+            This is a public interactive product demonstration. It applies PARIS-generated demo actions to the preview; the authenticated Website Builder is the production workspace that saves and publishes customer sites.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              const audio = commercialAudioRef.current;
+              if (!audio) return;
+              if (audio.paused) void audio.play();
+              else audio.pause();
+            }}
+            className="shrink-0 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-black text-slate-800 hover:bg-slate-50"
+          >
+            Play commercial narration
+          </button>
         </div>
 
-        {voiceError ? (
-          <p className="mt-3 text-sm font-semibold text-amber-800">The click-through visual demo remains available. Narration will resume when the configured voice service is available.</p>
-        ) : null}
-
-        <audio
-          ref={audioRef}
-          preload="none"
-          src="/api/store/website-builder/commercial-voice"
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
-          onEnded={() => {
-            setPlaying(false);
-            setProgress(100);
-            setScene(SCENES.length - 1);
-          }}
-          onError={() => {
-            setVoiceError(true);
-            setPlaying(false);
-          }}
-          onTimeUpdate={(event) => {
-            const audio = event.currentTarget;
-            setScene(sceneFromTime(audio.currentTime));
-            if (Number.isFinite(audio.duration) && audio.duration > 0) setProgress((audio.currentTime / audio.duration) * 100);
-          }}
-        />
+        <audio ref={commercialAudioRef} preload="none" src="/api/store/website-builder/commercial-voice" />
       </div>
     </section>
   );

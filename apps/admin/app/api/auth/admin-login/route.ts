@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getServerSupabaseEnvMisconfigurationReason } from '@/lib/supabase/server-env';
 import { applyNormalizedSupabaseUrlToEnv } from '@/lib/supabase/normalize-url';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { ADMIN_ROLES } from '@/lib/rbac/role-matrix';
 
 const ADMIN_PORTAL_LOGIN_ROLES = [
@@ -37,6 +38,9 @@ function jsonError(error: unknown): NextResponse {
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'auth');
+    if (rateLimited) return rateLimited as NextResponse;
+
     const body = (await req.json().catch(() => null)) as
       | { email?: unknown; password?: unknown }
       | null;

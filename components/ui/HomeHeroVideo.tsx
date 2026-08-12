@@ -23,6 +23,13 @@ export interface HomeHeroVideoProps {
   banner: HeroBanner;
 }
 
+const HOME_MEDIA_REVISION = '20260812-home-hero';
+
+function withMediaRevision(src?: string) {
+  if (!src) return undefined;
+  return `${src}${src.includes('?') ? '&' : '?'}v=${HOME_MEDIA_REVISION}`;
+}
+
 /**
  * Homepage compatibility wrapper.
  * Media playback, mobile source selection, error fallback, narration controls,
@@ -32,6 +39,10 @@ export interface HomeHeroVideoProps {
  * renderer. HeroVideo keeps it mounted behind the video until a renderable
  * frame is ready, so slow mobile decoding, autoplay restrictions, and media
  * errors fall back to a real hero image instead of a blank/black frame.
+ *
+ * Homepage media URLs carry an explicit revision so a previously cached media
+ * failure cannot pin the current deployment to the poster after a successful
+ * release.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const ctas = banner.secondaryCta
@@ -40,10 +51,10 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
 
   return (
     <HeroVideo
-      videoSrcDesktop={banner.videoSrcDesktop}
-      videoSrcMobile={banner.videoSrcMobile}
-      posterImage={banner.posterImage}
-      voiceoverSrc={banner.voiceoverSrc}
+      videoSrcDesktop={withMediaRevision(banner.videoSrcDesktop)}
+      videoSrcMobile={withMediaRevision(banner.videoSrcMobile)}
+      posterImage={withMediaRevision(banner.posterImage)}
+      voiceoverSrc={withMediaRevision(banner.voiceoverSrc)}
       microLabel={banner.microLabel}
       belowHeroHeadline={banner.belowHeroHeadline}
       belowHeroSubheadline={banner.belowHeroSubheadline}

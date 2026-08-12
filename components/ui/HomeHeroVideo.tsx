@@ -23,7 +23,7 @@ export interface HomeHeroVideoProps {
   banner: HeroBanner;
 }
 
-const HOME_MEDIA_REVISION = '20260812-home-hero';
+const HOME_MEDIA_REVISION = process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 12) || 'home-hero';
 
 function withMediaRevision(src?: string) {
   if (!src) return undefined;
@@ -35,14 +35,9 @@ function withMediaRevision(src?: string) {
  * Media playback, mobile source selection, error fallback, narration controls,
  * and route cleanup all live in components/marketing/HeroVideo.
  *
- * The page-specific poster is intentionally passed through to the canonical
- * renderer. HeroVideo keeps it mounted behind the video until a renderable
- * frame is ready, so slow mobile decoding, autoplay restrictions, and media
- * errors fall back to a real hero image instead of a blank/black frame.
- *
- * Homepage media URLs carry an explicit revision so a previously cached media
- * failure cannot pin the current deployment to the poster after a successful
- * release.
+ * Homepage media URLs are revisioned with the deployed commit SHA so browsers,
+ * service workers, and intermediary caches cannot pin a new deployment to an
+ * older poster/video/image response.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const ctas = banner.secondaryCta

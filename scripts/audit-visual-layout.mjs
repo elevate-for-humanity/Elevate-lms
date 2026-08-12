@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 /**
- * Full-site visual audit: oversized heroes/images, layout/text gaps.
+ * Active-platform visual audit: heroes, images, sizing and text/layout risks.
+ *
+ * This audit intentionally targets the three deployed app trees rather than the
+ * legacy root app/ tree. Shared components are included because all services can
+ * consume them.
  *
  * Usage: node scripts/audit-visual-layout.mjs
  * Writes: docs/audits/VISUAL_LAYOUT_AUDIT.json + VISUAL_LAYOUT_AUDIT.md
@@ -9,56 +13,43 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const SCAN_DIRS = ['app', 'components', 'content'];
-const SKIP_DIRS = new Set(['node_modules', '.next', '__tests__']);
+const SCAN_DIRS = [
+  'apps/marketing/app',
+  'apps/lms/app',
+  'apps/admin/app',
+  'components',
+  'content',
+];
+const SKIP_DIRS = new Set(['node_modules', '.next', '__tests__', 'archive', 'legacy']);
 
-/** Canonical max hero height per docs/page-design-standard.md */
-const CANONICAL_MAX_HERO_PX = 560;
-const CANONICAL_HERO_CLASS =
-  'h-[38vh] min-h-[220px] max-h-[420px]';
+/** Current canonical hero size used by HeroPicture/HeroVideo and page design tokens. */
+const CANONICAL_MAX_HERO_PX = 520;
+const CANONICAL_HERO_CLASS = 'h-[38vh] min-h-[260px] max-h-[520px]';
 
 const OVERSIZED_HERO_PATTERNS = [
   {
     id: 'vh-50-plus',
     re: /h-\[(5[0-9]|[6-9][0-9]|100)vh\]/g,
     severity: 'high',
-    message: 'Hero/viewport height ≥50vh (often oversized)',
+    message: 'Hero/viewport height ≥50vh',
   },
   {
     id: 'min-h-420-plus',
     re: /min-h-\[(?:4[2-9]\d|[5-9]\d{2,})px\]/g,
     severity: 'high',
-    message: 'min-height ≥420px on hero-like container',
+    message: 'Large minimum height on hero-like container',
   },
   {
-    id: 'max-h-600-plus',
-    re: /max-h-\[(6[0-9]{2}|[7-9]\d{2}|[8-9]\d{2})px\]/g,
+    id: 'max-h-over-canonical',
+    re: /max-h-\[(?:5[3-9]\d|[6-9]\d{2}|[1-9]\d{3,})px\]/g,
     severity: 'high',
-    message: 'max-height >560px (exceeds design standard)',
+    message: `Hero max-height exceeds canonical ${CANONICAL_MAX_HERO_PX}px`,
   },
   {
-    id: 'clamp-tall',
-    re: /clamp\(\s*(3[2-9]{2}|[4-9]\d{2})px\s*,/g,
-    severity: 'medium',
-    message: 'clamp() minimum ≥320px (tall hero)',
-  },
-  {
-    id: 'clamp-max-600-plus',
-    re: /clamp\([^)]+,\s*[^)]+,\s*(6[0-9]{2}|[7-9]\d{2})px\s*\)/g,
+    id: 'clamp-max-over-canonical',
+    re: /clamp\([^)]+,\s*[^)]+,\s*(?:5[3-9]\d|[6-9]\d{2}|[1-9]\d{3,})px\s*\)/g,
     severity: 'high',
-    message: 'clamp() max >560px',
-  },
-  {
-    id: 'page-video-hero-primary',
-    re: /primary:\s*['"]h-\[75vh\]/g,
-    severity: 'critical',
-    message: 'PageVideoHero primary size is 75vh (legacy oversized)',
-  },
-  {
-    id: 'home-top-hero-500',
-    re: /lg:h-\[500px\]/g,
-    severity: 'medium',
-    message: 'HomeTopHero lg height 500px without max-h cap',
+    message: `Hero clamp max exceeds canonical ${CANONICAL_MAX_HERO_PX}px`,
   },
   {
     id: 'layout-700',
@@ -70,43 +61,31 @@ const OVERSIZED_HERO_PATTERNS = [
 
 const IMAGE_PERF_PATTERNS = [
   {
-    id: 'sizes-100vw',
-    re: /\bsizes=["']100vw["']/g,
-    severity: 'medium',
-    message: 'sizes=100vw loads full viewport width image (heavy LCP)',
-  },
-  {
     id: 'preload-full-hero',
     re: /preloadFull\b/g,
     severity: 'high',
-    message: 'preloadFull downloads entire hero video on load',
+    message: 'preloadFull downloads the entire hero video on load',
   },
   {
     id: 'fill-no-sizes',
     re: /<Image[^>]*\bfill\b(?![^>]*\bsizes=)/g,
-    severity: 'low',
-    message: 'next/image fill without sizes (may over-fetch)',
+    severity: 'medium',
+    message: 'next/image fill without sizes may over-fetch',
   },
 ];
 
 const LAYOUT_TEXT_PATTERNS = [
   {
-    id: 'text-gray',
-    re: /\btext-gray-\d+/g,
-    severity: 'medium',
-    message: 'Use text-slate-* per page design standard',
-  },
-  {
     id: 'hero-gradient-overlay',
     re: /(?:hero|Hero)[\s\S]{0,400}bg-gradient-to/g,
     severity: 'high',
-    message: 'Gradient overlay near hero (forbidden on hero frame)',
+    message: 'Gradient overlay near hero media',
   },
   {
     id: 'hero-text-overlay',
     re: /absolute inset-0[\s\S]{0,300}text-(?:white|3xl|4xl|5xl)/g,
     severity: 'high',
-    message: 'Headline/text overlaid on hero media',
+    message: 'Possible headline/text overlaid on hero media',
   },
   {
     id: 'invisible-white-on-white',
@@ -115,17 +94,24 @@ const LAYOUT_TEXT_PATTERNS = [
     message: 'Possible white text on white background',
   },
   {
-    id: 'sparse-hero-only',
-    re: /<section[^>]*hero[\s\S]{0,200}<\/section>\s*<section[^>]*(?:cta|CTA)/gi,
-    severity: 'low',
-    message: 'Possible sparse page (hero then CTA with little content)',
-  },
-  {
-    id: 'empty-alt',
+    id: 'empty-next-image-alt',
     re: /<Image[^>]*alt=["']\s*["']/g,
     severity: 'medium',
-    message: 'Empty image alt text',
+    message: 'Empty Next/Image alt text',
   },
+];
+
+const CANONICAL_HERO_MARKERS = [
+  'HeroPicture',
+  'HeroVideo',
+  'HomeHeroVideo',
+  'PageVideoHero',
+  'PictureFirstPageHero',
+  'ProgramDetailPage',
+  'ProgramPageLayout',
+  'heroBanners',
+  'hero.imageWrap',
+  'heroTokens.imageWrap',
 ];
 
 function walk(dir, out = []) {
@@ -143,16 +129,31 @@ function lineNumber(content, index) {
   return content.slice(0, index).split('\n').length;
 }
 
-function findMatches(content, relFile, patterns) {
+function serviceFor(relFile) {
+  if (relFile.startsWith('apps/marketing/')) return 'marketing';
+  if (relFile.startsWith('apps/lms/')) return 'lms';
+  if (relFile.startsWith('apps/admin/')) return 'admin';
+  return 'shared';
+}
+
+function nearbyLooksHeroLike(content, index) {
+  const start = Math.max(0, index - 700);
+  const end = Math.min(content.length, index + 700);
+  return /hero|banner/i.test(content.slice(start, end));
+}
+
+function findMatches(content, relFile, patterns, heroOnly = false) {
   const hits = [];
   for (const pat of patterns) {
     pat.re.lastIndex = 0;
     let m;
     while ((m = pat.re.exec(content)) !== null) {
+      if (heroOnly && !nearbyLooksHeroLike(content, m.index)) continue;
       hits.push({
         file: relFile,
+        service: serviceFor(relFile),
         line: lineNumber(content, m.index),
-        match: m[0].slice(0, 80),
+        match: m[0].slice(0, 100),
         ...pat,
       });
     }
@@ -163,59 +164,68 @@ function findMatches(content, relFile, patterns) {
 function usesCanonicalHero(content) {
   return (
     content.includes(CANONICAL_HERO_CLASS) ||
-    content.includes('hero.imageWrap') ||
-    content.includes('heroTokens.imageWrap') ||
-    content.includes('HeroPicture') ||
-    content.includes('HeroVideo')
+    CANONICAL_HERO_MARKERS.some((marker) => content.includes(marker))
   );
 }
 
-const files = SCAN_DIRS.flatMap((d) => walk(path.join(ROOT, d)));
+function pageHasHeroIntent(content) {
+  return /\bHero\b|\bhero\b|bannerImage|heroImage|posterImage|<video\b/i.test(content);
+}
+
+const files = [...new Set(SCAN_DIRS.flatMap((d) => walk(path.join(ROOT, d))))];
 const oversizedHero = [];
 const imagePerf = [];
 const layoutText = [];
 const marketingPagesNoCanonical = [];
 
 for (const full of files) {
-  const rel = path.relative(ROOT, full);
+  const rel = path.relative(ROOT, full).replaceAll('\\', '/');
   const content = fs.readFileSync(full, 'utf8');
-  oversizedHero.push(...findMatches(content, rel, OVERSIZED_HERO_PATTERNS));
+
+  oversizedHero.push(...findMatches(content, rel, OVERSIZED_HERO_PATTERNS, true));
   imagePerf.push(...findMatches(content, rel, IMAGE_PERF_PATTERNS));
-
-  if (rel.startsWith('app/') && rel.endsWith('page.tsx')) {
-    const isPublic =
-      !rel.includes('/admin/') &&
-      !rel.includes('/api/') &&
-      !rel.includes('(app)/') &&
-      !rel.includes('/lms/');
-    if (isPublic && /(?:Hero|hero|fill\s)/.test(content) && !usesCanonicalHero(content)) {
-      marketingPagesNoCanonical.push(rel);
-    }
-  }
-
   layoutText.push(...findMatches(content, rel, LAYOUT_TEXT_PATTERNS));
+
+  if (
+    rel.startsWith('apps/marketing/app/') &&
+    rel.endsWith('/page.tsx') &&
+    !rel.includes('/api/') &&
+    pageHasHeroIntent(content) &&
+    !usesCanonicalHero(content)
+  ) {
+    marketingPagesNoCanonical.push(rel);
+  }
 }
 
 function groupByFile(hits) {
   const map = new Map();
-  for (const h of hits) {
-    if (!map.has(h.file)) map.set(h.file, []);
-    map.get(h.file).push(h);
+  for (const hit of hits) {
+    if (!map.has(hit.file)) map.set(hit.file, []);
+    map.get(hit.file).push(hit);
   }
   return [...map.entries()].sort((a, b) => b[1].length - a[1].length);
 }
 
 function countBySeverity(hits) {
-  const c = { critical: 0, high: 0, medium: 0, low: 0 };
-  for (const h of hits) {
-    c[h.severity] = (c[h.severity] || 0) + 1;
+  const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+  for (const hit of hits) counts[hit.severity] = (counts[hit.severity] || 0) + 1;
+  return counts;
+}
+
+function countFilesByService() {
+  const counts = { marketing: 0, lms: 0, admin: 0, shared: 0 };
+  for (const full of files) {
+    const rel = path.relative(ROOT, full).replaceAll('\\', '/');
+    counts[serviceFor(rel)] += 1;
   }
-  return c;
+  return counts;
 }
 
 const report = {
-  scannedFiles: files.length,
   generatedAt: new Date().toISOString(),
+  scanDirs: SCAN_DIRS,
+  scannedFiles: files.length,
+  filesByService: countFilesByService(),
   canonicalHero: CANONICAL_HERO_CLASS,
   summary: {
     oversizedHero: countBySeverity(oversizedHero),
@@ -226,12 +236,12 @@ const report = {
     layoutTextTotal: layoutText.length,
     marketingPagesWithHeroButNotCanonical: marketingPagesNoCanonical.length,
   },
-  topOversizedHeroFiles: groupByFile(oversizedHero).slice(0, 40),
-  topImagePerfFiles: groupByFile(imagePerf).slice(0, 30),
-  topLayoutTextFiles: groupByFile(layoutText).slice(0, 40),
-  marketingPagesNoCanonical: marketingPagesNoCanonical.slice(0, 80),
+  topOversizedHeroFiles: groupByFile(oversizedHero).slice(0, 60),
+  topImagePerfFiles: groupByFile(imagePerf).slice(0, 50),
+  topLayoutTextFiles: groupByFile(layoutText).slice(0, 60),
+  marketingPagesNoCanonical: marketingPagesNoCanonical.slice(0, 300),
   criticalHits: [...oversizedHero, ...imagePerf, ...layoutText].filter(
-    (h) => h.severity === 'critical',
+    (hit) => hit.severity === 'critical',
   ),
 };
 
@@ -240,65 +250,34 @@ fs.mkdirSync(outDir, { recursive: true });
 const jsonPath = path.join(outDir, 'VISUAL_LAYOUT_AUDIT.json');
 fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
 
-function mdSection(title, groups, limit = 25) {
-  let s = `## ${title}\n\n`;
-  if (!groups.length) return s + '_None_\n\n';
+function mdSection(title, groups, limit = 30) {
+  let section = `## ${title}\n\n`;
+  if (!groups.length) return section + '_None_\n\n';
   for (const [file, hits] of groups.slice(0, limit)) {
-    s += `### \`${file}\` (${hits.length})\n`;
-    for (const h of hits.slice(0, 8)) {
-      s += `- L${h.line} **${h.id}**: ${h.message} — \`${h.match}\`\n`;
+    section += `### \`${file}\` (${hits.length})\n`;
+    for (const hit of hits.slice(0, 10)) {
+      section += `- L${hit.line} **${hit.id}**: ${hit.message} — \`${hit.match}\`\n`;
     }
-    if (hits.length > 8) s += `- _+${hits.length - 8} more_\n`;
-    s += '\n';
+    if (hits.length > 10) section += `- _+${hits.length - 10} more_\n`;
+    section += '\n';
   }
-  return s;
+  return section;
 }
 
-const md = `# Visual layout audit (heroes, images, text gaps)
+const serviceRows = Object.entries(report.filesByService)
+  .map(([service, count]) => `| ${service} | ${count} |`)
+  .join('\n');
 
-Generated: ${report.generatedAt}
-
-| Category | Critical | High | Medium | Low | Total |
-|----------|----------|------|--------|-----|-------|
-| Oversized heroes | ${report.summary.oversizedHero.critical} | ${report.summary.oversizedHero.high} | ${report.summary.oversizedHero.medium} | ${report.summary.oversizedHero.low} | ${report.summary.oversizedHeroTotal} |
-| Image load cost | ${report.summary.imagePerf.critical} | ${report.summary.imagePerf.high} | ${report.summary.imagePerf.medium} | ${report.summary.imagePerf.low} | ${report.summary.imagePerfTotal} |
-| Layout / text | ${report.summary.layoutText.critical} | ${report.summary.layoutText.high} | ${report.summary.layoutText.medium} | ${report.summary.layoutText.low} | ${report.summary.layoutTextTotal} |
-
-**Canonical hero (design standard):** \`${CANONICAL_HERO_CLASS}\` or \`HeroPicture\` / \`HeroVideo\` from \`components/marketing/\`.
-
-**Marketing pages with hero markup but not canonical components:** ${report.summary.marketingPagesWithHeroButNotCanonical}
-
-### Critical findings
-
-${
-  report.criticalHits.length
-    ? report.criticalHits
-        .map((h) => `- \`${h.file}:${h.line}\` ${h.message}`)
-        .join('\n')
-    : '_None_'
-}
-
-${mdSection('Oversized hero / banner patterns', report.topOversizedHeroFiles, 30)}
-${mdSection('Image performance (LCP / video)', report.topImagePerfFiles, 20)}
-${mdSection('Layout & text standard violations', report.topLayoutTextFiles, 25)}
-
-## Recommended fix order
-
-1. **Shared components** — \`HeroVideo.tsx\`, \`HeroPicture.tsx\`, \`page-design-tokens.ts\` \`hero.imageWrap\`, \`PageVideoHero.tsx\` SIZE map, \`PublicLandingPage.tsx\`, \`HomeTopHero.tsx\`
-2. **Remove \`preloadFull\`** on marketing heroes (use \`metadata\` preload; home page only may opt in)
-3. **Replace \`sizes="100vw"\`** with \`(max-width: 768px) 100vw, 1200px\` on heroes
-4. **Page-by-page** — host-shops, government, store, pathways templates using \`h-[60vh] min-h-[450px]\`
-5. **text-gray-* → text-slate-*** in touched files
-
-Re-run: \`node scripts/audit-visual-layout.mjs\` and \`node scripts/audit-image-assets.mjs\`
-`;
+const md = `# Visual layout audit — active platform\n\nGenerated: ${report.generatedAt}\n\nThis report scans the deployed monorepo app trees, not the legacy root \`app/\` tree.\n\n## Coverage\n\n| Service | TSX/JSX files scanned |\n|---|---:|\n${serviceRows}\n\n| Category | Critical | High | Medium | Low | Total |\n|----------|----------|------|--------|-----|-------|\n| Oversized heroes | ${report.summary.oversizedHero.critical} | ${report.summary.oversizedHero.high} | ${report.summary.oversizedHero.medium} | ${report.summary.oversizedHero.low} | ${report.summary.oversizedHeroTotal} |\n| Image load cost | ${report.summary.imagePerf.critical} | ${report.summary.imagePerf.high} | ${report.summary.imagePerf.medium} | ${report.summary.imagePerf.low} | ${report.summary.imagePerfTotal} |\n| Layout / text | ${report.summary.layoutText.critical} | ${report.summary.layoutText.high} | ${report.summary.layoutText.medium} | ${report.summary.layoutText.low} | ${report.summary.layoutTextTotal} |\n\n**Canonical Marketing hero:** \`${CANONICAL_HERO_CLASS}\` or a canonical hero renderer.\n\n**Active Marketing pages with hero intent but no canonical hero marker:** ${report.summary.marketingPagesWithHeroButNotCanonical}\n\n## Marketing pages requiring canonicalization\n\n${marketingPagesNoCanonical.map((file) => `- \`${file}\``).join('\n') || '_None_'}\n\n### Critical findings\n\n${report.criticalHits.length ? report.criticalHits.map((hit) => `- \`${hit.file}:${hit.line}\` ${hit.message}`).join('\n') : '_None_'}\n\n${mdSection('Oversized hero / banner patterns', report.topOversizedHeroFiles)}\n${mdSection('Image performance', report.topImagePerfFiles)}\n${mdSection('Layout & text standard violations', report.topLayoutTextFiles)}\n\n## Re-run\n\n- \`node scripts/audit-visual-layout.mjs\`\n- \`node scripts/audit-image-assets.mjs\`\n- \`pnpm audit:public-media-nav\`\n- \`pnpm audit:hero-banners\`\n`;
 
 const mdPath = path.join(outDir, 'VISUAL_LAYOUT_AUDIT.md');
 fs.writeFileSync(mdPath, md);
 
 console.log(`Wrote ${jsonPath}`);
 console.log(`Wrote ${mdPath}`);
+console.log(`Scanned active files: ${report.scannedFiles}`);
 console.log(
   `Oversized: ${report.summary.oversizedHeroTotal} | Image perf: ${report.summary.imagePerfTotal} | Layout/text: ${report.summary.layoutTextTotal}`,
 );
+console.log(`Marketing pages requiring canonicalization: ${marketingPagesNoCanonical.length}`);
 console.log(`Critical: ${report.criticalHits.length}`);

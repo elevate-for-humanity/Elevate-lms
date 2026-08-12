@@ -3,9 +3,52 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const ROOT = process.cwd();
-const SCAN_DIRS = ['app', 'components', 'data', 'content'];
-const IMAGE_REF_RE = /(?:src|posterImage|heroImage|image)\s*[:=]\s*["'`]([^"'`]+\.(?:png|jpg|jpeg|webp|gif|svg|avif))["'`]/g;
+
+// Scan both the legacy root app tree and the active monorepo services.
+// The previous audit omitted apps/marketing, apps/lms, and apps/admin, which
+// allowed production image regressions to report as a false green.
+const SCAN_DIRS = [
+  'app',
+  'apps/marketing/app',
+  'apps/lms/app',
+  'apps/admin/app',
+  'components',
+  'data',
+  'content',
+  'lib',
+];
+
+const IMAGE_REF_RE =
+  /(?:src|posterImage|heroImage|image|imageSrc|desktopImage|mobileImage|thumbnail|thumbnailUrl|ogImage|coverImage)\s*[:=]\s*["'`]([^"'`]+\.(?:png|jpg|jpeg|webp|gif|svg|avif))["'`]/g;
 const PEXELS_RE = /\/images\/pexels\//;
+
+const SERVICE_PUBLIC_ROOTS = {
+  marketing: ['apps/marketing/public', 'public'],
+  lms: ['apps/lms/public', 'public'],
+  admin: ['apps/admin/public', 'public'],
+  shared: ['public'],
+};
+
+const PACKAGING_CONTRACTS = [
+  {
+    service: 'marketing',
+    dockerfile: 'Dockerfile.northflank-marketing',
+    requiredSource: '/workspace/public',
+    runtimeTarget: 'apps/marketing/public',
+  },
+  {
+    service: 'lms',
+    dockerfile: 'Dockerfile.northflank-lms',
+    requiredSource: '/app/public',
+    runtimeTarget: 'apps/lms/public',
+  },
+  {
+    service: 'admin',
+    dockerfile: 'Dockerfile.northflank-admin',
+    requiredSource: '/workspace/public',
+    runtimeTarget: 'apps/admin/public',
+  },
+];
 
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out;
@@ -18,17 +61,70 @@ function walk(dir, out = []) {
   return out;
 }
 
-const files = SCAN_DIRS.flatMap((d) => walk(path.join(ROOT, d)));
+function serviceFor(relativeFile) {
+  if (relativeFile.startsWith('apps/marketing/')) return 'marketing';
+  if (relativeFile.startsWith('apps/lms/')) return 'lms';
+  if (relativeFile.startsWith('apps/admin/')) return 'admin';
+  return 'shared';
+}
+
+function candidateRuntimePaths(service, ref) {
+  const relativeRef = ref.replace(/^\//, '');
+  return (SERVICE_PUBLIC_ROOTS[service] || SERVICE_PUBLIC_ROOTS.shared).map((publicRoot) =>
+    path.join(ROOT, publicRoot, relativeRef),
+  );
+}
+
+function auditPackagingContracts() {
+  const failures = [];
+
+  for (const contract of PACKAGING_CONTRACTS) {
+    const dockerfilePath = path.join(ROOT, contract.dockerfile);
+    if (!fs.existsSync(dockerfilePath)) {
+      failures.push({ ...contract, reason: 'Dockerfile missing' });
+      continue;
+    }
+
+    const source = fs.readFileSync(dockerfilePath, 'utf8');
+    const hasRootPublicCopy =
+      source.includes(contract.requiredSource) && source.includes(contract.runtimeTarget);
+
+    if (!hasRootPublicCopy) {
+      failures.push({
+        ...contract,
+        reason: 'root public assets are not packaged into the service runtime public directory',
+      });
+    }
+  }
+
+  return failures;
+}
+
+const files = [...new Set(SCAN_DIRS.flatMap((d) => walk(path.join(ROOT, d))))];
 const refs = [];
+
 for (const file of files) {
   const text = fs.readFileSync(file, 'utf8');
+  const relFile = path.relative(ROOT, file);
+  const service = serviceFor(relFile);
+  IMAGE_REF_RE.lastIndex = 0;
+
   let m;
   while ((m = IMAGE_REF_RE.exec(text)) !== null) {
     const ref = m[1];
     if (!ref.startsWith('/images/')) continue;
-    const relFile = path.relative(ROOT, file);
-    const abs = path.join(ROOT, 'public', ref);
-    refs.push({ file: relFile, ref, exists: fs.existsSync(abs), pexels: PEXELS_RE.test(ref) });
+
+    const candidates = candidateRuntimePaths(service, ref);
+    const existingPaths = candidates.filter((candidate) => fs.existsSync(candidate));
+    refs.push({
+      file: relFile,
+      service,
+      ref,
+      exists: existingPaths.length > 0,
+      existingPaths: existingPaths.map((candidate) => path.relative(ROOT, candidate)),
+      checkedPaths: candidates.map((candidate) => path.relative(ROOT, candidate)),
+      pexels: PEXELS_RE.test(ref),
+    });
   }
 }
 
@@ -37,14 +133,32 @@ for (const r of refs) unique.set(`${r.file}::${r.ref}`, r);
 const rows = [...unique.values()];
 const missing = rows.filter((r) => !r.exists);
 const pexels = rows.filter((r) => r.pexels);
+const packagingFailures = auditPackagingContracts();
+
+const byService = Object.fromEntries(
+  ['marketing', 'lms', 'admin', 'shared'].map((service) => {
+    const serviceRows = rows.filter((row) => row.service === service);
+    return [
+      service,
+      {
+        imageRefs: serviceRows.length,
+        missingRefs: serviceRows.filter((row) => !row.exists).length,
+      },
+    ];
+  }),
+);
 
 const report = {
+  scanDirs: SCAN_DIRS,
   scannedFiles: files.length,
   imageRefs: rows.length,
   missingRefs: missing.length,
   pexelsRefs: pexels.length,
+  packagingFailures: packagingFailures.length,
+  byService,
   missing,
   pexels,
+  packaging: packagingFailures,
 };
 
 const outDir = path.join(ROOT, 'docs', 'audits');
@@ -53,10 +167,30 @@ const jsonPath = path.join(outDir, 'image-assets-audit.json');
 fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
 
 const mdPath = path.join(outDir, 'IMAGE_ASSETS_AUDIT.md');
-const md = `# Image Assets Audit\n\n- Scanned files: ${report.scannedFiles}\n- Image refs (/images/*): ${report.imageRefs}\n- Missing refs: ${report.missingRefs}\n- Legacy pexels refs: ${report.pexelsRefs}\n\n## Missing refs\n${missing.slice(0, 200).map((r)=>`- ${r.ref} in \`${r.file}\``).join('\n') || 'None'}\n\n## Legacy pexels refs\n${pexels.slice(0, 300).map((r)=>`- ${r.ref} in \`${r.file}\``).join('\n') || 'None'}\n`;
+const serviceSummary = Object.entries(byService)
+  .map(
+    ([service, counts]) =>
+      `- ${service}: ${counts.imageRefs} refs, ${counts.missingRefs} missing`,
+  )
+  .join('\n');
+const md = `# Image Assets Audit\n\n- Scanned files: ${report.scannedFiles}\n- Image refs (/images/*): ${report.imageRefs}\n- Missing runtime refs: ${report.missingRefs}\n- Legacy pexels refs: ${report.pexelsRefs}\n- Runtime packaging failures: ${report.packagingFailures}\n\n## Service coverage\n${serviceSummary}\n\n## Missing runtime refs\n${missing
+  .slice(0, 300)
+  .map((r) => `- ${r.ref} in \`${r.file}\` (${r.service}); checked: ${r.checkedPaths.join(', ')}`)
+  .join('\n') || 'None'}\n\n## Runtime packaging failures\n${packagingFailures
+  .map((r) => `- ${r.service}: ${r.reason} in \`${r.dockerfile}\``)
+  .join('\n') || 'None'}\n\n## Legacy pexels refs\n${pexels
+  .slice(0, 300)
+  .map((r) => `- ${r.ref} in \`${r.file}\``)
+  .join('\n') || 'None'}\n`;
 fs.writeFileSync(mdPath, md);
 
 console.log(`Wrote ${jsonPath}`);
 console.log(`Wrote ${mdPath}`);
-console.log(`Missing refs: ${missing.length}`);
+console.log(`Scanned files: ${files.length}`);
+console.log(`Missing runtime refs: ${missing.length}`);
+console.log(`Runtime packaging failures: ${packagingFailures.length}`);
 console.log(`Pexels refs: ${pexels.length}`);
+
+if (missing.length > 0 || packagingFailures.length > 0) {
+  process.exitCode = 1;
+}

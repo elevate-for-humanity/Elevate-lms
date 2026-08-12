@@ -154,6 +154,29 @@ if (fs.existsSync(path.join(ROOT, adminLoginRoute))) {
   });
 }
 
+// Credential endpoints must be reachable before a session exists. Protecting
+// the Admin POST with auth middleware redirects it to /login and returns HTML,
+// which produced the production "<!DOCTYPE ... is not valid JSON" failure.
+const adminMiddleware = 'apps/admin/middleware.ts';
+if (fs.existsSync(path.join(ROOT, adminMiddleware))) {
+  const source = read(adminMiddleware);
+  if (!source.includes("'/api/auth/admin-login'")) {
+    findings.push({
+      severity: 'blocker',
+      code: 'ADMIN_LOGIN_API_NOT_PUBLIC',
+      file: adminMiddleware,
+      detail: '/api/auth/admin-login is not in the Admin middleware public-path allowlist',
+    });
+  }
+} else {
+  findings.push({
+    severity: 'blocker',
+    code: 'ADMIN_MIDDLEWARE_MISSING',
+    file: adminMiddleware,
+    detail: 'Active Admin middleware is missing',
+  });
+}
+
 // Non-route login-like files are a maintenance risk. They are warnings rather
 // than blockers because role-specific login pages can legitimately coexist.
 for (const file of loginFiles) {

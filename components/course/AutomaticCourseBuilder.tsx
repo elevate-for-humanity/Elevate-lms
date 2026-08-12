@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, Sparkles, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle,
+  Loader2,
+  MessageSquare,
+  Sparkles,
+} from 'lucide-react';
+import ConnectedAICourseBuilderChat from '@/components/admin/course-builder/ConnectedAICourseBuilderChat';
 
 interface GenerateResult {
   ok: boolean;
@@ -19,6 +27,8 @@ interface GenerateResult {
   errors_per_attempt?: string[][];
 }
 
+type AiMode = 'guided' | 'chat';
+
 const US_STATES = [
   'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming',
 ];
@@ -34,6 +44,7 @@ const COMPLIANCE_PROFILES = [
 
 export default function AutomaticCourseBuilder() {
   const router = useRouter();
+  const [mode, setMode] = useState<AiMode>('guided');
   const [title, setTitle] = useState('');
   const [audience, setAudience] = useState('');
   const [hours, setHours] = useState('');
@@ -72,7 +83,9 @@ export default function AutomaticCourseBuilder() {
         }),
       });
 
-      const data: GenerateResult = await res.json().catch(() => ({ ok: false, error: 'Invalid server response' }));
+      const data: GenerateResult = await res
+        .json()
+        .catch(() => ({ ok: false, error: 'Invalid server response' }));
       setResult(data);
       if (!res.ok && !data.error) setError(`Generation failed (${res.status}).`);
     } catch (err) {
@@ -83,118 +96,300 @@ export default function AutomaticCourseBuilder() {
   };
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-          <Sparkles className="h-5 w-5 text-brand-blue-600" /> AI Course Generator
-        </h2>
-        <p className="mt-1 text-sm text-slate-700">
-          Generates a complete workforce course, validates the structure, assigns a compliance profile,
-          and saves it as a draft for human review. Publishing remains behind the canonical Course Builder compliance gate.
-        </p>
+    <div className="space-y-5">
+      <div className="flex flex-col justify-between gap-3 border-b border-slate-200 pb-4 md:flex-row md:items-center">
+        <div>
+          <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+            <Sparkles className="h-5 w-5 text-brand-blue-600" /> AI Course Generator
+          </h2>
+          <p className="mt-1 text-sm text-slate-700">
+            Two authoring modes, one canonical backend and one review/publish pipeline.
+          </p>
+        </div>
+        <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+          <button
+            type="button"
+            onClick={() => setMode('guided')}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
+              mode === 'guided'
+                ? 'bg-white text-brand-blue-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Sparkles className="h-4 w-4" /> Guided form
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('chat')}
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
+              mode === 'chat'
+                ? 'bg-white text-brand-blue-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <MessageSquare className="h-4 w-4" /> AI conversation
+          </button>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        <Field label="Course Title" required>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. CNA Certification Prep — Indiana NATCEP" className="input" />
-        </Field>
-        <Field label="Target Audience" required>
-          <input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="e.g. Adults seeking entry-level healthcare employment" className="input" />
-        </Field>
+      {mode === 'chat' ? (
+        <ConnectedAICourseBuilderChat />
+      ) : (
+        <div className="max-w-3xl">
+          <p className="mb-6 text-sm text-slate-700">
+            Generates a complete workforce course, validates the structure, assigns a compliance
+            profile, and saves it as a draft for human review. Publishing remains behind the
+            canonical Course Builder governance gate.
+          </p>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Total Hours">
-            <input type="number" value={hours} onChange={(e) => setHours(e.target.value)} min={1} placeholder="e.g. 144" className="input" />
-          </Field>
-          <Field label="State">
-            <select value={state} onChange={(e) => setState(e.target.value)} className="input">
-              <option value="">Any state</option>
-              {US_STATES.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </Field>
-        </div>
+          <div className="space-y-4">
+            <Field label="Course Title" required>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. CNA Certification Prep — Indiana NATCEP"
+                className="input"
+              />
+            </Field>
+            <Field label="Target Audience" required>
+              <input
+                value={audience}
+                onChange={(e) => setAudience(e.target.value)}
+                placeholder="e.g. Adults seeking entry-level healthcare employment"
+                className="input"
+              />
+            </Field>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <Field label="Credential or Exam">
-            <input value={credential} onChange={(e) => setCredential(e.target.value)} placeholder="e.g. EPA 608, NHA CCMA, Indiana Barber License" className="input" />
-          </Field>
-          <Field label="Compliance Profile">
-            <select value={complianceProfileKey} onChange={(e) => setComplianceProfileKey(e.target.value)} className="input">
-              {COMPLIANCE_PROFILES.map((profile) => <option key={profile.value || 'auto'} value={profile.value}>{profile.label}</option>)}
-            </select>
-          </Field>
-        </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Total Hours">
+                <input
+                  type="number"
+                  value={hours}
+                  onChange={(e) => setHours(e.target.value)}
+                  min={1}
+                  placeholder="e.g. 144"
+                  className="input"
+                />
+              </Field>
+              <Field label="State">
+                <select value={state} onChange={(e) => setState(e.target.value)} className="input">
+                  <option value="">Any state</option>
+                  {US_STATES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
 
-        <Field label="Delivery Format">
-          <input value={deliveryFormat} onChange={(e) => setDeliveryFormat(e.target.value)} placeholder="e.g. Hybrid — online theory + in-person lab" className="input" />
-        </Field>
-        <Field label="Additional Instructions">
-          <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={4} placeholder="Specific topics, standards, competencies, practicals, assessment rules, or content requirements..." className="input resize-y" />
-        </Field>
-        <Field label="Program ID" hint="Optional — links the generated course to an existing program">
-          <input value={programId} onChange={(e) => setProgramId(e.target.value)} placeholder="Program UUID" className="input font-mono" />
-        </Field>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Credential or Exam">
+                <input
+                  value={credential}
+                  onChange={(e) => setCredential(e.target.value)}
+                  placeholder="e.g. EPA 608, NHA CCMA, Indiana Barber License"
+                  className="input"
+                />
+              </Field>
+              <Field label="Compliance Profile">
+                <select
+                  value={complianceProfileKey}
+                  onChange={(e) => setComplianceProfileKey(e.target.value)}
+                  className="input"
+                >
+                  {COMPLIANCE_PROFILES.map((profile) => (
+                    <option key={profile.value || 'auto'} value={profile.value}>
+                      {profile.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
 
-        {error && <Notice tone="error">{error}</Notice>}
+            <Field label="Delivery Format">
+              <input
+                value={deliveryFormat}
+                onChange={(e) => setDeliveryFormat(e.target.value)}
+                placeholder="e.g. Hybrid — online theory + in-person lab"
+                className="input"
+              />
+            </Field>
+            <Field label="Additional Instructions">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                rows={4}
+                placeholder="Specific topics, standards, competencies, practicals, assessment rules, or content requirements..."
+                className="input resize-y"
+              />
+            </Field>
+            <Field
+              label="Program ID"
+              hint="Optional — links the generated course to an existing program"
+            >
+              <input
+                value={programId}
+                onChange={(e) => setProgramId(e.target.value)}
+                placeholder="Program UUID"
+                className="input font-mono"
+              />
+            </Field>
 
-        <button onClick={generate} disabled={generating} className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 py-3 font-bold text-white hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-60">
-          {generating ? <><Loader2 className="h-4 w-4 animate-spin" />Generating + validating…</> : <><Sparkles className="h-4 w-4" />Generate Draft Course</>}
-        </button>
-      </div>
+            {error && <Notice>{error}</Notice>}
 
-      {result && (
-        <div className={`mt-6 rounded-lg border p-4 ${result.ok ? 'border-brand-green-200 bg-brand-green-50' : 'border-red-200 bg-red-50'}`}>
-          {result.ok ? (
-            <>
-              <div className="mb-3 flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-brand-green-600" />
-                <span className="font-bold text-brand-green-800">Draft course generated successfully</span>
-              </div>
-              <dl className="space-y-1 text-sm text-brand-green-900">
-                <Row label="Title" value={result.title} />
-                <Row label="Modules" value={result.modules_inserted} />
-                <Row label="Lessons generated" value={result.lessons_generated ?? result.lessons_published} />
-                <Row label="Generation attempt" value={result.generation_attempt ? `${result.generation_attempt} / 3` : undefined} />
-                <Row label="Compliance profile" value={result.compliance_profile_key} />
-                <Row label="Review status" value={result.compliance_status} />
-              </dl>
-              {result.course_id && (
-                <button onClick={() => router.push(`/course-builder?courseId=${encodeURIComponent(result.course_id!)}&tab=compliance`)} className="mt-4 flex items-center gap-1 text-sm font-semibold text-brand-green-700 hover:text-brand-green-900">
-                  Review in Course Builder <ArrowRight className="h-4 w-4" />
-                </button>
+            <button
+              onClick={generate}
+              disabled={generating}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 py-3 font-bold text-white hover:bg-brand-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {generating ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Generating + validating…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" /> Generate Draft Course
+                </>
               )}
-              <p className="mt-3 rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800">
-                AI-generated lessons remain draft content until the Course Builder audit and publish gates pass.
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="mb-2 flex items-center gap-2"><AlertCircle className="h-5 w-5 text-red-600" /><span className="font-bold text-red-800">Generation failed</span></div>
-              <p className="mb-2 text-sm text-red-700">{result.error}</p>
-              {result.errors_per_attempt && (
-                <details className="text-xs text-red-600"><summary className="cursor-pointer font-medium">Validation errors per attempt</summary><pre className="mt-2 whitespace-pre-wrap rounded bg-red-100 p-2">{result.errors_per_attempt.map((errs, i) => `Attempt ${i + 1}:\n${errs.map((e) => `  • ${e}`).join('\n')}`).join('\n\n')}</pre></details>
+            </button>
+          </div>
+
+          {result && (
+            <div
+              className={`mt-6 rounded-lg border p-4 ${
+                result.ok
+                  ? 'border-brand-green-200 bg-brand-green-50'
+                  : 'border-red-200 bg-red-50'
+              }`}
+            >
+              {result.ok ? (
+                <>
+                  <div className="mb-3 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-brand-green-600" />
+                    <span className="font-bold text-brand-green-800">
+                      Draft course generated successfully
+                    </span>
+                  </div>
+                  <dl className="space-y-1 text-sm text-brand-green-900">
+                    <Row label="Title" value={result.title} />
+                    <Row label="Modules" value={result.modules_inserted} />
+                    <Row
+                      label="Lessons generated"
+                      value={result.lessons_generated ?? result.lessons_published}
+                    />
+                    <Row
+                      label="Generation attempt"
+                      value={result.generation_attempt ? `${result.generation_attempt} / 3` : undefined}
+                    />
+                    <Row label="Compliance profile" value={result.compliance_profile_key} />
+                    <Row label="Review status" value={result.compliance_status} />
+                  </dl>
+                  {result.course_id && (
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/course-builder?courseId=${encodeURIComponent(result.course_id!)}&tab=compliance`,
+                        )
+                      }
+                      className="mt-4 flex items-center gap-1 text-sm font-semibold text-brand-green-700 hover:text-brand-green-900"
+                    >
+                      Review in Course Builder <ArrowRight className="h-4 w-4" />
+                    </button>
+                  )}
+                  <p className="mt-3 rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800">
+                    AI-generated lessons remain draft content until the Course Builder audit and
+                    publish gates pass.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="mb-2 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-red-600" />
+                    <span className="font-bold text-red-800">Generation failed</span>
+                  </div>
+                  <p className="mb-2 text-sm text-red-700">{result.error}</p>
+                  {result.errors_per_attempt && (
+                    <details className="text-xs text-red-600">
+                      <summary className="cursor-pointer font-medium">
+                        Validation errors per attempt
+                      </summary>
+                      <pre className="mt-2 whitespace-pre-wrap rounded bg-red-100 p-2">
+                        {result.errors_per_attempt
+                          .map(
+                            (errs, i) =>
+                              `Attempt ${i + 1}:\n${errs.map((e) => `  • ${e}`).join('\n')}`,
+                          )
+                          .join('\n\n')}
+                      </pre>
+                    </details>
+                  )}
+                </>
               )}
-            </>
+            </div>
           )}
         </div>
       )}
 
       <style jsx>{`
-        .input { width: 100%; border: 1px solid rgb(203 213 225); border-radius: .5rem; padding: .55rem .75rem; font-size: .875rem; color: rgb(15 23 42); background: white; }
-        .input:focus { outline: none; border-color: rgb(59 130 246); box-shadow: 0 0 0 2px rgb(191 219 254); }
+        .input {
+          width: 100%;
+          border: 1px solid rgb(203 213 225);
+          border-radius: 0.5rem;
+          padding: 0.55rem 0.75rem;
+          font-size: 0.875rem;
+          color: rgb(15 23 42);
+          background: white;
+        }
+        .input:focus {
+          outline: none;
+          border-color: rgb(59 130 246);
+          box-shadow: 0 0 0 2px rgb(191 219 254);
+        }
       `}</style>
     </div>
   );
 }
 
-function Field({ label, required, hint, children }: { label: string; required?: boolean; hint?: string; children: React.ReactNode }) {
-  return <div><label className="mb-1 block text-sm font-medium text-slate-900">{label}{required && <span className="text-red-500"> *</span>}{hint && <span className="ml-2 font-normal text-slate-500">({hint})</span>}</label>{children}</div>;
+function Field({
+  label,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium text-slate-900">
+        {label}
+        {required && <span className="text-red-500"> *</span>}
+        {hint && <span className="ml-2 font-normal text-slate-500">({hint})</span>}
+      </label>
+      {children}
+    </div>
+  );
 }
 
-function Notice({ children }: { tone: 'error'; children: React.ReactNode }) {
-  return <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{children}</div>;
+function Notice({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+      {children}
+    </div>
+  );
 }
 
 function Row({ label, value }: { label: string; value: unknown }) {
-  return <div className="flex justify-between gap-4"><dt>{label}</dt><dd className="text-right font-medium">{value === undefined || value === null || value === '' ? '—' : String(value)}</dd></div>;
+  return (
+    <div className="flex justify-between gap-4">
+      <dt>{label}</dt>
+      <dd className="text-right font-medium">
+        {value === undefined || value === null || value === '' ? '—' : String(value)}
+      </dd>
+    </div>
+  );
 }

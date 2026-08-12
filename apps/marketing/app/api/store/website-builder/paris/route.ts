@@ -221,7 +221,7 @@ export async function POST(req: NextRequest) {
               role: 'user',
               content:
                 mode === 'builder'
-                  ? `Current demo state: ${JSON.stringify(current)}\nCustomer request: ${message}`
+                  ? `Current builder state: ${JSON.stringify(current)}\nCustomer request: ${message}`
                   : message,
             },
           ],

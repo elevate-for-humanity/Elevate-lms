@@ -164,20 +164,16 @@ function SitePreview({ site }: { site: BuilderState }) {
                 <p className="mt-3 max-w-xl text-sm font-semibold leading-6 text-slate-700">
                   {site.heroSubhead}
                 </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <button
-                    type="button"
+                <div className="mt-5 flex flex-wrap gap-2" aria-label="Generated website call to action preview">
+                  <span
                     className="rounded-lg px-4 py-2.5 text-xs font-black text-white shadow-sm"
                     style={{ backgroundColor: site.primaryColor }}
                   >
                     {site.booking ? 'Book an appointment' : 'Get started'}
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-slate-800"
-                  >
+                  </span>
+                  <span className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-black text-slate-800">
                     View services
-                  </button>
+                  </span>
                 </div>
               </div>
 

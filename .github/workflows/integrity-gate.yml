@@ -89,25 +89,34 @@ jobs:
       - name: Authentication and role routing check
         run: pnpm exec tsx scripts/audit-auth-role-routing.ts
 
+      # Visual checks are intentionally independent of preceding auth/repository
+      # failures. They must still execute so hero, asset, contrast, and duplicate
+      # media regressions cannot be hidden by an unrelated earlier gate failure.
       - name: Canonical hero system check
+        if: ${{ always() }}
         run: pnpm run audit:hero-banners
 
       - name: Runtime image assets and packaging check
+        if: ${{ always() }}
         run: pnpm run audit:image-assets
 
       - name: Active platform visual layout report
+        if: ${{ always() }}
         run: pnpm run audit:visual-layout
 
       - name: Link integrity check
         run: pnpm run integrity:links
 
       - name: Media integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:media
 
       - name: Public UX and media acceptance check
+        if: ${{ always() }}
         run: pnpm run audit:public-media-nav
 
       - name: Homepage section media uniqueness check
+        if: ${{ always() }}
         run: node scripts/audit-homepage-section-media.mjs
 
       - name: LMS course integrity check

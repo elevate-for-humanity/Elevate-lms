@@ -102,6 +102,12 @@ RUN test -f /app/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
     test -f /app/apps/marketing/public/manifest-marketing.json && \
     test -f /app/apps/marketing/server.js && \
+    test -s /app/public/images/partners/razors-image-storefront.webp && \
+    test -s /app/apps/marketing/public/images/partners/razors-image-storefront.webp && \
+    test -s /app/public/images/heroes/hero-homepage.webp && \
+    test -s /app/apps/marketing/public/images/heroes/hero-homepage.webp && \
+    test -s /app/public/images/pages/barber-apprenticeship-hero.jpg && \
+    test -s /app/public/images/pages/workforce-training.webp && \
     (test -f /app/public/sw.js || test -f /app/public/sw-marketing.js) && \
     echo "Marketing runtime assets verified"
 

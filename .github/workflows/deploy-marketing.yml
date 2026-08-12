@@ -50,12 +50,12 @@ permissions:
   contents: read
   actions: read
 
-# Marketing deployments own only the Marketing service. A newer Marketing run
-# cancels an older Marketing run, but unrelated Admin/LMS commits must not abort
-# a valid Marketing deployment in this monorepo.
+# Marketing deployments own only the Marketing service. New Marketing runs queue
+# behind an active Marketing release instead of canceling it. The Northflank
+# trigger also waits for any in-flight service build before acquiring a new slot.
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   EXPECTED_SHA: ${{ github.sha }}
@@ -168,7 +168,7 @@ jobs:
             echo "Existing upstream returned HTTP $status; continuing in recovery mode."
           fi
 
-      - name: Trigger fresh Marketing build
+      - name: Acquire queued Marketing build
         id: trigger_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_MARKETING_SERVICE_ID"
 
@@ -178,6 +178,7 @@ jobs:
           BUILD_ID="${{ steps.trigger_build.outputs.build_id }}"
           test -n "$BUILD_ID" || { echo "Northflank trigger returned no build_id"; exit 1; }
           echo "Northflank build id: $BUILD_ID"
+          echo "Reused existing build: ${{ steps.trigger_build.outputs.reused_build }}"
 
       - name: Wait for Marketing build
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --build-id "${{ steps.trigger_build.outputs.build_id }}" --timeout-ms 3600000
@@ -210,20 +211,31 @@ jobs:
           for i in $(seq 1 30); do
             health_status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
             version_status=$(curl -sk --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
-            page_status=$(curl -sk --max-time 10 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
+            home_status=$(curl -sk --max-time 15 -o /tmp/www-home.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
+            page_status=$(curl -sk --max-time 15 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
+            razors_status=$(curl -sk --max-time 15 -o /tmp/razors-image.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/partners/razors-image-storefront.webp?deploy=${EXPECTED_SHA}" || true)
+            hero_status=$(curl -sk --max-time 15 -o /tmp/home-hero.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/heroes/hero-homepage.webp?deploy=${EXPECTED_SHA}" || true)
             LIVE_SHA="$(node -e "try{const d=require('/tmp/www-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
-            echo "Attempt $i/30: health=$health_status version=$version_status page=$page_status live_sha=${LIVE_SHA:-missing}"
+            razors_bytes=$(wc -c < /tmp/razors-image.webp 2>/dev/null || echo 0)
+            hero_bytes=$(wc -c < /tmp/home-hero.webp 2>/dev/null || echo 0)
+            echo "Attempt $i/30: health=$health_status version=$version_status home=$home_status barber=$page_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes live_sha=${LIVE_SHA:-missing}"
             if [ "$health_status" = "200" ] \
               && [ "$version_status" = "200" ] \
+              && [ "$home_status" = "200" ] \
               && [ "$page_status" = "200" ] \
+              && [ "$razors_status" = "200" ] \
+              && [ "$hero_status" = "200" ] \
+              && [ "$razors_bytes" -gt 1000 ] \
+              && [ "$hero_bytes" -gt 1000 ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
+              && grep -q "AI-Powered 360° Humanitarian Workforce Hub" /tmp/www-home.html \
               && grep -q "Barber Apprenticeship" /tmp/www-page.html; then
-              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live"
+              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with required visual assets"
               exit 0
             fi
             sleep 20
           done
-          echo "DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA"
+          echo "DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required visual assets"
           cat /tmp/www-health.json 2>/dev/null || true
           cat /tmp/www-version.json 2>/dev/null || true
           exit 1

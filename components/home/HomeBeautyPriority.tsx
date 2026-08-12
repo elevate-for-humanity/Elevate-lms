@@ -7,7 +7,7 @@ const TRACKS = [
     title: 'Barbering Apprenticeship',
     hours: '2,000 OJL hours + 144 hours of Related Technical Instruction',
     focus: 'Fades, clipper work, shaving, sanitation, shop operations',
-    image: '/images/pages/barber-hero-main.webp',
+    image: '/images/pages/barber-apprenticeship-hero.jpg',
     href: '/barber-apprenticeship',
     icon: Scissors,
   },

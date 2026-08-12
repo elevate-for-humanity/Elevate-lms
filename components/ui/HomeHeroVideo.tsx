@@ -28,10 +28,10 @@ export interface HomeHeroVideoProps {
  * Media playback, mobile source selection, error fallback, narration controls,
  * and route cleanup all live in components/marketing/HeroVideo.
  *
- * The homepage intentionally does not pass a poster layer into HeroVideo.
- * Its dedicated R2 video is the primary hero media; keeping a separate poster
- * underneath the opacity-faded video caused a visible poster/frame flash on
- * some browsers during first-frame decoding.
+ * The page-specific poster is intentionally passed through to the canonical
+ * renderer. HeroVideo keeps it mounted behind the video until a renderable
+ * frame is ready, so slow mobile decoding, autoplay restrictions, and media
+ * errors fall back to a real hero image instead of a blank/black frame.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const ctas = banner.secondaryCta
@@ -42,6 +42,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     <HeroVideo
       videoSrcDesktop={banner.videoSrcDesktop}
       videoSrcMobile={banner.videoSrcMobile}
+      posterImage={banner.posterImage}
       voiceoverSrc={banner.voiceoverSrc}
       microLabel={banner.microLabel}
       belowHeroHeadline={banner.belowHeroHeadline}

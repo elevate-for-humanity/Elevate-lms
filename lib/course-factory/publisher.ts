@@ -1,27 +1,18 @@
 /**
- * publisher.ts
- * 
- * Single unified publish pipeline.
- * Consolidates:
- * - lib/course-builder/pipeline.ts (runCoursePublishPipeline)
- * - lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts
- * 
- * Writes to: courses → course_modules → course_lessons
+ * Canonical Course Factory persistence.
+ *
+ * Writes only to courses → course_modules → course_lessons.
+ * Factory persistence creates/updates DRAFT authoring content; learner publication is
+ * handled separately by the reviewed version-publish gate.
  */
-
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
-import type { 
-  BlueprintModule, 
-  BlueprintLessonRef, 
-  BuildMode,
-  ValidationResult 
-} from './types';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import type { BlueprintModule, BlueprintLessonRef, BuildMode, ValidationResult } from './types';
 
 export interface PublishInput {
+  /** Exact course target. When present, persistence must not create a parallel course. */
+  courseId?: string;
   programId: string;
   courseSlug: string;
   courseTitle: string;
@@ -42,20 +33,14 @@ export interface PublishResult {
   validation: ValidationResult;
 }
 
-interface LessonFailure {
-  slug: string;
-  reason: string;
-}
-
-// ─── Validation ────────────────────────────────────────────────────────────────
-
-function validateLessonSlug(slug: string): boolean {
-  // Check for invalid characters
+function validateSlug(slug: string): boolean {
   return /^[a-z0-9-]+$/.test(slug.toLowerCase());
 }
 
-function inferStepType(slug: string): string {
-  const lower = slug.toLowerCase();
+function inferStepType(lesson: BlueprintLessonRef): string {
+  const explicit = String((lesson as any).stepType ?? (lesson as any).type ?? '').toLowerCase();
+  if (explicit) return explicit;
+  const lower = lesson.slug.toLowerCase();
   if (lower.includes('checkpoint') || lower.includes('quiz')) return 'checkpoint';
   if (lower.includes('exam') || lower.includes('final')) return 'exam';
   if (lower.includes('lab')) return 'lab';
@@ -64,46 +49,30 @@ function inferStepType(slug: string): string {
 }
 
 function validateBlueprint(blueprint: BlueprintModule[]): ValidationResult {
-  const errors: Array<{ type: 'error' | 'warning'; module?: string; lesson?: string; field: string; message: string }> = [];
-  const warnings: Array<{ type: 'error' | 'warning'; module?: string; lesson?: string; field: string; message: string }> = [];
-
-  for (const mod of blueprint) {
-    if (!mod.slug) {
-      errors.push({ type: 'error', module: mod.title, field: 'slug', message: 'Module slug is required' });
+  const errors: ValidationResult['errors'] = [];
+  const warnings: ValidationResult['warnings'] = [];
+  for (const module of blueprint) {
+    if (!module.slug) {
+      errors.push({ type: 'error', module: module.title, field: 'slug', message: 'Module slug is required' });
       continue;
     }
-
-    if (!validateLessonSlug(mod.slug)) {
-      errors.push({ type: 'error', module: mod.title, field: 'slug', message: 'Invalid slug format' });
+    if (!validateSlug(module.slug)) {
+      errors.push({ type: 'error', module: module.title, field: 'slug', message: 'Invalid module slug format' });
     }
-
-    for (const lesson of mod.lessons ?? []) {
+    for (const lesson of module.lessons ?? []) {
       if (!lesson.slug) {
-        errors.push({ type: 'error', module: mod.title, field: 'slug', message: 'Lesson slug is required' });
+        errors.push({ type: 'error', module: module.title, field: 'slug', message: 'Lesson slug is required' });
         continue;
       }
-
-      if (!validateLessonSlug(lesson.slug)) {
-        errors.push({ type: 'error', module: mod.title, lesson: lesson.slug, field: 'slug', message: 'Invalid slug format' });
+      if (!validateSlug(lesson.slug)) {
+        errors.push({ type: 'error', module: module.title, lesson: lesson.slug, field: 'slug', message: 'Invalid lesson slug format' });
       }
-
-      const stepType = inferStepType(lesson.slug);
-      
-      // Content requirements based on step type
-      if (stepType !== 'exam') {
-        if (!lesson.content || lesson.content.trim().length < 100) {
-          warnings.push({ 
-            type: 'warning',
-            module: mod.title,
-            lesson: lesson.slug, 
-            field: 'content', 
-            message: 'Content may be too short (< 100 chars)'
-          });
-        }
+      const stepType = inferStepType(lesson);
+      if (stepType !== 'exam' && (!lesson.content || lesson.content.trim().length < 100)) {
+        warnings.push({ type: 'warning', module: module.title, lesson: lesson.slug, field: 'content', message: 'Instructional content is shorter than 100 characters' });
       }
     }
   }
-
   return {
     ok: errors.length === 0,
     valid: errors.length === 0,
@@ -114,95 +83,89 @@ function validateBlueprint(blueprint: BlueprintModule[]): ValidationResult {
   };
 }
 
-// ─── Upsert Helpers ────────────────────────────────────────────────────────────
-
-async function upsertCourse(
+async function resolveCourse(
   db: SupabaseClient,
-  slug: string,
-  title: string,
-  programId: string,
+  input: Pick<PublishInput, 'courseId' | 'courseSlug' | 'courseTitle' | 'programId'>,
 ): Promise<string> {
-  // Check if exists
-  const { data: existing } = await db
-    .from('courses')
-    .select('id')
-    .eq('slug', slug)
-    .maybeSingle();
+  const now = new Date().toISOString();
 
+  if (input.courseId) {
+    const { data: exact, error } = await db.from('courses').select('id').eq('id', input.courseId).maybeSingle();
+    if (error) throw error;
+    if (!exact) throw new Error(`Target course ${input.courseId} not found`);
+    const { error: updateError } = await db.from('courses').update({
+      title: input.courseTitle,
+      program_id: input.programId,
+      updated_at: now,
+    }).eq('id', input.courseId);
+    if (updateError) throw updateError;
+    return input.courseId;
+  }
+
+  const { data: existing, error: lookupError } = await db.from('courses').select('id').eq('slug', input.courseSlug).maybeSingle();
+  if (lookupError) throw lookupError;
   if (existing?.id) {
-    await db
-      .from('courses')
-      .update({
-        title,
-        program_id: programId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', existing.id);
+    const { error } = await db.from('courses').update({
+      title: input.courseTitle,
+      program_id: input.programId,
+      updated_at: now,
+    }).eq('id', existing.id);
+    if (error) throw error;
     return existing.id;
   }
 
-  const { data: newCourse, error } = await db
-    .from('courses')
-    .insert({
-      slug,
-      title,
-      program_id: programId,
-      status: 'draft',
-      is_active: true,
-    })
-    .select('id')
-    .maybeSingle();
-
-  if (error || !newCourse) {
-    throw new Error(`Failed to create course: ${error?.message}`);
-  }
-
-  return newCourse.id;
+  const { data: created, error } = await db.from('courses').insert({
+    slug: input.courseSlug,
+    course_slug: input.courseSlug,
+    title: input.courseTitle,
+    course_name: input.courseTitle,
+    program_id: input.programId,
+    status: 'draft',
+    review_status: 'draft',
+    is_active: false,
+    generation_status: 'draft',
+  }).select('id').single();
+  if (error || !created) throw new Error(`Failed to create course: ${error?.message ?? 'unknown error'}`);
+  return created.id;
 }
 
 async function upsertModule(
   db: SupabaseClient,
   courseId: string,
   module: BlueprintModule,
-): Promise<string | null> {
-  // Check if exists
-  const { data: existing } = await db
+): Promise<string> {
+  const orderIndex = Number((module as any).orderIndex ?? (module as any).order ?? 0);
+  const { data: existing, error: lookupError } = await db
     .from('course_modules')
     .select('id')
     .eq('course_id', courseId)
     .eq('slug', module.slug)
     .maybeSingle();
+  if (lookupError) throw lookupError;
+
+  const payload = {
+    course_id: courseId,
+    slug: module.slug,
+    title: module.title,
+    description: module.description ?? null,
+    order_index: orderIndex,
+    order: orderIndex,
+    domain_key: (module as any).domainKey ?? null,
+    target_hours: (module as any).targetHours ?? null,
+    is_published: false,
+    is_draft: true,
+    updated_at: new Date().toISOString(),
+  };
 
   if (existing?.id) {
-    await db
-      .from('course_modules')
-      .update({
-        title: module.title,
-        description: module.description,
-        order_index: module.orderIndex,
-      })
-      .eq('id', existing.id);
+    const { error } = await db.from('course_modules').update(payload).eq('id', existing.id);
+    if (error) throw error;
     return existing.id;
   }
 
-  const { data: newModule, error } = await db
-    .from('course_modules')
-    .insert({
-      course_id: courseId,
-      slug: module.slug,
-      title: module.title,
-      description: module.description,
-      order_index: module.orderIndex,
-    })
-    .select('id')
-    .maybeSingle();
-
-  if (error || !newModule) {
-    logger.error('[publisher] Module upsert failed', { module: module.slug, error });
-    return null;
-  }
-
-  return newModule.id;
+  const { data: created, error } = await db.from('course_modules').insert(payload).select('id').single();
+  if (error || !created) throw new Error(`Failed to create module '${module.slug}': ${error?.message ?? 'unknown error'}`);
+  return created.id;
 }
 
 async function upsertLesson(
@@ -210,166 +173,163 @@ async function upsertLesson(
   courseId: string,
   moduleId: string,
   lesson: BlueprintLessonRef,
-): Promise<boolean> {
-  const stepType = inferStepType(lesson.slug);
-
-  // Build quiz questions array
-  const quizQuestions = lesson.quizQuestions?.map((q) => ({
-    question: q.question,
-    options: q.options,
-    correct: q.correctAnswer,
-    explanation: q.explanation,
+): Promise<void> {
+  const stepType = inferStepType(lesson);
+  const quizQuestions = lesson.quizQuestions?.map((question) => ({
+    question: question.question,
+    options: question.options,
+    correct: question.correctAnswer,
+    explanation: question.explanation,
   })) ?? null;
+  const orderIndex = Number((lesson as any).orderIndex ?? lesson.order ?? 0);
+  const objectives = Array.isArray((lesson as any).learningObjectives) && (lesson as any).learningObjectives.length
+    ? (lesson as any).learningObjectives
+    : lesson.objective
+      ? [lesson.objective]
+      : [];
+  const contentJson = (lesson as any).contentJson ?? (lesson as any).content_json ?? {};
 
-  // Check if exists
-  const { data: existing } = await db
-    .from('course_lessons')
-    .select('id')
-    .eq('course_id', courseId)
-    .eq('slug', lesson.slug)
-    .maybeSingle();
-
-  const lessonData = {
+  const payload = {
     course_id: courseId,
     module_id: moduleId,
     slug: lesson.slug,
     title: lesson.title,
     lesson_type: stepType,
-    order_index: lesson.order,
-    objective: lesson.objective ?? null,
+    order_index: orderIndex,
     content: lesson.content ?? null,
+    rendered_html: (lesson as any).renderedHtml ?? (typeof lesson.content === 'string' ? lesson.content : null),
+    learning_objectives: objectives,
     quiz_questions: quizQuestions,
-    passing_score: lesson.passingScore ?? (stepType === 'exam' ? 80 : 70),
-    activities: null,
+    passing_score: lesson.passingScore ?? (stepType === 'exam' ? 75 : ['checkpoint', 'quiz'].includes(stepType) ? 70 : null),
+    duration_minutes: (lesson as any).durationMinutes ?? null,
+    minimum_seat_time_minutes: (lesson as any).minimumSeatTimeMinutes ?? (lesson as any).durationMinutes ?? null,
+    domain_key: (lesson as any).domainKey ?? null,
+    practical_required: Boolean((lesson as any).practicalRequired ?? stepType === 'lab'),
+    requires_instructor_signoff: Boolean((lesson as any).requiresInstructorSignoff ?? stepType === 'lab'),
+    competency_checks: (lesson as any).competencyChecks ?? [],
+    required_skill_id: (lesson as any).requiredSkillId ?? null,
+    hour_category: (lesson as any).hourCategory ?? null,
+    delivery_method: (lesson as any).deliveryMethod ?? null,
+    content_json: contentJson,
     status: 'draft',
     is_published: false,
+    approved: false,
+    updated_at: new Date().toISOString(),
   };
 
+  const { data: existing, error: lookupError } = await db
+    .from('course_lessons')
+    .select('id')
+    .eq('course_id', courseId)
+    .eq('slug', lesson.slug)
+    .maybeSingle();
+  if (lookupError) throw lookupError;
+
   if (existing?.id) {
-    const { error } = await db
-      .from('course_lessons')
-      .update(lessonData)
-      .eq('id', existing.id);
-    
-    if (error) {
-      logger.error('[publisher] Lesson update failed', { lesson: lesson.slug, error });
-      return false;
-    }
-    return true;
+    const { error } = await db.from('course_lessons').update(payload).eq('id', existing.id);
+    if (error) throw error;
+    return;
   }
-
-  const { error } = await db.from('course_lessons').insert(lessonData);
-  
-  if (error) {
-    logger.error('[publisher] Lesson insert failed', { lesson: lesson.slug, error });
-    return false;
-  }
-
-  return true;
+  const { error } = await db.from('course_lessons').insert(payload);
+  if (error) throw error;
 }
 
-// ─── Main Publisher ────────────────────────────────────────────────────────────
-
 /**
- * Single unified publish function.
- * 
- * Steps:
- * 1. Upsert course
- * 2. Validate blueprint
- * 3. Upsert modules & lessons
- * 4. Handle replace vs missing-only mode
+ * Persist a generated/blueprint course as authoring draft content.
+ * Replace mode is non-destructive: existing rows absent from the new blueprint are unpublished,
+ * not deleted, so learner progress foreign keys remain intact.
  */
 export async function publishCourse(input: PublishInput): Promise<PublishResult> {
   const db = await requireAdminClient();
   const warnings: string[] = [];
   const errors: string[] = [];
-
-  // 1. Validate blueprint
   const validation = validateBlueprint(input.blueprint);
-  
   if (!validation.valid) {
     return {
       success: false,
-      courseId: '',
+      courseId: input.courseId ?? '',
       moduleCount: 0,
       lessonCount: 0,
       skippedCount: 0,
       warnings,
-      errors: validation.errors.map((e) => `${e.lesson || e.module || 'module'}: ${e.message}`),
+      errors: validation.errors.map((error) => `${error.lesson || error.module || 'course'}: ${error.message}`),
       validation,
     };
   }
+  warnings.push(...validation.warnings.map((warning) => `Warning: ${warning.lesson || warning.module || 'course'}: ${warning.message}`));
 
-  warnings.push(...validation.warnings.map((w) => `Warning: ${w.lesson || w.module || 'module'}: ${w.message}`));
-
-  // 2. Upsert course
-  let courseId: string;
+  let courseId = '';
   try {
-    courseId = await upsertCourse(db, input.courseSlug, input.courseTitle, input.programId);
-  } catch (err) {
+    courseId = await resolveCourse(db, input);
+  } catch (error) {
     return {
       success: false,
-      courseId: '',
+      courseId: input.courseId ?? '',
       moduleCount: 0,
       lessonCount: 0,
       skippedCount: 0,
       warnings,
-      errors: [`Course upsert failed: ${err instanceof Error ? err.message : String(err)}`],
+      errors: [`Course resolution failed: ${error instanceof Error ? error.message : String(error)}`],
       validation,
     };
   }
 
-  // 3. Replace mode: wipe existing
+  const blueprintModuleSlugs = input.blueprint.map((module) => module.slug);
+  const blueprintLessonSlugs = input.blueprint.flatMap((module) => (module.lessons ?? []).map((lesson) => lesson.slug));
+
   if (input.mode === 'replace') {
-    await db.from('course_lessons').delete().eq('course_id', courseId);
-    await db.from('course_modules').delete().eq('course_id', courseId);
-    logger.info('[publisher] Replace mode: cleared existing modules and lessons');
+    let oldLessons = db.from('course_lessons').update({ status: 'draft', is_published: false, approved: false, updated_at: new Date().toISOString() }).eq('course_id', courseId);
+    if (blueprintLessonSlugs.length) oldLessons = oldLessons.not('slug', 'in', `(${blueprintLessonSlugs.map((slug) => `"${slug}"`).join(',')})`);
+    const { error: oldLessonError } = await oldLessons;
+    if (oldLessonError) warnings.push(`Could not unpublish superseded lessons: ${oldLessonError.message}`);
+
+    let oldModules = db.from('course_modules').update({ is_published: false, is_draft: true, updated_at: new Date().toISOString() }).eq('course_id', courseId);
+    if (blueprintModuleSlugs.length) oldModules = oldModules.not('slug', 'in', `(${blueprintModuleSlugs.map((slug) => `"${slug}"`).join(',')})`);
+    const { error: oldModuleError } = await oldModules;
+    if (oldModuleError) warnings.push(`Could not unpublish superseded modules: ${oldModuleError.message}`);
   }
 
-  // 4. Load existing slugs for missing-only mode
   const existingSlugs = new Set<string>();
   if (input.mode === 'missing-only') {
-    const { data: existing } = await db
-      .from('course_lessons')
-      .select('slug')
-      .eq('course_id', courseId);
-    for (const row of existing ?? []) {
-      if (row.slug) existingSlugs.add(row.slug);
-    }
+    const { data, error } = await db.from('course_lessons').select('slug').eq('course_id', courseId);
+    if (error) throw error;
+    for (const row of data ?? []) if (row.slug) existingSlugs.add(row.slug);
   }
 
-  // 5. Upsert modules & lessons
   let moduleCount = 0;
   let lessonCount = 0;
   let skippedCount = 0;
+  const sortedModules = [...input.blueprint].sort((a, b) => Number((a as any).orderIndex ?? (a as any).order ?? 0) - Number((b as any).orderIndex ?? (b as any).order ?? 0));
 
-  const sortedModules = [...input.blueprint].sort((a, b) => a.orderIndex - b.orderIndex);
-
-  for (const mod of sortedModules) {
-    const moduleId = await upsertModule(db, courseId, mod);
-    if (!moduleId) {
-      warnings.push(`Module '${mod.slug}' failed to upsert`);
-      continue;
-    }
-    moduleCount++;
-
-    const sortedLessons = [...(mod.lessons ?? [])].sort((a, b) => a.order - b.order);
-
-    for (const lesson of sortedLessons) {
-      // Skip existing in missing-only mode
-      if (input.mode === 'missing-only' && existingSlugs.has(lesson.slug)) {
-        skippedCount++;
-        continue;
+  for (const module of sortedModules) {
+    try {
+      const moduleId = await upsertModule(db, courseId, module);
+      moduleCount += 1;
+      const sortedLessons = [...(module.lessons ?? [])].sort((a, b) => Number((a as any).orderIndex ?? a.order ?? 0) - Number((b as any).orderIndex ?? b.order ?? 0));
+      for (const lesson of sortedLessons) {
+        if (input.mode === 'missing-only' && existingSlugs.has(lesson.slug)) {
+          skippedCount += 1;
+          continue;
+        }
+        try {
+          await upsertLesson(db, courseId, moduleId, lesson);
+          lessonCount += 1;
+        } catch (error) {
+          errors.push(`Lesson '${lesson.slug}' failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
       }
-
-      const ok = await upsertLesson(db, courseId, moduleId, lesson);
-      if (ok) {
-        lessonCount++;
-      } else {
-        errors.push(`Lesson '${lesson.slug}' failed to upsert`);
-      }
+    } catch (error) {
+      errors.push(`Module '${module.slug}' failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
+
+  const { error: courseStateError } = await db.from('courses').update({
+    status: 'draft',
+    review_status: 'draft',
+    is_active: false,
+    updated_at: new Date().toISOString(),
+  }).eq('id', courseId);
+  if (courseStateError) errors.push(`Failed to enforce draft course state: ${courseStateError.message}`);
 
   return {
     success: errors.length === 0,
@@ -383,27 +343,17 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
   };
 }
 
-// ─── Atomic Publish ────────────────────────────────────────────────────────────
-
-/**
- * Atomic publish with DB transaction.
- * Uses the publish_course_from_staging RPC function.
- */
+/** Atomic publish RPC retained for callers that explicitly use the database staging pipeline. */
 export async function publishCourseAtomic(
   courseId: string,
   programId?: string | null,
 ): Promise<{ success: boolean; lessonsPublished?: number; error?: string }> {
   const db = await requireAdminClient();
-
   const { data, error } = await db.rpc('publish_course_from_staging', {
     p_course_id: courseId,
     p_program_id: programId && programId !== courseId ? programId : null,
   });
-
-  if (error) {
-    return { success: false, error: error.message };
-  }
-
+  if (error) return { success: false, error: error.message };
   return {
     success: true,
     lessonsPublished: (data as { lessons_published?: number })?.lessons_published,

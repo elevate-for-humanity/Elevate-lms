@@ -1,13 +1,44 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 function getSafeRedirect(raw: string | null | undefined): string {
   return validateRedirect(raw, '/dashboard');
+}
+
+type AdminLoginResponse = {
+  ok?: boolean;
+  error?: string;
+  role?: string;
+  effectiveRoles?: string[];
+};
+
+async function readAdminLoginResponse(res: Response): Promise<AdminLoginResponse> {
+  const contentType = res.headers.get('content-type')?.toLowerCase() ?? '';
+
+  if (contentType.includes('application/json')) {
+    return (await res.json()) as AdminLoginResponse;
+  }
+
+  // A Next.js 404/500 document starts with <!DOCTYPE html>. Do not call
+  // response.json() on it — that is the source of the raw "Unexpected token <"
+  // error previously shown to administrators.
+  const raw = await res.text();
+  console.error('[admin-login] endpoint returned a non-JSON response', {
+    status: res.status,
+    contentType,
+    preview: raw.slice(0, 120),
+  });
+
+  return {
+    error:
+      res.status === 404
+        ? 'The admin authentication endpoint is not available on this deployment. Please retry after the Admin service finishes deploying.'
+        : `The admin authentication service returned an invalid response (HTTP ${res.status || 500}). Please retry.`,
+  };
 }
 
 export default function AdminLoginForm({ redirectTo, initialError }: { redirectTo?: string; initialError?: string }) {
@@ -46,21 +77,24 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
       // Avoids RLS blocking the profile read when using the anon client.
       const res = await fetch('/api/auth/admin-login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        cache: 'no-store',
         body: JSON.stringify({ email: email.trim(), password }), // never trim passwords
       });
 
-      const body = await res.json();
+      const body = await readAdminLoginResponse(res);
 
-      if (!res.ok) {
+      if (!res.ok || body.ok !== true) {
         setError(body.error || 'Invalid email or password.');
-        setLoading(false);
         return;
       }
 
       window.location.href = next;
-    } catch (err: any) {
-      setError(err?.message || 'Invalid email or password');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Admin authentication request failed. Please retry.');
     } finally {
       setLoading(false);
     }
@@ -82,8 +116,8 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
 
       if (resetError) throw resetError;
       setForgotSent(true);
-    } catch (err: any) {
-      setForgotError(err?.message || 'Failed to send reset email. Try again.');
+    } catch (err: unknown) {
+      setForgotError(err instanceof Error ? err.message : 'Failed to send reset email. Try again.');
     } finally {
       setForgotLoading(false);
     }

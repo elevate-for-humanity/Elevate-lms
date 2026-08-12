@@ -6,32 +6,80 @@ import { createClient } from '@/lib/supabase/server';
 import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
 import { FEATURES } from '@/lib/platform/feature-catalog';
 import { importExistingWebsite } from '@/lib/websites/import-site-service';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-async function isPlatformAdmin(userId: string) {
+async function hasIndividualWebsiteImport(userId: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
-  return data?.role === 'admin' || data?.role === 'super_admin';
+  const access = await getWebsiteBuilderAccess(userId, supabase);
+  if (!access.allowed) return false;
+  if (access.isAdmin) return true;
+  return ['professional', 'enterprise'].includes(access.plan || '');
 }
 
-async function hasIndividualWebsiteImport(userId: string) {
-  if (await isPlatformAdmin(userId)) return true;
+function canonicalTenantHref(labelValue: unknown, hrefValue: unknown, sourceOrigin: string) {
+  const label = typeof labelValue === 'string' ? labelValue.trim() : '';
+  const href = typeof hrefValue === 'string' ? hrefValue.trim() : '';
+  if (!label || !href) return null;
 
-  const supabase = await createClient();
-  const { data: appSub } = await supabase
-    .from('user_app_subscriptions')
-    .select('plan, status, trial_ends_at')
-    .eq('user_id', userId)
-    .eq('app_slug', 'website-builder')
-    .maybeSingle();
+  const semantic = `${label} ${href}`.toLowerCase();
+  if (/\b(home|welcome)\b/.test(semantic)) return { label, href: '/' };
+  if (/\b(about|our story|who we are)\b/.test(semantic)) return { label, href: '/about' };
+  if (/\b(contact|connect|reach us)\b/.test(semantic)) return { label, href: '/contact' };
+  if (/\b(shop|store|product|merch)\b/.test(semantic)) return { label, href: '/shop' };
+  if (/\b(program|service|course|training|offering)\b/.test(semantic)) return { label, href: '/programs' };
 
-  if (!appSub || !['trial', 'active'].includes(appSub.status || '')) return false;
-  if (appSub.status === 'trial' && appSub.trial_ends_at && new Date(appSub.trial_ends_at).getTime() < Date.now()) return false;
-  return ['professional', 'enterprise'].includes(appSub.plan || '');
+  try {
+    const parsed = new URL(href, sourceOrigin);
+    // Preserve genuinely external destinations (social links, partner portals,
+    // booking providers). Same-origin unknown paths are omitted because the
+    // tenant renderer cannot safely claim a page it did not migrate.
+    if (parsed.origin !== sourceOrigin) return { label, href: parsed.href };
+  } catch {
+    // Invalid imported links are dropped rather than published broken.
+  }
+  return null;
+}
+
+function normalizeImportedConfig(imported: any, sourceUrl: string) {
+  let sourceOrigin = '';
+  try {
+    sourceOrigin = new URL(sourceUrl).origin;
+  } catch {
+    return imported;
+  }
+
+  const navigation = Array.isArray(imported?.config?.navigation)
+    ? imported.config.navigation
+        .map((item: any) => canonicalTenantHref(item?.label, item?.href, sourceOrigin))
+        .filter(Boolean)
+        .filter((item: any, index: number, all: any[]) =>
+          index === all.findIndex((candidate) => candidate.href === item.href || candidate.label === item.label),
+        )
+        .slice(0, 12)
+    : [];
+
+  const required = [
+    { label: 'Home', href: '/' },
+    { label: imported?.config?.meta?.siteKind === 'store' ? 'Shop' : 'Programs', href: imported?.config?.meta?.siteKind === 'store' ? '/shop' : '/programs' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+  ];
+  for (const item of required) {
+    if (!navigation.some((candidate: any) => candidate.href === item.href)) navigation.push(item);
+  }
+
+  return {
+    ...imported,
+    config: {
+      ...(imported.config || {}),
+      navigation,
+    },
+  };
 }
 
 async function _POST(request: NextRequest) {
@@ -66,7 +114,7 @@ async function _POST(request: NextRequest) {
       : undefined;
     if (!url) return NextResponse.json({ error: 'URL required' }, { status: 400 });
 
-    const imported = await importExistingWebsite(url, includePages);
+    const imported = normalizeImportedConfig(await importExistingWebsite(url, includePages), url);
     return NextResponse.json({ success: true, ...imported });
   } catch (error) {
     logger.warn('[website-builder-import] import failed', { error: String(error) });

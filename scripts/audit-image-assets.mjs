@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { LEGACY_IMAGE_ALIASES } from '../lib/media/legacy-image-aliases.mjs';
 
 const ROOT = process.cwd();
 
@@ -76,6 +77,41 @@ function candidateRuntimePaths(service, ref) {
   );
 }
 
+function resolveRuntimeAsset(service, ref) {
+  const directCandidates = candidateRuntimePaths(service, ref);
+  const directExisting = directCandidates.filter((candidate) => fs.existsSync(candidate));
+  if (directExisting.length > 0) {
+    return {
+      exists: true,
+      resolution: 'direct',
+      resolvedRef: ref,
+      existingPaths: directExisting,
+      checkedPaths: directCandidates,
+    };
+  }
+
+  const aliasTarget = LEGACY_IMAGE_ALIASES[ref];
+  if (!aliasTarget || aliasTarget === ref) {
+    return {
+      exists: false,
+      resolution: aliasTarget === ref ? 'invalid-self-alias' : 'missing',
+      resolvedRef: aliasTarget || ref,
+      existingPaths: [],
+      checkedPaths: directCandidates,
+    };
+  }
+
+  const aliasCandidates = candidateRuntimePaths(service, aliasTarget);
+  const aliasExisting = aliasCandidates.filter((candidate) => fs.existsSync(candidate));
+  return {
+    exists: aliasExisting.length > 0,
+    resolution: aliasExisting.length > 0 ? 'verified-rewrite' : 'missing-rewrite-target',
+    resolvedRef: aliasTarget,
+    existingPaths: aliasExisting,
+    checkedPaths: [...directCandidates, ...aliasCandidates],
+  };
+}
+
 function auditPackagingContracts() {
   const failures = [];
 
@@ -115,15 +151,16 @@ for (const file of files) {
     const ref = m[1];
     if (!ref.startsWith('/images/')) continue;
 
-    const candidates = candidateRuntimePaths(service, ref);
-    const existingPaths = candidates.filter((candidate) => fs.existsSync(candidate));
+    const resolved = resolveRuntimeAsset(service, ref);
     refs.push({
       file: relFile,
       service,
       ref,
-      exists: existingPaths.length > 0,
-      existingPaths: existingPaths.map((candidate) => path.relative(ROOT, candidate)),
-      checkedPaths: candidates.map((candidate) => path.relative(ROOT, candidate)),
+      exists: resolved.exists,
+      resolution: resolved.resolution,
+      resolvedRef: resolved.resolvedRef,
+      existingPaths: resolved.existingPaths.map((candidate) => path.relative(ROOT, candidate)),
+      checkedPaths: resolved.checkedPaths.map((candidate) => path.relative(ROOT, candidate)),
       pexels: PEXELS_RE.test(ref),
     });
   }
@@ -133,6 +170,7 @@ const unique = new Map();
 for (const r of refs) unique.set(`${r.file}::${r.ref}`, r);
 const rows = [...unique.values()];
 const missing = rows.filter((r) => !r.exists);
+const rewritten = rows.filter((r) => r.resolution === 'verified-rewrite');
 const pexels = rows.filter((r) => r.pexels);
 const packagingFailures = auditPackagingContracts();
 
@@ -144,6 +182,7 @@ const byService = Object.fromEntries(
       {
         imageRefs: serviceRows.length,
         missingRefs: serviceRows.filter((row) => !row.exists).length,
+        verifiedRewrites: serviceRows.filter((row) => row.resolution === 'verified-rewrite').length,
       },
     ];
   }),
@@ -154,10 +193,12 @@ const report = {
   scannedFiles: files.length,
   imageRefs: rows.length,
   missingRefs: missing.length,
+  verifiedRewrites: rewritten.length,
   pexelsRefs: pexels.length,
   packagingFailures: packagingFailures.length,
   byService,
   missing,
+  rewritten,
   pexels,
   packaging: packagingFailures,
 };
@@ -171,12 +212,15 @@ const mdPath = path.join(outDir, 'IMAGE_ASSETS_AUDIT.md');
 const serviceSummary = Object.entries(byService)
   .map(
     ([service, counts]) =>
-      `- ${service}: ${counts.imageRefs} refs, ${counts.missingRefs} missing`,
+      `- ${service}: ${counts.imageRefs} refs, ${counts.missingRefs} missing, ${counts.verifiedRewrites} verified rewrites`,
   )
   .join('\n');
-const md = `# Image Assets Audit — active platform\n\n- Scanned files: ${report.scannedFiles}\n- Image refs (/images/*): ${report.imageRefs}\n- Missing runtime refs: ${report.missingRefs}\n- Legacy pexels refs: ${report.pexelsRefs}\n- Runtime packaging failures: ${report.packagingFailures}\n\n## Service coverage\n${serviceSummary}\n\n## Missing runtime refs\n${missing
+const md = `# Image Assets Audit — active platform\n\n- Scanned files: ${report.scannedFiles}\n- Image refs (/images/*): ${report.imageRefs}\n- Missing runtime refs: ${report.missingRefs}\n- Verified legacy rewrites: ${report.verifiedRewrites}\n- Legacy pexels refs: ${report.pexelsRefs}\n- Runtime packaging failures: ${report.packagingFailures}\n\n## Service coverage\n${serviceSummary}\n\n## Missing runtime refs\n${missing
   .slice(0, 300)
-  .map((r) => `- ${r.ref} in \`${r.file}\` (${r.service}); checked: ${r.checkedPaths.join(', ')}`)
+  .map((r) => `- ${r.ref} in \`${r.file}\` (${r.service}); resolution=${r.resolution}; checked: ${r.checkedPaths.join(', ')}`)
+  .join('\n') || 'None'}\n\n## Verified legacy rewrites\n${rewritten
+  .slice(0, 300)
+  .map((r) => `- ${r.ref} -> ${r.resolvedRef} in \`${r.file}\` (${r.service})`)
   .join('\n') || 'None'}\n\n## Runtime packaging failures\n${packagingFailures
   .map((r) => `- ${r.service}: ${r.reason} in \`${r.dockerfile}\``)
   .join('\n') || 'None'}\n\n## Legacy pexels refs\n${pexels
@@ -189,6 +233,7 @@ console.log(`Wrote ${jsonPath}`);
 console.log(`Wrote ${mdPath}`);
 console.log(`Scanned files: ${files.length}`);
 console.log(`Missing runtime refs: ${missing.length}`);
+console.log(`Verified legacy rewrites: ${rewritten.length}`);
 console.log(`Runtime packaging failures: ${packagingFailures.length}`);
 console.log(`Pexels refs: ${pexels.length}`);
 

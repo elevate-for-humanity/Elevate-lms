@@ -1,24 +1,19 @@
 /**
- * POST /api/admin/courses/pipeline
+ * POST /api/admin/course-builder/pipeline
  *
- * Unified course generation pipeline endpoint.
- * Streams progress via SSE, runs all stages sequentially:
- *   blueprint → lessons → quizzes → publish
- *
- * Body: { title, topic, difficulty, programId, moduleCount?, lessonsPerModule?, includeVideos?, dryRun? }
- * Response: SSE stream of { stage, message } events, ending with { stage: 'complete', result }
+ * Canonical flexible Course Factory endpoint.
+ * Streams blueprint → lessons → assessments → validation → persistence → video progress via SSE.
  */
-
 import { NextRequest } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { runCoursePipeline } from '@/lib/course-builder/orchestrator';
+import { runCoursePipeline } from '@/lib/course-factory/orchestrator';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // 5 min — course generation is slow
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
@@ -37,6 +32,7 @@ export async function POST(req: NextRequest) {
     lessonsPerModule?: number;
     includeVideos?: boolean;
     dryRun?: boolean;
+    complianceProfileKey?: string;
   };
 
   try {
@@ -46,10 +42,12 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.title || !body.topic || !body.programId) {
-    return new Response(JSON.stringify({ error: 'title, topic, and programId are required' }), { status: 400 });
+    return new Response(
+      JSON.stringify({ error: 'title, topic, and programId are required' }),
+      { status: 400 },
+    );
   }
 
-  // SSE stream
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -59,40 +57,26 @@ export async function POST(req: NextRequest) {
 
       try {
         const db = await requireAdminClient();
-
-        // Resolve programSlug from the programs table if not supplied by the caller
-        let programSlug = body.programSlug;
-        if (!programSlug) {
-          const { data: prog } = await db
-            .from('programs')
-            .select('slug')
-            .eq('id', body.programId)
-            .maybeSingle();
-          programSlug = prog?.slug ?? undefined;
-        }
-
         const result = await runCoursePipeline({
           title: body.title,
           topic: body.topic,
           difficulty: body.difficulty ?? 'intermediate',
           programId: body.programId,
-          programSlug,
+          programSlug: body.programSlug,
           moduleCount: body.moduleCount,
           lessonsPerModule: body.lessonsPerModule,
           includeVideos: body.includeVideos ?? false,
           dryRun: body.dryRun ?? false,
+          complianceProfileKey: body.complianceProfileKey,
           db,
-          onProgress: (stage, message) => {
-            write({ stage, message });
-          },
+          onProgress: (stage, message) => write({ stage, message }),
         });
-
         write({ stage: 'complete', result });
-      } catch (err) {
-        logger.error('[pipeline/route] Pipeline error', err);
+      } catch (error) {
+        logger.error('[course-builder/pipeline] Pipeline error', error);
         write({
           stage: 'error',
-          message: 'Pipeline failed',
+          message: error instanceof Error ? error.message : 'Pipeline failed',
         });
       } finally {
         controller.close();
@@ -104,7 +88,7 @@ export async function POST(req: NextRequest) {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-store',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'X-Accel-Buffering': 'no',
     },
   });

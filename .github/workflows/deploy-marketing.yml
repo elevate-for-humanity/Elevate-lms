@@ -13,6 +13,8 @@ on:
       - 'components/programs/**'
       - 'components/home/**'
       - 'components/ui/**'
+      - 'components/voice/**'
+      - 'lib/ai/**'
       - 'lib/navigation/**'
       - 'lib/programs/**'
       - 'lib/apprenticeship-programs/**'

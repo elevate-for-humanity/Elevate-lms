@@ -37,7 +37,6 @@ jobs:
                       raise RuntimeError(f'Could not find occurrence {n} of {old}')
               return text[:start] + new + text[start + len(old):]
 
-          # 1-2: Next/Image fill sizing blockers.
           for path in [
               'apps/marketing/app/privacy/page.tsx',
               'apps/marketing/app/store/testing/page.tsx',
@@ -53,8 +52,6 @@ jobs:
                   raise RuntimeError(f'No fill image repaired in {path}')
               write(path, text2)
 
-          # 3: How It Works — metadata/poster share one canonical hero constant;
-          # step 2 gets its own training image so the rendered journey is not duplicated.
           path = 'apps/marketing/app/how-it-works/page.tsx'
           text = read(path)
           old = "'/images/pages/how-it-works-hero.webp'"
@@ -64,15 +61,12 @@ jobs:
           text = text.replace("image: HOW_IT_WORKS_HERO,\n                cta: 'View Programs'", "image: '/images/pages/certifications-page-1.webp',\n                cta: 'View Programs'", 1)
           write(path, text)
 
-          # 4-5: Testing page — keep the hero unique; WorkKeys and fallback get distinct images.
           path = 'apps/marketing/app/testing/page.tsx'
           text = read(path)
           text = replace_nth(text, '/images/pages/career-services-page-1.webp', '/images/pages/career-counseling-page-1.webp', 1)
           text = replace_nth(text, '/images/pages/career-services-page-1.webp', '/images/pages/certifications-page-1.webp', 2)
-          text = replace_nth(text, '/images/pages/comp-pathway-classroom.webp', '/images/pages/healthcare-grad.jpg', 2)
           write(path, text)
 
-          # 6-7: Funding page — canonical hero constant + distinct WRG card image.
           path = 'apps/marketing/app/funding/page.tsx'
           text = read(path)
           hero = "'/images/pages/funding-page-5.webp'"
@@ -82,19 +76,16 @@ jobs:
           text = replace_nth(text, '/images/pages/funding-page-3.webp', '/images/pages/certifications-page-1.webp', 2)
           write(path, text)
 
-          # 8: Success stories — second duplicate counseling image gets distinct graduate imagery.
           path = 'apps/marketing/app/success-stories/page.tsx'
           text = read(path)
           text = replace_nth(text, '/images/pages/career-counseling.jpg', '/images/pages/healthcare-grad.jpg', 2)
           write(path, text)
 
-          # 9: Blog — second repeated campaign hero gets a distinct editorial image.
           path = 'apps/marketing/app/blog/page.tsx'
           text = read(path)
           text = replace_nth(text, '/images/pages/admin-campaigns-hero.webp', '/images/pages/certifications-page-1.webp', 2)
           write(path, text)
 
-          # 10: Cross-page hero collision: hire-graduates gets employer-specific imagery.
           path = 'apps/marketing/app/hire-graduates/page.tsx'
           text = read(path)
           text2 = text.replace('/images/pages/comp-home-highlight-health.webp', '/images/pages/about-employer-partners.webp')
@@ -102,7 +93,6 @@ jobs:
               raise RuntimeError('hire-graduates hero source not found')
           write(path, text2)
 
-          # 11: Cross-page hero collision: WIOA gets its own funding/counseling image.
           path = 'apps/marketing/app/funding/wioa/page.tsx'
           text = read(path)
           text2 = text.replace('/images/pages/funding-page-5.webp', '/images/pages/career-counseling-page-1.webp')
@@ -110,7 +100,6 @@ jobs:
               raise RuntimeError('funding/wioa hero source not found')
           write(path, text2)
 
-          # 12: Deterministic contrast risk — use an opaque dark surface and high-contrast text.
           path = 'components/store/GuidedProductInterview.tsx'
           text = read(path)
           old = 'mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-300'

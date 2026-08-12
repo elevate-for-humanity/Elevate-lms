@@ -155,7 +155,13 @@ RUN echo "=== RUNTIME VERIFICATION ===" && \
     fi
 
 COPY --from=builder /app/apps/lms/.next/static ./apps/lms/.next/static
+
+# Package repository-level public assets used by shared components and registries.
+COPY --from=builder /app/public ./apps/lms/public
+# App-specific public assets override shared assets when paths overlap.
 COPY --from=builder /app/apps/lms/public ./apps/lms/public
+
+RUN test -d /app/apps/lms/public/images
 
 EXPOSE 3000
 

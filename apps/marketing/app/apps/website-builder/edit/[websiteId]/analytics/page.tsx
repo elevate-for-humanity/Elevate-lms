@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
@@ -5,6 +6,11 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Website Analytics | Elevate Website Builder',
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ websiteId: string }> };
 

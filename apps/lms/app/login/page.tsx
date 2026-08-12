@@ -16,6 +16,43 @@ const APPRENTICE_ROLES = new Set([
   'cosmetology_apprentice',
 ]);
 
+type SignInApiResponse = {
+  success?: boolean;
+  error?: string;
+  message?: string;
+  user?: { id?: string; email?: string };
+};
+
+async function serverSignIn(email: string, password: string): Promise<string> {
+  const response = await fetch('/api/auth/signin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    cache: 'no-store',
+    body: JSON.stringify({ email: email.trim(), password }),
+  });
+
+  const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
+  if (!contentType.includes('application/json')) {
+    const raw = await response.text();
+    console.error('[login] sign-in endpoint returned non-JSON', {
+      status: response.status,
+      contentType,
+      preview: raw.slice(0, 120),
+    });
+    throw new Error(`Authentication service returned an invalid response (HTTP ${response.status || 500}).`);
+  }
+
+  const body = (await response.json()) as SignInApiResponse;
+  if (!response.ok || body.success !== true || !body.user?.id) {
+    throw new Error(body.error || body.message || 'Invalid email or password.');
+  }
+
+  return body.user.id;
+}
+
 export default function LoginPage() {
   const searchParams = useSafeSearchParams();
   const requestedRedirect = searchParams.get('next') || searchParams.get('redirect') || '';
@@ -40,14 +77,13 @@ export default function LoginPage() {
     setError('');
 
     try {
+      // Sign in through the server route instead of directly from the browser.
+      // lib/supabase/server.ts scopes Supabase auth cookies to
+      // .elevateforhumanity.org, so a valid session survives role-based moves
+      // between app, admin, and www subdomains. The API also applies the auth
+      // rate limiter and request validation.
+      const userId = await serverSignIn(email, password);
       const supabase = createClient();
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (signInError) throw signInError;
-      if (!data.user) throw new Error('Authentication completed without a user session.');
 
       // Resolve the user's authoritative role before evaluating any requested
       // redirect. Previously `/login?redirect=/dashboard` was honored first;
@@ -56,7 +92,7 @@ export default function LoginPage() {
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, portal_type, onboarding_completed')
-        .eq('id', data.user.id)
+        .eq('id', userId)
         .maybeSingle();
 
       if (profileError) {
@@ -71,7 +107,7 @@ export default function LoginPage() {
       const { data: roleRows, error: rolesError } = await supabase
         .from('user_roles')
         .select('roles(name)')
-        .eq('user_id', data.user.id);
+        .eq('user_id', userId);
 
       if (rolesError) {
         throw new Error('Unable to verify your portal access. Please try again.');
@@ -95,7 +131,7 @@ export default function LoginPage() {
         // canonical /apprentice runtime. Do not let a stale redirect override it.
         destination = await resolveStudentHomePath(
           supabase,
-          data.user.id,
+          userId,
           typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
         );
         allowRequestedRedirect = false;

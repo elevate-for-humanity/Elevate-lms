@@ -1,11 +1,12 @@
 #!/usr/bin/env tsx
 /**
- * Configure DNS mapping between Durable and Northflank
- * 
+ * Configure DNS mapping between Cloudflare and Northflank.
+ *
  * Run: npx tsx scripts/northflank/configure-dns.ts
- * 
- * This script shows the required DNS configuration.
- * You need to configure these in Durable.io (or your DNS provider).
+ *
+ * Cloudflare owns authoritative DNS for elevateforhumanity.org. Northflank
+ * owns the application services and TLS termination for the three production
+ * hostnames below.
  */
 
 import { nfFetch, projectApiPath } from './lib';
@@ -40,9 +41,7 @@ async function getNorthflankDomains(serviceId: string): Promise<string[]> {
     const domains: string[] = [];
     for (const port of data.ports || []) {
       if (port.dns) domains.push(port.dns);
-      for (const d of port.domains || []) {
-        domains.push(d.name);
-      }
+      for (const d of port.domains || []) domains.push(d.name);
     }
     return domains;
   } catch (e) {
@@ -52,19 +51,22 @@ async function getNorthflankDomains(serviceId: string): Promise<string[]> {
 }
 
 async function main() {
-  console.log('\n=== DNS CONFIGURATION: Durable.io -> Northflank ===\n');
-
-  console.log('STEP 1: In Durable.io (or your DNS provider), configure these CNAME records:\n');
+  console.log('\n=== DNS CONFIGURATION: Cloudflare -> Northflank ===\n');
+  console.log('STEP 1: In Cloudflare DNS, configure these CNAME records:\n');
 
   for (const svc of SERVICES) {
     console.log(`${svc.displayName}:`);
     console.log(`  Type:  CNAME`);
     console.log(`  Name:  ${svc.publicDomain}`);
     console.log(`  Value: ${svc.northflankDomain}`);
-    console.log(`  TTL:   300\n`);
+    console.log('  Proxy: DNS only while Northflank verifies/provisions the domain; enable proxy only after verification if desired.');
+    console.log('  TTL:   Auto\n');
   }
 
-  console.log('STEP 2: In Northflank dashboard, verify each service has the custom domain:\n');
+  console.log('Apex domain: elevateforhumanity.org must redirect permanently to https://www.elevateforhumanity.org.');
+  console.log('Do not point Marketing, LMS, or Admin at Durable, Vercel, or Netlify.\n');
+
+  console.log('STEP 2: In Northflank, verify each service has the matching custom domain:\n');
 
   for (const svc of SERVICES) {
     console.log(`${svc.name} (${svc.displayName}):`);
@@ -72,19 +74,16 @@ async function main() {
     if (domains.length > 0) {
       console.log(`  Northflank configured: ${domains.join(', ')}`);
     } else {
-      console.log(`  NOT configured in Northflank`);
-      console.log(`  -> Go to Northflank -> ${svc.name} -> Ports/Domains -> Add custom domain`);
-      console.log(`  -> Add: ${svc.publicDomain}`);
+      console.log('  NOT configured in Northflank');
+      console.log(`  -> Northflank -> ${svc.name} -> Ports/Domains -> Add ${svc.publicDomain}`);
     }
   }
 
-  console.log('\n=== SUMMARY ===\n');
-  console.log('| Service     | Public Domain                  | Northflank Target                      |');
-  console.log('|-------------|--------------------------------|----------------------------------------|');
-  for (const svc of SERVICES) {
-    console.log(`| ${svc.displayName.padEnd(11)} | ${svc.publicDomain.padEnd(30)} | ${svc.northflankDomain.padEnd(38)} |`);
-  }
-  console.log('\n');
+  console.log('\n=== CANONICAL OWNERSHIP ===\n');
+  console.log('www.elevateforhumanity.org   -> elevate-marketing');
+  console.log('app.elevateforhumanity.org   -> elevate-lms');
+  console.log('admin.elevateforhumanity.org -> elevate-admin');
+  console.log('elevateforhumanity.org       -> 301/308 redirect to https://www.elevateforhumanity.org\n');
 }
 
 main().catch(console.error);

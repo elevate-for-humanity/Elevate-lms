@@ -1,142 +1,40 @@
-# Worker Scripts - Automated Task Execution
+# Worker Scripts
 
-This directory contains worker scripts that automate various deployment and cleanup tasks.
+This directory contains support scripts for infrastructure and service integrations.
 
----
+## Cloudflare
 
-## Available Scripts
+`get-cloudflare-credentials.sh` is used for optional Cloudflare service credentials such as R2 and Stream.
 
-### `get-supabase-credentials.sh`
+Cloudflare is also the authoritative DNS provider for `elevateforhumanity.org`. Production application traffic is routed from Cloudflare DNS to Northflank; the application is not deployed to Cloudflare Workers, Durable, Vercel, or Netlify.
 
-**Interactive Supabase setup**
+Canonical production host ownership:
 
-**What it does:**
+- `www.elevateforhumanity.org` -> Northflank `elevate-marketing`
+- `app.elevateforhumanity.org` -> Northflank `elevate-lms`
+- `admin.elevateforhumanity.org` -> Northflank `elevate-admin`
+- `elevateforhumanity.org` -> permanent redirect to `https://www.elevateforhumanity.org`
 
-- Guides you through Supabase account creation
-- Helps you get project credentials
-- Updates .env.local with values
+Do not add cleanup/removal scripts that detach these production hostnames from Cloudflare without an explicit infrastructure migration plan.
 
-**Usage:**
+## Supabase
 
-```bash
-./scripts/workers/get-supabase-credentials.sh
-```
+`get-supabase-credentials.sh` provides interactive local setup for Supabase credentials.
 
-**What you need:**
+## Production deployment
 
-- Supabase account (or will create one)
-- Project URL
-- Anon key
-- Service role key
+Production application services deploy to Northflank. Canonical infrastructure configuration is maintained in:
 
----
+- `scripts/northflank/configure-services.ts`
+- `scripts/northflank/configure-domains.ts`
+- `scripts/northflank/configure-dns.ts`
+- `scripts/northflank/sync-env.ts`
 
-### `get-cloudflare-credentials.sh`
+Use the repository's GitHub Actions/Northflank deployment path. Do not deploy this platform to Netlify or Vercel.
 
-**Interactive Cloudflare setup (optional)**
+## Security
 
-**What it does:**
-
-- Guides you through Cloudflare account setup
-- Helps configure Stream (video hosting)
-- Helps configure R2 (object storage)
-- Updates .env.local with values
-
-**Usage:**
-
-```bash
-./scripts/workers/get-cloudflare-credentials.sh
-```
-
-**What you need:**
-
-- Cloudflare account (optional)
-- Account ID
-- API token
-- Stream/R2 configuration (optional)
-
----
-
-### `cleanup-cloudflare-elevateforhumanity.sh`
-
-**Cloudflare cleanup script**
-
-**What it does:**
-
-- Cleans up Cloudflare resources
-- Removes old configurations
-
-**Usage:**
-
-```bash
-./scripts/workers/cleanup-cloudflare-elevateforhumanity.sh
-```
-
----
-
-### `remove-elevateforhumanity-from-cloudflare.mjs`
-
-**Node.js Cloudflare removal script**
-
-**What it does:**
-
-- Programmatically removes resources from Cloudflare
-- Uses Cloudflare API
-
-**Usage:**
-
-```bash
-node scripts/workers/remove-elevateforhumanity-from-cloudflare.mjs
-```
-
----
-
-## Deployment
-
-This project deploys to **Netlify**. See `netlify.toml` for configuration.
-
-### Deploy to Netlify:
-
-```bash
-# Install Netlify CLI
-npm install -g netlify-cli
-
-# Login
-netlify login
-
-# Deploy
-netlify deploy --prod
-```
-
----
-
-## Security Notes
-
-### Environment Variables
-
-- **Never commit** `.env.local` to git
-- Contains sensitive credentials
-- Use `.env.example` for templates
-- Backup securely
-
----
-
-## Output Files
-
-### Created by Scripts:
-
-- `.env.local` - Local environment variables
-- `.env.cloudflare` - Cloudflare-specific vars
-
-### Logs:
-
-- `.implementation-logs/` - Implementation logs
-- `.elevate-logs/` - Autopilot logs
-
----
-
-## Need Help?
-
-1. **Check Documentation:** Review docs in `/docs` directory
-2. **Search Issues:** https://github.com/elevateforhumanity/Elevate-lms/issues
-3. **Contact Support:** support@elevateforhumanity.org
+- Never commit `.env.local`, API tokens, service-role keys, or production secrets.
+- Use the Northflank production secret group for runtime secrets.
+- Cloudflare DNS tokens should use least privilege; DNS automation needs only the zone permissions required for the intended operation.
+- R2/Stream credentials should be scoped separately from DNS credentials where possible.

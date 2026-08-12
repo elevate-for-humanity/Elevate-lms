@@ -8,6 +8,7 @@ const routesFile = path.join(nextDir, 'routes-manifest.json');
 const requiredAppPaths = [
   '/page',
   '/api/ping/route',
+  '/api/auth/admin-login/route',
   '/api/admin/workflows/run/route',
   '/studio/page',
   '/studio/workflows/page',
@@ -44,6 +45,9 @@ if (routes) {
   if (redirects.some((rule) => rule.source === '/studio/workflows/new')) {
     fail('/studio/workflows/new is still shadowed by a redirect');
   }
+  if (redirects.some((rule) => rule.source === '/api/auth/admin-login')) {
+    fail('/api/auth/admin-login is shadowed by a redirect');
+  }
 
   const rewriteGroups = routes.rewrites && !Array.isArray(routes.rewrites)
     ? Object.values(routes.rewrites)
@@ -51,6 +55,9 @@ if (routes) {
   const rewrites = rewriteGroups.flat().filter(Boolean);
   if (rewrites.some((rule) => rule.source === '/api/admin/workflows/run')) {
     fail('/api/admin/workflows/run is still shadowed by a rewrite');
+  }
+  if (rewrites.some((rule) => rule.source === '/api/auth/admin-login')) {
+    fail('/api/auth/admin-login is shadowed by a rewrite');
   }
 }
 

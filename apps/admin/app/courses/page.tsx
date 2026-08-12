@@ -1,179 +1,192 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Plus, Search, Filter, MoreVertical, AlertCircle } from 'lucide-react';
+import {
+  AlertCircle,
+  BookOpen,
+  CheckCircle2,
+  Clock3,
+  Plus,
+  ShieldCheck,
+  Users,
+} from 'lucide-react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 60;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Courses | Elevate Admin',
-  description: 'Manage training programs and courses in the Elevate LMS.',
+  description: 'Manage canonical LMS courses in the unified Course Builder.',
 };
 
-interface ProgramCourse {
+type CourseRow = {
   id: string;
-  title: string | null;
-  name: string | null;
+  title: string;
+  slug: string;
   status: string | null;
   is_active: boolean | null;
-  is_published: boolean | null;
-  total_hours: number | null;
-  student_count: number;
-  category: string | null;
-}
+  duration_hours: number | null;
+  program_id: string | null;
+  compliance_profile_key: string | null;
+  updated_at: string | null;
+};
 
 export default async function CoursesPage() {
   const db = await requireAdminClient();
-
-  const [{ data: programs, error: programsError }, { data: enrollments }] = await Promise.all([
-    db.from('programs').select('id, title, name, status, is_active, is_published, total_hours').order('created_at', { ascending: false }).limit(100),
-    db.from('program_enrollments').select('program_id', { count: 'exact', head: true }),
+  const [{ data: courses, error: coursesError }, { data: enrollments }] = await Promise.all([
+    db
+      .from('courses')
+      .select(
+        'id,title,slug,status,is_active,duration_hours,program_id,compliance_profile_key,updated_at',
+      )
+      .order('updated_at', { ascending: false })
+      .limit(250),
+    db
+      .from('program_enrollments')
+      .select('course_id')
+      .not('course_id', 'is', null)
+      .limit(10000),
   ]);
 
-  if (programsError) {
+  if (coursesError) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600 font-medium">Failed to load courses: {programsError.message}</p>
+      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+        <div className="max-w-lg rounded-xl border border-red-200 bg-white p-8 text-center shadow-sm">
+          <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-500" />
+          <h1 className="text-lg font-bold text-slate-900">Course inventory unavailable</h1>
+          <p className="mt-2 text-sm text-red-700">{coursesError.message}</p>
         </div>
       </div>
     );
   }
 
-  const enrollmentMap: Record<string, number> = {};
-  for (const e of enrollments ?? []) {
-    if (e && typeof e === 'object' && 'program_id' in e) {
-      const pid = (e as any).program_id;
-      enrollmentMap[pid] = (enrollmentMap[pid] ?? 0) + 1;
-    }
+  const enrollmentCount = new Map<string, number>();
+  for (const enrollment of enrollments ?? []) {
+    const courseId = enrollment.course_id as string | null;
+    if (!courseId) continue;
+    enrollmentCount.set(courseId, (enrollmentCount.get(courseId) ?? 0) + 1);
   }
 
-  const courses: ProgramCourse[] = (programs ?? []).map((p) => ({
-    ...p,
-    student_count: enrollmentMap[p.id] ?? 0,
-    category: (p as any).category ?? (p as any).program_category ?? null,
-  }));
-
-  const activeCourses = courses.filter((c) => c.is_active || c.status === 'active').length;
-  const totalStudents = courses.reduce((sum, c) => sum + c.student_count, 0);
-
-  const getStatusBadge = (course: ProgramCourse) => {
-    if (course.is_published) {
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>;
-    }
-    if (course.is_active) {
-      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Draft</span>;
-    }
-    return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">Inactive</span>;
-  };
-
-  const getHoursDisplay = (course: ProgramCourse) => {
-    if (course.total_hours) return course.total_hours + ' hrs';
-    return '—';
-  };
+  const rows = (courses ?? []) as CourseRow[];
+  const published = rows.filter((course) => course.status === 'published').length;
+  const active = rows.filter((course) => course.is_active).length;
+  const governed = rows.filter((course) => Boolean(course.compliance_profile_key)).length;
+  const totalDirectEnrollments = [...enrollmentCount.values()].reduce((sum, value) => sum + value, 0);
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="bg-white border-b border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+          <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Courses</h1>
-              <p className="text-sm text-slate-500 mt-1">
-                {courses.length} programs · {activeCourses} active · {totalStudents} total students
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-blue-600">
+                Canonical course inventory
+              </p>
+              <h1 className="mt-1 text-3xl font-black text-slate-900">Courses</h1>
+              <p className="mt-1 text-sm text-slate-600">
+                Every authoring action opens the same Admin Course Builder. Programs and courses are
+                no longer presented as the same record type.
               </p>
             </div>
-            <Link href="/studio/courses/create"
-              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Add Course
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-4 bg-white border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input type="text" placeholder="Search courses..." className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
-            </div>
-            <select className="px-3 py-2 border border-slate-200 rounded-lg text-sm">
-              <option>All Programs</option>
-              <option>Healthcare</option>
-              <option>Skilled Trades</option>
-              <option>Beauty</option>
-              <option>Transportation</option>
-            </select>
-            <select className="px-3 py-2 border border-slate-200 rounded-lg text-sm">
-              <option>All Status</option>
-              <option>Active</option>
-              <option>Draft</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          {courses.length === 0 ? (
-            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-              <BookOpen className="mx-auto h-12 w-12 text-slate-300" />
-              <h3 className="mt-4 text-lg font-semibold text-slate-900">No courses yet</h3>
-              <p className="mt-1 text-sm text-slate-500">Create your first program to get started.</p>
-              <Link href="/studio/courses/create" className="mt-6 inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-brand-blue-700 transition-colors">
-                <Plus className="w-4 h-4" /> Create Course
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/course-builder?tab=templates"
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                <BookOpen className="h-4 w-4" /> Templates
+              </Link>
+              <Link
+                href="/course-builder?tab=build"
+                className="inline-flex items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-blue-700"
+              >
+                <Plus className="h-4 w-4" /> Create Course
               </Link>
             </div>
-          ) : (
-            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Metric icon={BookOpen} label="Courses" value={rows.length} />
+            <Metric icon={CheckCircle2} label="Published" value={published} />
+            <Metric icon={ShieldCheck} label="Governed" value={governed} />
+            <Metric icon={Users} label="Direct enrollments" value={totalDirectEnrollments} />
+          </div>
+          <p className="mt-2 text-xs text-slate-500">{active} course record(s) are currently marked active.</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-7 sm:px-6">
+        {rows.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <BookOpen className="mx-auto h-12 w-12 text-slate-300" />
+            <h2 className="mt-4 text-lg font-semibold text-slate-900">No canonical courses yet</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Create one manually, from a template, by document import, or with the AI generator.
+            </p>
+            <Link
+              href="/course-builder?tab=templates"
+              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-brand-blue-700"
+            >
+              <Plus className="h-4 w-4" /> Open Course Builder
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
-                    <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Course</th>
-                    <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3 hidden md:table-cell">Category</th>
-                    <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3 hidden lg:table-cell">Hours</th>
-                    <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Students</th>
-                    <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Status</th>
-                    <th className="text-right text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Actions</th>
+                    <Header>Course</Header>
+                    <Header>Hours</Header>
+                    <Header>Enrollments</Header>
+                    <Header>Compliance</Header>
+                    <Header>Status</Header>
+                    <Header>Updated</Header>
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {courses.map((course) => (
+                  {rows.map((course) => (
                     <tr key={course.id} className="hover:bg-slate-50">
                       <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                            <BookOpen className="w-5 h-5 text-brand-blue-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-slate-900">{course.title ?? course.name ?? 'Untitled'}</p>
-                            <p className="text-sm text-slate-500 md:hidden">{getStatusBadge(course)}</p>
-                          </div>
-                        </div>
+                        <div className="font-semibold text-slate-900">{course.title}</div>
+                        <div className="mt-0.5 font-mono text-xs text-slate-500">{course.slug}</div>
                       </td>
-                      <td className="px-4 py-4 hidden md:table-cell">
-                        <span className="text-sm text-slate-600">{course.category ?? '—'}</span>
+                      <td className="px-4 py-4 text-sm text-slate-700">
+                        {course.duration_hours ? `${course.duration_hours} hrs` : '—'}
                       </td>
-                      <td className="px-4 py-4 hidden lg:table-cell">
-                        <span className="text-sm text-slate-600">{getHoursDisplay(course)}</span>
+                      <td className="px-4 py-4 text-sm font-semibold text-slate-800">
+                        {enrollmentCount.get(course.id) ?? 0}
                       </td>
                       <td className="px-4 py-4">
-                        <span className="text-sm font-medium text-slate-900">{course.student_count}</span>
+                        {course.compliance_profile_key ? (
+                          <span className="inline-flex rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">
+                            {course.compliance_profile_key}
+                          </span>
+                        ) : (
+                          <span className="text-xs font-medium text-amber-700">Needs profile</span>
+                        )}
                       </td>
-                      <td className="px-4 py-4">{getStatusBadge(course)}</td>
+                      <td className="px-4 py-4">
+                        <StatusBadge status={course.status} active={course.is_active} />
+                      </td>
+                      <td className="px-4 py-4 text-xs text-slate-500">
+                        {course.updated_at ? new Date(course.updated_at).toLocaleDateString() : '—'}
+                      </td>
                       <td className="px-4 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Link href={"/admin/studio/courses/" + course.id} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
-                            <BookOpen className="w-4 h-4 text-brand-blue-600" />
+                        <div className="flex justify-end gap-2">
+                          <Link
+                            href={`/course-builder?courseId=${encodeURIComponent(course.id)}&tab=build`}
+                            className="rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                          >
+                            Build
                           </Link>
-                          <Link href={"/admin/studio/courses/" + course.id + "/edit"} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
-                            <MoreVertical className="w-4 h-4 text-slate-500" />
+                          <Link
+                            href={`/course-builder?courseId=${encodeURIComponent(course.id)}&tab=compliance`}
+                            className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+                          >
+                            Governance
                           </Link>
                         </div>
                       </td>
@@ -182,9 +195,53 @@ export default async function CoursesPage() {
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </section>
     </div>
+  );
+}
+
+function Header({ children }: { children: React.ReactNode }) {
+  return (
+    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+      {children}
+    </th>
+  );
+}
+
+function Metric({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <Icon className="h-4 w-4" /> {label}
+      </div>
+      <div className="mt-2 text-2xl font-black text-slate-900">{value}</div>
+    </div>
+  );
+}
+
+function StatusBadge({ status, active }: { status: string | null; active: boolean | null }) {
+  const published = status === 'published';
+  return (
+    <span
+      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
+        published
+          ? 'bg-green-50 text-green-700'
+          : active
+            ? 'bg-amber-50 text-amber-700'
+            : 'bg-slate-100 text-slate-600'
+      }`}
+    >
+      {published ? 'Published' : active ? 'Active draft' : status ?? 'Draft'}
+    </span>
   );
 }

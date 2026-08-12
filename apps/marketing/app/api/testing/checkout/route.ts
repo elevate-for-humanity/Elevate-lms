@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
 import { CERT_PROVIDERS, type ExamDefinition } from '@/lib/testing/proctoring-capabilities';
+import { isPublicTestingPriceVerified } from '@/lib/testing/public-pricing';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -9,7 +10,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-function exactExamAmount(providerKey: string, examName: string): { amountCents: number; displayName: string } | null {
+function exactExamAmount(
+  providerKey: string,
+  examName: string,
+): { amountCents: number; displayName: string } | null {
   const provider = CERT_PROVIDERS[providerKey];
   if (!provider || provider.status !== 'active' || provider.publicVisible === false) return null;
 
@@ -22,7 +26,6 @@ function exactExamAmount(providerKey: string, examName: string): { amountCents: 
     return { amountCents: exam.amountCents, displayName: exam.name };
   }
 
-  // Backward compatibility for providers that publish one uniform fee.
   if (exam && provider.fees?.length === 1 && provider.fees[0].amount > 0) {
     return {
       amountCents: Math.round(provider.fees[0].amount * 100),
@@ -38,7 +41,9 @@ export async function POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const stripe = getStripe();
-  if (!stripe) return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
+  if (!stripe) {
+    return NextResponse.json({ error: 'Payment system not configured.' }, { status: 503 });
+  }
 
   let body: {
     examType?: string;
@@ -50,6 +55,7 @@ export async function POST(request: NextRequest) {
     email?: string;
     name?: string;
   };
+
   try {
     body = await request.json();
   } catch {
@@ -59,24 +65,41 @@ export async function POST(request: NextRequest) {
   const providerKey = body.examType?.trim() || '';
   const provider = CERT_PROVIDERS[providerKey];
   if (!provider || provider.status !== 'active' || provider.publicVisible === false) {
-    return NextResponse.json({ error: 'Testing provider is not available for public checkout.' }, { status: 404 });
+    return NextResponse.json(
+      { error: 'Testing provider is not available for public checkout.' },
+      { status: 404 },
+    );
+  }
+
+  // Never turn planning estimates into a customer charge.
+  if (!isPublicTestingPriceVerified(providerKey)) {
+    return NextResponse.json(
+      {
+        error:
+          'Online payment is temporarily disabled for this provider while the current provider cost is being verified. Contact Elevate for the current total before payment.',
+      },
+      { status: 409 },
+    );
   }
 
   const examName = body.examName?.trim() || '';
   const pricing = exactExamAmount(providerKey, examName);
   if (!pricing) {
     return NextResponse.json(
-      { error: 'Select a specific exam with published individual pricing before checkout.' },
+      { error: 'Select a specific exam with verified published pricing before checkout.' },
       { status: 422 },
     );
   }
 
   const bookingType = body.bookingType === 'organization' ? 'organization' : 'individual';
-  const participantCount = bookingType === 'organization'
-    ? Math.max(1, Math.min(100, Math.round(Number(body.participantCount || 1))))
-    : 1;
+  const participantCount =
+    bookingType === 'organization'
+      ? Math.max(1, Math.min(100, Math.round(Number(body.participantCount || 1))))
+      : 1;
 
-  const addOnSelected = body.addOn === true && bookingType === 'individual' && Boolean(provider.addOn);
+  const addOnSelected =
+    body.addOn === true && bookingType === 'individual' && Boolean(provider.addOn);
+
   const lineItems: any[] = [
     {
       quantity: participantCount,
@@ -129,6 +152,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!session.url) throw new Error('Stripe did not return a Checkout URL.');
+
     return NextResponse.json({
       url: session.url,
       sessionId: session.id,

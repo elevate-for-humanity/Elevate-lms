@@ -77,7 +77,7 @@ export default function TestingPage() {
 
       <section className="relative min-h-[340px] overflow-hidden bg-slate-100 sm:min-h-[430px]">
         <Image
-          src="/images/pages/career-services-page-1.webp"
+          src="/images/pages/testing-center-hero.webp"
           alt="Credential testing and career readiness"
           fill
           sizes="100vw"
@@ -148,7 +148,7 @@ export default function TestingPage() {
                 >
                   <Link href={`/testing/${provider.key}`} className="relative block h-56 overflow-hidden">
                     <Image
-                      src={PROVIDER_IMAGES[provider.key] || '/images/pages/career-services-page-1.webp'}
+                      src={PROVIDER_IMAGES[provider.key] || '/images/pages/testing-hero.webp'}
                       alt={provider.name}
                       fill
                       sizes="(max-width: 1024px) 100vw, 50vw"

@@ -4,11 +4,17 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { resolveRoleCompatiblePostLoginUrl } from '@/lib/auth/post-login-redirect';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { siteUrls } from '@/lib/utils/site-urls';
-import { absoluteRoleDestination } from '@/lib/auth/absolute-role-destination';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 import { resolveDashboardUrl } from '@/lib/routing/dashboard-resolver';
+
+const APPRENTICE_ROLES = new Set([
+  'apprentice',
+  'barber_apprentice',
+  'cosmetology_apprentice',
+]);
 
 export default function LoginPage() {
   const searchParams = useSafeSearchParams();
@@ -20,8 +26,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Restore the May behavior: an idle-timeout redirect must actually clear the
-  // Supabase browser session before the user signs in again.
+  // An idle-timeout redirect must actually clear the Supabase browser session
+  // before the user signs in again.
   useEffect(() => {
     if (reason !== 'idle') return;
     const supabase = createClient();
@@ -43,11 +49,10 @@ export default function LoginPage() {
       if (signInError) throw signInError;
       if (!data.user) throw new Error('Authentication completed without a user session.');
 
-      if (safeRedirect) {
-        window.location.assign(absoluteRoleDestination(safeRedirect));
-        return;
-      }
-
+      // Resolve the user's authoritative role before evaluating any requested
+      // redirect. Previously `/login?redirect=/dashboard` was honored first;
+      // `/dashboard` belongs to the Admin host, so students could be sent to
+      // admin.elevateforhumanity.org immediately after a successful login.
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, portal_type, onboarding_completed')
@@ -63,35 +68,49 @@ export default function LoginPage() {
         return;
       }
 
-      const { data: roleRows } = await supabase
+      const { data: roleRows, error: rolesError } = await supabase
         .from('user_roles')
         .select('roles(name)')
         .eq('user_id', data.user.id);
 
+      if (rolesError) {
+        throw new Error('Unable to verify your portal access. Please try again.');
+      }
+
       const secondaryRoles = (roleRows ?? [])
         .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
         .filter((role): role is string => typeof role === 'string');
-      const effectiveRoles = Array.from(new Set([profile.role, ...secondaryRoles].filter(Boolean))) as string[];
+      const effectiveRoles = Array.from(
+        new Set([profile.role, ...secondaryRoles].filter(Boolean)),
+      ) as string[];
 
       let destination: string;
+      let allowRequestedRedirect = true;
 
       if (profile.role === 'employer' && profile.onboarding_completed !== true) {
         destination = `${siteUrls.app}/onboarding/employer`;
-      } else if (effectiveRoles.some((role) => ['apprentice', 'barber_apprentice', 'cosmetology_apprentice'].includes(role))) {
-        // Resolve the apprentice's actual occupation/program portal. Never hard-code barber.
+        allowRequestedRedirect = false;
+      } else if (effectiveRoles.some((role) => APPRENTICE_ROLES.has(role))) {
+        // Resolve program context while keeping every apprenticeship on the
+        // canonical /apprentice runtime. Do not let a stale redirect override it.
         destination = await resolveStudentHomePath(
           supabase,
           data.user.id,
           typeof profile.portal_type === 'string' ? profile.portal_type : undefined,
         );
-      } else if (
-        profile.role === 'student' &&
-        typeof profile.portal_type === 'string' &&
-        profile.portal_type.trim() !== ''
-      ) {
-        destination = `${siteUrls.app}/portal/${profile.portal_type.trim()}`;
+        allowRequestedRedirect = false;
       } else {
+        // portal_type is retained as enrollment metadata, not as permission to
+        // invent /portal/* routes. Role ownership determines the actual portal.
         destination = resolveDashboardUrl(profile.role, effectiveRoles);
+      }
+
+      if (safeRedirect && allowRequestedRedirect) {
+        destination = resolveRoleCompatiblePostLoginUrl(
+          safeRedirect,
+          profile.role,
+          effectiveRoles,
+        );
       }
 
       window.location.assign(destination);

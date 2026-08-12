@@ -16,16 +16,22 @@ export type PortalKey =
   | 'hospitality'
   | 'jri';
 
+/**
+ * Only /apprentice currently has a dedicated learner runtime. The former
+ * /portal/* field pages are not present in apps/lms/app, so sending a valid
+ * student session there produces a 404. Keep the field value as metadata while
+ * routing standard learners through the canonical LMS dashboard.
+ */
 export const PORTAL_PATHS: Record<PortalKey, string> = {
   apprentice: '/apprentice',
-  healthcare: '/portal/healthcare',
-  technology: '/portal/technology',
-  business: '/portal/business',
-  beauty: '/portal/beauty',
-  trades: '/portal/trades',
-  'social-services': '/portal/social-services',
-  hospitality: '/portal/hospitality',
-  jri: '/portal/jri',
+  healthcare: '/lms/dashboard',
+  technology: '/lms/dashboard',
+  business: '/lms/dashboard',
+  beauty: '/lms/dashboard',
+  trades: '/lms/dashboard',
+  'social-services': '/lms/dashboard',
+  hospitality: '/lms/dashboard',
+  jri: '/lms/dashboard',
 };
 
 /** Legacy occupation-specific profile values all resolve to the canonical apprentice portal. */

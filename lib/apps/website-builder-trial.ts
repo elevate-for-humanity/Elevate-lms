@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 
 export const WEBSITE_BUILDER_TRIAL = {
   days: 14,
@@ -53,22 +54,14 @@ export async function consumeWebsiteBuilderCredits(
   userId: string,
   operation: WebsiteBuilderCreditOperation,
 ): Promise<TrialCreditResult> {
-  const { data: subscription, error: subscriptionError } = await supabase
-    .from('user_app_subscriptions')
-    .select('status, trial_ends_at')
-    .eq('user_id', userId)
-    .eq('app_slug', 'website-builder')
-    .maybeSingle();
-
-  if (subscriptionError) {
-    return {
-      allowed: false,
-      charged: 0,
-      balance: null,
-      isTrial: false,
-      error: subscriptionError.message,
-    };
-  }
+  // Paid access is synchronized with Stripe before every metered AI operation.
+  // This prevents a stale local `active` row from granting continued AI use
+  // after the upstream subscription has become past_due/canceled.
+  const subscription = await syncIndividualAppSubscription(
+    userId,
+    'website-builder',
+    supabase,
+  );
 
   if (!subscription || !['trial', 'active'].includes(subscription.status || '')) {
     return {

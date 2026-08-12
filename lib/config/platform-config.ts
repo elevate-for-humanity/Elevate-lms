@@ -19,6 +19,22 @@ import { cache } from 'react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
+// `canonicalDomain` is the registrable/root domain used to derive service hosts
+// and email addresses. The public website origin remains `siteUrl` (www).
+// Normalize old values such as "www.elevateforhumanity.org" so callers that
+// prepend `admin.` never generate the invalid host admin.www.elevateforhumanity.org.
+function normalizeCanonicalDomain(value: string): string {
+  const raw = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .split('/')[0]
+    .replace(/\.$/, '')
+    .replace(/^www\./, '');
+
+  return raw || 'elevateforhumanity.org';
+}
+
 // ── Build-time / env-var defaults ─────────────────────────────────────────────
 // These are the fallback values used when platform_settings has no row for a key.
 // Override via environment variables in ECS task definition or .env.local.
@@ -40,8 +56,9 @@ export const PLATFORM_DEFAULTS = {
     process.env.NEXT_PUBLIC_EMAIL_FROM_ADDRESS ?? `noreply@elevateforhumanity.org`,
   certificateHolder:
     process.env.NEXT_PUBLIC_CERT_HOLDER ?? `Elevate for Humanity`,
-  canonicalDomain:
-    process.env.NEXT_PUBLIC_CANONICAL_DOMAIN ?? `www.elevateforhumanity.org`,
+  canonicalDomain: normalizeCanonicalDomain(
+    process.env.NEXT_PUBLIC_CANONICAL_DOMAIN ?? `elevateforhumanity.org`,
+  ),
 } as const;
 
 export type PlatformConfig = typeof PLATFORM_DEFAULTS;
@@ -89,7 +106,9 @@ export const getPlatformConfig = cache(async (): Promise<PlatformConfig> => {
       emailFromName: s['email_from_name'] || PLATFORM_DEFAULTS.emailFromName,
       emailFromAddress: s['email_from_address'] || PLATFORM_DEFAULTS.emailFromAddress,
       certificateHolder: s['certificate_holder'] || PLATFORM_DEFAULTS.certificateHolder,
-      canonicalDomain: s['canonical_domain'] || PLATFORM_DEFAULTS.canonicalDomain,
+      canonicalDomain: normalizeCanonicalDomain(
+        s['canonical_domain'] || PLATFORM_DEFAULTS.canonicalDomain,
+      ),
     };
   } catch (err) {
     logger.warn('[getPlatformConfig] unexpected error — using env defaults', err);

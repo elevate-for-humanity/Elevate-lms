@@ -17,9 +17,11 @@ export function MarketingPwaRegistration() {
 
     const register = async () => {
       try {
-        await navigator.serviceWorker.register('/sw-marketing.js', {
+        const registration = await navigator.serviceWorker.register('/sw-marketing.js', {
           scope: '/',
+          updateViaCache: 'none',
         });
+        await registration.update();
       } catch (error) {
         console.error('[pwa] Marketing service-worker registration failed', error);
       }
@@ -30,4 +32,3 @@ export function MarketingPwaRegistration() {
 
   return null;
 }
-

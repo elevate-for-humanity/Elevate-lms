@@ -3,6 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROLE_ROUTE_CONFIG } from '../lib/auth/role-destinations';
 import { PORTAL_PATHS } from '../lib/portal/router';
+import {
+  ADMIN_ROLES,
+  INSTRUCTOR_ROLES,
+  STAFF_ROLES,
+  TESTING_CENTER_ROLES,
+} from '../lib/rbac/role-matrix';
 
 const ROOT = process.cwd();
 const APP_ROOTS = {
@@ -44,6 +50,15 @@ function read(file: string): string {
   return fs.readFileSync(path.join(ROOT, file), 'utf8');
 }
 
+function adminRolesForPath(route: string): readonly string[] {
+  if (route.startsWith('/staff-portal')) return STAFF_ROLES;
+  if (route.startsWith('/instructor')) return INSTRUCTOR_ROLES;
+  if (route === '/testing-center' || route.startsWith('/testing-center/')) {
+    return TESTING_CENTER_ROLES;
+  }
+  return ADMIN_ROLES;
+}
+
 const filesByHost = Object.fromEntries(
   Object.entries(APP_ROOTS).map(([host, appRoot]) => [host, walk(appRoot)]),
 ) as Record<Host, string[]>;
@@ -67,6 +82,14 @@ for (const [role, config] of Object.entries(ROLE_ROUTE_CONFIG)) {
       severity: 'blocker',
       code: 'ROLE_DESTINATION_MISSING',
       detail: `${role} -> ${host}:${config.path} has no active page.tsx route`,
+    });
+  }
+
+  if (host === 'admin' && !adminRolesForPath(config.path).includes(role as never)) {
+    findings.push({
+      severity: 'warning',
+      code: 'ROLE_DESTINATION_AUTH_MISMATCH',
+      detail: `${role} routes to Admin ${config.path} but is not included in that middleware role set`,
     });
   }
 }
@@ -118,6 +141,61 @@ for (const file of filesByHost.lms) {
   }
 }
 
+const lmsMainLogin = 'apps/lms/app/login/page.tsx';
+if (fs.existsSync(path.join(ROOT, lmsMainLogin))) {
+  const source = read(lmsMainLogin);
+  if (source.includes('signInWithPassword')) {
+    findings.push({
+      severity: 'blocker',
+      code: 'LMS_MAIN_LOGIN_BROWSER_ONLY_AUTH',
+      file: lmsMainLogin,
+      detail: 'Main LMS login bypasses the server sign-in route and shared-domain session cookie policy',
+    });
+  }
+  if (!source.includes("fetch('/api/auth/signin'")) {
+    findings.push({
+      severity: 'blocker',
+      code: 'LMS_MAIN_LOGIN_SERVER_AUTH_MISSING',
+      file: lmsMainLogin,
+      detail: 'Main LMS login is not using the rate-limited server sign-in endpoint',
+    });
+  }
+}
+
+const lmsSignInRoute = 'apps/lms/app/api/auth/signin/route.ts';
+if (fs.existsSync(path.join(ROOT, lmsSignInRoute))) {
+  const source = read(lmsSignInRoute);
+  if (!source.includes("applyRateLimit(request, 'auth')")) {
+    findings.push({
+      severity: 'blocker',
+      code: 'LMS_SIGNIN_NOT_RATE_LIMITED',
+      file: lmsSignInRoute,
+      detail: 'Public LMS credential endpoint is missing the auth rate limiter',
+    });
+  }
+  if (/accessToken\s*:|access_token/.test(source.split('return NextResponse.json')[1] ?? '')) {
+    findings.push({
+      severity: 'blocker',
+      code: 'LMS_SIGNIN_TOKEN_IN_JSON',
+      file: lmsSignInRoute,
+      detail: 'LMS sign-in response exposes session/access token material in JSON',
+    });
+  }
+}
+
+const sharedServerClient = 'lib/supabase/server.ts';
+if (fs.existsSync(path.join(ROOT, sharedServerClient))) {
+  const source = read(sharedServerClient);
+  if (!source.includes("domain: '.elevateforhumanity.org'")) {
+    findings.push({
+      severity: 'blocker',
+      code: 'SHARED_AUTH_COOKIE_DOMAIN_MISSING',
+      file: sharedServerClient,
+      detail: 'Server Supabase auth cookies are not scoped to the Elevate root domain for cross-portal sessions',
+    });
+  }
+}
+
 const adminLoginForm = 'apps/admin/app/login/LoginForm.tsx';
 if (fs.existsSync(path.join(ROOT, adminLoginForm))) {
   const source = read(adminLoginForm);
@@ -132,6 +210,14 @@ if (fs.existsSync(path.join(ROOT, adminLoginForm))) {
       detail: 'Admin login must validate response content-type before parsing JSON',
     });
   }
+  if (source.includes('supabase.auth.getUser()') && source.includes('window.location.href = next')) {
+    findings.push({
+      severity: 'blocker',
+      code: 'ADMIN_LOGIN_SHARED_SESSION_AUTO_REDIRECT',
+      file: adminLoginForm,
+      detail: 'Admin login auto-redirects any shared-domain session without proving an Admin role',
+    });
+  }
 }
 
 const adminLoginRoute = 'apps/admin/app/api/auth/admin-login/route.ts';
@@ -143,6 +229,14 @@ if (fs.existsSync(path.join(ROOT, adminLoginRoute))) {
       code: 'ADMIN_LOGIN_UNCAUGHT_SERVER_ERROR',
       file: adminLoginRoute,
       detail: 'Admin login can throw before returning a JSON response',
+    });
+  }
+  if (!source.includes("applyRateLimit(req, 'auth')")) {
+    findings.push({
+      severity: 'blocker',
+      code: 'ADMIN_LOGIN_NOT_RATE_LIMITED',
+      file: adminLoginRoute,
+      detail: 'Public Admin credential endpoint is missing the auth rate limiter',
     });
   }
 } else {

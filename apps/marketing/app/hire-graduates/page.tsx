@@ -26,7 +26,7 @@ const PATHWAYS = [
   {
     title: 'Healthcare',
     description: 'Connect with candidates preparing for healthcare support and clinical credential pathways.',
-    image: '/images/pages/comp-home-highlight-health.webp',
+    image: '/images/pages/about-employer-partners.webp',
   },
   {
     title: 'Skilled Trades',

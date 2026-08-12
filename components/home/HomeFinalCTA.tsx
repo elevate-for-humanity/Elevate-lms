@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
+const FINAL_CTA_IMAGE = '/images/pages/workforce-training.webp?v=20260812-home-cta';
+
 export function HomeFinalCTA() {
   return (
     <section
@@ -20,9 +22,12 @@ export function HomeFinalCTA() {
       <div className="relative mx-auto grid max-w-5xl overflow-hidden rounded-2xl border border-white/20 bg-brand-red-800 shadow-xl lg:grid-cols-[0.9fr_1.1fr]">
         <div className="relative min-h-[220px] lg:min-h-[320px]">
           <Image
-            src="/images/pages/workforce-training.webp"
+            src={FINAL_CTA_IMAGE}
             alt="Elevate for Humanity workforce training and career advancement"
             fill
+            priority
+            fetchPriority="high"
+            unoptimized
             sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover"
           />

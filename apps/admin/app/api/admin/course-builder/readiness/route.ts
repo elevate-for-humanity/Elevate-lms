@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     const [{ data: modules, error: moduleError }, { data: lessons, error: lessonError }] = await Promise.all([
       db.from('course_modules').select('id,title,order_index,target_hours,domain_key,is_published,is_draft').eq('course_id', courseId).order('order_index'),
-      db.from('course_lessons').select('id,module_id,title,lesson_type,duration_minutes,minimum_seat_time_minutes,passing_score,status,is_published,learning_objectives,practical_required,requires_instructor_signoff,competency_checks,hour_category,delivery_method,content,content_json,video_url').eq('course_id', courseId).order('order_index'),
+      db.from('course_lessons').select('id,module_id,title,lesson_type,duration_minutes,minimum_seat_time_minutes,passing_score,status,is_published,approved,learning_objectives,practical_required,requires_instructor_signoff,competency_checks,hour_category,delivery_method,content,content_json,video_url').eq('course_id', courseId).order('order_index'),
     ]);
     if (moduleError) throw moduleError;
     if (lessonError) throw lessonError;
@@ -48,12 +48,13 @@ export async function GET(request: NextRequest) {
     const lessonHours = lessonMinutes / 60;
     const moduleTargetHours = moduleRows.reduce((sum, mod) => sum + Number(mod.target_hours ?? 0), 0);
     const missingObjectives = lessonRows.filter((lesson) => !Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length === 0);
-    const missingAssessmentScores = assessments.filter((lesson) => lesson.passing_score === null || lesson.passing_score === undefined);
+    const missingAssessmentScores = assessments.filter((lesson) => lesson.passing_score == null);
     const missingHourCategories = lessonRows.filter((lesson) => !lesson.hour_category);
     const missingDeliveryMethods = lessonRows.filter((lesson) => !lesson.delivery_method);
     const missingCompetencies = lessonRows.filter((lesson) => !Array.isArray(lesson.competency_checks) || lesson.competency_checks.length === 0);
     const practicalWithoutSignoff = practicals.filter((lesson) => !lesson.requires_instructor_signoff);
     const emptyLessons = lessonRows.filter((lesson) => !String(lesson.content ?? '').trim() && !lesson.content_json);
+    const unapprovedLessons = lessonRows.filter((lesson) => !lesson.approved);
 
     const checks: Check[] = [];
     const add = (key: string, ok: boolean, severity: Check['severity'], message: string) => checks.push({ key, ok, severity, message });
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
     add('lessons', lessonRows.length > 0, 'error', lessonRows.length ? `${lessonRows.length} lessons present.` : 'Course has no lessons.');
     add('content', emptyLessons.length === 0, 'error', emptyLessons.length ? `${emptyLessons.length} lessons have no instructional content.` : 'All lessons contain content.');
     add('objectives', missingObjectives.length === 0, 'warning', missingObjectives.length ? `${missingObjectives.length} lessons are missing learning objectives.` : 'All lessons have learning objectives.');
+    add('lesson_approval', unapprovedLessons.length === 0 && lessonRows.length > 0, 'error', unapprovedLessons.length ? `${unapprovedLessons.length} lessons still require instructional review/approval.` : 'All lessons are approved.');
     add('compliance_profile', Boolean(course.compliance_profile_key), profileKey === 'internal_basic' ? 'warning' : 'error', course.compliance_profile_key ? `Compliance profile: ${profileKey}.` : 'No explicit compliance profile; internal_basic fallback is being used.');
     add('minimum_hours', declaredHours >= profile.minimumProgramHours, 'error', `Declared hours ${declaredHours}; profile minimum ${profile.minimumProgramHours}.`);
     add('lesson_hours', lessonHours > 0, 'error', `Configured lesson seat time: ${lessonHours.toFixed(2)} hours.`);
@@ -89,6 +91,7 @@ export async function GET(request: NextRequest) {
       metrics: {
         modules: moduleRows.length,
         lessons: lessonRows.length,
+        approvedLessons: lessonRows.length - unapprovedLessons.length,
         assessments: assessments.length,
         exams: exams.length,
         practicals: practicals.length,

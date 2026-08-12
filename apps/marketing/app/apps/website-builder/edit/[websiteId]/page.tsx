@@ -1,8 +1,11 @@
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { WebsiteEditorClient } from './WebsiteEditorClient';
+import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
+import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +18,12 @@ export default async function WebsiteEditorPage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/apps/website-builder/edit/${websiteId}`);
+
+  const access = await getWebsiteBuilderAccess(user.id, supabase);
+  if (!access.allowed) {
+    const reason = access.reason || 'inactive';
+    redirect(`/store/apps/website-builder?access=${encodeURIComponent(reason)}`);
+  }
 
   const { data: site } = await supabase
     .from('user_websites')
@@ -32,12 +41,16 @@ export default async function WebsiteEditorPage({ params }: Props) {
       : base;
 
   return (
-    <WebsiteEditorClient
-      websiteId={site.id}
-      siteName={name}
-      subdomain={(site.subdomain as string | null) ?? null}
-      isPublished={Boolean(site.is_published)}
-      initialConfig={config}
-    />
+    <>
+      <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
+      <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
+      <WebsiteEditorClient
+        websiteId={site.id}
+        siteName={name}
+        subdomain={(site.subdomain as string | null) ?? null}
+        isPublished={Boolean(site.is_published)}
+        initialConfig={config}
+      />
+    </>
   );
 }

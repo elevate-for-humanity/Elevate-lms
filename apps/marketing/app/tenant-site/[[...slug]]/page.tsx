@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PublicTenantSite } from '@/components/tenant/PublicTenantSite';
+import { TenantAnalytics, TenantLeadForm } from '@/components/tenant/TenantSiteClientOps';
 import { getTenantSlugFromHeaders } from '@/lib/tenant/get-tenant-slug';
 import { loadPublishedSiteBySubdomain } from '@/lib/tenant/load-published-site';
 
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 type Props = { params: Promise<{ slug?: string[] }> };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params: _params }: Props): Promise<Metadata> {
   const tenantSlug = await getTenantSlugFromHeaders();
   if (!tenantSlug) return { title: 'Site' };
   const site = await loadPublishedSiteBySubdomain(tenantSlug);
@@ -16,6 +17,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: site.config.seo?.title ?? site.siteName,
     description: site.config.seo?.description,
+    keywords: site.config.seo?.keywords,
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: site.config.seo?.title ?? site.siteName,
+      description: site.config.seo?.description,
+      type: 'website',
+      images: site.config.homepage.heroImage ? [{ url: site.config.homepage.heroImage }] : undefined,
+    },
   };
 }
 
@@ -26,5 +35,19 @@ export default async function TenantSitePage({ params }: Props) {
   if (!site) notFound();
   const { slug: segments } = await params;
   const pathname = '/' + (segments?.join('/') ?? '');
-  return <PublicTenantSite site={site} pathname={pathname} />;
+  const normalizedPath = pathname === '/' ? '/' : pathname.replace(/\/$/, '');
+
+  return (
+    <>
+      <TenantAnalytics pathname={normalizedPath} />
+      <PublicTenantSite site={site} pathname={normalizedPath} />
+      {normalizedPath === '/contact' ? (
+        <section className="border-t border-slate-200 bg-slate-50 px-5 py-12 sm:px-6">
+          <div className="mx-auto max-w-4xl">
+            <TenantLeadForm accent={site.config.branding.primaryColor || '#7c3f58'} />
+          </div>
+        </section>
+      ) : null}
+    </>
+  );
 }

@@ -22,22 +22,21 @@ describe('middleware tenant routing', () => {
     expect(tenantSlugFromAppHost('demo.app.elevateforhumanity.org:3000')).toBe('demo');
   });
 
-  it('routes app apex host admin paths to admin dashboard', () => {
-    const proxySource = readFileSync(join(process.cwd(), 'proxy.ts'), 'utf8');
-    const appHostBlock = proxySource.slice(
-      proxySource.indexOf("hostWithoutPort === 'app.elevateforhumanity.org'"),
-      proxySource.indexOf('// {subdomain}.app.elevateforhumanity.org'),
-    );
-
-    // app.elevateforhumanity.org/admin routes to admin dashboard
-    expect(appHostBlock).toContain("'/admin/dashboard'");
-    expect(appHostBlock).toContain("rewriteUrl.pathname = adminPath");
+  it('wires tenant subdomains into the actual Marketing middleware', () => {
+    const source = readFileSync(join(process.cwd(), 'apps/marketing/middleware.ts'), 'utf8');
+    expect(source).toContain('tenantSlugFromAppHost(host)');
+    expect(source).toContain('rewriteTenantAppHostRequest');
+    expect(source).toContain('rewriteCustomDomainRequest');
   });
 
-  it('validates canonical admin host configuration', () => {
-    const proxySource = readFileSync(join(process.cwd(), 'proxy.ts'), 'utf8');
-    // proxy.ts validates that app.elevateforhumanity.org is not used as admin host
-    expect(proxySource).toContain('canonicalAdminHost');
-    expect(proxySource).toContain('hostWithoutPort === canonicalAdminHost');
+  it('routes custom domains through x-tenant-host resolution', () => {
+    const routingSource = readFileSync(
+      join(process.cwd(), 'lib/tenant/middleware-tenant-routing.ts'),
+      'utf8',
+    );
+    const slugSource = readFileSync(join(process.cwd(), 'lib/tenant/get-tenant-slug.ts'), 'utf8');
+    expect(routingSource).toContain("requestHeadersWithTenant.set('x-tenant-host'");
+    expect(slugSource).toContain("h.get('x-tenant-host')");
+    expect(slugSource).toContain(".from('website_domains')");
   });
 });

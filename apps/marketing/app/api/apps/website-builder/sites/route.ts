@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,10 +21,7 @@ function optionalString(value: unknown, max = 1200) {
   return typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
 }
 
-function normalizeProvidedConfig(
-  provided: unknown,
-  fallback: TenantSiteConfig,
-): TenantSiteConfig {
+function normalizeProvidedConfig(provided: unknown, fallback: TenantSiteConfig): TenantSiteConfig {
   if (!provided || typeof provided !== 'object' || Array.isArray(provided)) return fallback;
   const incoming = provided as Record<string, any>;
 
@@ -99,6 +97,15 @@ function normalizeProvidedConfig(
               : undefined,
           }
         : fallback.contact,
+    stats: incoming.stats && typeof incoming.stats === 'object' && !Array.isArray(incoming.stats)
+      ? { ...fallback.stats, ...incoming.stats }
+      : fallback.stats,
+    testimonial: incoming.testimonial && typeof incoming.testimonial === 'object' && !Array.isArray(incoming.testimonial)
+      ? {
+          quote: stringValue(incoming.testimonial.quote, '', 1200),
+          author: stringValue(incoming.testimonial.author, '', 160),
+        }
+      : fallback.testimonial,
     navigation: Array.isArray(incoming.navigation)
       ? incoming.navigation.slice(0, 16).map((item: any) => ({
           label: stringValue(item?.label, 'Page', 60),
@@ -126,37 +133,20 @@ function normalizeProvidedConfig(
   };
 }
 
-async function getAdminRole(userId: string) {
-  const supabase = await createClient();
-  const { data } = await supabase.from('profiles').select('role').eq('id', userId).maybeSingle();
-  return data?.role === 'admin' || data?.role === 'super_admin';
-}
-
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
-  const adminTesting = await getAdminRole(user.id);
-  const { data: subscription } = await supabase
-    .from('user_app_subscriptions')
-    .select('plan, status, trial_ends_at')
-    .eq('user_id', user.id)
-    .eq('app_slug', 'website-builder')
-    .maybeSingle();
-
-  if (!adminTesting && (!subscription || !['trial', 'active'].includes(subscription.status || ''))) {
-    return NextResponse.json({ error: 'Website Builder subscription required' }, { status: 403 });
+  const access = await getWebsiteBuilderAccess(user.id, supabase);
+  if (!access.allowed) {
+    return NextResponse.json(
+      { error: 'Website Builder subscription or active trial required', reason: access.reason },
+      { status: 403 },
+    );
   }
 
-  if (!adminTesting && subscription?.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
-    return NextResponse.json({ error: 'Website Builder trial has expired' }, { status: 403 });
-  }
-
-  const plan = adminTesting ? 'enterprise' : (subscription?.plan || 'starter');
+  const plan = access.plan || 'starter';
   const limit = PLAN_SITE_LIMITS[plan] ?? 1;
   if (limit !== null) {
     const { count } = await supabase

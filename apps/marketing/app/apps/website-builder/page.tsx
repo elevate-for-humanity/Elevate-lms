@@ -26,8 +26,6 @@ export default async function WebsiteBuilderPage() {
 
   let subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
 
-  // First authenticated visit provisions the free trial automatically. The
-  // customer should land in the product, not bounce through another setup page.
   if (!subscription) {
     const trial = await startAppTrial(user.id, 'website-builder', supabase);
     if (trial.status === 'error') {
@@ -57,9 +55,12 @@ export default async function WebsiteBuilderPage() {
     trialDaysRemaining = Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   }
 
+  // user_websites.site_config is the canonical tenant-site content model.
+  // website_pages belongs to the admin content system and is intentionally not
+  // joined here, avoiding a second competing page-count source of truth.
   const { data: websites } = await supabase
     .from('user_websites')
-    .select('*, pages:website_pages(count)')
+    .select('id, site_name, subdomain, is_published, updated_at')
     .eq('user_id', user.id)
     .order('updated_at', { ascending: false });
 

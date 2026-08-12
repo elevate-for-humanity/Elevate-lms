@@ -1,17 +1,11 @@
 export const revalidate = 3600;
 
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  MessageSquare,
-  FileText,
-  HelpCircle,
-  Briefcase,
-  GraduationCap,
-  DollarSign,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import HeroPicture from '@/components/marketing/HeroPicture';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Get Started',
@@ -22,137 +16,121 @@ export const metadata: Metadata = {
   },
 };
 
+const START_OPTIONS = [
+  {
+    title: 'Enroll in a Program',
+    description:
+      'Apply online in minutes. Pick your program, check eligibility, and start training in as little as 2 weeks.',
+    href: '/start-trial',
+    action: 'Apply Now',
+    image: '/images/pages/training-classroom.webp',
+    imageAlt: 'Students participating in career training',
+  },
+  {
+    title: 'Ask a Question',
+    description:
+      'Not sure which program is right for you? Submit an inquiry and get a personalized response within 24 hours.',
+    href: '/inquiry',
+    action: 'Get Info',
+    image: '/images/pages/about-supportive-services.webp',
+    imageAlt: 'Student receiving advising and support',
+  },
+  {
+    title: 'Check Funding Eligibility',
+    description:
+      'See if you qualify for funded training through WIOA, WRG, or Job Ready Indy. Takes less than 2 minutes.',
+    href: '/wioa-eligibility',
+    action: 'Check Eligibility',
+    image: '/images/pages/admin-wioa-hero.webp',
+    imageAlt: 'Workforce funding and eligibility support',
+  },
+  {
+    title: 'Employer Partnership',
+    description:
+      'Hire trained graduates, access tax credits, and post jobs. Set up your employer account online.',
+    href: '/employer/dashboard',
+    action: 'Partner With Us',
+    image: '/images/pages/business-meeting.webp',
+    imageAlt: 'Employer and workforce partnership meeting',
+  },
+  {
+    title: 'FAQ & Help Center',
+    description:
+      'Find answers to common questions about enrollment, funding, programs, certificates, and more.',
+    href: '/faq',
+    action: 'Browse FAQ',
+    image: '/images/pages/about-career-training.webp',
+    imageAlt: 'Career training information and learner resources',
+  },
+  {
+    title: 'Technical Support',
+    description:
+      'Having trouble with your account, courses, or the platform? Submit a support ticket and get help fast.',
+    href: '/support',
+    action: 'Get Support',
+    image: '/images/pages/programs-it-hero.webp',
+    imageAlt: 'Technology and online learning support',
+  },
+] as const;
+
 export default function GetStartedPage() {
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Get Started' }]} />
         </div>
       </div>
 
-      <section className="bg-brand-blue-700 text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <MessageSquare className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">How Can We Help?</h1>
-          <p className="text-xl text-white mb-8">
-            Everything you need is available online — Choose what you need below.
-          </p>
-        </div>
-      </section>
+      <HeroPicture
+        src="/images/pages/workforce-training.webp"
+        alt="Career training and workforce support at Elevate for Humanity"
+        microLabel="Get Started"
+        belowHeroHeadline="How Can We Help?"
+        belowHeroSubheadline="Everything you need is available online — choose what you need below."
+        analyticsName="get-started"
+      />
 
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Link
-              href="/start-trial"
-              className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
-            >
-              <GraduationCap aria-label="graduationcap" className="w-10 h-10 text-brand-blue-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600">
-                Enroll in a Program
-              </h3>
-              <p className="text-slate-700 mb-4">
-                Apply online in minutes. Pick your program, check eligibility, and start training in
-                as little as 2 weeks.
-              </p>
-              <span className="text-brand-blue-600 font-semibold flex items-center gap-2">
-                Apply Now <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            <Link
-              href="/inquiry"
-              className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
-            >
-              <HelpCircle className="w-10 h-10 text-brand-green-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-green-600">
-                Ask a Question
-              </h3>
-              <p className="text-slate-700 mb-4">
-                Not sure which program is right for you? Submit an inquiry and get a personalized
-                response within 24 hours.
-              </p>
-              <span className="text-brand-green-600 font-semibold flex items-center gap-2">
-                Get Info <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            <Link
-              href="/wioa-eligibility"
-              className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
-            >
-              <DollarSign className="w-10 h-10 text-brand-orange-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-orange-600">
-                Check Funding Eligibility
-              </h3>
-              <p className="text-slate-700 mb-4">
-                See if you qualify for funded training through WIOA, WRG, or Job Ready Indy.
-                Takes less than 2 minutes.
-              </p>
-              <span className="text-brand-orange-600 font-semibold flex items-center gap-2">
-                Check Eligibility <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            <Link
-              href="/employer/dashboard"
-              className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
-            >
-              <Briefcase className="w-10 h-10 text-purple-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-purple-600">
-                Employer Partnership
-              </h3>
-              <p className="text-slate-700 mb-4">
-                Hire trained graduates, access tax credits, and post jobs. Set up your employer
-                account online.
-              </p>
-              <span className="text-purple-600 font-semibold flex items-center gap-2">
-                Partner With Us <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            <Link
-              href="/faq"
-              className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
-            >
-              <FileText className="w-10 h-10 text-teal-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-600">
-                FAQ & Help Center
-              </h3>
-              <p className="text-slate-700 mb-4">
-                Find answers to common questions about enrollment, funding, programs, certificates,
-                and more.
-              </p>
-              <span className="text-teal-600 font-semibold flex items-center gap-2">
-                Browse FAQ <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-
-            <Link
-              href="/support"
-              className="bg-white rounded-xl p-8 shadow-sm border hover:border-brand-blue-500 hover:shadow-md transition group"
-            >
-              <MessageSquare className="w-10 h-10 text-brand-red-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-red-600">
-                Technical Support
-              </h3>
-              <p className="text-slate-700 mb-4">
-                Having trouble with your account, courses, or the platform? Submit a support ticket
-                and get help fast.
-              </p>
-              <span className="text-brand-red-600 font-semibold flex items-center gap-2">
-                Get Support <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
+      <section className="py-16" aria-labelledby="get-started-options">
+        <div className="mx-auto max-w-5xl px-4">
+          <h2 id="get-started-options" className="sr-only">
+            Get started options
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {START_OPTIONS.map((option) => (
+              <Link
+                key={option.href}
+                href={option.href}
+                className="group overflow-hidden rounded-xl border bg-white shadow-sm transition hover:border-brand-blue-500 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2"
+              >
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
+                  <Image
+                    src={option.image}
+                    alt={option.imageAlt}
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
+                </div>
+                <div className="p-8">
+                  <h3 className="mb-2 text-xl font-bold text-slate-900 transition-colors group-hover:text-brand-blue-600">
+                    {option.title}
+                  </h3>
+                  <p className="mb-4 text-slate-700">{option.description}</p>
+                  <span className="flex items-center gap-2 font-semibold text-brand-blue-600">
+                    {option.action} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-8">Everything Is Self-Service</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <h2 className="mb-8 text-2xl font-bold">Everything Is Self-Service</h2>
+          <div className="grid gap-6 md:grid-cols-3">
             {[
               'Apply online in minutes',
               'Check eligibility instantly',
@@ -160,9 +138,11 @@ export default function GetStartedPage() {
               'Submit inquiries 24/7',
               'Track your application status',
               'Enroll and start training',
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 justify-center">
-                <span className="text-slate-400 flex-shrink-0">•</span>
+            ].map((item) => (
+              <div key={item} className="flex items-center justify-center gap-2">
+                <span className="flex-shrink-0 text-slate-400" aria-hidden="true">
+                  •
+                </span>
                 <span className="text-slate-900">{item}</span>
               </div>
             ))}

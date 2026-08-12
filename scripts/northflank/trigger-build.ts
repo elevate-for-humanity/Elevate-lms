@@ -2,7 +2,7 @@
 /**
  * Acquire a safe Northflank build slot and return exactly one build id.
  *
- * - Reuses an active or successful build for the same Git SHA.
+ * - Reuses an active or positively successful build for the same Git SHA.
  * - Waits for a different in-flight build instead of overlapping/canceling it.
  * - Triggers one fresh build only when the service has no competing build.
  *
@@ -43,7 +43,6 @@ const TERMINAL_STATUSES = new Set([
   'SUBMISSION_FAILURE',
   'SUCCESS',
 ]);
-const SUCCESS_STATUSES = new Set(['COMPLETED', 'SKIPPED', 'SUCCESS']);
 const POLL_MS = 15_000;
 const SLOT_TIMEOUT_MS = Number(process.env.NORTHFLANK_BUILD_SLOT_TIMEOUT_MS || 3_600_000);
 
@@ -61,7 +60,10 @@ function isActive(build: NorthflankBuildResponse): boolean {
 function isSuccessfulForSha(build: NorthflankBuildResponse, sha: string): boolean {
   if ((build.sha || '').toLowerCase() !== sha.toLowerCase()) return false;
   if (build.success === true) return true;
-  return SUCCESS_STATUSES.has(normalizedStatus(build));
+  // SUCCESS is unambiguous even when the API omits the boolean. COMPLETED and
+  // SKIPPED are not reused unless success=true because they can represent a
+  // concluded build that did not produce a deployable artifact.
+  return normalizedStatus(build) === 'SUCCESS';
 }
 
 function emitBuildId(buildId: string, reused: boolean) {

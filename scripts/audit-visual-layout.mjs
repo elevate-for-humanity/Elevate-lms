@@ -74,6 +74,9 @@ const IMAGE_PERF_PATTERNS = [
   },
 ];
 
+const LIGHT_SURFACE = '(?:bg-white|bg-(?:slate|gray|zinc|neutral)-(?:50|100))';
+const LOW_CONTRAST_NEUTRAL = 'text-(?:slate|gray|zinc|neutral)-(?:200|300|400)';
+
 const LAYOUT_TEXT_PATTERNS = [
   {
     id: 'hero-gradient-overlay',
@@ -92,6 +95,24 @@ const LAYOUT_TEXT_PATTERNS = [
     re: /bg-white[^"']*["'][^"']*text-white/g,
     severity: 'high',
     message: 'Possible white text on white background',
+  },
+  {
+    id: 'low-contrast-neutral-on-light',
+    re: new RegExp(
+      `className=["'\x60][^"'\x60]*${LIGHT_SURFACE}[^"'\x60]*${LOW_CONTRAST_NEUTRAL}[^"'\x60]*["'\x60]`,
+      'g',
+    ),
+    severity: 'high',
+    message: 'Low-contrast neutral text on a light surface',
+  },
+  {
+    id: 'low-contrast-neutral-on-light-reversed',
+    re: new RegExp(
+      `className=["'\x60][^"'\x60]*${LOW_CONTRAST_NEUTRAL}[^"'\x60]*${LIGHT_SURFACE}[^"'\x60]*["'\x60]`,
+      'g',
+    ),
+    severity: 'high',
+    message: 'Low-contrast neutral text on a light surface',
   },
   {
     id: 'empty-next-image-alt',
@@ -268,7 +289,7 @@ const serviceRows = Object.entries(report.filesByService)
   .map(([service, count]) => `| ${service} | ${count} |`)
   .join('\n');
 
-const md = `# Visual layout audit — active platform\n\nGenerated: ${report.generatedAt}\n\nThis report scans the deployed monorepo app trees, not the legacy root \`app/\` tree.\n\n## Coverage\n\n| Service | TSX/JSX files scanned |\n|---|---:|\n${serviceRows}\n\n| Category | Critical | High | Medium | Low | Total |\n|----------|----------|------|--------|-----|-------|\n| Oversized heroes | ${report.summary.oversizedHero.critical} | ${report.summary.oversizedHero.high} | ${report.summary.oversizedHero.medium} | ${report.summary.oversizedHero.low} | ${report.summary.oversizedHeroTotal} |\n| Image load cost | ${report.summary.imagePerf.critical} | ${report.summary.imagePerf.high} | ${report.summary.imagePerf.medium} | ${report.summary.imagePerf.low} | ${report.summary.imagePerfTotal} |\n| Layout / text | ${report.summary.layoutText.critical} | ${report.summary.layoutText.high} | ${report.summary.layoutText.medium} | ${report.summary.layoutText.low} | ${report.summary.layoutTextTotal} |\n\n**Canonical Marketing hero:** \`${CANONICAL_HERO_CLASS}\` or a canonical hero renderer.\n\n**Active Marketing pages with hero intent but no canonical hero marker:** ${report.summary.marketingPagesWithHeroButNotCanonical}\n\n## Marketing pages requiring canonicalization\n\n${marketingPagesNoCanonical.map((file) => `- \`${file}\``).join('\n') || '_None_'}\n\n### Critical findings\n\n${report.criticalHits.length ? report.criticalHits.map((hit) => `- \`${hit.file}:${hit.line}\` ${hit.message}`).join('\n') : '_None_'}\n\n${mdSection('Oversized hero / banner patterns', report.topOversizedHeroFiles)}\n${mdSection('Image performance', report.topImagePerfFiles)}\n${mdSection('Layout & text standard violations', report.topLayoutTextFiles)}\n\n## Re-run\n\n- \`node scripts/audit-visual-layout.mjs\`\n- \`node scripts/audit-image-assets.mjs\`\n- \`pnpm audit:public-media-nav\`\n- \`pnpm audit:hero-banners\`\n`;
+const md = `# Visual layout audit — active platform\n\nGenerated: ${report.generatedAt}\n\nThis report scans the deployed monorepo app trees, not the legacy root \`app/\` tree.\n\n## Coverage\n\n| Service | TSX/JSX files scanned |\n|---|---:|\n${serviceRows}\n\n| Category | Critical | High | Medium | Low | Total |\n|----------|----------|------|--------|-----|-------|\n| Oversized heroes | ${report.summary.oversizedHero.critical} | ${report.summary.oversizedHero.high} | ${report.summary.oversizedHero.medium} | ${report.summary.oversizedHero.low} | ${report.summary.oversizedHeroTotal} |\n| Image load cost | ${report.summary.imagePerf.critical} | ${report.summary.imagePerf.high} | ${report.summary.imagePerf.medium} | ${report.summary.imagePerf.low} | ${report.summary.imagePerfTotal} |\n| Layout / text | ${report.summary.layoutText.critical} | ${report.summary.layoutText.high} | ${report.summary.layoutText.medium} | ${report.summary.layoutText.low} | ${report.summary.layoutTextTotal} |\n\n**Canonical Marketing hero:** \`${CANONICAL_HERO_CLASS}\` or a canonical hero renderer.\n\n**Active Marketing pages with hero intent but no canonical hero marker:** ${report.summary.marketingPagesWithHeroButNotCanonical}\n\n## Marketing pages requiring canonicalization\n\n${marketingPagesNoCanonical.map((file) => `- \`${file}\``).join('\n') || '_None_'}\n\n### Critical findings\n\n${report.criticalHits.length ? report.criticalHits.map((hit) => `- \`${hit.file}:${hit.line}\` ${hit.message}`).join('\n') : '_None_'}\n\n${mdSection('Oversized hero / banner patterns', report.topOversizedHeroFiles)}\n${mdSection('Image performance', report.topImagePerfFiles)}\n${mdSection('Layout, text & contrast standard violations', report.topLayoutTextFiles)}\n\n## Re-run\n\n- \`node scripts/audit-visual-layout.mjs\`\n- \`node scripts/audit-image-assets.mjs\`\n- \`pnpm audit:public-media-nav\`\n- \`pnpm audit:hero-banners\`\n`;
 
 const mdPath = path.join(outDir, 'VISUAL_LAYOUT_AUDIT.md');
 fs.writeFileSync(mdPath, md);

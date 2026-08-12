@@ -86,6 +86,9 @@ jobs:
       - name: API admin guard check
         run: bash scripts/audit-api-auth-guards.sh
 
+      - name: Authentication and role routing check
+        run: pnpm exec tsx scripts/audit-auth-role-routing.ts
+
       - name: Canonical hero system check
         run: pnpm run audit:hero-banners
 
@@ -150,6 +153,8 @@ jobs:
             reports/store_integrity_report.json
             reports/pre_auth_registry_report.json
             reports/grants_audit_context_report.json
+            docs/audits/AUTH_ROLE_ROUTING_AUDIT.json
+            docs/audits/AUTH_ROLE_ROUTING_AUDIT.md
             docs/audits/image-assets-audit.json
             docs/audits/IMAGE_ASSETS_AUDIT.md
             docs/audits/VISUAL_LAYOUT_AUDIT.json

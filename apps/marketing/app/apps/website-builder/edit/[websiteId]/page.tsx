@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { WebsiteEditorClient } from './WebsiteEditorClient';
 import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
+import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
@@ -42,6 +43,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
   return (
     <>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
+      <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
       <WebsiteEditorClient
         websiteId={site.id}
         siteName={name}

@@ -1,0 +1,50 @@
+name: Apply Platform Media Dedupe
+
+on:
+  push:
+    branches:
+      - fix/platform-media-duplicate-gate
+    paths:
+      - 'scripts/fix-platform-media-duplicates.mjs'
+      - '.github/workflows/apply-platform-media-dedupe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: platform-media-dedupe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/platform-media-duplicate-gate
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply deterministic media replacements
+        run: node scripts/fix-platform-media-duplicates.mjs
+
+      - name: Commit generated source fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add apps/marketing apps/lms apps/admin docs/audits
+          if git diff --cached --quiet; then
+            echo 'No deterministic media changes to commit.'
+            exit 0
+          fi
+          git config user.name 'elevate-media-audit[bot]'
+          git config user.email 'elevate-media-audit[bot]@users.noreply.github.com'
+          git commit -m 'fix(media): apply platform duplicate image sweep'
+          git push origin HEAD:fix/platform-media-duplicate-gate

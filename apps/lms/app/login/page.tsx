@@ -86,9 +86,8 @@ export default function LoginPage() {
       const supabase = createClient();
 
       // Resolve the user's authoritative role before evaluating any requested
-      // redirect. Previously `/login?redirect=/dashboard` was honored first;
-      // `/dashboard` belongs to the Admin host, so students could be sent to
-      // admin.elevateforhumanity.org immediately after a successful login.
+      // redirect. A historical login path could previously send students to
+      // the Admin dashboard immediately after a successful login.
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, portal_type, onboarding_completed')

@@ -68,7 +68,7 @@ export async function handleNaturalVoiceRequest(request: Request) {
   } catch (cause) {
     console.error('[natural-voice] Speech generation failed', cause instanceof Error ? cause.message : 'unknown provider error');
     return Response.json(
-      { error: 'Natural voice is temporarily unavailable.', fallback: 'browser' },
+      { error: 'Natural voice is temporarily unavailable.', retryable: true },
       { status: 503, headers: { 'Cache-Control': 'no-store' } },
     );
   }

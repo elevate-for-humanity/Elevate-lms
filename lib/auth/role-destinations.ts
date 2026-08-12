@@ -53,8 +53,8 @@ export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
 
   workforce_partner: { path: '/workforce/dashboard', host: 'lms', portalKey: 'workforce', label: 'Workforce Partner' },
   parent: { path: '/parent-portal/dashboard', host: 'lms', portalKey: 'parent', label: 'Parent' },
+  creator: { path: '/creator/products', host: 'lms', portalKey: 'creator', label: 'Creator' },
 
-  creator: { path: '/creator/products', host: 'marketing', portalKey: 'creator', label: 'Creator' },
   case_manager: { path: '/case-manager/dashboard', host: 'marketing', portalKey: 'casemanager', label: 'Case Manager' },
   workforce_board: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board' },
   workforce_board_admin: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board Admin' },

@@ -68,6 +68,12 @@ export const PORTAL_MAP = {
     host: LMS_HOST,
     defaultPath: '/host-shop/dashboard',
   },
+  creator: {
+    subdomain: 'app',
+    basePath: '/creator',
+    host: LMS_HOST,
+    defaultPath: '/creator/products',
+  },
 
   admin: {
     subdomain: 'admin',
@@ -118,12 +124,6 @@ export const PORTAL_MAP = {
     host: MARKETING_HOST,
     defaultPath: '/program-holder/dashboard',
   },
-  creator: {
-    subdomain: 'marketing',
-    basePath: '/creator',
-    host: MARKETING_HOST,
-    defaultPath: '/creator/products',
-  },
 } as const satisfies Record<string, PortalRoute>;
 
 export type PortalKey = keyof typeof PORTAL_MAP;
@@ -158,7 +158,6 @@ export function isMarketingRoute(pathname: string): boolean {
     'casemanager',
     'provider',
     'programholder',
-    'creator',
   ];
 
   return marketingKeys.some((key) => {

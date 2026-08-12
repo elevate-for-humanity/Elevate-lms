@@ -1,5 +1,7 @@
 name: Deploy Marketing (www)
 
+# Deployment replay for portal and store fixes — 2026-08-12
+
 on:
   push:
     branches:

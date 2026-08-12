@@ -11,6 +11,8 @@ export type ContentSource = 'ai' | 'blueprint' | 'curriculum_lessons';
 export type PublishStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'lesson' | 'checkpoint' | 'quiz' | 'exam' | 'lab' | 'assignment';
 export interface FactoryInput {
+  /** Exact canonical courses.id to enhance. When supplied, Course Factory must never create a parallel course. */
+  courseId?: string;
   programId?: string;
   programSlug?: string;
   blueprint?: CredentialBlueprint;
@@ -78,7 +80,6 @@ export interface QuizQuestion {
   explanation: string;
 }
 
-// Missing types that were referenced but not exported
 export type CredentialLevel = 'certificate' | 'diploma' | 'degree' | 'certification' | 'license';
 
 export interface BlueprintVideoConfig {

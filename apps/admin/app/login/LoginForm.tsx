@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
@@ -23,9 +23,9 @@ async function readAdminLoginResponse(res: Response): Promise<AdminLoginResponse
     return (await res.json()) as AdminLoginResponse;
   }
 
-  // A Next.js 404/500 document starts with <!DOCTYPE html>. Do not call
-  // response.json() on it — that is the source of the raw "Unexpected token <"
-  // error previously shown to administrators.
+  // A middleware redirect or Next.js 404/500 document starts with HTML. Do not
+  // call response.json() on it — that is the source of the raw
+  // "Unexpected token < / <!DOCTYPE ... is not valid JSON" error.
   const raw = await res.text();
   console.error('[admin-login] endpoint returned a non-JSON response', {
     status: res.status,
@@ -54,18 +54,10 @@ export default function AdminLoginForm({ redirectTo, initialError }: { redirectT
 
   const next = getSafeRedirect(redirectTo ?? null);
 
-  // Check if already logged in on mount
-  useEffect(() => {
-    async function checkSession() {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Already logged in - redirect to admin dashboard
-        window.location.href = next;
-      }
-    }
-    checkSession();
-  }, [next]);
+  // Do not auto-redirect merely because a shared Supabase cookie exists.
+  // Sessions are deliberately scoped to .elevateforhumanity.org so a student,
+  // employer, or partner can arrive on the Admin subdomain with a valid session.
+  // Admin access must be proven by the credential endpoint + role check below.
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

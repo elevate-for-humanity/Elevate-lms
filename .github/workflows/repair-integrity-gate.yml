@@ -23,6 +23,19 @@ jobs:
           from pathlib import Path
           import re
 
+          paths = [
+              'apps/marketing/app/privacy/page.tsx',
+              'apps/marketing/app/store/testing/page.tsx',
+              'apps/marketing/app/how-it-works/page.tsx',
+              'apps/marketing/app/testing/page.tsx',
+              'apps/marketing/app/funding/page.tsx',
+              'apps/marketing/app/success-stories/page.tsx',
+              'apps/marketing/app/blog/page.tsx',
+              'apps/marketing/app/hire-graduates/page.tsx',
+              'apps/marketing/app/funding/wioa/page.tsx',
+              'components/store/GuidedProductInterview.tsx',
+          ]
+
           def read(path):
               return Path(path).read_text()
 
@@ -37,18 +50,15 @@ jobs:
                       return text
               return text[:start] + new + text[start + len(old):]
 
-          for path in [
-              'apps/marketing/app/privacy/page.tsx',
-              'apps/marketing/app/store/testing/page.tsx',
-          ]:
+          for path in paths[:2]:
               text = read(path)
-              text2 = re.sub(
+              text = re.sub(
                   r'(<Image\b(?:(?!/>)[\s\S])*?\bfill\b)(?=(?:(?!/>)[\s\S])*?/>)',
                   lambda m: m.group(1) if 'sizes=' in m.group(0) else m.group(1) + '\n          sizes="100vw"',
                   text,
                   count=1,
               )
-              write(path, text2)
+              write(path, text)
 
           path = 'apps/marketing/app/how-it-works/page.tsx'
           text = read(path)
@@ -75,33 +85,31 @@ jobs:
           write(path, text)
 
           path = 'apps/marketing/app/success-stories/page.tsx'
-          text = read(path)
-          text = replace_nth(text, '/images/pages/career-counseling.jpg', '/images/pages/healthcare-grad.jpg', 2)
+          text = replace_nth(read(path), '/images/pages/career-counseling.jpg', '/images/pages/healthcare-grad.jpg', 2)
           write(path, text)
 
           path = 'apps/marketing/app/blog/page.tsx'
-          text = read(path)
-          text = replace_nth(text, '/images/pages/admin-campaigns-hero.webp', '/images/pages/certifications-page-1.webp', 2)
+          text = replace_nth(read(path), '/images/pages/admin-campaigns-hero.webp', '/images/pages/certifications-page-1.webp', 2)
           write(path, text)
 
           path = 'apps/marketing/app/hire-graduates/page.tsx'
-          text = read(path)
-          text = text.replace('/images/pages/comp-home-highlight-health.webp', '/images/pages/about-employer-partners.webp')
-          write(path, text)
+          write(path, read(path).replace('/images/pages/comp-home-highlight-health.webp', '/images/pages/about-employer-partners.webp'))
 
           path = 'apps/marketing/app/funding/wioa/page.tsx'
-          text = read(path)
-          text = text.replace('/images/pages/funding-page-5.webp', '/images/pages/career-counseling-page-1.webp')
-          write(path, text)
+          write(path, read(path).replace('/images/pages/funding-page-5.webp', '/images/pages/career-counseling-page-1.webp'))
 
           path = 'components/store/GuidedProductInterview.tsx'
-          text = read(path)
-          text = text.replace(
+          write(path, read(path).replace(
               'mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-300',
               'mt-6 rounded-2xl border border-slate-700 bg-slate-950 p-6 text-slate-100',
               1,
-          )
-          write(path, text)
+          ))
+
+          # Keep the generated patch clean even where the original JSX had trailing spaces.
+          for path in paths:
+              text = read(path)
+              text = '\n'.join(line.rstrip() for line in text.split('\n'))
+              write(path, text)
           PY
 
           git config user.name "elevateforhumanity"

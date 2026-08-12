@@ -6,6 +6,12 @@ import { Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 
+const APPRENTICE_ROLES = new Set([
+  'apprentice',
+  'barber_apprentice',
+  'cosmetology_apprentice',
+]);
+
 export default function ApprenticeLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,16 +41,43 @@ export default function ApprenticeLoginForm() {
         return;
       }
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('portal_type')
+        .select('role, portal_type')
         .eq('id', data.user.id)
         .maybeSingle();
+
+      if (profileError || !profile) {
+        await supabase.auth.signOut();
+        throw new Error('Your learner profile could not be verified. Please use the main login or contact support.');
+      }
+
+      const { data: roleRows, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('roles(name)')
+        .eq('user_id', data.user.id);
+
+      if (rolesError) {
+        await supabase.auth.signOut();
+        throw new Error('Your apprenticeship access could not be verified. Please retry.');
+      }
+
+      const secondaryRoles = (roleRows ?? [])
+        .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
+        .filter((role): role is string => typeof role === 'string');
+      const effectiveRoles = new Set(
+        [profile.role, ...secondaryRoles].filter((role): role is string => typeof role === 'string'),
+      );
+
+      if (![...effectiveRoles].some((role) => APPRENTICE_ROLES.has(role))) {
+        await supabase.auth.signOut();
+        throw new Error('This account is not assigned to an apprenticeship portal. Please use the main student and partner login.');
+      }
 
       const dest = await resolveStudentHomePath(
         supabase,
         data.user.id,
-        profile?.portal_type,
+        profile.portal_type,
       );
 
       window.location.href = dest;

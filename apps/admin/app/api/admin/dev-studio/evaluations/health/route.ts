@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
       const db = await requireAdminClient();
       const { error } = await db.from('platform_evaluation_runs').select('id').limit(1);
       tablePassed = !error;
-      tableMessage = error ? error.message : 'Evaluation table query succeeded.';
-    } catch (error) {
-      tableMessage = error instanceof Error ? error.message : 'Evaluation table query failed.';
+      tableMessage = error ? 'Evaluation table query failed.' : 'Evaluation table query succeeded.';
+    } catch {
+      tableMessage = 'Evaluation table query failed.';
     }
     return buildCapabilityHealth('evaluations', [
       { name: 'evaluation-runs-table', passed: tablePassed, required: true, message: tableMessage },

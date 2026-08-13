@@ -11,16 +11,20 @@ describe('apprentice portal access', () => {
     expect(isApprenticeFieldPortalPath('/portal/healthcare')).toBe(false);
   });
 
-  it('allows program_holder on barber portal', () => {
-    expect(allowedRolesForPortalPath('/portal/barber')).toContain('program_holder');
+  it('keeps program_holder outside the barber apprentice runtime', () => {
+    expect(allowedRolesForPortalPath('/portal/barber')).not.toContain('program_holder');
+    expect(allowedRolesForPortalPath('/portal/barber')).toContain('apprentice');
+    expect(allowedRolesForPortalPath('/portal/barber')).toContain('barber_apprentice');
   });
 
   it('does not allow program_holder on healthcare portal', () => {
     expect(allowedRolesForPortalPath('/portal/healthcare')).not.toContain('program_holder');
   });
 
-  it('allows program_holder on apprentice tools', () => {
-    expect(canAccessApprenticeTools('program_holder')).toBe(true);
+  it('keeps apprentice tools restricted to apprentice roles', () => {
+    expect(canAccessApprenticeTools('program_holder')).toBe(false);
+    expect(canAccessApprenticeTools('apprentice')).toBe(true);
+    expect(canAccessApprenticeTools('barber_apprentice')).toBe(true);
     expect(canAccessApprenticeTools('employer')).toBe(false);
   });
 });

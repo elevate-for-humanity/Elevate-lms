@@ -1,13 +1,8 @@
 /**
- * scripts/check-program-integrity.ts
- *
- * Checks every published program for missing required relations.
- * Exits with code 1 if any program is incomplete.
- *
- * Usage:
- *   pnpm tsx scripts/check-program-integrity.ts
+ * Checks every published program for required related records.
+ * CI and explicit strict mode fail closed on missing config, zero published programs,
+ * or incomplete program relations.
  */
-
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
@@ -15,106 +10,52 @@ import { promises as fs } from 'fs';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
-const db = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+const STRICT = process.env.STRICT_PROGRAM_INTEGRITY === 'true' || process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const REPORT_PATH = path.resolve(process.cwd(), 'audit-packet/program-integrity-report.json');
 
-type Check = { label: string; table: string };
+if (!url || !serviceKey) {
+  console.error('Program integrity configuration missing: Supabase URL and service-role key are required.');
+  process.exit(1);
+}
 
-const REQUIRED: Check[] = [
+const db = createClient(url, serviceKey);
+const REQUIRED = [
   { label: 'media', table: 'program_media' },
   { label: 'CTAs', table: 'program_ctas' },
   { label: 'tracks', table: 'program_tracks' },
   { label: 'modules', table: 'program_modules' },
-];
-
-const STRICT = process.env.STRICT_PROGRAM_INTEGRITY === 'true';
-const REPORT_PATH = path.resolve(process.cwd(), 'audit-packet/program-integrity-report.json');
+] as const;
 
 async function main() {
-  const { data: programs, error } = await db
-    .from('programs')
-    .select('id, slug, title')
-    .eq('published', true)
-    .order('title');
-
-  if (error) {
-    console.error('Failed to fetch programs:', error.message);
+  const { data: programs, error } = await db.from('programs').select('id, slug, title').eq('published', true).order('title');
+  if (error) throw new Error(`Failed to fetch programs: ${error.message}`);
+  if (!programs?.length) {
+    console.error('No published programs found; integrity coverage is invalid.');
     process.exit(1);
   }
-  if (!programs?.length) {
-    console.log('No published programs found.');
-    return;
-  }
-
-  console.log(`Checking ${programs.length} published program(s)...\n`);
 
   const membership = new Map<string, Set<string>>();
   for (const check of REQUIRED) {
     const { data: rows, error: rowsError } = await db.from(check.table).select('program_id');
-    if (rowsError) {
-      console.error(`Failed to load ${check.table}:`, rowsError.message);
-      process.exit(1);
-    }
-    membership.set(
-      check.label,
-      new Set((rows ?? []).map((row: { program_id: string }) => row.program_id)),
-    );
+    if (rowsError) throw new Error(`Failed to load ${check.table}: ${rowsError.message}`);
+    membership.set(check.label, new Set((rows ?? []).map((row: { program_id: string }) => row.program_id)));
   }
 
-  let failures = 0;
-  const report: Array<{ slug: string; title: string; missing: string[] }> = [];
-
+  const items = [] as Array<{slug:string;title:string;missing:string[]}>;
   for (const program of programs) {
-    const missing: string[] = [];
-
-    for (const check of REQUIRED) {
-      const present = membership.get(check.label)?.has(program.id) ?? false;
-      if (!present) missing.push(check.label);
-    }
-
-    if (missing.length > 0) {
+    const missing = REQUIRED.filter((check) => !(membership.get(check.label)?.has(program.id) ?? false)).map((check) => check.label);
+    if (missing.length) {
       console.log(`❌ ${program.slug} — missing: ${missing.join(', ')}`);
-      failures++;
-      report.push({ slug: program.slug, title: program.title ?? '', missing });
-    } else {
-      console.log(`✅ ${program.slug}`);
-    }
+      items.push({ slug: program.slug, title: program.title ?? '', missing });
+    } else console.log(`✅ ${program.slug}`);
   }
 
   await fs.mkdir(path.dirname(REPORT_PATH), { recursive: true });
-  await fs.writeFile(
-    REPORT_PATH,
-    JSON.stringify(
-      {
-        generatedAt: new Date().toISOString(),
-        strict: STRICT,
-        scannedPrograms: programs.length,
-        incompletePrograms: failures,
-        items: report,
-      },
-      null,
-      2,
-    ) + '\n',
-    'utf8',
-  );
-
-  if (failures > 0) {
-    console.log(`\nReport written: ${REPORT_PATH}`);
-  }
-
-  console.log(
-    `\n${failures === 0 ? '✅ All programs complete.' : `⚠️ ${failures} program(s) incomplete.`}`,
-  );
-
-  if (failures > 0 && STRICT) {
-    console.error('Strict mode enabled: failing due to incomplete programs.');
-    process.exit(1);
-  }
+  await fs.writeFile(REPORT_PATH, JSON.stringify({generatedAt:new Date().toISOString(),strict:STRICT,scannedPrograms:programs.length,incompletePrograms:items.length,items}, null, 2) + '\n');
+  console.log(`Checked ${programs.length} published program(s); ${items.length} incomplete.`);
+  if (items.length && STRICT) process.exit(1);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main().catch((err) => { console.error(err); process.exit(1); });

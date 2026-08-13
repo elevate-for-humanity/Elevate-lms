@@ -87,7 +87,7 @@ export function normalizeRoles(values: unknown[]): UserRole[] {
   );
 }
 
-export const ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'staff'];
+export const ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'advisor', 'staff'];
 export const API_ADMIN_ROLES: UserRole[] = ['super_admin', 'admin', 'org_admin', 'staff'];
 export const INSTRUCTOR_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'instructor'];
 export const TESTING_CENTER_ROLES: UserRole[] = ['super_admin', 'admin', 'staff', 'test_admin', 'proctor'];

@@ -34,7 +34,7 @@ const features = [
   {
     title: 'PIRL Data Export',
     description: 'One-click export to Participant Individual Record Layout format.',
-    image: '/images/pages/store-recommendations.webp',
+    image: '/images/pages/admin-external-progress-detail.webp',
     items: ['Automated field mapping', 'Data validation', 'Error checking', 'Batch export capability'],
   },
   {

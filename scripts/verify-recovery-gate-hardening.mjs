@@ -44,6 +44,18 @@ requireText('.github/workflows/integrity-gate.yml', 'LMS course integrity check'
 requireText('.github/workflows/integrity-gate.yml', 'Store product integrity check', 'Store integrity must remain independently evaluated.');
 requireText('.github/workflows/integrity-gate.yml', 'Stripe route and webhook integrity check', 'Stripe integrity must remain independently evaluated.');
 
+requireText('.github/workflows/apply-platform-media-dedupe.yml', 'contents: read', 'Media dedupe workflow must remain read-only during recovery.');
+forbidText('.github/workflows/apply-platform-media-dedupe.yml', 'git push', 'Media dedupe workflow must not push a competing repair branch.');
+forbidText('.github/workflows/apply-platform-media-dedupe.yml', 'fix/platform-media-duplicate-gate', 'Recovery must not revive the obsolete media repair branch.');
+
+requireText('.github/workflows/promote-to-production.yml', 'Direct auto-merge is disabled', 'Production promotion must remain supervised through a PR.');
+forbidText('.github/workflows/promote-to-production.yml', 'git push origin main', 'Promotion workflow must not directly push main.');
+forbidText('.github/workflows/promote-to-production.yml', 'skipping LMS health check', 'Missing staging health configuration must not be treated as success.');
+forbidText('.github/workflows/promote-to-production.yml', 'skipping Admin health check', 'Missing Admin staging health configuration must not be treated as success.');
+
+requireText('.github/workflows/northflank-trigger-dispatch.yml', 'git merge-base --is-ancestor', 'Production dispatcher must prove requested SHA belongs to main.');
+requireText('.github/workflows/northflank-trigger-dispatch.yml', 'RESOLVED_SHA', 'Production dispatcher must resolve the exact requested commit.');
+
 requireText('scripts/check-stripe-integrity.mjs', 'process.exit(1)', 'Stripe violations must remain blocking.');
 forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe gate must not regress to warning-only behavior.');
 
@@ -53,8 +65,12 @@ requireText('scripts/production-readiness-gate.sh', 'audit-auth-gaps.sh --strict
 requireText('scripts/check-analytics-integrity.mjs', 'result.status === 1', 'Analytics audit must distinguish no-match from execution failure.');
 requireText('scripts/audit-migration-discipline.mjs', 'scripts/lint-migrations.cjs', 'Migration discipline command must remain wired to blocking migration lint.');
 
+requireText('scripts/platform-doctor.mjs', 'const strictBlocks = STRICT_MODE || ENFORCE_STRICT', 'Platform Doctor --strict must directly enforce STRICT findings.');
+requireText('scripts/platform-doctor.mjs', "addCheck(name, 'fail', summary)", 'Platform Doctor timeouts must fail rather than pass.');
+requireText('scripts/platform-doctor.mjs', "pnpm typecheck:all", 'Strict Platform Doctor must run the full production typecheck.');
+
 requireText('scripts/run-platform-doctor-strict.mjs', "PLATFORM_DOCTOR_ENFORCE_STRICT: 'true'", 'Platform Doctor strict enforcement wrapper is missing.');
-requireText('scripts/run-platform-doctor-strict.mjs', "summary.includes('timed out')", 'Platform Doctor timeout-as-pass rejection is missing.');
+requireText('scripts/run-platform-doctor-strict.mjs', "summary.includes('timed out')", 'Platform Doctor timeout regression detection is missing.');
 
 if (failures.length > 0) {
   console.error('Recovery gate hardening regression detected:\n');

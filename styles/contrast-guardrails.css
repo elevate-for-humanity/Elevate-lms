@@ -59,7 +59,10 @@
     .bg-zinc-900,
     .bg-brand-blue-700,
     .bg-brand-blue-800,
-    .bg-brand-blue-900
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
   ) {
   color: #f8fafc;
 }
@@ -76,7 +79,10 @@
     .bg-zinc-900,
     .bg-brand-blue-700,
     .bg-brand-blue-800,
-    .bg-brand-blue-900
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
   )
   :is(.text-slate-300, .text-gray-300, .text-zinc-300) {
   color: #f1f5f9 !important;
@@ -94,7 +100,10 @@
     .bg-zinc-900,
     .bg-brand-blue-700,
     .bg-brand-blue-800,
-    .bg-brand-blue-900
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
   )
   :is(.text-slate-400, .text-gray-400, .text-zinc-400) {
   color: #e2e8f0 !important;
@@ -114,7 +123,10 @@
     .bg-zinc-900,
     .bg-brand-blue-700,
     .bg-brand-blue-800,
-    .bg-brand-blue-900
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
   ):is(
     .text-slate-500,
     .text-slate-600,
@@ -141,7 +153,10 @@
     .bg-zinc-900,
     .bg-brand-blue-700,
     .bg-brand-blue-800,
-    .bg-brand-blue-900
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
   )
   > :is(
     .text-slate-500,
@@ -172,7 +187,10 @@
     .bg-zinc-900,
     .bg-brand-blue-700,
     .bg-brand-blue-800,
-    .bg-brand-blue-900
+    .bg-brand-blue-900,
+    .bg-brand-red-700,
+    .bg-brand-red-800,
+    .bg-brand-red-900
   )
   .text-white {
   color: #ffffff !important;

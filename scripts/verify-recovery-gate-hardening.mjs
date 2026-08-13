@@ -52,6 +52,8 @@ for (const file of [
   '.github/workflows/predeploy-check.yml',
   '.github/workflows/design-policy-enforcement.yml',
   '.github/workflows/lockfile-check.yml',
+  '.github/workflows/health-check.yml',
+  '.github/workflows/supabase-auto-migrate-seed.yml',
 ]) protectDeterministicGate(file);
 
 forbidText('.github/workflows/ci-cd.yml', 'package-lock.json', 'CI/CD cache must not use package-lock.json in this pnpm repository.');
@@ -89,16 +91,35 @@ forbidText('.github/workflows/promote-to-production.yml', 'skipping Admin health
 requireText('.github/workflows/northflank-trigger-dispatch.yml', 'git merge-base --is-ancestor', 'Production dispatcher must prove requested SHA belongs to main.');
 requireText('.github/workflows/northflank-trigger-dispatch.yml', 'RESOLVED_SHA', 'Production dispatcher must resolve the exact requested commit.');
 
-protectProductionWorkflow('.github/workflows/deploy-marketing.yml');
-protectProductionWorkflow('.github/workflows/deploy-admin.yml');
-protectProductionWorkflow('.github/workflows/deploy-lms.yml');
-protectProductionWorkflow('.github/workflows/recover-marketing.yml');
+for (const file of [
+  '.github/workflows/deploy-marketing.yml',
+  '.github/workflows/deploy-admin.yml',
+  '.github/workflows/deploy-lms.yml',
+  '.github/workflows/recover-marketing.yml',
+  '.github/workflows/elevate-production-deploy.yml',
+]) protectProductionWorkflow(file);
+
+requireText('.github/workflows/elevate-production-deploy.yml', "inputs.environment }}' == 'production'", 'Canonical production deploy must explicitly enforce production SHA provenance.');
+requireText('.github/workflows/elevate-production-deploy.yml', 'Recovery hardening regression check', 'Canonical deployment must run recovery hardening before publish/deploy.');
+
+requireText('.github/workflows/health-check.yml', 'Require Northflank health credentials', 'Health checks must fail when required credentials are unavailable.');
+forbidText('.github/workflows/health-check.yml', 'Skipping health check for now', 'Missing health credentials must not produce a green check.');
+
+forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'node scripts/db/runMigrations.js', 'Supabase workflow must not automatically apply production migrations.');
+forbidText('.github/workflows/supabase-auto-migrate-seed.yml', 'pnpm db:seed', 'Supabase workflow must not automatically seed production data.');
+requireText('.github/workflows/supabase-auto-migrate-seed.yml', 'This workflow does NOT apply migrations or seed production data.', 'Supabase workflow must remain audit-only during recovery.');
+
+forbidText('.github/workflows/fix-northflank-services.yml', '--all --execute', 'Legacy all-service mutator must remain disabled.');
+forbidText('.github/workflows/fix-northflank-services.yml', 'restart-service.ts', 'Legacy workflow must not restart all production services.');
+requireText('.github/workflows/fix-northflank-services.yml', 'does not mutate or restart production services', 'Northflank legacy fixer must remain audit-only.');
 
 requireText('scripts/check-stripe-integrity.mjs', 'process.exit(1)', 'Stripe violations must remain blocking.');
 forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe gate must not regress to warning-only behavior.');
 
 requireText('scripts/audit-auth-gaps.sh', '--strict', 'Auth audit strict mode must remain available.');
 requireText('scripts/production-readiness-gate.sh', 'audit-auth-gaps.sh --strict', 'Production readiness must enforce strict auth auditing.');
+requireText('scripts/production-readiness-gate.sh', 'Stripe Secret Key is required for production readiness', 'Missing Stripe production configuration must remain blocking.');
+requireText('scripts/production-readiness-gate.sh', 'Stripe Webhook Secret is required for production readiness', 'Missing Stripe webhook configuration must remain blocking.');
 
 requireText('scripts/check-analytics-integrity.mjs', 'result.status === 1', 'Analytics audit must distinguish no-match from execution failure.');
 requireText('scripts/audit-migration-discipline.mjs', 'scripts/lint-migrations.cjs', 'Migration discipline command must remain wired to blocking migration lint.');

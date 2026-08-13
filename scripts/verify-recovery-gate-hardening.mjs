@@ -65,8 +65,13 @@ forbidText('.github/workflows/predeploy-check.yml', 'run: pnpm platform:doctor:s
 
 requireText('.github/workflows/design-policy-enforcement.yml', 'Block newly introduced STRICT design regressions', 'Design policy must compare current design findings against the base.');
 requireText('.github/workflows/design-policy-enforcement.yml', 'design-enforcer-base.json', 'Design policy base evidence must be generated.');
-requireText('.github/workflows/design-policy-enforcement.yml', 'node scripts/image-contract.mjs --strict', 'Image contract must remain strict.');
+requireText('.github/workflows/design-policy-enforcement.yml', 'Block newly introduced STRICT image regressions', 'Image policy must compare current image findings against the base.');
+requireText('.github/workflows/design-policy-enforcement.yml', 'image-contract-base.json', 'Image policy base evidence must be generated.');
+forbidText('.github/workflows/design-policy-enforcement.yml', 'Image contract strict audit\n        run: node scripts/image-contract.mjs --strict', 'Historical image STRICT findings must not block without a base comparison.');
 forbidText('.github/workflows/design-policy-enforcement.yml', 'WARNING: Heavy overlays detected (non-blocking)', 'Design policy must not regress to warning-only legacy checks.');
+
+requireText('.github/workflows/recovery-hardening-gate.yml', 'Stripe implementation integrity\n        if: ${{ always() }}', 'Stripe hardening must run even after an earlier domain fails.');
+requireText('.github/workflows/recovery-hardening-gate.yml', 'Platform Doctor strict enforcement\n        if: ${{ always() }}', 'Platform Doctor hardening must run even after an earlier domain fails.');
 
 requireText('.github/workflows/compliance-gate.yml', 'pnpm audit --audit-level high', 'High-severity dependency vulnerabilities must remain blocking.');
 forbidText('.github/workflows/compliance-gate.yml', 'Security vulnerabilities found - review SECURITY_NOTES.md', 'Compliance security audit must not convert high vulnerabilities to success.');
@@ -118,6 +123,7 @@ requireText('scripts/check-stripe-integrity.mjs', 'process.exit(1)', 'Stripe vio
 forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe gate must not regress to warning-only behavior.');
 
 requireText('scripts/audit-auth-gaps.sh', '--strict', 'Auth audit strict mode must remain available.');
+requireText('scripts/audit-auth-gaps.sh', 'is_production_file', 'Auth strict mode must distinguish deployed roots from detached legacy roots.');
 requireText('scripts/production-readiness-gate.sh', 'audit-auth-gaps.sh --strict', 'Production readiness must enforce strict auth auditing.');
 requireText('scripts/production-readiness-gate.sh', 'Stripe Secret Key is required for production readiness', 'Missing Stripe production configuration must remain blocking.');
 requireText('scripts/production-readiness-gate.sh', 'Stripe Webhook Secret is required for production readiness', 'Missing Stripe webhook configuration must remain blocking.');

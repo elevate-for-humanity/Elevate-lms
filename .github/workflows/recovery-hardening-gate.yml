@@ -17,9 +17,12 @@ on:
 permissions:
   contents: read
 
+# This gate is intentionally keyed to the exact SHA. Recovery autopilots may
+# continue committing while validation runs; an older validation must finish
+# rather than being cancelled before later domains (Stripe/Platform Doctor) run.
 concurrency:
-  group: recovery-hardening-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: recovery-hardening-${{ github.sha }}
+  cancel-in-progress: false
 
 jobs:
   hardening:

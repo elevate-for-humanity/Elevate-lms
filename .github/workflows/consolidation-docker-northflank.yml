@@ -1,9 +1,23 @@
 name: Canonical Docker + Northflank Gate
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - consolidation/unified-platform
+      - 'release/production-recovery-*'
+    paths:
+      - 'Dockerfile.marketing'
+      - 'Dockerfile.northflank-lms'
+      - 'Dockerfile.northflank-admin'
+      - 'apps/marketing/**'
+      - 'apps/admin/**'
+      - 'apps/lms/**'
+      - 'packages/**'
+      - 'scripts/northflank/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/consolidation-docker-northflank.yml'
   pull_request:
     branches:
       - main
@@ -25,7 +39,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: canonical-docker-northflank-${{ github.ref }}
+  group: canonical-docker-northflank-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -47,18 +61,21 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       RUNTIME_PORT: '3000'
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
       - name: Validate required build configuration
         shell: bash
         run: |
           set -euo pipefail
           test -n "${NEXT_PUBLIC_SUPABASE_URL}" || { echo 'NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
           test -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" || { echo 'NEXT_PUBLIC_SUPABASE_ANON_KEY is not configured'; exit 1; }
-
       - name: Build canonical production container
         shell: bash
         run: |
@@ -76,7 +93,6 @@ jobs:
             --build-arg NEXT_PUBLIC_GIT_SHA="${GITHUB_SHA}" \
             --build-arg BUILD_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             -t "elevate-${{ matrix.service }}:${GITHUB_SHA}" .
-
       - name: Verify canonical port and health endpoints
         shell: bash
         run: |
@@ -91,7 +107,6 @@ jobs:
             -p "$RUNTIME_PORT:$RUNTIME_PORT" \
             "elevate-${{ matrix.service }}:${GITHUB_SHA}"
           trap 'docker logs "$name" || true; docker rm -f "$name" || true' EXIT
-
           for attempt in $(seq 1 30); do
             ping_status=$(curl -sS -o /tmp/ping.json -w '%{http_code}' "http://127.0.0.1:${RUNTIME_PORT}/api/ping" || true)
             health_status=$(curl -sS -o /tmp/health.json -w '%{http_code}' "http://127.0.0.1:${RUNTIME_PORT}/api/health" || true)
@@ -104,7 +119,6 @@ jobs:
             fi
             sleep 5
           done
-
           echo "${{ matrix.service }} failed canonical health on PORT=${RUNTIME_PORT}"
           docker logs "$name"
           exit 1

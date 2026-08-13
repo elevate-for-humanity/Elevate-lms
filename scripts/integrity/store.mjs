@@ -1,17 +1,8 @@
 #!/usr/bin/env node
 /**
  * Store Product Integrity Check
- *
- * Validates all visible store products against A+ criteria:
- * - Name and description present
- * - Price defined
- * - Product type metadata present
- * - No placeholder content
- * - Post-purchase route exists
- *
- * Output: reports/store_integrity_report.json
+ * Fails closed when visible product definitions cannot be proven.
  */
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,201 +10,71 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
 const reportsDir = path.join(rootDir, 'reports');
+fs.mkdirSync(reportsDir, { recursive: true });
 
-// Ensure reports directory exists
-if (!fs.existsSync(reportsDir)) {
-  fs.mkdirSync(reportsDir, { recursive: true });
-}
+const PLACEHOLDER_PATTERNS = [/lorem ipsum/i,/placeholder/i,/coming soon/i,/\btbd\b/i,/\btodo\b/i,/sample product/i,/test product/i];
+const containsPlaceholder = (text) => Boolean(text && PLACEHOLDER_PATTERNS.some((p)=>p.test(text)));
 
-// Placeholder patterns to detect
-const PLACEHOLDER_PATTERNS = [
-  /lorem ipsum/i,
-  /placeholder/i,
-  /coming soon/i,
-  /tbd/i,
-  /todo/i,
-  /sample product/i,
-  /test product/i,
-];
-
-function containsPlaceholder(text) {
-  if (!text) return false;
-  return PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(text));
-}
-
-// Check if post-purchase route exists
-// After monorepo split, success pages are in apps/marketing and apps/lms
 function checkPostPurchaseRoute() {
   const candidates = [
-    path.join(rootDir, 'app', 'checkout', 'success', 'page.tsx'),           // legacy monorepo
-    path.join(rootDir, 'apps', 'marketing', 'app', 'store', 'checkout', 'success', 'page.tsx'),
-    path.join(rootDir, 'apps', 'marketing', 'app', 'checkout', 'success', 'page.tsx'),
-    path.join(rootDir, 'apps', 'lms', 'app', 'checkout', 'success', 'page.tsx'),
+    path.join(rootDir,'app','checkout','success','page.tsx'),
+    path.join(rootDir,'apps','marketing','app','store','checkout','success','page.tsx'),
+    path.join(rootDir,'apps','marketing','app','checkout','success','page.tsx'),
+    path.join(rootDir,'apps','lms','app','checkout','success','page.tsx'),
   ];
-  return candidates.some((p) => fs.existsSync(p));
+  return candidates.some(fs.existsSync);
 }
 
-// Load products from various sources
-async function loadProducts() {
+function loadProducts() {
+  const sourceFiles = [
+    path.join(rootDir,'apps','marketing','app','pricing','page.tsx'),
+    path.join(rootDir,'apps','marketing','app','store','page.tsx'),
+    path.join(rootDir,'lms-data','paymentPlans.ts'),
+    path.join(rootDir,'app','pricing','page.tsx'),
+  ].filter(fs.existsSync);
+
+  if (sourceFiles.length === 0) throw new Error('No canonical Store/pricing source files found');
+
   const products = [];
-
-  // Check pricing page for product definitions
-  // After monorepo split, pricing page is in apps/marketing
-  const pricingFiles = [
-    path.join(rootDir, 'app', 'pricing', 'page.tsx'),            // legacy monorepo
-    path.join(rootDir, 'apps', 'marketing', 'app', 'pricing', 'page.tsx'),
-    path.join(rootDir, 'lms-data', 'paymentPlans.ts'),
-  ];
-
-  for (const filePath of pricingFiles) {
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf-8');
-
-      // Extract product-like objects (simplified parsing)
-      // Look for name/title and price patterns
-      const nameMatches = content.matchAll(/(?:name|title):\s*["']([^"']+)["']/g);
-      const priceMatches = content.matchAll(/price:\s*(\d+)/g);
-
-      const names = Array.from(nameMatches).map((m) => m[1]);
-      const prices = Array.from(priceMatches).map((m) => parseInt(m[1]));
-
-      // Pair them up (simplified)
-      for (let i = 0; i < Math.min(names.length, prices.length); i++) {
-        products.push({
-          id: `product-${i}`,
-          name: names[i],
-          price: prices[i],
-          source: path.basename(filePath),
-        });
-      }
+  for (const filePath of sourceFiles) {
+    const content = fs.readFileSync(filePath,'utf-8');
+    const objectMatches = content.matchAll(/{[\s\S]*?(?:name|title):\s*["']([^"']+)["'][\s\S]*?price:\s*(?:["']?\$?([0-9]+(?:\.[0-9]{1,2})?)["']?)[\s\S]*?}/g);
+    let i = 0;
+    for (const m of objectMatches) {
+      products.push({ id:`${path.basename(filePath)}-${i++}`, name:m[1], price:Number(m[2]), source:path.relative(rootDir,filePath) });
     }
   }
-
-  // If no products found from files, create a baseline check
-  if (products.length === 0) {
-    // Check if checkout flow exists (check all possible locations)
-    const checkoutPaths = [
-      path.join(rootDir, 'app', 'checkout', 'page.tsx'),
-      path.join(rootDir, 'apps', 'lms', 'app', 'checkout', 'page.tsx'),
-      path.join(rootDir, 'apps', 'marketing', 'app', 'store', 'checkout', 'page.tsx'),
-    ];
-    const checkoutExists = checkoutPaths.some((p) => fs.existsSync(p));
-    if (checkoutExists) {
-      products.push({
-        id: 'checkout-flow',
-        name: 'Checkout Flow',
-        price: null,
-        source: 'checkout/page.tsx',
-        isFlowCheck: true,
-      });
-    }
-  }
-
+  if (products.length === 0) throw new Error('Store parser found zero priced products; inventory integrity cannot be proven');
   return products;
 }
 
-// Validate a single product
 function validateProduct(product) {
-  const issues = [];
-
-  // Skip flow checks
-  if (product.isFlowCheck) {
-    return {
-      productId: product.id,
-      name: product.name,
-      status: 'PASS',
-      issues: [],
-      note: 'Flow check only',
-    };
-  }
-
-  // A. Identity & Scope
-  if (!product.name || product.name.length < 3) {
-    issues.push('Missing or invalid name');
-  }
-  if (containsPlaceholder(product.name)) {
-    issues.push('Name contains placeholder content');
-  }
-
-  // B. Pricing Clarity
-  if (product.price === null || product.price === undefined) {
-    issues.push('Missing price');
-  }
-
-  return {
-    productId: product.id,
-    name: product.name,
-    price: product.price,
-    source: product.source,
-    status: issues.length === 0 ? 'PASS' : 'FAIL',
-    issues,
-  };
+  const issues=[];
+  if (!product.name || product.name.length < 3) issues.push('Missing or invalid name');
+  if (containsPlaceholder(product.name)) issues.push('Name contains placeholder content');
+  if (!Number.isFinite(product.price) || product.price < 0) issues.push('Missing or invalid price');
+  return { productId:product.id, name:product.name, price:product.price, source:product.source, status:issues.length?'FAIL':'PASS', issues };
 }
 
-// Main execution
-async function main() {
-  const products = await loadProducts();
+try {
+  const products = loadProducts();
   const hasPostPurchase = checkPostPurchaseRoute();
-
-  const results = products.map((product) => validateProduct(product));
-
-  // Add post-purchase check
-  if (!hasPostPurchase) {
-    results.push({
-      productId: 'post-purchase-flow',
-      name: 'Post-Purchase Confirmation',
-      status: 'FAIL',
-      issues: ['Missing checkout/success page'],
-    });
-  } else {
-    results.push({
-      productId: 'post-purchase-flow',
-      name: 'Post-Purchase Confirmation',
-      status: 'PASS',
-      issues: [],
-    });
-  }
-
-  const passed = results.filter((r) => r.status === 'PASS').length;
-  const failed = results.filter((r) => r.status === 'FAIL').length;
-
-  const report = {
-    timestamp: new Date().toISOString(),
-    summary: {
-      totalChecks: results.length,
-      passed,
-      failed,
-      hasPostPurchaseFlow: hasPostPurchase,
-    },
-    results,
-  };
-
-  fs.writeFileSync(
-    path.join(reportsDir, 'store_integrity_report.json'),
-    JSON.stringify(report, null, 2),
-  );
-
-  console.log('Store Product Integrity Report');
-  console.log('==============================');
-  console.log(`Total checks: ${report.summary.totalChecks}`);
-  console.log(`Passed: ${report.summary.passed}`);
-  console.log(`Failed: ${report.summary.failed}`);
-  console.log(`Post-purchase flow: ${hasPostPurchase ? '✅' : '❌'}`);
-
-  if (failed > 0) {
-    console.log('\nFailed checks:');
-    results
-      .filter((r) => r.status === 'FAIL')
-      .forEach((r) => {
-        console.log(`  ❌ ${r.name}`);
-        r.issues.forEach((issue) => console.log(`     - ${issue}`));
-      });
-    console.log('\nReport saved to: reports/store_integrity_report.json');
+  const results = products.map(validateProduct);
+  if (!hasPostPurchase) results.push({ productId:'post-purchase-flow', name:'Post-Purchase Confirmation', status:'FAIL', issues:['Missing checkout/success page'] });
+  else results.push({ productId:'post-purchase-flow', name:'Post-Purchase Confirmation', status:'PASS', issues:[] });
+  const failed=results.filter((r)=>r.status==='FAIL').length;
+  const report={timestamp:new Date().toISOString(),summary:{totalChecks:results.length,productsDetected:products.length,passed:results.length-failed,failed,hasPostPurchaseFlow:hasPostPurchase},results};
+  fs.writeFileSync(path.join(reportsDir,'store_integrity_report.json'),JSON.stringify(report,null,2));
+  console.log(`Store integrity: ${products.length} priced products detected; ${failed} failed checks.`);
+  if (failed) {
+    for (const r of results.filter((r)=>r.status==='FAIL')) console.error(`FAIL ${r.name}: ${r.issues.join('; ')}`);
     process.exit(1);
   }
-
-  console.log('\n✅ All store checks pass');
+  console.log('PASS: Store product and post-purchase integrity proven.');
   process.exit(0);
+} catch (error) {
+  const report={timestamp:new Date().toISOString(),summary:{totalChecks:0,productsDetected:0,passed:0,failed:1},fatalError:String(error?.message||error),results:[]};
+  fs.writeFileSync(path.join(reportsDir,'store_integrity_report.json'),JSON.stringify(report,null,2));
+  console.error(`FAIL: Store integrity could not be proven: ${report.fatalError}`);
+  process.exit(1);
 }
-
-main();

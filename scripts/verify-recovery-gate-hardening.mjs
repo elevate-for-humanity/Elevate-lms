@@ -63,7 +63,8 @@ forbidText('.github/workflows/ci-cd.yml', 'git push origin --delete', 'CI/CD mus
 requireText('.github/workflows/predeploy-check.yml', 'run: node scripts/run-platform-doctor-strict.mjs', 'Pre-deploy must use strict Platform Doctor enforcement.');
 forbidText('.github/workflows/predeploy-check.yml', 'run: pnpm platform:doctor:strict\n        continue-on-error: true', 'Main strict Platform Doctor must not be warning-only.');
 
-requireText('.github/workflows/design-policy-enforcement.yml', 'node scripts/design-enforcer.mjs --strict', 'Design policy must use the strict canonical audit.');
+requireText('.github/workflows/design-policy-enforcement.yml', 'Block newly introduced STRICT design regressions', 'Design policy must compare current design findings against the base.');
+requireText('.github/workflows/design-policy-enforcement.yml', 'design-enforcer-base.json', 'Design policy base evidence must be generated.');
 requireText('.github/workflows/design-policy-enforcement.yml', 'node scripts/image-contract.mjs --strict', 'Image contract must remain strict.');
 forbidText('.github/workflows/design-policy-enforcement.yml', 'WARNING: Heavy overlays detected (non-blocking)', 'Design policy must not regress to warning-only legacy checks.');
 

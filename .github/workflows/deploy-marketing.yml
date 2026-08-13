@@ -1,7 +1,5 @@
 name: Deploy Marketing (www)
 
-# Deployment replay for portal and store fixes — 2026-08-12
-
 on:
   push:
     branches:
@@ -52,9 +50,6 @@ permissions:
   contents: read
   actions: read
 
-# Marketing deployments own only the Marketing service. New Marketing runs queue
-# behind an active Marketing release instead of canceling it. The Northflank
-# trigger also waits for any in-flight service build before acquiring a new slot.
 concurrency:
   group: northflank-marketing-deploy
   cancel-in-progress: false
@@ -66,6 +61,7 @@ jobs:
   deploy-marketing:
     name: Build and deploy Marketing (www) on Northflank
     runs-on: ubuntu-latest
+    environment: production
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
@@ -92,12 +88,24 @@ jobs:
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
 
     steps:
-      - name: Checkout exact Marketing commit
+      - name: Checkout repository history
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           clean: true
+
+      - name: Prove deployment SHA belongs to main
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          REQUESTED_SHA="${{ github.sha }}"
+          git fetch origin main --depth=200
+          RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          test -n "$RESOLVED_SHA" || { echo '::error::Deployment SHA cannot be resolved'; exit 1; }
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Refusing production deploy of SHA not contained in main: $RESOLVED_SHA"; exit 1; }
+          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
+          test "$(git status --porcelain)" = ""
+          echo "Verified production Marketing SHA $RESOLVED_SHA"
 
       - name: Set build environment variables
         run: |
@@ -108,22 +116,11 @@ jobs:
           echo "BUILD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
           echo "BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
 
-      - name: Verify source commit SHA
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "${{ github.sha }}"
-          test "$(git status --porcelain)" = ""
-          echo "Building exact Marketing SHA ${{ github.sha }}"
-
       - name: Generate version file
         run: |
           node - <<'NODE'
           const fs = require('fs');
-          const payload = {
-            service: 'marketing',
-            commit: process.env.GITHUB_SHA,
-            builtAt: process.env.BUILD_TIMESTAMP,
-          };
+          const payload = { service: 'marketing', commit: process.env.GITHUB_SHA, builtAt: process.env.BUILD_TIMESTAMP };
           fs.writeFileSync('public/version.json', JSON.stringify(payload, null, 2) + '\n');
           NODE
           cat public/version.json
@@ -138,16 +135,17 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Verify production deployment credentials
         run: |
           set -euo pipefail
           required=(NORTHFLANK_API_TOKEN NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY)
           for name in "${required[@]}"; do
-            test -n "${!name:-}" || { echo "$name GitHub secret is missing"; exit 1; }
+            test -n "${!name:-}" || { echo "::error::$name GitHub secret is missing"; exit 1; }
           done
           echo "Marketing deployment credentials are configured"
 
@@ -162,12 +160,12 @@ jobs:
         id: predeploy
         run: |
           set -euo pipefail
-          status=$(curl -sk --max-time 10 -o /tmp/predeploy-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
+          status=$(curl -sS --max-time 10 -o /tmp/predeploy-health.json -w "%{http_code}" https://www.elevateforhumanity.org/api/health || true)
           if [ "$status" = "200" ]; then
             echo "was_healthy=true" >> "$GITHUB_OUTPUT"
           else
             echo "was_healthy=false" >> "$GITHUB_OUTPUT"
-            echo "Existing upstream returned HTTP $status; continuing in recovery mode."
+            echo "Existing upstream returned HTTP $status; continuing in supervised recovery mode."
           fi
 
       - name: Acquire queued Marketing build
@@ -178,7 +176,7 @@ jobs:
         run: |
           set -euo pipefail
           BUILD_ID="${{ steps.trigger_build.outputs.build_id }}"
-          test -n "$BUILD_ID" || { echo "Northflank trigger returned no build_id"; exit 1; }
+          test -n "$BUILD_ID" || { echo "::error::Northflank trigger returned no build_id"; exit 1; }
           echo "Northflank build id: $BUILD_ID"
           echo "Reused existing build: ${{ steps.trigger_build.outputs.reused_build }}"
 
@@ -202,21 +200,19 @@ jobs:
           pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 3600000
 
       - name: Verify Northflank deployment SHA
-        run: |
-          set -euo pipefail
-          pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
+        run: pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"
 
       - name: Smoke production and require exact live SHA
         run: |
           set -euo pipefail
           EXPECTED_SHA="${{ github.sha }}"
           for i in $(seq 1 30); do
-            health_status=$(curl -sk --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
-            version_status=$(curl -sk --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
-            home_status=$(curl -sk --max-time 15 -o /tmp/www-home.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
-            page_status=$(curl -sk --max-time 15 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
-            razors_status=$(curl -sk --max-time 15 -o /tmp/razors-image.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/partners/razors-image-storefront.webp?deploy=${EXPECTED_SHA}" || true)
-            hero_status=$(curl -sk --max-time 15 -o /tmp/home-hero.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/heroes/hero-homepage.webp?deploy=${EXPECTED_SHA}" || true)
+            health_status=$(curl -sS --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
+            version_status=$(curl -sS --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
+            home_status=$(curl -sS --max-time 15 -o /tmp/www-home.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
+            page_status=$(curl -sS --max-time 15 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
+            razors_status=$(curl -sS --max-time 15 -o /tmp/razors-image.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/partners/razors-image-storefront.webp?deploy=${EXPECTED_SHA}" || true)
+            hero_status=$(curl -sS --max-time 15 -o /tmp/home-hero.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/heroes/hero-homepage.webp?deploy=${EXPECTED_SHA}" || true)
             LIVE_SHA="$(node -e "try{const d=require('/tmp/www-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
             razors_bytes=$(wc -c < /tmp/razors-image.webp 2>/dev/null || echo 0)
             hero_bytes=$(wc -c < /tmp/home-hero.webp 2>/dev/null || echo 0)
@@ -237,7 +233,7 @@ jobs:
             fi
             sleep 20
           done
-          echo "DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required visual assets"
+          echo "::error::DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required visual assets"
           cat /tmp/www-health.json 2>/dev/null || true
           cat /tmp/www-version.json 2>/dev/null || true
           exit 1

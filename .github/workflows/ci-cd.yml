@@ -39,20 +39,23 @@ on:
       - 'Dockerfile.*'
       - 'pnpm-lock.yaml'
       - 'package.json'
+      - '.github/workflows/ci-cd.yml'
 
 concurrency:
-  group: ci-cd-${{ github.ref }}
+  group: ci-cd-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NODE_OPTIONS: '--max-old-space-size=6144'
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
           fetch-depth: 1
           clean: true
 
@@ -60,38 +63,37 @@ jobs:
         run: |
           set -euo pipefail
           ACTUAL_SHA="$(git rev-parse HEAD)"
-          EXPECTED_SHA="${{ github.sha }}"
-          echo "Expected SHA: $EXPECTED_SHA"
-          echo "Actual SHA:   $ACTUAL_SHA"
-          test "$ACTUAL_SHA" = "$EXPECTED_SHA"
+          echo "Checked out SHA: $ACTUAL_SHA"
           test "$(git status --porcelain)" = ""
-          echo "SHA verification passed"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Cache Next.js build artifacts
         uses: actions/cache@v4
         with:
           path: |
-            .next/cache/tsbuildinfo.json
-            .next/cache/webpack
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.mjs') }}
+            .next/cache
+            apps/*/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.mjs', '**/*.js') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
             ${{ runner.os }}-nextjs-
 
       - name: System invariants
-        run: npm run verify:system || echo "System invariants check failed but continuing"
-        continue-on-error: true
+        run: pnpm run verify:system
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -108,42 +110,29 @@ jobs:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: Run unit tests
-        run: npm run test || echo "No unit tests found"
-        continue-on-error: false
+        run: pnpm run test
 
       - name: Run smoke tests
         run: bash scripts/smoke-test.sh
-        continue-on-error: false
 
       - name: TypeScript — production applications
-        run: npm run typecheck:all
-        env:
-          NODE_OPTIONS: '--max-old-space-size=6144'
+        run: pnpm run typecheck:all
 
       - name: Route governance (strict)
-        run: npm run platform:doctor:strict
-        continue-on-error: true
+        run: pnpm run platform:doctor:strict
 
-      - name: SEO governance
-        run: npm run seo:check
+      - name: SEO governance (advisory)
         continue-on-error: true
+        run: pnpm run seo:check
 
-      - name: Archetype + Quality Gates
-        run: npm run archetype:check
+      - name: Archetype + Quality Gates (advisory)
         continue-on-error: true
+        run: pnpm run archetype:check
 
-      - name: Install Playwright browsers
-        continue-on-error: true
-        run: |
-          for i in 1 2 3; do
-            npm exec playwright install --with-deps chromium 2>&1 | tail -5 && break
-            echo "Retrying Playwright install ($i/3)..."
-            sleep 30
-          done || true
-          which playwright || true
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
 
-      - name: Browser E2E (CI-safe)
-        continue-on-error: true
+      - name: Browser E2E acceptance
         shell: bash
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -151,19 +140,13 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SKIP_ENV_VALIDATION: 'true'
           PLAYWRIGHT_BASE_URL: 'https://www.elevateforhumanity.org'
-        run: |
-          if npm exec playwright --version >/dev/null 2>&1; then
-            npm exec playwright test --config=playwright.ci.config.ts 2>&1 | tail -30 || true
-          else
-            echo "Playwright not available - skipping E2E tests"
-          fi
+        run: pnpm exec playwright test --config=playwright.ci.config.ts
 
       - name: Clear Next.js cache
-        run: rm -rf .next
+        run: rm -rf .next apps/*/.next
 
       - name: Build
         env:
-          NODE_OPTIONS: '--max-old-space-size=6144'
           GENERATE_SOURCEMAP: 'false'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
@@ -178,7 +161,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        run: npm run build:lms:phased
+        run: pnpm run build:lms:phased
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -186,35 +169,42 @@ jobs:
           name: nextjs-build-${{ github.sha }}
           path: |
             .next/
+            apps/*/.next/
             Dockerfile.northflank-lms
             Dockerfile.northflank-admin
             Dockerfile.marketing
           retention-days: 1
           compression-level: 9
 
-  legacy-lint:
+  changed-file-lint:
     runs-on: ubuntu-latest
-    continue-on-error: true
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Lint changed files only
+        shell: bash
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE="${{ github.event.pull_request.base.sha }}"
           else
@@ -227,7 +217,7 @@ jobs:
             || true)
 
           if [ -z "$CHANGED" ]; then
-            echo "No TS/JS files changed. Skipping lint."
+            echo "No TS/JS files changed."
             exit 0
           fi
 
@@ -236,18 +226,18 @@ jobs:
           done)
 
           if [ -z "$EXISTING_FILES" ]; then
-            echo "No existing TS/JS files to lint (changed files were deleted)."
+            echo "No existing TS/JS files to lint."
             exit 0
           fi
 
-          echo "Linting changed files:"
           echo "$EXISTING_FILES"
-          echo "$EXISTING_FILES" | xargs npx eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored || true
+          echo "$EXISTING_FILES" | xargs pnpm exec eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored
 
   post-deployment-check:
     runs-on: ubuntu-latest
-    needs: [test-and-build]
+    needs: [test-and-build, changed-file-lint]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -260,51 +250,39 @@ jobs:
 
       - name: Check health endpoint
         id: health
+        shell: bash
         run: |
+          set -euo pipefail
           HEALTH_URL="https://www.elevateforhumanity.org/api/health"
           echo "Checking: $HEALTH_URL"
+          status_code=""
+          body=""
           for attempt in 1 2 3; do
-            response=$(curl -s -w "\n%{http_code}" --max-time 15 "$HEALTH_URL")
+            response=$(curl -sS -w "\n%{http_code}" --max-time 15 "$HEALTH_URL" || true)
             status_code=$(echo "$response" | tail -n1)
             body=$(echo "$response" | head -n-1)
             echo "Attempt $attempt - Status: $status_code"
             if [ "$status_code" = "200" ]; then
-              echo "Health check passed"
-              echo "healthy=true" >> $GITHUB_OUTPUT
+              echo "healthy=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            echo "Not healthy yet (got $status_code), waiting 30s..."
             sleep 30
           done
-          echo "Health check failed after 3 attempts (last status: $status_code)"
+          echo "healthy=false" >> "$GITHUB_OUTPUT"
+          echo "Health check failed; last status: $status_code"
           echo "Response: $body"
-          echo "healthy=false" >> $GITHUB_OUTPUT
           exit 1
 
       - name: Run production smoke tests
         run: bash scripts/smoke-test-portal.sh https://www.elevateforhumanity.org
 
-      - name: Auto-rollback on health failure
-        if: failure() && steps.health.outputs.healthy == 'false'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Health check failed - initiating rollback to previous commit"
-          PREV_SHA=$(git rev-parse HEAD~1)
-          echo "Rolling back to: $PREV_SHA"
-          git config user.email "ci@elevateforhumanity.org"
-          git config user.name "Elevate CI"
-          git revert --no-edit HEAD
-          git push origin main
-          echo "Rollback pushed. Previous commit: $PREV_SHA"
-
-      - name: Notify deployment failure
+      - name: Report deployment failure
         if: failure()
         run: |
-          echo "Deployment verification failed"
-          echo "Check logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "Deployment verification failed."
+          echo "Automatic rollback is disabled; recovery supervisor must decide rollback after reviewing the failed SHA and Northflank state."
 
-  cleanup-branches:
+  branch-cleanup-audit:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
@@ -314,21 +292,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Delete merged branches
+      - name: Report merged branches without deleting
         run: |
-          git fetch --prune
-          for branch in $(git branch -r --merged origin/main | grep -v 'main\|HEAD\|dependabot'); do
-            branch_name=$(echo $branch | sed 's/origin\///')
-            echo "Deleting merged branch: $branch_name"
-            git push origin --delete $branch_name || true
-          done
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          echo "Merged non-main branches eligible for supervised cleanup:"
+          git branch -r --merged origin/main \
+            | sed 's#^[[:space:]]*origin/##' \
+            | grep -Ev '^(main|HEAD|dependabot/|release/production-recovery-)' \
+            || true
 
   notify-on-failure:
     runs-on: ubuntu-latest
-    needs: [test-and-build]
+    needs: [test-and-build, changed-file-lint]
     if: failure()
 
     steps:
       - name: Send notification
         run: |
-          echo "Build failed! Check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "CI/CD validation failed. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

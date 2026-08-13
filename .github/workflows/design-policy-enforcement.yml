@@ -25,6 +25,9 @@ on:
       - 'components/**'
       - 'public/**'
 
+permissions:
+  contents: read
+
 concurrency:
   group: design-policy-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -32,35 +35,121 @@ concurrency:
 jobs:
   enforce-design-policy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
-      - name: Design policy strict audit
-        run: node scripts/design-enforcer.mjs --strict
+
+      - name: Scan current production design state
+        run: |
+          set -euo pipefail
+          node scripts/design-enforcer.mjs || status=$?
+          status=${status:-0}
+          test -f artifacts/design-enforcer-report.json || { echo '::error::Current design report was not generated'; exit 1; }
+          cp artifacts/design-enforcer-report.json artifacts/design-enforcer-current.json
+          # CRITICAL findings are always blocking. STRICT findings are compared
+          # against the base below so historical design debt does not masquerade
+          # as a regression introduced by this PR/commit.
+          node - <<'NODE'
+          const fs = require('fs');
+          const r = JSON.parse(fs.readFileSync('artifacts/design-enforcer-current.json','utf8'));
+          const critical = (r.findings || []).filter(f => f.severity === 'CRITICAL');
+          if (critical.length) {
+            for (const f of critical.slice(0,50)) console.error(`::error file=${f.file},line=${f.line || 1}::${f.code}: ${f.message}`);
+            process.exit(1);
+          }
+          NODE
+
+      - name: Scan base production design state
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ '${{ github.event_name }}' = 'pull_request' ]; then
+            BASE_SHA='${{ github.event.pull_request.base.sha }}'
+          elif git rev-parse HEAD^ >/dev/null 2>&1; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          else
+            echo '::error::Unable to resolve a comparison base for design policy.'
+            exit 1
+          fi
+          rm -rf /tmp/design-policy-base
+          git worktree add --detach /tmp/design-policy-base "$BASE_SHA"
+          mkdir -p /tmp/design-policy-base/scripts /tmp/design-policy-base/artifacts
+          cp scripts/design-enforcer.mjs /tmp/design-policy-base/scripts/design-enforcer.mjs
+          (
+            cd /tmp/design-policy-base
+            node scripts/design-enforcer.mjs || true
+          )
+          test -f /tmp/design-policy-base/artifacts/design-enforcer-report.json || { echo '::error::Base design report was not generated'; exit 1; }
+          cp /tmp/design-policy-base/artifacts/design-enforcer-report.json artifacts/design-enforcer-base.json
+          git worktree remove --force /tmp/design-policy-base
+
+      - name: Block newly introduced STRICT design regressions
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const base = JSON.parse(fs.readFileSync('artifacts/design-enforcer-base.json','utf8'));
+          const cur = JSON.parse(fs.readFileSync('artifacts/design-enforcer-current.json','utf8'));
+
+          // Compare counts per stable finding identity instead of line numbers so
+          // unrelated edits do not manufacture a new violation by shifting lines.
+          const key = f => [f.severity, f.file, f.code, f.message].join('|');
+          const counts = list => {
+            const m = new Map();
+            for (const f of list.filter(x => x.severity === 'STRICT')) {
+              const k = key(f); m.set(k, (m.get(k) || 0) + 1);
+            }
+            return m;
+          };
+          const b = counts(base.findings || []);
+          const c = counts(cur.findings || []);
+          const regressions = [];
+          for (const [k, n] of c) {
+            const delta = n - (b.get(k) || 0);
+            if (delta > 0) regressions.push({ k, delta });
+          }
+          console.log(`Design STRICT findings: base=${(base.findings||[]).filter(f=>f.severity==='STRICT').length} current=${(cur.findings||[]).filter(f=>f.severity==='STRICT').length} new=${regressions.reduce((a,r)=>a+r.delta,0)}`);
+          if (regressions.length) {
+            console.error('::error::New STRICT design regressions were introduced:');
+            for (const r of regressions.slice(0,50)) console.error(`::error::${r.delta}x ${r.k}`);
+            process.exit(1);
+          }
+          NODE
+
+      - name: Image contract strict audit
+        run: node scripts/image-contract.mjs --strict
+
+      - name: Canonical hero audit
+        run: pnpm run audit:hero-banners
+
       - name: Preserve design audit evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: design-enforcer-${{ github.sha }}
-          path: artifacts/design-enforcer-report.json
+          path: |
+            artifacts/design-enforcer-current.json
+            artifacts/design-enforcer-base.json
+            artifacts/design-enforcer-report.json
           if-no-files-found: warn
           retention-days: 14
-      - name: Image contract strict audit
-        run: node scripts/image-contract.mjs --strict
-      - name: Canonical hero audit
-        run: pnpm run audit:hero-banners

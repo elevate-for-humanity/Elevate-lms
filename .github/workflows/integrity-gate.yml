@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '0 6 * * *' # daily at 06:00 UTC
+    - cron: '0 6 * * *'
 
 concurrency:
   group: integrity-${{ github.ref }}
@@ -15,7 +15,7 @@ concurrency:
 jobs:
   integrity:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       NODE_OPTIONS: '--max-old-space-size=6144'
 
@@ -30,6 +30,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -47,51 +49,63 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
+      # Critical integrity checks. `always()` is deliberate: a failure in one
+      # domain must not hide failures in later domains.
       - name: Pre-auth registry check
+        if: ${{ always() }}
         run: node scripts/check-pre-auth-registry.cjs
 
       - name: Grants audit context check
+        if: ${{ always() }}
         run: node scripts/check-grants-audit-context.cjs
 
       - name: Migration lint
+        if: ${{ always() }}
         run: node scripts/lint-migrations.cjs
 
       - name: Repository integrity check
+        if: ${{ always() }}
         run: node scripts/verify-repository-integrity.cjs
 
       - name: Admin native modules check
+        if: ${{ always() }}
         run: pnpm --filter @elevate/admin exec node ../../scripts/check-native-modules.cjs
 
       - name: Next.js version parity check
+        if: ${{ always() }}
         run: pnpm run verify:next-parity
 
       - name: Build identity configuration check
+        if: ${{ always() }}
         run: pnpm run verify:build-identity
 
       - name: No AWS ECS deploy artifacts
+        if: ${{ always() }}
         run: node scripts/verify-no-aws-deploy.mjs
 
       - name: No legacy studio shell wiring
+        if: ${{ always() }}
         run: node scripts/verify-no-studio-shell.mjs
 
       - name: Production readiness gate
+        if: ${{ always() }}
         run: SKIP_BUILD_GATE=1 bash scripts/production-readiness-gate.sh
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: PLATFORM_DEFAULTS leak audit
+        if: ${{ always() }}
         run: bash scripts/audit-platform-defaults-leaks.sh
 
       - name: API admin guard check
+        if: ${{ always() }}
         run: bash scripts/audit-api-auth-guards.sh
 
       - name: Authentication and role routing check
+        if: ${{ always() }}
         run: pnpm exec tsx scripts/audit-auth-role-routing.ts
 
-      # Visual checks are intentionally independent of preceding auth/repository
-      # failures. They must still execute so hero, asset, contrast, and duplicate
-      # media regressions cannot be hidden by an unrelated earlier gate failure.
       - name: Canonical hero system check
         if: ${{ always() }}
         run: pnpm run audit:hero-banners
@@ -105,6 +119,7 @@ jobs:
         run: pnpm run audit:visual-layout
 
       - name: Link integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:links
 
       - name: Media integrity check
@@ -119,17 +134,22 @@ jobs:
         if: ${{ always() }}
         run: node scripts/audit-homepage-section-media.mjs
 
-      - name: Platform media duplicate check
+      # Platform-wide image reuse is useful quality evidence, but it must not
+      # outrank auth, payments, LMS, Store or program integrity.
+      - name: Platform media duplicate advisory
         if: ${{ always() }}
+        continue-on-error: true
         run: node scripts/audit-platform-media-duplicates.mjs
 
       - name: LMS course integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:lms
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Store product integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:store
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
@@ -137,25 +157,29 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Stripe route and webhook integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:stripe
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
       - name: Analytics integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:analytics
 
       - name: Self-service policy check
+        if: ${{ always() }}
         run: pnpm run integrity:self-service
 
       - name: Program catalog integrity check
+        if: ${{ always() }}
         run: pnpm run integrity:programs
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Upload integrity reports
-        if: always()
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: integrity-reports

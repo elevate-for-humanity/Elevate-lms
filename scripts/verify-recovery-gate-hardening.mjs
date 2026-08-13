@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
+import path from 'node:path';
 
 const failures = [];
 
@@ -31,6 +32,34 @@ function protectProductionWorkflow(file) {
 function protectDeterministicGate(file) {
   requireText(file, 'pnpm install --frozen-lockfile', 'Gate must use the frozen lockfile.');
   forbidText(file, 'pnpm install --no-frozen-lockfile', 'Gate must not resolve dependencies nondeterministically.');
+}
+
+function scanForHardcodedPrivilegedJwts() {
+  const roots = ['app', 'apps', 'components', 'lib', 'packages', 'hooks', 'scripts'];
+  const skipDirs = new Set(['node_modules', '.next', '.git', 'dist', 'build', '.turbo', 'coverage']);
+  const skipExt = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif', '.mp4', '.mp3', '.pdf', '.ico', '.svg', '.zip']);
+  // Detect legacy Supabase/Northflank JWT literals. Publishable/anon values should
+  // also be environment-sourced in production scripts, but privileged service-role
+  // and platform tokens are the critical regression this guard must stop.
+  const jwt = /(?:nf-)?eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}/g;
+  const hits = [];
+  const walk = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory() && skipDirs.has(entry.name)) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (!skipExt.has(path.extname(entry.name).toLowerCase())) {
+        try {
+          const text = fs.readFileSync(full, 'utf8');
+          if (jwt.test(text)) hits.push(full);
+          jwt.lastIndex = 0;
+        } catch {}
+      }
+    }
+  };
+  for (const root of roots) walk(root);
+  if (hits.length) failures.push(`Hardcoded JWT credential(s) remain in: ${hits.slice(0, 10).join(', ')}`);
 }
 
 requireText('.github/workflows/autopilot.yml', 'pnpm install --frozen-lockfile', 'Autopilot must use the frozen lockfile.');
@@ -72,6 +101,7 @@ forbidText('.github/workflows/design-policy-enforcement.yml', 'WARNING: Heavy ov
 
 requireText('.github/workflows/recovery-hardening-gate.yml', 'Stripe implementation integrity\n        if: ${{ always() }}', 'Stripe hardening must run even after an earlier domain fails.');
 requireText('.github/workflows/recovery-hardening-gate.yml', 'Platform Doctor strict enforcement\n        if: ${{ always() }}', 'Platform Doctor hardening must run even after an earlier domain fails.');
+requireText('.github/workflows/recovery-hardening-gate.yml', 'group: recovery-hardening-${{ github.sha }}', 'Hardening validation must be keyed to exact SHA so later commits cannot cancel it.');
 
 requireText('.github/workflows/compliance-gate.yml', 'pnpm audit --audit-level high', 'High-severity dependency vulnerabilities must remain blocking.');
 forbidText('.github/workflows/compliance-gate.yml', 'Security vulnerabilities found - review SECURITY_NOTES.md', 'Compliance security audit must not convert high vulnerabilities to success.');
@@ -137,6 +167,12 @@ requireText('scripts/platform-doctor.mjs', 'pnpm typecheck:all', 'Strict Platfor
 
 requireText('scripts/run-platform-doctor-strict.mjs', "PLATFORM_DOCTOR_ENFORCE_STRICT: 'true'", 'Platform Doctor strict enforcement wrapper is missing.');
 requireText('scripts/run-platform-doctor-strict.mjs', "summary.includes('timed out')", 'Platform Doctor timeout regression detection is missing.');
+
+requireText('scripts/integrity/links.mjs', "Expected 3 deployed app trees", 'Link integrity must remain scoped to the three deployed apps.');
+requireText('scripts/integrity/links.mjs', "type: isApi ? 'api' : 'page'", 'Link integrity must discover API routes rather than misclassifying them as broken links.');
+forbidText('scripts/integrity/links.mjs', "path.join(rootDir,'app-legacy')", 'Legacy app tree must not be treated as a production link source.');
+
+scanForHardcodedPrivilegedJwts();
 
 if (failures.length > 0) {
   console.error('Recovery gate hardening regression detected:\n');

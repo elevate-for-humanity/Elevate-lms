@@ -25,18 +25,18 @@ export async function GET(request: NextRequest) {
 
       checks.courses = {
         passed: !coursesResult.error,
-        message: coursesResult.error ? coursesResult.error.message : 'Canonical courses table query succeeded.',
+        message: coursesResult.error ? 'Canonical courses table query failed.' : 'Canonical courses table query succeeded.',
       };
       checks.modules = {
         passed: !modulesResult.error,
-        message: modulesResult.error ? modulesResult.error.message : 'Canonical course_modules table query succeeded.',
+        message: modulesResult.error ? 'Canonical course_modules table query failed.' : 'Canonical course_modules table query succeeded.',
       };
       checks.lessons = {
         passed: !lessonsResult.error,
-        message: lessonsResult.error ? lessonsResult.error.message : 'Canonical course_lessons table query succeeded.',
+        message: lessonsResult.error ? 'Canonical course_lessons table query failed.' : 'Canonical course_lessons table query succeeded.',
       };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Course Builder database probe failed.';
+    } catch {
+      const message = 'Course Builder database probe failed.';
       checks.courses.message = message;
       checks.modules.message = message;
       checks.lessons.message = message;

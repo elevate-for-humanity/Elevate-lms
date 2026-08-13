@@ -25,26 +25,37 @@ function checkPostPurchaseRoute() {
   return candidates.some(fs.existsSync);
 }
 
+function collectPricedObjects(content, source) {
+  const products = [];
+  const objectMatches = content.matchAll(/{[\s\S]*?(?:name|title):\s*["']([^"']+)["'][\s\S]*?(?:price|priceMonthly):\s*(?:["']?\$?([0-9]+(?:\.[0-9]{1,2})?)["']?)[\s\S]*?}/g);
+  let i = 0;
+  for (const match of objectMatches) {
+    products.push({
+      id: `${path.basename(source)}-${i++}`,
+      name: match[1],
+      price: Number(match[2]),
+      source: path.relative(rootDir, source),
+    });
+  }
+  return products;
+}
+
 function loadProducts() {
+  // These are the canonical Store pricing/inventory sources consumed by the
+  // live marketplace. UI pages themselves intentionally delegate pricing to
+  // these catalogs instead of duplicating price literals in JSX.
   const sourceFiles = [
+    path.join(rootDir,'lib','store','platform-pricing.ts'),
+    path.join(rootDir,'lib','apps','individual-app-plans.ts'),
+    path.join(rootDir,'lms-data','paymentPlans.ts'),
     path.join(rootDir,'apps','marketing','app','pricing','page.tsx'),
     path.join(rootDir,'apps','marketing','app','store','page.tsx'),
-    path.join(rootDir,'lms-data','paymentPlans.ts'),
-    path.join(rootDir,'app','pricing','page.tsx'),
   ].filter(fs.existsSync);
 
   if (sourceFiles.length === 0) throw new Error('No canonical Store/pricing source files found');
 
-  const products = [];
-  for (const filePath of sourceFiles) {
-    const content = fs.readFileSync(filePath,'utf-8');
-    const objectMatches = content.matchAll(/{[\s\S]*?(?:name|title):\s*["']([^"']+)["'][\s\S]*?price:\s*(?:["']?\$?([0-9]+(?:\.[0-9]{1,2})?)["']?)[\s\S]*?}/g);
-    let i = 0;
-    for (const m of objectMatches) {
-      products.push({ id:`${path.basename(filePath)}-${i++}`, name:m[1], price:Number(m[2]), source:path.relative(rootDir,filePath) });
-    }
-  }
-  if (products.length === 0) throw new Error('Store parser found zero priced products; inventory integrity cannot be proven');
+  const products = sourceFiles.flatMap((filePath) => collectPricedObjects(fs.readFileSync(filePath,'utf-8'), filePath));
+  if (products.length === 0) throw new Error('Canonical Store pricing catalogs contain zero priced products; inventory integrity cannot be proven');
   return products;
 }
 

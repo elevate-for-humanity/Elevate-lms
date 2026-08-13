@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
+import { getStripe, stripeCall } from '@/lib/stripe/client';
+import { hydrateProcessEnv } from '@/lib/secrets';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,9 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   if (!requestedPlan || !(requestedPlan in PLANS)) redirect('/pricing/sponsor-licensing?error=invalid-plan');
   const plan = requestedPlan as PlanKey;
 
-  if (!process.env.STRIPE_SECRET_KEY) {
+  await hydrateProcessEnv().catch(() => undefined);
+  const stripe = getStripe();
+  if (!stripe) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50">
         <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
@@ -37,12 +40,11 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
   }
 
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2026-02-25.clover' });
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await stripeCall(() => stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: PLANS[plan].priceId, quantity: 1 }],
@@ -53,7 +55,7 @@ export default async function CheckoutPage({ searchParams }: { searchParams: Pro
       allow_promotion_codes: true,
       billing_address_collection: 'required',
       phone_number_collection: { enabled: true },
-    });
+    }));
 
     if (user) await supabase.from('license_leads').insert({ email: user.email, plan, source: 'website' });
     if (!session.url) redirect('/pricing/sponsor-licensing?error=checkout');

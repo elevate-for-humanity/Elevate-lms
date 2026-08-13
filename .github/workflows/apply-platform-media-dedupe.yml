@@ -1,30 +1,23 @@
-name: Apply Platform Media Dedupe
+name: Platform Media Dedupe Audit (supervised)
 
 on:
-  push:
-    branches:
-      - fix/platform-media-duplicate-gate
-    paths:
-      - 'scripts/fix-platform-media-duplicates.mjs'
-      - '.github/workflows/apply-platform-media-dedupe.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: platform-media-dedupe-${{ github.ref }}
-  cancel-in-progress: false
+  group: platform-media-dedupe-audit-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  apply:
+  audit:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout audit branch
+      - name: Checkout current supervised branch
         uses: actions/checkout@v4
         with:
-          ref: fix/platform-media-duplicate-gate
           fetch-depth: 0
 
       - name: Setup Node
@@ -32,19 +25,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Apply deterministic media replacements
-        run: node scripts/fix-platform-media-duplicates.mjs
+      - name: Verify duplicate media without mutating source
+        run: node scripts/audit-platform-media-duplicates.mjs
+        continue-on-error: true
 
-      - name: Commit generated source fixes
-        shell: bash
+      - name: Recovery policy
         run: |
-          set -euo pipefail
-          git add apps/marketing apps/lms apps/admin docs/audits
-          if git diff --cached --quiet; then
-            echo 'No deterministic media changes to commit.'
-            exit 0
-          fi
-          git config user.name 'elevate-media-audit[bot]'
-          git config user.email 'elevate-media-audit[bot]@users.noreply.github.com'
-          git commit -m 'fix(media): apply platform duplicate image sweep'
-          git push origin HEAD:fix/platform-media-duplicate-gate
+          echo 'Automatic media replacement and competing-branch pushes are disabled during supervised production recovery.'
+          echo 'Any verified media correction must be committed to release/production-recovery-20260813 after semantic review.'

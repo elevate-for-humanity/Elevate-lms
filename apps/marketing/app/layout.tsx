@@ -1,4 +1,5 @@
 /**
+ * Production recovery deploy marker: 2026-08-13.
  * IMPORTANT: client-polyfills MUST be the first import in this file.
  * It patches the browser environment (Buffer, process, etc.) before
  * any other module — including Next.js internals — runs.

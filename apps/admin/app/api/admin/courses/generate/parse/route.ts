@@ -15,9 +15,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 async function extractPdf(buffer: Buffer): Promise<string> {
-  const pdfParse = (await import('pdf-parse')).default;
-  const result = await pdfParse(buffer);
-  return result.text?.trim() ?? '';
+  const { PDFParse } = await import('pdf-parse');
+  const parser = new PDFParse({ data: buffer });
+
+  try {
+    const result = await parser.getText();
+    return result.text?.trim() ?? '';
+  } finally {
+    await parser.destroy();
+  }
 }
 
 async function extractDocx(buffer: Buffer): Promise<string> {

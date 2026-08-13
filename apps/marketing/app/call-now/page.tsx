@@ -68,8 +68,8 @@ const START_OPTIONS = [
       'Having trouble with your account, courses, or the platform? Submit a support ticket and get help fast.',
     href: '/support',
     action: 'Get Support',
-    image: '/images/pages/programs-it-hero.webp',
-    imageAlt: 'Technology and online learning support',
+    image: '/images/pages/contact-hero.jpg',
+    imageAlt: 'Technical support specialist helping with an online account',
   },
 ] as const;
 

@@ -36,6 +36,7 @@ jobs:
       - name: Verify clean starting lockfile
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
+      # pnpm-workspace.yaml is already pinned to the patched Next.js floor before this run.
       - name: Upgrade Next.js security floor in root and production services
         run: |
           pnpm --workspace-root up next@15.5.22 @next/bundle-analyzer@15.5.22 --strict-peer-dependencies=false

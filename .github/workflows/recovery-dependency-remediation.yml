@@ -1,0 +1,63 @@
+name: Recovery Dependency Remediation
+
+on:
+  push:
+    branches:
+      - release/production-recovery-20260813
+    paths:
+      - .github/workflows/recovery-dependency-remediation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  remediate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout recovery branch
+        uses: actions/checkout@v4
+        with:
+          ref: release/production-recovery-20260813
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Verify clean starting lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Apply direct security floors
+        run: |
+          pnpm up next@15.5.21 @next/bundle-analyzer@15.5.21 nodemailer@9.0.1 fast-xml-parser@5.10.1 js-yaml@5.2.2 postcss@8.5.18 react-router-dom@7.18.2 --strict-peer-dependencies=false
+
+      - name: Apply safe transitive audit fixes
+        run: pnpm audit --fix
+
+      - name: Require zero high-severity audit findings
+        run: pnpm audit --audit-level high
+
+      - name: Verify regenerated lockfile is frozen-installable
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Commit dependency remediation and remove one-shot workflow
+        run: |
+          git config user.name "elevateforhumanity"
+          git config user.email "Elizabethpowell6262@gmail.com"
+          git rm .github/workflows/recovery-dependency-remediation.yml
+          git add package.json pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "No dependency changes were produced"
+            exit 1
+          fi
+          git commit -m "fix(security): remediate high-severity dependency advisories"
+          git push origin HEAD:release/production-recovery-20260813

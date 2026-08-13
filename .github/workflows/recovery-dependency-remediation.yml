@@ -36,15 +36,21 @@ jobs:
       - name: Verify clean starting lockfile
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Apply direct security floors
+      - name: Upgrade Next.js security floor across every workspace
+        run: pnpm -r up next@15.5.22 --strict-peer-dependencies=false
+
+      - name: Upgrade root direct security floors
         run: |
-          pnpm up next@15.5.21 @next/bundle-analyzer@15.5.21 nodemailer@9.0.1 fast-xml-parser@5.10.1 js-yaml@5.2.2 postcss@8.5.18 react-router-dom@7.18.2 --strict-peer-dependencies=false
+          pnpm --workspace-root up @next/bundle-analyzer@15.5.22 nodemailer@9.0.3 fast-xml-parser@5.10.1 js-yaml@5.2.2 postcss@8.5.25 react-router-dom@7.18.2 --strict-peer-dependencies=false
 
       - name: Apply safe transitive audit fixes
         run: pnpm audit --fix
 
       - name: Require zero high-severity audit findings
         run: pnpm audit --audit-level high
+
+      - name: Verify Next.js version parity
+        run: pnpm run verify:next-parity
 
       - name: Verify regenerated lockfile is frozen-installable
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
@@ -54,7 +60,7 @@ jobs:
           git config user.name "elevateforhumanity"
           git config user.email "Elizabethpowell6262@gmail.com"
           git rm .github/workflows/recovery-dependency-remediation.yml
-          git add package.json pnpm-lock.yaml
+          git add package.json pnpm-lock.yaml apps/*/package.json
           if git diff --cached --quiet; then
             echo "No dependency changes were produced"
             exit 1

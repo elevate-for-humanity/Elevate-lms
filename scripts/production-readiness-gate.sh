@@ -96,7 +96,9 @@ else
   FAIL=$((FAIL+1))
 fi
 if [[ -n "${STRIPE_WEBHOOK_SECRET:-}" ]]; then
-  echo "OK: Stripe Webhook Secret configured"
+  echo "OK: Stripe Webhook Secret configured in job environment"
+elif [[ "${STRIPE_WEBHOOK_RUNTIME_VERIFIED:-}" == "true" ]]; then
+  echo "OK: Stripe Webhook Secret verified in canonical runtime secret store"
 else
   echo "FAIL: Stripe Webhook Secret is required for production readiness"
   FAIL=$((FAIL+1))

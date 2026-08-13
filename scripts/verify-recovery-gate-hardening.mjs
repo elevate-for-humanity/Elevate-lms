@@ -21,6 +21,13 @@ function forbidText(file, text, reason) {
   if (content.includes(text)) failures.push(`${file}: ${reason}`);
 }
 
+function protectProductionWorkflow(file) {
+  requireText(file, 'environment: production', 'Production workflow must use the protected production environment.');
+  requireText(file, 'pnpm install --frozen-lockfile', 'Production workflow must use the frozen lockfile.');
+  requireText(file, 'git merge-base --is-ancestor', 'Production workflow must prove the deployed SHA belongs to main.');
+  forbidText(file, 'pnpm install --no-frozen-lockfile', 'Production workflow must not resolve dependencies nondeterministically.');
+}
+
 requireText('.github/workflows/autopilot.yml', 'pnpm install --frozen-lockfile', 'Autopilot must use the frozen lockfile.');
 requireText('.github/workflows/autopilot.yml', 'AUTOPILOT_STRICT_TYPECHECK', 'Recovery Autopilot strict typecheck protection is missing.');
 
@@ -56,6 +63,11 @@ forbidText('.github/workflows/promote-to-production.yml', 'skipping Admin health
 requireText('.github/workflows/northflank-trigger-dispatch.yml', 'git merge-base --is-ancestor', 'Production dispatcher must prove requested SHA belongs to main.');
 requireText('.github/workflows/northflank-trigger-dispatch.yml', 'RESOLVED_SHA', 'Production dispatcher must resolve the exact requested commit.');
 
+protectProductionWorkflow('.github/workflows/deploy-marketing.yml');
+protectProductionWorkflow('.github/workflows/deploy-admin.yml');
+protectProductionWorkflow('.github/workflows/deploy-lms.yml');
+protectProductionWorkflow('.github/workflows/recover-marketing.yml');
+
 requireText('scripts/check-stripe-integrity.mjs', 'process.exit(1)', 'Stripe violations must remain blocking.');
 forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe gate must not regress to warning-only behavior.');
 
@@ -67,7 +79,7 @@ requireText('scripts/audit-migration-discipline.mjs', 'scripts/lint-migrations.c
 
 requireText('scripts/platform-doctor.mjs', 'const strictBlocks = STRICT_MODE || ENFORCE_STRICT', 'Platform Doctor --strict must directly enforce STRICT findings.');
 requireText('scripts/platform-doctor.mjs', "addCheck(name, 'fail', summary)", 'Platform Doctor timeouts must fail rather than pass.');
-requireText('scripts/platform-doctor.mjs', "pnpm typecheck:all", 'Strict Platform Doctor must run the full production typecheck.');
+requireText('scripts/platform-doctor.mjs', 'pnpm typecheck:all', 'Strict Platform Doctor must run the full production typecheck.');
 
 requireText('scripts/run-platform-doctor-strict.mjs', "PLATFORM_DOCTOR_ENFORCE_STRICT: 'true'", 'Platform Doctor strict enforcement wrapper is missing.');
 requireText('scripts/run-platform-doctor-strict.mjs', "summary.includes('timed out')", 'Platform Doctor timeout regression detection is missing.');

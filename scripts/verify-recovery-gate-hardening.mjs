@@ -28,6 +28,11 @@ function protectProductionWorkflow(file) {
   forbidText(file, 'pnpm install --no-frozen-lockfile', 'Production workflow must not resolve dependencies nondeterministically.');
 }
 
+function protectDeterministicGate(file) {
+  requireText(file, 'pnpm install --frozen-lockfile', 'Gate must use the frozen lockfile.');
+  forbidText(file, 'pnpm install --no-frozen-lockfile', 'Gate must not resolve dependencies nondeterministically.');
+}
+
 requireText('.github/workflows/autopilot.yml', 'pnpm install --frozen-lockfile', 'Autopilot must use the frozen lockfile.');
 requireText('.github/workflows/autopilot.yml', 'AUTOPILOT_STRICT_TYPECHECK', 'Recovery Autopilot strict typecheck protection is missing.');
 
@@ -37,14 +42,35 @@ forbidText('.github/workflows/repair-integrity-gate.yml', 'git checkout -B fix/'
 forbidText('.github/workflows/branch-protection.yml', 'git push origin --delete', 'Automated branch deletion must remain disabled during supervised recovery.');
 requireText('.github/workflows/branch-protection.yml', 'release/production-recovery-', 'Canonical recovery branches must be protected from cleanup.');
 
-requireText('.github/workflows/ci-cd.yml', 'pnpm install --frozen-lockfile', 'CI/CD dependency installation must remain deterministic.');
+for (const file of [
+  '.github/workflows/ci-cd.yml',
+  '.github/workflows/ci.yml',
+  '.github/workflows/build.yml',
+  '.github/workflows/compliance-gate.yml',
+  '.github/workflows/lint.yml',
+  '.github/workflows/survival-guard.yml',
+  '.github/workflows/predeploy-check.yml',
+  '.github/workflows/design-policy-enforcement.yml',
+  '.github/workflows/lockfile-check.yml',
+]) protectDeterministicGate(file);
+
 forbidText('.github/workflows/ci-cd.yml', 'package-lock.json', 'CI/CD cache must not use package-lock.json in this pnpm repository.');
 forbidText('.github/workflows/ci-cd.yml', 'Auto-rollback on health failure', 'CI/CD must not automatically rewrite main on health-check failure.');
 forbidText('.github/workflows/ci-cd.yml', 'git push origin --delete', 'CI/CD must not autonomously delete branches.');
 
-requireText('.github/workflows/predeploy-check.yml', 'pnpm install --frozen-lockfile', 'Pre-deploy dependency installation must remain deterministic.');
 requireText('.github/workflows/predeploy-check.yml', 'run: node scripts/run-platform-doctor-strict.mjs', 'Pre-deploy must use strict Platform Doctor enforcement.');
 forbidText('.github/workflows/predeploy-check.yml', 'run: pnpm platform:doctor:strict\n        continue-on-error: true', 'Main strict Platform Doctor must not be warning-only.');
+
+requireText('.github/workflows/design-policy-enforcement.yml', 'node scripts/design-enforcer.mjs --strict', 'Design policy must use the strict canonical audit.');
+requireText('.github/workflows/design-policy-enforcement.yml', 'node scripts/image-contract.mjs --strict', 'Image contract must remain strict.');
+forbidText('.github/workflows/design-policy-enforcement.yml', 'WARNING: Heavy overlays detected (non-blocking)', 'Design policy must not regress to warning-only legacy checks.');
+
+requireText('.github/workflows/compliance-gate.yml', 'pnpm audit --audit-level high', 'High-severity dependency vulnerabilities must remain blocking.');
+forbidText('.github/workflows/compliance-gate.yml', 'Security vulnerabilities found - review SECURITY_NOTES.md', 'Compliance security audit must not convert high vulnerabilities to success.');
+
+requireText('.github/workflows/consolidation-docker-northflank.yml', "'release/production-recovery-*'", 'Docker/Northflank gate must follow the canonical recovery branch.');
+requireText('.github/workflows/consolidation-gate.yml', "startsWith(github.head_ref, 'release/production-recovery-')", 'Consolidation gate must be limited to recovery branches.');
+forbidText('.github/workflows/consolidation-gate.yml', 'consolidation/unified-platform', 'Stale consolidation branch must not remain an approved integration branch.');
 
 requireText('.github/workflows/integrity-gate.yml', 'Platform media duplicate advisory', 'Visual duplicate checking must remain advisory.');
 requireText('.github/workflows/integrity-gate.yml', 'LMS course integrity check', 'LMS integrity must remain independently evaluated.');

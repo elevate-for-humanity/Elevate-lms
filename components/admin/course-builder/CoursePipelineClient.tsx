@@ -52,13 +52,17 @@ function loadDraft(): DraftConfig | null {
 function saveDraft(config: DraftConfig) {
   try {
     localStorage.setItem(DRAFT_KEY, JSON.stringify(config));
-  } catch {}
+  } catch {
+    return;
+  }
 }
 
 function clearDraft() {
   try {
     localStorage.removeItem(DRAFT_KEY);
-  } catch {}
+  } catch {
+    return;
+  }
 }
 
 export default function CoursePipelineClient({ programs, onCourseCreated }: { programs: Program[]; onCourseCreated?: (courseId: string) => void }) {
@@ -160,7 +164,9 @@ export default function CoursePipelineClient({ programs, onCourseCreated }: { pr
               }
             }
             if (event.stage === 'error') setError(event.message);
-          } catch {}
+          } catch {
+            continue;
+          }
         }
       }
     } catch (err) {

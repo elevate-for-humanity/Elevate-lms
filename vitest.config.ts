@@ -1,9 +1,7 @@
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
   // tsconfig.json uses "jsx": "preserve" for Next.js, but Vitest/esbuild needs
   // to transform JSX itself. Override here so all .tsx/.jsx files get the
   // automatic React 17+ runtime injected without requiring `import React`.

@@ -27,61 +27,58 @@ concurrency:
 
 jobs:
   static-safety:
-    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'release/production-recovery-20260813' || github.head_ref == 'consolidation/unified-platform'
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/production-recovery-')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
       - name: Validate consolidation manifests
         run: |
+          set -euo pipefail
+          test -f consolidation/feature-preservation.json
+          test -f consolidation/supervisor-tasks.json
           node -e "JSON.parse(require('fs').readFileSync('consolidation/feature-preservation.json','utf8')); JSON.parse(require('fs').readFileSync('consolidation/supervisor-tasks.json','utf8')); console.log('Consolidation manifests valid')"
-
       - name: Guard navigation service URLs
         run: node scripts/check-navigation-hardcoding.mjs
-
-      - name: Typecheck
-        run: pnpm typecheck
-
+      - name: Typecheck production applications
+        run: pnpm typecheck:all
       - name: Lint
         run: pnpm lint
-
       - name: Guard client/server boundaries
         run: |
-          if [ -f scripts/check-client-node-globals.mjs ]; then
-            node scripts/check-client-node-globals.mjs
-          fi
-
+          set -euo pipefail
+          test -f scripts/check-client-node-globals.mjs
+          node scripts/check-client-node-globals.mjs
       - name: Redirect conflict check
         run: |
-          if [ -f scripts/check-redirect-conflicts.mjs ]; then
-            node scripts/check-redirect-conflicts.mjs
-          fi
-
-      - name: Confirm protected integration policy
+          set -euo pipefail
+          test -f scripts/check-redirect-conflicts.mjs
+          node scripts/check-redirect-conflicts.mjs
+      - name: Confirm canonical integration branch
         run: |
+          set -euo pipefail
           branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
           case "$branch" in
-            release/production-recovery-20260813|consolidation/unified-platform)
+            release/production-recovery-*)
               echo "Static consolidation safety gate passed for $branch"
               ;;
             *)
-              echo "This gate is restricted to an approved integration branch: $branch"
+              echo "This gate is restricted to the canonical production recovery branch: $branch"
               exit 1
               ;;
           esac

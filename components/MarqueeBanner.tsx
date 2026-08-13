@@ -1,9 +1,8 @@
 'use client';
 
 /**
- * MarqueeBanner - announcement bar with accessible semantic structure.
- * Keeps the existing visual treatment while describing Elevate as the broader
- * AI-powered humanitarian workforce hub rather than as a traditional institute.
+ * Homepage announcement strip.
+ * Render each announcement once so the live page never shows duplicated copy.
  */
 export default function MarqueeBanner() {
   const announcements = [
@@ -13,27 +12,26 @@ export default function MarqueeBanner() {
   ];
 
   return (
-    <div className="w-full bg-brand-red-50 border-y border-brand-red-100 py-2.5 overflow-hidden" role="region" aria-label="Announcements">
+    <div
+      className="w-full border-y border-brand-red-100 bg-brand-red-50"
+      role="region"
+      aria-label="Announcements"
+    >
       <ul
-        className="flex gap-0 animate-marquee"
+        className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 py-3 text-center sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-2"
         aria-label="Announcement list"
         style={{ listStyle: 'none' }}
       >
-        {announcements.map((text, i) => (
+        {announcements.map((text, index) => (
           <li
-            key={i}
-            className="shrink-0 px-8 text-sm font-medium text-brand-red-700 whitespace-nowrap"
+            key={text}
+            className="flex items-center text-sm font-semibold text-brand-red-700"
           >
-            {text}
-          </li>
-        ))}
-        {/* Duplicate for a seamless visual loop; hidden from assistive tech. */}
-        {announcements.map((text, i) => (
-          <li
-            key={`dup-${i}`}
-            className="shrink-0 px-8 text-sm font-medium text-brand-red-700 whitespace-nowrap"
-            aria-hidden="true"
-          >
+            {index > 0 ? (
+              <span className="mr-6 hidden text-brand-red-300 sm:inline" aria-hidden="true">
+                •
+              </span>
+            ) : null}
             {text}
           </li>
         ))}

@@ -13,8 +13,8 @@ concurrency:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
       NODE_OPTIONS: --max-old-space-size=6144
     steps:
       - uses: actions/checkout@v4
@@ -25,11 +25,16 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
       - name: TypeScript — Marketing
         run: pnpm run typecheck:marketing
       - name: TypeScript — LMS
         run: pnpm run typecheck:lms
       - name: TypeScript — Admin
         run: pnpm run typecheck:admin
-      - run: pnpm lint
+      - name: Lint
+        run: pnpm lint

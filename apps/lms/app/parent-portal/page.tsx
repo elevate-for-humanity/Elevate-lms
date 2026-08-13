@@ -49,13 +49,13 @@ const FEATURES = [
     icon: Bell,
     title: 'Notifications',
     desc: 'See important program, attendance, assignment, and account updates.',
-    image: '/images/pages/admin-campaigns-hero.webp',
+    image: '/images/pages/admin-email-automation-new-d1.webp',
   },
   {
     icon: BarChart3,
     title: 'Progress Reports',
     desc: 'Review learner progress and program milestones from one secure workspace.',
-    image: '/images/pages/card-wioa.webp',
+    image: '/images/pages/admin-analytics-learning-hero.webp',
   },
   {
     icon: Shield,

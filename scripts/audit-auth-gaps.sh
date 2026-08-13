@@ -76,7 +76,7 @@ echo "--- ROLE_BLIND: admin/* routes that check identity but not role ---"
 while IFS= read -r f; do
   [[ -z "$f" ]] && continue
   has_auth=$(grep -cE "getCurrentUser|getAuthUser|requireAuth|apiAuthGuard|apiRequireAdmin|getUser\(\)|requireApiAuth|requireApiRole|withAuth|checkAuth|verifyAuth" "$f" 2>/dev/null || true)
-  has_role=$(grep -cE "apiRequireAdmin|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole" "$f" 2>/dev/null || true)
+  has_role=$(grep -cE "apiRequireAdmin|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole|API_ADMIN_ROLES|roles:\s*\[|roles:\s*[A-Z_]+" "$f" 2>/dev/null || true)
   if [[ "${has_auth:-0}" -gt 0 && "${has_role:-0}" -eq 0 ]]; then
     ROLE_BLIND=$((ROLE_BLIND + 1))
     echo "  ROLE_BLIND [BLOCKING]: $f"

@@ -83,7 +83,17 @@ jobs:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
           TEST_MODE: 'true'
       - name: Wait for server
-        run: pnpm exec wait-on http://127.0.0.1:3000 --timeout 120000
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              echo 'Marketing server is ready.'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo '::error::Marketing server did not become ready within 120 seconds.'
+          exit 1
       - name: Run canonical application-flow tests
         run: pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts
       - name: Upload test results
@@ -140,7 +150,17 @@ jobs:
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
           TEST_MODE: 'true'
       - name: Wait for server
-        run: pnpm exec wait-on http://127.0.0.1:3000 --timeout 120000
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              echo 'Marketing server is ready.'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo '::error::Marketing server did not become ready within 120 seconds.'
+          exit 1
       - name: Run accessibility tests
         run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
       - name: Homepage config leak smoke

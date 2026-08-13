@@ -36,24 +36,21 @@ jobs:
       - name: Verify clean starting lockfile
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Upgrade root Next.js packages
+      - name: Set patched dependency versions in manifests
         run: |
-          pnpm --workspace-root add next@15.5.22 --strict-peer-dependencies=false
-          pnpm --workspace-root add -D @next/bundle-analyzer@15.5.22 --strict-peer-dependencies=false
+          npm pkg set dependencies.next=15.5.22
+          npm pkg set devDependencies.@next/bundle-analyzer=15.5.22
+          npm pkg set dependencies.nodemailer=^9.0.3
+          npm pkg set dependencies.fast-xml-parser=^5.10.1
+          npm pkg set dependencies.js-yaml=^5.2.2
+          npm pkg set devDependencies.postcss=^8.5.25
+          npm pkg set devDependencies.react-router-dom=^7.18.2
+          npm pkg set dependencies.next=15.5.22 --prefix apps/marketing
+          npm pkg set dependencies.next=15.5.22 --prefix apps/lms
+          npm pkg set dependencies.next=15.5.22 --prefix apps/admin
 
-      - name: Upgrade Marketing Next.js
-        run: pnpm --dir apps/marketing add next@15.5.22 --strict-peer-dependencies=false
-
-      - name: Upgrade LMS Next.js
-        run: pnpm --dir apps/lms add next@15.5.22 --strict-peer-dependencies=false
-
-      - name: Upgrade Admin Next.js
-        run: pnpm --dir apps/admin add next@15.5.22 --strict-peer-dependencies=false
-
-      - name: Upgrade root direct security floors
-        run: |
-          pnpm --workspace-root add nodemailer@9.0.3 fast-xml-parser@5.10.1 js-yaml@5.2.2 --strict-peer-dependencies=false
-          pnpm --workspace-root add -D postcss@8.5.25 react-router-dom@7.18.2 --strict-peer-dependencies=false
+      - name: Regenerate lockfile
+        run: pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
 
       - name: Apply safe transitive audit fixes
         run: pnpm audit --fix
@@ -72,7 +69,7 @@ jobs:
           git config user.name "elevateforhumanity"
           git config user.email "Elizabethpowell6262@gmail.com"
           git rm .github/workflows/recovery-dependency-remediation.yml
-          git add package.json pnpm-lock.yaml apps/marketing/package.json apps/lms/package.json apps/admin/package.json
+          git add package.json pnpm-lock.yaml pnpm-workspace.yaml apps/marketing/package.json apps/lms/package.json apps/admin/package.json
           if git diff --cached --quiet; then
             echo "No dependency changes were produced"
             exit 1

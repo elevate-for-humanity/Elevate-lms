@@ -118,8 +118,14 @@ jobs:
       - name: TypeScript — production applications
         run: pnpm run typecheck:all
 
-      - name: Route governance (strict)
-        run: pnpm run platform:doctor:strict
+      - name: Route governance
+        run: node scripts/run-platform-doctor-strict.mjs
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder' }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org' }}
+          SKIP_ENV_VALIDATION: 'true'
 
       - name: SEO governance (advisory)
         continue-on-error: true

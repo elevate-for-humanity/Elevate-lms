@@ -19,11 +19,6 @@ run() {
   echo ""; echo "--- $name ---"
   if "$@"; then echo "OK: $name"; else echo "FAIL: $name"; FAIL=$((FAIL+1)); fi
 }
-run_warn() {
-  local name="$1"; shift
-  echo ""; echo "--- $name ---"
-  if "$@"; then echo "OK: $name"; else echo "WARN: $name"; WARN=$((WARN+1)); fi
-}
 
 section(){ echo ""; echo "=============================================="; echo "$1"; echo "=============================================="; }
 
@@ -40,7 +35,7 @@ if [[ -f scripts/audit-public-html.mjs ]]; then
     run "Public HTML hygiene" node scripts/audit-public-html.mjs
   else
     echo ""; echo "--- Public HTML hygiene ---"
-    echo "WARN: Public HTML validation was NOT executed because PUBLIC_HTML_AUDIT_BASE_URL is unset."
+    echo "WARN: Public HTML validation was not executed because PUBLIC_HTML_AUDIT_BASE_URL is unset."
     WARN=$((WARN+1))
   fi
 fi
@@ -94,8 +89,18 @@ for pattern in "example.com" "your-email" "test@test"; do
 done
 
 section "SECTION 8: STRIPE CONFIGURATION"
-if [[ -n "${STRIPE_SECRET_KEY:-}" ]]; then echo "OK: Stripe Secret Key configured"; else echo "WARN: Stripe Secret Key unavailable in this gate context"; WARN=$((WARN+1)); fi
-if [[ -n "${STRIPE_WEBHOOK_SECRET:-}" ]]; then echo "OK: Stripe Webhook Secret configured"; else echo "WARN: Stripe Webhook Secret unavailable in this gate context"; WARN=$((WARN+1)); fi
+if [[ -n "${STRIPE_SECRET_KEY:-}" ]]; then
+  echo "OK: Stripe Secret Key configured"
+else
+  echo "FAIL: Stripe Secret Key is required for production readiness"
+  FAIL=$((FAIL+1))
+fi
+if [[ -n "${STRIPE_WEBHOOK_SECRET:-}" ]]; then
+  echo "OK: Stripe Webhook Secret configured"
+else
+  echo "FAIL: Stripe Webhook Secret is required for production readiness"
+  FAIL=$((FAIL+1))
+fi
 run "Stripe implementation integrity" node scripts/check-stripe-integrity.mjs
 
 section "SECTION 9: DEPLOYMENT BLOCKERS"

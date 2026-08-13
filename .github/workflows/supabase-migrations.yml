@@ -8,10 +8,24 @@ on:
         required: false
         type: boolean
         default: false
+      confirm:
+        description: 'Type APPLY_PRODUCTION when apply=true'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-production-migrations
+  cancel-in-progress: false
 
 jobs:
   supabase-migrations:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
@@ -20,6 +34,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -42,12 +59,27 @@ jobs:
               missing=1
             fi
           done
-          if [ "$missing" -ne 0 ]; then
-            exit 1
-          fi
+          test "$missing" -eq 0
+
+      - name: Verify production apply authorization
+        if: ${{ inputs.apply == true }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test "${{ inputs.confirm }}" = "APPLY_PRODUCTION" || { echo '::error::confirm must equal APPLY_PRODUCTION when apply=true'; exit 1; }
+          REQUESTED_SHA="${{ github.sha }}"
+          git fetch origin main --depth=200
+          RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          test -n "$RESOLVED_SHA" || { echo '::error::Migration SHA cannot be resolved'; exit 1; }
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Refusing production migration from SHA not contained in main: $RESOLVED_SHA"; exit 1; }
+          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
+          echo "Authorized supervised production migration SHA $RESOLVED_SHA"
 
       - name: Lint migrations
         run: node scripts/lint-migrations.cjs
+
+      - name: Audit migration discipline
+        run: node scripts/audit-migration-discipline.mjs
 
       - name: Link production project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
@@ -65,7 +97,7 @@ jobs:
       - name: Migration mode summary
         run: |
           if [ "${{ inputs.apply }}" = "true" ]; then
-            echo "Official Supabase migration push completed."
+            echo "Official supervised Supabase migration push completed."
           else
-            echo "Audit-only run completed. Re-run with apply=true only after migration history is reconciled."
+            echo "Audit-only run completed. Re-run with apply=true and confirm=APPLY_PRODUCTION only after history is reconciled."
           fi

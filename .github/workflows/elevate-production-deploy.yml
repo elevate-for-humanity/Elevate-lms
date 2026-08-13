@@ -7,21 +7,15 @@ on:
         description: Service to deploy
         required: true
         type: choice
-        options:
-          - marketing
-          - admin
-          - lms
-          - all
+        options: [marketing, admin, lms, all]
       environment:
         description: Deployment environment
         required: true
         default: staging
         type: choice
-        options:
-          - staging
-          - production
+        options: [staging, production]
       git_sha:
-        description: Exact Git SHA to deploy
+        description: Exact Git SHA to deploy; production SHA must belong to main
         required: false
         type: string
 
@@ -34,14 +28,14 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: "22"
-  PNPM_VERSION: "10.28.2"
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.28.2'
   REGISTRY: ghcr.io
   GITHUB_OWNER: elevate-for-humanity
 
 jobs:
   prepare:
-    name: Resolve deployment
+    name: Resolve and authorize deployment
     runs-on: ubuntu-latest
     outputs:
       sha: ${{ steps.resolve.outputs.sha }}
@@ -50,73 +44,92 @@ jobs:
       deploy_admin: ${{ steps.services.outputs.admin }}
       deploy_lms: ${{ steps.services.outputs.lms }}
     steps:
-      - name: Resolve Git SHA
+      - name: Checkout repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve and validate Git SHA
         id: resolve
         shell: bash
         run: |
           set -Eeuo pipefail
-          REQUESTED_SHA="${{ inputs.git_sha }}"
-          if [[ -n "$REQUESTED_SHA" ]]; then SHA="$REQUESTED_SHA"
-          else SHA="${{ github.sha }}"; fi
-          if [[ ! "$SHA" =~ ^[a-fA-F0-9]{7,40}$ ]]; then echo "Invalid Git SHA: $SHA"; exit 1; fi
-          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          echo "short_sha=${SHA:0:12}" >> "$GITHUB_OUTPUT"
+          REQUESTED_SHA='${{ inputs.git_sha }}'
+          if [[ -n "$REQUESTED_SHA" ]]; then
+            SHA="$REQUESTED_SHA"
+          else
+            SHA='${{ github.sha }}'
+          fi
+          [[ "$SHA" =~ ^[a-fA-F0-9]{7,40}$ ]] || { echo "::error::Invalid Git SHA: $SHA"; exit 1; }
+          git fetch origin main --depth=300
+          RESOLVED_SHA="$(git rev-parse "$SHA^{commit}" 2>/dev/null || true)"
+          test -n "$RESOLVED_SHA" || { echo "::error::Git SHA cannot be resolved: $SHA"; exit 1; }
+          if [[ '${{ inputs.environment }}' == 'production' ]]; then
+            git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || {
+              echo "::error::Production SHA is not contained in main: $RESOLVED_SHA"
+              exit 1
+            }
+          fi
+          echo "sha=$RESOLVED_SHA" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${RESOLVED_SHA:0:12}" >> "$GITHUB_OUTPUT"
+          echo "Authorized ${{ inputs.environment }} deployment of $RESOLVED_SHA"
+
       - name: Resolve selected services
         id: services
         shell: bash
         run: |
           set -Eeuo pipefail
-          SERVICE="${{ inputs.service }}"
-          case "$SERVICE" in
-            marketing) echo "marketing=true" >> "$GITHUB_OUTPUT"; echo "admin=false" >> "$GITHUB_OUTPUT"; echo "lms=false" >> "$GITHUB_OUTPUT" ;;
-            admin) echo "marketing=false" >> "$GITHUB_OUTPUT"; echo "admin=true" >> "$GITHUB_OUTPUT"; echo "lms=false" >> "$GITHUB_OUTPUT" ;;
-            lms) echo "marketing=false" >> "$GITHUB_OUTPUT"; echo "admin=false" >> "$GITHUB_OUTPUT"; echo "lms=true" >> "$GITHUB_OUTPUT" ;;
-            all) echo "marketing=true" >> "$GITHUB_OUTPUT"; echo "admin=true" >> "$GITHUB_OUTPUT"; echo "lms=true" >> "$GITHUB_OUTPUT" ;;
-            *) echo "Unknown service: $SERVICE"; exit 1 ;;
+          case '${{ inputs.service }}' in
+            marketing) echo 'marketing=true' >> "$GITHUB_OUTPUT"; echo 'admin=false' >> "$GITHUB_OUTPUT"; echo 'lms=false' >> "$GITHUB_OUTPUT" ;;
+            admin) echo 'marketing=false' >> "$GITHUB_OUTPUT"; echo 'admin=true' >> "$GITHUB_OUTPUT"; echo 'lms=false' >> "$GITHUB_OUTPUT" ;;
+            lms) echo 'marketing=false' >> "$GITHUB_OUTPUT"; echo 'admin=false' >> "$GITHUB_OUTPUT"; echo 'lms=true' >> "$GITHUB_OUTPUT" ;;
+            all) echo 'marketing=true' >> "$GITHUB_OUTPUT"; echo 'admin=true' >> "$GITHUB_OUTPUT"; echo 'lms=true' >> "$GITHUB_OUTPUT" ;;
+            *) echo '::error::Unknown service selection'; exit 1 ;;
           esac
 
   validate-repository:
-    name: Validate repository
+    name: Validate repository and recovery policy
     runs-on: ubuntu-latest
     needs: prepare
+    timeout-minutes: 30
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           fetch-depth: 1
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Install pnpm
-        run: corepack prepare pnpm@${{ env.PNPM_VERSION }} --activate
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - name: Configure Node
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
-      - name: Verify pnpm version
-        run: node --version && pnpm --version
-      - name: Install dependencies
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies deterministically
         env:
           NODE_OPTIONS: --max-old-space-size=16384
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Validate required files
         shell: bash
         run: |
           set -Eeuo pipefail
           for FILE in Dockerfile.marketing Dockerfile.admin Dockerfile.lms apps/marketing/next.config.mjs apps/admin/next.config.mjs apps/lms/next.config.mjs; do
-            if [[ ! -f "$FILE" ]]; then echo "::error::Missing required file: $FILE"; exit 1; fi
-            echo "Found: $FILE"
+            test -f "$FILE" || { echo "::error::Missing required file: $FILE"; exit 1; }
           done
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
       - name: Check Docker startup commands
         shell: bash
         run: |
           set -Eeuo pipefail
           for FILE in Dockerfile.marketing Dockerfile.admin Dockerfile.lms; do
-            if ! grep -Eq 'CMD.*server\.(js|cjs)|CMD.*pnpm.*start|ENTRYPOINT.*server\.(js|cjs)' "$FILE"; then
+            grep -Eq 'CMD.*server\.(js|cjs)|CMD.*pnpm.*start|ENTRYPOINT.*server\.(js|cjs)' "$FILE" || {
               echo "::error file=$FILE::No valid production startup command found."
               exit 1
-            fi
+            }
           done
 
   build-marketing:
@@ -126,13 +139,11 @@ jobs:
     if: needs.prepare.outputs.deploy_marketing == 'true'
     timeout-minutes: 45
     steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           fetch-depth: 1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Build marketing image
         uses: docker/build-push-action@v6
         with:
@@ -149,21 +160,10 @@ jobs:
             BUILD_TIMESTAMP=${{ github.event.repository.updated_at }}
           cache-from: type=gha,scope=marketing
           cache-to: type=gha,mode=max,scope=marketing
-      - name: Verify image contains runnable application
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          docker run --rm --entrypoint sh elevate-marketing:test -c '
-            set -e
-            if [ -f server.js ]; then echo "Found server.js"; exit 0; fi
-            if [ -f .next/standalone/server.js ]; then echo "Found standalone server.js"; exit 0; fi
-            if [ -f package.json ]; then echo "Found package.json"; exit 0; fi
-            echo "No valid startup application was found."; exit 1
-          '
       - name: Smoke test marketing container
         run: |
           chmod +x scripts/smoke-test-container.sh
-          scripts/smoke-test-container.sh "elevate-marketing:test" "marketing-smoke" "3100"
+          scripts/smoke-test-container.sh elevate-marketing:test marketing-smoke 3100
 
   build-admin:
     name: Build and test Admin
@@ -172,13 +172,11 @@ jobs:
     if: needs.prepare.outputs.deploy_admin == 'true'
     timeout-minutes: 60
     steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           fetch-depth: 1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Build admin image
         uses: docker/build-push-action@v6
         with:
@@ -195,21 +193,10 @@ jobs:
             NODE_OPTIONS=--max-old-space-size=16384
           cache-from: type=gha,scope=admin
           cache-to: type=gha,mode=max,scope=admin
-      - name: Verify image contains runnable application
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          docker run --rm --entrypoint sh elevate-admin:test -c '
-            set -e
-            if [ -f server.js ]; then echo "Found server.js"; exit 0; fi
-            if [ -f .next/standalone/server.js ]; then echo "Found standalone server.js"; exit 0; fi
-            if [ -f package.json ]; then echo "Found package.json"; exit 0; fi
-            echo "No valid Admin startup application was found."; exit 1
-          '
       - name: Smoke test admin container
         run: |
           chmod +x scripts/smoke-test-container.sh
-          scripts/smoke-test-container.sh "elevate-admin:test" "admin-smoke" "3200"
+          scripts/smoke-test-container.sh elevate-admin:test admin-smoke 3200
 
   build-lms:
     name: Build and test LMS
@@ -218,13 +205,11 @@ jobs:
     if: needs.prepare.outputs.deploy_lms == 'true'
     timeout-minutes: 60
     steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           fetch-depth: 1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Build LMS image
         uses: docker/build-push-action@v6
         with:
@@ -241,21 +226,10 @@ jobs:
             NODE_OPTIONS=--max-old-space-size=16384
           cache-from: type=gha,scope=lms
           cache-to: type=gha,mode=max,scope=lms
-      - name: Verify image contains runnable application
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          docker run --rm --entrypoint sh elevate-lms:test -c '
-            set -e
-            if [ -f server.js ]; then echo "Found server.js"; exit 0; fi
-            if [ -f .next/standalone/server.js ]; then echo "Found standalone server.js"; exit 0; fi
-            if [ -f package.json ]; then echo "Found package.json"; exit 0; fi
-            echo "No valid LMS startup application was found."; exit 1
-          '
       - name: Smoke test LMS container
         run: |
           chmod +x scripts/smoke-test-container.sh
-          scripts/smoke-test-container.sh "elevate-lms:test" "lms-smoke" "3300"
+          scripts/smoke-test-container.sh elevate-lms:test lms-smoke 3300
 
   publish-images:
     name: Publish validated images
@@ -272,13 +246,11 @@ jobs:
       admin_image: ${{ steps.images.outputs.admin_image }}
       lms_image: ${{ steps.images.outputs.lms_image }}
     steps:
-      - name: Checkout exact commit
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ needs.prepare.outputs.sha }}
           fetch-depth: 1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v3
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -351,37 +323,24 @@ jobs:
     needs: [prepare, publish-images]
     if: inputs.environment == 'staging'
     steps:
-      - name: Trigger Northflank marketing staging deployment
-        if: needs.prepare.outputs.deploy_marketing == 'true'
+      - name: Trigger selected staging deployments
+        shell: bash
         env:
-          WEBHOOK_URL: ${{ secrets.NORTHFLANK_MARKETING_STAGING_WEBHOOK }}
-          IMAGE_TAG: ${{ needs.publish-images.outputs.marketing_image }}
-        run: scripts/trigger-northflank.sh "$WEBHOOK_URL" "$IMAGE_TAG"
-      - name: Trigger Northflank admin staging deployment
-        if: needs.prepare.outputs.deploy_admin == 'true'
-        env:
-          WEBHOOK_URL: ${{ secrets.NORTHFLANK_ADMIN_STAGING_WEBHOOK }}
-          IMAGE_TAG: ${{ needs.publish-images.outputs.admin_image }}
-        run: scripts/trigger-northflank.sh "$WEBHOOK_URL" "$IMAGE_TAG"
-      - name: Trigger Northflank LMS staging deployment
-        if: needs.prepare.outputs.deploy_lms == 'true'
-        env:
-          WEBHOOK_URL: ${{ secrets.NORTHFLANK_LMS_STAGING_WEBHOOK }}
-          IMAGE_TAG: ${{ needs.publish-images.outputs.lms_image }}
-        run: scripts/trigger-northflank.sh "$WEBHOOK_URL" "$IMAGE_TAG"
+          MKT: ${{ secrets.NORTHFLANK_MARKETING_STAGING_WEBHOOK }}
+          ADM: ${{ secrets.NORTHFLANK_ADMIN_STAGING_WEBHOOK }}
+          LMS: ${{ secrets.NORTHFLANK_LMS_STAGING_WEBHOOK }}
+        run: |
+          set -Eeuo pipefail
+          if [[ '${{ needs.prepare.outputs.deploy_marketing }}' == 'true' ]]; then scripts/trigger-northflank.sh "$MKT" '${{ needs.publish-images.outputs.marketing_image }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_admin }}' == 'true' ]]; then scripts/trigger-northflank.sh "$ADM" '${{ needs.publish-images.outputs.admin_image }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_lms }}' == 'true' ]]; then scripts/trigger-northflank.sh "$LMS" '${{ needs.publish-images.outputs.lms_image }}'; fi
       - name: Verify staging services
         shell: bash
         run: |
           set -Eeuo pipefail
-          if [[ "${{ needs.prepare.outputs.deploy_marketing }}" == "true" ]]; then
-            scripts/wait-for-public-health.sh "https://staging.elevateforhumanity.org/api/health" "${{ needs.prepare.outputs.sha }}"
-          fi
-          if [[ "${{ needs.prepare.outputs.deploy_admin }}" == "true" ]]; then
-            scripts/wait-for-public-health.sh "https://admin-staging.elevateforhumanity.org/api/health" "${{ needs.prepare.outputs.sha }}"
-          fi
-          if [[ "${{ needs.prepare.outputs.deploy_lms }}" == "true" ]]; then
-            scripts/wait-for-public-health.sh "https://app-staging.elevateforhumanity.org/api/health" "${{ needs.prepare.outputs.sha }}"
-          fi
+          if [[ '${{ needs.prepare.outputs.deploy_marketing }}' == 'true' ]]; then scripts/wait-for-public-health.sh https://staging.elevateforhumanity.org/api/health '${{ needs.prepare.outputs.sha }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_admin }}' == 'true' ]]; then scripts/wait-for-public-health.sh https://admin-staging.elevateforhumanity.org/api/health '${{ needs.prepare.outputs.sha }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_lms }}' == 'true' ]]; then scripts/wait-for-public-health.sh https://app-staging.elevateforhumanity.org/api/health '${{ needs.prepare.outputs.sha }}'; fi
 
   deploy-production:
     name: Deploy to production
@@ -390,37 +349,24 @@ jobs:
     needs: [prepare, publish-images]
     if: inputs.environment == 'production'
     steps:
-      - name: Trigger Northflank marketing production deployment
-        if: needs.prepare.outputs.deploy_marketing == 'true'
+      - name: Trigger selected production deployments
+        shell: bash
         env:
-          WEBHOOK_URL: ${{ secrets.NORTHFLANK_MARKETING_PRODUCTION_WEBHOOK }}
-          IMAGE_TAG: ${{ needs.publish-images.outputs.marketing_image }}
-        run: scripts/trigger-northflank.sh "$WEBHOOK_URL" "$IMAGE_TAG"
-      - name: Trigger Northflank admin production deployment
-        if: needs.prepare.outputs.deploy_admin == 'true'
-        env:
-          WEBHOOK_URL: ${{ secrets.NORTHFLANK_ADMIN_PRODUCTION_WEBHOOK }}
-          IMAGE_TAG: ${{ needs.publish-images.outputs.admin_image }}
-        run: scripts/trigger-northflank.sh "$WEBHOOK_URL" "$IMAGE_TAG"
-      - name: Trigger Northflank LMS production deployment
-        if: needs.prepare.outputs.deploy_lms == 'true'
-        env:
-          WEBHOOK_URL: ${{ secrets.NORTHFLANK_LMS_PRODUCTION_WEBHOOK }}
-          IMAGE_TAG: ${{ needs.publish-images.outputs.lms_image }}
-        run: scripts/trigger-northflank.sh "$WEBHOOK_URL" "$IMAGE_TAG"
-      - name: Verify production services
+          MKT: ${{ secrets.NORTHFLANK_MARKETING_PRODUCTION_WEBHOOK }}
+          ADM: ${{ secrets.NORTHFLANK_ADMIN_PRODUCTION_WEBHOOK }}
+          LMS: ${{ secrets.NORTHFLANK_LMS_PRODUCTION_WEBHOOK }}
+        run: |
+          set -Eeuo pipefail
+          if [[ '${{ needs.prepare.outputs.deploy_marketing }}' == 'true' ]]; then scripts/trigger-northflank.sh "$MKT" '${{ needs.publish-images.outputs.marketing_image }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_admin }}' == 'true' ]]; then scripts/trigger-northflank.sh "$ADM" '${{ needs.publish-images.outputs.admin_image }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_lms }}' == 'true' ]]; then scripts/trigger-northflank.sh "$LMS" '${{ needs.publish-images.outputs.lms_image }}'; fi
+      - name: Verify production services and exact SHA
         shell: bash
         run: |
           set -Eeuo pipefail
-          if [[ "${{ needs.prepare.outputs.deploy_marketing }}" == "true" ]]; then
-            scripts/wait-for-public-health.sh "https://www.elevateforhumanity.org/api/health" "${{ needs.prepare.outputs.sha }}"
-          fi
-          if [[ "${{ needs.prepare.outputs.deploy_admin }}" == "true" ]]; then
-            scripts/wait-for-public-health.sh "https://admin.elevateforhumanity.org/api/health" "${{ needs.prepare.outputs.sha }}"
-          fi
-          if [[ "${{ needs.prepare.outputs.deploy_lms }}" == "true" ]]; then
-            scripts/wait-for-public-health.sh "https://app.elevateforhumanity.org/api/health" "${{ needs.prepare.outputs.sha }}"
-          fi
+          if [[ '${{ needs.prepare.outputs.deploy_marketing }}' == 'true' ]]; then scripts/wait-for-public-health.sh https://www.elevateforhumanity.org/api/health '${{ needs.prepare.outputs.sha }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_admin }}' == 'true' ]]; then scripts/wait-for-public-health.sh https://admin.elevateforhumanity.org/api/health '${{ needs.prepare.outputs.sha }}'; fi
+          if [[ '${{ needs.prepare.outputs.deploy_lms }}' == 'true' ]]; then scripts/wait-for-public-health.sh https://app.elevateforhumanity.org/api/health '${{ needs.prepare.outputs.sha }}'; fi
 
   deployment-failed:
     name: Deployment failure report
@@ -430,5 +376,5 @@ jobs:
     steps:
       - name: Report blocked deployment
         run: |
-          echo "::error::Deployment was blocked because validation, container startup, health verification, publishing, or deployment failed."
-          echo "No additional production deployment should be attempted until the failing step is corrected."
+          echo '::error::Deployment was blocked because validation, container startup, publishing, or exact-SHA health verification failed.'
+          echo 'Do not retry production until the failing condition is corrected.'

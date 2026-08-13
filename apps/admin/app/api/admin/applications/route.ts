@@ -1,33 +1,89 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/with-auth';
-import { API_ADMIN_ROLES } from '@/lib/rbac/role-matrix';
+import { NextResponse } from 'next/server';
+import { ApplicationCreateSchema } from '@/lib/validators/course';
+import { createApplication, listApplications } from '@/lib/db/courses';
+import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { withApiAudit } from '@/lib/audit/withApiAudit';
 
-const UNIFIED_APP = process.env.UNIFIED_APP_URL || 'https://app.elevateforhumanity.org';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-export const GET = withAuth(async (req: NextRequest) => {
-  const url = `${UNIFIED_APP}/api/admin/applications?${req.nextUrl.searchParams.toString()}`;
-  const resp = await fetch(url, {
-    headers: { cookie: req.headers.get('cookie') || '' },
-    credentials: 'include',
-    cache: 'no-store',
-  });
-  const data = await resp.json();
-  return NextResponse.json(data, { status: resp.status });
-}, { roles: API_ADMIN_ROLES });
+async function requireAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-export const POST = withAuth(async (req: NextRequest) => {
-  const url = `${UNIFIED_APP}/api/admin/applications`;
-  const body = await req.json();
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: {
-      cookie: req.headers.get('cookie') || '',
-      'content-type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(body),
-    cache: 'no-store',
-  });
-  const data = await resp.json();
-  return NextResponse.json(data, { status: resp.status });
-}, { roles: API_ADMIN_ROLES });
+  if (!user) return { error: 'Unauthorized' as const, status: 401 as const };
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!profile || !['admin', 'super_admin', 'staff', 'org_admin'].includes(profile.role)) {
+    return { error: 'Forbidden' as const, status: 403 as const };
+  }
+
+  return { user, profile, supabase };
+}
+
+async function handleGet(request: Request) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await requireAdmin();
+  if ('error' in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status') || undefined;
+    const programId = searchParams.get('program_id') || undefined;
+    const data = await listApplications({ status, programId });
+    return NextResponse.json({ data }, { status: 200 });
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+async function handlePost(request: Request) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  const auth = await requireAdmin();
+  if ('error' in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  try {
+    const body = await request.json().catch(() => null);
+    const parsed = ApplicationCreateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parsed.error.flatten() },
+        { status: 400 },
+      );
+    }
+
+    const data = await createApplication(parsed.data);
+
+    await auth.supabase.from('audit_logs').insert({
+      actor_id: auth.user.id,
+      actor_role: auth.profile.role,
+      action: 'create',
+      resource_type: 'application',
+      resource_id: data.id,
+      after_state: data,
+    });
+
+    return NextResponse.json({ data }, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export const GET = withApiAudit('/api/admin/applications', handleGet);
+export const POST = withApiAudit('/api/admin/applications', handlePost);

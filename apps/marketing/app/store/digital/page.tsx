@@ -206,7 +206,7 @@ export default function StoreDigitalPage() {
               >
                 <div className="relative h-40 overflow-hidden">
                   <Image
-                    src={product.image || '/images/pages/store-digital-detail1.jpg'}
+                    src={product.image || '/images/pages/platform-page-4.webp'}
                     alt={product.name}
                     fill
                     quality={85} className="object-cover"

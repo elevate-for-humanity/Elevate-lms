@@ -35,6 +35,10 @@ forbidText('.github/workflows/ci-cd.yml', 'package-lock.json', 'CI/CD cache must
 forbidText('.github/workflows/ci-cd.yml', 'Auto-rollback on health failure', 'CI/CD must not automatically rewrite main on health-check failure.');
 forbidText('.github/workflows/ci-cd.yml', 'git push origin --delete', 'CI/CD must not autonomously delete branches.');
 
+requireText('.github/workflows/predeploy-check.yml', 'pnpm install --frozen-lockfile', 'Pre-deploy dependency installation must remain deterministic.');
+requireText('.github/workflows/predeploy-check.yml', 'run: node scripts/run-platform-doctor-strict.mjs', 'Pre-deploy must use strict Platform Doctor enforcement.');
+forbidText('.github/workflows/predeploy-check.yml', 'run: pnpm platform:doctor:strict\n        continue-on-error: true', 'Main strict Platform Doctor must not be warning-only.');
+
 requireText('.github/workflows/integrity-gate.yml', 'Platform media duplicate advisory', 'Visual duplicate checking must remain advisory.');
 requireText('.github/workflows/integrity-gate.yml', 'LMS course integrity check', 'LMS integrity must remain independently evaluated.');
 requireText('.github/workflows/integrity-gate.yml', 'Store product integrity check', 'Store integrity must remain independently evaluated.');
@@ -45,6 +49,9 @@ forbidText('scripts/check-stripe-integrity.mjs', 'Warn only for now', 'Stripe ga
 
 requireText('scripts/audit-auth-gaps.sh', '--strict', 'Auth audit strict mode must remain available.');
 requireText('scripts/production-readiness-gate.sh', 'audit-auth-gaps.sh --strict', 'Production readiness must enforce strict auth auditing.');
+
+requireText('scripts/check-analytics-integrity.mjs', 'result.status === 1', 'Analytics audit must distinguish no-match from execution failure.');
+requireText('scripts/audit-migration-discipline.mjs', 'scripts/lint-migrations.cjs', 'Migration discipline command must remain wired to blocking migration lint.');
 
 requireText('scripts/run-platform-doctor-strict.mjs', "PLATFORM_DOCTOR_ENFORCE_STRICT: 'true'", 'Platform Doctor strict enforcement wrapper is missing.');
 requireText('scripts/run-platform-doctor-strict.mjs', "summary.includes('timed out')", 'Platform Doctor timeout-as-pass rejection is missing.');

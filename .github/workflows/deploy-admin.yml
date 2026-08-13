@@ -34,6 +34,7 @@ jobs:
   deploy-admin:
     name: Build and deploy admin on Northflank
     runs-on: ubuntu-latest
+    environment: production
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
@@ -56,27 +57,29 @@ jobs:
       USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository history
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
-          fetch-depth: 1
+          fetch-depth: 0
           clean: true
 
-      - name: Verify source commit SHA
+      - name: Prove deployment SHA belongs to main
+        shell: bash
         run: |
-          set -euo pipefail
-          ACTUAL_SHA="$(git rev-parse HEAD)"
-          EXPECTED_SHA="${{ github.sha }}"
-          echo "Expected SHA: $EXPECTED_SHA"
-          echo "Actual SHA:   $ACTUAL_SHA"
-          test "$ACTUAL_SHA" = "$EXPECTED_SHA"
+          set -Eeuo pipefail
+          REQUESTED_SHA="${{ github.sha }}"
+          git fetch origin main --depth=200
+          RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          test -n "$RESOLVED_SHA" || { echo '::error::Deployment SHA cannot be resolved'; exit 1; }
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Refusing production deploy of SHA not contained in main: $RESOLVED_SHA"; exit 1; }
+          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
           test "$(git status --porcelain)" = ""
+          echo "Verified production Admin SHA $RESOLVED_SHA"
 
       - name: Set build environment variables
         run: |
-          echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV
-          echo "BUILD_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "GITHUB_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "BUILD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
 
       - name: Generate version file
         run: |
@@ -98,13 +101,11 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      # Enforce runtime shape before deployment. This is a service PATCH, not a
-      # second image build, and prevents successful images from landing behind
-      # stale ports/probes/rollout settings.
       - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
 
@@ -114,6 +115,11 @@ jobs:
       - name: Trigger admin build
         id: trigger_admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+
+      - name: Require concrete build id
+        run: |
+          set -euo pipefail
+          test -n "${{ steps.trigger_admin_build.outputs.build_id }}" || { echo '::error::Northflank trigger returned no build_id'; exit 1; }
 
       - name: Wait for admin build to complete
         run: pnpm tsx scripts/northflank/wait-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 900000
@@ -139,8 +145,8 @@ jobs:
         run: |
           set -euo pipefail
           for i in $(seq 1 20); do
-            ping_status=$(curl -sk --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
-            health_status=$(curl -sk --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/health || true)
+            ping_status=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
+            health_status=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/health || true)
             ping_body=$(cat /tmp/admin-ping.json 2>/dev/null || true)
             health_body=$(cat /tmp/admin-health.json 2>/dev/null || true)
             if [ "$ping_status" = "200" ] && [ "$health_status" = "200" ] \
@@ -152,7 +158,7 @@ jobs:
             echo "Admin not ready: ping=${ping_status} health=${health_status}. Retry ${i}/20."
             sleep 15
           done
-          echo "Admin health contract failed after deploy."
+          echo "::error::Admin health contract failed after deploy."
           cat /tmp/admin-ping.json 2>/dev/null || true
           cat /tmp/admin-health.json 2>/dev/null || true
           exit 1
@@ -162,23 +168,17 @@ jobs:
           set -euo pipefail
           headers=/tmp/admin-login-headers.txt
           body=/tmp/admin-login-body.json
-          status=$(curl -sk --max-time 15 \
-            -D "$headers" \
-            -o "$body" \
-            -w "%{http_code}" \
-            -X POST \
-            -H 'Content-Type: application/json' \
-            -H 'Accept: application/json' \
-            --data '{}' \
-            https://admin.elevateforhumanity.org/api/auth/admin-login || true)
+          status=$(curl -sS --max-time 15 \
+            -D "$headers" -o "$body" -w "%{http_code}" -X POST \
+            -H 'Content-Type: application/json' -H 'Accept: application/json' \
+            --data '{}' https://admin.elevateforhumanity.org/api/auth/admin-login || true)
           content_type=$(awk 'BEGIN{IGNORECASE=1} /^content-type:/ {print $2}' "$headers" | tr -d '\r' | tail -1)
           echo "Admin login contract: status=${status} content-type=${content_type}"
-          cat "$body" || true
           test "$status" = "400"
           echo "$content_type" | grep -qi '^application/json'
           grep -q '"error":"Email and password required."' "$body"
           if grep -qi '<!DOCTYPE\|<html' "$body"; then
-            echo 'Admin login endpoint returned HTML instead of JSON.'
+            echo '::error::Admin login endpoint returned HTML instead of JSON.'
             exit 1
           fi
 
@@ -191,10 +191,9 @@ jobs:
         run: |
           set -euo pipefail
           for route in /dashboard /studio /course-builder /instructor/dashboard; do
-            status=$(curl -sk --max-time 15 -o /tmp/admin-route.html -w "%{http_code}" \
-              "https://admin.elevateforhumanity.org${route}" || true)
+            status=$(curl -sS --max-time 15 -o /tmp/admin-route.html -w "%{http_code}" "https://admin.elevateforhumanity.org${route}" || true)
             case "$status" in
               2*|3*) echo "${route} served HTTP ${status}." ;;
-              *) echo "${route} failed HTTP ${status}."; cat /tmp/admin-route.html || true; exit 1 ;;
+              *) echo "::error::${route} failed HTTP ${status}."; cat /tmp/admin-route.html || true; exit 1 ;;
             esac
           done

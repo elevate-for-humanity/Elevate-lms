@@ -52,6 +52,14 @@ jobs:
         run: node scripts/verify-recovery-gate-hardening.mjs
       - name: Design policy strict audit
         run: node scripts/design-enforcer.mjs --strict
+      - name: Preserve design audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-enforcer-${{ github.sha }}
+          path: artifacts/design-enforcer-report.json
+          if-no-files-found: warn
+          retention-days: 14
       - name: Image contract strict audit
         run: node scripts/image-contract.mjs --strict
       - name: Canonical hero audit

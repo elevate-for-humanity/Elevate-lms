@@ -50,9 +50,7 @@ export interface HeroVideoProps {
  * - audio-on playback is attempted first; browsers that block audible autoplay
  *   fall back to muted playback with a positive "Play audio" control;
  * - mobile switches to the page's assigned mobile source without a reload;
- * - the poster remains mounted behind the video for the full hero lifecycle;
- * - the video is revealed only after playback has started and the browser has
- *   had two animation frames to composite the first playing frame;
+ * - the poster stays visible only until a renderable video frame is ready;
  * - media errors fail to the page-specific poster instead of a broken/black frame;
  * - route changes stop all video/audio/timers immediately.
  */
@@ -293,17 +291,6 @@ export default function HeroVideo({
     await turnSoundOn();
   }
 
-  function handlePlaying() {
-    setHasStarted(true);
-    if (typeof window === 'undefined') {
-      setVideoReady(true);
-      return;
-    }
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => setVideoReady(true));
-    });
-  }
-
   function handleEnded() {
     setHasEnded(true);
     videoRef.current?.pause();
@@ -311,7 +298,7 @@ export default function HeroVideo({
   }
 
   const showVideo = Boolean(videoSrc) && !videoFailed;
-  const showPoster = Boolean(posterImage);
+  const showPoster = Boolean(posterImage) && (!showVideo || !videoReady);
   const hasSoundControl = mediaActivated && Boolean(voiceoverSrc || showVideo);
   const activeSlide = demoActive ? demoSlides[demoSlideIndex] : null;
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
@@ -341,7 +328,11 @@ export default function HeroVideo({
             preload={mediaActivated ? 'metadata' : 'none'}
             playsInline
             loop={false}
-            onPlaying={handlePlaying}
+            onCanPlay={() => setVideoReady(true)}
+            onPlaying={() => {
+              setHasStarted(true);
+              setVideoReady(true);
+            }}
             onEnded={handleEnded}
             onError={() => {
               setVideoFailed(true);
@@ -349,7 +340,7 @@ export default function HeroVideo({
               setHasStarted(false);
               setMuted(false);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-150 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           />
         ) : null}

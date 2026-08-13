@@ -1,69 +1,75 @@
-name: Supabase Auto Migrate + Seed
+name: Supabase Migration Audit (supervised)
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seeds/**'
+      - 'scripts/lint-migrations.cjs'
+      - 'scripts/audit-migration-discipline.mjs'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'supabase/migrations/**'
       - 'supabase/seeds/**'
 
-jobs:
-  supabase-db:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+concurrency:
+  group: supabase-migration-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migration-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+      - name: Lint migration history
+        run: node scripts/lint-migrations.cjs
 
-      - name: Run migrations
-        run: node scripts/db/runMigrations.js
-        env:
-          SUPABASE_MANAGEMENT_API_KEY: ${{ secrets.SUPABASE_MANAGEMENT_API_KEY }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Audit migration discipline
+        run: node scripts/audit-migration-discipline.mjs
 
-      - name: Run seed (non-fatal)
-        run: pnpm db:seed || echo "⚠️ Seed completed with warnings (non-fatal)"
-        env:
-          # Management API — used as primary runner (no direct TCP needed)
-          SUPABASE_MANAGEMENT_API_KEY: ${{ secrets.SUPABASE_MANAGEMENT_API_KEY }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-          # Direct pg — fallback for local runs
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-          # REST API (used by db:check)
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      - name: Verify migration changes are reviewable
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="HEAD~1"
+          fi
+          git diff --name-status "$BASE" HEAD -- supabase/migrations supabase/seeds || true
+          if git diff --name-status "$BASE" HEAD -- supabase/migrations | grep -Eq '^D'; then
+            echo '::error::Migration deletion detected. Migration history must not be rewritten during supervised recovery.'
+            exit 1
+          fi
 
-      - name: Check database health
-        run: pnpm db:check || echo "⚠️ DB check completed with warnings (non-fatal)"
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-
-      - name: Notify success
-        if: success()
-        run: echo "✅ Database migrations and seeds completed successfully"
-
-      - name: Notify failure
-        if: failure()
-        run: echo "❌ Database migrations failed"
+      - name: Recovery database policy
+        run: |
+          echo 'Database audit passed.'
+          echo 'This workflow does NOT apply migrations or seed production data.'
+          echo 'Production database writes require explicit supervised execution after dependency/reference tracing.'

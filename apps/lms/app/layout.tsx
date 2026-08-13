@@ -1,3 +1,4 @@
+// Production recovery deploy marker: 2026-08-13.
 import type { Metadata } from 'next';
 import './globals.css';
 import './layout.css';

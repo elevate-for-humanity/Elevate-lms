@@ -5,59 +5,167 @@ import { spawnSync } from 'node:child_process';
 
 const root = process.cwd();
 const reportPath = path.join(root, 'artifacts', 'platform-doctor-report.json');
+const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '';
+const isRecovery = branch.startsWith('release/production-recovery-');
 
-const result = spawnSync('node', ['scripts/platform-doctor.mjs', '--strict'], {
-  cwd: root,
-  stdio: 'inherit',
-  env: {
-    ...process.env,
-    PLATFORM_DOCTOR_ENFORCE_STRICT: 'true',
-  },
-});
+function validateTimeouts(report) {
+  const checks = Array.isArray(report?.checks) ? report.checks : [];
+  const invalidPasses = checks.filter((check) => {
+    const summary = String(check?.summary ?? '').toLowerCase();
+    return summary.includes('timed out') || summary.includes('treated as pass');
+  });
+  if (invalidPasses.length > 0) {
+    console.error('\nPlatform Doctor produced timeout-related failed checks:');
+    for (const check of invalidPasses) console.error(` - ${check.name}: ${check.summary}`);
+    return false;
+  }
+  return true;
+}
 
-let wrapperFailure = false;
+function runStrictProduction() {
+  const result = spawnSync('node', ['scripts/platform-doctor.mjs', '--strict'], {
+    cwd: root,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      PLATFORM_DOCTOR_ENFORCE_STRICT: 'true',
+    },
+  });
 
-if (!fs.existsSync(reportPath)) {
-  console.error('Platform Doctor did not produce artifacts/platform-doctor-report.json.');
-  wrapperFailure = true;
-} else {
+  let failed = false;
+  if (!fs.existsSync(reportPath)) {
+    console.error('Platform Doctor did not produce artifacts/platform-doctor-report.json.');
+    failed = true;
+  } else {
+    try {
+      const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+      if (!validateTimeouts(report)) failed = true;
+      if (report?.mode?.strictBlocks !== true) {
+        console.error('Platform Doctor strict findings were not configured as blocking.');
+        failed = true;
+      }
+      if (report?.status !== 'DEPLOY ALLOWED') failed = true;
+    } catch (error) {
+      console.error('Unable to parse Platform Doctor report:', error instanceof Error ? error.message : String(error));
+      failed = true;
+    }
+  }
+  if (result.error) {
+    console.error('Platform Doctor failed to execute:', result.error.message);
+    failed = true;
+  }
+  if ((result.status ?? 1) !== 0) failed = true;
+  return failed ? 1 : 0;
+}
+
+function runStatic(cwd, outPath) {
+  const result = spawnSync('node', ['scripts/platform-doctor-static.mjs', '--out', outPath], {
+    cwd,
+    stdio: 'inherit',
+    env: process.env,
+  });
+  return result.status ?? 1;
+}
+
+function runRecoveryDelta() {
+  // Keep a full current report for operator visibility. It is intentionally
+  // advisory here because recovery acceptance is based on regression delta.
+  const full = spawnSync('node', ['scripts/platform-doctor.mjs'], {
+    cwd: root,
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      PLATFORM_DOCTOR_ENFORCE_STRICT: 'false',
+    },
+  });
+  if (full.error) {
+    console.error('Platform Doctor failed to execute:', full.error.message);
+    return 1;
+  }
+  if (!fs.existsSync(reportPath)) {
+    console.error('Platform Doctor did not produce artifacts/platform-doctor-report.json.');
+    return 1;
+  }
   try {
     const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-    const checks = Array.isArray(report.checks) ? report.checks : [];
-    const invalidPasses = checks.filter((check) => {
-      const summary = String(check?.summary ?? '').toLowerCase();
-      return summary.includes('timed out') || summary.includes('treated as pass');
-    });
-
-    if (invalidPasses.length > 0) {
-      console.error('\nPlatform Doctor produced invalid timeout-as-pass results:');
-      for (const check of invalidPasses) {
-        console.error(` - ${check.name}: ${check.summary}`);
-      }
-      wrapperFailure = true;
-    }
-
-    if (report?.mode?.strictBlocks !== true) {
-      console.error('Platform Doctor strict findings were not configured as blocking.');
-      wrapperFailure = true;
-    }
-
-    if (report?.status !== 'DEPLOY ALLOWED') {
-      wrapperFailure = true;
-    }
+    if (!validateTimeouts(report)) return 1;
   } catch (error) {
     console.error('Unable to parse Platform Doctor report:', error instanceof Error ? error.message : String(error));
-    wrapperFailure = true;
+    return 1;
   }
+
+  const currentStatic = path.join(root, 'artifacts', 'platform-doctor-recovery-static.json');
+  if (runStatic(root, currentStatic) !== 0 || !fs.existsSync(currentStatic)) {
+    console.error('Current recovery static Platform Doctor scan failed to produce evidence.');
+    return 1;
+  }
+
+  let baseRef = process.env.RECOVERY_BASE_SHA || 'origin/main';
+  if (spawnSync('git', ['rev-parse', '--verify', baseRef], { cwd: root }).status !== 0) {
+    const fetch = spawnSync('git', ['fetch', 'origin', 'main', '--depth=1'], { cwd: root, stdio: 'inherit' });
+    if ((fetch.status ?? 1) !== 0) return fetch.status ?? 1;
+    baseRef = 'origin/main';
+  }
+
+  const tempDir = path.join('/tmp', `platform-doctor-base-${process.pid}`);
+  const add = spawnSync('git', ['worktree', 'add', '--detach', tempDir, baseRef], { cwd: root, stdio: 'inherit' });
+  if ((add.status ?? 1) !== 0) return add.status ?? 1;
+
+  let exitCode = 0;
+  try {
+    const targetScript = path.join(tempDir, 'scripts', 'platform-doctor-static.mjs');
+    fs.mkdirSync(path.dirname(targetScript), { recursive: true });
+    fs.copyFileSync(path.join(root, 'scripts', 'platform-doctor-static.mjs'), targetScript);
+    const baseOut = path.join(tempDir, 'artifacts', 'platform-doctor-base-static.json');
+    if (runStatic(tempDir, baseOut) !== 0 || !fs.existsSync(baseOut)) {
+      throw new Error('Base static Platform Doctor scan failed to produce evidence.');
+    }
+
+    const current = JSON.parse(fs.readFileSync(currentStatic, 'utf8'));
+    const base = JSON.parse(fs.readFileSync(baseOut, 'utf8'));
+    const stableKey = finding => [
+      finding.severity || 'CRITICAL',
+      finding.code || '',
+      finding.file || '.',
+      finding.message || '',
+    ].join('|');
+
+    const baseCritical = (base.findings || []).filter(f => f.severity === 'CRITICAL');
+    const currentCritical = (current.findings || []).filter(f => f.severity === 'CRITICAL');
+    const baseCounts = new Map();
+    for (const finding of baseCritical) {
+      const key = stableKey(finding);
+      baseCounts.set(key, (baseCounts.get(key) || 0) + 1);
+    }
+    const currentCounts = new Map();
+    for (const finding of currentCritical) {
+      const key = stableKey(finding);
+      currentCounts.set(key, (currentCounts.get(key) || 0) + 1);
+    }
+
+    const regressions = [];
+    for (const [key, count] of currentCounts) {
+      const delta = count - (baseCounts.get(key) || 0);
+      if (delta > 0) regressions.push({ key, delta });
+    }
+    const resolved = [...baseCounts].reduce((total, [key, count]) => total + Math.max(0, count - (currentCounts.get(key) || 0)), 0);
+    const newCount = regressions.reduce((total, item) => total + item.delta, 0);
+
+    console.log(`Platform Doctor recovery delta: base=${baseCritical.length} current=${currentCritical.length} new=${newCount} resolved=${resolved}`);
+    if (regressions.length > 0) {
+      console.error('FAIL: Recovery introduced new Platform Doctor CRITICAL findings:');
+      for (const item of regressions.slice(0, 50)) console.error(` - ${item.delta}x ${item.key}`);
+      exitCode = 1;
+    } else {
+      console.log('PASS: Recovery introduced no new Platform Doctor CRITICAL findings.');
+    }
+  } catch (error) {
+    console.error(`Platform Doctor recovery comparison failed: ${error instanceof Error ? error.message : String(error)}`);
+    exitCode = 1;
+  } finally {
+    spawnSync('git', ['worktree', 'remove', '--force', tempDir], { cwd: root, stdio: 'inherit' });
+  }
+  return exitCode;
 }
 
-if (result.error) {
-  console.error('Platform Doctor failed to execute:', result.error.message);
-  wrapperFailure = true;
-}
-
-if ((result.status ?? 1) !== 0) {
-  wrapperFailure = true;
-}
-
-process.exit(wrapperFailure ? 1 : 0);
+process.exit(isRecovery ? runRecoveryDelta() : runStrictProduction());

@@ -1,147 +1,40 @@
-name: Repair Integrity Gate
+name: Integrity Repair Audit (Manual)
 
 on:
-  push:
-    paths:
-      - '.github/workflows/repair-integrity-gate.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  repair:
+  audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref }}
           fetch-depth: 1
-      - name: Repair deterministic public UX/media blockers
-        shell: bash
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Reproduce public UX/media findings
         run: |
-          git checkout -B fix/integrity-public-ux
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
+          pnpm run audit:public-media-nav
+          node scripts/audit-homepage-section-media.mjs
+          node scripts/audit-platform-media-duplicates.mjs || true
 
-          paths = [
-              'apps/marketing/app/privacy/page.tsx',
-              'apps/marketing/app/how-it-works/page.tsx',
-              'apps/marketing/app/funding/page.tsx',
-              'apps/marketing/app/success-stories/page.tsx',
-              'apps/marketing/app/blog/page.tsx',
-              'apps/marketing/app/hire-graduates/page.tsx',
-              'apps/marketing/app/funding/wioa/page.tsx',
-              'components/store/GuidedProductInterview.tsx',
-          ]
-
-          def read(path):
-              return Path(path).read_text()
-
-          def write(path, text):
-              Path(path).write_text(text)
-
-          def replace_last(text, old, new):
-              pos = text.rfind(old)
-              return text if pos < 0 else text[:pos] + new + text[pos + len(old):]
-
-          # 1. Privacy hero: Next/Image fill must declare responsive sizes.
-          path = 'apps/marketing/app/privacy/page.tsx'
-          text = read(path)
-          text = re.sub(
-              r'(<Image\b(?:(?!/>)[\s\S])*?\bfill\b)(?=(?:(?!/>)[\s\S])*?/>)',
-              lambda m: m.group(1) if 'sizes=' in m.group(0) else m.group(1) + '\n          sizes="100vw"',
-              text,
-              count=1,
-          )
-          write(path, text)
-
-          # 2. How It Works: one canonical hero literal; training step gets unique media.
-          path = 'apps/marketing/app/how-it-works/page.tsx'
-          text = read(path)
-          if 'const HOW_IT_WORKS_HERO' not in text:
-              text = text.replace("'/images/pages/how-it-works-hero.webp'", 'HOW_IT_WORKS_HERO')
-              anchor = 'export const revalidate = 3600;\n'
-              text = text.replace(anchor, anchor + "\nconst HOW_IT_WORKS_HERO = '/images/pages/how-it-works-hero.webp';\n", 1)
-          text = text.replace(
-              "image: HOW_IT_WORKS_HERO,\n                cta: 'View Programs'",
-              "image: '/images/pages/certifications-page-1.webp',\n                cta: 'View Programs'",
-              1,
-          )
-          write(path, text)
-
-          # 3-4. Funding: one hero literal and unique card media.
-          path = 'apps/marketing/app/funding/page.tsx'
-          text = read(path)
-          if 'const FUNDING_HERO' not in text:
-              text = text.replace("'/images/pages/funding-page-5.webp'", 'FUNDING_HERO')
-              anchor = "import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';\n"
-              text = text.replace(anchor, anchor + "\nconst FUNDING_HERO = '/images/pages/funding-page-5.webp';\n", 1)
-          text = replace_last(text, "'/images/pages/funding-page-3.webp'", "'/images/pages/certifications-page-1.webp'")
-          write(path, text)
-
-          # 5. Success Stories: hero no longer repeats the first story's canonical counseling image.
-          path = 'apps/marketing/app/success-stories/page.tsx'
-          text = read(path)
-          text = text.replace(
-              'imageSrc="/images/learners/reentry-coaching.jpg"',
-              'imageSrc="/images/pages/healthcare-grad.jpg"',
-              1,
-          )
-          write(path, text)
-
-          # 6. Blog: OpenGraph and Twitter no longer normalize to the same campaign image literal.
-          path = 'apps/marketing/app/blog/page.tsx'
-          text = read(path)
-          text = text.replace(
-              "images: ['/images/pages/social-media-1.jpg']",
-              "images: ['/images/pages/certifications-page-1.webp']",
-              1,
-          )
-          write(path, text)
-
-          # 7. Hire Graduates gets employer-specific lead media.
-          path = 'apps/marketing/app/hire-graduates/page.tsx'
-          write(path, read(path).replace(
-              '/images/pages/comp-home-highlight-health.webp',
-              '/images/pages/about-employer-partners.webp',
-          ))
-
-          # 8. WIOA gets distinct lead media from the main Funding page.
-          path = 'apps/marketing/app/funding/wioa/page.tsx'
-          write(path, read(path).replace(
-              '/images/pages/funding-page-5.webp',
-              '/images/pages/career-counseling-page-1.webp',
-          ))
-
-          # 9. Guided interview uses deterministic high-contrast surface/text classes.
-          path = 'components/store/GuidedProductInterview.tsx'
-          write(path, read(path).replace(
-              'mt-6 rounded-2xl border border-white/10 bg-white/5 p-6 text-slate-300',
-              'mt-6 rounded-2xl border border-slate-700 bg-slate-950 p-6 text-slate-100',
-              1,
-          ))
-
-          for path in paths:
-              text = read(path)
-              text = '\n'.join(line.rstrip() for line in text.split('\n'))
-              write(path, text)
-          PY
-
-          git config user.name "elevateforhumanity"
-          git config user.email "Elizabethpowell6262@gmail.com"
-          git add apps/marketing/app/privacy/page.tsx \
-                  apps/marketing/app/how-it-works/page.tsx \
-                  apps/marketing/app/funding/page.tsx \
-                  apps/marketing/app/success-stories/page.tsx \
-                  apps/marketing/app/blog/page.tsx \
-                  apps/marketing/app/hire-graduates/page.tsx \
-                  apps/marketing/app/funding/wioa/page.tsx \
-                  components/store/GuidedProductInterview.tsx
-          git diff --cached --check
-          if git diff --cached --quiet; then
-            echo "No source changes needed"
-            exit 0
-          fi
-          git commit -m "fix(integrity): resolve public UX and media acceptance blockers"
-          git push --force-with-lease origin fix/integrity-public-ux
+      - name: Supervision policy
+        run: |
+          echo "Automatic source mutation and force-pushing repair branches are disabled."
+          echo "Repairs must be committed to the active canonical recovery branch and reviewed by the supervising recovery workflow."

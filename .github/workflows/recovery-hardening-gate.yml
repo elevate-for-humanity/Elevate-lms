@@ -25,7 +25,7 @@ jobs:
   hardening:
     if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/production-recovery-')
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     env:
       NODE_OPTIONS: '--max-old-space-size=6144'
 
@@ -51,21 +51,27 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Recovery gate regression guard
+        if: ${{ always() }}
         run: node scripts/verify-recovery-gate-hardening.mjs
 
       - name: Migration discipline
+        if: ${{ always() }}
         run: node scripts/audit-migration-discipline.mjs
 
       - name: Analytics integrity
+        if: ${{ always() }}
         run: node scripts/check-analytics-integrity.mjs
 
       - name: Strict auth audit
+        if: ${{ always() }}
         run: bash scripts/audit-auth-gaps.sh --strict
 
       - name: Stripe implementation integrity
+        if: ${{ always() }}
         run: node scripts/check-stripe-integrity.mjs
 
       - name: Platform Doctor strict enforcement
+        if: ${{ always() }}
         run: node scripts/run-platform-doctor-strict.mjs
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -74,7 +80,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Upload hardening evidence
-        if: always()
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: recovery-hardening-${{ github.sha }}

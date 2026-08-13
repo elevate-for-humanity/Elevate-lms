@@ -19,15 +19,15 @@ export async function GET(request: NextRequest) {
           name: table,
           passed: !error,
           required: true,
-          message: error ? error.message : `${table} query succeeded.`,
+          message: error ? `${table} query failed.` : `${table} query succeeded.`,
         });
       }
-    } catch (error) {
+    } catch {
       checks.push({
         name: 'workflow-database',
         passed: false,
         required: true,
-        message: error instanceof Error ? error.message : 'Workflow database check failed.',
+        message: 'Workflow database check failed.',
       });
     }
 

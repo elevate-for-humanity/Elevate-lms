@@ -3,9 +3,14 @@ name: Health Check
 on:
   workflow_dispatch:
 
+concurrency:
+  group: northflank-health-check
+  cancel-in-progress: true
+
 jobs:
   northflank-health:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -15,20 +20,22 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
-      - name: Check Northflank secrets
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies deterministically
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Require Northflank health credentials
         env:
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
           NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}
           NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID }}
         run: |
-          if [ -z "$NORTHFLANK_API_TOKEN" ] || [ -z "$NORTHFLANK_PROJECT_ID" ]; then
-            echo "⚠️ Northflank secrets not configured. Add these secrets at:"
-            echo "   https://github.com/elevate-for-humanity/Elevate-lms/settings/secrets/actions"
-            echo "   - NORTHFLANK_API_TOKEN"
-            echo "   - NORTHFLANK_PROJECT_ID"
-            echo "   - NORTHFLANK_TEAM_ID"
-            echo "Skipping health check for now."
-            exit 0
-          fi
-          pnpm tsx scripts/northflank/verify-health-checks.ts --all
+          set -euo pipefail
+          test -n "$NORTHFLANK_API_TOKEN" || { echo '::error::NORTHFLANK_API_TOKEN is missing'; exit 1; }
+          test -n "$NORTHFLANK_PROJECT_ID" || { echo '::error::NORTHFLANK_PROJECT_ID is missing'; exit 1; }
+          test -n "$NORTHFLANK_TEAM_ID" || { echo '::error::NORTHFLANK_TEAM_ID is missing'; exit 1; }
+      - name: Verify all Northflank health-check contracts
+        env:
+          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID }}
+          NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID }}
+        run: pnpm tsx scripts/northflank/verify-health-checks.ts --all

@@ -4,143 +4,55 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - 'app/**/*.tsx'
-      - 'components/**/*.tsx'
+      - 'app/**'
+      - 'app-legacy/**'
+      - 'apps/marketing/**'
+      - 'apps/lms/**'
+      - 'apps/admin/**'
+      - 'components/**'
+      - 'public/**'
+      - 'scripts/design-enforcer.mjs'
+      - 'scripts/image-contract.mjs'
+      - '.github/workflows/design-policy-enforcement.yml'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
-      - 'app/**/*.tsx'
-      - 'components/**/*.tsx'
+      - 'app/**'
+      - 'app-legacy/**'
+      - 'apps/marketing/**'
+      - 'apps/lms/**'
+      - 'apps/admin/**'
+      - 'components/**'
+      - 'public/**'
+
+concurrency:
+  group: design-policy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   enforce-design-policy:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Check for Heavy Overlays
-        id: check-overlays
-        run: |
-          echo "🔍 Checking for prohibited heavy overlays..."
-
-          # Find heavy overlays (50%+) excluding gradients and UI elements
-          VIOLATIONS=$(grep -r "bg-black/[5-9][0-9]\|bg-.*-900/[5-9][0-9]" app components --include="*.tsx" 2>/dev/null | \
-            grep -v "node_modules" | \
-            grep -v "bg-gradient" | \
-            grep -v "fixed inset-0" | \
-            grep -v "modal" | \
-            grep -v "sidebar" || true)
-
-          if [ ! -z "$VIOLATIONS" ]; then
-            echo "⚠️ WARNING: Heavy overlays detected (non-blocking)"
-            echo ""
-            echo "$VIOLATIONS"
-            echo ""
-            echo "POLICY: Heavy overlays (50%+ opacity) should be avoided on content."
-            echo ""
-            echo "ALLOWED:"
-            echo "  ✅ bg-black/40 (max) for hero sections"
-            echo "  ✅ bg-gradient-to-t from-color-900/90 to-transparent for photo cards"
-            echo ""
-            echo "REVIEW NEEDED:"
-            echo "  ⚠️ bg-black/50, bg-black/60, bg-black/70"
-            echo "  ⚠️ bg-blue-900/70, bg-purple-900/70, etc."
-            echo ""
-            echo "WHY: We have real photos of real students. Heavy overlays hide them."
-            echo ""
-            echo "FIX: Run ./scripts/enforce-design-policy.sh"
-          fi
-
-          echo "✅ Overlay check complete"
-
-      - name: Check for Placeholder Images
-        id: check-placeholders
-        run: |
-          echo "🔍 Checking for placeholder images..."
-
-          # Find placeholder image references
-          VIOLATIONS=$(grep -r "src=.*placeholder\|src=.*generic.*\\.jpg\|src=.*stock-photo" app components --include="*.tsx" 2>/dev/null | \
-            grep -v "node_modules" | \
-            grep -v "placeholder=" || true)
-
-          if [ ! -z "$VIOLATIONS" ]; then
-            echo "⚠️ WARNING: Placeholder images detected (non-blocking)"
-            echo ""
-            echo "$VIOLATIONS"
-            echo ""
-            echo "POLICY: Placeholder and generic images should be replaced."
-            echo ""
-            echo "RECOMMENDED:"
-            echo "  ✅ Use real photos from /public/images/"
-            echo "  ✅ Use real videos from /public/videos/"
-            echo ""
-            echo "REVIEW NEEDED:"
-            echo "  ⚠️ placeholder.jpg, generic-student.jpg, stock-photo.jpg"
-            echo "  ⚠️ via.placeholder.com, placeholder.com"
-            echo ""
-            echo "WHY: We have 724 real images. Use them."
-          fi
-
-          echo "✅ Placeholder check complete"
-
-      - name: Check for External Placeholder Services
-        id: check-external
-        run: |
-          echo "🔍 Checking for external placeholder services..."
-
-          VIOLATIONS=$(grep -r "via.placeholder.com\|placeholder.com\|lorempixel.com\|unsplash.it" app components --include="*.tsx" 2>/dev/null | \
-            grep -v "node_modules" || true)
-
-          if [ ! -z "$VIOLATIONS" ]; then
-            echo "⚠️ WARNING: External placeholder service detected (non-blocking)"
-            echo ""
-            echo "$VIOLATIONS"
-            echo ""
-            echo "RECOMMENDATION: External placeholder services should be replaced."
-            echo ""
-            echo "USE: Real photos from /public/images/"
-          fi
-
-          echo "✅ External placeholder check complete"
-
-      - name: Verify Hero Videos
-        id: check-videos
-        run: |
-          echo "🔍 Verifying hero video placements..."
-
-          # Check programs page
-          if ! grep -q "programs-overview-video\|hero.*video" app/programs/page.tsx; then
-            echo "⚠️  WARNING: Programs page may be missing hero video"
-          else
-            echo "✅ Programs page has hero video"
-          fi
-
-          # Check employer page
-          if ! grep -q "employer-partner-hero\|hero.*video" app/employer/page.tsx; then
-            echo "⚠️  WARNING: Employer page may be missing hero video"
-          else
-            echo "✅ Employer page has hero video"
-          fi
-
-          # Check homepage
-          if ! grep -q "hero-home.mp4\|hero.*video" app/page.tsx; then
-            echo "⚠️  WARNING: Homepage may be missing hero video"
-          else
-            echo "✅ Homepage has hero video"
-          fi
-
-      - name: Policy Check Summary
-        if: success()
-        run: |
-          echo "✅ All design policy checks passed"
-          echo ""
-          echo "Policy enforced:"
-          echo "  ✅ No heavy overlays (50%+ opacity)"
-          echo "  ✅ No placeholder images"
-          echo "  ✅ No external placeholder services"
-          echo "  ✅ Hero videos verified"
-          echo ""
-          echo "Site is compliant with design policy."
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Design policy strict audit
+        run: node scripts/design-enforcer.mjs --strict
+      - name: Image contract strict audit
+        run: node scripts/image-contract.mjs --strict
+      - name: Canonical hero audit
+        run: pnpm run audit:hero-banners

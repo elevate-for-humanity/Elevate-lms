@@ -1,14 +1,26 @@
 import { nfFetch, projectApiPath } from './lib';
 
-const projectId = 'elevate-platform';
+const projectId = process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 const services = ['elevate-lms', 'elevate-admin', 'elevate-lms-production', 'elevate-marketing'];
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!process.env.NORTHFLANK_API_TOKEN) {
+  console.error('NORTHFLANK_API_TOKEN is required.');
+  process.exit(1);
+}
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('NEXT_PUBLIC_SUPABASE_URL/SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required.');
+  process.exit(1);
+}
+
 const buildArgs = {
-  NEXT_PUBLIC_SUPABASE_URL: 'https://cuxzzpsyufcewtmicszk.supabase.co',
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNjEwNDcsImV4cCI6MjA3MzczNzA0N30.DyFtzoKha_tuhKiSIPoQlKonIpaoSYrlhzntCUvLUnA',
+  NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
   NEXT_PUBLIC_SITE_URL: 'https://www.elevateforhumanity.org',
   NEXT_PUBLIC_ADMIN_URL: 'https://admin.elevateforhumanity.org',
-  BUILD_SCOPE: '1'
+  BUILD_SCOPE: '1',
 };
 
 async function main() {
@@ -16,14 +28,12 @@ async function main() {
     console.log(`Updating build configuration for ${serviceId}...`);
     const response = await nfFetch<any>(projectApiPath(projectId, `/services/${serviceId}`));
     const s = response.data || response;
-    
-    // Fix advancedOptions validation error
-    if (s.ports && s.ports[0]) {
-      if (s.ports[0].advancedOptions === null) {
-        s.ports[0].advancedOptions = {};
+
+    if (s.ports?.[0]) {
+      if (s.ports[0].advancedOptions === null) s.ports[0].advancedOptions = {};
+      if (Array.isArray(s.ports[0].domains)) {
+        s.ports[0].domains = s.ports[0].domains.map((d: any) => typeof d === 'string' ? d : d?.name).filter(Boolean);
       }
-      // Fix domains validation error: map domain objects to strings
-      s.ports[0].domains = s.ports[0].domains.map((d: any) => typeof d === 'string' ? d : d.name);
     }
 
     const body = {
@@ -32,17 +42,20 @@ async function main() {
         ...s.buildConfiguration,
         buildArguments: {
           ...s.buildConfiguration?.buildArguments,
-          ...buildArgs
-        }
-      }
+          ...buildArgs,
+        },
+      },
     };
 
     await nfFetch(projectApiPath(projectId, `/services/combined/${serviceId}`), {
       method: 'PATCH',
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     console.log(`Successfully updated ${serviceId}.`);
   }
 }
 
-main();
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
+});

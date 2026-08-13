@@ -1,59 +1,55 @@
 /**
- * Script to check and report on product_images foreign key status
- * Run: node scripts/fix-product-images-fk.mjs
+ * Check and report on product_images foreign-key status.
+ * Requires NEXT_PUBLIC_SUPABASE_URL (or SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY.
  */
 
-const SUPABASE_URL = 'https://cuxzzpsyufcewtmicszk.supabase.co';
-const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1eHp6cHN5dWZjZXd0bWljc3prIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODE2MTA0NywiZXhwIjoyMDczNzM3MDQ3fQ.5JRYvJPzFzsVaZQkbZDLcohP7dq8LWQEFeFdVByyihE';
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL || !SERVICE_KEY) {
+  console.error('Missing SUPABASE_URL/NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.');
+  process.exit(1);
+}
 
 async function checkAndReport() {
-  console.log('🔧 Checking product_images foreign key relationship...\n');
+  console.log('Checking product_images foreign key relationship...\n');
 
-  // Check if relationship works
   const response = await fetch(
-    `${SUPABASE_URL}/rest/v1/products?select=name,product_images(id)&limit=1`,
+    `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/products?select=name,product_images(id)&limit=1`,
     {
       headers: {
-        'apikey': SERVICE_KEY,
-        'Authorization': `Bearer ${SERVICE_KEY}`
-      }
-    }
+        apikey: SERVICE_KEY,
+        Authorization: `Bearer ${SERVICE_KEY}`,
+      },
+    },
   );
 
-  const data = await response.json();
-
-  if (response.ok) {
-    console.log('✅ Foreign key relationship is WORKING');
-    console.log('   Products can now join with product_images');
-    return true;
-  } else if (data.code === 'PGRST200') {
-    console.log('❌ Foreign key relationship is BROKEN');
-    console.log('   Error:', data.message);
-    console.log('\n📝 Please run this SQL in Supabase SQL Editor:\n');
-    console.log(`
--- Fix product_images foreign key
-ALTER TABLE public.product_images 
-ADD CONSTRAINT fk_product_images_product_id 
-FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE;
-
--- Fix product_variants foreign key  
-ALTER TABLE public.product_variants 
-ADD CONSTRAINT fk_product_variants_product_id 
-FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE;
-
--- Reload PostgREST schema cache
-NOTIFY pgrst, 'reload schema';
-    `);
-    return false;
-  } else {
-    console.log('❌ Unexpected error:', data);
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    console.error(`Supabase returned non-JSON response (HTTP ${response.status}).`);
     return false;
   }
+
+  if (response.ok) {
+    console.log('Foreign key relationship is working.');
+    return true;
+  }
+
+  if (data?.code === 'PGRST200') {
+    console.error('Foreign key relationship is not available through PostgREST.');
+    console.error('Review the product_images/product_variants foreign keys in a supervised database change.');
+    return false;
+  }
+
+  console.error(`Unexpected Supabase error (HTTP ${response.status}): ${data?.code || 'unknown'}`);
+  return false;
 }
 
 checkAndReport()
-  .then(success => process.exit(success ? 0 : 1))
-  .catch(err => {
-    console.error('Error:', err);
+  .then((success) => process.exit(success ? 0 : 1))
+  .catch((err) => {
+    console.error('Foreign-key audit failed:', err instanceof Error ? err.message : String(err));
     process.exit(1);
   });

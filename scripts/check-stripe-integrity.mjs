@@ -1,64 +1,56 @@
 #!/usr/bin/env node
 
 /**
- * CI gate: Detect multiple Stripe client initializations.
- *
- * The canonical Stripe client is lib/stripe/client.ts.
- * All other files should import from there, not create their own Stripe instances.
+ * CI gate: enforce canonical Stripe client usage and scan all active app trees.
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, readdirSync, statSync, existsSync } from 'fs';
+import { join, relative, sep } from 'path';
 
+const ROOT = process.cwd();
 const CANONICAL = 'lib/stripe/client.ts';
+const SCAN_ROOTS = ['lib', 'app', 'apps'];
 
-function walkDir(dir, ext) {
+function walkDir(dir) {
   const results = [];
-  try {
-    const entries = readdirSync(dir);
-    for (const entry of entries) {
-      if (entry === 'node_modules' || entry === '.next' || entry === '.git') continue;
-      const fullPath = join(dir, entry);
-      const stat = statSync(fullPath);
-      if (stat.isDirectory()) {
-        results.push(...walkDir(fullPath, ext));
-      } else if (entry.endsWith(ext)) {
-        results.push(fullPath);
-      }
+  if (!existsSync(dir)) return results;
+  for (const entry of readdirSync(dir)) {
+    if (['node_modules', '.next', '.git', 'dist', 'coverage'].includes(entry)) continue;
+    const fullPath = join(dir, entry);
+    const stat = statSync(fullPath);
+    if (stat.isDirectory()) {
+      results.push(...walkDir(fullPath));
+    } else if (/\.(ts|tsx|js|mjs|cjs)$/.test(entry)) {
+      results.push(fullPath);
     }
-  } catch {
-    // ignore
   }
   return results;
 }
 
-const tsFiles = [...walkDir('lib', '.ts'), ...walkDir('app', '.ts')];
-
+const files = SCAN_ROOTS.flatMap(walkDir);
 const violations = [];
 
-for (const file of tsFiles) {
-  const relative = file;
-  if (relative === CANONICAL) continue;
-
+for (const file of files) {
+  const rel = relative(ROOT, file).split(sep).join('/');
+  if (rel === CANONICAL) continue;
   const content = readFileSync(file, 'utf-8');
 
-  // Check for direct Stripe instantiation (new Stripe(...))
-  if (content.includes('new Stripe(') && content.includes("from 'stripe'")) {
-    violations.push(relative);
+  const importsStripe = /from\s+['"]stripe['"]|require\(['"]stripe['"]\)/.test(content);
+  const instantiatesStripe = /new\s+Stripe\s*\(/.test(content);
+
+  if (importsStripe && instantiatesStripe) {
+    violations.push(rel);
   }
 }
 
+console.log(`Stripe integrity: scanned ${files.length} source files.`);
+
 if (violations.length > 0) {
-  console.warn(
-    `\n⚠️  Found ${violations.length} files creating their own Stripe client (should import from ${CANONICAL}):\n`,
-  );
-  for (const v of violations) {
-    console.warn(`  - ${v}`);
-  }
-  console.warn(`\nCanonical Stripe client: ${CANONICAL}`);
-  console.warn('Refactor these to import { stripe } from "@/lib/stripe/client"\n');
-  // Warn only for now
-  process.exit(0);
-} else {
-  console.log('✅ All Stripe clients use canonical import.');
+  console.error(`FAIL: Found ${violations.length} non-canonical Stripe client initialization(s):`);
+  for (const v of violations) console.error(`  - ${v}`);
+  console.error(`Canonical Stripe client: ${CANONICAL}`);
+  process.exit(1);
 }
+
+console.log('PASS: All Stripe clients use the canonical implementation.');
+process.exit(0);

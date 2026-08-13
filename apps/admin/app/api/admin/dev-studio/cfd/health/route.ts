@@ -10,14 +10,14 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
     let tablePassed = false;
-    let tableMessage = 'CFD table unavailable.';
+    let tableMessage = 'CFD project table is unavailable.';
     try {
       const db = await requireAdminClient();
       const { error } = await db.from('cfd_projects').select('id').limit(1);
       tablePassed = !error;
-      tableMessage = error ? error.message : 'CFD project table query succeeded.';
-    } catch (error) {
-      tableMessage = error instanceof Error ? error.message : 'CFD project table query failed.';
+      tableMessage = error ? 'CFD project table query failed.' : 'CFD project table query succeeded.';
+    } catch {
+      tableMessage = 'CFD project table query failed.';
     }
 
     const featureEnabled = process.env.CFD_ENABLED === 'true';

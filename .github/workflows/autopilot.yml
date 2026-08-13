@@ -7,9 +7,14 @@ on:
     branches:
       - main
 
+concurrency:
+  group: autopilot-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   autopilot:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,14 +26,17 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Install
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Autopilot
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           GENERATE_SOURCEMAP: 'false'
+          AUTOPILOT_STRICT_TYPECHECK: ${{ github.head_ref == 'release/production-recovery-20260813' && 'true' || 'false' }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

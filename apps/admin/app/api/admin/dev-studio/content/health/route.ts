@@ -10,14 +10,14 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
     let contentTablePassed = false;
-    let contentMessage = 'Content table unavailable.';
+    let contentMessage = 'Content table is unavailable.';
     try {
       const db = await requireAdminClient();
       const { error } = await db.from('content').select('id').limit(1);
       contentTablePassed = !error;
-      contentMessage = error ? error.message : 'Content table query succeeded.';
-    } catch (err) {
-      contentMessage = err instanceof Error ? err.message : 'Content table query failed.';
+      contentMessage = error ? 'Content table query failed.' : 'Content table query succeeded.';
+    } catch {
+      contentMessage = 'Content table query failed.';
     }
     return buildCapabilityHealth('content', [
       { name: 'content-table', passed: contentTablePassed, required: true, message: contentMessage },

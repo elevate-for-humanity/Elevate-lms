@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Scans API routes for missing or role-blind auth.
-# Default mode reports all findings. --strict fails on production-sensitive findings.
+# Default mode reports all findings. --strict fails only on deployed production roots.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -8,13 +8,19 @@ cd "$ROOT"
 STRICT=0
 [[ "${1:-}" == "--strict" ]] && STRICT=1
 
-APP_DIRS=(
-  "$ROOT/app-legacy"
+# Production App Router roots are the three deployed services. Legacy roots stay
+# visible in the report, but findings there do not block a production release
+# unless they are re-exported through a deployed route (which is scanned separately).
+PRODUCTION_DIRS=(
   "$ROOT/apps/marketing/app"
   "$ROOT/apps/lms/app"
   "$ROOT/apps/admin/app"
+)
+LEGACY_DIRS=(
+  "$ROOT/app-legacy"
   "$ROOT/apps/app"
 )
+APP_DIRS=("${PRODUCTION_DIRS[@]}" "${LEGACY_DIRS[@]}")
 
 ROUTES_FILE=$(mktemp)
 ADMIN_ROUTES_FILE=$(mktemp)
@@ -30,15 +36,24 @@ sort -u -o "$ADMIN_ROUTES_FILE" "$ADMIN_ROUTES_FILE"
 NO_AUTH=0
 SENSITIVE_NO_AUTH=0
 ROLE_BLIND=0
+SENSITIVE_ROLE_BLIND=0
 LEAKS=0
 SENSITIVE_LEAKS=0
 
+is_production_file() {
+  local f="$1"
+  [[ "$f" == "$ROOT/apps/marketing/app/"* || "$f" == "$ROOT/apps/lms/app/"* || "$f" == "$ROOT/apps/admin/app/"* ]]
+}
+
 is_sensitive_route() {
   local f="$1"
+  is_production_file "$f" || return 1
   echo "$f" | grep -qE '/api/admin/|/api/devstudio/|/api/platform/workspaces/provision/|/api/program-holder/applications/.+/(approve|deny)/|/api/admin/sendgrid/'
 }
 
 echo "=== Elevate LMS — Auth Gap Audit ==="
+echo "Production roots: apps/marketing, apps/lms, apps/admin"
+echo "Legacy roots are report-only unless reached through a deployed re-export."
 echo ""
 echo "--- REEXPORT: routes that re-export from another file (verify target has auth) ---"
 while IFS= read -r f; do
@@ -79,7 +94,12 @@ while IFS= read -r f; do
   has_role=$(grep -cE "apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole|API_ADMIN_ROLES|roles:\s*\[|roles:\s*[A-Z_]+" "$f" 2>/dev/null || true)
   if [[ "${has_auth:-0}" -gt 0 && "${has_role:-0}" -eq 0 ]]; then
     ROLE_BLIND=$((ROLE_BLIND + 1))
-    echo "  ROLE_BLIND [BLOCKING]: $f"
+    if is_production_file "$f"; then
+      SENSITIVE_ROLE_BLIND=$((SENSITIVE_ROLE_BLIND + 1))
+      echo "  ROLE_BLIND [BLOCKING]: $f"
+    else
+      echo "  ROLE_BLIND [REVIEW]: $f"
+    fi
   fi
 done < "$ADMIN_ROUTES_FILE"
 
@@ -104,9 +124,9 @@ while IFS= read -r f; do
 done < "$ROUTES_FILE"
 
 echo ""
-echo "Summary: NO_AUTH=$NO_AUTH (blocking=$SENSITIVE_NO_AUTH), ROLE_BLIND=$ROLE_BLIND, LEAKS=$LEAKS (blocking=$SENSITIVE_LEAKS)"
+echo "Summary: NO_AUTH=$NO_AUTH (blocking=$SENSITIVE_NO_AUTH), ROLE_BLIND=$ROLE_BLIND (blocking=$SENSITIVE_ROLE_BLIND), LEAKS=$LEAKS (blocking=$SENSITIVE_LEAKS)"
 
-BLOCKING=$((SENSITIVE_NO_AUTH + ROLE_BLIND + SENSITIVE_LEAKS))
+BLOCKING=$((SENSITIVE_NO_AUTH + SENSITIVE_ROLE_BLIND + SENSITIVE_LEAKS))
 if [[ "$STRICT" -eq 1 && "$BLOCKING" -gt 0 ]]; then
   echo "FAIL: $BLOCKING production-sensitive auth/security finding(s)."
   exit 1

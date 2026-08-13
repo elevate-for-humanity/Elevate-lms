@@ -35,64 +35,44 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
     }
   };
 
+  const shareNative = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title, text: description, url });
+        return;
+      } catch (err) {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        logger.error('Native share failed:', err);
+      }
+    }
+    await copyToClipboard();
+  };
+
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-slate-700 mr-2">Share:</span>
 
-      <a
-        href={shareLinks.facebook}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition"
-        aria-label="Share on Facebook"
-      >
+      <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition" aria-label="Share on Facebook">
         <Facebook className="w-5 h-5" />
       </a>
 
-      <a
-        href={shareLinks.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-blue-700 text-white hover:bg-brand-blue-800 transition"
-        aria-label="Share on LinkedIn"
-      >
+      <a href={shareLinks.linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-blue-700 text-white hover:bg-brand-blue-800 transition" aria-label="Share on LinkedIn">
         <Linkedin className="w-5 h-5" />
       </a>
 
-      <a
-        href={shareLinks.whatsapp}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-green-500 text-white hover:bg-brand-green-600 transition"
-        aria-label="Share on Instagram"
-      >
+      <a href={shareLinks.whatsapp} target="_blank" rel="noopener noreferrer" className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-green-500 text-white hover:bg-brand-green-600 transition" aria-label="Share via WhatsApp">
         <Instagram className="w-5 h-5" />
       </a>
 
-      <a
-        href="#"
-        onClick={(e) => { e.preventDefault(); copyToClipboard(); }}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-500 text-white hover:bg-slate-600 transition"
-        aria-label="Share"
-      >
+      <button type="button" onClick={shareNative} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-500 text-white hover:bg-slate-600 transition" aria-label="Share">
         <Share2 className="w-5 h-5" />
-      </a>
+      </button>
 
-      <a
-        href={shareLinks.email}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-600 text-white hover:bg-slate-700 transition"
-        aria-label="Share via Email"
-      >
+      <a href={shareLinks.email} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-600 text-white hover:bg-slate-700 transition" aria-label="Share via Email">
         <Mail className="w-5 h-5" />
       </a>
 
-      <button
-        onClick={copyToClipboard}
-        className={`w-10 h-10 flex items-center justify-center rounded-full transition ${
-          copied ? 'bg-brand-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-        }`}
-        aria-label="Copy link"
-      >
+      <button type="button" onClick={copyToClipboard} className={`w-10 h-10 flex items-center justify-center rounded-full transition ${copied ? 'bg-brand-green-500 text-white' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'}`} aria-label="Copy link">
         <Link2 className="w-5 h-5" />
       </button>
 

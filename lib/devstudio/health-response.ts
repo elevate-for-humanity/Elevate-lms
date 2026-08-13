@@ -39,17 +39,12 @@ export async function capabilityHealthResponse(
             name: 'health-check',
             passed: false,
             required: true,
-            message:
-              error instanceof Error
-                ? error.message
-                : 'Capability health check failed.',
+            message: 'Capability health check failed. Review server logs for details.',
           },
         ],
         checkedAt: new Date().toISOString(),
       },
       {
-        // Keep this a successful HTTP response. The structured status above is
-        // what Studio uses to show degraded/unavailable capability state.
         status: 200,
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',

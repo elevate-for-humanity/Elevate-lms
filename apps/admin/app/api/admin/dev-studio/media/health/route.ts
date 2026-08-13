@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
       const db = await requireAdminClient();
       const { error } = await db.from('media_assets').select('id').limit(1);
       databasePassed = !error;
-      databaseMessage = error ? error.message : 'Media table query succeeded.';
-    } catch (error) {
-      databaseMessage = error instanceof Error ? error.message : 'Media table query failed.';
+      databaseMessage = error ? 'Media table query failed.' : 'Media table query succeeded.';
+    } catch {
+      databaseMessage = 'Media table query failed.';
     }
 
     const storageConfigured = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL);

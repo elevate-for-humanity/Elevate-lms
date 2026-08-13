@@ -11,54 +11,56 @@ concurrency:
   group: compliance-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.28.2'
+
 jobs:
   security:
     name: Security Audit
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      - uses: pnpm/action-setup@v4
-
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Run npm audit
-        run: |
-          npm audit --audit-level=high || {
-            echo "::warning::Security vulnerabilities found - review SECURITY_NOTES.md"
-            exit 0
-          }
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Dependency security audit
+        run: pnpm audit --audit-level high
 
   e2e-enrollment:
     name: E2E Enrollment Flow
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      - uses: pnpm/action-setup@v4
-
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Install Playwright
         run: pnpm exec playwright install chromium --with-deps
-
       - name: Build application
         run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
       - name: Build marketing app
         run: pnpm --filter @elevate/marketing build --no-lint
         env:
@@ -66,7 +68,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
-
       - name: Start server
         run: pnpm --filter @elevate/marketing run start &
         env:
@@ -80,14 +81,11 @@ jobs:
           NEXTAUTH_URL: http://127.0.0.1:3000
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
-          TEST_MODE: "true"
-
+          TEST_MODE: 'true'
       - name: Wait for server
-        run: npx wait-on http://127.0.0.1:3000 --timeout 120000
-
+        run: pnpm exec wait-on http://127.0.0.1:3000 --timeout 120000
       - name: Run canonical application-flow tests
         run: pnpm exec playwright test tests/e2e/canonical-application-flow.spec.ts --config playwright.config.ts
-
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
@@ -99,28 +97,27 @@ jobs:
   accessibility:
     name: Accessibility Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      - uses: pnpm/action-setup@v4
-
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Install Playwright
         run: pnpm exec playwright install chromium --with-deps
-
       - name: Build application
         run: pnpm run ci:build
         env:
           NODE_OPTIONS: '--max-old-space-size=6144'
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
       - name: Build marketing app
         run: pnpm --filter @elevate/marketing build --no-lint
         env:
@@ -128,7 +125,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
-
       - name: Start server
         run: pnpm --filter @elevate/marketing run start &
         env:
@@ -142,17 +138,13 @@ jobs:
           NEXTAUTH_URL: http://127.0.0.1:3000
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY || '' }}
           SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY || '' }}
-          TEST_MODE: "true"
-
+          TEST_MODE: 'true'
       - name: Wait for server
-        run: npx wait-on http://127.0.0.1:3000 --timeout 120000
-
+        run: pnpm exec wait-on http://127.0.0.1:3000 --timeout 120000
       - name: Run accessibility tests
         run: pnpm exec playwright test tests/e2e/accessibility.spec.ts --config playwright.config.ts
-
       - name: Homepage config leak smoke
         run: pnpm exec playwright test tests/e2e/home-config-leaks.spec.ts --config playwright.config.ts
-
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
@@ -166,28 +158,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Verify compliance components exist
         run: |
-          echo "Checking compliance components..."
-          test -f components/compliance/PathwayDisclosure.tsx || { echo "Missing PathwayDisclosure.tsx"; exit 1; }
-          test -f components/compliance/ComplianceGuardrails.tsx || { echo "Missing ComplianceGuardrails.tsx"; exit 1; }
-          test -f components/compliance/ComplianceNotice.tsx || { echo "Missing ComplianceNotice.tsx"; exit 1; }
-          test -f components/EligibilityNotice.tsx || { echo "Missing EligibilityNotice.tsx"; exit 1; }
-          echo "✓ All compliance components present"
-
+          set -euo pipefail
+          test -f components/compliance/PathwayDisclosure.tsx
+          test -f components/compliance/ComplianceGuardrails.tsx
+          test -f components/compliance/ComplianceNotice.tsx
+          test -f components/EligibilityNotice.tsx
       - name: Verify legal pages exist
         run: |
-          echo "Checking legal pages..."
-          test -f apps/marketing/app/legal/disclosures/page.tsx || { echo "Missing disclosures page"; exit 1; }
-          test -d apps/marketing/app/terms || { echo "Missing terms"; exit 1; }
-          test -d apps/marketing/app/legal/privacy || { echo "Missing privacy policy"; exit 1; }
-          echo "✓ All legal pages present"
-
+          set -euo pipefail
+          test -f apps/marketing/app/legal/disclosures/page.tsx
+          test -d apps/marketing/app/terms
+          test -d apps/marketing/app/legal/privacy
       - name: Verify audit packet exists
         run: |
-          echo "Checking audit packet..."
-          test -d audit-packet || { echo "Missing audit-packet folder"; exit 1; }
-          test -f audit-packet/EXECUTIVE_SUMMARY.md || { echo "Missing EXECUTIVE_SUMMARY.md"; exit 1; }
-          test -f audit-packet/AUDIT_REPORT.md || { echo "Missing AUDIT_REPORT.md"; exit 1; }
-          echo "✓ Audit packet present"
+          set -euo pipefail
+          test -d audit-packet
+          test -f audit-packet/EXECUTIVE_SUMMARY.md
+          test -f audit-packet/AUDIT_REPORT.md

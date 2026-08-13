@@ -142,7 +142,7 @@ export default function WIOAEligibilityPage() {
               { title: 'Tuition', image: '/images/pages/writing-center.jpg' },
               { title: 'Books & Supplies', image: '/images/pages/writing-center-page-1.jpg' },
               { title: 'Certification Exams', image: '/images/pages/card-wioa.webp' },
-              { title: 'Support Services', image: '/images/pages/comp-home-highlight-health.webp' },
+              { title: 'Support Services', image: '/images/pages/about-supportive-services.webp' },
             ].map((item) => (
               <div
                 key={item.title}

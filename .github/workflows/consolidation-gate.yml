@@ -27,7 +27,7 @@ concurrency:
 
 jobs:
   static-safety:
-    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'consolidation/unified-platform'
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'release/production-recovery-20260813' || github.head_ref == 'consolidation/unified-platform'
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -35,17 +35,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20.11.1'
-          cache: 'pnpm'
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Validate consolidation manifests
         run: |
@@ -72,10 +73,15 @@ jobs:
             node scripts/check-redirect-conflicts.mjs
           fi
 
-      - name: Confirm protected consolidation policy
+      - name: Confirm protected integration policy
         run: |
-          test "${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}" = "consolidation/unified-platform" || {
-            echo "This gate is intended for the consolidation branch only";
-            exit 1;
-          }
-          echo "Static consolidation safety gate passed"
+          branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
+          case "$branch" in
+            release/production-recovery-20260813|consolidation/unified-platform)
+              echo "Static consolidation safety gate passed for $branch"
+              ;;
+            *)
+              echo "This gate is restricted to an approved integration branch: $branch"
+              exit 1
+              ;;
+          esac

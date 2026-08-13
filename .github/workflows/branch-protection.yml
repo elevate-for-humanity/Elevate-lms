@@ -1,20 +1,18 @@
-name: Branch Protection & Cleanup
+name: Branch Cleanup Audit
 
 on:
-  schedule:
-    - cron: '0 2 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: read
 
 concurrency:
-  group: branch-protection-cleanup
-  cancel-in-progress: false
+  group: branch-cleanup-audit
+  cancel-in-progress: true
 
 jobs:
-  cleanup-stale-branches:
+  audit-stale-branches:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,12 +25,12 @@ jobs:
       - name: Fetch remote branches
         run: git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
 
-      - name: Delete branches older than 30 days without open PRs
+      - name: Report branches older than 30 days without open PRs
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
-          set -u
+          set -euo pipefail
           owner="${REPO%%/*}"
           current_time=$(date +%s)
 
@@ -41,6 +39,7 @@ jobs:
               | grep -v '^HEAD$' \
               | grep -v '^main$' \
               | grep -v '^dependabot/' \
+              | grep -v '^release/production-recovery-' \
               | sort
           )
 
@@ -52,24 +51,18 @@ jobs:
               continue
             fi
 
-            open_prs=$(gh api -X GET search/issues \
+            if ! open_prs=$(gh api -X GET search/issues \
               -f q="repo:${REPO} is:pr is:open head:${owner}:${branch}" \
-              --jq '.total_count' 2>/dev/null || echo 0)
-
-            if [ "$open_prs" -gt 0 ]; then
-              echo "Keeping $branch: open pull request exists."
-              continue
+              --jq '.total_count'); then
+              echo "ERROR: Could not verify PR state for $branch; refusing to classify it as deletable."
+              exit 1
             fi
 
-            echo "Deleting stale branch: $branch (${days_old} days old)"
-            git push origin --delete "$branch" || echo "GitHub refused deletion of $branch"
+            if [ "$open_prs" -gt 0 ]; then
+              echo "KEEP: $branch (${days_old} days old) — open pull request exists."
+            else
+              echo "REVIEW: $branch (${days_old} days old) — no open pull request found."
+            fi
           done
 
-      - name: Report cleanup
-        run: |
-          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
-          remaining=$(git for-each-ref --format='%(refname:strip=3)' refs/remotes/origin \
-            | grep -v '^HEAD$' \
-            | grep -v '^main$' \
-            | wc -l)
-          echo "Branch cleanup complete. Remaining non-main branches: $remaining"
+          echo "Audit complete. No branches were deleted."

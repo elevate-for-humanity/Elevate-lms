@@ -74,10 +74,7 @@ export async function POST(req: NextRequest) {
         write({ stage: 'complete', result });
       } catch (error) {
         logger.error('[course-builder/pipeline] Pipeline error', error);
-        write({
-          stage: 'error',
-          message: error instanceof Error ? error.message : 'Pipeline failed',
-        });
+        write({ stage: 'error', message: 'Course pipeline failed. Review server logs for details.' });
       } finally {
         controller.close();
       }

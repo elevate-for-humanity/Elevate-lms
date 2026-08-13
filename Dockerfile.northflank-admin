@@ -49,10 +49,15 @@ RUN echo "nf-cache-invalidate-admin-2026-08-08-devstudio-import-repair"
 # STAGE 2: Dependencies
 # =============================================================================
 FROM base AS dependencies
-RUN echo "nf-deps-2026-08-08-nf-git-sha"
+RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages ./packages
+# Admin ships Debian FFmpeg in the runtime image and application code does not
+# import ffmpeg-static. Prevent its postinstall from downloading a second
+# GitHub-hosted binary; that redundant network step causes ECONNRESET failures
+# on Northflank and blocks otherwise healthy Admin releases.
+RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\\n');"
 RUN set -eux; \
     echo "PATH=${PATH}"; \
     echo "Corepack version:"; \

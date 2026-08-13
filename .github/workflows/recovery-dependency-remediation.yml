@@ -42,13 +42,13 @@ jobs:
           pnpm --workspace-root add -D @next/bundle-analyzer@15.5.22 --strict-peer-dependencies=false
 
       - name: Upgrade Marketing Next.js
-        run: pnpm --filter @elevate/marketing add next@15.5.22 --strict-peer-dependencies=false
+        run: pnpm --dir apps/marketing add next@15.5.22 --strict-peer-dependencies=false
 
       - name: Upgrade LMS Next.js
-        run: pnpm --filter @elevate/lms add next@15.5.22 --strict-peer-dependencies=false
+        run: pnpm --dir apps/lms add next@15.5.22 --strict-peer-dependencies=false
 
       - name: Upgrade Admin Next.js
-        run: pnpm --filter @elevate/admin add next@15.5.22 --strict-peer-dependencies=false
+        run: pnpm --dir apps/admin add next@15.5.22 --strict-peer-dependencies=false
 
       - name: Upgrade root direct security floors
         run: |

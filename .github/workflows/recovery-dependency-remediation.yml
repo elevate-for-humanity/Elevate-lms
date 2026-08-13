@@ -36,12 +36,16 @@ jobs:
       - name: Verify clean starting lockfile
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Upgrade Next.js security floor across every workspace
-        run: pnpm -r up next@15.5.22 --strict-peer-dependencies=false
+      - name: Upgrade Next.js security floor in root and production services
+        run: |
+          pnpm --workspace-root up next@15.5.22 @next/bundle-analyzer@15.5.22 --strict-peer-dependencies=false
+          pnpm --filter @elevate/marketing up next@15.5.22 --strict-peer-dependencies=false
+          pnpm --filter @elevate/lms up next@15.5.22 --strict-peer-dependencies=false
+          pnpm --filter @elevate/admin up next@15.5.22 --strict-peer-dependencies=false
 
       - name: Upgrade root direct security floors
         run: |
-          pnpm --workspace-root up @next/bundle-analyzer@15.5.22 nodemailer@9.0.3 fast-xml-parser@5.10.1 js-yaml@5.2.2 postcss@8.5.25 react-router-dom@7.18.2 --strict-peer-dependencies=false
+          pnpm --workspace-root up nodemailer@9.0.3 fast-xml-parser@5.10.1 js-yaml@5.2.2 postcss@8.5.25 react-router-dom@7.18.2 --strict-peer-dependencies=false
 
       - name: Apply safe transitive audit fixes
         run: pnpm audit --fix
@@ -60,7 +64,7 @@ jobs:
           git config user.name "elevateforhumanity"
           git config user.email "Elizabethpowell6262@gmail.com"
           git rm .github/workflows/recovery-dependency-remediation.yml
-          git add package.json pnpm-lock.yaml apps/*/package.json
+          git add package.json pnpm-lock.yaml apps/marketing/package.json apps/lms/package.json apps/admin/package.json
           if git diff --cached --quiet; then
             echo "No dependency changes were produced"
             exit 1

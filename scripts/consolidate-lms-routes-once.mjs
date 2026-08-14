@@ -19,6 +19,12 @@ function replaceExactPathLiterals(text, from, to) {
 }
 
 const canonicalPaths = new Map([
+  ['/dashboard', '/lms/dashboard'],
+  ['/messages', '/lms/messages'],
+  ['/notifications', '/lms/notifications'],
+  ['/orientation', '/lms/orientation'],
+  ['/profile', '/lms/profile'],
+  ['/settings', '/lms/settings'],
   ['/learner/dashboard', '/lms/dashboard'],
   ['/lms/login', '/login'],
   ['/achievements', '/lms/achievements'],
@@ -38,7 +44,7 @@ const canonicalPaths = new Map([
   ['/apprentice/resources', '/lms/library'],
 ]);
 
-for (const root of ['apps/lms/app', 'components', 'lib']) {
+for (const root of ['apps/lms/app', 'components/lms', 'components/portal', 'components/dashboard', 'components/navigation', 'lib']) {
   for (const file of walk(root)) {
     let text = fs.readFileSync(file, 'utf8');
     const original = text;
@@ -68,8 +74,6 @@ for (const root of ['apps/lms/app', 'components', 'lib']) {
   let text = fs.readFileSync(file, 'utf8');
   text = text
     .replace("title: 'Partner Portal'", "title: 'Host Shop Portal'")
-    .replace("{ href: '/notifications',", "{ href: '/lms/notifications',")
-    .replace('href="/notifications"', 'href="/lms/notifications"')
     .replace('href="/profile"', 'href="/lms/settings/profile"');
   fs.writeFileSync(file, text);
 }
@@ -81,7 +85,7 @@ for (const root of ['apps/lms/app', 'components', 'lib']) {
   fs.writeFileSync(file, text);
 }
 
-for (const file of [
+const retiredFiles = [
   'apps/lms/app/learner/page.tsx',
   'apps/lms/app/learner/dashboard/error.tsx',
   'apps/lms/app/lms/login/page.tsx',
@@ -89,17 +93,32 @@ for (const file of [
   'apps/lms/app/ai-tutor/page.tsx',
   'apps/lms/app/lms/ai-tutor/page.tsx',
   'apps/lms/app/lms/(app)/badges/page.tsx',
-]) {
+  'apps/lms/app/dashboard/page.tsx',
+  'apps/lms/app/messages/page.tsx',
+  'apps/lms/app/messages/MessagesClient.tsx',
+  'apps/lms/app/notifications/page.tsx',
+  'apps/lms/app/notifications/NotificationsClient.tsx',
+  'apps/lms/app/orientation/page.tsx',
+  'apps/lms/app/profile/page.tsx',
+  'apps/lms/app/settings/page.tsx',
+  'apps/lms/app/settings/SettingsClient.tsx',
+];
+for (const file of retiredFiles) {
   if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
 const required = [
   'apps/lms/app/login/page.tsx',
   'apps/lms/app/lms/(app)/dashboard/page.tsx',
+  'apps/lms/app/lms/(app)/messages/page.tsx',
+  'apps/lms/app/lms/(app)/notifications/page.tsx',
+  'apps/lms/app/lms/(app)/notifications/NotificationsClient.tsx',
+  'apps/lms/app/lms/(app)/orientation/page.tsx',
+  'apps/lms/app/lms/(app)/profile/page.tsx',
+  'apps/lms/app/lms/(app)/settings/page.tsx',
   'apps/lms/app/lms/(app)/achievements/page.tsx',
   'apps/lms/app/lms/(app)/ai-team/page.tsx',
   'apps/lms/app/lms/(app)/portfolio/page.tsx',
-  'apps/lms/app/lms/(app)/messages/page.tsx',
   'apps/lms/app/lms/(app)/library/page.tsx',
   'apps/lms/app/apprentice/page.tsx',
   'apps/lms/app/apprentice/billing/page.tsx',
@@ -110,24 +129,13 @@ const required = [
   'apps/lms/app/apprentice/profile/page.tsx',
   'apps/lms/app/host-shop/dashboard/page.tsx',
 ];
-
 for (const file of required) {
   if (!fs.existsSync(file)) throw new Error(`Canonical route missing: ${file}`);
 }
-
-const retiredFiles = [
-  'apps/lms/app/learner/page.tsx',
-  'apps/lms/app/lms/login/page.tsx',
-  'apps/lms/app/achievements/page.tsx',
-  'apps/lms/app/ai-tutor/page.tsx',
-  'apps/lms/app/lms/ai-tutor/page.tsx',
-  'apps/lms/app/lms/(app)/badges/page.tsx',
-];
 for (const file of retiredFiles) {
   if (fs.existsSync(file)) throw new Error(`Retired route still exists: ${file}`);
 }
 
-// Report any remaining root page that has an equivalent learner page under /lms.
 const appRoot = 'apps/lms/app';
 const canonicalRoot = 'apps/lms/app/lms/(app)';
 const canonicalPages = new Set(
@@ -150,8 +158,9 @@ for (const file of walk(appRoot).filter((entry) => entry.endsWith('/page.tsx')))
 }
 
 if (collisions.length) {
-  console.log('POTENTIAL_LMS_ROUTE_COLLISIONS');
-  for (const collision of collisions) console.log(`${collision.route} :: ${collision.file} :: ${collision.canonical}`);
+  console.error('POTENTIAL_LMS_ROUTE_COLLISIONS');
+  for (const collision of collisions) console.error(`${collision.route} :: ${collision.file} :: ${collision.canonical}`);
+  process.exitCode = 1;
 } else {
   console.log('POTENTIAL_LMS_ROUTE_COLLISIONS none');
 }

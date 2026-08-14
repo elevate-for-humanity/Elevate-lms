@@ -34,7 +34,7 @@ export default async function EnvManagerPage() {
           <Link href="/integrations" className="text-brand-blue-700 underline">
             Integration status
           </Link>
-          <Link href="/admin/studio" className="text-brand-blue-700 underline">
+          <Link href="/studio" className="text-brand-blue-700 underline">
             Dev Studio
           </Link>
           <Link href="/dashboard" className="text-brand-blue-700 underline">

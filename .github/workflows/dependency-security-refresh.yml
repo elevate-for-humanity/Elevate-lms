@@ -1,0 +1,70 @@
+name: Dependency Security Refresh
+
+on:
+  push:
+    branches:
+      - consolidate/legacy-routes-20260814
+    paths:
+      - .github/workflows/dependency-security-refresh.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: consolidate/legacy-routes-20260814
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Upgrade vulnerable direct dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const edits = [
+            ['package.json', p => {
+              p.dependencies.next = '15.5.21';
+              p.dependencies.nodemailer = '^9.0.1';
+              p.devDependencies['@next/bundle-analyzer'] = '15.5.21';
+              p.devDependencies['react-router-dom'] = '^7.18.2';
+            }],
+            ['apps/marketing/package.json', p => { p.dependencies.next = '15.5.21'; }],
+            ['apps/admin/package.json', p => { p.dependencies.next = '15.5.21'; }],
+            ['apps/lms/package.json', p => { p.dependencies.next = '15.5.21'; }],
+          ];
+          for (const [file, mutate] of edits) {
+            const p = JSON.parse(fs.readFileSync(file, 'utf8'));
+            mutate(p);
+            fs.writeFileSync(file, JSON.stringify(p, null, 2) + '\n');
+          }
+          NODE
+          pnpm install --lockfile-only --strict-peer-dependencies=false
+      - name: Verify Next parity
+        run: pnpm verify:next-parity
+      - name: Verify no high vulnerabilities
+        run: pnpm audit --audit-level high
+      - name: Commit refreshed dependency graph
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "elevate-production-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add package.json apps/marketing/package.json apps/admin/package.json apps/lms/package.json pnpm-lock.yaml
+          if git diff --cached --quiet; then
+            echo "Dependency graph already current."
+            exit 0
+          fi
+          git commit -m "fix(security): upgrade vulnerable production dependencies"
+          git push origin HEAD:consolidate/legacy-routes-20260814

@@ -61,7 +61,7 @@ export default function WIOAEligibilityPage() {
                 step: '1',
                 title: 'Register Online',
                 desc: 'Create your account at Indiana Career Connect — the state workforce portal.',
-                image: '/images/pages/online-apps-page-1.webp',
+                image: '/images/pages/office-admin-desk.jpg',
                 cta: 'Register Now',
                 href: 'https://www.indianacareerconnect.com',
                 external: true,

@@ -48,20 +48,21 @@ export default function ZeroCodeSetup({
     return `${startHref}${startHref.includes('?') ? '&' : '?'}${params.toString()}`;
   }, [answers, startHref]);
 
-  function answerCurrent(value: string) {
+  const answerCurrent = (value: string) => {
     if (!current) return;
-    setAnswers((previous) => ({ ...previous, [current.id]: value }));
-  }
+    setAnswers((prev) => ({ ...prev, [current.id]: value }));
+  };
 
-  function next() {
-    if (!current || !answers[current.id]?.trim()) return;
+  const next = () => {
+    if (!current) return;
+    if (!answers[current.id]?.trim()) return;
     setStep((value) => value + 1);
-  }
+  };
 
-  function reset() {
+  const reset = () => {
     setAnswers({});
     setStep(0);
-  }
+  };
 
   return (
     <section className="px-4 py-16" aria-label={`${productName} zero-code setup`}>
@@ -76,12 +77,7 @@ export default function ZeroCodeSetup({
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">{intro}</p>
             <div className="mt-8 space-y-3 text-sm text-slate-700">
-              {[
-                'Answer in plain English',
-                'Review the recommended setup',
-                'Open a configured starting workspace',
-                'Keep advanced controls optional',
-              ].map((item) => (
+              {['Answer in plain English', 'Review the recommended setup', 'Open a configured starting workspace', 'Keep advanced controls optional'].map((item) => (
                 <div key={item} className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />
                   <span>{item}</span>
@@ -105,15 +101,10 @@ export default function ZeroCodeSetup({
                   <span className="text-xs font-bold text-slate-400">{productName}</span>
                 </div>
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10">
-                  <div
-                    className="h-full bg-brand-red-500 transition-all"
-                    style={{ width: `${((step + 1) / questions.length) * 100}%` }}
-                  />
+                  <div className="h-full bg-brand-red-500 transition-all" style={{ width: `${((step + 1) / questions.length) * 100}%` }} />
                 </div>
                 <h3 className="mt-7 text-2xl font-black">{current.prompt}</h3>
-                {current.helper ? (
-                  <p className="mt-2 text-sm leading-6 text-slate-300">{current.helper}</p>
-                ) : null}
+                {current.helper ? <p className="mt-2 text-sm leading-6 text-slate-300">{current.helper}</p> : null}
 
                 {current.choices?.length ? (
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -124,16 +115,10 @@ export default function ZeroCodeSetup({
                           key={choice.value}
                           type="button"
                           onClick={() => answerCurrent(choice.value)}
-                          className={`rounded-2xl border p-4 text-left transition ${
-                            selected
-                              ? 'border-brand-red-400 bg-brand-red-500/15'
-                              : 'border-white/15 bg-white/5 hover:bg-white/10'
-                          }`}
+                          className={`rounded-2xl border p-4 text-left transition ${selected ? 'border-brand-red-400 bg-brand-red-500/15' : 'border-white/15 bg-white/5 hover:bg-white/10'}`}
                         >
                           <span className="font-black">{choice.label}</span>
-                          {choice.description ? (
-                            <span className="mt-1 block text-xs leading-5 text-slate-300">{choice.description}</span>
-                          ) : null}
+                          {choice.description ? <span className="mt-1 block text-xs leading-5 text-slate-300">{choice.description}</span> : null}
                         </button>
                       );
                     })}
@@ -149,20 +134,10 @@ export default function ZeroCodeSetup({
                 )}
 
                 <div className="mt-7 flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    disabled={step === 0}
-                    onClick={() => setStep((value) => Math.max(0, value - 1))}
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-4 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-30"
-                  >
+                  <button type="button" disabled={step === 0} onClick={() => setStep((value) => Math.max(0, value - 1))} className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-4 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-30">
                     <ChevronLeft className="h-4 w-4" /> Back
                   </button>
-                  <button
-                    type="button"
-                    disabled={!answers[current.id]?.trim()}
-                    onClick={next}
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black hover:bg-brand-red-500 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
+                  <button type="button" disabled={!answers[current.id]?.trim()} onClick={next} className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black hover:bg-brand-red-500 disabled:cursor-not-allowed disabled:opacity-40">
                     Continue <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -170,12 +145,10 @@ export default function ZeroCodeSetup({
             ) : (
               <div className="py-4">
                 <Sparkles className="h-9 w-9 text-brand-red-300" />
-                <p className="mt-5 text-xs font-black uppercase tracking-[.18em] text-brand-red-300">
-                  Your guided setup is ready
-                </p>
+                <p className="mt-5 text-xs font-black uppercase tracking-[.18em] text-brand-red-300">Your guided setup is ready</p>
                 <h3 className="mt-3 text-3xl font-black">Open {productName} with your answers attached.</h3>
                 <p className="mt-4 leading-7 text-slate-300">
-                  Elevate carries this setup context into the product instead of making you start from a blank screen. Review before publishing or activating anything.
+                  Elevate will carry this setup context into the product instead of making you start from a blank screen. Review before publishing or activating anything.
                 </p>
                 <div className="mt-7 space-y-2 rounded-2xl border border-white/10 bg-white/5 p-5">
                   {questions.map((question) => (
@@ -186,24 +159,11 @@ export default function ZeroCodeSetup({
                   ))}
                 </div>
                 <div className="mt-7 flex flex-wrap gap-3">
-                  <Link
-                    href={setupHref}
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black hover:bg-brand-red-500"
-                  >
+                  <Link href={setupHref} className="inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 font-black hover:bg-brand-red-500">
                     Open guided workspace <ArrowRight className="h-4 w-4" />
                   </Link>
-                  {trialHref ? (
-                    <Link href={trialHref} className="rounded-xl border border-white/20 px-5 py-3 font-black hover:bg-white/10">
-                      Start free trial
-                    </Link>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={reset}
-                    className="rounded-xl px-4 py-3 font-bold text-slate-300 hover:bg-white/10"
-                  >
-                    Start over
-                  </button>
+                  {trialHref ? <Link href={trialHref} className="rounded-xl border border-white/20 px-5 py-3 font-black hover:bg-white/10">Start free trial</Link> : null}
+                  <button type="button" onClick={reset} className="rounded-xl px-4 py-3 font-bold text-slate-300 hover:bg-white/10">Start over</button>
                 </div>
               </div>
             )}

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Clock, Loader2, ShoppingCart } from 'lucide-react';
+import { Check, Clock, Code2, Loader2, ShoppingCart, Sparkles } from 'lucide-react';
 import type { IndividualAppCatalog } from '@/lib/apps/individual-app-plans';
 
 interface Props {
@@ -43,116 +43,58 @@ export function IndividualAppPlansSection({ catalog }: Props) {
   };
 
   return (
-    <section className="py-16 px-4 bg-slate-50">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-4">
-          <span className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full text-sm font-bold">
-            <Clock className="w-4 h-4" />
-            {catalog.trialDays}-day free trial — individual account
+    <section className="bg-slate-50 px-4 py-16">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-4 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full bg-brand-blue-100 px-4 py-2 text-sm font-bold text-brand-blue-800">
+            <Clock className="h-4 w-4" /> {catalog.trialDays}-day free trial — individual account
           </span>
         </div>
-        <h2 className="text-3xl font-bold text-center text-slate-900 mb-2">Individual plans</h2>
-        <p className="text-slate-600 text-center mb-4 max-w-2xl mx-auto">{catalog.tagline}</p>
-        <p className="text-center mb-10">
-          <Link
-            href={catalog.trialHref}
-            className="text-brand-blue-600 font-semibold hover:underline"
-          >
-            Start free trial (no card)
-          </Link>
-          {catalog.importHref ? (
-            <>
-              {' '}
-              ·{' '}
-              <Link href={catalog.importHref} className="text-brand-blue-600 font-semibold hover:underline">
-                Import an existing website
-              </Link>
-            </>
-          ) : null}
+        <h2 className="mb-2 text-center text-3xl font-bold text-slate-900">Choose how much control you need</h2>
+        <p className="mx-auto mb-6 max-w-3xl text-center text-slate-600">Every plan starts with the zero-code guided experience. Higher tiers add capacity and advanced controls; customers should not need developer tools just to get started.</p>
+        <div className="mx-auto mb-10 grid max-w-4xl gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5"><div className="flex items-center gap-2 font-black text-emerald-900"><Sparkles className="h-5 w-5"/>Simple Mode — default</div><p className="mt-2 text-sm leading-6 text-emerald-900/80">Plain-English setup, AI guidance, visual controls and recommended next steps. No code required.</p></div>
+          <div className="rounded-2xl border border-slate-300 bg-white p-5"><div className="flex items-center gap-2 font-black text-slate-900"><Code2 className="h-5 w-5"/>Advanced Mode — higher tiers</div><p className="mt-2 text-sm leading-6 text-slate-600">Custom domains, API access, white-label, multi-user controls, advanced integrations and other power-user features appear only when the plan includes them.</p></div>
+        </div>
+
+        <p className="mb-10 text-center">
+          <Link href={catalog.trialHref} className="font-semibold text-brand-blue-600 hover:underline">Start free trial (no card)</Link>
+          {catalog.importHref ? <>{' '}·{' '}<Link href={catalog.importHref} className="font-semibold text-brand-blue-600 hover:underline">Import an existing website</Link></> : null}
         </p>
 
-        {error && (
-          <p className="mb-6 text-center text-sm text-brand-red-600 bg-brand-red-50 border border-brand-red-200 rounded-lg py-2 px-4 max-w-lg mx-auto">
-            {error}
-          </p>
-        )}
+        {error && <p className="mx-auto mb-6 max-w-lg rounded-lg border border-brand-red-200 bg-brand-red-50 px-4 py-2 text-center text-sm text-brand-red-600">{error}</p>}
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid gap-8 md:grid-cols-3">
           {catalog.plans.map((plan) => {
             const popular = plan.popular;
+            const tierMessage = plan.id === 'starter'
+              ? 'Best for getting started with the guided, zero-code workflow.'
+              : plan.id === 'professional'
+                ? 'Adds business-ready capabilities and removes common Starter limits.'
+                : 'Adds advanced controls, scale, API/white-label capabilities where supported.';
             return (
-              <div
-                key={plan.id}
-                className={`rounded-2xl p-8 flex flex-col ${
-                  popular
-                    ? 'bg-brand-blue-600 text-white ring-4 ring-brand-blue-300 shadow-xl'
-                    : 'bg-white border border-slate-200'
-                }`}
-              >
-                {popular && (
-                  <span className="self-start bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">
-                    MOST POPULAR
-                  </span>
-                )}
-                <h3 className={`text-2xl font-bold ${popular ? 'text-white' : 'text-slate-900'}`}>
-                  {plan.name}
-                </h3>
-                <div className="mt-4 mb-6">
-                  <span className="text-4xl font-bold">${plan.priceMonthly}</span>
-                  <span className={popular ? 'text-brand-blue-100' : 'text-slate-600'}>/mo</span>
-                </div>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check
-                        className={`w-5 h-5 flex-shrink-0 ${popular ? 'text-white' : 'text-brand-green-600'}`}
-                      />
-                      <span className={popular ? 'text-white' : 'text-slate-700'}>{f}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div key={plan.id} className={`flex flex-col rounded-2xl p-8 ${popular ? 'bg-brand-blue-600 text-white shadow-xl ring-4 ring-brand-blue-300' : 'border border-slate-200 bg-white'}`}>
+                {popular && <span className="mb-3 self-start rounded-full bg-brand-red-600 px-3 py-1 text-xs font-bold text-white">MOST POPULAR</span>}
+                <h3 className={`text-2xl font-bold ${popular ? 'text-white' : 'text-slate-900'}`}>{plan.name}</h3>
+                <p className={`mt-2 text-sm leading-6 ${popular ? 'text-brand-blue-100' : 'text-slate-500'}`}>{tierMessage}</p>
+                <div className="mb-6 mt-4"><span className="text-4xl font-bold">${plan.priceMonthly}</span><span className={popular ? 'text-brand-blue-100' : 'text-slate-600'}>/mo</span></div>
+                <ul className="mb-8 flex-1 space-y-3">{plan.features.map((f) => <li key={f} className="flex items-start gap-2 text-sm"><Check className={`h-5 w-5 flex-shrink-0 ${popular ? 'text-white' : 'text-brand-green-600'}`} /><span className={popular ? 'text-white' : 'text-slate-700'}>{f}</span></li>)}</ul>
                 <div className="space-y-2">
-                  <button
-                    type="button"
-                    disabled={loadingPlan !== null}
-                    onClick={() => subscribe(plan.id)}
-                    className={`w-full py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors disabled:opacity-60 ${
-                      popular
-                        ? 'bg-white text-brand-blue-700 hover:bg-brand-blue-50'
-                        : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
-                    }`}
-                  >
-                    {loadingPlan === plan.id ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <ShoppingCart className="w-4 h-4" />
-                    )}
-                    Subscribe — {plan.priceLabel}
+                  <button type="button" disabled={loadingPlan !== null} onClick={() => subscribe(plan.id)} className={`flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors disabled:opacity-60 ${popular ? 'bg-white text-brand-blue-700 hover:bg-brand-blue-50' : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'}`}>
+                    {loadingPlan === plan.id ? <Loader2 className="h-5 w-5 animate-spin" /> : <ShoppingCart className="h-4 w-4" />} Subscribe — {plan.priceLabel}
                   </button>
-                  <Link
-                    href={catalog.trialHref}
-                    className={`block w-full text-center py-2.5 rounded-lg text-sm font-semibold border ${
-                      popular
-                        ? 'border-white/40 text-white hover:bg-white/10'
-                        : 'border-slate-300 text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    Try free for {catalog.trialDays} days
-                  </Link>
+                  <Link href={catalog.trialHref} className={`block w-full rounded-lg border py-2.5 text-center text-sm font-semibold ${popular ? 'border-white/40 text-white hover:bg-white/10' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}>Try free for {catalog.trialDays} days</Link>
                 </div>
               </div>
             );
           })}
         </div>
 
-        <p className="text-center text-xs text-slate-500 mt-8 max-w-xl mx-auto">
-          Individual subscriptions are tied to your login — not an organization license. Need a team or
-          WIOA provider site?{' '}
-          <Link href="/store/trial" className="text-brand-blue-600 hover:underline">
-            Managed platform trial
-          </Link>
-          .
-        </p>
+        <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 text-center text-sm leading-6 text-slate-600">
+          Elevate should recommend an upgrade only when the customer reaches a real plan limit or requests a gated capability. Example: “Custom domains are included in Professional. Upgrade to connect your own domain.”
+        </div>
+
+        <p className="mx-auto mt-8 max-w-xl text-center text-xs text-slate-500">Individual subscriptions are tied to your login — not an organization license. Need a team or WIOA provider site? <Link href="/store/trial" className="text-brand-blue-600 hover:underline">Managed platform trial</Link>.</p>
       </div>
     </section>
   );

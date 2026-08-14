@@ -9,8 +9,10 @@ on:
       - 'lib/**'
       - 'packages/**'
       - 'components/admin/**'
+      - 'components/studio/**'
       - 'public/**'
       - 'scripts/northflank/**'
+      - 'scripts/verify-no-retired-admin-ui-routes.mjs'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -28,7 +30,7 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-admin:
@@ -75,6 +77,9 @@ jobs:
           test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
           test "$(git status --porcelain)" = ""
           echo "Verified production Admin SHA $RESOLVED_SHA"
+
+      - name: Block retired Admin UI routes
+        run: node scripts/verify-no-retired-admin-ui-routes.mjs
 
       - name: Set build environment variables
         run: |

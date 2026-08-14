@@ -97,19 +97,24 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
-# Keep one deterministic asset precedence across every Marketing image path.
-# The app-specific tree is copied first; repository-level public/ is canonical
-# and copied last so stale duplicate files cannot shadow corrected assets.
-COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./public/
+# Root public/ is the single canonical Marketing asset tree. Do not overlay the
+# entire apps/marketing/public directory: broad overlays create two competing
+# sources of truth and can silently replace a corrected production asset.
+# The only app-local runtime asset not represented by root public/ is the
+# generated hero-banner data file, so copy that file explicitly after the
+# canonical public tree is installed.
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
-COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public ./apps/marketing/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./public/data/hero-banners.json
+COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./apps/marketing/public/data/hero-banners.json
 
 RUN test -f /app/public/version.json && \
     test -f /app/apps/marketing/public/version.json && \
     test -f /app/public/manifest-marketing.json && \
     test -f /app/apps/marketing/public/manifest-marketing.json && \
     test -f /app/apps/marketing/server.js && \
+    test -s /app/public/data/hero-banners.json && \
+    test -s /app/apps/marketing/public/data/hero-banners.json && \
     test -s /app/public/images/partners/razors-image-storefront.webp && \
     test -s /app/apps/marketing/public/images/partners/razors-image-storefront.webp && \
     test -s /app/public/images/heroes/hero-homepage.webp && \
@@ -119,7 +124,7 @@ RUN test -f /app/public/version.json && \
     test -s /app/public/images/pages/about-supportive-services.webp && \
     test -s /app/public/images/pages/about-employer-partners.webp && \
     (test -f /app/public/sw.js || test -f /app/public/sw-marketing.js) && \
-    echo "Marketing runtime assets verified"
+    echo "Marketing runtime assets verified from canonical public tree"
 
 RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true
 

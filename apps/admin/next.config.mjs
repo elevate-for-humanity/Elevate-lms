@@ -82,6 +82,7 @@ const adminConfig = {
       { source: '/admin/crm', destination: '/crm', permanent: true },
       { source: '/admin/funding', destination: '/funding', permanent: true },
       { source: '/admin/certificates', destination: '/certificates', permanent: true },
+      { source: '/admin/enrollment', destination: '/enrollments', permanent: true },
       { source: '/admin/staff-portal', destination: '/staff-portal/dashboard', permanent: true },
       { source: '/admin/staff-portal/:path*', destination: '/staff-portal/:path*', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },

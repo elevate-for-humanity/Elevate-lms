@@ -26,6 +26,8 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - name: Block retired Admin UI routes
+        run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
       - name: Recovery hardening regression check

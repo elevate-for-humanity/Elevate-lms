@@ -14,7 +14,7 @@ export default function OrientationError({
       error={error}
       reset={reset}
       title="Orientation Error"
-      backHref="/orientation"
+      backHref="/lms/orientation"
       backLabel="Back to Orientation"
     />
   );

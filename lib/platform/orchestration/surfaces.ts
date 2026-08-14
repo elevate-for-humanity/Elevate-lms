@@ -76,7 +76,7 @@ export const PLATFORM_SURFACES: Record<string, PlatformSurfaceContract> = {
   },
   lms: {
     key: 'lms', label: 'Learning Management System', runtime: 'lms',
-    entryPath: '/dashboard', scope: 'organization', requiredFeature: PlatformFeature.LMS,
+    entryPath: '/lms/dashboard', scope: 'organization', requiredFeature: PlatformFeature.LMS,
     provisioningKind: 'lms_workspace',
   },
   course_builder: {

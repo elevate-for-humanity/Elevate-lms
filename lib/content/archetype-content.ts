@@ -130,7 +130,7 @@ export const applicationEnrollmentContent: LocalizedContent = {
       primary: 'Submit Application',
       secondary: 'Save and Continue Later',
       primaryHref: '/apply/submit',
-      secondaryHref: '/dashboard',
+      secondaryHref: '/lms/dashboard',
     },
   },
   es: {
@@ -150,7 +150,7 @@ export const applicationEnrollmentContent: LocalizedContent = {
       primary: 'Enviar solicitud',
       secondary: 'Guardar y continuar después',
       primaryHref: '/apply/submit',
-      secondaryHref: '/dashboard',
+      secondaryHref: '/lms/dashboard',
     },
   },
 };

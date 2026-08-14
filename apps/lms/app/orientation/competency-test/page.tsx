@@ -56,7 +56,7 @@ export default function CompetencyTestPage() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs
           items={[
-            { label: 'Orientation', href: '/orientation' },
+            { label: 'Orientation', href: '/lms/orientation' },
             { label: 'Competency Assessment' },
           ]}
         />

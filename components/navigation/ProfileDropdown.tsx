@@ -310,7 +310,7 @@ export function ProfileDropdown({ className }: Props) {
               <div className="font-semibold text-slate-900">Certificates</div>
             </Link>
             <Link
-              href="/notifications"
+              href="/lms/notifications"
               className="text-center hover:text-brand-blue-600 relative"
               onClick={() => setIsOpen(false)}
             >
@@ -362,7 +362,7 @@ export function ProfileDropdown({ className }: Props) {
             </Link>
 
             <Link
-              href="/notifications"
+              href="/lms/notifications"
               className="flex items-center justify-between px-4 py-2.5 text-sm text-slate-900 hover:bg-slate-50"
               onClick={() => setIsOpen(false)}
             >

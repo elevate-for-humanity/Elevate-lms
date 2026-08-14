@@ -25,9 +25,9 @@ export interface NavSection {
 export const DEFAULT_NAV: NavSection[] = [
   {
     label: 'Operations',
-    href: '/dashboard',
+    href: '/lms/dashboard',
     items: [
-      { label: 'Dashboard', href: '/dashboard' },
+      { label: 'Dashboard', href: '/lms/dashboard' },
       { label: 'At-Risk Learners', href: '/at-risk' },
       { label: 'Analytics', href: '/analytics' },
       { label: 'Analytics — Engagement', href: '/analytics/engagement' },
@@ -39,7 +39,7 @@ export const DEFAULT_NAV: NavSection[] = [
       { label: 'Reports — Financial', href: '/reports/financial' },
       { label: 'Reports — Caseload', href: '/reports/caseload' },
       { label: 'Reports — WIOA', href: '/reports/wioa' },
-      { label: 'Notifications', href: '/notifications' },
+      { label: 'Notifications', href: '/lms/notifications' },
       { label: 'Inbox', href: '/inbox' },
     ],
   },
@@ -49,7 +49,7 @@ export const DEFAULT_NAV: NavSection[] = [
     items: [
       { label: 'Risk Dashboard', href: '/intelligence' },
       { label: 'Completion Forecast', href: '/intelligence/forecast' },
-      { label: 'Lizzy', href: '/dashboard' },
+      { label: 'Lizzy', href: '/lms/dashboard' },
       { label: 'Workflows', href: '/studio/workflows' },
       { label: 'System Health', href: '/system-health' },
       { label: 'Snapshots', href: '/snapshots' },
@@ -215,9 +215,9 @@ export const DEFAULT_NAV: NavSection[] = [
   },
   {
     label: 'System',
-    href: '/settings',
+    href: '/lms/settings',
     items: [
-      { label: 'Settings', href: '/settings' },
+      { label: 'Settings', href: '/lms/settings' },
       { label: 'Staff', href: '/staff' },
       { label: 'Licenses', href: '/licenses' },
       { label: 'API Keys', href: '/api-keys' },

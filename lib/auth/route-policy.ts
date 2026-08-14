@@ -15,7 +15,7 @@ export type AccessPolicy = 'public' | 'authenticated' | 'admin' | 'instructor_or
 
 export const ROUTE_POLICY: Record<string, AccessPolicy> = {
   // ── Admin UI (canonical root routes on admin.elevateforhumanity.org) ───────
-  '/dashboard': 'admin',
+  '/lms/dashboard': 'admin',
   '/applications': 'admin',
   '/applications/review/[id]': 'admin',
   '/courses': 'admin',

@@ -186,7 +186,7 @@ export const CAPABILITY_CATALOG: PlatformCapability[] = [
     category: 'education',
     description: 'Deliver programs, lessons, quizzes, learner progress and certificates.',
     status: 'sell_now',
-    appHref: '/dashboard',
+    appHref: '/lms/dashboard',
     keywords: ['lms', 'courses', 'students', 'lessons', 'quizzes'],
   },
   {

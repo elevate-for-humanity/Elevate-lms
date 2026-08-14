@@ -1,7 +1,7 @@
 import { siteUrls } from '@/lib/utils/site-urls';
 
 const ADMIN_PATH_PREFIXES = [
-  '/dashboard',
+  '/lms/dashboard',
   '/staff-portal',
   '/instructor',
   '/testing-center',
@@ -12,7 +12,7 @@ const ADMIN_PATH_PREFIXES = [
   '/crm',
   '/compliance',
   '/studio',
-  '/settings',
+  '/lms/settings',
   '/integrations',
   '/operations',
   '/system-health',

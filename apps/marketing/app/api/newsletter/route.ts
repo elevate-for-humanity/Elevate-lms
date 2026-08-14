@@ -1,30 +1,15 @@
 // PUBLIC ROUTE: public newsletter subscription
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
 import { headers } from 'next/headers';
 import crypto from 'crypto';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-
-
-// 5 requests per 5 minutes per IP
-const ratelimit =
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-    ? new Ratelimit({
-        redis: new Redis({
-          url: process.env.UPSTASH_REDIS_REST_URL,
-          token: process.env.UPSTASH_REDIS_REST_TOKEN,
-        }),
-        limiter: Ratelimit.slidingWindow(5, '5 m'),
-        prefix: 'newsletter',
-      })
-    : null;
 
 function hashIp(ip: string): string {
   return crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
@@ -39,15 +24,17 @@ async function _POST(req: Request) {
   const ipHash = hashIp(ip);
   const ua = headersList.get('user-agent') ?? 'unknown';
 
-  // Rate limit check
-  if (ratelimit) {
-    const { success } = await ratelimit.limit(ipHash);
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Too many requests. Try again in a few minutes.' },
-        { status: 429 },
-      );
-    }
+  // Newsletter-specific shared Redis limit: 5 requests per 5 minutes per IP.
+  const newsletterLimit = await checkRateLimit({
+    key: `newsletter:${ipHash}`,
+    limit: 5,
+    windowSeconds: 300,
+  });
+  if (!newsletterLimit.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests. Try again in a few minutes.' },
+      { status: 429 },
+    );
   }
 
   try {
@@ -71,7 +58,6 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
-    // Lightweight audit log (fire-and-forget)
     supabase
       .from('analytics_events')
       .insert([

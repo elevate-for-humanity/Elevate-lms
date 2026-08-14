@@ -43,13 +43,15 @@ export default async function AchievementsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return <PublicAchievementsPreview />;
 
-  const [profileResult, scoreResult, badgesResult, definitionsResult, certificatesResult, enrollmentsResult, leaderboard] = await Promise.all([
+  const [profileResult, scoreResult, badgesResult, definitionsResult, certificatesResult, enrollmentsResult, quizAttemptsResult, forumPostsResult, leaderboard] = await Promise.all([
     supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
     supabase.from('leaderboard_scores').select('points').eq('user_id', user.id).is('course_id', null).maybeSingle(),
     supabase.from('user_badges').select('badge_id,awarded_at').eq('user_id', user.id).order('awarded_at', { ascending: false }),
     supabase.from('badge_definitions').select('id,key,name,description,icon_url,badge_type,points_reward,rarity').eq('is_active', true).order('points_reward', { ascending: true }),
     supabase.from('certificates').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
     supabase.from('program_enrollments').select('id,status,progress_percent').eq('user_id', user.id),
+    supabase.from('quiz_attempts').select('score').eq('user_id', user.id).eq('status', 'completed'),
+    supabase.from('forum_posts').select('id', { count: 'exact', head: true }).eq('author_id', user.id),
     getGlobalLeaderboard(10),
   ]);
 
@@ -62,7 +64,32 @@ export default async function AchievementsPage() {
   const enrollments = enrollmentsResult.data ?? [];
   const completedPrograms = enrollments.filter((row: any) => row.status === 'completed').length;
   const activePrograms = enrollments.filter((row: any) => row.status !== 'completed').length;
+  const quizAttempts = quizAttemptsResult.data ?? [];
+  const perfectQuizCount = quizAttempts.filter((row: any) => Number(row.score) === 100).length;
+  const highQuizCount = quizAttempts.filter((row: any) => Number(row.score) >= 90).length;
+  const forumPostCount = forumPostsResult.count ?? 0;
   const name = profileResult.data?.full_name || user.email?.split('@')[0] || 'Learner';
+
+  function progressForBadge(key: string | null | undefined, earned: boolean) {
+    if (earned) return 100;
+    switch (key) {
+      case 'first-course':
+      case 'course-complete':
+        return Math.min(100, completedPrograms * 100);
+      case 'course-master':
+        return Math.min(100, Math.round((completedPrograms / 5) * 100));
+      case 'quiz-ace':
+      case 'perfect-score':
+        return Math.min(100, perfectQuizCount * 100);
+      case 'perfectionist':
+        return Math.min(100, Math.round((highQuizCount / 10) * 100));
+      case 'community-helper':
+      case 'helper':
+        return Math.min(100, Math.round((forumPostCount / 5) * 100));
+      default:
+        return null;
+    }
+  }
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8">
@@ -85,7 +112,11 @@ export default async function AchievementsPage() {
       <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <section>
           <div className="mb-4 flex items-end justify-between"><div><h2 className="text-2xl font-black text-slate-950">Badges</h2><p className="text-sm text-slate-600">One canonical badge system powers onboarding, learning, credentials, career milestones, and community recognition.</p></div><Link href="/lms/progress" className="text-sm font-black text-brand-blue-700">View detailed progress</Link></div>
-          <div className="grid gap-4 md:grid-cols-2">{definitions.map((badge: any) => { const earned = earnedIds.has(badge.id); return <article key={badge.id} className={`rounded-2xl border p-5 ${earned ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}><div className="flex items-start gap-4"><div className={`flex h-11 w-11 items-center justify-center rounded-xl ${earned ? 'bg-amber-400 text-slate-950' : 'bg-slate-100 text-slate-500'}`}><Star className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950">{badge.name}</h3><span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-slate-500">{badge.rarity || 'common'}</span></div><p className="mt-1 text-sm leading-5 text-slate-600">{badge.description}</p><div className="mt-3 flex items-center justify-between text-xs font-bold"><span className={earned ? 'text-emerald-700' : 'text-slate-500'}>{earned ? `Earned ${new Date(earnedAt.get(badge.id) as string).toLocaleDateString()}` : 'Not earned yet'}</span><span className="text-amber-700">+{badge.points_reward ?? 0} pts</span></div></div></div></article>; })}</div>
+          <div className="grid gap-4 md:grid-cols-2">{definitions.map((badge: any) => {
+            const earned = earnedIds.has(badge.id);
+            const badgeProgress = progressForBadge(badge.key, earned);
+            return <article key={badge.id} className={`rounded-2xl border p-5 ${earned ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}><div className="flex items-start gap-4"><div className={`flex h-11 w-11 items-center justify-center rounded-xl ${earned ? 'bg-amber-400 text-slate-950' : 'bg-slate-100 text-slate-500'}`}><Star className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950">{badge.name}</h3><span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-slate-500">{badge.rarity || 'common'}</span></div><p className="mt-1 text-sm leading-5 text-slate-600">{badge.description}</p>{badgeProgress !== null && !earned && <div className="mt-3"><div className="mb-1 flex justify-between text-[11px] font-bold text-slate-500"><span>Progress</span><span>{badgeProgress}%</span></div><div className="h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-brand-blue-600" style={{ width: `${badgeProgress}%` }} /></div></div>}<div className="mt-3 flex items-center justify-between text-xs font-bold"><span className={earned ? 'text-emerald-700' : 'text-slate-500'}>{earned ? `Earned ${new Date(earnedAt.get(badge.id) as string).toLocaleDateString()}` : 'Not earned yet'}</span><span className="text-amber-700">+{badge.points_reward ?? 0} pts</span></div></div></div></article>;
+          })}</div>
         </section>
 
         <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><Trophy className="h-5 w-5 text-amber-500" /><h2 className="font-black">Leaderboard</h2></div><p className="mt-1 text-sm text-slate-600">Global points across learning and community activity.</p><div className="mt-4 divide-y divide-slate-100">{leaderboard.map((row, index) => <div key={row.user_id} className="flex items-center gap-3 py-3"><div className="w-7 text-center text-sm font-black text-slate-500">{index + 1}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-black text-slate-900">{row.profile?.full_name || 'Learner'}</p><p className="text-xs text-slate-500">Level {levelForPoints(row.points).level}</p></div><div className="text-sm font-black">{row.points} pts</div></div>)}{!leaderboard.length && <p className="py-6 text-center text-sm text-slate-500">Leaderboard activity starts when learners earn points.</p>}</div></aside>

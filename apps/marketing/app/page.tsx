@@ -58,34 +58,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const currentBanner = heroBanners.home;
-  const banner = {
-    ...currentBanner,
-    microLabel: 'AI-Powered 360° Humanitarian Workforce Hub',
-    eyebrow: 'Training • Testing • LMS • Hands-On Learning • Workforce',
-    belowHeroHeadline: 'One connected hub for learning, credentials, work, and advancement.',
-    belowHeroSubheadline:
-      'Elevate for Humanity connects career training, an integrated LMS, hands-on learning, testing, credentials, registered apprenticeship, workforce funding, employers, employment pathways, and supportive services through one AI-powered ecosystem.',
-    primaryCta: { label: 'Get Started', href: '/apply' },
-    secondaryCta: {
-      label: 'Explore Programs & Pathways',
-      href: '/programs',
-      variant: 'secondary' as const,
-    },
-    trustIndicators: [
-      'DOL Apprenticeship Sponsor',
-      'Indiana ETPL Provider',
-      'Testing & Proctoring',
-      'Integrated LMS',
-    ],
-    transcript:
-      'Elevate for Humanity is an AI-powered 360-degree humanitarian workforce hub connecting training, a learning management system, hands-on learning, testing, credentials, registered apprenticeship, workforce funding, employers, employment pathways, and supportive services in one connected ecosystem.',
-  };
-
   return (
     <>
       <StructuredData />
-      <HomeHeroVideo banner={banner} />
+      <HomeHeroVideo banner={heroBanners.home} />
       <MarqueeBanner />
       <HomeCareerPathways />
       <HomeTrustBar />

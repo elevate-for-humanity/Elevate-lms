@@ -1,19 +1,41 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
 function replaceOrThrow(text, before, after, label) {
-  if (!text.includes(before)) {
-    throw new Error(`Expected ${label} block was not found`);
-  }
+  if (!text.includes(before)) throw new Error(`Expected ${label} block was not found`);
   return text.replace(before, after);
 }
 
-// Shared shell: canonical apprentice and host-shop paths.
-{
-  const path = 'components/dashboard/PlatformShell.tsx';
-  let text = fs.readFileSync(path, 'utf8');
-  text = text.replaceAll("'/portal/apprentice", "'/apprentice");
-  text = text.replaceAll('"/portal/apprentice', '"/apprentice');
+function walk(dir, files = []) {
+  if (!fs.existsSync(dir)) return files;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walk(full, files);
+    else if (/\.(?:ts|tsx|js|jsx|mjs|cjs)$/.test(entry.name)) files.push(full);
+  }
+  return files;
+}
 
+// Normalize emitted legacy LMS paths without touching imports such as @/lib/portal/...
+for (const root of ['apps/lms/app', 'components', 'lib']) {
+  for (const file of walk(root)) {
+    let text = fs.readFileSync(file, 'utf8');
+    const original = text;
+    text = text
+      .replaceAll("'/learner/dashboard'", "'/lms/dashboard'")
+      .replaceAll('"/learner/dashboard"', '"/lms/dashboard"')
+      .replaceAll('`/learner/dashboard`', '`/lms/dashboard`')
+      .replaceAll("'/portal/apprentice", "'/apprentice")
+      .replaceAll('"/portal/apprentice', '"/apprentice')
+      .replaceAll('`/portal/apprentice', '`/apprentice');
+    if (text !== original) fs.writeFileSync(file, text);
+  }
+}
+
+// Shared shell: partner role is the host-shop portal, not a parallel /partner UI.
+{
+  const file = 'components/dashboard/PlatformShell.tsx';
+  let text = fs.readFileSync(file, 'utf8');
   const oldPartner = `      { href: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/partner/programs', label: 'Programs', icon: BookOpen },
       { href: '/partner/reports', label: 'Reports', icon: BarChart3 },
@@ -24,13 +46,13 @@ function replaceOrThrow(text, before, after, label) {
       { href: '/host-shop/mou', label: 'MOU', icon: FileText },
       { href: '/host-shop/onboarding', label: 'Onboarding', icon: ClipboardCheck },`;
   text = replaceOrThrow(text, oldPartner, newPartner, 'partner navigation');
-  fs.writeFileSync(path, text);
+  fs.writeFileSync(file, text);
 }
 
-// Profile menu: use the same canonical destinations as role-destinations.ts.
+// Profile menu: mirror the canonical role destination registry and cross service hosts.
 {
-  const path = 'components/navigation/ProfileDropdown.tsx';
-  let text = fs.readFileSync(path, 'utf8');
+  const file = 'components/navigation/ProfileDropdown.tsx';
+  let text = fs.readFileSync(file, 'utf8');
   if (!text.includes("import { siteUrls } from '@/lib/utils/site-urls';")) {
     text = replaceOrThrow(
       text,
@@ -72,16 +94,16 @@ function replaceOrThrow(text, before, after, label) {
   learner: { label: 'My Dashboard', href: \`${'${siteUrls.app}'}/lms/dashboard\` },
 };`;
   text = text.slice(0, start) + canonical + text.slice(end + 3);
-  fs.writeFileSync(path, text);
+  fs.writeFileSync(file, text);
 }
 
-// Redirect-only wrappers duplicated canonical LMS routes and contained no unique UI.
-for (const path of [
+// Redirect-only/dead route wrappers duplicate canonical surfaces and contain no unique functionality.
+for (const file of [
   'apps/lms/app/learner/page.tsx',
   'apps/lms/app/learner/dashboard/error.tsx',
   'apps/lms/app/lms/login/page.tsx',
 ]) {
-  if (fs.existsSync(path)) fs.unlinkSync(path);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
 }
 
 const required = [
@@ -90,8 +112,8 @@ const required = [
   'apps/lms/app/host-shop/dashboard/page.tsx',
   'apps/lms/app/login/page.tsx',
 ];
-for (const path of required) {
-  if (!fs.existsSync(path)) throw new Error(`Canonical route missing: ${path}`);
+for (const file of required) {
+  if (!fs.existsSync(file)) throw new Error(`Canonical route missing: ${file}`);
 }
 
 console.log('LMS route consolidation completed.');

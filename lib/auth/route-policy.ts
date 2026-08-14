@@ -14,20 +14,22 @@
 export type AccessPolicy = 'public' | 'authenticated' | 'admin' | 'instructor_or_admin';
 
 export const ROUTE_POLICY: Record<string, AccessPolicy> = {
-  // ── Admin ──────────────────────────────────────────────────────────────────
-  '/admin': 'admin',
-  '/admin/dashboard': 'admin',
-  '/admin/applications': 'admin',
-  '/admin/applications/review/[id]': 'admin',
-  '/admin/courses': 'admin',
-  '/admin/courses/[courseId]': 'admin',
-  '/admin/studio': 'admin',
-  '/admin/enrollments': 'admin',
-  '/admin/gradebook': 'admin',
-  '/admin/programs': 'admin',
-  '/admin/security/route-audit': 'admin',
-  '/admin/students': 'admin',
-  '/admin/users': 'admin',
+  // ── Admin UI (canonical root routes on admin.elevateforhumanity.org) ───────
+  '/dashboard': 'admin',
+  '/applications': 'admin',
+  '/applications/review/[id]': 'admin',
+  '/courses': 'admin',
+  '/courses/[courseId]': 'admin',
+  '/course-builder': 'admin',
+  '/studio': 'admin',
+  '/studio/workflows': 'admin',
+  '/enrollments': 'admin',
+  '/gradebook': 'admin',
+  '/programs': 'admin',
+  '/security/route-audit': 'admin',
+  '/students': 'admin',
+  '/users': 'admin',
+  '/impersonate': 'admin',
 
   // ── Admin API ──────────────────────────────────────────────────────────────
   '/api/admin/applications': 'admin',

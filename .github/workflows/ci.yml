@@ -11,9 +11,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  preflight:
+    name: CI Preflight
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Block retired Admin UI routes
+        run: node scripts/verify-no-retired-admin-ui-routes.mjs
+      - name: Recovery hardening regression check
+        run: node scripts/verify-recovery-gate-hardening.mjs
+
+  typecheck:
+    name: TypeScript — ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [marketing, lms, admin]
     env:
       NODE_OPTIONS: --max-old-space-size=6144
     steps:
@@ -26,17 +52,44 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Block retired Admin UI routes
-        run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Recovery hardening regression check
-        run: node scripts/verify-recovery-gate-hardening.mjs
-      - name: TypeScript — Marketing
-        run: pnpm run typecheck:marketing
-      - name: TypeScript — LMS
-        run: pnpm run typecheck:lms
-      - name: TypeScript — Admin
-        run: pnpm run typecheck:admin
-      - name: Lint
+      - name: Run typecheck
+        run: pnpm run typecheck:${{ matrix.app }}
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NODE_OPTIONS: --max-old-space-size=6144
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Lint repository
         run: pnpm lint
+
+  ci-gate:
+    name: CI Required Gate
+    runs-on: ubuntu-latest
+    needs: [preflight, typecheck, lint]
+    if: always()
+    steps:
+      - name: Require every CI diagnostic to pass
+        shell: bash
+        run: |
+          echo "preflight=${{ needs.preflight.result }}"
+          echo "typecheck=${{ needs.typecheck.result }}"
+          echo "lint=${{ needs.lint.result }}"
+          test "${{ needs.preflight.result }}" = "success"
+          test "${{ needs.typecheck.result }}" = "success"
+          test "${{ needs.lint.result }}" = "success"

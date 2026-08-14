@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,7 +11,6 @@ const config = {
     files: [
       'sw-marketing.js',
       'manifest-marketing.json',
-      'manifest-program-holder.json',
       'offline.html',
     ],
   },
@@ -40,28 +39,18 @@ const targetDir = join(root, config[service].appDir, 'public');
 mkdirSync(targetDir, { recursive: true });
 
 // App-local PWA files are generated build artifacts, never independent sources
-// of truth. Remove every known current/legacy PWA artifact before copying the
-// canonical files from root public/ so stale workers/manifests cannot survive
-// from an older checkout, local build, cached image layer, or retired portal.
-const generatedPwaFiles = new Set([
-  ...Object.values(config).flatMap((entry) => entry.files),
-  'sw.js',
-  'sw-portal.js',
-  'manifest-portal.json',
-  'manifest.json',
-  'manifest-barber.json',
-  'manifest-partner.json',
-  'manifest-instructor.json',
-  'manifest-store.json',
-  'manifest-enrollment.json',
-  'store-manifest.json',
-]);
+// of truth. Clean by filename pattern rather than carrying a list of retired
+// manifest/worker names forever. Only the service's canonical files are copied
+// back from root public/ below.
+const isGeneratedPwaArtifact = (filename) =>
+  /^sw(?:-[a-z0-9-]+)?\.js$/i.test(filename) ||
+  /manifest.*\.(?:json|webmanifest)$/i.test(filename) ||
+  filename === 'offline.html';
 
 let removed = 0;
-for (const filename of generatedPwaFiles) {
-  const target = join(targetDir, filename);
-  if (!existsSync(target)) continue;
-  rmSync(target, { force: true });
+for (const filename of readdirSync(targetDir)) {
+  if (!isGeneratedPwaArtifact(filename)) continue;
+  rmSync(join(targetDir, filename), { force: true });
   removed += 1;
 }
 

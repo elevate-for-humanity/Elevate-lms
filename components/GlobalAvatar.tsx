@@ -4,24 +4,19 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
-  { pattern: /^\/admin$/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Admin Overview' },
+  { pattern: /^\/dashboard$/i, video: '/videos/avatars/orientation-guide.mp4', name: 'Admin Dashboard' },
   {
-    pattern: /^\/admin\/dashboard/i,
-    video: '/videos/avatars/orientation-guide.mp4',
-    name: 'Admin Dashboard',
-  },
-  {
-    pattern: /^\/admin\/users/i,
+    pattern: /^\/users/i,
     video: '/videos/avatars/orientation-guide.mp4',
     name: 'User Management',
   },
   {
-    pattern: /^\/admin\/programs/i,
+    pattern: /^\/programs/i,
     video: '/videos/avatars/orientation-guide.mp4',
     name: 'Program Management',
   },
   {
-    pattern: /^\/admin\/reports/i,
+    pattern: /^\/reports/i,
     video: '/videos/avatars/financial-guide.mp4',
     name: 'Reports Guide',
   },
@@ -29,7 +24,7 @@ const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
   { pattern: /^\/student/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Student Guide' },
   { pattern: /^\/instructor/i, video: '/videos/avatars/ai-tutor.mp4', name: 'Instructor Guide' },
   {
-    pattern: /^\/admin\/staff-portal/i,
+    pattern: /^\/staff-portal/i,
     video: '/videos/avatars/orientation-guide.mp4',
     name: 'Staff Guide',
   },
@@ -134,14 +129,17 @@ export default function GlobalAvatar() {
     return () => observer.disconnect();
   }, [pathname, isExcluded, config, hasPlayed]);
 
-  // Only show on authenticated portals — never on public marketing pages
+  // Only show on authenticated portals — never on public marketing pages.
   const isPublicPage =
-    !pathname.startsWith('/admin') &&
+    !pathname.startsWith('/dashboard') &&
+    !pathname.startsWith('/studio') &&
+    !pathname.startsWith('/users') &&
+    !pathname.startsWith('/programs') &&
+    !pathname.startsWith('/reports') &&
     !pathname.startsWith('/lms') &&
     !pathname.startsWith('/learner') &&
-    !pathname.startsWith('/learner/dashboard') &&
-    !pathname.startsWith('/admin/instructor') &&
-    !pathname.startsWith('/admin/staff-portal') &&
+    !pathname.startsWith('/instructor') &&
+    !pathname.startsWith('/staff-portal') &&
     !pathname.startsWith('/partner/dashboard') &&
     !pathname.startsWith('/program-holder') &&
     !pathname.startsWith('/employer');

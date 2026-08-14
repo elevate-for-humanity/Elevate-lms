@@ -1,48 +1,63 @@
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 const root = process.cwd();
-const read = (file: string) => readFileSync(path.join(root, file), 'utf8');
+const SOURCE_ROOTS = ['apps/admin/app', 'apps/lms/app', 'components', 'lib/routes'];
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs']);
 
-describe('studio route consolidation', () => {
-  it('studio pages exist at the canonical /admin/studio route (LMS container)', () => {
-    // LMS root level: app/admin/studio/
-    expect(existsSync(path.join(root, 'app/admin/studio/page.tsx'))).toBe(true);
-    expect(existsSync(path.join(root, 'app/admin/studio/courses/page.tsx'))).toBe(true);
-    expect(existsSync(path.join(root, 'app/admin/studio/StudioClientWrapper.tsx'))).toBe(true);
+function collectSourceFiles(relativeDir: string): string[] {
+  const absoluteDir = path.join(root, relativeDir);
+  if (!existsSync(absoluteDir)) return [];
+
+  const files: string[] = [];
+  for (const name of readdirSync(absoluteDir)) {
+    const absolute = path.join(absoluteDir, name);
+    const relative = path.relative(root, absolute).replaceAll('\\', '/');
+    const stat = statSync(absolute);
+    if (stat.isDirectory()) {
+      files.push(...collectSourceFiles(relative));
+    } else if (SOURCE_EXTENSIONS.has(path.extname(name))) {
+      files.push(relative);
+    }
+  }
+  return files;
+}
+
+const retiredUiPatterns = [
+  /href\s*=\s*["'`]\/admin(?:\/|["'`])/,
+  /redirect\(\s*["'`]\/admin(?:\/|["'`])/,
+  /permanentRedirect\(\s*["'`]\/admin(?:\/|["'`])/,
+  /router\.(?:push|replace)\(\s*["'`]\/admin(?:\/|["'`])/,
+  /window\.location(?:\.href)?\s*=\s*["'`]\/admin(?:\/|["'`])/,
+];
+
+describe('Admin UI route consolidation', () => {
+  it('has no parallel apps/admin/app/admin route tree', () => {
+    expect(existsSync(path.join(root, 'apps/admin/app/admin'))).toBe(false);
   });
 
-  it('deleted legacy page directories no longer exist', () => {
-    expect(existsSync(path.join(root, 'app/admin/course-builder'))).toBe(false);
-    expect(existsSync(path.join(root, 'app/admin/video-manager'))).toBe(false);
-    expect(existsSync(path.join(root, 'app/admin/ai-console'))).toBe(false);
-    expect(existsSync(path.join(root, 'app/admin/ai-studio'))).toBe(false);
-    expect(existsSync(path.join(root, 'app/admin/copilot'))).toBe(false);
-    expect(existsSync(path.join(root, 'app/admin/applicants'))).toBe(false);
+  it('keeps the canonical Studio and Course Builder entries', () => {
+    expect(existsSync(path.join(root, 'apps/admin/app/studio/page.tsx'))).toBe(true);
+    expect(existsSync(path.join(root, 'apps/admin/app/course-builder/page.tsx'))).toBe(true);
   });
 
-  it('nav and program pages link to /admin/studio, not old routes', () => {
-    expect(read('app/admin/programs/page.tsx')).toContain('href="/admin/studio"');
-    expect(read('app/admin/programs/page.tsx')).not.toContain('href="/admin/course-builder"');
-    expect(read('app/admin/programs/page.tsx')).not.toContain('href="/admin/curriculum"');
+  it('does not expose retired /admin UI links or redirects from executable source', () => {
+    const violations: string[] = [];
+    for (const sourceRoot of SOURCE_ROOTS) {
+      for (const file of collectSourceFiles(sourceRoot)) {
+        const content = readFileSync(path.join(root, file), 'utf8');
+        if (retiredUiPatterns.some((pattern) => pattern.test(content))) {
+          violations.push(file);
+        }
+      }
+    }
+
+    expect(violations, `Retired /admin UI route references found:\n${violations.join('\n')}`).toEqual([]);
   });
 
-  it('programs-table links to /admin/studio not /admin/course-builder', () => {
-    const table = read('app/admin/programs/programs-table.tsx');
-    expect(table).not.toContain('/admin/course-builder');
-    expect(table).toContain('/admin/studio');
-  });
-
-  it('does not rely on legacy builder redirects or route metadata', () => {
-    expect(read('proxy.ts')).not.toContain('/admin/programs/builder');
-    expect(read('lib/auth/lms-routes.ts')).not.toContain('/lms/builder');
-  });
-
-  it('studio route uses ClientComponent wrapper for ssr:false', () => {
-    const wrapper = read('app/admin/studio/StudioClientWrapper.tsx');
-    expect(wrapper).toContain("'use client'");
-    expect(wrapper).toContain("ssr: false");
-    expect(wrapper).toContain("dynamic(");
+  it('does not confuse the valid /api/admin namespace with retired UI routes', () => {
+    const example = "fetch('/api/admin/studio/workflows')";
+    expect(retiredUiPatterns.some((pattern) => pattern.test(example))).toBe(false);
   });
 });

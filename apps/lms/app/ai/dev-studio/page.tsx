@@ -14,7 +14,7 @@ export const metadata: Metadata = {
  *
  * Canonical ownership:
  * - Public/product information: Marketing app `/dev-studio`
- * - Operational Dev Studio: Admin app `/admin/studio`
+ * - Operational Dev Studio: Admin-domain root `/studio`
  *
  * Keep this compatibility route so existing LMS links/bookmarks continue to work
  * while eliminating the duplicate Dev Studio implementation from the LMS bundle.

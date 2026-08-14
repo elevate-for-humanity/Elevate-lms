@@ -93,7 +93,7 @@ function buildCourseProgress(
   blueprint: CredentialBlueprint,
   rows: Array<{ completed: boolean }>,
 ): CourseProgress {
-  const total = blueprint.modules.reduce((sum, module) => sum + (module.lessons?.length || 0), 0);
+  const total = blueprint.modules.reduce((sum, blueprintModule) => sum + (blueprintModule.lessons?.length || 0), 0);
   const done = rows.filter((row) => row.completed).length;
   return {
     courseId: enrollment.course_id as string,
@@ -113,14 +113,14 @@ function buildCourseProgress(
 
 function buildModuleProgress(blueprint: CredentialBlueprint, data: Record<string, unknown>[]): ModuleProgress[] {
   const stored = new Map(data.map((row) => [row.module_slug, row]));
-  return blueprint.modules.map((module) => {
-    const row = stored.get(module.slug);
-    const total = module.lessons?.length || 0;
+  return blueprint.modules.map((blueprintModule) => {
+    const row = stored.get(blueprintModule.slug);
+    const total = blueprintModule.lessons?.length || 0;
     const completed = (row?.lessons_completed as number) || 0;
     return {
-      moduleSlug: module.slug,
-      moduleTitle: module.title,
-      orderIndex: module.orderIndex,
+      moduleSlug: blueprintModule.slug,
+      moduleTitle: blueprintModule.title,
+      orderIndex: blueprintModule.orderIndex,
       percentComplete: total ? Math.round((completed / total) * 100) : 0,
       lessonsCompleted: completed,
       totalLessons: total,
@@ -135,8 +135,8 @@ function buildModuleProgress(blueprint: CredentialBlueprint, data: Record<string
 function buildLessonProgress(blueprint: CredentialBlueprint, data: Record<string, unknown>[]): LessonProgress[] {
   const stored = new Map(data.map((row) => [row.lesson_slug, row]));
   const result: LessonProgress[] = [];
-  for (const module of blueprint.modules) {
-    for (const lesson of module.lessons || []) {
+  for (const blueprintModule of blueprint.modules) {
+    for (const lesson of blueprintModule.lessons || []) {
       const row = stored.get(lesson.slug);
       result.push({
         lessonSlug: lesson.slug,
@@ -158,8 +158,8 @@ function buildLessonProgress(blueprint: CredentialBlueprint, data: Record<string
 
 function buildCompetencyProgress(blueprint: CredentialBlueprint, data: Record<string, unknown>[]): CompetencyProgress[] {
   const result = new Map<string, CompetencyProgress>();
-  for (const module of blueprint.modules) {
-    for (const competency of module.competencies || []) {
+  for (const blueprintModule of blueprint.modules) {
+    for (const competency of blueprintModule.competencies || []) {
       if (!result.has(competency.competencyKey)) {
         result.set(competency.competencyKey, {
           competencyKey: competency.competencyKey,

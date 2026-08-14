@@ -34,13 +34,13 @@ import { NotificationBell } from './NotificationBell';
 import { createClient } from '@/lib/supabase/client';
 
 const PORTAL_TYPE_TO_PATH: Record<string, string> = {
-  barber: '/portal/barber',
-  cosmetology: '/portal/cosmetology',
-  esthetician: '/portal/esthetician',
-  'nail-technician': '/portal/nail-technician',
-  culinary: '/portal/culinary',
-  electrical: '/portal/electrical',
-  plumbing: '/portal/plumbing',
+  barber: '/apprentice?program=barber-apprenticeship',
+  cosmetology: '/apprentice?program=cosmetology-apprenticeship',
+  esthetician: '/apprentice?program=esthetician-apprenticeship',
+  'nail-technician': '/apprentice?program=nail-technician-apprenticeship',
+  culinary: '/apprentice?program=culinary-apprenticeship',
+  electrical: '/apprentice?program=electrical',
+  plumbing: '/apprentice?program=plumbing',
 };
 
 interface LMSSidebarProps {
@@ -155,7 +155,7 @@ export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 
       <div className={`flex-shrink-0 border-b border-slate-800 px-4 py-4 ${collapsed ? 'px-2' : ''}`}><div className="flex items-center gap-3">{profile?.avatar_url ? <img src={profile.avatar_url} alt={userName} className="h-9 w-9 flex-shrink-0 rounded-full object-cover ring-2 ring-slate-700" /> : <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">{userInitials}</div>}{!collapsed && <div className="min-w-0 flex-1"><p className="truncate text-sm font-bold text-white">{userName}</p><p className="truncate text-xs capitalize text-slate-400">{profile?.role ?? 'Student'}</p></div>}{!collapsed && <NotificationBell />}</div></div>
 
       <nav aria-label="LMS navigation" className="flex-1 overflow-y-auto px-2 py-3">
-        {profile?.portal_type && PORTAL_TYPE_TO_PATH[profile.portal_type] && <div className="mb-4">{!collapsed && <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">Apprenticeship</p>}<Link href={PORTAL_TYPE_TO_PATH[profile.portal_type]} onClick={() => setMobileOpen(false)} className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${pathname?.startsWith('/portal/') ? 'bg-brand-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Scissors className="h-4 w-4" />{!collapsed && <span>My Apprenticeship</span>}</Link></div>}
+        {profile?.portal_type && PORTAL_TYPE_TO_PATH[profile.portal_type] && <div className="mb-4">{!collapsed && <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">Apprenticeship</p>}<Link href={PORTAL_TYPE_TO_PATH[profile.portal_type]} onClick={() => setMobileOpen(false)} className={`mb-0.5 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${pathname?.startsWith('/apprentice') ? 'bg-brand-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Scissors className="h-4 w-4" />{!collapsed && <span>My Apprenticeship</span>}</Link></div>}
         <Section label="Start here" items={primaryItems} />
         <Section label="Coursework" items={courseworkItems} />
         <Section label="Communication" items={communicationItems} />

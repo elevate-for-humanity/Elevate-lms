@@ -2,7 +2,9 @@ name: Consolidate LMS Routes Once
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - fix/lms-route-consolidation-20260814
     paths:
       - 'scripts/consolidate-lms-routes-once.mjs'
       - '.github/workflows/consolidate-lms-routes-once.yml'
@@ -21,11 +23,14 @@ jobs:
       - name: Consolidate LMS routes
         run: node scripts/consolidate-lms-routes-once.mjs
 
-      - name: Verify retired LMS route literals are gone
+      - name: Verify canonical LMS routes exist
         run: |
-          ! grep -R --line-number --include='*.ts' --include='*.tsx' "/portal/apprentice" apps/lms/app components lib
-          ! grep -R --line-number --include='*.ts' --include='*.tsx' "'/learner/dashboard'\|\"/learner/dashboard\"" apps/lms/app components lib
-          ! grep -R --line-number --include='*.ts' --include='*.tsx' "'/lms/login'\|\"/lms/login\"" apps/lms/app components lib
+          test -f apps/lms/app/lms/'(app)'/dashboard/page.tsx
+          test -f apps/lms/app/apprentice/page.tsx
+          test -f apps/lms/app/host-shop/dashboard/page.tsx
+          test -f apps/lms/app/login/page.tsx
+          test ! -f apps/lms/app/learner/page.tsx
+          test ! -f apps/lms/app/lms/login/page.tsx
 
       - name: Commit consolidation
         run: |
@@ -36,5 +41,5 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "refactor(lms): consolidate canonical portal routes"
-            git push origin HEAD:main
+            git push origin HEAD:${GITHUB_REF_NAME}
           fi

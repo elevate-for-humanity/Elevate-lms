@@ -37,8 +37,12 @@ jobs:
             ['package.json', p => {
               p.dependencies.next = '15.5.21';
               p.dependencies.nodemailer = '^9.0.1';
+              p.dependencies['js-yaml'] = '^5.2.2';
               p.devDependencies['@next/bundle-analyzer'] = '15.5.21';
               p.devDependencies['react-router-dom'] = '^7.18.2';
+              p.pnpm ??= {};
+              p.pnpm.overrides ??= {};
+              p.pnpm.overrides['js-yaml@>=4.0.0 <4.3.1'] = '4.3.1';
             }],
             ['apps/marketing/package.json', p => { p.dependencies.next = '15.5.21'; }],
             ['apps/admin/package.json', p => { p.dependencies.next = '15.5.21'; }],

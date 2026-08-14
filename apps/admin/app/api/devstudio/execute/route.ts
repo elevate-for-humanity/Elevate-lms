@@ -3,11 +3,7 @@ import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { aiChat } from '@/lib/ai/ai-service';
-import {
-  getAITool,
-  getAIToolCatalogForPrompt,
-  listAIToolsForAgent,
-} from '@/lib/ai/tools/registry';
+import { getAITool, getAIToolCatalogForPrompt, listAIToolsForAgent } from '@/lib/ai/tools/registry';
 import { executeRegisteredAITool } from '@/lib/ai/tools/executor';
 import { getAdminUrl } from '@/lib/utils/siteUrl';
 import { logger } from '@/lib/logger';
@@ -30,9 +26,7 @@ function sseDone(): Uint8Array {
   return new TextEncoder().encode('data: [DONE]\n\n');
 }
 function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, unknown>
-    : {};
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 function extractUuid(text: string): string | null {
   return text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i)?.[0] ?? null;
@@ -189,8 +183,7 @@ export async function POST(request: NextRequest) {
           if (result.status === 'approval_required') {
             write(`Blocked pending human approval. Type exactly: "${result.requiredConfirmation}"`);
           } else if (!result.ok) {
-            write(`Failed · HTTP ${result.httpStatus} · ${result.error ?? 'Tool execution failed.'}`);
-            if (result.payload !== undefined) write(summarizePayload(result.payload));
+            write(`Failed · HTTP ${result.httpStatus} · Tool execution failed.`);
           } else {
             write(`Completed · ${result.tool} · HTTP ${result.httpStatus}`);
             write(summarizePayload(result.payload));
@@ -201,7 +194,7 @@ export async function POST(request: NextRequest) {
           command,
           correlationId,
         });
-        write(`Failed: ${error instanceof Error ? error.message : 'Unknown command error'}`);
+        write('Failed: command execution failed. Check the operation logs for details.');
       } finally {
         controller.enqueue(sseDone());
         controller.close();
@@ -218,7 +211,10 @@ export async function POST(request: NextRequest) {
   });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await apiRequireDevStudio(request);
+  if (auth.error) return auth.error;
+
   return Response.json({
     agent: 'LIZZY',
     tools: listAIToolsForAgent('LIZZY').map((tool) => ({

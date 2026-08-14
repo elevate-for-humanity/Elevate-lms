@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/partners',
+    canonical: 'https://admin.elevateforhumanity.org/partners',
   },
   title: 'Admin Partners | Elevate For Humanity',
   description: 'Manage training provider partnerships',
@@ -29,7 +29,6 @@ export default async function PartnersPage() {
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  // Fetch relevant data
   const { data: items, count: totalItems } = await supabase
     .from('partners')
     .select('*', { count: 'exact' })
@@ -37,11 +36,9 @@ export default async function PartnersPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Image */}
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Partners' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/dashboard' }, { label: 'Partners' }]} />
       </div>
-      {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
           src="/images/pages/admin-partners-detail.jpg"
@@ -54,11 +51,9 @@ export default async function PartnersPage() {
         />
       </section>
 
-      {/* Content Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
-            {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <h3 className="text-sm font-medium text-black mb-2">Total Items</h3>
@@ -85,7 +80,6 @@ export default async function PartnersPage() {
               </div>
             </div>
 
-            {/* Data Display */}
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-2xl font-bold mb-4">Items</h2>
               {items && items.length > 0 ? (
@@ -107,7 +101,6 @@ export default async function PartnersPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-16 bg-brand-blue-700">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">

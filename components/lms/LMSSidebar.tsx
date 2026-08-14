@@ -62,6 +62,7 @@ type NavItem = { href: string; label: string; icon: typeof Home };
 const primaryItems: NavItem[] = [
   { href: '/lms/dashboard', label: 'Home', icon: Home },
   { href: '/lms/community', label: 'Community', icon: Users },
+  { href: '/lms/groups', label: 'Groups', icon: Users },
   { href: '/lms/courses', label: 'Learn', icon: BookOpen },
   { href: '/lms/events', label: 'Events', icon: CalendarDays },
   { href: '/lms/progress', label: 'Progress', icon: TrendingUp },

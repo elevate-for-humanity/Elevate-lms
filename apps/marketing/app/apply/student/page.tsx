@@ -140,7 +140,8 @@ export default async function StudentApplicationPage({
           fill
           sizes="100vw"
           className="object-cover"
-          priority
+          loading="eager"
+          fetchPriority="high"
         />
       </div>
 

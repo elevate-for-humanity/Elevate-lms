@@ -16,7 +16,7 @@ type LearnerNotification = {
   created_at: string;
 };
 
-export default function NotificationsClient({ initialNotifications }: { initialNotifications: LearnerNotification[] }) {
+export default function NotificationsClient({ userId, initialNotifications }: { userId: string; initialNotifications: LearnerNotification[] }) {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const unreadCount = notifications.filter((item) => !item.read_at).length;
@@ -30,24 +30,24 @@ export default function NotificationsClient({ initialNotifications }: { initialN
     const now = new Date().toISOString();
     const supabase = createClient();
     const table = notification.source === 'community' ? 'community_notifications' : 'notifications';
-    const { error } = await supabase.from(table).update({ read_at: now }).eq('id', notification.id);
+    const { error } = await supabase.from(table).update({ read_at: now }).eq('id', notification.id).eq('user_id', userId);
     if (!error) setNotifications((items) => items.map((item) => item.id === notification.id && item.source === notification.source ? { ...item, read_at: now } : item));
   }
 
   async function markAllRead() {
     const supabase = createClient();
     const now = new Date().toISOString();
-    await Promise.all([
-      supabase.from('notifications').update({ read_at: now }).is('read_at', null),
-      supabase.from('community_notifications').update({ read_at: now }).is('read_at', null),
+    const [core, community] = await Promise.all([
+      supabase.from('notifications').update({ read_at: now }).eq('user_id', userId).is('read_at', null),
+      supabase.from('community_notifications').update({ read_at: now }).eq('user_id', userId).is('read_at', null),
     ]);
-    setNotifications((items) => items.map((item) => item.read_at ? item : { ...item, read_at: now }));
+    if (!core.error && !community.error) setNotifications((items) => items.map((item) => item.read_at ? item : { ...item, read_at: now }));
   }
 
   async function remove(notification: LearnerNotification) {
     const supabase = createClient();
     const table = notification.source === 'community' ? 'community_notifications' : 'notifications';
-    const { error } = await supabase.from(table).delete().eq('id', notification.id);
+    const { error } = await supabase.from(table).delete().eq('id', notification.id).eq('user_id', userId);
     if (!error) setNotifications((items) => items.filter((item) => !(item.id === notification.id && item.source === notification.source)));
   }
 

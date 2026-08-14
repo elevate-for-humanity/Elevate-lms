@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "updated": "2026-08-10",
+  "version": 6,
+  "updated": "2026-08-14",
   "surfaces": {
     "studentApplication": {
       "function": "Complete public student training application",
@@ -31,14 +31,7 @@
       "function": "Registered apprenticeship OJT, RTI, competencies, documents, and program-specific progress",
       "canonical": { "app": "lms", "path": "/apprentice" },
       "operational": [
-        { "app": "lms", "path": "/apprentice/timeclock", "purpose": "OJT timeclock and hour entry" },
-        { "app": "marketing", "path": "/portal/barber", "purpose": "Barber program-specific apprenticeship dashboard" },
-        { "app": "marketing", "path": "/portal/cosmetology", "purpose": "Cosmetology program-specific apprenticeship dashboard" },
-        { "app": "marketing", "path": "/portal/esthetician", "purpose": "Esthetician program-specific apprenticeship dashboard" },
-        { "app": "marketing", "path": "/portal/nail-technician", "purpose": "Nail Technician program-specific apprenticeship dashboard" },
-        { "app": "marketing", "path": "/portal/culinary", "purpose": "Culinary program-specific apprenticeship dashboard" },
-        { "app": "marketing", "path": "/portal/electrical", "purpose": "Electrical program-specific apprenticeship dashboard" },
-        { "app": "marketing", "path": "/portal/plumbing", "purpose": "Plumbing program-specific apprenticeship dashboard" }
+        { "app": "lms", "path": "/apprentice/timeclock", "purpose": "OJT timeclock and hour entry" }
       ]
     },
     "hostSites": {
@@ -102,7 +95,7 @@
     },
     "programHolderPortal": {
       "function": "Program holder training programs, students, hours, documents, and required actions",
-      "canonical": { "app": "marketing", "path": "/program-holder/dashboard" }
+      "canonical": { "app": "lms", "path": "/program-holder/dashboard" }
     },
     "adminPortal": {
       "function": "Platform administration and operational command center",

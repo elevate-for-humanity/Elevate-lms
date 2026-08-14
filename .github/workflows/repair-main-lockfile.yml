@@ -8,7 +8,7 @@ on:
       - .github/workflows/repair-main-lockfile.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   repair-lockfile:
@@ -38,9 +38,12 @@ jobs:
       - name: Verify frozen install accepts repaired lockfile
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Upload repaired lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: repaired-pnpm-lockfile
-          path: pnpm-lock.yaml
-          retention-days: 1
+      - name: Push repaired lockfile branch
+        run: |
+          set -euo pipefail
+          git config user.name "elevateforhumanity"
+          git config user.email "Elizabethpowell6262@gmail.com"
+          git switch -c fix/pnpm-lock-sync-20260814
+          git add pnpm-lock.yaml
+          git commit -m "fix(deps): sync pnpm lockfile with overrides"
+          git push --force-with-lease origin fix/pnpm-lock-sync-20260814

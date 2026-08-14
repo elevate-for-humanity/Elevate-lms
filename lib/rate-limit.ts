@@ -1,22 +1,34 @@
+import { Redis } from 'ioredis';
 import { logger } from '@/lib/logger';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
 
-// Lazy initialize Redis client to avoid build-time errors.
+// Shared standard Redis client. REDIS_URL is the canonical runtime secret.
 let redis: Redis | null = null;
 
 function getRedis(): Redis | null {
   if (redis) return redis;
 
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.REDIS_URL;
+  if (!url) return null;
 
-  if (!url || !token || !url.startsWith('https://')) {
+  try {
+    redis = new Redis(url, {
+      maxRetriesPerRequest: 1,
+      connectTimeout: 5_000,
+      enableReadyCheck: true,
+    });
+    redis.on('error', (error) => {
+      logger.warn('[redis] connection error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+    return redis;
+  } catch (error) {
+    logger.warn('[redis] client initialization failed', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    redis = null;
     return null;
   }
-
-  redis = new Redis({ url, token });
-  return redis;
 }
 
 export function getRedisClient(): Redis | null {
@@ -37,29 +49,89 @@ export const RATE_LIMITS = {
 
 export type RateLimitTier = keyof typeof RATE_LIMITS;
 
+export interface RateLimitResult {
+  success: boolean;
+  limit: number;
+  remaining: number;
+  reset: number;
+}
+
+export interface RateLimiterLike {
+  limit(identifier: string): Promise<RateLimitResult>;
+}
+
+function parseWindowMs(window: string): number {
+  const match = window.trim().match(/^(\d+)\s*([smhd])$/i);
+  if (!match) return 60_000;
+
+  const value = Number(match[1]);
+  const unit = match[2].toLowerCase();
+  const multipliers: Record<string, number> = {
+    s: 1_000,
+    m: 60_000,
+    h: 3_600_000,
+    d: 86_400_000,
+  };
+  return value * multipliers[unit];
+}
+
+const FIXED_WINDOW_SCRIPT = `
+local current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('PEXPIRE', KEYS[1], ARGV[1])
+end
+local ttl = redis.call('PTTL', KEYS[1])
+return {current, ttl}
+`;
+
+async function consumeRedisWindow(
+  client: Redis,
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  const now = Date.now();
+  const raw = (await client.eval(FIXED_WINDOW_SCRIPT, 1, key, String(windowMs))) as unknown;
+  const pair = Array.isArray(raw) ? raw : [];
+  const current = Number(pair[0] ?? 1);
+  const ttl = Number(pair[1] ?? windowMs);
+  const safeTtl = Number.isFinite(ttl) && ttl > 0 ? ttl : windowMs;
+
+  return {
+    success: current <= limit,
+    limit,
+    remaining: Math.max(limit - current, 0),
+    reset: now + safeTtl,
+  };
+}
+
 function createRateLimiter(
   config: { requests: number; window: string },
   prefix: string,
-): Ratelimit | null {
-  const r = getRedis();
-  if (!r) return null;
-  return new Ratelimit({
-    redis: r,
-    limiter: Ratelimit.slidingWindow(config.requests, config.window as any),
-    analytics: true,
-    prefix,
-  });
+): RateLimiterLike | null {
+  if (!getRedis()) return null;
+  const windowMs = parseWindowMs(config.window);
+
+  return {
+    async limit(identifier: string): Promise<RateLimitResult> {
+      const client = getRedis();
+      if (!client) throw new Error('Redis is not configured');
+      const bucket = Math.floor(Date.now() / windowMs);
+      const key = `${prefix}:${bucket}:${identifier}`;
+      return consumeRedisWindow(client, key, config.requests, windowMs);
+    },
+  };
 }
 
-let _authRateLimit: Ratelimit | null | undefined;
-let _paymentRateLimit: Ratelimit | null | undefined;
-let _contactRateLimit: Ratelimit | null | undefined;
-let _apiRateLimit: Ratelimit | null | undefined;
-let _strictRateLimit: Ratelimit | null | undefined;
-let _publicRateLimit: Ratelimit | null | undefined;
-let _pageLoadRateLimit: Ratelimit | null | undefined;
-let _licenseRateLimit: Ratelimit | null | undefined;
-let _licenseValidateRateLimit: Ratelimit | null | undefined;
+let _authRateLimit: RateLimiterLike | null | undefined;
+let _paymentRateLimit: RateLimiterLike | null | undefined;
+let _contactRateLimit: RateLimiterLike | null | undefined;
+let _apiRateLimit: RateLimiterLike | null | undefined;
+let _strictRateLimit: RateLimiterLike | null | undefined;
+let _publicRateLimit: RateLimiterLike | null | undefined;
+let _pageLoadRateLimit: RateLimiterLike | null | undefined;
+let _licenseRateLimit: RateLimiterLike | null | undefined;
+let _licenseValidateRateLimit: RateLimiterLike | null | undefined;
 
 export const authRateLimit = {
   get: () =>
@@ -124,8 +196,6 @@ export function getIdentifier(request: Request): string {
 
   if (ip) return ip;
 
-  // Avoid putting every request with a missing proxy header into one shared
-  // "unknown" bucket. This fingerprint is only a last-resort fallback.
   const fingerprintSeed = [
     request.headers.get('user-agent') || '',
     request.headers.get('accept-language') || '',
@@ -135,21 +205,6 @@ export function getIdentifier(request: Request): string {
   return `anonymous:${simpleHash(fingerprintSeed || 'no-client-headers')}`;
 }
 
-function parseWindowMs(window: string): number {
-  const match = window.trim().match(/^(\d+)\s*([smhd])$/i);
-  if (!match) return 60_000;
-
-  const value = Number(match[1]);
-  const unit = match[2].toLowerCase();
-  const multipliers: Record<string, number> = {
-    s: 1_000,
-    m: 60_000,
-    h: 3_600_000,
-    d: 86_400_000,
-  };
-  return value * multipliers[unit];
-}
-
 type LocalBucket = { count: number; reset: number };
 const localBuckets = new Map<string, LocalBucket>();
 
@@ -157,7 +212,7 @@ export function checkInMemoryRateLimit(
   tier: RateLimitTier,
   identifier: string,
   now = Date.now(),
-): { success: boolean; limit: number; remaining: number; reset: number } {
+): RateLimitResult {
   const config = RATE_LIMITS[tier];
   const key = `${tier}:${identifier}`;
   const windowMs = parseWindowMs(config.window);
@@ -172,7 +227,6 @@ export function checkInMemoryRateLimit(
 
   localBuckets.set(key, bucket);
 
-  // Keep the fallback bounded during a long-lived process.
   if (localBuckets.size > 10_000) {
     for (const [bucketKey, candidate] of localBuckets) {
       if (candidate.reset <= now) localBuckets.delete(bucketKey);
@@ -190,9 +244,6 @@ export function checkInMemoryRateLimit(
 
 export function normalizeRateLimitReset(reset: number, now = Date.now()): number {
   if (!Number.isFinite(reset) || reset <= 0) return now + 1_000;
-
-  // Some Redis/rate-limit implementations expose epoch seconds; Upstash uses
-  // epoch milliseconds. Normalize either form before headers are produced.
   const normalized = reset < 1_000_000_000_000 ? reset * 1_000 : reset;
   return Math.max(normalized, now + 1_000);
 }
@@ -201,12 +252,7 @@ export function getRetryAfterSeconds(reset: number, now = Date.now()): number {
   return Math.max(1, Math.ceil((normalizeRateLimitReset(reset, now) - now) / 1_000));
 }
 
-export function createRateLimitHeaders(result: {
-  success: boolean;
-  limit: number;
-  remaining: number;
-  reset: number;
-}): Record<string, string> {
+export function createRateLimitHeaders(result: RateLimitResult): Record<string, string> {
   const reset = normalizeRateLimitReset(result.reset);
   return {
     'X-RateLimit-Limit': result.limit.toString(),
@@ -222,28 +268,20 @@ interface RateLimitConfig {
 }
 
 export async function checkRateLimit(config: RateLimitConfig) {
-  const r = getRedis();
-  if (!r) {
+  const client = getRedis();
+  if (!client) {
     logger.warn('Rate limiting Redis not configured; legacy check is allowing request');
     return { ok: true, remaining: config.limit, current: 0 };
   }
 
-  const { key, limit, windowSeconds } = config;
-  const now = Math.floor(Date.now() / 1000);
-  const windowKey = `${key}:${Math.floor(now / windowSeconds)}`;
-
-  const current = (await r.incr(windowKey)) as number;
-
-  if (current === 1) {
-    await r.expire(windowKey, windowSeconds);
-  }
-
-  const remaining = Math.max(limit - current, 0);
-  const ok = current <= limit;
+  const windowMs = config.windowSeconds * 1_000;
+  const bucket = Math.floor(Date.now() / windowMs);
+  const result = await consumeRedisWindow(client, `${config.key}:${bucket}`, config.limit, windowMs);
+  const current = config.limit - result.remaining;
 
   return {
-    ok,
-    remaining,
+    ok: result.success,
+    remaining: result.remaining,
     current,
   };
 }

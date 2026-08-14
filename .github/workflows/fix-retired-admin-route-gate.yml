@@ -1,0 +1,51 @@
+name: Fix Retired Admin Route Gate
+
+on:
+  push:
+    branches: [consolidate/legacy-routes-20260814]
+    paths:
+      - '.github/workflows/fix-retired-admin-route-gate.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Add canonical Admin compatibility redirects and repair verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          config = Path('apps/marketing/next.config.js')
+          text = config.read_text()
+          anchor = "      // Public marketing aliases only. Private portal/admin/LMS routes are\n"
+          redirects = """      // Compatibility only: retired /admin URLs never render on Marketing.\n      // They are sent to the one canonical Admin service.\n      { source: '/admin', destination: 'https://admin.elevateforhumanity.org', permanent: false },\n      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: false },\n\n"""
+          if "source: '/admin/:path*'" not in text:
+              if anchor not in text:
+                  raise SystemExit('Marketing redirect insertion anchor missing')
+              text = text.replace(anchor, redirects + anchor, 1)
+              config.write_text(text)
+
+          verifier = Path('scripts/verify-no-retired-admin-ui-routes.mjs')
+          v = verifier.read_text()
+          v = v.replace("['apps/lms/next.config.mjs', 'apps/marketing/next.config.mjs']", "['apps/lms/next.config.mjs', 'apps/marketing/next.config.js']")
+          verifier.write_text(v)
+          PY
+
+          node scripts/verify-no-retired-admin-ui-routes.mjs
+      - name: Commit gate repair
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'elevate-platform-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add apps/marketing/next.config.js scripts/verify-no-retired-admin-ui-routes.mjs
+          git commit -m 'fix(routes): redirect retired Admin URLs to canonical Admin service'
+          git push origin HEAD:consolidate/legacy-routes-20260814

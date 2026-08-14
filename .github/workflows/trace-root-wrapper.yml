@@ -1,0 +1,107 @@
+name: Trace Root Wrapper
+
+on:
+  push:
+    branches:
+      - consolidate/legacy-routes-20260814
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Trace root wrapper files and references
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit
+          REPORT=audit/root-wrapper-trace.txt
+          : > "$REPORT"
+
+          echo "ROOT WRAPPER TRACE" >> "$REPORT"
+          echo "commit=$(git rev-parse HEAD)" >> "$REPORT"
+          echo >> "$REPORT"
+
+          echo "== Remaining apps root files ==" >> "$REPORT"
+          find apps -maxdepth 1 -type f -print | sort >> "$REPORT" || true
+          echo >> "$REPORT"
+
+          echo "== Remaining apps root directories ==" >> "$REPORT"
+          find apps -mindepth 1 -maxdepth 1 -type d -print | sort >> "$REPORT" || true
+          echo >> "$REPORT"
+
+          echo "== Legacy App Router directories/files ==" >> "$REPORT"
+          if [ -e apps/app ]; then
+            find apps/app -type f -print | sort >> "$REPORT"
+          else
+            echo "apps/app ABSENT" >> "$REPORT"
+          fi
+          echo >> "$REPORT"
+
+          candidates=(
+            apps/package.json
+            apps/server.js
+            apps/middleware.ts
+            apps/next.config.mjs
+            apps/instrumentation.ts
+            apps/postcss.config.cjs
+            apps/postcss.config.mjs
+            apps/tailwind.config.cjs
+            apps/tsconfig.json
+          )
+
+          echo "== External references to wrapper files ==" >> "$REPORT"
+          for f in "${candidates[@]}"; do
+            echo "--- $f ---" >> "$REPORT"
+            if [ -e "$f" ]; then
+              base=$(basename "$f")
+              git grep -n -I -E "apps/${base//./\\.}|cd apps([^/]|$)|--dir[ =]apps([^/]|$)|workspace.*apps([^/]|$)" -- . \
+                ':!apps/*' ':!audit/*' 2>/dev/null >> "$REPORT" || true
+            else
+              echo "ABSENT" >> "$REPORT"
+            fi
+          done
+          echo >> "$REPORT"
+
+          echo "== Generic root-app build/runtime references ==" >> "$REPORT"
+          git grep -n -I -E '(@elevate/admin|apps/server\.js|apps/next\.config\.mjs|apps/middleware\.ts|apps/package\.json|next (build|start).*apps|cd[[:space:]]+apps([[:space:]]|$))' -- . ':!apps/*' ':!audit/*' 2>/dev/null >> "$REPORT" || true
+          echo >> "$REPORT"
+
+          echo "== Docker / Northflank references involving apps root wrapper ==" >> "$REPORT"
+          git grep -n -I -E '(COPY|WORKDIR|cd|--dir|--filter).*apps([[:space:]/]|$)|apps/server\.js|apps/package\.json' -- 'Dockerfile*' '.github/**' 'northflank*' 'scripts/**' 2>/dev/null >> "$REPORT" || true
+          echo >> "$REPORT"
+
+          echo "== PWA/root public references ==" >> "$REPORT"
+          if [ -d apps/public ]; then
+            find apps/public -type f -print | sort >> "$REPORT"
+            echo "-- references to apps/public --" >> "$REPORT"
+            git grep -n -I 'apps/public' -- . ':!audit/*' 2>/dev/null >> "$REPORT" || true
+          else
+            echo "apps/public ABSENT" >> "$REPORT"
+          fi
+          echo >> "$REPORT"
+
+          echo "== Root lib references from canonical apps ==" >> "$REPORT"
+          if [ -d apps/lib ]; then
+            find apps/lib -type f -print | sort >> "$REPORT"
+            echo "-- direct references --" >> "$REPORT"
+            git grep -n -I -E "from ['\"](\.\./)+lib|from ['\"]@/apps/lib|apps/lib/" -- apps/admin apps/lms apps/marketing packages scripts 2>/dev/null >> "$REPORT" || true
+          else
+            echo "apps/lib ABSENT" >> "$REPORT"
+          fi
+
+          cat "$REPORT"
+
+      - name: Upload trace report
+        uses: actions/upload-artifact@v4
+        with:
+          name: root-wrapper-trace
+          path: audit/root-wrapper-trace.txt
+          retention-days: 7

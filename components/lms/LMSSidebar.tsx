@@ -139,6 +139,7 @@ export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 
     );
   };
 
+  // eslint-disable-next-line react-hooks/static-components -- pre-existing pattern, uses closure over collapsed
   const Section = ({ label, items }: { label: string; items: NavItem[] }) => (
     <div className="mb-4">
       {!collapsed && <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">{label}</p>}

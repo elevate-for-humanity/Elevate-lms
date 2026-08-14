@@ -25,7 +25,7 @@ const QUICK_LINKS = [
   { href: '/at-risk', label: 'At-risk learners', icon: Users },
   { href: '/inbox', label: 'Admin inbox', icon: Inbox },
   { href: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/admin/studio/workflows', label: 'Workflows', icon: Zap },
+  { href: '/studio/workflows', label: 'Workflows', icon: Zap },
 ] as const;
 
 export default async function MissionControlPage() {

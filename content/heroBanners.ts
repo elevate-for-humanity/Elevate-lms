@@ -67,6 +67,7 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   'micro-programs': '/images/micro-classes-hero.webp',
   'skilled-trades': '/images/hero/hero-skilled-trades.webp',
   'home-health-aide': '/images/healthcare/hero-program-patient-care.webp',
+  store: '/images/pages/store-licensing-hero.webp',
 };
 
 function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
@@ -91,6 +92,15 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
     secondaryCta: banner.secondaryCta ?? banner.ctaSecondary,
     analyticsName: banner.analyticsName ?? key,
   };
+
+  if (key === 'store') {
+    normalized = {
+      ...normalized,
+      videoSrcDesktop: undefined,
+      videoSrcMobile: undefined,
+      posterImage: banner.posterImage ?? '/images/pages/store-licensing-hero.webp',
+    };
+  }
 
   if (key === 'home') {
     normalized = {

@@ -16,17 +16,16 @@ const APPS = [
   ['marketing', 'apps/marketing/app/layout.tsx', 'public/manifest-marketing.json', 'public/sw-marketing.js', 'MarketingPwaClient'],
   ['admin', 'apps/admin/app/layout.tsx', 'public/manifest-admin.json', 'public/sw-admin.js', 'AdminPwaRegister'],
   ['lms', 'apps/lms/app/layout.tsx', 'public/manifest-lms.json', 'public/sw-lms.js', 'LmsPwaRegistration'],
-  ['app (portal)', 'apps/app/layout.tsx', 'public/manifest-portal.json', 'public/sw-portal.js', 'PortalPwaRegistration'],
 ];
-const PWA_COMPONENTS = ['AdminPwaRegister', 'MarketingPwaClient', 'MarketingPwaRegistration', 'LmsPwaRegistration', 'PortalPwaRegistration', 'ServiceWorkerRegistration', 'PWAManager'];
+const PWA_COMPONENTS = ['AdminPwaRegister', 'MarketingPwaClient', 'MarketingPwaRegistration', 'LmsPwaRegistration'];
 const PERSONAS = [
   ['Learner', 'apps/lms/app/lms/layout.tsx', 'public/manifest-student.json', '/manifest-student.json', '/lms/dashboard', '/lms', 'lms'],
   ['Apprentice', 'apps/lms/app/apprentice/layout.tsx', 'public/manifest-apprentice.json', '/manifest-apprentice.json', '/apprentice', '/apprentice', 'lms'],
   ['Host Shop', 'apps/lms/app/host-shop/layout.tsx', 'public/manifest-shop-owner.json', '/manifest-shop-owner.json', '/host-shop/dashboard', '/host-shop/', 'lms'],
-  ['Program Holder', 'apps/marketing/app/program-holder/layout.tsx', 'public/manifest-program-holder.json', '/manifest-program-holder.json', '/program-holder/dashboard', '/program-holder/', 'marketing'],
+  ['Program Holder', 'apps/lms/app/program-holder/layout.tsx', 'public/manifest-program-holder.json', '/manifest-program-holder.json', '/program-holder/dashboard', '/program-holder/', 'lms'],
 ];
 
-console.log('\n── Root PWA registrations ──');
+console.log('\n── Canonical PWA registrations ──');
 for (const [name, layoutPath, manifestFile, swFile, expectedComponent] of APPS) {
   const source = readFile(layoutPath);
   if (!source) { fail(`${name}: root layout missing`); continue; }
@@ -43,7 +42,7 @@ for (const [name, layoutPath, manifestFile, swFile, expectedComponent] of APPS) 
   if (!exists(swFile)) fail(`${name}: ${swFile} missing`); else pass(`${name}: service worker exists`);
 }
 
-console.log('\n── Persona portal manifests ──');
+console.log('\n── Authenticated role manifests ──');
 const syncSource = readFile('scripts/sync-pwa-public.mjs') || '';
 for (const [name, layoutPath, manifestFile, manifestHref, startUrl, scope, shippedBy] of PERSONAS) {
   const layout = readFile(layoutPath);
@@ -68,7 +67,7 @@ for (const [name, layoutPath, manifestFile, manifestHref, startUrl, scope, shipp
 }
 
 console.log('\n── Production PWA sync ──');
-for (const [service, packagePath] of [['lms', 'apps/lms/package.json'], ['marketing', 'apps/marketing/package.json']]) {
+for (const [service, packagePath] of [['lms', 'apps/lms/package.json'], ['marketing', 'apps/marketing/package.json'], ['admin', 'apps/admin/package.json']]) {
   const pkg = readJson(packagePath);
   const scripts = `${pkg?.scripts?.prebuild || ''} ${pkg?.scripts?.prestart || ''}`;
   if (!scripts.includes(`sync-pwa-public.mjs ${service}`)) fail(`${service}: prebuild/prestart does not run PWA sync`);
@@ -76,19 +75,14 @@ for (const [service, packagePath] of [['lms', 'apps/lms/package.json'], ['market
 }
 
 console.log('\n── Service worker responsibility boundaries ──');
-for (const sw of ['public/sw-marketing.js', 'public/sw-admin.js', 'public/sw-portal.js']) {
+for (const sw of ['public/sw-marketing.js', 'public/sw-admin.js']) {
   const source = readFile(sw) || '';
   if (/COURSE_CACHE|COURSE_STRATEGY|sync-enrollment|sync-hours|openOfflineDB/i.test(source)) fail(`${sw}: contains LMS offline/course responsibilities`);
   else pass(`${sw}: domain responsibilities are isolated`);
 }
 const lmsWorker = readFile('public/sw-lms.js') || '';
-for (const protectedPath of ['/lms/dashboard', '/apprentice', '/host-shop']) {
+for (const protectedPath of ['/lms/dashboard', '/apprentice', '/host-shop', '/program-holder']) {
   if (!lmsWorker.includes(protectedPath)) warn(`public/sw-lms.js: protected route marker ${protectedPath} was not found; confirm authenticated navigation remains network-only`);
-}
-
-console.log('\n── Legacy PWA files ──');
-for (const legacy of ['public/manifest-barber.json', 'public/manifest-partner.json', 'public/manifest-instructor.json', 'public/manifest-store.json', 'public/manifest-enrollment.json', 'public/store-manifest.json', 'public/manifest.json']) {
-  if (exists(legacy)) warn(`${legacy}: legacy/unlinked manifest remains`);
 }
 
 if (failures) {

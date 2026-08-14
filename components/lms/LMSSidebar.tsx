@@ -98,6 +98,8 @@ const bottomItems: NavItem[] = [
   { href: '/lms/settings', label: 'Settings', icon: Settings },
 ];
 
+/* eslint-disable react-hooks/static-components -- pre-existing pattern: NavLink/Section use closures over collapsed/state */
+
 export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 }: LMSSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
@@ -139,7 +141,6 @@ export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 
     );
   };
 
-  // eslint-disable-next-line react-hooks/static-components -- pre-existing pattern, uses closure over collapsed
   const Section = ({ label, items }: { label: string; items: NavItem[] }) => (
     <div className="mb-4">
       {!collapsed && <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-600">{label}</p>}

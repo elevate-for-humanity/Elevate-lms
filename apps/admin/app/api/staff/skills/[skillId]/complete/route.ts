@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - staff portal auth is required before user_skills writes and user_id comes from the authenticated session.
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -14,11 +15,9 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ skillId: 
   if (!isStaffPortalApiAuth(auth)) return auth;
 
   const db = await requireAdminClient();
-  if (!db)
-    return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
+  if (!db) return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
   const { skillId } = await params;
-
   await db.from('user_skills').upsert(
     {
       user_id: auth.userId,
@@ -31,7 +30,6 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ skillId: 
     { onConflict: 'user_id,skill_name' },
   );
 
-  // Redirect back to skills page (form POST)
   return NextResponse.redirect(new URL('/admin/staff-portal/skills', req.url));
 }
 

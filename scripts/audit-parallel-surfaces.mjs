@@ -14,6 +14,17 @@ const surfaces = {
 
 const routeFiles = new Set(['page.tsx','page.ts','page.jsx','page.js','route.ts','route.js','layout.tsx','layout.ts','layout.jsx','layout.js']);
 const codeExt = /\.(?:ts|tsx|js|jsx|mjs|cjs|json)$/;
+const allowedAppsEntries = new Set(['admin', 'lms', 'marketing']);
+const retiredArtifactNames = new Set([
+  'manifest-barber.json',
+  'manifest-partner.json',
+  'manifest-instructor.json',
+  'manifest-store.json',
+  'manifest-enrollment.json',
+  'store-manifest.json',
+  'manifest-portal.json',
+  'sw-portal.js',
+]);
 
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
@@ -56,6 +67,10 @@ function collectSurface(name, baseRel) {
     };
   });
 }
+
+const appsDir = path.join(ROOT, 'apps');
+const appsEntries = fs.existsSync(appsDir) ? fs.readdirSync(appsDir).sort() : [];
+const unexpectedAppsEntries = appsEntries.filter((entry) => !allowedAppsEntries.has(entry));
 
 const collected = Object.entries(surfaces).flatMap(([name, base]) => collectSurface(name, base));
 const canonical = collected.filter((r) => ['admin','lms','marketing'].includes(r.surface));
@@ -100,7 +115,9 @@ const workers = publicDirs.flatMap((rel) => walk(path.join(ROOT, rel))
   .filter((f) => /^sw(?:-[\w-]+)?\.js$/i.test(path.basename(f)))
   .map((f) => path.relative(ROOT, f).split(path.sep).join('/')));
 
-const sourceFiles = walk(ROOT).filter((f) => codeExt.test(f) && !f.includes(`${path.sep}node_modules${path.sep}`) && !f.includes(`${path.sep}.next${path.sep}`) && !f.includes(`${path.sep}.git${path.sep}`));
+const retiredArtifacts = [...manifests, ...workers].filter((file) => retiredArtifactNames.has(path.basename(file)));
+
+const sourceFiles = walk(ROOT).filter((f) => codeExt.test(f) && !f.includes(`${path.sep}node_modules${path.sep}`) && !f.includes(`${path.sep}.next${path.sep}`) && !f.includes(`${path.sep}.git${path.sep}`) && !f.includes(`${path.sep}artifacts${path.sep}`));
 const staleTokens = [
   'manifest-barber.json','manifest-partner.json','manifest-instructor.json','manifest-store.json','manifest-enrollment.json','store-manifest.json',
   'manifest-portal.json','sw-portal.js','PortalPwaRegistration',
@@ -120,6 +137,13 @@ for (const token of staleTokens) {
   }
 }
 
+const staleReferenceCount = Object.values(references).reduce((sum, files) => sum + files.length, 0);
+const violations = [];
+if (legacy.length) violations.push(`${legacy.length} legacy route file(s) remain under apps/app or apps/partner`);
+if (unexpectedAppsEntries.length) violations.push(`unexpected top-level apps entries: ${unexpectedAppsEntries.join(', ')}`);
+if (retiredArtifacts.length) violations.push(`retired PWA artifacts remain: ${retiredArtifacts.join(', ')}`);
+if (staleReferenceCount) violations.push(`${staleReferenceCount} stale private-route/PWA reference(s) remain`);
+
 const summary = {
   counts: {
     legacyRoutes: legacy.length,
@@ -130,12 +154,18 @@ const summary = {
     duplicateCanonicalKeys: duplicateCanonical.length,
     manifests: manifests.length,
     serviceWorkers: workers.length,
+    retiredArtifacts: retiredArtifacts.length,
+    staleReferences: staleReferenceCount,
   },
+  appsEntries,
+  unexpectedAppsEntries,
   classifications,
   duplicateCanonical,
   manifests,
   workers,
+  retiredArtifacts,
   references,
+  violations,
 };
 
 fs.mkdirSync(path.join(ROOT, 'artifacts'), { recursive: true });
@@ -144,12 +174,16 @@ fs.writeFileSync(path.join(ROOT, 'artifacts/parallel-surface-audit.json'), JSON.
 const md = [];
 md.push('# Parallel Surface Audit');
 md.push('');
+md.push(`Top-level apps entries: **${appsEntries.join(', ') || 'none'}**`);
+md.push(`Unexpected apps entries: **${unexpectedAppsEntries.length}**`);
 md.push(`Legacy route files: **${summary.counts.legacyRoutes}**`);
 md.push(`Canonical route files: **${summary.counts.canonicalRoutes}**`);
 md.push(`Exact duplicates: **${summary.counts.exactDuplicates}**`);
 md.push(`Divergent duplicates: **${summary.counts.divergentDuplicates}**`);
 md.push(`Unique legacy: **${summary.counts.uniqueLegacy}**`);
 md.push(`Canonical route collisions: **${summary.counts.duplicateCanonicalKeys}**`);
+md.push(`Retired PWA artifacts: **${summary.counts.retiredArtifacts}**`);
+md.push(`Stale route/PWA references: **${summary.counts.staleReferences}**`);
 md.push('');
 md.push('## Legacy route classification');
 md.push('');
@@ -171,6 +205,18 @@ for (const [token, files] of Object.entries(references)) {
   md.push(`- \`${token}\`: ${files.length ? files.map((f) => `\`${f}\``).join(', ') : 'none'}`);
 }
 md.push('');
+md.push('## Violations');
+if (violations.length) {
+  for (const violation of violations) md.push(`- ${violation}`);
+} else {
+  md.push('- none');
+}
+md.push('');
 fs.writeFileSync(path.join(ROOT, 'artifacts/parallel-surface-audit.md'), md.join('\n') + '\n');
 
 console.log(md.join('\n'));
+if (violations.length) {
+  console.error(`Parallel surface integrity FAILED with ${violations.length} violation group(s).`);
+  process.exit(1);
+}
+console.log('PASS: only canonical Admin/LMS/Marketing app surfaces remain.');

@@ -52,7 +52,7 @@ permissions:
 
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   EXPECTED_SHA: ${{ github.sha }}

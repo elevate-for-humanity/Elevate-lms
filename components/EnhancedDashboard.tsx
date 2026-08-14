@@ -147,7 +147,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
           </a>
 
           <a
-            href="/achievements"
+            href="/lms/achievements"
             className="flex flex-col items-center justify-center p-4 border-2 border-slate-200 rounded-lg hover:border-brand-orange-500 hover:bg-brand-orange-50 transition-colors"
           >
             <Award aria-label="award" className="w-6 h-6 text-black mb-2" />

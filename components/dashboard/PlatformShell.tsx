@@ -87,10 +87,10 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
       { href: '/apprentice/skills', label: 'Skills', icon: TrendingUp },
       { href: '/apprentice/attendance', label: 'Attendance', icon: Calendar },
       { href: '/apprentice/documents', label: 'Documents', icon: FileText },
-      { href: '/apprentice/portfolio', label: 'Portfolio', icon: Briefcase },
-      { href: '/apprentice/payments', label: 'Payments', icon: DollarSign },
-      { href: '/apprentice/messages', label: 'Messages', icon: MessageSquare },
-      { href: '/apprentice/resources', label: 'Resources', icon: BookOpen },
+      { href: '/lms/portfolio', label: 'Portfolio', icon: Briefcase },
+      { href: '/apprentice/billing', label: 'Payments', icon: DollarSign },
+      { href: '/lms/messages', label: 'Messages', icon: MessageSquare },
+      { href: '/lms/library', label: 'Resources', icon: BookOpen },
       { href: '/apprentice/profile', label: 'Profile', icon: Settings },
     ],
   },
@@ -118,7 +118,7 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
     ],
   },
   partner: {
-    title: 'Partner Portal',
+    title: 'Host Shop Portal',
     items: [
       { href: '/host-shop/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/host-shop/resources', label: 'Resources', icon: BookOpen },
@@ -249,7 +249,7 @@ export function PlatformShell({
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <Link
-              href="/notifications"
+              href="/lms/notifications"
               className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
               aria-label="Notifications"
             >
@@ -279,7 +279,7 @@ export function PlatformShell({
                     <p className="font-medium text-slate-900">{userName}</p>
                     <p className="text-sm text-slate-500">{user.email}</p>
                   </div>
-                  <Link href="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
+                  <Link href="/lms/settings/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
                     <Settings className="w-4 h-4" />
                     Settings
                   </Link>

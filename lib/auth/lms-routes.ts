@@ -32,7 +32,7 @@ export const LMS_PROTECTED_ROUTES: RouteConfig[] = [
   { path: '/lms/calendar', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
   { path: '/lms/messages', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
   { path: '/lms/portfolio', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
-  { path: '/lms/badges', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
+  { path: '/lms/achievements', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
   { path: '/lms/achievements', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
   { path: '/lms/leaderboard', allowedRoles: ['student', 'instructor', 'staff', 'admin'] },
 ];

@@ -73,7 +73,7 @@ function EnrollmentConfirmedContent() {
       const state = normalizeEnrollmentState(data.enrollment_state) ?? data.enrollment_state;
 
       if (hasLmsAccess(state)) {
-        router.push('/learner/dashboard');
+        router.push('/lms/dashboard');
         return;
       }
 
@@ -239,7 +239,7 @@ function EnrollmentConfirmedContent() {
           </Link>
         ) : awaitingReview ? (
           <Link
-            href="/learner/dashboard"
+            href="/lms/dashboard"
             className="flex items-center justify-center gap-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-900 text-center font-semibold py-4 px-6 rounded-lg transition-colors"
           >
             Go to Dashboard <ArrowRight className="w-5 h-5" />

@@ -164,7 +164,7 @@ export const footerNavigation = {
  */
 export const dashboardNavigation = {
   student: [
-    { label: 'Dashboard', href: '/learner/dashboard', icon: 'home' },
+    { label: 'Dashboard', href: '/lms/dashboard', icon: 'home' },
     { label: 'My Lessons', href: '/lms/courses', icon: 'book' },
     { label: 'Transcript', href: '/transcript', icon: 'file-text' },
     { label: 'Leaderboard', href: '/leaderboard', icon: 'award' },

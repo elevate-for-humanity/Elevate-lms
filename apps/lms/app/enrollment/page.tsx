@@ -111,7 +111,7 @@ export default function EnrollmentPage() {
                 })}
               </div>
               {app.enrollment_status === 'active' && (
-                <Link href="/learner/dashboard" className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-colors">
+                <Link href="/lms/dashboard" className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-colors">
                   Go to My Courses <ArrowRight className="w-4 h-4" />
                 </Link>
               )}

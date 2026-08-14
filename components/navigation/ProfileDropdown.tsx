@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { siteUrls } from '@/lib/utils/site-urls';
 import {
   User,
   Settings,
@@ -23,19 +24,29 @@ import {
 
 // Maps every role to its portal landing page — mirrors lib/auth/role-destinations.ts
 const ROLE_PORTAL: Record<string, { label: string; href: string }> = {
-  admin:     { label: 'Admin Dashboard',        href: '/admin/dashboard' },
-  admin:           { label: 'Admin Dashboard',        href: '/admin/dashboard' },
-  org_admin:       { label: 'Admin Dashboard',        href: '/admin/dashboard' },
-  staff:           { label: 'Staff Portal',           href: '/admin/staff-portal/dashboard' },
-  instructor:      { label: 'Instructor Portal',      href: '/instructor' },
-  creator:         { label: 'Creator Portal',         href: '/creator/products' },
-  case_manager:    { label: 'Case Manager Portal',    href: '/case-manager/dashboard' },
-  workforce_board: { label: 'Workforce Board',        href: '/workforce-board/dashboard' },
-  program_holder:  { label: 'Program Holder Portal',  href: '/program-holder/dashboard' },
-  provider_admin:  { label: 'Provider Portal',        href: '/provider/dashboard' },
-  employer:        { label: 'Employer Portal',        href: '/employer/dashboard' },
-  partner:         { label: 'Partner Portal',         href: '/partner/dashboard' },
-  student:         { label: 'My Dashboard',           href: '/learner/dashboard' },
+  super_admin: { label: 'Admin Dashboard', href: `${siteUrls.admin}/dashboard` },
+  admin: { label: 'Admin Dashboard', href: `${siteUrls.admin}/dashboard` },
+  org_admin: { label: 'Admin Dashboard', href: `${siteUrls.admin}/dashboard` },
+  staff: { label: 'Staff Portal', href: `${siteUrls.admin}/staff-portal/dashboard` },
+  instructor: { label: 'Instructor Portal', href: `${siteUrls.admin}/instructor/dashboard` },
+  creator: { label: 'Creator Portal', href: `${siteUrls.app}/creator/products` },
+  case_manager: { label: 'Case Manager Portal', href: `${siteUrls.site}/case-manager/dashboard` },
+  workforce_board: { label: 'Workforce Board', href: `${siteUrls.site}/workforce-board/dashboard` },
+  program_holder: { label: 'Program Holder Portal', href: `${siteUrls.site}/program-holder/dashboard` },
+  provider: { label: 'Provider Portal', href: `${siteUrls.site}/provider/dashboard` },
+  provider_admin: { label: 'Provider Portal', href: `${siteUrls.site}/provider/dashboard` },
+  employer: { label: 'Employer Portal', href: `${siteUrls.app}/employer/dashboard` },
+  sponsor: { label: 'Employer Portal', href: `${siteUrls.app}/employer/dashboard` },
+  partner: { label: 'Host Shop Portal', href: `${siteUrls.app}/host-shop/dashboard` },
+  host_shop: { label: 'Host Shop Portal', href: `${siteUrls.app}/host-shop/dashboard` },
+  host_shop_admin: { label: 'Host Shop Portal', href: `${siteUrls.app}/host-shop/dashboard` },
+  workforce_partner: { label: 'Workforce Portal', href: `${siteUrls.app}/workforce/dashboard` },
+  parent: { label: 'Parent Portal', href: `${siteUrls.app}/parent-portal/dashboard` },
+  apprentice: { label: 'Apprentice Portal', href: `${siteUrls.app}/apprentice` },
+  barber_apprentice: { label: 'Apprentice Portal', href: `${siteUrls.app}/apprentice` },
+  cosmetology_apprentice: { label: 'Apprentice Portal', href: `${siteUrls.app}/apprentice` },
+  student: { label: 'My Dashboard', href: `${siteUrls.app}/lms/dashboard` },
+  learner: { label: 'My Dashboard', href: `${siteUrls.app}/lms/dashboard` },
 };
 
 interface UserProfile {

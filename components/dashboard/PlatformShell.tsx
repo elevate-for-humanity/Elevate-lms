@@ -82,16 +82,16 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
   apprentice: {
     title: 'Apprentice Portal',
     items: [
-      { href: '/portal/apprentice', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/portal/apprentice/hours', label: 'Clock Hours', icon: Clock },
-      { href: '/portal/apprentice/skills', label: 'Skills', icon: TrendingUp },
-      { href: '/portal/apprentice/attendance', label: 'Attendance', icon: Calendar },
-      { href: '/portal/apprentice/documents', label: 'Documents', icon: FileText },
-      { href: '/portal/apprentice/portfolio', label: 'Portfolio', icon: Briefcase },
-      { href: '/portal/apprentice/payments', label: 'Payments', icon: DollarSign },
-      { href: '/portal/apprentice/messages', label: 'Messages', icon: MessageSquare },
-      { href: '/portal/apprentice/resources', label: 'Resources', icon: BookOpen },
-      { href: '/portal/apprentice/profile', label: 'Profile', icon: Settings },
+      { href: '/apprentice', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/apprentice/hours', label: 'Clock Hours', icon: Clock },
+      { href: '/apprentice/skills', label: 'Skills', icon: TrendingUp },
+      { href: '/apprentice/attendance', label: 'Attendance', icon: Calendar },
+      { href: '/apprentice/documents', label: 'Documents', icon: FileText },
+      { href: '/apprentice/portfolio', label: 'Portfolio', icon: Briefcase },
+      { href: '/apprentice/payments', label: 'Payments', icon: DollarSign },
+      { href: '/apprentice/messages', label: 'Messages', icon: MessageSquare },
+      { href: '/apprentice/resources', label: 'Resources', icon: BookOpen },
+      { href: '/apprentice/profile', label: 'Profile', icon: Settings },
     ],
   },
   instructor: {
@@ -120,11 +120,10 @@ const NAV_CONFIG: Record<UserRole, { items: NavItem[]; title: string }> = {
   partner: {
     title: 'Partner Portal',
     items: [
-      { href: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-      { href: '/partner/programs', label: 'Programs', icon: BookOpen },
-      { href: '/partner/reports', label: 'Reports', icon: BarChart3 },
-      { href: '/partner/messages', label: 'Messages', icon: MessageSquare },
-      { href: '/partner/settings', label: 'Settings', icon: Settings },
+      { href: '/host-shop/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/host-shop/resources', label: 'Resources', icon: BookOpen },
+      { href: '/host-shop/mou', label: 'MOU', icon: FileText },
+      { href: '/host-shop/onboarding', label: 'Onboarding', icon: ClipboardCheck },
     ],
   },
   staff: {

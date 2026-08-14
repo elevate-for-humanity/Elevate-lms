@@ -74,7 +74,7 @@ export default function DocumentsPage() {
       const state = normalizeEnrollmentState(data.enrollment_state) ?? data.enrollment_state;
 
       if (hasLmsAccess(state)) {
-        router.push('/learner/dashboard');
+        router.push('/lms/dashboard');
         return;
       }
 
@@ -170,7 +170,7 @@ export default function DocumentsPage() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push('/learner/dashboard');
+        router.push('/lms/dashboard');
       }, 2000);
     } catch (err: any) {
       setError('An error occurred');

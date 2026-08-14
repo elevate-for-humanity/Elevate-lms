@@ -50,7 +50,7 @@ export const NEVER_INDEX_PATTERNS = [
   '/creator/*',
   '/checkout/*',
   '/payment/*',
-  '/learner/dashboard',
+  '/lms/dashboard',
   '/lms/courses/*', // Course interiors
   '/lms/assignments',
   '/lms/quizzes',

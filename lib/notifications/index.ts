@@ -342,7 +342,7 @@ export async function notifyApprenticeDecision(
   let portalUrl: string | null = null;
 
   if (approved) {
-    portalUrl = await buildTokenUrl('/learner/dashboard', {
+    portalUrl = await buildTokenUrl('/lms/dashboard', {
       purpose: 'continue_enrollment',
       email,
       expiresDays: 14,

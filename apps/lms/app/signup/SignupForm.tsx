@@ -18,7 +18,7 @@ function SignupFormContent() {
   const searchParams = useSafeSearchParams();
   const next = validateRedirect(
     searchParams.get('next') || searchParams.get('redirect'),
-    '/learner/dashboard',
+    '/lms/dashboard',
   );
   const router = useRouter();
   const [formData, setFormData] = useState({

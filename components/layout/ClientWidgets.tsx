@@ -68,7 +68,7 @@ export default function ClientWidgets() {
   // Home, Community, Learn, Events, Progress, AI Team.
   const showBottomNav =
     pathname?.startsWith('/lms') ||
-    pathname?.startsWith('/learner/dashboard') ||
+    pathname?.startsWith('/lms/dashboard') ||
     pathname?.startsWith('/account/ai-team') ||
     pathname?.startsWith('/achievements') ||
     pathname?.startsWith('/leaderboard') ||

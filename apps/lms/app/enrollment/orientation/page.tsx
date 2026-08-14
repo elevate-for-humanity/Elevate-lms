@@ -53,7 +53,7 @@ export default function EnrollMentorientationPage() {
       const state = normalizeEnrollmentState(data.enrollment_state) ?? data.enrollment_state;
 
       if (hasLmsAccess(state)) {
-        router.push('/learner/dashboard');
+        router.push('/lms/dashboard');
         return;
       }
 

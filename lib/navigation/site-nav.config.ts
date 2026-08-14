@@ -406,7 +406,7 @@ export const footerNavigation = {
       { label: 'Career Services', href: '/career-services' },
       { label: 'Employment Support', href: '/employment-support' },
       { label: 'Success Stories', href: '/success' },
-      { label: 'Student Login', href: '/learner/dashboard' },
+      { label: 'Student Login', href: '/lms/dashboard' },
     ],
   },
   partners: {

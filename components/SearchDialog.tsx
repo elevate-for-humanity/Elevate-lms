@@ -21,7 +21,7 @@ const staticPages = [
   { title: 'About Us', href: '/about', category: 'Page' },
   { title: 'Contact', href: '/contact', category: 'Page' },
   { title: 'Apply Now', href: '/apply', category: 'Page' },
-  { title: 'Learner Portal', href: '/learner/dashboard', category: 'Page' },
+  { title: 'Learner Portal', href: '/lms/dashboard', category: 'Page' },
   { title: 'All Programs', href: '/programs', category: 'Page' },
 ];
 

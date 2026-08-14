@@ -125,12 +125,12 @@ export const PAGE_SCRIPTS: Record<
   },
 
   // === DASHBOARD / STATUS ===
-  '/learner/dashboard': {
+  '/lms/dashboard': {
     opening: `This dashboard shows your status and the one step blocking progress. Status flow: submitted → under review → approved/denied → enrolled → completed.`,
     nextAction: `Open Requirements/Documents and complete the first incomplete item.`,
   },
 
-  '/learner/dashboard': {
+  '/lms/dashboard': {
     opening: `This dashboard shows your status and next required action. Most delays are missing documents or unsigned agreements.`,
     nextAction: `Check your status card and complete any pending items.`,
   },
@@ -141,7 +141,7 @@ export const PAGE_SCRIPTS: Record<
     nextAction: `Click a course to continue learning.`,
   },
 
-  '/learner/dashboard': {
+  '/lms/dashboard': {
     opening: `Your enrolled courses, completion percentage, and deadlines are shown here. For funded programs, progress is reported to oversight partners.`,
     nextAction: `Click 'Continue' on your active course.`,
   },

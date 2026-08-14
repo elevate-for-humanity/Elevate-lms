@@ -212,7 +212,7 @@ export async function notifyNewRequirement(
     type: 'requirement',
     title: 'New Requirement Added',
     message: `You have a new requirement: ${requirementTitle}. Due: ${dueDate}`,
-    actionUrl: `/learner/dashboard`,
+    actionUrl: `/lms/dashboard`,
     actionLabel: 'View Requirements',
     metadata: {
       requirement_id: requirementId,
@@ -235,7 +235,7 @@ export async function notifyRequirementDeadline(
     type: 'warning',
     title: 'Requirement Due Soon',
     message: `"${requirementTitle}" is due in ${daysUntilDue} day${daysUntilDue !== 1 ? 's' : ''}`,
-    actionUrl: `/learner/dashboard`,
+    actionUrl: `/lms/dashboard`,
     actionLabel: 'Complete Now',
     metadata: {
       requirement_id: requirementId,
@@ -258,7 +258,7 @@ export async function notifyOverdueRequirement(
     type: 'error',
     title: 'Overdue Requirement',
     message: `"${requirementTitle}" is ${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue. Please complete as soon as possible.`,
-    actionUrl: `/learner/dashboard`,
+    actionUrl: `/lms/dashboard`,
     actionLabel: 'Complete Now',
     metadata: {
       requirement_id: requirementId,
@@ -283,7 +283,7 @@ export async function notifyRequirementVerified(
     message: approved
       ? `Your "${requirementTitle}" has been verified and approved.`
       : `Your "${requirementTitle}" needs revision. ${reason || 'Please review and resubmit.'}`,
-    actionUrl: `/learner/dashboard`,
+    actionUrl: `/lms/dashboard`,
     actionLabel: approved ? 'View Progress' : 'Revise Requirement',
     metadata: {
       approved,
@@ -397,7 +397,7 @@ export async function notifyFundingAssigned(
     type: 'funding',
     title: 'Funding Approved',
     message: `You've been approved for ${fundingSource} funding: $${amount.toFixed(2)}`,
-    actionUrl: `/learner/dashboard`,
+    actionUrl: `/lms/dashboard`,
     actionLabel: 'View Details',
     metadata: {
       funding_source: fundingSource,
@@ -419,7 +419,7 @@ export async function notifyEnrollmentConfirmed(
     type: 'success',
     title: 'Enrollment Confirmed',
     message: `You're enrolled in ${programName}. Start date: ${startDate}`,
-    actionUrl: `/learner/dashboard`,
+    actionUrl: `/lms/dashboard`,
     actionLabel: 'View Dashboard',
     metadata: {
       program_name: programName,

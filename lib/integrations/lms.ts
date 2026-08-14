@@ -318,7 +318,7 @@ export async function getEnrollmentStatus(
     lmsUserId: enrollment.user_id,
     dashboardUrl: dashboard?.id
       ? `/learner/dashboard?id=${dashboard.id}`
-      : `/learner/dashboard`,
+      : `/lms/dashboard`,
   };
 }
 

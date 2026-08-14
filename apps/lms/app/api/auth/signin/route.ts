@@ -4,13 +4,13 @@
  * Authenticates user with email and password.
  * Protected with rate limiting and input validation.
  *
- * Session tokens are persisted only through Supabase's HttpOnly/shared-domain
- * cookie response. They are intentionally not echoed into JSON.
+ * Session tokens are persisted only through Supabase's shared-domain cookie
+ * response. They are intentionally not echoed into JSON.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { signInSchema } from '@/lib/api/validation-schemas';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -19,33 +19,34 @@ const _POST = withErrorHandling(async (request: NextRequest) => {
   const rateLimited = await applyRateLimit(request, 'auth');
   if (rateLimited) return rateLimited as NextResponse;
 
-  const supabase = await createClient();
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: 'Authentication service is temporarily unavailable.', code: 'AUTH_UNAVAILABLE' },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
+  }
 
-  let body;
+  let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json(
       { error: 'Invalid JSON in request body', code: 'BAD_REQUEST' },
-      { status: 400 },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
     );
   }
 
-  let validatedData;
-  try {
-    validatedData = signInSchema.parse(body);
-  } catch (err) {
+  const validated = signInSchema.safeParse(body);
+  if (!validated.success) {
     return NextResponse.json(
-      { error: 'Invalid request data', code: 'VALIDATION_ERROR', details: (err as Error).message },
-      { status: 400 },
+      { error: 'Invalid sign-in request.', code: 'VALIDATION_ERROR' },
+      { status: 400, headers: { 'Cache-Control': 'no-store' } },
     );
   }
-  const { email, password } = validatedData;
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const { email, password } = validated.data;
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     if (error.message.includes('Invalid login credentials')) {

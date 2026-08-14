@@ -1,46 +1,105 @@
 /**
  * timedFetch — fetch with hard timeout + circuit breaker for all Supabase clients.
  *
- * Without the timeout, a stalled TCP connection to Supabase waits ~22s before
- * the OS gives up. On ECS/Lambda this shows as 21-23s request durations.
- *
- * The circuit breaker opens after 5 consecutive failures and prevents
- * cascading DB timeouts from stalling the entire request pipeline.
- *
- * Keep-alive header reuses TCP connections across invocations within the
- * same warm container, reducing cold-start connection overhead.
+ * Transient Supabase Data API/PostgREST failures must not immediately cascade
+ * into Admin/LMS outages. Safe reads get a small bounded retry budget; writes
+ * are never replayed automatically. Final transient HTTP failures are thrown so
+ * the circuit breaker records them instead of treating a 503 Response as success.
  */
 import { breakers } from '@/lib/resilience';
 
 const SUPABASE_FETCH_TIMEOUT_MS = 8_000;
+const SAFE_READ_MAX_ATTEMPTS = 3;
+const TRANSIENT_STATUSES = new Set([502, 503, 504]);
 
-export function timedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
+  if (!headers) return {};
+
+  return Object.fromEntries(
+    headers instanceof Headers
+      ? headers.entries()
+      : Array.isArray(headers)
+        ? headers
+        : Object.entries(headers).map(([key, value]) => [key, String(value)]),
+  );
+}
+
+function methodFor(init?: RequestInit): string {
+  return (init?.method || 'GET').toUpperCase();
+}
+
+function isSafeRead(method: string): boolean {
+  return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+}
+
+function retryDelayMs(attempt: number): number {
+  // Small deterministic backoff keeps recovery fast without creating a retry storm.
+  return attempt === 1 ? 150 : 400;
+}
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchAttempt(
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  headers: Record<string, string>,
+): Promise<Response> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SUPABASE_FETCH_TIMEOUT_MS);
 
-  // Normalize headers — init.headers may be a Headers instance, a plain object,
-  // or an array of [key, value] pairs. Spreading a Headers instance produces {}
-  // which silently drops apikey/Authorization, causing "No API key" from Supabase.
-  const existingHeaders = init?.headers
-    ? Object.fromEntries(
-        init.headers instanceof Headers
-          ? init.headers.entries()
-          : Array.isArray(init.headers)
-            ? init.headers
-            : Object.entries(init.headers),
-      )
-    : {};
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        Connection: 'keep-alive',
+        ...headers,
+      },
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
-  return breakers.supabase
-    .call(() =>
-      fetch(input, {
-        ...init,
-        signal: controller.signal,
-        headers: {
-          Connection: 'keep-alive',
-          ...existingHeaders,
-        },
-      }),
-    )
-    .finally(() => clearTimeout(timer));
+export function timedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const method = methodFor(init);
+  const headers = normalizeHeaders(init?.headers);
+  const maxAttempts = isSafeRead(method) ? SAFE_READ_MAX_ATTEMPTS : 1;
+
+  return breakers.supabase.call(async () => {
+    let lastError: unknown;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        const response = await fetchAttempt(input, init, headers);
+
+        if (!TRANSIENT_STATUSES.has(response.status)) {
+          return response;
+        }
+
+        lastError = new Error(`Supabase transient HTTP ${response.status}`);
+
+        if (attempt < maxAttempts) {
+          await sleep(retryDelayMs(attempt));
+          continue;
+        }
+      } catch (error) {
+        lastError = error;
+
+        // Only safe reads may be retried. Never replay writes after an unknown
+        // network outcome because the server may already have committed them.
+        if (!isSafeRead(method) || attempt >= maxAttempts) {
+          throw error;
+        }
+
+        await sleep(retryDelayMs(attempt));
+      }
+    }
+
+    throw lastError instanceof Error
+      ? lastError
+      : new Error('Supabase request failed after bounded retries');
+  });
 }

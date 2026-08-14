@@ -7,9 +7,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const metadata: Metadata = { title: 'Provider Dashboard', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
 
-function host(value: string | undefined, fallback: string) {
-  try { return new URL((value || fallback).trim()).host; } catch { return fallback.replace(/^https?:\/\//, ''); }
-}
+function host(value: string | undefined, fallback: string) { try { return new URL((value || fallback).trim()).host; } catch { return fallback.replace(/^https?:\/\//, ''); } }
 
 export default async function ProviderDashboardPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
   const { tenant } = await searchParams;
@@ -18,8 +16,8 @@ export default async function ProviderDashboardPage({ searchParams }: { searchPa
 
   const tenantId = access.tenantId!;
   const db = access.db;
+  const tenantSuffix = access.isPlatformAdmin ? `?tenant=${encodeURIComponent(tenantId)}` : '';
   const appHost = host(process.env.NEXT_PUBLIC_APP_URL, PLATFORM_DEFAULTS.canonicalDomain);
-
   const [tenantRes, orgRes, onboardingRes, programsRes, enrollmentsRes, completedRes, certsRes, complianceRes] = await Promise.all([
     db.from('tenants').select('id, name, slug, status, active').eq('id', tenantId).maybeSingle(),
     db.from('organizations').select('id, name, slug, domain').eq('tenant_id', tenantId).maybeSingle(),
@@ -30,51 +28,24 @@ export default async function ProviderDashboardPage({ searchParams }: { searchPa
     db.from('certificates').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
     db.from('provider_compliance_artifacts').select('id, label, expires_at, verified').eq('tenant_id', tenantId),
   ]);
-
   const organization = orgRes.data;
   const tenantRecord = tenantRes.data;
   const programs = programsRes.data ?? [];
   const onboarding = onboardingRes.data ?? [];
-  const completeSteps = onboarding.filter((step: any) => step.completed).length;
-  const onboardingPct = onboarding.length ? Math.round((completeSteps / onboarding.length) * 100) : 100;
+  const onboardingPct = onboarding.length ? Math.round((onboarding.filter((step: any) => step.completed).length / onboarding.length) * 100) : 100;
   const expiring = (complianceRes.data ?? []).filter((row: any) => row.expires_at && new Date(row.expires_at).getTime() <= Date.now() + 30 * 86400000).length;
+  const p = (path: string) => `${path}${tenantSuffix}`;
 
-  return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950">
-      <div className="mx-auto max-w-6xl space-y-7">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700">Provider Portal</p>
-          <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
-            <div><h1 className="text-3xl font-black">{organization?.name || tenantRecord?.name || 'Training Provider'}</h1><p className="mt-1 text-slate-600">Programs, learners, compliance, and provider operations.</p></div>
-            {access.isPlatformAdmin ? <Link href="/provider/dashboard" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to provider oversight</Link> : null}
-          </div>
-        </section>
-
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Metric label="Programs" value={programs.length} icon={BookOpen} />
-          <Metric label="Enrollments" value={enrollmentsRes.count ?? 0} icon={Users} />
-          <Metric label="Completions" value={completedRes.count ?? 0} icon={Award} />
-          <Metric label="Certificates" value={certsRes.count ?? 0} icon={ShieldCheck} />
-        </section>
-
-        {onboardingPct < 100 ? <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5"><div className="flex justify-between gap-3"><div><h2 className="font-black text-blue-950">Provider onboarding</h2><p className="text-sm text-blue-800">Complete required setup before all operations are enabled.</p></div><span className="font-black text-blue-900">{onboardingPct}%</span></div><div className="mt-4 h-2 overflow-hidden rounded-full bg-blue-200"><div className="h-full bg-blue-700" style={{ width: `${onboardingPct}%` }} /></div></section> : null}
-
-        {expiring > 0 ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5"><p className="font-black text-amber-950">{expiring} compliance item{expiring === 1 ? '' : 's'} expire within 30 days.</p><Link href="/provider/compliance" className="mt-2 inline-flex text-sm font-bold text-amber-900">Review compliance <ArrowRight className="ml-1 h-4 w-4" /></Link></section> : null}
-
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between"><h2 className="text-xl font-black">Programs</h2><Link href="/provider/programs" className="text-sm font-bold text-blue-700">Manage programs</Link></div>
-            <div className="mt-4 divide-y divide-slate-100">{programs.length ? programs.map((program: any) => <div key={program.id} className="flex items-center justify-between gap-4 py-3"><div><p className="font-bold">{program.title || 'Untitled program'}</p><p className="text-xs text-slate-600">{program.published && program.is_active ? 'Published' : program.status || 'Draft'}</p></div><Link href="/provider/programs" className="text-sm font-bold text-blue-700">Open</Link></div>) : <p className="py-6 text-sm text-slate-600">No programs are assigned to this provider yet.</p>}</div>
-          </div>
-
-          <div className="space-y-6">
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center gap-2"><Globe className="h-5 w-5 text-blue-700" /><h2 className="font-black">Domain & DNS</h2></div><p className="mt-3 text-sm text-slate-600">Custom domain: <strong>{organization?.domain || 'Not configured'}</strong></p><p className="mt-2 text-sm text-slate-600">Application target: <strong>{appHost}</strong></p><Link href="/provider/settings" className="mt-4 inline-flex text-sm font-bold text-blue-700">Manage settings</Link></section>
-            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="font-black">Quick actions</h2><div className="mt-4 grid gap-2"><Quick href="/provider/programs" label="Programs" /><Quick href="/provider/compliance" label="Compliance" /><Quick href="/provider/settings" label="Settings" /></div></section>
-          </div>
-        </section>
-      </div>
-    </main>
-  );
+  return <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950"><div className="mx-auto max-w-6xl space-y-7">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700">Provider Portal</p><div className="mt-2 flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-3xl font-black">{organization?.name || tenantRecord?.name || 'Training Provider'}</h1><p className="mt-1 text-slate-600">Programs, learners, compliance, and provider operations.</p></div>{access.isPlatformAdmin ? <Link href="/provider/dashboard" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to provider oversight</Link> : null}</div></section>
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Metric label="Programs" value={programs.length} icon={BookOpen} /><Metric label="Enrollments" value={enrollmentsRes.count ?? 0} icon={Users} /><Metric label="Completions" value={completedRes.count ?? 0} icon={Award} /><Metric label="Certificates" value={certsRes.count ?? 0} icon={ShieldCheck} /></section>
+    {onboardingPct < 100 ? <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5"><div className="flex justify-between gap-3"><div><h2 className="font-black text-blue-950">Provider onboarding</h2><p className="text-sm text-blue-800">Complete required setup before all operations are enabled.</p></div><span className="font-black text-blue-900">{onboardingPct}%</span></div><div className="mt-4 h-2 overflow-hidden rounded-full bg-blue-200"><div className="h-full bg-blue-700" style={{ width: `${onboardingPct}%` }} /></div></section> : null}
+    {expiring > 0 ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5"><p className="font-black text-amber-950">{expiring} compliance item{expiring === 1 ? '' : 's'} expire within 30 days.</p><Link href={p('/provider/compliance')} className="mt-2 inline-flex text-sm font-bold text-amber-900">Review compliance <ArrowRight className="ml-1 h-4 w-4" /></Link></section> : null}
+    <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between"><h2 className="text-xl font-black">Programs</h2><Link href={p('/provider/programs')} className="text-sm font-bold text-blue-700">Manage programs</Link></div><div className="mt-4 divide-y divide-slate-100">{programs.length ? programs.map((program: any) => <div key={program.id} className="flex items-center justify-between gap-4 py-3"><div><p className="font-bold">{program.title || 'Untitled program'}</p><p className="text-xs text-slate-600">{program.published && program.is_active ? 'Published' : program.status || 'Draft'}</p></div><Link href={p('/provider/programs')} className="text-sm font-bold text-blue-700">Open</Link></div>) : <p className="py-6 text-sm text-slate-600">No programs are assigned to this provider yet.</p>}</div></div>
+      <div className="space-y-6"><section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center gap-2"><Globe className="h-5 w-5 text-blue-700" /><h2 className="font-black">Domain & DNS</h2></div><p className="mt-3 text-sm text-slate-600">Custom domain: <strong>{organization?.domain || 'Not configured'}</strong></p><p className="mt-2 text-sm text-slate-600">Application target: <strong>{appHost}</strong></p><Link href={p('/provider/settings')} className="mt-4 inline-flex text-sm font-bold text-blue-700">Manage settings</Link></section><section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="font-black">Quick actions</h2><div className="mt-4 grid gap-2"><Quick href={p('/provider/programs')} label="Programs" /><Quick href={p('/provider/compliance')} label="Compliance" /><Quick href={p('/provider/settings')} label="Settings" /></div></section></div>
+    </section>
+  </div></main>;
 }
 
 async function ProviderAdminOversight({ db }: { db: any }) {

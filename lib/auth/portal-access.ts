@@ -29,7 +29,7 @@ export async function requirePortalAccess(portalKey: PortalKey): Promise<PortalA
     portalKey,
     isPlatformAdmin,
     isStaffOperator,
-    tenantId: auth.profile.organization_id ?? null,
+    tenantId: auth.profile.tenant_id ?? auth.profile.organization_id ?? null,
   };
 }
 

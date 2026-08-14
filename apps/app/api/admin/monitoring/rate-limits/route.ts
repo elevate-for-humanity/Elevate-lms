@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { Redis } from '@upstash/redis';
+import { Redis } from 'ioredis';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
@@ -16,7 +16,6 @@ async function _GET(request: Request) {
 
     const supabase = await createClient();
 
-    // Check if user is admin
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -35,7 +34,6 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get rate limit hits from audit logs
     const now = new Date();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
@@ -45,27 +43,27 @@ async function _GET(request: Request) {
       .eq('action_type', 'rate_limit_hit')
       .gte('created_at', oneHourAgo.toISOString());
 
-    // Get Upstash analytics if available
-    let upstashStats = null;
-    if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-      try {
-        const redis = new Redis({
-          url: process.env.UPSTASH_REDIS_REST_URL,
-          token: process.env.UPSTASH_REDIS_REST_TOKEN,
-        });
+    let redisStats = null;
+    if (process.env.REDIS_URL) {
+      const redis = new Redis(process.env.REDIS_URL, {
+        maxRetriesPerRequest: 1,
+        connectTimeout: 5_000,
+        enableReadyCheck: true,
+      });
 
-        // Get rate limit keys
+      try {
         const keys = await redis.keys('ratelimit:*');
-        upstashStats = {
+        redisStats = {
           totalKeys: keys.length,
-          keys: keys.slice(0, 100), // Limit to 100 keys
+          keys: keys.slice(0, 100),
         };
       } catch (error) {
-        logger.error('Failed to get Upstash stats:', error);
+        logger.error('Failed to get Redis rate-limit stats:', error);
+      } finally {
+        redis.disconnect();
       }
     }
 
-    // Analyze rate limit hits
     const analysis = analyzeRateLimitHits(rateLimitHits || []);
 
     return NextResponse.json({
@@ -73,7 +71,7 @@ async function _GET(request: Request) {
       timeRange: '1h',
       totalHits: rateLimitHits?.length || 0,
       analysis,
-      upstashStats,
+      redisStats,
     });
   } catch (error) {
     logger.error('Rate limit monitoring error:', error);
@@ -96,14 +94,12 @@ function analyzeRateLimitHits(hits: any[]) {
     };
   }
 
-  // Group by endpoint
   const byEndpoint: Record<string, number> = {};
   hits.forEach((hit) => {
     const endpoint = hit.details?.endpoint || 'unknown';
     byEndpoint[endpoint] = (byEndpoint[endpoint] || 0) + 1;
   });
 
-  // Group by IP
   const byIP: Record<string, { count: number; endpoints: Set<string> }> = {};
   hits.forEach((hit) => {
     const ip = hit.ip_address || 'unknown';
@@ -117,7 +113,6 @@ function analyzeRateLimitHits(hits: any[]) {
     byIP[ip].endpoints.add(endpoint);
   });
 
-  // Find top offenders
   const topOffenders = Object.entries(byIP)
     .map(([ip, data]) => ({
       ip,
@@ -127,7 +122,6 @@ function analyzeRateLimitHits(hits: any[]) {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
 
-  // Create timeline (hourly buckets)
   const timeline: Record<string, number> = {};
   hits.forEach((hit) => {
     const hour = new Date(hit.created_at).toISOString().slice(0, 13) + ':00:00';

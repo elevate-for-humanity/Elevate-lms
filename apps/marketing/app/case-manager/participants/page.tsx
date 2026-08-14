@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
+import { getCaseManagerParticipants } from '@/lib/case-manager/participant-scope';
 import { Users, ChevronRight } from 'lucide-react';
 import { StudentSearchPanel } from '../StudentSearchPanel';
 
@@ -20,40 +21,26 @@ interface Props {
 export default async function CaseManagerParticipantsPage({ searchParams }: Props) {
   const { q } = await searchParams;
   const normalizedQuery = q?.trim().toLowerCase() ?? '';
-  const { user } = await requireRole(['case_manager', 'admin', 'staff']);
+  const { user, effectiveRoles } = await requireRole(['case_manager', 'admin', 'staff']);
 
   const supabase = await createClient();
   const admin = await requireAdminClient();
   const db = admin || supabase;
 
-  // Resolve only applications assigned to this case manager. Search is applied
-  // after the assignment boundary so a query can never expand the caseload.
-  const { data: assignments } = await supabase
-    .from('case_manager_assignments')
-    .select('application_id')
-    .eq('case_manager_id', user.id);
-
-  const applicationIds = (assignments ?? [])
-    .map((assignment: any) => assignment.application_id as string | null)
-    .filter((id): id is string => Boolean(id));
-
-  let applications: any[] = [];
-  if (applicationIds.length > 0) {
-    const { data } = await supabase
-      .from('applications')
-      .select('id, first_name, last_name, email, phone, program_interest, status, created_at')
-      .in('id', applicationIds)
-      .order('last_name', { ascending: true });
-    applications = data ?? [];
-  }
+  let participants = await getCaseManagerParticipants({
+    db,
+    userId: user.id,
+    effectiveRoles,
+  });
 
   if (normalizedQuery) {
-    applications = applications.filter((application) => {
+    participants = participants.filter(({ application, learnerProfile }) => {
       const searchable = [
         application.first_name,
         application.last_name,
         application.email,
-        `${application.first_name ?? ''} ${application.last_name ?? ''}`,
+        learnerProfile?.full_name,
+        learnerProfile?.email,
       ]
         .filter(Boolean)
         .join(' ')
@@ -62,31 +49,20 @@ export default async function CaseManagerParticipantsPage({ searchParams }: Prop
     });
   }
 
-  const emails = applications.map((application) => application.email).filter(Boolean);
-  const profilesByEmail: Record<string, any> = {};
+  const learnerIds = participants
+    .map((participant) => participant.learnerId)
+    .filter((id): id is string => Boolean(id));
   const enrollmentCountByUserId: Record<string, number> = {};
 
-  if (emails.length > 0) {
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, email, full_name, city, state')
-      .in('email', emails);
+  if (learnerIds.length > 0) {
+    const { data: enrollments } = await db
+      .from('program_enrollments')
+      .select('user_id, status')
+      .in('user_id', learnerIds);
 
-    for (const profile of profiles ?? []) {
-      if (profile.email) profilesByEmail[profile.email] = profile;
-    }
-
-    const userIds = Object.values(profilesByEmail).map((profile: any) => profile.id);
-    if (userIds.length > 0) {
-      const { data: enrollments } = await db
-        .from('program_enrollments')
-        .select('user_id, status')
-        .in('user_id', userIds);
-
-      for (const enrollment of enrollments ?? []) {
-        enrollmentCountByUserId[enrollment.user_id] =
-          (enrollmentCountByUserId[enrollment.user_id] ?? 0) + 1;
-      }
+    for (const enrollment of enrollments ?? []) {
+      enrollmentCountByUserId[enrollment.user_id] =
+        (enrollmentCountByUserId[enrollment.user_id] ?? 0) + 1;
     }
   }
 
@@ -103,9 +79,7 @@ export default async function CaseManagerParticipantsPage({ searchParams }: Prop
         <div className="mb-6 flex items-center justify-between">
           <div>
             <nav className="mb-1 text-xs text-slate-700">
-              <Link href="/case-manager/dashboard" className="hover:underline">
-                Dashboard
-              </Link>
+              <Link href="/case-manager/dashboard" className="hover:underline">Dashboard</Link>
               <span className="mx-1">/</span>
               <span>Participants</span>
             </nav>
@@ -114,7 +88,7 @@ export default async function CaseManagerParticipantsPage({ searchParams }: Prop
               Participants
             </h1>
             <p className="mt-1 text-sm text-slate-700">
-              {applications.length} assigned{normalizedQuery ? ' matching search' : ''}
+              {participants.length} participant{participants.length === 1 ? '' : 's'}{normalizedQuery ? ' matching search' : ''}
             </p>
           </div>
         </div>
@@ -122,20 +96,17 @@ export default async function CaseManagerParticipantsPage({ searchParams }: Prop
         <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <StudentSearchPanel defaultValue={q ?? ''} />
           {normalizedQuery && (
-            <Link
-              href="/case-manager/participants"
-              className="mt-2 inline-block text-xs font-semibold text-brand-blue-700 hover:underline"
-            >
+            <Link href="/case-manager/participants" className="mt-2 inline-block text-xs font-semibold text-brand-blue-700 hover:underline">
               Clear search
             </Link>
           )}
         </div>
 
-        {applications.length === 0 ? (
+        {participants.length === 0 ? (
           <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
             <Users className="mx-auto mb-3 h-10 w-10 text-slate-500" />
             <p className="text-sm text-slate-700">
-              {normalizedQuery ? 'No assigned participants match this search.' : 'No participants assigned yet.'}
+              {normalizedQuery ? 'No scoped participants match this search.' : 'No participants assigned yet.'}
             </p>
           </div>
         ) : (
@@ -153,34 +124,25 @@ export default async function CaseManagerParticipantsPage({ searchParams }: Prop
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {applications.map((application) => {
-                  const profile = profilesByEmail[application.email];
-                  const enrollCount = profile ? (enrollmentCountByUserId[profile.id] ?? 0) : 0;
+                {participants.map(({ application, learnerProfile, learnerId }) => {
+                  const displayName = learnerProfile?.full_name || `${application.first_name ?? ''} ${application.last_name ?? ''}`.trim() || 'Unknown';
+                  const enrollCount = learnerId ? (enrollmentCountByUserId[learnerId] ?? 0) : 0;
                   return (
                     <tr key={application.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 text-sm font-medium text-slate-900">
-                        {application.first_name} {application.last_name}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-700">{application.email}</td>
-                      <td className="px-4 py-3 text-sm text-slate-700">
-                        {application.program_interest ?? '—'}
-                      </td>
+                      <td className="px-4 py-3 text-sm font-medium text-slate-900">{displayName}</td>
+                      <td className="px-4 py-3 text-sm text-slate-700">{application.email ?? learnerProfile?.email ?? '—'}</td>
+                      <td className="px-4 py-3 text-sm text-slate-700">{application.program_interest ?? '—'}</td>
                       <td className="px-4 py-3 text-sm text-slate-900">{enrollCount}</td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(application.status)}`}
-                        >
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(application.status)}`}>
                           {application.status ?? 'unknown'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-slate-700">
-                        {new Date(application.created_at).toLocaleDateString()}
+                        {application.created_at ? new Date(application.created_at).toLocaleDateString() : '—'}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <Link
-                          href={`/case-manager/participants/${application.id}`}
-                          className="inline-flex items-center gap-1 text-xs text-brand-blue-600 hover:underline"
-                        >
+                        <Link href={`/case-manager/participants/${application.id}`} className="inline-flex items-center gap-1 text-xs text-brand-blue-600 hover:underline">
                           View <ChevronRight className="h-3 w-3" />
                         </Link>
                       </td>

@@ -2,6 +2,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
@@ -45,33 +46,27 @@ for (const portal of PORTALS) {
   let canonical = surface?.canonical;
   if (portal.surface === 'hostSites') canonical = surface?.portal;
   if (portal.surface === 'employerPublic') canonical = (surface?.operational || []).find((x) => x.path === portal.path);
-  if (portal.surface === 'testingOperations') canonical = surface?.canonical;
 
   if (!canonical) fail(`${portal.surface}: canonical contract missing`);
-  else if (canonical.app !== portal.app || canonical.path !== portal.path) {
-    fail(`${portal.surface}: contract says ${canonical.app}:${canonical.path}, expected ${portal.app}:${portal.path}`);
-  } else pass(`${portal.surface}: ${portal.app}:${portal.path}`);
+  else if (canonical.app !== portal.app || canonical.path !== portal.path) fail(`${portal.surface}: contract says ${canonical.app}:${canonical.path}, expected ${portal.app}:${portal.path}`);
+  else pass(`${portal.surface}: ${portal.app}:${portal.path}`);
 
   const routeFile = pageFile(portal.app, portal.path);
-  if (!exists(routeFile)) fail(`${portal.key}: missing route file ${routeFile}`);
-  else pass(`${portal.key}: route exists`);
+  if (!exists(routeFile)) fail(`${portal.key}: missing route file ${routeFile}`); else pass(`${portal.key}: route exists`);
 
-  const keyBlock = new RegExp(`${portal.key}:\\s*\\{[\\s\\S]*?defaultPath:\\s*['\"]${portal.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['\"]`, 'm');
-  if (!keyBlock.test(portalMap)) fail(`${portal.key}: portal-map ownership/default path drift`);
-  else pass(`${portal.key}: portal-map aligned`);
+  const escapedPath = portal.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const keyBlock = new RegExp(`${portal.key}:\\s*\\{[\\s\\S]*?defaultPath:\\s*['\"]${escapedPath}['\"]`, 'm');
+  if (!keyBlock.test(portalMap)) fail(`${portal.key}: portal-map ownership/default path drift`); else pass(`${portal.key}: portal-map aligned`);
 
   for (const role of portal.roles) {
-    const rolePattern = new RegExp(`${role}:\\s*\\{[^}]*path:\\s*['\"]${portal.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['\"][^}]*portalKey:\\s*['\"]${portal.key}['\"]`);
-    if (!rolePattern.test(roleDestinations)) fail(`${role}: role destination does not resolve to ${portal.key}:${portal.path}`);
-    else pass(`${role}: role destination aligned`);
+    const rolePattern = new RegExp(`${role}:\\s*\\{[^}]*path:\\s*['\"]${escapedPath}['\"][^}]*portalKey:\\s*['\"]${portal.key}['\"]`);
+    if (!rolePattern.test(roleDestinations)) fail(`${role}: role destination does not resolve to ${portal.key}:${portal.path}`); else pass(`${role}: role destination aligned`);
   }
 }
 
 console.log('\n── Admin override invariant ──');
-if (!roleMatrix.includes("role === 'admin' || role === 'super_admin'")) fail('RBAC admin override invariant missing');
-else pass('regular admin remains global portal override');
-if (!portalAccess.includes("auth.effectiveRoles.includes('admin')")) fail('portal-access does not recognize regular admin as platform admin');
-else pass('portal-access recognizes regular admin');
+if (!roleMatrix.includes("role === 'admin' || role === 'super_admin'")) fail('RBAC admin override invariant missing'); else pass('regular admin remains global portal override');
+if (!portalAccess.includes("auth.effectiveRoles.includes('admin')")) fail('portal-access does not recognize regular admin as platform admin'); else pass('portal-access recognizes regular admin');
 
 console.log('\n── PWA persona contracts ──');
 const PWA = [
@@ -95,11 +90,15 @@ for (const [name, manifestPath, startUrl, scope, layoutPath] of PWA) {
 
 console.log('\n── Retired portal ownership ──');
 for (const retired of ['/portal/barber', '/portal/cosmetology', '/portal/esthetician', '/portal/nail-technician']) {
-  if (portalMap.includes(retired)) fail(`portal-map still advertises retired route ${retired}`);
-  else pass(`${retired}: not canonical`);
+  if (portalMap.includes(retired)) fail(`portal-map still advertises retired route ${retired}`); else pass(`${retired}: not canonical`);
 }
-if (/programholder:\s*\{[\s\S]*?subdomain:\s*['\"]marketing['\"]/.test(portalMap)) fail('Program Holder still owned by Marketing');
-else pass('Program Holder is not owned by Marketing');
+if (/programholder:\s*\{[\s\S]*?subdomain:\s*['\"]marketing['\"]/.test(portalMap)) fail('Program Holder still owned by Marketing'); else pass('Program Holder is not owned by Marketing');
+
+if (!failures) {
+  console.log('\n── Portal function integrity ──');
+  const child = spawnSync(process.execPath, [join(ROOT, 'scripts/audit-portal-functions.mjs')], { cwd: ROOT, stdio: 'inherit' });
+  if (child.status !== 0) failures += 1;
+}
 
 if (failures) {
   console.error(`\n❌ Portal contract audit FAILED — ${failures} issue(s).`);

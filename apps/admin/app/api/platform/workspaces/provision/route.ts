@@ -4,6 +4,7 @@
  *
  * @see docs/platform-owner-tenant-model.md
  */
+// AUTH: Enforced inside handler by apiRequirePlatformStaff.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequirePlatformStaff } from '@/lib/admin/guards';
@@ -41,9 +42,7 @@ export async function POST(request: NextRequest) {
 
   if (!displayName) return safeError('displayName is required', 400);
   if (!slug) return safeError('slug is required', 400);
-  if (!VALID_TIERS.includes(subscriptionTier)) {
-    return safeError('Invalid subscriptionTier', 400);
-  }
+  if (!VALID_TIERS.includes(subscriptionTier)) return safeError('Invalid subscriptionTier', 400);
 
   try {
     const result = await provisionWorkspace({
@@ -55,10 +54,7 @@ export async function POST(request: NextRequest) {
       provisionedByUserId: auth.id,
     });
 
-    if (!result.ok) {
-      return safeError(result.error, 400);
-    }
-
+    if (!result.ok) return safeError(result.error, 400);
     return NextResponse.json(result, { status: 201 });
   } catch (err) {
     return safeInternalError(err, 'Failed to provision workspace');

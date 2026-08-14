@@ -4,6 +4,10 @@
  * The JSON dataset owns each page's explicit media assignment. Do not replace
  * page videos merely because another page happens to reference the same file;
  * that behavior caused unrelated hero videos to disappear or turn into stills.
+ *
+ * Posters are also explicit. Do not infer broad topical fallback images because
+ * that caused the same workforce/healthcare/business pictures to appear across
+ * unrelated pages and made the site look duplicated.
  */
 
 import { loadJsonOnce } from '@/lib/data/json-cache';
@@ -65,24 +69,10 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   'home-health-aide': '/images/healthcare/hero-program-patient-care.webp',
 };
 
-function topicalPictureForKey(key: string): string {
-  const value = key.toLowerCase();
-  if (/barber|cosmet|esthetic|nail|salon|beauty/.test(value)) return '/images/pages/barber-apprenticeship-hero.jpg';
-  if (/cna|medical|health|phleb|pharm|patient|cpr|emt|dental|dsp|recovery|peer|care/.test(value)) return '/images/pages/healthcare-hero.webp';
-  if (/hvac|electr|weld|plumb|construction|building|forklift|solar|manufactur|trade/.test(value)) return '/images/hero/hero-skilled-trades.webp';
-  if (/cyber|technology|tech|software|web|network|digital|ai/.test(value)) return '/images/pages/programs-it-hero.webp';
-  if (/business|bookkeep|tax|administrat|entrepreneur|finance|office|project|insurance/.test(value)) return '/images/business/team-4.webp';
-  if (/hospital|guest|servsafe|food|culinary/.test(value)) return '/images/pages/comp-layout-hero.webp';
-  if (/fund|wioa|grant|financial|workforce|partner|employer|agency|provider/.test(value)) return '/images/pages/admin-wioa-hero.webp';
-  if (/student|learner|career|training|course|credential|certif|pathway|enroll|support/.test(value)) return '/images/pages/training-classroom.webp';
-  if (/about|mission|founder|impact|team|community|volunteer|donate/.test(value)) return '/images/pages/about-hero.webp';
-  return '/images/pages/workforce-training.webp';
-}
-
-function posterFor(key: string, banner: RawHeroBannerConfig): string {
+function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
   if (banner.posterImage) return banner.posterImage;
   if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
-  return PAGE_PICTURE_OVERRIDES[key] ?? topicalPictureForKey(key);
+  return PAGE_PICTURE_OVERRIDES[key];
 }
 
 function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerConfig {

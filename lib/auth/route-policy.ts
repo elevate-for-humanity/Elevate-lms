@@ -63,7 +63,7 @@ export const ROUTE_POLICY: Record<string, AccessPolicy> = {
   '/api/instructor/step-submissions/[id]/reject': 'instructor_or_admin',
 
   // ── Authenticated (any logged-in user) ─────────────────────────────────────
-  '/learner/dashboard': 'authenticated',
+  '/lms/dashboard': 'authenticated',
   '/lms': 'authenticated',
   '/lms/programs': 'authenticated',
   '/lms/courses': 'authenticated',

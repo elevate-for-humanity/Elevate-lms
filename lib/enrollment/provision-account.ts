@@ -63,7 +63,7 @@ export async function provisionAccount(
   const loginUrl = `${siteUrl}/login`;
   // Always route through /auth/callback so the session is established correctly
   // and role-based routing runs. The destination is encoded as ?redirect=.
-  const destination = postLoginUrl || '/learner/dashboard';
+  const destination = postLoginUrl || '/lms/dashboard';
   const dashboardUrl = `${siteUrl}/auth/callback?redirect=${encodeURIComponent(destination)}`;
   const onboardingUrl = `${siteUrl}/programs/${programSlug}/orientation`;
 

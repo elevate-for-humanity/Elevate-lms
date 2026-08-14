@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { ArrowRight, Flame } from 'lucide-react';
 
 export type AutoPolishedPageProps = {
-  route: string; // e.g. "/learner/dashboard"
+  route: string; // e.g. "/lms/dashboard"
   label: string; // e.g. "Student Dashboard"
   section: string; // e.g. "For Students"
 };
@@ -106,7 +106,7 @@ function getAutoConfig(section: string, label: string, route: string): AutoConfi
         audience: 'Current & future students',
         shortTagline: "A single place to see where you are, what's next, and who's in your corner.",
         description: `The "${baseLabel}" page supports the student side of the Elevate For Humanity platform. It's built to keep you from feeling lost by putting courses, messages, documents, and support all in one place.`,
-        primaryCta: { href: '/learner/dashboard', label: 'Go to Student Portal' },
+        primaryCta: { href: '/lms/dashboard', label: 'Go to Student Portal' },
         secondaryCta: { href: '/career-services', label: 'Visit Career Services' },
         bullets: [
           'Quick access to courses, grades, and certificate progress',

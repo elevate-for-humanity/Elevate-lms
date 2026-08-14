@@ -122,7 +122,7 @@ export function DocumentUploadForm({ requirements, apiEndpoint, successRedirect 
         const {
           data: { user: currentUser },
         } = await supabase.auth.getUser();
-        dest = '/learner/dashboard';
+        dest = '/lms/dashboard';
         if (currentUser) {
           const { data: prof } = await supabase
             .from('profiles')

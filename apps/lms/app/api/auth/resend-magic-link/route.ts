@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     email = (body.email ?? '').trim().toLowerCase();
-    redirectPath = (body.redirect ?? body.next ?? '/learner/dashboard').trim();
+    redirectPath = (body.redirect ?? body.next ?? '/lms/dashboard').trim();
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
   // Sanitize redirect path — must be a relative path on this domain.
   if (!redirectPath.startsWith('/') || redirectPath.includes('//') || redirectPath.length > 200) {
-    redirectPath = '/learner/dashboard';
+    redirectPath = '/lms/dashboard';
   }
 
   try {

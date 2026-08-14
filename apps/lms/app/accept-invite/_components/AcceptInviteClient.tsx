@@ -45,7 +45,7 @@ export default function AcceptInviteClient({ token, invite, isLoggedIn, userEmai
       }
 
       setState('success');
-      setTimeout(() => router.push('/learner/dashboard'), 1500);
+      setTimeout(() => router.push('/lms/dashboard'), 1500);
     } catch {
       setState('error');
       setError('An unexpected error occurred.');

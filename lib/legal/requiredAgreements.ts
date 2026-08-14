@@ -192,7 +192,7 @@ export async function hasSignedAllRequired(
 export const PROTECTED_ROUTES: Record<string, UserRole[]> = {
   '/lms': ['student', 'instructor', 'admin', 'staff', 'super_admin'],
   '/student-portal': ['student'],
-  '/learner/dashboard': ['student'],
+  '/lms/dashboard': ['student'],
   '/program-holder': ['program_holder'],
   '/employer': ['employer'],
   '/admin/staff-portal': ['staff', 'admin', 'super_admin'],

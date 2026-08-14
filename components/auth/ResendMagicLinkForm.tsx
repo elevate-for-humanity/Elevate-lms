@@ -14,7 +14,7 @@ interface Props {
 
 export function ResendMagicLinkForm({
   defaultEmail = '',
-  next = '/learner/dashboard',
+  next = '/lms/dashboard',
   label = 'Resend sign-in link',
 }: Props) {
   const [email, setEmail] = useState(defaultEmail);

@@ -8,9 +8,6 @@ cd "$ROOT"
 STRICT=0
 [[ "${1:-}" == "--strict" ]] && STRICT=1
 
-# Production App Router roots are the three deployed services. Legacy roots stay
-# visible in the report, but findings there do not block a production release
-# unless they are re-exported through a deployed route (which is scanned separately).
 PRODUCTION_DIRS=(
   "$ROOT/apps/marketing/app"
   "$ROOT/apps/lms/app"
@@ -75,7 +72,7 @@ while IFS= read -r f; do
   fi
   grep -q "supersonicfastermoney.com" "$f" 2>/dev/null && continue
 
-  if ! grep -qE "requireAuth|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|apiAuthGuard|requireAdmin|getUser|getCurrentUser|getAuthUser|createClient|createAdminClient|requireApiAuth|requireApiRole|CRON_SECRET|apiGuard|withAuth|checkAuth|verifyAuth|authMiddleware|requireOrgAdmin|AUDIT_SECRET|apiRequireInstructor|builderGuard|requireInstructor|apiRequireRole" "$f" 2>/dev/null; then
+  if ! grep -qE "requireAuth|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|apiAuthGuard|requireAdmin|getUser|getCurrentUser|getAuthUser|createClient|createAdminClient|requireApiAuth|requireApiRole|requireRole|requireStaffPortalApi|CRON_SECRET|apiGuard|withAuth|checkAuth|verifyAuth|authMiddleware|requireOrgAdmin|AUDIT_SECRET|apiRequireInstructor|builderGuard|requireInstructor|apiRequireRole" "$f" 2>/dev/null; then
     NO_AUTH=$((NO_AUTH + 1))
     if is_sensitive_route "$f"; then
       SENSITIVE_NO_AUTH=$((SENSITIVE_NO_AUTH + 1))
@@ -90,8 +87,8 @@ echo ""
 echo "--- ROLE_BLIND: admin/* routes that check identity but not role ---"
 while IFS= read -r f; do
   [[ -z "$f" ]] && continue
-  has_auth=$(grep -cE "getCurrentUser|getAuthUser|requireAuth|apiAuthGuard|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|getUser\(\)|requireApiAuth|requireApiRole|withAuth|checkAuth|verifyAuth" "$f" 2>/dev/null || true)
-  has_role=$(grep -cE "apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole|API_ADMIN_ROLES|roles:\s*\[|roles:\s*[A-Z_]+" "$f" 2>/dev/null || true)
+  has_auth=$(grep -cE "getCurrentUser|getAuthUser|requireAuth|apiAuthGuard|apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|getUser\(\)|requireApiAuth|requireApiRole|requireRole|requireStaffPortalApi|withAuth|checkAuth|verifyAuth" "$f" 2>/dev/null || true)
+  has_role=$(grep -cE "apiRequireAdmin|apiRequireDevStudio|capabilityHealthResponse|allowedRoles|\.role\s*===|profile\.role|role.*admin|admin.*role|super_admin|requireApiRole|requireRole|requireStaffPortalApi|API_ADMIN_ROLES|roles:\s*\[|roles:\s*[A-Z_]+" "$f" 2>/dev/null || true)
   if [[ "${has_auth:-0}" -gt 0 && "${has_role:-0}" -eq 0 ]]; then
     ROLE_BLIND=$((ROLE_BLIND + 1))
     if is_production_file "$f"; then

@@ -70,27 +70,6 @@ const adminConfig = {
 
   async redirects() {
     return [
-      // Verified legacy /admin aliases. Canonical Admin URLs live at the root
-      // of admin.elevateforhumanity.org; keep bookmark compatibility without
-      // maintaining duplicate page implementations.
-      { source: '/admin/mission-control', destination: '/mission-control', permanent: true },
-      { source: '/admin/system-health', destination: '/system-health', permanent: true },
-      { source: '/admin/operations', destination: '/operations', permanent: true },
-      { source: '/admin/intelligence', destination: '/intelligence', permanent: true },
-      { source: '/admin/billing', destination: '/billing', permanent: true },
-      { source: '/admin/compliance', destination: '/compliance', permanent: true },
-      { source: '/admin/crm', destination: '/crm', permanent: true },
-      { source: '/admin/funding', destination: '/funding', permanent: true },
-      { source: '/admin/certificates', destination: '/certificates', permanent: true },
-      { source: '/admin/enrollment', destination: '/enrollments', permanent: true },
-      { source: '/admin/program-holders', destination: '/program-holders', permanent: true },
-      { source: '/admin/program-holder-documents', destination: '/program-holder-documents', permanent: true },
-      { source: '/admin/employers', destination: '/employers', permanent: true },
-      { source: '/admin/tenants', destination: '/tenants', permanent: true },
-      { source: '/admin/audit-logs', destination: '/audit-logs', permanent: true },
-      { source: '/admin/wioa', destination: '/wioa', permanent: true },
-      { source: '/admin/staff-portal', destination: '/staff-portal/dashboard', permanent: true },
-      { source: '/admin/staff-portal/:path*', destination: '/staff-portal/:path*', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
       { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },

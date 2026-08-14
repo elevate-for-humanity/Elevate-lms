@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   Shield,
@@ -8,7 +8,6 @@ import {
   GraduationCap,
   BarChart3,
   ArrowRight,
-  Play,
   ExternalLink,
   CheckCircle2,
   Layers3,
@@ -16,101 +15,82 @@ import {
   Replace,
 } from 'lucide-react';
 
+const FALLBACK_VIDEO = 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/store-marketplace.mp4';
+
 const DEMOS = [
   {
     id: 'admin',
     label: 'Admin Dashboard',
     icon: Shield,
     liveHref: '/store/demo/admin',
-    description:
-      'Run enrollment, courses, compliance, funding and intervention work from one operating view instead of bouncing between disconnected systems.',
+    video: '/videos/store/store-admin-demo.mp4',
+    description: 'Run enrollment, courses, compliance, funding and intervention work from one operating view.',
     buyer: 'Training providers, schools, workforce organizations and multi-program operators',
-    benefit:
-      'Staff can see what is happening from first application through enrollment, training, funding and compliance without rebuilding the same record in multiple places.',
-    differentiator:
-      'Elevate connects the operational record across admissions, learners, courses, funding, compliance and reporting. The dashboard is not a reporting shell sitting on top of separate products.',
+    benefit: 'Staff can see application, enrollment, training, funding and compliance activity in one connected workspace.',
+    differentiator: 'The operational record stays connected across admissions, learners, courses, funding, compliance and reporting.',
     replaces: 'Spreadsheets + separate SIS/LMS + compliance trackers + disconnected intake tools',
-    features: [
-      'Enrollment pipeline with application and status visibility',
-      'Compliance tracking and workforce reporting workflows',
-      'Funding utilization across supported workforce programs',
-      'At-risk learner alerts and intervention workflows',
-      'Application review and approval from the same platform record',
-    ],
+    features: ['Enrollment pipeline', 'Compliance workflows', 'Funding utilization', 'At-risk learner alerts', 'Application review'],
   },
   {
     id: 'employer',
     label: 'Employer Portal',
     icon: Briefcase,
     liveHref: '/store/demo/employer',
-    description:
-      'Give employers one place to find talent, manage apprenticeship participation, review workforce activity and complete required documents.',
+    video: '/videos/store/store-employer-demo.mp4',
+    description: 'Give employers one place to find talent, manage apprenticeship participation and complete required documents.',
     buyer: 'Employers, apprenticeship host sites, workforce partners and business-services teams',
-    benefit:
-      'Employers spend less time emailing documents and status questions back and forth because candidate, apprentice and program activity is connected to the same operating system.',
-    differentiator:
-      'The employer experience is connected to the learner, apprenticeship, workforce and compliance records behind the scenes—not a standalone job board with another login and another database.',
+    benefit: 'Candidate, apprentice and program activity stays connected instead of being passed through email chains.',
+    differentiator: 'The employer experience connects directly to learner, apprenticeship, workforce and compliance records.',
     replaces: 'Email chains + shared spreadsheets + separate recruiting/OJT/apprenticeship trackers',
-    features: [
-      'Browse candidates with training and credential context',
-      'Apprenticeship hour and wage-progression workflows',
-      'OJT contract and reimbursement tracking',
-      'Workforce incentive and documentation workflows',
-      'MOU and compliance-document workflows',
-    ],
+    features: ['Candidate browsing', 'Apprenticeship hours', 'OJT contracts', 'Workforce incentives', 'MOU workflows'],
   },
   {
     id: 'learner',
     label: 'Student Portal',
     icon: GraduationCap,
     liveHref: '/store/demo/student',
-    description:
-      'Give learners one guided place for courses, progress, apprenticeship activity, credentials and next-step career support.',
+    video: '/videos/store/store-student-demo.mp4',
+    description: 'Give learners one guided place for courses, progress, apprenticeship activity, credentials and career support.',
     buyer: 'Career schools, training providers, apprenticeship sponsors and workforce programs',
-    benefit:
-      'Learners do not have to figure out which system holds the class, which form tracks hours, or where credentials live. Their training journey stays together.',
-    differentiator:
-      'Elevate combines LMS delivery with workforce and apprenticeship context. The learner portal can reflect the full career pathway, not only course completion.',
+    benefit: 'Learners keep their course work, hours, credentials and career steps in one place.',
+    differentiator: 'LMS delivery is connected to the full workforce and apprenticeship pathway.',
     replaces: 'Standalone LMS + paper/hour logs + separate certificate folders + scattered career-service links',
-    features: [
-      'Course modules with video lessons and quizzes',
-      'Progress and completion tracking',
-      'Apprenticeship hour logging from mobile',
-      'Earned certificates and credential records',
-      'Career-service and job-placement workflows',
-    ],
+    features: ['Video lessons', 'Progress tracking', 'Apprenticeship hours', 'Credential wallet', 'Career support'],
   },
   {
     id: 'workforce',
     label: 'Workforce Board',
     icon: BarChart3,
     liveHref: '/store/demo/institutional',
-    description:
-      'Manage eligibility, funding, provider activity, compliance and outcomes from the same data used to operate programs day to day.',
+    video: '/videos/store/store-workforce-demo.mp4',
+    description: 'Manage eligibility, funding, provider activity, compliance and outcomes from the same operating data.',
     buyer: 'Workforce boards, funded-program operators, agencies and provider networks',
-    benefit:
-      'Program teams can reduce manual reconciliation because eligibility, participant activity, funding and outcomes are linked instead of reported from disconnected files after the fact.',
-    differentiator:
-      'Elevate is designed around the operating workflow behind workforce reporting. Data can originate in intake, enrollment, training and employer activity before it becomes a report.',
-    replaces: 'Eligibility spreadsheets + separate provider trackers + manual funding logs + after-the-fact reporting files',
-    features: [
-      'Eligibility screening with document-verification workflows',
-      'ITA and funding-allocation management',
-      'PIRL-oriented reporting workflows and performance views',
-      'Provider-network oversight and outcomes',
-      'Multi-source funding tracking across supported programs',
-    ],
+    benefit: 'Eligibility, participant activity, funding and outcomes remain linked instead of reconciled manually later.',
+    differentiator: 'The reporting layer is fed by the same intake, enrollment, training and employer workflows used every day.',
+    replaces: 'Eligibility spreadsheets + provider trackers + manual funding logs + after-the-fact reporting files',
+    features: ['Eligibility screening', 'ITA management', 'PIRL workflows', 'Provider oversight', 'Multi-source funding'],
   },
-];
+] as const;
 
 export default function DemoTabs() {
   const [activeTab, setActiveTab] = useState('admin');
+  const [videoKey, setVideoKey] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const active = useMemo(() => DEMOS.find((demo) => demo.id === activeTab) || DEMOS[0], [activeTab]);
 
-  const active = DEMOS.find((demo) => demo.id === activeTab) || DEMOS[0];
-
-  const switchTab = (id: string) => {
+  function switchTab(id: string) {
     setActiveTab(id);
-  };
+    setVideoKey((value) => value + 1);
+  }
+
+  function useFallbackVideo() {
+    const video = videoRef.current;
+    if (!video || video.dataset.fallbackApplied === 'true') return;
+    video.dataset.fallbackApplied = 'true';
+    video.src = FALLBACK_VIDEO;
+    video.load();
+    void video.play().catch(() => undefined);
+  }
 
   return (
     <div>
@@ -120,11 +100,7 @@ export default function DemoTabs() {
             key={demo.id}
             type="button"
             onClick={() => switchTab(demo.id)}
-            className={`flex min-w-[140px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-              activeTab === demo.id
-                ? 'bg-slate-950 text-white shadow-md'
-                : 'bg-white text-slate-800 hover:bg-slate-50'
-            }`}
+            className={`flex min-w-[140px] flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${activeTab === demo.id ? 'bg-slate-950 text-white shadow-md' : 'bg-white text-slate-800 hover:bg-slate-50'}`}
           >
             <demo.icon className="h-4 w-4" />
             <span className="hidden sm:inline">{demo.label}</span>
@@ -135,14 +111,29 @@ export default function DemoTabs() {
 
       <div className="grid gap-7 lg:grid-cols-5">
         <div className="lg:col-span-3">
-          <div className="flex aspect-video flex-col items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-8 text-center text-white shadow-xl">
-            <active.icon className="h-16 w-16 text-brand-red-400" />
-            <span className="mt-4 rounded bg-white/10 px-3 py-1 text-xs font-bold">Interactive sample workspace</span>
-            <h2 className="mt-4 text-3xl font-black">{active.label}</h2>
-            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-300">Open the working sample portal and use its guided controls. No missing video or prerecorded screen is required.</p>
-            <Link href={active.liveHref} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-6 py-3 font-black hover:bg-brand-red-500">
-              <Play className="h-5 w-5" /> Launch interactive demo
-            </Link>
+          <div className="overflow-hidden rounded-2xl bg-slate-950 shadow-xl">
+            <video
+              key={`${active.id}-${videoKey}`}
+              ref={videoRef}
+              src={active.video}
+              controls
+              playsInline
+              preload="metadata"
+              onError={useFallbackVideo}
+              className="aspect-video w-full bg-black object-contain"
+              aria-label={`${active.label} video demo`}
+            >
+              Your browser does not support video playback.
+            </video>
+            <div className="flex flex-col gap-3 border-t border-white/10 bg-slate-950 p-4 text-white sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-red-300">Video walkthrough + live workspace</p>
+                <h2 className="mt-1 text-xl font-black">{active.label}</h2>
+              </div>
+              <Link href={active.liveHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-black hover:bg-brand-red-500">
+                <ExternalLink className="h-4 w-4" /> Open interactive demo
+              </Link>
+            </div>
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -171,10 +162,8 @@ export default function DemoTabs() {
               <span className="text-xs font-black uppercase tracking-[0.16em]">Built for</span>
             </div>
             <p className="mt-2 text-sm font-bold leading-6 text-slate-800">{active.buyer}</p>
-
             <h2 className="mt-5 text-2xl font-black text-slate-950">{active.label}</h2>
             <p className="mt-2 text-base leading-7 text-slate-700">{active.description}</p>
-
             <h3 className="mt-6 text-sm font-black uppercase tracking-wide text-slate-700">What you will see</h3>
             <ul className="mt-3 flex-1 space-y-3">
               {active.features.map((feature) => (
@@ -184,26 +173,14 @@ export default function DemoTabs() {
                 </li>
               ))}
             </ul>
-
             <div className="mt-7 space-y-2">
-              <Link
-                href={active.liveHref}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-700 py-3 font-black text-white transition hover:bg-brand-red-800"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Open Interactive Demo
+              <Link href={active.liveHref} className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand-red-700 py-3 font-black text-white transition hover:bg-brand-red-800">
+                <ExternalLink className="h-4 w-4" /> Open Interactive Demo
               </Link>
-              <Link
-                href="/store/trial"
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-400 py-3 font-bold text-slate-900 transition hover:bg-slate-50"
-              >
+              <Link href="/store/trial" className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-slate-400 py-3 font-bold text-slate-900 transition hover:bg-slate-50">
                 Try it with your organization <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-
-            <p className="mt-3 text-center text-xs font-medium text-slate-600">
-              Sample-data environment. Demo actions do not change production records.
-            </p>
           </div>
         </div>
       </div>

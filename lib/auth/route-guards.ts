@@ -39,7 +39,7 @@ const PORTAL_ROLE_MAP: Record<string, readonly string[]> = {
 };
 
 const ROUTE_REDIRECTS: Record<string, string> = {
-  '/admin': '/dashboard',
+  '/admin': '/lms/dashboard',
   '/lms': '/lms/dashboard',
   '/apprentice': '/apprentice',
   '/portal': '/lms/dashboard',

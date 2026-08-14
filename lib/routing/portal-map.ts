@@ -79,7 +79,7 @@ export const PORTAL_MAP = {
     subdomain: 'admin',
     basePath: '',
     host: ADMIN_HOST,
-    defaultPath: '/dashboard',
+    defaultPath: '/lms/dashboard',
   },
   instructor: {
     subdomain: 'admin',

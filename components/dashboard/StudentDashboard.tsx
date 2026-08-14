@@ -277,7 +277,7 @@ function QuickActions() {
   const actions = [
     { icon: <Play className="w-5 h-5" />, label: 'Start Lesson', href: '/lessons', color: 'bg-brand-red-600' },
     { icon: <Calendar className="w-5 h-5" />, label: 'Schedule Lab', href: '/schedule', color: 'bg-blue-600' },
-    { icon: <MessageCircle className="w-5 h-5" />, label: 'Message Coach', href: '/messages', color: 'bg-green-600' },
+    { icon: <MessageCircle className="w-5 h-5" />, label: 'Message Coach', href: '/lms/messages', color: 'bg-green-600' },
     { icon: <FileText className="w-5 h-5" />, label: 'View Syllabus', href: '/syllabus', color: 'bg-purple-600' },
   ];
   

@@ -286,7 +286,7 @@ export class CompletionTracker {
     // Find first incomplete required item
     for (const item of checklist) {
       if (item.required && !completedIds.has(item.id)) {
-        return { item, route: item.route || '/dashboard' };
+        return { item, route: item.route || '/lms/dashboard' };
       }
     }
 

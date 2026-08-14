@@ -8,7 +8,7 @@
  *   
  *   url('/admin/dashboard')     → https://admin.elevateforhumanity.org/admin/dashboard
  *   url('/enroll')              → https://www.elevateforhumanity.org/enroll
- *   adminUrl('/dashboard')      → https://admin.elevateforhumanity.org/dashboard
+ *   adminUrl('/lms/dashboard')      → https://admin.elevateforhumanity.org/dashboard
  *   emailUrl('/verify')        → https://www.elevateforhumanity.org/verify
  */
 

@@ -109,7 +109,7 @@ export function DashboardHeader({
 
           {/* Notifications */}
           <Link
-            href="/notifications"
+            href="/lms/notifications"
             className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
             aria-label="Notifications"
           >
@@ -136,11 +136,11 @@ export function DashboardHeader({
                 <p className="font-medium text-slate-900">{userName}</p>
                 <p className="text-sm text-slate-500">{user.email}</p>
               </div>
-              <Link href="/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
+              <Link href="/lms/profile" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
                 <User className="w-4 h-4" />
                 Profile
               </Link>
-              <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
+              <Link href="/lms/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
                 <Settings className="w-4 h-4" />
                 Settings
               </Link>

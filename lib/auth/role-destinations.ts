@@ -24,10 +24,10 @@ export interface RoleRouteConfig {
 }
 
 export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
-  super_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Super Admin' },
-  admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Admin' },
-  org_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Org Admin' },
-  advisor: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Advisor' },
+  super_admin: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Super Admin' },
+  admin: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Admin' },
+  org_admin: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Org Admin' },
+  advisor: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Advisor' },
   staff: { path: '/staff-portal/dashboard', host: 'admin', portalKey: 'staff', label: 'Staff' },
   instructor: { path: '/instructor/dashboard', host: 'admin', portalKey: 'instructor', label: 'Instructor' },
   test_admin: { path: '/testing-center', host: 'admin', portalKey: 'testing', label: 'Test Admin' },

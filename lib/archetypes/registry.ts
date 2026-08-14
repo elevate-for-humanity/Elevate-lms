@@ -25,7 +25,7 @@ export enum PageArchetype {
  */
 export function getArchetypeForRoute(route: string): PageArchetype {
   // Dashboard pages
-  if (route.includes('/dashboard')) {
+  if (route.includes('/lms/dashboard')) {
     return PageArchetype.DASHBOARD;
   }
 

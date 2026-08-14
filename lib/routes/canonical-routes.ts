@@ -20,9 +20,9 @@ export const legacyAliasLookup = new Map<string, string>(
 );
 
 export const ADMIN = {
-  MISSION_CONTROL: '/dashboard',
+  MISSION_CONTROL: '/lms/dashboard',
   OPERATIONS: '/operations',
-  COMMAND_CENTER: '/dashboard',
+  COMMAND_CENTER: '/lms/dashboard',
   STUDENTS: '/students',
   APPLICATIONS: '/applications',
   ENROLLMENTS: '/enrollments',
@@ -47,7 +47,7 @@ export const ADMIN = {
   GOVERNANCE: '/governance',
   ANALYTICS: '/analytics',
   REPORTS: '/reports',
-  SETTINGS: '/settings',
+  SETTINGS: '/lms/settings',
   SYSTEM_HEALTH: '/system-health',
   SNAPSHOTS: '/snapshots',
   AUTOMATION: '/studio/workflows',

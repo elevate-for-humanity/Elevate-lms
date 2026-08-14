@@ -34,11 +34,11 @@ export default function OrientationVideoPage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="text-2xl font-black text-gray-900">
+            <Link href="/lms/dashboard" className="text-2xl font-black text-gray-900">
               ELEVATE<span className="text-amber-500">.</span>
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+              <Link href="/lms/dashboard" className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
                 Back to Dashboard
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -227,7 +227,7 @@ export default function OrientationVideoPage() {
               <CheckCircle className="w-16 h-16 mx-auto mb-4" />
               <h2 className="text-2xl font-bold mb-2">Congratulations!</h2>
               <p className="text-white/80 mb-6">You've completed your orientation. You're ready to start your apprenticeship!</p>
-              <Link href="/dashboard" className="inline-flex items-center gap-2 bg-white text-green-600 py-4 px-8 rounded-xl font-bold hover:bg-gray-100">
+              <Link href="/lms/dashboard" className="inline-flex items-center gap-2 bg-white text-green-600 py-4 px-8 rounded-xl font-bold hover:bg-gray-100">
                 Go to Your Dashboard
                 <ArrowRight className="w-5 h-5" />
               </Link>

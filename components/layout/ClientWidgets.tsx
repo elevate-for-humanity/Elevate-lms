@@ -70,7 +70,7 @@ export default function ClientWidgets() {
     pathname?.startsWith('/lms') ||
     pathname?.startsWith('/lms/dashboard') ||
     pathname?.startsWith('/account/ai-team') ||
-    pathname?.startsWith('/achievements') ||
+    pathname?.startsWith('/lms/achievements') ||
     pathname?.startsWith('/leaderboard') ||
     pathname?.startsWith('/profile') ||
     pathname?.startsWith('/settings') ||

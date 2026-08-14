@@ -47,7 +47,7 @@ export interface ApprenticePortalConfig {
   shopLabel: string;
   requiredOjl: number;
   requiredRti: number;
-  portalPath: string; // e.g. /portal/barber
+  portalPath: string; // canonical /apprentice route for this program
 }
 
 export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> = {
@@ -61,7 +61,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Barber Shop',
     requiredOjl: 1500,
     requiredRti: 500,
-    portalPath: '/portal/barber',
+    portalPath: '/apprentice?program=barber-apprenticeship',
   },
   'cosmetology-apprenticeship': {
     programSlug: 'cosmetology-apprenticeship',
@@ -73,7 +73,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Salon',
     requiredOjl: 1500,
     requiredRti: 500,
-    portalPath: '/portal/cosmetology',
+    portalPath: '/apprentice?program=cosmetology-apprenticeship',
   },
   'esthetician-apprenticeship': {
     programSlug: 'esthetician-apprenticeship',
@@ -85,7 +85,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Spa / Salon',
     requiredOjl: 525,
     requiredRti: 175,
-    portalPath: '/portal/esthetician',
+    portalPath: '/apprentice?program=esthetician-apprenticeship',
   },
   'nail-technician-apprenticeship': {
     programSlug: 'nail-technician-apprenticeship',
@@ -97,7 +97,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Nail Salon',
     requiredOjl: 400,
     requiredRti: 100,
-    portalPath: '/portal/nail-technician',
+    portalPath: '/apprentice?program=nail-technician-apprenticeship',
   },
   'culinary-apprenticeship': {
     programSlug: 'culinary-apprenticeship',
@@ -109,7 +109,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Kitchen',
     requiredOjl: 3000,
     requiredRti: 500,
-    portalPath: '/portal/culinary',
+    portalPath: '/apprentice?program=culinary-apprenticeship',
   },
   'electrical': {
     programSlug: 'electrical',
@@ -121,7 +121,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Job Site',
     requiredOjl: 7000,
     requiredRti: 1000,
-    portalPath: '/portal/electrical',
+    portalPath: '/apprentice?program=electrical',
   },
   'plumbing': {
     programSlug: 'plumbing',
@@ -133,7 +133,7 @@ export const APPRENTICE_PORTAL_CONFIGS: Record<string, ApprenticePortalConfig> =
     shopLabel: 'Job Site',
     requiredOjl: 7000,
     requiredRti: 1000,
-    portalPath: '/portal/plumbing',
+    portalPath: '/apprentice?program=plumbing',
   },
 };
 

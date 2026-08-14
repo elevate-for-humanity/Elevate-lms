@@ -304,7 +304,7 @@ export default async function PortfolioPage() {
                   Recent Badges
                 </h2>
                 <Link
-                  href="/lms/badges"
+                  href="/lms/achievements"
                   className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                 >
                   View All

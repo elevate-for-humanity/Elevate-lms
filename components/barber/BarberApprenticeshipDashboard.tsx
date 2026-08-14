@@ -27,7 +27,7 @@ import type { BarberDashboardData } from '@/lib/barber/load-barber-dashboard';
 import { PRESTIGE_BARBER_BRAND } from '@/lib/barber/branding';
 
 const NAV_TABS = [
-  { id: 'dashboard', label: 'Dashboard', href: '/portal/barber' },
+  { id: 'dashboard', label: 'Dashboard', href: '/apprentice?program=barber-apprenticeship' },
   { id: 'hours', label: 'Hours', href: '/apprentice/hours' },
   { id: 'timeclock', label: 'Timeclock', href: '/apprentice/timeclock' },
   { id: 'competencies', label: 'Competencies', href: '/apprentice/competencies' },

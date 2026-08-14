@@ -74,12 +74,12 @@ function buildCompetencyTree(
   const map = new Map<string, CompetencyNode>();
   const progress = new Map(progressData.map((row) => [row.competency_key as string, row]));
 
-  for (const module of blueprint.modules) {
-    for (const competency of module.competencies || []) {
+  for (const blueprintModule of blueprint.modules) {
+    for (const competency of blueprintModule.competencies || []) {
       const stored = progress.get(competency.competencyKey);
       const existing = map.get(competency.competencyKey);
       if (existing) {
-        existing.modules.push(module.slug);
+        existing.modules.push(blueprintModule.slug);
         continue;
       }
 
@@ -91,7 +91,7 @@ function buildCompetencyTree(
         currentLevel: level,
         targetLevel: 100,
         verified,
-        modules: [module.slug],
+        modules: [blueprintModule.slug],
         requiredSkills: competency.minimumTouchpoints,
         completedSkills: Math.floor((level / 100) * competency.minimumTouchpoints),
         status: verified ? 'verified' : level >= 100 ? 'mastered' : level > 0 ? 'in-progress' : 'not-started',

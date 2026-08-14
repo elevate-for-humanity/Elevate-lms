@@ -55,11 +55,15 @@ export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
   parent: { path: '/parent-portal/dashboard', host: 'lms', portalKey: 'parent', label: 'Parent' },
   creator: { path: '/creator/products', host: 'lms', portalKey: 'creator', label: 'Creator' },
   program_holder: { path: '/program-holder/dashboard', host: 'lms', portalKey: 'programholder', label: 'Program Holder' },
-  case_manager: { path: '/case-manager/dashboard', host: 'lms', portalKey: 'casemanager', label: 'Case Manager' },
-  workforce_board: { path: '/workforce-board/dashboard', host: 'lms', portalKey: 'workforceboard', label: 'Workforce Board' },
-  workforce_board_admin: { path: '/workforce-board/dashboard', host: 'lms', portalKey: 'workforceboard', label: 'Workforce Board Admin' },
-  provider: { path: '/provider/dashboard', host: 'lms', portalKey: 'provider', label: 'Training Provider' },
-  provider_admin: { path: '/provider/dashboard', host: 'lms', portalKey: 'provider', label: 'Training Provider Admin' },
+
+  // These private portals still physically live in the Marketing app on the
+  // current canonical branch. Keep role destinations on the real owner until
+  // the route directories themselves are moved and verified in LMS.
+  case_manager: { path: '/case-manager/dashboard', host: 'marketing', portalKey: 'casemanager', label: 'Case Manager' },
+  workforce_board: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board' },
+  workforce_board_admin: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board Admin' },
+  provider: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider' },
+  provider_admin: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider Admin' },
 };
 
 export const ROLE_ROUTE_PRIORITY: ReadonlyArray<UserRole | string> = [

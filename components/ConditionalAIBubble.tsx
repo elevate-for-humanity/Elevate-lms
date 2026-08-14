@@ -13,12 +13,13 @@ const AIAssistantBubble = dynamic(
 
 const APP_ROUTE_PREFIXES = [
   '/lms',
-  '/admin',
+  '/dashboard',
+  '/studio',
   '/learner',
-  '/admin/instructor',
+  '/instructor',
   '/employer',
   '/partner',
-  '/admin/staff-portal',
+  '/staff-portal',
   '/program-holder',
 ];
 

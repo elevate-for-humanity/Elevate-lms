@@ -69,6 +69,7 @@ export async function POST(request: Request) {
 
   const { data: applications, error } = await query;
   if (error) {
+    logger.error('[follow-up-blast] application query failed', undefined, { operation: 'load_pending_applications' });
     return NextResponse.json({ error: 'Failed to fetch applications' }, { status: 500 });
   }
   if (!applications || applications.length === 0) {
@@ -101,10 +102,10 @@ export async function POST(request: Request) {
         .update({ support_notes: `Follow-up email sent ${new Date().toISOString()}` })
         .eq('id', app.id);
       sent++;
-    } catch (err: unknown) {
+    } catch {
       logger.warn('[follow-up-blast] email failed', {
         appId: app.id,
-        err: err instanceof Error ? err.message : 'unknown error',
+        operation: 'send_follow_up',
       });
       errors.push('Failed to send to one recipient');
       skipped++;

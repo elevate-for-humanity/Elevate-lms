@@ -26,16 +26,18 @@ const workers = [
 ];
 
 let stampedCount = 0;
+let skippedCount = 0;
 for (const worker of workers) {
   const swPath = join(ROOT, worker.path);
   try {
     const original = readFileSync(swPath, 'utf8');
     if (!original.includes('__CACHE_VERSION__')) {
-      if (original.includes(worker.cache)) {
-        console.log(`[stamp-sw] ${worker.path} already stamped → ${worker.cache}`);
-        continue;
-      }
-      throw new Error(`No __CACHE_VERSION__ placeholder in ${worker.path}`);
+      // App-specific workers may already be source-stamped or intentionally not
+      // use the shared cache placeholder. A build for one service must not fail
+      // merely because another service owns a different worker implementation.
+      console.warn(`[stamp-sw] ${worker.path} has no __CACHE_VERSION__ placeholder — skipped`);
+      skippedCount++;
+      continue;
     }
     const stamped = original.replaceAll('__CACHE_VERSION__', worker.cache);
     if (stamped.includes('__CACHE_VERSION__')) {
@@ -45,11 +47,13 @@ for (const worker of workers) {
     console.log(`[stamp-sw] ${worker.path} → ${worker.cache}`);
     stampedCount++;
   } catch (err) {
-    if (err?.code === 'ENOENT') console.warn(`[stamp-sw] ${worker.path} not found — skipped`);
-    else throw err;
+    if (err?.code === 'ENOENT') {
+      console.warn(`[stamp-sw] ${worker.path} not found — skipped`);
+      skippedCount++;
+    } else {
+      throw err;
+    }
   }
 }
 
-console.log(stampedCount > 0
-  ? `[stamp-sw] ${stampedCount} service worker(s) stamped with SHA ${shortSha}`
-  : `[stamp-sw] service workers already stamped for SHA ${shortSha}`);
+console.log(`[stamp-sw] ${stampedCount} service worker(s) stamped with SHA ${shortSha}; ${skippedCount} skipped`);

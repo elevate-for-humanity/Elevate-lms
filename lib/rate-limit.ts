@@ -31,8 +31,41 @@ function getRedis(): Redis | null {
   }
 }
 
-export function getRedisClient(): Redis | null {
-  return getRedis();
+export interface RedisClientCompat {
+  set(
+    key: string,
+    value: string,
+    options?: { nx?: boolean; ex?: number },
+  ): Promise<string | null>;
+  get(key: string): Promise<string | null>;
+}
+
+let redisCompat: RedisClientCompat | null = null;
+
+export function getRedisClient(): RedisClientCompat | null {
+  const client = getRedis();
+  if (!client) return null;
+  if (redisCompat) return redisCompat;
+
+  redisCompat = {
+    async set(key, value, options) {
+      if (options?.nx && options?.ex) {
+        return client.set(key, value, 'EX', options.ex, 'NX');
+      }
+      if (options?.nx) {
+        return client.set(key, value, 'NX');
+      }
+      if (options?.ex) {
+        return client.set(key, value, 'EX', options.ex);
+      }
+      return client.set(key, value);
+    },
+    async get(key) {
+      return client.get(key);
+    },
+  };
+
+  return redisCompat;
 }
 
 export const RATE_LIMITS = {

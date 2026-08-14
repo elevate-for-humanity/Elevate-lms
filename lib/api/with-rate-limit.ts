@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Ratelimit } from '@upstash/ratelimit';
 import { logger } from '@/lib/logger';
 import {
   authRateLimit,
@@ -12,13 +11,14 @@ import {
   getIdentifier,
   createRateLimitHeaders,
   getRetryAfterSeconds,
+  type RateLimiterLike,
 } from '@/lib/rate-limit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-type RateLimiterGetter = { get: () => Ratelimit | null };
+type RateLimiterGetter = { get: () => RateLimiterLike | null };
 type CanonicalTier = 'strict' | 'contact' | 'api' | 'auth' | 'payment' | 'public' | 'pageLoad';
 
-function canonicalTierFor(limiter: Ratelimit | null | RateLimiterGetter): CanonicalTier | null {
+function canonicalTierFor(limiter: RateLimiterLike | null | RateLimiterGetter): CanonicalTier | null {
   if (limiter === strictRateLimit) return 'strict';
   if (limiter === contactRateLimit) return 'contact';
   if (limiter === apiRateLimit) return 'api';
@@ -38,7 +38,7 @@ function canonicalTierFor(limiter: Ratelimit | null | RateLimiterGetter): Canoni
 export function withRateLimit<T = any>(
   handler: (request: NextRequest, context?: any) => Promise<NextResponse>,
   options: {
-    limiter: Ratelimit | null | RateLimiterGetter;
+    limiter: RateLimiterLike | null | RateLimiterGetter;
     skipOnMissing?: boolean;
   },
 ) {
@@ -55,7 +55,7 @@ export function withRateLimit<T = any>(
     const limiter =
       typeof (options.limiter as any)?.get === 'function'
         ? (options.limiter as RateLimiterGetter).get()
-        : (options.limiter as Ratelimit | null);
+        : (options.limiter as RateLimiterLike | null);
 
     if (!limiter) {
       if (skipOnMissing) {
@@ -103,7 +103,7 @@ export function withRateLimit<T = any>(
 export function withRateLimitAndAuth<T = any>(
   handler: (request: NextRequest, context: any, user: any) => Promise<NextResponse>,
   options: {
-    limiter: Ratelimit | null | RateLimiterGetter;
+    limiter: RateLimiterLike | null | RateLimiterGetter;
     roles?: string[];
     skipOnMissing?: boolean;
   },

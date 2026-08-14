@@ -7,7 +7,7 @@ const requiredFiles = [
   'package.json',
   'pnpm-lock.yaml',
   'pnpm-workspace.yaml',
-  'Dockerfile.northflank-marketing',
+  'Dockerfile.marketing',
   'Dockerfile.northflank-admin',
   'Dockerfile.northflank-lms',
   'apps/marketing/package.json',
@@ -21,6 +21,13 @@ for (const relativePath of requiredFiles) {
   const fullPath = path.join(root, relativePath);
   if (!fs.existsSync(fullPath)) {
     errors.push(`Missing required file: ${relativePath}`);
+  }
+}
+
+const retiredFiles = ['Dockerfile.northflank-marketing'];
+for (const relativePath of retiredFiles) {
+  if (fs.existsSync(path.join(root, relativePath))) {
+    errors.push(`Retired duplicate build file must not exist: ${relativePath}`);
   }
 }
 

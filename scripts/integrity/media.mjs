@@ -4,7 +4,8 @@
  *
  * Validates local media references, canonical program imagery, key portal
  * picture coverage, production-safe legacy image rewrites, and the production
- * rule that browser SpeechSynthesis may not be used for spoken output.
+ * rule that browser SpeechSynthesis is only used as a fallback behind the
+ * shared natural-voice endpoint.
  */
 
 import fs from 'node:fs';
@@ -156,12 +157,23 @@ for (const [name, relPath, markers] of portalRequirements) {
 }
 
 console.log('\n── Natural voice policy ──');
-const roboticSpeechUses = [];
+const browserSpeechUses = [];
 scanSourceFiles(['apps', 'components', 'lib'], (_file, relative, content) => {
-  if (/new\s+SpeechSynthesisUtterance\s*\(/.test(content) || /(?:window\.)?speechSynthesis\.speak\s*\(/.test(content)) roboticSpeechUses.push(relative);
+  if (/new\s+SpeechSynthesisUtterance\s*\(/.test(content) || /(?:window\.)?speechSynthesis\.speak\s*\(/.test(content)) browserSpeechUses.push(relative);
 });
-if (roboticSpeechUses.length) fail(`Browser SpeechSynthesis output remains in production source: ${roboticSpeechUses.join(', ')}`);
-else pass('No production source uses browser SpeechSynthesis for spoken output');
+const allowedFallback = 'components/voice/useNaturalVoice.ts';
+const unauthorizedBrowserSpeech = browserSpeechUses.filter((relative) => relative !== allowedFallback);
+if (unauthorizedBrowserSpeech.length) {
+  fail(`Browser SpeechSynthesis bypasses the shared voice fallback: ${unauthorizedBrowserSpeech.join(', ')}`);
+} else if (browserSpeechUses.length === 1) {
+  const fallbackSource = fs.readFileSync(path.join(rootDir, allowedFallback), 'utf8');
+  const hasNaturalEndpoint = fallbackSource.includes('/api/voice/natural');
+  const hasFallback = /SpeechSynthesisUtterance|speechSynthesis\.speak/.test(fallbackSource);
+  if (!hasNaturalEndpoint || !hasFallback) fail('Shared voice hook does not enforce natural-TTS-first browser fallback behavior');
+  else pass('Browser SpeechSynthesis is confined to the shared natural-voice failure fallback');
+} else {
+  pass('No production source uses browser SpeechSynthesis for spoken output');
+}
 
 const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
 if (!naturalRoute.includes("model: 'gpt-4o-mini-tts'")) fail('Natural voice handler is not using the configured natural TTS model');

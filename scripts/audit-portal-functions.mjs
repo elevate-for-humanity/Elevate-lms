@@ -58,10 +58,30 @@ for (const [app, relRoot] of Object.entries(APPS)) {
   apiIndex[app] = apis.map((file) => ({ file, route: routeFromFile(appRoot, file, 'route') }));
 }
 
-function existsRoute(app, target, api = false) {
+function targetVariants(target) {
   const pathname = target.split(/[?#]/)[0] || '/';
-  return (api ? apiIndex[app] : routeIndex[app]).some((entry) => pattern(entry.route).test(pathname));
+  if (!pathname.includes('${')) return [pathname];
+
+  // Source references frequently use template literals while Next routes use
+  // [param] folders. Resolve both a dynamic-segment representative and an empty
+  // suffix representative so these common forms are checked correctly:
+  //   /api/workflows/${id}       -> /api/workflows/__dynamic__
+  //   /provider/programs${suffix} -> /provider/programs
+  //   /submissions${qs.toString()} -> /submissions
+  const expression = /\$\{[^}]+\}/g;
+  return [...new Set([
+    pathname.replace(expression, '__dynamic__'),
+    pathname.replace(expression, ''),
+  ])];
 }
+
+function existsRoute(app, target, api = false) {
+  const index = api ? apiIndex[app] : routeIndex[app];
+  return targetVariants(target).some((pathname) =>
+    index.some((entry) => pattern(entry.route).test(pathname)),
+  );
+}
+
 function extract(source) {
   const refs = [];
   const regexes = [

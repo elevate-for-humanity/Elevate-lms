@@ -22,6 +22,7 @@ export const ROUTES = {
   parentPortal: `${LMS_HOST}/parent-portal/dashboard`,
   workforcePortal: `${LMS_HOST}/workforce/dashboard`,
   hostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
+  programHolderPortal: `${LMS_HOST}/program-holder/dashboard`,
   // Compatibility aliases retained for old bookmarks; do not expose as separate navigation items.
   cosmetologyHostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
   partnerPortal: `${LMS_HOST}/host-shop/dashboard`,
@@ -31,10 +32,9 @@ export const ROUTES = {
   adminLogin: `${ADMIN_HOST}/login`,
   // These operational workspaces still live on the Marketing service. Keep
   // their URLs absolute so shared navigation never resolves them against the
-  // LMS or Admin hostname.
+  // LMS or Admin hostname. Program Holder has already moved to LMS above.
   caseManagerPortal: `${MARKETING_HOST}/case-manager/dashboard`,
   providerPortal: `${MARKETING_HOST}/provider/dashboard`,
-  programHolderPortal: `${MARKETING_HOST}/program-holder/dashboard`,
   workforceBoardPortal: `${MARKETING_HOST}/workforce-board/dashboard`,
 
   // Programs
@@ -69,8 +69,6 @@ export const ROUTES = {
   eligibility: '/eligibility/quiz',
 
   // Employers
-  // /employer remains a compatibility alias. The general employer overview and
-  // hire-graduates recruiting page are intentionally separate public surfaces.
   employers: '/employers',
   employersHireGraduates: '/hire-graduates',
   employersPostJob: `${LMS_HOST}/employer/dashboard`,

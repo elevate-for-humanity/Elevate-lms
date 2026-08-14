@@ -26,6 +26,28 @@ const STYLE_INSTRUCTIONS: Record<string, string> = {
     'Use a warm, natural, conversational speaking style. Sound human and clear with natural pauses and emphasis. Never sound robotic or monotone.',
 };
 
+function classifyVoiceProviderError(cause: unknown): {
+  code: 'billing_inactive' | 'rate_limited' | 'provider_unavailable';
+  retryable: boolean;
+} {
+  const message = cause instanceof Error ? cause.message : String(cause ?? '');
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('account is not active') ||
+    normalized.includes('billing') ||
+    normalized.includes('insufficient_quota')
+  ) {
+    return { code: 'billing_inactive', retryable: false };
+  }
+
+  if (normalized.includes('429') || normalized.includes('rate limit')) {
+    return { code: 'rate_limited', retryable: true };
+  }
+
+  return { code: 'provider_unavailable', retryable: true };
+}
+
 export async function handleNaturalVoiceRequest(request: Request) {
   const limited = await applyRateLimit(request, 'public');
   if (limited) return limited;
@@ -44,7 +66,10 @@ export async function handleNaturalVoiceRequest(request: Request) {
 
   await hydrateProcessEnv();
   if (!isOpenAIConfigured()) {
-    return Response.json({ error: 'Natural voice service is not configured.' }, { status: 503 });
+    return Response.json(
+      { error: 'Natural voice service is not configured.', code: 'not_configured', retryable: false },
+      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+    );
   }
 
   try {
@@ -66,10 +91,26 @@ export async function handleNaturalVoiceRequest(request: Request) {
       },
     });
   } catch (cause) {
-    console.error('[natural-voice] Speech generation failed', cause instanceof Error ? cause.message : 'unknown provider error');
+    const classification = classifyVoiceProviderError(cause);
+    console.error(
+      '[natural-voice] Speech generation failed',
+      classification.code,
+      cause instanceof Error ? cause.message : 'unknown provider error',
+    );
+
     return Response.json(
-      { error: 'Natural voice is temporarily unavailable.', retryable: true },
-      { status: 503, headers: { 'Cache-Control': 'no-store' } },
+      {
+        error:
+          classification.code === 'billing_inactive'
+            ? 'Natural voice is unavailable because the voice provider account requires billing activation.'
+            : 'Natural voice is temporarily unavailable.',
+        code: classification.code,
+        retryable: classification.retryable,
+      },
+      {
+        status: classification.code === 'billing_inactive' ? 503 : 503,
+        headers: { 'Cache-Control': 'no-store' },
+      },
     );
   }
 }

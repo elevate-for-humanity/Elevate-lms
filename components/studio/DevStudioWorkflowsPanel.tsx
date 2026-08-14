@@ -95,7 +95,7 @@ export default function DevStudioWorkflowsPanel() {
             Refresh
           </button>
           <Link
-            href="/admin/studio/workflows"
+            href="/studio/workflows"
             className="inline-flex items-center gap-1 rounded-lg bg-brand-blue-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-brand-blue-700"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -126,7 +126,7 @@ export default function DevStudioWorkflowsPanel() {
           {workflows.length === 0 && !loading ? (
             <p className="text-sm text-slate-500">
               No workflows yet.{' '}
-              <Link href="/admin/studio/workflows" className="text-brand-blue-600 underline">
+              <Link href="/studio/workflows" className="text-brand-blue-600 underline">
                 Create one
               </Link>
             </p>
@@ -158,7 +158,7 @@ export default function DevStudioWorkflowsPanel() {
                       Run
                     </button>
                     <Link
-                      href={`/admin/studio/workflows`}
+                      href="/studio/workflows"
                       className="text-xs text-brand-blue-600 hover:underline"
                     >
                       Edit
@@ -187,7 +187,7 @@ export default function DevStudioWorkflowsPanel() {
             </ul>
           )}
           <Link
-            href="/admin/studio/workflows"
+            href="/studio/workflows"
             className="mt-2 inline-flex items-center gap-1 text-xs text-brand-blue-600 hover:underline"
           >
             Open workflow builder

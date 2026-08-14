@@ -51,6 +51,9 @@ const nextConfig = {
         permanent: true,
       },
 
+      // Public marketing aliases only. Private portal/admin/LMS routes are
+      // intentionally not redirected from the public origin; retired private
+      // paths must remain inaccessible here and resolve as not found.
       { source: '/wioa-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },
@@ -61,33 +64,10 @@ const nextConfig = {
       { source: '/legal/agreements', destination: '/legal', permanent: false },
       { source: '/intake', destination: '/apply', permanent: false },
       { source: '/snap', destination: '/snap/snap-et', permanent: false },
-
       { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
       { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
-
-      { source: '/portal/barber', destination: 'https://app.elevateforhumanity.org/apprentice?program=barber-apprenticeship', permanent: true },
-      { source: '/portal/cosmetology', destination: 'https://app.elevateforhumanity.org/apprentice?program=cosmetology-apprenticeship', permanent: true },
-      { source: '/portal/esthetician', destination: 'https://app.elevateforhumanity.org/apprentice?program=esthetician-apprenticeship', permanent: true },
-      { source: '/portal/nail-technician', destination: 'https://app.elevateforhumanity.org/apprentice?program=nail-technician-apprenticeship', permanent: true },
-      { source: '/portal/culinary', destination: 'https://app.elevateforhumanity.org/apprentice?program=culinary-apprenticeship', permanent: true },
-      { source: '/portal/electrical', destination: 'https://app.elevateforhumanity.org/apprentice?program=electrical', permanent: true },
-      { source: '/portal/plumbing', destination: 'https://app.elevateforhumanity.org/apprentice?program=plumbing', permanent: true },
-
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: true },
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
-      { source: '/lms/:path*', destination: 'https://app.elevateforhumanity.org/lms/:path*', permanent: true },
-      { source: '/student-portal/education', destination: 'https://app.elevateforhumanity.org/lms/dashboard', permanent: true },
-      { source: '/employer/:path*', destination: 'https://app.elevateforhumanity.org/employer/:path*', permanent: true },
-      { source: '/apprentice', destination: 'https://app.elevateforhumanity.org/apprentice', permanent: true },
-      { source: '/apprentice/:path*', destination: 'https://app.elevateforhumanity.org/apprentice/:path*', permanent: true },
-      { source: '/parent-portal/:path*', destination: 'https://app.elevateforhumanity.org/parent-portal/:path*', permanent: true },
-      { source: '/workforce/:path*', destination: 'https://app.elevateforhumanity.org/workforce/:path*', permanent: true },
-      { source: '/cosmetology-host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: true },
-      { source: '/partner/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: true },
-      { source: '/host-shop', destination: 'https://app.elevateforhumanity.org/host-shop/dashboard', permanent: true },
-      { source: '/host-shop/:path*', destination: 'https://app.elevateforhumanity.org/host-shop/:path*', permanent: true },
     ];
   },
 

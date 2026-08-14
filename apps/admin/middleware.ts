@@ -12,6 +12,7 @@ import {
 } from '@/lib/rbac/role-matrix';
 
 const PUBLIC_PATHS = [
+  '/',
   '/login',
   '/unauthorized',
   // The credential endpoint must be reachable before a Supabase session exists.
@@ -28,7 +29,7 @@ const PUBLIC_PATHS = [
 
 function isPublicPath(pathname: string): boolean {
   return (
-    PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`)) ||
+    PUBLIC_PATHS.some((path) => pathname === path || (path !== '/' && pathname.startsWith(`${path}/`))) ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/favicon') ||
     /[a-z0-9]+\.[a-z]+$/i.test(pathname)

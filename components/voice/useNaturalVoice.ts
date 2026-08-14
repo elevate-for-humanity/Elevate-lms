@@ -10,8 +10,30 @@ type PlayOptions = {
   rate?: number;
 };
 
+function pickBrowserVoice(style: NaturalVoiceStyle): SpeechSynthesisVoice | null {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) return null;
+
+  const english = voices.filter((voice) => /^en([-_]|$)/i.test(voice.lang));
+  const pool = english.length ? english : voices;
+  const preferred = style === 'commercial'
+    ? ['Samantha', 'Ava', 'Google US English', 'Microsoft Jenny', 'Microsoft Aria']
+    : style === 'instructor'
+      ? ['Samantha', 'Google US English', 'Microsoft Jenny', 'Microsoft Aria']
+      : ['Google US English', 'Samantha', 'Microsoft Jenny', 'Microsoft Aria'];
+
+  for (const name of preferred) {
+    const match = pool.find((voice) => voice.name.toLowerCase().includes(name.toLowerCase()));
+    if (match) return match;
+  }
+
+  return pool.find((voice) => voice.default) || pool[0] || null;
+}
+
 export function useNaturalVoice() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const objectUrlRef = useRef<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -37,11 +59,59 @@ export function useNaturalVoice() {
       audio.src = '';
     }
     audioRef.current = null;
+    utteranceRef.current = null;
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     releaseObjectUrl();
     setIsPlaying(false);
     setIsPaused(false);
     setIsLoading(false);
   }, [releaseObjectUrl]);
+
+  const playBrowserVoice = useCallback((text: string, options: PlayOptions = {}) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = Math.min(2, Math.max(0.5, options.rate || 1));
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    const voice = pickBrowserVoice(options.style || 'default');
+    if (voice) utterance.voice = voice;
+
+    utterance.onstart = () => {
+      setIsLoading(false);
+      setIsPlaying(true);
+      setIsPaused(false);
+      setError(null);
+    };
+    utterance.onpause = () => {
+      setIsPlaying(false);
+      setIsPaused(true);
+    };
+    utterance.onresume = () => {
+      setIsPlaying(true);
+      setIsPaused(false);
+    };
+    utterance.onend = () => {
+      setIsPlaying(false);
+      setIsPaused(false);
+      utteranceRef.current = null;
+    };
+    utterance.onerror = (event) => {
+      if (event.error === 'canceled' || event.error === 'interrupted') return;
+      setIsLoading(false);
+      setIsPlaying(false);
+      setIsPaused(false);
+      setError('Voice playback is unavailable on this device.');
+      utteranceRef.current = null;
+    };
+
+    utteranceRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+    return true;
+  }, []);
 
   const play = useCallback(async (text: string, options: PlayOptions = {}) => {
     const clean = text.trim();
@@ -64,7 +134,9 @@ export function useNaturalVoice() {
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        throw new Error(payload?.error || 'Natural voice is temporarily unavailable.');
+        const fallbackWorked = playBrowserVoice(clean, options);
+        if (fallbackWorked) return true;
+        throw new Error(payload?.error || 'Voice is temporarily unavailable.');
       }
 
       const blob = await response.blob();
@@ -91,42 +163,63 @@ export function useNaturalVoice() {
         releaseObjectUrl();
       };
       audio.onerror = () => {
-        setIsLoading(false);
-        setIsPlaying(false);
-        setIsPaused(false);
-        setError('Natural voice playback failed.');
         releaseObjectUrl();
+        if (!playBrowserVoice(clean, options)) {
+          setIsLoading(false);
+          setIsPlaying(false);
+          setIsPaused(false);
+          setError('Voice playback failed.');
+        }
       };
       audioRef.current = audio;
 
-      await audio.play();
-      return true;
+      try {
+        await audio.play();
+        return true;
+      } catch {
+        releaseObjectUrl();
+        audioRef.current = null;
+        if (playBrowserVoice(clean, options)) return true;
+        throw new Error('Voice playback could not start.');
+      }
     } catch (cause) {
+      if (playBrowserVoice(clean, options)) return true;
       setIsLoading(false);
       setIsPlaying(false);
       setIsPaused(false);
-      setError(cause instanceof Error ? cause.message : 'Natural voice is temporarily unavailable.');
+      setError(cause instanceof Error ? cause.message : 'Voice is temporarily unavailable.');
       releaseObjectUrl();
       return false;
     }
-  }, [releaseObjectUrl, stop]);
+  }, [playBrowserVoice, releaseObjectUrl, stop]);
 
   const pause = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || audio.paused) return;
-    audio.pause();
+    if (audio && !audio.paused) {
+      audio.pause();
+      return;
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+    }
   }, []);
 
   const resume = useCallback(async () => {
     const audio = audioRef.current;
-    if (!audio) return false;
-    try {
-      await audio.play();
-      return true;
-    } catch {
-      setError('Natural voice playback could not resume.');
-      return false;
+    if (audio) {
+      try {
+        await audio.play();
+        return true;
+      } catch {
+        setError('Voice playback could not resume.');
+        return false;
+      }
     }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      return true;
+    }
+    return false;
   }, []);
 
   useEffect(() => () => stop(), [stop]);

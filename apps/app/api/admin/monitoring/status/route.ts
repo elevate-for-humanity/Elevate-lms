@@ -2,10 +2,9 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { Redis } from '@upstash/redis';
+import { Redis } from 'ioredis';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-
 import { withRuntime } from '@/lib/api/withRuntime';
 
 export const runtime = 'nodejs';
@@ -16,7 +15,6 @@ async function _GET(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  // Auth — admin/admin only (endpoint exposes infrastructure details)
   const supabase = await createClient();
   const db = await requireAdminClient();
 
@@ -85,7 +83,6 @@ async function _GET(request: Request) {
 async function checkDatabase() {
   const startTime = Date.now();
   try {
-    const supabase = await createClient();
     const db = await requireAdminClient();
     const { error } = await db.from('profiles').select('id', { count: 'exact', head: true });
     const latency = Date.now() - startTime;
@@ -98,17 +95,24 @@ async function checkDatabase() {
 
 async function checkRedis() {
   const startTime = Date.now();
+  const url = process.env.REDIS_URL;
+  if (!url) {
+    return { status: 'warn', connected: false, message: 'Redis not configured', latency: 0 };
+  }
+
+  const redis = new Redis(url, {
+    maxRetriesPerRequest: 1,
+    connectTimeout: 5_000,
+    enableReadyCheck: true,
+  });
+
   try {
-    const url = process.env.UPSTASH_REDIS_REST_URL;
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-    if (!url || !token) {
-      return { status: 'warn', connected: false, message: 'Redis not configured', latency: 0 };
-    }
-    const redis = new Redis({ url, token });
     await redis.ping();
     return { status: 'pass', connected: true, latency: Date.now() - startTime };
   } catch {
     return { status: 'fail', connected: false, latency: Date.now() - startTime };
+  } finally {
+    redis.disconnect();
   }
 }
 
@@ -143,8 +147,6 @@ function getMetrics() {
       used: Math.round(mem.heapUsed / 1024 / 1024),
       total: Math.round(mem.heapTotal / 1024 / 1024),
     },
-    // Request and rate-limit counters are not tracked in-process.
-    // Wire up to Redis or an APM tool for real values.
     requests: { total: 0, errors: 0, rate: 0 },
     rateLimits: { blocked: 0, allowed: 0 },
   };

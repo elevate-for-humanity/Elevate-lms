@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { Award, BookOpen, Medal, Star, Trophy } from 'lucide-react';
+import { Award, BookOpen, Flame, Medal, Star, Trophy } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getGlobalLeaderboard, levelForPoints } from '@/lib/gamification/points';
 
@@ -12,10 +11,37 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+function PublicAchievementsPreview() {
+  return (
+    <main className="min-h-screen bg-white">
+      <section className="bg-gradient-to-br from-amber-500 to-brand-orange-600 px-4 py-16 text-white">
+        <div className="mx-auto max-w-4xl text-center">
+          <Trophy className="mx-auto mb-4 h-16 w-16" />
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-white/80">Progress & Recognition</p>
+          <h1 className="mt-3 text-4xl font-black">Earn achievements, badges, and certificates.</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-white/90">
+            Complete real learning milestones, build streaks, earn points, and collect credentials that document your progress.
+          </p>
+          <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div className="rounded-2xl bg-white/15 p-4"><Star className="mx-auto h-6 w-6" /><p className="mt-2 font-black">First Steps</p><p className="text-xs text-white/80">Start learning</p></div>
+            <div className="rounded-2xl bg-white/15 p-4"><BookOpen className="mx-auto h-6 w-6" /><p className="mt-2 font-black">Course Complete</p><p className="text-xs text-white/80">Finish programs</p></div>
+            <div className="rounded-2xl bg-white/15 p-4"><Flame className="mx-auto h-6 w-6" /><p className="mt-2 font-black">Learning Streaks</p><p className="text-xs text-white/80">Stay consistent</p></div>
+            <div className="rounded-2xl bg-white/15 p-4"><Award className="mx-auto h-6 w-6" /><p className="mt-2 font-black">Certified</p><p className="text-xs text-white/80">Earn credentials</p></div>
+          </div>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/login?redirect=/lms/achievements" className="rounded-xl bg-white px-6 py-3 font-black text-brand-orange-700">Sign in to view progress</Link>
+            <Link href="/signup" className="rounded-xl border-2 border-white px-6 py-3 font-black text-white">Create an account</Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 export default async function AchievementsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/lms/achievements');
+  if (!user) return <PublicAchievementsPreview />;
 
   const [profileResult, scoreResult, badgesResult, definitionsResult, certificatesResult, enrollmentsResult, leaderboard] = await Promise.all([
     supabase.from('profiles').select('full_name').eq('id', user.id).maybeSingle(),
@@ -58,7 +84,7 @@ export default async function AchievementsPage() {
 
       <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <section>
-          <div className="mb-4 flex items-end justify-between"><div><h2 className="text-2xl font-black text-slate-950">Badges</h2><p className="text-sm text-slate-600">One canonical badge system now powers onboarding, learning, credentials, career milestones, and community recognition.</p></div><Link href="/lms/progress" className="text-sm font-black text-brand-blue-700">View detailed progress</Link></div>
+          <div className="mb-4 flex items-end justify-between"><div><h2 className="text-2xl font-black text-slate-950">Badges</h2><p className="text-sm text-slate-600">One canonical badge system powers onboarding, learning, credentials, career milestones, and community recognition.</p></div><Link href="/lms/progress" className="text-sm font-black text-brand-blue-700">View detailed progress</Link></div>
           <div className="grid gap-4 md:grid-cols-2">{definitions.map((badge: any) => { const earned = earnedIds.has(badge.id); return <article key={badge.id} className={`rounded-2xl border p-5 ${earned ? 'border-amber-200 bg-amber-50' : 'border-slate-200 bg-white'}`}><div className="flex items-start gap-4"><div className={`flex h-11 w-11 items-center justify-center rounded-xl ${earned ? 'bg-amber-400 text-slate-950' : 'bg-slate-100 text-slate-500'}`}><Star className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950">{badge.name}</h3><span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-slate-500">{badge.rarity || 'common'}</span></div><p className="mt-1 text-sm leading-5 text-slate-600">{badge.description}</p><div className="mt-3 flex items-center justify-between text-xs font-bold"><span className={earned ? 'text-emerald-700' : 'text-slate-500'}>{earned ? `Earned ${new Date(earnedAt.get(badge.id) as string).toLocaleDateString()}` : 'Not earned yet'}</span><span className="text-amber-700">+{badge.points_reward ?? 0} pts</span></div></div></div></article>; })}</div>
         </section>
 

@@ -2,7 +2,8 @@
  * Centralized organization information.
  *
  * SINGLE SOURCE OF TRUTH for public organization/contact information.
- * Do not hardcode addresses, phone numbers, hours, or approval descriptions in pages.
+ * Do not hardcode addresses, phone numbers, hours, approval descriptions,
+ * or founder identity fields in pages.
  */
 
 import { PLATFORM_DEFAULTS } from './platform-config';
@@ -23,6 +24,15 @@ export const organization = {
   },
   appointmentOnly: true,
   calendly: 'https://calendly.com/elevate4humanityedu',
+
+  founder: {
+    name: 'Elizabeth Greene',
+    title: 'Founder & Chief Executive Officer',
+    canonicalPath: '/about/elizabeth-greene',
+    imagePath: '/images/team/elizabeth-greene.webp',
+    linkedIn: 'https://www.linkedin.com/in/elizabeth-greene-214615288',
+    location: 'Indianapolis, Indiana',
+  },
 
   approvals: {
     jobReadyIndy: {

@@ -70,6 +70,8 @@ const adminConfig = {
 
   async redirects() {
     return [
+      { source: '/admin', destination: '/dashboard', permanent: true },
+      { source: '/admin/:path*', destination: '/:path*', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
       { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },

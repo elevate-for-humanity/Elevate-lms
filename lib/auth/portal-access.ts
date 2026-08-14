@@ -1,6 +1,18 @@
 import { requireRole, type AuthResult } from '@/lib/auth/require-role';
-import { getRolesForPortal } from '@/lib/auth/role-destinations';
 import type { PortalKey } from '@/lib/routing/portal-map';
+import {
+  ADMIN_ROLES,
+  APPRENTICE_ROLES,
+  EMPLOYER_ROLES,
+  HOST_SHOP_ROLES,
+  INSTRUCTOR_ROLES,
+  PROGRAM_HOLDER_ROLES,
+  STAFF_ROLES,
+  TESTING_CENTER_ROLES,
+  WORKFORCE_ROLES,
+  ALL_AUTHENTICATED_ROLES,
+  type UserRole,
+} from '@/lib/rbac/role-matrix';
 
 export interface PortalAccessContext extends AuthResult {
   portalKey: PortalKey;
@@ -10,17 +22,36 @@ export interface PortalAccessContext extends AuthResult {
 }
 
 /**
- * Canonical protected-portal authorization entry point.
- *
- * Portal pages/layouts must use this instead of implementing their own
- * role checks. Regular `admin` is the highest active platform operator and
- * receives the same cross-portal access override everywhere. Tenant/resource
- * scoping remains a separate concern and must never be faked by assigning an
- * admin to a tenant or role-specific record.
+ * Destination roles and access roles are intentionally separate.
+ * A staff member may support an Employer/Provider portal without that portal
+ * being the staff member's post-login destination. Regular `admin` remains the
+ * highest active platform operator and is also honored by requireRole's global
+ * admin override.
  */
+const PORTAL_ACCESS_ROLES: Record<PortalKey, readonly UserRole[]> = {
+  lms: ALL_AUTHENTICATED_ROLES,
+  apprentice: APPRENTICE_ROLES,
+  employer: EMPLOYER_ROLES,
+  parent: ['parent', 'admin', 'staff'],
+  workforce: WORKFORCE_ROLES,
+  hostshop: HOST_SHOP_ROLES,
+  programholder: PROGRAM_HOLDER_ROLES,
+  creator: ['creator', 'admin'],
+  admin: ADMIN_ROLES,
+  instructor: INSTRUCTOR_ROLES,
+  staff: STAFF_ROLES,
+  testing: TESTING_CENTER_ROLES,
+  workforceboard: ['workforce_board', 'workforce_board_admin', 'admin', 'org_admin', 'staff'],
+  casemanager: ['case_manager', 'admin', 'staff'],
+  provider: ['provider', 'provider_admin', 'admin', 'staff'],
+};
+
+export function getPortalAccessRoles(portalKey: PortalKey): readonly UserRole[] {
+  return PORTAL_ACCESS_ROLES[portalKey];
+}
+
 export async function requirePortalAccess(portalKey: PortalKey): Promise<PortalAccessContext> {
-  const portalRoles = getRolesForPortal(portalKey);
-  const auth = await requireRole(portalRoles);
+  const auth = await requireRole(PORTAL_ACCESS_ROLES[portalKey]);
   const isPlatformAdmin = auth.effectiveRoles.includes('admin');
   const isStaffOperator = isPlatformAdmin || auth.effectiveRoles.includes('staff');
 
@@ -47,8 +78,5 @@ export function resolvePortalTenantScope(
     return { tenantId, platformWide: tenantId === null };
   }
 
-  return {
-    tenantId: access.tenantId,
-    platformWide: false,
-  };
+  return { tenantId: access.tenantId, platformWide: false };
 }

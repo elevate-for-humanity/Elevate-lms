@@ -1,0 +1,49 @@
+name: Divergent Route Bundle
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/divergent-route-bundle.yml'
+      - 'apps/app/**'
+      - 'apps/admin/app/**'
+      - 'apps/lms/app/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build divergent handler bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf route-bundle
+          mkdir -p route-bundle/source route-bundle/target
+          count=0
+          while IFS= read -r src; do
+            rel="${src#apps/app/}"
+            if [[ "$rel" == api/apprentice/* || "$rel" == api/learner/* ]]; then
+              target="apps/lms/app/$rel"
+            else
+              target="apps/admin/app/$rel"
+            fi
+            if [[ -f "$target" ]]; then
+              mkdir -p "route-bundle/source/$(dirname "$rel")" "route-bundle/target/$(dirname "$rel")"
+              cp "$src" "route-bundle/source/$rel"
+              cp "$target" "route-bundle/target/$rel"
+              printf '%s\t%s\n' "$src" "$target" >> route-bundle/pairs.tsv
+              count=$((count+1))
+            fi
+          done < <(find apps/app/api -type f -name 'route.ts' | sort)
+          echo "Bundled $count divergent route pairs"
+          find apps/app -type f | sort > route-bundle/all-legacy-files.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: divergent-route-bundle
+          path: route-bundle
+          retention-days: 2

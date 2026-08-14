@@ -1,0 +1,99 @@
+name: Consolidate LMS Routes Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/consolidate-lms-routes-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Normalize canonical LMS routes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # Shared navigation must emit canonical route families.
+          shell = Path('components/dashboard/PlatformShell.tsx')
+          text = shell.read_text()
+          text = text.replace("'/portal/apprentice", "'/apprentice")
+          text = text.replace("\"/portal/apprentice", "\"/apprentice")
+          text = text.replace("{ href: '/partner/dashboard', label: 'Dashboard', icon: LayoutDashboard },\n      { href: '/partner/programs', label: 'Programs', icon: BookOpen },\n      { href: '/partner/reports', label: 'Reports', icon: BarChart3 },\n      { href: '/partner/messages', label: 'Messages', icon: MessageSquare },\n      { href: '/partner/settings', label: 'Settings', icon: Settings },",
+                              "{ href: '/host-shop/dashboard', label: 'Dashboard', icon: LayoutDashboard },\n      { href: '/host-shop/resources', label: 'Resources', icon: BookOpen },\n      { href: '/host-shop/mou', label: 'MOU', icon: FileText },\n      { href: '/host-shop/onboarding', label: 'Onboarding', icon: ClipboardCheck },")
+          shell.write_text(text)
+
+          profile = Path('components/navigation/ProfileDropdown.tsx')
+          text = profile.read_text()
+          if "import { siteUrls } from '@/lib/utils/site-urls';" not in text:
+              text = text.replace("import { createClient } from '@/lib/supabase/client';", "import { createClient } from '@/lib/supabase/client';\nimport { siteUrls } from '@/lib/utils/site-urls';")
+          start = text.index('const ROLE_PORTAL: Record<string, { label: string; href: string }> = {')
+          end = text.index('\n};', start) + 3
+          canonical = """const ROLE_PORTAL: Record<string, { label: string; href: string }> = {
+  super_admin:      { label: 'Admin Dashboard',       href: `${siteUrls.admin}/dashboard` },
+  admin:            { label: 'Admin Dashboard',       href: `${siteUrls.admin}/dashboard` },
+  org_admin:        { label: 'Admin Dashboard',       href: `${siteUrls.admin}/dashboard` },
+  staff:            { label: 'Staff Portal',          href: `${siteUrls.admin}/staff-portal/dashboard` },
+  instructor:       { label: 'Instructor Portal',     href: `${siteUrls.admin}/instructor/dashboard` },
+  creator:          { label: 'Creator Portal',        href: `${siteUrls.app}/creator/products` },
+  case_manager:     { label: 'Case Manager Portal',   href: `${siteUrls.site}/case-manager/dashboard` },
+  workforce_board:  { label: 'Workforce Board',       href: `${siteUrls.site}/workforce-board/dashboard` },
+  program_holder:   { label: 'Program Holder Portal', href: `${siteUrls.site}/program-holder/dashboard` },
+  provider:         { label: 'Provider Portal',       href: `${siteUrls.site}/provider/dashboard` },
+  provider_admin:   { label: 'Provider Portal',       href: `${siteUrls.site}/provider/dashboard` },
+  employer:         { label: 'Employer Portal',       href: `${siteUrls.app}/employer/dashboard` },
+  sponsor:          { label: 'Employer Portal',       href: `${siteUrls.app}/employer/dashboard` },
+  partner:          { label: 'Host Shop Portal',      href: `${siteUrls.app}/host-shop/dashboard` },
+  host_shop:        { label: 'Host Shop Portal',      href: `${siteUrls.app}/host-shop/dashboard` },
+  host_shop_admin:  { label: 'Host Shop Portal',      href: `${siteUrls.app}/host-shop/dashboard` },
+  workforce_partner:{ label: 'Workforce Portal',      href: `${siteUrls.app}/workforce/dashboard` },
+  parent:           { label: 'Parent Portal',         href: `${siteUrls.app}/parent-portal/dashboard` },
+  apprentice:       { label: 'Apprentice Portal',     href: `${siteUrls.app}/apprentice` },
+  barber_apprentice:{ label: 'Apprentice Portal',     href: `${siteUrls.app}/apprentice` },
+  cosmetology_apprentice:{ label: 'Apprentice Portal', href: `${siteUrls.app}/apprentice` },
+  student:          { label: 'My Dashboard',          href: `${siteUrls.app}/lms/dashboard` },
+  learner:          { label: 'My Dashboard',          href: `${siteUrls.app}/lms/dashboard` },
+};"""
+          text = text[:start] + canonical + text[end:]
+          profile.write_text(text)
+
+          # Remove redirect-only wrappers that duplicate canonical LMS routes.
+          for rel in [
+              'apps/lms/app/learner/page.tsx',
+              'apps/lms/app/learner/dashboard/error.tsx',
+              'apps/lms/app/lms/login/page.tsx',
+          ]:
+              p = Path(rel)
+              if p.exists():
+                  p.unlink()
+          PY
+
+      - name: Verify canonical route references
+        run: |
+          ! grep -R --line-number --include='*.ts' --include='*.tsx' "/portal/apprentice" apps/lms/app components lib || (echo 'retired /portal/apprentice reference remains' && exit 1)
+          ! grep -R --line-number --include='*.ts' --include='*.tsx' "'/learner/dashboard'\|\"/learner/dashboard\"" apps/lms/app components lib || (echo 'retired /learner/dashboard literal remains' && exit 1)
+          ! grep -R --line-number --include='*.ts' --include='*.tsx' "'/lms/login'\|\"/lms/login\"" apps/lms/app components lib || (echo 'retired /lms/login literal remains' && exit 1)
+          test -f apps/lms/app/lms/'(app)'/dashboard/page.tsx
+          test -f apps/lms/app/apprentice/page.tsx
+          test -f apps/lms/app/host-shop/dashboard/page.tsx
+
+      - name: Commit consolidation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "refactor(lms): consolidate canonical portal routes"
+            git push origin HEAD:main
+          fi

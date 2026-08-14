@@ -33,7 +33,7 @@ if (!adminConfig.includes("destination: '/:path*'")) {
   violations.push('Admin edge must strip the retired /admin prefix');
 }
 
-for (const configPath of ['apps/lms/next.config.mjs', 'apps/marketing/next.config.mjs']) {
+for (const configPath of ['apps/lms/next.config.mjs', 'apps/marketing/next.config.js']) {
   const config = read(configPath);
   if (!config.includes("source: '/admin'")) {
     violations.push(`${configPath} is missing the /admin cross-service redirect`);

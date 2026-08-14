@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const FINAL_CTA_IMAGE = '/images/pages/apply-page-1.jpg';
+const FINAL_CTA_IMAGE = '/images/pages/apply-page-4.jpg';
 
 export function HomeFinalCTA() {
   return (

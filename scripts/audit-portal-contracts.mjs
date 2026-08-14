@@ -35,9 +35,21 @@ const PORTALS = [
   { key: 'provider', surface: 'providerPortal', app: 'marketing', path: '/provider/dashboard', roles: ['provider', 'provider_admin'] },
 ];
 
-function pageFile(app, route) {
+function routeFileCandidates(app, route) {
   const clean = route.replace(/^\//, '');
-  return `${APP_DIR[app]}/${clean}${clean ? '/' : ''}page.tsx`;
+  const base = APP_DIR[app];
+  const suffix = `${clean}${clean ? '/' : ''}page.tsx`;
+  // Next route groups do not participate in the URL. Keep the canonical learner
+  // workspace inside (app) while still proving that /lms/dashboard exists.
+  const candidates = [`${base}/${suffix}`];
+  if (app === 'lms' && clean.startsWith('lms/')) {
+    candidates.push(`${base}/lms/(app)/${clean.slice('lms/'.length)}${clean.slice('lms/'.length) ? '/' : ''}page.tsx`);
+  }
+  return candidates;
+}
+
+function routeExists(app, route) {
+  return routeFileCandidates(app, route).some(exists);
 }
 
 console.log('\n── Canonical portal ownership ──');
@@ -51,8 +63,7 @@ for (const portal of PORTALS) {
   else if (canonical.app !== portal.app || canonical.path !== portal.path) fail(`${portal.surface}: contract says ${canonical.app}:${canonical.path}, expected ${portal.app}:${portal.path}`);
   else pass(`${portal.surface}: ${portal.app}:${portal.path}`);
 
-  const routeFile = pageFile(portal.app, portal.path);
-  if (!exists(routeFile)) fail(`${portal.key}: missing route file ${routeFile}`); else pass(`${portal.key}: route exists`);
+  if (!routeExists(portal.app, portal.path)) fail(`${portal.key}: missing route for ${portal.app}:${portal.path}`); else pass(`${portal.key}: route exists`);
 
   const escapedPath = portal.path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const keyBlock = new RegExp(`${portal.key}:\\s*\\{[\\s\\S]*?defaultPath:\\s*['\"]${escapedPath}['\"]`, 'm');
@@ -92,7 +103,8 @@ console.log('\n── Retired portal ownership ──');
 for (const retired of ['/portal/barber', '/portal/cosmetology', '/portal/esthetician', '/portal/nail-technician']) {
   if (portalMap.includes(retired)) fail(`portal-map still advertises retired route ${retired}`); else pass(`${retired}: not canonical`);
 }
-if (/programholder:\s*\{[\s\S]*?subdomain:\s*['\"]marketing['\"]/.test(portalMap)) fail('Program Holder still owned by Marketing'); else pass('Program Holder is not owned by Marketing');
+const programHolderBlock = portalMap.match(/programholder:\s*\{([\s\S]*?)\n\s*\},/)?.[1] || '';
+if (/subdomain:\s*['\"]marketing['\"]/.test(programHolderBlock)) fail('Program Holder still owned by Marketing'); else pass('Program Holder is not owned by Marketing');
 
 if (!failures) {
   console.log('\n── Portal function integrity ──');

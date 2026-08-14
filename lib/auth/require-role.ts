@@ -11,11 +11,15 @@ export interface AuthResult {
   profile: {
     id: string;
     role: string;
-    organization_id?: string;
+    organization_id?: string | null;
+    tenant_id?: string | null;
+    program_holder_id?: string | null;
     email?: string;
     first_name?: string;
     last_name?: string;
     full_name?: string;
+    company_name?: string | null;
+    verified?: boolean | null;
   };
   effectiveRoles: UserRole[];
 }

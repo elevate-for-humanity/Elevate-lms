@@ -24,10 +24,10 @@ export interface RoleRouteConfig {
 }
 
 export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
-  super_admin: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Super Admin' },
-  admin: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Admin' },
-  org_admin: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Org Admin' },
-  advisor: { path: '/lms/dashboard', host: 'admin', portalKey: 'admin', label: 'Advisor' },
+  super_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Super Admin' },
+  admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Admin' },
+  org_admin: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Org Admin' },
+  advisor: { path: '/dashboard', host: 'admin', portalKey: 'admin', label: 'Advisor' },
   staff: { path: '/staff-portal/dashboard', host: 'admin', portalKey: 'staff', label: 'Staff' },
   instructor: { path: '/instructor/dashboard', host: 'admin', portalKey: 'instructor', label: 'Instructor' },
   test_admin: { path: '/testing-center', host: 'admin', portalKey: 'testing', label: 'Test Admin' },
@@ -54,11 +54,14 @@ export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
   workforce_partner: { path: '/workforce/dashboard', host: 'lms', portalKey: 'workforce', label: 'Workforce Partner' },
   parent: { path: '/parent-portal/dashboard', host: 'lms', portalKey: 'parent', label: 'Parent' },
   creator: { path: '/creator/products', host: 'lms', portalKey: 'creator', label: 'Creator' },
+  program_holder: { path: '/program-holder/dashboard', host: 'lms', portalKey: 'programholder', label: 'Program Holder' },
 
+  // These private portals still physically live in the Marketing app on the
+  // current canonical branch. Keep role destinations on the real owner until
+  // the route directories themselves are moved and verified in LMS.
   case_manager: { path: '/case-manager/dashboard', host: 'marketing', portalKey: 'casemanager', label: 'Case Manager' },
   workforce_board: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board' },
   workforce_board_admin: { path: '/workforce-board/dashboard', host: 'marketing', portalKey: 'workforceboard', label: 'Workforce Board Admin' },
-  program_holder: { path: '/program-holder/dashboard', host: 'marketing', portalKey: 'programholder', label: 'Program Holder' },
   provider: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider' },
   provider_admin: { path: '/provider/dashboard', host: 'marketing', portalKey: 'provider', label: 'Training Provider Admin' },
 };

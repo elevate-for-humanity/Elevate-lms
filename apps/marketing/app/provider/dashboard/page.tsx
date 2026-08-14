@@ -1,410 +1,61 @@
-import { Metadata } from 'next';
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { requireRole } from '@/lib/auth/require-role';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Building2, BookOpen, Users, Award, ShieldCheck, Globe, ArrowRight } from 'lucide-react';
+import { requireProviderPortal } from '@/lib/auth/provider-access';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  CheckCircle,
-  Clock,
-  ArrowRight,
-  BookOpen,
-  Users,
-  ShieldCheck,
-  TrendingUp,
-  Award,
-  ChevronRight,
-  Globe,
-} from 'lucide-react';
 
-export const metadata: Metadata = {
-  title: 'Provider Dashboard',
-};
-
+export const metadata: Metadata = { title: 'Provider Dashboard', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
 
-function getHostFromEnv(value: string | undefined, fallback: string): string {
-  const candidate = (value || '').trim();
-  if (!candidate) return fallback;
+function host(value: string | undefined, fallback: string) { try { return new URL((value || fallback).trim()).host; } catch { return fallback.replace(/^https?:\/\//, ''); } }
 
-  try {
-    return new URL(candidate).host;
-  } catch {
-    return fallback;
-  }
-}
+export default async function ProviderDashboardPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
+  const { tenant } = await searchParams;
+  const access = await requireProviderPortal(tenant);
+  if (access.isPlatformAdmin && access.platformWide) return <ProviderAdminOversight db={access.db} />;
 
-export default async function ProviderDashboardPage() {
-  const { user } = await requireRole(['provider_admin', 'admin', 'staff']);
-  const supabase = await createClient();
-  const db = await requireAdminClient();
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('tenant_id, full_name, role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  if (!profile?.tenant_id) redirect('/unauthorized');
-
-  const tenantId = profile.tenant_id;
-
-  const appHost = getHostFromEnv(
-    process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL,
-    PLATFORM_DEFAULTS.canonicalDomain,
-  );
-  const adminHost = getHostFromEnv(
-    process.env.NEXT_PUBLIC_ADMIN_URL,
-    '',
-  );
-
-  const { data: organization } = await db
-    .from('organizations')
-    .select('id, name, slug, domain')
-    .eq('tenant_id', tenantId)
-    .maybeSingle();
-
-  const { data: tenantDomains } = organization?.id
-    ? await db
-        .from('tenant_domains')
-        .select('domain, status, verified_at')
-        .eq('organization_id', organization.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-    : { data: null };
-
-  const [
-    { data: onboardingSteps },
-    { count: programCount },
-    { count: enrollmentCount },
-    { count: completedCount },
-    { count: certCount },
-    { data: complianceArtifacts },
-    { data: recentPrograms },
-  ] = await Promise.all([
-    supabase
-      .from('provider_onboarding_steps')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .order('created_at'),
-    supabase.from('programs').select('*', { count: 'exact', head: true }).eq('tenant_id', tenantId),
-    supabase
-      .from('program_enrollments')
-      .select('*', { count: 'exact', head: true })
-      .eq('tenant_id', tenantId),
-    supabase
-      .from('program_enrollments')
-      .select('*', { count: 'exact', head: true })
-      .eq('tenant_id', tenantId)
-      .eq('status', 'completed'),
-    supabase
-      .from('certificates')
-      .select('*', { count: 'exact', head: true })
-      .eq('tenant_id', tenantId),
-    supabase
-      .from('provider_compliance_artifacts')
-      .select('id, label, expires_at, verified')
-      .eq('tenant_id', tenantId),
-    supabase
-      .from('programs')
-      .select('id, title, status, published, is_active, created_at')
-      .eq('tenant_id', tenantId)
-      .order('created_at', { ascending: false })
-      .limit(5),
+  const tenantId = access.tenantId!;
+  const db = access.db;
+  const tenantSuffix = access.isPlatformAdmin ? `?tenant=${encodeURIComponent(tenantId)}` : '';
+  const appHost = host(process.env.NEXT_PUBLIC_APP_URL, PLATFORM_DEFAULTS.canonicalDomain);
+  const [tenantRes, orgRes, onboardingRes, programsRes, enrollmentsRes, completedRes, certsRes, complianceRes] = await Promise.all([
+    db.from('tenants').select('id, name, slug, status, active').eq('id', tenantId).maybeSingle(),
+    db.from('organizations').select('id, name, slug, domain').eq('tenant_id', tenantId).maybeSingle(),
+    db.from('provider_onboarding_steps').select('id, step, completed').eq('tenant_id', tenantId).order('created_at'),
+    db.from('programs').select('id, title, status, published, is_active, created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(8),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+    db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('status', 'completed'),
+    db.from('certificates').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
+    db.from('provider_compliance_artifacts').select('id, label, expires_at, verified').eq('tenant_id', tenantId),
   ]);
+  const organization = orgRes.data;
+  const tenantRecord = tenantRes.data;
+  const programs = programsRes.data ?? [];
+  const onboarding = onboardingRes.data ?? [];
+  const onboardingPct = onboarding.length ? Math.round((onboarding.filter((step: any) => step.completed).length / onboarding.length) * 100) : 100;
+  const expiring = (complianceRes.data ?? []).filter((row: any) => row.expires_at && new Date(row.expires_at).getTime() <= Date.now() + 30 * 86400000).length;
+  const p = (path: string) => `${path}${tenantSuffix}`;
 
-  const steps = onboardingSteps ?? [];
-  const doneCount = steps.filter((s: any) => s.completed).length;
-  const totalSteps = steps.length;
-  const pct = totalSteps > 0 ? Math.round((doneCount / totalSteps) * 100) : 0;
-  const nextStep = steps.find((s: any) => !s.completed);
-
-  const expiringCount = (complianceArtifacts ?? []).filter((a: any) => {
-    if (!a.expires_at) return false;
-    return Math.ceil((new Date(a.expires_at).getTime() - Date.now()) / 86400000) <= 30;
-  }).length;
-
-  const domainRecord = tenantDomains?.[0] ?? null;
-  const customDomain = domainRecord?.domain ?? null;
-  const dnsStatus = domainRecord?.status ?? null;
-  const verifiedAt = domainRecord?.verified_at
-    ? new Date(domainRecord.verified_at).toLocaleDateString()
-    : null;
-
-  const firstName = profile.full_name?.split(' ')[0] ?? '';
-
-  const stats = [
-    {
-      label: 'Programs',
-      value: String(programCount ?? 0),
-      icon: BookOpen,
-      color: 'text-brand-blue-600',
-      bg: 'bg-brand-blue-50',
-    },
-    {
-      label: 'Enrollments',
-      value: String(enrollmentCount ?? 0),
-      icon: Users,
-      color: 'text-brand-orange-600',
-      bg: 'bg-brand-orange-50',
-    },
-    {
-      label: 'Completions',
-      value: String(completedCount ?? 0),
-      icon: TrendingUp,
-      color: 'text-slate-600',
-      bg: 'bg-slate-50',
-    },
-    {
-      label: 'Certificates',
-      value: String(certCount ?? 0),
-      icon: Award,
-      color: 'text-slate-600',
-      bg: 'bg-slate-50',
-    },
-  ];
-
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              {firstName ? `Welcome, ${firstName}` : 'Provider Dashboard'}
-            </h1>
-            <p className="text-slate-500 text-sm mt-0.5">Provider portal</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {[
-              { label: 'Programs', href: '/provider/programs' },
-              { label: 'Compliance', href: '/provider/compliance' },
-              { label: 'Settings', href: '/provider/settings' },
-            ].map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="text-sm text-slate-600 hover:text-slate-900 font-medium"
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((s) => (
-            <div key={s.label} className="bg-white rounded-xl border border-slate-200 p-5">
-              <div className={`w-9 h-9 ${s.bg} rounded-lg flex items-center justify-center mb-3`}>
-                <s.icon className={`w-4 h-4 ${s.color}`} />
-              </div>
-              <p className="text-2xl font-bold text-slate-900">{s.value}</p>
-              <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Onboarding widget — hidden once 100% complete */}
-        {pct < 100 && totalSteps > 0 && (
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-5 mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-brand-blue-900 text-sm">Getting Started</h2>
-              <span className="text-xs font-bold text-brand-blue-700">{pct}% complete</span>
-            </div>
-            <div className="w-full bg-brand-blue-200 rounded-full h-1.5 mb-4">
-              <div
-                className="bg-white h-1.5 rounded-full transition-all"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-            <div className="space-y-1.5">
-              {steps.map((step) => (
-                <div key={step.id} className="flex items-center gap-2 text-sm">
-                  {step.completed ? (
-                    <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
-                  ) : (
-                    <Clock className="w-4 h-4 text-brand-blue-300 flex-shrink-0" />
-                  )}
-                  <span className={step.completed ? 'text-brand-blue-800' : 'text-brand-blue-500'}>
-                    {step.step.replace(/_/g, ' ')}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {nextStep && (
-              <div className="mt-4">
-                <Link
-                  href={
-                    nextStep.step === 'profile_complete'
-                      ? '/provider/settings'
-                      : nextStep.step === 'mou_signed'
-                        ? '/provider/compliance'
-                        : nextStep.step.includes('program')
-                          ? '/provider/programs'
-                          : '/provider/dashboard'
-                  }
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-blue-700 hover:text-brand-blue-900 transition"
-                >
-                  Next: {nextStep.step.replace(/_/g, ' ')} <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Compliance alert */}
-        {expiringCount > 0 && (
-          <div className="bg-slate-50 border border-yellow-200 rounded-xl p-4 mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-slate-600" />
-              <p className="text-sm font-semibold text-yellow-800">
-                {expiringCount} compliance item{expiringCount > 1 ? 's' : ''} expiring within 30
-                days
-              </p>
-            </div>
-            <Link
-              href="/provider/compliance"
-              className="text-sm font-semibold text-yellow-700 hover:underline"
-            >
-              Review →
-            </Link>
-          </div>
-        )}
-
-        <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Globe className="w-4 h-4 text-slate-600" />
-                <h2 className="font-semibold text-slate-900 text-sm">Domain & DNS</h2>
-              </div>
-              <p className="text-sm text-slate-500">
-                {customDomain
-                  ? 'Your custom domain status and the live DNS target.'
-                  : 'Set up a custom domain and point DNS to the live application host.'}
-              </p>
-            </div>
-            <Link
-              href="/provider/settings"
-              className="text-xs text-brand-blue-600 hover:underline font-medium"
-            >
-              Manage settings →
-            </Link>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
-              <p className="text-xs font-medium text-slate-500 mb-1">Custom Domain</p>
-              <p className="text-sm font-semibold text-slate-900">
-                {customDomain ?? 'Not configured'}
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
-                {customDomain
-                  ? dnsStatus === 'active' || dnsStatus === 'verified'
-                    ? `Verified${verifiedAt ? ` on ${verifiedAt}` : ''}`
-                    : `Status: ${dnsStatus ?? 'pending'}`
-                  : 'Add a domain in settings to start verification.'}
-              </p>
-            </div>
-
-            <div className="rounded-lg bg-slate-50 border border-slate-200 p-4">
-              <p className="text-xs font-medium text-slate-500 mb-1">DNS Target</p>
-              <p className="text-sm font-semibold text-slate-900 break-all">{appHost}</p>
-              <p className="text-xs text-slate-500 mt-1">
-                Create a CNAME from your chosen subdomain to this host.
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-brand-blue-200 bg-brand-blue-50 p-4">
-            <div className="grid sm:grid-cols-3 gap-3 text-sm">
-              <div>
-                <p className="text-xs font-medium text-brand-blue-700 mb-1">Record Type</p>
-                <p className="font-semibold text-brand-blue-950">CNAME</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-brand-blue-700 mb-1">Host / Name</p>
-                <p className="font-semibold text-brand-blue-950">
-                  {customDomain ? customDomain.split('.').slice(0, 1).join('.') || '@' : 'training'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-brand-blue-700 mb-1">Value / Target</p>
-                <p className="font-semibold text-brand-blue-950 break-all">{appHost}</p>
-              </div>
-            </div>
-            <p className="text-xs text-brand-blue-900 mt-3">
-              Admin access remains on {adminHost}. Your public domain goes live after DNS
-              propagation and verification.
-            </p>
-          </div>
-        </div>
-
-        {/* Recent programs */}
-        {(recentPrograms ?? []).length > 0 && (
-          <div className="bg-white rounded-xl border border-slate-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-slate-900 text-sm">Recent Programs</h2>
-              <Link
-                href="/provider/programs"
-                className="text-xs text-brand-blue-600 hover:underline"
-              >
-                View all →
-              </Link>
-            </div>
-            <div className="divide-y divide-slate-50">
-              {(recentPrograms ?? []).map((prog) => (
-                <div key={prog.id} className="flex items-center justify-between py-2.5 text-sm">
-                  <span className="text-slate-800">{prog.title ?? '(untitled)'}</span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      prog.published && prog.is_active
-                        ? 'bg-brand-green-100 text-brand-green-700'
-                        : prog.status === 'pending_review'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-white text-slate-500'
-                    }`}
-                  >
-                    {prog.published && prog.is_active
-                      ? 'Published'
-                      : prog.status === 'pending_review'
-                        ? 'Under Review'
-                        : (prog.status ?? 'Draft')}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Quick links */}
-        <div className="mt-6 bg-white rounded-xl border border-slate-200 p-5">
-          <h2 className="font-semibold text-slate-900 text-sm mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {[
-              { label: 'Manage Programs', href: '/provider/programs' },
-              { label: 'View Enrollments', href: '/provider/enrollments' },
-              { label: 'Compliance', href: '/provider/compliance' },
-              { label: 'Reports', href: '/provider/reports' },
-              { label: 'Settings', href: '/provider/settings' },
-              { label: 'Support', href: '/contact' },
-            ].map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="flex items-center justify-between p-3 rounded-lg bg-slate-50 hover:bg-slate-100 text-sm text-slate-700 transition-colors"
-              >
-                {l.label}
-                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-950"><div className="mx-auto max-w-6xl space-y-7">
+    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700">Provider Portal</p><div className="mt-2 flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-3xl font-black">{organization?.name || tenantRecord?.name || 'Training Provider'}</h1><p className="mt-1 text-slate-600">Programs, learners, compliance, and provider operations.</p></div>{access.isPlatformAdmin ? <Link href="/provider/dashboard" className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold">Back to provider oversight</Link> : null}</div></section>
+    <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Metric label="Programs" value={programs.length} icon={BookOpen} /><Metric label="Enrollments" value={enrollmentsRes.count ?? 0} icon={Users} /><Metric label="Completions" value={completedRes.count ?? 0} icon={Award} /><Metric label="Certificates" value={certsRes.count ?? 0} icon={ShieldCheck} /></section>
+    {onboardingPct < 100 ? <section className="rounded-2xl border border-blue-200 bg-blue-50 p-5"><div className="flex justify-between gap-3"><div><h2 className="font-black text-blue-950">Provider onboarding</h2><p className="text-sm text-blue-800">Complete required setup before all operations are enabled.</p></div><span className="font-black text-blue-900">{onboardingPct}%</span></div><div className="mt-4 h-2 overflow-hidden rounded-full bg-blue-200"><div className="h-full bg-blue-700" style={{ width: `${onboardingPct}%` }} /></div></section> : null}
+    {expiring > 0 ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5"><p className="font-black text-amber-950">{expiring} compliance item{expiring === 1 ? '' : 's'} expire within 30 days.</p><Link href={p('/provider/compliance')} className="mt-2 inline-flex text-sm font-bold text-amber-900">Review compliance <ArrowRight className="ml-1 h-4 w-4" /></Link></section> : null}
+    <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center justify-between"><h2 className="text-xl font-black">Programs</h2><Link href={p('/provider/programs')} className="text-sm font-bold text-blue-700">Manage programs</Link></div><div className="mt-4 divide-y divide-slate-100">{programs.length ? programs.map((program: any) => <div key={program.id} className="flex items-center justify-between gap-4 py-3"><div><p className="font-bold">{program.title || 'Untitled program'}</p><p className="text-xs text-slate-600">{program.published && program.is_active ? 'Published' : program.status || 'Draft'}</p></div><Link href={p('/provider/programs')} className="text-sm font-bold text-blue-700">Open</Link></div>) : <p className="py-6 text-sm text-slate-600">No programs are assigned to this provider yet.</p>}</div></div>
+      <div className="space-y-6"><section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex items-center gap-2"><Globe className="h-5 w-5 text-blue-700" /><h2 className="font-black">Domain & DNS</h2></div><p className="mt-3 text-sm text-slate-600">Custom domain: <strong>{organization?.domain || 'Not configured'}</strong></p><p className="mt-2 text-sm text-slate-600">Application target: <strong>{appHost}</strong></p><Link href={p('/provider/settings')} className="mt-4 inline-flex text-sm font-bold text-blue-700">Manage settings</Link></section><section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="font-black">Quick actions</h2><div className="mt-4 grid gap-2"><Quick href={p('/provider/programs')} label="Programs" /><Quick href={p('/provider/compliance')} label="Compliance" /><Quick href={p('/provider/settings')} label="Settings" /></div></section></div>
+    </section>
+  </div></main>;
 }
+
+async function ProviderAdminOversight({ db }: { db: any }) {
+  const [{ data: tenants }, { count: pending }] = await Promise.all([
+    db.from('tenants').select('id, name, slug, status, active, created_at').eq('type', 'partner_provider').order('created_at', { ascending: false }).limit(100),
+    db.from('provider_applications').select('id', { count: 'exact', head: true }).in('status', ['pending', 'under_review']),
+  ]);
+  const providers = tenants ?? [];
+  return <main className="min-h-screen bg-slate-50 px-4 py-8"><div className="mx-auto max-w-6xl"><p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700">Provider Portal · Admin Oversight</p><h1 className="mt-2 text-4xl font-black">Training provider operations</h1><p className="mt-2 max-w-3xl text-slate-600">Platform-wide oversight without assigning the Admin account to a provider tenant.</p><div className="mt-7 grid gap-4 sm:grid-cols-3"><Metric label="Providers" value={providers.length} icon={Building2} /><Metric label="Active providers" value={providers.filter((p: any) => p.active || p.status === 'active').length} icon={ShieldCheck} /><Metric label="Pending applications" value={pending ?? 0} icon={Users} /></div><section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">Provider registry</h2><a href="https://admin.elevateforhumanity.org/providers" className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white">Open Admin provider management</a></div><div className="mt-4 divide-y divide-slate-100">{providers.length ? providers.map((provider: any) => <div key={provider.id} className="flex flex-wrap items-center justify-between gap-4 py-3"><div><p className="font-bold">{provider.name}</p><p className="text-xs text-slate-600">/{provider.slug} · {provider.status || (provider.active ? 'active' : 'inactive')}</p></div><Link href={`/provider/dashboard?tenant=${encodeURIComponent(provider.id)}`} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">Open provider view</Link></div>) : <p className="py-6 text-sm text-slate-600">No provider tenants found.</p>}</div></section></div></main>;
+}
+
+function Metric({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) { return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><Icon className="h-5 w-5 text-blue-700" /><p className="mt-3 text-3xl font-black">{value}</p><p className="text-sm font-semibold text-slate-600">{label}</p></div>; }
+function Quick({ href, label }: { href: string; label: string }) { return <Link href={href} className="rounded-lg bg-slate-100 px-4 py-3 text-sm font-bold hover:bg-slate-200">{label}</Link>; }

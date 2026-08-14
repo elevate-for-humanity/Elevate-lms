@@ -42,7 +42,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const privileged = ['admin', 'super_admin', 'staff'].includes(String(profile?.role || ''));
 
   if (!privileged && !programSlug) {
-    redirect('/learner/dashboard?notice=apprentice-access-required');
+    redirect('/lms/dashboard?notice=apprentice-access-required');
   }
 
   const nav = resolveApprenticeNavConfig(programSlug);

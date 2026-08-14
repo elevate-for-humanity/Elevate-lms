@@ -1,260 +1,55 @@
-import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight, GraduationCap, Phone, Mail, ShieldCheck } from 'lucide-react';
+import { requireParentPortal, getVerifiedParentLinks } from '@/lib/auth/parent-access';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import {
-  GraduationCap,
-  ArrowRight,
-  BookOpen,
-  Award,
-  Phone,
-  Mail,
-  AlertTriangle,
-} from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
-
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-  title: 'Parent & Guardian Dashboard',
-};
+export const metadata: Metadata = { title: 'Parent & Guardian Dashboard', robots: { index: false, follow: false } };
 
 export default async function ParentDashboardPage() {
-  const supabase = await createClient();
+  const access = await requireParentPortal();
+  if (access.isPlatformAdmin) return <ParentAdminOversight />;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect('/login?redirect=/parent-portal/dashboard');
-  }
-
-  // Verify role — parents have role 'parent' or 'guardian', or are any authenticated user
-  // with a parent_student_links row. We allow any authenticated user to reach this page;
-  // if they have no linked students the page shows the empty state.
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, email, role')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  // Fetch linked students
-  const { data: links } = await supabase
-    .from('parent_student_links')
-    .select('student_id, relationship, verified')
-    .eq('parent_id', user.id)
-    .limit(20);
-
-  const studentIds = (links || []).map((l: any) => l.student_id).filter(Boolean);
-
-  // Hydrate student profiles and enrollments in parallel
-  const [{ data: studentProfiles }, { data: studentEnrollments }] = await Promise.all([
-    studentIds.length
-      ? supabase.from('profiles').select('id, full_name, email').in('id', studentIds)
-      : Promise.resolve({ data: [] }),
-    studentIds.length
-      ? supabase
-          .from('program_enrollments')
-          .select('id, user_id, status, progress_percent, enrolled_at, programs ( title, slug )')
-          .in('user_id', studentIds)
-      : Promise.resolve({ data: [] }),
+  const links = await getVerifiedParentLinks(access.user.id);
+  const studentIds = links.map((link: any) => link.student_id).filter(Boolean);
+  const [{ data: profiles }, { data: enrollments }] = await Promise.all([
+    studentIds.length ? access.supabase.from('profiles').select('id, full_name, email').in('id', studentIds) : Promise.resolve({ data: [] }),
+    studentIds.length ? access.supabase.from('program_enrollments').select('id, user_id, status, enrollment_state, progress_percent, enrolled_at, programs(title, slug)').in('user_id', studentIds) : Promise.resolve({ data: [] }),
   ]);
-
-  const profileMap = Object.fromEntries((studentProfiles || []).map((p: any) => [p.id, p]));
-  const enrollmentsByStudent: Record<string, any[]> = {};
-  for (const e of studentEnrollments || []) {
-    const uid = (e as any).user_id;
-    if (!enrollmentsByStudent[uid]) enrollmentsByStudent[uid] = [];
-    enrollmentsByStudent[uid].push(e);
+  const profileById = Object.fromEntries((profiles ?? []).map((profile: any) => [profile.id, profile]));
+  const enrollmentByStudent: Record<string, any[]> = {};
+  for (const enrollment of enrollments ?? []) {
+    const userId = (enrollment as any).user_id;
+    (enrollmentByStudent[userId] ||= []).push(enrollment);
   }
 
-  const students = (links ?? []).map((row: any) => ({
-    id: row.student_id as string,
-    fullName: profileMap[row.student_id]?.full_name ?? 'Student',
-    email: profileMap[row.student_id]?.email ?? null,
-    relationship: row.relationship ?? 'guardian',
-    verified: row.verified ?? false,
-    enrollments: (enrollmentsByStudent[row.student_id] ?? []).map((e: any) => ({
-      id: e.id,
-      status: e.status,
-      progressPercent: e.progress_percent ?? 0,
-      enrolledAt: e.enrolled_at,
-      programTitle: (e.programs as any)?.title ?? 'Program',
-      programSlug: (e.programs as any)?.slug ?? '',
-    })),
+  const students = links.map((link: any) => ({
+    id: link.student_id,
+    relationship: link.relationship || 'guardian',
+    profile: profileById[link.student_id],
+    enrollments: enrollmentByStudent[link.student_id] || [],
   }));
+  const firstName = access.profile.full_name?.split(' ')[0] || 'Guardian';
 
-  const firstName = profile?.full_name?.split(' ')[0] ?? 'Guardian';
+  return <main className="min-h-screen bg-slate-50 px-4 py-8"><div className="mx-auto max-w-5xl space-y-7">
+    <section className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm"><p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700">Parent & Guardian Portal</p><h1 className="mt-2 text-4xl font-black text-slate-950">Welcome, {firstName}</h1><p className="mt-2 text-slate-600">View verified student relationships, program enrollment, and training progress.</p></section>
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative h-40 sm:h-56 overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/about-career-training.webp"
-          alt=""
-          fill
-          className="object-cover object-center"
-          priority
-          sizes="100vw" 
-        />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
-      </section>
+    {students.length ? <section className="space-y-5">{students.map((student: any) => <article key={student.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 p-5"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50"><GraduationCap className="h-5 w-5 text-blue-700" /></div><div><p className="text-lg font-black text-slate-950">{student.profile?.full_name || 'Student'}</p><p className="text-sm capitalize text-slate-600">{student.relationship} · verified</p></div></div><Link href={`/parent-portal/student/${student.id}`} className="inline-flex items-center gap-2 rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-bold text-white">Full view <ArrowRight className="h-4 w-4" /></Link></div><div className="divide-y divide-slate-100">{student.enrollments.length ? student.enrollments.map((enrollment: any) => { const progress = Math.max(0, Math.min(100, Number(enrollment.progress_percent ?? 0))); return <div key={enrollment.id} className="p-5"><div className="flex items-center justify-between gap-3"><div><p className="font-bold text-slate-900">{enrollment.programs?.title || 'Program'}</p><p className="text-xs text-slate-600">{enrollment.enrollment_state || enrollment.status || 'unknown'}</p></div><span className="font-black">{progress}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full bg-blue-600" style={{ width: `${progress}%` }} /></div></div>; }) : <p className="p-5 text-sm text-slate-600">No program enrollments found.</p>}</div></article>)}</section> : <section className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center"><ShieldCheck className="mx-auto h-8 w-8 text-amber-700" /><h2 className="mt-3 text-xl font-black text-amber-950">No verified student links</h2><p className="mt-2 text-sm text-amber-900">A coordinator must verify the parent/student relationship before student records are visible.</p></section>}
 
-      <div className="max-w-5xl mx-auto px-4 py-4">
-        <Breadcrumbs
-          items={[{ label: 'Parent Portal', href: '/parent-portal' }, { label: 'Dashboard' }]}
-        />
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 pb-20">
-        <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-2">
-          Welcome, {firstName}
-        </h1>
-        <p className="text-slate-500 mb-10">
-          Monitor your student&apos;s progress and stay connected with their training program.
-        </p>
-
-        {students.length === 0 ? (
-          /* No linked students */
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-8 py-14 text-center max-w-lg mx-auto">
-            <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto mb-5">
-              <AlertTriangle className="w-7 h-7 text-amber-500" />
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-3">No students linked yet</h2>
-            <p className="text-slate-500 text-sm mb-6 leading-relaxed">
-              Your account isn&apos;t linked to any student records. Contact your student&apos;s
-              program coordinator to request access.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a
-                href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors"
-              >
-                <Phone className="w-4 h-4" /> {PLATFORM_DEFAULTS.supportPhone}
-              </a>
-              <a
-                href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors"
-              >
-                <Mail className="w-4 h-4" /> Email Us
-              </a>
-            </div>
-          </div>
-        ) : (
-          /* Student cards */
-          <div className="space-y-8">
-            {students.map((student) => (
-              <div
-                key={student.id}
-                className="rounded-2xl border border-slate-200 bg-white overflow-hidden"
-              >
-                {/* Student header */}
-                <div className="flex items-center gap-4 px-6 py-5 border-b border-slate-100">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-6 h-6 text-blue-600"  aria-label="graduationcap"/>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-lg font-bold text-slate-900 truncate">{student.fullName}</p>
-                    <p className="text-sm text-slate-400 capitalize">{student.relationship}</p>
-                  </div>
-                  {!student.verified && (
-                    <span className="flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
-                      Pending verification
-                    </span>
-                  )}
-                  <Link
-                    href={`/parent-portal/student/${student.id}`}
-                    className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700"
-                  >
-                    Full view <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-
-                {/* Enrollments */}
-                {student.enrollments.length === 0 ? (
-                  <div className="px-6 py-6 text-sm text-slate-400">
-                    No active enrollments found.
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-100">
-                    {student.enrollments.map((enr) => (
-                      <div key={enr.id} className="px-6 py-5">
-                        <div className="flex items-start justify-between gap-4 mb-3">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <BookOpen className="w-4 h-4 text-slate-400 flex-shrink-0" />
-                            <span className="text-sm font-semibold text-slate-800 truncate">
-                              {enr.programTitle}
-                            </span>
-                          </div>
-                          <span
-                            className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-                              enr.status === 'active'
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : enr.status === 'completed'
-                                  ? 'bg-blue-100 text-blue-700'
-                                  : 'bg-slate-100 text-slate-600'
-                            }`}
-                          >
-                            {enr.status}
-                          </span>
-                        </div>
-                        {/* Progress bar */}
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                            <div
-                              className="h-full rounded-full bg-blue-500 transition-all"
-                              style={{ width: `${enr.progressPercent}%` }}
-                            />
-                          </div>
-                          <span className="text-xs font-bold tabular-nums text-slate-500 flex-shrink-0 w-10 text-right">
-                            {enr.progressPercent}%
-                          </span>
-                        </div>
-                        {enr.status === 'completed' && (
-                          <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 font-semibold">
-                            <Award className="w-3.5 h-3.5"  aria-label="award"/> Program completed
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Contact footer */}
-        <div className="mt-14 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="font-bold text-slate-900">Need help?</p>
-            <p className="text-sm text-slate-500">
-              Contact your student&apos;s program coordinator.
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <a
-              href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors"
-            >
-              <Phone className="w-4 h-4" /> Call
-            </a>
-            <a
-              href="mailto:info@elevateforhumanity.org"
-              className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 bg-white text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors"
-            >
-              <Mail className="w-4 h-4" /> Email
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    <section className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5"><div><p className="font-black">Need help?</p><p className="text-sm text-slate-600">Contact the program coordinator.</p></div><div className="flex gap-2"><a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white"><Phone className="mr-1 inline h-4 w-4" />Call</a><a href={`mailto:${PLATFORM_DEFAULTS.supportEmail}`} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold"><Mail className="mr-1 inline h-4 w-4" />Email</a></div></section>
+  </div></main>;
 }
+
+async function ParentAdminOversight() {
+  const db = await requireAdminClient();
+  const [{ count: verifiedLinks }, { count: pendingLinks }, { count: linkedStudents }] = await Promise.all([
+    db.from('parent_student_links').select('student_id', { count: 'exact', head: true }).eq('verified', true),
+    db.from('parent_student_links').select('student_id', { count: 'exact', head: true }).eq('verified', false),
+    db.from('parent_student_links').select('student_id', { count: 'exact', head: true }),
+  ]);
+  return <main className="min-h-screen bg-slate-50 px-4 py-8"><div className="mx-auto max-w-5xl"><p className="text-sm font-bold uppercase tracking-[0.14em] text-blue-700">Parent Portal · Admin Oversight</p><h1 className="mt-2 text-4xl font-black">Guardian access oversight</h1><p className="mt-2 max-w-3xl text-slate-600">Admin may enter the portal without being assigned a fake parent relationship. Student detail still requires an explicit student selection.</p><div className="mt-7 grid gap-4 sm:grid-cols-3"><Metric label="Verified relationships" value={verifiedLinks ?? 0} /><Metric label="Pending verification" value={pendingLinks ?? 0} /><Metric label="Relationship records" value={linkedStudents ?? 0} /></div><div className="mt-7 rounded-2xl border border-slate-200 bg-white p-6"><h2 className="text-xl font-black">Support workflow</h2><p className="mt-2 text-sm text-slate-600">Use Admin student search to select a student, then open that student through the Parent Portal detail route for support verification.</p><a href="https://admin.elevateforhumanity.org/students" className="mt-4 inline-flex rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-bold text-white">Open Admin student search</a></div></div></main>;
+}
+
+function Metric({ label, value }: { label: string; value: number }) { return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-3xl font-black">{value}</p><p className="text-sm font-semibold text-slate-600">{label}</p></div>; }

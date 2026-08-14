@@ -1,5 +1,43 @@
 /** Canonical credential-blueprint types shared by generator, auditor, and seeded curricula. */
 
+export type EnrollmentType = 'standard' | 'apprentice' | 'employer-sponsored' | 'workforce-funded' | string;
+
+export type InteractionSpecs = {
+  includeKnowledgeChecks?: boolean;
+  knowledgeCheckCount?: number;
+  includeScenarios?: boolean;
+  scenarioCount?: number;
+  includeFlashcards?: boolean;
+  flashcardCount?: number;
+  includeClickToReveal?: boolean;
+  includeDragDrop?: boolean;
+  includeMatching?: boolean;
+  matchingCount?: number;
+  includeCaseStudies?: boolean;
+  caseStudyCount?: number;
+  includeSimulations?: boolean;
+  simulationCount?: number;
+  includeDecisionTrees?: boolean;
+  decisionTreeCount?: number;
+  [key: string]: unknown;
+};
+
+export type BlueprintApprenticeshipConfig = {
+  totalHours: number;
+  rtiHours: number;
+  ojlHours: number;
+  competencyCount: number;
+  rapidsProgramCode?: string;
+  [key: string]: unknown;
+};
+
+export type BlueprintCertificationPathway = {
+  certificationBodyId: string;
+  certificationName?: string;
+  examCode?: string;
+  [key: string]: unknown;
+};
+
 export type BlueprintQuizQuestion = {
   id: string;
   question: string;
@@ -68,7 +106,7 @@ export type BlueprintModule = {
   suggestedLessonSkeleton?: string[];
   lessons?: BlueprintLessonRef[];
   domainKey?: string;
-  interactionSpecs?: unknown[];
+  interactionSpecs?: InteractionSpecs;
   [key: string]: unknown;
 };
 
@@ -186,5 +224,7 @@ export type CredentialBlueprint = {
   certificateRequirements?: BlueprintCertificateRequirements;
   videoConfig?: BlueprintVideoConfig;
   externalCourses?: BlueprintExternalCourse[];
+  apprenticeshipConfig?: BlueprintApprenticeshipConfig;
+  certificationPathway?: BlueprintCertificationPathway;
   [key: string]: unknown;
 };

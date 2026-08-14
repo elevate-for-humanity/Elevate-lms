@@ -1,11 +1,6 @@
 #!/usr/bin/env node
 /**
- * Monorepo internal-route audit.
- *
- * Validates literal internal href/router navigation in the deployed Next.js apps
- * against routes that actually exist in each app directory. This intentionally
- * does not depend on the legacy root .next manifest, which missed routes under
- * apps/marketing, apps/lms, and apps/admin.
+ * Monorepo internal-route audit for the three canonical deployed Next.js apps.
  */
 
 import fs from 'node:fs';
@@ -38,11 +33,6 @@ const APPS = [
     appDir: 'apps/admin/app',
     scanDirs: ['apps/admin/app', 'apps/admin/components', 'components/admin', 'components/studio'],
   },
-  {
-    name: 'portal',
-    appDir: 'apps/app',
-    scanDirs: ['apps/app'],
-  },
 ];
 
 const PAGE_FILES = new Set(['page.tsx', 'page.ts', 'page.jsx', 'page.js']);
@@ -59,19 +49,14 @@ function exists(rel) {
 }
 
 function normalizeRouteSegment(segment) {
-  // Route groups and parallel slots do not appear in the URL.
   if ((segment.startsWith('(') && segment.endsWith(')')) || segment.startsWith('@')) return '';
-  // Intercepting-route markers are filesystem syntax, not URL syntax.
   return segment.replace(/^\(\.\.\.\)/, '').replace(/^\(\.\.\)/, '').replace(/^\(\.\)/, '');
 }
 
 function routeFromPage(appAbs, fileAbs) {
   const relDir = path.relative(appAbs, path.dirname(fileAbs));
   if (!relDir || relDir === '.') return '/';
-  const segments = relDir
-    .split(path.sep)
-    .map(normalizeRouteSegment)
-    .filter(Boolean);
+  const segments = relDir.split(path.sep).map(normalizeRouteSegment).filter(Boolean);
   return '/' + segments.join('/');
 }
 
@@ -79,7 +64,6 @@ function collectRoutes(appDir) {
   const appAbs = path.join(ROOT, appDir);
   const routes = new Set(['/']);
   if (!fs.existsSync(appAbs)) return routes;
-
   function walk(dir) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
@@ -97,7 +81,6 @@ function collectRoutes(appDir) {
       }
     }
   }
-
   walk(appAbs);
   return routes;
 }
@@ -105,12 +88,10 @@ function collectRoutes(appDir) {
 function routeMatches(routes, href) {
   const base = href.split('?')[0].split('#')[0] || '/';
   if (routes.has(base)) return true;
-
   for (const route of routes) {
     if (!route.includes('[')) continue;
     const routeParts = route.split('/').filter(Boolean);
     const hrefParts = base.split('/').filter(Boolean);
-
     let ri = 0;
     let hi = 0;
     let ok = true;
@@ -121,14 +102,8 @@ function routeMatches(routes, href) {
         ri = routeParts.length;
         break;
       }
-      if (hi >= hrefParts.length) {
-        ok = false;
-        break;
-      }
-      if (!(rp.startsWith('[') && rp.endsWith(']')) && rp !== hrefParts[hi]) {
-        ok = false;
-        break;
-      }
+      if (hi >= hrefParts.length) { ok = false; break; }
+      if (!(rp.startsWith('[') && rp.endsWith(']')) && rp !== hrefParts[hi]) { ok = false; break; }
       ri += 1;
       hi += 1;
     }
@@ -144,7 +119,6 @@ function collectRedirectSources() {
     'apps/marketing/next.config.mjs', 'apps/marketing/next.config.js',
     'apps/lms/next.config.mjs', 'apps/lms/next.config.js',
     'apps/admin/next.config.mjs', 'apps/admin/next.config.js',
-    'apps/app/next.config.mjs', 'apps/app/next.config.js',
   ];
   const pattern = /source:\s*['"]([/][^'"]+)['"]/g;
   for (const rel of configCandidates) {
@@ -168,9 +142,7 @@ function redirectMatches(href) {
     } else if (source.endsWith('/:path*')) {
       const prefix = source.slice(0, -7);
       if (base === prefix || base.startsWith(prefix + '/')) return true;
-    } else if (base === source) {
-      return true;
-    }
+    } else if (base === source) return true;
   }
   return false;
 }
@@ -193,11 +165,7 @@ function shouldSkip(href) {
 
 function scanFile(fileAbs, app, routes, broken, seen) {
   let src;
-  try {
-    src = fs.readFileSync(fileAbs, 'utf8');
-  } catch {
-    return;
-  }
+  try { src = fs.readFileSync(fileAbs, 'utf8'); } catch { return; }
   const lines = src.split('\n');
   for (let i = 0; i < lines.length; i += 1) {
     for (const pattern of hrefPatterns) {
@@ -225,21 +193,16 @@ function walkScan(relDir, callback) {
     if (entry.isDirectory()) {
       if (['node_modules', '.next', '.git'].includes(entry.name)) continue;
       walkScan(path.relative(ROOT, full), callback);
-    } else if (SOURCE_EXT.test(entry.name)) {
-      callback(full);
-    }
+    } else if (SOURCE_EXT.test(entry.name)) callback(full);
   }
 }
 
 const broken = [];
 const seen = new Set();
-
 for (const app of APPS) {
   if (!exists(app.appDir)) continue;
   const routes = collectRoutes(app.appDir);
-  for (const dir of app.scanDirs) {
-    walkScan(dir, (file) => scanFile(file, app, routes, broken, seen));
-  }
+  for (const dir of app.scanDirs) walkScan(dir, (file) => scanFile(file, app, routes, broken, seen));
   console.log(`✓ ${app.name}: ${routes.size} filesystem routes indexed`);
 }
 
@@ -247,9 +210,6 @@ if (!broken.length) {
   console.log('✅ Zero unresolved literal internal links across deployed monorepo apps');
   process.exit(0);
 }
-
 console.error(`❌ BROKEN LINKS: ${broken.length}`);
-for (const item of broken) {
-  console.error(`[${item.app}] ${item.file}:${item.line}  ${item.href}`);
-}
+for (const item of broken) console.error(`[${item.app}] ${item.file}:${item.line}  ${item.href}`);
 process.exit(1);

@@ -29,6 +29,7 @@ run "Env vars" bash scripts/audit-env-vars.sh
 run "Redirect conflicts" env BUILD_SCOPE=1 node scripts/check-redirect-conflicts.mjs
 run "Public route guards" node scripts/guard-public-routes.mjs
 run "Pre-auth registry" node scripts/check-pre-auth-registry.cjs
+run "Canonical portal contracts" node scripts/audit-portal-contracts.mjs
 
 if [[ -f scripts/audit-public-html.mjs ]]; then
   if [[ -n "${PUBLIC_HTML_AUDIT_BASE_URL:-}" ]]; then

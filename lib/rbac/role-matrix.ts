@@ -100,11 +100,6 @@ export const APPRENTICE_ROLES: UserRole[] = ['super_admin', 'admin', 'student', 
 
 export const ALL_AUTHENTICATED_ROLES: UserRole[] = Array.from(CANONICAL_ROLES);
 
-/**
- * Match an effective-role set against required roles.
- * Admin/super-admin can enter ordinary role portals when adminOverride is true,
- * but a super-admin-only requirement is never widened to normal admin.
- */
 export function hasAnyRole(
   effectiveRoles: readonly (UserRole | string)[],
   allowedRoles: readonly (UserRole | string)[],
@@ -125,9 +120,12 @@ export function hasAnyRole(
 }
 
 export const PERMISSIONS = {
-  impersonate_users: ['super_admin'] as UserRole[],
-  manage_roles: ['super_admin'] as UserRole[],
-  access_dev_tools: ['super_admin'] as UserRole[],
+  // Elevate's production operating model uses the regular admin role as the
+  // highest active administrator. Keep super_admin as a legacy-compatible alias
+  // but never make a production capability depend on a role that is not used.
+  impersonate_users: ['admin', 'super_admin'] as UserRole[],
+  manage_roles: ['admin', 'super_admin'] as UserRole[],
+  access_dev_tools: ['admin', 'super_admin'] as UserRole[],
   view_audit_logs: ['super_admin', 'admin'] as UserRole[],
   manage_programs: ['super_admin', 'admin'] as UserRole[],
   manage_courses: ['super_admin', 'admin', 'staff'] as UserRole[],
@@ -135,8 +133,8 @@ export const PERMISSIONS = {
   manage_users: ['super_admin', 'admin'] as UserRole[],
   manage_payments: ['super_admin', 'admin'] as UserRole[],
   manage_grants: ['super_admin', 'admin', 'staff', 'case_manager'] as UserRole[],
-  manage_platform_settings: ['super_admin'] as UserRole[],
-  trigger_deployments: ['super_admin'] as UserRole[],
+  manage_platform_settings: ['admin', 'super_admin'] as UserRole[],
+  trigger_deployments: ['admin', 'super_admin'] as UserRole[],
   run_bulk_operations: ['super_admin', 'admin'] as UserRole[],
   sign_off_lab_submissions: ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],
   view_student_progress: ['super_admin', 'admin', 'staff', 'instructor'] as UserRole[],

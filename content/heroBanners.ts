@@ -129,6 +129,10 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
 
   if (key === 'barber-apprenticeship') {
     const barber = RAPIDS_CONFIG.programs.barber;
+    const programBanner = normalized as ProgramHeroBannerConfig;
+    const credential = programBanner.credentialLabel || 'Indiana Barber License';
+    const duration = programBanner.durationLabel || `${barber.totalHours.toLocaleString('en-US')} hours`;
+    const salary = programBanner.salaryRangeLabel || '$28,000 to $52,000';
     normalized = {
       ...normalized,
       microLabel: 'DOL Registered Apprenticeship',
@@ -136,7 +140,7 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
       belowHeroSubheadline: `Complete ${barber.totalHours.toLocaleString('en-US')} hours of supervised on-the-job learning plus ${barber.relatedInstructionHours} hours of Related Technical Instruction under the registered program standards.`,
       primaryCta: { label: 'Enroll Now', href: '/programs/barber-apprenticeship/apply' },
       secondaryCta: { label: 'Request Information', href: '/programs/barber-apprenticeship/request-info', variant: 'secondary' },
-      transcript: `The Barber Apprenticeship combines ${barber.totalHours.toLocaleString('en-US')} hours of supervised on-the-job learning with ${barber.relatedInstructionHours} hours of Related Technical Instruction.`,
+      transcript: `The Barber Apprenticeship prepares participants for the ${credential} through ${duration} of structured training, including supervised on-the-job learning and Related Technical Instruction. The published wage range for this pathway is ${salary}, with actual earnings varying by employer, experience, schedule, and compensation structure.`,
     };
   }
 

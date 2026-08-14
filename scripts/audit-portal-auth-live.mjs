@@ -1,12 +1,5 @@
 #!/usr/bin/env node
-/**
- * Live canonical portal auth audit.
- *
- * Verifies the split-app production architecture instead of probing retired
- * monolith paths. Protected portals must reject anonymous access by redirecting
- * to an authentication surface. Public entry pages must return 200.
- */
-
+/** Live canonical portal authentication/ownership audit. */
 const HOSTS = {
   marketing: (process.env.MARKETING_URL || 'https://www.elevateforhumanity.org').replace(/\/$/, ''),
   lms: (process.env.LMS_URL || 'https://app.elevateforhumanity.org').replace(/\/$/, ''),
@@ -14,17 +7,9 @@ const HOSTS = {
 };
 
 const PROTECTED = [
-  // Marketing-hosted operational workspaces and program-specific apprenticeships.
-  ['marketing', '/portal/barber'],
-  ['marketing', '/portal/cosmetology'],
-  ['marketing', '/portal/esthetician'],
-  ['marketing', '/portal/nail-technician'],
-  ['marketing', '/program-holder/dashboard'],
   ['marketing', '/provider/dashboard'],
   ['marketing', '/case-manager/dashboard'],
   ['marketing', '/workforce-board/dashboard'],
-
-  // LMS portals.
   ['lms', '/lms/dashboard'],
   ['lms', '/lms/courses'],
   ['lms', '/apprentice'],
@@ -33,8 +18,7 @@ const PROTECTED = [
   ['lms', '/parent-portal/dashboard'],
   ['lms', '/workforce/dashboard'],
   ['lms', '/host-shop/dashboard'],
-
-  // Admin portals.
+  ['lms', '/program-holder/dashboard'],
   ['admin', '/dashboard'],
   ['admin', '/instructor/dashboard'],
   ['admin', '/staff-portal/dashboard'],
@@ -51,57 +35,49 @@ const PUBLIC = [
   ['admin', '/login'],
 ];
 
-const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+const MANIFESTS = [
+  ['marketing', '/manifest-marketing.json'],
+  ['lms', '/manifest-lms.json'],
+  ['lms', '/manifest-student.json'],
+  ['lms', '/manifest-apprentice.json'],
+  ['lms', '/manifest-shop-owner.json'],
+  ['lms', '/manifest-program-holder.json'],
+  ['admin', '/manifest-admin.json'],
+];
+
+const REDIRECTS = new Set([301, 302, 303, 307, 308]);
 let failed = 0;
+function absolute(host, path) { return `${HOSTS[host]}${path}`; }
+function authLocation(location) { return !!location && (location.includes('/login') || location.includes('/unauthorized') || location.includes('/host-shop/login')); }
 
-function absoluteUrl(hostKey, path) {
-  return `${HOSTS[hostKey]}${path}`;
-}
-
-function isAuthLocation(location) {
-  if (!location) return false;
-  return (
-    location.includes('/login') ||
-    location.includes('/unauthorized') ||
-    location.includes('/host-shop/login')
-  );
-}
-
-async function checkProtected(hostKey, path) {
-  const url = absoluteUrl(hostKey, path);
-  const res = await fetch(url, { redirect: 'manual' });
+async function protectedCheck(host, path) {
+  const res = await fetch(absolute(host, path), { redirect: 'manual' });
   const location = res.headers.get('location') || '';
-  const pass = REDIRECT_STATUSES.has(res.status) && isAuthLocation(location);
-  console.log(
-    `${pass ? '✅' : '❌'} [${hostKey}] ${path} → ${res.status}${location ? ` → ${location}` : ''}`,
-  );
-  if (!pass) failed += 1;
+  const pass = REDIRECTS.has(res.status) && authLocation(location);
+  console.log(`${pass ? '✅' : '❌'} [${host}] ${path} → ${res.status}${location ? ` → ${location}` : ''}`);
+  if (!pass) failed++;
 }
-
-async function checkPublic(hostKey, path) {
-  const url = absoluteUrl(hostKey, path);
-  const res = await fetch(url, { redirect: 'manual' });
-  const location = res.headers.get('location') || '';
+async function publicCheck(host, path) {
+  const res = await fetch(absolute(host, path), { redirect: 'manual' });
   const pass = res.status === 200;
-  console.log(
-    `${pass ? '✅' : '❌'} [${hostKey}] ${path} → ${res.status}${location ? ` → ${location}` : ''}`,
-  );
-  if (!pass) failed += 1;
+  console.log(`${pass ? '✅' : '❌'} [${host}] ${path} → ${res.status}`);
+  if (!pass) failed++;
+}
+async function manifestCheck(host, path) {
+  const res = await fetch(absolute(host, path), { redirect: 'manual' });
+  let valid = res.status === 200;
+  if (valid) {
+    try { const body = await res.json(); valid = typeof body.name === 'string' && typeof body.start_url === 'string' && Array.isArray(body.icons); } catch { valid = false; }
+  }
+  console.log(`${valid ? '✅' : '❌'} [${host}] manifest ${path} → ${res.status}`);
+  if (!valid) failed++;
 }
 
 console.log('Canonical portal auth audit');
-console.log(`Marketing: ${HOSTS.marketing}`);
-console.log(`LMS:       ${HOSTS.lms}`);
-console.log(`Admin:     ${HOSTS.admin}\n`);
-
-for (const [hostKey, path] of PROTECTED) {
-  await checkProtected(hostKey, path);
-}
-
-console.log('');
-for (const [hostKey, path] of PUBLIC) {
-  await checkPublic(hostKey, path);
-}
-
+for (const item of PROTECTED) await protectedCheck(...item);
+console.log('\nPublic entry points');
+for (const item of PUBLIC) await publicCheck(...item);
+console.log('\nPWA manifests');
+for (const item of MANIFESTS) await manifestCheck(...item);
 console.log(failed ? `\n❌ ${failed} canonical portal checks failed` : '\n✅ All canonical portal auth checks passed');
 process.exit(failed ? 1 : 0);

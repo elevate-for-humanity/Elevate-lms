@@ -64,7 +64,7 @@ export function useNaturalVoice() {
 
       if (!response.ok) {
         const payload = await response.json().catch(() => null);
-        throw new Error(payload?.error || 'Natural voice is temporarily unavailable.');
+        throw new Error(payload?.error || 'Voice is temporarily unavailable.');
       }
 
       const blob = await response.blob();
@@ -88,24 +88,27 @@ export function useNaturalVoice() {
       audio.onended = () => {
         setIsPlaying(false);
         setIsPaused(false);
+        audioRef.current = null;
         releaseObjectUrl();
       };
       audio.onerror = () => {
+        audioRef.current = null;
+        releaseObjectUrl();
         setIsLoading(false);
         setIsPlaying(false);
         setIsPaused(false);
-        setError('Natural voice playback failed.');
-        releaseObjectUrl();
+        setError('Voice playback failed.');
       };
       audioRef.current = audio;
 
       await audio.play();
       return true;
     } catch (cause) {
+      audioRef.current = null;
       setIsLoading(false);
       setIsPlaying(false);
       setIsPaused(false);
-      setError(cause instanceof Error ? cause.message : 'Natural voice is temporarily unavailable.');
+      setError(cause instanceof Error ? cause.message : 'Voice is temporarily unavailable.');
       releaseObjectUrl();
       return false;
     }
@@ -113,18 +116,18 @@ export function useNaturalVoice() {
 
   const pause = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || audio.paused) return;
-    audio.pause();
+    if (audio && !audio.paused) audio.pause();
   }, []);
 
   const resume = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return false;
+
     try {
       await audio.play();
       return true;
     } catch {
-      setError('Natural voice playback could not resume.');
+      setError('Voice playback could not resume.');
       return false;
     }
   }, []);

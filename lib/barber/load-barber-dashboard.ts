@@ -8,19 +8,6 @@ import { BARBER_COURSE_ID, BARBER_PROGRAM_SLUG } from '@/lib/barber/constants';
 import { PRESTIGE_ELEVATION_BARBER_CURRICULUM, BARBER_LMS_COURSE_PATH } from '@/lib/barber/branding';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 
-/**
- * Barber Registered Apprenticeship requirements.
- *
- * RAPIDS_CONFIG is the authoritative repository source for sponsor/program
- * registration data. Do not duplicate or subtract RTI from OJL here.
- *
- * Registered program requirement:
- *   - 2,000 hours of supervised on-the-job learning (OJL)
- *   - 144 hours of related technical instruction (RTI)
- *
- * RTI is tracked separately from OJL. It is not subtracted from the 2,000 OJL
- * requirement. Transfer hours remain progress credit only and must be approved.
- */
 const BARBER_RAPIDS = RAPIDS_CONFIG.programs.barber;
 const REQUIRED_OJL = BARBER_RAPIDS.totalHours;
 const REQUIRED_RTI = BARBER_RAPIDS.relatedInstructionHours;
@@ -70,7 +57,7 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/portal/barber');
+  if (!user) redirect('/login?redirect=/apprentice');
 
   const [profileRes, enrollmentRes, apprenticeRes] = await Promise.all([
     queryDb.from('profiles').select('full_name, role').eq('id', user.id).maybeSingle(),
@@ -120,10 +107,6 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
 
   const totalOjl = hours.ojl + hours.transferredOjl;
   const totalRti = hours.rti + hours.transferredRti;
-
-  // OJL and RTI are independent RAPIDS requirements. Cap each requirement
-  // separately so overage in one bucket cannot compensate for missing hours in
-  // the other.
   const creditedOjl = Math.min(totalOjl, REQUIRED_OJL);
   const creditedRti = Math.min(totalRti, REQUIRED_RTI);
   const totalRequired = REQUIRED_OJL + REQUIRED_RTI;
@@ -132,8 +115,6 @@ export async function loadBarberDashboardData(): Promise<BarberDashboardData> {
     Math.round(((creditedOjl + creditedRti) / totalRequired) * 100),
   );
 
-  // Weekly employment planning is based on OJL only. RTI is completed through
-  // the assigned course and is not treated as 40-hour workweeks.
   const ojlRemaining = Math.max(0, REQUIRED_OJL - creditedOjl);
   const weeksRemaining = Math.ceil(ojlRemaining / STANDARD_OJL_HOURS_PER_WEEK);
 

@@ -9,28 +9,32 @@ export async function register(): Promise<void> {
   }
 
   try {
-    const required = [
+    // Public Elevate domains are canonical deployment constants. Northflank builds also
+    // inject them as NEXT_PUBLIC_* build args, but runtime startup must not treat their
+    // absence as a secret/configuration failure.
+    process.env.NEXT_PUBLIC_SITE_URL ||= 'https://www.elevateforhumanity.org';
+    process.env.NEXT_PUBLIC_ADMIN_URL ||= 'https://admin.elevateforhumanity.org';
+    process.env.NEXT_PUBLIC_APP_URL ||= 'https://app.elevateforhumanity.org';
+
+    const requiredSecrets = [
       'NEXT_PUBLIC_SUPABASE_URL',
       'NEXT_PUBLIC_SUPABASE_ANON_KEY',
       'SUPABASE_SERVICE_ROLE_KEY',
-      'NEXT_PUBLIC_SITE_URL',
-      'NEXT_PUBLIC_ADMIN_URL',
-      'NEXT_PUBLIC_APP_URL',
     ];
 
-    const missing = required.filter((name) => {
-      const v = process.env[name];
-      return !v || !v.trim();
+    const missing = requiredSecrets.filter((name) => {
+      const value = process.env[name];
+      return !value || !value.trim();
     });
 
     if (missing.length > 0) {
-      console.warn(`[admin] Missing env vars: ${missing.join(', ')}`);
+      console.warn(`[admin] Missing required env vars: ${missing.join(', ')}`);
     } else {
       console.info('[admin] Environment validated');
     }
   } catch (error) {
     console.warn('[admin] Environment validation error:', error);
-    // Do not crash the server
+    // Do not crash the server solely because observability validation failed.
   }
 }
 

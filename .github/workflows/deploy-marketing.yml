@@ -12,6 +12,7 @@ on:
       - 'components/home/**'
       - 'components/ui/**'
       - 'components/voice/**'
+      - 'components/pwa/**'
       - 'lib/ai/**'
       - 'lib/navigation/**'
       - 'lib/programs/**'

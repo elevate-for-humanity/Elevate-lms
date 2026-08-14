@@ -59,7 +59,7 @@ scanSourceFiles(['app', 'apps', 'components', 'data', 'lib'], (_file, relative, 
 const missingLocalMedia = [];
 const aliasedLocalMedia = [];
 for (const [url, owners] of mediaReferences) {
-  if (url.startsWith('/videos/')) continue; // video production media is mirrored/R2-backed.
+  if (url.startsWith('/videos/')) continue;
   const localPath = path.join(publicDir, url.replace(/^\//, ''));
   if (fs.existsSync(localPath)) continue;
 
@@ -74,11 +74,7 @@ for (const [url, owners] of mediaReferences) {
       aliasedLocalMedia.push({ url, target: aliasTarget });
       continue;
     }
-    missingLocalMedia.push({
-      url,
-      owners: [...owners],
-      reason: `alias target ${aliasTarget} does not exist`,
-    });
+    missingLocalMedia.push({ url, owners: [...owners], reason: `alias target ${aliasTarget} does not exist` });
     continue;
   }
 
@@ -150,7 +146,7 @@ const portalRequirements = [
   ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'learningTools']],
   ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Your workspaces']],
   ['Host Shop', 'apps/lms/app/host-shop/dashboard/board/page.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
-  ['Program Holder', 'apps/marketing/app/program-holder/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
+  ['Program Holder', 'apps/lms/app/program-holder/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
 ];
 for (const [name, relPath, markers] of portalRequirements) {
   const source = fs.readFileSync(path.join(rootDir, relPath), 'utf8');
@@ -162,18 +158,10 @@ for (const [name, relPath, markers] of portalRequirements) {
 console.log('\n── Natural voice policy ──');
 const roboticSpeechUses = [];
 scanSourceFiles(['apps', 'components', 'lib'], (_file, relative, content) => {
-  if (
-    /new\s+SpeechSynthesisUtterance\s*\(/.test(content) ||
-    /(?:window\.)?speechSynthesis\.speak\s*\(/.test(content)
-  ) {
-    roboticSpeechUses.push(relative);
-  }
+  if (/new\s+SpeechSynthesisUtterance\s*\(/.test(content) || /(?:window\.)?speechSynthesis\.speak\s*\(/.test(content)) roboticSpeechUses.push(relative);
 });
-if (roboticSpeechUses.length) {
-  fail(`Browser SpeechSynthesis output remains in production source: ${roboticSpeechUses.join(', ')}`);
-} else {
-  pass('No production source uses browser SpeechSynthesis for spoken output');
-}
+if (roboticSpeechUses.length) fail(`Browser SpeechSynthesis output remains in production source: ${roboticSpeechUses.join(', ')}`);
+else pass('No production source uses browser SpeechSynthesis for spoken output');
 
 const naturalRoute = fs.readFileSync(path.join(rootDir, 'lib/ai/natural-voice-route.ts'), 'utf8');
 if (!naturalRoute.includes("model: 'gpt-4o-mini-tts'")) fail('Natural voice handler is not using the configured natural TTS model');

@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - Dev Studio auth is required before ai_deployments/dev_audit_logs writes; triggered_by/user_id come from the authenticated operator.
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
 import { requireAdminClient } from '@/lib/supabase/admin';

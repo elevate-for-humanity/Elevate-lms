@@ -8,11 +8,23 @@ import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { logger } from '@/lib/logger';
 import { startWorkspaceTrial } from '@/lib/workspace/start-workspace-trial';
+import { startAppTrial } from '@/lib/trial/start-app-trial';
 
 const fallbackLimiter = new Map<string, { count: number; reset: number }>();
 
 function emailValid(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function normalizeExistingUrl(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  try {
+    const url = new URL(value.trim());
+    if (!['http:', 'https:'].includes(url.protocol)) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 async function allowed(email: string) {
@@ -63,6 +75,9 @@ async function _POST(request: NextRequest) {
     const industry = typeof body.industry === 'string' && body.industry.trim()
       ? body.industry.trim()
       : 'Training Provider';
+    const websiteMode = body.websiteMode === 'existing' ? 'existing' : 'new';
+    const existingUrl = normalizeExistingUrl(body.existingUrl);
+    const programs = typeof body.programs === 'string' ? body.programs.trim() : '';
 
     if (
       organizationName.length < 2 ||
@@ -75,6 +90,13 @@ async function _POST(request: NextRequest) {
           error: 'Valid organization name, administrator name, and email are required.',
           correlationId: reference,
         },
+        { status: 400 },
+      );
+    }
+
+    if (websiteMode === 'existing' && !existingUrl) {
+      return NextResponse.json(
+        { error: 'A valid existing website URL is required.', correlationId: reference },
         { status: 400 },
       );
     }
@@ -141,20 +163,92 @@ async function _POST(request: NextRequest) {
           { status: 500 },
         );
       }
+
+      const builderTrial = await startAppTrial(authUser.id, 'website-builder', db);
+      if (builderTrial.status === 'error') {
+        logger.error('[trial] Website Builder entitlement failed', new Error(builderTrial.message), {
+          reference,
+          userId: authUser.id,
+        });
+        return NextResponse.json(
+          {
+            error: 'Workspace was created but Website Builder access could not be provisioned.',
+            correlationId: reference,
+          },
+          { status: 500 },
+        );
+      }
+    }
+
+    const { data: website } = await db
+      .from('user_websites')
+      .select('id, site_config')
+      .eq('organization_id', trial.organizationId)
+      .maybeSingle();
+
+    let builderUrl: string | null = null;
+    if (website?.id) {
+      const currentConfig = website.site_config && typeof website.site_config === 'object'
+        ? (website.site_config as Record<string, any>)
+        : {};
+      const currentMeta = currentConfig.meta && typeof currentConfig.meta === 'object'
+        ? currentConfig.meta
+        : {};
+      const updatedConfig = {
+        ...currentConfig,
+        meta: {
+          ...currentMeta,
+          connectionMode: websiteMode,
+          sourceWebsiteUrl: existingUrl,
+          programsIntake: programs || null,
+          trialReference: reference,
+        },
+      };
+
+      if (websiteMode === 'existing' && currentConfig.homepage) {
+        updatedConfig.homepage = {
+          ...currentConfig.homepage,
+          heroCtaText: 'Enroll Now',
+          heroSubtitle:
+            'Connect your existing website to Elevate enrollment, CRM, automation, and learner management.',
+        };
+      }
+
+      const { error: websiteUpdateError } = await db
+        .from('user_websites')
+        .update({ site_config: updatedConfig, updated_at: new Date().toISOString() })
+        .eq('id', website.id);
+
+      if (websiteUpdateError) {
+        logger.warn('[trial] trial website intake metadata update failed', {
+          reference,
+          websiteId: website.id,
+          message: websiteUpdateError.message,
+        });
+      }
+      builderUrl = `/apps/website-builder/edit/${website.id}`;
     }
 
     await db.from('license_events').insert({
       organization_id: trial.organizationId,
+      tenant_id: trial.tenantId,
       event_type: 'trial_workspace_created',
+      correlation_id: reference,
+      source: 'managed_trial',
       event_data: {
         correlation_id: reference,
         tenant_id: trial.tenantId,
         workspace_id: trial.workspaceId,
         owner_email: ownerEmail,
+        website_mode: websiteMode,
+        existing_url: existingUrl,
+        programs: programs || null,
+        builder_url: builderUrl,
       },
     });
 
-    const fallbackLogin = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(trial.dashboardUrl)}`;
+    const workspaceTarget = builderUrl || trial.dashboardUrl;
+    const fallbackLogin = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(workspaceTarget)}`;
     const loginUrl = generated.data?.properties?.action_link ?? fallbackLogin;
 
     try {
@@ -178,13 +272,17 @@ async function _POST(request: NextRequest) {
       tenantId: trial.tenantId,
       organizationId: trial.organizationId,
       workspaceId: trial.workspaceId,
-      tenantUrl: trial.dashboardUrl,
+      tenantUrl: workspaceTarget,
+      dashboardUrl: workspaceTarget,
+      builderUrl,
       publicPreviewUrl: trial.publicPreviewUrl,
       subdomain: trial.slug,
       trialEndsAt: trial.trialEndsAt,
       correlationId: reference,
+      connectionMode: websiteMode,
+      existingUrl,
       loginUrl,
-      message: 'Trial workspace created.',
+      message: 'Trial workspace and Website Builder access created.',
     });
   } catch (error) {
     logger.error(

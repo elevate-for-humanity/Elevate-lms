@@ -1,9 +1,7 @@
-/**
- * Media Assets Health Endpoint
- */
-
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+/** Media Assets Health Endpoint */
+import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/admin/guards';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 interface CapabilityHealth {
   capability: string;
@@ -15,70 +13,33 @@ interface CapabilityHealth {
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(): Promise<NextResponse<CapabilityHealth>> {
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   const checks: CapabilityHealth['checks'] = [];
   let status: CapabilityHealth['status'] = 'healthy';
-  
-  // Check Supabase Storage
+  const supabase = await requireAdminClient();
+
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
     const { error } = await supabase.storage.listBuckets();
-    checks.push({
-      name: 'Supabase Storage',
-      passed: !error,
-      message: error ? `Error: ${error.message}` : 'Connected',
-    });
+    checks.push({ name: 'Supabase Storage', passed: !error, message: error ? 'Storage unavailable' : 'Connected' });
     if (error) status = 'degraded';
   } catch {
     checks.push({ name: 'Supabase Storage', passed: false, message: 'Connection failed' });
     status = 'unavailable';
   }
-  
-  // Check media_assets table
+
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
     const { error } = await supabase.from('media_assets').select('id').limit(1);
-    checks.push({
-      name: 'Media Assets Table',
-      passed: !error,
-      message: error ? 'Table not accessible' : 'Accessible',
-    });
+    checks.push({ name: 'Media Assets Table', passed: !error, message: error ? 'Table not accessible' : 'Accessible' });
   } catch {
     checks.push({ name: 'Media Assets Table', passed: false, message: 'Check failed' });
   }
-  
-  // Check storage buckets
-  const hasBuckets = ['media', 'images', 'documents'].every(
-    bucket => process.env[`SUPABASE_STORAGE_BUCKET_${bucket.toUpperCase()}`]
-  );
-  checks.push({
-    name: 'Storage Buckets',
-    passed: true, // Buckets are optional
-    message: 'Using default Supabase storage',
-  });
-  
-  // Check upload limits
-  checks.push({
-    name: 'Upload Configuration',
-    passed: true,
-    message: 'Max upload size: 50MB per file',
-  });
-  
-  const response: CapabilityHealth = {
-    capability: 'media-library',
-    status,
-    configured: true,
-    checks,
-    checkedAt: new Date().toISOString(),
-  };
-  
-  return NextResponse.json(response, {
-    status: status === 'unavailable' ? 503 : 200,
-  });
+
+  checks.push({ name: 'Storage Buckets', passed: true, message: 'Using canonical Supabase storage configuration' });
+  checks.push({ name: 'Upload Configuration', passed: true, message: 'Max upload size: 50MB per file' });
+
+  const response: CapabilityHealth = { capability: 'media-library', status, configured: true, checks, checkedAt: new Date().toISOString() };
+  return NextResponse.json(response, { status: status === 'unavailable' ? 503 : 200 });
 }

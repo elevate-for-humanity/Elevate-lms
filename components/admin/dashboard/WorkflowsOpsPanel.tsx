@@ -76,7 +76,7 @@ export function WorkflowsOpsPanel() {
             Refresh
           </button>
           <Link
-            href="/admin/studio/workflows"
+            href="/studio/workflows"
             className="inline-flex h-8 items-center gap-1 rounded bg-[#0078d4] px-2 text-[11px] font-semibold text-white"
           >
             Full editor
@@ -117,7 +117,7 @@ export function WorkflowsOpsPanel() {
                   Run
                 </button>
                 <Link
-                  href="/admin/studio/workflows"
+                  href="/studio/workflows"
                   className="text-[10px] font-semibold text-[#4ec9b0] hover:underline"
                 >
                   Edit
@@ -131,5 +131,4 @@ export function WorkflowsOpsPanel() {
   );
 }
 
-// Default export for next/dynamic
 export default WorkflowsOpsPanel;

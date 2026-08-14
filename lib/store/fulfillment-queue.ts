@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis';
+import { Redis } from 'ioredis';
 import { logger } from '@/lib/logger';
 
 const QUEUE_KEY = 'store:fulfillment:queue';
@@ -23,21 +23,32 @@ let redis: Redis | null = null;
 function getRedis(): Redis | null {
   if (redis) return redis;
 
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (!url || !token) {
-    logger.warn('Upstash Redis not configured - queue disabled');
+  const url = process.env.REDIS_URL;
+  if (!url) {
+    logger.warn('Redis not configured - fulfillment queue disabled');
     return null;
   }
 
-  redis = new Redis({ url, token });
-  return redis;
+  try {
+    redis = new Redis(url, {
+      maxRetriesPerRequest: 1,
+      connectTimeout: 5_000,
+      enableReadyCheck: true,
+    });
+    redis.on('error', (error) => {
+      logger.warn('[fulfillment-queue] Redis connection error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+    return redis;
+  } catch (error) {
+    logger.error('Failed to initialize fulfillment Redis client', error as Error);
+    redis = null;
+    return null;
+  }
 }
 
-/**
- * Queue a fulfillment job for background processing
- */
+/** Queue a fulfillment job for background processing. */
 export async function queueFulfillment(job: FulfillmentJob): Promise<boolean> {
   const client = getRedis();
   if (!client) return false;
@@ -58,26 +69,22 @@ export async function queueFulfillment(job: FulfillmentJob): Promise<boolean> {
   }
 }
 
-/**
- * Get next job from queue for processing
- */
+/** Get next job from queue for processing. */
 export async function getNextJob(): Promise<FulfillmentJob | null> {
   const client = getRedis();
   if (!client) return null;
 
   try {
-    const jobStr = await client.lmove(QUEUE_KEY, PROCESSING_KEY, 'right', 'left');
+    const jobStr = await client.lmove(QUEUE_KEY, PROCESSING_KEY, 'RIGHT', 'LEFT');
     if (!jobStr) return null;
-    return JSON.parse(jobStr as string) as FulfillmentJob;
+    return JSON.parse(jobStr) as FulfillmentJob;
   } catch (error) {
     logger.error('Failed to get next job', error as Error);
     return null;
   }
 }
 
-/**
- * Mark job as completed and remove from processing
- */
+/** Mark job as completed and remove from processing. */
 export async function completeJob(job: FulfillmentJob): Promise<void> {
   const client = getRedis();
   if (!client) return;
@@ -90,9 +97,7 @@ export async function completeJob(job: FulfillmentJob): Promise<void> {
   }
 }
 
-/**
- * Retry a failed job with exponential backoff
- */
+/** Retry a failed job with exponential backoff. */
 export async function retryJob(job: FulfillmentJob): Promise<boolean> {
   const client = getRedis();
   if (!client) return false;
@@ -101,7 +106,6 @@ export async function retryJob(job: FulfillmentJob): Promise<boolean> {
 
   if (retryCount > MAX_RETRIES) {
     logger.error('Job exceeded max retries', undefined, { eventId: job.eventId, retryCount });
-    // Move to dead letter queue
     await client.lpush(
       'store:fulfillment:dead',
       JSON.stringify({
@@ -115,16 +119,16 @@ export async function retryJob(job: FulfillmentJob): Promise<boolean> {
   }
 
   try {
-    // Remove from processing
     await client.lrem(PROCESSING_KEY, 1, JSON.stringify(job));
-
-    // Re-queue with incremented retry count after delay
     const updatedJob: FulfillmentJob = { ...job, retryCount };
 
-    // Use setTimeout for delay (in production, use scheduled job)
     setTimeout(async () => {
-      await client.lpush(QUEUE_KEY, JSON.stringify(updatedJob));
-      logger.info('Job re-queued for retry', { eventId: job.eventId, retryCount });
+      try {
+        await client.lpush(QUEUE_KEY, JSON.stringify(updatedJob));
+        logger.info('Job re-queued for retry', { eventId: job.eventId, retryCount });
+      } catch (error) {
+        logger.error('Delayed fulfillment requeue failed', error as Error);
+      }
     }, RETRY_DELAY_MS * retryCount);
 
     return true;
@@ -134,9 +138,7 @@ export async function retryJob(job: FulfillmentJob): Promise<boolean> {
   }
 }
 
-/**
- * Get queue stats
- */
+/** Get queue stats. */
 export async function getQueueStats(): Promise<{
   pending: number;
   processing: number;
@@ -159,10 +161,7 @@ export async function getQueueStats(): Promise<{
   }
 }
 
-/**
- * Process fulfillment jobs (called by cron or background worker)
- * Uses transactional provisioning for enterprise-grade reliability
- */
+/** Process fulfillment jobs (called by cron or background worker). */
 export async function processFulfillmentQueue(): Promise<number> {
   const { provisionLicense } = await import('@/lib/licensing/provisioning');
 
@@ -174,14 +173,13 @@ export async function processFulfillmentQueue(): Promise<number> {
     if (!job) break;
 
     try {
-      // Use transactional provisioning
       const result = await provisionLicense({
         correlationId: job.eventId,
         email: job.email,
         productId: job.productId,
         paymentIntentId: job.eventId,
         sessionId: job.sessionId,
-        amountCents: 0, // Amount not tracked in queue job
+        amountCents: 0,
         currency: 'usd',
         metadata: {
           repo: job.repo,

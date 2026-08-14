@@ -56,7 +56,6 @@ for (const root of ['apps/lms/app', 'components', 'lib']) {
   }
 }
 
-// The apprenticeship shell owns the trade selector but every trade lands on one canonical /apprentice entry.
 {
   const file = 'components/portal/ApprenticePortalShell.tsx';
   let text = fs.readFileSync(file, 'utf8');
@@ -64,7 +63,6 @@ for (const root of ['apps/lms/app', 'components', 'lib']) {
   fs.writeFileSync(file, text);
 }
 
-// Shared platform shell must never point LMS users at retired or nonexistent apprentice paths.
 {
   const file = 'components/dashboard/PlatformShell.tsx';
   let text = fs.readFileSync(file, 'utf8');
@@ -76,7 +74,6 @@ for (const root of ['apps/lms/app', 'components', 'lib']) {
   fs.writeFileSync(file, text);
 }
 
-// There is one recognition system. /lms/achievements owns badges, points, certificates and leaderboard data.
 {
   const file = 'lib/auth/lms-routes.ts';
   let text = fs.readFileSync(file, 'utf8');
@@ -84,7 +81,6 @@ for (const root of ['apps/lms/app', 'components', 'lib']) {
   fs.writeFileSync(file, text);
 }
 
-// Remove route-entry wrappers and superseded duplicate pages after references are normalized.
 for (const file of [
   'apps/lms/app/learner/page.tsx',
   'apps/lms/app/learner/dashboard/error.tsx',
@@ -129,6 +125,35 @@ const retiredFiles = [
 ];
 for (const file of retiredFiles) {
   if (fs.existsSync(file)) throw new Error(`Retired route still exists: ${file}`);
+}
+
+// Report any remaining root page that has an equivalent learner page under /lms.
+const appRoot = 'apps/lms/app';
+const canonicalRoot = 'apps/lms/app/lms/(app)';
+const canonicalPages = new Set(
+  walk(canonicalRoot)
+    .filter((file) => file.endsWith('/page.tsx'))
+    .map((file) => file.slice(canonicalRoot.length).replace(/\/page\.tsx$/, '')),
+);
+const intentionalRootPrefixes = [
+  '/apprentice', '/employer', '/host-shop', '/workforce', '/parent-portal', '/creator',
+  '/login', '/signup', '/auth', '/accept-invite', '/enrollment', '/status', '/api', '/lms',
+];
+const collisions = [];
+for (const file of walk(appRoot).filter((entry) => entry.endsWith('/page.tsx'))) {
+  if (file.startsWith(`${canonicalRoot}/`)) continue;
+  let route = file.slice(appRoot.length).replace(/\/page\.tsx$/, '');
+  route = route.replace(/\/(?:\([^/]+\))/g, '');
+  if (!route) route = '/';
+  if (intentionalRootPrefixes.some((prefix) => route === prefix || route.startsWith(`${prefix}/`))) continue;
+  if (canonicalPages.has(route)) collisions.push({ route, file, canonical: `${canonicalRoot}${route}/page.tsx` });
+}
+
+if (collisions.length) {
+  console.log('POTENTIAL_LMS_ROUTE_COLLISIONS');
+  for (const collision of collisions) console.log(`${collision.route} :: ${collision.file} :: ${collision.canonical}`);
+} else {
+  console.log('POTENTIAL_LMS_ROUTE_COLLISIONS none');
 }
 
 console.log('LMS route consolidation completed.');

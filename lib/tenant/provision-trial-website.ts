@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
@@ -54,23 +56,33 @@ export async function provisionTrialWebsite(
     site_name: organizationName,
     template_id: config.template.id,
     is_published: true,
-    status: 'published',
     site_config: config,
     trial_ends_at: trialEndsAt,
     updated_at: new Date().toISOString(),
   };
 
-  const { data: existing } = await db
+  const { data: existing, error: existingError } = await db
     .from('user_websites')
     .select('id')
     .eq('organization_id', organizationId)
     .maybeSingle();
 
+  if (existingError) {
+    logger.error('[provisionTrialWebsite] existing website lookup failed', existingError, {
+      organizationId,
+    });
+    return { ok: false, error: 'Failed to inspect existing trial website' };
+  }
+
   try {
     if (existing?.id) {
       const { error } = await db.from('user_websites').update(payload).eq('id', existing.id);
       if (error) throw error;
-      return { ok: true, websiteId: existing.id, publicUrl: `https://${slug}.app.elevateforhumanity.org` };
+      return {
+        ok: true,
+        websiteId: existing.id,
+        publicUrl: `https://${slug}.app.elevateforhumanity.org`,
+      };
     }
 
     const { data: inserted, error } = await db

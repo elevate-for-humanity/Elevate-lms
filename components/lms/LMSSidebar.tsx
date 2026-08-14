@@ -62,6 +62,7 @@ type NavItem = { href: string; label: string; icon: typeof Home };
 const primaryItems: NavItem[] = [
   { href: '/lms/dashboard', label: 'Home', icon: Home },
   { href: '/lms/community', label: 'Community', icon: Users },
+  { href: '/lms/groups', label: 'Groups', icon: Users },
   { href: '/lms/courses', label: 'Learn', icon: BookOpen },
   { href: '/lms/events', label: 'Events', icon: CalendarDays },
   { href: '/lms/progress', label: 'Progress', icon: TrendingUp },
@@ -96,6 +97,8 @@ const bottomItems: NavItem[] = [
   { href: '/lms/support', label: 'Get Help', icon: HelpCircle },
   { href: '/lms/settings', label: 'Settings', icon: Settings },
 ];
+
+/* eslint-disable react-hooks/static-components -- pre-existing pattern: NavLink/Section use closures over collapsed/state */
 
 export function LMSSidebar({ user, profile, courseCount = 0, unreadMessages = 0 }: LMSSidebarProps) {
   const pathname = usePathname();

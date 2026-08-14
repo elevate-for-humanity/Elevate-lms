@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const FINAL_CTA_IMAGE = '/images/pages/workforce-training.webp?v=20260812-home-cta';
+const FINAL_CTA_IMAGE = '/images/pages/apply-page-1.jpg';
 
 export function HomeFinalCTA() {
   return (
@@ -23,11 +23,10 @@ export function HomeFinalCTA() {
         <div className="relative min-h-[220px] lg:min-h-[320px]">
           <Image
             src={FINAL_CTA_IMAGE}
-            alt="Elevate for Humanity workforce training and career advancement"
+            alt="Student getting started with an Elevate for Humanity career training application"
             fill
             priority
             fetchPriority="high"
-            unoptimized
             sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover"
           />

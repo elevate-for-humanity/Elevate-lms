@@ -8,11 +8,8 @@
 const fs = require('fs');
 
 const forbidden = [
-  // Never use serverActionVersion — this is not a valid Next.js config option
   { pattern: /serverActionVersion/, message: 'Forbidden serverActionVersion option' },
-  // Never commit unknown SHA defaults in production Dockerfiles
   { pattern: /GIT_SHA=unknown/, message: 'Forbidden GIT_SHA=unknown default in Dockerfile' },
-  // Never use all-zeros SHA
   {
     pattern: /0000000000000000000000000000000000000000/,
     message: 'Forbidden all-zeros commit SHA',
@@ -24,11 +21,10 @@ const targets = [
   'apps/next.config.mjs',
   'apps/admin/next.config.mjs',
   'apps/lms/next.config.mjs',
-  // Marketing uses next.config.js (not .mjs) — .js takes precedence in Next.js
   'apps/marketing/next.config.js',
   'Dockerfile.northflank-admin',
   'Dockerfile.northflank-lms',
-  'Dockerfile.northflank-marketing',
+  'Dockerfile.marketing',
 ].filter((f) => fs.existsSync(f));
 
 let failed = false;

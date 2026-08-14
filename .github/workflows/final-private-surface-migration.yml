@@ -16,11 +16,30 @@ jobs:
         with:
           ref: consolidate/legacy-routes-20260814
           fetch-depth: 0
-      - name: Move private role surfaces and retire trade routes
+      - name: Consolidate traced private and root surfaces
         shell: bash
         run: |
           set -euo pipefail
 
+          # Root app has been traced: it contains only stale home-component copies
+          # plus an EmployerCharts stub. Require canonical counterparts before removal.
+          if [ -d app ]; then
+            for f in app/components/home/*.tsx; do
+              [ -e "$f" ] || continue
+              canonical="components/home/$(basename "$f")"
+              if [ ! -e "$canonical" ]; then
+                echo "Missing canonical counterpart for $f: $canonical" >&2
+                exit 1
+              fi
+            done
+            if [ -e app/employer/analytics/EmployerCharts.tsx ] && [ ! -e apps/lms/app/employer/analytics/EmployerCharts.tsx ]; then
+              echo 'Missing canonical LMS EmployerCharts.tsx' >&2
+              exit 1
+            fi
+            git rm -r app
+          fi
+
+          # These are authenticated role portals and must not be served by www.
           for surface in case-manager workforce-board provider; do
             src="apps/marketing/app/$surface"
             dst="apps/lms/app/$surface"
@@ -47,7 +66,8 @@ jobs:
               if not p.is_file() or p.suffix not in exts:
                   continue
               parts = set(p.parts)
-              if parts & excluded_parts or p.as_posix().startswith('docs/audits/'):
+              posix = p.as_posix()
+              if parts & excluded_parts or posix.startswith('docs/audits/') or posix == '.github/workflows/final-private-surface-migration.yml':
                   continue
               try:
                   text = p.read_text()
@@ -76,6 +96,18 @@ jobs:
                       item['app'] = 'lms'
           contract_path.write_text(json.dumps(data, indent=2) + '\n')
 
+          # Remove retired root app locations from operational doctor scans.
+          doctor = pathlib.Path('scripts/platform-doctor.mjs')
+          if doctor.exists():
+              text = doctor.read_text()
+              for stale in [
+                  "    'app',\n", "    'app-legacy',\n", "    'apps/app',\n",
+                  "    'app/api/admin',\n", "    'app-legacy/api/admin',\n", "    'apps/app/api/admin',\n"
+              ]:
+                  text = text.replace(stale, '')
+              doctor.write_text(text)
+
+          # Historical audits remain historical; production stale-reference enforcement ignores them.
           audit_path = pathlib.Path('scripts/audit-parallel-surfaces.mjs')
           text = audit_path.read_text()
           needle = "&& !f.includes(`${path.sep}artifacts${path.sep}`)"
@@ -84,11 +116,11 @@ jobs:
               audit_path.write_text(text.replace(needle, replacement))
           PY
 
-          echo "Remaining operational retired trade-route references:"
-          git grep -n -I -E '/portal/(barber|cosmetology|esthetician|nail-technician|culinary|electrical|plumbing)' -- ':!docs/audits/**' || true
-
-          if git grep -n -I -E '/portal/(barber|cosmetology|esthetician|nail-technician|culinary|electrical|plumbing)' -- ':!docs/audits/**'; then
-            echo 'Retired trade route references remain' >&2
+          # Prove the retired trade routes are absent from operational code/config.
+          if git grep -n -I -E '/portal/(barber|cosmetology|esthetician|nail-technician|culinary|electrical|plumbing)' -- \
+            '*.ts' '*.tsx' '*.js' '*.jsx' '*.mjs' '*.cjs' '*.json' \
+            ':!docs/**' ':!audits/**' ':!scripts/audit-parallel-surfaces.mjs' ':!.github/workflows/final-private-surface-migration.yml'; then
+            echo 'Retired trade route references remain in operational code' >&2
             exit 1
           fi
 
@@ -103,5 +135,5 @@ jobs:
             echo 'No migration changes required.'
             exit 0
           fi
-          git commit -m 'consolidate: move private portals to LMS and retire trade routes'
+          git commit -m 'consolidate: remove root app and move private portals to LMS'
           git push origin HEAD:consolidate/legacy-routes-20260814

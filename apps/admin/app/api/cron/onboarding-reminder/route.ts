@@ -11,7 +11,6 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
@@ -23,11 +22,8 @@ export async function GET(request: Request) {
   }
 
   const db = await requireAdminClient();
-  if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  // Tenants with at least one incomplete onboarding step
   const { data: incomplete, error } = await db
     .from('provider_onboarding_steps')
     .select('tenant_id')
@@ -37,16 +33,12 @@ export async function GET(request: Request) {
     logger.error('onboarding-reminder cron: query failed', error);
     return NextResponse.json({ error: 'Query failed' }, { status: 500 });
   }
+  if (!incomplete?.length) return NextResponse.json({ queued: 0, message: 'All providers fully onboarded' });
 
-  if (!incomplete || incomplete.length === 0) {
-    return NextResponse.json({ queued: 0, message: 'All providers fully onboarded' });
-  }
-
-  const tenantIds = [...new Set(incomplete.map((r) => r.tenant_id))];
+  const tenantIds = [...new Set(incomplete.map((row) => row.tenant_id))];
   let queued = 0;
 
   for (const tenantId of tenantIds) {
-    // Only remind if the provider admin hasn't logged in recently
     const { data: contact } = await db
       .from('profiles')
       .select('id, email, full_name, updated_at')
@@ -54,19 +46,10 @@ export async function GET(request: Request) {
       .eq('role', 'provider_admin')
       .limit(1)
       .maybeSingle();
-
     if (!contact?.email) continue;
-
-    // Skip if they were active in the last 7 days (updated_at is a proxy for activity)
     if (contact.updated_at && contact.updated_at > sevenDaysAgo) continue;
 
-    const { data: tenant } = await db
-      .from('tenants')
-      .select('name')
-      .eq('id', tenantId)
-      .maybeSingle();
-
-    // Get the next incomplete step
+    const { data: tenant } = await db.from('tenants').select('name').eq('id', tenantId).maybeSingle();
     const { data: nextStep } = await db
       .from('provider_onboarding_steps')
       .select('step')
@@ -86,23 +69,24 @@ export async function GET(request: Request) {
             ? `${siteUrl}/provider/programs`
             : `${siteUrl}/provider/dashboard`;
 
-    await db
-      .from('notification_outbox')
-      .insert({
-        to_email: contact.email,
-        template_key: 'inquiry_received', // reuse generic until onboarding_reminder template exists
-        template_data: {
-          name: contact.full_name ?? contact.email,
-          inquiry_type: 'onboarding reminder',
-          site_url: nextStepHref,
-          org_name: tenant?.name ?? tenantId,
-          next_step: nextStep?.step?.replace(/_/g, ' ') ?? 'complete onboarding',
-        },
-        status: 'queued',
-        scheduled_for: new Date().toISOString(),
-      })
-      .catch((err) => logger.warn('Failed to queue onboarding reminder', err));
+    const { error: queueError } = await db.from('notification_outbox').insert({
+      to_email: contact.email,
+      template_key: 'inquiry_received',
+      template_data: {
+        name: contact.full_name ?? contact.email,
+        inquiry_type: 'onboarding reminder',
+        site_url: nextStepHref,
+        org_name: tenant?.name ?? tenantId,
+        next_step: nextStep?.step?.replace(/_/g, ' ') ?? 'complete onboarding',
+      },
+      status: 'queued',
+      scheduled_for: new Date().toISOString(),
+    });
 
+    if (queueError) {
+      logger.warn('Failed to queue onboarding reminder', { tenantId, error: queueError.message });
+      continue;
+    }
     queued++;
   }
 

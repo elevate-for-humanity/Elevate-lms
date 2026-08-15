@@ -9,8 +9,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
-
 const quizQuestionSchema = z.object({
   id: z.string(),
   prompt: z.string(),
@@ -73,10 +71,10 @@ const bodySchema = z.object({
   ]),
   durationMinutes: z.number().positive(),
   learningObjectives: z.array(z.string()).min(1),
-  content: z.record(z.unknown()),
+  content: z.record(z.string(), z.unknown()),
   renderedHtml: z.string().nullable().optional(),
   videoUrl: z.string().nullable().optional(),
-  videoConfig: z.record(z.unknown()).nullable().optional(),
+  videoConfig: z.record(z.string(), z.unknown()).nullable().optional(),
   quizQuestions: z.array(quizQuestionSchema).optional(),
   passingScore: z.number().nullable().optional(),
   competencyChecks: z.array(competencyCheckSchema).optional(),
@@ -101,7 +99,7 @@ const bodySchema = z.object({
           'lab',
         ]),
         label: z.string(),
-        config: z.record(z.unknown()).optional(),
+        config: z.record(z.string(), z.unknown()).optional(),
       }),
     )
     .optional(),
@@ -152,7 +150,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = bodySchema.parse(await req.json());
-    const db = getServiceDb();
+    const db = await getServiceDb();
 
     const payload = {
       course_id: body.courseId,
@@ -202,7 +200,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
     return NextResponse.json({ ok: true, lesson: data });
   } catch (error) {
-    logger.error('[course-builder/lesson]', error);
+    logger.error('[course-builder/lesson]', error as Error);
     return NextResponse.json({ ok: false, error: 'Failed to save lesson' }, { status: 400 });
   }
 }

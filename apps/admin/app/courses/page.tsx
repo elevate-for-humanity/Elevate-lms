@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Plus, Search, Filter, MoreVertical, AlertCircle } from 'lucide-react';
+import { BookOpen, Plus, Search, MoreVertical, AlertCircle } from 'lucide-react';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
@@ -169,10 +169,10 @@ export default async function CoursesPage() {
                       <td className="px-4 py-4">{getStatusBadge(course)}</td>
                       <td className="px-4 py-4 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <Link href={"/admin/studio/courses/" + course.id} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
+                          <Link href={"/studio/courses/" + course.id} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
                             <BookOpen className="w-4 h-4 text-brand-blue-600" />
                           </Link>
-                          <Link href={"/admin/studio/courses/" + course.id + "/edit"} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
+                          <Link href={"/studio/courses/" + course.id + "/edit"} className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors">
                             <MoreVertical className="w-4 h-4 text-slate-500" />
                           </Link>
                         </div>

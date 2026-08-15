@@ -5,7 +5,6 @@ import MarqueeBanner from '@/components/MarqueeBanner';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
-import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
 import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
@@ -70,7 +69,6 @@ export default function HomePage() {
       <HomeFunding />
       <HomeApprenticeshipInfra />
       <HomeEmployerStrip />
-      <HomeBeautyPriority />
       <HomeFinalCTA />
       <ParisFloatingButton />
     </>

@@ -11,17 +11,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 15;
 
-/**
- * Admin-only manual/retry sync for one application.
- *
- * Guardrails:
- * - Supabase remains authoritative.
- * - Only the HubSpot CONTACT object is written.
- * - Uses standard contact properties only.
- * - Never changes enrollment/application state.
- * - Does not call HubSpot workflows, marketing email, billing, subscriptions,
- *   campaigns, products, quotes, invoices, or other paid-feature endpoints.
- */
 export async function POST(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
@@ -85,18 +74,26 @@ export async function POST(request: NextRequest) {
     zip: application.zip,
   });
 
-  if (!result.ok) {
+  if ('error' in result) {
     return NextResponse.json(
       { ok: false, error: result.error, hubspotStatus: result.status },
       { status: 502 },
     );
   }
 
+  if (result.skipped) {
+    return NextResponse.json({
+      ok: true,
+      applicationId,
+      skipped: true,
+      reason: result.reason,
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     applicationId,
-    contactId: result.skipped ? undefined : result.contactId,
-    skipped: result.skipped,
-    reason: result.skipped ? result.reason : undefined,
+    contactId: result.contactId,
+    skipped: false,
   });
 }

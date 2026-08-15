@@ -5,6 +5,13 @@ on:
     branches: [fix/marketing-missing-images-20260815]
     paths:
       - '.github/workflows/audit-marketing-images.yml'
+      - 'apps/marketing/**'
+      - 'components/**'
+      - 'content/**'
+      - 'config/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'Dockerfile.marketing'
   workflow_dispatch:
 
 permissions:
@@ -22,9 +29,9 @@ jobs:
         shell: bash
         run: |
           echo '=== GET STARTED TEXT MATCHES ==='
-          rg -n -i --glob '!node_modules/**' --glob '!.next/**' --glob '!app-legacy/**' 'get started( now)?|start now|ready to get started' apps/marketing components content config lib || true
+          grep -RniE --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=app-legacy 'get started( now)?|start now|ready to get started' apps/marketing components content config lib || true
 
-      - name: Audit local image references
+      - name: Audit local image references and rewrites
         shell: bash
         run: |
           python - <<'PY'
@@ -32,10 +39,23 @@ jobs:
           import re, json
 
           roots = [Path('apps/marketing/app'), Path('components'), Path('content'), Path('config'), Path('lib')]
-          exts = r'(?:png|jpe?g|webp|gif|svg|avif)'
-          # Literal root-relative image refs only; dynamic/remote refs need separate runtime validation.
           pattern = re.compile(r'''["'`](\/[^"'`?]+\.(?:png|jpe?g|webp|gif|svg|avif))(?:\?[^"'`]*)?["'`]''', re.I)
           public_roots = [Path('public'), Path('apps/marketing/public')]
+
+          alias_file = Path('lib/media/legacy-image-aliases.mjs')
+          alias_text = alias_file.read_text(errors='ignore') if alias_file.exists() else ''
+          alias_pattern = re.compile(r'''['"](\/[^'"]+)['"]\s*:\s*['"](\/[^'"]+)['"]''')
+          aliases = dict(alias_pattern.findall(alias_text))
+
+          def exists(ref):
+              rel = ref.lstrip('/')
+              return any((r / rel).exists() for r in public_roots)
+
+          bad_aliases = []
+          for src, dst in aliases.items():
+              if not exists(dst):
+                  bad_aliases.append({'source': src, 'destination': dst})
+
           findings = []
           refs = []
           for root in roots:
@@ -44,6 +64,8 @@ jobs:
               for p in root.rglob('*'):
                   if not p.is_file() or p.suffix.lower() not in {'.ts','.tsx','.js','.jsx','.mjs','.json'}:
                       continue
+                  if p == alias_file:
+                      continue
                   try:
                       text = p.read_text(errors='ignore')
                   except Exception:
@@ -51,17 +73,31 @@ jobs:
                   for lineno, line in enumerate(text.splitlines(), 1):
                       for m in pattern.finditer(line):
                           ref = m.group(1)
-                          rel = ref.lstrip('/')
-                          candidates = [r / rel for r in public_roots]
-                          exists = any(c.exists() for c in candidates)
-                          refs.append((str(p), lineno, ref, exists))
-                          if not exists:
+                          direct = exists(ref)
+                          aliased = ref in aliases and exists(aliases[ref])
+                          refs.append((str(p), lineno, ref, direct, aliased))
+                          if not direct and not aliased:
                               findings.append({'file': str(p), 'line': lineno, 'ref': ref})
+
           print(f'Total literal local image refs: {len(refs)}')
-          print(f'Missing local image refs: {len(findings)}')
+          print(f'Canonical compatibility aliases: {len(aliases)}')
+          print(f'Broken alias destinations: {len(bad_aliases)}')
+          for f in bad_aliases:
+              print(f"BROKEN_ALIAS {f['source']} -> {f['destination']}")
+          print(f'Unresolved local image refs: {len(findings)}')
           for f in findings:
               print(f"MISSING {f['file']}:{f['line']} -> {f['ref']}")
+
           Path('/tmp/missing-images.json').write_text(json.dumps(findings, indent=2))
-          if findings:
+          if bad_aliases or findings:
               raise SystemExit(2)
           PY
+
+      - name: Verify critical Marketing runtime assets
+        shell: bash
+        run: |
+          test -s public/images/pages/apply-page-4.jpg
+          test -s public/images/pages/about-supportive-services.webp
+          test -s public/images/pages/about-employer-partners.webp
+          test -s public/images/pages/for-employers-page-1.webp
+          echo 'Critical Marketing image assets are present.'

@@ -8,13 +8,6 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/**
- * POST /api/admin/send-email
- * Auth: admin role required.
- * Body: { to, subject, html, text?, fromName? }
- *
- * General-purpose email send for admin tooling (Dev Studio, etc.).
- */
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
@@ -38,8 +31,7 @@ async function _POST(req: NextRequest) {
   }
 
   const displayName = fromName ? String(fromName) : PLATFORM_DEFAULTS.orgName;
-  const fromAddress =
-    process.env.EMAIL_FROM || process.env.MAIL_FROM || 'info@elevateforhumanity.org';
+  const fromAddress = process.env.EMAIL_FROM || process.env.MAIL_FROM || 'info@elevateforhumanity.org';
   const fromField = `${displayName} <${fromAddress}>`;
 
   const result = await sendEmail({
@@ -51,7 +43,7 @@ async function _POST(req: NextRequest) {
   });
 
   if (result.success) {
-    return NextResponse.json({ ok: true, messageId: result.data?.id });
+    return NextResponse.json({ ok: true, provider: result.data?.provider ?? 'sendgrid' });
   }
 
   return NextResponse.json({ error: result.error ?? 'Send failed' }, { status: 500 });

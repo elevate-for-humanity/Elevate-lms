@@ -1,0 +1,15 @@
+{
+  "name": "@elevate/website-builder",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --no-lint",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "15.5.22",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  }
+}

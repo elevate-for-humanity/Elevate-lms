@@ -62,7 +62,11 @@ export default async function OperationsPage() {
   const deadRows = rows(recentDeadLetters);
   const alertRows = rows(recentAlerts);
   const quickLinks = [
-    ['Mission Control', '/admin/mission-control'], ['System Health', '/admin/system-health'], ['Workflows', '/admin/studio/workflows'], ['Automation', '/admin/automation'], ['Monitoring', '/admin/monitoring'],
+    ['Mission Control', '/mission-control'],
+    ['System Health', '/system-health'],
+    ['Workflows', '/studio/workflows'],
+    ['Advanced Tools', '/advanced-tools'],
+    ['Monitoring', '/monitoring'],
   ];
 
   return (

@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-
-import {
-  getCourseAnalytics,
-  getStudentEngagement,
-  generateCourseReport,
-} from '@/lib/analytics/course-analytics';
+import { createClient } from '@/lib/supabase/server';
+import { getCourseAnalytics, generateCourseReport } from '@/lib/analytics/course-analytics';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -27,7 +23,6 @@ async function _GET(req: Request, { params }: { params: Promise<{ courseId: stri
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if user is admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -53,7 +48,7 @@ async function _GET(req: Request, { params }: { params: Promise<{ courseId: stri
     }
 
     return NextResponse.json(analytics);
-  } catch (err: any) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch analytics' }, { status: 500 });
   }
 }

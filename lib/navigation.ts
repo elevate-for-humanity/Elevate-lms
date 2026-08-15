@@ -12,6 +12,9 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Programs',
     href: ROUTES.programs,
     subItems: [
+      // Keep the canonical catalog entry outside category groups so mobile,
+      // desktop, and quick-menu navigation always expose the full catalog.
+      { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
       { name: 'Healthcare', isHeader: true, href: ROUTES.programsHealthcare },
       { name: 'CNA', href: ROUTES.programsCNA, isSectionLink: true },
       { name: 'QMA', href: ROUTES.programsQMA, isSectionLink: true },
@@ -24,7 +27,6 @@ export const NAV_ITEMS: NavItem[] = [
       { name: 'Barber & Beauty', href: ROUTES.programsBarber, isSectionLink: true },
       { name: 'Tech & Business', isHeader: true },
       { name: 'Technology Programs', href: ROUTES.programsTechnology, isSectionLink: true },
-      { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
     ],
   },
   {

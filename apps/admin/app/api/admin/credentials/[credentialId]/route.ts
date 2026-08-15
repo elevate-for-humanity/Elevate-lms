@@ -24,7 +24,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ credentialId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { credentialId } = await params;
   const user = await requireAdmin();
@@ -34,8 +34,6 @@ export async function PATCH(
   if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
 
   const db = await requireAdminClient();
-
-  // Pre-read: verify credential exists before updating
   const { data: existing, error: fetchError } = await db
     .from('credential_registry')
     .select('id')
@@ -46,7 +44,6 @@ export async function PATCH(
     return NextResponse.json({ error: 'Credential not found' }, { status: 404 });
   }
 
-  // Re-derive protected flag if proctor_authority changed
   if (body.proctor_authority !== undefined) {
     body.metadata = {
       ...(body.metadata ?? {}),
@@ -79,8 +76,6 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = await requireAdminClient();
-
-  // Pre-read: verify credential exists before soft-deleting
   const { data: existing, error: fetchError } = await db
     .from('credential_registry')
     .select('id, is_active')

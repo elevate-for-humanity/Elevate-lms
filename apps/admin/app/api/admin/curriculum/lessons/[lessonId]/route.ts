@@ -1,9 +1,5 @@
 /**
  * PATCH /api/admin/curriculum/lessons/[lessonId]
- *
- * Updates a curriculum_lessons row. Uses the service-role client so the write
- * is not blocked by the authenticated-only RLS policy on curriculum_lessons.
- * Auth is enforced here — admin/admin/staff only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,7 +11,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Fields an admin is allowed to patch on a curriculum_lessons row.
 const ALLOWED_FIELDS = [
   'lesson_title',
   'step_type',
@@ -46,18 +41,15 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ less
     return safeError('Invalid JSON body', 400);
   }
 
-  // Whitelist — only allow known safe fields
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
   for (const field of ALLOWED_FIELDS) {
     if (field in body) patch[field] = body[field as AllowedField];
   }
 
   if (Object.keys(patch).length === 1) {
-    // Only updated_at — nothing to do
     return NextResponse.json({ lesson: null, message: 'No updatable fields provided' });
   }
 
-  // Write via service-role client — bypasses RLS (auth enforced above)
   const db = await requireAdminClient();
   if (!db) return safeError('Service unavailable', 503);
 
@@ -79,5 +71,5 @@ async function _PATCH(request: NextRequest, { params }: { params: Promise<{ less
 }
 
 export const PATCH = withApiAudit('/api/admin/curriculum/lessons/[lessonId]', (req, ctx) =>
-  _PATCH(req, ctx as { params: Promise<{ lessonId: string }> }),
+  _PATCH(req as NextRequest, ctx as { params: Promise<{ lessonId: string }> }),
 );

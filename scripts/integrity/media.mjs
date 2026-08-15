@@ -12,10 +12,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LEGACY_IMAGE_ALIASES } from '../../lib/media/legacy-image-aliases.mjs';
+import { VERIFIED_IMAGE_ALIASES } from '../../lib/media/verified-image-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '../..');
 const publicDir = path.join(rootDir, 'public');
+const ALL_IMAGE_ALIASES = Object.freeze({ ...LEGACY_IMAGE_ALIASES, ...VERIFIED_IMAGE_ALIASES });
 let failures = 0;
 
 function pass(message) { console.log(`✅ ${message}`); }
@@ -64,7 +66,7 @@ for (const [url, owners] of mediaReferences) {
   const localPath = path.join(publicDir, url.replace(/^\//, ''));
   if (fs.existsSync(localPath)) continue;
 
-  const aliasTarget = LEGACY_IMAGE_ALIASES[url];
+  const aliasTarget = ALL_IMAGE_ALIASES[url];
   if (aliasTarget) {
     if (aliasTarget === url) {
       missingLocalMedia.push({ url, owners: [...owners], reason: 'alias points to itself' });
@@ -90,13 +92,13 @@ if (missingLocalMedia.length) {
   pass(`${[...mediaReferences.keys()].filter((url) => url.startsWith('/images/')).length} local image references resolve in public/ (${aliasedLocalMedia.length} historical paths use verified canonical rewrites)`);
 }
 
-for (const [source, destination] of Object.entries(LEGACY_IMAGE_ALIASES)) {
-  if (!source.startsWith('/images/') || !destination.startsWith('/images/')) {
-    fail(`Invalid legacy image rewrite ${source} -> ${destination}`);
+for (const [source, destination] of Object.entries(ALL_IMAGE_ALIASES)) {
+  if (!source.startsWith('/') || !destination.startsWith('/')) {
+    fail(`Invalid image rewrite ${source} -> ${destination}`);
     continue;
   }
   const destinationPath = path.join(publicDir, destination.replace(/^\//, ''));
-  if (!fs.existsSync(destinationPath)) fail(`Legacy image rewrite target is missing: ${source} -> ${destination}`);
+  if (!fs.existsSync(destinationPath)) fail(`Image rewrite target is missing: ${source} -> ${destination}`);
 }
 
 console.log('\n── Static program image coverage ──');

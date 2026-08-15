@@ -6,7 +6,11 @@ export default function ProgramsHeroVideo() {
   return (
     <UltraVideoPlayer
       src="/videos/programs-overview-video-with-narration.mp4"
-      poster="/images/pages/training-cohort.webp"
+      autoPlay
+      autoPlayOnMount
+      muted
+      loop
+      showControls={false}
       className="absolute inset-0 w-full h-full object-cover"
     />
   );

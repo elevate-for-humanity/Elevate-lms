@@ -10,6 +10,7 @@ export type StrictInsuranceDecision = {
 
 const MIN_TEXT_FOR_VALIDATION = 100;
 const MIN_TEXT_FOR_ANY_ANALYSIS = 50;
+const MIN_OCR_CONFIDENCE = 40;
 
 export async function scanApproveStrict(args: {
   pdfBuffer: Buffer;
@@ -100,6 +101,7 @@ export async function scanApproveStrict(args: {
     minGlPerOccurrence: args.minGlPerOccurrence,
     minGlAggregate: args.minGlAggregate,
     minProLiabilityPerClaim: args.minProLiabilityPerClaim,
+    minOcrConfidence: MIN_OCR_CONFIDENCE,
     ocrConfidence,
     workerRelationship: args.workerRelationship,
   });

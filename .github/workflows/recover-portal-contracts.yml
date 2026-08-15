@@ -1,0 +1,124 @@
+name: Recover Portal Contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/recover-portal-contracts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: recover-portal-contracts
+  cancel-in-progress: true
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Recover verified pre-split implementations
+        shell: bash
+        run: |
+          set -euo pipefail
+          HIST=f86a76f86a22236707cf31cfc2b1707705f69569
+          git fetch origin "$HIST" --depth=1 || true
+          python - <<'PY'
+          import os, subprocess, pathlib
+          hist='f86a76f86a22236707cf31cfc2b1707705f69569'
+          mappings = {
+            # LMS learner/account/billing/support
+            'apps/lms/app/api/applications/route.ts':'app-legacy/api/applications/route.ts',
+            'apps/lms/app/api/enroll/payment/route.ts':'app-legacy/api/enroll/payment/route.ts',
+            'apps/lms/app/api/billing/portal/route.ts':'app-legacy/api/billing/portal/route.ts',
+            'apps/lms/app/api/account/export/route.ts':'app-legacy/api/account/export/route.ts',
+            'apps/lms/app/api/account/delete/route.ts':'app-legacy/api/account/delete/route.ts',
+            'apps/lms/app/api/support/route.ts':'app-legacy/api/support/route.ts',
+            # LMS employer/apprenticeship/host shop
+            'apps/lms/app/api/employer/hiring-trends/route.ts':'app-legacy/api/employer/hiring-trends/route.ts',
+            'apps/lms/app/api/employer/retention-stats/route.ts':'app-legacy/api/employer/retention-stats/route.ts',
+            'apps/lms/app/api/employer/hours/route.ts':'app-legacy/api/employer/hours/route.ts',
+            'apps/lms/app/api/apprenticeship/hours/approve/route.ts':'app-legacy/api/apprenticeship/hours/approve/route.ts',
+            'apps/lms/app/api/employer/reports/submit/route.ts':'app-legacy/api/employer/reports/submit/route.ts',
+            'apps/lms/app/api/partner/onboarding-status/route.ts':'app-legacy/api/partner/onboarding-status/route.ts',
+            'apps/lms/app/api/partner/apprentices/route.ts':'app-legacy/api/partner/apprentices/route.ts',
+            'apps/lms/app/api/partner/progress/route.ts':'app-legacy/api/partner/progress/route.ts',
+            'apps/lms/app/api/partner/settings/route.ts':'app-legacy/api/partner/settings/route.ts',
+            # LMS pages
+            'apps/lms/app/lms/courses/[course]/enroll/page.tsx':'app-legacy/lms/courses/[course]/enroll/page.tsx',
+            'apps/lms/app/workforce/compliance/page.tsx':'app-legacy/workforce/compliance/page.tsx',
+            'apps/lms/app/workforce/outcomes/page.tsx':'app-legacy/workforce/outcomes/page.tsx',
+            'apps/lms/app/workforce/reports/page.tsx':'app-legacy/workforce/reports/page.tsx',
+            'apps/lms/app/workforce/cases/page.tsx':'app-legacy/workforce/cases/page.tsx',
+            # Admin instructor/staff/workflows
+            'apps/admin/app/api/instructor/engagement-stats/route.ts':'app-legacy/api/instructor/engagement-stats/route.ts',
+            'apps/admin/app/api/instructor/course-performance/route.ts':'app-legacy/api/instructor/course-performance/route.ts',
+            'apps/admin/app/api/crm/templates/route.ts':'app-legacy/api/crm/templates/route.ts',
+            'apps/admin/app/api/instructor/my-students/route.ts':'app-legacy/api/instructor/my-students/route.ts',
+            'apps/admin/app/api/instructor/campaigns/send/route.ts':'app-legacy/api/instructor/campaigns/send/route.ts',
+            'apps/admin/app/api/courses/[courseId]/announcements/route.ts':'app-legacy/api/courses/[courseId]/announcements/route.ts',
+            'apps/admin/app/api/grade/upsert/route.ts':'app-legacy/api/grade/upsert/route.ts',
+            'apps/admin/app/api/lms/submissions/review/route.ts':'app-legacy/api/lms/submissions/review/route.ts',
+            'apps/admin/app/api/crm/send-campaign/route.ts':'app-legacy/api/crm/send-campaign/route.ts',
+            'apps/admin/app/api/staff/settings/route.ts':'app-legacy/api/staff/settings/route.ts',
+            'apps/admin/app/api/documents/upload/route.ts':'app-legacy/api/documents/upload/route.ts',
+            'apps/admin/app/api/programs/route.ts':'app-legacy/api/programs/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/route.ts':'app-legacy/api/admin/workflows/[id]/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/steps/route.ts':'app-legacy/api/admin/workflows/[id]/steps/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/steps/[stepId]/route.ts':'app-legacy/api/admin/workflows/[id]/steps/[stepId]/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/triggers/route.ts':'app-legacy/api/admin/workflows/[id]/triggers/route.ts',
+            'apps/admin/app/api/admin/workflows/[id]/triggers/[triggerId]/route.ts':'app-legacy/api/admin/workflows/[id]/triggers/[triggerId]/route.ts',
+          }
+          copied=[]; missing=[]; skipped=[]
+          for dest, src in mappings.items():
+            if pathlib.Path(dest).exists():
+              skipped.append((dest,'already exists'))
+              continue
+            p=subprocess.run(['git','show',f'{hist}:{src}'],capture_output=True)
+            if p.returncode:
+              missing.append((dest,src))
+              continue
+            path=pathlib.Path(dest); path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(p.stdout)
+            copied.append((dest,src))
+          # Canonical apprentice portal root is /apprentice; remove stale dashboard aliases in active page.
+          apprentice=pathlib.Path('apps/lms/app/apprentice/match-requests/page.tsx')
+          if apprentice.exists():
+            text=apprentice.read_text()
+            text=text.replace('href="/apprentice/dashboard"','href="/apprentice"')
+            text=text.replace("href='/apprentice/dashboard'","href='/apprentice'")
+            apprentice.write_text(text)
+          print(f'copied={len(copied)} skipped={len(skipped)} historical_missing={len(missing)}')
+          for d,s in copied: print('COPIED',s,'->',d)
+          for d,s in missing: print('NO_HISTORICAL_SOURCE',s,'for',d)
+          pathlib.Path('/tmp/portal-missing.txt').write_text('\n'.join(f'{s} -> {d}' for d,s in missing))
+          PY
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Validate recovered portal contracts
+        run: |
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false
+          echo '--- historical sources not found ---'
+          cat /tmp/portal-missing.txt || true
+          echo '--- portal audit ---'
+          node scripts/audit-portal-functions.mjs || true
+      - name: Publish recovery branch
+        run: |
+          if git diff --quiet; then
+            echo 'No portal recovery changes generated.'
+            exit 0
+          fi
+          git config user.name 'elevate-ci'
+          git config user.email 'actions@users.noreply.github.com'
+          git checkout -B fix/portal-contract-recovery
+          git add apps/lms apps/admin
+          git commit -m 'fix(portals): restore deployed portal function contracts'
+          git push --force-with-lease origin HEAD:fix/portal-contract-recovery

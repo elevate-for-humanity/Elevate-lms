@@ -84,9 +84,11 @@ export async function autoGenerateCourseForProgram(args: {
   }
 
   let standardsBlock: string | undefined;
-  if (blueprint.socCode) {
+  const socCode = typeof blueprint.socCode === 'string' ? blueprint.socCode : undefined;
+  const credentialCode = typeof blueprint.credentialCode === 'string' ? blueprint.credentialCode : undefined;
+  if (socCode) {
     try {
-      const standards = await loadIndustryStandards(blueprint.socCode, blueprint.credentialCode);
+      const standards = await loadIndustryStandards(socCode, credentialCode);
       if (standards) {
         standardsBlock = buildIndustryStandardsBlock(standards);
       }
@@ -124,7 +126,7 @@ export async function autoGenerateCourseForProgram(args: {
           objective: generated.objective,
           content: generated.content,
           quizQuestions: generated.quiz_questions.map((question, idx) => ({
-            id: question.id ?? `q-${idx}`,
+            id: `q-${idx}`,
             question: question.question,
             options: question.options,
             correctAnswer: question.correct,

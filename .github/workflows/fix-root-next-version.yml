@@ -24,8 +24,6 @@ jobs:
           ref: main
           fetch-depth: 0
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10.24.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -49,7 +47,7 @@ jobs:
       - name: Verify single Next.js production version
         run: |
           node scripts/verify-next-version-parity.cjs
-          grep -n "next:" package.json | head
+          grep -n '"next"' package.json | head
       - name: Commit package and lockfile
         run: |
           if git diff --quiet -- package.json pnpm-lock.yaml; then

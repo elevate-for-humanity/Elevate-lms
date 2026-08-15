@@ -186,6 +186,13 @@ export function UltraVideoPlayer({
   // Resolve video URL
   const resolvedSrc = resolveVideoSrc(src);
   const hasVideo = Boolean(resolvedSrc);
+  // Full-bleed non-lesson players are marketing/program heroes, not course players.
+  // Hero media is video-only: no poster, controls, gradient wash, loading mask, or play overlay.
+  const heroMode = !lessonId && (className.includes('absolute') || className.includes('fixed'));
+  const effectiveShowControls = showControls && !heroMode;
+  const effectivePoster = heroMode ? undefined : poster;
+  const effectiveLoop = heroMode || loop;
+  const effectiveMuted = heroMode || isMuted;
 
   // Initialize video
   useEffect(() => {
@@ -203,10 +210,11 @@ export function UltraVideoPlayer({
     }
 
     // Auto-play on mount (for hero/ambient videos)
-    if (autoPlayOnMount) {
+    if (autoPlayOnMount || heroMode) {
+      video.muted = true;
       video.play().catch(() => {});
     }
-  }, [resolvedSrc, lessonId, enableResume, startTime, autoPlayOnMount]);
+  }, [resolvedSrc, lessonId, enableResume, startTime, autoPlayOnMount, heroMode]);
 
   // Progress tracking
   useEffect(() => {
@@ -246,7 +254,7 @@ export function UltraVideoPlayer({
 
   // Auto-hide controls
   useEffect(() => {
-    if (!controlsAutoHide || !showControls) return;
+    if (!controlsAutoHide || !effectiveShowControls) return;
 
     const hideControls = () => {
       if (isPlaying) {
@@ -278,7 +286,7 @@ export function UltraVideoPlayer({
         clearTimeout(controlsTimeoutRef.current);
       }
     };
-  }, [isPlaying, controlsAutoHide, showControls]);
+  }, [isPlaying, controlsAutoHide, effectiveShowControls]);
 
   // Handle fullscreen changes
   useEffect(() => {
@@ -472,18 +480,18 @@ export function UltraVideoPlayer({
   return (
     <div
       ref={containerRef}
-      className={`${className?.includes('absolute') || className?.includes('fixed') ? '' : 'relative group'} bg-black rounded-xl overflow-hidden ${ASPECT_RATIOS[aspectRatio]} ${className}`}
+      className={`${className?.includes('absolute') || className?.includes('fixed') ? '' : 'relative group'} bg-black overflow-hidden ${heroMode ? '' : `rounded-xl ${ASPECT_RATIOS[aspectRatio]}`} ${className}`}
     >
       {/* Video Element */}
       <video
         ref={videoRef}
         src={resolvedSrc}
-        poster={poster}
-        autoPlay={autoPlay}
-        muted={isMuted}
-        loop={loop}
+        poster={effectivePoster}
+        autoPlay={heroMode || autoPlay}
+        muted={effectiveMuted}
+        loop={effectiveLoop}
         playsInline
-        className="w-full h-full object-contain"
+        className={`w-full h-full ${heroMode ? 'object-cover' : 'object-contain'}`}
         onClick={togglePlay}
         onLoadedMetadata={(e) => {
           setDuration((e.target as HTMLVideoElement).duration);
@@ -512,14 +520,14 @@ export function UltraVideoPlayer({
       />
 
       {/* Loading Overlay */}
-      {isLoading && (
+      {isLoading && !heroMode && (
         <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
           <Loader2 className="w-12 h-12 text-white animate-spin" />
         </div>
       )}
 
       {/* Error Overlay */}
-      {hasError && (
+      {hasError && !heroMode && (
         <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400">
           <X className="w-16 h-16 mb-4" />
           <p className="text-lg font-medium">Video unavailable</p>
@@ -535,7 +543,7 @@ export function UltraVideoPlayer({
       )}
 
       {/* Click to play overlay */}
-      {!isPlaying && !isLoading && !hasError && (
+      {!heroMode && !isPlaying && !isLoading && !hasError && (
         <div
           className="absolute inset-0 flex items-center justify-center cursor-pointer"
           onClick={togglePlay}
@@ -547,7 +555,7 @@ export function UltraVideoPlayer({
       )}
 
       {/* Controls Overlay */}
-      {showControls && !isLoading && !hasError && (
+      {effectiveShowControls && !isLoading && !hasError && (
         <div
           className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 transition-opacity duration-300 ${
             showControlsOverlay || !isPlaying ? 'opacity-100' : 'opacity-0'

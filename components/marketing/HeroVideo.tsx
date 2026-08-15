@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Volume2 } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export interface HeroVideoCta {
   label: string;
@@ -20,9 +19,11 @@ export interface HeroDemoSlide {
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
+  /** Deprecated for hero rendering. Kept only for caller compatibility; posters are not rendered. */
   posterImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
+  /** Deprecated for hero rendering. Branding is kept out of the video frame. */
   showBrandBug?: boolean;
   belowHeroHeadline?: string;
   belowHeroSubheadline?: string;
@@ -33,6 +34,7 @@ export interface HeroVideoProps {
   className?: string;
   children?: React.ReactNode;
   mediaFit?: 'cover' | 'contain';
+  /** Demo slides are intentionally not rendered over canonical hero video. */
   demoSlides?: HeroDemoSlide[];
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
@@ -42,10 +44,10 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
-  posterImage,
+  posterImage: _posterImage,
   voiceoverSrc,
   microLabel,
-  showBrandBug = false,
+  showBrandBug: _showBrandBug = false,
   belowHeroHeadline,
   belowHeroSubheadline,
   ctas,
@@ -55,36 +57,20 @@ export default function HeroVideo({
   className = '',
   children,
   mediaFit = 'cover',
-  demoSlides = [],
-  demoStartSeconds = 6,
-  demoSlideSeconds = 4.5,
+  demoSlides: _demoSlides = [],
+  demoStartSeconds: _demoStartSeconds = 6,
+  demoSlideSeconds: _demoSlideSeconds = 4.5,
   heightClassName = 'h-[38vh] min-h-[260px] max-h-[520px]',
 }: HeroVideoProps) {
   const pathname = usePathname();
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const demoStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const demoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const posterHideFrameRef = useRef<number | null>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [posterHidden, setPosterHidden] = useState(false);
-  const [mediaActivated, setMediaActivated] = useState(false);
-  const [inView, setInView] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop || videoSrcMobile || '');
-  const [demoActive, setDemoActive] = useState(false);
-  const [demoSlideIndex, setDemoSlideIndex] = useState(0);
   const transcriptId = useId();
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
-
-  const clearDemoTimers = useCallback(() => {
-    if (demoStartTimerRef.current) clearTimeout(demoStartTimerRef.current);
-    if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-    demoStartTimerRef.current = null;
-    demoIntervalRef.current = null;
-  }, []);
 
   const chooseVideoSource = useCallback(() => {
     if (typeof window === 'undefined') return videoSrcDesktop || videoSrcMobile || '';
@@ -105,112 +91,28 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
-    setPosterHidden(false);
     setMuted(true);
-  }, [videoSrc]);
-
-  const pauseMedia = useCallback(() => {
-    videoRef.current?.pause();
-    audioRef.current?.pause();
-  }, []);
-
-  const stopAllMedia = useCallback(() => {
-    pauseMedia();
-    clearDemoTimers();
-    if (audioRef.current) audioRef.current.currentTime = 0;
-    if (videoRef.current) {
-      videoRef.current.muted = true;
-      try {
-        videoRef.current.currentTime = 0;
-      } catch {
-        // Media metadata may not be available during route teardown.
-      }
-    }
-    setMuted(true);
-  }, [clearDemoTimers, pauseMedia]);
-
-  const startDemoSequence = useCallback(() => {
-    if (!demoSlides.length || demoStartTimerRef.current || demoActive) return;
-    demoStartTimerRef.current = setTimeout(() => {
-      setDemoActive(true);
-      setDemoSlideIndex(0);
-      demoStartTimerRef.current = null;
-      if (demoSlides.length > 1) {
-        demoIntervalRef.current = setInterval(() => {
-          setDemoSlideIndex((current) => {
-            if (current >= demoSlides.length - 1) {
-              if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-              demoIntervalRef.current = null;
-              return current;
-            }
-            return current + 1;
-          });
-        }, Math.max(2000, demoSlideSeconds * 1000));
-      }
-    }, Math.max(0, demoStartSeconds * 1000));
-  }, [demoActive, demoSlideSeconds, demoSlides.length, demoStartSeconds]);
-
-  const revealVideoAfterPaint = useCallback(() => {
-    if (posterHideFrameRef.current) cancelAnimationFrame(posterHideFrameRef.current);
-    posterHideFrameRef.current = requestAnimationFrame(() => {
-      posterHideFrameRef.current = requestAnimationFrame(() => setPosterHidden(true));
-    });
-  }, []);
-
-  const startOrResume = useCallback(async () => {
     const video = videoRef.current;
-    if (!video || videoFailed || !mediaActivated || !inView) return;
-
-    startDemoSequence();
-    video.loop = false;
-
-    try {
-      video.muted = true;
-      await video.play();
-      setMuted(true);
-    } catch {
-      // Keep the stable poster visible until playback is user/browser allowed.
-    }
-  }, [inView, mediaActivated, startDemoSequence, videoFailed]);
-
-  useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper || (!videoSrc && !voiceoverSrc) || videoFailed) return undefined;
-
-    if (typeof IntersectionObserver === 'undefined') {
-      setMediaActivated(true);
-      setInView(true);
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const visible = entry.isIntersecting && entry.intersectionRatio >= 0.15;
-        setInView(visible);
-        if (entry.isIntersecting) setMediaActivated(true);
-        if (!visible) pauseMedia();
-      },
-      { threshold: [0, 0.15, 0.35, 0.75], rootMargin: '220px 0px 220px 0px' },
-    );
-
-    observer.observe(wrapper);
-    return () => observer.disconnect();
-  }, [pauseMedia, videoFailed, videoSrc, voiceoverSrc]);
-
-  useEffect(() => {
-    if (mediaActivated && inView && !videoFailed) void startOrResume();
-  }, [inView, mediaActivated, startOrResume, videoFailed, videoSrc]);
+    if (!video || !videoSrc) return;
+    video.muted = true;
+    video.loop = true;
+    void video.play().catch(() => {
+      // Browser autoplay policy may defer playback until interaction.
+      // The frame remains clean and posterless rather than showing stale artwork.
+    });
+  }, [videoSrc]);
 
   useEffect(() => {
     return () => {
-      if (posterHideFrameRef.current) cancelAnimationFrame(posterHideFrameRef.current);
-      stopAllMedia();
+      videoRef.current?.pause();
+      audioRef.current?.pause();
     };
-  }, [stopAllMedia]);
+  }, []);
 
   useEffect(() => {
-    stopAllMedia();
-  }, [pathname, stopAllMedia]);
+    videoRef.current?.pause();
+    audioRef.current?.pause();
+  }, [pathname]);
 
   async function toggleSound() {
     const video = videoRef.current;
@@ -228,7 +130,10 @@ export default function HeroVideo({
         if (video) {
           video.muted = true;
           if (video.paused) await video.play();
-          audio.currentTime = Math.min(video.currentTime || 0, Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : video.currentTime || 0);
+          const targetTime = video.currentTime || 0;
+          audio.currentTime = Number.isFinite(audio.duration) && audio.duration > 0
+            ? Math.min(targetTime, audio.duration)
+            : targetTime;
         }
         await audio.play();
       } else if (video) {
@@ -244,108 +149,68 @@ export default function HeroVideo({
   }
 
   const showVideo = Boolean(videoSrc) && !videoFailed;
-  const hasSoundControl = mediaActivated && Boolean(voiceoverSrc || showVideo);
-  const activeSlide = demoActive ? demoSlides[demoSlideIndex] : null;
 
   return (
-    <div ref={wrapperRef} className={`w-full ${className}`}>
+    <div className={`w-full ${className}`}>
       <section
-        className={`relative w-full overflow-hidden bg-slate-900 ${heightClassName}`}
+        className={`relative w-full overflow-hidden bg-black ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero media` : 'Hero media'}
       >
         {showVideo ? (
           <video
             ref={videoRef}
-            src={mediaActivated ? videoSrc : undefined}
-            preload={mediaActivated ? 'auto' : 'metadata'}
+            src={videoSrc}
+            preload="auto"
+            autoPlay
             playsInline
             muted
-            loop={false}
-            onLoadedData={() => {
-              // Loaded data is not enough to hide the poster. Wait for playing.
+            loop
+            onCanPlay={() => {
+              const video = videoRef.current;
+              if (video?.paused) void video.play().catch(() => {});
             }}
-            onPlaying={revealVideoAfterPaint}
             onError={() => {
               setVideoFailed(true);
-              setPosterHidden(false);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 h-full w-full ${mediaClass} object-center`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           />
         ) : null}
 
-        {posterImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={posterImage}
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            fetchPriority="high"
-            className={`pointer-events-none absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-200 ${posterHidden && showVideo ? 'opacity-0' : 'opacity-100'}`}
-          />
-        ) : null}
-
-        {activeSlide ? (
-          <div className="absolute inset-0 z-[11] bg-slate-950" aria-live="polite">
-            {demoSlides.map((slide, index) => (
-              <div
-                key={`${slide.src}-${index}`}
-                className={`absolute inset-0 transition-opacity duration-500 ${index === demoSlideIndex ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-                aria-hidden={index !== demoSlideIndex}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={slide.src} alt={slide.alt} className="h-full w-full object-contain" />
-                {slide.label ? (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-slate-950/90 px-4 py-2 text-xs font-bold text-white shadow-lg sm:text-sm">
-                    {slide.label}
-                  </div>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        ) : null}
-
         {voiceoverSrc ? (
-          <audio ref={audioRef} src={mediaActivated ? voiceoverSrc : undefined} preload="metadata" aria-hidden="true" className="hidden" onEnded={() => setMuted(true)} />
-        ) : null}
-
-        {showBrandBug ? (
-          <div className="absolute left-4 top-4 z-20">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/Elevate_for_Humanity_logo_81bf0fab.jpg" alt={PLATFORM_DEFAULTS.orgName} className="h-7 w-auto opacity-90" />
-          </div>
-        ) : null}
-
-        {microLabel ? (
-          <div className="absolute bottom-4 left-4 z-20">
-            <span className="rounded bg-slate-950/90 px-2 py-1 text-xs font-semibold uppercase tracking-widest text-white">{microLabel}</span>
-          </div>
-        ) : null}
-
-        {hasSoundControl ? (
-          <div className="absolute bottom-4 right-4 z-20">
-            <button
-              type="button"
-              onClick={() => void toggleSound()}
-              aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
-              className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full bg-white/95 px-3 py-2 text-xs font-bold text-slate-950 shadow-sm ring-1 ring-slate-200 transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-600"
-            >
-              <Volume2 className="h-4 w-4" />
-              <span className="hidden sm:inline">{muted ? 'Play audio' : 'Audio playing'}</span>
-            </button>
-          </div>
+          <audio
+            ref={audioRef}
+            src={voiceoverSrc}
+            preload="metadata"
+            aria-hidden="true"
+            className="hidden"
+            onEnded={() => setMuted(true)}
+          />
         ) : null}
       </section>
 
-      {belowHeroHeadline || belowHeroSubheadline || ctas?.length || trustIndicators?.length || children ? (
+      {microLabel || belowHeroHeadline || belowHeroSubheadline || ctas?.length || trustIndicators?.length || children || voiceoverSrc || showVideo ? (
         <section className="border-b border-slate-100 bg-white py-8 sm:py-14">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            {microLabel ? (
+              <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.16em] text-brand-red-700">
+                {microLabel}
+              </p>
+            ) : null}
+
             {children ? children : (
               <>
-                {belowHeroHeadline ? <h1 className="mb-3 text-2xl font-extrabold leading-tight text-slate-950 sm:mb-4 sm:text-4xl lg:text-5xl">{belowHeroHeadline}</h1> : null}
-                {belowHeroSubheadline ? <p className="mb-6 max-w-2xl text-base font-medium leading-relaxed text-slate-800 sm:mb-8 sm:text-lg">{belowHeroSubheadline}</p> : null}
+                {belowHeroHeadline ? (
+                  <h1 className="mb-3 text-2xl font-extrabold leading-tight text-slate-950 sm:mb-4 sm:text-4xl lg:text-5xl">
+                    {belowHeroHeadline}
+                  </h1>
+                ) : null}
+                {belowHeroSubheadline ? (
+                  <p className="mb-6 max-w-2xl text-base font-medium leading-relaxed text-slate-800 sm:mb-8 sm:text-lg">
+                    {belowHeroSubheadline}
+                  </p>
+                ) : null}
                 {ctas?.length ? (
                   <div className="mb-6 flex flex-col gap-3 sm:flex-row">
                     {ctas.map((cta) => (
@@ -373,6 +238,18 @@ export default function HeroVideo({
                 ) : null}
               </>
             )}
+
+            {(voiceoverSrc || showVideo) ? (
+              <button
+                type="button"
+                onClick={() => void toggleSound()}
+                aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
+                className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-950 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-red-600"
+              >
+                <Volume2 className="h-4 w-4" />
+                <span>{muted ? 'Play audio' : 'Audio playing'}</span>
+              </button>
+            ) : null}
           </div>
         </section>
       ) : null}
@@ -390,7 +267,11 @@ export default function HeroVideo({
               <span>{transcriptOpen ? '▲' : '▼'}</span>
               Video transcript
             </button>
-            {transcriptOpen ? <p id={transcriptId} className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800">{transcript}</p> : null}
+            {transcriptOpen ? (
+              <p id={transcriptId} className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800">
+                {transcript}
+              </p>
+            ) : null}
           </div>
         </div>
       ) : null}

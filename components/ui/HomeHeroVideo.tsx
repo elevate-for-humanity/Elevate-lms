@@ -31,13 +31,10 @@ function withMediaRevision(src?: string) {
 }
 
 /**
- * Homepage compatibility wrapper.
- * Media playback, mobile source selection, error fallback, narration controls,
- * and route cleanup all live in components/marketing/HeroVideo.
- *
- * Homepage media URLs are revisioned with the deployed commit SHA so browsers,
- * service workers, and intermediary caches cannot pin a new deployment to an
- * older poster/video/image response.
+ * Homepage video wrapper.
+ * Video and narration URLs are revisioned with the deployed commit SHA so
+ * browsers, service workers, and intermediary caches cannot pin stale media.
+ * Poster artwork is deliberately not supplied to the canonical video hero.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const ctas = banner.secondaryCta
@@ -48,7 +45,6 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     <HeroVideo
       videoSrcDesktop={withMediaRevision(banner.videoSrcDesktop)}
       videoSrcMobile={withMediaRevision(banner.videoSrcMobile)}
-      posterImage={withMediaRevision(banner.posterImage)}
       voiceoverSrc={withMediaRevision(banner.voiceoverSrc)}
       microLabel={banner.microLabel}
       belowHeroHeadline={banner.belowHeroHeadline}

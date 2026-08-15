@@ -5,13 +5,11 @@ import { z } from 'zod';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-// GET /api/admin/programs/[programId]/credentials
-// Returns all credential_registry rows linked to this program via program_credentials.
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { programId } = await params;
   const auth = await apiRequireAdmin(req);
@@ -47,8 +45,6 @@ const LinkSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-// POST /api/admin/programs/[programId]/credentials
-// Links a credential to this program.
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string }> },
@@ -64,7 +60,6 @@ export async function POST(
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 });
   }
 
-  // Prevent duplicates
   const { data: existing } = await db
     .from('program_credentials')
     .select('id')

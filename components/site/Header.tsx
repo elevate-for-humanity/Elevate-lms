@@ -19,7 +19,7 @@ export default function Header() {
       data-site-header
       data-header-owner="marketing-root"
     >
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 min-[900px]:gap-1 min-[900px]:px-2 xl:gap-3 xl:px-4 2xl:px-6">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 xl:gap-3 xl:px-4 2xl:px-6">
         <Link
           href="/"
           className="flex min-w-0 flex-shrink-0 items-center gap-2"
@@ -31,12 +31,15 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="hidden min-w-0 justify-center overflow-visible min-[900px]:flex">
+        {/* Keep compact laptop/tablet widths on the drawer navigation. The
+            complete desktop nav only renders when there is enough horizontal
+            space for every primary destination plus account actions. */}
+        <div className="hidden min-w-0 justify-center overflow-visible xl:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          <div className="hidden flex-nowrap items-center gap-1 min-[900px]:flex">
+          <div className="hidden flex-nowrap items-center gap-1 xl:flex">
             <HeaderQuickMenu items={NAV_ITEMS} />
             <Link
               href={ROUTES.login}
@@ -52,7 +55,9 @@ export default function Header() {
             </Link>
           </div>
 
-          <div className="flex flex-nowrap items-center gap-1 min-[900px]:hidden">
+          {/* Phones, tablets, and compact laptops use the dedicated drawer so
+              Programs and every other navigation group remain reachable. */}
+          <div className="flex flex-nowrap items-center gap-1 xl:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu
             </span>

@@ -1,5 +1,5 @@
 /**
- * Admin Route Guards - ECS/AWS Context
+ * Admin Route Guards
  * Controls access to dev/test tools and sensitive admin features.
  */
 
@@ -64,13 +64,35 @@ export const SENSITIVE_ROUTES = [
 
 export type { UserRole } from '@/lib/rbac/role-matrix';
 
+type GuardIdentity = { id: string; email: string | null };
+
 export type GuardedUser = {
   id: string;
+  userId: string;
+  user: GuardIdentity | null;
   email: string | null;
   role: UserRole | null;
   effectiveRoles: string[];
   error?: NextResponse;
 };
+
+function guardedIdentity(
+  id: string,
+  email: string | null,
+  role: UserRole | null,
+  effectiveRoles: string[],
+  error?: NextResponse,
+): GuardedUser {
+  return {
+    id,
+    userId: id,
+    user: id ? { id, email } : null,
+    email,
+    role,
+    effectiveRoles,
+    ...(error ? { error } : {}),
+  };
+}
 
 /** Resolve the authenticated API caller using both the primary profile role and active secondary roles. */
 export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
@@ -82,7 +104,7 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return { id: '', email: null, role: null, effectiveRoles: [], error: unauthorized() };
+      return guardedIdentity('', null, null, [], unauthorized());
     }
 
     const [profileResult, roleResult] = await Promise.all([
@@ -91,13 +113,13 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
     ]);
 
     if (profileResult.error) {
-      return {
-        id: user.id,
-        email: user.email ?? null,
-        role: null,
-        effectiveRoles: [],
-        error: serverError('PROFILE_LOOKUP_FAILED'),
-      };
+      return guardedIdentity(
+        user.id,
+        user.email ?? null,
+        null,
+        [],
+        serverError('PROFILE_LOOKUP_FAILED'),
+      );
     }
 
     const secondaryRoles = (roleResult.data ?? [])
@@ -106,14 +128,9 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
     const role = (profileResult.data?.role as UserRole) ?? null;
     const effectiveRoles = normalizeRoles([role, ...secondaryRoles]);
 
-    return {
-      id: user.id,
-      email: user.email ?? null,
-      role,
-      effectiveRoles,
-    };
+    return guardedIdentity(user.id, user.email ?? null, role, effectiveRoles);
   } catch {
-    return { id: '', email: null, role: null, effectiveRoles: [], error: unauthorized() };
+    return guardedIdentity('', null, null, [], unauthorized());
   }
 }
 
@@ -140,4 +157,8 @@ export async function apiRequireInstructor(request?: Request): Promise<GuardedUs
 
 export async function apiRequireTestingCenter(request?: Request): Promise<GuardedUser> {
   return apiRequireRoles(request, TESTING_CENTER_ROLES);
+}
+
+export async function apiRequirePlatformStaff(request?: Request): Promise<GuardedUser> {
+  return apiRequireRoles(request, API_ADMIN_ROLES);
 }

@@ -52,14 +52,8 @@ const nextConfig = {
         permanent: true,
       },
 
-      // Compatibility only: retired /admin URLs never render on Marketing.
-      // They are sent to the one canonical Admin service.
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org', permanent: false },
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: false },
-
-      // Public marketing aliases only. Private portal/admin/LMS routes are
-      // intentionally not redirected from the public origin; retired private
-      // paths must remain inaccessible here and resolve as not found.
+      // Public marketing aliases only. Private portal/Admin/LMS aliases are
+      // intentionally absent so retired internal paths remain inaccessible.
       { source: '/wioa-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },

@@ -22,27 +22,19 @@ if (fs.existsSync(retiredTree)) {
   violations.push('apps/admin/app/admin exists; retired parallel Admin UI tree must not exist');
 }
 
-const adminConfig = read('apps/admin/next.config.mjs');
-if (!adminConfig.includes("source: '/admin'")) {
-  violations.push('Admin edge is missing the /admin compatibility redirect');
-}
-if (!adminConfig.includes("source: '/admin/:path*'")) {
-  violations.push('Admin edge is missing the /admin/:path* compatibility redirect');
-}
-if (!adminConfig.includes("destination: '/:path*'")) {
-  violations.push('Admin edge must strip the retired /admin prefix');
-}
-
-for (const configPath of ['apps/lms/next.config.mjs', 'apps/marketing/next.config.js']) {
+// Retired private /admin aliases must not be preserved as compatibility
+// redirects on any deployed service. Callers must use the canonical Admin host
+// and root route directly.
+for (const configPath of [
+  'apps/admin/next.config.mjs',
+  'apps/lms/next.config.mjs',
+  'apps/marketing/next.config.js',
+]) {
   const config = read(configPath);
-  if (!config.includes("source: '/admin'")) {
-    violations.push(`${configPath} is missing the /admin cross-service redirect`);
-  }
-  if (!config.includes("source: '/admin/:path*'")) {
-    violations.push(`${configPath} is missing the /admin/:path* cross-service redirect`);
-  }
-  if (!config.includes("https://admin.elevateforhumanity.org/:path*")) {
-    violations.push(`${configPath} must send retired Admin paths to the canonical Admin hostname`);
+  for (const forbidden of ["source: '/admin'", "source: '/admin/:path*'"]) {
+    if (config.includes(forbidden)) {
+      violations.push(`${configPath} contains retired private alias ${forbidden}`);
+    }
   }
 }
 
@@ -66,4 +58,4 @@ if (violations.length) {
   process.exit(1);
 }
 
-console.log('Admin UI namespace guard passed: retired /admin paths cannot resolve as canonical UI routes.');
+console.log('Admin UI namespace guard passed: retired /admin routes and compatibility aliases are absent.');

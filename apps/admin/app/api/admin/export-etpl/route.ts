@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
@@ -12,7 +13,6 @@ async function _GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    // Verify admin access
     const supabase = await createClient();
     const {
       data: { user },
@@ -24,11 +24,6 @@ async function _GET(req: Request) {
 
     const adminClient = await requireAdminClient();
 
-    if (!adminClient) {
-      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
-    }
-
-    // Check if user is admin
     const { data: profile } = await adminClient
       .from('profiles')
       .select('role')
@@ -39,13 +34,11 @@ async function _GET(req: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get query parameters
     const url = new URL(req.url);
     const format = url.searchParams.get('format') || 'json';
     const startDate = url.searchParams.get('start_date');
     const endDate = url.searchParams.get('end_date');
 
-    // Build query
     let query = adminClient
       .from('applications')
       .select(
@@ -84,12 +77,8 @@ async function _GET(req: Request) {
       )
       .order('created_at', { ascending: false });
 
-    if (startDate) {
-      query = query.gte('created_at', startDate);
-    }
-    if (endDate) {
-      query = query.lte('created_at', endDate);
-    }
+    if (startDate) query = query.gte('created_at', startDate);
+    if (endDate) query = query.lte('created_at', endDate);
 
     const { data, error } = await query;
 
@@ -97,8 +86,7 @@ async function _GET(req: Request) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
-    // Format data for ETPL compliance
-    const exportData = data.map((item: any) => ({
+    const exportData = (data ?? []).map((item: any) => ({
       student_id: item.id,
       first_name: item.first_name,
       last_name: item.last_name,
@@ -126,7 +114,6 @@ async function _GET(req: Request) {
     }));
 
     if (format === 'csv') {
-      // Convert to CSV
       const headers = Object.keys(exportData[0] || {});
       const csvRows = [
         headers.join(','),
@@ -144,13 +131,12 @@ async function _GET(req: Request) {
       });
     }
 
-    // Return JSON by default
     return NextResponse.json({
       export_date: new Date().toISOString(),
       record_count: exportData.length,
       data: exportData,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

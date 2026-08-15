@@ -54,7 +54,10 @@ export async function POST(request: NextRequest) {
       provisionedByUserId: auth.id,
     });
 
-    if (!result.ok) return safeError(result.error, 400);
+    if (!result.ok) {
+      const message = 'error' in result ? result.error : 'Workspace provisioning failed';
+      return safeError(message, 400);
+    }
     return NextResponse.json(result, { status: 201 });
   } catch (err) {
     return safeInternalError(err, 'Failed to provision workspace');

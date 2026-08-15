@@ -41,7 +41,6 @@ async function _GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = (page - 1) * limit;
 
-    // Use admin client — profiles RLS blocks user-scoped queries for other users
     const db = await requireAdminClient();
 
     let query = db
@@ -65,7 +64,6 @@ async function _GET(request: Request) {
 
     let filteredStudents = students || [];
 
-    // profiles has no PostgREST FK to enrollments — filter via training_enrollments separately
     if (status || programId) {
       const studentIds = filteredStudents.map((s) => s.id);
       if (studentIds.length > 0) {
@@ -127,15 +125,14 @@ async function _POST(request: Request) {
       return NextResponse.json({ error: 'Failed to create student' }, { status: 500 });
     }
 
-    // Log audit — fire and forget
-    db.from('audit_logs').insert({
+    await db.from('audit_logs').insert({
       actor_id: auth.id,
       actor_role: auth.profile.role,
       action: 'create',
       resource_type: 'student',
       resource_id: student?.id,
       after_state: student,
-    }).catch(() => {});
+    });
 
     return NextResponse.json({ student }, { status: 201 });
   } catch (error: any) {

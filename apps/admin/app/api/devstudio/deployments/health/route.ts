@@ -12,6 +12,10 @@ interface CapabilityHealth {
 
 export const dynamic = 'force-dynamic';
 
+function statusCodeForHealth(status: CapabilityHealth['status']): number {
+  return status === 'unavailable' ? 503 : 200;
+}
+
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const auth = await apiRequireDevStudio(request);
   if (auth.error) return auth.error;
@@ -28,5 +32,5 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   checks.push({ name: 'GitHub Actions Secrets', passed: hasGithubSecrets, message: hasGithubSecrets ? 'GitHub secrets configured' : 'Secrets may be missing' });
 
   const response: CapabilityHealth = { capability: 'deployments', status, configured: hasGithub && hasNorthflank, checks, checkedAt: new Date().toISOString() };
-  return NextResponse.json(response, { status: status === 'unavailable' ? 503 : 200 });
+  return NextResponse.json(response, { status: statusCodeForHealth(response.status) });
 }

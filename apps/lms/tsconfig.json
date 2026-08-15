@@ -3,16 +3,16 @@
   "compilerOptions": {
     "paths": {
       "@/lib/stripe/handlers/checkout-session-completed": [
-        "./lib/stripe/handlers/checkout-session-completed-with-store.ts"
+        "../../lib/stripe/handlers/checkout-session-completed-with-store.ts"
       ],
       "@/*": [
-        "./*"
+        "../../*"
       ],
       "next": [
-        "./apps/lms/node_modules/next"
+        "./node_modules/next"
       ],
       "next/*": [
-        "./apps/lms/node_modules/next/*"
+        "./node_modules/next/*"
       ]
     },
     "plugins": [

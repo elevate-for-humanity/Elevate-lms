@@ -40,7 +40,7 @@ const adminConfig = {
 
   transpilePackages: ['edge-tts'],
 
-  webpack(config, { isServer, webpack }) {
+  webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
@@ -48,12 +48,6 @@ const adminConfig = {
     }
     config.parallelism = 1;
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
-    if (!isServer) {
-      config.plugins = config.plugins || [];
-      config.plugins.push(
-        new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'], buffer: 'buffer' }),
-      );
-    }
     return config;
   },
 
@@ -66,8 +60,6 @@ const adminConfig = {
   },
 
   async redirects() {
-    // Public cross-service convenience routes only. The retired /admin prefix is
-    // intentionally not preserved on the Admin hostname.
     return [
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },

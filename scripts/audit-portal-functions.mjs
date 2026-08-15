@@ -59,9 +59,12 @@ for (const [app, relRoot] of Object.entries(APPS)) {
 }
 
 function normalizeDynamicTarget(target) {
-  // Convert template-literal interpolation to a concrete placeholder so it can
-  // be matched against filesystem dynamic routes such as [id].
-  return target.replace(/\$\{[^}]+\}/g, '__dynamic__');
+  // Path-segment interpolation maps to a filesystem dynamic segment.
+  // Interpolation appended directly to a static path is commonly a query/suffix
+  // builder and should not fabricate an extra pathname segment.
+  return target
+    .replace(/\/\$\{[^}]+\}/g, '/__dynamic__')
+    .replace(/\$\{[^}]+\}/g, '');
 }
 
 function existsRoute(app, target, api = false) {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
+import HeaderQuickMenu from './HeaderQuickMenu';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -30,14 +31,13 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* One canonical desktop navigation row. Keep it available on compact
-            laptop viewports instead of falling back to the mobile drawer. */}
         <div className="hidden min-w-0 justify-center overflow-visible min-[900px]:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
           <div className="hidden flex-nowrap items-center gap-1 min-[900px]:flex">
+            <HeaderQuickMenu items={NAV_ITEMS} />
             <Link
               href={ROUTES.login}
               className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"
@@ -52,7 +52,6 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Phones and compact tablets below 900px use the dedicated drawer. */}
           <div className="flex flex-nowrap items-center gap-1 min-[900px]:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu

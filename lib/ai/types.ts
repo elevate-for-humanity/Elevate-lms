@@ -269,7 +269,7 @@ export interface ChatCompletionOptions {
   messages: ChatMessage[];
   temperature?: number;
   maxTokens?: number;
-  provider?: AIProviderName;
+  provider?: AIProviderName | string;
 }
 
 export interface ChatCompletionResult {

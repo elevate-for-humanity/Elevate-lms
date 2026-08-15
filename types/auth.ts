@@ -19,14 +19,19 @@ export interface RouteContext<TParams = Record<string, string>> {
 
 export interface AuthedContext<TParams = Record<string, string>> extends RouteContext<TParams> {
   user: AuthedUser;
+  /** Compatibility aliases for handlers migrated from the older flat context. */
+  id: string;
+  email: string | null;
+  role: UserRole | null;
+  effectiveRoles: UserRole[];
 }
 
 /**
  * Canonical authenticated route handler contract.
  *
- * `user` is available both on context.user and as a third argument. The third
- * argument preserves compatibility with older handlers while every invocation
- * still goes through the same Supabase/RBAC guard.
+ * `user` is available both on context.user and as a third argument. The flat
+ * identity aliases preserve compatibility with older handlers while every
+ * invocation still goes through the same Supabase/RBAC guard.
  */
 export type AuthHandler<TParams = Record<string, string>> = (
   req: NextRequest,

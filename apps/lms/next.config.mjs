@@ -31,10 +31,11 @@ const nextConfig = {
     };
   },
   async redirects() {
-    // Keep only public cross-service convenience routes here. Private portal
-    // aliases are intentionally not redirected: callers must use the canonical
-    // LMS/Admin route directly so retired internal surfaces stay retired.
+    // Retired /admin aliases are compatibility handoffs only. Canonical Admin UI
+    // lives on the Admin hostname; no duplicate Admin route tree exists in LMS.
     return [
+      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/', permanent: true },
+      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },
       { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: true },

@@ -8,6 +8,32 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
 
+async function _GET(req: NextRequest) {
+  const rateLimited = await applyRateLimit(req, 'api');
+  if (rateLimited) return rateLimited;
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
+  try {
+    const db = await requireAdminClient();
+    if (!db) return safeError('Database unavailable', 503);
+
+    const quizId = String(req.nextUrl.searchParams.get('quizId') || '').trim();
+    if (!quizId) return safeError('quizId is required', 400);
+
+    const { data, error } = await db
+      .from('quiz_questions')
+      .select('*')
+      .eq('quiz_id', quizId)
+      .order('order_index', { ascending: true });
+
+    if (error) return safeError('Failed to load quiz questions', 400);
+    return NextResponse.json({ data: data ?? [] });
+  } catch (err) {
+    return safeInternalError(err, 'Unexpected error');
+  }
+}
+
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
@@ -117,6 +143,7 @@ async function _DELETE(req: NextRequest) {
   }
 }
 
+export const GET = withApiAudit('/api/admin/courses/quiz-questions', _GET);
 export const POST = withApiAudit('/api/admin/courses/quiz-questions', _POST);
 export const PATCH = withApiAudit('/api/admin/courses/quiz-questions', _PATCH);
 export const DELETE = withApiAudit('/api/admin/courses/quiz-questions', _DELETE);

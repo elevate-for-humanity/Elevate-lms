@@ -1,0 +1,67 @@
+name: Audit Marketing Images
+
+on:
+  push:
+    branches: [fix/marketing-missing-images-20260815]
+    paths:
+      - '.github/workflows/audit-marketing-images.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Locate Get Started surfaces
+        shell: bash
+        run: |
+          echo '=== GET STARTED TEXT MATCHES ==='
+          rg -n -i --glob '!node_modules/**' --glob '!.next/**' --glob '!app-legacy/**' 'get started( now)?|start now|ready to get started' apps/marketing components content config lib || true
+
+      - name: Audit local image references
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, json
+
+          roots = [Path('apps/marketing/app'), Path('components'), Path('content'), Path('config'), Path('lib')]
+          exts = r'(?:png|jpe?g|webp|gif|svg|avif)'
+          # Literal root-relative image refs only; dynamic/remote refs need separate runtime validation.
+          pattern = re.compile(r'''["'`](\/[^"'`?]+\.(?:png|jpe?g|webp|gif|svg|avif))(?:\?[^"'`]*)?["'`]''', re.I)
+          public_roots = [Path('public'), Path('apps/marketing/public')]
+          findings = []
+          refs = []
+          for root in roots:
+              if not root.exists():
+                  continue
+              for p in root.rglob('*'):
+                  if not p.is_file() or p.suffix.lower() not in {'.ts','.tsx','.js','.jsx','.mjs','.json'}:
+                      continue
+                  try:
+                      text = p.read_text(errors='ignore')
+                  except Exception:
+                      continue
+                  for lineno, line in enumerate(text.splitlines(), 1):
+                      for m in pattern.finditer(line):
+                          ref = m.group(1)
+                          rel = ref.lstrip('/')
+                          candidates = [r / rel for r in public_roots]
+                          exists = any(c.exists() for c in candidates)
+                          refs.append((str(p), lineno, ref, exists))
+                          if not exists:
+                              findings.append({'file': str(p), 'line': lineno, 'ref': ref})
+          print(f'Total literal local image refs: {len(refs)}')
+          print(f'Missing local image refs: {len(findings)}')
+          for f in findings:
+              print(f"MISSING {f['file']}:{f['line']} -> {f['ref']}")
+          Path('/tmp/missing-images.json').write_text(json.dumps(findings, indent=2))
+          if findings:
+              raise SystemExit(2)
+          PY

@@ -14,12 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 220
       - name: Identify exact conflicts with main
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main
+          git fetch origin main:refs/remotes/origin/main --depth=220
           set +e
           git merge --no-commit --no-ff origin/main
           rc=$?

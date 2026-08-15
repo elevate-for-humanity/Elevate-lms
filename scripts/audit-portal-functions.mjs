@@ -59,9 +59,6 @@ for (const [app, relRoot] of Object.entries(APPS)) {
 }
 
 function normalizeDynamicTarget(target) {
-  // Path-segment interpolation maps to a filesystem dynamic segment.
-  // Interpolation appended directly to a static path is commonly a query/suffix
-  // builder and should not fabricate an extra pathname segment.
   return target
     .replace(/\/\$\{[^}]+\}/g, '/__dynamic__')
     .replace(/\$\{[^}]+\}/g, '');
@@ -71,6 +68,20 @@ function existsRoute(app, target, api = false) {
   const pathname = normalizeDynamicTarget(target.split(/[?#]/)[0] || '/');
   return (api ? apiIndex[app] : routeIndex[app]).some((entry) => pattern(entry.route).test(pathname));
 }
+
+function hasBalancedInterpolation(ref) {
+  let depth = 0;
+  for (let i = 0; i < ref.length; i++) {
+    if (ref[i] === '$' && ref[i + 1] === '{') {
+      depth++;
+      i++;
+    } else if (ref[i] === '}' && depth > 0) {
+      depth--;
+    }
+  }
+  return depth === 0;
+}
+
 function extract(source) {
   const refs = [];
   const regexes = [
@@ -78,7 +89,7 @@ function extract(source) {
     /(?:redirect|router\.(?:push|replace)|fetch)\(\s*["'`]([^"'`]+)["'`]/g,
   ];
   for (const re of regexes) { let m; while ((m = re.exec(source))) refs.push(m[1]); }
-  return refs.filter((ref) => ref.startsWith('/') && !ref.startsWith('//'));
+  return refs.filter((ref) => ref.startsWith('/') && !ref.startsWith('//') && hasBalancedInterpolation(ref));
 }
 
 console.log('\n── Portal child-route/function integrity ──');

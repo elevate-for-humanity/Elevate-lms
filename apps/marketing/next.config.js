@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
+import { verifiedImageRewrites } from '../../lib/media/verified-image-aliases.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 const require = createRequire(import.meta.url);
@@ -36,7 +37,7 @@ const nextConfig = {
 
   async rewrites() {
     return {
-      beforeFiles: legacyImageRewrites(),
+      beforeFiles: [...legacyImageRewrites(), ...verifiedImageRewrites()],
       afterFiles: [],
       fallback: [],
     };

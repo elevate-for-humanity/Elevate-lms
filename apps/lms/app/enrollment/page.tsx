@@ -50,7 +50,7 @@ export default function EnrollmentPage() {
       {/* Hero Banner */}
       <section className="relative w-full h-[40vh] min-h-[280px] max-h-[400px] overflow-hidden">
         <Image
-          src="/images/pages/programs-hero-vibrant.webp"
+          src="/images/hero/hero-main-welcome.webp"
           alt="Student enrollment at Elevate for Humanity"
           fill
           className="object-cover object-center"

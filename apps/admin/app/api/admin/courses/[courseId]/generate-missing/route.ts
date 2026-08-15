@@ -1,11 +1,6 @@
 /**
  * POST /api/admin/courses/[courseId]/generate-missing
- *
- * Generates missing lessons for a blueprint-backed course.
- * Writes to: courses → course_modules → course_lessons (canonical tables).
- * Does NOT write to curriculum_lessons or training_lessons.
- *
- * courseId must be a courses.id (canonical table), not training_courses.id.
+ * Generates missing lessons for a blueprint-backed canonical course.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,7 +11,6 @@ import { loadAllBlueprints } from '@/lib/curriculum/load-blueprint';
 import { generateCourseFromBlueprint } from '@/lib/curriculum/generate-course-from-blueprint';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
-
 export const dynamic = 'force-dynamic';
 
 export async function POST(
@@ -25,12 +19,13 @@ export async function POST(
 ) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-    const auth = await apiRequireAdmin(request);
-    if (auth.error) return auth.error;
+
+  const auth = await apiRequireAdmin(request);
+  if (auth.error) return auth.error;
+
   const { courseId } = await params;
   const db = await requireAdminClient();
 
-  // Resolve course from canonical courses table (not training_courses)
   const { data: course, error: courseError } = await db
     .from('courses')
     .select('id, slug, title, program_id, programs(slug)')
@@ -40,9 +35,14 @@ export async function POST(
   if (courseError) return safeInternalError(courseError, 'Failed to load course');
   if (!course) return safeError('Course not found', 404);
 
-  const programSlug = (course.programs as { slug: string } | null)?.slug ?? null;
-  if (!programSlug)
+  const relatedPrograms = course.programs as unknown as Array<{ slug: string }> | { slug: string } | null;
+  const programSlug = Array.isArray(relatedPrograms)
+    ? relatedPrograms[0]?.slug ?? null
+    : relatedPrograms?.slug ?? null;
+
+  if (!programSlug) {
     return safeError('Course has no linked program — cannot determine blueprint', 400);
+  }
 
   const blueprint = (await loadAllBlueprints()).find((bp) => bp.programSlug === programSlug);
   if (!blueprint) return safeError(`No blueprint registered for program slug: ${programSlug}`, 400);

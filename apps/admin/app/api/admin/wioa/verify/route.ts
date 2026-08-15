@@ -10,16 +10,11 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
-
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireAdmin();
-  if ('error' in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
-  }
+  await requireAdmin();
 
   try {
     const formData = await request.formData();
@@ -35,12 +30,12 @@ async function _POST(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { data: _roleProfile } = await supabase
+    const { data: roleProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!_roleProfile || !['admin', 'staff'].includes(_roleProfile.role)) {
+    if (!roleProfile || !['admin', 'staff'].includes(roleProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -49,7 +44,7 @@ async function _POST(request: NextRequest) {
       .update({
         eligibility_status: action === 'approve' ? 'approved' : 'denied',
         eligibility_verified_at: new Date().toISOString(),
-        eligibility_verified_by: user?.id,
+        eligibility_verified_by: user.id,
         updated_at: new Date().toISOString(),
       })
       .eq('id', participantId);
@@ -58,14 +53,13 @@ async function _POST(request: NextRequest) {
 
     await logAdminAudit({
       action: AdminAction.WIOA_ELIGIBILITY_VERIFIED,
-      actorId: user?.id || 'unknown',
+      actorId: user.id,
       entityType: 'wioa_participants',
       entityId: participantId,
       metadata: { decision: action },
       req: request,
     });
 
-    // Redirect back to the verification list
     return NextResponse.redirect(new URL('/admin/wioa/verify', request.url));
   } catch (error) {
     logger.error('WIOA verification failed', error as Error);

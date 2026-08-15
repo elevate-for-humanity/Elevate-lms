@@ -65,7 +65,7 @@ export default function BuildsClient() {
     <div className="min-h-screen bg-white">
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-dev-hero.jpg"
+          src="/images/instructors/angela-thompson.webp"
           alt="Builds & Deploy"
           fill
           className="object-cover"

@@ -47,7 +47,7 @@ export default function DirectDepositPage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/banking-page-1.webp"
+          src="/images/cdl-hero.webp"
           alt="Direct Deposit"
           fill
           className="object-cover"

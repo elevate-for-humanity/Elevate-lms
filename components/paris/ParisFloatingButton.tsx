@@ -1,24 +1,14 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import dynamic from 'next/dynamic';
 import { X, MessageCircle } from 'lucide-react';
-
-const ParisChat = dynamic(() => import('./ParisChat'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-full">
-      <div className="animate-spin w-8 h-8 border-4 border-brand-red-600 border-t-transparent rounded-full" />
-    </div>
-  ),
-});
+import ParisChat from './ParisChat';
 
 export function ParisFloatingButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-open removed — triggered manually by user click to prevent SSR issues
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
 
@@ -32,7 +22,6 @@ export function ParisFloatingButton() {
 
   return (
     <>
-      {/* ── Chat Window ── */}
       {isOpen && (
         <div
           role="dialog"
@@ -40,16 +29,13 @@ export function ParisFloatingButton() {
           aria-label="Paris AI Assistant"
           className="fixed inset-0 z-[9999] flex items-stretch"
         >
-          {/* Backdrop — click to close on mobile, fixed panel on desktop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={close}
             aria-hidden="true"
           />
 
-          {/* Chat Panel — full-screen mobile, right-side panel on tablet/desktop */}
           <div className="relative z-10 ml-auto w-full sm:w-[min(100vw,640px)] lg:w-[min(100vw,720px)] h-full bg-white flex flex-col shadow-2xl animate-in slide-in-from-right-0 fade-in duration-200">
-            {/* Header */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 shrink-0 bg-white">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-brand-red-600 flex items-center justify-center text-white text-sm sm:text-base font-bold shrink-0">
@@ -69,7 +55,6 @@ export function ParisFloatingButton() {
               </button>
             </div>
 
-            {/* Chat body — fills remaining height */}
             <div className="flex-1 overflow-hidden min-h-0">
               <ParisChat showHeader={false} />
             </div>
@@ -77,7 +62,6 @@ export function ParisFloatingButton() {
         </div>
       )}
 
-      {/* ── Floating Button ── */}
       <button
         onClick={open}
         onMouseEnter={handleFloatingMouseEnter}
@@ -88,7 +72,6 @@ export function ParisFloatingButton() {
         <MessageCircle className="w-6 h-6 text-white" />
       </button>
 
-      {/* Tooltip */}
       {showTooltip && !isOpen && (
         <div className="fixed bottom-24 right-6 z-50 pointer-events-none">
           <div className="bg-slate-900 text-white text-xs px-3 py-2 rounded-lg shadow-lg max-w-[190px]">

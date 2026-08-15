@@ -50,18 +50,15 @@ const nextConfig = {
     '@remotion/licensing',
     'esbuild',
   ],
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
-      const webpack = config.compiler?.webpack;
-      if (webpack?.ProvidePlugin) {
-        config.plugins = config.plugins || [];
-        config.plugins.push(
-          new webpack.ProvidePlugin({
-            Buffer: ['buffer', 'Buffer'],
-            buffer: 'buffer',
-          })
-        );
-      }
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          Buffer: ['buffer', 'Buffer'],
+          buffer: 'buffer',
+        }),
+      );
     }
     return config;
   },

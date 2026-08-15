@@ -43,7 +43,7 @@ export default async function ProgramHolderDashboard() {
             <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-slate-700">Programs, student rosters, training hours, documents, and compliance actions in one scoped workspace.</p>
             <div className="mt-6 flex flex-wrap gap-3"><Link href="/program-holder/onboarding" className="rounded-lg bg-blue-700 px-5 py-3 font-bold text-white">Review onboarding</Link><Link href="/program-holder/rights-responsibilities" className="rounded-lg border border-slate-300 px-5 py-3 font-bold">Rights & responsibilities</Link></div>
           </div>
-          <div className="relative min-h-[260px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm"><Image src="/images/pages/program-holder-page-1.webp" alt="Training provider working with learners" fill priority className="object-cover" sizes="(max-width:1024px) 100vw,42vw" /></div>
+          <div className="relative min-h-[260px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-sm"><Image src="/images/building-maintenance.webp" alt="Training provider working with learners" fill priority className="object-cover" sizes="(max-width:1024px) 100vw,42vw" /></div>
         </div>
       </section>
 

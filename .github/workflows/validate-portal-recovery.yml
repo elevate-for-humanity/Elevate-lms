@@ -1,0 +1,109 @@
+name: Validate Portal Recovery
+
+on:
+  push:
+    branches:
+      - fix/portal-contract-recovery
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22'
+  PNPM_VERSION: '10.28.2'
+
+jobs:
+  lms-standalone:
+    name: LMS Standalone
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Build LMS standalone
+        run: pnpm run build:lms:phased
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          NEXT_STANDALONE_OUTPUT: '1'
+          BUILD_SCOPE: LMS
+
+  admin-standalone:
+    name: Admin Standalone
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Build Admin standalone
+        run: pnpm run build:admin
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          NEXT_STANDALONE_OUTPUT: '1'
+          NEXT_PUBLIC_SITE_URL: https://www.elevateforhumanity.org
+          NEXT_PUBLIC_WWW_URL: https://www.elevateforhumanity.org
+          NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
+          NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
+
+  marketing-standalone:
+    name: Marketing Standalone
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Build Marketing standalone
+        run: pnpm run build:marketing
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          NEXT_STANDALONE_OUTPUT: '1'
+          BUILD_SCOPE: MARKETING
+
+  integrity:
+    name: Route and Function Integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Portal function audit
+        run: node scripts/audit-portal-functions.mjs
+      - name: Parallel surface audit
+        run: node scripts/audit-parallel-surfaces.mjs
+      - name: Duplicate sweep
+        run: node scripts/full-platform-duplicate-sweep.mjs
+      - name: Logger audit
+        run: node scripts/audit-logger-errors.mjs
+      - name: Path casing audit
+        run: node scripts/check-path-casing.mjs

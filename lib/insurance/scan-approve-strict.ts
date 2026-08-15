@@ -1,4 +1,3 @@
-import pdf from 'pdf-parse';
 import { ocrPdfFirstPages } from './ocr';
 import { validateCoiText, type CoiTextValidationResult } from './validate-coi-text';
 
@@ -11,15 +10,8 @@ export type StrictInsuranceDecision = {
 
 const MIN_TEXT_FOR_VALIDATION = 100;
 const MIN_TEXT_FOR_ANY_ANALYSIS = 50;
+const MIN_OCR_CONFIDENCE = 40;
 
-/**
- * End-to-end COI scan pipeline:
- * 1. Try pdf-parse (fast, digital PDFs)
- * 2. If insufficient text, OCR via pdftoppm + Tesseract (returns confidence)
- * 3. If OCR confidence below threshold, reject as unreadable
- * 4. Run strict validator — PASS/FAIL with risk level
- * 5. APPROVED only on PASS with zero missing items
- */
 export async function scanApproveStrict(args: {
   pdfBuffer: Buffer;
   expectedBusinessName?: string;
@@ -28,22 +20,25 @@ export async function scanApproveStrict(args: {
   minGlPerOccurrence?: number;
   minGlAggregate?: number;
   minProLiabilityPerClaim?: number;
-  /** Worker relationship type. Drives conditional WC gate. */
   workerRelationship?: 'w2_employees' | '1099_contractors_only' | 'owner_only' | 'not_sure';
 }): Promise<StrictInsuranceDecision> {
   let extractedText = '';
   let method: StrictInsuranceDecision['method'] = 'PDF_TEXT';
   let ocrConfidence: number | undefined;
 
-  // 1) Try native PDF text extraction
   try {
-    const parsed = await pdf(args.pdfBuffer);
-    extractedText = parsed.text || '';
+    const { PDFParse } = await import('pdf-parse');
+    const parser = new PDFParse({ data: args.pdfBuffer });
+    try {
+      const parsed = await parser.getText();
+      extractedText = parsed.text || '';
+    } finally {
+      await parser.destroy();
+    }
   } catch {
     extractedText = '';
   }
 
-  // 2) If not enough text, try OCR with confidence tracking
   if (extractedText.trim().length < MIN_TEXT_FOR_VALIDATION) {
     method = 'OCR';
     const ocrResult = await ocrPdfFirstPages(args.pdfBuffer, 2);
@@ -54,7 +49,6 @@ export async function scanApproveStrict(args: {
     ocrConfidence = ocrResult.confidence;
   }
 
-  // 3) Truly unreadable — reject with specific message
   if (extractedText.trim().length < MIN_TEXT_FOR_ANY_ANALYSIS) {
     method = 'NONE';
     return {
@@ -99,7 +93,6 @@ export async function scanApproveStrict(args: {
     };
   }
 
-  // 4) Run strict validator with OCR confidence
   const validation = validateCoiText({
     extractedText,
     expectedBusinessName: args.expectedBusinessName,
@@ -108,6 +101,7 @@ export async function scanApproveStrict(args: {
     minGlPerOccurrence: args.minGlPerOccurrence,
     minGlAggregate: args.minGlAggregate,
     minProLiabilityPerClaim: args.minProLiabilityPerClaim,
+    minOcrConfidence: MIN_OCR_CONFIDENCE,
     ocrConfidence,
     workerRelationship: args.workerRelationship,
   });

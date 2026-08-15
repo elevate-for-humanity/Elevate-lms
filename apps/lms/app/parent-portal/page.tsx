@@ -120,7 +120,7 @@ export default async function ParentPortalPage() {
             </div>
           </div>
           <div className="relative order-1 min-h-[260px] overflow-hidden rounded-3xl shadow-xl lg:order-2 lg:min-h-[380px]">
-            <Image src="/images/pages/about-career-training.webp" alt="Parent and guardian support for career training" fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 50vw" />
+            <Image src="/images/instructors/marcus-johnson.jpg" alt="Parent and guardian support for career training" fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 50vw" />
           </div>
         </div>
       </section>

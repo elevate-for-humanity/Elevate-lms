@@ -31,7 +31,7 @@ export default function DevStudioPage() {
       </div>
 
       <PictureFirstPageHero
-        image="/images/pages/admin-grants-submissions-detail.webp"
+        image="/images/location-1.webp"
         alt="Administrative development and operations workspace"
         eyebrow="Dev Studio"
         title="Build and Operate from One Admin Workspace"

@@ -1,21 +1,17 @@
 import { NextRequest } from 'next/server';
 import { internalFetch } from '@/lib/api/internal-fetch';
-import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { createClient } from '@/lib/supabase/server';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
-
-import { auditMutation } from '@/lib/api/withAudit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 const _POST = withAuth(
@@ -36,13 +32,10 @@ const _POST = withAuth(
       return new Response('Invalid signature format', { status: 400 });
     }
 
-    const base64 = matches[1];
-    const buffer = Buffer.from(base64, 'base64');
-
+    const buffer = Buffer.from(matches[1], 'base64');
     const serviceClient = await requireAdminClient();
     if (!serviceClient) return new Response('Service unavailable', { status: 503 });
 
-    // Pre-read — verify holder exists before mutating
     const { data: holder, error: holderError } = await serviceClient
       .from('program_holders')
       .select('id, mou_status')
@@ -63,32 +56,20 @@ const _POST = withAuth(
       return new Response('Failed to upload signature', { status: 500 });
     }
 
-    const sigUrl = path;
     const now = new Date().toISOString();
-
     const { data: updated, error } = await supabase
       .from('program_holders')
       .update({
         mou_status: 'fully_executed',
         mou_admin_name: name,
         mou_admin_signed_at: now,
-        mou_admin_sig_url: sigUrl,
+        mou_admin_sig_url: path,
       })
       .eq('id', programHolderId)
       .select(
-        `
-        id,
-        name,
-        payout_share,
-        mou_status,
-        mou_holder_name,
-        mou_holder_signed_at,
-        mou_holder_sig_url,
-        mou_admin_name,
-        mou_admin_signed_at,
-        mou_admin_sig_url,
-        mou_final_pdf_url
-      `,
+        `id, name, payout_share, mou_status, mou_holder_name, mou_holder_signed_at,
+         mou_holder_sig_url, mou_admin_name, mou_admin_signed_at, mou_admin_sig_url,
+         mou_final_pdf_url`,
       )
       .maybeSingle();
 
@@ -96,10 +77,10 @@ const _POST = withAuth(
       logger.error('Update error:', error);
       return new Response(toErrorMessage(error), { status: 500 });
     }
+    if (!updated) return new Response('Program holder not found after update', { status: 404 });
 
-    // Send archive copy of fully executed MOU
     const archiveEmail = process.env.MOU_ARCHIVE_EMAIL;
-    if (archiveEmail && updated) {
+    if (archiveEmail) {
       try {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
         await internalFetch(`${siteUrl}/api/email/send`, {
@@ -115,7 +96,6 @@ const _POST = withAuth(
           }),
         });
       } catch (emailErr) {
-        // Non-blocking — log but don't fail the request
         logger.error(
           'Failed to send MOU archive email:',
           emailErr instanceof Error ? emailErr : new Error(String(emailErr)),
@@ -127,7 +107,7 @@ const _POST = withAuth(
       action: AdminAction.MOU_COUNTERSIGNED,
       actorId: user.id,
       entityType: 'program_holders',
-      entityId: holderId,
+      entityId: programHolderId,
       metadata: { holder_name: updated.name },
       req,
     });
@@ -136,4 +116,5 @@ const _POST = withAuth(
   },
   { roles: ['admin'] },
 );
+
 export const POST = withApiAudit('/api/admin/program-holders/mou/countersign', _POST);

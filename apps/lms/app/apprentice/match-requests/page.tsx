@@ -310,7 +310,7 @@ export default function MyMatchRequestsPage() {
                       
                       {req.status === 'approved' && (
                         <Link
-                          href="/apprentice/dashboard"
+                          href="/apprentice"
                           className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition"
                         >
                           Start Training
@@ -337,7 +337,7 @@ export default function MyMatchRequestsPage() {
                         )}
                       </div>
                       <Link
-                        href="/apprentice/dashboard"
+                        href="/apprentice"
                         className="text-sm font-medium text-green-700 hover:text-green-900 flex items-center gap-1"
                       >
                         Go to Dashboard

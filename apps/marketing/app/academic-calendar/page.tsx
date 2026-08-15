@@ -65,7 +65,7 @@ export default function AcademicCalendarPage() {
       {/* Hero Image */}
       <section className="relative h-[200px] sm:h-[280px] md:h-[340px] overflow-hidden">
         <Image
-          src="/images/pages/academic-calendar-hero.webp"
+          src="/images/business/collaboration-1.webp"
           alt="Academic calendar and important dates"
           fill
           sizes="100vw"

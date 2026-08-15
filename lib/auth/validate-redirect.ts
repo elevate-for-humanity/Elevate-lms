@@ -33,6 +33,36 @@ const TRUSTED_HOSTS = [
   'app.elevateforhumanity.org',
 ];
 
+/**
+ * Join a pathname and a search string into a return path.
+ * Normalises missing leading slashes.
+ */
+export function buildReturnPath(pathname: string, search: string = ''): string {
+  const normalised = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return `${normalised}${search}`;
+}
+
+/**
+ * Build a login URL with an encoded redirect parameter.
+ */
+export function buildLoginUrl(origin: string, redirect: string): URL {
+  const url = new URL('/login', origin);
+  url.searchParams.set('redirect', redirect);
+  return url;
+}
+
+/**
+ * Resolve a redirect target to an absolute URL.
+ * Relative paths are resolved against the provided origin.
+ * Already-absolute URLs are returned as-is.
+ */
+export function resolveRedirectLocation(target: string, origin: string): URL {
+  if (target.startsWith('http://') || target.startsWith('https://')) {
+    return new URL(target);
+  }
+  return new URL(target, origin);
+}
+
 export function validateRedirect(url: string | null | undefined, fallback: string = '/'): string {
   if (!url || typeof url !== 'string') return fallback;
 

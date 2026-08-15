@@ -16,7 +16,12 @@ export type AuditAction =
   | 'SUBMIT'
   | 'PII_ACCESS'
   | 'PII_VERIFY'
-  | 'PII_EXPORT';
+  | 'PII_EXPORT'
+  | 'enrollment.create'
+  | 'enrollment.delete'
+  | 'certificate.issue'
+  | 'grade.update'
+  | 'user.delete';
 
 export type AuditEntity =
   | 'referral'

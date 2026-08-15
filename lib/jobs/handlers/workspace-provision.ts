@@ -54,15 +54,16 @@ export async function processWorkspaceProvision(job: ProvisioningJob): Promise<v
   });
 
   if (!website.ok) {
+    const errResult = website as { ok: false; error: string };
     await db
       .from('customer_workspaces')
       .update({
         status: 'failed',
-        provision_error: website.error,
+        provision_error: errResult.error,
         updated_at: new Date().toISOString(),
       } as Record<string, unknown>)
       .eq('id', workspace.id);
-    throw new Error(website.error);
+    throw new Error(errResult.error);
   }
 
   const publicUrl = website.publicUrl || tenantPublicSiteUrl(payload.slug);

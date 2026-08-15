@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     .upload(path, buffer, { contentType: file.type, upsert: false });
 
   if (uploadError) {
-    return NextResponse.json(safeError(uploadError), { status: 500 });
+    return NextResponse.json(safeError(uploadError.message), { status: 500 });
   }
 
   const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path);
@@ -144,7 +144,7 @@ export async function DELETE(request: NextRequest) {
 
   const { error: storageError } = await db.storage.from(BUCKET).remove([filePath]);
   if (storageError) {
-    return NextResponse.json(safeError(storageError), { status: 500 });
+    return NextResponse.json(safeError(storageError.message), { status: 500 });
   }
 
   await db.from('documents').delete().eq('file_path', filePath);

@@ -31,7 +31,7 @@ interface EmailPayload {
 
 export async function processEmailSend(job: ProvisioningJob): Promise<void> {
   const supabase = await requireAdminClient();
-  const payload = job.payload as EmailPayload;
+  const payload = job.payload as unknown as EmailPayload;
 
   if (!payload.to || !payload.emailType) {
     throw new Error('Missing required fields: to, emailType');

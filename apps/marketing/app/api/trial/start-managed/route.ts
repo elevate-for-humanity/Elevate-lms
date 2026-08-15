@@ -194,7 +194,7 @@ async function _POST(request: NextRequest) {
       const currentMeta = currentConfig.meta && typeof currentConfig.meta === 'object'
         ? currentConfig.meta
         : {};
-      const updatedConfig = {
+      const updatedConfig: Record<string, any> = {
         ...currentConfig,
         meta: {
           ...currentMeta,

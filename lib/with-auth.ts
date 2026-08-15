@@ -61,6 +61,17 @@ export function withAuth<TParams = Record<string, string>>(
     }
 
     const params = await context.params;
-    return handler(req, { params, user }, user);
+    return handler(
+      req,
+      {
+        params,
+        user,
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        effectiveRoles: user.effectiveRoles,
+      },
+      user,
+    );
   };
 }

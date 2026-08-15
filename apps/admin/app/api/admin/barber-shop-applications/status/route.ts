@@ -52,10 +52,12 @@ async function updateStatus(request: NextRequest) {
   if (status === 'approved') {
     let linkUserId: string | undefined;
     try {
-      const { data: byEmail } = await db.auth.admin.getUserByEmail(
-        application.contact_email.toLowerCase(),
-      );
-      linkUserId = byEmail.user?.id;
+      const { data: profile } = await db
+        .from('profiles')
+        .select('id')
+        .ilike('email', application.contact_email.trim())
+        .maybeSingle();
+      linkUserId = profile?.id;
     } catch {
       // Applicant may claim the account later; provisioning still creates/updates the partner row.
     }

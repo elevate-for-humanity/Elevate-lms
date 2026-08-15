@@ -11,8 +11,6 @@ async function _POST(request: NextRequest) {
   if (rateLimited) return rateLimited;
 
   const supabase = await createClient();
-
-  // Get current user and verify admin role
   const {
     data: { user },
     error: authError,
@@ -22,7 +20,6 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Check if user is admin
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -39,7 +36,6 @@ async function _POST(request: NextRequest) {
   if (!submissionId || !action) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
-
   if (!['approve', 'reject'].includes(action)) {
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
@@ -70,7 +66,6 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update submission' }, { status: 500 });
   }
 
-  // Secondary audit via admin audit log (non-transactional, supplementary)
   await logAdminAudit({
     action: AdminAction.CERTIFICATION_REVIEWED,
     actorId: user.id,
@@ -80,13 +75,17 @@ async function _POST(request: NextRequest) {
     req: request,
   });
 
-  // HVAC workflow: advance credential sequence when admin approves a cert
-  if (action === 'approve' && data?.program_id === 'hvac-technician' && data?.user_id) {
+  const submission = data as { program_id?: unknown; user_id?: unknown } | null;
+  if (
+    action === 'approve' &&
+    submission?.program_id === 'hvac-technician' &&
+    typeof submission.user_id === 'string'
+  ) {
     try {
       const { advanceHvacWorkflow } = await import('@/lib/courses/hvac-completion-workflow');
-      const wfResult = await advanceHvacWorkflow(data.user_id);
+      const wfResult = await advanceHvacWorkflow(submission.user_id);
       logger.info('[hvac-workflow] Advanced on admin approval', {
-        userId: data.user_id,
+        userId: submission.user_id,
         ...wfResult,
       });
     } catch (wfErr) {
@@ -106,7 +105,6 @@ async function _GET(request: NextRequest) {
   if (rateLimited) return rateLimited;
   const supabase = await createClient();
 
-  // Get current user and verify admin role
   const {
     data: { user },
     error: authError,
@@ -116,7 +114,6 @@ async function _GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Check if user is admin
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -141,12 +138,9 @@ async function _GET(request: NextRequest) {
     )
     .order('created_at', { ascending: false });
 
-  if (status) {
-    query = query.eq('status', status);
-  }
+  if (status) query = query.eq('status', status);
 
   const { data, error } = await query;
-
   if (error) {
     logger.error('Failed to fetch submissions:', error);
     return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });

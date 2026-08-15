@@ -12,7 +12,6 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
@@ -24,38 +23,29 @@ export async function GET(request: Request) {
   }
 
   const db = await requireAdminClient();
-  if (!db) return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
-
   const now = new Date();
   const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  // Artifacts expiring within 30 days that haven't been notified recently
   const { data: expiring, error } = await db
     .from('provider_compliance_artifacts')
     .select('id, tenant_id, label, artifact_type, expires_at')
     .lte('expires_at', in30)
-    .gte('expires_at', now.toISOString().split('T')[0]); // not yet expired — notify all, verified or not
+    .gte('expires_at', now.toISOString().split('T')[0]);
 
   if (error) {
     logger.error('compliance-expiration cron: query failed', error);
     return NextResponse.json({ error: 'Query failed' }, { status: 500 });
   }
+  if (!expiring?.length) return NextResponse.json({ queued: 0, message: 'No expiring artifacts' });
 
-  if (!expiring || expiring.length === 0) {
-    return NextResponse.json({ queued: 0, message: 'No expiring artifacts' });
-  }
-
-  // Group by tenant to send one notification per tenant
-  const byTenant = expiring.reduce<Record<string, typeof expiring>>((acc, a) => {
-    if (!acc[a.tenant_id]) acc[a.tenant_id] = [];
-    acc[a.tenant_id].push(a);
+  const byTenant = expiring.reduce<Record<string, typeof expiring>>((acc, artifact) => {
+    if (!acc[artifact.tenant_id]) acc[artifact.tenant_id] = [];
+    acc[artifact.tenant_id].push(artifact);
     return acc;
   }, {});
 
   let queued = 0;
-
   for (const [tenantId, artifacts] of Object.entries(byTenant)) {
-    // Get provider contact email from profiles
     const { data: contact } = await db
       .from('profiles')
       .select('email, full_name')
@@ -63,49 +53,35 @@ export async function GET(request: Request) {
       .eq('role', 'provider_admin')
       .limit(1)
       .maybeSingle();
-
     if (!contact?.email) continue;
 
-    const { data: tenant } = await db
-      .from('tenants')
-      .select('name')
-      .eq('id', tenantId)
-      .maybeSingle();
+    const { data: tenant } = await db.from('tenants').select('name').eq('id', tenantId).maybeSingle();
 
     for (const artifact of artifacts) {
-      const daysLeft = Math.ceil(
-        (new Date(artifact.expires_at).getTime() - now.getTime()) / 86400000,
-      );
-
-      await db
-        .from('notification_outbox')
-        .insert({
-          to_email: contact.email,
-          template_key: 'compliance_expiring',
-          template_data: {
-            contact_name: contact.full_name ?? contact.email,
-            org_name: tenant?.name ?? tenantId,
-            artifact_label: artifact.label,
-            artifact_type: artifact.artifact_type,
-            expires_at: artifact.expires_at,
-            days_until_expiry: daysLeft,
-            portal_link: `${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/provider/compliance`,
-          },
-          status: 'queued',
-          scheduled_for: now.toISOString(),
-        })
-        .catch((err) => logger.warn('Failed to queue compliance_expiring notification', err));
-
+      const daysLeft = Math.ceil((new Date(artifact.expires_at).getTime() - now.getTime()) / 86400000);
+      const { error: queueError } = await db.from('notification_outbox').insert({
+        to_email: contact.email,
+        template_key: 'compliance_expiring',
+        template_data: {
+          contact_name: contact.full_name ?? contact.email,
+          org_name: tenant?.name ?? tenantId,
+          artifact_label: artifact.label,
+          artifact_type: artifact.artifact_type,
+          expires_at: artifact.expires_at,
+          days_until_expiry: daysLeft,
+          portal_link: `${process.env.NEXT_PUBLIC_SITE_URL ?? PLATFORM_DEFAULTS.siteUrl}/provider/compliance`,
+        },
+        status: 'queued',
+        scheduled_for: now.toISOString(),
+      });
+      if (queueError) {
+        logger.warn('Failed to queue compliance_expiring notification', { tenantId, artifactId: artifact.id, error: queueError.message });
+        continue;
+      }
       queued++;
     }
   }
 
-  logger.info(
-    `compliance-expiration cron: queued ${queued} notifications for ${Object.keys(byTenant).length} tenants`,
-  );
-  return NextResponse.json({
-    queued,
-    tenants: Object.keys(byTenant).length,
-    artifacts: expiring.length,
-  });
+  logger.info(`compliance-expiration cron: queued ${queued} notifications for ${Object.keys(byTenant).length} tenants`);
+  return NextResponse.json({ queued, tenants: Object.keys(byTenant).length, artifacts: expiring.length });
 }

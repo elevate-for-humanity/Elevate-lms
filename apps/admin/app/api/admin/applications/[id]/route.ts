@@ -53,8 +53,6 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
       return safeError('No fields to update', 400);
     }
 
-    // Approval must go through POST /approve — it runs the full pipeline
-    // (user creation, enrollment, post-approval actions, audit).
     if (parsed.data.status === 'approved') {
       return safeError(
         'Use POST /api/admin/applications/[id]/approve to approve applications.',
@@ -67,20 +65,16 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
 
     const data = await updateApplication(id, updateData as any);
 
-    // Audit log (non-fatal)
     const db = await requireAdminClient();
     if (db) {
-      await db
-        .from('audit_logs')
-        .insert({
-          actor_id: auth.id,
-          action: updateData.status === 'rejected' ? 'reject' : 'status_change',
-          resource_type: 'application',
-          resource_id: id,
-          before_state: before,
-          after_state: data,
-        })
-        .catch(() => {});
+      await db.from('audit_logs').insert({
+        actor_id: auth.id,
+        action: updateData.status === 'rejected' ? 'reject' : 'status_change',
+        resource_type: 'application',
+        resource_id: id,
+        before_state: before,
+        after_state: data,
+      });
     }
 
     return NextResponse.json({ data });
@@ -106,16 +100,13 @@ async function _DELETE(request: Request, { params }: { params: Promise<{ id: str
 
     const db = await requireAdminClient();
     if (db) {
-      await db
-        .from('audit_logs')
-        .insert({
-          actor_id: auth.id,
-          action: 'delete',
-          resource_type: 'application',
-          resource_id: id,
-          before_state: before,
-        })
-        .catch(() => {});
+      await db.from('audit_logs').insert({
+        actor_id: auth.id,
+        action: 'delete',
+        resource_type: 'application',
+        resource_id: id,
+        before_state: before,
+      });
     }
 
     return NextResponse.json({ data });

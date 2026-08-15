@@ -51,15 +51,8 @@ const nextConfig = {
         destination: 'https://www.elevateforhumanity.org/:path*',
         permanent: true,
       },
-
-      // Compatibility only: retired /admin URLs never render on Marketing.
-      // They are sent to the one canonical Admin service.
       { source: '/admin', destination: 'https://admin.elevateforhumanity.org', permanent: false },
       { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: false },
-
-      // Public marketing aliases only. Private portal/admin/LMS routes are
-      // intentionally not redirected from the public origin; retired private
-      // paths must remain inaccessible here and resolve as not found.
       { source: '/wioa-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },
@@ -87,6 +80,10 @@ const nextConfig = {
 
   webpack: (config, { isServer }) => {
     config.parallelism = 1;
+    config.resolve.alias = {
+      ...(config.resolve.alias ?? {}),
+      '@': path.join(__dirname, '../..'),
+    };
 
     if (!isServer) {
       config.resolve.fallback = {

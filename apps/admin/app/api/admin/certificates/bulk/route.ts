@@ -4,7 +4,6 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { generateCertificateNumber } from '@/lib/partner-workflows/certificates';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,8 +12,6 @@ async function _POST(req: NextRequest) {
   if (rateLimited) return rateLimited;
   const supabase = await createClient();
   const db = await requireAdminClient();
-  if (!db)
-    return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
 
   const {
     data: { user },
@@ -26,7 +23,7 @@ async function _POST(req: NextRequest) {
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (profile?.role !== 'admin' && profile?.role !== 'admin') {
+  if (profile?.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
@@ -41,7 +38,6 @@ async function _POST(req: NextRequest) {
 
   for (const enrollmentId of enrollmentIds) {
     try {
-      // Get enrollment with student and course info
       const { data: enrollment } = await db
         .from('enrollments')
         .select('id, user_id, course_id, completed_at, profiles(full_name, email), courses(title)')
@@ -53,9 +49,8 @@ async function _POST(req: NextRequest) {
         continue;
       }
 
-      const certNumber = generateCertificateNumber('EFH');
+      const certNumber = generateCertificateNumber('EFH', enrollment.user_id);
 
-      // Insert certificate
       const { error: insertErr } = await db.from('issued_certificates').insert({
         certificate_number: certNumber,
         recipient_name: (enrollment as any).profiles?.full_name || 'Unknown',
@@ -71,7 +66,6 @@ async function _POST(req: NextRequest) {
       });
 
       if (insertErr) {
-        // Fallback to certificates table
         await db.from('certificates').insert({
           certificate_number: certNumber,
           student_name: (enrollment as any).profiles?.full_name || 'Unknown',
@@ -92,7 +86,6 @@ async function _POST(req: NextRequest) {
     }
   }
 
-  // Audit log
   await db.from('audit_logs').insert({
     user_id: user.id,
     action: 'bulk_certificates_issued',

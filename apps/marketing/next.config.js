@@ -32,7 +32,7 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
-  transpilePackages: ['buffer', 'process'],
+  transpilePackages: ['buffer'],
 
   async rewrites() {
     return {
@@ -84,28 +84,20 @@ const nextConfig = {
     cpus: 1,
   },
 
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, webpack }) => {
     config.parallelism = 1;
 
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),
-        buffer: false,
-        process: false,
+        buffer: require.resolve('buffer/'),
       };
 
-      config.resolve.alias = {
-        ...(config.resolve.alias ?? {}),
-        buffer: false,
-        'process/browser': false,
-      };
-
-      const { ProvidePlugin } = require('webpack');
+      config.plugins = config.plugins || [];
       config.plugins.push(
-        new ProvidePlugin({
+        new webpack.ProvidePlugin({
           Buffer: ['buffer', 'Buffer'],
           buffer: ['buffer'],
-          process: ['process/browser'],
         }),
       );
 

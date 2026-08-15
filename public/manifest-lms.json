@@ -3,7 +3,7 @@
   "name": "Elevate Learning & Apprenticeship",
   "short_name": "Elevate",
   "description": "Learner, apprentice, host shop, employer, and workforce dashboards for Elevate for Humanity.",
-  "start_url": "/dashboards?utm_source=homescreen&utm_medium=pwa",
+  "start_url": "/lms/dashboard?utm_source=homescreen&utm_medium=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",

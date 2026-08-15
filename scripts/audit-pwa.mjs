@@ -25,6 +25,29 @@ const PERSONAS = [
   ['Program Holder', 'apps/lms/app/program-holder/layout.tsx', 'public/manifest-program-holder.json', '/manifest-program-holder.json', '/program-holder/dashboard', '/program-holder/', 'lms'],
 ];
 
+const CANONICAL_MANIFEST_ROUTES = [
+  ['LMS root start', 'public/manifest-lms.json', 'start_url', '/lms/dashboard', 'apps/lms/app/lms/(app)/dashboard/page.tsx'],
+  ['LMS learner shortcut', 'public/manifest-lms.json', 'shortcut:Learner Dashboard', '/lms/dashboard', 'apps/lms/app/lms/(app)/dashboard/page.tsx'],
+  ['LMS apprentice shortcut', 'public/manifest-lms.json', 'shortcut:Apprentice Dashboard', '/apprentice', 'apps/lms/app/apprentice/page.tsx'],
+  ['LMS host shop shortcut', 'public/manifest-lms.json', 'shortcut:Host Shop Dashboard', '/host-shop/dashboard', 'apps/lms/app/host-shop/dashboard/page.tsx'],
+  ['LMS employer shortcut', 'public/manifest-lms.json', 'shortcut:Employer Dashboard', '/employer/dashboard', 'apps/lms/app/employer/dashboard/page.tsx'],
+  ['Admin root start', 'public/manifest-admin.json', 'start_url', '/dashboard', 'apps/admin/app/dashboard/page.tsx'],
+  ['Admin students shortcut', 'public/manifest-admin.json', 'shortcut:Students', '/students', 'apps/admin/app/students/page.tsx'],
+  ['Admin applications shortcut', 'public/manifest-admin.json', 'shortcut:Applications', '/applications', 'apps/admin/app/applications/page.tsx'],
+  ['Admin reports shortcut', 'public/manifest-admin.json', 'shortcut:Reports', '/reports', 'apps/admin/app/reports/page.tsx'],
+  ['Marketing root start', 'public/manifest-marketing.json', 'start_url', '/', 'apps/marketing/app/page.tsx'],
+];
+
+const pathOnly = (value) => typeof value === 'string' ? value.split('?')[0].split('#')[0] : '';
+const manifestRouteValue = (manifest, selector) => {
+  if (selector === 'start_url') return manifest?.start_url;
+  if (selector.startsWith('shortcut:')) {
+    const name = selector.slice('shortcut:'.length);
+    return manifest?.shortcuts?.find((shortcut) => shortcut?.name === name)?.url;
+  }
+  return undefined;
+};
+
 console.log('\n── Canonical PWA registrations ──');
 for (const [name, layoutPath, manifestFile, swFile, expectedComponent] of APPS) {
   const source = readFile(layoutPath);
@@ -40,6 +63,31 @@ for (const [name, layoutPath, manifestFile, swFile, expectedComponent] of APPS) 
   else pass(`${name}: root manifest linked`);
   if (!exists(manifestFile)) fail(`${name}: ${manifestFile} missing`); else pass(`${name}: root manifest exists`);
   if (!exists(swFile)) fail(`${name}: ${swFile} missing`); else pass(`${name}: service worker exists`);
+}
+
+console.log('\n── Manifest launch and shortcut routes ──');
+for (const [label, manifestFile, selector, expectedUrl, sourcePath] of CANONICAL_MANIFEST_ROUTES) {
+  const manifest = readJson(manifestFile);
+  if (!manifest) { fail(`${label}: invalid or missing ${manifestFile}`); continue; }
+  const actual = manifestRouteValue(manifest, selector);
+  if (!actual) {
+    fail(`${label}: ${selector} missing`);
+    continue;
+  }
+  if (pathOnly(actual) !== expectedUrl) fail(`${label}: expected ${expectedUrl}, found ${actual}`);
+  else pass(`${label}: canonical URL ${expectedUrl}`);
+  if (!exists(sourcePath)) fail(`${label}: source route missing at ${sourcePath}`);
+  else pass(`${label}: source route exists`);
+}
+
+const adminManifest = readJson('public/manifest-admin.json');
+for (const shortcut of adminManifest?.shortcuts || []) {
+  if (typeof shortcut.url === 'string' && shortcut.url.startsWith('/admin/')) {
+    fail(`Admin manifest contains retired /admin/* shortcut: ${shortcut.url}`);
+  }
+}
+if (pathOnly(adminManifest?.start_url).startsWith('/admin/')) {
+  fail(`Admin manifest contains retired /admin/* start_url: ${adminManifest.start_url}`);
 }
 
 console.log('\n── Authenticated role manifests ──');

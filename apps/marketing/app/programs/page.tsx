@@ -51,8 +51,7 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
             )}
             {funded && program.top_jobs_stars ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-sm font-bold text-slate-900 shadow">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-500" /> {program.top_jobs_stars}★
-                Top Jobs
+                <Star className="h-4 w-4 fill-amber-400 text-amber-500" /> {program.top_jobs_stars}★ Top Jobs
               </span>
             ) : null}
           </div>
@@ -66,29 +65,18 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
           </Link>
         </h3>
         {program.description ? (
-          <p className="mt-3 line-clamp-3 text-base leading-relaxed text-slate-600">
-            {program.description}
-          </p>
+          <p className="mt-3 line-clamp-3 text-base leading-relaxed text-slate-600">{program.description}</p>
         ) : null}
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-slate-600">
           {program.duration ? (
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-4 w-4" />
-              {program.duration}
-            </span>
+            <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4" />{program.duration}</span>
           ) : null}
           {program.credential ? (
-            <span className="inline-flex items-center gap-1.5">
-              <Award className="h-4 w-4" />
-              {program.credential}
-            </span>
+            <span className="inline-flex items-center gap-1.5"><Award className="h-4 w-4" />{program.credential}</span>
           ) : null}
         </div>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-          <Link
-            href={`/programs/${program.slug}`}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-base font-bold text-white hover:bg-slate-800"
-          >
+          <Link href={`/programs/${program.slug}`} className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-base font-bold text-white hover:bg-slate-800">
             View Program <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
@@ -116,21 +104,15 @@ export default async function ProgramsPage() {
           alt="Elevate career training programs"
           fill
           priority
-          className="object-cover opacity-55"
+          className="object-cover"
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-slate-950/45" />
-        <div className="relative mx-auto flex min-h-[360px] max-w-6xl items-center px-6 py-16">
-          <div className="max-w-3xl text-white">
-            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-orange-300">
-              Career Training
-            </p>
-            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-6xl">
-              Choose the right program — and the right funding path.
-            </h1>
-            <p className="mt-5 text-lg leading-relaxed text-white sm:text-xl">
-              {PLATFORM_DEFAULTS.orgName} separates verified workforce-funded programs from regular
-              self-pay courses so applicants know exactly which enrollment process applies.
+        <div className="relative mx-auto flex min-h-[360px] max-w-6xl items-end px-6 py-12 sm:py-16">
+          <div className="max-w-3xl rounded-2xl bg-white/92 p-6 text-slate-950 shadow-lg backdrop-blur-sm sm:p-8">
+            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-brand-red-700">Career Training</p>
+            <h1 className="mt-3 text-4xl font-black leading-tight sm:text-6xl">Choose the right program — and the right funding path.</h1>
+            <p className="mt-5 text-lg leading-relaxed text-slate-700 sm:text-xl">
+              {PLATFORM_DEFAULTS.orgName} separates verified workforce-funded programs from regular self-pay courses so applicants know exactly which enrollment process applies.
             </p>
           </div>
         </div>
@@ -140,59 +122,32 @@ export default async function ProgramsPage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-widest text-emerald-800">
-                Verified Workforce-Funded Programs
-              </p>
-              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
-                CDL, HVAC, Business & Financial Literacy
-              </h2>
+              <p className="text-sm font-extrabold uppercase tracking-widest text-emerald-800">Verified Workforce-Funded Programs</p>
+              <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">CDL, HVAC, Business & Financial Literacy</h2>
               <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-700">
-                These are the four programs confirmed for workforce-funding consideration. WorkOne
-                or the responsible agency determines participant eligibility, covered costs, and
-                written authorization. Funding is not guaranteed.
+                These are the four programs confirmed for workforce-funding consideration. WorkOne or the responsible agency determines participant eligibility, covered costs, and written authorization. Funding is not guaranteed.
               </p>
             </div>
-            <a
-              href={WORKONE_INDY_INTAKE_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-3.5 text-base font-extrabold text-white hover:bg-emerald-800"
-            >
+            <a href={WORKONE_INDY_INTAKE_URL} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-700 px-6 py-3.5 text-base font-extrabold text-white hover:bg-emerald-800">
               Schedule WorkOne Intake <ArrowRight className="h-4 w-4" />
             </a>
           </div>
-
           <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {funded.map((program) => (
-              <ProgramCard key={program.slug} program={program} />
-            ))}
+            {funded.map((program) => <ProgramCard key={program.slug} program={program} />)}
           </div>
-          {funded.length === 0 ? (
-            <p className="mt-8 rounded-xl bg-white p-6 text-slate-700">
-              No programs are currently published in the verified funded registry.
-            </p>
-          ) : null}
+          {funded.length === 0 ? <p className="mt-8 rounded-xl bg-white p-6 text-slate-700">No programs are currently published in the verified funded registry.</p> : null}
         </div>
       </section>
 
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="max-w-3xl">
-            <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">
-              Regular Courses
-            </p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
-              Self-pay & payment-plan programs
-            </h2>
-            <p className="mt-4 text-lg leading-relaxed text-slate-700">
-              Every program outside the confirmed four appears here as a regular program. These
-              programs do not advertise WIOA or Workforce Ready Grant funding.
-            </p>
+            <p className="text-sm font-extrabold uppercase tracking-widest text-brand-red-700">Regular Courses</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">Self-pay & payment-plan programs</h2>
+            <p className="mt-4 text-lg leading-relaxed text-slate-700">Every program outside the confirmed four appears here as a regular program. These programs do not advertise WIOA or Workforce Ready Grant funding.</p>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {selfPay.map((program) => (
-              <ProgramCard key={program.slug} program={program} />
-            ))}
+            {selfPay.map((program) => <ProgramCard key={program.slug} program={program} />)}
           </div>
         </div>
       </section>
@@ -201,14 +156,8 @@ export default async function ProgramsPage() {
         <div className="mx-auto max-w-4xl px-6 text-center">
           <BriefcaseBusiness className="mx-auto h-9 w-9 text-orange-300" />
           <h2 className="mt-4 text-3xl font-black">Need help choosing?</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">
-            Start the application and choose a program. The form will automatically show either the
-            required WorkOne funded pathway or the regular self-pay pathway.
-          </p>
-          <Link
-            href="/apply"
-            className="mt-7 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 text-lg font-extrabold text-white hover:bg-brand-red-700"
-          >
+          <p className="mx-auto mt-3 max-w-2xl text-lg text-slate-300">Start the application and choose a program. The form will automatically show either the required WorkOne funded pathway or the regular self-pay pathway.</p>
+          <Link href="/apply" className="mt-7 inline-flex items-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 text-lg font-extrabold text-white hover:bg-brand-red-700">
             Start Application <ArrowRight className="h-5 w-5" />
           </Link>
         </div>

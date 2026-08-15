@@ -14,14 +14,14 @@ async function requireAdmin() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: 'Unauthorized', status: 401 };
+  if (!user) return { error: 'Unauthorized', status: 401 as const };
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
   if (!profile || !['admin', 'staff'].includes(profile.role)) {
-    return { error: 'Forbidden', status: 403 };
+    return { error: 'Forbidden', status: 403 as const };
   }
   return { user, profile, supabase };
 }
@@ -42,7 +42,6 @@ async function _GET(request: Request) {
     const offset = (page - 1) * limit;
 
     const db = await requireAdminClient();
-
     let query = db
       .from('profiles')
       .select('*', { count: 'exact' })
@@ -56,14 +55,12 @@ async function _GET(request: Request) {
     }
 
     const { data: students, error, count } = await query;
-
     if (error) {
       logger.error('[/api/admin/students] DB error', error);
       return NextResponse.json({ error: 'Failed to fetch students' }, { status: 500 });
     }
 
     let filteredStudents = students || [];
-
     if (status || programId) {
       const studentIds = filteredStudents.map((s) => s.id);
       if (studentIds.length > 0) {
@@ -88,8 +85,8 @@ async function _GET(request: Request) {
         totalPages: Math.ceil((count || 0) / limit),
       },
     });
-  } catch (error: any) {
-    logger.error('[/api/admin/students] Unexpected error', error);
+  } catch (error) {
+    logger.error('[/api/admin/students] Unexpected error', error as Error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -126,7 +123,7 @@ async function _POST(request: Request) {
     }
 
     await db.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'create',
       resource_type: 'student',
@@ -135,8 +132,8 @@ async function _POST(request: Request) {
     });
 
     return NextResponse.json({ student }, { status: 201 });
-  } catch (error: any) {
-    logger.error('[/api/admin/students POST] Unexpected error', error);
+  } catch (error) {
+    logger.error('[/api/admin/students POST] Unexpected error', error as Error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

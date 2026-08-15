@@ -491,9 +491,9 @@ export function AdminDashboardContent({
                 <p className="text-xs font-bold text-slate-600">Active enrollments</p>
                 <p className="mt-1 text-2xl font-black text-emerald-700">{data.counts?.activeEnrollments ?? 0}</p>
               </div>
-              <div className="col-span-2 rounded-2xl border border-rose-200 bg-white p-4 shadow-sm sm:col-span-1">
-                <p className="text-xs font-bold text-slate-600">Portal security</p>
-                <p className="mt-1 text-sm font-black text-rose-800">Role restricted</p>
+              <div className="col-span-2 rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm sm:col-span-1">
+                <p className="text-xs font-bold text-slate-600">Access status</p>
+                <p className="mt-1 text-sm font-black text-emerald-800">Authenticated admin</p>
               </div>
             </div>
           </div>

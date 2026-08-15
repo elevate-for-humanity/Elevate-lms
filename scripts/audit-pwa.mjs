@@ -42,6 +42,19 @@ for (const [name, layoutPath, manifestFile, swFile, expectedComponent] of APPS) 
   if (!exists(swFile)) fail(`${name}: ${swFile} missing`); else pass(`${name}: service worker exists`);
 }
 
+const PWA_LAUNCH_ROUTES = [
+  ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx'],
+  ['Apprentice', 'apps/lms/app/apprentice/page.tsx'],
+  ['Host Shop', 'apps/lms/app/host-shop/dashboard/page.tsx'],
+  ['Program Holder', 'apps/lms/app/program-holder/dashboard/page.tsx'],
+];
+
+console.log('\n── PWA launch routes ──');
+for (const [name, routeFile] of PWA_LAUNCH_ROUTES) {
+  if (!exists(routeFile)) fail(`${name}: launch route source missing: ${routeFile}`);
+  else pass(`${name}: launch route exists`);
+}
+
 console.log('\n── Authenticated role manifests ──');
 const syncSource = readFile('scripts/sync-pwa-public.mjs') || '';
 for (const [name, layoutPath, manifestFile, manifestHref, startUrl, scope, shippedBy] of PERSONAS) {

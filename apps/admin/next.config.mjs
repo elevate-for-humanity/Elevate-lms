@@ -45,10 +45,6 @@ const adminConfig = {
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
       config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');
-    } else {
-      // Diagnostic isolation: determine whether the migrated Admin regression is
-      // exclusively in the browser minification phase. This is not the final fix.
-      config.optimization.minimize = false;
     }
     config.parallelism = 1;
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;

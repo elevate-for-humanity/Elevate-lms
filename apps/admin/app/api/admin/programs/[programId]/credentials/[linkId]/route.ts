@@ -11,12 +11,11 @@ const PatchSchema = z.object({
   notes: z.string().optional().nullable(),
 });
 
-// PATCH /api/admin/programs/[programId]/credentials/[linkId]
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string; linkId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { programId, linkId } = await params;
   const auth = await apiRequireAdmin(req);
@@ -45,7 +44,6 @@ export async function PATCH(
   return NextResponse.json({ link: data });
 }
 
-// DELETE /api/admin/programs/[programId]/credentials/[linkId]
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string; linkId: string }> },

@@ -8,6 +8,13 @@ export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
 
+type ApprenticeProfile = {
+  id: string;
+  full_name: string;
+  email: string;
+  avatar_url: string | null;
+};
+
 async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -25,7 +32,6 @@ async function _GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const programId = searchParams.get('program');
 
-    // Get partner user
     const { data: partnerUser } = await supabase
       .from('partner_users')
       .select('partner_id')
@@ -37,7 +43,6 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'Not a partner' }, { status: 403 });
     }
 
-    // Check program access
     if (programId) {
       const { data: access } = await supabase
         .from('partner_program_access')
@@ -52,7 +57,6 @@ async function _GET(request: NextRequest) {
       }
     }
 
-    // Get apprentices assigned to this partner
     let query = supabase
       .from('apprenticeships')
       .select(
@@ -79,7 +83,6 @@ async function _GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch apprentices' }, { status: 500 });
     }
 
-    // Get total hours for each apprentice
     const apprentices = await Promise.all(
       (apprenticeships || []).map(async (a) => {
         const { data: progressSum } = await supabase
@@ -89,18 +92,14 @@ async function _GET(request: NextRequest) {
           .eq('partner_id', partnerUser.partner_id);
 
         const totalHours = (progressSum || []).reduce((sum, p) => sum + (p.hours_worked || 0), 0);
-        const profile = a.profiles as {
-          id: string;
-          full_name: string;
-          email: string;
-          avatar_url: string | null;
-        } | null;
+        const rawProfiles = a.profiles as unknown;
+        const profile = (Array.isArray(rawProfiles) ? rawProfiles[0] : rawProfiles) as ApprenticeProfile | null | undefined;
 
         return {
           id: profile?.id || a.apprentice_id,
           full_name: profile?.full_name || 'Unknown',
           email: profile?.email || '',
-          avatar_url: profile?.avatar_url,
+          avatar_url: profile?.avatar_url || null,
           start_date: a.start_date,
           total_hours: totalHours,
         };

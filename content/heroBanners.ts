@@ -1,18 +1,16 @@
 /**
  * Canonical marketing hero configuration.
  *
- * The JSON dataset owns each page's explicit media assignment. Do not replace
- * page videos merely because another page happens to reference the same file;
- * that behavior caused unrelated hero videos to disappear or turn into stills.
- *
- * Posters are also explicit. Do not infer broad topical fallback images because
- * that caused the same workforce/healthcare/business pictures to appear across
- * unrelated pages and made the site look duplicated.
+ * JSON owns copy and non-dedicated media. Dedicated hero media is owned by the
+ * video registry and always wins so stale JSON cannot duplicate the homepage
+ * film across unrelated pages. Posters are explicit and semantic; no heuristic
+ * image substitution is allowed.
  */
 
 import { loadJsonOnce } from '@/lib/data/json-cache';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 import { PROGRAM_IMAGES, getProgramHeroImage } from '@/lib/images/programImages';
+import { getHeroVideoForPageKey } from '@/lib/video/registry';
 
 export interface HeroBannerCta {
   label: string;
@@ -71,14 +69,19 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
 };
 
 function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
+  const dedicated = getHeroVideoForPageKey(key);
+  if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
   if (banner.posterImage) return banner.posterImage;
   if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
   return PAGE_PICTURE_OVERRIDES[key];
 }
 
 function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerConfig {
-  const desktop = banner.videoSrcDesktop || banner.videoSrcMobile;
-  const mobile = banner.videoSrcMobile || banner.videoSrcDesktop;
+  const dedicated = getHeroVideoForPageKey(key);
+  const jsonDesktop = banner.videoSrcDesktop || banner.videoSrcMobile;
+  const jsonMobile = banner.videoSrcMobile || banner.videoSrcDesktop;
+  const desktop = dedicated?.video_url || jsonDesktop;
+  const mobile = dedicated?.video_url || jsonMobile;
 
   let normalized: HeroBannerConfig = {
     ...banner,
@@ -93,21 +96,21 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
     analyticsName: banner.analyticsName ?? key,
   };
 
+  // Store is intentionally poster-first. It must never inherit a generic or
+  // homepage mobile video from the JSON dataset.
   if (key === 'store') {
     normalized = {
       ...normalized,
       videoSrcDesktop: undefined,
       videoSrcMobile: undefined,
-      posterImage: banner.posterImage ?? '/images/pages/store-licensing-hero.webp',
+      posterImage: posterFor(key, banner) ?? '/images/pages/store-licensing-hero.webp',
     };
   }
 
   if (key === 'home') {
     normalized = {
       ...normalized,
-      videoSrcDesktop: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
-      videoSrcMobile: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
-      posterImage: '/images/heroes/hero-homepage.webp',
+      posterImage: posterFor(key, banner) ?? '/images/heroes/hero-homepage.webp',
       voiceoverSrc: '/audio/heroes/home.mp3',
       microLabel: 'The AI-Powered Workforce Operating System',
       eyebrow: 'Career Training & Workforce Development',

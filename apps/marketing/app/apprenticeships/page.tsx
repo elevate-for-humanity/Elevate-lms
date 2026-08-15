@@ -28,7 +28,7 @@ const PATHWAYS = [
     title: 'Cosmetology Apprenticeship',
     href: '/programs/cosmetology-apprenticeship',
     applyHref: '/apply/student?program=cosmetology-apprenticeship',
-    image: '/images/pages/cosmetology-hero.webp',
+    image: '/images/pexels/cosmetology.webp',
     imageAlt: 'Cosmetology apprentice receiving supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
     description:
@@ -38,7 +38,7 @@ const PATHWAYS = [
     title: 'Esthetics Apprenticeship',
     href: '/programs/esthetician-apprenticeship',
     applyHref: '/apply/student?program=esthetician-apprenticeship',
-    image: '/images/pages/esthetician-hero.webp',
+    image: '/images/pexels/esthetician.webp',
     imageAlt: 'Esthetics apprentice completing supervised skincare training',
     badge: 'Beauty Apprenticeship Pathway',
     description:
@@ -48,7 +48,7 @@ const PATHWAYS = [
     title: 'Nail Technician Apprenticeship',
     href: '/programs/nail-technician-apprenticeship',
     applyHref: '/apply/student?program=nail-technician-apprenticeship',
-    image: '/images/pages/nail-tech-hero.webp',
+    image: '/images/pexels/nail-tech.webp',
     imageAlt: 'Nail technician apprentice completing supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
     description:

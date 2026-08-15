@@ -8,7 +8,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const maxDuration = 60;
 
 const _POST = withAuth(
-  async (request: NextRequest, user) => {
+  async (request: NextRequest, _context, user) => {
     const rateLimited = await applyRateLimit(request, 'strict');
     if (rateLimited) return rateLimited;
     if (!user?.role || !['admin', 'staff'].includes(user.role)) {
@@ -23,8 +23,7 @@ const _POST = withAuth(
         return NextResponse.json({ error: result.error }, { status: 500 });
       }
 
-      // Export to JSON
-      const jsonBackup = await exportBackupToJSON(result.backup);
+      await exportBackupToJSON(result.backup);
 
       return NextResponse.json({
         success: true,
@@ -41,14 +40,13 @@ const _POST = withAuth(
 );
 
 const _GET = withAuth(
-  async (request: NextRequest, user) => {
+  async (_request: NextRequest, _context, user) => {
     if (!user?.role || !['admin', 'staff'].includes(user.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     try {
       const backups = await listBackups();
-
       return NextResponse.json({ backups });
     } catch (error) {
       logger.error('Error listing backups:', error);

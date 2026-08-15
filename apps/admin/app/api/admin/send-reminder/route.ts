@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
-
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireApiAuth } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
@@ -39,7 +38,7 @@ async function sendSMS(phone: string, message: string): Promise<boolean> {
     );
 
     return response.ok;
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -49,17 +48,17 @@ async function _POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    // Auth guard: require authenticated admin user
+    let actorId = '';
     try {
       await requireApiAuth();
-      const supabase = await createClient();
+      const userClient = await createClient();
       const {
         data: { user },
-      } = await supabase.auth.getUser();
+      } = await userClient.auth.getUser();
       if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
-      const { data: profile } = await supabase
+      const { data: profile } = await userClient
         .from('profiles')
         .select('role')
         .eq('id', user.id)
@@ -67,6 +66,7 @@ async function _POST(req: Request) {
       if (!profile?.role || !['admin', 'staff'].includes(profile.role)) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
       }
+      actorId = user.id;
     } catch {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -80,11 +80,6 @@ async function _POST(req: Request) {
 
     const supabase = await requireAdminClient();
 
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
-    }
-
-    // Get application details
     const { data: app, error: appError } = await supabase
       .from('applications')
       .select(
@@ -106,12 +101,10 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'Requested application is unavailable' }, { status: 404 });
     }
 
-    // Only send SMS if contact preference is text
     if (app.contact_preference !== 'Text Message') {
       return NextResponse.json({ message: 'Contact preference is not SMS' }, { status: 200 });
     }
 
-    // Build message based on reminder type
     let message = '';
     const checklist = app.application_checklist?.[0];
 
@@ -136,31 +129,30 @@ async function _POST(req: Request) {
         return NextResponse.json({ error: 'Invalid reminder type' }, { status: 400 });
     }
 
-    // Send SMS
     const sent = await sendSMS(app.phone, message);
 
-    // Log reminder
     await supabase.from('sms_reminders').insert({
       application_id: app.id,
       reminder_type,
       status: sent ? 'sent' : 'failed',
     });
 
-    if (sent)
+    if (sent) {
       await logAdminAudit({
         action: AdminAction.REMINDER_SENT,
-        actorId: user.id,
+        actorId,
         entityType: 'sms_reminders',
         entityId: app.id,
         metadata: { reminder_type, phone_last4: app.phone?.slice(-4) },
-        req: request,
+        req,
       });
+    }
 
     return NextResponse.json({
       success: sent,
       message: sent ? 'Reminder sent' : 'Failed to send reminder',
     });
-  } catch (err: any) {
+  } catch {
     return NextResponse.json({ error: 'Failed to send reminder' }, { status: 500 });
   }
 }

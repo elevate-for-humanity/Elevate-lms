@@ -3,6 +3,7 @@ import { sendEmail } from '@/lib/email/sendgrid';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,10 @@ export const dynamic = 'force-dynamic';
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
   const token = process.env.ADMIN_TEST_EMAIL_TOKEN;
   if (!token) {
     return NextResponse.json(
@@ -55,4 +60,5 @@ async function _POST(req: NextRequest) {
 
   return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
 }
+
 export const POST = withApiAudit('/api/admin/test-email', _POST);

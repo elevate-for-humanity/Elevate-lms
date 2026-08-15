@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
-import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
+import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
@@ -12,10 +12,7 @@ async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireAdmin();
-  if ('error' in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
-  }
+  await requireAdmin();
 
   try {
     const body = await request.json();
@@ -24,12 +21,12 @@ async function _POST(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    const { data: _roleProfile } = await supabase
+    const { data: roleProfile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle();
-    if (!_roleProfile || !['admin', 'staff'].includes(_roleProfile.role)) {
+    if (!roleProfile || !['admin', 'staff'].includes(roleProfile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -43,7 +40,7 @@ async function _POST(request: NextRequest) {
         stage: body.stage || 'lead',
         probability: body.probability || 50,
         expected_close_date: body.expected_close_date || null,
-        assigned_to: user?.id,
+        assigned_to: user.id,
         notes: body.notes || null,
       })
       .select()
@@ -51,15 +48,14 @@ async function _POST(request: NextRequest) {
 
     if (error) throw error;
 
-    if (user)
-      await logAdminAudit({
-        action: AdminAction.CRM_DEAL_CREATED,
-        actorId: user.id,
-        entityType: 'crm_deals',
-        entityId: data.id,
-        metadata: { company: body.company_name, stage: body.stage },
-        req: request,
-      });
+    await logAdminAudit({
+      action: AdminAction.CRM_DEAL_CREATED,
+      actorId: user.id,
+      entityType: 'crm_deals',
+      entityId: data.id,
+      metadata: { company: body.company_name, stage: body.stage },
+      req: request,
+    });
 
     return NextResponse.json({ data }, { status: 201 });
   } catch (error) {
@@ -72,10 +68,7 @@ async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireAdmin();
-  if ('error' in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
-  }
+  await requireAdmin();
 
   const supabase = await createClient();
   const { data, error } = await supabase

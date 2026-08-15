@@ -8,22 +8,33 @@ import {
   handlePaymentFailed,
 } from '@/lib/license/linkStripeToLicense';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-04-30.basil' });
+function getStripe(): Stripe {
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(secretKey, { apiVersion: '2025-04-30.basil' });
+}
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const body = await req.text();
   const sig = req.headers.get('stripe-signature') ?? '';
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+  if (!webhookSecret) {
+    console.error('[/api/licenses/webhook] STRIPE_WEBHOOK_SECRET is not configured');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
+  }
+
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, webhookSecret!);
+    event = getStripe().webhooks.constructEvent(body, sig, webhookSecret);
   } catch (err) {
     console.error('[/api/licenses/webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  console.log('[/api/licenses/webhook] Received event:', event.type);
+  console.info('[/api/licenses/webhook] Received event:', event.type);
 
   try {
     switch (event.type) {
@@ -43,7 +54,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         await handlePaymentFailed(event.data.object as Stripe.Invoice);
         break;
       default:
-        console.log('[/api/licenses/webhook] Unhandled event type:', event.type);
+        console.info('[/api/licenses/webhook] Unhandled event type:', event.type);
     }
   } catch (err) {
     console.error('[/api/licenses/webhook] Handler error:', err);

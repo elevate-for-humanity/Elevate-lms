@@ -1,6 +1,20 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "paths": {
+      "@/lib/stripe/handlers/checkout-session-completed": [
+        "../../lib/stripe/handlers/checkout-session-completed-with-store.ts"
+      ],
+      "@/*": [
+        "../../*"
+      ],
+      "next": [
+        "./node_modules/next"
+      ],
+      "next/*": [
+        "./node_modules/next/*"
+      ]
+    },
     "plugins": [
       {
         "name": "next"

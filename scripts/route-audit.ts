@@ -72,13 +72,17 @@ const BANNED_PARTNER_PAGES = new Set([
 ]);
 
 // Exact duplicate/wrong API namespaces. These are forbidden even if a stale
-// generated inventory or old documentation still mentions them.
+// generated inventory or old documentation still mentions them. Stripe is
+// canonical only at LMS /api/webhooks/stripe; retired license webhook aliases
+// must never return as parallel endpoints.
 const BANNED_API_PREFIXES = [
   'api/pwa/api-pwa/',
   'api/store/api-store/',
   'api/cm/',
   'api/cert/',
   'api/donations/',
+  'api/license/',
+  'api/licenses/',
   'api/licensing/',
   'api/program-owner/',
   'api/employer-portal/',

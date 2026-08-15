@@ -4,14 +4,10 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Bell,
   Search,
   Menu,
   ChevronDown,
   LogOut,
-  Settings,
-  User,
-  ExternalLink,
   ShieldCheck,
 } from 'lucide-react';
 import type {
@@ -56,7 +52,6 @@ export function PlatformShell({
   role,
   breadcrumbs,
   actions = [],
-  notifications = 0,
   children,
 }: PlatformShellProps) {
   const pathname = usePathname();
@@ -165,19 +160,6 @@ export function PlatformShell({
               </div>
             )}
 
-            <Link
-              href="/notifications"
-              className="relative rounded-lg p-2 transition-colors hover:bg-slate-100"
-              aria-label="Notifications"
-            >
-              <Bell className="h-5 w-5 text-slate-700" />
-              {notifications > 0 && (
-                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand-red-600 text-xs text-white">
-                  {notifications > 9 ? '9+' : notifications}
-                </span>
-              )}
-            </Link>
-
             <div className="group relative">
               <button className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-slate-100" aria-label="Open account menu">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">
@@ -194,13 +176,6 @@ export function PlatformShell({
                     <ShieldCheck className="h-3.5 w-3.5" /> Authenticated with Supabase
                   </p>
                 </div>
-                <Link href="/profile" className="flex items-center gap-2 px-4 py-2 font-medium text-slate-800 hover:bg-slate-50">
-                  <User className="h-4 w-4" /> Profile
-                </Link>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2 font-medium text-slate-800 hover:bg-slate-50">
-                  <Settings className="h-4 w-4" /> Settings
-                </Link>
-                <hr className="my-2 border-slate-100" />
                 <form action="/api/auth/signout" method="post">
                   <button type="submit" className="flex w-full items-center gap-2 px-4 py-2 text-left font-bold text-red-700 hover:bg-red-50">
                     <LogOut className="h-4 w-4" /> Sign out securely
@@ -290,17 +265,11 @@ export function PlatformShell({
               ))}
             </nav>
 
-            <div className="space-y-1 border-t border-slate-800 p-4">
-              <div className="mb-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-100">
+            <div className="border-t border-slate-800 p-4">
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-100">
                 <div className="flex items-center gap-2 font-black"><ShieldCheck className="h-4 w-4" /> Secure workspace</div>
                 <p className="mt-1 leading-5 text-emerald-100/90">Your session is authenticated and portal access is role-restricted.</p>
               </div>
-              <Link href="/lms/support" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
-                <Bell className="h-4 w-4" /> Support
-              </Link>
-              <Link href="/lms/help" className="flex items-center gap-2 py-2 text-sm font-medium text-slate-300 hover:text-white">
-                <ExternalLink className="h-4 w-4" /> Help Center
-              </Link>
             </div>
           </div>
         </aside>

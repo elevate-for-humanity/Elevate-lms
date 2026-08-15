@@ -6,11 +6,15 @@ export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
 
-async function requireAdmin() {
+type AdminContext = {
+  user: { id: string };
+  profile: { role: string };
+  db: Awaited<ReturnType<typeof requireAdminClient>>;
+};
+
+async function requireAdmin(): Promise<AdminContext | { error: string; status: number }> {
   const supabase = await createClient();
   const db = await requireAdminClient();
-  if (!db)
-    return NextResponse.json({ error: 'Admin client failed to initialize' }, { status: 500 });
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -23,7 +27,11 @@ async function requireAdmin() {
   if (!profile || !['admin', 'sponsor'].includes(profile.role)) {
     return { error: 'Forbidden', status: 403 };
   }
-  return { user, profile, db };
+  return { user: { id: user.id }, profile: { role: profile.role }, db };
+}
+
+function isAdminError(auth: AdminContext | { error: string; status: number }): auth is { error: string; status: number } {
+  return 'error' in auth;
 }
 
 // GET — list sessions for a cohort
@@ -31,7 +39,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ coho
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const auth = await requireAdmin();
-  if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (isAdminError(auth)) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const { cohortId } = await params;
 
@@ -51,7 +59,7 @@ export async function POST(
   { params }: { params: Promise<{ cohortId: string }> },
 ) {
   const auth = await requireAdmin();
-  if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+  if (isAdminError(auth)) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   const { cohortId } = await params;
   const body = await req.json();
@@ -69,7 +77,7 @@ export async function POST(
       location: body.location || null,
       instructor_name: body.instructor_name || null,
       notes: body.notes || null,
-      created_by: auth.id,
+      created_by: auth.user.id,
     })
     .select()
     .maybeSingle();

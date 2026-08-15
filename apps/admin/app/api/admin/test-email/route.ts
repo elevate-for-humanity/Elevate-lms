@@ -1,24 +1,20 @@
-import { requireAdmin } from '@/lib/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/sendgrid';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { apiRequireAdmin } from '@/lib/admin/guards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/**
- * POST /api/admin/test-email
- * Auth: token query param or x-admin-test-token header.
- * Body: { to?: string } — defaults to MAIL_TO_ADMIN env.
- *
- * curl -X POST "https://www.elevateforhumanity.org/api/admin/test-email?token=YOUR_TOKEN" \
- *   -H "content-type: application/json" -d '{"to":"you@gmail.com"}'
- */
 async function _POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
+
+  const auth = await apiRequireAdmin(req);
+  if (auth.error) return auth.error;
+
   const token = process.env.ADMIN_TEST_EMAIL_TOKEN;
   if (!token) {
     return NextResponse.json(
@@ -59,9 +55,10 @@ async function _POST(req: NextRequest) {
   });
 
   if (result.success) {
-    return NextResponse.json({ ok: true, to, id: result.data?.id });
+    return NextResponse.json({ ok: true, to, provider: result.data?.provider ?? 'sendgrid' });
   }
 
   return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
 }
+
 export const POST = withApiAudit('/api/admin/test-email', _POST);

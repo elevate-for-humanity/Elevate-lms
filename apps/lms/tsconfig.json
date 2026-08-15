@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
       "@/lib/stripe/handlers/checkout-session-completed": [
         "../../lib/stripe/handlers/checkout-session-completed-with-store.ts"

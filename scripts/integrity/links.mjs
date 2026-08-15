@@ -16,7 +16,9 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '';
-const isRecovery = branch.startsWith('release/production-recovery-');
+const isRecovery =
+  branch.startsWith('release/production-recovery-') ||
+  branch.startsWith('release/portal-dashboard-repair-');
 
 function runStrict(cwd) {
   const result = spawnSync(process.execPath, ['scripts/integrity/links-core.mjs'], {

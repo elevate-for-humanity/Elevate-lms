@@ -30,7 +30,7 @@ const INSTALLABLE_APPS = [
   {
     name: 'Program Holder PWA',
     description: 'Programs, students, hours, documents and compliance actions.',
-    href: 'https://www.elevateforhumanity.org/program-holder/dashboard',
+    href: 'https://app.elevateforhumanity.org/program-holder/dashboard',
     image: '/images/pages/business-meeting.webp',
   },
 ] as const;

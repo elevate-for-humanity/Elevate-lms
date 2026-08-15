@@ -6,6 +6,24 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
+type SupabaseStatus = {
+  status: 'connected' | 'error';
+  latency_ms: number;
+  region: string;
+  tables_accessible: number;
+  total_tables: number;
+  last_error?: string;
+};
+
+type StripeStatus = {
+  status: 'inactive' | 'active' | 'error';
+  mode: 'test' | 'live';
+  balance_cents: number;
+  active_subscriptions: number;
+  failed_payments_24h: number;
+  pending_invoices: number;
+};
+
 export async function GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -16,10 +34,9 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
 
-    // Supabase Status
     const supabaseStart = Date.now();
-    const supabaseStatus = {
-      status: 'connected' as const,
+    const supabaseStatus: SupabaseStatus = {
+      status: 'connected',
       latency_ms: 0,
       region: 'us-east-1',
       tables_accessible: 0,
@@ -27,23 +44,21 @@ export async function GET(request: NextRequest) {
     };
 
     try {
-      // Count accessible tables
       const { count: profileCount } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
       supabaseStatus.latency_ms = Date.now() - supabaseStart;
       supabaseStatus.tables_accessible = profileCount !== null ? 1 : 0;
-      supabaseStatus.total_tables = 50; // Estimated total tables
-    } catch (err) {
+      supabaseStatus.total_tables = 50;
+    } catch {
       supabaseStatus.status = 'error';
       supabaseStatus.last_error = 'Connection failed';
     }
 
-    // Stripe Status
-    let stripeStatus = {
-      status: 'inactive' as const,
-      mode: 'test' as const,
+    let stripeStatus: StripeStatus = {
+      status: 'inactive',
+      mode: 'test',
       balance_cents: 0,
       active_subscriptions: 0,
       failed_payments_24h: 0,
@@ -53,8 +68,7 @@ export async function GET(request: NextRequest) {
     try {
       const stripe = getStripe();
       if (stripe) {
-        const now = new Date();
-        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
         const [balance, subscriptions, failedPayments, pendingInvoices] = await Promise.all([
           stripe.balance.retrieve(),
@@ -62,7 +76,7 @@ export async function GET(request: NextRequest) {
           stripe.charges.list({
             created: { gte: Math.floor(yesterday.getTime() / 1000) },
             limit: 100,
-          }).then(r => r.data.filter(c => !c.paid && c.failure_message)),
+          }).then((r) => r.data.filter((c) => !c.paid && c.failure_message)),
           stripe.invoices.list({ status: 'open', limit: 100 }),
         ]);
 
@@ -80,7 +94,6 @@ export async function GET(request: NextRequest) {
       stripeStatus.status = 'error';
     }
 
-    // GitHub PR Status (mock for now - would need GitHub token)
     const githubStatus = {
       total_open: 0,
       needs_review: 0,
@@ -107,24 +120,18 @@ export async function GET(request: NextRequest) {
               Authorization: `Bearer ${githubToken}`,
               Accept: 'application/vnd.github.v3+json',
             },
-          }
+          },
         );
 
         if (repoResponse.ok) {
           const prs = await repoResponse.json();
           githubStatus.total_open = prs.length;
-          
+
           for (const pr of prs) {
-            const isDraft = pr.draft;
-            const hasChanges = pr.requested_reviewers?.length > 0;
-            
-            if (isDraft) {
-              githubStatus.drafts++;
-            } else if (hasChanges) {
-              githubStatus.needs_review++;
-            }
+            if (pr.draft) githubStatus.drafts++;
+            else if (pr.requested_reviewers?.length > 0) githubStatus.needs_review++;
           }
-          
+
           githubStatus.recent_prs = prs.slice(0, 5).map((pr: any) => ({
             number: pr.number,
             title: pr.title,
@@ -147,9 +154,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.error('Platform status error:', err);
-    return NextResponse.json(
-      { error: 'Status check failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Status check failed' }, { status: 500 });
   }
 }

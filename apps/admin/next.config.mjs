@@ -66,8 +66,8 @@ const adminConfig = {
   },
 
   async redirects() {
-    // Public cross-service convenience routes only. Retired internal /admin
-    // aliases are intentionally not preserved on the Admin hostname.
+    // Public cross-service convenience routes only. The retired /admin prefix is
+    // intentionally not preserved on the Admin hostname.
     return [
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },

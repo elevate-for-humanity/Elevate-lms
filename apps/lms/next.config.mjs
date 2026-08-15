@@ -31,8 +31,8 @@ const nextConfig = {
     };
   },
   async redirects() {
-    // Public cross-service convenience routes only. Retired internal LMS,
-    // partner, host-shop and Admin aliases are intentionally not preserved.
+    // Public cross-service convenience routes only. Private Admin aliases are
+    // intentionally absent; callers must use the canonical Admin hostname.
     return [
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },

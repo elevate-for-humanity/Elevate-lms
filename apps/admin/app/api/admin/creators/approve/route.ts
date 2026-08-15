@@ -1,6 +1,7 @@
 // Using Node.js runtime for email compatibility
 
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { sendCreatorApprovalEmail } from '@/lib/email/sendgrid';
 import { toErrorMessage } from '@/lib/safe';
@@ -41,7 +42,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'creatorId is required' }, { status: 400 });
     }
 
-    // Pre-read: verify creator exists before updating
     const { data: creator, error: fetchError } = await supabase
       .from('marketplace_creators')
       .select('user_id, status, profiles(email, full_name)')
@@ -59,7 +59,6 @@ export async function POST(req: Request) {
 
     if (error) throw error;
 
-    // Audit log
     await logAuditEvent({
       userId: user.id,
       action: AuditActions.MARKETPLACE_CREATOR_APPROVED,
@@ -68,7 +67,6 @@ export async function POST(req: Request) {
       ipAddress,
     });
 
-    // Send approval email
     const profile = creator?.profiles as any;
     if (profile?.email) {
       try {

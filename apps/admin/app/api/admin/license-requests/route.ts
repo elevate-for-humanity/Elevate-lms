@@ -41,7 +41,7 @@ async function _PATCH(req: NextRequest) {
   if (error) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
 
   await logAdminAudit({
-    action: AdminAction.ENROLLMENT_UPDATED,
+    action: AdminAction.LICENSE_REQUEST_REVIEWED,
     actorId: auth.id,
     entityType: 'license_requests',
     entityId: id,

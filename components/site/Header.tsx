@@ -6,6 +6,7 @@ import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
+import HeaderQuickMenu from './HeaderQuickMenu';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -18,7 +19,7 @@ export default function Header() {
       data-site-header
       data-header-owner="marketing-root"
     >
-      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 min-[900px]:gap-1 min-[900px]:px-2 xl:gap-3 xl:px-4 2xl:px-6">
+      <div className="mx-auto grid h-full w-full max-w-screen-2xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-3 xl:gap-3 xl:px-4 2xl:px-6">
         <Link
           href="/"
           className="flex min-w-0 flex-shrink-0 items-center gap-2"
@@ -30,14 +31,16 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* One canonical desktop navigation row. Keep it available on compact
-            laptop viewports instead of falling back to the mobile drawer. */}
-        <div className="hidden min-w-0 justify-center overflow-visible min-[900px]:flex">
+        {/* Keep compact laptop/tablet widths on the drawer navigation. The
+            complete desktop nav only renders when there is enough horizontal
+            space for every primary destination plus account actions. */}
+        <div className="hidden min-w-0 justify-center overflow-visible xl:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          <div className="hidden flex-nowrap items-center gap-1 min-[900px]:flex">
+          <div className="hidden flex-nowrap items-center gap-1 xl:flex">
+            <HeaderQuickMenu items={NAV_ITEMS} />
             <Link
               href={ROUTES.login}
               className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"
@@ -52,8 +55,9 @@ export default function Header() {
             </Link>
           </div>
 
-          {/* Phones and compact tablets below 900px use the dedicated drawer. */}
-          <div className="flex flex-nowrap items-center gap-1 min-[900px]:hidden">
+          {/* Phones, tablets, and compact laptops use the dedicated drawer so
+              Programs and every other navigation group remain reachable. */}
+          <div className="flex flex-nowrap items-center gap-1 xl:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu
             </span>

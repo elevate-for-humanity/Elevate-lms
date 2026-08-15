@@ -16,8 +16,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
-
 const PatchSchema = z.object({
   partner_name: z.string().min(1).optional(),
   title: z.string().min(1).optional(),
@@ -38,7 +36,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string; itemId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { programId, itemId } = await params;
   const auth = await apiRequireAdmin(req);

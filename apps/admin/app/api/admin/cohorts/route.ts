@@ -46,21 +46,14 @@ async function _GET(request: Request) {
       )
       .order('start_date', { ascending: false });
 
-    if (status) {
-      query = query.eq('status', status);
-    }
-    if (programId) {
-      query = query.eq('program_id', programId);
-    }
+    if (status) query = query.eq('status', status);
+    if (programId) query = query.eq('program_id', programId);
 
     const { data: cohorts, error } = await query;
-
-    if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-    }
+    if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
     return NextResponse.json({ cohorts: cohorts || [] });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -94,7 +87,6 @@ async function _POST(request: Request) {
         location: body.location,
         instructor_id: body.instructor_id,
         notes: body.notes,
-        // Workforce scheduling metadata
         partner_name: body.partner_name || null,
         partner_id: body.partner_id || null,
         duration_weeks_min: body.duration_weeks_min || null,
@@ -109,13 +101,10 @@ async function _POST(request: Request) {
       .select()
       .maybeSingle();
 
-    if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-    }
+    if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
-    // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'create',
       resource_type: 'cohort',
@@ -124,7 +113,7 @@ async function _POST(request: Request) {
     });
 
     return NextResponse.json({ cohort }, { status: 201 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -139,11 +128,8 @@ async function _PATCH(request: Request) {
     const body = await request.json();
     const { id, ...updates } = body;
 
-    if (!id) {
-      return NextResponse.json({ error: 'Cohort ID required' }, { status: 400 });
-    }
+    if (!id) return NextResponse.json({ error: 'Cohort ID required' }, { status: 400 });
 
-    // Get current state for audit
     const { data: oldCohort } = await auth.supabase
       .from('cohorts')
       .select('*')
@@ -152,21 +138,15 @@ async function _PATCH(request: Request) {
 
     const { data: cohort, error } = await auth.supabase
       .from('cohorts')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .maybeSingle();
 
-    if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-    }
+    if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
-    // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'update',
       resource_type: 'cohort',
@@ -176,7 +156,7 @@ async function _PATCH(request: Request) {
     });
 
     return NextResponse.json({ cohort });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -190,31 +170,23 @@ async function _DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    if (!id) return NextResponse.json({ error: 'Cohort ID required' }, { status: 400 });
 
-    if (!id) {
-      return NextResponse.json({ error: 'Cohort ID required' }, { status: 400 });
-    }
-
-    // Get current state for audit
     const { data: oldCohort } = await auth.supabase
       .from('cohorts')
       .select('*')
       .eq('id', id)
       .maybeSingle();
 
-    // Soft delete by setting status to cancelled
     const { error } = await auth.supabase
       .from('cohorts')
       .update({ status: 'cancelled', updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) {
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-    }
+    if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
-    // Log audit
     await auth.supabase.from('audit_logs').insert({
-      actor_id: auth.id,
+      actor_id: auth.user.id,
       actor_role: auth.profile.role,
       action: 'delete',
       resource_type: 'cohort',
@@ -223,7 +195,7 @@ async function _DELETE(request: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

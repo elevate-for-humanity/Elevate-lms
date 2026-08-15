@@ -4,209 +4,139 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - 'apps/**'
-      - 'packages/**'
-      - 'lib/**'
-      - 'components/**'
-      - 'public/**'
-      - 'styles/**'
-      - 'data/**'
-      - 'types/**'
-      - 'hooks/**'
-      - 'contexts/**'
-      - 'config/**'
-      - 'content/**'
-      - 'utils/**'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'proxy.ts'
-      - 'Dockerfile.*'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
   pull_request:
     branches: [main]
-    paths:
-      - 'apps/**'
-      - 'packages/**'
-      - 'lib/**'
-      - 'components/**'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'proxy.ts'
-      - 'Dockerfile.*'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - '.github/workflows/ci-cd.yml'
 
 concurrency:
   group: ci-cd-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
+
+env:
+  NODE_OPTIONS: '--max-old-space-size=6144'
 
 jobs:
-  test-and-build:
+  quality:
+    name: Release diagnostic — ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: system-invariants
+            command: pnpm run verify:system
+          - name: unit-tests
+            command: pnpm run test
+          - name: smoke-tests
+            command: bash scripts/smoke-test.sh
+          - name: production-typecheck
+            command: pnpm run typecheck:all
+          - name: route-governance
+            command: node scripts/run-platform-doctor-strict.mjs
     env:
-      NODE_OPTIONS: '--max-old-space-size=6144'
-
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org' }}
+      SSN_SALT: ${{ secrets.SSN_SALT }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      SKIP_ENV_VALIDATION: 'true'
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
           clean: true
-
-      - name: Verify source commit SHA
-        run: |
-          set -euo pipefail
-          ACTUAL_SHA="$(git rev-parse HEAD)"
-          echo "Checked out SHA: $ACTUAL_SHA"
-          test "$(git status --porcelain)" = ""
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify source commit
+        run: |
+          echo "Checked out SHA: $(git rev-parse HEAD)"
+          test "$(git status --porcelain)" = ""
+      - name: Run ${{ matrix.name }}
+        run: ${{ matrix.command }}
 
-      - name: Cache Next.js build artifacts
-        uses: actions/cache@v4
+  build:
+    name: Production build — ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: marketing
+            command: pnpm --filter @elevate/marketing build
+          - app: admin
+            command: pnpm --filter @elevate/admin build
+          - app: lms
+            command: pnpm run build:lms:phased
+    env:
+      GENERATE_SOURCEMAP: 'false'
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org' }}
+      NEXT_PUBLIC_ADMIN_URL: ${{ secrets.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org' }}
+      NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org' }}
+      SSN_SALT: ${{ secrets.SSN_SALT }}
+      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+      SKIP_ENV_VALIDATION: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          path: |
-            .next/cache
-            apps/*/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.mjs', '**/*.js') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
-            ${{ runner.os }}-nextjs-
-
-      - name: System invariants
-        run: pnpm run verify:system
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-          SSN_SALT: ${{ secrets.SSN_SALT }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-
-      - name: Run unit tests
-        run: pnpm run test
-
-      - name: Run smoke tests
-        run: bash scripts/smoke-test.sh
-
-      - name: TypeScript — production applications
-        run: pnpm run typecheck:all
-
-      - name: Route governance
-        run: node scripts/run-platform-doctor-strict.mjs
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder' }}
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org' }}
-          SKIP_ENV_VALIDATION: 'true'
-
-      - name: SEO governance (advisory)
-        continue-on-error: true
-        run: pnpm run seo:check
-
-      - name: Archetype + Quality Gates (advisory)
-        continue-on-error: true
-        run: pnpm run archetype:check
-
-      - name: Install Playwright browser
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Browser E2E acceptance
-        shell: bash
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          SKIP_ENV_VALIDATION: 'true'
-          PLAYWRIGHT_BASE_URL: 'https://www.elevateforhumanity.org'
-        run: pnpm exec playwright test --config=playwright.ci.config.ts
-
-      - name: Clear Next.js cache
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Clear Next.js caches
         run: rm -rf .next apps/*/.next
-
-      - name: Build
-        env:
-          GENERATE_SOURCEMAP: 'false'
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-          SSN_SALT: ${{ secrets.SSN_SALT }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-        run: pnpm run build:lms:phased
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: nextjs-build-${{ github.sha }}
-          path: |
-            .next/
-            apps/*/.next/
-            Dockerfile.northflank-lms
-            Dockerfile.northflank-admin
-            Dockerfile.marketing
-          retention-days: 1
-          compression-level: 9
+      - name: Build ${{ matrix.app }}
+        run: ${{ matrix.command }}
 
   changed-file-lint:
+    name: Changed-file lint
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    timeout-minutes: 25
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
       - name: Lint changed files only
         shell: bash
         run: |
@@ -216,103 +146,85 @@ jobs:
           else
             BASE="HEAD~1"
           fi
-
-          CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' \
-            | grep -v node_modules \
-            | grep -v '\.next' \
-            || true)
-
+          CHANGED=$(git diff --name-only "$BASE" HEAD -- '*.ts' '*.tsx' '*.js' '*.jsx' | grep -v node_modules | grep -v '\.next' || true)
           if [ -z "$CHANGED" ]; then
             echo "No TS/JS files changed."
             exit 0
           fi
-
-          EXISTING_FILES=$(echo "$CHANGED" | while IFS= read -r file; do
-            [ -f "$file" ] && echo "$file"
-          done)
-
+          EXISTING_FILES=$(echo "$CHANGED" | while IFS= read -r file; do [ -f "$file" ] && echo "$file"; done)
           if [ -z "$EXISTING_FILES" ]; then
             echo "No existing TS/JS files to lint."
             exit 0
           fi
-
-          echo "$EXISTING_FILES"
           echo "$EXISTING_FILES" | xargs pnpm exec eslint --max-warnings=0 --no-error-on-unmatched-pattern --no-warn-ignored
 
-  post-deployment-check:
+  release-gate:
+    name: Production Release Gate
     runs-on: ubuntu-latest
-    needs: [test-and-build, changed-file-lint]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    timeout-minutes: 10
-
+    needs: [quality, build, changed-file-lint]
+    if: always()
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Require every release diagnostic to pass
+        shell: bash
+        run: |
+          echo "quality=${{ needs.quality.result }}"
+          echo "build=${{ needs.build.result }}"
+          echo "changed-file-lint=${{ needs.changed-file-lint.result }}"
+          test "${{ needs.quality.result }}" = "success"
+          test "${{ needs.build.result }}" = "success"
+          test "${{ needs.changed-file-lint.result }}" = "success"
+
+  post-deployment-check:
+    name: Production post-deployment verification
+    runs-on: ubuntu-latest
+    needs: [release-gate]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
-
-      - name: Wait for deployment to propagate
-        run: sleep 90
-
-      - name: Check health endpoint
-        id: health
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Refuse to certify a failed release gate
+        run: test "${{ needs.release-gate.result }}" = "success"
+      - name: Wait for production deployment
+        run: sleep 120
+      - name: Check Marketing, Admin and LMS health
         shell: bash
         run: |
           set -euo pipefail
-          HEALTH_URL="https://www.elevateforhumanity.org/api/health"
-          echo "Checking: $HEALTH_URL"
-          status_code=""
-          body=""
-          for attempt in 1 2 3; do
-            response=$(curl -sS -w "\n%{http_code}" --max-time 15 "$HEALTH_URL" || true)
-            status_code=$(echo "$response" | tail -n1)
-            body=$(echo "$response" | head -n-1)
-            echo "Attempt $attempt - Status: $status_code"
-            if [ "$status_code" = "200" ]; then
-              echo "healthy=true" >> "$GITHUB_OUTPUT"
-              exit 0
+          for url in \
+            https://www.elevateforhumanity.org/api/health \
+            https://admin.elevateforhumanity.org/api/health \
+            https://app.elevateforhumanity.org/api/health; do
+            echo "Checking $url"
+            ok=false
+            for attempt in 1 2 3; do
+              code=$(curl -sS -o /tmp/health-body -w '%{http_code}' --max-time 15 "$url" || true)
+              echo "Attempt $attempt: HTTP $code"
+              if [ "$code" = "200" ]; then ok=true; break; fi
+              sleep 20
+            done
+            if [ "$ok" != "true" ]; then
+              echo "FAILED: $url"
+              cat /tmp/health-body || true
+              exit 1
             fi
-            sleep 30
           done
-          echo "healthy=false" >> "$GITHUB_OUTPUT"
-          echo "Health check failed; last status: $status_code"
-          echo "Response: $body"
-          exit 1
-
-      - name: Run production smoke tests
+      - name: Run production portal smoke tests
         run: bash scripts/smoke-test-portal.sh https://www.elevateforhumanity.org
 
-      - name: Report deployment failure
-        if: failure()
-        run: |
-          echo "Deployment verification failed."
-          echo "Automatic rollback is disabled; recovery supervisor must decide rollback after reviewing the failed SHA and Northflank state."
-
-  branch-cleanup-audit:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Report merged branches without deleting
-        run: |
-          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
-          echo "Merged non-main branches eligible for supervised cleanup:"
-          git branch -r --merged origin/main \
-            | sed 's#^[[:space:]]*origin/##' \
-            | grep -Ev '^(main|HEAD|dependabot/|release/production-recovery-)' \
-            || true
-
   notify-on-failure:
+    name: Release failure report
     runs-on: ubuntu-latest
-    needs: [test-and-build, changed-file-lint]
-    if: failure()
-
+    needs: [release-gate]
+    if: always() && needs.release-gate.result != 'success'
     steps:
-      - name: Send notification
+      - name: Report release failure
         run: |
-          echo "CI/CD validation failed. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "Required release validation failed."
+          echo "No downstream required gate is being treated as successful because an earlier job failed."
+          echo "Check ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

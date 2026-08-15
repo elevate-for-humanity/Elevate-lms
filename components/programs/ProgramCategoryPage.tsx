@@ -90,7 +90,13 @@ export default function ProgramCategoryPage({
       <section className="relative w-full h-[45vh] sm:h-[50vh] min-h-[280px] overflow-hidden">
         <UltraVideoPlayer
           src={heroVideoSrc}
-          poster={heroPosterImage}
+          autoPlayOnMount
+          muted
+          loop
+          showControls={false}
+          enableProgressTracking={false}
+          enableResume={false}
+          aspectRatio="auto"
           className="absolute inset-0 w-full h-full object-cover"
         />
       </section>

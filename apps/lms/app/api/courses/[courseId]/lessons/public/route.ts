@@ -253,10 +253,12 @@ async function _GET(_request: NextRequest, { params }: { params: Promise<{ cours
       .select('id, content, video_url, quiz_questions, passing_score')
       .in('id', lessonIds);
 
-    const enrichMap = new Map((enriched ?? []).map((r: any) => [r.id, r]));
+    const enrichMap = new Map<string, Record<string, unknown>>(
+      (enriched ?? []).map((r: any) => [String(r.id), r as Record<string, unknown>]),
+    );
     const fullLessons = payload.lessons.map((l: any) => ({
       ...l,
-      ...(enrichMap.get(l.id) ?? {}),
+      ...(enrichMap.get(String(l.id)) ?? {}),
     }));
     return NextResponse.json({ ...payload, lessons: fullLessons });
   }

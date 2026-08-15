@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/staff-portal/dashboard',
+    canonical: 'https://admin.elevateforhumanity.org/staff-portal/dashboard',
   },
   title: 'Staff Dashboard',
   description: 'Staff portal for managing students, enrollments, and support tasks.',
@@ -94,7 +94,7 @@ export default async function StaffDashboard() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs
-            items={[{ label: 'Staff Portal', href: '/admin/staff-portal' }, { label: 'Dashboard' }]}
+            items={[{ label: 'Staff Portal', href: '/staff-portal' }, { label: 'Dashboard' }]}
           />
         </div>
       </div>
@@ -312,8 +312,8 @@ export default async function StaffDashboard() {
                 </div>
               </div>
             </Link>
-            <Link
-              href="/booth-rental/apply"
+            <a
+              href="https://www.elevateforhumanity.org/booth-rental/apply"
               className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
             >
               <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
@@ -325,7 +325,7 @@ export default async function StaffDashboard() {
                   Start the signup and payment flow
                 </div>
               </div>
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -390,8 +390,8 @@ export default async function StaffDashboard() {
             <h3 className="text-lg font-semibold text-black mb-4">HR, Hiring &amp; Payroll</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Hiring */}
-              <Link
-                href="/apply/staff"
+              <a
+                href="https://www.elevateforhumanity.org/apply/staff"
                 className="flex items-start gap-4 p-4 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-500 hover:shadow-sm transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-brand-blue-50 flex items-center justify-center flex-shrink-0">
@@ -403,7 +403,7 @@ export default async function StaffDashboard() {
                     Public hiring form — share with candidates
                   </div>
                 </div>
-              </Link>
+              </a>
 
               <Link
                 href="/applications"

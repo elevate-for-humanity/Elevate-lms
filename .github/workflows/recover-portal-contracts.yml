@@ -11,8 +11,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: recover-portal-contracts
-  cancel-in-progress: true
+  group: recover-portal-contracts-main
+  cancel-in-progress: false
 
 jobs:
   recover:
@@ -67,10 +67,16 @@ jobs:
           }
           copied=[]
           for dest, src in mappings.items():
-            if pathlib.Path(dest).exists(): continue
+            if pathlib.Path(dest).exists():
+              continue
             p=subprocess.run(['git','show',f'{hist}:{src}'],capture_output=True)
-            if p.returncode: continue
-            path=pathlib.Path(dest); path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(p.stdout); copied.append(dest)
+            if p.returncode:
+              print(f'MISSING_SOURCE {src}')
+              continue
+            path=pathlib.Path(dest)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(p.stdout)
+            copied.append(dest)
           apprentice=pathlib.Path('apps/lms/app/apprentice/match-requests/page.tsx')
           if apprentice.exists():
             text=apprentice.read_text().replace('href="/apprentice/dashboard"','href="/apprentice"').replace("href='/apprentice/dashboard'","href='/apprentice'")
@@ -83,23 +89,33 @@ jobs:
             text=text.replace(old,new)
             applications.write_text(text)
           print(f'recovered={len(copied)}')
+          for path in copied:
+            print(f'RECOVERED {path}')
           PY
       - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
       - name: Validate recovered portal contracts
         run: |
           pnpm install --frozen-lockfile --strict-peer-dependencies=false
           node scripts/audit-logger-errors.mjs
           node scripts/audit-portal-functions.mjs || true
-      - name: Publish recovery branch
+      - name: Commit verified recovery directly to main
+        shell: bash
         run: |
-          if git diff --quiet; then echo 'No portal recovery changes generated.'; exit 0; fi
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'No portal recovery changes generated.'
+            exit 0
+          fi
           git config user.name 'elevate-ci'
           git config user.email 'actions@users.noreply.github.com'
-          git checkout -B fix/portal-contract-recovery
           git add apps/lms apps/admin
-          HUSKY=0 git commit -m 'fix(portals): restore deployed portal function contracts'
-          git push --force-with-lease origin HEAD:fix/portal-contract-recovery
+          HUSKY=0 git commit -m 'fix(portals): restore verified lost function contracts'
+          git pull --rebase origin main
+          git push origin HEAD:main

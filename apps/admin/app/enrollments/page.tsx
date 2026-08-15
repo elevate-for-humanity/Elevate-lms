@@ -20,8 +20,8 @@ export default async function AdminEnrollmentsPage({
 }) {
   await requireRole(['admin', 'staff']);
   const params = await searchParams;
-  const programFilter = params.program || '';
-  const statusFilter = params.status || '';
+  const programFilter = params.program && params.program !== 'all' ? params.program : '';
+  const statusFilter = params.status && params.status !== 'all' ? params.status : '';
   const db = await requireAdminClient();
 
   // Students who completed onboarding but haven't been granted LMS access yet
@@ -43,6 +43,14 @@ export default async function AdminEnrollmentsPage({
       return { ...e, profile: p };
     }),
   );
+
+  // Build the filter from the real enrollment population rather than a hard-coded program list.
+  const { data: programRows } = await db
+    .from('program_enrollments')
+    .select('program_slug')
+    .not('program_slug', 'is', null)
+    .order('program_slug');
+  const programOptions = [...new Set((programRows ?? []).map((row: any) => String(row.program_slug || '').trim()).filter(Boolean))];
 
   let enrollmentsQuery = db
     .from('program_enrollments')
@@ -119,7 +127,6 @@ export default async function AdminEnrollmentsPage({
         },
       ]}
     >
-      {/* Program / status filters */}
       <AdminFilterBar>
         <form method="GET" className="flex flex-wrap gap-3 items-end">
           <div>
@@ -130,7 +137,11 @@ export default async function AdminEnrollmentsPage({
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
             >
               <option value="all">All Programs</option>
-              <option value="cdl-training">CDL Training</option>
+              {programOptions.map((slug) => (
+                <option key={slug} value={slug}>
+                  {slug.split('-').map((word) => word ? word[0].toUpperCase() + word.slice(1) : '').join(' ')}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -141,9 +152,11 @@ export default async function AdminEnrollmentsPage({
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-brand-blue-500 focus:outline-none"
             >
               <option value="all">All Statuses</option>
+              <option value="applied">Applied</option>
+              <option value="onboarding">Onboarding</option>
+              <option value="documents_complete">Documents Complete</option>
+              <option value="orientation_complete">Orientation Complete</option>
               <option value="active">Active</option>
-              <option value="pending">Pending</option>
-              <option value="pending_review">Pending Review</option>
               <option value="completed">Completed</option>
               <option value="withdrawn">Withdrawn</option>
             </select>
@@ -160,10 +173,15 @@ export default async function AdminEnrollmentsPage({
           >
             Clear
           </Link>
+          <Link
+            href="/applications"
+            className="px-4 py-2 bg-brand-blue-50 text-brand-blue-700 text-sm font-semibold rounded-lg hover:bg-brand-blue-100 transition-colors"
+          >
+            Review Applications
+          </Link>
         </form>
       </AdminFilterBar>
 
-      {/* Pending access — students who paid + completed onboarding, waiting for admin grant */}
       {pendingWithProfiles.length > 0 && (
         <div className="mb-8">
           <PendingAccessPanel enrollments={pendingWithProfiles} />

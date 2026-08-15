@@ -1,7 +1,7 @@
 /**
  * /api/admin/programs/[programId]/courses/[linkId]
  *
- * PATCH  — update sort_order or is_required on a program_courses row
+ * PATCH  — update order_index or is_required on a program_courses row
  * DELETE — detach an internal course from this program
  */
 
@@ -23,7 +23,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string; linkId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { programId, linkId } = await params;
   const auth = await apiRequireAdmin(req);

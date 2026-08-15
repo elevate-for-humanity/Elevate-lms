@@ -1,4 +1,5 @@
 import { getStripe } from '@/lib/stripe/client';
+import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -9,7 +10,6 @@ export const dynamic = 'force-dynamic';
 
 async function guardAdmin() {
   const supabase = await createClient();
-  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -33,10 +33,6 @@ async function _GET(request: Request) {
   if (denied) return denied;
   try {
     const supabase = await requireAdminClient();
-
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
-    }
 
     const { data: courses, error } = await supabase
       .from('career_courses')
@@ -73,11 +69,6 @@ async function _POST(req: Request) {
     if (action === 'sync-stripe') {
       const supabase = await requireAdminClient();
 
-      if (!supabase) {
-        return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
-      }
-
-      // Get all courses without Stripe IDs
       const { data: courses, error } = await supabase
         .from('career_courses')
         .select('*')
@@ -87,15 +78,11 @@ async function _POST(req: Request) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       }
 
-      // Import Stripe
-      const Stripe = (await import('stripe')).default;
       const stripe = getStripe();
-
       const results = [];
 
       for (const course of courses || []) {
         try {
-          // Create Stripe product
           const product = await stripe.products.create({
             name: course.title,
             description: course.description || undefined,
@@ -106,7 +93,6 @@ async function _POST(req: Request) {
             },
           });
 
-          // Create Stripe price
           const price = await stripe.prices.create({
             product: product.id,
             unit_amount: Math.round(course.price * 100),
@@ -116,7 +102,6 @@ async function _POST(req: Request) {
             },
           });
 
-          // Update course with Stripe IDs
           await supabase
             .from('career_courses')
             .update({
@@ -131,7 +116,7 @@ async function _POST(req: Request) {
             price_id: price.id,
             status: 'success',
           });
-        } catch (stripeError: any) {
+        } catch {
           results.push({
             course: course.title,
             status: 'error',
@@ -150,7 +135,7 @@ async function _POST(req: Request) {
           entityType: 'career_courses',
           entityId: BULK_ENTITY_ID,
           metadata: { action: 'sync_stripe', count: results.length },
-          req: request,
+          req,
         });
 
       return NextResponse.json({ results });

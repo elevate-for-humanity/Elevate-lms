@@ -17,8 +17,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
-
 const AttachSchema = z.object({
   course_id: z.string().uuid('Must be a valid course UUID'),
   is_required: z.boolean().default(true),
@@ -29,7 +27,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { programId } = await params;
   const auth = await apiRequireAdmin(req);
@@ -51,13 +49,16 @@ export async function GET(
     logger.error('GET program courses error', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-  // Normalize course sub-rows through the domain mapper to resolve title/course_name drift
-  const items = (data ?? []).map((row) => ({
-    id: row.id,
-    order_index: row.order_index,
-    is_required: row.is_required,
-    course: row.course ? mapCourseRow(row.course as RawCourseRow) : null,
-  }));
+
+  const items = (data ?? []).map((row) => {
+    const rawCourse = Array.isArray(row.course) ? row.course[0] : row.course;
+    return {
+      id: row.id,
+      order_index: row.order_index,
+      is_required: row.is_required,
+      course: rawCourse ? mapCourseRow(rawCourse as unknown as RawCourseRow) : null,
+    };
+  });
   return NextResponse.json({ items });
 }
 

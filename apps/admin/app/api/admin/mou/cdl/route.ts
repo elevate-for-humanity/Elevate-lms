@@ -38,28 +38,26 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'CDL MOU PDF generation failed');
   }
 
-  // Optionally persist to partners table
   if (body.partner_id) {
     const db = await requireAdminClient();
-    if (db) {
-      await db
-        .from('partners')
-        .update({
-          mou_signed: true,
-          mou_signed_at: body.signed_at ?? new Date().toISOString(),
-          mou_version: body.mou_version ?? '2025-cdl-01',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', body.partner_id);
-    }
+    await db
+      .from('partners')
+      .update({
+        mou_signed: true,
+        mou_signed_at: body.signed_at ?? new Date().toISOString(),
+        mou_version: body.mou_version ?? '2025-cdl-01',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', body.partner_id);
   }
 
-  return new NextResponse(pdfBytes, {
+  const pdfBody = Buffer.from(pdfBytes);
+  return new NextResponse(pdfBody, {
     status: 200,
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="CDL-MOU-${body.company_name.replace(/\s+/g, '-')}.pdf"`,
-      'Content-Length': String(pdfBytes.length),
+      'Content-Length': String(pdfBody.length),
     },
   });
 }
@@ -72,9 +70,6 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const db = await requireAdminClient();
-  if (!db) return safeError('Service unavailable', 503);
-
-  // Return CDL partners with MOU status
   const { data, error } = await db
     .from('partners')
     .select('id, name, contact_name, contact_email, mou_signed, mou_signed_at, mou_version, partner_type_detail, city, state, created_at')

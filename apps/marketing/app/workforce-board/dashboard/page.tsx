@@ -188,13 +188,13 @@ export default async function WorkforceBoardDashboard() {
               <h3 className="font-semibold text-slate-900 mb-1">View Job Board</h3>
               <p className="text-sm text-slate-500">Browse employment opportunities</p>
             </Link>
-            <Link href="/reports/wioa" className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md hover:border-brand-blue-200 transition-all">
-              <h3 className="font-semibold text-slate-900 mb-1">WIOA Reports</h3>
-              <p className="text-sm text-slate-500">View compliance reports</p>
+            <Link href="/workforce-board" className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md hover:border-brand-blue-200 transition-all">
+              <h3 className="font-semibold text-slate-900 mb-1">Board Overview</h3>
+              <p className="text-sm text-slate-500">Review workforce board services and resources</p>
             </Link>
-            <Link href="/case-manager/dashboard" className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md hover:border-brand-blue-200 transition-all">
-              <h3 className="font-semibold text-slate-900 mb-1">Case Manager</h3>
-              <p className="text-sm text-slate-500">Manage participants</p>
+            <Link href="/programs" className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md hover:border-brand-blue-200 transition-all">
+              <h3 className="font-semibold text-slate-900 mb-1">Training Programs</h3>
+              <p className="text-sm text-slate-500">Browse active training pathways</p>
             </Link>
           </div>
         </div>

@@ -1,5 +1,3 @@
-import { safeInternalError } from '@/lib/api/safe-error';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
@@ -60,10 +58,6 @@ async function _POST(req: NextRequest) {
 
   const body = await req.json();
 
-  // Accept both payload shapes:
-  //   { settings: Record<string, string> }  — canonical (used by SettingsFormClient)
-  //   { entries: {key,value}[] }            — legacy (used by GeneralSettingsClient)
-  //   flat object                           — legacy fallback
   let rawPairs: [string, string][];
   if (body.settings && typeof body.settings === 'object') {
     rawPairs = Object.entries(body.settings).map(([k, v]) => [k, String(v)]);
@@ -104,7 +98,10 @@ async function _POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 });
   }
 
-  logger.info('[settings] Updated by', user.id, ':', updates.map((u) => u.key).join(', '));
+  logger.info('[settings] Updated', {
+    userId: user.id,
+    keys: updates.map((u) => u.key),
+  });
   return NextResponse.json({ success: true });
 }
 

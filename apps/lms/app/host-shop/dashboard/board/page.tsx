@@ -225,18 +225,6 @@ export default async function PartnerBoardPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      {isPlatformAdmin ? (
-        <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-blue-300 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-black text-blue-950">Admin Host Shop view</p>
-            <p className="text-sm font-medium text-blue-950">Viewing {board.partner?.name || 'selected partner'} without changing your Admin role.</p>
-          </div>
-          <form action={clearAdminPartner}>
-            <button className="rounded-lg border border-blue-400 bg-white px-4 py-2 text-sm font-bold text-blue-950 hover:bg-blue-100">Change Host Shop</button>
-          </form>
-        </div>
-      ) : null}
-
       <section className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] lg:items-stretch">
           <div className="p-6 sm:p-8">
@@ -247,13 +235,18 @@ export default async function PartnerBoardPage() {
                 <p className="mt-2 font-medium text-slate-700">{board.tradeInfo.label}</p>
                 {board.shops[0]?.city ? <p className="mt-1 text-sm font-medium text-slate-700">{board.shops[0].city}, {board.shops[0].state}</p> : null}
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className={`rounded-full px-3 py-1 text-xs font-bold ${board.partner?.approval_status === 'approved' ? 'bg-green-100 text-green-900' : 'bg-amber-100 text-amber-900'}`}>
                   {board.partner?.approval_status === 'approved' ? 'Approved Partner' : 'Pending Approval'}
                 </span>
                 <span className={`rounded-full px-3 py-1 text-xs font-bold ${board.partner?.mou_signed ? 'bg-green-100 text-green-900' : 'bg-amber-100 text-amber-900'}`}>
                   MOU {board.partner?.mou_signed ? 'Signed' : 'Pending'}
                 </span>
+                {isPlatformAdmin ? (
+                  <form action={clearAdminPartner}>
+                    <button className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50">Change Host Shop</button>
+                  </form>
+                ) : null}
               </div>
             </div>
           </div>

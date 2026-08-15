@@ -58,8 +58,14 @@ for (const [app, relRoot] of Object.entries(APPS)) {
   apiIndex[app] = apis.map((file) => ({ file, route: routeFromFile(appRoot, file, 'route') }));
 }
 
+function normalizeDynamicTarget(target) {
+  // Convert template-literal interpolation to a concrete placeholder so it can
+  // be matched against filesystem dynamic routes such as [id].
+  return target.replace(/\$\{[^}]+\}/g, '__dynamic__');
+}
+
 function existsRoute(app, target, api = false) {
-  const pathname = target.split(/[?#]/)[0] || '/';
+  const pathname = normalizeDynamicTarget(target.split(/[?#]/)[0] || '/');
   return (api ? apiIndex[app] : routeIndex[app]).some((entry) => pattern(entry.route).test(pathname));
 }
 function extract(source) {

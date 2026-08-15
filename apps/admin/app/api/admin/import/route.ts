@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
+import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logAdminAudit, AdminAction, BULK_ENTITY_ID } from '@/lib/admin/audit-log';
 
@@ -37,7 +38,6 @@ function parseCSV(content: string): Record<string, string>[] {
     const line = lines[i].trim();
     if (!line) continue;
 
-    // Handle quoted values with commas
     const values: string[] = [];
     let current = '';
     let inQuotes = false;
@@ -85,7 +85,6 @@ async function importStudents(
         [record.first_name, record.last_name].filter(Boolean).join(' ') ||
         email.split('@')[0];
 
-      // Check if profile exists
       const { data: existing } = await supabase
         .from('profiles')
         .select('id')
@@ -94,7 +93,6 @@ async function importStudents(
         .maybeSingle();
 
       if (existing) {
-        // Update existing profile
         await supabase
           .from('profiles')
           .update({
@@ -106,7 +104,6 @@ async function importStudents(
           .eq('id', existing.id);
         result.imported++;
       } else {
-        // Create new profile (without auth user for CSV import)
         const { error } = await supabase.from('profiles').insert({
           id: crypto.randomUUID(),
           email,
@@ -154,7 +151,6 @@ async function importCourses(
         record.course_code ||
         name.toUpperCase().replace(/\s+/g, '_').substring(0, 20);
 
-      // Check if course exists in canonical table
       const { data: existing } = await supabase
         .from('courses')
         .select('id')
@@ -216,7 +212,6 @@ async function importEnrollments(
         continue;
       }
 
-      // Find student
       const { data: student } = await supabase
         .from('profiles')
         .select('id')
@@ -230,7 +225,6 @@ async function importEnrollments(
         continue;
       }
 
-      // Find course in canonical table
       const { data: course } = await supabase
         .from('courses')
         .select('id')
@@ -243,7 +237,6 @@ async function importEnrollments(
         continue;
       }
 
-      // Check existing enrollment
       const { data: existing } = await supabase
         .from('program_enrollments')
         .select('id')
@@ -297,7 +290,6 @@ async function importEmployers(
         continue;
       }
 
-      // Check if employer exists
       const { data: existing } = await supabase
         .from('employers')
         .select('id')
@@ -346,7 +338,6 @@ async function _POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Get current tenant
     const { data: profile } = await supabase
       .from('profiles')
       .select('tenant_id')
@@ -358,8 +349,6 @@ async function _POST(request: NextRequest) {
     }
 
     const tenantId = profile.tenant_id;
-
-    // Parse form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const type = formData.get('type') as string;
@@ -375,7 +364,6 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Read and parse CSV
     const content = await file.text();
     const records = parseCSV(content);
 
@@ -395,7 +383,6 @@ async function _POST(request: NextRequest) {
       );
     }
 
-    // Import based on type
     let result: ImportResult;
     switch (type) {
       case 'students':

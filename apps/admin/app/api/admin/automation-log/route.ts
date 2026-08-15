@@ -8,7 +8,10 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const db = getAdminClient();
+  const db = await getAdminClient();
+  if (!db) {
+    return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });
+  }
 
   const [
     { data: deliveryLogs },

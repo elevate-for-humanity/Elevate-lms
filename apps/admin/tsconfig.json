@@ -15,6 +15,8 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
+      "next": ["./node_modules/next"],
+      "next/*": ["./node_modules/next/*"],
       "@/*": ["../../*"],
       "@/app/*": ["./app/*"],
       "@/lib/*": ["../../lib/*"],

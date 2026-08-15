@@ -45,6 +45,7 @@ const BANNED_PAGE_PREFIXES = [
   'dashboards',
   'career-services/courses',
   'hvac/lesson',
+  'cosmetology-host-shop',
 ];
 
 const BANNED_EXACT_PAGES = new Set([
@@ -61,7 +62,6 @@ const BANNED_EXACT_PAGES = new Set([
   'dev/slide-preview',
 ]);
 
-// Authenticated /partners/* aliases that duplicate /partner/*.
 const BANNED_PARTNER_PAGES = new Set([
   'partners/dashboard',
   'partners/hours',
@@ -71,10 +71,6 @@ const BANNED_PARTNER_PAGES = new Set([
   'partners/login',
 ]);
 
-// Exact duplicate/wrong API namespaces. These are forbidden even if a stale
-// generated inventory or old documentation still mentions them. Stripe is
-// canonical only at LMS /api/webhooks/stripe; retired license webhook aliases
-// must never return as parallel endpoints.
 const BANNED_API_PREFIXES = [
   'api/pwa/api-pwa/',
   'api/store/api-store/',
@@ -100,18 +96,13 @@ interface RouteFile {
 
 function resolveRoute(appDir: string, absPath: string, filename: 'page.tsx' | 'route.ts'): string {
   const suffix = filename === 'page.tsx' ? /\/page\.tsx$/ : /\/route\.ts$/;
-  const rel = absPath
-    .replace(appDir, '')
-    .replace(suffix, '')
-    .replace(/\\/g, '/');
-
+  const rel = absPath.replace(appDir, '').replace(suffix, '').replace(/\\/g, '/');
   const resolved = rel.replace(/\/\([^)]+\)/g, '') || '/';
   return resolved || '/';
 }
 
 function walkApp(root: AppRoot): RouteFile[] {
   const results: RouteFile[] = [];
-
   function walk(dir: string): void {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
@@ -120,20 +111,11 @@ function walkApp(root: AppRoot): RouteFile[] {
         walk(full);
         continue;
       }
-
       if (entry.name !== 'page.tsx' && entry.name !== 'route.ts') continue;
       const kind: RouteFile['kind'] = entry.name === 'page.tsx' ? 'page' : 'api';
-      results.push({
-        service: root.service,
-        appDir: root.dir,
-        file: full,
-        route: resolveRoute(root.dir, full, entry.name),
-        relative: path.relative(root.dir, full).replace(/\\/g, '/'),
-        kind,
-      });
+      results.push({ service: root.service, appDir: root.dir, file: full, route: resolveRoute(root.dir, full, entry.name), relative: path.relative(root.dir, full).replace(/\\/g, '/'), kind });
     }
   }
-
   walk(root.dir);
   return results;
 }
@@ -142,7 +124,6 @@ const all = APP_ROOTS.flatMap(walkApp);
 const pages = all.filter(r => r.kind === 'page');
 const apiRoutes = all.filter(r => r.kind === 'api');
 
-// Duplicate resolved URLs are only a collision inside the same deployed service.
 const duplicateMap = new Map<string, RouteFile[]>();
 for (const p of pages) {
   const key = `${p.service}:${p.route}`;
@@ -158,11 +139,7 @@ function normalizedPagePath(p: RouteFile): string {
 
 const bannedPages = pages.filter(p => {
   const rel = normalizedPagePath(p);
-  return (
-    BANNED_PAGE_PREFIXES.some(prefix => rel === prefix || rel.startsWith(prefix + '/')) ||
-    BANNED_EXACT_PAGES.has(rel) ||
-    BANNED_PARTNER_PAGES.has(rel)
-  );
+  return BANNED_PAGE_PREFIXES.some(prefix => rel === prefix || rel.startsWith(prefix + '/')) || BANNED_EXACT_PAGES.has(rel) || BANNED_PARTNER_PAGES.has(rel);
 });
 
 const bannedApi = apiRoutes.filter(r => {
@@ -170,8 +147,6 @@ const bannedApi = apiRoutes.filter(r => {
   return BANNED_API_PREFIXES.some(prefix => rel === prefix.slice(0, -1) || rel.startsWith(prefix));
 });
 
-// Redirect-only page files are technical debt for retired internal routes. Repair
-// callers and delete the obsolete page instead of keeping a page-level patch.
 const redirectStubs = pages.filter(p => {
   try {
     const content = fs.readFileSync(p.file, 'utf8');
@@ -183,42 +158,34 @@ const redirectStubs = pages.filter(p => {
 });
 
 let issues = 0;
-
 console.log('\n══════════════════════════════════════════════════');
 console.log('  CANONICAL ROUTE INTEGRITY AUDIT');
 console.log('══════════════════════════════════════════════════\n');
 console.log(`Services scanned: ${APP_ROOTS.map(r => r.service).join(', ')}`);
 
-if (duplicates.length === 0) {
-  console.log('✅ No duplicate resolved page routes inside any service');
-} else {
+if (duplicates.length === 0) console.log('✅ No duplicate resolved page routes inside any service');
+else {
   issues += duplicates.length;
   console.log(`❌ DUPLICATE RESOLVED PAGE ROUTES (${duplicates.length})`);
-  for (const files of duplicates) {
-    console.log(`  ${files[0].service}:${files[0].route}`);
-    for (const f of files) console.log(`    → ${path.relative(ROOT, f.file)}`);
-  }
+  for (const files of duplicates) { console.log(`  ${files[0].service}:${files[0].route}`); for (const f of files) console.log(`    → ${path.relative(ROOT, f.file)}`); }
 }
 
-if (bannedPages.length === 0) {
-  console.log('✅ No retired internal page namespaces');
-} else {
+if (bannedPages.length === 0) console.log('✅ No retired internal page namespaces');
+else {
   issues += bannedPages.length;
   console.log(`❌ RETIRED INTERNAL PAGE ROUTES (${bannedPages.length})`);
   for (const p of bannedPages) console.log(`  ${p.service}:${p.route} → ${path.relative(ROOT, p.file)}`);
 }
 
-if (bannedApi.length === 0) {
-  console.log('✅ No banned duplicate API namespaces');
-} else {
+if (bannedApi.length === 0) console.log('✅ No banned duplicate API namespaces');
+else {
   issues += bannedApi.length;
   console.log(`❌ BANNED DUPLICATE API ROUTES (${bannedApi.length})`);
   for (const r of bannedApi) console.log(`  ${r.service}:${r.route} → ${path.relative(ROOT, r.file)}`);
 }
 
-if (redirectStubs.length === 0) {
-  console.log('✅ No redirect-only page stubs');
-} else {
+if (redirectStubs.length === 0) console.log('✅ No redirect-only page stubs');
+else {
   issues += redirectStubs.length;
   console.log(`❌ REDIRECT-ONLY PAGE STUBS (${redirectStubs.length})`);
   for (const p of redirectStubs) console.log(`  ${p.service}:${p.route} → ${path.relative(ROOT, p.file)}`);
@@ -232,5 +199,4 @@ for (const root of APP_ROOTS) {
 }
 console.log(`Issues found: ${issues}`);
 console.log('══════════════════════════════════════════════════\n');
-
 if (STRICT && issues > 0) process.exit(1);

@@ -26,13 +26,13 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       logger.error('[admin/api/compliance/items] query failed', error);
-      return safeInternalError();
+      return safeInternalError(error, 'Failed to load compliance items');
     }
 
     return NextResponse.json({ items: items ?? [] });
   } catch (err) {
     logger.error('[admin/api/compliance/items] error', err);
-    return safeInternalError();
+    return safeInternalError(err, 'Failed to load compliance items');
   }
 }
 
@@ -58,12 +58,12 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       logger.error('[admin/api/compliance/items PATCH] update failed', error);
-      return safeInternalError();
+      return safeInternalError(error, 'Failed to update compliance item');
     }
 
     return NextResponse.json({ success: true });
   } catch (err) {
     logger.error('[admin/api/compliance/items PATCH] error', err);
-    return safeInternalError();
+    return safeInternalError(err, 'Failed to update compliance item');
   }
 }

@@ -1,9 +1,5 @@
 /**
  * /api/admin/programs/[programId]/external-courses/[itemId]/completions
- *
- * GET  — list all learner completions for this external item
- * POST — mark a learner as complete (admin action)
- * DELETE — remove a completion record (admin action)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -19,7 +15,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ programId: string; itemId: string }> },
 ) {
-  const rateLimited = await applyRateLimit(request, 'api');
+  const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
   const { programId, itemId } = await params;
   const auth = await apiRequireAdmin(req);

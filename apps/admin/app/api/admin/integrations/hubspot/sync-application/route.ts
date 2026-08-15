@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     applicationId,
-    contactId: result.contactId,
+    contactId: 'contactId' in result ? result.contactId : undefined,
     skipped: false,
   });
 }

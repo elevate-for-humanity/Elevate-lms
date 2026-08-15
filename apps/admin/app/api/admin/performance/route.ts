@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
@@ -21,7 +22,6 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify user is admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -32,7 +32,6 @@ async function _GET(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Aggregate metrics from various tables
     const [
       studentsResult,
       enrollmentsResult,
@@ -41,16 +40,11 @@ async function _GET(request: Request) {
       revenueResult,
       ticketsResult,
     ] = await Promise.all([
-      // Total students
       supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
-
-      // Active enrollments
       supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'active'),
-
-      // Applications this month
       supabase
         .from('applications')
         .select('*', { count: 'exact', head: true })
@@ -58,8 +52,6 @@ async function _GET(request: Request) {
           'created_at',
           new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
         ),
-
-      // Course completions this month
       supabase
         .from('program_enrollments')
         .select('*', { count: 'exact', head: true })
@@ -68,8 +60,6 @@ async function _GET(request: Request) {
           'updated_at',
           new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
         ),
-
-      // Revenue this month (from donations)
       supabase
         .from('donations')
         .select('amount')
@@ -78,26 +68,21 @@ async function _GET(request: Request) {
           'created_at',
           new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
         ),
-
-      // Open tickets
       supabase
         .from('service_tickets')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'open'),
     ]);
 
-    // Calculate revenue
     const revenue =
       revenueResult.data?.reduce((sum, d) => sum + parseFloat(d.amount || '0'), 0) || 0;
 
-    // Get recent performance metrics
     const { data: recentMetrics } = await supabase
       .from('performance_metrics')
       .select('*')
       .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
       .order('date', { ascending: false });
 
-    // Calculate completion rate
     const totalEnrollments = enrollmentsResult.count || 0;
     const completedEnrollments = completionsResult.count || 0;
     const completionRate =
@@ -114,7 +99,6 @@ async function _GET(request: Request) {
       recentMetrics: recentMetrics || [],
     };
 
-    // Update performance_metrics table
     const today = new Date().toISOString().split('T')[0];
     await supabase.from('performance_metrics').upsert([
       {
@@ -150,7 +134,7 @@ async function _GET(request: Request) {
     ]);
 
     return NextResponse.json({ metrics });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

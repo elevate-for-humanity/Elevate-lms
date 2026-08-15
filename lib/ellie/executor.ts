@@ -58,7 +58,8 @@ async function flagAtRisk(params: Params, db: SupabaseClient): Promise<ExecuteRe
     .from('program_enrollments')
     .update({ status: 'at_risk', at_risk_reason: params.reason ?? 'Flagged by Ellie', at_risk_flagged_at: new Date().toISOString() })
     .in('id', enrollmentIds)
-    .select('id', { count: 'exact', head: true });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .select('id', { count: 'exact', head: true } as any);
 
   if (error) throw new Error(`Failed to flag enrollments: ${error.message}`);
   return { success: true, message: `${count ?? enrollmentIds.length} enrollment(s) flagged as at-risk.` };
@@ -72,7 +73,8 @@ async function unflagAtRisk(params: Params, db: SupabaseClient): Promise<Execute
     .from('program_enrollments')
     .update({ status: 'active', at_risk_reason: null, at_risk_flagged_at: null })
     .in('id', enrollmentIds)
-    .select('id', { count: 'exact', head: true });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .select('id', { count: 'exact', head: true } as any);
 
   if (error) throw new Error(`Failed to clear at-risk flags: ${error.message}`);
   return { success: true, message: `${count ?? enrollmentIds.length} enrollment(s) cleared.` };

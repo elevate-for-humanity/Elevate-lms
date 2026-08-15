@@ -24,11 +24,11 @@ export function buildCourseMetadataPath(courseSlug: string): string {
 export function validateCourseStructure(data: any): { ok: boolean; errors: string[] } {
   const errors: string[] = [];
 
-  if (!course.title) errors.push('Missing course title');
-  if (!course.slug) errors.push('Missing course slug');
-  if (!Array.isArray(course.modules)) errors.push('Modules must be an array');
+  if (!data.title) errors.push('Missing course title');
+  if (!data.slug) errors.push('Missing course slug');
+  if (!Array.isArray(data.modules)) errors.push('Modules must be an array');
 
-  course.modules?.forEach((module: any, index: number) => {
+  data.modules?.forEach((module: any, index: number) => {
     if (!module.title) errors.push(`Module ${index + 1} missing title`);
     if (!module.slug) errors.push(`Module ${index + 1} missing slug`);
     if (!Array.isArray(module.lessons)) {

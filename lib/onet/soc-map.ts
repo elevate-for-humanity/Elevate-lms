@@ -77,3 +77,6 @@ export const PROGRAM_SOC_MAP: Record<string, string> = {
 export function getSocCode(slug: string): string | null {
   return PROGRAM_SOC_MAP[slug] ?? null;
 }
+
+/** Alias for PROGRAM_SOC_MAP — used by lib/industry/onet.ts re-export. */
+export const PROGRAM_SOC_CODES = PROGRAM_SOC_MAP;

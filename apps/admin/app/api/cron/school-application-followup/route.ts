@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
           counts[window.sequence]++;
           logger.info(`[school-followup] ${window.sequence} sent`, { id: app.id });
         } catch (err) {
-          logger.error(`[school-followup] ${window.sequence} failed`, { id: app.id, err });
+          logger.error(`[school-followup] ${window.sequence} failed`, err);
           counts.errors++;
         }
       }

@@ -31,7 +31,7 @@ async function _GET(_req: NextRequest) {
 
   const { data, error } = await db.from('platform_settings').select('key, value');
   if (error) {
-    logger.error('[settings] GET failed:', error.message);
+    logger.error(`[settings] GET failed: ${error.message}`);
     return NextResponse.json({ error: 'Failed to load settings' }, { status: 500 });
   }
 
@@ -100,7 +100,7 @@ async function _POST(req: NextRequest) {
   const { error } = await db.from('platform_settings').upsert(updates, { onConflict: 'key' });
 
   if (error) {
-    logger.error('[settings] POST failed:', error.message);
+    logger.error(`[settings] POST failed: ${error.message}`);
     return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 });
   }
 

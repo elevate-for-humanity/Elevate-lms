@@ -29,10 +29,15 @@ const retiredArtifactNames = new Set([
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
   const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...walk(full));
-    else out.push(full);
+  const stack = [dir];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      if (entry.name === 'node_modules' || entry.name === '.next' || entry.name === '.git') continue;
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) stack.push(full);
+      else out.push(full);
+    }
   }
   return out;
 }

@@ -14,7 +14,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-const src = fs.readFileSync(path.resolve('apps/admin/app/admin/users/actions.ts'), 'utf-8');
+const src = fs.readFileSync(path.resolve('apps/admin/app/users/actions.ts'), 'utf-8');
 const hasProfilesSelect = (code: string) => /from\('profiles'\)\s*\.select\(/.test(code);
 
 describe('admin/users/actions.ts integrity contracts', () => {

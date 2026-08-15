@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArchiveRestore, BarChart3, EyeOff, Trash2, Users } from 'lucide-react';
+import { ArchiveRestore, BarChart3, EyeOff, MonitorSmartphone, Trash2, Users } from 'lucide-react';
 
 type Revision = {
   id: string;
@@ -103,6 +103,9 @@ export function WebsiteLifecyclePanel({
         ) : null}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
+            <Link href={`/apps/website-builder/edit/${websiteId}/preview`} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800">
+              <MonitorSmartphone className="h-4 w-4" /> Responsive preview
+            </Link>
             <Link href={`/apps/website-builder/edit/${websiteId}/leads`} className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800">
               <Users className="h-4 w-4" /> Leads
             </Link>

@@ -10,6 +10,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { setAuditContext } from '@/lib/audit-context';
 import { emailService } from '@/lib/notifications/email';
 import { sendWorkflowNotification } from '@/lib/integrations/notifications';
 
@@ -131,6 +132,8 @@ export async function provisionEnrollment(
 ): Promise<ProvisioningResult> {
   const supabase = getServiceClient();
   const { applicationId, enrolledById } = input;
+  
+  await setAuditContext(supabase, { systemActor: 'paris:provisioning-service' });
   
   logger.info('Starting enrollment provisioning', { applicationId });
   

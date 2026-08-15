@@ -7,18 +7,21 @@ import { requireFeatureForAuth } from '@/lib/platform/require-feature-for-auth';
 import { FEATURES } from '@/lib/platform/feature-catalog';
 import { importExistingWebsite } from '@/lib/websites/import-site-service';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
+import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-async function hasIndividualWebsiteImport(userId: string) {
+async function getIndividualWebsiteImportAccess(userId: string) {
   const supabase = await createClient();
   const access = await getWebsiteBuilderAccess(userId, supabase);
-  if (!access.allowed) return false;
-  if (access.isAdmin) return true;
-  return ['professional', 'enterprise'].includes(access.plan || '');
+  if (!access.allowed) return { allowed: false, access, supabase };
+  // URL import is part of the actual 14-day evaluation path. Paid accounts
+  // retain the existing Professional/Enterprise entitlement rule.
+  const allowed = access.isAdmin || access.status === 'trial' || ['professional', 'enterprise'].includes(access.plan || '');
+  return { allowed, access, supabase };
 }
 
 function canonicalTenantHref(labelValue: unknown, hrefValue: unknown, sourceOrigin: string) {
@@ -35,9 +38,6 @@ function canonicalTenantHref(labelValue: unknown, hrefValue: unknown, sourceOrig
 
   try {
     const parsed = new URL(href, sourceOrigin);
-    // Preserve genuinely external destinations (social links, partner portals,
-    // booking providers). Same-origin unknown paths are omitted because the
-    // tenant renderer cannot safely claim a page it did not migrate.
     if (parsed.origin !== sourceOrigin) return { label, href: parsed.href };
   } catch {
     // Invalid imported links are dropped rather than published broken.
@@ -78,6 +78,11 @@ function normalizeImportedConfig(imported: any, sourceUrl: string) {
     config: {
       ...(imported.config || {}),
       navigation,
+      meta: {
+        ...(imported?.config?.meta || {}),
+        importedFrom: sourceUrl,
+        importedAt: new Date().toISOString(),
+      },
     },
   };
 }
@@ -92,12 +97,13 @@ async function _POST(request: NextRequest) {
     return NextResponse.json({ error: 'User authentication required' }, { status: 401 });
   }
 
-  if (!(await hasIndividualWebsiteImport(auth.userId))) {
+  const individual = await getIndividualWebsiteImportAccess(auth.userId);
+  if (!individual.allowed) {
     const organizationAccess = await requireFeatureForAuth(request, FEATURES.WEBSITE_IMPORT);
     if (organizationAccess instanceof NextResponse) {
       return NextResponse.json(
         {
-          error: 'Website import is available on Website Builder Professional/Enterprise or with the Website Import entitlement.',
+          error: 'Website import requires an active Website Builder trial, Professional/Enterprise plan, or Website Import entitlement.',
           upgradeUrl: '/store/apps/website-builder',
           feature: FEATURES.WEBSITE_IMPORT,
         },
@@ -113,6 +119,18 @@ async function _POST(request: NextRequest) {
       ? body.includePages.filter((value: unknown): value is string => typeof value === 'string').slice(0, 6)
       : undefined;
     if (!url) return NextResponse.json({ error: 'URL required' }, { status: 400 });
+
+    // Meter the expensive crawl/AI mapping for individual trials. Paid/admin and
+    // organization-entitled imports remain unmetered here.
+    if (individual.allowed && individual.access.status === 'trial') {
+      const credits = await consumeWebsiteBuilderCredits(individual.supabase, auth.userId, 'initial_site_generation');
+      if (!credits.allowed) {
+        return NextResponse.json(
+          { error: credits.error || 'Trial credits are insufficient for website import', balance: credits.balance, upgradeUrl: credits.upgradeUrl },
+          { status: 402 },
+        );
+      }
+    }
 
     const imported = normalizeImportedConfig(await importExistingWebsite(url, includePages), url);
     return NextResponse.json({ success: true, ...imported });

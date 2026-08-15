@@ -15,7 +15,7 @@ import { RAPIDS_CONFIG } from './rapids-config';
 import { setAuditContext } from '@/lib/audit-context';
 
 // Lazy initialization to avoid build-time errors
-async function getSupabaseAdmin(): SupabaseClient {
+async function getSupabaseAdmin(): Promise<SupabaseClient> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 

@@ -8,17 +8,11 @@ export const runtime = 'nodejs';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * POST /api/admin/scorm — Import a SCORM package via SCORM Cloud
- */
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireAdmin();
-  if ('error' in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
-  }
+  await requireAdmin();
 
   try {
     const { courseId, fileUrl } = await request.json();
@@ -34,17 +28,11 @@ async function _POST(request: NextRequest) {
   }
 }
 
-/**
- * GET /api/admin/scorm?registrationId=xxx — Get SCORM registration status
- */
 async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
-  const auth = await requireAdmin();
-  if ('error' in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
-  }
+  await requireAdmin();
 
   try {
     const registrationId = request.nextUrl.searchParams.get('registrationId');

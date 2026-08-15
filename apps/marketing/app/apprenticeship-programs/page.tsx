@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: "Apprenticeship Programs",
-  description: "Explore our apprenticeship programs in cosmetology, barbering, and more.",
-  robots: { index: false, follow: false },
+  title: 'Apprenticeship Programs',
+  description: 'Explore current apprenticeship and career training programs.',
+  robots: { index: false, follow: true },
 };
 
 export default function ApprenticeshipProgramsPage() {
-  redirect('/barber-and-beauty-apprenticeships');
+  redirect('/programs');
 }

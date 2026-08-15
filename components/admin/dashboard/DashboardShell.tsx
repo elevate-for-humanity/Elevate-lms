@@ -177,7 +177,7 @@ const LIVE_PORTALS = [
   {
     title: 'Program Holder PWA',
     detail: 'Programs, students, documents, hours and compliance actions.',
-    href: 'https://www.elevateforhumanity.org/program-holder/dashboard',
+    href: 'https://app.elevateforhumanity.org/program-holder/dashboard',
     image: '/images/pages/business-meeting.webp',
     installable: true,
   },

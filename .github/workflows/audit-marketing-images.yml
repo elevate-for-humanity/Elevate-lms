@@ -1,8 +1,19 @@
 name: Audit Marketing Images
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-marketing-images.yml'
+      - 'apps/marketing/**'
+      - 'components/**'
+      - 'content/**'
+      - 'config/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'Dockerfile.marketing'
   push:
-    branches: [fix/marketing-missing-images-20260815]
+    branches: [main]
     paths:
       - '.github/workflows/audit-marketing-images.yml'
       - 'apps/marketing/**'

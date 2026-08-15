@@ -22,7 +22,6 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-// Deterministic UUID namespace for course/lesson IDs
 const UUID_NAMESPACE = 'a1b2c3d4-e5f6-7890-abcd-200000000001';
 
 function deterministicUUID(key: string): string {
@@ -32,18 +31,18 @@ function deterministicUUID(key: string): string {
 async function requireAdmin() {
   const supabase = await createClient();
   const db = await requireAdminClient();
-  if (!supabase) return { error: 'Database unavailable', status: 500 };
+  if (!supabase) return { error: 'Database unavailable', status: 500 as const };
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: 'Unauthorized', status: 401 };
+  if (!user) return { error: 'Unauthorized', status: 401 as const };
   const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .maybeSingle();
-  if (!profile || !['admin'].includes(profile.role)) {
-    return { error: 'Forbidden', status: 403 };
+  if (!profile || profile.role !== 'admin') {
+    return { error: 'Forbidden', status: 403 as const };
   }
   return { user, supabase, db };
 }
@@ -77,14 +76,6 @@ function buildLessonHtml(
   }
 }
 
-/**
- * POST /api/admin/sync-course-definitions
- *
- * Syncs COURSE_DEFINITIONS from lib/courses/definitions.ts into
- * training_courses + training_lessons tables in Supabase.
- *
- * Body: { slug?: string } — sync one course by slug, or all if omitted.
- */
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -95,7 +86,6 @@ async function _POST(request: NextRequest) {
   }
   const { db } = auth;
 
-  // Load per-request — GC-eligible after handler returns
   const COURSE_DEFINITIONS = loadCourseDefinitions();
   const { HVAC_QUIZ_MAP, getUniversalExam } = loadHvacQuizzes();
 
@@ -121,7 +111,6 @@ async function _POST(request: NextRequest) {
     for (const course of courses) {
       const courseId = deterministicUUID(`${course.slug}-course`);
 
-      // Upsert course
       const { error: courseError } = await db.from('lms_courses').upsert(
         {
           id: courseId,
@@ -146,21 +135,16 @@ async function _POST(request: NextRequest) {
         continue;
       }
 
-      // Flatten modules → lessons with order_index
       let lessonNumber = 0;
       const lessonRows: Array<Record<string, unknown>> = [];
 
       for (const mod of course.modules) {
         const moduleNum = parseInt(mod.id.split('-').pop() || '0', 10);
-
         for (let i = 0; i < mod.lessons.length; i++) {
           const lesson = mod.lessons[i];
           lessonNumber++;
-
           const lessonId = deterministicUUID(lesson.id);
           const orderIndex = moduleNum * 100 + (i + 1);
-
-          // Build content HTML with module context and lesson type
           const desc = lesson.description || '';
           const dur = lesson.durationMinutes;
           const durStr = dur ? `${dur} minutes` : '';
@@ -172,11 +156,8 @@ async function _POST(request: NextRequest) {
             mod.title,
             lessonNumber,
           );
-
-          // Look up quiz questions for this lesson
           const quizQuestions =
             lesson.id === 'hvac-10-07' ? getUniversalExam() : HVAC_QUIZ_MAP[lesson.id] || null;
-
           const contentType =
             lesson.type === 'quiz' ? 'quiz' : lesson.type === 'video' ? 'video' : 'reading';
 
@@ -189,14 +170,13 @@ async function _POST(request: NextRequest) {
             duration_minutes: lesson.durationMinutes || null,
             is_published: true,
             is_required: true,
-            lesson_type: contentType === 'quiz' ? 'quiz' : contentType === 'video' ? 'lesson' : 'lesson',
+            lesson_type: contentType === 'quiz' ? 'quiz' : 'lesson',
             quiz_questions: quizQuestions ?? null,
             passing_score: lesson.type === 'quiz' ? 70 : null,
           });
         }
       }
 
-      // Delete existing lessons for this course, then insert fresh
       const { error: deleteError } = await db
         .from('course_lessons')
         .delete()
@@ -213,7 +193,6 @@ async function _POST(request: NextRequest) {
         continue;
       }
 
-      // Insert in batches of 50 (Supabase limit)
       let inserted = 0;
       for (let batch = 0; batch < lessonRows.length; batch += 50) {
         const chunk = lessonRows.slice(batch, batch + 50);
@@ -245,7 +224,7 @@ async function _POST(request: NextRequest) {
 
     await logAdminAudit({
       action: AdminAction.COURSE_DEFINITIONS_SYNCED,
-      actorId: auth.id,
+      actorId: auth.user.id,
       entityType: 'course_definitions',
       entityId: BULK_ENTITY_ID,
       metadata: {
@@ -267,12 +246,6 @@ async function _POST(request: NextRequest) {
   }
 }
 
-/**
- * GET /api/admin/sync-course-definitions
- *
- * Returns the list of courses available in definitions.ts
- * and their lesson counts.
- */
 async function _GET(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
@@ -288,7 +261,7 @@ async function _GET(request: NextRequest) {
     title: c.title,
     category: c.category,
     modules: c.modules.length,
-    lessons: c.modules.reduce((sum, m) => sum + m.lessons.length, 0),
+    lessons: c.modules.reduce((sum: number, m: any) => sum + m.lessons.length, 0),
     courseId: deterministicUUID(`${c.slug}-course`),
   }));
 

@@ -2,11 +2,6 @@
  * POST /api/admin/contracts/extract
  *
  * Extracts text and detects blank fields from an uploaded contract template.
- * Uses pdf-parse, mammoth, and tesseract.js (same engine as /api/admin/documents/extract).
- * Saves detected fields to contract_template_fields.
- * Updates contract_templates.status to 'extracted'.
- *
- * Body: { contract_id: string }
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -14,7 +9,6 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { hydrateProcessEnv } from '@/lib/secrets';
-
 import { detectFieldsFromText } from '@/lib/contracts/response-style';
 
 export const runtime = 'nodejs';
@@ -26,13 +20,19 @@ async function extractText(buffer: Buffer, mimeType: string): Promise<{ text: st
 
   if (mime.includes('pdf')) {
     try {
-      const pdfParse = await import('pdf-parse').then(m => m.default ?? m);
-      const result = await pdfParse(buffer);
-      const text = result.text?.trim() ?? '';
-      if (text.length > 50) return { text, method: 'pdf-parse' };
-    } catch { /* fall through */ }
+      const { PDFParse } = await import('pdf-parse');
+      const parser = new PDFParse({ data: buffer });
+      try {
+        const result = await parser.getText();
+        const text = result.text?.trim() ?? '';
+        if (text.length > 50) return { text, method: 'pdf-parse' };
+      } finally {
+        await parser.destroy();
+      }
+    } catch {
+      // fall through to OCR
+    }
 
-    // OCR fallback for scanned PDFs
     try {
       const Tesseract = await import('tesseract.js').catch(() => null);
       if (!Tesseract) return { text: '', method: 'ocr_unavailable' };
@@ -91,11 +91,14 @@ export async function POST(request: NextRequest) {
   await hydrateProcessEnv();
 
   let body: { contract_id?: string };
-  try { body = await request.json(); } catch { return safeError('Invalid JSON', 400); }
+  try {
+    body = await request.json();
+  } catch {
+    return safeError('Invalid JSON', 400);
+  }
   if (!body.contract_id) return safeError('contract_id is required', 400);
 
   const db = await requireAdminClient();
-  const storage = db;
 
   const { data: template, error: tErr } = await db
     .from('contract_templates')
@@ -106,12 +109,10 @@ export async function POST(request: NextRequest) {
   if (tErr || !template) return safeError('Contract not found', 404);
   if (!template.original_file_path) return safeError('No file path on record', 422);
 
-  // Mark as extracting
   await db.from('contract_templates').update({ status: 'extracting' }).eq('id', body.contract_id);
 
   try {
-    // Download from private storage
-    const { data: fileData, error: dlErr } = await storage.storage
+    const { data: fileData, error: dlErr } = await db.storage
       .from('contracts')
       .download(template.original_file_path);
 
@@ -122,11 +123,8 @@ export async function POST(request: NextRequest) {
 
     const buffer = Buffer.from(await fileData.arrayBuffer());
     const { text, method } = await extractText(buffer, template.file_type ?? '');
-
-    // Detect fields
     const detectedFields = text ? detectFieldsFromText(text) : [];
 
-    // Save raw text + update status
     await db.from('contract_templates').update({
       raw_text: text || null,
       extraction_method: method,
@@ -134,12 +132,11 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     }).eq('id', body.contract_id);
 
-    // Delete old detected fields, insert new ones
     await db.from('contract_template_fields').delete().eq('contract_template_id', body.contract_id);
 
     if (detectedFields.length > 0) {
       await db.from('contract_template_fields').insert(
-        detectedFields.map(f => ({
+        detectedFields.map((f) => ({
           contract_template_id: body.contract_id,
           label: f.label,
           field_key: f.field_key,
@@ -148,11 +145,10 @@ export async function POST(request: NextRequest) {
           confidence: f.confidence,
           sort_order: f.sort_order,
           source: 'detected',
-        }))
+        })),
       );
     }
 
-    // Audit
     await db.from('contract_audit_logs').insert({
       actor_id: auth.id ?? null,
       action: 'extract',

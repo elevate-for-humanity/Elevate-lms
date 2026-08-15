@@ -150,7 +150,13 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
         {config.heroVideo ? (
           <UltraVideoPlayer
             src={config.heroVideo}
-            poster={config.heroPoster || config.heroImage || '/images/og-default.jpg'}
+            autoPlayOnMount
+            muted
+            loop
+            showControls={false}
+            enableProgressTracking={false}
+            enableResume={false}
+            aspectRatio="auto"
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : config.heroImage ? (

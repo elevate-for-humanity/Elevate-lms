@@ -11,6 +11,13 @@ export default function ProgramsHeroVideo() {
       muted
       loop
       showControls={false}
+      autoPlayOnMount
+      muted
+      loop
+      showControls={false}
+      enableProgressTracking={false}
+      enableResume={false}
+      aspectRatio="auto"
       className="absolute inset-0 w-full h-full object-cover"
     />
   );

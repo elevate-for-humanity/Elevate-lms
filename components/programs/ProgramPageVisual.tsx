@@ -45,7 +45,13 @@ export function ProgramPageVisual({ program }: Props) {
         {program.heroVideo ? (
           <UltraVideoPlayer
             src={program.heroVideo}
-            poster={program.heroImage || '/images/og-default.jpg'}
+            autoPlayOnMount
+            muted
+            loop
+            showControls={false}
+            enableProgressTracking={false}
+            enableResume={false}
+            aspectRatio="auto"
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (

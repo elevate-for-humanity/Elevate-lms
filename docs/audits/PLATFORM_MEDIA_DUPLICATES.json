@@ -1,97 +1,21 @@
 {
-  "generatedAt": "2026-08-12T17:10:33.767Z",
+  "generatedAt": "2026-08-15T18:32:29.198Z",
   "apps": [
     "marketing",
     "lms",
     "admin"
   ],
   "summary": {
-    "routesScanned": 1497,
-    "withinRouteDuplicates": 4,
+    "routesScanned": 1447,
+    "withinRouteDuplicates": 0,
     "crossRouteHeroDuplicates": 15,
     "heroRegistryDuplicates": 0,
     "sharedComponentDuplicateAdvisory": 3,
-    "crossRouteImageReuseAdvisory": 94,
-    "binaryAliasGroups": 26
+    "crossRouteImageReuseAdvisory": 93,
+    "binaryAliasGroups": 25
   },
   "blocking": {
-    "withinRouteDuplicates": [
-      {
-        "app": "marketing",
-        "route": "/store/compliance/wioa",
-        "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
-        "asset": "/images/pages/compliance-page-1.webp",
-        "aliases": [
-          "/images/pages/compliance-page-1.webp",
-          "/images/pages/store-recommendations.webp"
-        ],
-        "locations": [
-          "apps/marketing/app/store/compliance/wioa/page.tsx:37",
-          "apps/marketing/app/store/compliance/wioa/page.tsx:232"
-        ],
-        "ownedLocations": [
-          "apps/marketing/app/store/compliance/wioa/page.tsx:37",
-          "apps/marketing/app/store/compliance/wioa/page.tsx:232"
-        ]
-      },
-      {
-        "app": "marketing",
-        "route": "/store/digital",
-        "fingerprint": "sha256:73cc447cd22d04f70c2273f4c1abff01b72becc39ee492be44c4eea474479bce",
-        "asset": "/images/pages/store-digital-detail1.jpg",
-        "aliases": [
-          "/images/pages/store-digital-detail1.jpg",
-          "/images/pages/store-digital-detail1.webp"
-        ],
-        "locations": [
-          "apps/marketing/app/store/digital/page.tsx:82",
-          "apps/marketing/app/store/digital/page.tsx:209"
-        ],
-        "ownedLocations": [
-          "apps/marketing/app/store/digital/page.tsx:82",
-          "apps/marketing/app/store/digital/page.tsx:209"
-        ]
-      },
-      {
-        "app": "marketing",
-        "route": "/wioa-eligibility",
-        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
-        "asset": "/images/pages/card-wioa.webp",
-        "aliases": [
-          "/images/pages/card-wioa.webp",
-          "/images/pages/comp-home-highlight-health.webp"
-        ],
-        "locations": [
-          "apps/marketing/app/wioa-eligibility/page.tsx:144",
-          "apps/marketing/app/wioa-eligibility/page.tsx:145"
-        ],
-        "ownedLocations": [
-          "apps/marketing/app/wioa-eligibility/page.tsx:144",
-          "apps/marketing/app/wioa-eligibility/page.tsx:145"
-        ]
-      },
-      {
-        "app": "lms",
-        "route": "/parent-portal",
-        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
-        "asset": "/images/pages/about-career-training.webp",
-        "aliases": [
-          "/images/pages/about-career-training.webp",
-          "/images/pages/admin-campaigns-hero.webp",
-          "/images/pages/card-wioa.webp"
-        ],
-        "locations": [
-          "apps/lms/app/parent-portal/page.tsx:52",
-          "apps/lms/app/parent-portal/page.tsx:58",
-          "apps/lms/app/parent-portal/page.tsx:123"
-        ],
-        "ownedLocations": [
-          "apps/lms/app/parent-portal/page.tsx:52",
-          "apps/lms/app/parent-portal/page.tsx:58",
-          "apps/lms/app/parent-portal/page.tsx:123"
-        ]
-      }
-    ],
+    "withinRouteDuplicates": [],
     "crossRouteHeroDuplicates": [
       {
         "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
@@ -129,10 +53,10 @@
         "routes": [
           "admin:/email-marketing/campaigns/new",
           "admin:/live-chat",
+          "lms:/program-holder/dashboard",
           "marketing:/academic-calendar",
           "marketing:/banking/direct-deposit",
-          "marketing:/online-apps",
-          "marketing:/program-holder/dashboard"
+          "marketing:/online-apps"
         ]
       },
       {
@@ -185,19 +109,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
-        "asset": "/images/pages/about-career-training.webp",
-        "aliases": [
-          "/images/pages/about-career-training.webp",
-          "/images/pages/admin-compliance-exports-detail.webp"
-        ],
-        "routes": [
-          "admin:/compliance/exports",
-          "lms:/parent-portal",
-          "lms:/parent-portal/dashboard"
-        ]
-      },
-      {
         "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
         "asset": "/images/pages/academic-integrity-hero.webp",
         "aliases": [
@@ -236,6 +147,18 @@
           "admin:/email-marketing/analytics",
           "marketing:/store/compliance/wioa",
           "marketing:/store/practice-tests"
+        ]
+      },
+      {
+        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
+        "asset": "/images/pages/about-career-training.webp",
+        "aliases": [
+          "/images/pages/about-career-training.webp",
+          "/images/pages/admin-compliance-exports-detail.webp"
+        ],
+        "routes": [
+          "admin:/compliance/exports",
+          "lms:/parent-portal"
         ]
       },
       {
@@ -414,6 +337,7 @@
         "routes": [
           "admin:/email-marketing/campaigns/new",
           "admin:/live-chat",
+          "lms:/program-holder/dashboard",
           "marketing:/academic-calendar",
           "marketing:/banking",
           "marketing:/banking/direct-deposit",
@@ -421,39 +345,12 @@
           "marketing:/certificates",
           "marketing:/certificates/verify/[certificateId]",
           "marketing:/online-apps",
-          "marketing:/program-holder/dashboard",
           "marketing:/programs/esthetician-apprenticeship/apply",
           "marketing:/services",
           "marketing:/store/add-ons/analytics-pro",
           "marketing:/store/compliance/wcag",
-          "marketing:/store/compliance/wioa"
-        ]
-      },
-      {
-        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
-        "asset": "/images/pages/about-career-training.webp",
-        "aliases": [
-          "/images/pages/about-career-training.webp",
-          "/images/pages/admin-campaigns-hero.webp",
-          "/images/pages/admin-compliance-exports-detail.webp",
-          "/images/pages/card-wioa.webp",
-          "/images/pages/comp-home-highlight-health.webp",
-          "/images/pages/programs-catalog-hero.webp"
-        ],
-        "routes": [
-          "admin:/compliance/exports",
-          "lms:/parent-portal",
-          "lms:/parent-portal/dashboard",
-          "marketing:/calendar",
-          "marketing:/call-now",
-          "marketing:/email",
-          "marketing:/onboarding",
-          "marketing:/programs/barber-apprenticeship/orientation",
-          "marketing:/store/compliance/grant-reporting",
-          "marketing:/transparency",
-          "marketing:/wioa-eligibility",
-          "marketing:/workforce-partners",
-          "marketing:/writing-center"
+          "marketing:/store/compliance/wioa",
+          "marketing:/wioa-eligibility"
         ]
       },
       {
@@ -508,6 +405,54 @@
         ]
       },
       {
+        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
+        "asset": "/images/pages/about-career-training.webp",
+        "aliases": [
+          "/images/pages/about-career-training.webp",
+          "/images/pages/admin-compliance-exports-detail.webp",
+          "/images/pages/programs-catalog-hero.webp"
+        ],
+        "routes": [
+          "admin:/compliance/exports",
+          "lms:/parent-portal",
+          "marketing:/calendar",
+          "marketing:/call-now",
+          "marketing:/email",
+          "marketing:/onboarding",
+          "marketing:/programs/barber-apprenticeship/orientation",
+          "marketing:/store/compliance/grant-reporting",
+          "marketing:/transparency",
+          "marketing:/workforce-partners",
+          "marketing:/writing-center"
+        ]
+      },
+      {
+        "fingerprint": "sha256:f1db8b11666b5f7f17dbbad2ce72348f689a06bb424d8d9ff87170bec10bdb6d",
+        "asset": "/images/pages/accessibility-hero.jpg",
+        "aliases": [
+          "/images/pages/accessibility-hero.jpg",
+          "/images/pages/admin-compliance-audit-hero.jpg",
+          "/images/pages/admin-compliance-audit-hero.webp",
+          "/images/pages/admin-dev-hero.jpg",
+          "/images/pages/admin-email-marketing-d1.jpg",
+          "/images/pages/admin-social-campaigns-new-hero.jpg",
+          "/images/pages/comp-highlights-team.jpg",
+          "/images/pages/contact-hero.jpg"
+        ],
+        "routes": [
+          "admin:/email-marketing",
+          "admin:/social-media/campaigns/new",
+          "admin:/studio/builds",
+          "lms:/lms/dashboard",
+          "marketing:/accessibility",
+          "marketing:/call-now",
+          "marketing:/careers",
+          "marketing:/store/compliance",
+          "marketing:/store/compliance/ferpa",
+          "marketing:/store/compliance/wcag"
+        ]
+      },
+      {
         "fingerprint": "sha256:fb61600195b9686e2b11c5f7d7ea5d2545db0344bd3e339c58c1171fd25eb43e",
         "asset": "/images/pages/admin-advanced-tools-hero.webp",
         "aliases": [
@@ -537,8 +482,7 @@
           "/images/pages/admin-videos-upload-hero.webp",
           "/images/pages/admin-wioa-hero.webp",
           "/images/pages/calendar-page-1.webp",
-          "/images/pages/how-it-works-hero.webp",
-          "/images/pages/programs-it-hero.webp"
+          "/images/pages/how-it-works-hero.webp"
         ],
         "routes": [
           "admin:/email-marketing/analytics",
@@ -570,31 +514,6 @@
           "marketing:/portal/nail-technician",
           "marketing:/portal/plumbing",
           "marketing:/programs/nail-technician-apprenticeship/apply"
-        ]
-      },
-      {
-        "fingerprint": "sha256:f1db8b11666b5f7f17dbbad2ce72348f689a06bb424d8d9ff87170bec10bdb6d",
-        "asset": "/images/pages/accessibility-hero.jpg",
-        "aliases": [
-          "/images/pages/accessibility-hero.jpg",
-          "/images/pages/admin-compliance-audit-hero.jpg",
-          "/images/pages/admin-compliance-audit-hero.webp",
-          "/images/pages/admin-dev-hero.jpg",
-          "/images/pages/admin-email-marketing-d1.jpg",
-          "/images/pages/admin-social-campaigns-new-hero.jpg",
-          "/images/pages/comp-highlights-team.jpg",
-          "/images/pages/contact-hero.jpg"
-        ],
-        "routes": [
-          "admin:/email-marketing",
-          "admin:/social-media/campaigns/new",
-          "admin:/studio/builds",
-          "lms:/lms/dashboard",
-          "marketing:/accessibility",
-          "marketing:/careers",
-          "marketing:/store/compliance",
-          "marketing:/store/compliance/ferpa",
-          "marketing:/store/compliance/wcag"
         ]
       },
       {
@@ -687,6 +606,27 @@
         ]
       },
       {
+        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
+        "asset": "/images/pages/academic-integrity-hero.webp",
+        "aliases": [
+          "/images/pages/academic-integrity-hero.webp",
+          "/images/pages/admin-analytics-learning-hero.webp",
+          "/images/pages/admin-compliance-agreements-hero.webp",
+          "/images/pages/admin-signatures-hero.webp",
+          "/images/pages/banking-page-2.webp",
+          "/images/pages/compliance-page-2.webp"
+        ],
+        "routes": [
+          "admin:/signatures",
+          "lms:/parent-portal",
+          "marketing:/academic-integrity",
+          "marketing:/banking",
+          "marketing:/compliance/competency-verification",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/wcag"
+        ]
+      },
+      {
         "fingerprint": "sha256:0ff33c59f9435b60591bb92afd99016d50317d843189f9e995e0953ef9d9a91d",
         "asset": "/images/pages/apprenticeship-structure.webp",
         "aliases": [
@@ -727,30 +667,10 @@
         "routes": [
           "lms:/parent-portal",
           "marketing:/",
-          "marketing:/call-now",
           "marketing:/email",
           "marketing:/employment-support",
-          "marketing:/platform/partner-portal"
-        ]
-      },
-      {
-        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
-        "asset": "/images/pages/academic-integrity-hero.webp",
-        "aliases": [
-          "/images/pages/academic-integrity-hero.webp",
-          "/images/pages/admin-analytics-learning-hero.webp",
-          "/images/pages/admin-compliance-agreements-hero.webp",
-          "/images/pages/admin-signatures-hero.webp",
-          "/images/pages/banking-page-2.webp",
-          "/images/pages/compliance-page-2.webp"
-        ],
-        "routes": [
-          "admin:/signatures",
-          "marketing:/academic-integrity",
-          "marketing:/banking",
-          "marketing:/compliance/competency-verification",
-          "marketing:/store/add-ons/analytics-pro",
-          "marketing:/store/compliance/wcag"
+          "marketing:/platform/partner-portal",
+          "marketing:/wioa-eligibility"
         ]
       },
       {
@@ -771,24 +691,6 @@
           "marketing:/approvals",
           "marketing:/onboarding/learner/agreements",
           "marketing:/schedule-consultation"
-        ]
-      },
-      {
-        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
-        "asset": "/images/pages/admin-videos-hero.webp",
-        "aliases": [
-          "/images/pages/admin-videos-hero.webp",
-          "/images/pages/calendar-hero.webp",
-          "/images/pages/homepage-why-elevate.webp",
-          "/images/pages/programs-hero-vibrant.webp"
-        ],
-        "routes": [
-          "admin:/videos",
-          "lms:/enrollment",
-          "marketing:/calendar",
-          "marketing:/services",
-          "marketing:/wioa-eligibility",
-          "marketing:/writing-center"
         ]
       },
       {
@@ -856,6 +758,39 @@
         ]
       },
       {
+        "fingerprint": "sha256:457a7fd8f5c15872c2f81c54cd6edb05e95e7f334107fc025041daed27da9c3a",
+        "asset": "/images/pages/admin-external-progress-detail.webp",
+        "aliases": [
+          "/images/pages/admin-external-progress-detail.webp",
+          "/images/pages/social-media-1.webp",
+          "/images/pages/verify-page-1.webp"
+        ],
+        "routes": [
+          "admin:/blog/management/[slug]",
+          "admin:/external-progress",
+          "marketing:/blog/[slug]",
+          "marketing:/store/compliance/wioa",
+          "marketing:/verify/[certificateId]"
+        ]
+      },
+      {
+        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
+        "asset": "/images/pages/admin-videos-hero.webp",
+        "aliases": [
+          "/images/pages/admin-videos-hero.webp",
+          "/images/pages/calendar-hero.webp",
+          "/images/pages/homepage-why-elevate.webp",
+          "/images/pages/programs-hero-vibrant.webp"
+        ],
+        "routes": [
+          "admin:/videos",
+          "lms:/enrollment",
+          "marketing:/calendar",
+          "marketing:/services",
+          "marketing:/writing-center"
+        ]
+      },
+      {
         "fingerprint": "sha256:ce7d568881c0405d247b811462225bf02f24008498b4fa2b3969c901cbb8edf1",
         "asset": "/images/pages/career-services-page-10.webp",
         "aliases": [
@@ -913,18 +848,18 @@
         ]
       },
       {
-        "fingerprint": "sha256:457a7fd8f5c15872c2f81c54cd6edb05e95e7f334107fc025041daed27da9c3a",
-        "asset": "/images/pages/admin-external-progress-detail.webp",
+        "fingerprint": "sha256:c333c5643ab569540364a76863fd3f83428cff2ac910029fc8a0d6ee54587249",
+        "asset": "/images/pages/admin-email-automation-new-d1.webp",
         "aliases": [
-          "/images/pages/admin-external-progress-detail.webp",
-          "/images/pages/social-media-1.webp",
-          "/images/pages/verify-page-1.webp"
+          "/images/pages/admin-email-automation-new-d1.webp",
+          "/images/pages/comp-universal-hero.webp",
+          "/images/pages/government-3.webp"
         ],
         "routes": [
-          "admin:/blog/management/[slug]",
-          "admin:/external-progress",
-          "marketing:/blog/[slug]",
-          "marketing:/verify/[certificateId]"
+          "admin:/email-marketing/automation/new",
+          "lms:/parent-portal",
+          "marketing:/agencies",
+          "marketing:/store/digital"
         ]
       },
       {
@@ -1046,20 +981,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:c333c5643ab569540364a76863fd3f83428cff2ac910029fc8a0d6ee54587249",
-        "asset": "/images/pages/admin-email-automation-new-d1.webp",
-        "aliases": [
-          "/images/pages/admin-email-automation-new-d1.webp",
-          "/images/pages/comp-universal-hero.webp",
-          "/images/pages/government-3.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/automation/new",
-          "marketing:/agencies",
-          "marketing:/store/digital"
-        ]
-      },
-      {
         "fingerprint": "sha256:8f86d01d428b747271f51b30d1dce88e4ce0d107c6825daedd27a03abad54079",
         "asset": "/images/pages/barber-apprenticeship-hero.jpg",
         "aliases": [
@@ -1069,6 +990,18 @@
           "admin:/dashboard",
           "lms:/host-shop/dashboard/board",
           "marketing:/"
+        ]
+      },
+      {
+        "fingerprint": "sha256:129ec93c1afb7f20fa321bf2b8ffc75ec4995de3dbaa4defc5a70eea99d2fe97",
+        "asset": "/images/pages/career-counseling.jpg",
+        "aliases": [
+          "/images/pages/career-counseling.jpg"
+        ],
+        "routes": [
+          "lms:/lms/dashboard",
+          "marketing:/call-now",
+          "marketing:/tutoring"
         ]
       },
       {
@@ -1117,6 +1050,18 @@
           "marketing:/platform/[slug]",
           "marketing:/platform/sponsors",
           "marketing:/platform/student-portal/handbook"
+        ]
+      },
+      {
+        "fingerprint": "sha256:b6832153e8dad7e71e3311f87520fec775bea3421132dbf0a40bdb240ef6446c",
+        "asset": "/images/pages/platform-page-4.webp",
+        "aliases": [
+          "/images/pages/platform-page-4.webp"
+        ],
+        "routes": [
+          "lms:/parent-portal",
+          "marketing:/platform",
+          "marketing:/store/digital"
         ]
       },
       {
@@ -1221,17 +1166,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:129ec93c1afb7f20fa321bf2b8ffc75ec4995de3dbaa4defc5a70eea99d2fe97",
-        "asset": "/images/pages/career-counseling.jpg",
-        "aliases": [
-          "/images/pages/career-counseling.jpg"
-        ],
-        "routes": [
-          "lms:/lms/dashboard",
-          "marketing:/tutoring"
-        ]
-      },
-      {
         "fingerprint": "path:/images/pages/career-services-page-3.jpg",
         "asset": "/images/pages/career-services-page-3.jpg",
         "aliases": [
@@ -1320,17 +1254,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:c02d66111b115b52f1079392219a93ddbeb03ef26ad47e2686bb11262c814df9",
-        "asset": "/images/pages/ferpa-page-1.jpg",
-        "aliases": [
-          "/images/pages/ferpa-page-1.jpg"
-        ],
-        "routes": [
-          "marketing:/call-now",
-          "marketing:/store/compliance/ferpa"
-        ]
-      },
-      {
         "fingerprint": "sha256:c0b0b5e7f89973c4b81aca9221a446b4f5f1cb2a47274acf52bfc46a0b3e4895",
         "asset": "/images/pages/funding-page-3.webp",
         "aliases": [
@@ -1361,17 +1284,6 @@
         "routes": [
           "marketing:/store/compliance/wioa",
           "marketing:/testimonials"
-        ]
-      },
-      {
-        "fingerprint": "path:/images/pages/homepage-why-elevate.jpg",
-        "asset": "/images/pages/homepage-why-elevate.jpg",
-        "aliases": [
-          "/images/pages/homepage-why-elevate.jpg"
-        ],
-        "routes": [
-          "marketing:/services",
-          "marketing:/wioa-eligibility"
         ]
       },
       {
@@ -1416,6 +1328,17 @@
         "routes": [
           "marketing:/mobile",
           "marketing:/mobile-app"
+        ]
+      },
+      {
+        "fingerprint": "sha256:5087fe4bf47ee67fc6d05829ad1450f1c8416f874c806776ea1852be394ccb38",
+        "asset": "/images/pages/office-admin-desk.jpg",
+        "aliases": [
+          "/images/pages/office-admin-desk.jpg"
+        ],
+        "routes": [
+          "lms:/lms/dashboard",
+          "marketing:/wioa-eligibility"
         ]
       },
       {
@@ -1504,17 +1427,6 @@
         "routes": [
           "marketing:/platform",
           "marketing:/store/guides/licensing"
-        ]
-      },
-      {
-        "fingerprint": "sha256:b6832153e8dad7e71e3311f87520fec775bea3421132dbf0a40bdb240ef6446c",
-        "asset": "/images/pages/platform-page-4.webp",
-        "aliases": [
-          "/images/pages/platform-page-4.webp"
-        ],
-        "routes": [
-          "lms:/parent-portal",
-          "marketing:/platform"
         ]
       },
       {
@@ -1725,6 +1637,7 @@
         "routes": [
           "admin:/email-marketing/campaigns/new",
           "admin:/live-chat",
+          "lms:/program-holder/dashboard",
           "marketing:/academic-calendar",
           "marketing:/banking",
           "marketing:/banking/direct-deposit",
@@ -1732,12 +1645,12 @@
           "marketing:/certificates",
           "marketing:/certificates/verify/[certificateId]",
           "marketing:/online-apps",
-          "marketing:/program-holder/dashboard",
           "marketing:/programs/esthetician-apprenticeship/apply",
           "marketing:/services",
           "marketing:/store/add-ons/analytics-pro",
           "marketing:/store/compliance/wcag",
-          "marketing:/store/compliance/wioa"
+          "marketing:/store/compliance/wioa",
+          "marketing:/wioa-eligibility"
         ]
       },
       {
@@ -1758,6 +1671,7 @@
           "admin:/studio/builds",
           "lms:/lms/dashboard",
           "marketing:/accessibility",
+          "marketing:/call-now",
           "marketing:/careers",
           "marketing:/store/compliance",
           "marketing:/store/compliance/ferpa",
@@ -1791,6 +1705,26 @@
         ]
       },
       {
+        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
+        "aliases": [
+          "/images/pages/academic-integrity-hero.webp",
+          "/images/pages/admin-analytics-learning-hero.webp",
+          "/images/pages/admin-compliance-agreements-hero.webp",
+          "/images/pages/admin-signatures-hero.webp",
+          "/images/pages/banking-page-2.webp",
+          "/images/pages/compliance-page-2.webp"
+        ],
+        "routes": [
+          "admin:/signatures",
+          "lms:/parent-portal",
+          "marketing:/academic-integrity",
+          "marketing:/banking",
+          "marketing:/compliance/competency-verification",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/wcag"
+        ]
+      },
+      {
         "fingerprint": "sha256:2ff1aa0333f5b6efdea83c5dacd52260eafe559c8ddfb76fa655bf2307a4651d",
         "aliases": [
           "/images/pages/admin-email-analytics-detail.webp",
@@ -1798,8 +1732,7 @@
           "/images/pages/admin-videos-upload-hero.webp",
           "/images/pages/admin-wioa-hero.webp",
           "/images/pages/calendar-page-1.webp",
-          "/images/pages/how-it-works-hero.webp",
-          "/images/pages/programs-it-hero.webp"
+          "/images/pages/how-it-works-hero.webp"
         ],
         "routes": [
           "admin:/email-marketing/analytics",
@@ -1812,51 +1745,6 @@
           "marketing:/store/practice-tests",
           "marketing:/tutoring",
           "marketing:/workforce-board"
-        ]
-      },
-      {
-        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
-        "aliases": [
-          "/images/pages/about-career-training.webp",
-          "/images/pages/admin-campaigns-hero.webp",
-          "/images/pages/admin-compliance-exports-detail.webp",
-          "/images/pages/card-wioa.webp",
-          "/images/pages/comp-home-highlight-health.webp",
-          "/images/pages/programs-catalog-hero.webp"
-        ],
-        "routes": [
-          "admin:/compliance/exports",
-          "lms:/parent-portal",
-          "lms:/parent-portal/dashboard",
-          "marketing:/calendar",
-          "marketing:/call-now",
-          "marketing:/email",
-          "marketing:/onboarding",
-          "marketing:/programs/barber-apprenticeship/orientation",
-          "marketing:/store/compliance/grant-reporting",
-          "marketing:/transparency",
-          "marketing:/wioa-eligibility",
-          "marketing:/workforce-partners",
-          "marketing:/writing-center"
-        ]
-      },
-      {
-        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
-        "aliases": [
-          "/images/pages/academic-integrity-hero.webp",
-          "/images/pages/admin-analytics-learning-hero.webp",
-          "/images/pages/admin-compliance-agreements-hero.webp",
-          "/images/pages/admin-signatures-hero.webp",
-          "/images/pages/banking-page-2.webp",
-          "/images/pages/compliance-page-2.webp"
-        ],
-        "routes": [
-          "admin:/signatures",
-          "marketing:/academic-integrity",
-          "marketing:/banking",
-          "marketing:/compliance/competency-verification",
-          "marketing:/store/add-ons/analytics-pro",
-          "marketing:/store/compliance/wcag"
         ]
       },
       {
@@ -1930,7 +1818,27 @@
           "lms:/enrollment",
           "marketing:/calendar",
           "marketing:/services",
-          "marketing:/wioa-eligibility",
+          "marketing:/writing-center"
+        ]
+      },
+      {
+        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
+        "aliases": [
+          "/images/pages/about-career-training.webp",
+          "/images/pages/admin-compliance-exports-detail.webp",
+          "/images/pages/programs-catalog-hero.webp"
+        ],
+        "routes": [
+          "admin:/compliance/exports",
+          "lms:/parent-portal",
+          "marketing:/calendar",
+          "marketing:/call-now",
+          "marketing:/email",
+          "marketing:/onboarding",
+          "marketing:/programs/barber-apprenticeship/orientation",
+          "marketing:/store/compliance/grant-reporting",
+          "marketing:/transparency",
+          "marketing:/workforce-partners",
           "marketing:/writing-center"
         ]
       },
@@ -1977,6 +1885,7 @@
         ],
         "routes": [
           "admin:/email-marketing/automation/new",
+          "lms:/parent-portal",
           "marketing:/agencies",
           "marketing:/store/digital"
         ]
@@ -1992,6 +1901,7 @@
           "admin:/blog/management/[slug]",
           "admin:/external-progress",
           "marketing:/blog/[slug]",
+          "marketing:/store/compliance/wioa",
           "marketing:/verify/[certificateId]"
         ]
       },
@@ -2125,16 +2035,6 @@
           "marketing:/portal/esthetician",
           "marketing:/portal/nail-technician",
           "marketing:/portal/plumbing"
-        ]
-      },
-      {
-        "fingerprint": "sha256:73cc447cd22d04f70c2273f4c1abff01b72becc39ee492be44c4eea474479bce",
-        "aliases": [
-          "/images/pages/store-digital-detail1.jpg",
-          "/images/pages/store-digital-detail1.webp"
-        ],
-        "routes": [
-          "marketing:/store/digital"
         ]
       },
       {
@@ -2276,6 +2176,18 @@
       "route": "/survey/workone",
       "page": "apps/marketing/app/(public)/survey/workone/page.tsx",
       "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
+      "route": "/about/elizabeth-greene",
+      "page": "apps/marketing/app/about/elizabeth-greene/page.tsx",
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -3233,6 +3145,18 @@
     },
     {
       "app": "marketing",
+      "route": "/apps/website-builder/edit/[websiteId]/preview",
+      "page": "apps/marketing/app/apps/website-builder/edit/[websiteId]/preview/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "marketing",
       "route": "/apps/website-builder/import",
       "page": "apps/marketing/app/apps/website-builder/import/page.tsx",
       "componentFiles": 2,
@@ -3324,18 +3248,6 @@
       "imageFingerprints": 5,
       "ownedImageRefs": 5,
       "ownedImageFingerprints": 5,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
-    },
-    {
-      "app": "marketing",
-      "route": "/banking/prepaid-card",
-      "page": "apps/marketing/app/banking/prepaid-card/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 1,
-      "imageFingerprints": 1,
-      "ownedImageRefs": 1,
-      "ownedImageFingerprints": 1,
       "ownedHeroRefs": 1,
       "ownedHeroFingerprints": 1
     },
@@ -5503,7 +5415,7 @@
       "app": "marketing",
       "route": "/funding",
       "page": "apps/marketing/app/funding/page.tsx",
-      "componentFiles": 3,
+      "componentFiles": 4,
       "imageRefs": 1,
       "imageFingerprints": 1,
       "ownedImageRefs": 1,
@@ -7865,114 +7777,6 @@
     },
     {
       "app": "marketing",
-      "route": "/program-holder/dashboard",
-      "page": "apps/marketing/app/program-holder/dashboard/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 1,
-      "imageFingerprints": 1,
-      "ownedImageRefs": 1,
-      "ownedImageFingerprints": 1,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/onboarding",
-      "page": "apps/marketing/app/program-holder/onboarding/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/portal/page",
-      "page": "apps/marketing/app/program-holder/portal/page/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/portal/reports",
-      "page": "apps/marketing/app/program-holder/portal/reports/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/portal/students",
-      "page": "apps/marketing/app/program-holder/portal/students/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/rights-responsibilities",
-      "page": "apps/marketing/app/program-holder/rights-responsibilities/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/sign-mou",
-      "page": "apps/marketing/app/program-holder/sign-mou/page.tsx",
-      "componentFiles": 7,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/students",
-      "page": "apps/marketing/app/program-holder/students/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
-      "route": "/program-holder/verification",
-      "page": "apps/marketing/app/program-holder/verification/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "marketing",
       "route": "/program-inquiry",
       "page": "apps/marketing/app/program-inquiry/page.tsx",
       "componentFiles": 2,
@@ -8923,7 +8727,7 @@
       "app": "marketing",
       "route": "/provider/programs/new",
       "page": "apps/marketing/app/provider/programs/new/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -9775,7 +9579,7 @@
       "app": "marketing",
       "route": "/store/apps/grants",
       "page": "apps/marketing/app/store/apps/grants/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -9799,7 +9603,7 @@
       "app": "marketing",
       "route": "/store/apps/sam-gov",
       "page": "apps/marketing/app/store/apps/sam-gov/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -9957,9 +9761,9 @@
       "page": "apps/marketing/app/store/compliance/wioa/page.tsx",
       "componentFiles": 3,
       "imageRefs": 10,
-      "imageFingerprints": 9,
+      "imageFingerprints": 10,
       "ownedImageRefs": 10,
-      "ownedImageFingerprints": 9,
+      "ownedImageFingerprints": 10,
       "ownedHeroRefs": 1,
       "ownedHeroFingerprints": 1
     },
@@ -10015,7 +9819,7 @@
       "app": "marketing",
       "route": "/store/demo/ai-studio",
       "page": "apps/marketing/app/store/demo/ai-studio/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -10161,9 +9965,9 @@
       "page": "apps/marketing/app/store/digital/page.tsx",
       "componentFiles": 2,
       "imageRefs": 6,
-      "imageFingerprints": 5,
+      "imageFingerprints": 6,
       "ownedImageRefs": 6,
-      "ownedImageFingerprints": 5,
+      "ownedImageFingerprints": 6,
       "ownedHeroRefs": 1,
       "ownedHeroFingerprints": 1
     },
@@ -11133,11 +10937,11 @@
       "page": "apps/marketing/app/wioa-eligibility/page.tsx",
       "componentFiles": 3,
       "imageRefs": 10,
-      "imageFingerprints": 9,
+      "imageFingerprints": 10,
       "ownedImageRefs": 10,
-      "ownedImageFingerprints": 9,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
+      "ownedImageFingerprints": 10,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "marketing",
@@ -11239,7 +11043,7 @@
       "app": "marketing",
       "route": "/workone-partner-packet",
       "page": "apps/marketing/app/workone-partner-packet/page.tsx",
-      "componentFiles": 6,
+      "componentFiles": 7,
       "imageRefs": 5,
       "imageFingerprints": 5,
       "ownedImageRefs": 5,
@@ -11429,18 +11233,6 @@
     },
     {
       "app": "lms",
-      "route": "/achievements",
-      "page": "apps/lms/app/achievements/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
       "route": "/ai/ai/instructor",
       "page": "apps/lms/app/ai/ai/instructor/page.tsx",
       "componentFiles": 1,
@@ -11552,18 +11344,6 @@
       "route": "/ai-chat",
       "page": "apps/lms/app/ai-chat/page.tsx",
       "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
-      "route": "/ai-tutor",
-      "page": "apps/lms/app/ai-tutor/page.tsx",
-      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -11960,18 +11740,6 @@
       "route": "/credentials",
       "page": "apps/lms/app/credentials/page.tsx",
       "componentFiles": 3,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
-      "route": "/dashboard",
-      "page": "apps/lms/app/dashboard/page.tsx",
-      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -12857,18 +12625,6 @@
     },
     {
       "app": "lms",
-      "route": "/learner",
-      "page": "apps/lms/app/learner/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
       "route": "/learning",
       "page": "apps/lms/app/learning/page.tsx",
       "componentFiles": 3,
@@ -12980,18 +12736,6 @@
       "route": "/lms/attendance",
       "page": "apps/lms/app/lms/(app)/attendance/page.tsx",
       "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
-      "route": "/lms/badges",
-      "page": "apps/lms/app/lms/(app)/badges/page.tsx",
-      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -13327,7 +13071,7 @@
       "app": "lms",
       "route": "/lms/notifications",
       "page": "apps/lms/app/lms/(app)/notifications/page.tsx",
-      "componentFiles": 1,
+      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -13589,18 +13333,6 @@
     },
     {
       "app": "lms",
-      "route": "/lms/ai-tutor",
-      "page": "apps/lms/app/lms/ai-tutor/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
       "route": "/lms/courses/[courseId]/lessons/[lessonId]",
       "page": "apps/lms/app/lms/courses/[courseId]/lessons/[lessonId]/page.tsx",
       "componentFiles": 5,
@@ -13625,6 +13357,18 @@
     },
     {
       "app": "lms",
+      "route": "/lms/courses/[course]/enroll",
+      "page": "apps/lms/app/lms/courses/[course]/enroll/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
       "route": "/lms/courses",
       "page": "apps/lms/app/lms/courses/page.tsx",
       "componentFiles": 1,
@@ -13639,18 +13383,6 @@
       "app": "lms",
       "route": "/lms/host-shops",
       "page": "apps/lms/app/lms/host-shops/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
-      "route": "/lms/login",
-      "page": "apps/lms/app/lms/login/page.tsx",
       "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
@@ -13697,33 +13429,9 @@
     },
     {
       "app": "lms",
-      "route": "/messages",
-      "page": "apps/lms/app/messages/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
       "route": "/next-steps",
       "page": "apps/lms/app/next-steps/page.tsx",
       "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
-      "route": "/notifications",
-      "page": "apps/lms/app/notifications/page.tsx",
-      "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -13742,18 +13450,6 @@
       "ownedImageFingerprints": 2,
       "ownedHeroRefs": 1,
       "ownedHeroFingerprints": 1
-    },
-    {
-      "app": "lms",
-      "route": "/orientation",
-      "page": "apps/lms/app/orientation/page.tsx",
-      "componentFiles": 3,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
     },
     {
       "app": "lms",
@@ -13795,13 +13491,13 @@
       "app": "lms",
       "route": "/parent-portal/dashboard",
       "page": "apps/lms/app/parent-portal/dashboard/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 1,
-      "imageFingerprints": 1,
-      "ownedImageRefs": 1,
-      "ownedImageFingerprints": 1,
-      "ownedHeroRefs": 1,
-      "ownedHeroFingerprints": 1
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "lms",
@@ -13809,11 +13505,23 @@
       "page": "apps/lms/app/parent-portal/page.tsx",
       "componentFiles": 2,
       "imageRefs": 8,
-      "imageFingerprints": 6,
+      "imageFingerprints": 8,
       "ownedImageRefs": 8,
-      "ownedImageFingerprints": 6,
+      "ownedImageFingerprints": 8,
       "ownedHeroRefs": 1,
       "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "lms",
+      "route": "/parent-portal/student/[id]",
+      "page": "apps/lms/app/parent-portal/student/[id]/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
     },
     {
       "app": "lms",
@@ -14009,9 +13717,105 @@
     },
     {
       "app": "lms",
-      "route": "/profile",
-      "page": "apps/lms/app/profile/page.tsx",
-      "componentFiles": 2,
+      "route": "/program-holder/dashboard",
+      "page": "apps/lms/app/program-holder/dashboard/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 1,
+      "imageFingerprints": 1,
+      "ownedImageRefs": 1,
+      "ownedImageFingerprints": 1,
+      "ownedHeroRefs": 1,
+      "ownedHeroFingerprints": 1
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/onboarding",
+      "page": "apps/lms/app/program-holder/onboarding/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/portal/page",
+      "page": "apps/lms/app/program-holder/portal/page/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/portal/reports",
+      "page": "apps/lms/app/program-holder/portal/reports/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/portal/students",
+      "page": "apps/lms/app/program-holder/portal/students/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/rights-responsibilities",
+      "page": "apps/lms/app/program-holder/rights-responsibilities/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/sign-mou",
+      "page": "apps/lms/app/program-holder/sign-mou/page.tsx",
+      "componentFiles": 7,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/students",
+      "page": "apps/lms/app/program-holder/students/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "lms",
+      "route": "/program-holder/verification",
+      "page": "apps/lms/app/program-holder/verification/page.tsx",
+      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -14072,18 +13876,6 @@
       "route": "/reset-password",
       "page": "apps/lms/app/reset-password/page.tsx",
       "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "lms",
-      "route": "/settings",
-      "page": "apps/lms/app/settings/page.tsx",
-      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -14384,546 +14176,6 @@
       "route": "/activity",
       "page": "apps/admin/app/activity/page.tsx",
       "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/applications/review/[id]",
-      "page": "apps/admin/app/admin/applications/review/[id]/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/audit-logs",
-      "page": "apps/admin/app/admin/audit-logs/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/billing",
-      "page": "apps/admin/app/admin/billing/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/certificates",
-      "page": "apps/admin/app/admin/certificates/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/compliance",
-      "page": "apps/admin/app/admin/compliance/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/crm/leads/[id]",
-      "page": "apps/admin/app/admin/crm/leads/[id]/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/crm/leads",
-      "page": "apps/admin/app/admin/crm/leads/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/crm",
-      "page": "apps/admin/app/admin/crm/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/documents/review",
-      "page": "apps/admin/app/admin/documents/review/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/employers",
-      "page": "apps/admin/app/admin/employers/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/enrollment",
-      "page": "apps/admin/app/admin/enrollment/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/funding",
-      "page": "apps/admin/app/admin/funding/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/integrations/stripe",
-      "page": "apps/admin/app/admin/integrations/stripe/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/intelligence/forecast",
-      "page": "apps/admin/app/admin/intelligence/forecast/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/intelligence",
-      "page": "apps/admin/app/admin/intelligence/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/mission-control",
-      "page": "apps/admin/app/admin/mission-control/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/operations",
-      "page": "apps/admin/app/admin/operations/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin",
-      "page": "apps/admin/app/admin/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/program-holder-documents",
-      "page": "apps/admin/app/admin/program-holder-documents/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/program-holders",
-      "page": "apps/admin/app/admin/program-holders/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/programs/[code]/manage",
-      "page": "apps/admin/app/admin/programs/[code]/manage/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/staff-portal/dashboard",
-      "page": "apps/admin/app/admin/staff-portal/dashboard/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/students/[id]",
-      "page": "apps/admin/app/admin/students/[id]/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/course",
-      "page": "apps/admin/app/admin/studio/course/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]/content",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/content/page.tsx",
-      "componentFiles": 3,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]/edit",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/edit/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]/inspect",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/inspect/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/page.tsx",
-      "componentFiles": 11,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]/quizzes/[quizId]",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/quizzes/[quizId]/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]/quizzes/[quizId]/questions",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/quizzes/[quizId]/questions/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/[courseId]/quizzes",
-      "page": "apps/admin/app/admin/studio/courses/[courseId]/quizzes/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/bulk-operations",
-      "page": "apps/admin/app/admin/studio/courses/bulk-operations/page.tsx",
-      "componentFiles": 4,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/create",
-      "page": "apps/admin/app/admin/studio/courses/create/page.tsx",
-      "componentFiles": 4,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/generate",
-      "page": "apps/admin/app/admin/studio/courses/generate/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses",
-      "page": "apps/admin/app/admin/studio/courses/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/partners",
-      "page": "apps/admin/app/admin/studio/courses/partners/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/courses/pipeline",
-      "page": "apps/admin/app/admin/studio/courses/pipeline/page.tsx",
-      "componentFiles": 2,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/studio/pages",
-      "page": "apps/admin/app/admin/studio/pages/page.tsx",
-      "componentFiles": 3,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/submissions",
-      "page": "apps/admin/app/admin/submissions/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/system-health",
-      "page": "apps/admin/app/admin/system-health/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/tenants",
-      "page": "apps/admin/app/admin/tenants/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/testing-center",
-      "page": "apps/admin/app/admin/testing-center/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/website-editor",
-      "page": "apps/admin/app/admin/website-editor/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/wioa/documents",
-      "page": "apps/admin/app/admin/wioa/documents/page.tsx",
-      "componentFiles": 1,
-      "imageRefs": 0,
-      "imageFingerprints": 0,
-      "ownedImageRefs": 0,
-      "ownedImageFingerprints": 0,
-      "ownedHeroRefs": 0,
-      "ownedHeroFingerprints": 0
-    },
-    {
-      "app": "admin",
-      "route": "/admin/wioa",
-      "page": "apps/admin/app/admin/wioa/page.tsx",
-      "componentFiles": 1,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -15775,6 +15027,30 @@
       "app": "admin",
       "route": "/contracts",
       "page": "apps/admin/app/contracts/page.tsx",
+      "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/course-builder/bulk-operations",
+      "page": "apps/admin/app/course-builder/bulk-operations/page.tsx",
+      "componentFiles": 4,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/course-builder/lifecycle",
+      "page": "apps/admin/app/course-builder/lifecycle/page.tsx",
       "componentFiles": 2,
       "imageRefs": 0,
       "imageFingerprints": 0,
@@ -19099,7 +18375,7 @@
       "app": "admin",
       "route": "/staff-portal/students/add",
       "page": "apps/admin/app/staff-portal/students/add/page.tsx",
-      "componentFiles": 2,
+      "componentFiles": 4,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,
@@ -19892,6 +19168,30 @@
       "route": "/waitlist",
       "page": "apps/admin/app/waitlist/page.tsx",
       "componentFiles": 2,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/website-editor",
+      "page": "apps/admin/app/website-editor/page.tsx",
+      "componentFiles": 1,
+      "imageRefs": 0,
+      "imageFingerprints": 0,
+      "ownedImageRefs": 0,
+      "ownedImageFingerprints": 0,
+      "ownedHeroRefs": 0,
+      "ownedHeroFingerprints": 0
+    },
+    {
+      "app": "admin",
+      "route": "/website-editor/pages",
+      "page": "apps/admin/app/website-editor/pages/page.tsx",
+      "componentFiles": 3,
       "imageRefs": 0,
       "imageFingerprints": 0,
       "ownedImageRefs": 0,

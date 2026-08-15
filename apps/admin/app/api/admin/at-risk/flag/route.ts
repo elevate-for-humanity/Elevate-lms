@@ -26,17 +26,15 @@ export async function POST(request: NextRequest) {
 
   if (error) return safeInternalError(error, 'Failed to flag student');
 
-  // Log the intervention — non-fatal if table doesn't exist yet
-  await db
-    .from('student_interventions')
-    .insert({
-      student_id: studentId,
-      enrollment_id: enrollmentId ?? null,
-      intervention_type: 'flagged_for_review',
-      notes: 'Admin-flagged from at-risk dashboard',
-      created_at: new Date().toISOString(),
-    })
-    .catch(() => null);
+  // Non-fatal audit/intervention write. Supabase returns database errors in the
+  // result object rather than via Promise.catch on the query builder.
+  await db.from('student_interventions').insert({
+    student_id: studentId,
+    enrollment_id: enrollmentId ?? null,
+    intervention_type: 'flagged_for_review',
+    notes: 'Admin-flagged from at-risk dashboard',
+    created_at: new Date().toISOString(),
+  });
 
   return NextResponse.json({ ok: true });
 }

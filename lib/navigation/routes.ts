@@ -9,11 +9,9 @@
 import { ADMIN_HOST, LMS_HOST, MARKETING_HOST } from '@/lib/routing/portal-map';
 
 export const ROUTES = {
-  // Home / intake
   home: '/',
   apply: '/apply/student',
 
-  // Authentication / portals
   login: `${LMS_HOST}/login`,
   studentPortal: `${LMS_HOST}/lms/dashboard`,
   lmsPortal: `${LMS_HOST}/lms/dashboard`,
@@ -23,21 +21,16 @@ export const ROUTES = {
   workforcePortal: `${LMS_HOST}/workforce/dashboard`,
   hostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
   programHolderPortal: `${LMS_HOST}/program-holder/dashboard`,
-  // Compatibility aliases retained for old bookmarks; do not expose as separate navigation items.
   cosmetologyHostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
   partnerPortal: `${LMS_HOST}/host-shop/dashboard`,
   adminPortal: `${ADMIN_HOST}/dashboard`,
   instructorPortal: `${ADMIN_HOST}/instructor/dashboard`,
   staffPortal: `${ADMIN_HOST}/staff-portal/dashboard`,
   adminLogin: `${ADMIN_HOST}/login`,
-  // These operational workspaces still live on the Marketing service. Keep
-  // their URLs absolute so shared navigation never resolves them against the
-  // LMS or Admin hostname. Program Holder has already moved to LMS above.
   caseManagerPortal: `${MARKETING_HOST}/case-manager/dashboard`,
   providerPortal: `${MARKETING_HOST}/provider/dashboard`,
   workforceBoardPortal: `${MARKETING_HOST}/workforce-board/dashboard`,
 
-  // Programs
   programs: '/programs',
   programsHealthcare: '/programs/healthcare',
   programsCNA: '/programs/cna',
@@ -46,7 +39,7 @@ export const ROUTES = {
   programsPhlebotomy: '/programs/phlebotomy',
   programsHVAC: '/programs/hvac-technician',
   programsCDL: '/programs/cdl-training',
-  programsBeauty: '/barber-and-beauty-apprenticeships',
+  programsBeauty: '/programs',
   programsBarber: '/programs/barber-apprenticeship',
   programsCosmetology: '/programs/cosmetology-apprenticeship',
   programsEsthetician: '/programs/esthetician-apprenticeship',
@@ -54,13 +47,11 @@ export const ROUTES = {
   programsIT: '/programs/technology',
   programsTechnology: '/programs/technology',
 
-  // Apprenticeships / host sites
   apprenticeships: '/apprenticeships',
   apprenticeshipsHowItWorks: '/how-it-works',
   apprenticeshipsHostShop: '/partners/host-shops',
   apprenticeshipSponsor: '/apprenticeship-sponsor',
 
-  // Funding
   funding: '/funding',
   fundingWIOA: '/funding/wioa',
   fundingJobReadyIndy: '/jri',
@@ -68,13 +59,11 @@ export const ROUTES = {
   scholarships: '/scholarships',
   eligibility: '/eligibility/quiz',
 
-  // Employers
   employers: '/employers',
   employersHireGraduates: '/hire-graduates',
   employersPostJob: `${LMS_HOST}/employer/dashboard`,
   forAgencies: '/for-agencies',
 
-  // About
   about: '/about',
   aboutLocations: '/about',
   aboutApprovals: '/approvals',
@@ -84,7 +73,6 @@ export const ROUTES = {
   faq: '/faq',
   contact: '/contact',
 
-  // Store / Trials
   store: '/store',
   storeDemo: '/store/demo',
 } as const;

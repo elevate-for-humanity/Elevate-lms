@@ -2,15 +2,25 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import { ACTIVE_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
-import { isPublicTestingPriceVerified } from '@/lib/testing/public-pricing';
 import TestingCheckoutClient from './TestingCheckoutClient';
 
 export const metadata: Metadata = {
   title: 'Choose Exam & Checkout | Elevate Testing Center',
   description:
-    'Select an exam with verified published pricing, review the exact total, and continue to secure Stripe Checkout.',
+    'Select an available exam, review the exact configured retail total, and continue to secure Stripe Checkout.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/testing/checkout' },
 };
+
+function examAmountCents(
+  provider: (typeof ACTIVE_PROVIDERS)[number],
+  exam: (typeof ACTIVE_PROVIDERS)[number]['exams'][number],
+): number | null {
+  if (typeof exam === 'object' && exam.amountCents && exam.amountCents > 0) return exam.amountCents;
+  if (provider.fees?.length === 1 && provider.fees[0].amount > 0) {
+    return Math.round(provider.fees[0].amount * 100);
+  }
+  return null;
+}
 
 export default async function TestingCheckoutPage({
   searchParams,
@@ -21,22 +31,17 @@ export default async function TestingCheckoutPage({
   const selectedProvider = params?.provider || '';
   const selectedExam = params?.exam_name || params?.exam || '';
 
-  const providers = ACTIVE_PROVIDERS.filter((provider) =>
-    isPublicTestingPriceVerified(provider.key),
-  ).map((provider) => ({
+  const providers = ACTIVE_PROVIDERS.map((provider) => ({
     key: provider.key,
     name: provider.name,
-    exams: provider.exams.map((exam) => ({
-      name: typeof exam === 'string' ? exam : exam.name,
-      description: typeof exam === 'string' ? '' : exam.description || '',
-      durationMinutes: typeof exam === 'string' ? null : exam.durationMinutes || null,
-      amountCents:
-        typeof exam === 'object' && exam.amountCents
-          ? exam.amountCents
-          : provider.fees?.length === 1
-            ? Math.round(provider.fees[0].amount * 100)
-            : null,
-    })),
+    exams: provider.exams
+      .map((exam) => ({
+        name: typeof exam === 'string' ? exam : exam.name,
+        description: typeof exam === 'string' ? '' : exam.description || '',
+        durationMinutes: typeof exam === 'string' ? null : exam.durationMinutes || null,
+        amountCents: examAmountCents(provider, exam),
+      }))
+      .filter((exam) => Boolean(exam.amountCents && exam.amountCents > 0)),
     addOn: provider.addOn
       ? {
           label: provider.addOn.label,
@@ -45,7 +50,7 @@ export default async function TestingCheckoutPage({
           includes: provider.addOn.includes,
         }
       : null,
-  }));
+  })).filter((provider) => provider.exams.length > 0);
 
   return (
     <main className="min-h-screen bg-slate-50 py-10 sm:py-14">
@@ -62,23 +67,17 @@ export default async function TestingCheckoutPage({
             <ShieldCheck className="mt-1 h-7 w-7 shrink-0 text-emerald-600" />
             <div>
               <p className="text-sm font-bold uppercase tracking-widest text-emerald-700">
-                Verified-price checkout
+                Server-authoritative checkout
               </p>
               <h1 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
                 Choose the exact exam you are taking.
               </h1>
               <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-                Online payment is available only when Elevate has an explicitly verified public
-                retail price for that provider. We do not charge planning estimates or placeholder
-                voucher costs.
+                Every exam shown here has a positive configured retail amount in the canonical testing registry.
+                The server re-resolves that amount before it creates Stripe Checkout, so the browser cannot set the price.
               </p>
             </div>
           </div>
-        </div>
-
-        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          If your provider is not listed here, return to the Testing Center and request the current
-          price. Your total will be confirmed before payment.
         </div>
 
         <div className="mt-6">

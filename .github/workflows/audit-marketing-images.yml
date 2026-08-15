@@ -42,10 +42,15 @@ jobs:
           pattern = re.compile(r'''["'`](\/[^"'`?]+\.(?:png|jpe?g|webp|gif|svg|avif))(?:\?[^"'`]*)?["'`]''', re.I)
           public_roots = [Path('public'), Path('apps/marketing/public')]
 
-          alias_file = Path('lib/media/legacy-image-aliases.mjs')
-          alias_text = alias_file.read_text(errors='ignore') if alias_file.exists() else ''
+          alias_files = [
+              Path('lib/media/legacy-image-aliases.mjs'),
+              Path('lib/media/verified-image-aliases.mjs'),
+          ]
           alias_pattern = re.compile(r'''['"](\/[^'"]+)['"]\s*:\s*['"](\/[^'"]+)['"]''')
-          aliases = dict(alias_pattern.findall(alias_text))
+          aliases = {}
+          for alias_file in alias_files:
+              if alias_file.exists():
+                  aliases.update(dict(alias_pattern.findall(alias_file.read_text(errors='ignore'))))
 
           def exists(ref):
               rel = ref.lstrip('/')
@@ -64,7 +69,7 @@ jobs:
               for p in root.rglob('*'):
                   if not p.is_file() or p.suffix.lower() not in {'.ts','.tsx','.js','.jsx','.mjs','.json'}:
                       continue
-                  if p == alias_file:
+                  if p in alias_files:
                       continue
                   try:
                       text = p.read_text(errors='ignore')
@@ -80,7 +85,7 @@ jobs:
                               findings.append({'file': str(p), 'line': lineno, 'ref': ref})
 
           print(f'Total literal local image refs: {len(refs)}')
-          print(f'Canonical compatibility aliases: {len(aliases)}')
+          print(f'Explicit canonical image aliases: {len(aliases)}')
           print(f'Broken alias destinations: {len(bad_aliases)}')
           for f in bad_aliases:
               print(f"BROKEN_ALIAS {f['source']} -> {f['destination']}")

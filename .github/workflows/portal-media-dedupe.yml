@@ -24,8 +24,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Replace duplicate route media
-        run: node scripts/fix-platform-media-duplicates.mjs
+      - name: Force replace duplicate route media
+        run: node scripts/force-replace-duplicate-media.mjs
 
       - name: Commit replacements
         shell: bash
@@ -37,5 +37,5 @@ jobs:
           git config user.name "elevate-autopilot"
           git config user.email "actions@users.noreply.github.com"
           git add apps components docs/audits
-          git commit -m "fix(media): replace duplicate route hero assets"
+          git commit -m "fix(media): force unique route hero assets"
           git push origin HEAD:${{ github.head_ref }}

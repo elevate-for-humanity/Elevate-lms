@@ -22,7 +22,7 @@ export function getConfirmationPhrase(action: string): ConfirmationAction | null
 export function requireTypedConfirmation(
   userInput: unknown,
   action: string,
-): { ok: true } | { ok: false; required: string } {
+): { ok: true; required?: never } | { ok: false; required: string } {
   const required = getConfirmationPhrase(action);
   if (!required) return { ok: true };
   if (typeof userInput !== 'string' || userInput !== required) {

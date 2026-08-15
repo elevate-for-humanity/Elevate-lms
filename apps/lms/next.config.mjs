@@ -31,6 +31,9 @@ const nextConfig = {
     };
   },
   async redirects() {
+    // Keep only public cross-service convenience routes here. Private portal
+    // aliases are intentionally not redirected: callers must use the canonical
+    // LMS/Admin route directly so retired internal surfaces stay retired.
     return [
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },
@@ -40,13 +43,6 @@ const nextConfig = {
       { source: '/funding', destination: 'https://www.elevateforhumanity.org/funding', permanent: true },
       { source: '/testing', destination: 'https://www.elevateforhumanity.org/testing', permanent: true },
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: true },
-      { source: '/portal', destination: '/lms/dashboard', permanent: true },
-      { source: '/cosmetology-host-shop', destination: '/host-shop/dashboard', permanent: true },
-      { source: '/cosmetology-host-shop/:path*', destination: '/host-shop/dashboard', permanent: true },
-      { source: '/partner', destination: '/host-shop/dashboard', permanent: true },
-      { source: '/partner/:path*', destination: '/host-shop/dashboard', permanent: true },
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org/dashboard', permanent: true },
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: true },
     ];
   },
   serverExternalPackages: [

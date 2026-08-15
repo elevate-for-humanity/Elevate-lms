@@ -9,7 +9,7 @@
  *   sort_by - 'date' | 'salary' (default 'date')
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { searchJobs, getSalaryInsights } from '@/lib/adzuna';
+import { searchJobs } from '@/lib/adzuna';
 import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
     const result = await searchJobs({
       what,
       where,
-      resultsPerPage,
-      sortBy,
+      results_per_page: resultsPerPage,
+      sort_by: sortBy,
     });
 
     return NextResponse.json(result);

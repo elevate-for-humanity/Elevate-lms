@@ -45,7 +45,8 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ programI
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
     const data = await updateProgram(programId, parsed.data);
-    await auth.db.from('audit_logs').insert({
+    const db = await requireAdminClient();
+    await db.from('audit_logs').insert({
       actor_id: auth.id,
       actor_role: auth.role,
       action: 'update',
@@ -70,7 +71,8 @@ async function _DELETE(request: Request, { params }: { params: Promise<{ program
     const before = await getProgram(programId);
     if (!before) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     const data = await deleteProgram(programId);
-    await auth.db.from('audit_logs').insert({
+    const db = await requireAdminClient();
+    await db.from('audit_logs').insert({
       actor_id: auth.id,
       actor_role: auth.role,
       action: 'delete',

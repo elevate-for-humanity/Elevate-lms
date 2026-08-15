@@ -1,13 +1,10 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
-
-// Using Node.js runtime for email compatibility
-import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
-import { logger } from '@/lib/logger';
-export const maxDuration = 60;
 
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 async function _POST(req: Request) {
@@ -37,7 +34,6 @@ async function _POST(req: Request) {
       return NextResponse.json({ error: 'productId is required' }, { status: 400 });
     }
 
-    // Pre-read: verify product exists before updating
     const { data: product, error: fetchError } = await supabase
       .from('marketplace_products')
       .select('title, creator_id, status')
@@ -55,7 +51,6 @@ async function _POST(req: Request) {
 
     if (error) throw error;
 
-    // Send approval notification to creator
     if (product?.creator_id) {
       try {
         const { data: creator } = await supabase
@@ -81,7 +76,6 @@ async function _POST(req: Request) {
           }
         }
       } catch (emailErr) {
-        // Non-fatal — product is already approved
         const { logger } = await import('@/lib/logger');
         logger.warn('Failed to send product approval email', emailErr);
       }
@@ -97,7 +91,7 @@ async function _POST(req: Request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

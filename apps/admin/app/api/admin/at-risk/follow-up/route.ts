@@ -46,7 +46,8 @@ export async function POST(request: NextRequest) {
     `,
   });
 
-  // Log the intervention
+  // Non-fatal intervention write. Supabase surfaces table/database failures in
+  // the resolved result rather than via Promise.catch on the query builder.
   await db
     .from('student_interventions')
     .upsert({
@@ -57,8 +58,7 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString(),
     })
     .select()
-    .maybeSingle()
-    .catch(() => null); // non-fatal if table doesn't exist yet
+    .maybeSingle();
 
   return NextResponse.json({ ok: true });
 }

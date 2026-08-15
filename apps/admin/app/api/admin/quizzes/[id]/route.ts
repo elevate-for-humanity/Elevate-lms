@@ -25,7 +25,7 @@ async function requireAdmin() {
   return { user, profile };
 }
 
-async function _GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+async function _GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const { id } = await params;
@@ -35,7 +35,7 @@ async function _GET(_: Request, { params }: { params: Promise<{ id: string }> })
     const data = await getQuiz(id);
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -61,12 +61,12 @@ async function _PATCH(request: Request, { params }: { params: Promise<{ id: stri
     const data = await updateQuiz(id, parsed.data);
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-async function _DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+async function _DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
   const { id } = await params;
@@ -75,7 +75,7 @@ async function _DELETE(_: Request, { params }: { params: Promise<{ id: string }>
   try {
     const data = await deleteQuiz(id);
     return NextResponse.json({ data }, { status: 200 });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

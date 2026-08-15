@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
-import { createAdminClient } from '@/lib/supabase/admin';
-import { safeError } from '@/lib/api/safe-error';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { safeInternalError } from '@/lib/api/safe-error';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const db = await createAdminClient();
+  const db = await requireAdminClient();
 
   const [auditRes, snapshotRes] = await Promise.all([
     db
@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
   ]);
 
   if (auditRes.error) {
-    return NextResponse.json(safeError(auditRes.error), { status: 500 });
+    return safeInternalError(auditRes.error, 'Failed to load mission-control audit activity');
+  }
+  if (snapshotRes.error) {
+    return safeInternalError(snapshotRes.error, 'Failed to load mission-control snapshots');
   }
 
   return NextResponse.json({

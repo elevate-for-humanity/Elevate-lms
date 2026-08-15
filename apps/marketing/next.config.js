@@ -3,6 +3,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 import { legacyImageRewrites } from '../../lib/media/legacy-image-aliases.mjs';
+import { verifiedImageRewrites } from '../../lib/media/verified-image-aliases.mjs';
 import { resolveCommitSha } from '../../scripts/build-identity.mjs';
 
 const require = createRequire(import.meta.url);
@@ -32,11 +33,11 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
-  transpilePackages: ['buffer'],
+  transpilePackages: ['buffer', 'process'],
 
   async rewrites() {
     return {
-      beforeFiles: legacyImageRewrites(),
+      beforeFiles: [...legacyImageRewrites(), ...verifiedImageRewrites()],
       afterFiles: [],
       fallback: [],
     };
@@ -51,14 +52,8 @@ const nextConfig = {
         permanent: true,
       },
 
-      // Compatibility only: retired /admin URLs never render on Marketing.
-      // They are sent to the one canonical Admin service.
-      { source: '/admin', destination: 'https://admin.elevateforhumanity.org', permanent: false },
-      { source: '/admin/:path*', destination: 'https://admin.elevateforhumanity.org/:path*', permanent: false },
-
-      // Public marketing aliases only. Private portal/admin/LMS routes are
-      // intentionally not redirected from the public origin; retired private
-      // paths must remain inaccessible here and resolve as not found.
+      // Public marketing aliases only. Private portal/Admin/LMS aliases are
+      // intentionally absent so retired internal paths remain inaccessible.
       { source: '/wioa-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },
@@ -84,20 +79,28 @@ const nextConfig = {
     cpus: 1,
   },
 
-  webpack: (config, { isServer, webpack }) => {
+  webpack: (config, { isServer }) => {
     config.parallelism = 1;
 
     if (!isServer) {
       config.resolve.fallback = {
         ...(config.resolve.fallback ?? {}),
-        buffer: require.resolve('buffer/'),
+        buffer: false,
+        process: false,
       };
 
-      config.plugins = config.plugins || [];
+      config.resolve.alias = {
+        ...(config.resolve.alias ?? {}),
+        buffer: false,
+        'process/browser': false,
+      };
+
+      const { ProvidePlugin } = require('webpack');
       config.plugins.push(
-        new webpack.ProvidePlugin({
+        new ProvidePlugin({
           Buffer: ['buffer', 'Buffer'],
           buffer: ['buffer'],
+          process: ['process/browser'],
         }),
       );
 

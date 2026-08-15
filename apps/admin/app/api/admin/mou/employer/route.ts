@@ -38,48 +38,43 @@ export async function POST(request: NextRequest) {
     return safeInternalError(err, 'Employer MOU PDF generation failed');
   }
 
-  // Persist MOU status to partners table if partner_id provided
   if (body.partner_id) {
     const db = await requireAdminClient();
-    if (db) {
-      await db
-        .from('partners')
-        .update({
-          mou_signed: true,
-          mou_signed_at: body.signed_at ?? new Date().toISOString(),
-          mou_version: body.mou_version ?? '2025-employer-01',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', body.partner_id);
-    }
-  }
-
-  // Optionally create a new partner record if no partner_id
-  if (!body.partner_id && body.create_partner) {
-    const db = await requireAdminClient();
-    if (db) {
-      await db.from('partners').insert({
-        name: body.employer_name,
-        partner_type: 'employer',
-        contact_name: body.signer_name,
-        contact_email: body.contact_email ?? null,
-        contact_phone: body.contact_phone ?? null,
-        city: body.city ?? null,
-        state: body.state ?? 'IN',
+    await db
+      .from('partners')
+      .update({
         mou_signed: true,
         mou_signed_at: body.signed_at ?? new Date().toISOString(),
         mou_version: body.mou_version ?? '2025-employer-01',
-        is_active: true,
-      });
-    }
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', body.partner_id);
   }
 
-  return new NextResponse(pdfBytes, {
+  if (!body.partner_id && body.create_partner) {
+    const db = await requireAdminClient();
+    await db.from('partners').insert({
+      name: body.employer_name,
+      partner_type: 'employer',
+      contact_name: body.signer_name,
+      contact_email: body.contact_email ?? null,
+      contact_phone: body.contact_phone ?? null,
+      city: body.city ?? null,
+      state: body.state ?? 'IN',
+      mou_signed: true,
+      mou_signed_at: body.signed_at ?? new Date().toISOString(),
+      mou_version: body.mou_version ?? '2025-employer-01',
+      is_active: true,
+    });
+  }
+
+  const pdfBody = Buffer.from(pdfBytes);
+  return new NextResponse(pdfBody, {
     status: 200,
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="Employer-MOU-${body.employer_name.replace(/\s+/g, '-')}.pdf"`,
-      'Content-Length': String(pdfBytes.length),
+      'Content-Length': String(pdfBody.length),
     },
   });
 }
@@ -92,8 +87,6 @@ export async function GET(request: NextRequest) {
   if (auth.error) return auth.error;
 
   const db = await requireAdminClient();
-  if (!db) return safeError('Service unavailable', 503);
-
   const { searchParams } = new URL(request.url);
   const signed = searchParams.get('signed');
 

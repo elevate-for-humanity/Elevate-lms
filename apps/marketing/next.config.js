@@ -64,8 +64,10 @@ const nextConfig = {
       { source: '/intake', destination: '/apply', permanent: false },
       { source: '/snap', destination: '/snap/snap-et', permanent: false },
       { source: '/barber-apprenticeship', destination: '/programs/barber-apprenticeship', permanent: true },
-      { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
-      { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
+      { source: '/beauty-apprenticeships', destination: '/programs', permanent: true },
+      { source: '/barber-and-beauty-apprenticeship', destination: '/programs', permanent: true },
+      { source: '/barber-and-beauty-apprenticeships', destination: '/programs', permanent: true },
+      { source: '/apprenticeship-programs', destination: '/programs', permanent: true },
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
     ];
   },

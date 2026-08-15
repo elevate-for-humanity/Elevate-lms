@@ -38,9 +38,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const buf: Buffer = await renderSlideFrameForPreview!(slide, slideIndex, totalSlides, opts);
+  const buf = await renderSlideFrameForPreview(slide, slideIndex, totalSlides, opts);
+  const bodyBlob = new Blob([new Uint8Array(buf)], { type: 'image/png' });
 
-  return new NextResponse(buf, {
+  return new NextResponse(bodyBlob, {
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'no-store',

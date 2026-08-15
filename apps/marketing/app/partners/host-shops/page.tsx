@@ -78,7 +78,7 @@ export default async function HostShopsPage() {
     <main className="min-h-screen bg-white text-slate-950">
       <section className="relative h-[clamp(280px,44vw,540px)] overflow-hidden bg-slate-950">
         <Image
-          src="/images/pages/admin-employers-hero.webp"
+          src="/images/instructors/sarah-chen.jpg"
           alt="Licensed employer mentoring an apprentice at an approved training site"
           fill
           priority

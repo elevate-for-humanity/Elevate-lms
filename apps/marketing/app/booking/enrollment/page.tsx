@@ -18,7 +18,7 @@ export default async function EnrollmentBookingPage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/booking-page-1.webp"
+        image="/images/hero/hero-early-childhood.webp"
         alt="Enrollment advisor meeting with a prospective student"
         eyebrow="Enrollment Support"
         title="Book an Enrollment Consultation"

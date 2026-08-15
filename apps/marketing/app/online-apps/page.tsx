@@ -81,7 +81,7 @@ export default function OnlineAppsPage() {
             </p>
           </div>
           <div className="relative min-h-[260px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
-            <Image src="/images/pages/admin-analytics-hero.webp" alt="Elevate online platform dashboards" fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 42vw" />
+            <Image src="/images/certificates-hero.webp" alt="Elevate online platform dashboards" fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 42vw" />
           </div>
         </div>
       </section>

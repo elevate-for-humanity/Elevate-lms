@@ -190,7 +190,7 @@ export default function LicensingGuidePage() {
           <Image
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/admin-business-hero.webp"
+          src="/images/hero/hero-beauty-wellness.webp"
           alt="Elevate platform licensing guide"
           fill
           className="object-cover"

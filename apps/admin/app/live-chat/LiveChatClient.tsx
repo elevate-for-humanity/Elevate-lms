@@ -18,7 +18,7 @@ export default function LiveChatPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-live-chat-detail.webp"
+          src="/images/brandon-instructor.webp"
           alt="Live Chat"
           fill
           className="object-cover"

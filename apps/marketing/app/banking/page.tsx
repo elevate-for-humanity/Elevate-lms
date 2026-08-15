@@ -23,7 +23,7 @@ export default function BankingPage() {
 
       <section className="relative h-64 md:h-80 overflow-hidden">
         <Image
-          src="/images/pages/banking-page-2.webp"
+          src="/images/heroes/training-provider-3.webp"
           alt="Banking services for Elevate for Humanity learners and partners"
           fill
           className="object-cover"

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-15T18:32:29.198Z",
+  "generatedAt": "2026-08-15T18:34:46.756Z",
   "apps": [
     "marketing",
     "lms",
@@ -8,230 +8,15 @@
   "summary": {
     "routesScanned": 1447,
     "withinRouteDuplicates": 0,
-    "crossRouteHeroDuplicates": 15,
+    "crossRouteHeroDuplicates": 0,
     "heroRegistryDuplicates": 0,
     "sharedComponentDuplicateAdvisory": 3,
-    "crossRouteImageReuseAdvisory": 93,
-    "binaryAliasGroups": 25
+    "crossRouteImageReuseAdvisory": 91,
+    "binaryAliasGroups": 24
   },
   "blocking": {
     "withinRouteDuplicates": [],
-    "crossRouteHeroDuplicates": [
-      {
-        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
-        "asset": "/images/pages/compare-hero.webp",
-        "aliases": [
-          "/images/pages/compare-hero.webp",
-          "/images/pages/implementation-hero.webp",
-          "/images/pages/privacy-hero.webp",
-          "/images/pages/roi-hero.webp",
-          "/images/pages/secure-server.webp",
-          "/images/pages/team-collaboration.webp",
-          "/images/pages/trust-hero.webp"
-        ],
-        "routes": [
-          "marketing:/about/team",
-          "marketing:/compare",
-          "marketing:/implementation",
-          "marketing:/privacy",
-          "marketing:/roi",
-          "marketing:/security",
-          "marketing:/trust"
-        ]
-      },
-      {
-        "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
-        "asset": "/images/pages/academic-calendar-hero.webp",
-        "aliases": [
-          "/images/pages/academic-calendar-hero.webp",
-          "/images/pages/admin-analytics-hero.webp",
-          "/images/pages/admin-email-campaigns-new-detail.webp",
-          "/images/pages/admin-live-chat-detail.webp",
-          "/images/pages/banking-page-1.webp",
-          "/images/pages/program-holder-page-1.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/campaigns/new",
-          "admin:/live-chat",
-          "lms:/program-holder/dashboard",
-          "marketing:/academic-calendar",
-          "marketing:/banking/direct-deposit",
-          "marketing:/online-apps"
-        ]
-      },
-      {
-        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
-        "asset": "/images/pages/admin-business-hero.webp",
-        "aliases": [
-          "/images/pages/admin-business-hero.webp",
-          "/images/pages/admin-compliance-deletions-detail.webp",
-          "/images/pages/admin-dev-studio-detail.webp"
-        ],
-        "routes": [
-          "admin:/compliance/deletions",
-          "admin:/studio/deployments",
-          "admin:/studio/workflows/[id]",
-          "admin:/studio/workflows/new",
-          "marketing:/store/guides/licensing"
-        ]
-      },
-      {
-        "fingerprint": "sha256:92d9514ea17bae553b22de561cef006ee22ece8f937a492b4fb0d8c924806560",
-        "asset": "/images/pages/admin-compliance-detail.webp",
-        "aliases": [
-          "/images/pages/admin-compliance-detail.webp",
-          "/images/pages/admin-docs-detail.webp",
-          "/images/pages/booking-page-1.webp",
-          "/images/pages/faq-page-1.webp"
-        ],
-        "routes": [
-          "admin:/compliance",
-          "admin:/docs",
-          "marketing:/booking",
-          "marketing:/booking/enrollment",
-          "marketing:/faq"
-        ]
-      },
-      {
-        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
-        "asset": "/images/pages/admin-videos-hero.webp",
-        "aliases": [
-          "/images/pages/admin-videos-hero.webp",
-          "/images/pages/calendar-hero.webp",
-          "/images/pages/homepage-why-elevate.webp",
-          "/images/pages/programs-hero-vibrant.webp"
-        ],
-        "routes": [
-          "admin:/videos",
-          "lms:/enrollment",
-          "marketing:/calendar",
-          "marketing:/writing-center"
-        ]
-      },
-      {
-        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
-        "asset": "/images/pages/academic-integrity-hero.webp",
-        "aliases": [
-          "/images/pages/academic-integrity-hero.webp",
-          "/images/pages/admin-signatures-hero.webp",
-          "/images/pages/banking-page-2.webp"
-        ],
-        "routes": [
-          "admin:/signatures",
-          "marketing:/academic-integrity",
-          "marketing:/banking"
-        ]
-      },
-      {
-        "fingerprint": "sha256:f1db8b11666b5f7f17dbbad2ce72348f689a06bb424d8d9ff87170bec10bdb6d",
-        "asset": "/images/pages/admin-dev-hero.jpg",
-        "aliases": [
-          "/images/pages/admin-dev-hero.jpg",
-          "/images/pages/admin-email-marketing-d1.jpg",
-          "/images/pages/admin-social-campaigns-new-hero.jpg"
-        ],
-        "routes": [
-          "admin:/email-marketing",
-          "admin:/social-media/campaigns/new",
-          "admin:/studio/builds"
-        ]
-      },
-      {
-        "fingerprint": "sha256:2ff1aa0333f5b6efdea83c5dacd52260eafe559c8ddfb76fa655bf2307a4651d",
-        "asset": "/images/pages/admin-email-analytics-detail.webp",
-        "aliases": [
-          "/images/pages/admin-email-analytics-detail.webp",
-          "/images/pages/admin-wioa-hero.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/analytics",
-          "marketing:/store/compliance/wioa",
-          "marketing:/store/practice-tests"
-        ]
-      },
-      {
-        "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
-        "asset": "/images/pages/about-career-training.webp",
-        "aliases": [
-          "/images/pages/about-career-training.webp",
-          "/images/pages/admin-compliance-exports-detail.webp"
-        ],
-        "routes": [
-          "admin:/compliance/exports",
-          "lms:/parent-portal"
-        ]
-      },
-      {
-        "fingerprint": "sha256:fb61600195b9686e2b11c5f7d7ea5d2545db0344bd3e339c58c1171fd25eb43e",
-        "asset": "/images/pages/admin-advanced-tools-hero.webp",
-        "aliases": [
-          "/images/pages/admin-advanced-tools-hero.webp",
-          "/images/pages/admin-applications-hero.webp"
-        ],
-        "routes": [
-          "admin:/applications/review/[id]",
-          "admin:/studio/memory"
-        ]
-      },
-      {
-        "fingerprint": "sha256:f805533ab491d95fa54e2d4611c5f6a8ab5fd1277c58b0bbe464706d1f62ef77",
-        "asset": "/images/pages/admin-employers-hero.webp",
-        "aliases": [
-          "/images/pages/admin-employers-hero.webp",
-          "/images/pages/for-employers-page-1.webp"
-        ],
-        "routes": [
-          "marketing:/hire-graduates",
-          "marketing:/partners/host-shops"
-        ]
-      },
-      {
-        "fingerprint": "sha256:8e4ad1530577938f1076c4532d32de88bf1be789fb8d1eabd5d162c05cc9cad2",
-        "asset": "/images/pages/admin-grants-submissions-detail.webp",
-        "aliases": [
-          "/images/pages/admin-grants-submissions-detail.webp"
-        ],
-        "routes": [
-          "admin:/grants/submissions",
-          "marketing:/store/dev-studio"
-        ]
-      },
-      {
-        "fingerprint": "sha256:87a590eeb0eeb42198f14def4ef195bc746086d896e3224f45ee842c002c516e",
-        "asset": "/images/pages/admin-grants-workflow-detail.webp",
-        "aliases": [
-          "/images/pages/admin-grants-workflow-detail.webp"
-        ],
-        "routes": [
-          "admin:/grants/workflow",
-          "marketing:/store/workflow-studio"
-        ]
-      },
-      {
-        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
-        "asset": "/images/pages/approvals-page-1.webp",
-        "aliases": [
-          "/images/pages/approvals-page-1.webp",
-          "/images/pages/schedule-consultation-page-1.webp"
-        ],
-        "routes": [
-          "marketing:/approvals",
-          "marketing:/schedule-consultation"
-        ]
-      },
-      {
-        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
-        "asset": "/images/pages/barber-apprentice-learning.webp",
-        "aliases": [
-          "/images/pages/barber-apprentice-learning.webp",
-          "/images/pages/barber-training.webp"
-        ],
-        "routes": [
-          "lms:/host-shop/dashboard/board",
-          "marketing:/store/guides/capital-readiness/slides"
-        ]
-      }
-    ],
+    "crossRouteHeroDuplicates": [],
     "heroRegistryDuplicates": []
   },
   "advisory": {
@@ -285,102 +70,6 @@
     ],
     "crossRouteImageReuse": [
       {
-        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
-        "asset": "/images/pages/about-hero.webp",
-        "aliases": [
-          "/images/pages/about-hero.webp",
-          "/images/pages/business-meeting.webp",
-          "/images/pages/compare-hero.webp",
-          "/images/pages/implementation-hero.webp",
-          "/images/pages/privacy-hero.webp",
-          "/images/pages/roi-hero.webp",
-          "/images/pages/secure-server.webp",
-          "/images/pages/staff-page-13.jpg",
-          "/images/pages/success-stories-hero.jpg",
-          "/images/pages/team-collaboration.webp",
-          "/images/pages/trust-hero.webp"
-        ],
-        "routes": [
-          "admin:/dashboard",
-          "admin:/staff-portal/settings",
-          "lms:/host-shop/dashboard/board",
-          "lms:/lms/dashboard",
-          "lms:/parent-portal",
-          "marketing:/about/partners",
-          "marketing:/about/team",
-          "marketing:/call-now",
-          "marketing:/career-services",
-          "marketing:/compare",
-          "marketing:/implementation",
-          "marketing:/online-apps",
-          "marketing:/privacy",
-          "marketing:/roi",
-          "marketing:/security",
-          "marketing:/success-stories",
-          "marketing:/trust"
-        ]
-      },
-      {
-        "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
-        "asset": "/images/pages/academic-calendar-hero.webp",
-        "aliases": [
-          "/images/pages/academic-calendar-hero.webp",
-          "/images/pages/admin-analytics-hero.webp",
-          "/images/pages/admin-email-campaigns-new-detail.webp",
-          "/images/pages/admin-live-chat-detail.webp",
-          "/images/pages/banking-page-1.webp",
-          "/images/pages/certificates-page-1.webp",
-          "/images/pages/compliance-page-1.webp",
-          "/images/pages/program-holder-page-1.webp",
-          "/images/pages/store-recommendations.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/campaigns/new",
-          "admin:/live-chat",
-          "lms:/program-holder/dashboard",
-          "marketing:/academic-calendar",
-          "marketing:/banking",
-          "marketing:/banking/direct-deposit",
-          "marketing:/blog/[slug]",
-          "marketing:/certificates",
-          "marketing:/certificates/verify/[certificateId]",
-          "marketing:/online-apps",
-          "marketing:/programs/esthetician-apprenticeship/apply",
-          "marketing:/services",
-          "marketing:/store/add-ons/analytics-pro",
-          "marketing:/store/compliance/wcag",
-          "marketing:/store/compliance/wioa",
-          "marketing:/wioa-eligibility"
-        ]
-      },
-      {
-        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
-        "asset": "/images/pages/admin-business-hero.webp",
-        "aliases": [
-          "/images/pages/admin-business-hero.webp",
-          "/images/pages/admin-compliance-deletions-detail.webp",
-          "/images/pages/admin-dev-studio-detail.webp",
-          "/images/pages/admin-email-marketing-d2.webp",
-          "/images/pages/admin/staff-portal-page-1.webp",
-          "/images/pages/events-page-1.webp",
-          "/images/pages/shop-hero.webp"
-        ],
-        "routes": [
-          "admin:/compliance/deletions",
-          "admin:/email-marketing",
-          "admin:/staff-portal",
-          "admin:/studio/deployments",
-          "admin:/studio/workflows/[id]",
-          "admin:/studio/workflows/new",
-          "lms:/host-shop/dashboard/board",
-          "marketing:/",
-          "marketing:/calendar",
-          "marketing:/staff",
-          "marketing:/store/compliance/grant-reporting",
-          "marketing:/store/guides/licensing"
-        ]
-      },
-      {
         "fingerprint": "sha256:61e2efd358dfab3d3df826b5f2244dd52dff4174e19e88a70b2afb47971f0d13",
         "asset": "/images/beauty/cosmetology-hero.webp",
         "aliases": [
@@ -405,6 +94,56 @@
         ]
       },
       {
+        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
+        "asset": "/images/pages/about-hero.webp",
+        "aliases": [
+          "/images/pages/about-hero.webp",
+          "/images/pages/business-meeting.webp",
+          "/images/pages/staff-page-13.jpg",
+          "/images/pages/success-stories-hero.jpg",
+          "/images/pages/team-collaboration.webp"
+        ],
+        "routes": [
+          "admin:/dashboard",
+          "admin:/staff-portal/settings",
+          "lms:/host-shop/dashboard/board",
+          "lms:/lms/dashboard",
+          "lms:/parent-portal",
+          "marketing:/about/partners",
+          "marketing:/about/team",
+          "marketing:/call-now",
+          "marketing:/career-services",
+          "marketing:/online-apps",
+          "marketing:/success-stories"
+        ]
+      },
+      {
+        "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
+        "asset": "/images/pages/admin-analytics-hero.webp",
+        "aliases": [
+          "/images/pages/admin-analytics-hero.webp",
+          "/images/pages/admin-email-campaigns-new-detail.webp",
+          "/images/pages/banking-page-1.webp",
+          "/images/pages/certificates-page-1.webp",
+          "/images/pages/compliance-page-1.webp",
+          "/images/pages/program-holder-page-1.webp",
+          "/images/pages/store-recommendations.webp"
+        ],
+        "routes": [
+          "admin:/email-marketing/campaigns/new",
+          "marketing:/banking",
+          "marketing:/blog/[slug]",
+          "marketing:/certificates",
+          "marketing:/certificates/verify/[certificateId]",
+          "marketing:/programs/esthetician-apprenticeship/apply",
+          "marketing:/services",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/wcag",
+          "marketing:/store/compliance/wioa",
+          "marketing:/wioa-eligibility"
+        ]
+      },
+      {
         "fingerprint": "sha256:15ef0ac04518e8f398886e576872260dde8c57e4604e60c375331f195b146a11",
         "asset": "/images/pages/about-career-training.webp",
         "aliases": [
@@ -414,7 +153,6 @@
         ],
         "routes": [
           "admin:/compliance/exports",
-          "lms:/parent-portal",
           "marketing:/calendar",
           "marketing:/call-now",
           "marketing:/email",
@@ -424,77 +162,6 @@
           "marketing:/transparency",
           "marketing:/workforce-partners",
           "marketing:/writing-center"
-        ]
-      },
-      {
-        "fingerprint": "sha256:f1db8b11666b5f7f17dbbad2ce72348f689a06bb424d8d9ff87170bec10bdb6d",
-        "asset": "/images/pages/accessibility-hero.jpg",
-        "aliases": [
-          "/images/pages/accessibility-hero.jpg",
-          "/images/pages/admin-compliance-audit-hero.jpg",
-          "/images/pages/admin-compliance-audit-hero.webp",
-          "/images/pages/admin-dev-hero.jpg",
-          "/images/pages/admin-email-marketing-d1.jpg",
-          "/images/pages/admin-social-campaigns-new-hero.jpg",
-          "/images/pages/comp-highlights-team.jpg",
-          "/images/pages/contact-hero.jpg"
-        ],
-        "routes": [
-          "admin:/email-marketing",
-          "admin:/social-media/campaigns/new",
-          "admin:/studio/builds",
-          "lms:/lms/dashboard",
-          "marketing:/accessibility",
-          "marketing:/call-now",
-          "marketing:/careers",
-          "marketing:/store/compliance",
-          "marketing:/store/compliance/ferpa",
-          "marketing:/store/compliance/wcag"
-        ]
-      },
-      {
-        "fingerprint": "sha256:fb61600195b9686e2b11c5f7d7ea5d2545db0344bd3e339c58c1171fd25eb43e",
-        "asset": "/images/pages/admin-advanced-tools-hero.webp",
-        "aliases": [
-          "/images/pages/admin-advanced-tools-hero.webp",
-          "/images/pages/admin-applications-hero.webp",
-          "/images/pages/culinary.webp"
-        ],
-        "routes": [
-          "admin:/applications/review/[id]",
-          "admin:/studio/memory",
-          "lms:/apprentice/billing",
-          "marketing:/portal/barber",
-          "marketing:/portal/cosmetology",
-          "marketing:/portal/culinary",
-          "marketing:/portal/electrical",
-          "marketing:/portal/esthetician",
-          "marketing:/portal/nail-technician",
-          "marketing:/portal/plumbing"
-        ]
-      },
-      {
-        "fingerprint": "sha256:2ff1aa0333f5b6efdea83c5dacd52260eafe559c8ddfb76fa655bf2307a4651d",
-        "asset": "/images/pages/admin-email-analytics-detail.webp",
-        "aliases": [
-          "/images/pages/admin-email-analytics-detail.webp",
-          "/images/pages/admin-ferpa-training-hero.webp",
-          "/images/pages/admin-videos-upload-hero.webp",
-          "/images/pages/admin-wioa-hero.webp",
-          "/images/pages/calendar-page-1.webp",
-          "/images/pages/how-it-works-hero.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/analytics",
-          "admin:/videos/upload",
-          "marketing:/calendar",
-          "marketing:/call-now",
-          "marketing:/store/add-ons/analytics-pro",
-          "marketing:/store/compliance/ferpa",
-          "marketing:/store/compliance/wioa",
-          "marketing:/store/practice-tests",
-          "marketing:/tutoring",
-          "marketing:/workforce-board"
         ]
       },
       {
@@ -514,6 +181,25 @@
           "marketing:/portal/nail-technician",
           "marketing:/portal/plumbing",
           "marketing:/programs/nail-technician-apprenticeship/apply"
+        ]
+      },
+      {
+        "fingerprint": "sha256:fb61600195b9686e2b11c5f7d7ea5d2545db0344bd3e339c58c1171fd25eb43e",
+        "asset": "/images/pages/admin-applications-hero.webp",
+        "aliases": [
+          "/images/pages/admin-applications-hero.webp",
+          "/images/pages/culinary.webp"
+        ],
+        "routes": [
+          "admin:/applications/review/[id]",
+          "lms:/apprentice/billing",
+          "marketing:/portal/barber",
+          "marketing:/portal/cosmetology",
+          "marketing:/portal/culinary",
+          "marketing:/portal/electrical",
+          "marketing:/portal/esthetician",
+          "marketing:/portal/nail-technician",
+          "marketing:/portal/plumbing"
         ]
       },
       {
@@ -552,6 +238,71 @@
           "marketing:/portal/esthetician",
           "marketing:/portal/nail-technician",
           "marketing:/portal/plumbing"
+        ]
+      },
+      {
+        "fingerprint": "sha256:f1db8b11666b5f7f17dbbad2ce72348f689a06bb424d8d9ff87170bec10bdb6d",
+        "asset": "/images/pages/accessibility-hero.jpg",
+        "aliases": [
+          "/images/pages/accessibility-hero.jpg",
+          "/images/pages/admin-compliance-audit-hero.jpg",
+          "/images/pages/admin-compliance-audit-hero.webp",
+          "/images/pages/admin-email-marketing-d1.jpg",
+          "/images/pages/comp-highlights-team.jpg",
+          "/images/pages/contact-hero.jpg"
+        ],
+        "routes": [
+          "admin:/email-marketing",
+          "lms:/lms/dashboard",
+          "marketing:/accessibility",
+          "marketing:/call-now",
+          "marketing:/careers",
+          "marketing:/store/compliance",
+          "marketing:/store/compliance/ferpa",
+          "marketing:/store/compliance/wcag"
+        ]
+      },
+      {
+        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
+        "asset": "/images/pages/admin-compliance-deletions-detail.webp",
+        "aliases": [
+          "/images/pages/admin-compliance-deletions-detail.webp",
+          "/images/pages/admin-email-marketing-d2.webp",
+          "/images/pages/admin/staff-portal-page-1.webp",
+          "/images/pages/events-page-1.webp",
+          "/images/pages/shop-hero.webp"
+        ],
+        "routes": [
+          "admin:/compliance/deletions",
+          "admin:/email-marketing",
+          "admin:/staff-portal",
+          "lms:/host-shop/dashboard/board",
+          "marketing:/",
+          "marketing:/calendar",
+          "marketing:/staff",
+          "marketing:/store/compliance/grant-reporting"
+        ]
+      },
+      {
+        "fingerprint": "sha256:2ff1aa0333f5b6efdea83c5dacd52260eafe559c8ddfb76fa655bf2307a4651d",
+        "asset": "/images/pages/admin-email-analytics-detail.webp",
+        "aliases": [
+          "/images/pages/admin-email-analytics-detail.webp",
+          "/images/pages/admin-ferpa-training-hero.webp",
+          "/images/pages/admin-videos-upload-hero.webp",
+          "/images/pages/admin-wioa-hero.webp",
+          "/images/pages/calendar-page-1.webp",
+          "/images/pages/how-it-works-hero.webp"
+        ],
+        "routes": [
+          "admin:/email-marketing/analytics",
+          "admin:/videos/upload",
+          "marketing:/calendar",
+          "marketing:/call-now",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/ferpa",
+          "marketing:/tutoring",
+          "marketing:/workforce-board"
         ]
       },
       {
@@ -606,27 +357,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
-        "asset": "/images/pages/academic-integrity-hero.webp",
-        "aliases": [
-          "/images/pages/academic-integrity-hero.webp",
-          "/images/pages/admin-analytics-learning-hero.webp",
-          "/images/pages/admin-compliance-agreements-hero.webp",
-          "/images/pages/admin-signatures-hero.webp",
-          "/images/pages/banking-page-2.webp",
-          "/images/pages/compliance-page-2.webp"
-        ],
-        "routes": [
-          "admin:/signatures",
-          "lms:/parent-portal",
-          "marketing:/academic-integrity",
-          "marketing:/banking",
-          "marketing:/compliance/competency-verification",
-          "marketing:/store/add-ons/analytics-pro",
-          "marketing:/store/compliance/wcag"
-        ]
-      },
-      {
         "fingerprint": "sha256:0ff33c59f9435b60591bb92afd99016d50317d843189f9e995e0953ef9d9a91d",
         "asset": "/images/pages/apprenticeship-structure.webp",
         "aliases": [
@@ -674,43 +404,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
-        "asset": "/images/pages/admin-email-automation-new-d2.webp",
-        "aliases": [
-          "/images/pages/admin-email-automation-new-d2.webp",
-          "/images/pages/approvals-page-1.webp",
-          "/images/pages/competency-test-hero.webp",
-          "/images/pages/enrollment-agreement-page-1.webp",
-          "/images/pages/government-4.webp",
-          "/images/pages/schedule-consultation-page-1.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/automation/new",
-          "lms:/apprentice",
-          "marketing:/agencies",
-          "marketing:/approvals",
-          "marketing:/onboarding/learner/agreements",
-          "marketing:/schedule-consultation"
-        ]
-      },
-      {
-        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
-        "asset": "/images/pages/barber-apprentice-learning.webp",
-        "aliases": [
-          "/images/pages/barber-apprentice-learning.webp",
-          "/images/pages/barber-gallery-1.webp",
-          "/images/pages/barber-training.webp"
-        ],
-        "routes": [
-          "admin:/dashboard",
-          "lms:/host-shop/dashboard/board",
-          "marketing:/online-apps",
-          "marketing:/partners/host-shops",
-          "marketing:/store/guides/capital-readiness/slides",
-          "marketing:/workone-partner-packet"
-        ]
-      },
-      {
         "fingerprint": "sha256:4ecd9061a045d90b773c706acce0345e24e6770b79ab4ecfb08bf6409ebeac00",
         "asset": "/images/pages/hvac-technician.webp",
         "aliases": [
@@ -726,35 +419,38 @@
         ]
       },
       {
-        "fingerprint": "sha256:92d9514ea17bae553b22de561cef006ee22ece8f937a492b4fb0d8c924806560",
-        "asset": "/images/pages/admin-compliance-detail.webp",
+        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
+        "asset": "/images/pages/admin-analytics-learning-hero.webp",
         "aliases": [
-          "/images/pages/admin-compliance-detail.webp",
-          "/images/pages/admin-docs-detail.webp",
-          "/images/pages/booking-page-1.webp",
-          "/images/pages/faq-page-1.webp"
+          "/images/pages/admin-analytics-learning-hero.webp",
+          "/images/pages/admin-compliance-agreements-hero.webp",
+          "/images/pages/admin-signatures-hero.webp",
+          "/images/pages/compliance-page-2.webp"
         ],
         "routes": [
-          "admin:/compliance",
-          "admin:/docs",
-          "marketing:/booking",
-          "marketing:/booking/enrollment",
-          "marketing:/faq"
+          "admin:/signatures",
+          "lms:/parent-portal",
+          "marketing:/compliance/competency-verification",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/wcag"
         ]
       },
       {
-        "fingerprint": "sha256:f805533ab491d95fa54e2d4611c5f6a8ab5fd1277c58b0bbe464706d1f62ef77",
-        "asset": "/images/pages/admin-employers-hero.webp",
+        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
+        "asset": "/images/pages/admin-email-automation-new-d2.webp",
         "aliases": [
-          "/images/pages/admin-employers-hero.webp",
-          "/images/pages/for-employers-page-1.webp"
+          "/images/pages/admin-email-automation-new-d2.webp",
+          "/images/pages/approvals-page-1.webp",
+          "/images/pages/competency-test-hero.webp",
+          "/images/pages/enrollment-agreement-page-1.webp",
+          "/images/pages/government-4.webp"
         ],
         "routes": [
-          "lms:/host-shop/dashboard/board",
-          "marketing:/",
-          "marketing:/hire-graduates",
-          "marketing:/ojt-and-funding",
-          "marketing:/partners/host-shops"
+          "admin:/email-marketing/automation/new",
+          "lms:/apprentice",
+          "marketing:/agencies",
+          "marketing:/approvals",
+          "marketing:/onboarding/learner/agreements"
         ]
       },
       {
@@ -774,20 +470,18 @@
         ]
       },
       {
-        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
-        "asset": "/images/pages/admin-videos-hero.webp",
+        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
+        "asset": "/images/pages/barber-gallery-1.webp",
         "aliases": [
-          "/images/pages/admin-videos-hero.webp",
-          "/images/pages/calendar-hero.webp",
-          "/images/pages/homepage-why-elevate.webp",
-          "/images/pages/programs-hero-vibrant.webp"
+          "/images/pages/barber-gallery-1.webp",
+          "/images/pages/barber-training.webp"
         ],
         "routes": [
-          "admin:/videos",
-          "lms:/enrollment",
-          "marketing:/calendar",
-          "marketing:/services",
-          "marketing:/writing-center"
+          "admin:/dashboard",
+          "lms:/host-shop/dashboard/board",
+          "marketing:/online-apps",
+          "marketing:/partners/host-shops",
+          "marketing:/workone-partner-packet"
         ]
       },
       {
@@ -860,6 +554,20 @@
           "lms:/parent-portal",
           "marketing:/agencies",
           "marketing:/store/digital"
+        ]
+      },
+      {
+        "fingerprint": "sha256:f805533ab491d95fa54e2d4611c5f6a8ab5fd1277c58b0bbe464706d1f62ef77",
+        "asset": "/images/pages/admin-employers-hero.webp",
+        "aliases": [
+          "/images/pages/admin-employers-hero.webp",
+          "/images/pages/for-employers-page-1.webp"
+        ],
+        "routes": [
+          "lms:/host-shop/dashboard/board",
+          "marketing:/",
+          "marketing:/hire-graduates",
+          "marketing:/ojt-and-funding"
         ]
       },
       {
@@ -1089,6 +797,17 @@
         ]
       },
       {
+        "fingerprint": "sha256:96ea48f0312f310a38885fcde2f2ceaceb048641cdd67aad432b21627d680fb7",
+        "asset": "/images/beauty/barber-hero.webp",
+        "aliases": [
+          "/images/beauty/barber-hero.webp"
+        ],
+        "routes": [
+          "marketing:/barber-and-beauty-apprenticeships",
+          "marketing:/security"
+        ]
+      },
+      {
         "fingerprint": "sha256:d5949ee2e82706fd62b3373e4a7a30a46e80c6170837baecbb3a741e2142260e",
         "asset": "/images/business/professional-2.jpg",
         "aliases": [
@@ -1111,28 +830,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:8e4ad1530577938f1076c4532d32de88bf1be789fb8d1eabd5d162c05cc9cad2",
-        "asset": "/images/pages/admin-grants-submissions-detail.webp",
-        "aliases": [
-          "/images/pages/admin-grants-submissions-detail.webp"
-        ],
-        "routes": [
-          "admin:/grants/submissions",
-          "marketing:/store/dev-studio"
-        ]
-      },
-      {
-        "fingerprint": "sha256:87a590eeb0eeb42198f14def4ef195bc746086d896e3224f45ee842c002c516e",
-        "asset": "/images/pages/admin-grants-workflow-detail.webp",
-        "aliases": [
-          "/images/pages/admin-grants-workflow-detail.webp"
-        ],
-        "routes": [
-          "admin:/grants/workflow",
-          "marketing:/store/workflow-studio"
-        ]
-      },
-      {
         "fingerprint": "sha256:aba9114f83cbf76db0d541c207565f01b126c1483c072e1caf37f8f4f45419bb",
         "asset": "/images/pages/admin-licensing-hero.webp",
         "aliases": [
@@ -1141,6 +838,18 @@
         "routes": [
           "marketing:/store/guides",
           "marketing:/store/licenses"
+        ]
+      },
+      {
+        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
+        "asset": "/images/pages/admin-videos-hero.webp",
+        "aliases": [
+          "/images/pages/admin-videos-hero.webp",
+          "/images/pages/homepage-why-elevate.webp"
+        ],
+        "routes": [
+          "admin:/videos",
+          "marketing:/services"
         ]
       },
       {
@@ -1587,47 +1296,10 @@
     ],
     "binaryAliasGroups": [
       {
-        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
-        "aliases": [
-          "/images/pages/about-hero.webp",
-          "/images/pages/business-meeting.webp",
-          "/images/pages/compare-hero.webp",
-          "/images/pages/implementation-hero.webp",
-          "/images/pages/privacy-hero.webp",
-          "/images/pages/roi-hero.webp",
-          "/images/pages/secure-server.webp",
-          "/images/pages/staff-page-13.jpg",
-          "/images/pages/success-stories-hero.jpg",
-          "/images/pages/team-collaboration.webp",
-          "/images/pages/trust-hero.webp"
-        ],
-        "routes": [
-          "admin:/dashboard",
-          "admin:/staff-portal/settings",
-          "lms:/host-shop/dashboard/board",
-          "lms:/lms/dashboard",
-          "lms:/parent-portal",
-          "marketing:/about/partners",
-          "marketing:/about/team",
-          "marketing:/call-now",
-          "marketing:/career-services",
-          "marketing:/compare",
-          "marketing:/implementation",
-          "marketing:/online-apps",
-          "marketing:/privacy",
-          "marketing:/roi",
-          "marketing:/security",
-          "marketing:/success-stories",
-          "marketing:/trust"
-        ]
-      },
-      {
         "fingerprint": "sha256:02590f9bbfb855e953255c111079dd0a3a57962703dba9f7fc7bd765bdd0303d",
         "aliases": [
-          "/images/pages/academic-calendar-hero.webp",
           "/images/pages/admin-analytics-hero.webp",
           "/images/pages/admin-email-campaigns-new-detail.webp",
-          "/images/pages/admin-live-chat-detail.webp",
           "/images/pages/banking-page-1.webp",
           "/images/pages/certificates-page-1.webp",
           "/images/pages/compliance-page-1.webp",
@@ -1636,15 +1308,10 @@
         ],
         "routes": [
           "admin:/email-marketing/campaigns/new",
-          "admin:/live-chat",
-          "lms:/program-holder/dashboard",
-          "marketing:/academic-calendar",
           "marketing:/banking",
-          "marketing:/banking/direct-deposit",
           "marketing:/blog/[slug]",
           "marketing:/certificates",
           "marketing:/certificates/verify/[certificateId]",
-          "marketing:/online-apps",
           "marketing:/programs/esthetician-apprenticeship/apply",
           "marketing:/services",
           "marketing:/store/add-ons/analytics-pro",
@@ -1659,68 +1326,18 @@
           "/images/pages/accessibility-hero.jpg",
           "/images/pages/admin-compliance-audit-hero.jpg",
           "/images/pages/admin-compliance-audit-hero.webp",
-          "/images/pages/admin-dev-hero.jpg",
           "/images/pages/admin-email-marketing-d1.jpg",
-          "/images/pages/admin-social-campaigns-new-hero.jpg",
           "/images/pages/comp-highlights-team.jpg",
           "/images/pages/contact-hero.jpg"
         ],
         "routes": [
           "admin:/email-marketing",
-          "admin:/social-media/campaigns/new",
-          "admin:/studio/builds",
           "lms:/lms/dashboard",
           "marketing:/accessibility",
           "marketing:/call-now",
           "marketing:/careers",
           "marketing:/store/compliance",
           "marketing:/store/compliance/ferpa",
-          "marketing:/store/compliance/wcag"
-        ]
-      },
-      {
-        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
-        "aliases": [
-          "/images/pages/admin-business-hero.webp",
-          "/images/pages/admin-compliance-deletions-detail.webp",
-          "/images/pages/admin-dev-studio-detail.webp",
-          "/images/pages/admin-email-marketing-d2.webp",
-          "/images/pages/admin/staff-portal-page-1.webp",
-          "/images/pages/events-page-1.webp",
-          "/images/pages/shop-hero.webp"
-        ],
-        "routes": [
-          "admin:/compliance/deletions",
-          "admin:/email-marketing",
-          "admin:/staff-portal",
-          "admin:/studio/deployments",
-          "admin:/studio/workflows/[id]",
-          "admin:/studio/workflows/new",
-          "lms:/host-shop/dashboard/board",
-          "marketing:/",
-          "marketing:/calendar",
-          "marketing:/staff",
-          "marketing:/store/compliance/grant-reporting",
-          "marketing:/store/guides/licensing"
-        ]
-      },
-      {
-        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
-        "aliases": [
-          "/images/pages/academic-integrity-hero.webp",
-          "/images/pages/admin-analytics-learning-hero.webp",
-          "/images/pages/admin-compliance-agreements-hero.webp",
-          "/images/pages/admin-signatures-hero.webp",
-          "/images/pages/banking-page-2.webp",
-          "/images/pages/compliance-page-2.webp"
-        ],
-        "routes": [
-          "admin:/signatures",
-          "lms:/parent-portal",
-          "marketing:/academic-integrity",
-          "marketing:/banking",
-          "marketing:/compliance/competency-verification",
-          "marketing:/store/add-ons/analytics-pro",
           "marketing:/store/compliance/wcag"
         ]
       },
@@ -1741,29 +1358,8 @@
           "marketing:/call-now",
           "marketing:/store/add-ons/analytics-pro",
           "marketing:/store/compliance/ferpa",
-          "marketing:/store/compliance/wioa",
-          "marketing:/store/practice-tests",
           "marketing:/tutoring",
           "marketing:/workforce-board"
-        ]
-      },
-      {
-        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
-        "aliases": [
-          "/images/pages/admin-email-automation-new-d2.webp",
-          "/images/pages/approvals-page-1.webp",
-          "/images/pages/competency-test-hero.webp",
-          "/images/pages/enrollment-agreement-page-1.webp",
-          "/images/pages/government-4.webp",
-          "/images/pages/schedule-consultation-page-1.webp"
-        ],
-        "routes": [
-          "admin:/email-marketing/automation/new",
-          "lms:/apprentice",
-          "marketing:/agencies",
-          "marketing:/approvals",
-          "marketing:/onboarding/learner/agreements",
-          "marketing:/schedule-consultation"
         ]
       },
       {
@@ -1790,35 +1386,79 @@
         ]
       },
       {
-        "fingerprint": "sha256:92d9514ea17bae553b22de561cef006ee22ece8f937a492b4fb0d8c924806560",
+        "fingerprint": "sha256:8256545e7bcb75b94e40c00932484e119ca169dcfd7b7b41516b0f4a3f8f4449",
         "aliases": [
-          "/images/pages/admin-compliance-detail.webp",
-          "/images/pages/admin-docs-detail.webp",
-          "/images/pages/booking-page-1.webp",
-          "/images/pages/faq-page-1.webp"
+          "/images/pages/about-hero.webp",
+          "/images/pages/business-meeting.webp",
+          "/images/pages/staff-page-13.jpg",
+          "/images/pages/success-stories-hero.jpg",
+          "/images/pages/team-collaboration.webp"
         ],
         "routes": [
-          "admin:/compliance",
-          "admin:/docs",
-          "marketing:/booking",
-          "marketing:/booking/enrollment",
-          "marketing:/faq"
+          "admin:/dashboard",
+          "admin:/staff-portal/settings",
+          "lms:/host-shop/dashboard/board",
+          "lms:/lms/dashboard",
+          "lms:/parent-portal",
+          "marketing:/about/partners",
+          "marketing:/about/team",
+          "marketing:/call-now",
+          "marketing:/career-services",
+          "marketing:/online-apps",
+          "marketing:/success-stories"
         ]
       },
       {
-        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
+        "fingerprint": "sha256:771bb203b074c7e39456fe93f599d139d0999ec48e8fe26a702083164a29e1a3",
         "aliases": [
-          "/images/pages/admin-videos-hero.webp",
-          "/images/pages/calendar-hero.webp",
-          "/images/pages/homepage-why-elevate.webp",
-          "/images/pages/programs-hero-vibrant.webp"
+          "/images/pages/admin-compliance-deletions-detail.webp",
+          "/images/pages/admin-email-marketing-d2.webp",
+          "/images/pages/admin/staff-portal-page-1.webp",
+          "/images/pages/events-page-1.webp",
+          "/images/pages/shop-hero.webp"
         ],
         "routes": [
-          "admin:/videos",
-          "lms:/enrollment",
+          "admin:/compliance/deletions",
+          "admin:/email-marketing",
+          "admin:/staff-portal",
+          "lms:/host-shop/dashboard/board",
+          "marketing:/",
           "marketing:/calendar",
-          "marketing:/services",
-          "marketing:/writing-center"
+          "marketing:/staff",
+          "marketing:/store/compliance/grant-reporting"
+        ]
+      },
+      {
+        "fingerprint": "sha256:282d8e16866b1ae8383d678852680a56052a024db59972cfe0433ee40e81e570",
+        "aliases": [
+          "/images/pages/admin-email-automation-new-d2.webp",
+          "/images/pages/approvals-page-1.webp",
+          "/images/pages/competency-test-hero.webp",
+          "/images/pages/enrollment-agreement-page-1.webp",
+          "/images/pages/government-4.webp"
+        ],
+        "routes": [
+          "admin:/email-marketing/automation/new",
+          "lms:/apprentice",
+          "marketing:/agencies",
+          "marketing:/approvals",
+          "marketing:/onboarding/learner/agreements"
+        ]
+      },
+      {
+        "fingerprint": "sha256:2b3ab849722ff28b621b0d2d86b96d9f47f79a106ec8cb4c598b8436e4493b00",
+        "aliases": [
+          "/images/pages/admin-analytics-learning-hero.webp",
+          "/images/pages/admin-compliance-agreements-hero.webp",
+          "/images/pages/admin-signatures-hero.webp",
+          "/images/pages/compliance-page-2.webp"
+        ],
+        "routes": [
+          "admin:/signatures",
+          "lms:/parent-portal",
+          "marketing:/compliance/competency-verification",
+          "marketing:/store/add-ons/analytics-pro",
+          "marketing:/store/compliance/wcag"
         ]
       },
       {
@@ -1830,7 +1470,6 @@
         ],
         "routes": [
           "admin:/compliance/exports",
-          "lms:/parent-portal",
           "marketing:/calendar",
           "marketing:/call-now",
           "marketing:/email",
@@ -1840,26 +1479,6 @@
           "marketing:/transparency",
           "marketing:/workforce-partners",
           "marketing:/writing-center"
-        ]
-      },
-      {
-        "fingerprint": "sha256:fb61600195b9686e2b11c5f7d7ea5d2545db0344bd3e339c58c1171fd25eb43e",
-        "aliases": [
-          "/images/pages/admin-advanced-tools-hero.webp",
-          "/images/pages/admin-applications-hero.webp",
-          "/images/pages/culinary.webp"
-        ],
-        "routes": [
-          "admin:/applications/review/[id]",
-          "admin:/studio/memory",
-          "lms:/apprentice/billing",
-          "marketing:/portal/barber",
-          "marketing:/portal/cosmetology",
-          "marketing:/portal/culinary",
-          "marketing:/portal/electrical",
-          "marketing:/portal/esthetician",
-          "marketing:/portal/nail-technician",
-          "marketing:/portal/plumbing"
         ]
       },
       {
@@ -1920,22 +1539,6 @@
         ]
       },
       {
-        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
-        "aliases": [
-          "/images/pages/barber-apprentice-learning.webp",
-          "/images/pages/barber-gallery-1.webp",
-          "/images/pages/barber-training.webp"
-        ],
-        "routes": [
-          "admin:/dashboard",
-          "lms:/host-shop/dashboard/board",
-          "marketing:/online-apps",
-          "marketing:/partners/host-shops",
-          "marketing:/store/guides/capital-readiness/slides",
-          "marketing:/workone-partner-packet"
-        ]
-      },
-      {
         "fingerprint": "sha256:99a0770a4da2231e284d1a3ae29413fa32746efeb329536a1f06d953c744b5bd",
         "aliases": [
           "/images/funding/funding-jri-program-v2.jpg",
@@ -1961,6 +1564,24 @@
         ]
       },
       {
+        "fingerprint": "sha256:fb61600195b9686e2b11c5f7d7ea5d2545db0344bd3e339c58c1171fd25eb43e",
+        "aliases": [
+          "/images/pages/admin-applications-hero.webp",
+          "/images/pages/culinary.webp"
+        ],
+        "routes": [
+          "admin:/applications/review/[id]",
+          "lms:/apprentice/billing",
+          "marketing:/portal/barber",
+          "marketing:/portal/cosmetology",
+          "marketing:/portal/culinary",
+          "marketing:/portal/electrical",
+          "marketing:/portal/esthetician",
+          "marketing:/portal/nail-technician",
+          "marketing:/portal/plumbing"
+        ]
+      },
+      {
         "fingerprint": "sha256:f805533ab491d95fa54e2d4611c5f6a8ab5fd1277c58b0bbe464706d1f62ef77",
         "aliases": [
           "/images/pages/admin-employers-hero.webp",
@@ -1970,8 +1591,32 @@
           "lms:/host-shop/dashboard/board",
           "marketing:/",
           "marketing:/hire-graduates",
-          "marketing:/ojt-and-funding",
-          "marketing:/partners/host-shops"
+          "marketing:/ojt-and-funding"
+        ]
+      },
+      {
+        "fingerprint": "sha256:8374cb9b38b802ee272e7644c3e87d3677df069a3cd736a85a34bb0434bd5ef6",
+        "aliases": [
+          "/images/pages/admin-videos-hero.webp",
+          "/images/pages/homepage-why-elevate.webp"
+        ],
+        "routes": [
+          "admin:/videos",
+          "marketing:/services"
+        ]
+      },
+      {
+        "fingerprint": "sha256:81e736fb75b18d8150899f9cec37cb0d1a641f450f8af67e15d915ca9e247283",
+        "aliases": [
+          "/images/pages/barber-gallery-1.webp",
+          "/images/pages/barber-training.webp"
+        ],
+        "routes": [
+          "admin:/dashboard",
+          "lms:/host-shop/dashboard/board",
+          "marketing:/online-apps",
+          "marketing:/partners/host-shops",
+          "marketing:/workone-partner-packet"
         ]
       },
       {

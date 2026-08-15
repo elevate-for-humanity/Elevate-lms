@@ -156,7 +156,7 @@ export default function ScheduleConsultationPage() {
       {/* Hero */}
       <div className="relative h-[160px] sm:h-[200px] overflow-hidden">
         <Image
-          src="/images/pages/schedule-consultation-page-1.webp"
+          src="/images/naomi-jordan.jpg"
           alt="Schedule enrollment consultation"
           fill
           sizes="100vw"

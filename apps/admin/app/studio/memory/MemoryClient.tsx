@@ -56,7 +56,7 @@ export default function MemoryClient() {
       {/* Hero */}
       <div className="relative h-[280px] w-full overflow-hidden">
         <Image
-          src="/images/pages/admin-advanced-tools-hero.webp"
+          src="/images/instructors/robert-davis.jpg"
           alt="AI Memory"
           fill
           className="object-cover"

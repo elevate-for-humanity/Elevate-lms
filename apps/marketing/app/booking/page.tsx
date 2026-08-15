@@ -88,7 +88,7 @@ export default async function BookingPage() {
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image
-            src="/images/pages/booking-page-1.webp"
+            src="/images/hero/hero-career-services.webp"
             alt="Elevate for Humanity appointment and advising team"
             fill
             className="object-cover"

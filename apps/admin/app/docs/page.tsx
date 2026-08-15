@@ -40,7 +40,7 @@ export default async function DocsPage() {
       {/* Hero Section */}
       <section className="relative h-48 md:h-64 overflow-hidden">
         <Image
-          src="/images/pages/admin-docs-detail.webp"
+          src="/images/hero/hero-business.webp"
           alt="Documentation Management"
           fill
           className="object-cover"

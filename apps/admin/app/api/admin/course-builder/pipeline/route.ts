@@ -1,19 +1,42 @@
 /**
  * POST /api/admin/course-builder/pipeline
  *
- * Canonical flexible Course Factory endpoint.
- * Streams blueprint → lessons → assessments → validation → persistence → video progress via SSE.
+ * Canonical Course Factory endpoint.
+ * The route only handles auth/rate limiting/SSE transport. All generation,
+ * validation, persistence, assessments and media orchestration belong to
+ * lib/course-factory/factory.ts.
  */
 import { NextRequest } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import { runCoursePipeline } from '@/lib/course-factory/orchestrator';
+import { courseFactory } from '@/lib/course-factory';
+import type { FactoryStage } from '@/lib/course-factory';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
+
+type PipelineStage =
+  | 'blueprint'
+  | 'lessons'
+  | 'quizzes'
+  | 'validate'
+  | 'publish'
+  | 'videos'
+  | 'complete'
+  | 'error';
+
+function toPipelineStage(stage: FactoryStage): PipelineStage {
+  if (stage === 'enrich') return 'lessons';
+  if (stage === 'assess') return 'quizzes';
+  if (stage === 'media') return 'videos';
+  if (stage === 'validate') return 'validate';
+  if (stage === 'publish') return 'publish';
+  if (stage === 'complete') return 'complete';
+  if (stage === 'error') return 'error';
+  return 'blueprint';
+}
 
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
@@ -32,7 +55,8 @@ export async function POST(req: NextRequest) {
     lessonsPerModule?: number;
     includeVideos?: boolean;
     dryRun?: boolean;
-    complianceProfileKey?: string;
+    credential?: string;
+    state?: string;
   };
 
   try {
@@ -48,6 +72,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (body.dryRun) {
+    return new Response(
+      JSON.stringify({
+        error:
+          'Dry-run generation is disabled on the unified pipeline. Use the Course Factory build action to generate a complete draft.',
+      }),
+      { status: 409, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -56,25 +90,42 @@ export async function POST(req: NextRequest) {
       };
 
       try {
-        const db = await requireAdminClient();
-        const result = await runCoursePipeline({
-          title: body.title,
-          topic: body.topic,
-          difficulty: body.difficulty ?? 'intermediate',
-          programId: body.programId,
-          programSlug: body.programSlug,
-          moduleCount: body.moduleCount,
-          lessonsPerModule: body.lessonsPerModule,
-          includeVideos: body.includeVideos ?? false,
-          dryRun: body.dryRun ?? false,
-          complianceProfileKey: body.complianceProfileKey,
-          db,
-          onProgress: (stage, message) => write({ stage, message }),
+        const result = await courseFactory(
+          {
+            title: body.title,
+            topic: body.topic,
+            difficulty: body.difficulty ?? 'intermediate',
+            programId: body.programId,
+            programSlug: body.programSlug,
+            moduleCount: body.moduleCount,
+            lessonsPerModule: body.lessonsPerModule,
+            credential: body.credential,
+            state: body.state,
+            contentSource: 'ai',
+            mode: 'replace',
+            videoMode: body.includeVideos === false ? 'off' : 'queue',
+          },
+          (stage, message, progress) =>
+            write({ stage: toPipelineStage(stage), message, progress }),
+        );
+
+        write({
+          stage: 'complete',
+          result: {
+            success: result.ok,
+            courseId: result.courseId ?? null,
+            title: result.title ?? body.title,
+            modulesGenerated: result.moduleCount ?? 0,
+            lessonsGenerated: result.lessonCount ?? 0,
+            lessonsWithQuizzes: result.assessmentsGenerated ?? 0,
+            videosQueued: result.videosQueued ?? 0,
+            errors: result.errors ?? [],
+            dryRun: false,
+          },
         });
-        write({ stage: 'complete', result });
       } catch (error) {
-        logger.error('[course-builder/pipeline] Pipeline error', error);
-        write({ stage: 'error', message: 'Course pipeline failed. Review server logs for details.' });
+        logger.error('[course-builder/pipeline] Course Factory error', error);
+        write({ stage: 'error', message: 'Course Factory failed. Review server logs for details.' });
       } finally {
         controller.close();
       }

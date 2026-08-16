@@ -326,3 +326,75 @@ Return ONLY valid JSON:
     throw error;
   }
 }
+
+export interface CompetencyMapping {
+  lessonSlug: string;
+  competencies: string[];
+  standards: string[];
+}
+
+export async function generateCompetencyMapping(
+  lessonTitle: string,
+  moduleTitle: string,
+  content: string,
+): Promise<CompetencyMapping> {
+  if (!isAIAvailable()) throw new Error('AI service not available');
+
+  const prompt = `
+Analyze this lesson and identify relevant workforce competencies and standards.
+
+Lesson: ${lessonTitle}
+Module: ${moduleTitle}
+Content summary: ${content.substring(0, 500)}...
+
+Return ONLY valid JSON:
+{
+  "lessonSlug": "${lessonTitle.toLowerCase().replace(/\s+/g, '-')}",
+  "competencies": ["competency identifier or statement"],
+  "standards": ["applicable industry or credential standard"]
+}
+
+Only map standards that are genuinely applicable to the lesson.
+`.trim();
+
+  try {
+    const response = await aiChat({
+      model: 'gpt-4.1',
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You map workforce lessons to relevant competency frameworks and credential standards. Return ONLY valid JSON.',
+        },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.5,
+      maxTokens: 1000,
+    });
+
+    const raw = response.content?.replace(/```json\n?|```\n?/g, '').trim();
+    const parsed = JSON.parse(raw || '{}') as Partial<CompetencyMapping>;
+    return {
+      lessonSlug:
+        String(parsed.lessonSlug || '').trim() ||
+        lessonTitle.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
+      competencies: Array.isArray(parsed.competencies)
+        ? parsed.competencies.map((value) => String(value).trim()).filter(Boolean)
+        : [],
+      standards: Array.isArray(parsed.standards)
+        ? parsed.standards.map((value) => String(value).trim()).filter(Boolean)
+        : [],
+    };
+  } catch (error) {
+    logger.error('[course-factory/content-generator] Competency mapping failed', error);
+    return {
+      lessonSlug: lessonTitle
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, ''),
+      competencies: [],
+      standards: [],
+    };
+  }
+}

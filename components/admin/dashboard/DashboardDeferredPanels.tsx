@@ -1,20 +1,32 @@
 'use client';
 
 /**
- * Below-the-fold dashboard panels — lazy-loaded to improve initial dashboard paint.
- * Includes error boundaries to prevent ChunkLoadError from breaking the entire page.
+ * Admin dashboard panels.
+ *
+ * These panels previously used next/dynamic for below-the-fold loading. In the
+ * current Next.js 15.5.x workspace that pulled an internal vendored loadable
+ * context that is not available in the Admin bundle. Static client imports keep
+ * the same panel contracts and error isolation without depending on Next.js
+ * private internals.
  */
 
-import dynamic from 'next/dynamic';
 import { Component, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { PublishWebsitePanel } from './PublishWebsitePanel';
+import { ProgramIntegrityPanel } from './ProgramIntegrityPanel';
+import { JobBoardPanel } from './JobBoardPanel';
+import { SitePreviewPanelWrapper } from './SitePreviewPanelWrapper';
+import { LizzyContainerWrapper } from './LizzyContainerWrapper';
 
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
 
-class PanelErrorBoundary extends Component<{ children: ReactNode; name: string }, ErrorBoundaryState> {
+export class PanelErrorBoundary extends Component<
+  { children: ReactNode; name: string },
+  ErrorBoundaryState
+> {
   constructor(props: { children: ReactNode; name: string }) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -27,75 +39,34 @@ class PanelErrorBoundary extends Component<{ children: ReactNode; name: string }
   render() {
     if (this.state.hasError) {
       return (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 mb-6">
-          <div className="flex items-center gap-2 text-red-700 font-semibold mb-2">
-            <AlertTriangle className="w-5 h-5" />
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-6">
+          <div className="mb-2 flex items-center gap-2 font-semibold text-red-700">
+            <AlertTriangle className="h-5 w-5" />
             Failed to load {this.props.name}
           </div>
-          <p className="text-sm text-red-600 mb-4">
+          <p className="mb-4 text-sm text-red-600">
             {this.state.error?.message || 'An error occurred while loading this panel.'}
           </p>
           <button
+            type="button"
             onClick={() => this.setState({ hasError: false, error: null })}
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-red-100 px-3 py-1.5 text-sm font-medium text-red-700 transition-colors hover:bg-red-200"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="h-4 w-4" />
             Retry
           </button>
         </div>
       );
     }
+
     return this.props.children;
   }
 }
 
-const panelSkeleton = (
-  <div className="rounded-xl border border-slate-200 bg-white p-6 mb-6 animate-pulse">
-    <div className="h-4 w-40 bg-slate-200 rounded mb-4" />
-    <div className="h-24 w-full bg-slate-100 rounded" />
-  </div>
-);
-
-// Handle both default and named exports
-const withFallback = (m: any) => m.default || m;
-
-// Wrapper with error boundary for each lazy panel
-export const PublishWebsitePanelLazy = dynamic(
-  () => import('./PublishWebsitePanel').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
-);
-
-export const ProgramIntegrityPanelLazy = dynamic(
-  () => import('./ProgramIntegrityPanel').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
-);
-
-export const JobBoardPanelLazy = dynamic(
-  () => import('./JobBoardPanel').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
-);
-
-export const SitePreviewPanelWrapperLazy = dynamic(
-  () => import('./SitePreviewPanelWrapper').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
-);
-
-export const LizzyContainerWrapperLazy = dynamic(
-  () => import('./LizzyContainerWrapper').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
-);
+// Preserve the public names consumed by DashboardShell while removing the
+// next/dynamic dependency that broke the Admin production bundle.
+export const PublishWebsitePanelLazy = PublishWebsitePanel;
+export const ProgramIntegrityPanelLazy = ProgramIntegrityPanel;
+export const JobBoardPanelLazy = JobBoardPanel;
+export const SitePreviewPanelWrapperLazy = SitePreviewPanelWrapper;
+export const LizzyContainerWrapperLazy = LizzyContainerWrapper;

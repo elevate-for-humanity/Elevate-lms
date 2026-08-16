@@ -249,7 +249,7 @@ export function adaptCourseTemplateToBlueprint(template: CourseTemplate): Creden
           prompt: question.question,
           type: 'multiple_choice',
           options: question.options,
-          correctAnswer: question.correctAnswer,
+          correctAnswer: question.options[question.correctAnswer] ?? String(question.correctAnswer),
           explanation: question.explanation,
         })),
       })),

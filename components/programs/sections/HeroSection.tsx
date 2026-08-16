@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
 interface HeroSectionProps {
   title: string;
@@ -30,17 +31,12 @@ export function HeroSection({
     <section className="overflow-hidden bg-white">
       <div className="relative h-[clamp(220px,42vw,520px)] w-full overflow-hidden bg-slate-100">
         {heroVideo ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="h-full w-full object-cover"
+          <SafeHeroVideo
+            src={heroVideo}
             poster={heroImage}
-            aria-label={`${title} program overview video`}
-          >
-            <source src={heroVideo} type="video/mp4" />
-          </video>
+            className="absolute inset-0 h-full w-full object-cover"
+            ariaLabel={`${title} program overview video`}
+          />
         ) : (
           <Image src={heroImage} alt={`${title} training`} fill className="object-cover" priority sizes="100vw" />
         )}

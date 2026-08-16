@@ -17,7 +17,7 @@
 
 ## Browser runtime
 
-`apps/studio-browser` is an isolated Playwright/Chromium HTTP service. It provides:
+`services/studio-browser` is an isolated Playwright/Chromium HTTP service. It provides:
 
 - short-lived browser sessions;
 - an allowlisted target-domain policy and private-network blocking;

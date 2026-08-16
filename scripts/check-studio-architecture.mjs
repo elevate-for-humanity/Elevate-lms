@@ -15,7 +15,7 @@ for (const file of [
   'apps/admin/app/studio/layout.tsx',
   'apps/admin/app/studio/StudioNavigation.client.tsx',
   'lib/devstudio/workspace-registry.ts',
-  'apps/studio-browser/server.mjs',
+  'services/studio-browser/server.mjs',
   'apps/admin/app/api/devstudio/browser/session/route.ts',
   'apps/admin/app/api/devstudio/browser/agent/route.ts',
   'components/studio/CloudBrowserWorkspace.tsx',

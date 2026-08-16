@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { AIAdvisorWidget } from '@/components/home/AIAdvisorWidget';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
 // Program types
 type BeautyProgram = 'barber' | 'cosmetology' | 'esthetics' | 'manicurist';
@@ -1455,16 +1456,12 @@ export function BeautyApprenticeship({ program: programType }: BeautyApprentices
       {/* ===== FINAL CTA ===== */}
       <section className="relative py-24 overflow-hidden">
         <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
+          <SafeHeroVideo
+            src={program.heroVideo}
             poster={program.heroImage}
-          >
-            <source src={program.heroVideo} type="video/mp4" />
-          </video>
+            className="absolute inset-0 w-full h-full object-cover"
+            ariaLabel={`${program.title} overview video`}
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 to-slate-900/80" />
         </div>
         

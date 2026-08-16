@@ -28,7 +28,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   'medical-assistant': { card: `${P}/medical-assistant-lab.webp`, hero: `${P}/medical-assistant-real.webp`, alt: 'Medical assistant working in a clinical setting' },
   phlebotomy: { card: `${P}/phlebotomy-draw.webp`, hero: `${P}/phlebotomy-real.webp`, alt: 'Phlebotomist performing a blood draw procedure' },
   'pharmacy-technician': { card: `${P}/pharmacy-tech.webp`, hero: `${P}/pharmacy-technician.webp`, alt: 'Pharmacy technician preparing medications' },
-  qma: { card: `${P}/funding-impact-1.webp`, hero: `${P}/cna-patient-care.jpg`, alt: 'Qualified Medication Aide supporting supervised patient medication care' },
+  qma: { card: `${P}/funding-impact-1.webp`, hero: '/images/healthcare/hero-program-medical-assistant.webp', alt: 'Qualified Medication Aide supporting supervised patient medication care' },
   'home-health-aide': { card: `${P}/healthcare-classroom.webp`, hero: `${P}/adult-learner.webp`, alt: 'Home Health Aide learner preparing for in-home patient care' },
   'emergency-health-safety': { card: `${P}/comp-pathway-classroom.webp`, hero: '/images/healthcare/hero-program-patient-care.webp', alt: 'Emergency health and safety learner practicing patient-response skills' },
   'peer-recovery-specialist': { card: `${P}/career-counseling.jpg`, hero: '/images/pexels/medical-assistant.webp', alt: 'Peer recovery specialist supporting a client through a counseling conversation' },

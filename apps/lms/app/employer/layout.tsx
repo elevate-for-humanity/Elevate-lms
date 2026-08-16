@@ -1,5 +1,18 @@
+import type { Metadata } from 'next';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { requireRole } from '@/lib/auth/require-role';
+
+export const metadata: Metadata = {
+  title: { default: 'Employer Portal', template: '%s | Elevate Employer' },
+  description: 'Hiring, candidates, workforce solutions, and employer operations.',
+  manifest: '/manifest-employer.json',
+  robots: { index: false, follow: false },
+  appleWebApp: {
+    capable: true,
+    title: 'Elevate Hire',
+    statusBarStyle: 'black-translucent',
+  },
+};
 
 export const dynamic = 'force-dynamic';
 

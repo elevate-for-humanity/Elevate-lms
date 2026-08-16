@@ -2,8 +2,8 @@
   "name": "Elevate Hire",
   "short_name": "Hire",
   "description": "Employer portal for hiring graduates and workforce solutions",
-  "start_url": "/employer-portal",
-  "scope": "/employer",
+  "start_url": "/employer/dashboard",
+  "scope": "/employer/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#ffffff",
@@ -41,11 +41,11 @@
   "shortcuts": [
     {
       "name": "Job Postings",
-      "url": "/employer-portal/jobs"
+      "url": "/employer/jobs"
     },
     {
       "name": "Candidates",
-      "url": "/employer-portal/candidates"
+      "url": "/employer/candidates"
     }
   ],
   "id": "org.elevateforhumanity.employer",

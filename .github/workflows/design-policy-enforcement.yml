@@ -66,13 +66,19 @@ jobs:
         run: |
           set -euo pipefail
           if [ '${{ github.event_name }}' = 'pull_request' ]; then
-            BASE_SHA='${{ github.event.pull_request.base.sha }}'
+            # actions/checkout checks out refs/pull/<n>/merge for PR workflows.
+            # Its first parent is the current target-branch head used to build
+            # the merge result. Comparing against event.pull_request.base.sha
+            # can become stale while a long-lived PR is open and falsely charge
+            # newer main-branch changes to this PR.
+            BASE_SHA="$(git rev-parse HEAD^1)"
           elif git rev-parse HEAD^ >/dev/null 2>&1; then
             BASE_SHA="$(git rev-parse HEAD^)"
           else
             echo '::error::Unable to resolve a comparison base for design policy.'
             exit 1
           fi
+          git cat-file -e "${BASE_SHA}^{commit}"
           echo "sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Scan current production design state

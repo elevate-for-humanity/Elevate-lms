@@ -33,7 +33,7 @@ export async function loadCaseFile(participantId: string): Promise<ParticipantCa
 
   // Load enrollments
   const { data: enrollments } = await supabase
-    .from('student_enrollments')
+    .from('program_enrollments')
     .select('*')
     .eq('student_id', participantId)
     .order('created_at', { ascending: false });
@@ -243,7 +243,7 @@ export async function loadCaseFileSummaries(
   // Get enrollments for these profiles
   const profileIds = profiles.map((p) => p.id);
   const { data: enrollments } = await supabase
-    .from('student_enrollments')
+    .from('program_enrollments')
     .select('student_id, program_slug, status, updated_at')
     .in('student_id', profileIds)
     .order('updated_at', { ascending: false });

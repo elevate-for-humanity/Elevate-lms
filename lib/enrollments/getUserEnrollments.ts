@@ -147,18 +147,18 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     }
   }
 
-  // Query student_enrollments table (barber apprenticeship / hybrid)
+  // Query the canonical program enrollment table (barber apprenticeship / hybrid)
   const { data: studentEnrollments } = await supabase
-    .from('student_enrollments')
+    .from('program_enrollments')
     .select('id, student_id, program_slug, status, progress, created_at, updated_at')
     .eq('student_id', userId);
 
   if (studentEnrollments) {
     for (const e of studentEnrollments) {
-      const { mode, inferred } = resolveDeliveryMode('student_enrollments', null);
+      const { mode, inferred } = resolveDeliveryMode('program_enrollments', null);
 
       const enrollment: NormalizedEnrollment = {
-        source_table: 'student_enrollments',
+        source_table: 'program_enrollments',
         enrollment_id: e.id,
         user_key: e.student_id,
         program_id: null,

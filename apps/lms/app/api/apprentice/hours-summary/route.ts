@@ -30,7 +30,7 @@ async function _GET(req: Request) {
 
   try {
     let enrollmentQuery = supabase
-      .from('student_enrollments')
+      .from('program_enrollments')
       .select(
         `
         id,
@@ -40,11 +40,11 @@ async function _GET(req: Request) {
         rapids_status,
         rapids_id,
         lms_enrolled,
-        shop_id,
+        host_shop_id,
         programs (
           name,
           slug,
-          total_hours
+          required_hours
         )
       `,
       )
@@ -64,7 +64,7 @@ async function _GET(req: Request) {
     let transferHours = 0;
 
     if (enrollment) {
-      requiredHours = enrollment.required_hours || program?.total_hours || 2000;
+      requiredHours = enrollment.required_hours || program?.required_hours || 2000;
       transferHours = Number(enrollment.transfer_hours) || 0;
     }
 
@@ -107,9 +107,7 @@ async function _GET(req: Request) {
       .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
     const wioaOjlHours = logs
-      .filter(
-        (log) => OJL_SOURCE_TYPES.includes(log.source_type) && log.category === 'wioa',
-      )
+      .filter((log) => OJL_SOURCE_TYPES.includes(log.source_type) && log.category === 'wioa')
       .reduce((sum, log) => sum + (Number(log.hours_claimed) || 0), 0);
 
     const { data: rapidsData } = await supabase

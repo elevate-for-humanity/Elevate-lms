@@ -1,6 +1,6 @@
 /**
  * Student Dashboard Service
- * 
+ *
  * Provides enrolled course data for student dashboard.
  * Students only see courses they are enrolled in.
  */
@@ -38,8 +38,9 @@ export async function getStudentEnrolledCourses(userId: string): Promise<Enrolle
   const supabase = await createClient();
 
   const { data: enrollments, error } = await supabase
-    .from('student_enrollments')
-    .select(`
+    .from('program_enrollments')
+    .select(
+      `
       *,
       course:courses(
         id,
@@ -49,7 +50,8 @@ export async function getStudentEnrolledCourses(userId: string): Promise<Enrolle
         hero_image_url,
         thumbnail_url
       )
-    `)
+    `,
+    )
     .eq('user_id', userId)
     .eq('status', 'active')
     .order('enrolled_at', { ascending: false });
@@ -101,13 +103,23 @@ export async function getStudentEnrolledCourses(userId: string): Promise<Enrolle
 
       return {
         id: enrollment.course_id,
-        slug: enrollment.course_slug,
+        slug: enrollment.course?.slug || enrollment.program_slug,
         title: enrollment.course?.title || 'Unknown Course',
         description: enrollment.course?.description || '',
-        hero_image_url: enrollment.course?.hero_image_url || 
-          getPublicCourseAssetUrl(enrollment.course_slug, 'hero', 'default.jpg'),
-        thumbnail_url: enrollment.course?.thumbnail_url ||
-          getPublicCourseAssetUrl(enrollment.course_slug, 'images', 'thumbnail.jpg'),
+        hero_image_url:
+          enrollment.course?.hero_image_url ||
+          getPublicCourseAssetUrl(
+            enrollment.course?.slug || enrollment.program_slug || 'course',
+            'hero',
+            'default.jpg',
+          ),
+        thumbnail_url:
+          enrollment.course?.thumbnail_url ||
+          getPublicCourseAssetUrl(
+            enrollment.course?.slug || enrollment.program_slug || 'course',
+            'images',
+            'thumbnail.jpg',
+          ),
         progress_percent: progress?.progress_percent || 0,
         current_module: progress?.current_module_index || 1,
         current_lesson: (progress?.current_lesson_index || 0) + 1,
@@ -123,7 +135,7 @@ export async function getStudentEnrolledCourses(userId: string): Promise<Enrolle
         practice_test_attempts: progress?.practice_test_attempts || 0,
         max_practice_attempts: 6,
       };
-    })
+    }),
   );
 
   return coursesWithProgress;
@@ -132,17 +144,14 @@ export async function getStudentEnrolledCourses(userId: string): Promise<Enrolle
 /**
  * Check if student has access to a course
  */
-export async function hasCourseAccess(
-  userId: string,
-  courseSlug: string
-): Promise<boolean> {
+export async function hasCourseAccess(userId: string, courseSlug: string): Promise<boolean> {
   const supabase = await createClient();
 
   const { data: enrollment } = await supabase
-    .from('student_enrollments')
-    .select('id')
+    .from('program_enrollments')
+    .select('id, course:courses!inner(slug)')
     .eq('user_id', userId)
-    .eq('course_slug', courseSlug)
+    .eq('courses.slug', courseSlug)
     .eq('status', 'active')
     .single();
 

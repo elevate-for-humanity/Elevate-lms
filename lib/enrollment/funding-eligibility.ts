@@ -64,7 +64,7 @@ export interface FundingOption {
   externalUrl?: string;
   /** If true, student must confirm external approval before form submits */
   requiresExternalConfirmation: boolean;
-  /** Maps to student_enrollments.funding_source */
+  /** Maps to program_enrollments.funding_source */
   enrollmentFundingSource: string;
 }
 

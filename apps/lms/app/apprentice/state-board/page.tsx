@@ -46,9 +46,9 @@ export default async function StateBoardExamPage() {
     .limit(1)
     .maybeSingle();
 
-  // Legacy enrollment for extra fields (lms_completed, practical_skills_verified, transfer_hours)
+  // Canonical enrollment fields used for state-board readiness.
   const { data: legacyEnrollment } = await supabase
-    .from('student_enrollments')
+    .from('program_enrollments')
     .select(
       'program_slug, required_hours, transfer_hours, lms_completed, practical_skills_verified',
     )
@@ -396,4 +396,3 @@ export default async function StateBoardExamPage() {
     </div>
   );
 }
-

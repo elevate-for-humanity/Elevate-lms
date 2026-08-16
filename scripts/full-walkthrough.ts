@@ -188,13 +188,13 @@ async function runSupabaseTrack() {
   check('Acknowledgements readable', !acksErr, acksErr?.message);
   check('Has acknowledgements',      (acks?.length ?? 0) > 0, `${acks?.length ?? 0} rows`);
 
-  // ── Student enrollments ──
-  console.log('\n  ── Student Enrollments ──');
+  // ── Canonical program enrollments ──
+  console.log('\n  ── Program Enrollments ──');
   const { data: enrollments, error: enrollErr } = await client
-    .from('student_enrollments')
-    .select('id, status, students(first_name, last_name)')
+    .from('program_enrollments')
+    .select('id, status, student_id')
     .limit(5);
-  check('student_enrollments readable', !enrollErr, enrollErr?.message);
+  check('program_enrollments readable', !enrollErr, enrollErr?.message);
 
   // ── Programs ──
   console.log('\n  ── Programs ──');
@@ -219,8 +219,8 @@ async function runSupabaseTrack() {
   if (phId) {
     // Students query (fixed FK)
     const { data: students, error: studErr } = await client
-      .from('student_enrollments')
-      .select('id, status, students!student_enrollments_student_fk(first_name, last_name)')
+      .from('program_enrollments')
+      .select('id, status, student_id')
       .limit(10);
     check('Dashboard: students query (fixed FK)', !studErr, studErr?.message);
 
@@ -250,8 +250,8 @@ async function runSupabaseTrack() {
 
     // Grades (no grade column)
     const { data: grades, error: gradeErr } = await client
-      .from('student_enrollments')
-      .select('id, status, students!student_enrollments_student_fk(first_name, last_name)')
+      .from('program_enrollments')
+      .select('id, status, student_id')
       .limit(10);
     check('Dashboard: grades query (no grade col)', !gradeErr, gradeErr?.message);
   }

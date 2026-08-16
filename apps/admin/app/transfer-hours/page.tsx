@@ -16,13 +16,13 @@ export default async function TransferHoursPage() {
   await requireRole(['admin']);
   const supabase = await createClient();
 
-  const { data: transferHours, count: totalRequests } = await supabase
-    .from('transfer_hours')
+  const { data: transferHourRequests, count: totalRequests } = await supabase
+    .from('transfer_hour_requests')
     .select(
       `
       *,
-      enrollment:student_enrollments(
-        student:students!student_enrollments_student_fk(first_name, last_name, email),
+      enrollment:program_enrollments(
+        student_id,
         program:programs(name, title, slug)
       )
     `,
@@ -30,18 +30,39 @@ export default async function TransferHoursPage() {
     )
     .order('created_at', { ascending: false });
 
+  const studentIds = Array.from(
+    new Set(
+      (transferHourRequests || [])
+        .map((request: any) => request.enrollment?.student_id)
+        .filter(Boolean),
+    ),
+  );
+  const { data: students } = studentIds.length
+    ? await supabase.from('profiles').select('id, full_name, email').in('id', studentIds)
+    : { data: [] };
+  const studentsById = new Map((students || []).map((student) => [student.id, student]));
+  const transferHours = (transferHourRequests || []).map((request: any) => ({
+    ...request,
+    enrollment: request.enrollment
+      ? {
+          ...request.enrollment,
+          student: studentsById.get(request.enrollment.student_id) || null,
+        }
+      : null,
+  }));
+
   const { count: pendingRequests } = await supabase
-    .from('transfer_hours')
+    .from('transfer_hour_requests')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'pending');
 
   const { count: approvedRequests } = await supabase
-    .from('transfer_hours')
+    .from('transfer_hour_requests')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'approved');
 
   const { count: deniedRequests } = await supabase
-    .from('transfer_hours')
+    .from('transfer_hour_requests')
     .select('*', { count: 'exact', head: true })
     .eq('status', 'denied');
 
@@ -97,7 +118,7 @@ export default async function TransferHoursPage() {
         </div>
 
         {/* Transfer Hours Table */}
-        <TransferHoursTable transferHours={transferHours || []} />
+        <TransferHoursTable transferHours={transferHours} />
       </div>
     </div>
   );

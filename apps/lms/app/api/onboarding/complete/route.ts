@@ -265,7 +265,7 @@ async function _POST(request: NextRequest) {
       }).catch((err) => logger.warn('[onboarding/complete] Admin notification failed', err));
     }
 
-    // Provision students record (required for student_enrollments FK and clock-in)
+    // Provision students record (required for program_enrollments and clock-in)
     // students.id is the PK — not a FK to profiles. Use userId as the id for easy lookup.
     const { data: existingStudent } = await db
       .from('students')

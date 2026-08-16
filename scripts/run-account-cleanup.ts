@@ -95,7 +95,6 @@ console.log('\nStarting account cleanup...\n');
 // Step 1: Enrollments — keep only 5 students
 await del('program_enrollments',  'user_id', STUDENTS);
 await del('training_enrollments', 'user_id', STUDENTS);
-await del('student_enrollments',  'user_id', STUDENTS);
 
 // Step 2: Learning progress — keep all 10
 await del('lesson_progress',                   'user_id', KEEP);

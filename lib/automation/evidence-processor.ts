@@ -654,7 +654,7 @@ export async function processTranscript(
 
     // Update enrollment with transfer hours
     const { error } = await supabase
-      .from('student_enrollments')
+      .from('program_enrollments')
       .update({
         transfer_hours: hours,
         transfer_hours_verified: true,

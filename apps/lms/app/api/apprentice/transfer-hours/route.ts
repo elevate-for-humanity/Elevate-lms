@@ -32,7 +32,7 @@ async function _GET(req: Request) {
     .select(
       `
       *,
-      student_enrollments (
+      program_enrollments (
         id,
         programs (name, slug)
       )
@@ -91,7 +91,7 @@ async function _POST(req: Request) {
 
   // Verify enrollment belongs to user
   const { data: enrollment, error: enrollmentError } = await supabase
-    .from('student_enrollments')
+    .from('program_enrollments')
     .select('id, student_id, transfer_hours')
     .eq('id', enrollment_id)
     .eq('student_id', user.id)

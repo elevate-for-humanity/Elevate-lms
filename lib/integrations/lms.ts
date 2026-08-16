@@ -3,7 +3,7 @@
  *
  * Connects to existing Elevate services:
  * - program_enrollments (enrollment-service.ts)
- * - student_enrollments
+ * - program_enrollments (canonical enrollment authority)
  * - student_dashboards
  * - profiles
  */

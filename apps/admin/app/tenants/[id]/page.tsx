@@ -42,7 +42,7 @@ export default async function TenantDetailPage({ params }: { params: Promise<{ i
       .eq('tenant_id', id)
       .order('started_at', { ascending: false })
       .limit(10),
-    db.from('student_enrollments')
+    db.from('program_enrollments')
       .select('id', { count: 'exact', head: true })
       .eq('tenant_id', id),
     db.from('student_risk_status')

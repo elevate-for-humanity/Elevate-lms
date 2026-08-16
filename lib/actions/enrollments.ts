@@ -105,7 +105,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
     }
     // 4. Check for existing active enrollment
     const { data: existingEnrollment } = await db
-      .from('student_enrollments')
+      .from('program_enrollments')
       .select('id, status')
       .eq('student_id', input.student_id)
       .eq('program_id', input.program_id)
@@ -116,7 +116,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
     }
     // 5. Create enrollment
     const { data: enrollment, error: enrollmentError } = await db
-      .from('student_enrollments')
+      .from('program_enrollments')
       .insert({
         student_id: input.student_id,
         program_id: input.program_id,
@@ -214,7 +214,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
     const db = await getDb();
     // 1. Verify enrollment exists
     const { data: enrollment, error: enrollmentError } = await db
-      .from('student_enrollments')
+      .from('program_enrollments')
       .select('id, student_id, program_id')
       .eq('id', input.enrollment_id)
       .maybeSingle();
@@ -274,7 +274,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
       .select(
         `
         *,
-        enrollment:student_enrollments(
+        enrollment:program_enrollments(
           id,
           student_id,
           program_id,
@@ -398,7 +398,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
     const db = await getDb();
     // 1. Verify enrollment exists
     const { data: enrollment, error: enrollmentError } = await db
-      .from('student_enrollments')
+      .from('program_enrollments')
       .select('id, student_id')
       .eq('id', input.enrollment_id)
       .maybeSingle();
@@ -407,7 +407,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
     }
     // 2. Update funding amounts
     const { error: updateError } = await db
-      .from('student_enrollments')
+      .from('program_enrollments')
       .update({
         wage_rate_hour: input.wage_rate_hour,
         stipend_total_amount: input.stipend_total_amount,
@@ -443,7 +443,7 @@ export async function getEnrollmentDetails(enrollment_id: string) {
   try {
     const db = await getDb();
     const { data, error }: any = await db
-      .from('student_enrollments')
+      .from('program_enrollments')
       .select(
         `
         *,

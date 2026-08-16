@@ -78,16 +78,6 @@ async function fetchEnrollments() {
   return data ?? [];
 }
 
-async function fetchStudentEnrollments() {
-  const { data, error } = await db
-    .from('student_enrollments')
-    .select(
-      'id,student_id,program_id,program_slug,stripe_checkout_session_id,payment_status,enrollment_state,status,created_at,funding_source',
-    );
-  if (error) throw error;
-  return data ?? [];
-}
-
 async function fetchApplications() {
   const { data, error } = await db
     .from('applications')
@@ -118,10 +108,10 @@ async function fetchWebhookEvents() {
 
 // ── AUDIT LOGIC ───────────────────────────────────────────────────────────────
 
-function auditA_PaidNotEnrolled(sessions, enrollments, studentEnrollments) {
+function auditA_PaidNotEnrolled(sessions, enrollments) {
   // Build lookup sets
   const enrolledBySession = new Set(
-    [...enrollments, ...studentEnrollments]
+    enrollments
       .map((e) => e.stripe_checkout_session_id)
       .filter(Boolean),
   );
@@ -241,16 +231,14 @@ async function main() {
   console.log(`      → ${sessions.length} paid sessions total`);
 
   console.log('[3/7] Fetching DB state...');
-  const [enrollments, studentEnrollments, applications, financials, webhookEvents] =
+  const [enrollments, applications, financials, webhookEvents] =
     await Promise.all([
       fetchEnrollments(),
-      fetchStudentEnrollments(),
       fetchApplications(),
       fetchApplicationFinancials(),
       fetchWebhookEvents(),
     ]);
   console.log(`      → program_enrollments: ${enrollments.length}`);
-  console.log(`      → student_enrollments: ${studentEnrollments.length}`);
   console.log(`      → applications: ${applications.length}`);
   console.log(`      → application_financials: ${financials.length}`);
   console.log(`      → checkout webhook events: ${webhookEvents.length}`);
@@ -258,7 +246,7 @@ async function main() {
   console.log('\n[4/7] Running audits...');
 
   // Audit A
-  const auditA = auditA_PaidNotEnrolled(sessions, enrollments, studentEnrollments);
+  const auditA = auditA_PaidNotEnrolled(sessions, enrollments);
   // Audit B
   const auditB = auditB_EnrolledNotPaid(enrollments, sessions, financials, applications);
   // Audit C

@@ -7,9 +7,9 @@ import { logger } from '@/lib/logger';
  *
  * Event handlers (line numbers approximate):
  *   checkout.session.completed:
- *     - kind=program_enrollment    → upserts student_enrollments
+ *     - kind=program_enrollment    → upserts program_enrollments
  *     - type=donation              → inserts donations
- *     - kind=apprenticeship_enrollment → updates applications + student_enrollments
+ *     - kind=apprenticeship_enrollment → updates applications + program_enrollments
  *     - kind=license_purchase      → creates licenses + tenants
  *     - kind=store_purchase        → creates orders
  *     - kind=course_purchase       → creates enrollments
@@ -23,7 +23,7 @@ import { logger } from '@/lib/logger';
  *   invoice.payment_failed         → flags license
  *   charge.refunded                → processes refund
  *
- * Tables written: student_enrollments, program_enrollments, enrollments,
+ * Tables written: program_enrollments, enrollments,
  *   licenses, license_events, donations, payments, payment_logs,
  *   audit_logs, tenants, applications
  *
@@ -495,7 +495,7 @@ async function _POST(request: NextRequest) {
 
             if (studentId && programId) {
               const { data: enrollment, error: enrollError } = await supabase
-                .from('student_enrollments')
+                .from('program_enrollments')
                 .upsert(
                   {
                     student_id: studentId,

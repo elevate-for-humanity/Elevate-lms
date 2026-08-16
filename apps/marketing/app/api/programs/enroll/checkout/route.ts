@@ -14,7 +14,7 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  *   program_slug: slug for routing
  *   funding_source: 'self_pay' | 'workone' | 'wioa' | 'grant' | 'employer'
  *
- * The webhook handler provisions student_enrollments on checkout.session.completed.
+ * The webhook handler provisions program_enrollments on checkout.session.completed.
  */
 
 export const runtime = 'nodejs';
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // Check for existing active enrollment
     const { data: existingEnrollment } = await supabase
-      .from('student_enrollments')
+      .from('program_enrollments')
       .select('id, status')
       .eq('student_id', user.id)
       .eq('program_id', program_id)
@@ -239,6 +239,6 @@ export async function GET() {
       session_id: 'Stripe session ID for tracking',
     },
     webhook_provisioning:
-      'On checkout.session.completed, student_enrollments is created with status=active',
+      'On checkout.session.completed, program_enrollments is created with status=active',
   });
 }

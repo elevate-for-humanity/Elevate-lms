@@ -235,6 +235,7 @@
     "check:studio-architecture": "node scripts/check-studio-architecture.mjs",
     "check:pwa-architecture": "node scripts/check-pwa-architecture.mjs",
     "check:supabase-architecture": "node scripts/check-supabase-architecture.mjs",
+    "check:enrollment-architecture": "node scripts/check-enrollment-architecture.mjs",
     "typecheck:studio": "tsc -p tsconfig.studio.json --pretty false",
     "deploy:studio-browser": "node --experimental-strip-types scripts/northflank/create-studio-browser-service.ts",
     "audit:schema": "tsx scripts/audit-schema-drift.ts",

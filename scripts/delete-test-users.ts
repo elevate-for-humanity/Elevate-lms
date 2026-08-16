@@ -82,7 +82,6 @@ const DEPENDENT_TABLES: Array<{ table: string; col: string }> = [
   { table: 'training_enrollments',             col: 'user_id' },
   { table: 'program_enrollments',              col: 'user_id' },
   { table: 'enrollments',                      col: 'user_id' },
-  { table: 'student_enrollments',              col: 'user_id' },
   { table: 'notifications',                    col: 'user_id' },
   { table: 'user_sessions',                    col: 'user_id' },
   { table: 'documents',                        col: 'user_id' },

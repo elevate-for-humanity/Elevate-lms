@@ -41,7 +41,7 @@ export default async function EmployerPage({ params }: { params: Promise<{ id: s
         .order('created_at', { ascending: false })
         .limit(10),
       db
-        .from('student_enrollments')
+        .from('program_enrollments')
         .select('id, student_id, status', { count: 'exact' })
         .eq('employer_id', id)
         .limit(1),

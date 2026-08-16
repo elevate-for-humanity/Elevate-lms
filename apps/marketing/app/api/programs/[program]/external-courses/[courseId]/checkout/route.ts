@@ -52,7 +52,7 @@ export async function POST(
 
   // Load student's enrollment to determine funding source
   const { data: enrollment } = await adminDb
-    .from('student_enrollments')
+    .from('program_enrollments')
     .select('id, funding_source')
     .eq('student_id', auth.id)
     .eq('program_id', program.id)

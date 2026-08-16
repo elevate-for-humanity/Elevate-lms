@@ -80,12 +80,40 @@ function mediaKey(value?: string): string | undefined {
   }
 }
 
-function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
+function escapeSvgText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * Final fallback for a page that has no dedicated packaged poster.
+ * The poster is generated from that page's own canonical copy, so uncovered
+ * pages remain visually distinct and semantically labeled without reusing an
+ * unrelated photo or remote media URL.
+ */
+function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string {
+  const fallbackTitle = key
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const title = (banner.belowHeroHeadline ?? banner.headline ?? banner.microLabel ?? fallbackTitle).trim();
+  const label = (banner.microLabel ?? 'Elevate for Humanity').trim();
+  const compactTitle = title.length > 72 ? `${title.slice(0, 69).trim()}...` : title;
+  const compactLabel = label.length > 40 ? `${label.slice(0, 37).trim()}...` : label;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${escapeSvgText(compactTitle)}"><rect width="1600" height="900" fill="#0f172a"/><rect x="0" y="0" width="18" height="900" fill="#b91c1c"/><text x="96" y="360" fill="#f8fafc" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="700" letter-spacing="2">${escapeSvgText(compactLabel.toUpperCase())}</text><text x="96" y="470" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800">${escapeSvgText(compactTitle)}</text><text x="96" y="790" fill="#cbd5e1" font-family="Arial,Helvetica,sans-serif" font-size="30">Elevate for Humanity · ${escapeSvgText(key)}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function posterFor(key: string, banner: RawHeroBannerConfig): string {
   const dedicated = getHeroVideoForPageKey(key);
   if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
   if (banner.posterImage) return banner.posterImage;
   if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
-  return PAGE_PICTURE_OVERRIDES[key];
+  if (PAGE_PICTURE_OVERRIDES[key]) return PAGE_PICTURE_OVERRIDES[key];
+  return semanticInlinePoster(key, banner);
 }
 
 function normalizeBanner(
@@ -119,14 +147,14 @@ function normalizeBanner(
       ...normalized,
       videoSrcDesktop: undefined,
       videoSrcMobile: undefined,
-      posterImage: posterFor(key, banner) ?? '/images/pages/store-licensing-hero.webp',
+      posterImage: posterFor(key, banner),
     };
   }
 
   if (key === 'home') {
     normalized = {
       ...normalized,
-      posterImage: posterFor(key, banner) ?? '/images/heroes/hero-homepage.webp',
+      posterImage: posterFor(key, banner),
       voiceoverSrc: '/audio/heroes/home.mp3',
       microLabel: 'The AI-Powered Workforce Operating System',
       eyebrow: 'Career Training & Workforce Development',

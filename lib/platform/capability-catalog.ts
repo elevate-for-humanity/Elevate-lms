@@ -186,7 +186,7 @@ export const CAPABILITY_CATALOG: PlatformCapability[] = [
     category: 'education',
     description: 'Deliver programs, lessons, quizzes, learner progress and certificates.',
     status: 'sell_now',
-    appHref: '/lms/dashboard',
+    appHref: 'https://app.elevateforhumanity.org/lms/dashboard',
     keywords: ['lms', 'courses', 'students', 'lessons', 'quizzes'],
   },
   {

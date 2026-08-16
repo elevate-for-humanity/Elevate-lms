@@ -6,8 +6,6 @@
 
 import { randomBytes } from 'crypto';
 import { logger } from '@/lib/logger';
-
-import { logAuditEvent } from '@/lib/audit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 interface EnrollmentParams {
@@ -57,7 +55,11 @@ export async function createEnrollmentFromPayment(
   try {
     const { requireAdminClient: getAdminClient } = await import('@/lib/supabase/admin');
     const { setAuditContext } = await import('@/lib/audit-context');
-    const supabaseAdmin = await getAdminClient();
+    // The generated database schema does not model Supabase Auth admin methods,
+    // which can incorrectly narrow listUsers/createUser results to `never` during
+    // Next production type-checking. Keep the escape hatch at this integration
+    // boundary rather than weakening types throughout the application.
+    const supabaseAdmin: any = await getAdminClient();
 
     if (!supabaseAdmin) {
       logger.error('[Enrollment] getAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY missing');
@@ -74,7 +76,7 @@ export async function createEnrollmentFromPayment(
     if (!finalStudentId && email) {
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
       const userExists = existingUsers?.users?.find(
-        (u) => u.email?.toLowerCase() === email.toLowerCase(),
+        (u: { id: string; email?: string | null }) => u.email?.toLowerCase() === email.toLowerCase(),
       );
 
       if (userExists) {
@@ -209,18 +211,19 @@ export async function createEnrollmentFromPayment(
       enrollmentId = existing.id;
       isNewEnrollment = true;
 
-      logger.info('[Enrollment] Activated existing enrollment', {
+      logger.info('[Enrollment] Moved paid enrollment to pending review', {
         enrollmentId: existing.id,
         paymentProvider,
       });
     } else {
       enrollmentId = existing.id;
-      logger.info('[Enrollment] Enrollment already active', {
+      logger.info('[Enrollment] Enrollment already active or pending review', {
         enrollmentId: existing.id,
+        status: existing.status,
       });
     }
 
-    // Send welcome email for new enrollments
+    // Send payment/enrollment acknowledgement for new or reactivated enrollments.
     if (isNewEnrollment && email) {
       await sendEnrollmentWelcomeEmail({
         email,
@@ -277,7 +280,7 @@ async function sendEnrollmentWelcomeEmail(params: {
   tempPassword: string;
   supabaseAdmin: any;
 }) {
-  const { email, firstName, programId, isNewUser, tempPassword, supabaseAdmin } = params;
+  const { email, firstName, programId, isNewUser, supabaseAdmin } = params;
 
   try {
     const { data: programDetails } = await supabaseAdmin
@@ -313,32 +316,32 @@ async function sendEnrollmentWelcomeEmail(params: {
       },
       body: JSON.stringify({
         to: email,
-        subject: `Welcome to ${programDetails?.name || 'Your Program'} - Your Access is Ready!`,
+        subject: `Payment Received - ${programDetails?.name || 'Your Program'} Enrollment Review`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #1e3a8a;">Welcome to ${PLATFORM_DEFAULTS.orgName}!</h2>
+            <h2 style="color: #1e3a8a;">Payment received by ${PLATFORM_DEFAULTS.orgName}</h2>
             <p>Hi ${firstName || 'there'},</p>
-            <p>Congratulations! Your enrollment in <strong>${programDetails?.name || 'your program'}</strong> is now <span style="color: #22c55e; font-weight: bold;">ACTIVE</span>.</p>
-            
+            <p>We received your payment for <strong>${programDetails?.name || 'your program'}</strong>. Your enrollment is now <strong>pending final review</strong>. Course access is granted after the enrollment review is completed.</p>
+
             ${loginSection}
-            
+
             <h3>What's Next?</h3>
             <ul>
               <li>Log in to your student portal</li>
-              <li>Complete your profile</li>
-              <li>Start your coursework</li>
+              <li>Complete or review your profile</li>
+              <li>Watch your portal and email for the enrollment approval notice</li>
             </ul>
-            
+
             <p>If you have any questions, please contact our support team.</p>
-            
+
             <p>Best regards,<br>The ${PLATFORM_DEFAULTS.orgName} Team</p>
           </div>
         `,
       }),
     });
 
-    logger.info('[Enrollment] Welcome email sent', { email, programId });
+    logger.info('[Enrollment] Payment/enrollment acknowledgement sent', { email, programId });
   } catch (error) {
-    logger.error('[Enrollment] Failed to send welcome email', error);
+    logger.error('[Enrollment] Failed to send payment/enrollment acknowledgement', error);
   }
 }

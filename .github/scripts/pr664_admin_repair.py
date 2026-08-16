@@ -13,40 +13,43 @@ def replace_exact(path: str, old: str, new: str, expected: int = 1) -> None:
 publish = "apps/admin/app/api/admin/courses/generate/publish/route.ts"
 replace_exact(
     publish,
-    """    if (seen.has(key))
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });""",
-    """    if (seen.has(key)) {
-      throw new Error(`Duplicate lesson title: ${lesson.title}`);
-    }""",
+    """      if (seen.has(key))
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });""",
+    """      if (seen.has(key)) {
+        throw new Error(`Duplicate lesson title: ${lesson.lesson_title}`);
+      }""",
 )
 replace_exact(
     publish,
-    """      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });""",
-    """      throw new Error(`Invalid quiz answer index for lesson: ${lesson.title}`);""",
-    expected=1,
+    """        if (!q.options.includes(q.correct_answer)) {
+          return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        }""",
+    """        if (!q.options.includes(q.correct_answer)) {
+          throw new Error(`Invalid quiz answer for lesson: ${lesson.lesson_title}`);
+        }""",
 )
 replace_exact(
     publish,
-    """    if (!Number.isFinite(lesson.duration_minutes))
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-    if ((lesson.duration_minutes ?? 0) < 0)
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });""",
-    """    if (!Number.isFinite(lesson.duration_minutes)) {
-      throw new Error(`Invalid lesson duration for: ${lesson.title}`);
-    }
-    if ((lesson.duration_minutes ?? 0) < 0) {
-      throw new Error(`Negative lesson duration for: ${lesson.title}`);
-    }""",
+    """      if (lesson.estimated_minutes < 3)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      if (lesson.narration_script.trim().length < 400)
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });""",
+    """      if (lesson.estimated_minutes < 3) {
+        throw new Error(`Lesson duration is too short: ${lesson.lesson_title}`);
+      }
+      if (lesson.narration_script.trim().length < 400) {
+        throw new Error(`Narration is incomplete: ${lesson.lesson_title}`);
+      }""",
 )
 replace_exact(
     publish,
     """  if (draft.program_id) {
-    const coverageError = await checkCoverageGate(draft.program_id, draft.lessons);
+    const coverageError = await checkCoverageGate(draft.program_id, draft.auto_publish);
     if (coverageError)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }""",
     """  if (draft.program_id) {
-    const coverageError = await checkCoverageGate(draft.program_id, draft.lessons);
+    const coverageError = await checkCoverageGate(draft.program_id, draft.auto_publish);
     if (coverageError) throw new Error(coverageError);
   }""",
 )

@@ -39,8 +39,6 @@ function routeFileCandidates(app, route) {
   const clean = route.replace(/^\//, '');
   const base = APP_DIR[app];
   const suffix = `${clean}${clean ? '/' : ''}page.tsx`;
-  // Next route groups do not participate in the URL. Keep the canonical learner
-  // workspace inside (app) while still proving that /lms/dashboard exists.
   const candidates = [`${base}/${suffix}`];
   if (app === 'lms' && clean.startsWith('lms/')) {
     candidates.push(`${base}/lms/(app)/${clean.slice('lms/'.length)}${clean.slice('lms/'.length) ? '/' : ''}page.tsx`);
@@ -85,6 +83,7 @@ const PWA = [
   ['apprentice', 'public/manifest-apprentice.json', '/apprentice', '/apprentice', 'apps/lms/app/apprentice/layout.tsx'],
   ['host shop', 'public/manifest-shop-owner.json', '/host-shop/dashboard', '/host-shop/', 'apps/lms/app/host-shop/layout.tsx'],
   ['program holder', 'public/manifest-program-holder.json', '/program-holder/dashboard', '/program-holder/', 'apps/lms/app/program-holder/layout.tsx'],
+  ['employer', 'public/manifest-employer.json', '/employer/dashboard', '/employer/', 'apps/lms/app/employer/layout.tsx'],
 ];
 for (const [name, manifestPath, startUrl, scope, layoutPath] of PWA) {
   if (!exists(manifestPath)) { fail(`${name}: missing ${manifestPath}`); continue; }

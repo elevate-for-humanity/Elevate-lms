@@ -9,6 +9,12 @@ function isExternalHref(href: string) {
   return /^https?:\/\//i.test(href);
 }
 
+function resolveInternalHref(href: string, basePath: string) {
+  if (!basePath || isExternalHref(href) || !href.startsWith('/')) return href;
+  if (href === '/') return basePath;
+  return `${basePath}${href}`;
+}
+
 function resolvePage(pathname: string): PageKey {
   const p = pathname.replace(/\/$/, '') || '/';
   if (p === '/programs' || p === '/shop' || p === '/products') return 'catalog';
@@ -54,7 +60,7 @@ function uniqueProductImages(products: TenantSiteProduct[], reservedImages: Arra
   });
 }
 
-function ProductCard({ product, accent, textColor }: { product: TenantSiteProduct; accent: string; textColor: string }) {
+function ProductCard({ product, accent, textColor, basePath }: { product: TenantSiteProduct; accent: string; textColor: string; basePath: string }) {
   const content = (
     <article className="group h-full overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
       <div className="aspect-square overflow-hidden bg-slate-100">
@@ -96,18 +102,21 @@ function ProductCard({ product, accent, textColor }: { product: TenantSiteProduc
   if (isExternalHref(product.href)) {
     return <a href={product.href} target="_blank" rel="noreferrer" className="block h-full">{content}</a>;
   }
-  return <Link href={product.href} className="block h-full">{content}</Link>;
+  return <Link href={resolveInternalHref(product.href, basePath)} className="block h-full">{content}</Link>;
 }
 
 export function PublicTenantSite({
   site,
   pathname = '/',
+  basePath = '',
 }: {
   site: PublishedTenantSite;
   pathname?: string;
+  basePath?: string;
 }) {
   const { config } = site;
   const page = resolvePage(pathname);
+  const normalizedBasePath = basePath.replace(/\/$/, '');
   const primary = config.branding.primaryColor || '#7c3f58';
   const secondary = config.branding.secondaryColor || '#475569';
   const accent = config.branding.accentColor || primary;
@@ -131,7 +140,7 @@ export function PublicTenantSite({
 
       <header className="sticky top-0 z-20 border-b border-black/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-4 sm:px-6">
-          <Link href="/" className="flex min-w-0 items-center gap-3">
+          <Link href={resolveInternalHref('/', normalizedBasePath)} className="flex min-w-0 items-center gap-3">
             {config.branding.logoImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-10 w-auto max-w-36 object-contain" />
@@ -147,10 +156,10 @@ export function PublicTenantSite({
               if (isExternalHref(item.href)) {
                 return <a key={`${item.label}-${item.href}`} href={item.href} target="_blank" rel="noreferrer" className={className}>{item.label}</a>;
               }
-              return <Link key={`${item.label}-${item.href}`} href={item.href} className={className} style={active ? { color: primary } : undefined}>{item.label}</Link>;
+              return <Link key={`${item.label}-${item.href}`} href={resolveInternalHref(item.href, normalizedBasePath)} className={className} style={active ? { color: primary } : undefined}>{item.label}</Link>;
             })}
           </nav>
-          <Link href={catalogHref} className="shrink-0 rounded-full px-4 py-2 text-sm font-black text-white" style={{ backgroundColor: primary }}>
+          <Link href={resolveInternalHref(catalogHref, normalizedBasePath)} className="shrink-0 rounded-full px-4 py-2 text-sm font-black text-white" style={{ backgroundColor: primary }}>
             {isStore ? 'Shop now' : 'Explore'}
           </Link>
         </div>
@@ -177,7 +186,7 @@ export function PublicTenantSite({
                         {config.homepage.heroCtaText}
                       </a>
                     ) : (
-                      <Link href={ctaHref} className="rounded-full px-7 py-3.5 font-black text-white shadow-lg" style={{ backgroundColor: primary }}>
+                      <Link href={resolveInternalHref(ctaHref, normalizedBasePath)} className="rounded-full px-7 py-3.5 font-black text-white shadow-lg" style={{ backgroundColor: primary }}>
                         {config.homepage.heroCtaText}
                       </Link>
                     )}
@@ -232,10 +241,10 @@ export function PublicTenantSite({
                       <p className="text-sm font-black uppercase tracking-[0.18em]" style={{ color: accent }}>Featured products</p>
                       <h2 className="mt-2 text-3xl font-black" style={{ fontFamily: headingFont }}>Shop {storeName}</h2>
                     </div>
-                    <Link href="/shop" className="font-black" style={{ color: primary }}>View all products →</Link>
+                    <Link href={resolveInternalHref('/shop', normalizedBasePath)} className="font-black" style={{ color: primary }}>View all products →</Link>
                   </div>
                   <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {products.slice(0, 8).map((product) => <ProductCard key={`${product.name}-${product.href || ''}`} product={product} accent={accent} textColor={textColor} />)}
+                    {products.slice(0, 8).map((product) => <ProductCard key={`${product.name}-${product.href || ''}`} product={product} accent={accent} textColor={textColor} basePath={normalizedBasePath} />)}
                   </div>
                 </div>
               </section>
@@ -254,7 +263,7 @@ export function PublicTenantSite({
             </div>
             {isStore ? (
               <div className="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {products.map((product) => <ProductCard key={`${product.name}-${product.href || ''}`} product={product} accent={accent} textColor={textColor} />)}
+                {products.map((product) => <ProductCard key={`${product.name}-${product.href || ''}`} product={product} accent={accent} textColor={textColor} basePath={normalizedBasePath} />)}
               </div>
             ) : (
               <div className="mt-9 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -327,7 +336,7 @@ export function PublicTenantSite({
             <p className="font-black" style={{ color: primary, fontFamily: headingFont }}>{config.branding.logoText}</p>
             <p className="mt-1 max-w-2xl text-sm font-medium leading-6 text-slate-600">{config.footer.description}</p>
           </div>
-          <Link href={catalogHref} className="font-black" style={{ color: primary }}>{isStore ? 'Shop products →' : 'Explore programs →'}</Link>
+          <Link href={resolveInternalHref(catalogHref, normalizedBasePath)} className="font-black" style={{ color: primary }}>{isStore ? 'Shop products →' : 'Explore programs →'}</Link>
         </div>
       </footer>
     </div>

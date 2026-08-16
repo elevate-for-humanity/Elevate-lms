@@ -11,7 +11,7 @@ import type { BlueprintModule, BuildMode, ValidationResult } from './types';
 import { inferStepType } from './validator';
 
 export interface PublishInput {
-  programId: string;
+  programId?: string | null;
   courseSlug: string;
   courseTitle: string;
   blueprint: BlueprintModule[];
@@ -111,7 +111,7 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
     // Generated Supabase types may lag the migration by one generation cycle.
     // Runtime RPC contract is enforced by the database migration.
     const { data, error } = await (db as any).rpc('publish_course_package_atomic', {
-      p_program_id: input.programId,
+      p_program_id: input.programId ?? null,
       p_course_slug: input.courseSlug,
       p_course_title: input.courseTitle,
       p_mode: input.mode,

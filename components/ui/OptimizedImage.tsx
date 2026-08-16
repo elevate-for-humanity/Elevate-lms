@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
 import { BLUR_PLACEHOLDERS } from '@/lib/images/blur-placeholder';
 
 interface OptimizedImageProps {
@@ -18,8 +17,11 @@ interface OptimizedImageProps {
 }
 
 /**
- * OptimizedImage - wraps Next.js Image with automatic blur placeholder
- * Replaces need for individual blurDataURL on every image
+ * OptimizedImage - canonical Next.js image wrapper with a real blur placeholder.
+ *
+ * Do not hide the image with opacity while it loads. Next owns the transition
+ * from the blur placeholder to the decoded image, which avoids blank frames in
+ * Chromium/Edge and prevents a second client-side loading state.
  */
 export function OptimizedImage({
   src,
@@ -33,9 +35,6 @@ export function OptimizedImage({
   style,
   ...props
 }: OptimizedImageProps) {
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Determine blur type based on path
   const getBlurType = () => {
     if (src.includes('partner') || src.includes('logo')) return 'partner';
     if (src.includes('hero') || src.includes('Hero')) return 'hero';
@@ -56,14 +55,9 @@ export function OptimizedImage({
       sizes={sizes}
       width={width}
       height={height}
-      style={{
-        ...style,
-        transition: 'opacity 0.3s ease-in-out',
-        opacity: isLoading ? 0 : 1,
-      }}
-      
+      style={style}
+      placeholder="blur"
       blurDataURL={blurDataURL}
-      onLoad={() => setIsLoading(false)}
       {...props}
     />
   );

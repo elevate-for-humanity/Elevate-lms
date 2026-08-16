@@ -25,6 +25,7 @@ const counts = new Map();
 for (const p of literalMatches) counts.set(p, (counts.get(p) || 0) + 1);
 const duplicates = [...counts.entries()].filter(([, n]) => n > 1).sort((a,b)=>b[1]-a[1]);
 const missing = [...new Set(literalMatches)].filter((p) => p.startsWith('/images/') && !assetFiles.includes(p));
+const unifiedResolver = /export function getProgramHeroImage[\s\S]*?return getProgramCardImage\(slug\);/.test(registry);
 
 const keywords = [
   'barber','cosmet','esthetic','nail','hvac','cdl','truck','cna','nurs','medical','phleb','pharmacy','sanit','cpr','electr','weld','plumb','construction','network','cyber','software','web','graphic','design','cad','business','office','project','bookkeep','account','entrepren','culinary','forklift','hospitality','technology','training'
@@ -46,4 +47,5 @@ md += candidates.map((p)=>`- ${p}`).join('\n');
 md += '\n';
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, md);
-console.log(JSON.stringify({assets:assetFiles.length, assignments:literalMatches.length, duplicateAssignments:duplicates.length, missing:missing.length, candidates:candidates.length}, null, 2));
+console.log(JSON.stringify({assets:assetFiles.length, assignments:literalMatches.length, duplicateAssignments:duplicates.length, missing:missing.length, unifiedCardAndHero:unifiedResolver, candidates:candidates.length}, null, 2));
+if (duplicates.length || missing.length || !unifiedResolver) process.exitCode = 1;

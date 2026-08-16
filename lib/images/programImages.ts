@@ -1,7 +1,9 @@
 /**
  * Canonical program image registry.
  *
- * Every public/static program slug maps to one card image and one hero image.
+ * Every public/static program slug maps to one canonical program image.
+ * The same visual is resolved for the catalog card and page hero so users do
+ * not see a different program identity after opening a card.
  * Images are chosen for trade specificity wherever repository media permits.
  *
  * Rules:
@@ -97,7 +99,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Emergency medical technician apprentice preparing for patient response',
   },
   'guest-service-gold': {
-    card: `${P}/community-page-9.webp`,
+    card: `${P}/career-services-page-11.webp`,
     hero: '/hero-images/services-hero.webp',
     alt: 'Guest service professional welcoming and assisting a visitor',
   },
@@ -362,7 +364,7 @@ export function getProgramCardImage(slug: string): string {
   return PROGRAM_IMAGES[slug]?.card ?? `${P}/training-cohort.webp`;
 }
 export function getProgramHeroImage(slug: string): string {
-  return PROGRAM_IMAGES[slug]?.hero ?? `${P}/workforce-training.webp`;
+  return getProgramCardImage(slug);
 }
 export function getProgramImageAlt(slug: string, fallback: string): string {
   return PROGRAM_IMAGES[slug]?.alt ?? fallback;

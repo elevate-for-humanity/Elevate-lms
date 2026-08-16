@@ -34,7 +34,7 @@ function withMediaRevision(src?: string) {
  * Homepage video wrapper.
  * Video and narration URLs are revisioned with the deployed commit SHA so
  * browsers, service workers, and intermediary caches cannot pin stale media.
- * Poster artwork is deliberately not supplied to the canonical video hero.
+ * Poster artwork remains visible until the video can render and on video failure.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const ctas = banner.secondaryCta
@@ -45,6 +45,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
     <HeroVideo
       videoSrcDesktop={withMediaRevision(banner.videoSrcDesktop)}
       videoSrcMobile={withMediaRevision(banner.videoSrcMobile)}
+      posterImage={banner.posterImage}
       voiceoverSrc={withMediaRevision(banner.voiceoverSrc)}
       microLabel={banner.microLabel}
       belowHeroHeadline={banner.belowHeroHeadline}

@@ -4,41 +4,9 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'apps/marketing/**'
-      - 'components/site/**'
-      - 'components/marketing/**'
-      - 'components/programs/**'
-      - 'components/home/**'
-      - 'components/ui/**'
-      - 'components/voice/**'
-      - 'components/pwa/**'
-      - 'lib/ai/**'
-      - 'lib/navigation/**'
-      - 'lib/programs/**'
-      - 'lib/apprenticeship-programs/**'
-      - 'lib/images/**'
-      - 'lib/config/**'
-      - 'lib/secrets.ts'
-      - 'lib/supabase/**'
-      - 'content/**'
-      - 'data/programs/**'
-      - 'public/images/**'
-      - 'public/audio/**'
-      - 'public/sw.js'
-      - 'public/manifest.webmanifest'
-      - 'public/manifest-marketing.json'
-      - 'styles/**'
-      - 'middleware.ts'
-      - 'next.config.mjs'
-      - 'tailwind.config.js'
-      - 'tsconfig.json'
-      - 'Dockerfile.marketing'
-      - 'scripts/northflank/**'
-      - 'pnpm-lock.yaml'
-      - 'package.json'
-      - 'pnpm-workspace.yaml'
-      - '.github/workflows/deploy-marketing.yml'
+    # Marketing imports shared monorepo code from many root-level directories.
+    # Deploy every main revision so a hand-maintained path allowlist cannot leave
+    # a merged website change out of production.
   workflow_dispatch:
     inputs:
       sync_secrets:

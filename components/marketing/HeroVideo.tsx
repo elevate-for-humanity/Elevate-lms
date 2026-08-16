@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { Volume2 } from 'lucide-react';
 
 export interface HeroVideoCta {
@@ -62,7 +61,6 @@ export default function HeroVideo({
   demoSlideSeconds: _demoSlideSeconds = 4.5,
   heightClassName = 'h-[38vh] min-h-[260px] max-h-[520px]',
 }: HeroVideoProps) {
-  const pathname = usePathname();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
@@ -110,11 +108,6 @@ export default function HeroVideo({
       audioRef.current?.pause();
     };
   }, []);
-
-  useEffect(() => {
-    videoRef.current?.pause();
-    audioRef.current?.pause();
-  }, [pathname]);
 
   async function toggleSound() {
     const video = videoRef.current;

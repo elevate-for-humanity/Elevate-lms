@@ -21,6 +21,9 @@ export interface FactoryInput {
   state?: string;
   credential?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  hours?: number;
+  deliveryFormat?: string;
+  additionalRequirements?: string;
   moduleCount?: number;
   lessonsPerModule?: number;
   mode?: BuildMode;

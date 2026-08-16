@@ -114,7 +114,15 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
         durationMinutes: lesson.durationMinutes,
         videoFile: lesson.videoUrl ?? undefined,
         instructorNotes: lesson.instructorNotes ?? undefined,
-        competencyChecks: lesson.competencyChecks ?? [],
+        competencyChecks: (lesson.competencyChecks ?? []).map((check) => ({
+          key: check.key,
+          label: check.label,
+          isCritical: check.isCritical,
+          requiresInstructorSignoff: check.requiresInstructorSignoff,
+          domainKey: check.domainKey,
+          assessmentMethod: check.assessmentMethod,
+          evidenceType: check.evidenceType,
+        })),
         passingScore: lesson.passingScore ?? undefined,
         quizQuestions: (lesson.quizQuestions ?? []).map((question, questionIndex) => ({
           id: question.id ?? `${canonicalLessonSlug(lesson)}-q${questionIndex + 1}`,
@@ -179,6 +187,15 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
     0,
     Math.min(1, (template.finalExam?.passingScore ?? 75) / 100),
   );
+  const certificateRequirements = {
+    includeHours: template.certificateRequirements.includeHours,
+    includeCompetencies: template.certificateRequirements.includeCompetencies,
+    includeInstructorVerification: template.certificateRequirements.includeInstructorVerification,
+    includeCompletionDate: template.certificateRequirements.includeCompletionDate,
+    includeVerificationUrl: template.certificateRequirements.includeVerificationUrl,
+    requireAllCriticalCompetencies:
+      template.certificateRequirements.requireAllCriticalCompetencies,
+  };
 
   return {
     id: template.id ?? `builder-${template.slug}`,
@@ -221,7 +238,7 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
       passingScore: template.finalExam?.passingScore ?? 75,
       domainDistribution: template.finalExam?.domainDistribution,
     },
-    certificateRequirements: template.certificateRequirements,
+    certificateRequirements,
     regulatory: template.regulatory,
     credentialTarget: template.credentialTarget,
     minimumHours: template.minimumHours,

@@ -48,6 +48,15 @@ const adminConfig = {
     }
     config.parallelism = 1;
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
+
+    // Next 15.5.23's webpack minifier crashes in this Admin bundle while
+    // wrapping minification errors (`WebpackError is not a constructor`).
+    // Keep webpack's normal module/chunk optimization but skip only the
+    // broken minimizer so the production build remains functionally intact.
+    config.optimization = config.optimization || {};
+    config.optimization.minimize = false;
+    config.optimization.minimizer = [];
+
     return config;
   },
 

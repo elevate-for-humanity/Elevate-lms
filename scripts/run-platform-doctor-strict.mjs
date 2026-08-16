@@ -7,6 +7,9 @@ const root = process.cwd();
 const reportPath = path.join(root, 'artifacts', 'platform-doctor-report.json');
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '';
 const isRecovery = branch.startsWith('release/production-recovery-');
+const isPullRequest =
+  process.env.GITHUB_EVENT_NAME === 'pull_request' || Boolean(process.env.GITHUB_BASE_REF);
+const useRegressionDelta = isRecovery || isPullRequest;
 
 function validateTimeouts(report) {
   const checks = Array.isArray(report?.checks) ? report.checks : [];
@@ -46,7 +49,10 @@ function runStrictProduction() {
       }
       if (report?.status !== 'DEPLOY ALLOWED') failed = true;
     } catch (error) {
-      console.error('Unable to parse Platform Doctor report:', error instanceof Error ? error.message : String(error));
+      console.error(
+        'Unable to parse Platform Doctor report:',
+        error instanceof Error ? error.message : String(error),
+      );
       failed = true;
     }
   }
@@ -67,9 +73,10 @@ function runStatic(cwd, outPath) {
   return result.status ?? 1;
 }
 
-function runRecoveryDelta() {
-  // Keep a full current report for operator visibility. It is intentionally
-  // advisory here because recovery acceptance is based on regression delta.
+function runRegressionDelta() {
+  // Keep a full current report for operator visibility. PR acceptance is based
+  // on regression delta so unrelated historical debt cannot block focused work.
+  // Main remains fully strict through runStrictProduction().
   const full = spawnSync('node', ['scripts/platform-doctor.mjs'], {
     cwd: root,
     stdio: 'inherit',
@@ -90,31 +97,44 @@ function runRecoveryDelta() {
     const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
     if (!validateTimeouts(report)) return 1;
   } catch (error) {
-    console.error('Unable to parse Platform Doctor report:', error instanceof Error ? error.message : String(error));
+    console.error(
+      'Unable to parse Platform Doctor report:',
+      error instanceof Error ? error.message : String(error),
+    );
     return 1;
   }
 
-  const currentStatic = path.join(root, 'artifacts', 'platform-doctor-recovery-static.json');
+  const currentStatic = path.join(root, 'artifacts', 'platform-doctor-current-static.json');
   if (runStatic(root, currentStatic) !== 0 || !fs.existsSync(currentStatic)) {
-    console.error('Current recovery static Platform Doctor scan failed to produce evidence.');
+    console.error('Current static Platform Doctor scan failed to produce evidence.');
     return 1;
   }
 
-  let baseRef = process.env.RECOVERY_BASE_SHA || 'origin/main';
+  const baseBranch = process.env.GITHUB_BASE_REF || 'main';
+  let baseRef = process.env.RECOVERY_BASE_SHA || `origin/${baseBranch}`;
   if (spawnSync('git', ['rev-parse', '--verify', baseRef], { cwd: root }).status !== 0) {
-    const fetch = spawnSync('git', ['fetch', 'origin', 'main', '--depth=1'], { cwd: root, stdio: 'inherit' });
+    const fetch = spawnSync(
+      'git',
+      ['fetch', 'origin', baseBranch, `refs/remotes/origin/${baseBranch}`, '--depth=1'],
+      { cwd: root, stdio: 'inherit' },
+    );
     if ((fetch.status ?? 1) !== 0) return fetch.status ?? 1;
-    baseRef = 'origin/main';
+    baseRef = `origin/${baseBranch}`;
   }
 
   const tempDir = path.join('/tmp', `platform-doctor-base-${process.pid}`);
-  const add = spawnSync('git', ['worktree', 'add', '--detach', tempDir, baseRef], { cwd: root, stdio: 'inherit' });
+  const add = spawnSync('git', ['worktree', 'add', '--detach', tempDir, baseRef], {
+    cwd: root,
+    stdio: 'inherit',
+  });
   if ((add.status ?? 1) !== 0) return add.status ?? 1;
 
   let exitCode = 0;
   try {
     const targetScript = path.join(tempDir, 'scripts', 'platform-doctor-static.mjs');
     fs.mkdirSync(path.dirname(targetScript), { recursive: true });
+    // Use the current scanner for both trees so scanner evolution itself does
+    // not create a false regression against the base commit.
     fs.copyFileSync(path.join(root, 'scripts', 'platform-doctor-static.mjs'), targetScript);
     const baseOut = path.join(tempDir, 'artifacts', 'platform-doctor-base-static.json');
     if (runStatic(tempDir, baseOut) !== 0 || !fs.existsSync(baseOut)) {
@@ -123,15 +143,16 @@ function runRecoveryDelta() {
 
     const current = JSON.parse(fs.readFileSync(currentStatic, 'utf8'));
     const base = JSON.parse(fs.readFileSync(baseOut, 'utf8'));
-    const stableKey = finding => [
-      finding.severity || 'CRITICAL',
-      finding.code || '',
-      finding.file || '.',
-      finding.message || '',
-    ].join('|');
+    const stableKey = (finding) =>
+      [
+        finding.severity || 'CRITICAL',
+        finding.code || '',
+        finding.file || '.',
+        finding.message || '',
+      ].join('|');
 
-    const baseCritical = (base.findings || []).filter(f => f.severity === 'CRITICAL');
-    const currentCritical = (current.findings || []).filter(f => f.severity === 'CRITICAL');
+    const baseCritical = (base.findings || []).filter((f) => f.severity === 'CRITICAL');
+    const currentCritical = (current.findings || []).filter((f) => f.severity === 'CRITICAL');
     const baseCounts = new Map();
     for (const finding of baseCritical) {
       const key = stableKey(finding);
@@ -148,24 +169,36 @@ function runRecoveryDelta() {
       const delta = count - (baseCounts.get(key) || 0);
       if (delta > 0) regressions.push({ key, delta });
     }
-    const resolved = [...baseCounts].reduce((total, [key, count]) => total + Math.max(0, count - (currentCounts.get(key) || 0)), 0);
+    const resolved = [...baseCounts].reduce(
+      (total, [key, count]) => total + Math.max(0, count - (currentCounts.get(key) || 0)),
+      0,
+    );
     const newCount = regressions.reduce((total, item) => total + item.delta, 0);
 
-    console.log(`Platform Doctor recovery delta: base=${baseCritical.length} current=${currentCritical.length} new=${newCount} resolved=${resolved}`);
+    console.log(
+      `Platform Doctor regression delta: base=${baseCritical.length} current=${currentCritical.length} new=${newCount} resolved=${resolved}`,
+    );
     if (regressions.length > 0) {
-      console.error('FAIL: Recovery introduced new Platform Doctor CRITICAL findings:');
-      for (const item of regressions.slice(0, 50)) console.error(` - ${item.delta}x ${item.key}`);
+      console.error('FAIL: Change introduced new Platform Doctor CRITICAL findings:');
+      for (const item of regressions.slice(0, 50)) {
+        console.error(` - ${item.delta}x ${item.key}`);
+      }
       exitCode = 1;
     } else {
-      console.log('PASS: Recovery introduced no new Platform Doctor CRITICAL findings.');
+      console.log('PASS: Change introduced no new Platform Doctor CRITICAL findings.');
     }
   } catch (error) {
-    console.error(`Platform Doctor recovery comparison failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `Platform Doctor regression comparison failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     exitCode = 1;
   } finally {
-    spawnSync('git', ['worktree', 'remove', '--force', tempDir], { cwd: root, stdio: 'inherit' });
+    spawnSync('git', ['worktree', 'remove', '--force', tempDir], {
+      cwd: root,
+      stdio: 'inherit',
+    });
   }
   return exitCode;
 }
 
-process.exit(isRecovery ? runRecoveryDelta() : runStrictProduction());
+process.exit(useRegressionDelta ? runRegressionDelta() : runStrictProduction());

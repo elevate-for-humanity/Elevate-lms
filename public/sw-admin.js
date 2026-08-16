@@ -83,8 +83,12 @@ self.addEventListener('fetch', (event) => {
 
   // Admin pages and data are authenticated and may contain sensitive records.
   // Never cache navigations, APIs, RSC responses, auth paths or range/media data.
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')));
+    return;
+  }
+
   if (
-    request.mode === 'navigate' ||
     request.headers.has('range') ||
     request.headers.get('RSC') === '1' ||
     url.searchParams.has('_rsc') ||

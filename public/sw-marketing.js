@@ -77,8 +77,12 @@ self.addEventListener('fetch', (event) => {
   // Page navigation, auth, APIs, RSC payloads, media/range requests and unknown
   // dynamic resources always go directly to the browser/network. The service
   // worker must never hide a server error or create its own 503 response.
+  if (request.mode === 'navigate') {
+    event.respondWith(networkFirst(request).then((response) => response || caches.match('/offline.html')));
+    return;
+  }
+
   if (
-    request.mode === 'navigate' ||
     request.headers.has('range') ||
     request.headers.get('RSC') === '1' ||
     url.searchParams.has('_rsc') ||

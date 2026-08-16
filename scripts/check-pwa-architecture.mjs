@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+
+const failures = [];
+const read = (path) => fs.readFileSync(path, 'utf8');
+const required = [
+  'lib/pwa/registry.ts',
+  'components/pwa/CanonicalPwaRegistration.tsx',
+  'public/sw-admin.js',
+  'public/sw-lms.js',
+  'public/sw-marketing.js',
+  'public/offline.html',
+  'public/manifest-admin.json',
+  'public/manifest-lms.json',
+  'public/manifest-student.json',
+  'public/manifest-apprentice.json',
+  'public/manifest-employer.json',
+  'public/manifest-program-holder.json',
+  'public/manifest-shop-owner.json',
+  'public/manifest-marketing.json',
+];
+for (const file of required) if (!fs.existsSync(file)) failures.push(`missing ${file}`);
+
+for (const [wrapper, application] of [['AdminPwaRegister.tsx', 'admin'], ['LmsPwaRegistration.tsx', 'lms'], ['MarketingPwaRegistration.tsx', 'marketing']]) {
+  const content = read(`components/pwa/${wrapper}`);
+  if (!content.includes('CanonicalPwaRegistration') || !content.includes(`application="${application}"`)) failures.push(`${wrapper} bypasses canonical registration`);
+  if (content.includes('serviceWorker.register')) failures.push(`${wrapper} contains a parallel registration path`);
+}
+
+for (const worker of ['public/sw-admin.js', 'public/sw-lms.js', 'public/sw-marketing.js']) {
+  const content = read(worker);
+  if (!content.includes("caches.match('/offline.html')")) failures.push(`${worker} lacks offline navigation fallback`);
+  if (!content.includes("url.pathname.startsWith('/api/')")) failures.push(`${worker} may cache API data`);
+}
+
+for (const manifest of required.filter((file) => file.includes('/manifest-'))) {
+  const data = JSON.parse(read(manifest));
+  if (!data.name || !data.start_url || !data.scope || data.display !== 'standalone') failures.push(`${manifest} is not installable`);
+}
+
+if (failures.length) {
+  console.error(failures.map((failure) => `PWA ARCHITECTURE ERROR: ${failure}`).join('\n'));
+  process.exit(1);
+}
+console.log('PWA architecture verified: one registration engine, three origin workers, role-specific manifests, offline fallback, no API caching.');

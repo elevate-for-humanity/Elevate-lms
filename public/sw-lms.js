@@ -86,8 +86,12 @@ self.addEventListener('fetch', (event) => {
   // Never cache authenticated HTML/RSC, application APIs, auth routes, or range
   // requests. Course-page offline caching is explicit through CACHE_COURSE below;
   // generic /lms/* responses are intentionally not cached.
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')));
+    return;
+  }
+
   if (
-    request.mode === 'navigate' ||
     request.headers.has('range') ||
     request.headers.get('RSC') === '1' ||
     url.searchParams.has('_rsc') ||

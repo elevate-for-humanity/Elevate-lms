@@ -40,7 +40,7 @@ export const COURSES: Course[] = [
     price: 176,
     duration: '4-6 weeks',
     hours: 40,
-    image: '/images/pages/courses-page-2.webp',
+    image: '/images/pages/courses-page-1.webp',
     features: ['Data analysis', 'Formulas', 'Charts'],
   },
 ];

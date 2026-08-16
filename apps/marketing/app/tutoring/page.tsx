@@ -55,19 +55,19 @@ export default function TutoringPage() {
       title: 'Technology & IT',
       description:
         'CompTIA A+ and Network+ exam prep, cybersecurity concepts, help desk scenarios, coding fundamentals, and web development projects.',
-      image: '/images/pages/cybersecurity.jpg',
+      image: '/images/pages/cybersecurity.webp',
     },
     {
       title: 'Business & Finance',
       description:
         'QuickBooks operations, bookkeeping fundamentals, tax preparation concepts, business plan development, and Microsoft Office proficiency.',
-      image: '/images/pages/bookkeeping.jpg',
+      image: '/images/pages/bookkeeping.webp',
     },
     {
       title: 'General Academic Support',
       description:
         'Math fundamentals, reading comprehension, study skills, test-taking strategies, and GED preparation for students who need foundational support.',
-      image: '/images/pages/adult-learner.jpg',
+      image: '/images/pages/adult-learner.webp',
     },
     {
       title: 'Certification Exam Prep',
@@ -164,7 +164,7 @@ export default function TutoringPage() {
                 step: '2',
                 title: 'Choose Your Subject',
                 desc: 'Select from healthcare, trades, technology, business, academic support, or exam prep.',
-                image: '/images/pages/courses-page-1.jpg',
+                image: '/images/pages/courses-page-1.webp',
               },
               {
                 step: '3',

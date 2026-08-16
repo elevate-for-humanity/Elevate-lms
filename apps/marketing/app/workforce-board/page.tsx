@@ -26,7 +26,7 @@ export default function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/pages/features-hero.jpg',
+      image: '/images/pages/features-hero.webp',
       title: 'Compliance Reporting',
       description: 'Automated WIOA, DOL, and state compliance reports with audit trails',
       href: '/workforce-board/reports',
@@ -38,7 +38,7 @@ export default function WorkforceBoardPage() {
       href: '/workforce-board/participants',
     },
     {
-      image: '/hero-images/business-hero.jpg',
+      image: '/hero-images/business-hero.webp',
       title: 'Budget Oversight',
       description: 'Track spending, allocations, and financial performance by program',
       href: '/workforce-board/reports',
@@ -50,7 +50,7 @@ export default function WorkforceBoardPage() {
       href: '/workforce-board/reports/performance',
     },
     {
-      image: '/images/pages/barber-gallery-1.jpg',
+      image: '/images/pages/barber-gallery-1.webp',
       title: 'Audit Readiness',
       description: 'Maintain audit-ready documentation and compliance records',
       href: '/workforce-board/reports',
@@ -59,19 +59,19 @@ export default function WorkforceBoardPage() {
 
   const quickLinks = [
     {
-      image: '/hero-images/healthcare-category.jpg',
+      image: '/hero-images/healthcare-category.webp',
       title: 'Participants',
       description: 'View and manage all program participants',
       href: '/workforce-board/participants',
     },
     {
-      image: '/hero-images/skilled-trades-category.jpg',
+      image: '/hero-images/skilled-trades-category.webp',
       title: 'Training Programs',
       description: 'Monitor training program performance',
       href: '/workforce-board/training',
     },
     {
-      image: '/hero-images/technology-category.jpg',
+      image: '/hero-images/technology-category.webp',
       title: 'Employment Outcomes',
       description: 'Track job placements and retention',
       href: '/workforce-board/employment',

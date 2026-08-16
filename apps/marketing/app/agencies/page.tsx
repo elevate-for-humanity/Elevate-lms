@@ -80,7 +80,7 @@ export default function AgenciesPage() {
 
       <HeroVideo
         videoSrcDesktop="/videos/training-providers-hero.mp4"
-        posterImage="/images/pages/agencies-page-1.jpg"
+        posterImage="/images/pages/agencies-page-1.webp"
         microLabel="For Workforce Agencies"
         analyticsName="agencies"
       >

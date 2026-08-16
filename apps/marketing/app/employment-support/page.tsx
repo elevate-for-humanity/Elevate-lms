@@ -73,7 +73,7 @@ export default function EmploymentSupportPage() {
               {
                 title: 'Interview Preparation',
                 desc: 'Practice with mock interviews, receive feedback, and learn how to present yourself confidently to employers.',
-                image: '/images/pages/career-services-page-3.jpg',
+                image: '/images/pages/career-services-page-3.webp',
               },
               {
                 title: 'Employer Connections',

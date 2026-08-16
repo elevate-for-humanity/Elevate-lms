@@ -148,7 +148,7 @@ export default function SecurityPage() {
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden">
               <Image 
-                src="/images/pages/student-privacy.webp" 
+                src="/images/pages/student-support-hero.webp"
                 alt="Student privacy and data protection" 
                 fill 
                 className="object-cover" 

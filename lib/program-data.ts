@@ -420,7 +420,7 @@ export const programsData: Record<string, ProgramData> = {
       'Launch your career in Healthcare Administration and manage healthcare office operations and patient records. This comprehensive 16-week program covers medical billing, coding, and office management.',
     duration: '16 Weeks',
     salaryRange: '$40K-$50K',
-    heroImage: '/media/programs/healthcare-programs-grid-hd.jpg',
+    heroImage: '/images/healthcare/program-healthcare-overview.jpg',
     skills: [
       {
         title: 'Medical Billing',

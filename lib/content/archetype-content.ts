@@ -330,7 +330,7 @@ export const partnerEmployerContent: LocalizedContent = {
     hero: {
       title: 'Partner Information',
       purpose: 'This page explains partnership opportunities and how to get started.',
-      image: '/images/partners/hero.webp',
+      image: '/images/pages/partners-hero.webp',
       imageAlt: 'Partnership opportunities',
     },
     sections: {
@@ -359,7 +359,7 @@ export const partnerEmployerContent: LocalizedContent = {
     hero: {
       title: 'Información para socios',
       purpose: 'Esta página explica oportunidades de asociación y cómo comenzar.',
-      image: '/images/partners/hero.webp',
+      image: '/images/pages/partners-hero.webp',
       imageAlt: 'Oportunidades de asociación',
     },
     sections: {},

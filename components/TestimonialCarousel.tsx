@@ -58,7 +58,7 @@ const testimonials: Testimonial[] = [
     name: 'Michael Chen',
     title: 'HVAC Graduate, 2024',
     rating: 5,
-    image: '/images/testimonials-hq/person-5.webp',
+    image: '/images/testimonials-hq/person-4.jpg',
   },
 ];
 

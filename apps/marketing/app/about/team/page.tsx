@@ -21,13 +21,13 @@ const TEAM_MEMBERS = [
     name: 'Career Counselors',
     role: 'Student Success Team',
     bio: 'Our experienced career counselors guide students through every step of their journey — from program selection to job placement.',
-    image: '/images/pages/counselor-session.webp',
+    image: '/hero-images/career-services-hero.webp',
   },
   {
     name: 'Industry Instructors',
     role: 'Technical Training',
     bio: 'Licensed professionals with years of real-world experience in healthcare, trades, beauty, and technology industries.',
-    image: '/images/pages/instructor-hands-on.webp',
+    image: '/images/hero/hero-hands-on-training.webp',
   },
 ];
 

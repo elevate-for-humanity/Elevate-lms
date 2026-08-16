@@ -16,7 +16,7 @@ export default function AlumniPage() {
       config={{
         breadcrumbs: [{ label: 'About', href: '/about' }, { label: 'Alumni' }],
         hero: {
-          image: '/images/pages/community-page-2.jpg',
+          image: '/images/pages/community-page-2.webp',
           tag: 'Alumni Network',
           tagColor: 'text-brand-blue-600',
           title: 'Once Elevate, Always Elevate',
@@ -28,7 +28,7 @@ export default function AlumniPage() {
             'Elevate for Humanity alumni have access to ongoing career services, continuing education discounts, and a growing network of graduates working in healthcare, skilled trades, technology, and business across Indiana.',
             'Whether you need a credential renewal, a job change, or just a connection to someone in your field — the alumni network is here.',
           ],
-          image: '/images/pages/community-page-1.jpg',
+          image: '/images/pages/community-page-1.webp',
         },
         features: {
           heading: 'Alumni Benefits',

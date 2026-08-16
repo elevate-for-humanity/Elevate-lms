@@ -1640,10 +1640,8 @@ header[role='banner'] nav[aria-label='Main navigation'] {
   align-items: center !important;
   justify-content: center !important;
   min-width: 0 !important;
-  overflow-x: auto !important;
+  overflow-x: visible !important;
   overflow-y: visible !important;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
 }
 
 header[role='banner'] nav[aria-label='Main navigation'] > div {

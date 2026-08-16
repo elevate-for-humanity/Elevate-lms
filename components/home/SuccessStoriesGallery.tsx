@@ -30,7 +30,7 @@ const STORIES: Story[] = [
     outcome: 'Now Owns His Own Barbershop',
     location: 'Indianapolis, IN',
     yearsAgo: 2,
-    image: '/images/students/marcus-j.webp',
+    image: '/images/testimonials-hq/person-1.jpg',
     featured: true,
   },
   {
@@ -41,7 +41,7 @@ const STORIES: Story[] = [
     outcome: 'Earned EPA 608 Certification',
     location: 'Carmel, IN',
     yearsAgo: 1,
-    image: '/images/students/sarah-t.webp',
+    image: '/images/testimonials-hq/person-2.jpg',
     featured: true,
   },
   {
@@ -52,7 +52,7 @@ const STORIES: Story[] = [
     outcome: 'Family-Sustaining Income',
     location: 'Fort Wayne, IN',
     yearsAgo: 1,
-    image: '/images/students/david-r.webp',
+    image: '/images/testimonials/student-david.jpg',
     featured: true,
   },
   {
@@ -63,7 +63,7 @@ const STORIES: Story[] = [
     outcome: 'Now Works at Local Hospital',
     location: 'South Bend, IN',
     yearsAgo: 2,
-    image: '/images/students/maria-g.webp',
+    image: '/images/testimonials-hq/person-3.jpg',
     featured: false,
   },
   {
@@ -74,7 +74,7 @@ const STORIES: Story[] = [
     outcome: 'Employed at Premier Barbershop',
     location: 'Bloomington, IN',
     yearsAgo: 3,
-    image: '/images/students/james-w.webp',
+    image: '/images/testimonials/james.jpg',
     featured: false,
   },
   {
@@ -85,7 +85,7 @@ const STORIES: Story[] = [
     outcome: 'Promoted to Office Manager',
     location: 'Evansville, IN',
     yearsAgo: 2,
-    image: '/images/students/ashley-m.webp',
+    image: '/images/testimonials-hq/person-4.jpg',
     featured: false,
   },
 ];

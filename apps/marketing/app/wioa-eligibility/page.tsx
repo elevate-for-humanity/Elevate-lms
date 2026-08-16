@@ -159,7 +159,7 @@ export default function WIOAEligibilityPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               { title: 'Workforce Ready Grant', desc: 'Indiana state grant for high-demand certifications. No income requirements.', href: '/funding', image: '/images/pages/hp-wioa-real.webp' },
-              { title: 'Job Ready Indy', desc: 'Funding for justice-involved individuals. Training, support, and job placement.', href: '/partners/jri', image: '/hero-images/jri-hero.jpg' },
+              { title: 'Job Ready Indy', desc: 'Funding for justice-involved individuals. Training, support, and job placement.', href: '/partners/jri', image: '/hero-images/jri-hero.webp' },
               { title: 'Payment Plans', desc: 'Flexible payments, Sezzle, and Affirm for programs not covered by grants.', href: '/apply', image: '/images/pages/store-compliance-wioa-detail.webp' },
             ].map((item) => (
               <Link key={item.title} href={item.href} className="block rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-lg transition-shadow group">

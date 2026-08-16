@@ -17,7 +17,7 @@ const AUDIENCES = [
     ctaHref: '/wioa-eligibility',
     secondaryCta: 'Browse Programs',
     secondaryHref: '/programs',
-    image: '/images/pages/student-learning.webp',
+    image: '/images/pages/adult-learner.webp',
     color: 'bg-brand-blue-700',
     accent: 'bg-brand-blue-500',
     stats: [

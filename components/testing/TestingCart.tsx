@@ -29,7 +29,7 @@ export const AddExamToCartButton = ({ examType, examName, amountCents, active, c
       category: 'certification-prep' as const,
       price: amountCents / 100,
       description: `${examName} exam at Elevate Testing Center`,
-      image: '/images/pages/testing-hero.webp',
+      image: '/images/pages/testing-page-1.webp',
       inStock: true,
       featured: false,
       digital: false,

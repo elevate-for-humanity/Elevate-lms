@@ -58,7 +58,7 @@ export default function BarberApplyIndexPage() {
           cta="Start Student Application"
         />
         <ApplicationCard
-          image="/images/pages/barber-apprentice-salon-work.webp"
+          image="/images/pages/barber-apprentice-learning.webp"
           title="I’m a Host Shop / Employer"
           description="Apply to host Barber apprentices using the universal beauty Host Site compliance application."
           href="/partners/host-shop/apply?program=barber"

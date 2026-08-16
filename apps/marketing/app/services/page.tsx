@@ -28,7 +28,7 @@ const services = [
     title: 'Career Services',
     description: 'Resume building, interview prep, job search support',
     href: '/career-services',
-    image: '/images/pages/homepage-why-elevate.jpg',
+    image: '/images/pages/homepage-why-elevate.webp',
   },
   {
     title: 'Career Center',

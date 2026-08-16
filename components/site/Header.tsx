@@ -6,7 +6,6 @@ import Link from 'next/link';
 import LogoImage from '@/components/site/LogoImage';
 import HeaderMobileMenu from './HeaderMobileMenu.client';
 import HeaderDesktopNav from './HeaderDesktopNav';
-import HeaderQuickMenu from './HeaderQuickMenu';
 import { NAV_ITEMS } from '@/lib/navigation';
 import { ROUTES } from '@/lib/navigation/routes';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -40,7 +39,6 @@ export default function Header() {
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
           <div className="hidden flex-nowrap items-center gap-1 xl:flex">
-            <HeaderQuickMenu items={NAV_ITEMS} />
             <Link
               href={ROUTES.login}
               className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"

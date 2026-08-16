@@ -43,7 +43,7 @@ export default async function CareersPage() {
         'Fair compensation with performance bonuses and annual raises based on performance',
     },
     {
-      image: '/images/pages/career-services-page-3.jpg',
+      image: '/images/pages/career-services-page-3.webp',
       title: 'Health Benefits',
       description: 'Comprehensive health, dental, and vision coverage for you and your family',
     },
@@ -58,7 +58,7 @@ export default async function CareersPage() {
       description: 'Continuous learning and growth opportunities with training stipends',
     },
     {
-      image: '/images/pages/career-services-page-6.jpg',
+      image: '/images/pages/career-services-page-6.webp',
       title: 'Remote Work',
       description: 'Flexible work arrangements with hybrid and fully remote options',
     },

@@ -15,7 +15,7 @@ const TESTIMONIALS = [
     name: 'Maria S.',
     program: 'Certified Nursing Assistant',
     quote: "Before Elevate, I was working minimum wage jobs. Now I'm a CNA making $18/hour with benefits. The instructors actually cared about my success.",
-    image: '/images/testimonials/maria-s.webp',
+    image: '/images/testimonials-hq/person-1.jpg',
     outcome: '$18/hr with benefits',
     location: 'Indianapolis, IN',
   },
@@ -23,7 +23,7 @@ const TESTIMONIALS = [
     name: 'James T.',
     program: 'HVAC Technician',
     quote: "The WIOA funding covered everything — tuition, books, even my certification exam. I went from unemployed to working in HVAC in just 3 months.",
-    image: '/images/testimonials/james-t.webp',
+    image: '/images/testimonials/james.jpg',
     outcome: 'Employed in 3 months',
     location: 'Carmel, IN',
   },
@@ -31,7 +31,7 @@ const TESTIMONIALS = [
     name: 'Destiny R.',
     program: 'Barber Apprenticeship',
     quote: "I'm earning money while I learn! My host shop pays me to train, and I'll have my barber license in 18 months with zero student debt.",
-    image: '/images/testimonials/destiny-r.webp',
+    image: '/images/testimonials-hq/person-2.jpg',
     outcome: 'Earning while learning',
     location: 'Fishers, IN',
   },
@@ -39,7 +39,7 @@ const TESTIMONIALS = [
     name: 'Michael C.',
     program: 'Welding Certification',
     quote: "Welding was always something I wanted to do. Elevate helped me get certified, and now I'm making $25/hour with overtime available.",
-    image: '/images/testimonials/michael-c.webp',
+    image: '/images/testimonials/michael.jpg',
     outcome: '$25/hr with overtime',
     location: 'Noblesville, IN',
   },
@@ -197,4 +197,3 @@ export default function TestimonialsPage() {
     </div>
   );
 }
-

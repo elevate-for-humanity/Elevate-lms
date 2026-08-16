@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 const capabilities = [
   {
-    image: '/images/pages/platform-page-2.jpg',
+    image: '/images/pages/platform-page-2.webp',
     alt: 'Multi-tenant provider management dashboard',
     label: 'Multi-Tenant Architecture',
     desc: 'Each provider, employer, and agency operates in an isolated data environment. Role-based access enforced at the row level — no cross-tenant data exposure.',
@@ -58,7 +58,7 @@ const capabilities = [
 
 const audiences = [
   {
-    image: '/images/pages/platform-page-8.jpg',
+    image: '/images/pages/platform-page-8.webp',
     alt: 'Training provider onboarding and program management',
     title: 'Training Providers',
     desc: 'Deliver workforce programs under the Elevate hub with built-in compliance infrastructure, credential pathway management, and employer connections. MOU-based onboarding.',
@@ -66,7 +66,7 @@ const audiences = [
     cta: 'Provider requirements',
   },
   {
-    image: '/images/pages/platform-page-9.jpg',
+    image: '/images/pages/platform-page-9.webp',
     alt: 'Workforce board and agency reporting tools',
     title: 'Workforce Boards & Agencies',
     desc: 'WIOA-aligned dashboards, multi-provider outcome reporting, and state agency integration. Built for organizations that answer to funders and auditors.',
@@ -82,7 +82,7 @@ const audiences = [
     cta: 'Employer portal',
   },
   {
-    image: '/images/pages/platform-page-11.jpg',
+    image: '/images/pages/platform-page-11.webp',
     alt: 'Platform licensing for workforce organizations',
     title: 'License the Platform',
     desc: 'Organizations running their own workforce programs can license the full infrastructure stack — enrollment, compliance, credentialing, reporting, and employer pipeline.',

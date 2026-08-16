@@ -68,6 +68,24 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
+// Legacy JSON contains broad category films assigned to many unrelated pages.
+// A page-specific picture is more accurate than one of these shared films.
+// Dedicated assignments from VIDEO_REGISTRY still win before this guard runs.
+const SHARED_GENERIC_VIDEO_FILES = new Set([
+  'hero-home-fast.mp4',
+  'programs-overview-video-with-narration.mp4',
+  'cna-hero.mp4',
+  'hvac-hero-final.mp4',
+  'it-technology.mp4',
+]);
+
+function isSharedGenericVideo(src?: string): boolean {
+  if (!src) return false;
+  const pathname = src.split('?')[0]?.split('#')[0] ?? '';
+  const filename = pathname.split('/').pop()?.toLowerCase() ?? '';
+  return SHARED_GENERIC_VIDEO_FILES.has(filename);
+}
+
 function mediaKey(value?: string): string | undefined {
   if (!value) return undefined;
   const clean = value.split('#')[0]?.split('?')[0]?.trim();
@@ -139,6 +157,16 @@ function normalizeBanner(
     secondaryCta: banner.secondaryCta ?? banner.ctaSecondary,
     analyticsName: banner.analyticsName ?? key,
   };
+
+  const picture = normalized.posterImage;
+  const desktopShared = !dedicated && isSharedGenericVideo(normalized.videoSrcDesktop);
+  if (desktopShared && picture) {
+    normalized = {
+      ...normalized,
+      videoSrcDesktop: undefined,
+      videoSrcMobile: undefined,
+    };
+  }
 
   // Store is intentionally poster-first. It must never inherit a generic or
   // homepage mobile video from the JSON dataset.

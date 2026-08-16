@@ -16,7 +16,7 @@ export default function CommunityServicesPage() {
       config={{
         breadcrumbs: [{ label: 'Community Services' }],
         hero: {
-          image: '/images/pages/community-page-1.jpg',
+          image: '/images/pages/community-page-1.webp',
           tag: 'Community Services',
           tagColor: 'text-brand-blue-600',
           title: 'Free Services for Indiana Residents',
@@ -28,7 +28,7 @@ export default function CommunityServicesPage() {
             'Elevate for Humanity provides free community services that address the barriers keeping Indiana residents from economic stability. Training is one piece — but stable housing, accurate tax filing, and financial literacy are equally critical.',
             'Our community services are available to all Indiana residents, not just enrolled students. No referral required.',
           ],
-          image: '/images/pages/community-page-2.jpg',
+          image: '/images/pages/community-page-2.webp',
         },
         features: {
           heading: 'Available Services',

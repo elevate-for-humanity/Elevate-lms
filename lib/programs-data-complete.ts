@@ -117,7 +117,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: 'Rolling Enrollment',
-    image: '/images/pages/admin-counseling-hero.webp',
+    image: '/hero-images/career-services-hero.webp',
     etplApproved: true,
   },
   {
@@ -142,7 +142,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Apprenticeship'],
     duration: '5 Weeks • 60 Hours',
-    image: '/images/pages/barber-gallery-2.webp',
+    image: '/images/pages/barber-gallery-1.webp',
     etplApproved: true,
   },
     {
@@ -214,7 +214,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'JRI'],
     duration: '6-8 Weeks',
-    image: '/images/pages/admin-counseling-hero.webp',
+    image: '/hero-images/career-services-hero.webp',
     etplApproved: true,
   },
   {
@@ -286,7 +286,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '8-12 Weeks',
-    image: '/images/pages/admin-health-hero.webp',
+    image: '/hero-images/healthcare-category.webp',
     etplApproved: true,
   },
   {
@@ -383,7 +383,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG'],
     duration: '6-8 Weeks • 160 Hours',
-    image: '/images/pages/comp-highlights-electrical.webp',
+    image: '/images/hero/hero-skilled-trades.webp',
     etplApproved: true,
   },
   {
@@ -548,7 +548,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 120 Hours',
-    image: '/images/pages/admin-network-hero.webp',
+    image: '/hero-images/technology-category.webp',
     etplApproved: true,
   },
   {
@@ -598,7 +598,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-10 Weeks • 120 Hours',
-    image: '/images/pages/admin-health-hero.webp',
+    image: '/hero-images/healthcare-category.webp',
     etplApproved: true,
   },
   {
@@ -647,7 +647,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Pell Grant'],
     duration: '8-12 Weeks • 150 Hours',
-    image: '/images/pages/admin-health-hero.webp',
+    image: '/hero-images/healthcare-category.webp',
     etplApproved: true,
   },
   {
@@ -722,7 +722,7 @@ export const COMPLETE_PROGRAMS: ProgramData[] = [
     ],
     funding: ['WIOA', 'WRG', 'Small Business Grants'],
     duration: '8-12 Weeks • 100 Hours',
-    image: '/images/pages/admin-startup-hero.webp',
+    image: '/hero-images/business-hero.webp',
     etplApproved: true,
   },
   {

@@ -21,7 +21,7 @@ export function PhotoCTA() {
             </div>
             <div className="relative h-40 overflow-hidden rounded-2xl sm:h-48">
               <Image
-                src="/media/programs/efh-cna-hero.jpg"
+                src="/images/programs/cna-hero.webp"
                 alt="Healthcare student in lab coat"
                 fill
                 className="object-cover"

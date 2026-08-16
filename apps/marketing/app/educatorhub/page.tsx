@@ -53,7 +53,7 @@ export default function EducatorHubPage() {
       <section className="relative w-full">
         <div className="relative h-[50vh] sm:h-[55vh] md:h-[60vh] lg:h-[65vh] min-h-[320px] w-full overflow-hidden">
           <Image
-            src="/hero-images/how-it-works-hero.jpg"
+            src="/hero-images/how-it-works-hero.webp"
             alt="Educator Hub"
             fill
             className="object-cover"

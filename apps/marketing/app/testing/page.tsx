@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 const PROVIDER_IMAGES: Record<string, string> = {
-  esco: '/images/pages/hvac-unit.jpg',
+  esco: '/images/pages/hvac-unit.webp',
   nrf: '/images/pages/certifications-page-1.webp',
   certiport: '/images/pages/testing-page-1.jpg',
   nha: '/images/pages/medical-assistant.webp',
@@ -81,7 +81,7 @@ export default function TestingPage() {
 
       <section className="relative min-h-[340px] overflow-hidden bg-slate-100 sm:min-h-[430px]">
         <Image
-          src="/images/pages/testing-center-hero.webp"
+          src="/images/pages/testing-page-1.webp"
           alt="Credential testing and career readiness"
           fill
           sizes="100vw"

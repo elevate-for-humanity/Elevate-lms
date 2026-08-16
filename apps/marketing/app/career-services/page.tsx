@@ -21,19 +21,19 @@ const SERVICES = [
     icon: FileText,
     title: 'Resume & Portfolio Building',
     desc: 'Professional resume reviews, cover letter assistance, and portfolio development to make you stand out.',
-    image: '/images/pages/resume-work.webp',
+    image: '/images/pages/resume-building-hero.webp',
   },
   {
     icon: Target,
     title: 'Interview Preparation',
     desc: 'Mock interviews, feedback sessions, and tips to help you confidently land the job.',
-    image: '/images/pages/interview-prep.webp',
+    image: '/hero-images/career-services-hero.webp',
   },
   {
     icon: Users,
     title: 'Career Coaching',
     desc: 'One-on-one guidance to help you navigate your career path, set goals, and overcome challenges.',
-    image: '/images/pages/counselor-session.webp',
+    image: '/hero-images/career-services-hero.webp',
   },
 ];
 

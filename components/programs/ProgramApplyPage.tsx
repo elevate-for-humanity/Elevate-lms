@@ -21,6 +21,7 @@ import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { ACTIVE_BNPL_PROVIDERS, BNPL_PROVIDER_NAMES } from '@/lib/bnpl-config';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import type { Affirm } from '@/lib/types/external-sdks';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 // Affirm SDK window extension
 interface AffirmWindow {
@@ -85,11 +86,7 @@ export default function ProgramApplyPage({ program }: Props) {
   // Auth guard
   useEffect(() => {
     const check = async () => {
-      const { createBrowserClient } = await import('@supabase/ssr');
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      const supabase = createBrowserClient();
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         window.location.href = `/login?redirect=/programs/${program.slug}/apply`;

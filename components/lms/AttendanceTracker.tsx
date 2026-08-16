@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 interface AttendanceTrackerProps {
   courseId?: number;
@@ -31,10 +31,7 @@ export default function AttendanceTracker({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isActiveRef = useRef(true);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   // Start attendance session
   const startSession = useCallback(async () => {

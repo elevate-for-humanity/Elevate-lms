@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { getRoleDestination } from '@/lib/auth/role-destinations';
 
 const WWW_ORIGIN =
@@ -14,10 +14,7 @@ export default function UnauthorizedPage() {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    const sb = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const sb = createBrowserClient();
     sb.auth.getUser().then(async ({ data }) => {
       setEmail(data.user?.email ?? null);
       if (!data.user) return;
@@ -70,10 +67,7 @@ export default function UnauthorizedPage() {
   }, [isAdminPortalRole, role]);
 
   async function handleSignOut() {
-    const sb = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const sb = createBrowserClient();
     await sb.auth.signOut();
     window.location.href = '/login';
   }

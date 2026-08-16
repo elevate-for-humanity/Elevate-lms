@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 
 import { createBrowserClient as createSupabaseBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 
 // Chainable stub that returns empty data for every query method.
 // Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
@@ -85,8 +86,9 @@ export function createBrowserClient(): SupabaseClient<any> {
   // process.env.NEXT_PUBLIC_* is inlined by Next.js at build time.
   // Fallback literals ensure the client works even when Turbopack
   // fails to inline env vars in dev (known issue with some env setups).
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const config = getBrowserPublicSupabaseConfig();
+  const supabaseUrl = config?.url;
+  const supabaseAnonKey = config?.anonKey;
 
   const misconfigured =
     !supabaseUrl ||

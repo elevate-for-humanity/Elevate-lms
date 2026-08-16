@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 import {
   Briefcase,
   Users,
@@ -48,10 +48,7 @@ export default function HiringNeedsPage() {
 
   // Guard: redirect unauthenticated users immediately on mount
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const supabase = createBrowserClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) router.replace('/login?redirect=/onboarding/employer/hiring-needs');
     });
@@ -84,10 +81,7 @@ export default function HiringNeedsPage() {
     setIsSubmitting(true);
 
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      const supabase = createBrowserClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();

@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs, BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 import {
   Clock,
   DollarSign,
@@ -174,10 +174,7 @@ export default function PublicProgramPage({ config }: { config: PublicProgramPag
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const supabase = createBrowserClient();
 
     const fetchData = async () => {
       const [programRes, modulesRes] = await Promise.all([

@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { Play, Pause, Maximize2 } from 'lucide-react';
+import { getBrowserPublicStorageUrl } from '@/lib/supabase/public-config';
 
 /**
  * Demo video shown on the store page.
@@ -70,7 +71,7 @@ export default function StoreDemoVideo() {
             onCanPlay={() => { videoRef.current?.play().then(() => setPlaying(true)).catch(() => {}); }}
             onEnded={() => setPlaying(false)}
           >
-            <source src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/course-videos/hvac/hvac-module1-lesson1.mp4`} type="video/mp4" />
+            <source src={getBrowserPublicStorageUrl('course-videos', 'hvac/hvac-module1-lesson1.mp4')} type="video/mp4" />
           </video>
           <div className="absolute bottom-0 inset-x-0 p-3 flex items-center justify-between bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={(e) => { e.stopPropagation(); toggle(); }} className="text-white hover:text-white/80">

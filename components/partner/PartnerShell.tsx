@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import PartnerNav from './PartnerNav';
-import { User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 
 interface PartnerShellProps {
   ctx: {

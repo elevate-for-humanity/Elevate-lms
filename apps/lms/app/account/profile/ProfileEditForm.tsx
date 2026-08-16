@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { Save, Loader2, Camera, User as UserIcon } from 'lucide-react';
 import Image from 'next/image';
 

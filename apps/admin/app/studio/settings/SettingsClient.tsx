@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Settings, RefreshCw, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { isSupabaseAuthConfigured } from '@/lib/supabase/public-config';
 
 interface HealthStatus {
   hasGroq: boolean;
@@ -31,13 +32,11 @@ export default function SettingsClient() {
     const results: HealthCheck[] = [];
 
     // Client-side NEXT_PUBLIC_ check (inlined at build time)
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseConfigured = isSupabaseAuthConfigured();
     results.push({
       name: 'Supabase',
-      status: supabaseUrl ? 'healthy' : 'offline',
-      detail: supabaseUrl
-        ? 'NEXT_PUBLIC_SUPABASE_URL configured'
-        : 'NEXT_PUBLIC_SUPABASE_URL missing',
+      status: supabaseConfigured ? 'healthy' : 'offline',
+      detail: supabaseConfigured ? 'Canonical Supabase client configured' : 'Supabase unavailable',
     });
 
     // Server-side health endpoint — granular provider + shell checks

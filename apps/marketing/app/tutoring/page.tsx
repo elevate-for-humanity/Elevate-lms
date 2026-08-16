@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 import {
   ArrowRight,
   ChevronDown,
@@ -22,10 +22,7 @@ import {
 export default function TutoringPage() {
   const [dbTutors, setDbTutors] = useState<any[]>([]);
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const supabase = createBrowserClient();
     supabase
       .from('profiles')
       .select('id, full_name, avatar_url, role')

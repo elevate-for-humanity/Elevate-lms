@@ -2,10 +2,10 @@
 
 import React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Calendar, Clock, Bell, TrendingUp, Award, Target, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 interface Deadline {
   id: string;
@@ -43,10 +43,7 @@ export function RightSidebar() {
   const [notifications, setNotifications] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-  );
+  const supabase = useMemo(() => createBrowserClient(), []);
 
   useEffect(() => {
     loadDashboardData();

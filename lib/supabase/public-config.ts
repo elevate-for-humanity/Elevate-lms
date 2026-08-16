@@ -78,6 +78,14 @@ export function isSupabaseAuthConfigured(): boolean {
   return getBrowserPublicSupabaseConfig() !== null;
 }
 
+export function getBrowserPublicStorageUrl(bucket: string, objectPath: string): string {
+  const baseUrl = getBrowserPublicSupabaseConfig()?.url;
+  if (!baseUrl) return '';
+  const normalizedBucket = bucket.replace(/^\/+|\/+$/g, '');
+  const normalizedPath = objectPath.replace(/^\/+/, '');
+  return `${baseUrl}/storage/v1/object/public/${normalizedBucket}/${normalizedPath}`;
+}
+
 /** Fetch runtime config from the server when build-time inlining was empty. */
 export async function hydrateBrowserSupabaseConfig(): Promise<SupabasePublicConfig | null> {
   const existing = getBrowserPublicSupabaseConfig();

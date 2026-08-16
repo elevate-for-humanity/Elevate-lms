@@ -20,6 +20,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Download, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Loader2, Lock, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { getBrowserPublicStorageUrl } from '@/lib/supabase/public-config';
 
 interface PDFViewerProps {
   // Direct URL mode
@@ -102,7 +103,7 @@ export function PDFViewer({
 
           if (storageError) {
             // Try public URL as fallback
-            const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${storageBucket}/${storagePath}`;
+            const publicUrl = getBrowserPublicStorageUrl(storageBucket, storagePath);
             setDocumentUrl(publicUrl);
           } else if (data) {
             setDocumentUrl(data.signedUrl);

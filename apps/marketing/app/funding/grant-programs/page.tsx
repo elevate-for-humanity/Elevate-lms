@@ -5,16 +5,13 @@ import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export default function GrantProgramsPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const supabase = createBrowserClient();
     supabase
       .from('programs')
       .select(

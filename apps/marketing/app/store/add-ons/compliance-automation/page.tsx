@@ -20,7 +20,7 @@ import {
 CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 const features = [
   {
     icon: ClipboardCheck,
@@ -76,10 +76,7 @@ const complianceAreas = [
 export default function ComplianceAutomationPage() {
   const [dbRows, setDbRows] = useState<any[]>([]);
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabase = createBrowserClient();
     supabase.from('products').select('*').limit(50)
       .then(({ data }) => { if (data) setDbRows(data); });
   }, []);

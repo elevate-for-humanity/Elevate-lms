@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { KpiGrid } from './KpiGrid';
 import type { KPICard } from './types';
 
@@ -28,11 +28,7 @@ export function RealtimeKpiGrid({ kpis: initialKpis }: Props) {
   const [kpis, setKpis] = useState<KPICard[]>(initialKpis);
 
   useEffect(() => {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) return;
-
-    const sb = createClient(url, key);
+    const sb = createBrowserClient();
     let channel: ReturnType<typeof sb.channel> | null = null;
 
     try {

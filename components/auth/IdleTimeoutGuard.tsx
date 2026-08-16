@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { initIdleTimeout } from '@/lib/auth/idle-timeout';
 
 /**
@@ -11,10 +11,7 @@ import { initIdleTimeout } from '@/lib/auth/idle-timeout';
  */
 export function IdleTimeoutGuard({ timeoutMs = 30 * 60 * 1000 }: { timeoutMs?: number }) {
   useEffect(() => {
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
+    const supabase = createBrowserClient();
 
     const cleanup = initIdleTimeout(async () => {
       await supabase.auth.signOut();

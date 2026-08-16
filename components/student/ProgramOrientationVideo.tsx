@@ -1,6 +1,7 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
+import { getBrowserPublicStorageUrl } from '@/lib/supabase/public-config';
 
 import React, { useEffect } from 'react';
 
@@ -17,7 +18,7 @@ interface ProgramOrientationVideoProps {
 
 export default function ProgramOrientationVideo({
   onComplete,
-  videoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/orientation/orientation-final.mp4`,
+  videoUrl = getBrowserPublicStorageUrl('media', 'orientation/orientation-final.mp4'),
   title = 'Program Orientation',
   description = 'Watch this orientation video to learn about our programs, what to expect, and how to succeed.',
   programId,

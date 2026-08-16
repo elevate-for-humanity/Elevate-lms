@@ -11,6 +11,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import FundingEligibilityFlow, {
   type EligibilityStatus,
 } from '@/components/programs/FundingEligibilityFlow';
+import { createBrowserClient } from '@/lib/supabase/client';
 
 const PRICING = {
   totalWeeks: 20,
@@ -38,11 +39,7 @@ export default function HvacApplyPage() {
   // Auth guard — enrollment requires a signed-in account
   useEffect(() => {
     const checkAuth = async () => {
-      const { createBrowserClient } = await import('@supabase/ssr');
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      const supabase = createBrowserClient();
       const {
         data: { session },
       } = await supabase.auth.getSession();

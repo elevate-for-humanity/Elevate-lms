@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import Turnstile from '@/components/Turnstile';
 import { validateRedirect } from '@/lib/auth/validate-redirect';
 import { validatePassword } from '@/lib/auth/password-validation';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { isSupabaseAuthConfigured } from '@/lib/supabase/public-config';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,10 +51,7 @@ function SignupFormContent() {
   const handleResendVerification = async () => {
     setResendLoading(true);
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      const supabase = createBrowserClient();
       await supabase.auth.resend({ type: 'signup', email: formData.email });
       setResendSent(true);
     } catch {
@@ -84,14 +82,11 @@ function SignupFormContent() {
     }
 
     try {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-      if (!supabaseUrl || !supabaseKey) {
+      if (!isSupabaseAuthConfigured()) {
         throw new Error('Authentication service is not available. Please try again later.');
       }
 
-      const supabase = createBrowserClient(supabaseUrl, supabaseKey);
+      const supabase = createBrowserClient();
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
@@ -126,10 +121,7 @@ function SignupFormContent() {
 
   const handleOAuthSignup = async (provider: 'google' | 'github') => {
     try {
-      const supabase = createBrowserClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      );
+      const supabase = createBrowserClient();
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider,

@@ -30,14 +30,26 @@ export function BulkCourseActions({ courses }: { courses: Course[] }) {
 
   function toggleAll() {
     if (allSelected) {
-      setSelected((s) => { const n = new Set(s); filtered.forEach((c) => n.delete(c.id)); return n; });
+      setSelected((s) => {
+        const n = new Set(s);
+        filtered.forEach((c) => n.delete(c.id));
+        return n;
+      });
     } else {
-      setSelected((s) => { const n = new Set(s); filtered.forEach((c) => n.add(c.id)); return n; });
+      setSelected((s) => {
+        const n = new Set(s);
+        filtered.forEach((c) => n.add(c.id));
+        return n;
+      });
     }
   }
 
   function toggle(id: string) {
-    setSelected((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setSelected((s) => {
+      const n = new Set(s);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
   }
 
   async function handleBulkStatus(status: 'published' | 'archived' | 'draft') {

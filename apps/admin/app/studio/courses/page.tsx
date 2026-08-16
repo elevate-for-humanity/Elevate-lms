@@ -15,13 +15,13 @@ export default function StudioCoursesPage() {
           </Link>
           <div className="flex flex-wrap gap-2">
             <Link
-              href="/course-builder/bulk-operations"
+              href="/studio/courses/bulk-operations"
               className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 font-bold text-slate-200 hover:bg-slate-800"
             >
               Bulk Operations
             </Link>
             <Link
-              href="/course-builder/lifecycle"
+              href="/studio/courses/lifecycle"
               className="rounded-lg border border-cyan-700 bg-cyan-950/40 px-4 py-2 font-bold text-cyan-300 hover:bg-cyan-950"
             >
               Governance · Versions · SCORM

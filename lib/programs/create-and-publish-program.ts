@@ -1,27 +1,15 @@
 /**
  * Canonical program creation pipeline.
  *
- * One entry point. One path. No split brain.
- *
- * Writes to (in order):
- *   programs → courses → course_modules → course_lessons
- *   → module_completion_rules → publish_course() RPC
- *
- * courses / course_modules / course_lessons is the source of truth.
- * curriculum_lessons and modules are NOT written here.
- *
- * Idempotent on program.slug and course slug (upsert on conflict).
- * Draft structure is wiped and rebuilt on each call so re-runs are safe.
- *
- * Usage:
- *   const result = await createAndPublishProgram(input);
- *   // result.published === true when input.publish === true and guard passed
+ * Program metadata remains owned here. Course package persistence is delegated
+ * to lib/course-factory/publisher so programs cannot create a competing
+ * courses -> course_modules -> course_lessons writer.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { ProgramCreateInput, ProgramCreateResult } from './types';
-
-// ── Validation ────────────────────────────────────────────────────────────────
+import { publishCourse as persistCoursePackage } from '@/lib/course-factory/publisher';
+import type { BlueprintModule } from '@/lib/curriculum/blueprints/types';
+import type { ProgramCreateInput, ProgramCreateResult, ProgramLessonInput } from './types';
 
 function assertValidInput(input: ProgramCreateInput): void {
   if (!input.program.slug) throw new Error('program.slug is required');
@@ -37,7 +25,6 @@ function assertValidInput(input: ProgramCreateInput): void {
     if (!mod.title) throw new Error(`module "${mod.slug}" missing title`);
     if (moduleSlugs.has(mod.slug)) throw new Error(`duplicate module slug: ${mod.slug}`);
     moduleSlugs.add(mod.slug);
-
     if (!mod.lessons.length) throw new Error(`module "${mod.slug}" has no lessons`);
 
     for (const lesson of mod.lessons) {
@@ -46,12 +33,9 @@ function assertValidInput(input: ProgramCreateInput): void {
       if (lessonSlugs.has(lesson.slug)) throw new Error(`duplicate lesson slug: ${lesson.slug}`);
       lessonSlugs.add(lesson.slug);
 
-      const needsPassingScore =
-        lesson.lessonType === 'checkpoint' ||
-        lesson.lessonType === 'quiz' ||
-        lesson.lessonType === 'exam' ||
-        lesson.lessonType === 'certification';
-
+      const needsPassingScore = ['checkpoint', 'quiz', 'exam', 'certification'].includes(
+        lesson.lessonType,
+      );
       if (needsPassingScore && !lesson.passingScore) {
         throw new Error(
           `lesson "${lesson.slug}" (${lesson.lessonType}) requires passingScore (1–100)`,
@@ -61,45 +45,77 @@ function assertValidInput(input: ProgramCreateInput): void {
   }
 }
 
-// ── Pipeline ──────────────────────────────────────────────────────────────────
+function lessonSlugForType(lesson: ProgramLessonInput): string {
+  const suffix =
+    lesson.lessonType === 'checkpoint'
+      ? 'checkpoint'
+      : lesson.lessonType === 'quiz'
+        ? 'quiz'
+        : lesson.lessonType === 'exam'
+          ? 'exam'
+          : lesson.lessonType === 'lab'
+            ? 'lab'
+            : lesson.lessonType === 'assignment'
+              ? 'assignment'
+              : lesson.lessonType === 'certification'
+                ? 'certification'
+                : null;
+  if (!suffix || lesson.slug.includes(suffix)) return lesson.slug;
+  return `${lesson.slug}-${suffix}`;
+}
+
+function toBlueprintModules(input: ProgramCreateInput): BlueprintModule[] {
+  return [...input.modules]
+    .sort((a, b) => a.orderIndex - b.orderIndex)
+    .map((mod) => ({
+      slug: mod.slug,
+      title: mod.title,
+      orderIndex: mod.orderIndex,
+      minLessons: mod.lessons.length,
+      maxLessons: mod.lessons.length,
+      quizRequired: mod.lessons.some((lesson) =>
+        ['checkpoint', 'quiz', 'exam'].includes(lesson.lessonType),
+      ),
+      practicalRequired: mod.lessons.some((lesson) =>
+        ['lab', 'assignment'].includes(lesson.lessonType),
+      ),
+      isCritical: true,
+      requiredLessonTypes: [],
+      competencies: [],
+      lessons: [...mod.lessons]
+        .sort((a, b) => a.orderIndex - b.orderIndex)
+        .map((lesson) => ({
+          slug: lessonSlugForType(lesson),
+          title: lesson.title,
+          order: mod.orderIndex * 1000 + lesson.orderIndex,
+          objective:
+            typeof lesson.content?.objective === 'string'
+              ? lesson.content.objective
+              : `Complete ${lesson.title}`,
+          content: JSON.stringify(lesson.content ?? {}),
+          passingScore: lesson.passingScore ?? undefined,
+          lessonType: lesson.lessonType,
+          isRequired: lesson.isRequired ?? true,
+        })),
+    }));
+}
 
 export async function createAndPublishProgram(
   input: ProgramCreateInput,
 ): Promise<ProgramCreateResult> {
   assertValidInput(input);
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error(
-      'createAndPublishProgram: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set',
-    );
-  }
-
   const db = await requireAdminClient();
 
-  // ── Pre-flight: verify required tables exist before any writes ──────────────
-  // Catches the most common schema drift failure (missing table) without
-  // requiring the Management API token.
-  for (const table of [
-    'programs',
-    'courses',
-    'course_modules',
-    'course_lessons',
-    'module_completion_rules',
-  ] as const) {
+  for (const table of ['programs', 'courses', 'course_modules', 'course_lessons'] as const) {
     const { error: tableErr } = await db.from(table).select('id').limit(0);
     if (tableErr) {
       throw new Error(
-        `createAndPublishProgram pre-flight failed: table "${table}" is not accessible. ` +
-          `Apply pending migrations and verify Supabase connection. (${tableErr.message})`,
+        `createAndPublishProgram pre-flight failed: table "${table}" is not accessible. (${tableErr.message})`,
       );
     }
   }
 
-  // ── 0. Resolve default org_id (Elevate Core) ────────────────────────────────
-  // New records are scoped to the caller's org. For platform-internal creation
-  // (no org context), fall back to the Elevate Core org.
   const { data: defaultOrg } = await db
     .from('organizations')
     .select('id')
@@ -107,14 +123,12 @@ export async function createAndPublishProgram(
     .maybeSingle();
   const orgId: string | null = defaultOrg?.id ?? null;
 
-  // ── 1. programs row ─────────────────────────────────────────────────────────
   const { data: program, error: programErr } = await db
     .from('programs')
     .upsert(
       {
         slug: input.program.slug,
         title: input.program.title,
-        // category is NOT NULL — default to 'workforce' for LMS programs
         category: input.program.category ?? 'workforce',
         description: input.program.description,
         short_description: input.program.shortDescription ?? null,
@@ -136,132 +150,72 @@ export async function createAndPublishProgram(
     throw new Error(`programs upsert failed: ${programErr?.message ?? 'no row returned'}`);
   }
 
-  // ── 2. courses row ──────────────────────────────────────────────────────────
   const courseOverride = input.course ?? {};
-  const { data: course, error: courseErr } = await db
-    .from('courses')
-    .upsert(
-      {
-        program_id: program.id,
-        slug: input.program.slug,
-        title: courseOverride.title ?? input.program.title,
-        short_description:
-          courseOverride.shortDescription ??
-          input.program.shortDescription ??
-          input.program.description.slice(0, 160),
-        description: courseOverride.description ?? input.program.description,
-        status: 'draft',
-        is_active: true,
-        org_id: orgId,
-      },
-      { onConflict: 'slug' },
-    )
-    .select('id, slug')
-    .single();
+  const courseTitle = courseOverride.title ?? input.program.title;
+  const packageResult = await persistCoursePackage({
+    programId: program.id,
+    courseSlug: input.program.slug,
+    courseTitle,
+    blueprint: toBlueprintModules(input),
+    mode: 'replace',
+    contentSource: 'blueprint',
+    videoConfig: { enabled: false },
+  });
 
-  if (courseErr || !course) {
-    throw new Error(`courses upsert failed: ${courseErr?.message ?? 'no row returned'}`);
+  if (!packageResult.success || !packageResult.courseId) {
+    throw new Error(
+      `Course Factory persistence failed: ${packageResult.errors.join('; ') || 'unknown error'}`,
+    );
   }
 
-  // ── 3. Wipe existing draft structure (idempotent rebuild) ───────────────────
-  // Delete in FK order: lessons → completion rules → modules
-  const { error: delLessonsErr } = await db
-    .from('course_lessons')
-    .delete()
-    .eq('course_id', course.id);
-  if (delLessonsErr) throw new Error(`delete course_lessons failed: ${delLessonsErr.message}`);
+  const courseId = packageResult.courseId;
+  const { error: metadataErr } = await db
+    .from('courses')
+    .update({
+      short_description:
+        courseOverride.shortDescription ??
+        input.program.shortDescription ??
+        input.program.description.slice(0, 160),
+      description: courseOverride.description ?? input.program.description,
+      org_id: orgId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', courseId);
+  if (metadataErr) throw new Error(`course metadata update failed: ${metadataErr.message}`);
 
+  // Recreate completion rules after the atomic course package has assigned canonical module IDs.
   const { error: delRulesErr } = await db
     .from('module_completion_rules')
     .delete()
-    .eq('course_id', course.id);
+    .eq('course_id', courseId);
   if (delRulesErr) throw new Error(`delete module_completion_rules failed: ${delRulesErr.message}`);
 
-  const { error: delModulesErr } = await db
+  const { data: persistedModules, error: persistedModulesErr } = await db
     .from('course_modules')
-    .delete()
-    .eq('course_id', course.id);
-  if (delModulesErr) throw new Error(`delete course_modules failed: ${delModulesErr.message}`);
+    .select('id, order_index')
+    .eq('course_id', courseId)
+    .order('order_index');
+  if (persistedModulesErr) {
+    throw new Error(`course_modules lookup failed: ${persistedModulesErr.message}`);
+  }
 
-  // ── 4. Modules + lessons + completion rules ─────────────────────────────────
-  const sortedModules = [...input.modules].sort((a, b) => a.orderIndex - b.orderIndex);
-  let lessonCount = 0;
-
-  for (const mod of sortedModules) {
-    // Insert module
-    const { data: courseModule, error: modErr } = await db
-      .from('course_modules')
-      .insert({
-        course_id: course.id,
-        title: mod.title,
-        order_index: mod.orderIndex,
-      })
-      .select('id')
-      .single();
-
-    if (modErr || !courseModule) {
-      throw new Error(
-        `course_modules insert failed for "${mod.slug}": ${modErr?.message ?? 'no row returned'}`,
-      );
-    }
-
-    // Insert lessons for this module
-    const sortedLessons = [...mod.lessons].sort((a, b) => a.orderIndex - b.orderIndex);
-    const lessonRows = sortedLessons.map((lesson) => ({
-      course_id: course.id,
-      module_id: courseModule.id,
-      slug: lesson.slug,
-      title: lesson.title,
-      content: lesson.content ?? {},
-      lesson_type: lesson.lessonType,
-      // order_index encodes module position: (moduleOrder * 1000) + lessonOrder
-      // This matches the convention used by the existing HVAC course and lms_lessons view.
-      order_index: mod.orderIndex * 1000 + lesson.orderIndex,
-      passing_score: lesson.passingScore ?? null,
-      is_required: lesson.isRequired ?? true,
-    }));
-
-    const { error: lessonsErr } = await db.from('course_lessons').insert(lessonRows);
-    if (lessonsErr) {
-      throw new Error(
-        `course_lessons insert failed for module "${mod.slug}": ${lessonsErr.message}`,
-      );
-    }
-    lessonCount += lessonRows.length;
-
-    // Completion rule — one per module, requires 100% of lessons complete
-    // module_completion_rules columns: course_id, module_id, required_previous_module_id,
-    //   required_checkpoint_lesson_id, minimum_score
-    // No rule_type or required_percent column exists in the live schema.
+  for (const courseModule of persistedModules ?? []) {
     const { error: ruleErr } = await db.from('module_completion_rules').insert({
-      course_id: course.id,
+      course_id: courseId,
       module_id: courseModule.id,
-      // required_previous_module_id and required_checkpoint_lesson_id left null —
-      // the publish guard only checks that at least one rule exists per course.
-      // Sequential gating can be added post-publish via the admin UI.
     });
     if (ruleErr) {
-      throw new Error(
-        `module_completion_rules insert failed for "${mod.slug}": ${ruleErr.message}`,
-      );
+      throw new Error(`module_completion_rules insert failed: ${ruleErr.message}`);
     }
   }
 
-  // ── 5. Publish ──────────────────────────────────────────────────────────────
   let published = false;
-
   if (input.publish === true) {
-    // publish_course() DB guard: checks title, slug, ≥1 module, ≥1 lesson,
-    // no NULL lesson_type, every module has lessons, ≥1 completion rule when >1 module.
     const { error: publishCourseErr } = await db.rpc('publish_course', {
-      p_course_id: course.id,
+      p_course_id: courseId,
     });
-    if (publishCourseErr) {
-      throw new Error(`publish_course failed: ${publishCourseErr.message}`);
-    }
+    if (publishCourseErr) throw new Error(`publish_course failed: ${publishCourseErr.message}`);
 
-    // Mark program published directly — the publish_program() RPC requires
-    // program_modules/tracks/CTAs/media rows that LMS programs don't have.
     const { error: programPublishErr } = await db
       .from('programs')
       .update({ published: true, updated_at: new Date().toISOString() })
@@ -269,15 +223,14 @@ export async function createAndPublishProgram(
     if (programPublishErr) {
       throw new Error(`programs publish update failed: ${programPublishErr.message}`);
     }
-
     published = true;
   }
 
   return {
     programId: program.id,
-    courseId: course.id,
-    moduleCount: input.modules.length,
-    lessonCount,
+    courseId,
+    moduleCount: packageResult.moduleCount,
+    lessonCount: packageResult.lessonCount,
     published,
   };
 }

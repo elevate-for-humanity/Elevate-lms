@@ -112,7 +112,7 @@ jobs:
       - name: Verify critical Marketing runtime assets
         shell: bash
         run: |
-          test -s public/images/pages/apply-page-4.jpg
+          test -s public/images/pages/apply-hero.webp
           test -s public/images/pages/about-supportive-services.webp
           test -s public/images/pages/about-employer-partners.webp
           test -s public/images/pages/for-employers-page-1.webp

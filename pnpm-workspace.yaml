@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "!apps/website-builder"
+  - "!apps/studio-browser"
   - "packages/*"
 
 catalog:

@@ -33,7 +33,7 @@ jobs:
 
           echo "=== CONTAINERS ==="
           curl -fsS -H "$auth" "$base/containers" |
-            jq '{containers: [(.data // .containers // .)[] | {id, name, status, startedAt, createdAt, restartCount, deploymentId}]}'
+            jq '(.data // .containers // .)'
 
           echo "=== RECENT RUNTIME LOGS ==="
           end_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"

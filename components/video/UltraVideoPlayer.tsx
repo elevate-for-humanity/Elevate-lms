@@ -164,6 +164,7 @@ export function UltraVideoPlayer({
 
   // State
   const [isPlaying, setIsPlaying] = useState(false);
+  const [heroVideoReady, setHeroVideoReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -187,17 +188,20 @@ export function UltraVideoPlayer({
   const resolvedSrc = resolveVideoSrc(src);
   const hasVideo = Boolean(resolvedSrc);
   // Full-bleed non-lesson players are marketing/program heroes, not course players.
-  // Hero media is video-only: no poster, controls, gradient wash, loading mask, or play overlay.
+  // Full-bleed marketing media keeps its poster mounted until playback begins
+  // and falls back to it when the video fails. Hero videos play once.
   const heroMode = !lessonId && (className.includes('absolute') || className.includes('fixed'));
   const effectiveShowControls = showControls && !heroMode;
-  const effectivePoster = heroMode ? undefined : poster;
-  const effectiveLoop = heroMode || loop;
+  const effectivePoster = poster;
+  const effectiveLoop = loop;
   const effectiveMuted = heroMode || isMuted;
 
   // Initialize video
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !resolvedSrc) return;
+
+    if (heroMode) setHeroVideoReady(false);
 
     // Resume from saved position
     if (enableResume && lessonId && startTime === 0) {
@@ -482,6 +486,16 @@ export function UltraVideoPlayer({
       ref={containerRef}
       className={`${className?.includes('absolute') || className?.includes('fixed') ? '' : 'relative group'} bg-black overflow-hidden ${heroMode ? '' : `rounded-xl ${ASPECT_RATIOS[aspectRatio]}`} ${className}`}
     >
+      {/* Poster remains visible until a playable hero frame is actually running. */}
+      {heroMode && effectivePoster ? (
+        <img
+          src={effectivePoster}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : null}
+
       {/* Video Element */}
       <video
         ref={videoRef}
@@ -491,7 +505,7 @@ export function UltraVideoPlayer({
         muted={effectiveMuted}
         loop={effectiveLoop}
         playsInline
-        className={`w-full h-full ${heroMode ? 'object-cover' : 'object-contain'}`}
+        className={`w-full h-full ${heroMode ? `object-cover transition-opacity duration-300 ${heroVideoReady && !hasError ? 'opacity-100' : 'opacity-0'}` : 'object-contain'}`}
         onClick={togglePlay}
         onLoadedMetadata={(e) => {
           setDuration((e.target as HTMLVideoElement).duration);
@@ -500,6 +514,7 @@ export function UltraVideoPlayer({
         }}
         onCanPlay={() => setIsLoading(false)}
         onError={() => {
+          setHeroVideoReady(false);
           setHasError(true);
           setIsLoading(false);
           onError?.('Failed to load video');
@@ -514,6 +529,9 @@ export function UltraVideoPlayer({
         onEnded={() => {
           setIsPlaying(false);
           onEnded?.();
+        }}
+        onPlaying={() => {
+          if (heroMode) setHeroVideoReady(true);
         }}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}

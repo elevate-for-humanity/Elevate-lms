@@ -68,10 +68,19 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
+/**
+ * Known legacy poster paths that are no longer packaged. Keep aliases narrow
+ * and semantic so stale JSON cannot produce a blank hero while avoiding broad
+ * heuristic image replacement.
+ */
+const POSTER_ALIASES: Record<string, string> = {
+  '/images/pages/cna-healthcare-workers.jpg': '/images/pages/healthcare-hero.webp',
+};
+
 function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
   const dedicated = getHeroVideoForPageKey(key);
   if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
-  if (banner.posterImage) return banner.posterImage;
+  if (banner.posterImage) return POSTER_ALIASES[banner.posterImage] ?? banner.posterImage;
   if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
   return PAGE_PICTURE_OVERRIDES[key];
 }

@@ -11,34 +11,33 @@ import {
 
 const SLUG = 'barber-apprenticeship';
 
-/** Canonical hrefs for /portal/barber Quick Actions + resources (student portal). */
+/** Canonical hrefs for the authenticated barber apprentice workspace. */
 export const BARBER_PORTAL_QUICK_ACTION_HREFS = {
   clockIn: '/apprentice/timeclock',
   rtiCourse: `/lms/courses/${BARBER_COURSE_ID}`,
   logHours: '/apprentice/hours/log',
   logService: '/apprentice/competencies/log',
-  uploadDocument: '/programs/barber-apprenticeship/documents',
+  uploadDocument: '/apprentice/documents',
   stateBoard: '/apprentice/state-board',
   billing: '/apprentice/billing',
   skills: '/apprentice/skills',
-  workbook: `/lms/courses/${BARBER_COURSE_ID}?activity=reading`,
+  workbook: '/apprentice/barber-apprenticeship/workbook',
   transferHours: '/apprentice/transfer-hours',
-  orientation: '/programs/barber-apprenticeship/orientation',
+  orientation: '/apprentice/orientation?program=barber-apprenticeship',
   mobileApp: BARBER_STUDENT_APP_HOME,
 } as const;
 
 describe('barber apprentice portal quick actions', () => {
-  it('uses Prestige Elevation labels (not Milady)', () => {
+  it('uses Elevate/Prestige learner-facing labels without third-party vendor branding', () => {
     expect(apprenticeshipRtiLabel(SLUG)).toBe('Prestige Elevation Barber Curriculum');
-    expect(apprenticeshipRtiLabel(SLUG, true)).toBe('Prestige Elevation Course');
+    expect(apprenticeshipRtiLabel(SLUG, true)).toBe('Barber Curriculum');
   });
 
-  it('workbook href targets canonical BARBER_COURSE_ID', () => {
-    expect(apprenticeshipWorkbookHref(SLUG)).toContain(BARBER_COURSE_ID);
-    expect(apprenticeshipWorkbookHref(SLUG)).toMatch(/\?activity=reading$/);
+  it('keeps the RTI launch bound to the canonical barber course ID', () => {
+    expect(apprenticeshipLmsCoursePath(SLUG)).toBe(`/lms/courses/${BARBER_COURSE_ID}`);
   });
 
-  it('resolves canonical LMS and document paths', () => {
+  it('resolves operational actions inside the canonical apprentice workspace', () => {
     expect(apprenticeshipLmsCoursePath(SLUG)).toBe(BARBER_PORTAL_QUICK_ACTION_HREFS.rtiCourse);
     expect(apprenticeshipDocumentsPath(SLUG)).toBe(BARBER_PORTAL_QUICK_ACTION_HREFS.uploadDocument);
     expect(apprenticeshipOrientationPath(SLUG)).toBe(BARBER_PORTAL_QUICK_ACTION_HREFS.orientation);

@@ -2,7 +2,16 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, Clock3, GraduationCap, Scissors, ShieldCheck, Store, WalletCards } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  GraduationCap,
+  Scissors,
+  ShieldCheck,
+  Store,
+  WalletCards,
+} from 'lucide-react';
 import type { HeroBannerConfig } from '@/content/heroBanners';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import HeroVideo from '@/components/marketing/HeroVideo';
@@ -11,6 +20,7 @@ import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 
 interface Props {
   program: ProgramSchema;
@@ -30,6 +40,8 @@ export default function BarberApprenticeshipClient({
   enrollmentCount = 0,
 }: Props) {
   const b = banner ?? heroBanner ?? null;
+  const canonicalHero = getProgramHeroImage(program.slug);
+  const canonicalHeroAlt = getProgramImageAlt(program.slug, program.heroImageAlt || program.title);
 
   const heroCtas = [
     b?.primaryCta ?? {
@@ -52,7 +64,7 @@ export default function BarberApprenticeshipClient({
         <HeroVideo
           videoSrcDesktop={b.videoSrcDesktop}
           videoSrcMobile={b.videoSrcMobile}
-          posterImage={b.posterImage ?? program.heroImage}
+          posterImage={canonicalHero}
           voiceoverSrc={b.voiceoverSrc}
           microLabel={b.microLabel ?? 'DOL Registered Apprenticeship'}
           belowHeroHeadline={b.belowHeroHeadline ?? program.title}
@@ -66,8 +78,8 @@ export default function BarberApprenticeshipClient({
         <>
           <section className="relative h-[clamp(260px,42vw,520px)] overflow-hidden bg-slate-100">
             <Image
-              src={b?.posterImage ?? program.heroImage ?? '/images/pages/barber-hero-new.webp'}
-              alt={program.heroImageAlt ?? 'Barber apprentice training with a licensed host shop'}
+              src={canonicalHero}
+              alt={canonicalHeroAlt}
               fill
               priority
               sizes="100vw"
@@ -107,22 +119,39 @@ export default function BarberApprenticeshipClient({
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: Clock3, label: 'On-the-Job Learning', value: `${OJL_HOURS.toLocaleString()} approved hours` },
-              { icon: GraduationCap, label: 'Related Instruction', value: `${RTI_HOURS} RTI hours` },
-              { icon: WalletCards, label: 'Self-Pay Tuition', value: `$${BARBER_PRICING.fullPrice.toLocaleString()}` },
+              {
+                icon: Clock3,
+                label: 'On-the-Job Learning',
+                value: `${OJL_HOURS.toLocaleString()} approved hours`,
+              },
+              {
+                icon: GraduationCap,
+                label: 'Related Instruction',
+                value: `${RTI_HOURS} RTI hours`,
+              },
+              {
+                icon: WalletCards,
+                label: 'Self-Pay Tuition',
+                value: `$${BARBER_PRICING.fullPrice.toLocaleString()}`,
+              },
               { icon: Store, label: 'Training Site', value: 'Approved host shop' },
             ].map(({ icon: Icon, label, value }) => (
               <article key={label} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <Icon className="h-6 w-6 text-brand-red-700" aria-hidden="true" />
-                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-700">{label}</p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-700">
+                  {label}
+                </p>
                 <p className="mt-1 text-lg font-black text-slate-950">{value}</p>
               </article>
             ))}
           </div>
           <p className="mt-5 text-sm leading-6 text-slate-800">
-            Standard OJL planning is 40 hours per week. Actual credited progress is based on approved
-            hour records, accepted transfer credit, completed RTI, and the apprentice&apos;s registered
-            program record. {enrollmentCount > 0 ? `${enrollmentCount} current enrollment records are reflected in the platform.` : 'Enrollment is currently available subject to host-shop placement and program review.'}
+            Standard OJL planning is 40 hours per week. Actual credited progress is based on
+            approved hour records, accepted transfer credit, completed RTI, and the
+            apprentice&apos;s registered program record.{' '}
+            {enrollmentCount > 0
+              ? `${enrollmentCount} current enrollment records are reflected in the platform.`
+              : 'Enrollment is currently available subject to host-shop placement and program review.'}
           </p>
         </div>
       </section>
@@ -130,7 +159,9 @@ export default function BarberApprenticeshipClient({
       <section className="px-4 py-14 sm:px-6 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center">
           <div>
-            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">How the apprenticeship works</p>
+            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
+              How the apprenticeship works
+            </p>
             <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
               Employment-based training plus structured RTI.
             </h2>
@@ -177,8 +208,12 @@ export default function BarberApprenticeshipClient({
 
       <section className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Program requirements</p>
-          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">What must be completed.</h2>
+          <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
+            Program requirements
+          </p>
+          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
+            What must be completed.
+          </h2>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {[
               `${OJL_HOURS.toLocaleString()} approved supervised OJL hours under the registered program standards`,
@@ -186,16 +221,23 @@ export default function BarberApprenticeshipClient({
               'Required competency verification and apprenticeship documentation',
               'Current Indiana licensing application and examination requirements after program completion',
             ].map((item) => (
-              <div key={item} className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-5 text-slate-900">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+              <div
+                key={item}
+                className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-5 text-slate-900"
+              >
+                <CheckCircle2
+                  className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700"
+                  aria-hidden="true"
+                />
                 <p className="font-semibold leading-6">{item}</p>
               </div>
             ))}
           </div>
           <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
-            <strong>Licensing distinction:</strong> completing the Registered Apprenticeship produces
-            the apprenticeship completion documentation. Indiana barber licensure is a separate state
-            process and remains subject to the state&apos;s current application and examination rules.
+            <strong>Licensing distinction:</strong> completing the Registered Apprenticeship
+            produces the apprenticeship completion documentation. Indiana barber licensure is a
+            separate state process and remains subject to the state&apos;s current application and
+            examination rules.
           </div>
         </div>
       </section>
@@ -203,14 +245,23 @@ export default function BarberApprenticeshipClient({
       {credentials.length > 0 && (
         <section className="px-4 py-14 sm:px-6 sm:py-16">
           <div className="mx-auto max-w-6xl">
-            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Credential pathway</p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Completion and licensing outcomes.</h2>
+            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
+              Credential pathway
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
+              Completion and licensing outcomes.
+            </h2>
             <div className="mt-8 grid gap-5 md:grid-cols-3">
               {credentials.map((credential) => (
-                <article key={credential.name} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <article
+                  key={credential.name}
+                  className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                >
                   <ShieldCheck className="h-6 w-6 text-brand-blue-700" aria-hidden="true" />
                   <h3 className="mt-4 text-xl font-black text-slate-950">{credential.name}</h3>
-                  <p className="mt-2 text-sm font-semibold text-brand-blue-800">{credential.issuer}</p>
+                  <p className="mt-2 text-sm font-semibold text-brand-blue-800">
+                    {credential.issuer}
+                  </p>
                   <p className="mt-3 text-sm leading-6 text-slate-800">{credential.description}</p>
                 </article>
               ))}
@@ -219,14 +270,22 @@ export default function BarberApprenticeshipClient({
         </section>
       )}
 
-      <section id="funding" className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16">
+      <section
+        id="funding"
+        className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:px-6 sm:py-16"
+      >
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">Funding & payment</p>
-          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">One price source. Multiple payment paths.</h2>
+          <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-brand-red-700">
+            Funding & payment
+          </p>
+          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
+            One price source. Multiple payment paths.
+          </h2>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-800">
-            Current self-pay tuition is <strong>${BARBER_PRICING.fullPrice.toLocaleString()}</strong>.
-            Transfer hours do not reduce tuition. Public or employer funding must be separately
-            authorized before it is treated as payment.
+            Current self-pay tuition is{' '}
+            <strong>${BARBER_PRICING.fullPrice.toLocaleString()}</strong>. Transfer hours do not
+            reduce tuition. Public or employer funding must be separately authorized before it is
+            treated as payment.
           </p>
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             <article className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -234,27 +293,39 @@ export default function BarberApprenticeshipClient({
               <p className="mt-3 text-sm leading-6 text-slate-800">
                 Complete one secure checkout for the current self-pay tuition amount.
               </p>
-              <Link href="/programs/barber-apprenticeship/apply?payment=pay_in_full" className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline">
+              <Link
+                href="/programs/barber-apprenticeship/apply?payment=pay_in_full"
+                className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline"
+              >
                 Apply & choose pay in full →
               </Link>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-white p-6">
               <h3 className="text-xl font-black text-slate-950">Payment Plan</h3>
               <p className="mt-3 text-sm leading-6 text-slate-800">
-                Minimum down payment is ${BARBER_PRICING.minDownPayment.toLocaleString()}; the remaining
-                balance is scheduled over {BARBER_PRICING.paymentTermWeeks} weekly payments under the
-                current plan configuration.
+                Minimum down payment is ${BARBER_PRICING.minDownPayment.toLocaleString()}; the
+                remaining balance is scheduled over {BARBER_PRICING.paymentTermWeeks} weekly
+                payments under the current plan configuration.
               </p>
-              <Link href="/programs/barber-apprenticeship/apply?payment=payment_plan" className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline">
+              <Link
+                href="/programs/barber-apprenticeship/apply?payment=payment_plan"
+                className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline"
+              >
                 Open payment calculator →
               </Link>
             </article>
             <article className="rounded-2xl border border-slate-200 bg-white p-6">
               <h3 className="text-xl font-black text-slate-950">BNPL / Funding Review</h3>
               <p className="mt-3 text-sm leading-6 text-slate-800">
-                Eligible checkout options currently configured include {bnplNames.length ? bnplNames.join(', ') : 'available providers shown at checkout'}. Provider approval and terms vary. Workforce funding requires separate eligibility and authorization.
+                Eligible checkout options currently configured include{' '}
+                {bnplNames.length ? bnplNames.join(', ') : 'available providers shown at checkout'}.
+                Provider approval and terms vary. Workforce funding requires separate eligibility
+                and authorization.
               </p>
-              <Link href="/programs/barber-apprenticeship/apply" className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline">
+              <Link
+                href="/programs/barber-apprenticeship/apply"
+                className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline"
+              >
                 Review all options →
               </Link>
             </article>
@@ -269,12 +340,17 @@ export default function BarberApprenticeshipClient({
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2">
           <article className="rounded-3xl border border-slate-200 bg-white p-7">
             <Scissors className="h-7 w-7 text-brand-red-700" aria-hidden="true" />
-            <h2 className="mt-4 text-2xl font-black text-slate-950">I want to become an apprentice</h2>
+            <h2 className="mt-4 text-2xl font-black text-slate-950">
+              I want to become an apprentice
+            </h2>
             <p className="mt-3 leading-7 text-slate-800">
               Use the apprentice application for enrollment, transfer-hour documentation, funding,
               payment options, and host-shop placement information.
             </p>
-            <Link href="/programs/barber-apprenticeship/apply" className="mt-5 inline-flex items-center gap-2 font-bold text-brand-red-700 hover:underline">
+            <Link
+              href="/programs/barber-apprenticeship/apply"
+              className="mt-5 inline-flex items-center gap-2 font-bold text-brand-red-700 hover:underline"
+            >
               Apprentice application <ArrowRight className="h-4 w-4" />
             </Link>
           </article>
@@ -285,7 +361,10 @@ export default function BarberApprenticeshipClient({
               Host-shop applications are employer applications. They are separate from student
               enrollment and use their own onboarding, MOU, document, and portal workflow.
             </p>
-            <Link href="/host-shop" className="mt-5 inline-flex items-center gap-2 font-bold text-brand-blue-800 hover:underline">
+            <Link
+              href="/host-shop"
+              className="mt-5 inline-flex items-center gap-2 font-bold text-brand-blue-800 hover:underline"
+            >
               Host Shop program <ArrowRight className="h-4 w-4" />
             </Link>
           </article>

@@ -53,6 +53,7 @@ function resolvePublicImage(imagePath) {
 }
 
 const missing = [];
+const corrupt = [];
 const duplicates = [];
 const binaries = new Map();
 
@@ -63,7 +64,12 @@ for (const [imagePath, usages] of references) {
   if (!resolvedImage) {
     missing.push({ imagePath, usages: uniqueUsages });
   } else {
-    const hash = crypto.createHash('sha256').update(fs.readFileSync(resolvedImage)).digest('hex');
+    const contents = fs.readFileSync(resolvedImage);
+    const extension = path.extname(resolvedImage).toLowerCase();
+    if (extension !== '.svg' && contents.length < 32) {
+      corrupt.push({ imagePath, bytes: contents.length, usages: uniqueUsages });
+    }
+    const hash = crypto.createHash('sha256').update(contents).digest('hex');
     if (!binaries.has(hash)) binaries.set(hash, []);
     binaries.get(hash).push(imagePath);
   }
@@ -81,6 +87,7 @@ const duplicateBinaries = [...binaries.values()]
 console.log('\nMarketing image audit\n');
 console.log(`Image references: ${references.size}`);
 console.log(`Missing local images: ${missing.length}`);
+console.log(`Corrupt or truncated images: ${corrupt.length}`);
 console.log(`Images used in 3+ files: ${duplicates.length}`);
 console.log(`Duplicate image binaries under different paths: ${duplicateBinaries.length}`);
 
@@ -88,6 +95,14 @@ if (missing.length > 0) {
   console.log('\nMissing image files:\n');
   for (const item of missing) {
     console.log(`- ${item.imagePath}`);
+    for (const usage of item.usages) console.log(`  ${usage}`);
+  }
+}
+
+if (corrupt.length > 0) {
+  console.log('\nCorrupt or truncated raster image files (< 32 bytes):\n');
+  for (const item of corrupt) {
+    console.log(`- ${item.imagePath}: ${item.bytes} bytes`);
     for (const usage of item.usages) console.log(`  ${usage}`);
   }
 }
@@ -110,4 +125,4 @@ if (duplicates.length > 0) {
     });
 }
 
-if (missing.length > 0) process.exitCode = 1;
+if (missing.length > 0 || corrupt.length > 0) process.exitCode = 1;

@@ -15,12 +15,21 @@ import {
 } from '@/lib/programs/build-program-schema';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { isArchivedProgramSlug } from '@/lib/programs/archived-program-slugs';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 
 export type LoadedProgramPage = {
   program: ProgramSchema;
   /** True when built from registry/DB partial data (not a full static file). */
   synthesized: boolean;
 };
+
+function withCanonicalProgramMedia(program: ProgramSchema, slug: string): ProgramSchema {
+  return normalizePublicProgram({
+    ...program,
+    heroImage: getProgramHeroImage(slug),
+    heroImageAlt: getProgramImageAlt(slug, program.heroImageAlt || program.title),
+  });
+}
 
 async function overlayDbFields(program: ProgramSchema, slug: string): Promise<ProgramSchema> {
   const db = createPublicClient();
@@ -39,27 +48,25 @@ async function overlayDbFields(program: ProgramSchema, slug: string): Promise<Pr
   // Registered-apprenticeship requirements and public compliance copy are
   // governed by RAPIDS_CONFIG through the static ProgramSchema. Database rows
   // may carry historical values from older seeds, so they must never override
-  // the registered OJL/RTI requirements or descriptive copy. A DB-managed image
-  // is safe to overlay because it does not change program requirements.
+  // the registered OJL/RTI requirements, descriptive copy, or canonical media.
   if (isRAPIDSProgram(slug)) {
-    return normalizePublicProgram({
-      ...program,
-      heroImage: row.image_url || program.heroImage,
-    });
+    return withCanonicalProgramMedia(program, slug);
   }
 
-  return normalizePublicProgram({
-    ...program,
-    title: row.title || program.title,
-    subtitle: row.short_description || row.description || program.subtitle,
-    durationWeeks: row.duration_weeks ?? program.durationWeeks,
-    heroImage: row.image_url || program.heroImage,
-    ...(row.description && row.description !== row.short_description
-      ? {
-          programDescription: row.description.split(/\n\n+/).filter(Boolean),
-        }
-      : {}),
-  });
+  return withCanonicalProgramMedia(
+    {
+      ...program,
+      title: row.title || program.title,
+      subtitle: row.short_description || row.description || program.subtitle,
+      durationWeeks: row.duration_weeks ?? program.durationWeeks,
+      ...(row.description && row.description !== row.short_description
+        ? {
+            programDescription: row.description.split(/\n\n+/).filter(Boolean),
+          }
+        : {}),
+    },
+    slug,
+  );
 }
 
 /**
@@ -76,7 +83,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   const staticProgram = getStaticProgram(slug);
   if (staticProgram) {
     return {
-      program: normalizePublicProgram(await overlayDbFields(staticProgram, slug)),
+      program: withCanonicalProgramMedia(await overlayDbFields(staticProgram, slug), slug),
       synthesized: false,
     };
   }
@@ -85,7 +92,10 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   if (registryEntry?.active) {
     const base = buildProgramSchemaFromRegistry(registryEntry);
     return {
-      program: normalizePublicProgram(await overlayDbFields(base, registryEntry.slug)),
+      program: withCanonicalProgramMedia(
+        await overlayDbFields(base, registryEntry.slug),
+        registryEntry.slug,
+      ),
       synthesized: true,
     };
   }
@@ -102,7 +112,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
 
     if (row) {
       return {
-        program: normalizePublicProgram(buildProgramSchemaFromDb(row as DbProgramRow)),
+        program: withCanonicalProgramMedia(buildProgramSchemaFromDb(row as DbProgramRow), slug),
         synthesized: true,
       };
     }

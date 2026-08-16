@@ -9,8 +9,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Job Ready Indy',
-  description:
-    `Job Ready Indy is an Indianapolis workforce initiative connecting residents to funded career training, credentials, and employment. ${PLATFORM_DEFAULTS.orgName} is an approved Job Ready Indy training provider.`,
+  description: `Job Ready Indy is an Indianapolis workforce initiative connecting residents to funded career training, credentials, and employment. ${PLATFORM_DEFAULTS.orgName} is an approved Job Ready Indy training provider.`,
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/job-ready-indy' },
 };
 
@@ -19,10 +18,10 @@ export default function JobReadyIndyPage() {
     <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[200px] sm:h-[260px] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/funding/funding-jri-program-v2.jpg"
+        <Image
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+          src="/images/pages/jri-hero.webp"
           alt="Job Ready Indy workforce training"
           fill
           className="object-cover"
@@ -54,9 +53,9 @@ export default function JobReadyIndyPage() {
                 barriers so residents can access quality training and enter high-demand careers.
               </p>
               <p className="text-slate-700 leading-relaxed mb-6">
-                {PLATFORM_DEFAULTS.orgName} is an approved Job Ready Indy training provider. Our credential
-                pathway programs in healthcare, skilled trades, technology, and CDL are aligned with
-                the employment outcomes Job Ready Indy is designed to achieve.
+                {PLATFORM_DEFAULTS.orgName} is an approved Job Ready Indy training provider. Our
+                credential pathway programs in healthcare, skilled trades, technology, and CDL are
+                aligned with the employment outcomes Job Ready Indy is designed to achieve.
               </p>
               <Link
                 href="/start-trial"
@@ -71,7 +70,8 @@ export default function JobReadyIndyPage() {
                 alt="Job Ready Indy career training"
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                placeholder="empty"
               />
             </div>
           </div>

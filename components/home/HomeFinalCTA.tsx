@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-const FINAL_CTA_IMAGE = '/images/pages/apply-page-4.jpg';
+const FINAL_CTA_IMAGE = '/images/pages/apply-hero.webp';
 
 export function HomeFinalCTA() {
   return (
@@ -30,7 +30,10 @@ export function HomeFinalCTA() {
             sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent" aria-hidden="true" />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-transparent"
+            aria-hidden="true"
+          />
         </div>
 
         <div className="flex flex-col justify-center px-6 py-7 text-center sm:px-8 lg:px-10 lg:text-left">
@@ -71,9 +74,13 @@ export function HomeFinalCTA() {
               <Phone className="h-3.5 w-3.5" aria-hidden="true" />
               {PLATFORM_DEFAULTS.supportPhone}
             </a>
-            <span className="hidden text-red-100 sm:block" aria-hidden="true">·</span>
+            <span className="hidden text-red-100 sm:block" aria-hidden="true">
+              ·
+            </span>
             <span>Call or text — Mon–Fri, 9am–5pm ET</span>
-            <span className="hidden text-red-100 sm:block" aria-hidden="true">·</span>
+            <span className="hidden text-red-100 sm:block" aria-hidden="true">
+              ·
+            </span>
             <Link
               href="/contact"
               className="font-semibold text-white underline underline-offset-2 transition-colors hover:text-red-50"

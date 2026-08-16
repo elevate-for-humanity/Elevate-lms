@@ -43,12 +43,12 @@ import {
 import { DeliveryBadge, FundingSection } from './ProgramTruthBadges';
 import { ICC_URL, ICC_INSTRUCTION } from '@/lib/page-design-tokens';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { resolveHeroPosterSrc } from '@/lib/images/hero-banner-media';
 import {
   sanitizePublicFundingList,
   sanitizePublicFundingText,
 } from '@/lib/programs/public-funding-copy';
 import { getVerifiedProgramFunding } from '@/lib/programs/funding-registry';
+import { getProgramHeroImage, getProgramImageAlt } from '@/lib/images/programImages';
 
 interface Props {
   program: ProgramSchema;
@@ -112,7 +112,8 @@ export default function ProgramDetailPage({
       ? Math.ceil((selfPayNumeric - bnplDepositStart) / p.durationWeeks)
       : null;
   const hasIndianaFunding = isWorkforceFunded;
-  const heroPosterSrc = resolveHeroPosterSrc(p.slug, { heroImage: p.heroImage });
+  const heroPosterSrc = getProgramHeroImage(p.slug);
+  const heroAlt = getProgramImageAlt(p.slug, p.heroImageAlt || p.title);
   const requestInfoHref =
     p.cta?.requestInfoHref || `/contact?program=${encodeURIComponent(p.slug)}`;
   const employerPartners = Array.isArray(p.employerPartners) ? p.employerPartners : [];
@@ -183,8 +184,8 @@ export default function ProgramDetailPage({
               if (!banner.videoSrcDesktop) {
                 return (
                   <HeroPicture
-                    src={resolveHeroPosterSrc(p.slug, { banner, heroImage: p.heroImage })}
-                    alt={p.heroImageAlt ?? banner.microLabel ?? p.title}
+                    src={heroPosterSrc}
+                    alt={heroAlt}
                     microLabel={banner.microLabel}
                     analyticsName={banner.analyticsName}
                     belowHeroHeadline={safeHeadline}
@@ -198,7 +199,7 @@ export default function ProgramDetailPage({
               return (
                 <HeroVideo
                   videoSrcDesktop={banner.videoSrcDesktop}
-                  posterImage={banner.posterImage}
+                  posterImage={heroPosterSrc}
                   voiceoverSrc={voiceoverSrc}
                   microLabel={banner.microLabel}
                   analyticsName={banner.analyticsName}
@@ -216,7 +217,7 @@ export default function ProgramDetailPage({
                 {/* IMAGE-CONTRACT: placeholder-review required (blurDataURL or approved fallback) */}
                 <Image
                   src={heroPosterSrc}
-                  alt={p.heroImageAlt}
+                  alt={heroAlt}
                   fill
                   className="object-cover object-center"
                   priority

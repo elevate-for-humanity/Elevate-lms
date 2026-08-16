@@ -45,7 +45,8 @@ export default function JriPage() {
         <div className="absolute inset-0">
           <Image
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" sizes="100vw"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+            sizes="100vw"
             src="/images/pages/funding-page-1.jpg"
             alt="Second chance career training"
             fill
@@ -232,12 +233,14 @@ export default function JriPage() {
                 className="bg-white rounded-xl overflow-hidden shadow-lg border group hover:shadow-xl transition-shadow"
               >
                 <div className="relative h-48">
-                  <Image sizes="100vw"
+                  <Image
+                    sizes="100vw"
                     src={program.image}
                     alt={program.title}
                     fill
                     unoptimized={program.image.endsWith('.svg')}
-                    className="object-cover group-hover:scale-105 transition-transform duration-300" placeholder="empty"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    placeholder="empty"
                   />
                   <div className="absolute top-4 right-4 bg-brand-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                     JRI FUNDED
@@ -299,19 +302,22 @@ export default function JriPage() {
 
               <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-amber-800">
-                  <strong>Not sure if you qualify?</strong> Call us at {PLATFORM_DEFAULTS.supportPhone}. We&apos;ll
-                  help you figure it out — no judgment, just answers.
+                  <strong>Not sure if you qualify?</strong> Call us at{' '}
+                  {PLATFORM_DEFAULTS.supportPhone}. We&apos;ll help you figure it out — no judgment,
+                  just answers.
                 </p>
               </div>
             </div>
 
             <div className="relative">
               <Image
-                src="/images/funding/funding-jri-program-v2.jpg"
+                src="/images/pages/jri-hero.webp"
                 alt="JRI participant in training"
                 width={600}
                 height={500}
-                className="rounded-2xl shadow-xl" placeholder="empty" sizes="(max-width: 768px) 100vw, 50vw"
+                className="rounded-2xl shadow-xl"
+                placeholder="empty"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
               <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-6 shadow-lg max-w-xs">
                 <p className="text-slate-900 font-medium italic">

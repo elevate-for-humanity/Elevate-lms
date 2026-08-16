@@ -5,6 +5,7 @@ import { blurDataURL } from '@/lib/ui/blur-placeholder';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, Clock } from 'lucide-react';
+import { getProgramCardImage, getProgramImageAlt } from '@/lib/images/programImages';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -80,14 +81,14 @@ function CatalogProgramCard({ p }: { p: CatalogProgram }) {
     >
       {/* Cover image — no overlay, no text on image */}
       <div className="relative aspect-[16/10] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src={p.heroImage}
-          alt={p.heroImageAlt}
+        <Image
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+          src={getProgramCardImage(p.slug)}
+          alt={getProgramImageAlt(p.slug, p.heroImageAlt)}
           fill
           className="object-cover transition duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" 
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
         />
         {/* Top badges only — no overlay, no text */}
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">

@@ -9,7 +9,7 @@ import { getProgramCardImage } from '@/lib/images/programImages';
  * Do not add icons, checkmarks, or colored badges here.
  */
 export default function ProgramCard({ program }: { program: Program }) {
-  const imageSrc = program.cardImage || program.heroImage || getProgramCardImage(program.slug);
+  const imageSrc = getProgramCardImage(program.slug);
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all">

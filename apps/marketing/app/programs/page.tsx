@@ -110,25 +110,26 @@ export default async function ProgramsPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <section className="relative min-h-[360px] overflow-hidden bg-slate-950">
-        <Image
-          src="/images/programs-hero-vibrant.webp"
-          alt="Elevate career training programs"
-          fill
-          priority
-          className="object-cover opacity-55"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-slate-950/45" />
-        <div className="relative mx-auto flex min-h-[360px] max-w-6xl items-center px-6 py-16">
-          <div className="max-w-3xl text-white">
-            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-orange-300">
+      <section className="overflow-hidden bg-white">
+        <div className="relative min-h-[360px] bg-slate-100">
+          <Image
+            src="/images/programs-hero-vibrant.webp"
+            alt="Elevate career training programs"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </div>
+        <div className="mx-auto max-w-6xl px-6 py-10">
+          <div className="max-w-3xl">
+            <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-brand-red-700">
               Career Training
             </p>
             <h1 className="mt-3 text-4xl font-black leading-tight sm:text-6xl">
               Choose the right program — and the right funding path.
             </h1>
-            <p className="mt-5 text-lg leading-relaxed text-white sm:text-xl">
+            <p className="mt-5 text-lg leading-relaxed text-slate-700 sm:text-xl">
               {PLATFORM_DEFAULTS.orgName} separates verified workforce-funded programs from regular
               self-pay courses so applicants know exactly which enrollment process applies.
             </p>

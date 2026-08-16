@@ -19,7 +19,7 @@ export interface HeroDemoSlide {
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
-  /** Deprecated for hero rendering. Kept only for caller compatibility; posters are not rendered. */
+  /** Poster shown while video buffers and as the permanent fallback on video failure. */
   posterImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
@@ -44,7 +44,7 @@ export interface HeroVideoProps {
 export default function HeroVideo({
   videoSrcDesktop,
   videoSrcMobile,
-  posterImage: _posterImage,
+  posterImage,
   voiceoverSrc,
   microLabel,
   showBrandBug: _showBrandBug = false,
@@ -98,7 +98,7 @@ export default function HeroVideo({
     video.loop = true;
     void video.play().catch(() => {
       // Browser autoplay policy may defer playback until interaction.
-      // The frame remains clean and posterless rather than showing stale artwork.
+      // The poster remains visible underneath until a frame can render.
     });
   }, [videoSrc]);
 
@@ -149,6 +149,7 @@ export default function HeroVideo({
   }
 
   const showVideo = Boolean(videoSrc) && !videoFailed;
+  const showPoster = Boolean(posterImage);
 
   return (
     <div className={`w-full ${className}`}>
@@ -156,10 +157,19 @@ export default function HeroVideo({
         className={`relative w-full overflow-hidden bg-black ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero media` : 'Hero media'}
       >
+        {showPoster ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${posterImage})` }}
+            aria-hidden="true"
+          />
+        ) : null}
+
         {showVideo ? (
           <video
             ref={videoRef}
             src={videoSrc}
+            poster={posterImage}
             preload="auto"
             autoPlay
             playsInline

@@ -109,6 +109,11 @@ replace_exact(
 gitroute = "apps/admin/app/api/devstudio/git/route.ts"
 replace_exact(
     gitroute,
+    "function parseDiffNameStatus(output: string) {",
+    "function parseDiffNameStatus(output: string): Array<{ status: string; path: string; oldPath?: string }> {",
+)
+replace_exact(
+    gitroute,
     """    .map((line) => {
       const parts = line.split('\\t');
       const status = parts[0] ?? '';
@@ -136,6 +141,35 @@ replace_exact(
     """          if (typeof row.lesson_slug === 'string') {
             curriculumMap.set(row.lesson_slug, row as CurriculumRow);
           }""",
+)
+replace_exact(
+    builder,
+    """  if (input.blueprint.socCode) {
+    try {
+      industryStandards = await loadIndustryStandards(
+        input.blueprint.socCode,
+        input.blueprint.credentialCode ?? null,
+      );
+      if (!industryStandards) {
+        warnings.push(
+          `Industry standards unavailable for SOC ${input.blueprint.socCode} (O*NET/BLS not loaded)`,
+        );
+      }
+    } catch (err) {""",
+    """  const blueprintSocCode =
+    typeof input.blueprint.socCode === 'string' ? input.blueprint.socCode : undefined;
+  if (blueprintSocCode) {
+    try {
+      industryStandards = await loadIndustryStandards(
+        blueprintSocCode,
+        input.blueprint.credentialCode ?? null,
+      );
+      if (!industryStandards) {
+        warnings.push(
+          `Industry standards unavailable for SOC ${blueprintSocCode} (O*NET/BLS not loaded)`,
+        );
+      }
+    } catch (err) {""",
 )
 replace_exact(
     builder,

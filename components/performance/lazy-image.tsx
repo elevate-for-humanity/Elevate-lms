@@ -1,11 +1,11 @@
 'use client';
 
 /**
- * LazyImage — client-safe lazy loading image component.
- * 
- * NOTE: This component does NOT call resolveSiteImagePath() because it uses 'fs'
- * which is server-only. Pass pre-resolved paths from Server Components when possible.
- * For direct usage, provide full URLs (not local paths that need resolution).
+ * LazyImage — client-safe image component with one deliberate lazy boundary.
+ *
+ * The IntersectionObserver is the lazy boundary. Once the component is mounted,
+ * the underlying Next Image loads eagerly so Chromium/Edge does not apply a
+ * second deferred-load layer to the same resource.
  */
 
 import Image, { ImageProps } from 'next/image';
@@ -24,15 +24,13 @@ export function LazyImage({
   className = '',
   ...props
 }: LazyImageProps) {
-  // Client-safe: just use the src directly
-  // If you need server-side path resolution, resolve in the parent Server Component
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(Boolean(props.priority || props.loading === 'eager'));
   const [error, setError] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!imgRef.current) return;
+    if (isInView || !imgRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -41,45 +39,46 @@ export function LazyImage({
           observer.disconnect();
         }
       },
-      { rootMargin: '100px' },
+      { rootMargin: '160px' },
     );
 
     observer.observe(imgRef.current);
-
     return () => observer.disconnect();
-  }, []);
+  }, [isInView]);
 
   return (
     <div ref={imgRef} className={`relative overflow-hidden ${className}`}>
-      {/* Placeholder/skeleton while loading */}
-      {!isLoaded && <div className="absolute inset-0 bg-slate-200 animate-pulse" />}
+      {!isLoaded && <div className="absolute inset-0 bg-slate-200 animate-pulse" aria-hidden="true" />}
 
       {isInView && (
         <Image
           src={error ? fallback : src}
           alt={alt}
           className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+          {...props}
+          loading="eager"
           onLoad={() => setIsLoaded(true)}
           onError={() => setError(true)}
-          {...props}
         />
       )}
     </div>
   );
 }
 
-// Preload critical images
+// Preload only exact, non-Next-optimized image URLs and never duplicate a tag.
 export function preloadImage(src: string) {
-  if (typeof window !== 'undefined') {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = src;
-    document.head.appendChild(link);
-  }
+  if (typeof window === 'undefined' || !src) return;
+  const escaped = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(src) : src.replace(/"/g, '\\"');
+  if (document.head.querySelector(`link[rel="preload"][as="image"][href="${escaped}"]`)) return;
+
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'image';
+  link.href = src;
+  link.dataset.elevateImagePreload = 'true';
+  document.head.appendChild(link);
 }
 
-// Image optimization utilities
 export const imageLoader = ({
   src,
   width,
@@ -89,7 +88,6 @@ export const imageLoader = ({
   width: number;
   quality?: number;
 }) => {
-  // Use Next.js image optimization
   if (src.startsWith('/')) {
     return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
   }

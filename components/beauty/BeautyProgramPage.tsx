@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ProgramSchema } from '@/lib/programs/program-schema';
 import { motion } from 'framer-motion';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
 interface BeautyProgramPageProps {
   program: ProgramSchema;
@@ -94,9 +95,12 @@ export default function BeautyProgramPage({ program, campuses = DEFAULT_CAMPUSES
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-bg">
-          <video autoPlay muted loop playsInline poster={program.heroImage} className="hero-video">
-            <source src={heroVideoSrc} type="video/mp4" />
-          </video>
+          <SafeHeroVideo
+            src={heroVideoSrc}
+            poster={program.heroImage}
+            className="hero-video"
+            ariaLabel={`${typeLabels[programType]} program overview video`}
+          />
           <div className="hero-gradient" />
         </div>
         <div className="hero-content">

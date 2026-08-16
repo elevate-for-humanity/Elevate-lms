@@ -15,6 +15,14 @@ export interface FactoryInput {
   programId?: string;
   programSlug?: string;
   blueprint?: CredentialBlueprint;
+  title?: string;
+  topic?: string;
+  audience?: string;
+  state?: string;
+  credential?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  moduleCount?: number;
+  lessonsPerModule?: number;
   mode?: BuildMode;
   contentSource?: ContentSource;
   videoMode?: VideoMode;

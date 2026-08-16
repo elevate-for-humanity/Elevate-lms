@@ -41,6 +41,16 @@ const validatedHandoff: ValidationResult = {
   warningCount: 0,
 };
 
+const DB_LESSON_TYPES = new Set([
+  'lesson',
+  'quiz',
+  'checkpoint',
+  'lab',
+  'assignment',
+  'exam',
+  'certification',
+]);
+
 function normalizeLessonContent(
   content: string | undefined,
   objective: string | undefined,
@@ -63,37 +73,89 @@ function normalizeLessonContent(
   };
 }
 
+function normalizeLessonType(lesson: Record<string, any>, slug: string): string {
+  const requested = String(lesson.lessonType ?? lesson.stepType ?? '').trim();
+  if (DB_LESSON_TYPES.has(requested)) return requested;
+  if (requested === 'practical') return 'lab';
+  return inferStepType(slug);
+}
+
 function buildAtomicPayload(modules: BlueprintModule[]) {
   return [...modules]
     .sort((left, right) => left.orderIndex - right.orderIndex)
-    .map((courseModule) => ({
-      slug: courseModule.slug,
-      title: courseModule.title,
-      description: courseModule.description ?? null,
-      order_index: courseModule.orderIndex,
-      lessons: [...(courseModule.lessons ?? [])]
-        .sort((left, right) => left.order - right.order)
-        .map((lesson) => {
-          const stepType = inferStepType(lesson.slug);
-          return {
-            slug: lesson.slug,
-            title: lesson.title,
-            lesson_type: stepType,
-            order_index: lesson.order,
-            objective: lesson.objective ?? null,
-            content: normalizeLessonContent(lesson.content, lesson.objective),
-            quiz_questions:
-              lesson.quizQuestions?.map((question) => ({
-                question: question.question,
-                options: question.options,
-                correct: question.correctAnswer,
-                explanation: question.explanation,
-              })) ?? null,
-            passing_score: lesson.passingScore ?? (stepType === 'exam' ? 80 : 70),
-            activities: lesson.activities ?? null,
-          };
-        }),
-    }));
+    .map((courseModule) => {
+      const moduleExtra = courseModule as typeof courseModule & Record<string, any>;
+      return {
+        slug: courseModule.slug,
+        title: courseModule.title,
+        description: courseModule.description ?? null,
+        order_index: courseModule.orderIndex,
+        domain_key: courseModule.domainKey ?? null,
+        target_hours: moduleExtra.targetHours ?? null,
+        is_required: moduleExtra.isRequired ?? true,
+        lessons: [...(courseModule.lessons ?? [])]
+          .sort((left, right) => left.order - right.order)
+          .map((lesson) => {
+            const extra = lesson as typeof lesson & Record<string, any>;
+            const stepType = normalizeLessonType(extra, lesson.slug);
+            const content = normalizeLessonContent(lesson.content, lesson.objective);
+            const renderedHtml =
+              typeof extra.renderedHtml === 'string'
+                ? extra.renderedHtml
+                : typeof content?.html === 'string'
+                  ? content.html
+                  : null;
+            const instructorNotes = Array.isArray(lesson.instructorNotes)
+              ? lesson.instructorNotes.join('\n\n')
+              : lesson.instructorNotes ?? null;
+
+            return {
+              slug: lesson.slug,
+              title: lesson.title,
+              lesson_type: stepType,
+              order_index: lesson.order,
+              objective: lesson.objective ?? null,
+              content,
+              rendered_html: renderedHtml,
+              quiz_questions:
+                lesson.quizQuestions?.map((question) => ({
+                  question: question.question,
+                  options: question.options,
+                  correct: question.correctAnswer,
+                  explanation: question.explanation,
+                })) ?? null,
+              passing_score:
+                lesson.passingScore ??
+                (stepType === 'exam' ? 80 : ['checkpoint', 'quiz'].includes(stepType) ? 70 : null),
+              activities: extra.activities ?? null,
+              duration_minutes: lesson.durationMinutes ?? null,
+              video_url: extra.videoUrl ?? lesson.videoFile ?? null,
+              video_config: extra.videoConfig ?? null,
+              learning_objectives: lesson.learningObjectives ?? null,
+              competency_checks: lesson.competencyChecks ?? null,
+              instructor_notes: instructorNotes,
+              practical_required: extra.practicalRequired ?? stepType === 'lab',
+              required_artifacts: Array.isArray(extra.requiredArtifacts)
+                ? extra.requiredArtifacts
+                : [],
+              unlock_rule: extra.unlockRule ?? null,
+              partner_exam_code: lesson.partnerExamCode ?? null,
+              domain_key: lesson.domainKey ?? courseModule.domainKey ?? null,
+              hour_category: extra.hourCategory ?? null,
+              evidence_type: extra.evidenceType ?? null,
+              delivery_method: extra.deliveryMethod ?? null,
+              requires_instructor_signoff: extra.requiresInstructorSignoff ?? false,
+              instructor_requirement: extra.instructorRequirement ?? null,
+              minimum_seat_time_minutes: extra.minimumSeatTimeMinutes ?? null,
+              fieldwork_eligible: extra.fieldworkEligible ?? false,
+              is_required: extra.isRequired ?? true,
+              ai_generated: extra.aiGenerated ?? false,
+              approved: extra.approved ?? false,
+              compliance_profile_key: extra.complianceProfileKey ?? null,
+            };
+          }),
+      };
+    });
 }
 
 /**
@@ -171,7 +233,13 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
 export async function publishCourseAtomic(
   courseId: string,
   programId?: string | null,
-): Promise<{ success: boolean; lessonsPublished?: number; error?: string }> {
+): Promise<{
+  success: boolean;
+  lessonsPublished?: number;
+  curriculumLessonsInserted?: number;
+  curriculumLessonsSkipped?: number;
+  error?: string;
+}> {
   const db = await requireAdminClient();
 
   const { data, error } = await db.rpc('publish_course_from_staging', {
@@ -180,9 +248,16 @@ export async function publishCourseAtomic(
   });
 
   if (error) return { success: false, error: error.message };
+  const result = (data ?? {}) as {
+    lessons_published?: number;
+    curriculum_lessons_inserted?: number;
+    curriculum_lessons_skipped?: number;
+  };
 
   return {
     success: true,
-    lessonsPublished: (data as { lessons_published?: number })?.lessons_published,
+    lessonsPublished: result.lessons_published,
+    curriculumLessonsInserted: result.curriculum_lessons_inserted,
+    curriculumLessonsSkipped: result.curriculum_lessons_skipped,
   };
 }

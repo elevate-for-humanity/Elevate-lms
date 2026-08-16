@@ -27,6 +27,7 @@ export interface FactoryInput {
   contentSource?: ContentSource;
   videoMode?: VideoMode;
   videoQueueLimit?: number | null;
+  dryRun?: boolean;
 }
 
 export interface FactoryOutput {
@@ -45,6 +46,7 @@ export interface FactoryOutput {
   warnings?: string[];
   errors?: string[];
   status?: FactoryStatus;
+  dryRun?: boolean;
 }
 
 export type FactoryStatus =

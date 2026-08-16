@@ -1,26 +1,25 @@
 import { describe, it, expect } from 'vitest';
 import {
+  clampSetupFeeCents,
   MIN_SETUP_FEE_CENTS,
   PAYMENT_TERM_WEEKS,
   TUITION_CENTS,
+  weeklyPaymentCents,
 } from '@/lib/barber/pricing';
 
 describe('barber pricing authority', () => {
-  it('uses $4,980 tuition, no minimum down payment, 29 weekly payments', () => {
+  it('uses $4,980 tuition, $600 minimum setup fee, and 29 weekly payments', () => {
     expect(TUITION_CENTS).toBe(498000);
-    expect(MIN_SETUP_FEE_CENTS).toBe(0); // No minimum required
+    expect(MIN_SETUP_FEE_CENTS).toBe(60000);
     expect(PAYMENT_TERM_WEEKS).toBe(29);
-    // With $0 down, full tuition spread over 29 weeks
-    const weekly = Math.ceil((TUITION_CENTS - MIN_SETUP_FEE_CENTS) / PAYMENT_TERM_WEEKS);
-    expect(weekly).toBe(17173); // ~$172/wk with no down payment
+    expect(weeklyPaymentCents(600)).toBe(15104);
   });
 
-  it('allows custom down payments from $0 to full tuition', () => {
-    // Verify the clamp function works for various inputs
-    const clamp = (fee: number) => Math.min(TUITION_CENTS, Math.max(0, fee));
-    expect(clamp(0)).toBe(0);
-    expect(clamp(60000)).toBe(60000);
-    expect(clamp(498000)).toBe(498000);
-    expect(clamp(600000)).toBe(498000); // Capped at tuition
+  it('clamps custom setup fees to the canonical allowed range', () => {
+    expect(clampSetupFeeCents(0)).toBe(60000);
+    expect(clampSetupFeeCents(600)).toBe(60000);
+    expect(clampSetupFeeCents(750)).toBe(75000);
+    expect(clampSetupFeeCents(4980)).toBe(498000);
+    expect(clampSetupFeeCents(6000)).toBe(498000);
   });
 });

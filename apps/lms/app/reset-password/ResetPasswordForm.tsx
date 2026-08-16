@@ -14,6 +14,9 @@ export default function ResetPasswordForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
+  const [requestMode, setRequestMode] = useState(false);
+  const [email, setEmail] = useState('');
+  const [recoverySent, setRecoverySent] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -21,10 +24,34 @@ export default function ResetPasswordForm() {
       if (data.session) {
         setSessionReady(true);
       } else {
-        router.replace('/login?error=session_expired');
+        // A direct visit from the login page is a recovery-email request.
+        // A visit from the emailed recovery link carries a Supabase session
+        // and continues to the new-password form above.
+        setRequestMode(true);
+        setSessionReady(true);
       }
     });
   }, [router]);
+
+  const handleRecoveryRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const redirectTo = `${window.location.origin}/auth/callback?next=/reset-password`;
+      const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(
+        email.trim().toLowerCase(),
+        { redirectTo },
+      );
+      if (recoveryError) throw recoveryError;
+      setRecoverySent(true);
+    } catch (err: any) {
+      setError(err?.message || 'Unable to send recovery email. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +102,29 @@ export default function ResetPasswordForm() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
-          {success ? (
+          {requestMode ? (
+            recoverySent ? (
+              <div className="text-center space-y-4" role="status">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mx-auto">
+                  <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </div>
+                <p className="text-slate-900 font-semibold text-lg">Check your email</p>
+                <p className="text-slate-600 text-sm">If an account exists for that address, a secure password-reset link has been sent.</p>
+                <Link href="/login" className="inline-block text-brand-blue-600 font-semibold hover:underline">Back to Login</Link>
+              </div>
+            ) : (
+              <form onSubmit={handleRecoveryRequest} className="space-y-6">
+                {error && <div role="alert" className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>}
+                <div>
+                  <label htmlFor="recovery-email" className="block text-sm font-semibold text-slate-700 mb-2">Email address</label>
+                  <input id="recovery-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" className="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-blue-500" />
+                </div>
+                <button type="submit" disabled={loading} className="w-full py-3 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg">
+                  {loading ? 'Sending…' : 'Send Password Reset Link'}
+                </button>
+              </form>
+            )
+          ) : success ? (
             <div className="text-center space-y-4">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mx-auto">
                 <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

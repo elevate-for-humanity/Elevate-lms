@@ -23,6 +23,7 @@ const PERSONAS = [
   ['Apprentice', 'apps/lms/app/apprentice/layout.tsx', 'public/manifest-apprentice.json', '/manifest-apprentice.json', '/apprentice', '/apprentice', 'lms'],
   ['Host Shop', 'apps/lms/app/host-shop/layout.tsx', 'public/manifest-shop-owner.json', '/manifest-shop-owner.json', '/host-shop/dashboard', '/host-shop/', 'lms'],
   ['Program Holder', 'apps/lms/app/program-holder/layout.tsx', 'public/manifest-program-holder.json', '/manifest-program-holder.json', '/program-holder/dashboard', '/program-holder/', 'lms'],
+  ['Employer', 'apps/lms/app/employer/layout.tsx', 'public/manifest-employer.json', '/manifest-employer.json', '/employer/dashboard', '/employer/', 'lms'],
 ];
 
 const CANONICAL_MANIFEST_ROUTES = [
@@ -31,6 +32,7 @@ const CANONICAL_MANIFEST_ROUTES = [
   ['LMS apprentice shortcut', 'public/manifest-lms.json', 'shortcut:Apprentice Dashboard', '/apprentice', 'apps/lms/app/apprentice/page.tsx'],
   ['LMS host shop shortcut', 'public/manifest-lms.json', 'shortcut:Host Shop Dashboard', '/host-shop/dashboard', 'apps/lms/app/host-shop/dashboard/page.tsx'],
   ['LMS employer shortcut', 'public/manifest-lms.json', 'shortcut:Employer Dashboard', '/employer/dashboard', 'apps/lms/app/employer/dashboard/page.tsx'],
+  ['LMS workforce shortcut', 'public/manifest-lms.json', 'shortcut:Workforce Dashboard', '/workforce/dashboard', 'apps/lms/app/workforce/dashboard/page.tsx'],
   ['Admin root start', 'public/manifest-admin.json', 'start_url', '/dashboard', 'apps/admin/app/dashboard/page.tsx'],
   ['Admin students shortcut', 'public/manifest-admin.json', 'shortcut:Students', '/students', 'apps/admin/app/students/page.tsx'],
   ['Admin applications shortcut', 'public/manifest-admin.json', 'shortcut:Applications', '/applications', 'apps/admin/app/applications/page.tsx'],
@@ -129,7 +131,7 @@ for (const sw of ['public/sw-marketing.js', 'public/sw-admin.js']) {
   else pass(`${sw}: domain responsibilities are isolated`);
 }
 const lmsWorker = readFile('public/sw-lms.js') || '';
-for (const protectedPath of ['/lms/dashboard', '/apprentice', '/host-shop', '/program-holder']) {
+for (const protectedPath of ['/lms/dashboard', '/apprentice', '/host-shop', '/program-holder', '/employer', '/workforce']) {
   if (!lmsWorker.includes(protectedPath)) warn(`public/sw-lms.js: protected route marker ${protectedPath} was not found; confirm authenticated navigation remains network-only`);
 }
 

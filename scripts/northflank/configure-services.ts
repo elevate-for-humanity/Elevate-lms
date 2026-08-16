@@ -8,7 +8,7 @@
  *   - elevate-admin     -> /Dockerfile.northflank-admin
  *
  * This file owns infrastructure/runtime shape: Dockerfile, public port,
- * service role, runtime port, zero-downtime rollout strategy, health probes,
+ * service role, runtime port, capacity-safe rollout strategy, health probes,
  * billing, and build storage. Privileged credentials are managed separately
  * by sync-env.ts through the shared elevate-production-env secret group.
  */
@@ -209,26 +209,23 @@ function buildPatch(service: ServiceConfig, storageMb: number, rolloutMode: Roll
   };
 }
 
-async function patchWithZeroDowntimeStrategy(
+async function patchWithCapacitySafeStrategy(
   projectId: string,
   service: ServiceConfig,
   storageMb: number,
 ): Promise<{ response: Record<string, any>; rolloutMode: RolloutMode }> {
   const path = combinedServicePatchPath(projectId, service.id);
 
-  try {
-    const response = await nfFetch<Record<string, any>>(path, {
-      method: 'PATCH',
-      body: JSON.stringify(buildPatch(service, storageMb, 'custom')),
-    });
-    return { response, rolloutMode: 'custom' };
-  } catch (customError) {
-    throw new Error(
-      `Northflank rejected the required ${service.role} zero-downtime strategy ` +
-        `(maxSurge=1,maxUnavailable=0). Refusing deployment rather than risking 503/no healthy upstream. ` +
-        `${customError instanceof Error ? customError.message : String(customError)}`,
-    );
-  }
+  // Production services currently run a single nf-compute-400 replica.
+  // maxSurge=1 requires capacity for a second full replica and leaves the
+  // replacement pending indefinitely when that allowance is unavailable.
+  // Northflank's steady rollout replaces within the existing allowance; the
+  // health probes below still gate readiness and the workflow verifies the SHA.
+  const response = await nfFetch<Record<string, any>>(path, {
+    method: 'PATCH',
+    body: JSON.stringify(buildPatch(service, storageMb, 'rollout-steady')),
+  });
+  return { response, rolloutMode: 'rollout-steady' };
 }
 
 async function configureService(
@@ -242,7 +239,7 @@ async function configureService(
 
   for (const storageMb of storageAllowanceCandidates(requestedEphemeralMb)) {
     try {
-      const patched = await patchWithZeroDowntimeStrategy(projectId, service, storageMb);
+      const patched = await patchWithCapacitySafeStrategy(projectId, service, storageMb);
       response = patched.response;
       appliedRolloutMode = patched.rolloutMode;
       appliedEphemeralMb = storageMb;
@@ -306,7 +303,7 @@ async function main() {
     for (const service of services) {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
-          `rollout=custom(maxSurge=1,maxUnavailable=0), health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
+          `rollout=rollout-steady, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
       );
     }
     return;

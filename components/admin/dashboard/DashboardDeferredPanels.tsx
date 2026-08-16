@@ -2,11 +2,11 @@
 
 /**
  * Below-the-fold dashboard panels — lazy-loaded to improve initial dashboard paint.
- * Includes error boundaries to prevent ChunkLoadError from breaking the entire page.
+ * Uses React lazy/Suspense instead of next/dynamic so the dashboard does not
+ * depend on private Next.js vendored loadable internals during production builds.
  */
 
-import dynamic from 'next/dynamic';
-import { Component, type ReactNode } from 'react';
+import { Component, lazy, Suspense, type ComponentType, type ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface ErrorBoundaryState {
@@ -56,46 +56,54 @@ const panelSkeleton = (
   </div>
 );
 
-// Handle both default and named exports
-const withFallback = (m: any) => m.default || m;
+type LazyModule = { default?: ComponentType<any> } & Record<string, unknown>;
 
-// Wrapper with error boundary for each lazy panel
-export const PublishWebsitePanelLazy = dynamic(
-  () => import('./PublishWebsitePanel').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
+function createDeferredPanel(
+  name: string,
+  loader: () => Promise<LazyModule>,
+): ComponentType<any> {
+  const LazyPanel = lazy(async () => {
+    const mod = await loader();
+    const component = mod.default ?? Object.values(mod).find((value) => typeof value === 'function');
+    if (!component) throw new Error(`${name} does not export a React component`);
+    return { default: component as ComponentType<any> };
+  });
+
+  function DeferredPanel(props: Record<string, unknown>) {
+    return (
+      <PanelErrorBoundary name={name}>
+        <Suspense fallback={panelSkeleton}>
+          <LazyPanel {...props} />
+        </Suspense>
+      </PanelErrorBoundary>
+    );
+  }
+
+  DeferredPanel.displayName = `${name}Lazy`;
+  return DeferredPanel;
+}
+
+export const PublishWebsitePanelLazy = createDeferredPanel(
+  'Publish Website',
+  () => import('./PublishWebsitePanel'),
 );
 
-export const ProgramIntegrityPanelLazy = dynamic(
-  () => import('./ProgramIntegrityPanel').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
+export const ProgramIntegrityPanelLazy = createDeferredPanel(
+  'Program Integrity',
+  () => import('./ProgramIntegrityPanel'),
 );
 
-export const JobBoardPanelLazy = dynamic(
-  () => import('./JobBoardPanel').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
+export const JobBoardPanelLazy = createDeferredPanel(
+  'Job Board',
+  () => import('./JobBoardPanel'),
 );
 
-export const SitePreviewPanelWrapperLazy = dynamic(
-  () => import('./SitePreviewPanelWrapper').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
+export const SitePreviewPanelWrapperLazy = createDeferredPanel(
+  'Site Preview',
+  () => import('./SitePreviewPanelWrapper'),
 );
 
-export const LizzyContainerWrapperLazy = dynamic(
-  () => import('./LizzyContainerWrapper').then(withFallback),
-  { 
-    loading: () => panelSkeleton, 
-    ssr: false,
-  },
+export const LizzyContainerWrapperLazy = createDeferredPanel(
+  'Lizzy',
+  () => import('./LizzyContainerWrapper'),
 );

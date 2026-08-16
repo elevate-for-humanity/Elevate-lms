@@ -214,8 +214,9 @@ function ensureUniqueLessonTitles(draft: PublishDraft): void {
   for (const mod of draft.modules) {
     for (const lesson of mod.lessons) {
       const key = lesson.lesson_title.trim().toLowerCase();
-      if (seen.has(key))
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      if (seen.has(key)) {
+        throw new Error(`Duplicate lesson title: ${lesson.lesson_title}`);
+      }
       seen.add(key);
     }
   }
@@ -226,7 +227,7 @@ function validateQuizAnswers(draft: PublishDraft): void {
     for (const lesson of mod.lessons) {
       for (const q of lesson.knowledge_check) {
         if (!q.options.includes(q.correct_answer)) {
-          return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+          throw new Error(`Invalid quiz answer in lesson: ${lesson.lesson_title}`);
         }
       }
     }
@@ -236,10 +237,12 @@ function validateQuizAnswers(draft: PublishDraft): void {
 function validateDurations(draft: PublishDraft): void {
   for (const mod of draft.modules) {
     for (const lesson of mod.lessons) {
-      if (lesson.estimated_minutes < 3)
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-      if (lesson.narration_script.trim().length < 400)
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      if (lesson.estimated_minutes < 3) {
+        throw new Error(`Lesson duration below minimum: ${lesson.lesson_title}`);
+      }
+      if (lesson.narration_script.trim().length < 400) {
+        throw new Error(`Narration below minimum length: ${lesson.lesson_title}`);
+      }
     }
   }
 }
@@ -316,8 +319,7 @@ async function publishCompiledDraft(
   // Drafts (auto_publish: false) are always allowed through.
   if (draft.program_id) {
     const coverageError = await checkCoverageGate(draft.program_id, draft.auto_publish);
-    if (coverageError)
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    if (coverageError) throw new Error(coverageError);
   }
 
   const slugBase = draft.course_name
@@ -363,8 +365,9 @@ async function publishCompiledDraft(
     .select('id, slug')
     .maybeSingle();
 
-  if (courseErr || !courseRow)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  if (courseErr || !courseRow) {
+    throw new Error(`Failed to create course: ${courseErr?.message ?? 'missing course row'}`);
+  }
 
   const courseId = courseRow.id;
 

@@ -1,9 +1,9 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 export const ENTREPRENEURSHIP: ProgramSchema = {
   slug: 'entrepreneurship',
-  title: 'Entrepreneurship & Small Business',
+  title: 'Elevate ESB',
   subtitle:
-    'Launch or grow your business. Business planning, marketing, financial management, and Certiport ESB certification in 6 weeks.',
+    'Launch or grow your business. Business planning, marketing, financial management, and ESB certification preparation in 6 weeks.',
   sector: 'business',
   category: 'Entrepreneurship',
   programType: 'workforce',
@@ -26,7 +26,7 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
     {
       name: 'Entrepreneurship and Small Business (ESB)',
       issuer: 'Certiport',
-      description: 'Certification in business planning and entrepreneurship fundamentals.',
+      description: 'External certification in business planning and entrepreneurship fundamentals.',
       validity: 'Lifetime',
     },
     {
@@ -56,13 +56,13 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
       statement: 'Identify funding sources (grants, loans, microfinance) for small businesses',
       assessedAt: 'Week 2',
     },
-    { statement: 'Pass Certiport ESB certification exam', assessedAt: 'Week 6' },
+    { statement: 'Complete Elevate ESB exam readiness requirements', assessedAt: 'Week 6' },
   ],
   careerPathway: [
     {
       title: 'Business Owner (startup)',
       timeframe: '0–6 months',
-      requirements: 'Business plan + ESB cert',
+      requirements: 'Business plan + ESB readiness',
       salaryRange: 'Varies',
     },
     {
@@ -106,8 +106,8 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
     },
     {
       week: 'Week 6',
-      title: 'ESB Certification & Launch',
-      competencyMilestone: 'Pass ESB exam and finalize launch plan',
+      title: 'Elevate ESB Readiness & Launch',
+      competencyMilestone: 'Complete ESB readiness review and finalize launch plan',
     },
   ],
   curriculum: [
@@ -144,8 +144,8 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   ],
   complianceAlignment: [
     {
-      standard: 'Certiport ESB Standards',
-      description: 'Curriculum aligned to Certiport ESB certification exam objectives.',
+      standard: 'ESB U.S. v.2 Objectives',
+      description: 'Elevate ESB curriculum is aligned to current Entrepreneurship and Small Business exam objective domains.',
     },
     {
       standard: 'SBA Guidelines',
@@ -154,9 +154,9 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   ],
   credentialPipeline: [
     {
-      training: 'Entrepreneurship (6 weeks)',
+      training: 'Elevate ESB (6 weeks)',
       certification: 'ESB + QuickBooks Certified',
-      certBody: 'Certiport',
+      certBody: 'External certification partners',
       jobRole: 'Small Business Owner / Consultant',
     },
   ],
@@ -185,13 +185,13 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
     'Basic computer skills',
   ],
   equipmentIncluded:
-    'Laptop provided during training. All software and certification exam fees included.',
+    'Laptop provided during training. All software and included exam fees are covered by the program where applicable.',
   modality: 'Hybrid — Evening classes, Saturday workshops, LMS-supported coursework',
   facilityInfo: 'Elevate training center, Indianapolis',
   employerPartners: ['SCORE Indianapolis mentors', 'Local business development organizations'],
   pricingIncludes: [
     '80 instructional hours',
-    'ESB certification exam',
+    'ESB exam preparation',
     'QuickBooks certification exam',
     'Business plan template and tools',
     'Mentorship connections',
@@ -213,11 +213,11 @@ export const ENTREPRENEURSHIP: ProgramSchema = {
   breadcrumbs: [
     { label: 'Home', href: '/' },
     { label: 'Programs', href: '/programs' },
-    { label: 'Entrepreneurship' },
+    { label: 'Elevate ESB' },
   ],
-  metaTitle: 'Entrepreneurship & Small Business | Certiport ESB | Indianapolis',
+  metaTitle: 'Elevate ESB | Entrepreneurship & Small Business | Indianapolis',
   metaDescription:
-    'Launch or grow your business. Business planning, marketing, and ESB certification in 6 weeks. Indianapolis. WIOA funding available for eligible Indiana residents.',
+    'Elevate ESB helps you launch or grow a business through business planning, marketing, financial management, and ESB exam preparation in 6 weeks.',
 
 
   fundingOptions: ['impact', 'self_pay'],

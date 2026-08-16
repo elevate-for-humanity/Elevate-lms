@@ -42,6 +42,7 @@ import { execFileSync, execSync } from 'child_process';
 import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
+type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
 type ChatProvider = 'auto' | 'groq' | 'openai' | 'gemini' | 'anthropic';
 
 const PROVIDER_MODELS: Record<Exclude<ChatProvider, 'auto'>, string[]> = {
@@ -63,7 +64,7 @@ function modelFor(provider: Exclude<ChatProvider, 'auto'>, requested: unknown) {
   return models.includes(candidate) ? candidate : models[0];
 }
 
-function toChatMessages(messages: { role: string; content: string }[]) {
+function toChatMessages(messages: ChatMessage[]) {
   return messages
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .map((m) => ({
@@ -666,7 +667,7 @@ export const maxDuration = 60;
 
 
 export const metadata: Metadata = {
-  title: '${pageTitle} | ${PLATFORM_DEFAULTS.orgName}',
+  title: '${pageTitle} | \${PLATFORM_DEFAULTS.orgName}',
   description: '${pageTitle} for ${audience}.',
 };
 
@@ -1190,9 +1191,23 @@ async function _POST(req: NextRequest) {
     const { fileContext, documentsContext, provider: rawProvider, model: rawModel } = body;
 
     // Accept both { messages: [...] } and legacy { message: "..." } shapes
-    let messages: { role: string; content: string }[] = [];
+    let messages: ChatMessage[] = [];
     if (Array.isArray(body.messages)) {
-      messages = body.messages;
+      messages = body.messages
+        .filter(
+          (message: unknown): message is { role: string; content: string } =>
+            !!message &&
+            typeof message === 'object' &&
+            'role' in message &&
+            'content' in message &&
+            typeof (message as { role?: unknown }).role === 'string' &&
+            typeof (message as { content?: unknown }).content === 'string',
+        )
+        .filter((message) => ['user', 'assistant', 'system'].includes(message.role))
+        .map((message) => ({
+          role: message.role as ChatMessage['role'],
+          content: message.content,
+        }));
     } else if (typeof body.message === 'string') {
       messages = [{ role: 'user', content: body.message }];
     } else {
@@ -1243,7 +1258,9 @@ async function _POST(req: NextRequest) {
           });
 
           const choice = initial.choices[0];
-          const toolCallRequests = choice?.message?.tool_calls ?? [];
+          const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
+            (toolCall) => toolCall.type === 'function',
+          );
 
           if (toolCallRequests.length > 0) {
             const execResults = await Promise.all(
@@ -1299,7 +1316,9 @@ async function _POST(req: NextRequest) {
             max_tokens: 4096,
           });
           const choice = initial.choices[0];
-          const toolCallRequests = choice?.message?.tool_calls ?? [];
+          const toolCallRequests = (choice?.message?.tool_calls ?? []).filter(
+            (toolCall) => toolCall.type === 'function',
+          );
           if (toolCallRequests.length > 0) {
             const execResults = await Promise.all(
               toolCallRequests.map(async (tc) => {

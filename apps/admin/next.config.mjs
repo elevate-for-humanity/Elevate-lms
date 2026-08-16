@@ -42,6 +42,15 @@ const adminConfig = {
 
   webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
+
+    // Next 15.5.23's compiled next/dynamic can request this vendored context
+    // even though that file is not present in the published package. Point the
+    // request at Next's canonical shared runtime context instead. This keeps all
+    // existing dynamic imports functional without relying on a missing private file.
+    config.resolve.alias[
+      'next/dist/server/route-modules/app-page/vendored/contexts/loadable'
+    ] = 'next/dist/shared/lib/loadable-context.shared-runtime.js';
+
     if (isServer) {
       config.resolve.alias['@/lib/logger'] = path.join(ROOT, 'lib/logger.ts');
       config.resolve.alias['@/lib/supabase'] = path.join(ROOT, 'lib/supabase');

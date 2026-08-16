@@ -315,7 +315,9 @@ export async function buildCanonicalCourseFromBlueprint(
         );
       } else {
         for (const row of curRows ?? []) {
-          curriculumMap.set(row.lesson_slug, row as CurriculumRow);
+          if (typeof row.lesson_slug === 'string') {
+            curriculumMap.set(row.lesson_slug, row as CurriculumRow);
+          }
         }
         logger.info(
           `[seeder] Loaded ${curriculumMap.size}/${allSlugs.length} rows from curriculum_lessons`,
@@ -325,15 +327,17 @@ export async function buildCanonicalCourseFromBlueprint(
   }
 
   // ── 5. Upsert modules + lessons in blueprint order ────────────────────────
-  if (input.blueprint.socCode) {
+  const blueprintSocCode =
+    typeof input.blueprint.socCode === 'string' ? input.blueprint.socCode : undefined;
+  if (blueprintSocCode) {
     try {
       industryStandards = await loadIndustryStandards(
-        input.blueprint.socCode,
+        blueprintSocCode,
         input.blueprint.credentialCode ?? null,
       );
       if (!industryStandards) {
         warnings.push(
-          `Industry standards unavailable for SOC ${input.blueprint.socCode} (O*NET/BLS not loaded)`,
+          `Industry standards unavailable for SOC ${blueprintSocCode} (O*NET/BLS not loaded)`,
         );
       }
     } catch (err) {
@@ -558,7 +562,9 @@ async function upsertLesson(
       })
       .eq('id', existing.id);
     if (error)
-      logger.error(`[seeder] DB update error [${lessonRef.slug}]:`, error.message, error.details);
+      logger.error(`[seeder] DB update error [${lessonRef.slug}]:`, error, {
+        details: error.details,
+      });
     return !error;
   }
 

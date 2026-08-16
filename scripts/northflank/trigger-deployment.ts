@@ -2,8 +2,9 @@
 /**
  * Deploy one exact Northflank build without changing the service replica count.
  *
- * Readiness probes control cutover: Northflank keeps the old ready container
- * serving traffic until the replacement is ready.
+ * The image is built and verified before this script runs. For the one-replica
+ * service, recreate is applied only at this deployment step so Northflank does
+ * not require capacity for a second full-size replica during cutover.
  *
  * Usage:
  *   npx tsx scripts/northflank/trigger-deployment.ts <service-id> --build-id <build-id> --sha <sha>
@@ -44,7 +45,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  console.log('=== EXACT ROLLING DEPLOYMENT ===');
+  console.log('=== EXACT SINGLE-REPLICA DEPLOYMENT ===');
   console.log(`Service:  ${serviceId}`);
   console.log(`Build ID: ${buildId}`);
   console.log(`SHA:      ${sha}`);
@@ -59,6 +60,9 @@ async function main(): Promise<void> {
       buildId,
     },
     docker: { configType: 'default' as const },
+    deployment: {
+      strategy: { type: 'recreate' as const },
+    },
   };
 
   await nfFetch(patchPath, {
@@ -66,8 +70,8 @@ async function main(): Promise<void> {
     body: JSON.stringify(deploymentPayload),
   });
 
-  console.log('Rolling deployment accepted.');
-  console.log('Replica count was preserved; no deprecated scale/restart call was made.');
+  console.log('Exact recreate deployment accepted after build verification.');
+  console.log('Replica count was preserved; readiness and SHA checks will verify recovery.');
 }
 
 main().catch((error) => {

@@ -2,16 +2,13 @@
   "name": "Elevate Admin",
   "short_name": "Admin",
   "description": "Administrative dashboard for managing programs, students, and operations",
-  "start_url": "/?utm_source=homescreen&utm_medium=pwa",
+  "start_url": "/dashboard?utm_source=homescreen&utm_medium=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#f97316",
-  "categories": [
-    "business",
-    "productivity"
-  ],
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-72.png",
@@ -66,35 +63,29 @@
     {
       "name": "Students",
       "short_name": "Students",
-      "url": "/admin/students",
-      "icons": [
-        {
-          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "url": "/students",
+      "icons": [{
+        "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
+        "sizes": "96x96"
+      }]
     },
     {
       "name": "Applications",
       "short_name": "Apps",
-      "url": "/admin/applications",
-      "icons": [
-        {
-          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "url": "/applications",
+      "icons": [{
+        "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
+        "sizes": "96x96"
+      }]
     },
     {
       "name": "Reports",
       "short_name": "Reports",
-      "url": "/admin/reports",
-      "icons": [
-        {
-          "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
-          "sizes": "96x96"
-        }
-      ]
+      "url": "/reports",
+      "icons": [{
+        "src": "https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/icons/admin-96.png",
+        "sizes": "96x96"
+      }]
     }
   ],
   "id": "org.elevateforhumanity.admin",

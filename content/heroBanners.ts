@@ -1,18 +1,16 @@
 /**
  * Canonical marketing hero configuration.
  *
- * The JSON dataset owns each page's explicit media assignment. Do not replace
- * page videos merely because another page happens to reference the same file;
- * that behavior caused unrelated hero videos to disappear or turn into stills.
- *
- * Posters are also explicit. Do not infer broad topical fallback images because
- * that caused the same workforce/healthcare/business pictures to appear across
- * unrelated pages and made the site look duplicated.
+ * JSON owns copy and non-dedicated media. Dedicated hero media is owned by the
+ * video registry and always wins so stale JSON cannot duplicate the homepage
+ * film across unrelated pages. Posters are explicit and semantic; no heuristic
+ * image substitution is allowed.
  */
 
 import { loadJsonOnce } from '@/lib/data/json-cache';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 import { PROGRAM_IMAGES, getProgramHeroImage } from '@/lib/images/programImages';
+import { getHeroVideoForPageKey } from '@/lib/video/registry';
 
 export interface HeroBannerCta {
   label: string;
@@ -70,15 +68,64 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
-function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
-  if (banner.posterImage) return banner.posterImage;
-  if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
-  return PAGE_PICTURE_OVERRIDES[key];
+function mediaKey(value?: string): string | undefined {
+  if (!value) return undefined;
+  const clean = value.split('#')[0]?.split('?')[0]?.trim();
+  if (!clean) return undefined;
+  try {
+    const url = new URL(clean, 'https://elevate.local');
+    return `${url.hostname.toLowerCase()}${url.pathname.replace(/\/{2,}/g, '/').toLowerCase()}`;
+  } catch {
+    return clean.replace(/\/{2,}/g, '/').toLowerCase();
+  }
 }
 
-function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerConfig {
-  const desktop = banner.videoSrcDesktop || banner.videoSrcMobile;
-  const mobile = banner.videoSrcMobile || banner.videoSrcDesktop;
+function escapeSvgText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
+ * Final fallback for a page that has no dedicated packaged poster.
+ * The poster is generated from that page's own canonical copy, so uncovered
+ * pages remain visually distinct and semantically labeled without reusing an
+ * unrelated photo or remote media URL.
+ */
+function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string {
+  const fallbackTitle = key
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+  const title = (banner.belowHeroHeadline ?? banner.headline ?? banner.microLabel ?? fallbackTitle).trim();
+  const label = (banner.microLabel ?? 'Elevate for Humanity').trim();
+  const compactTitle = title.length > 72 ? `${title.slice(0, 69).trim()}...` : title;
+  const compactLabel = label.length > 40 ? `${label.slice(0, 37).trim()}...` : label;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${escapeSvgText(compactTitle)}"><rect width="1600" height="900" fill="#0f172a"/><rect x="0" y="0" width="18" height="900" fill="#b91c1c"/><text x="96" y="360" fill="#f8fafc" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="700" letter-spacing="2">${escapeSvgText(compactLabel.toUpperCase())}</text><text x="96" y="470" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800">${escapeSvgText(compactTitle)}</text><text x="96" y="790" fill="#cbd5e1" font-family="Arial,Helvetica,sans-serif" font-size="30">Elevate for Humanity · ${escapeSvgText(key)}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function posterFor(key: string, banner: RawHeroBannerConfig): string {
+  const dedicated = getHeroVideoForPageKey(key);
+  if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
+  if (banner.posterImage) return banner.posterImage;
+  if (PROGRAM_IMAGES[key]) return getProgramHeroImage(key);
+  if (PAGE_PICTURE_OVERRIDES[key]) return PAGE_PICTURE_OVERRIDES[key];
+  return semanticInlinePoster(key, banner);
+}
+
+function normalizeBanner(
+  key: string,
+  banner: RawHeroBannerConfig,
+  allowJsonVideo = true,
+): HeroBannerConfig {
+  const dedicated = getHeroVideoForPageKey(key);
+  const jsonDesktop = banner.videoSrcDesktop || banner.videoSrcMobile;
+  const jsonMobile = banner.videoSrcMobile || banner.videoSrcDesktop;
+  const desktop = dedicated?.video_url || (allowJsonVideo ? jsonDesktop : undefined);
+  const mobile = dedicated?.video_url || (allowJsonVideo ? jsonMobile : undefined);
 
   let normalized: HeroBannerConfig = {
     ...banner,
@@ -93,21 +140,21 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
     analyticsName: banner.analyticsName ?? key,
   };
 
+  // Store is intentionally poster-first. It must never inherit a generic or
+  // homepage mobile video from the JSON dataset.
   if (key === 'store') {
     normalized = {
       ...normalized,
       videoSrcDesktop: undefined,
       videoSrcMobile: undefined,
-      posterImage: banner.posterImage ?? '/images/pages/store-licensing-hero.webp',
+      posterImage: posterFor(key, banner),
     };
   }
 
   if (key === 'home') {
     normalized = {
       ...normalized,
-      videoSrcDesktop: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
-      videoSrcMobile: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4',
-      posterImage: '/images/heroes/hero-homepage.webp',
+      posterImage: posterFor(key, banner),
       voiceoverSrc: '/audio/heroes/home.mp3',
       microLabel: 'The AI-Powered Workforce Operating System',
       eyebrow: 'Career Training & Workforce Development',
@@ -152,7 +199,32 @@ let normalizedData: Record<string, HeroBannerConfig> | null = null;
 function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
-  normalizedData = Object.fromEntries(Object.entries(raw).map(([key, banner]) => [key, normalizeBanner(key, banner)]));
+
+  // Compute the video each page would effectively receive after the dedicated
+  // registry takes precedence. A legacy JSON fallback is allowed only when its
+  // final effective media key is unique across the complete page set. This also
+  // catches collisions between a JSON fallback and another page's dedicated
+  // registry assignment, not only JSON-to-JSON duplicates.
+  const effectiveVideoCounts = new Map<string, number>();
+  for (const [key, banner] of Object.entries(raw)) {
+    const dedicated = getHeroVideoForPageKey(key);
+    const candidate = dedicated?.video_url || banner.videoSrcDesktop || banner.videoSrcMobile;
+    const candidateKey = mediaKey(candidate);
+    if (candidateKey) {
+      effectiveVideoCounts.set(candidateKey, (effectiveVideoCounts.get(candidateKey) ?? 0) + 1);
+    }
+  }
+
+  normalizedData = Object.fromEntries(
+    Object.entries(raw).map(([key, banner]) => {
+      const dedicated = getHeroVideoForPageKey(key);
+      const jsonCandidate = banner.videoSrcDesktop || banner.videoSrcMobile;
+      const finalCandidate = dedicated?.video_url || jsonCandidate;
+      const finalKey = mediaKey(finalCandidate);
+      const allowJsonVideo = Boolean(dedicated) || !finalKey || (effectiveVideoCounts.get(finalKey) ?? 0) <= 1;
+      return [key, normalizeBanner(key, banner, allowJsonVideo)];
+    }),
+  );
   return normalizedData;
 }
 

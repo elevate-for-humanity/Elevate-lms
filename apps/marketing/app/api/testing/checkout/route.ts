@@ -1,8 +1,7 @@
 // PUBLIC ROUTE: server-authoritative testing checkout.
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe/client';
-import { CERT_PROVIDERS, type ExamDefinition } from '@/lib/testing/proctoring-capabilities';
-import { isPublicTestingPriceVerified } from '@/lib/testing/public-pricing';
+import { CERT_PROVIDERS } from '@/lib/testing/proctoring-capabilities';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
@@ -71,22 +70,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Never turn planning estimates into a customer charge.
-  if (!isPublicTestingPriceVerified(providerKey)) {
-    return NextResponse.json(
-      {
-        error:
-          'Online payment is temporarily disabled for this provider while the current provider cost is being verified. Contact Elevate for the current total before payment.',
-      },
-      { status: 409 },
-    );
-  }
-
   const examName = body.examName?.trim() || '';
   const pricing = exactExamAmount(providerKey, examName);
   if (!pricing) {
     return NextResponse.json(
-      { error: 'Select a specific exam with verified published pricing before checkout.' },
+      { error: 'Select a specific exam with a configured retail price before checkout.' },
       { status: 422 },
     );
   }

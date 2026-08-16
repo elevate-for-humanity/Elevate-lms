@@ -54,30 +54,28 @@ async function flagAtRisk(params: Params, db: SupabaseClient): Promise<ExecuteRe
   const enrollmentIds = (params.enrollmentIds as string[]) ?? (params.enrollmentId ? [params.enrollmentId as string] : []);
   if (!enrollmentIds.length) return { success: false, message: 'No enrollment IDs provided.' };
 
-  const { error, count } = await db
+  const { data, error } = await db
     .from('program_enrollments')
     .update({ status: 'at_risk', at_risk_reason: params.reason ?? 'Flagged by Ellie', at_risk_flagged_at: new Date().toISOString() })
     .in('id', enrollmentIds)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .select('id', { count: 'exact', head: true } as any);
+    .select('id');
 
   if (error) throw new Error(`Failed to flag enrollments: ${error.message}`);
-  return { success: true, message: `${count ?? enrollmentIds.length} enrollment(s) flagged as at-risk.` };
+  return { success: true, message: `${data?.length ?? enrollmentIds.length} enrollment(s) flagged as at-risk.` };
 }
 
 async function unflagAtRisk(params: Params, db: SupabaseClient): Promise<ExecuteResult> {
   const enrollmentIds = (params.enrollmentIds as string[]) ?? (params.enrollmentId ? [params.enrollmentId as string] : []);
   if (!enrollmentIds.length) return { success: false, message: 'No enrollment IDs provided.' };
 
-  const { error, count } = await db
+  const { data, error } = await db
     .from('program_enrollments')
     .update({ status: 'active', at_risk_reason: null, at_risk_flagged_at: null })
     .in('id', enrollmentIds)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .select('id', { count: 'exact', head: true } as any);
+    .select('id');
 
   if (error) throw new Error(`Failed to clear at-risk flags: ${error.message}`);
-  return { success: true, message: `${count ?? enrollmentIds.length} enrollment(s) cleared.` };
+  return { success: true, message: `${data?.length ?? enrollmentIds.length} enrollment(s) cleared.` };
 }
 
 async function approveApplication(params: Params, db: SupabaseClient): Promise<ExecuteResult> {

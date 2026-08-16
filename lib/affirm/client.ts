@@ -15,6 +15,7 @@
  * - Refunding charges
  */
 
+import { createHash } from 'crypto';
 import { logger } from '@/lib/logger';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -67,6 +68,10 @@ export interface AffirmChargeResponse {
   }>;
 }
 
+function idempotencyKey(operation: string, value: string): string {
+  return `elevate-${operation}-${createHash('sha256').update(value).digest('hex').slice(0, 32)}`;
+}
+
 class AffirmClient {
   private publicKey: string | undefined;
   private privateKey: string | undefined;
@@ -110,8 +115,9 @@ class AffirmClient {
   }
 
   /**
-   * Authorize a charge using the checkout_token from client-side checkout
-   * This is called AFTER customer completes Affirm checkout
+   * Authorize a charge using the checkout_token from client-side checkout.
+   * Affirm's current API names this request field transaction_id even though
+   * the client-side value is returned as checkout_token.
    */
   async authorizeCharge(checkoutToken: string, orderId?: string): Promise<AffirmChargeResponse> {
     if (!this.isConfigured()) {
@@ -128,9 +134,10 @@ class AffirmClient {
       headers: {
         'Content-Type': 'application/json',
         Authorization: this.getAuthHeader(),
+        'Idempotency-Key': idempotencyKey('authorize', orderId || checkoutToken),
       },
       body: JSON.stringify({
-        checkout_token: checkoutToken,
+        transaction_id: checkoutToken,
         order_id: orderId,
       }),
     });
@@ -167,6 +174,7 @@ class AffirmClient {
       headers: {
         'Content-Type': 'application/json',
         Authorization: this.getAuthHeader(),
+        'Idempotency-Key': idempotencyKey('capture', `${chargeId}:${orderId || ''}:${amount || ''}`),
       },
       body: JSON.stringify(body),
     });

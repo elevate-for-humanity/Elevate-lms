@@ -63,6 +63,12 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     import('./entrepreneurship'),
   ]);
 
+  const elevateEsbBlueprint: CredentialBlueprint = {
+    ...entrepreneurshipBlueprint,
+    title: 'Elevate ESB',
+    credentialTitle: 'Elevate ESB',
+  };
+
   const explicitBlueprints = [
     bookkeepingQuickbooksBlueprint,
     barberApprenticeshipBlueprint,
@@ -71,7 +77,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     CCMA_BLUEPRINT,
     prsIndianaBlueprint,
     itHelpDeskBlueprint,
-    entrepreneurshipBlueprint,
+    elevateEsbBlueprint,
   ];
 
   const explicitProgramSlugs = new Set(explicitBlueprints.map((bp) => bp.programSlug));

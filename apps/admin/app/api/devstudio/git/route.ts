@@ -198,17 +198,21 @@ function safeBranch(value: string, label: string): string | NextResponse {
   return value;
 }
 
-function parseDiffNameStatus(output: string) {
+function parseDiffNameStatus(output: string): Array<{ status: string; path: string; oldPath?: string }> {
   return output
     .split('\n')
     .filter(Boolean)
-    .map((line) => {
+    .flatMap((line) => {
       const parts = line.split('\t');
       const status = parts[0] ?? '';
-      if (status.startsWith('R')) return { status: 'R', oldPath: parts[1], path: parts[2] };
-      return { status: status[0], path: parts[1] };
-    })
-    .filter((entry): entry is { status: string; path: string; oldPath?: string } => !!entry.path);
+      if (status.startsWith('R')) {
+        const oldPath = parts[1];
+        const path = parts[2];
+        return oldPath && path ? [{ status: 'R', oldPath, path }] : [];
+      }
+      const path = parts[1];
+      return path ? [{ status: status[0] ?? '', path }] : [];
+    });
 }
 
 async function githubApi<T>(path: string, token: string, init?: RequestInit): Promise<T> {

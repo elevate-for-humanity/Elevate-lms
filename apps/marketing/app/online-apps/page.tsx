@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { ExternalLink, ShieldCheck, Smartphone } from 'lucide-react';
+import { ExternalLink, LockKeyhole, ShieldCheck, Smartphone } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Elevate Online Apps & Portals',
-  description: 'Open Elevate learner, apprentice, host shop, program holder, admin, employer and workforce portals.',
+  description:
+    'Open Elevate public product demos and authenticated learner, apprentice, host shop, program holder, admin, employer and workforce portals.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/online-apps' },
 };
 
@@ -48,21 +49,48 @@ const ROLE_PORTALS = [
   ['Provider', 'https://www.elevateforhumanity.org/provider/dashboard'],
 ] as const;
 
-const PROOF_LINKS = [
+const PUBLIC_DEMOS = [
+  {
+    name: 'Barber Apprenticeship — Public Program Proof',
+    description:
+      'Public program overview for the registered barber pathway. The actual LMS curriculum, lesson progress and assessments remain behind learner authentication.',
+    href: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship',
+    action: 'View public program proof',
+  },
+  {
+    name: 'PARIS Website Builder — Interactive Demo',
+    description:
+      'Public interactive Website Builder demonstration. Use the Store demo to issue instructions and watch the preview change without exposing a customer-owned editing workspace.',
+    href: 'https://www.elevateforhumanity.org/store',
+    action: 'Run public builder demo',
+  },
+  {
+    name: 'Elevate Store & Subscription Demo',
+    description:
+      'Browse platform capabilities, product demonstrations, plan pricing and add-ons. Checkout and billing management require authentication.',
+    href: 'https://www.elevateforhumanity.org/store#marketplace',
+    action: 'Open store demos',
+  },
+] as const;
+
+const AUTHENTICATED_PROOF = [
   {
     name: 'Prestige Elevation Barber Curriculum',
-    description: 'Published 144-hour RTI barber curriculum in the Elevate LMS.',
+    description:
+      'Published LMS course workspace. Login is required because lesson navigation, progress and assessments are learner records.',
     href: 'https://app.elevateforhumanity.org/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
   },
   {
-    name: 'Curvature Body Sculpting — Website Builder',
-    description: 'Website Builder workspace created from the Curvature storefront import.',
-    href: 'https://www.elevateforhumanity.org/apps/website-builder/edit/4f36ef25-800d-48fa-a071-cf473064c22e',
+    name: 'Website Builder Production Workspace',
+    description:
+      'Production Website Builder editor. Access is limited to the authenticated site owner with active Website Builder entitlement.',
+    href: 'https://www.elevateforhumanity.org/apps/website-builder',
   },
   {
-    name: 'Elevate Store Demos',
-    description: 'Interactive capability demos and subscription explanations.',
-    href: 'https://www.elevateforhumanity.org/store#marketplace',
+    name: 'Plans, Add-ons & Billing',
+    description:
+      'Canonical subscription path for base plans, add-ons, trial conversion and authenticated Stripe billing management.',
+    href: 'https://www.elevateforhumanity.org/store/plans',
   },
 ] as const;
 
@@ -73,11 +101,11 @@ export default function OnlineAppsPage() {
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-16">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-4 py-2 text-sm font-black text-emerald-900">
-              <ShieldCheck className="h-4 w-4" /> Secure role-based access
+              <ShieldCheck className="h-4 w-4" /> Public demos + secure role-based workspaces
             </span>
             <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Elevate Online Apps & Portals</h1>
             <p className="mt-4 max-w-2xl text-lg font-medium leading-8 text-slate-700">
-              Choose the workspace that matches your role. Private dashboards require an authenticated account and the correct role, program, organization or partner relationship.
+              Use public demonstrations to evaluate the platform without an account. Production dashboards, LMS progress, billing and customer-owned editing workspaces require authentication and the correct role or subscription entitlement.
             </p>
           </div>
           <div className="relative min-h-[260px] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-lg">
@@ -87,20 +115,57 @@ export default function OnlineAppsPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-12">
-        <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Installable apps</p>
+        <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">No account required</p>
+        <h2 className="mt-2 text-3xl font-black">Public product demos</h2>
+        <p className="mt-2 max-w-3xl font-medium text-slate-700">
+          These links are safe for sales demonstrations and prospect evaluation. They do not expose learner records, customer websites or billing controls.
+        </p>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {PUBLIC_DEMOS.map((item) => (
+            <a key={item.name} href={item.href} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-rose-300 hover:shadow-md">
+              <h3 className="font-black text-slate-950">{item.name}</h3>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{item.description}</p>
+              <span className="mt-5 inline-flex items-center gap-1 text-sm font-black text-brand-red-700">{item.action} <ExternalLink className="h-4 w-4" /></span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-white py-12">
+        <div className="mx-auto max-w-7xl px-5">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-blue-800">Login required</p>
+          <h2 className="mt-2 text-3xl font-black">Authenticated production proof</h2>
+          <p className="mt-2 max-w-3xl font-medium text-slate-700">
+            These are real production pathways, not anonymous sandboxes. Demo them only with an authorized test or customer account.
+          </p>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {AUTHENTICATED_PROOF.map((item) => (
+              <a key={item.name} href={item.href} className="rounded-2xl border border-slate-200 bg-slate-50 p-6 transition hover:border-blue-300 hover:bg-blue-50">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-slate-600"><LockKeyhole className="h-4 w-4" /> Authenticated</div>
+                <h3 className="mt-3 font-black text-slate-950">{item.name}</h3>
+                <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{item.description}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm font-black text-blue-800">Open secure workspace <ExternalLink className="h-4 w-4" /></span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-12">
+        <p className="text-sm font-black uppercase tracking-[0.16em] text-brand-red-700">Authenticated apps</p>
         <h2 className="mt-2 text-3xl font-black">PWA workspaces</h2>
-        <p className="mt-2 max-w-3xl font-medium text-slate-700">Open the app in your browser, sign in, then use the browser or device install option when available.</p>
+        <p className="mt-2 max-w-3xl font-medium text-slate-700">Open the app in your browser, sign in, then use the browser or device install option when the current browser supports installation.</p>
         <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {INSTALLABLE_APPS.map((app) => (
             <a key={app.name} href={app.href} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md">
               <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
                 <Image src={app.image} alt={`${app.name} dashboard`} fill sizes="(max-width: 640px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-xs font-black text-slate-950 shadow-sm"><Smartphone className="h-3.5 w-3.5" /> Installable PWA</span>
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-xs font-black text-slate-950 shadow-sm"><Smartphone className="h-3.5 w-3.5" /> PWA workspace</span>
               </div>
               <div className="p-5">
                 <h3 className="font-black text-slate-950">{app.name}</h3>
                 <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{app.description}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-black text-blue-800">Open app <ExternalLink className="h-4 w-4" /></span>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-black text-blue-800">Sign in / open app <ExternalLink className="h-4 w-4" /></span>
               </div>
             </a>
           ))}
@@ -110,7 +175,7 @@ export default function OnlineAppsPage() {
       <section className="border-y border-slate-200 bg-white py-12">
         <div className="mx-auto max-w-7xl px-5">
           <h2 className="text-3xl font-black">Role portals</h2>
-          <p className="mt-2 font-medium text-slate-700">These are operational workspaces. Access is restricted to accounts with the matching authorization.</p>
+          <p className="mt-2 font-medium text-slate-700">Operational workspaces. Access is restricted to accounts with the matching authorization; a reachable login page is not proof that every role feature is enabled for every account.</p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {ROLE_PORTALS.map(([name, href]) => (
               <a key={name} href={href} className="flex min-h-24 items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-4 font-black text-slate-950 transition hover:border-blue-300 hover:bg-blue-50">
@@ -118,19 +183,6 @@ export default function OnlineAppsPage() {
               </a>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-12">
-        <h2 className="text-3xl font-black">Live proof & builder links</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {PROOF_LINKS.map((item) => (
-            <a key={item.name} href={item.href} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-rose-300 hover:shadow-md">
-              <h3 className="font-black text-slate-950">{item.name}</h3>
-              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{item.description}</p>
-              <span className="mt-5 inline-flex items-center gap-1 text-sm font-black text-brand-red-700">Open <ExternalLink className="h-4 w-4" /></span>
-            </a>
-          ))}
         </div>
       </section>
     </main>

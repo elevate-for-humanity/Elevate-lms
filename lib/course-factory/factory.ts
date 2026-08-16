@@ -2,12 +2,12 @@
  * Canonical Course Factory.
  *
  * This is the single course-creation orchestration boundary. Authoring surfaces,
- * automatic program provisioning, and scripts should call this module instead of
+ * automatic program provisioning, and scripts call this module instead of
  * assembling courses with independent generation/publish pipelines.
  *
  * Flow:
- * 1. Resolve program + blueprint
- * 2. Enrich every instructional lesson when AI generation is requested
+ * 1. Resolve program + registered blueprint, or generate a free-form blueprint
+ * 2. Enrich every learner-facing lesson
  * 3. Generate checkpoint/final assessment banks
  * 4. Validate the complete course package
  * 5. Persist courses -> modules -> lessons through the canonical publisher
@@ -22,6 +22,7 @@ import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import { loadBlueprintWithProgram } from './blueprint-loader';
 import {
   generateAssessment,
+  generateBlueprintFromAI,
   generateFinalExam,
   generateLessonContent,
 } from './content-generator';
@@ -47,6 +48,16 @@ class ProgressTracker {
   }
 }
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 90);
+}
+
 function cloneBlueprint(blueprint: CredentialBlueprint): CredentialBlueprint {
   return {
     ...blueprint,
@@ -57,19 +68,120 @@ function cloneBlueprint(blueprint: CredentialBlueprint): CredentialBlueprint {
   };
 }
 
-async function resolveProgramId(input: FactoryInput): Promise<string | null> {
-  if (input.programId) return input.programId;
-  if (!input.programSlug) return null;
+function normalizeGeneratedSlug(slug: string, stepType: string, fallback: string): string {
+  const base = slugify(slug || fallback);
+  if (stepType === 'checkpoint' && !base.includes('checkpoint')) return `${base}-checkpoint`;
+  if (stepType === 'quiz' && !base.includes('quiz')) return `${base}-quiz`;
+  if (stepType === 'exam' && !base.includes('exam') && !base.includes('final')) return `${base}-exam`;
+  if (stepType === 'lab' && !base.includes('lab')) return `${base}-lab`;
+  if (stepType === 'assignment' && !base.includes('assignment')) return `${base}-assignment`;
+  return base;
+}
 
-  const db = await requireAdminClient();
-  const { data, error } = await db
-    .from('programs')
-    .select('id')
-    .eq('slug', input.programSlug)
-    .maybeSingle();
+async function generateFreeFormBlueprint(
+  input: FactoryInput,
+  programSlug: string,
+): Promise<CredentialBlueprint> {
+  if (!input.title || !input.topic) {
+    throw new Error('title and topic are required when no registered blueprint exists');
+  }
 
-  if (error) throw error;
-  return data?.id ?? null;
+  const raw = await generateBlueprintFromAI({
+    title: input.title,
+    topic: input.topic,
+    audience: input.audience ?? `${input.difficulty ?? 'intermediate'} workforce learner`,
+    state: input.state,
+    credential: input.credential,
+    moduleCount: input.moduleCount,
+    lessonsPerModule: input.lessonsPerModule,
+  });
+
+  const modules = (raw.modules ?? []).map((module, moduleIndex) => {
+    const lessons = (module.lessons ?? []).map((lesson, lessonIndex) => {
+      const stepType = lesson.stepType || 'lesson';
+      return {
+        slug: normalizeGeneratedSlug(
+          lesson.slug,
+          stepType,
+          `${module.title}-${lesson.title || lessonIndex + 1}`,
+        ),
+        title: lesson.title || `Lesson ${lessonIndex + 1}`,
+        order: lessonIndex + 1,
+        domainKey: slugify(module.title),
+      };
+    });
+
+    const typeCounts = lessons.reduce<Record<string, number>>((counts, lesson) => {
+      const type = inferStepType(lesson.slug);
+      counts[type] = (counts[type] ?? 0) + 1;
+      return counts;
+    }, {});
+
+    return {
+      slug: slugify(module.title || `module-${moduleIndex + 1}`),
+      title: module.title || `Module ${moduleIndex + 1}`,
+      description: module.description,
+      orderIndex: moduleIndex + 1,
+      minLessons: lessons.length,
+      maxLessons: lessons.length,
+      quizRequired: Boolean(typeCounts.checkpoint || typeCounts.quiz),
+      practicalRequired: Boolean(typeCounts.lab || typeCounts.assignment),
+      isCritical: true,
+      requiredLessonTypes: Object.entries(typeCounts).map(([lessonType, requiredCount]) => ({
+        lessonType,
+        requiredCount,
+      })),
+      competencies: [],
+      domainKey: slugify(module.title),
+      lessons,
+    };
+  });
+
+  const expectedLessonCount = modules.reduce(
+    (count, module) => count + module.lessons.length,
+    0,
+  );
+  const credentialTitle = input.credential || raw.title || input.title;
+  const credentialCode = slugify(input.credential || input.title).toUpperCase().slice(0, 24);
+
+  return {
+    id: `generated-${programSlug}-${Date.now().toString(36)}`,
+    programSlug,
+    credentialSlug: slugify(credentialTitle),
+    credentialTitle,
+    credentialCode,
+    state: input.state ?? 'federal',
+    status: 'draft',
+    version: '1.0.0',
+    title: raw.title || input.title,
+    description: raw.description,
+    expectedModuleCount: modules.length,
+    expectedLessonCount,
+    modules,
+    assessmentRules: [
+      {
+        assessmentType: 'module',
+        scope: 'all',
+        minQuestions: 8,
+        maxQuestions: 10,
+        passingThreshold: 0.7,
+      },
+      {
+        assessmentType: 'final',
+        scope: 'all',
+        minQuestions: 25,
+        maxQuestions: 40,
+        passingThreshold: 0.75,
+      },
+    ],
+    generationRules: {
+      allowRemediation: true,
+      allowExpansionLessons: true,
+      maxTotalLessons: expectedLessonCount,
+      requiresFinalExam: true,
+      generatorMode: 'flexible',
+    },
+  };
 }
 
 async function enrichBlueprint(
@@ -99,8 +211,6 @@ async function enrichBlueprint(
       );
 
       try {
-        // Every learner-facing row gets a real objective/content package. Assessment
-        // rows additionally receive a purpose-built question bank below.
         const generated = await generateLessonContent({
           lesson,
           moduleTitle: module.title,
@@ -185,40 +295,68 @@ export async function courseFactory(
 
   try {
     progress.emit('init', 'Initializing canonical Course Factory.');
-    progress.emit('resolve', 'Resolving program and registered blueprint.');
+    progress.emit('resolve', 'Resolving program and curriculum source.');
 
     const db = await requireAdminClient();
-    const programId = await resolveProgramId(input);
+    let programQuery = db.from('programs').select('id, slug, title');
+    if (input.programId) programQuery = programQuery.eq('id', input.programId);
+    else if (input.programSlug) programQuery = programQuery.eq('slug', input.programSlug);
+    else {
+      return {
+        ok: false,
+        status: 'not_found',
+        errors: ['programId or programSlug is required'],
+        warnings: [],
+      };
+    }
+
+    const { data: program, error: programError } = await programQuery.maybeSingle();
+    if (programError) throw programError;
+    if (!program?.id) {
+      return {
+        ok: false,
+        status: 'not_found',
+        errors: ['Canonical program record not found'],
+        warnings: [],
+      };
+    }
 
     const resolved = input.blueprint
       ? null
       : await loadBlueprintWithProgram(db, {
-          programId: input.programId,
-          programSlug: input.programSlug,
+          programId: program.id,
+          programSlug: program.slug ?? input.programSlug,
         });
 
-    if (!resolved && !input.blueprint) {
+    let blueprint: CredentialBlueprint;
+    if (input.blueprint) {
+      blueprint = input.blueprint;
+    } else if (resolved?.blueprint) {
+      blueprint = resolved.blueprint;
+    } else if (input.title && input.topic && input.contentSource !== 'blueprint') {
+      if (!isAIAvailable()) {
+        return {
+          ok: false,
+          status: 'no_blueprint',
+          errors: ['No registered blueprint exists and AI blueprint generation is unavailable'],
+          warnings: [],
+        };
+      }
+      progress.emit('blueprint', 'No registered blueprint found; generating one in Course Factory.');
+      blueprint = await generateFreeFormBlueprint(
+        input,
+        program.slug || input.programSlug || slugify(program.title || input.title),
+      );
+    } else {
       return {
         ok: false,
         status: 'no_blueprint',
-        errors: ['Program not found or no matching registered blueprint'],
+        errors: ['No registered blueprint matches this program'],
         warnings: [],
       };
     }
 
-    const blueprint = input.blueprint ?? resolved!.blueprint;
-    const canonicalProgramId = programId ?? resolved?.program.id ?? null;
-
-    if (!canonicalProgramId) {
-      return {
-        ok: false,
-        status: 'not_found',
-        errors: ['A canonical program record is required before a course can be built'],
-        warnings: [],
-      };
-    }
-
-    progress.emit('blueprint', `Loaded blueprint: ${blueprint.credentialTitle}`);
+    progress.emit('blueprint', `Blueprint ready: ${blueprint.credentialTitle}`);
 
     const expectedLessonCount =
       blueprint.expectedLessonCount ??
@@ -283,7 +421,7 @@ export async function courseFactory(
 
     progress.emit('publish', 'Persisting the canonical LMS course package.');
     const publishResult = await publishCourse({
-      programId: canonicalProgramId,
+      programId: program.id,
       courseSlug: completeBlueprint.programSlug ?? `course-${Date.now()}`,
       courseTitle: completeBlueprint.credentialTitle,
       blueprint: completeBlueprint.modules,

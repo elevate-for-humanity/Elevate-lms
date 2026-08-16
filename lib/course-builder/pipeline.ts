@@ -1,75 +1,44 @@
 /**
- * lib/course-builder/pipeline.ts
+ * Compatibility pipeline for historical Course Builder/compiler callers.
  *
- * Pre-publish pipeline for course generation.
- *
- * Sequence:
- *   1. Normalize  — fill defaults, infer types from slug suffixes
- *   2. Validate   — run barber-grade rules, reject on any error
- *   3. Audit      — run blueprint auditor if a blueprint is provided
- *   4. Resolve    — map programSlug → courseId
- *   5. Persist    — write courses → course_modules → course_lessons
- *
- * Usage (from a seed script):
- *   import { runCoursePublishPipeline } from '@/lib/course-builder/pipeline';
- *   const result = await runCoursePublishPipeline({ template, db, mode: 'missing-only' });
- *
- * Usage (dry run — validate only, no DB writes):
- *   const result = await runCoursePublishPipeline({ template, db, dryRun: true });
+ * IMPORTANT: This file is no longer a persistence engine. The canonical
+ * generation, validation and persistence authority is lib/course-factory.
+ * Existing callers may keep using runCoursePublishPipeline while they migrate,
+ * but every write crosses courseFactory().
  */
 
 import type { SupabaseClient } from '@/lib/supabase';
-import type { CourseTemplate, CourseLesson, CourseModule } from './schema';
+import type { CourseTemplate } from './schema';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
-import { validateCourseTemplate, assertPublishable, type CourseValidationResult } from './validate';
-import { resolveCourseId } from './schema';
-import { getCompetencyDefinition } from './competencies';
+import { validateCourseTemplate, type CourseValidationResult } from './validate';
+import { adaptCourseTemplateToBlueprint } from './publish-adapter';
+import { courseFactory } from '@/lib/course-factory';
 import { logger } from '@/lib/logger';
 
-/**
- * Generate a short, human-readable enrollment code from a course slug.
- * Format: up to 4 uppercase alpha chars + 3-digit numeric suffix.
- * Examples:
- *   "hvac-epa-608-v1"        → "HVAC608"
- *   "tax-prep-enrolled-agent" → "TAXP001"
- *   "cosmetology-fundamentals" → "COSM001"
- *
- * The numeric suffix is derived from the slug so the same slug always
- * produces the same code (deterministic, no DB round-trip needed).
- */
 export function generateCourseCode(slug: string): string {
   const parts = slug.replace(/[^a-z0-9]+/gi, '-').split('-').filter(Boolean);
-
-  // Extract alpha prefix from first meaningful word
   const prefix = parts
-    .find((p) => /^[a-z]/i.test(p))
+    .find((part) => /^[a-z]/i.test(part))
     ?.replace(/[^a-z]/gi, '')
     .toUpperCase()
     .slice(0, 4) ?? 'CRS';
-
-  // Extract first number found in slug (e.g. "608" from "epa-608")
   const numMatch = slug.match(/\d+/);
   const suffix = numMatch
     ? numMatch[0].slice(-3).padStart(3, '0')
     : String(
-        // Deterministic 3-digit hash from slug
-        slug.split('').reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) & 0xffff, 0) % 900 + 100,
+        slug.split('').reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) & 0xffff, 0) % 900 + 100,
       );
-
   return `${prefix}${suffix}`;
 }
-
-// ─── Pipeline options ─────────────────────────────────────────────────────────
 
 export type PipelineMode = 'missing-only' | 'replace';
 
 export type PipelineOptions = {
   template: CourseTemplate;
+  /** Retained for API compatibility. Course Factory owns its DB client. */
   db: SupabaseClient;
   mode?: PipelineMode;
-  /** If true, validate and audit but do not write to DB */
   dryRun?: boolean;
-  /** Optional blueprint for auditor integration */
   blueprint?: CredentialBlueprint;
 };
 
@@ -82,202 +51,15 @@ export type PipelineResult = {
   errors: string[];
 };
 
-// ─── Normalization ────────────────────────────────────────────────────────────
-
 /**
- * Infers lesson type from slug suffix when type is not explicitly set.
- * Mirrors the logic in buildCanonicalCourseFromBlueprint.
+ * Compatibility wrapper around the canonical Course Factory.
+ * No direct courses/course_modules/course_lessons writes are allowed here.
  */
-function inferLessonType(slug: string): CourseLesson['type'] {
-  if (slug.endsWith('-checkpoint')) return 'checkpoint';
-  if (slug.endsWith('-exam')) return 'exam';
-  if (slug.endsWith('-quiz')) return 'quiz';
-  if (slug.endsWith('-lab')) return 'lab';
-  if (slug.endsWith('-assignment')) return 'assignment';
-  if (slug.endsWith('-cert')) return 'certification';
-  return 'lesson';
-}
-
-/**
- * Fills competency check labels from the registry when omitted.
- * Ensures the DB row has human-readable labels without requiring
- * blueprint authors to duplicate them.
- */
-function normalizeCompetencyChecks(lesson: CourseLesson): CourseLesson {
-  if (!lesson.competencyChecks?.length) return lesson;
-  return {
-    ...lesson,
-    competencyChecks: lesson.competencyChecks.map((check) => {
-      const def = getCompetencyDefinition(check.key);
-      return {
-        ...check,
-        label: check.label ?? def?.label ?? check.key,
-        isCritical: check.isCritical ?? def?.isCritical ?? false,
-      };
-    }),
-  };
-}
-
-export function normalizeTemplate(template: CourseTemplate): CourseTemplate {
-  return {
-    ...template,
-    modules: template.modules.map((mod, mi) => ({
-      ...mod,
-      order: mod.order ?? mi + 1,
-      lessons: mod.lessons.map((lesson, li) => {
-        const normalized: CourseLesson = {
-          ...lesson,
-          type: lesson.type ?? inferLessonType(lesson.slug),
-          order: lesson.order ?? li + 1,
-        };
-        return normalizeCompetencyChecks(normalized);
-      }),
-    })),
-  };
-}
-
-// ─── DB persistence ───────────────────────────────────────────────────────────
-
-async function persistCourse(
-  template: CourseTemplate,
-  courseId: string,
-  db: SupabaseClient,
-  mode: PipelineMode,
-): Promise<{ written: number; skipped: number; errors: string[] }> {
-  let written = 0;
-  let skipped = 0;
-  const errors: string[] = [];
-
-  // Generate a deterministic course code from the slug if not already set.
-  // Format: uppercase prefix (up to 4 chars) + 3-digit number from slug hash.
-  // e.g. "hvac-epa-608-v1" → "HVAC608"
-  const existingCode = await db
-    .from('courses')
-    .select('course_code')
-    .eq('id', courseId)
-    .maybeSingle()
-    .then((r) => r.data?.course_code ?? null);
-
-  const courseCode = existingCode ?? generateCourseCode(template.courseSlug);
-
-  // Upsert the courses row
-  const { error: courseErr } = await db.from('courses').upsert(
-    {
-      id: courseId,
-      slug: template.courseSlug,
-      title: template.title,
-      description: template.description ?? null,
-      course_code: courseCode,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'id' },
-  );
-  if (courseErr) {
-    errors.push(`courses upsert failed: ${courseErr.message}`);
-    return { written, skipped, errors };
-  }
-
-  // Replace mode: wipe existing modules + lessons for this course
-  if (mode === 'replace') {
-    await db.from('course_lessons').delete().eq('course_id', courseId);
-    await db.from('course_modules').delete().eq('course_id', courseId);
-  }
-
-  // Fetch existing lesson slugs for missing-only mode
-  let existingSlugs = new Set<string>();
-  if (mode === 'missing-only') {
-    const { data: existing } = await db
-      .from('course_lessons')
-      .select('slug')
-      .eq('course_id', courseId);
-    existingSlugs = new Set((existing ?? []).map((r: { slug: string }) => r.slug));
-  }
-
-  for (const mod of template.modules) {
-    // Upsert module
-    const { data: moduleRow, error: modErr } = await db
-      .from('course_modules')
-      .upsert(
-        {
-          course_id: courseId,
-          slug: mod.slug,
-          title: mod.title,
-          order_index: mod.order,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'course_id,slug' },
-      )
-      .select('id')
-      .maybeSingle();
-
-    if (modErr || !moduleRow) {
-      errors.push(`module '${mod.slug}' upsert failed: ${modErr?.message}`);
-      continue;
-    }
-
-    for (const lesson of mod.lessons) {
-      if (mode === 'missing-only' && existingSlugs.has(lesson.slug)) {
-        skipped++;
-        continue;
-      }
-
-      // content column is JSONB — wrap string HTML in { html } envelope.
-      // module_id is the FK column name (not course_module_id).
-      const contentValue = lesson.content
-        ? { html: lesson.content }
-        : null;
-
-      const { error: lessonErr } = await db.from('course_lessons').upsert(
-        {
-          course_id: courseId,
-          module_id: moduleRow.id,           // FK column is module_id, not course_module_id
-          slug: lesson.slug,
-          title: lesson.title,
-          lesson_type: lesson.type,
-          order_index: lesson.order,
-          learning_objectives: lesson.learningObjectives ?? null,
-          content: contentValue,             // JSONB — { html: string }
-          rendered_html: lesson.content ?? null, // TEXT — raw HTML for fast render
-          video_url: lesson.videoUrl ?? null,
-          quiz_questions: lesson.quizQuestions ?? null,
-          passing_score: lesson.passingScore ?? null,
-          practical_required: lesson.practicalRequired ?? false,
-          competency_checks: lesson.competencyChecks ?? null,
-          instructor_notes: lesson.instructorNotes ?? null,
-          duration_minutes: lesson.durationMinutes ?? null,
-          partner_exam_code: lesson.partnerExamCode ?? null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'course_id,slug' },
-      );
-
-      if (lessonErr) {
-        errors.push(`lesson '${lesson.slug}' upsert failed: ${lessonErr.message}`);
-      } else {
-        written++;
-      }
-    }
-  }
-
-  return { written, skipped, errors };
-}
-
-// ─── Main pipeline ────────────────────────────────────────────────────────────
-
 export async function runCoursePublishPipeline(opts: PipelineOptions): Promise<PipelineResult> {
-  const { db, mode = 'missing-only', dryRun = false } = opts;
-
-  // Step 1: Normalize
-  const template = normalizeTemplate(opts.template);
-
-  // Step 2: Validate — hard stop on any error
+  const { template, mode = 'missing-only', dryRun = false } = opts;
   const validation = validateCourseTemplate(template);
 
   if (!validation.valid) {
-    logger.error('[course-builder] Validation failed — pipeline aborted', undefined, {
-      courseSlug: template.courseSlug,
-      errorCount: validation.errorCount,
-    });
     return {
       success: false,
       courseId: null,
@@ -285,84 +67,34 @@ export async function runCoursePublishPipeline(opts: PipelineOptions): Promise<P
       lessonsWritten: 0,
       lessonsSkipped: 0,
       errors: validation.errors.map(
-        (e) => `${e.moduleSlug}/${e.lessonSlug} [${e.field}]: ${e.message}`,
+        (error) => `${error.moduleSlug}/${error.lessonSlug} [${error.field}]: ${error.message}`,
       ),
     };
   }
 
-  if (validation.warnings.length > 0) {
-    logger.warn('[course-builder] Validation warnings', {
-      courseSlug: template.courseSlug,
-      warnings: validation.warnings.map((w) => `${w.lessonSlug} [${w.field}]: ${w.message}`),
-    });
-  }
+  const blueprint = opts.blueprint ?? adaptCourseTemplateToBlueprint(template);
+  const result = await courseFactory({
+    programSlug: template.programSlug,
+    blueprint,
+    mode,
+    contentSource: 'blueprint',
+    videoMode: 'off',
+    dryRun,
+  });
 
-  // Step 3: Resolve course ID — DB first, static map as fallback.
-  let courseId = resolveCourseId(template.programSlug); // static fallback
-  try {
-    const { resolveCourseIdFromDb } = await import('./program-resolver');
-    const dbId = await resolveCourseIdFromDb(db, template.programSlug);
-    if (dbId) courseId = dbId;
-  } catch {
-    // program_course_map table not yet applied — static fallback already set above.
-  }
-  if (!courseId) {
-    return {
-      success: false,
-      courseId: null,
-      validation,
-      lessonsWritten: 0,
-      lessonsSkipped: 0,
-      errors: [
-        `programSlug '${template.programSlug}' not registered — add via POST /api/admin/course-builder/program-map`,
-      ],
-    };
-  }
-
-  // Step 4: Dry run — stop here
-  if (dryRun) {
-    logger.info('[course-builder] Dry run complete — no DB writes', {
+  if (!result.ok) {
+    logger.error('[course-builder/pipeline] Canonical Course Factory failed', undefined, {
       courseSlug: template.courseSlug,
-      lessonCount: validation.lessonCount,
-    });
-    return {
-      success: true,
-      courseId,
-      validation,
-      lessonsWritten: 0,
-      lessonsSkipped: 0,
-      errors: [],
-    };
-  }
-
-  // Step 5: Persist
-  const {
-    written,
-    skipped,
-    errors: persistErrors,
-  } = await persistCourse(template, courseId, db, mode);
-
-  const success = persistErrors.length === 0;
-  if (!success) {
-    logger.error('[course-builder] Persistence errors', undefined, {
-      courseSlug: template.courseSlug,
-      errors: persistErrors,
-    });
-  } else {
-    logger.info('[course-builder] Course published', {
-      courseSlug: template.courseSlug,
-      courseId,
-      written,
-      skipped,
+      errors: result.errors ?? [],
     });
   }
 
   return {
-    success,
-    courseId,
+    success: result.ok,
+    courseId: result.courseId ?? null,
     validation,
-    lessonsWritten: written,
-    lessonsSkipped: skipped,
-    errors: persistErrors,
+    lessonsWritten: result.lessonCount ?? 0,
+    lessonsSkipped: result.skippedCount ?? 0,
+    errors: result.errors ?? [],
   };
 }

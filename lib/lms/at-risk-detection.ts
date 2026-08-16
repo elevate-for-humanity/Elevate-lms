@@ -17,7 +17,8 @@ export interface AtRiskStudent {
 }
 
 /**
- * Get all at-risk students across all programs
+ * Get all at-risk students across all programs.
+ * Canonical risk statuses are: critical, at_risk, watch, on_track.
  */
 export async function getAtRiskStudents(): Promise<AtRiskStudent[]> {
   const supabase = await createClient();
@@ -47,7 +48,7 @@ export async function getAtRiskStudents(): Promise<AtRiskStudent[]> {
       )
     `,
     )
-    .eq('status', 'at_risk')
+    .in('status', ['critical', 'at_risk'])
     .order('overdue_count', { ascending: false });
 
   if (!data) {
@@ -70,15 +71,15 @@ export async function getAtRiskStudents(): Promise<AtRiskStudent[]> {
       risk_status: risk.status,
       overdue_count: risk.overdue_count,
       progress_percentage: risk.progress_percentage,
-      days_since_activity: risk.days_since_activity,
+      days_since_activity: Number(risk.days_since_activity ?? 0),
       last_activity_date: risk.last_activity_date,
-      has_critical_overdue: risk.has_critical_overdue,
+      has_critical_overdue: Boolean(risk.has_critical_overdue),
     };
   });
 }
 
 /**
- * Get students who need action (1-2 overdue items)
+ * Get students who need attention but have not crossed into at-risk/critical.
  */
 export async function getNeedsActionStudents(): Promise<AtRiskStudent[]> {
   const supabase = await createClient();
@@ -108,7 +109,7 @@ export async function getNeedsActionStudents(): Promise<AtRiskStudent[]> {
       )
     `,
     )
-    .eq('status', 'needs_action')
+    .eq('status', 'watch')
     .order('overdue_count', { ascending: false });
 
   if (!data) {
@@ -131,9 +132,9 @@ export async function getNeedsActionStudents(): Promise<AtRiskStudent[]> {
       risk_status: risk.status,
       overdue_count: risk.overdue_count,
       progress_percentage: risk.progress_percentage,
-      days_since_activity: risk.days_since_activity,
+      days_since_activity: Number(risk.days_since_activity ?? 0),
       last_activity_date: risk.last_activity_date,
-      has_critical_overdue: risk.has_critical_overdue,
+      has_critical_overdue: Boolean(risk.has_critical_overdue),
     };
   });
 }
@@ -190,9 +191,9 @@ export async function getInactiveStudents(
       risk_status: risk.status,
       overdue_count: risk.overdue_count,
       progress_percentage: risk.progress_percentage,
-      days_since_activity: risk.days_since_activity,
+      days_since_activity: Number(risk.days_since_activity ?? 0),
       last_activity_date: risk.last_activity_date,
-      has_critical_overdue: risk.has_critical_overdue,
+      has_critical_overdue: Boolean(risk.has_critical_overdue),
     };
   });
 }
@@ -238,7 +239,6 @@ export async function getLowCompletionPrograms(threshold: number = 70): Promise<
     };
   });
 
-  // Filter programs with low completion and minimum enrollment
   return programStats
     .filter((p) => p.completion_rate < threshold && p.total_enrollments >= 5)
     .sort((a, b) => a.completion_rate - b.completion_rate);
@@ -282,8 +282,8 @@ export async function getFundingSourceMetrics(): Promise<any[]> {
       const total = enrollments.length;
       const active = enrollments.filter((e: any) => e.status === 'active').length;
       const completed = enrollments.filter((e: any) => e.status === 'completed').length;
-      const atRisk = enrollments.filter(
-        (e: any) => e.student_risk_status?.[0]?.status === 'at_risk',
+      const atRisk = enrollments.filter((e: any) =>
+        ['critical', 'at_risk'].includes(e.student_risk_status?.[0]?.status),
       ).length;
       const onTrack = enrollments.filter(
         (e: any) => e.student_risk_status?.[0]?.status === 'on_track',
@@ -335,7 +335,6 @@ export async function getStudentsWithMissingCriticalRequirements(): Promise<any[
     return [];
   }
 
-  // Group by enrollment
   const grouped = data.reduce((acc: any, req: any) => {
     const enrollmentId = req.enrollment_id;
     if (!acc[enrollmentId]) {

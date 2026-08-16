@@ -12,8 +12,6 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-// ─── OpenAI tool definitions ──────────────────────────────────────────────────
-
 export const STUDIO_TOOLS = [
   {
     type: 'function' as const,
@@ -175,15 +173,11 @@ export const STUDIO_TOOLS = [
 
 export type StudioToolName = typeof STUDIO_TOOLS[number]['function']['name'];
 
-// ─── Tool result type ─────────────────────────────────────────────────────────
-
 export interface ToolResult {
   ok: boolean;
   message: string;
   data?: Record<string, unknown>;
 }
-
-// ─── Executors ────────────────────────────────────────────────────────────────
 
 export async function executeStudioTool(
   toolName: StudioToolName,
@@ -217,7 +211,6 @@ async function executeCreateLesson(
   courseId: string,
   db: SupabaseClient,
 ): Promise<ToolResult> {
-  // Derive order_index from existing lesson count
   const { count } = await db
     .from('course_lessons')
     .select('id', { count: 'exact', head: true })
@@ -252,10 +245,9 @@ async function executeCreateLesson(
 
   if (error) return { ok: false, message: `Failed to create lesson: ${error.message}` };
 
-  // Trigger embedding in background (non-blocking)
   import('@/lib/embeddings/embed-lessons').then(({ embedCourseLessons }) => {
-    embedCourseLessons(db, courseId, { force: false }).catch(() => {/* non-fatal */});
-  }).catch(() => {/* non-fatal */});
+    embedCourseLessons(db, courseId, { force: false }).catch(() => {});
+  }).catch(() => {});
 
   return {
     ok: true,
@@ -313,7 +305,6 @@ async function executePublishCourse(
   userId: string,
   db: SupabaseClient,
 ): Promise<ToolResult> {
-  // Delegate to the canonical publish service
   const { publishCourse } = await import('@/lib/lms/course-service');
   try {
     await publishCourse(db, courseId, userId, String(args.label ?? ''));
@@ -348,85 +339,57 @@ async function executeBuildCourseFromBlueprint(
   const blueprintId = String(args.blueprint_id ?? 'hvac-epa608-v1');
   const mode = String(args.mode ?? 'append');
 
-  // Load the blueprint
   const { getBlueprintById } = await import('@/lib/curriculum/blueprints/index');
   const blueprint = await getBlueprintById(blueprintId);
   if (!blueprint) return { ok: false, message: `Blueprint "${blueprintId}" not found` };
 
-  if (mode === 'replace') {
-    // Wipe existing modules and lessons for this course
-    await db.from('course_lessons').delete().eq('course_id', courseId);
-    await db.from('course_modules').delete().eq('course_id', courseId);
+  const { data: course, error: courseError } = await db
+    .from('courses')
+    .select('id, slug, title, program_id')
+    .eq('id', courseId)
+    .maybeSingle();
+  if (courseError || !course) {
+    return { ok: false, message: `Course not found: ${courseError?.message ?? courseId}` };
   }
 
-  // Get existing modules to avoid duplicates in append mode
-  const { data: existingModules } = await db
-    .from('course_modules')
-    .select('title, order_index')
-    .eq('course_id', courseId);
-  const existingTitles = new Set((existingModules ?? []).map((m: { title: string }) => m.title));
-
-  let modulesCreated = 0;
-  let lessonsCreated = 0;
-
-  for (const mod of blueprint.modules ?? []) {
-    if (mode === 'append' && existingTitles.has(mod.title)) continue;
-
-    const { data: modRow, error: modErr } = await db
-      .from('course_modules')
-      .insert({
-        course_id: courseId,
-        title: mod.title,
-        slug: mod.slug,
-        order_index: mod.orderIndex ?? modulesCreated + 1,
-        is_published: false,
-      })
-      .select('id')
-      .single();
-
-    if (modErr || !modRow) continue;
-    modulesCreated++;
-
-    // Insert lessons for this module
-    const lessons = (mod.lessons ?? []).map((lesson: {
-      title: string;
-      slug: string;
-      order: number;
-      passingScore?: number;
-      durationMinutes?: number;
-    }) => ({
-      course_id: courseId,
-      module_id: modRow.id,
-      title: lesson.title,
-      slug: lesson.slug,
-      // Infer lesson_type from slug suffix (matches blueprint engine convention)
-      lesson_type: lesson.slug.endsWith('-checkpoint') ? 'checkpoint'
-        : lesson.slug.endsWith('-exam') ? 'exam'
-        : lesson.slug.endsWith('-lab') ? 'lab'
-        : lesson.slug.endsWith('-quiz') ? 'quiz'
-        : 'lesson',
-      order_index: lesson.order,
-      passing_score: lesson.passingScore ?? null,
-      duration_minutes: lesson.durationMinutes ?? null,
-      is_published: false,
-      status: 'draft',
-    }));
-
-    if (lessons.length) {
-      const { error: lessonErr } = await db.from('course_lessons').insert(lessons);
-      if (!lessonErr) lessonsCreated += lessons.length;
-    }
+  const { validateBlueprint } = await import('@/lib/course-factory/validator');
+  const validation = validateBlueprint(blueprint);
+  if (!validation.valid) {
+    return {
+      ok: false,
+      message: `Blueprint validation failed: ${validation.errors.map((issue) => issue.message).join('; ')}`,
+    };
   }
 
-  // Trigger embedding in background (non-blocking)
+  const { publishCourse } = await import('@/lib/course-factory/publisher');
+  const result = await publishCourse({
+    programId: course.program_id ?? null,
+    courseSlug: course.slug,
+    courseTitle: course.title,
+    blueprint: blueprint.modules,
+    mode: mode === 'replace' ? 'replace' : 'missing-only',
+    contentSource: 'blueprint',
+    videoConfig: { enabled: false },
+  });
+
+  if (!result.success) {
+    return { ok: false, message: `Course Factory build failed: ${result.errors.join('; ')}` };
+  }
+
   import('@/lib/embeddings/embed-lessons').then(({ embedCourseLessons }) => {
-    embedCourseLessons(db, courseId, { force: true }).catch(() => {/* non-fatal */});
-  }).catch(() => {/* non-fatal */});
+    embedCourseLessons(db, courseId, { force: true }).catch(() => {});
+  }).catch(() => {});
 
   return {
     ok: true,
-    message: `Built course from blueprint "${blueprintId}": ${modulesCreated} modules, ${lessonsCreated} lessons created`,
-    data: { blueprintId, modulesCreated, lessonsCreated, mode },
+    message: `Built course from blueprint "${blueprintId}": ${result.moduleCount} modules, ${result.lessonCount} lessons written`,
+    data: {
+      blueprintId,
+      modulesCreated: result.moduleCount,
+      lessonsCreated: result.lessonCount,
+      lessonsSkipped: result.skippedCount,
+      mode,
+    },
   };
 }
 

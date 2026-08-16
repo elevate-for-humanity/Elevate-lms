@@ -46,7 +46,7 @@ export function withAuth<TParams = Record<string, string>>(
   handler: AuthHandler<TParams>,
   options: WithAuthOptions = {},
 ) {
-  return async (req: NextRequest, context: { params: Promise<TParams> }) => {
+  return async (req: NextRequest, context?: { params?: Promise<TParams> }) => {
     const user = await getAuthedUser();
 
     if (!user) {
@@ -60,7 +60,9 @@ export function withAuth<TParams = Record<string, string>>(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const params = await context.params;
+    const params = context?.params
+      ? await context.params
+      : ({} as TParams);
     return handler(
       req,
       {

@@ -41,7 +41,7 @@ describe('resolveDefaultPreviewUrl', () => {
     process.env.NEXT_PUBLIC_ADMIN_URL = '';
     expect(
       resolveDefaultPreviewUrl({ requestHost: 'admin.elevateforhumanity.org' }),
-    ).toBe('/admin/dashboard');
+    ).toBe('https://admin.elevateforhumanity.org/dashboard');
   });
 
   it('respects DEVSTUDIO_DEFAULT_PREVIEW_URL', () => {
@@ -58,7 +58,9 @@ describe('buildDevStudioPreviewTargets', () => {
     process.env.NEXT_PUBLIC_ADMIN_URL = 'https://admin.elevateforhumanity.org';
     const targets = buildDevStudioPreviewTargets();
     // Admin targets are always included
-    expect(targets.some((t) => t.url.includes('/admin/dashboard'))).toBe(true);
+    expect(targets.some((t) => t.url.endsWith('/dashboard'))).toBe(true);
+    expect(targets.some((t) => t.url.endsWith('/studio'))).toBe(true);
+    expect(targets.some((t) => t.url.endsWith('/course-builder'))).toBe(true);
     // Public targets are included
     expect(targets.some((t) => t.url.includes('elevateforhumanity.org/programs'))).toBe(true);
   });

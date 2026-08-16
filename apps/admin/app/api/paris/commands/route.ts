@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/with-auth';
-import type { AuthHandler } from '@/types/auth';
 
 // Command parser patterns
 const COMMAND_PATTERNS = {
@@ -233,7 +232,7 @@ async function executeCommand(
   }
 }
 
-export const POST = withAuth(async (request: NextRequest, _ctx: { params: Promise<Record<string, string>> }, user) => {
+export const POST = withAuth(async (request: NextRequest, _ctx, user) => {
   try {
     const body = await request.json();
     const { command, context } = body;

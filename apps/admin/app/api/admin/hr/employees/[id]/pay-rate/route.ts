@@ -6,16 +6,17 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
+  const { id } = await params;
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('hr_employees')
     .select('id, pay_rate_cents, pay_type, effective_date')
-    .eq('id', params.id)
+    .eq('id', id)
     .maybeSingle();
 
   if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
@@ -25,11 +26,12 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
+  const { id } = await params;
   const { pay_rate_cents, pay_type, effective_date } = await request.json();
   if (!pay_rate_cents) return NextResponse.json({ error: 'pay_rate_cents required' }, { status: 400 });
 
@@ -42,7 +44,7 @@ export async function POST(
       effective_date: effective_date ?? new Date().toISOString().split('T')[0],
       updated_at: new Date().toISOString(),
     })
-    .eq('id', params.id);
+    .eq('id', id);
 
   if (error) return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   return NextResponse.json({ ok: true });

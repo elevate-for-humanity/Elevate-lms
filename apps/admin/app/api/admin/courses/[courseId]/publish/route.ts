@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
  *
  * Requires admin/admin/staff role.
  */
-export async function POST(request: NextRequest, { params }: { params: { courseId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
   const rateLimited = await applyRateLimit(request, 'strict');
   if (rateLimited) return rateLimited;
 
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest, { params }: { params: { courseI
   if (auth.error) return auth.error;
   const userId = auth.id;
 
-  const courseId = params.courseId;
+  const { courseId } = await params;
   if (!courseId) return safeError('Course ID required', 400);
 
   // Run auditor — this is the single gate

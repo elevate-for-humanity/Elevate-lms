@@ -16,12 +16,13 @@ const STATUS_MAP: Record<Action, string> = {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { action: string } }
+  { params }: { params: Promise<{ action: string }> }
 ) {
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
-  const action = params.action as Action;
+  const { action: actionParam } = await params;
+  const action = actionParam as Action;
   if (!ALLOWED_ACTIONS.includes(action)) {
     return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
   }

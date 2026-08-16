@@ -20,14 +20,14 @@ interface ReorderItem {
   order_index: number;
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { courseId: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ courseId: string }> }) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
 
   const auth = await apiRequireInstructor(request);
   if (auth.error) return auth.error;
 
-  const { courseId } = params;
+  const { courseId } = await params;
   if (!courseId) return safeError('courseId required', 400);
 
   let items: ReorderItem[];

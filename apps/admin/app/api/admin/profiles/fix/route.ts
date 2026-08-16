@@ -22,7 +22,7 @@ const VALID_ROLES = new Set([
   'workforce_board', 'grant_client', 'sponsor', 'creator', 'org_admin',
 ]);
 
-async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
     // Rate limit
     const rateLimited = await applyRateLimit(request, 'strict');
@@ -139,4 +139,3 @@ async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -71,7 +71,7 @@ export function resolveDefaultPreviewUrl(options?: {
   const host = (options?.requestHost ?? '').split(':')[0]?.toLowerCase() ?? '';
 
   if (hostnameIsAdmin(host)) {
-    return `${adminSiteUrl}/admin/dashboard`;
+    return `${adminSiteUrl}/dashboard`;
   }
 
   return `${publicSiteUrl}/`;
@@ -99,15 +99,15 @@ export function buildDevStudioPreviewTargets(options?: {
     }
     const localAdmin = trimUrl(process.env.NEXT_PUBLIC_ADMIN_URL);
     if (localAdmin) {
-      targets.push({ label: 'Local admin', url: `${localAdmin}/admin/dashboard` });
+      targets.push({ label: 'Local admin', url: `${localAdmin}/dashboard` });
     }
   }
 
   targets.push(
-    { label: 'Admin · Dashboard', url: `${adminSiteUrl}/admin/dashboard` },
-    { label: 'Admin · Dev Studio', url: `${adminSiteUrl}/admin/dashboard` },
-    { label: 'Admin · Course builder', url: `${adminSiteUrl}/admin/courses/create` },
-    { label: 'Admin · Applications', url: `${adminSiteUrl}/admin/applications` },
+    { label: 'Admin · Dashboard', url: `${adminSiteUrl}/dashboard` },
+    { label: 'Admin · Dev Studio', url: `${adminSiteUrl}/studio` },
+    { label: 'Admin · Course builder', url: `${adminSiteUrl}/course-builder` },
+    { label: 'Admin · Applications', url: `${adminSiteUrl}/applications` },
     { label: 'Public · Homepage', url: `${publicSiteUrl}/` },
     { label: 'Public · Programs', url: `${publicSiteUrl}/programs` },
     { label: 'Public · Program catalog', url: `${publicSiteUrl}/programs/catalog` },

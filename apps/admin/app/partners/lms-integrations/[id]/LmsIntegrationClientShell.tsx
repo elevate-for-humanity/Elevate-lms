@@ -1,14 +1,6 @@
 'use client';
 
-import dynamicImport from 'next/dynamic';
-
-const UniversalCoursePlayer = dynamicImport(
-  () =>
-    import('@/components/UniversalCoursePlayer').then((m) => ({
-      default: m.UniversalCoursePlayer,
-    })),
-  { ssr: false },
-);
+import { UniversalCoursePlayer } from '@/components/UniversalCoursePlayer';
 
 interface Props {
   courseId: string;

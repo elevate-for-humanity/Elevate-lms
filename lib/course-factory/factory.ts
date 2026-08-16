@@ -86,10 +86,20 @@ async function generateFreeFormBlueprint(
     throw new Error('title and topic are required when no registered blueprint exists');
   }
 
+  const topic = [
+    input.topic,
+    input.hours ? `Target training hours: ${input.hours}.` : '',
+    input.deliveryFormat ? `Delivery format: ${input.deliveryFormat}.` : '',
+    input.additionalRequirements ? `Additional requirements: ${input.additionalRequirements}` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   const raw = await generateBlueprintFromAI({
     title: input.title,
-    topic: input.topic,
+    topic,
     audience: input.audience ?? `${input.difficulty ?? 'intermediate'} workforce learner`,
+    hours: input.hours,
     state: input.state,
     credential: input.credential,
     moduleCount: input.moduleCount,
@@ -298,35 +308,40 @@ export async function courseFactory(
     progress.emit('resolve', 'Resolving program and curriculum source.');
 
     const db = await requireAdminClient();
-    let programQuery = db.from('programs').select('id, slug, title');
-    if (input.programId) programQuery = programQuery.eq('id', input.programId);
-    else if (input.programSlug) programQuery = programQuery.eq('slug', input.programSlug);
-    else {
+    let program: { id: string; slug: string | null; title: string | null } | null = null;
+
+    if (input.programId || input.programSlug) {
+      let programQuery = db.from('programs').select('id, slug, title');
+      if (input.programId) programQuery = programQuery.eq('id', input.programId);
+      else if (input.programSlug) programQuery = programQuery.eq('slug', input.programSlug);
+
+      const { data, error: programError } = await programQuery.maybeSingle();
+      if (programError) throw programError;
+      if (!data?.id) {
+        return {
+          ok: false,
+          status: 'not_found',
+          errors: ['Canonical program record not found'],
+          warnings: [],
+        };
+      }
+      program = data as { id: string; slug: string | null; title: string | null };
+    } else if (!input.blueprint && !(input.title && input.topic)) {
       return {
         ok: false,
         status: 'not_found',
-        errors: ['programId or programSlug is required'],
+        errors: ['programId/programSlug or standalone title/topic is required'],
         warnings: [],
       };
     }
 
-    const { data: program, error: programError } = await programQuery.maybeSingle();
-    if (programError) throw programError;
-    if (!program?.id) {
-      return {
-        ok: false,
-        status: 'not_found',
-        errors: ['Canonical program record not found'],
-        warnings: [],
-      };
-    }
-
-    const resolved = input.blueprint
-      ? null
-      : await loadBlueprintWithProgram(db, {
-          programId: program.id,
-          programSlug: program.slug ?? input.programSlug,
-        });
+    const resolved =
+      input.blueprint || !program
+        ? null
+        : await loadBlueprintWithProgram(db, {
+            programId: program.id,
+            programSlug: program.slug ?? input.programSlug,
+          });
 
     let blueprint: CredentialBlueprint;
     if (input.blueprint) {
@@ -343,10 +358,11 @@ export async function courseFactory(
         };
       }
       progress.emit('blueprint', 'No registered blueprint found; generating one in Course Factory.');
-      blueprint = await generateFreeFormBlueprint(
-        input,
-        program.slug || input.programSlug || slugify(program.title || input.title),
-      );
+      const generatedSlug =
+        program?.slug ||
+        input.programSlug ||
+        `${slugify(input.title)}-${Date.now().toString(36)}`;
+      blueprint = await generateFreeFormBlueprint(input, generatedSlug);
     } else {
       return {
         ok: false,
@@ -452,12 +468,13 @@ export async function courseFactory(
 
     progress.emit('publish', 'Persisting the canonical LMS course package.');
     const publishResult = await publishCourse({
-      programId: program.id,
+      programId: program?.id ?? null,
       courseSlug: completeBlueprint.programSlug ?? `course-${Date.now()}`,
       courseTitle: completeBlueprint.credentialTitle,
       blueprint: completeBlueprint.modules,
       mode: input.mode ?? 'missing-only',
-      contentSource: input.contentSource === 'curriculum_lessons' ? 'curriculum_lessons' : 'blueprint',
+      contentSource:
+        input.contentSource === 'curriculum_lessons' ? 'curriculum_lessons' : 'blueprint',
       videoConfig: { enabled: input.videoMode === 'queue' },
     });
 

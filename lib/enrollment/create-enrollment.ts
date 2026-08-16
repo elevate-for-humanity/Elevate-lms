@@ -57,7 +57,7 @@ export async function createEnrollmentFromPayment(
   try {
     const { requireAdminClient: getAdminClient } = await import('@/lib/supabase/admin');
     const { setAuditContext } = await import('@/lib/audit-context');
-    const supabaseAdmin = await requireAdminClient();
+    const supabaseAdmin = await getAdminClient();
 
     if (!supabaseAdmin) {
       logger.error('[Enrollment] getAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY missing');

@@ -226,9 +226,9 @@ async function patchWithCapacitySafeStrategy(
   // replacement, and the workflow verifies the deployed SHA before success.
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',
-    body: JSON.stringify(buildPatch(service, storageMb, 'recreate')),
+    body: JSON.stringify(buildPatch(service, storageMb, 'custom')),
   });
-  return { response, rolloutMode: 'recreate' };
+  return { response, rolloutMode: 'custom' };
 }
 
 async function configureService(
@@ -306,7 +306,7 @@ async function main() {
     for (const service of services) {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
-          `rollout=recreate, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
+          `rollout=custom(maxSurge=1,maxUnavailable=0), health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
       );
     }
     return;

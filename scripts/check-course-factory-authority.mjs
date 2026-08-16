@@ -39,7 +39,7 @@ const requiredDelegations = [
   ['lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts', "from '@/lib/course-factory/publisher'", 'blueprint seeder'],
   ['lib/db/save-blueprint-canonical.ts', "from '@/lib/course-factory/publisher'", 'ingestion blueprint persistence'],
   ['lib/programs/create-and-publish-program.ts', "from '@/lib/course-factory/publisher'", 'program course persistence'],
-  ['lib/studio/tools.ts', "from '@/lib/course-factory/publisher'", 'Studio full-blueprint build'],
+  ['lib/studio/tools.ts', '@/lib/course-factory/publisher', 'Studio full-blueprint build'],
 ];
 
 for (const [rel, needle, label] of requiredDelegations) {

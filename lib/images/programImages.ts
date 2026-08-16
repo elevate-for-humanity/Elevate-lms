@@ -21,6 +21,136 @@ interface ProgramImageEntry {
 }
 
 export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
+  'business-administration': {
+    card: '/images/business/team-2.jpg',
+    hero: '/hero-images/business-hero.webp',
+    alt: 'Business administration learners collaborating in a professional setting',
+  },
+  'financial-literacy': {
+    card: `${P}/financial-aid-page-1.webp`,
+    hero: '/images/business/professional-2.jpg',
+    alt: 'Financial literacy learner reviewing a personal financial plan',
+  },
+  'administrative-assistant': {
+    card: `${P}/office-admin-desk.jpg`,
+    hero: '/images/business/office-admin.webp',
+    alt: 'Administrative assistant working at a professional office workstation',
+  },
+  'automotive-technician': {
+    card: '/images/pexels/diesel.webp',
+    hero: `${P}/cdl-cab-interior.webp`,
+    alt: 'Automotive technician inspecting vehicle systems in a service shop',
+  },
+  'business-operations': {
+    card: '/images/business/team-3.webp',
+    hero: '/images/business/team-4.webp',
+    alt: 'Business operations team coordinating a workplace process',
+  },
+  'business-startup': {
+    card: `${P}/entrepreneurship.webp`,
+    hero: '/images/programs/efh-business-startup-marketing-hero.jpg',
+    alt: 'Entrepreneur building the launch plan for a new business',
+  },
+  'chw-cert': {
+    card: `${P}/community-page-3.webp`,
+    hero: '/images/hero/hero-community.webp',
+    alt: 'Community health worker connecting a resident with support services',
+  },
+  'customer-service-pro': {
+    card: `${P}/community-page-4.webp`,
+    hero: '/images/business/collaboration-1.webp',
+    alt: 'Customer service professional assisting a client',
+  },
+  'customer-service-representative': {
+    card: `${P}/community-page-5.webp`,
+    hero: '/images/business/partnership-1.webp',
+    alt: 'Customer service representative helping a customer resolve a request',
+  },
+  'data-analytics': {
+    card: `${P}/store-addons-analytics-hero.webp`,
+    hero: '/images/heroes/lms-analytics.webp',
+    alt: 'Data analytics learner reviewing charts and business metrics',
+  },
+  'dental-assistant': {
+    card: `${P}/healthcare-classroom.webp`,
+    hero: '/images/healthcare/hero-program-patient-care.webp',
+    alt: 'Dental assistant learner preparing for supervised chairside care',
+  },
+  'drug-alcohol-specimen-collector': {
+    card: `${P}/drug-testing-page-4.webp`,
+    hero: '/hero-images/drug-collector-hero.webp',
+    alt: 'Drug and alcohol specimen collector following a documented collection process',
+  },
+  'nha-ekg-technician': {
+    card: `${P}/cna-patient-care.jpg`,
+    hero: `${P}/healthcare-hero.webp`,
+    alt: 'EKG technician learner preparing equipment for a cardiac test',
+  },
+  'nha-ehr': {
+    card: `${P}/admin-docs-detail.webp`,
+    hero: `${P}/admin-applications-hero.webp`,
+    alt: 'Electronic health records learner documenting patient information securely',
+  },
+  'emt-apprenticeship': {
+    card: `${P}/programs-emergency-health-safety-hero.webp`,
+    hero: '/images/healthcare/hero-program-patient-care.webp',
+    alt: 'Emergency medical technician apprentice preparing for patient response',
+  },
+  'guest-service-gold': {
+    card: `${P}/comp-home-hero-programs.jpg`,
+    hero: `${P}/comp-layout-hero.webp`,
+    alt: 'Guest service professional welcoming and assisting a visitor',
+  },
+  'information-technology': {
+    card: `${P}/tech-classroom.webp`,
+    hero: `${P}/programs-it-hero.webp`,
+    alt: 'Information technology learner working in a computer lab',
+  },
+  'insurance-agent': {
+    card: `${P}/business-meeting.webp`,
+    hero: '/hero-images/business-category.webp',
+    alt: 'Insurance agent reviewing coverage information with a client',
+  },
+  'manufacturing-technician': {
+    card: `${P}/construction-trades.webp`,
+    hero: `${P}/welding.webp`,
+    alt: 'Manufacturing technician working with industrial production equipment',
+  },
+  'nha-medical-admin-assistant': {
+    card: `${P}/admin/staff-portal-page-1.webp`,
+    hero: '/images/healthcare/hero-program-medical-assistant.webp',
+    alt: 'Medical administrative assistant coordinating patient office records',
+  },
+  'nha-billing-coding': {
+    card: `${P}/admin-compliance-exports-detail.webp`,
+    hero: `${P}/admin-accreditation-report-hero.webp`,
+    alt: 'Medical billing and coding learner reviewing healthcare records',
+  },
+  'nha-patient-care-technician': {
+    card: `${P}/healthcare-sector.webp`,
+    hero: '/images/healthcare/hero-program-patient-care.webp',
+    alt: 'Patient care technician learner practicing supervised clinical care',
+  },
+  'real-estate-agent': {
+    card: `${P}/about-employer-partners.webp`,
+    hero: `${P}/admin-employers-hero.webp`,
+    alt: 'Real estate agent presenting property information to a client',
+  },
+  'solar-panel-installation': {
+    card: `${P}/construction-trades.webp`,
+    hero: `${P}/electrical-conduit.webp`,
+    alt: 'Solar installation learner preparing rooftop electrical equipment',
+  },
+  'start-hospitality': {
+    card: `${P}/community-page-10.webp`,
+    hero: `${P}/comp-home-hero-programs.jpg`,
+    alt: 'Hospitality learner preparing for professional guest service',
+  },
+  'youth-culinary-apprenticeship': {
+    card: `${P}/culinary.webp`,
+    hero: `${P}/culinary-apprenticeship-hero.webp`,
+    alt: 'Youth culinary apprentice preparing food in a professional kitchen',
+  },
   'hvac-technician': {
     card: `${P}/hvac-unit.webp`,
     hero: `${P}/hvac-technician.webp`,

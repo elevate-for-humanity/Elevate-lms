@@ -62,6 +62,7 @@ function CheckoutPageInner() {
   const [error, setError] = useState<string | null>(null);
 
   const programData = getProgramPricing(program);
+  const applicationQuery = applicationId ? `&applicationId=${encodeURIComponent(applicationId)}` : '';
 
   useEffect(() => {
     if (method === 'affirm' && typeof window !== 'undefined') {
@@ -156,12 +157,20 @@ function CheckoutPageInner() {
       return;
     }
 
+    if (!applicationId) {
+      setError('Please start from your application payment link so your financing can be matched to your enrollment.');
+      setLoading(false);
+      return;
+    }
+
     try {
+      const orderId = `${program}--${applicationId}--${Date.now()}`;
+
       window.affirm.checkout({
         merchant: {
-          user_confirmation_url: `${window.location.origin}/checkout/success?program=${program}`,
-          user_cancel_url: `${window.location.origin}/checkout/${program}?method=affirm`,
-          user_confirmation_url_action: 'POST',
+          user_confirmation_url: `${window.location.origin}/checkout/success?program=${program}&applicationId=${encodeURIComponent(applicationId)}`,
+          user_cancel_url: `${window.location.origin}/checkout/${program}?method=affirm&applicationId=${encodeURIComponent(applicationId)}`,
+          user_confirmation_url_action: 'GET',
         },
         items: [
           {
@@ -176,8 +185,9 @@ function CheckoutPageInner() {
         metadata: {
           program_slug: program,
           program_name: programData.name,
+          application_id: applicationId,
         },
-        order_id: `${program}-${Date.now()}`,
+        order_id: orderId,
         shipping_amount: 0,
         tax_amount: 0,
         total: programData.price * 100,
@@ -192,11 +202,17 @@ function CheckoutPageInner() {
         },
         onSuccess: async (data: { checkout_token: string; order_id?: string }) => {
           try {
-            // Redirect to capture route — it authorizes the charge server-side
-            // and creates the enrollment. checkout_token + order_id are passed
-            // as query params by Affirm; we forward them to the capture endpoint.
-            const orderId = data.order_id || data.checkout_token;
-            window.location.href = `/api/affirm/capture?checkout_token=${encodeURIComponent(data.checkout_token)}&order_id=${encodeURIComponent(orderId)}`;
+            // The capture route authorizes/captures server-side and creates the
+            // enrollment through the shared payment enrollment activator. Keep
+            // application + program context so the server can verify ownership.
+            const confirmedOrderId = data.order_id || orderId;
+            const captureParams = new URLSearchParams({
+              checkout_token: data.checkout_token,
+              order_id: confirmedOrderId,
+              applicationId,
+              program,
+            });
+            window.location.href = `/api/affirm/capture?${captureParams.toString()}`;
           } catch (err) {
             setError('Failed to process payment. Please contact support.');
             setLoading(false);
@@ -354,7 +370,7 @@ function CheckoutPageInner() {
                   <p className="text-center text-sm text-black mt-4">
                     Or{' '}
                     <Link
-                      href={`/checkout/${program}?method=affirm`}
+                      href={`/checkout/${program}?method=affirm${applicationQuery}`}
                       className="text-blue-600 underline"
                     >
                       pay with Affirm
@@ -397,7 +413,7 @@ function CheckoutPageInner() {
                   <p className="text-center text-sm text-black mt-4">
                     Or{' '}
                     <Link
-                      href={`/checkout/${program}?method=stripe`}
+                      href={`/checkout/${program}?method=stripe${applicationQuery}`}
                       className="text-blue-600 underline"
                     >
                       pay in full with Stripe
@@ -427,7 +443,5 @@ function CheckoutPageInner() {
 }
 
 export default function CheckoutPage() {
-  return (
-          <CheckoutPageInner />
-  );
+  return <CheckoutPageInner />;
 }

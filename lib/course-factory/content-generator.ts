@@ -25,9 +25,6 @@ interface LessonGenerationInput {
   standardsBlock?: string;
 }
 
-/**
- * Generate one complete learner-facing lesson package.
- */
 export async function generateLessonContent(
   input: LessonGenerationInput,
 ): Promise<GeneratedLessonContent> {
@@ -81,7 +78,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
     const parsed = JSON.parse(raw || '{}') as Partial<GeneratedLessonContent>;
 
     const objective = String(parsed.objective || '').trim();
-    const content = String(parsed.content || '').trim();
+    const html = String(parsed.content || '').trim();
     const scenario = String(parsed.scenario || '').trim();
     const learningPoints = Array.isArray(parsed.learning_points)
       ? parsed.learning_points.map((point) => String(point).trim()).filter(Boolean)
@@ -90,7 +87,7 @@ The content must be original, job-ready, factually grounded, and aligned to the 
       ? parsed.quiz_questions
       : [];
 
-    if (!objective || !content || content.length < 500) {
+    if (!objective || !html || html.length < 500) {
       throw new Error('Generated lesson is missing required objective or substantive content');
     }
     if (learningPoints.length < 3) {
@@ -105,7 +102,11 @@ The content must be original, job-ready, factually grounded, and aligned to the 
 
     return {
       objective,
-      content,
+      content: JSON.stringify({
+        html,
+        learning_points: learningPoints,
+        scenario,
+      }),
       learning_points: learningPoints,
       scenario,
       quiz_questions: quizQuestions,

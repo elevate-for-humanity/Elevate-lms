@@ -150,12 +150,69 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
   return normalized;
 }
 
+function mediaKey(value?: string): string | undefined {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value, 'https://elevate.local');
+    return `${url.hostname.toLowerCase()}${url.pathname.toLowerCase()}`;
+  } catch {
+    return value.split('?')[0]?.split('#')[0]?.toLowerCase();
+  }
+}
+
+/**
+ * Remove inherited/generic video duplication after every banner has been
+ * normalized. A dedicated registry assignment remains authoritative. When a
+ * shared JSON fallback has no dedicated owner, every page in that duplicate
+ * group becomes poster-first instead of silently sharing unrelated footage.
+ *
+ * If multiple pages ever claim the same dedicated registry video, preserve the
+ * collision so the hero audit still fails loudly rather than hiding it here.
+ */
+function removeDuplicateFallbackVideos(
+  banners: Record<string, HeroBannerConfig>,
+): Record<string, HeroBannerConfig> {
+  const groups = new Map<string, string[]>();
+
+  for (const [pageKey, banner] of Object.entries(banners)) {
+    const key = mediaKey(banner.videoSrcDesktop || banner.videoSrcMobile);
+    if (!key) continue;
+    groups.set(key, [...(groups.get(key) ?? []), pageKey]);
+  }
+
+  for (const [videoKey, pageKeys] of groups) {
+    if (pageKeys.length < 2) continue;
+
+    const dedicatedOwners = pageKeys.filter((pageKey) => {
+      const dedicated = getHeroVideoForPageKey(pageKey);
+      return mediaKey(dedicated?.video_url) === videoKey;
+    });
+
+    if (dedicatedOwners.length > 1) continue;
+
+    const owner = dedicatedOwners[0];
+    for (const pageKey of pageKeys) {
+      if (pageKey === owner) continue;
+      banners[pageKey] = {
+        ...banners[pageKey],
+        videoSrcDesktop: undefined,
+        videoSrcMobile: undefined,
+      };
+    }
+  }
+
+  return banners;
+}
+
 let normalizedData: Record<string, HeroBannerConfig> | null = null;
 
 function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
-  normalizedData = Object.fromEntries(Object.entries(raw).map(([key, banner]) => [key, normalizeBanner(key, banner)]));
+  const normalized = Object.fromEntries(
+    Object.entries(raw).map(([key, banner]) => [key, normalizeBanner(key, banner)]),
+  );
+  normalizedData = removeDuplicateFallbackVideos(normalized);
   return normalizedData;
 }
 

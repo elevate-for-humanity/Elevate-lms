@@ -72,16 +72,6 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (body.dryRun) {
-    return new Response(
-      JSON.stringify({
-        error:
-          'Dry-run generation is disabled on the unified pipeline. Use the Course Factory build action to generate a complete draft.',
-      }),
-      { status: 409, headers: { 'Content-Type': 'application/json' } },
-    );
-  }
-
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -104,6 +94,7 @@ export async function POST(req: NextRequest) {
             contentSource: 'ai',
             mode: 'replace',
             videoMode: body.includeVideos === false ? 'off' : 'queue',
+            dryRun: Boolean(body.dryRun),
           },
           (stage, message, progress) =>
             write({ stage: toPipelineStage(stage), message, progress }),
@@ -120,7 +111,7 @@ export async function POST(req: NextRequest) {
             lessonsWithQuizzes: result.assessmentsGenerated ?? 0,
             videosQueued: result.videosQueued ?? 0,
             errors: result.errors ?? [],
-            dryRun: false,
+            dryRun: Boolean(result.dryRun),
           },
         });
       } catch (error) {

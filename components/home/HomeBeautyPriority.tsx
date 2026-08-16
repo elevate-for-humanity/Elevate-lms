@@ -2,6 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Building2, Scissors, Sparkles } from 'lucide-react';
 
+const HOST_SITE_HREF = '/partners/host-shops';
+
 const TRACKS = [
   {
     title: 'Barbering Apprenticeship',
@@ -49,7 +51,7 @@ export function HomeBeautyPriority() {
               <div>
                 <div className="font-black text-slate-950">Own a salon, spa, or barbershop?</div>
                 <p className="mt-1 text-sm font-medium leading-6 text-slate-600">Apply to become an Elevate Host Site. Elevate supports sponsor governance, RTI coordination, hour tracking, and apprenticeship workflows.</p>
-                <Link href="/partners/host-shops" className="mt-3 inline-flex items-center gap-2 text-sm font-black text-rose-700 hover:text-rose-900">
+                <Link href={HOST_SITE_HREF} className="mt-3 inline-flex items-center gap-2 text-sm font-black text-rose-700 hover:text-rose-900">
                   Become a Host Shop <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

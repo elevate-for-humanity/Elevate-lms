@@ -5,7 +5,7 @@ import HeroVideo from '@/components/marketing/HeroVideo';
 /**
  * PageVideoHero — wrapper providing backwards-compatible props for heroMedia config.
  * Every size maps to an explicit media-frame height; wrapper max-height hacks are prohibited.
- * Poster props remain accepted for compatibility but are intentionally not rendered.
+ * The poster is forwarded to HeroVideo and renders while the video buffers and as a fallback.
  */
 
 export type HeroSize = 'primary' | 'marketing' | 'compact' | 'full';
@@ -29,7 +29,7 @@ const HEIGHT_BY_SIZE: Record<HeroSize, string> = {
 
 export default function PageVideoHero({
   videoSrc,
-  posterSrc: _posterSrc,
+  posterSrc,
   posterAlt: _posterAlt,
   size = 'marketing',
   headline,
@@ -39,6 +39,7 @@ export default function PageVideoHero({
   return (
     <HeroVideo
       videoSrcDesktop={videoSrc}
+      posterImage={posterSrc}
       belowHeroHeadline={headline}
       belowHeroSubheadline={subheadline}
       heightClassName={HEIGHT_BY_SIZE[size]}

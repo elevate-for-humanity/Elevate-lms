@@ -38,7 +38,7 @@ const TRUST_ITEMS = [
     img: '/images/pages/about-team-hero.webp',
     label: 'WorkOne Partner',
     sub: 'Indiana DWD aligned',
-    href: '/partners/workforce',
+    href: '/for-agencies',
   },
   {
     img: '/images/pages/funding-impact-2.jpg',
@@ -57,12 +57,12 @@ const PARTNER_LOGOS = [
   {
     src: '/images/pages/about-partner-cta.webp',
     alt: 'Indiana Department of Workforce Development',
-    href: '/partners/workforce',
+    href: '/for-agencies',
   },
   {
     src: '/images/pages/workforce-board-page-2.webp',
     alt: 'WorkOne Indiana',
-    href: '/partners/workforce',
+    href: '/for-agencies',
   },
   { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
   { src: '/images/pages/about-hero.webp', alt: 'OSHA Authorized', href: '/compliance' },

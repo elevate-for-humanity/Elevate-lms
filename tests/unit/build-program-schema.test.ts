@@ -28,20 +28,22 @@ describe('build-program-schema', () => {
     expect(schema.programType).toBe('certification');
   });
 
-  it('canonicalizes duplicate phlebotomy aliases', () => {
+  it('canonicalizes the supported phlebotomy alias without reviving retired vendor aliases', () => {
     expect(resolveSlug('phlebotomy-technician')).toBe('phlebotomy');
-    expect(resolveSlug('nha-phlebotomy')).toBe('phlebotomy');
+    expect(resolveSlug('nha-phlebotomy')).toBeUndefined();
   });
 });
 
 describe('single program page renderer', () => {
-  it('[program]/page.tsx has no legacy ProgramPage or cf-programs fallback', () => {
-    const page = readFileSync(join(process.cwd(), 'app/programs/[program]/page.tsx'), 'utf8');
+  it('[program]/page.tsx uses the canonical Marketing renderer with no legacy cf-programs fallback', () => {
+    const page = readFileSync(
+      join(process.cwd(), 'apps/marketing/app/programs/[program]/page.tsx'),
+      'utf8',
+    );
     expect(page).not.toContain('cf-programs');
     expect(page).not.toContain('function ProgramPage');
-    expect(page).not.toContain('ProgramPage');
     expect(page).toContain('loadProgramForPage');
-    expect(page).toContain('ProgramDetailPageComponent');
+    expect(page).toContain('ProgramDetailPage');
   });
 
   it('cf-programs.ts is removed', () => {

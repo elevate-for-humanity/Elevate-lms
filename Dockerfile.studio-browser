@@ -1,0 +1,11 @@
+FROM mcr.microsoft.com/playwright:v1.57.0-noble
+
+WORKDIR /app
+COPY apps/studio-browser/package.json ./package.json
+RUN npm install --omit=dev --ignore-scripts
+COPY apps/studio-browser/server.mjs ./server.mjs
+
+ENV NODE_ENV=production PORT=3100
+EXPOSE 3100
+USER pwuser
+CMD ["node", "server.mjs"]

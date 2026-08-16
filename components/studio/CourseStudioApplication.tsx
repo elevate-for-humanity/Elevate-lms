@@ -96,7 +96,7 @@ function PublishProgress() {
   return <div className="h-1 bg-slate-100 shrink-0"><div className="h-full bg-brand-blue-500 transition-all duration-500" style={{ width: `${pct}%` }} /></div>;
 }
 
-export function StudioShell({ children }: { children: React.ReactNode }) {
+export function CourseStudioApplication({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   return (

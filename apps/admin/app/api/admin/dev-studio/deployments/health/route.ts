@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     const runtimeReady = isNorthflankReady();
 
     return buildCapabilityHealth('deployments', [
+      { name: 'github-integration', passed: Boolean(process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PERSONAL_ACCESS_TOKEN), required: true, message: 'GitHub deployment credentials checked.' },
       { name: 'northflank-token', passed: tokenPresent, required: true, message: tokenPresent ? 'Northflank token is configured.' : 'Northflank token is missing.' },
       { name: 'northflank-project', passed: projectPresent, required: true, message: projectPresent ? 'Northflank project is configured.' : 'Northflank project ID is missing.' },
       { name: 'northflank-services', passed: configuredServices.length >= 3, required: true, message: `${configuredServices.length} deployment services configured.` },

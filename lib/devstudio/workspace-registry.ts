@@ -13,6 +13,8 @@ export type StudioWorkspaceId =
   | 'media'
   | 'workflows'
   | 'repository'
+  | 'browser'
+  | 'canvas'
   | 'tasks'
   | 'deployments'
   | 'containers'
@@ -40,6 +42,8 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'media', label: 'Media Studio', description: 'Organization-scoped media and documents.', permission: 'studio.media.manage', route: '/studio/media', healthEndpoint: '/api/admin/dev-studio/media/health' },
   { id: 'workflows', label: 'Workflow Designer', description: 'Build versioned visual automations.', permission: 'studio.workflows.manage', route: '/studio/workflows', healthEndpoint: '/api/admin/dev-studio/workflows/health' },
   { id: 'repository', label: 'Repository Workspace', description: 'Edit and preview source, commit to GitHub, and run code in an isolated browser runtime.', permission: 'studio.repository.view', route: '/studio/repository', healthEndpoint: '/api/admin/dev-studio/repository/health' },
+  { id: 'browser', label: 'Cloud Browser', description: 'Operate isolated Playwright Chromium sessions and capture live runtime evidence.', permission: 'studio.repository.view', route: '/studio/browser', healthEndpoint: '/api/devstudio/browser/session' },
+  { id: 'canvas', label: 'Live Canvas', description: 'Build, preview, review and publish visual projects with approval controls.', permission: 'studio.content.manage', route: '/studio/canvas', healthEndpoint: '/api/devstudio/health' },
   { id: 'tasks', label: 'AI Task Queue', description: 'Plan, approve, execute and verify AI work.', permission: 'studio.tasks.manage', route: '/studio/tasks', healthEndpoint: '/api/admin/dev-studio/tasks/health' },
   { id: 'deployments', label: 'Deployments', description: 'Build, deploy, verify and roll back services.', permission: 'studio.deployments.manage', route: '/studio/deployments', healthEndpoint: '/api/admin/dev-studio/deployments/health' },
   { id: 'containers', label: 'Containers', description: 'Manage isolated execution environments and canonical runtime configuration.', permission: 'studio.containers.manage', route: '/studio/containers', healthEndpoint: '/api/admin/dev-studio/containers/health' },

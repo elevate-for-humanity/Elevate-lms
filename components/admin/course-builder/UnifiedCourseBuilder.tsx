@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { BookOpen, Bot, Boxes, CheckCircle2, FileCheck2, FlaskConical, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
 import CourseInteractionStudio from './CourseInteractionStudio';
 
@@ -85,6 +86,11 @@ export default function UnifiedCourseBuilder() {
               {courses.map((course) => <option key={course.id} value={course.id}>{course.title} — {course.status ?? 'draft'}</option>)}
             </select>
             <button onClick={() => void loadWorkspace()} disabled={!courseId || loading} className="rounded-lg border border-slate-700 p-2 hover:bg-slate-800 disabled:opacity-50" title="Refresh course"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /></button>
+            {courseId && (
+              <Link href={`/studio/courses/${courseId}`} className="rounded-lg bg-cyan-500 px-3 py-2 text-sm font-black text-slate-950 hover:bg-cyan-400">
+                Complete editor
+              </Link>
+            )}
           </div>
         </div>
       </div>

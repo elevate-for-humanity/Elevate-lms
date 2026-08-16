@@ -37,7 +37,7 @@ const featureChecks: FeatureCheck[] = [
   },
   {
     name: 'Course Authoring',
-    files: ['apps/admin/app/admin/studio/page.tsx', 'components/studio/StudioShell.tsx'],
+    files: ['apps/admin/app/studio/page.tsx', 'apps/admin/app/studio/layout.tsx'],
   },
   {
     name: 'AI Tutor & AI Course Builder',

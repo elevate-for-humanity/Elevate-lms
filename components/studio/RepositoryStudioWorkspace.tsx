@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Code2, TerminalSquare } from 'lucide-react';
+import { Code2, Globe2, TerminalSquare } from 'lucide-react';
 import RepositoryLivePreview from './RepositoryLivePreview';
 
 const DevStudioEditorWorkspace = dynamic(() => import('./DevStudioEditorWorkspace'), {
@@ -23,7 +23,12 @@ const RealRepoWorkspace = dynamic(() => import('./RealRepoWorkspace'), {
   ),
 });
 
-type Mode = 'preview' | 'runtime';
+const CloudBrowserWorkspace = dynamic(() => import('./CloudBrowserWorkspace'), {
+  ssr: false,
+  loading: () => <div className="flex h-full items-center justify-center bg-slate-950 text-slate-400">Connecting cloud browser…</div>,
+});
+
+type Mode = 'preview' | 'runtime' | 'browser';
 
 export default function RepositoryStudioWorkspace() {
   const [mode, setMode] = useState<Mode>('preview');
@@ -49,6 +54,13 @@ export default function RepositoryStudioWorkspace() {
           }`}
         >
           <Code2 className="h-4 w-4" /> Editor + Preview
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('browser')}
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold ${mode === 'browser' ? 'bg-violet-500 text-white' : 'border border-slate-700 bg-slate-950 text-slate-300 hover:bg-slate-800'}`}
+        >
+          <Globe2 className="h-4 w-4" /> Cloud Browser
         </button>
         <button
           type="button"
@@ -78,11 +90,11 @@ export default function RepositoryStudioWorkspace() {
               <RepositoryLivePreview filePath={activePath} content={activeContent} />
             </div>
           </div>
-        ) : (
+        ) : mode === 'runtime' ? (
           <div className="h-full min-h-[680px] overflow-hidden rounded-xl border border-slate-800 xl:min-h-0">
             <RealRepoWorkspace className="h-full" />
           </div>
-        )}
+        ) : <div className="h-full min-h-[680px] overflow-hidden rounded-xl border border-slate-800 xl:min-h-0"><CloudBrowserWorkspace /></div>}
       </div>
     </div>
   );

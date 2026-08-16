@@ -24,7 +24,7 @@ const PATHWAYS = [
       'Train apprentices at your licensed shop while Elevate supports onboarding, tracking, and compliance.',
     image: '/images/pages/shop-hero.webp',
     imageAlt: 'Barbershop and salon host shop partnership',
-    ctaHref: '/partners/barber-host-shop',
+    ctaHref: '/partners/host-shops',
     badge: 'For Shop Owners',
   },
   {

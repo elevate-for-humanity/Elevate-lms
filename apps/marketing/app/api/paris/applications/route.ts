@@ -7,6 +7,7 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createApplication } from '@/lib/paris/admissions/application-service';
+import { createPublicClient } from '@/lib/supabase/server';
 
 // ============================================
 // REQUEST VALIDATION
@@ -72,16 +73,6 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   try {
     // Get authenticated user
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        { success: false, error: 'Server configuration error' },
-        { status: 500 },
-      );
-    }
-    
     // Get user from Authorization header
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -94,8 +85,7 @@ export async function POST(request: Request) {
     const token = authHeader.substring(7);
     
     // Verify token and get user
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = createPublicClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
@@ -158,16 +148,6 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        { success: false, error: 'Server configuration error' },
-        { status: 500 },
-      );
-    }
-    
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json(
@@ -177,8 +157,7 @@ export async function GET(request: Request) {
     }
     
     const token = authHeader.substring(7);
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = createPublicClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     

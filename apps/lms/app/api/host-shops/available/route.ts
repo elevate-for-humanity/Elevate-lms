@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export const dynamic = 'force-dynamic';
-
-function createServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-  return createSupabaseClient(url, key);
-}
 
 const BEAUTY_PROGRAM_TERMS = [
   'barber',
@@ -36,7 +30,7 @@ function programLabels(programType: string | null, programs: unknown): string[] 
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = createServiceClient();
+  const supabase = await requireAdminClient();
   const { searchParams } = new URL(request.url);
   const city = searchParams.get('city')?.trim();
   const search = searchParams.get('search')?.trim().toLowerCase();

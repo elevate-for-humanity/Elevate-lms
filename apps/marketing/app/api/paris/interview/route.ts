@@ -1,8 +1,9 @@
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { createClient as createSupabaseServerClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { createPublicClient } from '@/lib/supabase/server';
 import type { InterviewSession, ConversationMessage } from '@/lib/paris/interview/types';
 import { ConversationEngine } from '@/lib/paris/interview/conversation-engine';
 import { scoreResponse, calculateInterviewScore } from '@/lib/paris/interview/scoring-engine';
@@ -11,19 +12,6 @@ import { provisionStudentFromInterview } from '@/lib/paris/interview/provisionin
 import { getQuestionsForProgram } from '@/lib/paris/interview/question-bank';
 
 // Initialize Supabase clients
-function getSupabaseAdmin(): SupabaseClient {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    }
-  );
-}
-
 async function getSupabaseUser(request: NextRequest) {
   const authHeader = request.headers.get('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
@@ -31,10 +19,7 @@ async function getSupabaseUser(request: NextRequest) {
   }
   
   const token = authHeader.substring(7);
-  const supabase = createSupabaseServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabase = createPublicClient();
   
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) {
@@ -70,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseAdmin();
+    const supabase = await requireAdminClient();
 
     // Fetch application from database
     const { data: application, error: appError } = await supabase
@@ -294,7 +279,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = getSupabaseAdmin();
+    const supabase = await requireAdminClient();
 
     // Try to find session
     let session: InterviewSession | null = null;

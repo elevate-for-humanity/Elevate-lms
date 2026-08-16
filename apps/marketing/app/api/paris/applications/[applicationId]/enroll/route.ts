@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { enrollAcceptedApplicant } from '@/lib/paris/admissions/enrollment-service';
 
 export const runtime = 'nodejs';
@@ -15,16 +16,6 @@ export async function POST(
   context: { params: Promise<{ applicationId: string }> },
 ) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json(
-        { success: false, error: 'Server configuration error' },
-        { status: 500 },
-      );
-    }
-    
     // Verify admin/staff authentication
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -35,8 +26,7 @@ export async function POST(
     }
     
     const token = authHeader.substring(7);
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = createPublicClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     

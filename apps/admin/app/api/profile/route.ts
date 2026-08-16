@@ -4,7 +4,7 @@
  * Requires admin authentication
  */
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
 
@@ -18,10 +18,7 @@ const handleGet: AuthHandler = async (req) => {
     return NextResponse.json({ error: 'user_id required' }, { status: 400 });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabase = await requireAdminClient();
 
   const { data: profile, error } = await supabase
     .from('profiles')

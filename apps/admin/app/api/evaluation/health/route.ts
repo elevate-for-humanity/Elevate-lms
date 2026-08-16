@@ -3,7 +3,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 interface CapabilityHealth {
   capability: string;
@@ -18,13 +18,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(): Promise<NextResponse<CapabilityHealth>> {
   const checks: CapabilityHealth['checks'] = [];
   let status: CapabilityHealth['status'] = 'healthy';
+  const supabase = await requireAdminClient();
   
   // Check AI tasks table
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
     const { error } = await supabase.from('ai_tasks').select('id').limit(1);
     checks.push({
       name: 'AI Tasks Table',
@@ -39,10 +36,6 @@ export async function GET(): Promise<NextResponse<CapabilityHealth>> {
   
   // Check guardrail enforcement table
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
     const { error } = await supabase.from('guardrail_enforcement_log').select('id').limit(1);
     checks.push({
       name: 'Guardrail Log Table',
@@ -63,10 +56,6 @@ export async function GET(): Promise<NextResponse<CapabilityHealth>> {
   
   // Check audit log table
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
     const { error } = await supabase.from('platform_audit_events').select('id').limit(1);
     checks.push({
       name: 'Audit Events Table',

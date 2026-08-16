@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
+import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
@@ -78,29 +78,17 @@ export async function middleware(req: NextRequest) {
   let response = NextResponse.next({ request: { headers: requestHeaders } });
 
   if (hasSupabaseSession || protectedPath) {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return req.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
-
-            response = NextResponse.next({ request: { headers: requestHeaders } });
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(
-                name,
-                value,
-                authCookieOptions(name, options as Record<string, unknown>) as any,
-              );
-            });
-          },
-        },
-      },
-    );
+    const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
+      cookiesToSet.forEach(({ name, value }) => req.cookies.set(name, value));
+      response = NextResponse.next({ request: { headers: requestHeaders } });
+      cookiesToSet.forEach(({ name, value, options }) => {
+        response.cookies.set(
+          name,
+          value,
+          authCookieOptions(name, options as Record<string, unknown>) as any,
+        );
+      });
+    });
 
     const {
       data: { user },

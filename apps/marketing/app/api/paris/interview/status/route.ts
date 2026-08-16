@@ -2,15 +2,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl) throw new Error('NEXT_PUBLIC_SUPABASE_URL is not configured');
-  if (!supabaseKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
-  return createClient(supabaseUrl, supabaseKey);
-}
+import { requireAdminClient } from '@/lib/supabase/admin';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -24,7 +16,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = getSupabaseAdmin();
+    const supabase = await requireAdminClient();
     const { data: application, error } = await supabase
       .from('paris_applications')
       .select('*')

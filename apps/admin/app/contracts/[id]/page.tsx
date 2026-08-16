@@ -62,11 +62,8 @@ export default async function ContractDetailPage({
   // Get signed URL for preview (private bucket — 1 hour)
   let previewUrl: string | null = null;
   try {
-    const { createClient: createStorageClient } = await import('@supabase/supabase-js');
-    const storageUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const storageKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (storageUrl && storageKey) {
-      const storage = createStorageClient(storageUrl, storageKey, { auth: { persistSession: false } });
+    const storage = await requireAdminClient();
+    if (storage) {
       const { data: fileData } = await db
         .from('contract_templates')
         .select('original_file_path')

@@ -1,24 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { hydrateProcessEnv } from '@/lib/secrets';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
 
 // Build-safe: lazily create the service-role client at runtime. This table is
 // intentionally not part of the generated public Database type, so keep the
 // client unparameterized here rather than manufacturing a false schema type.
-let _supabase: any = null;
-function getSupabaseAdmin(): any {
-  if (!_supabase) {
-    hydrateProcessEnv();
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    );
-  }
-  return _supabase;
-}
-
 const AGENT_TEMPLATES = {
   recruiter: {
     name: 'Recruiter AI',
@@ -84,7 +71,7 @@ Always cite sources and follow grant guidelines exactly.`,
 
 const handleGet: AuthHandler = async () => {
   try {
-    const { data: agents, error } = await getSupabaseAdmin()
+    const { data: agents, error } = await (await requireAdminClient())
       .from('ai_agents')
       .select('*')
       .order('created_at', { ascending: false });
@@ -119,7 +106,7 @@ const handlePost: AuthHandler = async (req) => {
       }
 
       const agentId = `agent_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
-      const { data, error } = await getSupabaseAdmin()
+      const { data, error } = await (await requireAdminClient())
         .from('ai_agents')
         .insert({
           id: agentId,
@@ -150,7 +137,7 @@ const handlePost: AuthHandler = async (req) => {
 
     if (action === 'update') {
       const { agentId, updates } = body;
-      const { data, error } = await getSupabaseAdmin()
+      const { data, error } = await (await requireAdminClient())
         .from('ai_agents')
         .update(updates)
         .eq('id', agentId)
@@ -162,14 +149,14 @@ const handlePost: AuthHandler = async (req) => {
 
     if (action === 'delete') {
       const { agentId } = body;
-      const { error } = await getSupabaseAdmin().from('ai_agents').delete().eq('id', agentId);
+      const { error } = await (await requireAdminClient()).from('ai_agents').delete().eq('id', agentId);
       if (error) throw error;
       return NextResponse.json({ success: true, message: 'Agent deleted' });
     }
 
     if (action === 'clone') {
       const { agentId, newOwnerId, name: cloneName } = body;
-      const { data: original, error: fetchError } = await getSupabaseAdmin()
+      const { data: original, error: fetchError } = await (await requireAdminClient())
         .from('ai_agents')
         .select('*')
         .eq('id', agentId)
@@ -181,7 +168,7 @@ const handlePost: AuthHandler = async (req) => {
 
       const originalConfig = (original.config && typeof original.config === 'object') ? original.config : {};
       const originalPrompt = typeof originalConfig.systemPrompt === 'string' ? originalConfig.systemPrompt : '';
-      const { data: clone, error: cloneError } = await getSupabaseAdmin()
+      const { data: clone, error: cloneError } = await (await requireAdminClient())
         .from('ai_agents')
         .insert({
           id: `agent_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,

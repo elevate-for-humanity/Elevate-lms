@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@supabase/supabase-js';
+import { getAdminClient } from '@/lib/supabase/admin';
 import { resolveBarberLessonVideoUrl } from '@/lib/barber/resolve-lesson-video-url';
 import { BARBER_COURSE_ID } from '@/lib/barber/constants';
 
@@ -12,10 +12,8 @@ export const metadata: Metadata = {
 
 // PUBLIC ROUTE: internal QA — lists barber RTI videos with native HTML5 player
 export default async function BarberVideosPreviewPage() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceKey) {
+  const db = await getAdminClient();
+  if (!db) {
     return (
       <main className="max-w-3xl mx-auto p-8">
         <h1 className="text-xl font-bold text-slate-900">Barber video preview</h1>
@@ -24,7 +22,6 @@ export default async function BarberVideosPreviewPage() {
     );
   }
 
-  const db = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
   const { data: lessons } = await db
     .from('course_lessons')
     .select('slug, title, video_url, order_index')

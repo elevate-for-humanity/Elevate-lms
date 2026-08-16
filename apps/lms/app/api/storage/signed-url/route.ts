@@ -4,31 +4,11 @@
  * Requires authentication
  */
 import { NextResponse } from 'next/server';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
-
-// Lazy initialization to prevent build-time evaluation
-let supabaseClient: SupabaseClient | null = null;
-
-function getSupabase(): SupabaseClient {
-  if (!supabaseClient) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    
-    if (!supabaseUrl) {
-      throw new Error('NEXT_PUBLIC_SUPABASE_URL is required');
-    }
-    if (!serviceRoleKey) {
-      throw new Error('SUPABASE_SERVICE_ROLE_KEY is required');
-    }
-    
-    supabaseClient = createClient(supabaseUrl, serviceRoleKey);
-  }
-  return supabaseClient;
-}
 
 const handleGet: AuthHandler = async (req) => {
   const url = new URL(req.url);
@@ -41,7 +21,7 @@ const handleGet: AuthHandler = async (req) => {
   }
 
   try {
-    const supabase = getSupabase();
+    const supabase = await requireAdminClient();
     const { data, error } = await supabase.storage
       .from(bucket)
       .createSignedUrl(path, expiresIn);

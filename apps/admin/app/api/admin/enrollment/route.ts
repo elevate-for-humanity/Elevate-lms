@@ -3,22 +3,15 @@
  * Server-only endpoint using service-role key.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { withAuth } from '@/lib/with-auth';
 import { API_ADMIN_ROLES } from '@/lib/rbac/role-matrix';
 import type { AuthHandler } from '@/types/auth';
 
 export const dynamic = 'force-dynamic';
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-}
-
 const handleGet: AuthHandler = async (req: NextRequest) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const url = new URL(req.url);
   const status = url.searchParams.get('status');
   const programSlug = url.searchParams.get('program');
@@ -46,7 +39,7 @@ const handleGet: AuthHandler = async (req: NextRequest) => {
 };
 
 const handlePatch: AuthHandler = async (req: NextRequest) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const body = await req.json();
   const { id, ...updates } = body;
 
@@ -70,7 +63,7 @@ const handlePatch: AuthHandler = async (req: NextRequest) => {
 };
 
 const handlePost: AuthHandler = async (req: NextRequest) => {
-  const supabase = getSupabaseAdmin();
+  const supabase = await requireAdminClient();
   const body = await req.json();
   const { action, applicationId, notes } = body;
 

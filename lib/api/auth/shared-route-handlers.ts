@@ -10,8 +10,56 @@ import { validatePassword } from '@/lib/auth/password-validation';
 import { verify2FAToken, verifyBackupCode } from '@/lib/auth/two-factor';
 import { resolvePortalForUser } from '@/lib/portal/router';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
+import { getRoleDestinationUrl } from '@/lib/auth/role-destinations';
+import { logger } from '@/lib/logger';
 
 const ADMIN_ROLES = ['admin', 'super_admin', 'org_admin', 'staff'];
+
+export async function handleOAuthCallback(request: Request, fallbackPath: string) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get('code');
+  const next = validateRedirect(requestUrl.searchParams.get('next'), fallbackPath);
+
+  if (!code) {
+    return NextResponse.redirect(new URL('/login?error=missing_oauth_code', requestUrl.origin));
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    return NextResponse.redirect(new URL('/login?error=oauth_failed', requestUrl.origin));
+  }
+
+  return NextResponse.redirect(new URL(next, requestUrl.origin));
+}
+
+export async function getAuthLanding(request: NextRequest) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
+
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ redirectTo: '/login' });
+
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (error || !profile?.role) {
+      logger.error('Auth landing profile lookup failed', error);
+      return NextResponse.json({ redirectTo: '/login' });
+    }
+
+    return NextResponse.json({ redirectTo: getRoleDestinationUrl(profile.role) });
+  } catch (error) {
+    logger.error('Auth landing failed', error as Error);
+    return NextResponse.json({ error: 'Authentication error' }, { status: 500 });
+  }
+}
 
 export async function getTwoFactorStatus(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'auth');

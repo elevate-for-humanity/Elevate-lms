@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
-import { createServerClient } from '@supabase/ssr';
+import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -93,23 +93,12 @@ export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return req.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          for (const cookie of cookiesToSet) {
-            req.cookies.set(cookie.name, cookie.value);
-            pendingCookies.push(cookie as PendingCookie);
-          }
-        },
-      },
-    },
-  );
+  const supabase = createMiddlewareSupabaseClient(req, (cookiesToSet) => {
+    for (const cookie of cookiesToSet) {
+      req.cookies.set(cookie.name, cookie.value);
+      pendingCookies.push(cookie as PendingCookie);
+    }
+  });
 
   const withCookies = (response: NextResponse) => {
     for (const cookie of pendingCookies) {

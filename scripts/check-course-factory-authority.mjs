@@ -30,42 +30,69 @@ function walk(dir, out = []) {
   return out;
 }
 
-// Required compatibility paths must delegate to Course Factory.
-assertContains(
-  'lib/course-builder/pipeline.ts',
-  "from '@/lib/course-factory'",
-  'legacy pipeline must delegate to the canonical Course Factory',
-);
-assertContains(
-  'lib/course-builder/program-auto-course.ts',
-  "from '@/lib/course-factory'",
-  'program auto-course creation must delegate to Course Factory',
-);
-assertContains(
-  'apps/admin/app/api/admin/course-builder/publish/route.ts',
-  "from '@/lib/course-factory'",
-  'Admin publish route must use Course Factory',
-);
+// All historical generation/orchestration entry points must delegate to Course Factory.
+const requiredDelegations = [
+  ['lib/course-builder/pipeline.ts', "from '@/lib/course-factory'", 'legacy pipeline'],
+  ['lib/course-builder/program-auto-course.ts', "from '@/lib/course-factory'", 'program auto-course'],
+  ['apps/admin/app/api/admin/course-builder/publish/route.ts', "from '@/lib/course-factory'", 'Admin builder publish'],
+  ['apps/lms/app/api/ai/generate-and-publish-course/route.ts', "from '@/lib/course-factory'", 'AI generate-and-publish'],
+  ['lib/curriculum/builders/buildCanonicalCourseFromBlueprint.ts', "from '@/lib/course-factory/publisher'", 'blueprint seeder'],
+  ['lib/db/save-blueprint-canonical.ts', "from '@/lib/course-factory/publisher'", 'ingestion blueprint persistence'],
+  ['lib/programs/create-and-publish-program.ts', "from '@/lib/course-factory/publisher'", 'program course persistence'],
+  ['lib/studio/tools.ts', "from '@/lib/course-factory/publisher'", 'Studio full-blueprint build'],
+];
 
-// Historical Supabase AI course creator must remain non-executable.
-const edge = read('supabase/functions/ai-course-create/index.ts');
-if (!edge.includes('COURSE_FACTORY_REQUIRED') || /\.from\(['\"](?:courses|modules|lessons)['\"]\)\s*\.(?:insert|upsert|update|delete)/s.test(edge)) {
-  failures.push('supabase/functions/ai-course-create/index.ts: historical AI creator must remain disabled and must not write course tables');
+for (const [rel, needle, label] of requiredDelegations) {
+  assertContains(rel, needle, `${label} must delegate to the canonical Course Factory`);
 }
 
-// A complete course-package writer outside the canonical publisher is forbidden.
-// Manual single-entity editors/importers remain allowed; this catches parallel orchestration engines.
-const allowPackageWriters = new Set([
-  'lib/course-factory/publisher.ts',
+// Historical Supabase AI creator must remain non-executable.
+const edge = read('supabase/functions/ai-course-create/index.ts');
+if (
+  !edge.includes('COURSE_FACTORY_REQUIRED') ||
+  /\.from\(['\"](?:courses|modules|lessons)['\"]\)\s*\.(?:insert|upsert|update|delete)/s.test(edge)
+) {
+  failures.push(
+    'supabase/functions/ai-course-create/index.ts: historical AI creator must remain disabled and must not write course tables',
+  );
+}
+
+// These files legitimately touch all three canonical tables but do NOT own a
+// generation pipeline. Each exception has a narrow role and is reviewed here
+// explicitly so a new full-package writer cannot appear unnoticed.
+const specializedPackageWriters = new Set([
+  // cloning preserves existing course/program content; it does not generate curriculum
+  'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
+  'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
+  // version rollback restores an immutable prior snapshot
+  'lib/course-factory/versioning.ts',
+  // generic/manual entity CRUD and lifecycle services
+  'lib/db/courses.ts',
+  'lib/lms/course-service.ts',
+  // Studio contains individual manual create/edit operations; its full build delegates above
+  'lib/studio/tools.ts',
+  // non-runtime verification/seed utilities
+  'scripts/e2e-test.ts',
+  'scripts/run-pipeline-e2e.ts',
+  'scripts/seed/apprenticeship-courses.mjs',
+  'scripts/smoke-test-pipeline.ts',
 ]);
 
+// A newly introduced complete package writer is forbidden by default.
 for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk('supabase/functions')]) {
   const normalized = rel.split(path.sep).join('/');
-  if (allowPackageWriters.has(normalized)) continue;
+  if (normalized === 'lib/course-factory/publisher.ts' || specializedPackageWriters.has(normalized)) {
+    continue;
+  }
   const text = fs.readFileSync(path.join(root, rel), 'utf8');
-  const writes = (table) => new RegExp(`\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,240}\\.(?:insert|upsert|update|delete)\\(`).test(text);
+  const writes = (table) =>
+    new RegExp(
+      `\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,240}\\.(?:insert|upsert|update|delete)\\(`,
+    ).test(text);
   if (writes('courses') && writes('course_modules') && writes('course_lessons')) {
-    failures.push(`${normalized}: parallel complete course-package writer detected; route generation/persistence through lib/course-factory`);
+    failures.push(
+      `${normalized}: parallel complete course-package writer detected; route generation/persistence through lib/course-factory or explicitly classify a narrow non-generation exception`,
+    );
   }
 }
 
@@ -75,4 +102,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Course Factory authority gate passed: one canonical generation/persistence authority enforced.');
+console.log(
+  'Course Factory authority gate passed: generation paths delegate to one canonical authority; specialized non-generation writers are explicitly classified.',
+);

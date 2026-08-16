@@ -27,6 +27,11 @@ export interface ValidationResult {
   warningCount: number;
 }
 
+/**
+ * Infer the canonical persistence type. Rich instructional labels such as
+ * orientation, concept, and scenario are authored as normal lesson rows because
+ * the database lesson_type enum does not define separate values for them.
+ */
 export function inferStepType(slug: string): string {
   const lower = slug.toLowerCase();
   if (lower.includes('checkpoint')) return 'checkpoint';
@@ -34,9 +39,7 @@ export function inferStepType(slug: string): string {
   if (lower.includes('quiz')) return 'quiz';
   if (lower.includes('lab') || lower.includes('practical')) return 'lab';
   if (lower.includes('assignment')) return 'assignment';
-  if (lower.includes('orientation')) return 'orientation';
-  if (lower.includes('scenario')) return 'scenario';
-  if (lower.includes('concept')) return 'concept';
+  if (lower.includes('certification')) return 'certification';
   return 'lesson';
 }
 
@@ -59,25 +62,9 @@ function validateLesson(
   const warnings: ValidationError[] = [];
   const stepType = inferStepType(lesson.slug);
 
-  const needsContent = [
-    'lesson',
-    'orientation',
-    'concept',
-    'scenario',
-    'checkpoint',
-    'lab',
-    'assignment',
-  ].includes(stepType);
+  const needsContent = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
   const needsQuiz = ['checkpoint', 'quiz', 'exam'].includes(stepType);
-  const needsObjective = [
-    'lesson',
-    'orientation',
-    'concept',
-    'scenario',
-    'checkpoint',
-    'lab',
-    'assignment',
-  ].includes(stepType);
+  const needsObjective = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
 
   if (needsObjective && !lesson.objective?.trim()) {
     errors.push({

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, Clock, DollarSign, Award, Users, CheckCircle, Play } from 'lucide-react';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
 // Video hero banner
 const HOME_HERO = {
@@ -205,15 +206,12 @@ export default function ElevateAnimatedHome() {
       {/* Hero with Video */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
         {/* Video Background */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
+        <SafeHeroVideo
+          src={HOME_HERO.video}
+          poster="/images/heroes/hero-homepage.webp"
           className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src={HOME_HERO.video} type="video/mp4" />
-        </video>
+          ariaLabel="Elevate apprenticeship overview video"
+        />
         
 
         {/* Content */}

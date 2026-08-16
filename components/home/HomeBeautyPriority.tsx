@@ -49,7 +49,7 @@ export function HomeBeautyPriority() {
               <div>
                 <div className="font-black text-slate-950">Own a salon, spa, or barbershop?</div>
                 <p className="mt-1 text-sm font-medium leading-6 text-slate-600">Apply to become an Elevate Host Site. Elevate supports sponsor governance, RTI coordination, hour tracking, and apprenticeship workflows.</p>
-                <Link href="/partners/barber-host-shop" className="mt-3 inline-flex items-center gap-2 text-sm font-black text-rose-700 hover:text-rose-900">
+                <Link href="/partners/host-shops" className="mt-3 inline-flex items-center gap-2 text-sm font-black text-rose-700 hover:text-rose-900">
                   Become a Host Shop <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

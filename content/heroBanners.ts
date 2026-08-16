@@ -68,6 +68,18 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
+function mediaKey(value?: string): string | undefined {
+  if (!value) return undefined;
+  const clean = value.split('#')[0]?.split('?')[0]?.trim();
+  if (!clean) return undefined;
+  try {
+    const url = new URL(clean, 'https://elevate.local');
+    return `${url.hostname.toLowerCase()}${url.pathname.replace(/\/{2,}/g, '/').toLowerCase()}`;
+  } catch {
+    return clean.replace(/\/{2,}/g, '/').toLowerCase();
+  }
+}
+
 function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
   const dedicated = getHeroVideoForPageKey(key);
   if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
@@ -76,12 +88,16 @@ function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined
   return PAGE_PICTURE_OVERRIDES[key];
 }
 
-function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerConfig {
+function normalizeBanner(
+  key: string,
+  banner: RawHeroBannerConfig,
+  allowJsonVideo = true,
+): HeroBannerConfig {
   const dedicated = getHeroVideoForPageKey(key);
   const jsonDesktop = banner.videoSrcDesktop || banner.videoSrcMobile;
   const jsonMobile = banner.videoSrcMobile || banner.videoSrcDesktop;
-  const desktop = dedicated?.video_url || jsonDesktop;
-  const mobile = dedicated?.video_url || jsonMobile;
+  const desktop = dedicated?.video_url || (allowJsonVideo ? jsonDesktop : undefined);
+  const mobile = dedicated?.video_url || (allowJsonVideo ? jsonMobile : undefined);
 
   let normalized: HeroBannerConfig = {
     ...banner,
@@ -155,7 +171,25 @@ let normalizedData: Record<string, HeroBannerConfig> | null = null;
 function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
-  normalizedData = Object.fromEntries(Object.entries(raw).map(([key, banner]) => [key, normalizeBanner(key, banner)]));
+
+  // Shared JSON videos are legacy fallbacks, not page-specific hero media.
+  // A video referenced by multiple pages is suppressed for those pages unless
+  // the dedicated video registry explicitly assigns media to that page. The
+  // semantic poster remains, giving each route a truthful, stable hero instead
+  // of silently inheriting another route's video.
+  const jsonVideoCounts = new Map<string, number>();
+  for (const banner of Object.values(raw)) {
+    const key = mediaKey(banner.videoSrcDesktop || banner.videoSrcMobile);
+    if (key) jsonVideoCounts.set(key, (jsonVideoCounts.get(key) ?? 0) + 1);
+  }
+
+  normalizedData = Object.fromEntries(
+    Object.entries(raw).map(([key, banner]) => {
+      const jsonKey = mediaKey(banner.videoSrcDesktop || banner.videoSrcMobile);
+      const allowJsonVideo = !jsonKey || (jsonVideoCounts.get(jsonKey) ?? 0) <= 1;
+      return [key, normalizeBanner(key, banner, allowJsonVideo)];
+    }),
+  );
   return normalizedData;
 }
 

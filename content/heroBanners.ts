@@ -68,6 +68,18 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
+function mediaKey(value?: string): string | undefined {
+  if (!value) return undefined;
+  const clean = value.split('#')[0]?.split('?')[0]?.trim();
+  if (!clean) return undefined;
+  try {
+    const url = new URL(clean, 'https://elevate.local');
+    return `${url.hostname.toLowerCase()}${url.pathname.replace(/\/{2,}/g, '/').toLowerCase()}`;
+  } catch {
+    return clean.replace(/\/{2,}/g, '/').toLowerCase();
+  }
+}
+
 function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined {
   const dedicated = getHeroVideoForPageKey(key);
   if (dedicated?.thumbnail_url) return dedicated.thumbnail_url;
@@ -76,12 +88,16 @@ function posterFor(key: string, banner: RawHeroBannerConfig): string | undefined
   return PAGE_PICTURE_OVERRIDES[key];
 }
 
-function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerConfig {
+function normalizeBanner(
+  key: string,
+  banner: RawHeroBannerConfig,
+  allowJsonVideo = true,
+): HeroBannerConfig {
   const dedicated = getHeroVideoForPageKey(key);
   const jsonDesktop = banner.videoSrcDesktop || banner.videoSrcMobile;
   const jsonMobile = banner.videoSrcMobile || banner.videoSrcDesktop;
-  const desktop = dedicated?.video_url || jsonDesktop;
-  const mobile = dedicated?.video_url || jsonMobile;
+  const desktop = dedicated?.video_url || (allowJsonVideo ? jsonDesktop : undefined);
+  const mobile = dedicated?.video_url || (allowJsonVideo ? jsonMobile : undefined);
 
   let normalized: HeroBannerConfig = {
     ...banner,
@@ -155,7 +171,32 @@ let normalizedData: Record<string, HeroBannerConfig> | null = null;
 function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
-  normalizedData = Object.fromEntries(Object.entries(raw).map(([key, banner]) => [key, normalizeBanner(key, banner)]));
+
+  // Compute the video each page would effectively receive after the dedicated
+  // registry takes precedence. A legacy JSON fallback is allowed only when its
+  // final effective media key is unique across the complete page set. This also
+  // catches collisions between a JSON fallback and another page's dedicated
+  // registry assignment, not only JSON-to-JSON duplicates.
+  const effectiveVideoCounts = new Map<string, number>();
+  for (const [key, banner] of Object.entries(raw)) {
+    const dedicated = getHeroVideoForPageKey(key);
+    const candidate = dedicated?.video_url || banner.videoSrcDesktop || banner.videoSrcMobile;
+    const candidateKey = mediaKey(candidate);
+    if (candidateKey) {
+      effectiveVideoCounts.set(candidateKey, (effectiveVideoCounts.get(candidateKey) ?? 0) + 1);
+    }
+  }
+
+  normalizedData = Object.fromEntries(
+    Object.entries(raw).map(([key, banner]) => {
+      const dedicated = getHeroVideoForPageKey(key);
+      const jsonCandidate = banner.videoSrcDesktop || banner.videoSrcMobile;
+      const finalCandidate = dedicated?.video_url || jsonCandidate;
+      const finalKey = mediaKey(finalCandidate);
+      const allowJsonVideo = Boolean(dedicated) || !finalKey || (effectiveVideoCounts.get(finalKey) ?? 0) <= 1;
+      return [key, normalizeBanner(key, banner, allowJsonVideo)];
+    }),
+  );
   return normalizedData;
 }
 

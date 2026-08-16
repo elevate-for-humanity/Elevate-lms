@@ -40,6 +40,19 @@ const CANONICAL_MANIFEST_ROUTES = [
   ['Marketing root start', 'public/manifest-marketing.json', 'start_url', '/', 'apps/marketing/app/page.tsx'],
 ];
 
+const ONLINE_APPS_PORTAL_ROUTES = [
+  ['Admin', 'https://admin.elevateforhumanity.org/dashboard', 'apps/admin/app/dashboard/page.tsx'],
+  ['Employer', 'https://app.elevateforhumanity.org/employer/dashboard', 'apps/lms/app/employer/dashboard/page.tsx'],
+  ['Parent', 'https://app.elevateforhumanity.org/parent-portal/dashboard', 'apps/lms/app/parent-portal/dashboard/page.tsx'],
+  ['Workforce', 'https://app.elevateforhumanity.org/workforce/dashboard', 'apps/lms/app/workforce/dashboard/page.tsx'],
+  ['Instructor', 'https://admin.elevateforhumanity.org/instructor/dashboard', 'apps/admin/app/instructor/dashboard/page.tsx'],
+  ['Staff', 'https://admin.elevateforhumanity.org/staff-portal/dashboard', 'apps/admin/app/staff-portal/dashboard/page.tsx'],
+  ['Testing Center', 'https://admin.elevateforhumanity.org/testing-center', 'apps/admin/app/testing-center/page.tsx'],
+  ['Workforce Board', 'https://www.elevateforhumanity.org/workforce-board/dashboard', 'apps/marketing/app/workforce-board/dashboard/page.tsx'],
+  ['Case Manager', 'https://www.elevateforhumanity.org/case-manager/dashboard', 'apps/marketing/app/case-manager/dashboard/page.tsx'],
+  ['Provider', 'https://www.elevateforhumanity.org/provider/dashboard', 'apps/marketing/app/provider/dashboard/page.tsx'],
+];
+
 const pathOnly = (value) => typeof value === 'string' ? value.split('?')[0].split('#')[0] : '';
 const manifestRouteValue = (manifest, selector) => {
   if (selector === 'start_url') return manifest?.start_url;
@@ -114,6 +127,18 @@ for (const [name, layoutPath, manifestFile, manifestHref, startUrl, scope, shipp
   const filename = manifestFile.replace('public/', '');
   if (!syncSource.includes(`'${filename}'`) && !syncSource.includes(`"${filename}"`)) fail(`${name}: ${filename} is not shipped with ${shippedBy}`);
   else pass(`${name}: role manifest ships with ${shippedBy} build`);
+}
+
+console.log('\n── Online Apps role portal launch contracts ──');
+const onlineAppsSource = readFile('apps/marketing/app/online-apps/page.tsx') || '';
+for (const [name, href, sourcePath] of ONLINE_APPS_PORTAL_ROUTES) {
+  if (!onlineAppsSource.includes(`'${href}'`) && !onlineAppsSource.includes(`"${href}"`)) {
+    fail(`${name}: Online Apps launch URL must be ${href}`);
+  } else {
+    pass(`${name}: Online Apps launch URL is canonical`);
+  }
+  if (!exists(sourcePath)) fail(`${name}: launch target source route missing at ${sourcePath}`);
+  else pass(`${name}: launch target source route exists`);
 }
 
 console.log('\n── Production PWA sync ──');

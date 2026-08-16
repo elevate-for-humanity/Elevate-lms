@@ -55,14 +55,16 @@ else
     "Add typescript: { ignoreBuildErrors: true } to next.config.mjs"
 fi
 
-# ── Check 5: sw.js cache versioning is valid (placeholder or stamped) ─────────
-if grep -q '__CACHE_VERSION__' public/sw.js; then
-  check "sw.js uses __CACHE_VERSION__ placeholder (stamped at build time)" "pass"
-elif grep -qE "CACHE_VERSION = 'v[0-9]+'" public/sw.js; then
-  check "sw.js uses stamped cache version" "pass" "stamped artifact detected"
+# ── Check 5: one canonical Marketing worker plus inert legacy shim ────────────
+if grep -q '__CACHE_VERSION__' public/sw-marketing.js; then
+  check "Marketing worker uses __CACHE_VERSION__ placeholder" "pass"
 else
-  # Already stamped (post-build) — acceptable
-  check "sw.js cache version present" "pass"
+  check "Marketing worker uses __CACHE_VERSION__ placeholder" "fail"
+fi
+if grep -q 'LEGACY_WORKER_RETIREMENT' public/sw.js && ! grep -q "addEventListener('fetch'" public/sw.js; then
+  check "Legacy sw.js is a non-fetching retirement shim" "pass"
+else
+  check "Legacy sw.js is a non-fetching retirement shim" "fail"
 fi
 
 # ── Check 6: stamp-sw.mjs wired into build script ────────────────────────────

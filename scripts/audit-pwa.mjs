@@ -133,6 +133,39 @@ for (const protectedPath of ['/lms/dashboard', '/apprentice', '/host-shop', '/pr
   if (!lmsWorker.includes(protectedPath)) warn(`public/sw-lms.js: protected route marker ${protectedPath} was not found; confirm authenticated navigation remains network-only`);
 }
 
+console.log('\n── Marketing homepage cache and canonical boundaries ──');
+const marketingWorker = readFile('public/sw-marketing.js') || '';
+const marketingPrecache = marketingWorker.match(/const PRECACHE_ASSETS\s*=\s*\[([^\]]*)\]/s)?.[1] || '';
+if (/['"]\/['"]/.test(marketingPrecache)) fail('Marketing worker precaches the homepage HTML');
+else pass('Marketing worker does not precache homepage HTML');
+const navigationHandler = marketingWorker.match(/if \(request\.mode === ['"]navigate['"]\)\s*\{([\s\S]*?)\n\s*\}/)?.[1] || '';
+const navigationCode = navigationHandler.replace(/\/\/.*$/gm, '');
+if (/respondWith|networkFirst|caches\./.test(navigationCode)) fail('Marketing worker intercepts or caches browser navigations');
+else pass('Marketing browser navigations bypass CacheStorage');
+
+const legacyWorker = readFile('public/sw.js') || '';
+if (!legacyWorker.includes('LEGACY_WORKER_RETIREMENT')) fail('Legacy /sw.js is not an explicit retirement shim');
+else if (legacyWorker.includes("addEventListener('fetch'")) fail('Legacy /sw.js still intercepts network requests');
+else pass('Legacy /sw.js only clears caches and unregisters itself');
+
+const offlineManager = readFile('lib/offline/service-worker-manager.ts') || '';
+if (offlineManager.includes("register('/sw.js'")) fail('Shared offline manager can re-register legacy /sw.js');
+else if (!offlineManager.includes("'/sw-marketing.js'")) fail('Shared offline manager does not resolve the canonical Marketing worker');
+else pass('Shared offline manager resolves app-specific canonical workers');
+
+if (exists('public/manifest.json')) fail('Legacy root manifest public/manifest.json still exists');
+else pass('Only the canonical Marketing root manifest is shipped');
+
+for (const staleConfig of ['next.config.mjs.current', 'next.config.mjs.green']) {
+  if (exists(staleConfig)) fail(`Tracked parallel configuration remains: ${staleConfig}`);
+  else pass(`Parallel configuration removed: ${staleConfig}`);
+}
+
+const sitemapSource = readFile('apps/marketing/app/sitemap.ts') || '';
+const homepageEntries = sitemapSource.match(/path:\s*ROUTES\.home/g)?.length || 0;
+if (homepageEntries !== 1) fail(`Sitemap source must declare one homepage, found ${homepageEntries}`);
+else pass('Sitemap source declares exactly one canonical homepage');
+
 if (failures) {
   console.error(`\n❌ PWA audit FAILED — ${failures} issue(s).\n`);
   process.exit(1);

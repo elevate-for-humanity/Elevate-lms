@@ -29,7 +29,13 @@ for (const [wrapper, application] of [['AdminPwaRegister.tsx', 'admin'], ['LmsPw
 
 for (const worker of ['public/sw-admin.js', 'public/sw-lms.js', 'public/sw-marketing.js']) {
   const content = read(worker);
-  if (!content.includes("caches.match('/offline.html')")) failures.push(`${worker} lacks offline navigation fallback`);
+  if (worker === 'public/sw-marketing.js') {
+    const navigationHandler = content.match(/if \(request\.mode === ['"]navigate['"]\)\s*\{([\s\S]*?)\n\s*\}/)?.[1] || '';
+    const navigationCode = navigationHandler.replace(/\/\/.*$/gm, '');
+    if (/respondWith|networkFirst|caches\./.test(navigationCode)) failures.push(`${worker} caches public page navigations`);
+  } else if (!content.includes("caches.match('/offline.html')")) {
+    failures.push(`${worker} lacks offline navigation fallback`);
+  }
   if (!content.includes("url.pathname.startsWith('/api/')")) failures.push(`${worker} may cache API data`);
 }
 
@@ -42,4 +48,4 @@ if (failures.length) {
   console.error(failures.map((failure) => `PWA ARCHITECTURE ERROR: ${failure}`).join('\n'));
   process.exit(1);
 }
-console.log('PWA architecture verified: one registration engine, three origin workers, role-specific manifests, offline fallback, no API caching.');
+console.log('PWA architecture verified: one registration engine, three origin workers, role manifests, no Marketing navigation or API caching.');

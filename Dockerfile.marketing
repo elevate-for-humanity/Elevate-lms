@@ -123,7 +123,10 @@ RUN test -f /app/public/version.json && \
     test -s /app/public/images/pages/workforce-training.webp && \
     test -s /app/public/images/pages/about-supportive-services.webp && \
     test -s /app/public/images/pages/about-employer-partners.webp && \
-    (test -f /app/public/sw.js || test -f /app/public/sw-marketing.js) && \
+    test -f /app/public/sw-marketing.js && \
+    test -f /app/public/sw.js && \
+    grep -q 'LEGACY_WORKER_RETIREMENT' /app/public/sw.js && \
+    ! grep -q "addEventListener('fetch'" /app/public/sw.js && \
     echo "Marketing runtime assets verified from canonical public tree"
 
 RUN sed -i '/"type": *"module"/d' /app/package.json 2>/dev/null || true

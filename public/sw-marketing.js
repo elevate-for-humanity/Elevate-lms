@@ -3,7 +3,9 @@
 const CACHE_VERSION = '__CACHE_VERSION__';
 
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const PRECACHE_ASSETS = ['/', '/offline.html', '/manifest-marketing.json'];
+// Never precache HTML routes. Navigations must always come from the network so
+// an installed PWA cannot present an older homepage after a deployment.
+const PRECACHE_ASSETS = ['/offline.html', '/manifest-marketing.json'];
 
 function isCacheableResponse(response) {
   return Boolean(
@@ -49,8 +51,20 @@ self.addEventListener('activate', (event) => {
       const names = await caches.keys();
       await Promise.all(
         names
-          .filter((name) => name.startsWith('elevate-marketing-') && !name.startsWith(CACHE_VERSION))
+          .filter((name) => name.startsWith('elevate-') && name !== STATIC_CACHE)
           .map((name) => caches.delete(name)),
+      );
+      // A previous worker used the same deploy cache namespace and stored `/`.
+      // Purge document entries that survived under the current cache name.
+      const currentCache = await caches.open(STATIC_CACHE);
+      const currentRequests = await currentCache.keys();
+      await Promise.all(
+        currentRequests
+          .filter((request) => {
+            const url = new URL(request.url);
+            return request.mode === 'navigate' || request.destination === 'document' || url.pathname === '/';
+          })
+          .map((request) => currentCache.delete(request)),
       );
       await self.clients.claim();
     })(),
@@ -78,7 +92,8 @@ self.addEventListener('fetch', (event) => {
   // dynamic resources always go directly to the browser/network. The service
   // worker must never hide a server error or create its own 503 response.
   if (request.mode === 'navigate') {
-    event.respondWith(networkFirst(request).then((response) => response || caches.match('/offline.html')));
+    // Do not call respondWith: browser navigations must use the deployed server
+    // response and must never be written into CacheStorage.
     return;
   }
 

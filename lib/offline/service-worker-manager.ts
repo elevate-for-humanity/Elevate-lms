@@ -13,8 +13,15 @@ export class ServiceWorkerManager {
       return null;
     }
     try {
-      this.registration = await navigator.serviceWorker.register('/sw.js', {
+      const hostname = window.location.hostname;
+      const workerPath = hostname.startsWith('admin.')
+        ? '/sw-admin.js'
+        : hostname.startsWith('app.') || hostname.startsWith('lms.')
+          ? '/sw-lms.js'
+          : '/sw-marketing.js';
+      this.registration = await navigator.serviceWorker.register(workerPath, {
         scope: '/',
+        updateViaCache: 'none',
       });
       // Handle updates
       this.registration.addEventListener('updatefound', () => {

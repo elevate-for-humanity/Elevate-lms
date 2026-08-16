@@ -22,7 +22,6 @@ const workers = [
   { path: 'apps/admin/public/sw-admin.js', cache: `elevate-admin-${shortSha}` },
   { path: 'public/sw-lms.js', cache: `elevate-lms-${shortSha}` },
   { path: 'apps/lms/public/sw-lms.js', cache: `elevate-lms-${shortSha}` },
-  { path: 'public/sw.js', cache: `elevate-marketing-${shortSha}` },
 ];
 
 let stampedCount = 0;

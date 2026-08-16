@@ -49,7 +49,7 @@ test_check "Gitignore configured" "grep -q '.env.local' .gitignore"
 echo ""
 
 echo -e "${BLUE}2. PWA Configuration${NC}"
-test_check "Manifest exists" "test -f public/manifest.json"
+test_check "Canonical Marketing manifest exists" "test -f public/manifest-marketing.json"
 test_check "Icon 192 exists" "test -f public/icon-192.png"
 test_check "Icon 512 exists" "test -f public/icon-512.png"
 test_check "Maskable icons exist" "test -f public/icon-192-maskable.png && test -f public/icon-512-maskable.png"

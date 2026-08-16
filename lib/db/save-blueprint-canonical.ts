@@ -1,16 +1,13 @@
 /**
- * lib/db/save-blueprint-canonical.ts
- *
- * Persist an AI-generated CourseBlueprint to the canonical LMS tables:
- *   courses → course_modules → course_lessons
- *
- * This replaces saveCourseBlueprint (lib/db/courses.ts) which wrote to
- * training_courses + training_lessons (legacy tables). All new courses
- * must go through this function so they appear in lms_lessons and on /programs.
+ * Persist an ingested CourseBlueprint through the canonical Course Factory
+ * persistence boundary. Ingestion/classification/compiler behavior remains
+ * independent; only final course-package persistence is centralized.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { CourseBlueprint } from '@/lib/ai/course-ingestion';
+import { publishCourse } from '@/lib/course-factory/publisher';
+import type { BlueprintModule } from '@/lib/curriculum/blueprints/types';
+import type { CourseBlueprint, LessonBlueprint } from '@/lib/ai/course-ingestion';
 
 export interface SaveBlueprintResult {
   courseId: string;
@@ -19,104 +16,12 @@ export interface SaveBlueprintResult {
   questionCount: number;
 }
 
-export async function saveBlueprintToCanonical(
-  blueprint: CourseBlueprint,
-  options: { program_id?: string | null; created_by?: string | null } = {},
-): Promise<SaveBlueprintResult> {
-  const db = await requireAdminClient();
-
-  // 1. Upsert course row
-  const { data: course, error: courseErr } = await db
-    .from('courses')
-    .insert({
-      title: blueprint.title,
-      description: blueprint.description ?? null,
-      program_id: options.program_id ?? null,
-      published: false,
-      generation_status: 'draft',
-      created_by: options.created_by ?? null,
-      // Store certificate config in metadata
-      metadata: {
-        certificate_enabled: blueprint.certificate_enabled ?? false,
-        certificate_title: blueprint.certificate_title ?? null,
-        passing_score: blueprint.passing_score ?? 70,
-        skill_level: blueprint.skill_level ?? 'beginner',
-        estimated_duration_hours: blueprint.estimated_duration_hours ?? null,
-        category: blueprint.category ?? null,
-      },
-    })
-    .select('id')
-    .maybeSingle();
-
-  if (courseErr || !course) {
-    throw new Error(`Failed to create course: ${courseErr?.message ?? 'unknown error'}`);
-  }
-
-  const courseId = course.id;
-  let lessonCount = 0;
-
-  // 2. Create modules + lessons
-  for (const [mi, mod] of (blueprint.modules ?? []).entries()) {
-    const { data: moduleRow, error: modErr } = await db
-      .from('course_modules')
-      .insert({
-        course_id: courseId,
-        title: mod.title,
-        description: mod.description ?? null,
-        order_index: mod.order_index ?? mi,
-      })
-      .select('id')
-      .maybeSingle();
-
-    if (modErr || !moduleRow) continue;
-
-    const lessons = (mod.lessons ?? []).map((lesson, li) => {
-      // Infer step_type from content_type or lesson title
-      const stepType = inferStepType(lesson.content_type, lesson.title);
-
-      return {
-        course_id: courseId,
-        module_id: moduleRow.id,
-        title: lesson.title,
-        description: lesson.description ?? null,
-        content: lesson.compiled?.narration_script ?? lesson.content ?? null,
-        order_index: lesson.order_index ?? li,
-        lesson_order: li + 1,
-        module_order: mi + 1,
-        duration_minutes: lesson.duration_minutes ?? null,
-        step_type: stepType,
-        lesson_type: stepType,
-        is_published: false,
-        approved: false,
-        // Store quiz questions in the canonical column
-        quiz_questions: lesson.compiled?.quiz_questions?.length
-          ? lesson.compiled.quiz_questions
-          : null,
-        passing_score:
-          stepType === 'checkpoint' || stepType === 'quiz' || stepType === 'exam' ? 70 : null,
-        // Store full compiled assets in activities JSONB
-        activities: lesson.compiled
-          ? {
-              learning_objectives: lesson.compiled.learning_objectives,
-              slide_outline: lesson.compiled.slide_outline,
-              examples: lesson.compiled.examples,
-            }
-          : null,
-      };
-    });
-
-    if (lessons.length) {
-      const { error: lessonErr } = await db.from('course_lessons').insert(lessons);
-      if (!lessonErr) lessonCount += lessons.length;
-    }
-  }
-
-  return {
-    courseId,
-    moduleCount: blueprint.modules?.length ?? 0,
-    lessonCount,
-    questionCount: blueprint.quiz_questions?.length ?? 0,
-  };
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 90);
 }
 
 function inferStepType(contentType: string | undefined, title: string): string {
@@ -129,4 +34,130 @@ function inferStepType(contentType: string | undefined, title: string): string {
   if (t === 'lab' || titleLower.includes('lab') || titleLower.includes('practical')) return 'lab';
   if (t === 'assignment' || titleLower.includes('assignment')) return 'assignment';
   return 'lesson';
+}
+
+function lessonSlug(lesson: LessonBlueprint, moduleIndex: number, lessonIndex: number): string {
+  const type = inferStepType(lesson.content_type, lesson.title);
+  const base = slugify(lesson.title) || `module-${moduleIndex + 1}-lesson-${lessonIndex + 1}`;
+  if (type === 'lesson' || base.includes(type)) return base;
+  return `${base}-${type}`;
+}
+
+function toBlueprintModules(blueprint: CourseBlueprint): BlueprintModule[] {
+  return (blueprint.modules ?? []).map((mod, mi) => {
+    const lessons = (mod.lessons ?? []).map((lesson, li) => {
+      const compiled = lesson.compiled;
+      const slug = lessonSlug(lesson, mi, li);
+      const quizQuestions = compiled?.knowledge_check?.map((question, qi) => ({
+        id: `${slug}-q${qi + 1}`,
+        question: question.question,
+        options: question.options,
+        correctAnswer: Math.max(0, question.options.indexOf(question.correct_answer)),
+        explanation: question.explanation,
+      }));
+
+      const content = compiled
+        ? JSON.stringify({
+            html: compiled.narration_script,
+            narration_script: compiled.narration_script,
+            learning_objectives: compiled.lesson_objectives,
+            slide_outline: compiled.slide_outline,
+            practice_exercise: compiled.practice_exercise,
+            instructor_notes: compiled.instructor_notes,
+            source_description: lesson.description,
+          })
+        : JSON.stringify({
+            html: lesson.content ?? '',
+            source_description: lesson.description,
+          });
+
+      return {
+        slug,
+        title: lesson.title,
+        order: lesson.order_index ?? li + 1,
+        objective:
+          compiled?.lesson_objectives?.[0] ??
+          lesson.description ??
+          `Complete ${lesson.title}`,
+        learningObjectives: compiled?.lesson_objectives ?? [],
+        content,
+        durationMinutes: compiled?.estimated_minutes ?? lesson.duration_minutes ?? undefined,
+        quizQuestions: quizQuestions?.length ? quizQuestions : undefined,
+        passingScore: quizQuestions?.length ? blueprint.passing_score ?? 70 : undefined,
+      };
+    });
+
+    return {
+      slug: slugify(mod.title) || `module-${mi + 1}`,
+      title: mod.title,
+      description: mod.description,
+      orderIndex: mod.order_index ?? mi + 1,
+      minLessons: lessons.length,
+      maxLessons: lessons.length,
+      quizRequired: lessons.some((lesson) => (lesson.quizQuestions?.length ?? 0) > 0),
+      practicalRequired: lessons.some((lesson) =>
+        lesson.slug.includes('-lab') || lesson.slug.includes('-assignment'),
+      ),
+      isCritical: true,
+      requiredLessonTypes: [],
+      competencies: [],
+      lessons,
+    };
+  });
+}
+
+export async function saveBlueprintToCanonical(
+  blueprint: CourseBlueprint,
+  options: { program_id?: string | null; created_by?: string | null } = {},
+): Promise<SaveBlueprintResult> {
+  const courseSlug = `ingested-${slugify(blueprint.title) || 'course'}-${Date.now().toString(36)}`;
+  const modules = toBlueprintModules(blueprint);
+
+  const result = await publishCourse({
+    programId: options.program_id ?? null,
+    courseSlug,
+    courseTitle: blueprint.title,
+    blueprint: modules,
+    mode: 'replace',
+    contentSource: 'blueprint',
+    videoConfig: { enabled: false },
+  });
+
+  if (!result.success || !result.courseId) {
+    throw new Error(`Failed to persist ingested course: ${result.errors.join('; ') || 'unknown error'}`);
+  }
+
+  // Preserve ingestion-specific metadata after the atomic package write.
+  const db = await requireAdminClient();
+  const { error: metadataError } = await db
+    .from('courses')
+    .update({
+      description: blueprint.description ?? null,
+      generation_status: 'draft',
+      created_by: options.created_by ?? null,
+      metadata: {
+        certificate_enabled: blueprint.certificate_enabled ?? false,
+        certificate_title: blueprint.certificate_title ?? null,
+        passing_score: blueprint.passing_score ?? 70,
+        skill_level: blueprint.skill_level ?? 'beginner',
+        estimated_duration_hours: blueprint.estimated_duration_hours ?? null,
+        category: blueprint.category ?? null,
+        target_audience: blueprint.target_audience ?? null,
+        completion_criteria: blueprint.completion_criteria ?? null,
+        ingestion_warnings: blueprint.warnings ?? [],
+      },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', result.courseId);
+
+  if (metadataError) {
+    throw new Error(`Course persisted but ingestion metadata update failed: ${metadataError.message}`);
+  }
+
+  return {
+    courseId: result.courseId,
+    moduleCount: result.moduleCount,
+    lessonCount: result.lessonCount,
+    questionCount: blueprint.quiz_questions?.length ?? 0,
+  };
 }

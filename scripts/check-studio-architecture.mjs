@@ -53,6 +53,21 @@ for (const dependency of ['CourseProvider', 'CourseStudioApplication', 'StudioWo
   if (!courseApplication.includes(dependency)) fail(`complete course application is missing ${dependency}`);
 }
 
+const courseCatalog = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
+for (const forbiddenDependency of [
+  '/api/admin/course-builder/course',
+  'LiveCourseBuilder',
+  'CourseInteractionStudio',
+  'WorkspacePayload',
+]) {
+  if (courseCatalog.includes(forbiddenDependency)) fail(`course catalog reintroduced a parallel course state path: ${forbiddenDependency}`);
+}
+
+const courseWorkspace = read('components/studio/StudioWorkspace.tsx');
+for (const panel of ['InteractionsPanel', 'AssessmentsPanel', 'CompliancePanel']) {
+  if (!courseWorkspace.includes(panel)) fail(`complete course application is missing ${panel}`);
+}
+
 const canvasPage = read('apps/admin/app/studio/canvas/page.tsx');
 if (!canvasPage.includes('LiveCanvas')) fail('Live Canvas is not connected to its canonical route');
 

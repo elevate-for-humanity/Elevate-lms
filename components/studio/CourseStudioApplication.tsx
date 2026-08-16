@@ -8,6 +8,9 @@ import {
   HelpCircle,
   Video,
   Rocket,
+  MousePointer2,
+  ClipboardCheck,
+  ShieldCheck,
   Zap,
   Bot,
   ChevronLeft,
@@ -32,6 +35,9 @@ const PANELS: Array<{
   { id: 'quiz', label: 'Quizzes', icon: HelpCircle, description: 'Assessments & questions' },
   { id: 'media', label: 'Media', icon: Video, description: 'Videos & attachments' },
   { id: 'automation', label: 'Automation', icon: Zap, description: 'Workflows & triggers' },
+  { id: 'interactions', label: 'Interactive', icon: MousePointer2, description: 'Lesson interactions' },
+  { id: 'assessments', label: 'Assessments', icon: ClipboardCheck, description: 'Questions & exams' },
+  { id: 'compliance', label: 'Compliance', icon: ShieldCheck, description: 'Readiness & evidence' },
   { id: 'publish', label: 'Publish', icon: Rocket, description: 'Review & publish' },
 ];
 

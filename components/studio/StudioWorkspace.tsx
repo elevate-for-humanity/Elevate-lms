@@ -13,6 +13,9 @@ import { MediaPanel } from './panels/MediaPanel';
 import { PublishPanel } from './panels/PublishPanel';
 import { AutomationPanel } from './panels/AutomationPanel';
 import { AIPanel } from './panels/AIPanel';
+import { InteractionsPanel } from './panels/InteractionsPanel';
+import { AssessmentsPanel } from './panels/AssessmentsPanel';
+import { CompliancePanel } from './panels/CompliancePanel';
 
 export function StudioWorkspace() {
   const { state } = useCourse();
@@ -25,6 +28,9 @@ export function StudioWorkspace() {
       case 'media':       return <MediaPanel />;
       case 'publish':     return <PublishPanel />;
       case 'automation':  return <AutomationPanel />;
+      case 'interactions': return <InteractionsPanel />;
+      case 'assessments': return <AssessmentsPanel />;
+      case 'compliance': return <CompliancePanel />;
       case 'ai':          return null; // AI renders in sidebar
       default:            return <BlueprintPanel />;
     }

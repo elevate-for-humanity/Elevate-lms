@@ -94,7 +94,10 @@ export type StudioPanel =
   | 'media'
   | 'ai'
   | 'publish'
-  | 'automation';
+  | 'automation'
+  | 'interactions'
+  | 'assessments'
+  | 'compliance';
 
 // ─── Actions ──────────────────────────────────────────────────────────────────
 

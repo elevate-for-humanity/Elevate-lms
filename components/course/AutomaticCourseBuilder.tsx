@@ -1,359 +1,134 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Loader2, Sparkles, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
 
-interface GenerateResult {
-  ok: boolean;
-  course_id?: string;
+type FactoryResult = {
+  success?: boolean;
+  courseId?: string | null;
   title?: string;
-  modules_inserted?: number;
-  lessons_published?: number;
-  curriculum_lessons_inserted?: number;
-  compliance_status?: string;
-  generation_attempt?: number;
-  error?: string;
-  errors_per_attempt?: string[][];
-}
+  modulesGenerated?: number;
+  lessonsGenerated?: number;
+  lessonsWithQuizzes?: number;
+  videosQueued?: number;
+  errors?: string[];
+  dryRun?: boolean;
+};
 
-const US_STATES = [
-  'Alabama',
-  'Alaska',
-  'Arizona',
-  'Arkansas',
-  'California',
-  'Colorado',
-  'Connecticut',
-  'Delaware',
-  'Florida',
-  'Georgia',
-  'Hawaii',
-  'Idaho',
-  'Illinois',
-  'Indiana',
-  'Iowa',
-  'Kansas',
-  'Kentucky',
-  'Louisiana',
-  'Maine',
-  'Maryland',
-  'Massachusetts',
-  'Michigan',
-  'Minnesota',
-  'Mississippi',
-  'Missouri',
-  'Montana',
-  'Nebraska',
-  'Nevada',
-  'New Hampshire',
-  'New Jersey',
-  'New Mexico',
-  'New York',
-  'North Carolina',
-  'North Dakota',
-  'Ohio',
-  'Oklahoma',
-  'Oregon',
-  'Pennsylvania',
-  'Rhode Island',
-  'South Carolina',
-  'South Dakota',
-  'Tennessee',
-  'Texas',
-  'Utah',
-  'Vermont',
-  'Virginia',
-  'Washington',
-  'West Virginia',
-  'Wisconsin',
-  'Wyoming',
-];
+const US_STATES = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'];
 
 export default function AutomaticCourseBuilder() {
-  const router = useRouter();
-
   const [title, setTitle] = useState('');
-  const [audience, setAudience] = useState('');
-  const [hours, setHours] = useState('');
+  const [topic, setTopic] = useState('');
   const [state, setState] = useState('Indiana');
   const [credential, setCredential] = useState('');
-  const [deliveryFormat, setDeliveryFormat] = useState('');
-  const [prompt, setPrompt] = useState('');
+  const [programSlug, setProgramSlug] = useState('');
   const [programId, setProgramId] = useState('');
-
+  const [modules, setModules] = useState('');
+  const [lessonsPerModule, setLessonsPerModule] = useState('');
+  const [includeVideos, setIncludeVideos] = useState(true);
+  const [dryRun, setDryRun] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [result, setResult] = useState<GenerateResult | null>(null);
+  const [progress, setProgress] = useState<string[]>([]);
+  const [result, setResult] = useState<FactoryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const generate = async () => {
-    if (!title.trim()) {
-      setError('Course title is required.');
-      return;
-    }
-    if (!audience.trim()) {
-      setError('Target audience is required.');
-      return;
-    }
+  async function generate() {
+    if (!title.trim()) return setError('Course title is required.');
+    if (!programId.trim() && !programSlug.trim()) return setError('Program ID or program slug is required so Course Factory can resolve the canonical program.');
+
+    setGenerating(true);
     setError(null);
     setResult(null);
-    setGenerating(true);
+    setProgress([]);
 
     try {
-      const res = await fetch('/api/ai/generate-and-publish-course', {
+      const response = await fetch('/api/admin/course-builder/pipeline', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: title.trim(),
-          audience: audience.trim(),
-          hours: hours ? parseInt(hours) : undefined,
-          state: state || undefined,
-          credentialOrExam: credential.trim() || undefined,
-          deliveryFormat: deliveryFormat.trim() || undefined,
-          prompt: prompt.trim() || undefined,
+          topic: topic.trim() || title.trim(),
           programId: programId.trim() || undefined,
+          programSlug: programSlug.trim() || undefined,
+          moduleCount: modules ? Number(modules) : undefined,
+          lessonsPerModule: lessonsPerModule ? Number(lessonsPerModule) : undefined,
+          credential: credential.trim() || undefined,
+          state: state || undefined,
+          includeVideos,
+          dryRun,
         }),
       });
 
-      const data: GenerateResult = await res.json();
-      setResult(data);
+      if (!response.ok || !response.body) {
+        const body = await response.text();
+        throw new Error(body || `Course Factory request failed (${response.status})`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let finalResult: FactoryResult | null = null;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+        const frames = buffer.split('\n\n');
+        buffer = frames.pop() || '';
+
+        for (const frame of frames) {
+          const line = frame.split('\n').find((part) => part.startsWith('data: '));
+          if (!line) continue;
+          const event = JSON.parse(line.slice(6));
+          if (event.message) setProgress((current) => [...current, `${event.stage ?? 'factory'}: ${event.message}`]);
+          if (event.result) finalResult = event.result as FactoryResult;
+        }
+        if (done) break;
+      }
+
+      if (!finalResult) throw new Error('Course Factory completed without a result payload.');
+      setResult(finalResult);
+      if (!finalResult.success) setError((finalResult.errors || ['Course Factory validation failed.']).join('; '));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Request failed');
+      setError(err instanceof Error ? err.message : 'Course Factory request failed.');
     } finally {
       setGenerating(false);
     }
-  };
+  }
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-3xl">
       <div className="mb-6">
-        <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-brand-blue-600" />
-          AI Course Generator
-        </h2>
-        <p className="text-sm text-slate-700 mt-1">
-          Generates a complete 24-lesson course (5 modules, 3 checkpoints, 1 exam) using GPT-4o and
-          publishes it immediately. Requires{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">OPENAI_API_KEY</code> to be set in
-          environment variables.
-        </p>
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900"><Sparkles className="h-5 w-5 text-brand-blue-600" />AI Course Factory</h2>
+        <p className="mt-1 text-sm text-slate-700">This Studio surface calls the same canonical Course Factory used by program automation. Dry run is on by default so you can validate a build without replacing an existing course.</p>
       </div>
 
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Course Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. CNA Certification Prep — Indiana NATCEP"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-          />
+        <label className="block text-sm font-medium text-slate-900">Course Title *<input className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Prestige Cosmetology Apprenticeship" /></label>
+        <label className="block text-sm font-medium text-slate-900">Topic / build instructions<textarea className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" rows={3} value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="Indiana cosmetology apprenticeship curriculum, RTI, practical skills, safety, sanitation, state licensing preparation..." /></label>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block text-sm font-medium text-slate-900">Program slug<input className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono" value={programSlug} onChange={(e) => setProgramSlug(e.target.value)} placeholder="cosmetology-apprenticeship" /></label>
+          <label className="block text-sm font-medium text-slate-900">Program UUID<input className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono" value={programId} onChange={(e) => setProgramId(e.target.value)} placeholder="optional when slug is supplied" /></label>
+          <label className="block text-sm font-medium text-slate-900">State<select className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={state} onChange={(e) => setState(e.target.value)}><option value="">Any</option>{US_STATES.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label className="block text-sm font-medium text-slate-900">Credential / exam<input className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={credential} onChange={(e) => setCredential(e.target.value)} placeholder="Indiana cosmetology licensure" /></label>
+          <label className="block text-sm font-medium text-slate-900">Module count<input type="number" min={1} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={modules} onChange={(e) => setModules(e.target.value)} placeholder="Factory / blueprint default" /></label>
+          <label className="block text-sm font-medium text-slate-900">Lessons per module<input type="number" min={1} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={lessonsPerModule} onChange={(e) => setLessonsPerModule(e.target.value)} placeholder="Factory / blueprint default" /></label>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Target Audience <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={audience}
-            onChange={(e) => setAudience(e.target.value)}
-            placeholder="e.g. Adults seeking entry-level healthcare employment"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
-          />
+        <div className="flex flex-wrap gap-5 text-sm text-slate-800">
+          <label className="flex items-center gap-2"><input type="checkbox" checked={includeVideos} onChange={(e) => setIncludeVideos(e.target.checked)} />Queue media after a real build</label>
+          <label className="flex items-center gap-2"><input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} />Dry run (no persistence)</label>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-900 mb-1">Total Hours</label>
-            <input
-              type="number"
-              value={hours}
-              onChange={(e) => setHours(e.target.value)}
-              placeholder="e.g. 75"
-              min={1}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-900 mb-1">State</label>
-            <select
-              value={state}
-              onChange={(e) => setState(e.target.value)}
-              className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500"
-            >
-              <option value="">— Any —</option>
-              {US_STATES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        {error && <div className="flex gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
 
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Credential or Exam
-          </label>
-          <input
-            type="text"
-            value={credential}
-            onChange={(e) => setCredential(e.target.value)}
-            placeholder="e.g. EPA 608, NCLEX-PN, CompTIA A+"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">Delivery Format</label>
-          <input
-            type="text"
-            value={deliveryFormat}
-            onChange={(e) => setDeliveryFormat(e.target.value)}
-            placeholder="e.g. Hybrid — online theory + in-person lab"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Additional Instructions
-          </label>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            rows={3}
-            placeholder="Specific topics, compliance requirements, or content notes..."
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-blue-500 resize-none"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-900 mb-1">
-            Program ID{' '}
-            <span className="text-slate-700 font-normal">
-              (optional — links course to a program)
-            </span>
-          </label>
-          <input
-            type="text"
-            value={programId}
-            onChange={(e) => setProgramId(e.target.value)}
-            placeholder="UUID from programs table"
-            className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-blue-500"
-          />
-        </div>
-
-        {error && (
-          <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            {error}
-          </div>
-        )}
-
-        <button
-          onClick={generate}
-          disabled={generating}
-          className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors"
-        >
-          {generating ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Generating course… this takes 30–60 seconds
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4" />
-              Generate &amp; Publish Course
-            </>
-          )}
-        </button>
+        <button onClick={() => void generate()} disabled={generating} className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-blue-600 py-3 font-bold text-white disabled:opacity-60">{generating ? <><Loader2 className="h-4 w-4 animate-spin" />Running Course Factory…</> : <><Sparkles className="h-4 w-4" />{dryRun ? 'Validate with Course Factory' : 'Build with Course Factory'}</>}</button>
       </div>
 
-      {result && (
-        <div
-          className={`mt-6 rounded-lg border p-4 ${result.ok ? 'bg-brand-green-50 border-brand-green-200' : 'bg-red-50 border-red-200'}`}
-        >
-          {result.ok ? (
-            <>
-              <div className="flex items-center gap-2 mb-3">
-                <CheckCircle className="w-5 h-5 text-brand-green-600" />
-                <span className="font-bold text-brand-green-800">Course published successfully</span>
-              </div>
-              <dl className="text-sm space-y-1 text-brand-green-900">
-                <div className="flex justify-between">
-                  <dt>Title</dt>
-                  <dd className="font-medium">{result.title}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Modules</dt>
-                  <dd className="font-medium">{result.modules_inserted}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Lessons published</dt>
-                  <dd className="font-medium">{result.lessons_published}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Curriculum lessons archived</dt>
-                  <dd className="font-medium">{result.curriculum_lessons_inserted}</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Generation attempt</dt>
-                  <dd className="font-medium">{result.generation_attempt} / 3</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt>Compliance status</dt>
-                  <dd className="font-medium text-amber-700">{result.compliance_status}</dd>
-                </div>
-              </dl>
-              <div className="mt-4 flex gap-4">
-                <button
-                  onClick={() => router.push(`/admin/curriculum/${result.course_id}`)}
-                  className="text-sm font-semibold text-brand-green-700 hover:text-brand-green-800"
-                >
-                  Review in Curriculum Builder →
-                </button>
-                <button
-                  onClick={() => router.push(`/lms/courses/${result.course_id}`)}
-                  className="flex items-center gap-1 text-sm font-semibold text-brand-green-700 hover:text-brand-green-800"
-                >
-                  <ExternalLink className="w-3 h-3" /> Preview in LMS
-                </button>
-              </div>
-              <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
-                All AI-generated content is marked <strong>draft_for_human_review</strong>. Review
-                each lesson in the Curriculum Builder before making this course visible to learners.
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-5 h-5 text-red-600" />
-                <span className="font-bold text-red-800">Generation failed</span>
-              </div>
-              <p className="text-sm text-red-700 mb-2">{result.error}</p>
-              {result.errors_per_attempt && (
-                <details className="text-xs text-red-600">
-                  <summary className="cursor-pointer font-medium">
-                    Validation errors per attempt
-                  </summary>
-                  <pre className="mt-2 whitespace-pre-wrap bg-red-100 rounded p-2">
-                    {result.errors_per_attempt
-                      .map(
-                        (errs, i) => `Attempt ${i + 1}:\n${errs.map((e) => `  • ${e}`).join('\n')}`,
-                      )
-                      .join('\n\n')}
-                  </pre>
-                </details>
-              )}
-            </>
-          )}
-        </div>
-      )}
+      {progress.length > 0 && <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4"><div className="text-sm font-bold text-slate-900">Factory execution trace</div><pre className="mt-2 max-h-56 overflow-auto whitespace-pre-wrap text-xs text-slate-700">{progress.join('\n')}</pre></div>}
+
+      {result && <div className={`mt-5 rounded-lg border p-4 ${result.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}><div className="flex items-center gap-2 font-bold text-slate-900">{result.success ? <CheckCircle className="h-5 w-5 text-green-600" /> : <AlertCircle className="h-5 w-5 text-red-600" />}{result.dryRun ? 'Course Factory dry run complete' : 'Course Factory build complete'}</div><dl className="mt-3 grid grid-cols-2 gap-2 text-sm text-slate-800"><div>Title: <strong>{result.title || title}</strong></div><div>Course ID: <strong>{result.courseId || (result.dryRun ? 'not persisted' : 'none')}</strong></div><div>Modules: <strong>{result.modulesGenerated ?? 0}</strong></div><div>Lessons: <strong>{result.lessonsGenerated ?? 0}</strong></div><div>Assessments: <strong>{result.lessonsWithQuizzes ?? 0}</strong></div><div>Videos queued: <strong>{result.videosQueued ?? 0}</strong></div></dl></div>}
     </div>
   );
 }

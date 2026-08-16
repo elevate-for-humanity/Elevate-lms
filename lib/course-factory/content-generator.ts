@@ -1,26 +1,19 @@
 /**
- * content-generator.ts
- * 
- * Unified AI content generation:
- * - Lesson content
- * - Assessment questions
- * - Industry standards
- * 
- * Consolidates:
- * - lib/course-builder/lesson-content-generator.ts
- * - lib/course-builder/assessment-generator.ts
- * - lib/ai/prompts/course-blueprint.ts
+ * Unified AI content generation for the canonical Course Factory.
+ *
+ * Lesson generation emits the same structured content contract consumed by
+ * course_lessons, the LMS transformer, and the atomic publication RPC.
  */
 
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
 import type { BlueprintLessonRef, QuizQuestion } from './types';
 
-// ─── Lesson Content Generation ─────────────────────────────────────────────────
-
 export interface GeneratedLessonContent {
   objective: string;
   content: string;
+  learning_points: string[];
+  scenario: string;
   quiz_questions: QuizQuestion[];
 }
 
@@ -33,28 +26,29 @@ interface LessonGenerationInput {
 }
 
 /**
- * Generate lesson content via AI.
- * Includes objective, HTML content, and quiz questions.
+ * Generate one complete learner-facing lesson package.
  */
 export async function generateLessonContent(
   input: LessonGenerationInput,
 ): Promise<GeneratedLessonContent> {
-  if (!isAIAvailable()) {
-    throw new Error('AI service not available');
-  }
+  if (!isAIAvailable()) throw new Error('AI service not available');
 
   const prompt = `
-Generate lesson content for:
+Generate a complete workforce-training lesson for:
 - Lesson: ${input.lesson.title}
 - Module: ${input.moduleTitle}
 - Course: ${input.courseTitle}
 ${input.state ? `- State: ${input.state}` : ''}
 ${input.standardsBlock ? `\nIndustry Standards:\n${input.standardsBlock}` : ''}
 
-Return JSON with:
+Return ONLY valid JSON with exactly this shape:
 {
-  "objective": "Clear learning objective using action verbs",
-  "content": "HTML formatted lesson content (minimum 500 words)",
+  "objective": "One measurable learning objective using an action verb",
+  "learning_points": [
+    "3 to 5 substantive learning points, each at least one complete sentence"
+  ],
+  "scenario": "A realistic workplace or business scenario of at least 80 words that applies the lesson",
+  "content": "HTML formatted instructional lesson content of at least 500 words, with headings, examples, application steps, and a short recap",
   "quiz_questions": [
     {
       "question": "Question text",
@@ -65,8 +59,7 @@ Return JSON with:
   ]
 }
 
-Make content job-ready and aligned to industry standards.
-Return ONLY valid JSON.
+The content must be original, job-ready, factually grounded, and aligned to the lesson title and course objective.
 `.trim();
 
   try {
@@ -75,23 +68,53 @@ Return ONLY valid JSON.
       messages: [
         {
           role: 'system',
-          content: 'You are an expert instructional designer. Create job-ready training content aligned to industry standards. Return ONLY valid JSON.',
+          content:
+            'You are an expert instructional designer. Create original, job-ready training aligned to industry standards. Return ONLY valid JSON.',
         },
         { role: 'user', content: prompt },
       ],
       temperature: 0.7,
-      maxTokens: 4000,
+      maxTokens: 5000,
     });
 
-    const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    return JSON.parse(content || '{}');
-  } catch (err) {
-    logger.error('[content-generator] Lesson generation failed', err);
-    throw err;
+    const raw = response.content?.replace(/```json\n?|```\n?/g, '').trim();
+    const parsed = JSON.parse(raw || '{}') as Partial<GeneratedLessonContent>;
+
+    const objective = String(parsed.objective || '').trim();
+    const content = String(parsed.content || '').trim();
+    const scenario = String(parsed.scenario || '').trim();
+    const learningPoints = Array.isArray(parsed.learning_points)
+      ? parsed.learning_points.map((point) => String(point).trim()).filter(Boolean)
+      : [];
+    const quizQuestions = Array.isArray(parsed.quiz_questions)
+      ? parsed.quiz_questions
+      : [];
+
+    if (!objective || !content || content.length < 500) {
+      throw new Error('Generated lesson is missing required objective or substantive content');
+    }
+    if (learningPoints.length < 3) {
+      throw new Error('Generated lesson must contain at least three learning points');
+    }
+    if (scenario.length < 80) {
+      throw new Error('Generated lesson must contain a substantive application scenario');
+    }
+    if (quizQuestions.length < 1) {
+      throw new Error('Generated lesson must contain at least one knowledge-check question');
+    }
+
+    return {
+      objective,
+      content,
+      learning_points: learningPoints,
+      scenario,
+      quiz_questions: quizQuestions,
+    };
+  } catch (error) {
+    logger.error('[course-factory/content-generator] Lesson generation failed', error);
+    throw error;
   }
 }
-
-// ─── Assessment Generation ─────────────────────────────────────────────────────
 
 export interface AssessmentGenerationInput {
   lessonSlug: string;
@@ -106,19 +129,13 @@ interface GeneratedAssessment {
   questions: QuizQuestion[];
 }
 
-/**
- * Generate assessment questions for a lesson/quiz.
- */
 export async function generateAssessment(
   input: AssessmentGenerationInput,
 ): Promise<GeneratedAssessment> {
-  if (!isAIAvailable()) {
-    throw new Error('AI service not available');
-  }
+  if (!isAIAvailable()) throw new Error('AI service not available');
 
   const count = input.questionCount ?? 10;
   const types = input.questionTypes ?? ['multiple_choice'];
-
   const prompt = `
 Generate ${count} assessment questions for:
 - Lesson: ${input.lessonTitle}
@@ -149,7 +166,8 @@ Return ONLY valid JSON.
       messages: [
         {
           role: 'system',
-          content: 'You are an expert in creating assessments for workforce training. Create job-relevant questions that test practical knowledge. Return ONLY valid JSON.',
+          content:
+            'You are an expert in creating assessments for workforce training. Create job-relevant questions that test practical knowledge. Return ONLY valid JSON.',
         },
         { role: 'user', content: prompt },
       ],
@@ -160,35 +178,25 @@ Return ONLY valid JSON.
     const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
     const parsed = JSON.parse(content || '{}');
     return { questions: parsed.questions || [] };
-  } catch (err) {
-    logger.error('[content-generator] Assessment generation failed', err);
-    throw err;
+  } catch (error) {
+    logger.error('[course-factory/content-generator] Assessment generation failed', error);
+    throw error;
   }
 }
 
-/**
- * Generate a final exam for a course.
- */
 export async function generateFinalExam(
   courseTitle: string,
   moduleCount: number,
   questionCount: number = 25,
 ): Promise<GeneratedAssessment> {
-  if (!isAIAvailable()) {
-    throw new Error('AI service not available');
-  }
+  if (!isAIAvailable()) throw new Error('AI service not available');
 
   const prompt = `
 Generate a ${questionCount}-question final exam for: "${courseTitle}"
 
-This course has ${moduleCount} modules covering:
-- Core concepts and theory
-- Practical applications
-- Safety and compliance
-- Industry regulations
-- Hands-on skills
+This course has ${moduleCount} modules. Cover the complete course proportionally and test knowledge recall, application, and scenario-based reasoning.
 
-Return JSON with ${questionCount} comprehensive exam questions:
+Return JSON with exactly ${questionCount} questions:
 {
   "questions": [
     {
@@ -200,7 +208,6 @@ Return JSON with ${questionCount} comprehensive exam questions:
   ]
 }
 
-Mix question types: knowledge recall, application, and scenario-based.
 Return ONLY valid JSON.
 `.trim();
 
@@ -210,7 +217,8 @@ Return ONLY valid JSON.
       messages: [
         {
           role: 'system',
-          content: 'You are an expert assessment writer. Create comprehensive final exams that test full course competency. Return ONLY valid JSON.',
+          content:
+            'You are an expert assessment writer. Create comprehensive final exams that test full course competency. Return ONLY valid JSON.',
         },
         { role: 'user', content: prompt },
       ],
@@ -220,14 +228,18 @@ Return ONLY valid JSON.
 
     const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
     const parsed = JSON.parse(content || '{}');
-    return { questions: parsed.questions || [] };
-  } catch (err) {
-    logger.error('[content-generator] Final exam generation failed', err);
-    throw err;
+    const questions = Array.isArray(parsed.questions) ? parsed.questions : [];
+    if (questions.length < questionCount) {
+      throw new Error(
+        `Final exam generation returned ${questions.length}/${questionCount} required questions`,
+      );
+    }
+    return { questions: questions.slice(0, questionCount) };
+  } catch (error) {
+    logger.error('[course-factory/content-generator] Final exam generation failed', error);
+    throw error;
   }
 }
-
-// ─── Blueprint Generation (AI) ─────────────────────────────────────────────────
 
 export interface BlueprintGenerationInput {
   title: string;
@@ -240,9 +252,6 @@ export interface BlueprintGenerationInput {
   lessonsPerModule?: number;
 }
 
-/**
- * Generate a course blueprint via AI when no static blueprint exists.
- */
 export async function generateBlueprintFromAI(
   input: BlueprintGenerationInput,
 ): Promise<{
@@ -254,43 +263,40 @@ export async function generateBlueprintFromAI(
     lessons: Array<{ title: string; slug: string; stepType: string }>;
   }>;
 }> {
-  if (!isAIAvailable()) {
-    throw new Error('AI service not available');
-  }
+  if (!isAIAvailable()) throw new Error('AI service not available');
 
   const modules = input.moduleCount ?? 6;
-  const lessons = input.lessonsPerModule ?? 5;
-
+  const lessonsPerModule = input.lessonsPerModule ?? 5;
   const prompt = `
-Generate a comprehensive course blueprint for: "${input.title}"
+Create a workforce training course blueprint.
 
-Details:
-- Target audience: ${input.audience}
-${input.hours ? `- Training hours: ${input.hours}` : ''}
-${input.state ? `- State alignment: ${input.state}` : ''}
-${input.credential ? `- Credential/exam: ${input.credential}` : ''}
+Title: ${input.title}
+Topic: ${input.topic}
+Audience: ${input.audience}
+${input.state ? `State: ${input.state}` : ''}
+${input.credential ? `Credential: ${input.credential}` : ''}
 
 Requirements:
-- ${modules} modules with ${lessons} lessons each
-- Include checkpoints after modules 2 and 3
-- Include a final exam
+- Exactly ${modules} modules
+- Approximately ${lessonsPerModule} learner-facing steps per module
+- Include module checkpoints and a final exam where appropriate
+- Use unique lowercase kebab-case slugs
+- Include practical or assignment steps when the topic requires applied competency
 
-Return JSON:
+Return ONLY valid JSON:
 {
-  "title": "Course Title",
+  "title": "Course title",
   "description": "Course description",
   "modules": [
     {
-      "title": "Module Title",
+      "title": "Module title",
       "description": "Module description",
       "lessons": [
-        { "title": "Lesson Title", "slug": "lesson-slug", "stepType": "lesson" }
+        { "title": "Lesson title", "slug": "lesson-slug", "stepType": "lesson" }
       ]
     }
   ]
 }
-
-Return ONLY valid JSON.
 `.trim();
 
   try {
@@ -299,84 +305,23 @@ Return ONLY valid JSON.
       messages: [
         {
           role: 'system',
-          content: 'You are an expert instructional designer. Create comprehensive, industry-aligned course blueprints. Return ONLY valid JSON.',
+          content:
+            'You design complete workforce-training course structures. Return ONLY valid JSON.',
         },
         { role: 'user', content: prompt },
       ],
-      temperature: 0.7,
-      maxTokens: 4000,
+      temperature: 0.6,
+      maxTokens: 5000,
     });
 
     const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    return JSON.parse(content || '{}');
-  } catch (err) {
-    logger.error('[content-generator] Blueprint generation failed', err);
-    throw err;
-  }
-}
-
-// ─── Competency Mapping ────────────────────────────────────────────────────────
-
-export interface CompetencyMapping {
-  lessonSlug: string;
-  competencies: string[];
-  standards: string[];
-}
-
-/**
- * Generate competency mappings for a lesson.
- */
-export async function generateCompetencyMapping(
-  lessonTitle: string,
-  moduleTitle: string,
-  content: string,
-): Promise<CompetencyMapping> {
-  if (!isAIAvailable()) {
-    throw new Error('AI service not available');
-  }
-
-  const prompt = `
-Analyze this lesson and identify relevant competencies:
-
-Lesson: ${lessonTitle}
-Module: ${moduleTitle}
-
-Content summary: ${content.substring(0, 500)}...
-
-Return JSON:
-{
-  "lessonSlug": "${lessonTitle.toLowerCase().replace(/\s+/g, '-')}",
-  "competencies": ["COMPTIA.1", "NIST.2"],
-  "standards": ["OSHA.1910", "EPA.608"]
-}
-
-Map to industry standards (NATE, ESCO, HVAC Excellence, state boards, etc.)
-Return ONLY valid JSON.
-`.trim();
-
-  try {
-    const response = await aiChat({
-      model: 'gpt-4.1',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an expert in workforce competency frameworks. Map lessons to industry certifications and standards. Return ONLY valid JSON.',
-        },
-        { role: 'user', content: prompt },
-      ],
-      temperature: 0.5,
-      maxTokens: 1000,
-    });
-
-    const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    return JSON.parse(content || '{}');
-  } catch (err) {
-    logger.error('[content-generator] Competency mapping failed', err);
-    // Return empty mapping rather than failing
-    return {
-      lessonSlug: lessonTitle.toLowerCase().replace(/\s+/g, '-'),
-      competencies: [],
-      standards: [],
-    };
+    const parsed = JSON.parse(content || '{}');
+    if (!Array.isArray(parsed.modules) || parsed.modules.length === 0) {
+      throw new Error('AI blueprint generation returned no modules');
+    }
+    return parsed;
+  } catch (error) {
+    logger.error('[course-factory/content-generator] Blueprint generation failed', error);
+    throw error;
   }
 }

@@ -72,7 +72,6 @@ export async function createEnrollmentFromPayment(
     let isNewUser = false;
     let tempPassword = '';
 
-    // If no studentId, find or create user account
     if (!finalStudentId && email) {
       const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
       const userExists = existingUsers?.users?.find(
@@ -83,10 +82,8 @@ export async function createEnrollmentFromPayment(
         finalStudentId = userExists.id;
         logger.info('[Enrollment] Found existing user', { email, userId: finalStudentId });
       } else {
-        // Generate temporary password
         tempPassword = `EFH-${randomBytes(8).toString('hex')}-Temp!`;
 
-        // Create new user account
         const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
           email: email.toLowerCase(),
           password: tempPassword,
@@ -105,12 +102,8 @@ export async function createEnrollmentFromPayment(
         if (newUser?.user) {
           finalStudentId = newUser.user.id;
           isNewUser = true;
-          logger.info('[Enrollment] Created new user account', {
-            email,
-            userId: finalStudentId,
-          });
+          logger.info('[Enrollment] Created new user account', { email, userId: finalStudentId });
 
-          // Create profile
           await supabaseAdmin.from('profiles').upsert({
             id: finalStudentId,
             email: email.toLowerCase(),
@@ -131,7 +124,6 @@ export async function createEnrollmentFromPayment(
       return { success: false, error: 'Could not determine student ID' };
     }
 
-    // Update application status if exists
     if (applicationId) {
       await supabaseAdmin
         .from('applications')
@@ -146,7 +138,6 @@ export async function createEnrollmentFromPayment(
         .eq('id', applicationId);
     }
 
-    // Check for existing enrollment (idempotency)
     const { data: existing } = await supabaseAdmin
       .from('program_enrollments')
       .select('id, status')
@@ -158,8 +149,6 @@ export async function createEnrollmentFromPayment(
     let isNewEnrollment = false;
 
     if (!existing) {
-      // Create new enrollment — payment received but access requires admin approval.
-      // Admin grants access via /admin/enrollments → sets access_granted_at.
       const { data: newEnrollment, error: enrollError } = await supabaseAdmin
         .from('program_enrollments')
         .insert({
@@ -186,7 +175,6 @@ export async function createEnrollmentFromPayment(
 
       enrollmentId = newEnrollment?.id || null;
       isNewEnrollment = true;
-
       logger.info('[Enrollment] Created new enrollment', {
         studentId: finalStudentId,
         programId,
@@ -194,7 +182,6 @@ export async function createEnrollmentFromPayment(
         paymentProvider,
       });
     } else if (existing.status !== 'active' && existing.status !== 'pending_review') {
-      // Payment received on a non-active enrollment — move to pending_review for admin.
       await supabaseAdmin
         .from('program_enrollments')
         .update({
@@ -210,7 +197,6 @@ export async function createEnrollmentFromPayment(
 
       enrollmentId = existing.id;
       isNewEnrollment = true;
-
       logger.info('[Enrollment] Moved paid enrollment to pending review', {
         enrollmentId: existing.id,
         paymentProvider,
@@ -223,7 +209,6 @@ export async function createEnrollmentFromPayment(
       });
     }
 
-    // Send payment/enrollment acknowledgement for new or reactivated enrollments.
     if (isNewEnrollment && email) {
       await sendEnrollmentWelcomeEmail({
         email,
@@ -235,14 +220,13 @@ export async function createEnrollmentFromPayment(
       });
     }
 
-    // L1 audit: record enrollment creation
     try {
       const { logAuditEvent } = await import('@/lib/audit');
       await logAuditEvent({
         action: 'ENROLLMENT_CREATED_FROM_PAYMENT',
         actor_id: 'system:enrollment_creation',
-        target_type: 'program_enrollment',
-        target_id: enrollmentId || undefined,
+        resourceType: 'program_enrollment',
+        resourceId: enrollmentId || undefined,
         metadata: {
           student_id: finalStudentId,
           program_id: programId,
@@ -265,10 +249,7 @@ export async function createEnrollmentFromPayment(
     };
   } catch (error) {
     logger.error('[Enrollment] Error creating enrollment', error);
-    return {
-      success: false,
-      error: 'Operation failed',
-    };
+    return { success: false, error: 'Operation failed' };
   }
 }
 
@@ -290,23 +271,19 @@ async function sendEnrollmentWelcomeEmail(params: {
       .maybeSingle();
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
-
-    const loginSection =
-      isNewUser
-        ? `
+    const loginSection = isNewUser
+      ? `
           <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:16px 20px;margin:20px 0;">
             <p style="margin:0 0 4px;font-size:12px;color:#9a3412;font-weight:700;">SECURE ACCOUNT SETUP REQUIRED</p>
             <p style="margin:0;font-size:13px;color:#7c2d12;">For security, we do not send passwords by email. Use the link below to set your password and access your student portal.</p>
           </div>
           <div style="text-align: center; margin: 24px 0;">
             <a href="${siteUrl}/login" style="display: inline-block; background: #2563eb; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">Set Password &amp; Log In</a>
-          </div>
-        `
-        : `
+          </div>`
+      : `
           <div style="text-align: center; margin: 24px 0;">
             <a href="${siteUrl}/login" style="display: inline-block; background: #2563eb; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px;">Login to Student Portal</a>
-          </div>
-        `;
+          </div>`;
 
     await fetch(`${siteUrl}/api/email/send`, {
       method: 'POST',
@@ -322,21 +299,16 @@ async function sendEnrollmentWelcomeEmail(params: {
             <h2 style="color: #1e3a8a;">Payment received by ${PLATFORM_DEFAULTS.orgName}</h2>
             <p>Hi ${firstName || 'there'},</p>
             <p>We received your payment for <strong>${programDetails?.name || 'your program'}</strong>. Your enrollment is now <strong>pending final review</strong>. Course access is granted after the enrollment review is completed.</p>
-
             ${loginSection}
-
             <h3>What's Next?</h3>
             <ul>
               <li>Log in to your student portal</li>
               <li>Complete or review your profile</li>
               <li>Watch your portal and email for the enrollment approval notice</li>
             </ul>
-
             <p>If you have any questions, please contact our support team.</p>
-
             <p>Best regards,<br>The ${PLATFORM_DEFAULTS.orgName} Team</p>
-          </div>
-        `,
+          </div>`,
       }),
     });
 

@@ -6,18 +6,20 @@ import {
 } from '@/lib/portal/apprentice-access';
 
 describe('apprentice portal access', () => {
-  it('treats barber portal as apprenticeship field portal', () => {
-    expect(isApprenticeFieldPortalPath('/portal/barber')).toBe(true);
+  it('treats the canonical apprentice workspace as the apprenticeship field portal', () => {
+    expect(isApprenticeFieldPortalPath('/apprentice')).toBe(true);
+    expect(isApprenticeFieldPortalPath('/apprentice/barber-apprenticeship/workbook')).toBe(true);
+    expect(isApprenticeFieldPortalPath('/portal/barber')).toBe(false);
+  });
+
+  it('keeps program_holder outside the apprentice runtime', () => {
+    expect(allowedRolesForPortalPath('/apprentice')).not.toContain('program_holder');
+    expect(allowedRolesForPortalPath('/apprentice')).toContain('apprentice');
+    expect(allowedRolesForPortalPath('/apprentice')).toContain('barber_apprentice');
+  });
+
+  it('does not grant apprentice runtime roles based on retired portal paths', () => {
     expect(isApprenticeFieldPortalPath('/portal/healthcare')).toBe(false);
-  });
-
-  it('keeps program_holder outside the barber apprentice runtime', () => {
-    expect(allowedRolesForPortalPath('/portal/barber')).not.toContain('program_holder');
-    expect(allowedRolesForPortalPath('/portal/barber')).toContain('apprentice');
-    expect(allowedRolesForPortalPath('/portal/barber')).toContain('barber_apprentice');
-  });
-
-  it('does not allow program_holder on healthcare portal', () => {
     expect(allowedRolesForPortalPath('/portal/healthcare')).not.toContain('program_holder');
   });
 

@@ -22,7 +22,7 @@ export default function CareerServicesCoursesPage() {
   return (
     <div className="min-h-screen bg-white">
       <PictureFirstPageHero
-        image="/images/pages/instructional-framework-page-1.webp"
+        image="/images/pages/courses-page-13.webp"
         alt="Professional development class and career skills training"
         eyebrow="Professional Development"
         title="Career Courses & Workshops"

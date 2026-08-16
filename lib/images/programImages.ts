@@ -28,17 +28,17 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'financial-literacy': {
     card: `${P}/financial-aid-page-1.webp`,
-    hero: '/images/business/professional-2.jpg',
+    hero: `${P}/finance-accounting.webp`,
     alt: 'Financial literacy learner reviewing a personal financial plan',
   },
   'administrative-assistant': {
-    card: `${P}/office-admin-desk.jpg`,
-    hero: '/images/business/office-admin.webp',
+    card: `${P}/suboffice-onboarding-page-1.webp`,
+    hero: `${P}/admin-business-hero.webp`,
     alt: 'Administrative assistant working at a professional office workstation',
   },
   'automotive-technician': {
-    card: '/images/pexels/diesel.webp',
-    hero: `${P}/cdl-cab-interior.webp`,
+    card: `${P}/diesel-mechanic.webp`,
+    hero: '/images/pexels/diesel.webp',
     alt: 'Automotive technician inspecting vehicle systems in a service shop',
   },
   'business-operations': {
@@ -72,8 +72,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Data analytics learner reviewing charts and business metrics',
   },
   'dental-assistant': {
-    card: `${P}/healthcare-classroom.webp`,
-    hero: '/images/healthcare/hero-program-patient-care.webp',
+    card: '/images/healthcare/video-thumbnail-dental-assistant.jpg',
+    hero: `${P}/programs-medical-apply-hero.webp`,
     alt: 'Dental assistant learner preparing for supervised chairside care',
   },
   'drug-alcohol-specimen-collector': {
@@ -82,8 +82,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Drug and alcohol specimen collector following a documented collection process',
   },
   'nha-ekg-technician': {
-    card: `${P}/cna-patient-care.jpg`,
-    hero: `${P}/healthcare-hero.webp`,
+    card: '/images/healthcare/healthcare-professional-portrait-2.jpg',
+    hero: '/hero-images/healthcare-category.webp',
     alt: 'EKG technician learner preparing equipment for a cardiac test',
   },
   'nha-ehr': {
@@ -92,18 +92,18 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Electronic health records learner documenting patient information securely',
   },
   'emt-apprenticeship': {
-    card: `${P}/programs-emergency-health-safety-hero.webp`,
-    hero: '/images/healthcare/hero-program-patient-care.webp',
+    card: `${P}/card-wioa.webp`,
+    hero: `${P}/programs-emergency-health-safety-hero.webp`,
     alt: 'Emergency medical technician apprentice preparing for patient response',
   },
   'guest-service-gold': {
-    card: `${P}/comp-home-hero-programs.jpg`,
-    hero: `${P}/comp-layout-hero.webp`,
+    card: `${P}/community-page-9.webp`,
+    hero: '/hero-images/services-hero.webp',
     alt: 'Guest service professional welcoming and assisting a visitor',
   },
   'information-technology': {
-    card: `${P}/tech-classroom.webp`,
-    hero: `${P}/programs-it-hero.webp`,
+    card: `${P}/technology-sector.webp`,
+    hero: '/hero-images/technology-cat-new.jpg',
     alt: 'Information technology learner working in a computer lab',
   },
   'insurance-agent': {
@@ -112,13 +112,13 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Insurance agent reviewing coverage information with a client',
   },
   'manufacturing-technician': {
-    card: `${P}/construction-trades.webp`,
-    hero: `${P}/welding.webp`,
+    card: '/images/programs/efh-building-tech-card.jpg',
+    hero: '/images/programs/efh-building-tech-hero.jpg',
     alt: 'Manufacturing technician working with industrial production equipment',
   },
   'nha-medical-admin-assistant': {
     card: `${P}/admin/staff-portal-page-1.webp`,
-    hero: '/images/healthcare/hero-program-medical-assistant.webp',
+    hero: `${P}/medical-assistant-hero.webp`,
     alt: 'Medical administrative assistant coordinating patient office records',
   },
   'nha-billing-coding': {
@@ -128,7 +128,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'nha-patient-care-technician': {
     card: `${P}/healthcare-sector.webp`,
-    hero: '/images/healthcare/hero-program-patient-care.webp',
+    hero: `${P}/healthcare-grad.jpg`,
     alt: 'Patient care technician learner practicing supervised clinical care',
   },
   'real-estate-agent': {
@@ -137,8 +137,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Real estate agent presenting property information to a client',
   },
   'solar-panel-installation': {
-    card: `${P}/construction-trades.webp`,
-    hero: `${P}/electrical-conduit.webp`,
+    card: `${P}/electrical.jpg`,
+    hero: '/hero-images/electrical-hero.jpg',
     alt: 'Solar installation learner preparing rooftop electrical equipment',
   },
   'start-hospitality': {
@@ -148,7 +148,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'youth-culinary-apprenticeship': {
     card: `${P}/culinary.webp`,
-    hero: `${P}/culinary-apprenticeship-hero.webp`,
+    hero: `${P}/apprenticeship-structure.webp`,
     alt: 'Youth culinary apprentice preparing food in a professional kitchen',
   },
   'hvac-technician': {
@@ -162,7 +162,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'CDL student performing a pre-trip inspection on a commercial truck',
   },
   'diesel-mechanic': {
-    card: '/images/pexels/diesel.webp',
+    card: `${P}/card-cdl.webp`,
     hero: `${P}/cdl-cab-interior.webp`,
     alt: 'Diesel mechanic working on a commercial vehicle engine',
   },
@@ -208,22 +208,22 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   qma: {
     card: `${P}/funding-impact-1.webp`,
-    hero: '/images/healthcare/hero-program-medical-assistant.webp',
+    hero: '/hero-images/healthcare-cat-new.jpg',
     alt: 'Qualified Medication Aide supporting supervised patient medication care',
   },
   'home-health-aide': {
-    card: `${P}/healthcare-classroom.webp`,
+    card: '/images/healthcare/program-healthcare-overview.jpg',
     hero: `${P}/adult-learner.webp`,
     alt: 'Home Health Aide learner preparing for in-home patient care',
   },
   'emergency-health-safety': {
     card: `${P}/comp-pathway-classroom.webp`,
-    hero: '/images/healthcare/hero-program-patient-care.webp',
+    hero: '/images/hero/hero-healthcare.jpg',
     alt: 'Emergency health and safety learner practicing patient-response skills',
   },
   'peer-recovery-specialist': {
     card: `${P}/peer-recovery.webp`,
-    hero: `${P}/peer-recovery.webp`,
+    hero: '/images/team/instructors/instructor-recovery.webp',
     alt: 'Peer recovery specialist supporting a client through a counseling conversation',
   },
   'sanitation-infection-control': {
@@ -283,7 +283,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   },
   'network-support-technician': {
     card: '/images/hero/hero-tech-careers.webp',
-    hero: '/images/heroes/lms-analytics.webp',
+    hero: '/hero-images/technology-hero.webp',
     alt: 'Network support technician troubleshooting a connection',
   },
   'software-development': {
@@ -312,8 +312,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Technology learner building practical IT and digital skills',
   },
   'tax-preparation': {
-    card: `${P}/business-meeting.webp`,
-    hero: '/images/business/professional-2.jpg',
+    card: `${P}/bookkeeping.webp`,
+    hero: `${P}/admin-analytics-hero.webp`,
     alt: 'Tax preparer working with a client on financial documents',
   },
   bookkeeping: {
@@ -322,18 +322,18 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Bookkeeping student working with financial records',
   },
   'finance-bookkeeping-accounting': {
-    card: '/images/business/team-2.jpg',
-    hero: '/images/business/team-3.webp',
+    card: `${P}/business-sector.webp`,
+    hero: `${P}/admin-analytics-learning-hero.webp`,
     alt: 'Finance and accounting student reviewing financial statements',
   },
   entrepreneurship: {
-    card: `${P}/entrepreneurship.webp`,
-    hero: '/images/business/collaboration-1.webp',
+    card: '/images/pexels/business.webp',
+    hero: '/images/hero/hero-business.webp',
     alt: 'Entrepreneur working on a business plan',
   },
   business: {
-    card: '/images/pexels/business.webp',
-    hero: '/images/business/team-4.webp',
+    card: '/images/business/professional-2.jpg',
+    hero: `${P}/admin-campaigns-hero.webp`,
     alt: 'Business administration student in a professional setting',
   },
   'office-administration': {
@@ -347,8 +347,8 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Project manager leading a team meeting',
   },
   hospitality: {
-    card: `${P}/comp-home-hero-programs.jpg`,
-    hero: `${P}/comp-layout-hero.webp`,
+    card: `${P}/services-page-1.webp`,
+    hero: `${P}/career-services-hero.webp`,
     alt: 'Hospitality and customer service learner preparing for guest-facing work',
   },
   forklift: {

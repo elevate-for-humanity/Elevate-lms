@@ -40,7 +40,7 @@ const services = [
     title: 'Career Fairs',
     description: 'Meet employers hiring our graduates',
     href: '/career-fair',
-    image: '/images/pages/homepage-why-elevate.webp',
+    image: '/images/pages/career-services-page-7.webp',
   },
   {
     title: 'Academic Advising',

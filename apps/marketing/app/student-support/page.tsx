@@ -72,14 +72,14 @@ const services = [
     description:
       'Personal counseling, mental health resources, and crisis support. Confidential services available to all enrolled students at no cost.',
     link: '/student-support/counseling',
-    image: '/images/pages/student-portal-page-1.webp',
+    image: '/images/pages/career-counseling-page-1.webp',
   },
   {
     title: 'Accessibility Services',
     description:
       'Accommodations for students with disabilities, assistive technology, and individualized support plans. ADA-compliant facilities and programs.',
     link: '/student-support/accessibility',
-    image: '/images/pages/student-support-hero.webp',
+    image: '/images/pages/support-page-2.webp',
   },
   {
     title: 'Scheduling & Advising',

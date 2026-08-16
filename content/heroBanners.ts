@@ -172,21 +172,28 @@ function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
 
-  // Shared JSON videos are legacy fallbacks, not page-specific hero media.
-  // A video referenced by multiple pages is suppressed for those pages unless
-  // the dedicated video registry explicitly assigns media to that page. The
-  // semantic poster remains, giving each route a truthful, stable hero instead
-  // of silently inheriting another route's video.
-  const jsonVideoCounts = new Map<string, number>();
-  for (const banner of Object.values(raw)) {
-    const key = mediaKey(banner.videoSrcDesktop || banner.videoSrcMobile);
-    if (key) jsonVideoCounts.set(key, (jsonVideoCounts.get(key) ?? 0) + 1);
+  // Compute the video each page would effectively receive after the dedicated
+  // registry takes precedence. A legacy JSON fallback is allowed only when its
+  // final effective media key is unique across the complete page set. This also
+  // catches collisions between a JSON fallback and another page's dedicated
+  // registry assignment, not only JSON-to-JSON duplicates.
+  const effectiveVideoCounts = new Map<string, number>();
+  for (const [key, banner] of Object.entries(raw)) {
+    const dedicated = getHeroVideoForPageKey(key);
+    const candidate = dedicated?.video_url || banner.videoSrcDesktop || banner.videoSrcMobile;
+    const candidateKey = mediaKey(candidate);
+    if (candidateKey) {
+      effectiveVideoCounts.set(candidateKey, (effectiveVideoCounts.get(candidateKey) ?? 0) + 1);
+    }
   }
 
   normalizedData = Object.fromEntries(
     Object.entries(raw).map(([key, banner]) => {
-      const jsonKey = mediaKey(banner.videoSrcDesktop || banner.videoSrcMobile);
-      const allowJsonVideo = !jsonKey || (jsonVideoCounts.get(jsonKey) ?? 0) <= 1;
+      const dedicated = getHeroVideoForPageKey(key);
+      const jsonCandidate = banner.videoSrcDesktop || banner.videoSrcMobile;
+      const finalCandidate = dedicated?.video_url || jsonCandidate;
+      const finalKey = mediaKey(finalCandidate);
+      const allowJsonVideo = Boolean(dedicated) || !finalKey || (effectiveVideoCounts.get(finalKey) ?? 0) <= 1;
       return [key, normalizeBanner(key, banner, allowJsonVideo)];
     }),
   );

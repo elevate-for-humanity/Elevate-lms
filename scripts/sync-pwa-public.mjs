@@ -23,6 +23,7 @@ const config = {
       'manifest-apprentice.json',
       'manifest-shop-owner.json',
       'manifest-program-holder.json',
+      'manifest-employer.json',
       'offline.html',
     ],
   },

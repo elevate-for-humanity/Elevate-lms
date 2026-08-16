@@ -6,7 +6,7 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { LEGAL_ENTITY_OPERATING_LINE } from '@/lib/config/legal-entity';
 import { ROUTES } from '@/lib/navigation/routes';
 import { PORTAL_MAP } from '@/lib/routing/portal-map';
-import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, ExternalLink } from 'lucide-react';
+import { Mail, Phone, MapPin, Facebook, Linkedin, Instagram, ExternalLink } from 'lucide-react';
 
 const portalHref = (key: keyof typeof PORTAL_MAP) => {
   const portal = PORTAL_MAP[key];
@@ -45,7 +45,6 @@ export function SiteFooter() {
             </Link>
             <div className="mt-5 flex gap-3">
               <a href="https://facebook.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-white hover:bg-blue-800" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
-              <a href="https://twitter.com/elevatefh" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-white hover:bg-sky-700" aria-label="Twitter"><Twitter className="h-5 w-5" /></a>
               <a href="https://linkedin.com/company/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900" aria-label="LinkedIn"><Linkedin className="h-5 w-5" /></a>
               <a href="https://instagram.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-white hover:bg-slate-800" aria-label="Instagram"><Instagram className="h-5 w-5" /></a>
             </div>

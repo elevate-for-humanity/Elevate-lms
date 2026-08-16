@@ -219,16 +219,17 @@ async function patchWithCapacitySafeStrategy(
   const path = combinedServicePatchPath(projectId, service.id);
 
   // Production services currently run a single nf-compute-400 replica.
-  // maxSurge=1 requires capacity for a second full replica and leaves the
+  // maxSurge=1 requires capacity for a second full replica and can leave a
   // replacement pending indefinitely when that allowance is unavailable.
-  // Northflank's recreate strategy is the proven one-replica configuration:
-  // it replaces within the existing allowance. Health probes still gate the
-  // replacement, and the workflow verifies the deployed SHA before success.
+  // Use recreate for the single-replica topology so replacement occurs within
+  // the existing allowance. Startup/readiness/liveness probes and the deploy
+  // workflow's SHA verification still gate production success.
+  const rolloutMode: RolloutMode = DESIRED_INSTANCES === 1 ? 'recreate' : 'custom';
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',
-    body: JSON.stringify(buildPatch(service, storageMb, 'custom')),
+    body: JSON.stringify(buildPatch(service, storageMb, rolloutMode)),
   });
-  return { response, rolloutMode: 'custom' };
+  return { response, rolloutMode };
 }
 
 async function configureService(
@@ -272,7 +273,7 @@ async function configureService(
   const availabilitySummary =
     appliedRolloutMode === 'custom'
       ? 'maxUnavailable=0 maxSurge=1'
-      : 'rollout-steady';
+      : appliedRolloutMode;
 
   console.info(
     `[patch-ok] ${service.role}:${service.id} dockerfile=${service.dockerfile} ` +
@@ -303,10 +304,11 @@ async function main() {
   console.info(`Targets: ${services.map((s) => `${s.role}:${s.id}`).join(', ')}`);
 
   if (dryRun) {
+    const rolloutMode: RolloutMode = DESIRED_INSTANCES === 1 ? 'recreate' : 'custom';
     for (const service of services) {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
-          `rollout=custom(maxSurge=1,maxUnavailable=0), health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
+          `rollout=${rolloutMode}, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
       );
     }
     return;
@@ -316,7 +318,7 @@ async function main() {
     await configureService(projectId, service, requestedEphemeralMb);
   }
 
-  console.info('Northflank zero-downtime configuration applied to all requested production services.');
+  console.info('Northflank capacity-safe configuration applied to all requested production services.');
 }
 
 main().catch((error) => {

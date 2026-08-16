@@ -4,16 +4,16 @@ import EnrollCourseClient from './EnrollCourseClient';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CourseEnrollPage({ params }: { params: Promise<{ course: string }> }) {
-  const { course } = await params;
+export default async function CourseEnrollPage({ params }: { params: Promise<{ courseId: string }> }) {
+  const { courseId } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/login?redirect=/lms/courses/${course}/enroll`);
+  if (!user) redirect(`/login?redirect=/lms/courses/${courseId}/enroll`);
 
   const { data: courseRow } = await supabase
     .from('courses')
     .select('id, title, slug, status, is_active')
-    .or(`id.eq.${course},slug.eq.${course}`)
+    .or(`id.eq.${courseId},slug.eq.${courseId}`)
     .maybeSingle();
 
   if (!courseRow || courseRow.status === 'archived' || !courseRow.is_active) notFound();

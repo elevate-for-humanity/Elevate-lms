@@ -119,7 +119,7 @@ function runtimeEnvironmentFor(service: ServiceConfig): Record<string, string> {
 function deploymentFor(mode: RolloutMode) {
   const strategy =
     mode === 'recreate'
-      ? 'recreate'
+      ? { type: 'recreate' }
       : mode === 'custom'
         ? {
             type: 'custom',

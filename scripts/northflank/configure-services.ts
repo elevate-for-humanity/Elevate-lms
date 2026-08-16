@@ -30,7 +30,7 @@ type ServiceConfig = {
   dockerfile: string;
 };
 
-type RolloutMode = 'custom' | 'rollout-steady';
+type RolloutMode = 'custom' | 'rollout-steady' | 'recreate';
 
 const RUNTIME_PORT = 3000;
 const DESIRED_INSTANCES = 1;
@@ -118,17 +118,19 @@ function runtimeEnvironmentFor(service: ServiceConfig): Record<string, string> {
 
 function deploymentFor(mode: RolloutMode) {
   const strategy =
-    mode === 'custom'
-      ? {
-          type: 'custom',
-          settings: {
-            maxSurge: 1,
-            maxUnavailable: 0,
-          },
-        }
-      : {
-          type: 'rollout-steady',
-        };
+    mode === 'recreate'
+      ? 'recreate'
+      : mode === 'custom'
+        ? {
+            type: 'custom',
+            settings: {
+              maxSurge: 1,
+              maxUnavailable: 0,
+            },
+          }
+        : {
+            type: 'rollout-steady',
+          };
 
   return {
     type: 'deployment',
@@ -219,13 +221,14 @@ async function patchWithCapacitySafeStrategy(
   // Production services currently run a single nf-compute-400 replica.
   // maxSurge=1 requires capacity for a second full replica and leaves the
   // replacement pending indefinitely when that allowance is unavailable.
-  // Northflank's steady rollout replaces within the existing allowance; the
-  // health probes below still gate readiness and the workflow verifies the SHA.
+  // Northflank's recreate strategy is the proven one-replica configuration:
+  // it replaces within the existing allowance. Health probes still gate the
+  // replacement, and the workflow verifies the deployed SHA before success.
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',
-    body: JSON.stringify(buildPatch(service, storageMb, 'rollout-steady')),
+    body: JSON.stringify(buildPatch(service, storageMb, 'recreate')),
   });
-  return { response, rolloutMode: 'rollout-steady' };
+  return { response, rolloutMode: 'recreate' };
 }
 
 async function configureService(
@@ -303,7 +306,7 @@ async function main() {
     for (const service of services) {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
-          `rollout=rollout-steady, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
+          `rollout=recreate, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
       );
     }
     return;

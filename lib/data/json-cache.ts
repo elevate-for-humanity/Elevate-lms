@@ -2,7 +2,12 @@
  * Process-level JSON file cache.
  *
  * Server-side: reads from public/data/ via Node built-ins, caches per process.
- * Client-side: returns an empty object — data must be passed as props from server.
+ * Client-side (real browser): the fs built-in is unavailable, so this returns
+ * an empty object — data must be passed as props from the server.
+ *
+ * Node-backed test environments such as jsdom expose `window` while still
+ * providing fs. Gate on built-in availability instead of window presence so
+ * those tests exercise the real JSON data path.
  *
  * process.getBuiltinModule() works in both CommonJS and ESM Node runtimes and
  * avoids a static fs/path import being traced into browser bundles.
@@ -14,26 +19,26 @@ const _errors = new Map<string, unknown>();
 type FsModule = typeof import('fs');
 type PathModule = typeof import('path');
 
-function getNodeBuiltin<T>(name: string): T {
+function getNodeBuiltin<T>(name: string): T | null {
   const getter = (process as typeof process & {
     getBuiltinModule?: (specifier: string) => unknown;
   }).getBuiltinModule;
-  if (!getter) {
-    throw new Error(`Node built-in loader is unavailable for ${name}`);
-  }
-  const loaded = getter(name);
-  if (!loaded) throw new Error(`Node built-in module ${name} is unavailable`);
-  return loaded as T;
+  if (!getter) return null;
+  return (getter(name) as T) ?? null;
 }
 
 export function loadJsonOnce<T = unknown>(filename: string): T {
-  if (typeof window !== 'undefined') return {} as T;
   if (_errors.has(filename)) return {} as T;
   if (_cache.has(filename)) return _cache.get(filename) as T;
 
+  const fs = getNodeBuiltin<FsModule>('fs');
+  const nodePath = getNodeBuiltin<PathModule>('path');
+  if (!fs || !nodePath) {
+    // Real browser: no Node filesystem. Data must arrive via server props.
+    return {} as T;
+  }
+
   try {
-    const fs = getNodeBuiltin<FsModule>('fs');
-    const nodePath = getNodeBuiltin<PathModule>('path');
     const filePath = nodePath.join(process.cwd(), 'public/data', filename);
 
     if (!fs.existsSync(filePath)) {

@@ -66,7 +66,6 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop || videoSrcMobile || '');
   const transcriptId = useId();
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
@@ -90,7 +89,6 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
-    setVideoReady(false);
     setMuted(true);
     const video = videoRef.current;
     if (!video || !videoSrc) return;
@@ -169,18 +167,15 @@ export default function HeroVideo({
             autoPlay
             playsInline
             muted
-            onLoadedData={() => setVideoReady(true)}
-            onPlaying={() => setVideoReady(true)}
             onCanPlay={() => {
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
             onError={() => {
-              setVideoReady(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 h-full w-full ${mediaClass} object-center`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           />
         ) : null}

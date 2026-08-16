@@ -35,10 +35,7 @@ export interface PublishResult {
   skippedCount: number;
   warnings: string[];
   errors: string[];
-  /**
-   * Retained for compatibility with older callers. Validation is completed by
-   * Course Factory before persistence, so this is a successful handoff marker.
-   */
+  /** Compatibility marker: validation occurs in Course Factory before handoff. */
   validation: ValidationResult;
 }
 
@@ -50,6 +47,28 @@ const validatedHandoff: ValidationResult = {
   errorCount: 0,
   warningCount: 0,
 };
+
+function normalizeLessonContent(
+  content: string | undefined,
+  objective: string | undefined,
+): Record<string, unknown> | null {
+  if (!content?.trim()) return null;
+
+  try {
+    const parsed = JSON.parse(content);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    // Blueprint-authored HTML/plain text is normalized below.
+  }
+
+  return {
+    html: content,
+    learning_points: objective?.trim() ? [objective.trim()] : [],
+    scenario: '',
+  };
+}
 
 async function upsertCourse(
   db: SupabaseClient,
@@ -69,11 +88,13 @@ async function upsertCourse(
       .update({
         title,
         program_id: programId,
+        status: 'draft',
+        is_active: false,
         updated_at: new Date().toISOString(),
       })
       .eq('id', existing.id);
 
-    if (error) throw new Error(`Failed to update course: ${error.message}`);
+    if (error) throw new Error(`Failed to stage course update: ${error.message}`);
     return existing.id;
   }
 
@@ -84,7 +105,7 @@ async function upsertCourse(
       title,
       program_id: programId,
       status: 'draft',
-      is_active: true,
+      is_active: false,
     })
     .select('id')
     .maybeSingle();
@@ -181,7 +202,7 @@ async function upsertLesson(
     lesson_type: stepType,
     order_index: lesson.order,
     objective: lesson.objective ?? null,
-    content: lesson.content ?? null,
+    content: normalizeLessonContent(lesson.content, lesson.objective),
     quiz_questions: quizQuestions,
     passing_score: lesson.passingScore ?? (stepType === 'exam' ? 80 : 70),
     activities: null,
@@ -218,11 +239,8 @@ async function upsertLesson(
 }
 
 /**
- * Persist an already-validated course package.
- *
- * replace: remove the previous canonical course_modules/course_lessons package
- * before writing the new one.
- * missing-only: retain existing lessons and create only missing slugs.
+ * Persist an already-validated course package as a complete draft.
+ * Publication is a separate atomic operation after completeness checks pass.
  */
 export async function publishCourse(input: PublishInput): Promise<PublishResult> {
   const db = await requireAdminClient();

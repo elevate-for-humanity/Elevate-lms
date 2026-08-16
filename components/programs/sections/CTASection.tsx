@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { SafeHeroVideo } from '@/components/hero/SafeHeroVideo';
 
 interface CTASectionProps {
   title?: string;
@@ -27,16 +28,12 @@ export function CTASection({
       {/* Background */}
       <div className="absolute inset-0">
         {videoSrc ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full h-full object-cover"
-            poster={videoPoster}
-          >
-            <source src={videoSrc} type="video/mp4" />
-          </video>
+          <SafeHeroVideo
+            src={videoSrc}
+            poster={videoPoster || '/images/og-default.jpg'}
+            className="absolute inset-0 h-full w-full object-cover"
+            ariaLabel="Program call to action video"
+          />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-slate-900 to-slate-800" />
         )}

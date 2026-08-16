@@ -1,23 +1,9 @@
 /**
  * POST /api/ai/generate-and-publish-course
  *
- * Full pipeline in one call:
- *   generate → normalize → validate → write staging → publish course_lessons
- *
- * The LMS renderer reads from lms_lessons view which sources course_lessons WHERE is_published=true.
- * curriculum_lessons is written as a secondary archive but is not the read path.
- *
- * Auth: X-Internal-Service-Key header (server-to-server only).
- *
- * Request body:
- *   { title, audience, hours?, state?, credentialOrExam?, deliveryFormat?, prompt?, programId? }
- *
- * Success response:
- *   { ok: true, course_id, title, modules_inserted, lessons_published,
- *     curriculum_lessons_inserted, curriculum_lessons_skipped, compliance_status, attempt }
- *
- * Failure response (422):
- *   { ok: false, error, errors_per_attempt? }
+ * Compatibility endpoint for callers that expect one-call generation + publish.
+ * Generation and package persistence are owned exclusively by Course Factory;
+ * this route retains auth, retry behavior, audit logging, and publication.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,16 +11,12 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { generateCourseOutlineFn } from '@/lib/ai/generate-course-outline-fn';
+import { courseFactory } from '@/lib/course-factory';
 import { logAdminAudit, AdminAction } from '@/lib/admin/audit-log';
-import { transformLessonContent } from '@/lib/lms/transformLessonContent';
-import { defaultActivities } from '@/lib/curriculum/activities';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-
-
 
 interface GenerateAndPublishRequest {
   title: string;
@@ -44,20 +26,14 @@ interface GenerateAndPublishRequest {
   credentialOrExam?: string;
   deliveryFormat?: string;
   prompt?: string;
-  programId?: string; // optional — links course to a program
+  programId?: string;
 }
 
-function buildPrompt(body: GenerateAndPublishRequest): string {
+function buildTopic(body: GenerateAndPublishRequest): string {
   return [
-    `Generate a complete workforce-ready training course titled "${body.title}".`,
-    `Target audience: ${body.audience}.`,
-    body.hours ? `Total training hours: ${body.hours}.` : '',
-    body.state ? `State alignment: ${body.state}.` : '',
-    body.credentialOrExam ? `Credential or exam: ${body.credentialOrExam}.` : '',
-    body.deliveryFormat ? `Delivery format: ${body.deliveryFormat}.` : '',
-    body.prompt ? `Additional requirements: ${body.prompt}` : '',
-    'Include 5 modules with 4 lessons each, 3 checkpoints after modules 2/3/4, and 1 final exam with 25+ questions.',
-    'All content must be specific, job-ready, and usable in a real training program.',
+    `Complete workforce-ready training course titled "${body.title}".`,
+    body.prompt ?? '',
+    'Include practical, job-ready instruction, module checkpoints, and a final examination appropriate to the course.',
   ]
     .filter(Boolean)
     .join(' ');
@@ -80,173 +56,74 @@ export async function POST(request: NextRequest) {
   if (!body?.title?.trim()) return safeError('title is required', 400);
   if (!body?.audience?.trim()) return safeError('audience is required', 400);
 
-  // ── Gate 1–3: Generate, normalize, validate (3-attempt retry) ────────────
-  const genResult = await generateCourseOutlineFn(buildPrompt(body));
+  const errorsPerAttempt: string[][] = [];
+  let generationAttempt = 0;
+  let result: Awaited<ReturnType<typeof courseFactory>> | null = null;
 
-  if (!genResult.ok) {
-    const failure = genResult as { ok: false; attempts: number; errors_per_attempt: string[][] };
+  // Preserve the historical three-attempt resilience while using one generator.
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    generationAttempt = attempt;
+    result = await courseFactory({
+      programId: body.programId,
+      title: body.title,
+      topic: buildTopic(body),
+      audience: body.audience,
+      hours: body.hours,
+      state: body.state,
+      credential: body.credentialOrExam,
+      deliveryFormat: body.deliveryFormat,
+      additionalRequirements: body.prompt,
+      moduleCount: 5,
+      lessonsPerModule: 4,
+      mode: 'replace',
+      contentSource: 'ai',
+      videoMode: 'off',
+    });
+
+    if (result.ok && result.courseId) break;
+    errorsPerAttempt.push(result.errors ?? ['Course Factory generation failed']);
+  }
+
+  if (!result?.ok || !result.courseId) {
     return NextResponse.json(
       {
         ok: false,
-        error: `Generation failed after ${failure.attempts} attempts`,
-        errors_per_attempt: failure.errors_per_attempt,
+        error: `Generation failed after ${generationAttempt} attempts`,
+        errors_per_attempt: errorsPerAttempt,
       },
       { status: 422 },
     );
   }
 
-  const { outline, attempt, normalization } = genResult;
   const db = await requireAdminClient();
-
-  // ── Gate 4: Write staging tables ─────────────────────────────────────────
-  // Insert course (map to actual courses columns)
-  const { data: courseRow, error: courseErr } = await db
-    .from('courses')
-    .insert({
-      title: outline.course.title,
-      slug: `ai-${outline.course.slug}-${Date.now()}`,
-      description: [
-        outline.course.description,
-        body.audience ? `Audience: ${body.audience}` : '',
-        body.state ? `State: ${body.state}` : '',
-        body.credentialOrExam ? `Credential: ${body.credentialOrExam}` : '',
-        `Compliance: ${outline.course.compliance_status}`,
-      ]
-        .filter(Boolean)
-        .join(' | '),
-      short_description: outline.course.description.substring(0, 200),
-      status: 'draft',
-      is_active: false,
-      program_id: body.programId ?? null,
-    })
-    .select('id')
-    .maybeSingle();
-
-  if (courseErr || !courseRow) {
-    return safeInternalError(courseErr, 'Failed to create course record');
-  }
-
-  const courseId = courseRow.id as string;
-
-  // Insert modules (actual columns: course_id, title, description, order_index)
-  const moduleRows = outline.modules.map((m) => ({
-    course_id: courseId,
-    title: m.title,
-    description: m.description,
-    order_index: m.module_index,
-  }));
-
-  const { data: insertedModules, error: modErr } = await db
-    .from('course_modules')
-    .insert(moduleRows)
-    .select('id, order_index');
-
-  if (modErr || !insertedModules) {
-    // Rollback course
-    await db.from('courses').delete().eq('id', courseId);
-    return safeInternalError(modErr, 'Failed to insert modules');
-  }
-
-  // Build module_index → module_id map
-  const moduleIdMap = new Map(
-    insertedModules.map((m) => [m.order_index as number, m.id as string]),
-  );
-
-  // Insert lessons (actual columns: course_id, module_id, title, slug, lesson_type,
-  //                                 order_index, passing_score, activities, content, status)
-  const lessonRows = outline.lessons.map((l) => {
-    const activities = defaultActivities(l.step_type);
-
-    return {
-      course_id: courseId,
-      module_id: moduleIdMap.get(l.module_index) ?? null,
-      title: l.title,
-      slug: l.slug,
-      lesson_type: l.step_type, // actual column name
-      order_index: l.order_index,
-      passing_score:
-        l.step_type === 'checkpoint'
-          ? outline.course.pass_threshold_checkpoints
-          : l.step_type === 'exam'
-            ? outline.course.pass_threshold_final_exam
-            : null,
-      activities,
-      status: 'draft',
-      is_published: false,
-      // Transform at write time — lesson page receives HTML + quiz, not raw JSON.
-      // The raw blob is preserved in content for audit/re-generation; the rendered
-      // fields (rendered_html, quiz_questions) are what the LMS actually reads.
-      ...(() => {
-        const blob = {
-          compliance_status: 'draft_for_human_review',
-          compliance_notice: (outline.course as any).compliance_notice,
-          learning_points: l.learning_points,
-          scenario: l.scenario,
-          assessment_question: l.assessment_question,
-          exam_eligibility:
-            l.step_type === 'exam' ? outline.course.exam_eligibility_criteria : undefined,
-          pass_threshold:
-            l.step_type === 'checkpoint'
-              ? outline.course.pass_threshold_checkpoints
-              : l.step_type === 'exam'
-                ? outline.course.pass_threshold_final_exam
-                : undefined,
-        };
-        const { html, quizQuestions } = transformLessonContent(blob, l.slug);
-        return {
-          content: JSON.stringify(blob), // raw blob preserved for audit
-          rendered_html: html, // production-ready HTML
-          quiz_questions: quizQuestions.length > 0 ? quizQuestions : null,
-        };
-      })(),
-    };
-  });
-
-  const { error: lessonErr } = await db.from('course_lessons').insert(lessonRows);
-
-  if (lessonErr) {
-    // Rollback — course_lessons failed, nothing to clean there
-    await db.from('course_modules').delete().eq('course_id', courseId);
-    await db.from('courses').delete().eq('id', courseId);
-    return safeInternalError(lessonErr, 'Failed to insert lessons');
-  }
-
-  // ── Gate 5: Atomic publish via DB function ────────────────────────────────
-  // publish_course_from_staging() runs inside a single Postgres transaction:
-  //   - UPDATE course_lessons SET is_published=true (makes them visible to lms_lessons)
-  //   - INSERT curriculum_lessons (archive copy, idempotent on lesson_order)
-  // Any failure rolls back both writes atomically — no compensating deletes needed.
   const { data: publishResult, error: publishErr } = await db.rpc('publish_course_from_staging', {
-    p_course_id: courseId,
-    p_program_id: body.programId && body.programId !== courseId ? body.programId : null,
+    p_course_id: result.courseId,
+    p_program_id:
+      body.programId && body.programId !== result.courseId ? body.programId : null,
   });
 
   if (publishErr) {
-    // Transaction rolled back by Postgres — only staging tables need cleanup
-    await db.from('course_lessons').delete().eq('course_id', courseId);
-    await db.from('course_modules').delete().eq('course_id', courseId);
-    await db.from('courses').delete().eq('id', courseId);
-    return safeInternalError(publishErr, 'Failed to publish course');
+    return safeInternalError(publishErr, 'Failed to publish generated course');
   }
 
-  const pub = publishResult as {
-    lessons_published: number;
-    curriculum_lessons_inserted: number;
-    curriculum_lessons_skipped: number;
+  const pub = (publishResult ?? {}) as {
+    lessons_published?: number;
+    curriculum_lessons_inserted?: number;
+    curriculum_lessons_skipped?: number;
   };
 
   await logAdminAudit({
     action: AdminAction.BULK_CONTENT_GENERATED,
     actorId: auth.id ?? '00000000-0000-0000-0000-000000000000',
     entityType: 'courses',
-    entityId: courseId,
+    entityId: result.courseId,
     metadata: {
-      title: outline.course.title,
-      modules_inserted: moduleRows.length,
-      lessons_published: pub.lessons_published,
-      curriculum_lessons_inserted: pub.curriculum_lessons_inserted,
-      generation_attempt: attempt,
-      normalization_applied: normalization,
+      title: result.title ?? body.title,
+      modules_inserted: result.moduleCount ?? 0,
+      lessons_published: pub.lessons_published ?? result.lessonCount ?? 0,
+      curriculum_lessons_inserted: pub.curriculum_lessons_inserted ?? 0,
+      generation_attempt: generationAttempt,
+      normalization_applied: ['canonical-course-factory'],
       program_id: body.programId ?? null,
     },
     req: request,
@@ -254,14 +131,14 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    course_id: courseId,
-    title: outline.course.title,
-    modules_inserted: moduleRows.length,
-    lessons_published: pub.lessons_published,
-    curriculum_lessons_inserted: pub.curriculum_lessons_inserted,
-    curriculum_lessons_skipped: pub.curriculum_lessons_skipped,
+    course_id: result.courseId,
+    title: result.title ?? body.title,
+    modules_inserted: result.moduleCount ?? 0,
+    lessons_published: pub.lessons_published ?? result.lessonCount ?? 0,
+    curriculum_lessons_inserted: pub.curriculum_lessons_inserted ?? 0,
+    curriculum_lessons_skipped: pub.curriculum_lessons_skipped ?? 0,
     compliance_status: 'draft_for_human_review',
-    generation_attempt: attempt,
-    normalization_applied: normalization,
+    generation_attempt: generationAttempt,
+    normalization_applied: ['canonical-course-factory'],
   });
 }

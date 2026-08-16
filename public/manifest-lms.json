@@ -52,6 +52,11 @@
       "name": "Employer Dashboard",
       "short_name": "Employer",
       "url": "/employer/dashboard"
+    },
+    {
+      "name": "Workforce Dashboard",
+      "short_name": "Workforce",
+      "url": "/workforce/dashboard"
     }
   ],
   "screenshots": [],

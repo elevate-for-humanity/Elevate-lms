@@ -49,7 +49,11 @@ export default async function PublicWebsiteBuilderSite({ params }: Props) {
   return (
     <>
       <TenantAnalytics pathname={normalizedPath} />
-      <PublicTenantSite site={site} pathname={normalizedPath} />
+      <PublicTenantSite
+        site={site}
+        pathname={normalizedPath}
+        basePath={`/sites/${subdomain}`}
+      />
       {normalizedPath === '/contact' ? (
         <section className="border-t border-slate-200 bg-slate-50 px-5 py-12 sm:px-6">
           <div className="mx-auto max-w-4xl">

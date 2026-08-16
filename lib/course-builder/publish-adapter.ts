@@ -2,12 +2,12 @@
  * Compatibility adapters for historical Course Builder payloads.
  *
  * The canonical generation/persistence authority is lib/course-factory.
- * These adapters preserve the existing ProgramBuilderTemplate contract while
- * translating it into the canonical CredentialBlueprint shape.
+ * These adapters preserve existing Course Builder contracts while translating
+ * them into the canonical CredentialBlueprint shape.
  */
 
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
-import type { BuilderLesson, ProgramBuilderTemplate } from './schema';
+import type { BuilderLesson, CourseTemplate, ProgramBuilderTemplate } from './schema';
 
 /** @deprecated Historical adapter retained for callers that still expect the old template shape. */
 export function adaptProgramTemplateForPublish(template: ProgramBuilderTemplate) {
@@ -225,5 +225,41 @@ export function adaptProgramTemplateToBlueprint(template: ProgramBuilderTemplate
     regulatory: template.regulatory,
     credentialTarget: template.credentialTarget,
     minimumHours: template.minimumHours,
+  };
+}
+
+/**
+ * Legacy compiler/pipeline adapter. The compiler may still enrich a CourseTemplate,
+ * but persistence is delegated to Course Factory through this conversion.
+ */
+export function adaptCourseTemplateToBlueprint(template: CourseTemplate): CredentialBlueprint {
+  const programTemplate: ProgramBuilderTemplate = {
+    ...template,
+    slug: template.programSlug || template.courseSlug,
+    modules: template.modules.map((module) => ({
+      ...module,
+      orderIndex: module.order,
+      lessons: module.lessons.map((lesson) => ({
+        ...lesson,
+        orderIndex: lesson.order,
+        lessonType: lesson.type,
+        content: lesson.content ? { html: lesson.content } : {},
+        quizQuestions: (lesson.quizQuestions ?? []).map((question) => ({
+          id: question.id ?? `${lesson.slug}-question`,
+          prompt: question.question,
+          type: 'multiple_choice',
+          options: question.options,
+          correctAnswer: question.correctAnswer,
+          explanation: question.explanation,
+        })),
+      })),
+    })),
+  };
+
+  const blueprint = adaptProgramTemplateToBlueprint(programTemplate);
+  return {
+    ...blueprint,
+    programSlug: template.programSlug,
+    credentialSlug: slugify(template.courseSlug),
   };
 }

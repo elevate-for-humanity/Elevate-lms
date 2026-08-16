@@ -2,14 +2,15 @@
  * types.ts
  * Unified type definitions for the Course Factory.
  */
-import type { SupabaseClient } from '@/lib/supabase';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 export type { BlueprintLessonRef, BlueprintModule, BlueprintQuizQuestion, CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
+
 export type BuildMode = 'replace' | 'missing-only';
 export type VideoMode = 'queue' | 'off';
 export type ContentSource = 'ai' | 'blueprint' | 'curriculum_lessons';
 export type PublishStatus = 'draft' | 'published' | 'archived';
 export type LessonType = 'lesson' | 'checkpoint' | 'quiz' | 'exam' | 'lab' | 'assignment';
+
 export interface FactoryInput {
   programId?: string;
   programSlug?: string;
@@ -19,6 +20,7 @@ export interface FactoryInput {
   videoMode?: VideoMode;
   videoQueueLimit?: number | null;
 }
+
 export interface FactoryOutput {
   ok: boolean;
   courseId?: string;
@@ -26,14 +28,39 @@ export interface FactoryOutput {
   title?: string;
   moduleCount?: number;
   lessonCount?: number;
+  expectedLessonCount?: number;
+  completionRatio?: number;
   skippedCount?: number;
+  assessmentsGenerated?: number;
+  videosQueued?: number;
+  generationFailures?: Array<{ slug: string; reason: string }>;
   warnings?: string[];
   errors?: string[];
   status?: FactoryStatus;
 }
-export type FactoryStatus = 'success' | 'not_found' | 'no_blueprint' | 'incomplete' | 'db_error';
-export type FactoryStage = 'init' | 'resolve' | 'blueprint' | 'enrich' | 'validate' | 'publish' | 'complete' | 'error';
+
+export type FactoryStatus =
+  | 'success'
+  | 'not_found'
+  | 'no_blueprint'
+  | 'incomplete'
+  | 'validation_failed'
+  | 'db_error';
+
+export type FactoryStage =
+  | 'init'
+  | 'resolve'
+  | 'blueprint'
+  | 'enrich'
+  | 'assess'
+  | 'validate'
+  | 'publish'
+  | 'media'
+  | 'complete'
+  | 'error';
+
 export type ProgressCallback = (stage: FactoryStage, message: string, progress?: number) => void;
+
 export interface ValidationError {
   type: 'error' | 'warning';
   module?: string;
@@ -41,6 +68,7 @@ export interface ValidationError {
   field: string;
   message: string;
 }
+
 export interface ValidationResult {
   ok: boolean;
   valid: boolean;
@@ -49,6 +77,7 @@ export interface ValidationResult {
   errorCount: number;
   warningCount: number;
 }
+
 export interface KnowledgeCheck {
   id: string;
   type: 'multiple-choice' | 'true-false' | 'fill-blank';
@@ -58,6 +87,7 @@ export interface KnowledgeCheck {
   explanation: string;
   points: number;
 }
+
 export interface InteractiveScenario {
   id: string;
   title: string;
@@ -65,12 +95,14 @@ export interface InteractiveScenario {
   options: { id: string; text: string; isCorrect: boolean; feedback: string }[];
   competencies: string[];
 }
+
 export interface Flashcard {
   id: string;
   front: string;
   back: string;
   tags: string[];
 }
+
 export interface QuizQuestion {
   question: string;
   options: string[];
@@ -78,7 +110,6 @@ export interface QuizQuestion {
   explanation: string;
 }
 
-// Missing types that were referenced but not exported
 export type CredentialLevel = 'certificate' | 'diploma' | 'degree' | 'certification' | 'license';
 
 export interface BlueprintVideoConfig {

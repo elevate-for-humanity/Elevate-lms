@@ -61,9 +61,9 @@ function slugify(value: string): string {
 function cloneBlueprint(blueprint: CredentialBlueprint): CredentialBlueprint {
   return {
     ...blueprint,
-    modules: blueprint.modules.map((module) => ({
-      ...module,
-      lessons: (module.lessons ?? []).map((lesson) => ({ ...lesson })),
+    modules: blueprint.modules.map((courseModule) => ({
+      ...courseModule,
+      lessons: (courseModule.lessons ?? []).map((lesson) => ({ ...lesson })),
     })),
   };
 }
@@ -96,18 +96,18 @@ async function generateFreeFormBlueprint(
     lessonsPerModule: input.lessonsPerModule,
   });
 
-  const modules = (raw.modules ?? []).map((module, moduleIndex) => {
-    const lessons = (module.lessons ?? []).map((lesson, lessonIndex) => {
+  const modules = (raw.modules ?? []).map((courseModule, moduleIndex) => {
+    const lessons = (courseModule.lessons ?? []).map((lesson, lessonIndex) => {
       const stepType = lesson.stepType || 'lesson';
       return {
         slug: normalizeGeneratedSlug(
           lesson.slug,
           stepType,
-          `${module.title}-${lesson.title || lessonIndex + 1}`,
+          `${courseModule.title}-${lesson.title || lessonIndex + 1}`,
         ),
         title: lesson.title || `Lesson ${lessonIndex + 1}`,
         order: lessonIndex + 1,
-        domainKey: slugify(module.title),
+        domainKey: slugify(courseModule.title),
       };
     });
 
@@ -118,9 +118,9 @@ async function generateFreeFormBlueprint(
     }, {});
 
     return {
-      slug: slugify(module.title || `module-${moduleIndex + 1}`),
-      title: module.title || `Module ${moduleIndex + 1}`,
-      description: module.description,
+      slug: slugify(courseModule.title || `module-${moduleIndex + 1}`),
+      title: courseModule.title || `Module ${moduleIndex + 1}`,
+      description: courseModule.description,
       orderIndex: moduleIndex + 1,
       minLessons: lessons.length,
       maxLessons: lessons.length,
@@ -132,13 +132,13 @@ async function generateFreeFormBlueprint(
         requiredCount,
       })),
       competencies: [],
-      domainKey: slugify(module.title),
+      domainKey: slugify(courseModule.title),
       lessons,
     };
   });
 
   const expectedLessonCount = modules.reduce(
-    (count, module) => count + module.lessons.length,
+    (count, courseModule) => count + courseModule.lessons.length,
     0,
   );
   const credentialTitle = input.credential || raw.title || input.title;
@@ -196,13 +196,13 @@ async function enrichBlueprint(
   const failures: Array<{ slug: string; reason: string }> = [];
   let assessmentsGenerated = 0;
   const totalLessons = enriched.modules.reduce(
-    (count, module) => count + (module.lessons?.length ?? 0),
+    (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
     0,
   );
   let processed = 0;
 
-  for (const module of enriched.modules) {
-    for (const lesson of module.lessons ?? []) {
+  for (const courseModule of enriched.modules) {
+    for (const lesson of courseModule.lessons ?? []) {
       const stepType = inferStepType(lesson.slug);
       progress.emit(
         'enrich',
@@ -213,7 +213,7 @@ async function enrichBlueprint(
       try {
         const generated = await generateLessonContent({
           lesson,
-          moduleTitle: module.title,
+          moduleTitle: courseModule.title,
           courseTitle: blueprint.credentialTitle,
           state: blueprint.state ?? undefined,
         });
@@ -237,7 +237,7 @@ async function enrichBlueprint(
           const assessment = await generateAssessment({
             lessonSlug: lesson.slug,
             lessonTitle: lesson.title,
-            moduleTitle: module.title,
+            moduleTitle: courseModule.title,
             courseTitle: blueprint.credentialTitle,
             questionCount,
             questionTypes: ['multiple_choice', 'scenario'],
@@ -360,7 +360,10 @@ export async function courseFactory(
 
     const expectedLessonCount =
       blueprint.expectedLessonCount ??
-      blueprint.modules.reduce((count, module) => count + (module.lessons?.length ?? 0), 0);
+      blueprint.modules.reduce(
+        (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
+        0,
+      );
 
     let completeBlueprint = cloneBlueprint(blueprint);
     let assessmentsGenerated = 0;
@@ -416,6 +419,34 @@ export async function courseFactory(
           (issue) => `${issue.module ?? 'course'}${issue.lesson ? `/${issue.lesson}` : ''}: ${issue.message}`,
         ),
         warnings: validation.warnings.map((issue) => issue.message),
+        dryRun: Boolean(input.dryRun),
+      };
+    }
+
+    const validatedLessonCount = completeBlueprint.modules.reduce(
+      (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
+      0,
+    );
+
+    if (input.dryRun) {
+      const completionRatio =
+        expectedLessonCount > 0 ? validatedLessonCount / expectedLessonCount : 1;
+      progress.emit('complete', 'Course package generated and validated in dry-run mode.', 100);
+      return {
+        ok: completionRatio >= 1,
+        status: completionRatio >= 1 ? 'success' : 'incomplete',
+        courseSlug: completeBlueprint.programSlug ?? undefined,
+        title: completeBlueprint.credentialTitle,
+        moduleCount: completeBlueprint.modules.length,
+        lessonCount: validatedLessonCount,
+        expectedLessonCount,
+        completionRatio,
+        assessmentsGenerated,
+        videosQueued: 0,
+        generationFailures,
+        warnings: validation.warnings.map((issue) => issue.message),
+        errors: completionRatio >= 1 ? [] : ['Generated lesson count does not satisfy the blueprint contract'],
+        dryRun: true,
       };
     }
 
@@ -459,6 +490,7 @@ export async function courseFactory(
           ? publishResult.errors
           : ['Persisted lesson count does not satisfy the blueprint contract'],
         warnings: publishResult.warnings,
+        dryRun: false,
       };
     }
 
@@ -490,6 +522,7 @@ export async function courseFactory(
       generationFailures,
       warnings: publishResult.warnings,
       errors: [],
+      dryRun: false,
     };
   } catch (error) {
     logger.error('[course-factory] Course factory failed', error);
@@ -502,6 +535,7 @@ export async function courseFactory(
       status: 'db_error',
       errors: [error instanceof Error ? error.message : String(error)],
       warnings: [],
+      dryRun: Boolean(input.dryRun),
     };
   }
 }

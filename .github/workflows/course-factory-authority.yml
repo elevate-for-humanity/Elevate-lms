@@ -1,0 +1,41 @@
+name: Course Factory Authority Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'lib/**'
+      - 'scripts/**'
+      - 'supabase/**'
+      - '.github/workflows/course-factory-authority.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'lib/**'
+      - 'scripts/**'
+      - 'supabase/**'
+      - '.github/workflows/course-factory-authority.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: course-factory-authority-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  authority:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Enforce one Course Factory authority
+        run: node scripts/check-course-factory-authority.mjs

@@ -6,6 +6,7 @@
  * API: https://www.dol.gov/agencies/vets/registered-apprenticeship-programs/rapids-api
  */
 
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
 import { logger } from '@/lib/logger';
 import type { SupabaseClient } from '@/lib/supabase';
 
@@ -233,12 +234,12 @@ class RAPIDSService {
    * Called by cron job
    */
   async syncPendingEnrollments(supabase: SupabaseClient): Promise<{ synced: number; failed: number }> {
-    // Get enrollments pending RAPIDS registration
+    // Only unsynced enrollments without a RAPIDS id belong in the registration queue.
     const { data: pending } = await supabase
       .from('program_enrollments')
       .select('id, user_id, program_id, enrolled_at, programs(rapids_code)')
       .eq('rapids_registered', false)
-      .not('rapids_id', 'is', null)
+      .is('rapids_id', null)
       .limit(50);
 
     if (!pending?.length) {
@@ -260,6 +261,16 @@ class RAPIDSService {
         continue;
       }
 
+      const occupationCode = (enrollment.programs as { rapids_code?: string })?.rapids_code?.trim();
+      if (!occupationCode) {
+        logger.error('[rapids] Pending enrollment is missing a RAPIDS occupation code', {
+          enrollmentId: enrollment.id,
+          programId: enrollment.program_id,
+        });
+        failed++;
+        continue;
+      }
+
       const result = await this.registerApprentice({
         firstName: profile.first_name || '',
         lastName: profile.last_name || '',
@@ -267,14 +278,14 @@ class RAPIDSService {
         address: {
           street: profile.address || '',
           city: profile.city || '',
-          state: profile.state || 'IN',
+          state: profile.state || RAPIDS_CONFIG.stateCode,
           zip: profile.zip || '',
         },
         phone: profile.phone || '',
         email: profile.email || '',
         programId: enrollment.program_id,
-        occupationCode: (enrollment.programs as { rapids_code?: string })?.rapids_code || '000.000',
-        sponsorId: 'SPONSOR_ID', // TODO: Get from program
+        occupationCode,
+        sponsorId: RAPIDS_CONFIG.registrationId,
         startDate: enrollment.enrolled_at || new Date().toISOString(),
         wageRate: { initial: 12.00, progression: [] },
       });

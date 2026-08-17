@@ -9,24 +9,6 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
-/**
- * The applications table uses workflow-specific states that are more granular
- * than the public tracker UI. Keep that internal state available as
- * workflow_status, but normalize review-stage values to the tracker's stable
- * public vocabulary so a valid application can never render a blank status
- * card simply because the workflow gained a more specific pending state.
- */
-function toPublicTrackerStatus(status: string | null | undefined): string {
-  switch (status) {
-    case 'submitted':
-    case 'pending_funding':
-    case 'pending_admin_review':
-      return 'pending';
-    default:
-      return status || 'pending';
-  }
-}
-
 async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
@@ -75,15 +57,11 @@ async function _GET(request: NextRequest) {
       );
     }
 
-    const workflowStatus = data.status;
-
-    // Normalize submitted_at — some rows use created_at, some submitted_at.
-    // Preserve the granular workflow state for diagnostics while returning a
-    // stable public status contract to the existing tracker UI.
+    // Preserve the canonical persisted workflow status. The tracker UI owns
+    // the presentation for current workflow states and has a safe fallback for
+    // future states so new statuses cannot silently blank the applicant view.
     const normalized = {
       ...data,
-      status: toPublicTrackerStatus(workflowStatus),
-      workflow_status: workflowStatus,
       submitted_at: data.submitted_at || data.created_at,
     };
 

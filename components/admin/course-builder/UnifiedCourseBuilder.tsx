@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { BookOpen, Bot, Boxes, Loader2, RefreshCw, Sparkles, Video } from 'lucide-react';
+import CourseInstructorMediaPanel from '@/components/admin/course-builder/CourseInstructorMediaPanel';
 
 const AutomaticCourseBuilder = dynamic(() => import('@/components/course/AutomaticCourseBuilder'), { ssr: false });
 const VideoStudio = dynamic(() => import('@/apps/admin/app/video-generator/VideoGeneratorClient'), { ssr: false });
@@ -81,7 +82,12 @@ export default function UnifiedCourseBuilder() {
 
         {tab === 'ai' && <div className="rounded-2xl bg-white p-6 text-slate-900"><AutomaticCourseBuilder /></div>}
         {tab === 'blueprints' && <BlueprintPanel blueprints={blueprints} selectedCourse={selectedCourse} onGenerated={async (id) => { await loadCourses(); setCourseId(id); setTab('courses'); }} />}
-        {tab === 'media' && <div className="overflow-hidden rounded-2xl bg-white text-slate-900"><VideoStudio /></div>}
+        {tab === 'media' && (
+          <>
+            <CourseInstructorMediaPanel courseId={courseId} />
+            <div className="overflow-hidden rounded-2xl bg-white text-slate-900"><VideoStudio /></div>
+          </>
+        )}
       </main>
     </div>
   );

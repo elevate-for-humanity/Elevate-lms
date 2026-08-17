@@ -18,8 +18,61 @@ function configured(provider: AIProviderName): boolean {
   }
 }
 
+async function callGitHubModels(prompt: string, system: string) {
+  const token = process.env.GITHUB_TOKEN?.trim();
+  const owner = process.env.GITHUB_REPOSITORY_OWNER?.trim();
+  if (!token || !owner) throw new Error('GitHub Models token or repository owner is unavailable');
+
+  const response = await fetch(
+    `https://models.github.ai/orgs/${encodeURIComponent(owner)}/inference/chat/completions`,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/vnd.github+json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'X-GitHub-Api-Version': '2026-03-10',
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4.1',
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.2,
+        max_tokens: 2500,
+      }),
+      signal: AbortSignal.timeout(60_000),
+    },
+  );
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    choices?: Array<{ message?: { content?: string } }>;
+    message?: string;
+  };
+  if (!response.ok) {
+    throw new Error(`GitHub Models ${response.status}: ${payload.message || 'request failed'}`);
+  }
+
+  const output = payload.choices?.[0]?.message?.content?.trim();
+  if (!output) throw new Error('GitHub Models returned an empty response');
+  return output;
+}
+
 async function callWithFallback(prompt: string, system: string) {
   const failures: string[] = [];
+
+  if (process.env.GITHUB_TOKEN?.trim()) {
+    try {
+      const output = await callGitHubModels(prompt, system);
+      return {
+        output,
+        metadata: { provider: 'github-models', attemptedProviders: 1, fallbackFailures: failures },
+      };
+    } catch (error) {
+      failures.push(`github-models: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
 
   for (const provider of PROVIDERS) {
     if (!configured(provider)) continue;
@@ -36,9 +89,7 @@ async function callWithFallback(prompt: string, system: string) {
         maxTokens: 2500,
       });
 
-      if (!result.content?.trim()) {
-        throw new Error(`${provider} returned an empty response`);
-      }
+      if (!result.content?.trim()) throw new Error(`${provider} returned an empty response`);
 
       return {
         output: result.content,

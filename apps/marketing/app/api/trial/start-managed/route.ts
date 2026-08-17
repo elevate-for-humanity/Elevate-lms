@@ -138,46 +138,137 @@ async function _POST(request: NextRequest) {
       },
     });
 
-    const authUser = generated.data?.user;
-    if (authUser?.id) {
-      const profilePayload = {
-        id: authUser.id,
-        email: ownerEmail,
-        full_name: ownerName,
-        role: 'org_admin',
-        organization_id: trial.organizationId,
-        tenant_id: trial.tenantId,
-      } as Record<string, unknown>;
+    if (generated.error || !generated.data?.user?.id) {
+      logger.error('[trial] administrator auth link generation failed', generated.error ?? undefined, {
+        reference,
+        ownerEmail,
+      });
+      return NextResponse.json(
+        {
+          error: 'Workspace was created but administrator sign-in could not be provisioned.',
+          correlationId: reference,
+        },
+        { status: 500 },
+      );
+    }
 
-      const { error: profileError } = await db
-        .from('profiles')
-        .upsert(profilePayload, { onConflict: 'id' });
+    const authUser = generated.data.user;
+    const { data: existingProfile, error: profileLookupError } = await db
+      .from('profiles')
+      .select('id, email, full_name, role, organization_id, tenant_id')
+      .eq('id', authUser.id)
+      .maybeSingle();
 
-      if (profileError) {
-        logger.error('[trial] profile provisioning failed', profileError, { reference });
-        return NextResponse.json(
-          {
-            error: 'Workspace was created but the administrator profile could not be linked.',
-            correlationId: reference,
-          },
-          { status: 500 },
-        );
-      }
+    if (profileLookupError) {
+      logger.error('[trial] profile lookup failed', profileLookupError, { reference });
+      return NextResponse.json(
+        {
+          error: 'Workspace was created but the administrator profile could not be checked.',
+          correlationId: reference,
+        },
+        { status: 500 },
+      );
+    }
 
-      const builderTrial = await startAppTrial(authUser.id, 'website-builder', db);
-      if (builderTrial.status === 'error') {
-        logger.error('[trial] Website Builder entitlement failed', new Error(builderTrial.message), {
-          reference,
-          userId: authUser.id,
-        });
-        return NextResponse.json(
-          {
-            error: 'Workspace was created but Website Builder access could not be provisioned.',
-            correlationId: reference,
-          },
-          { status: 500 },
-        );
-      }
+    const profilePayload = existingProfile
+      ? {
+          id: authUser.id,
+          email: ownerEmail,
+          full_name: ownerName,
+          role: existingProfile.role ?? 'org_admin',
+          organization_id: existingProfile.organization_id ?? trial.organizationId,
+          tenant_id: existingProfile.tenant_id,
+        }
+      : {
+          id: authUser.id,
+          email: ownerEmail,
+          full_name: ownerName,
+          role: 'org_admin',
+          organization_id: trial.organizationId,
+          tenant_id: trial.tenantId,
+        };
+
+    const { error: profileError } = await db
+      .from('profiles')
+      .upsert(profilePayload, { onConflict: 'id' });
+
+    if (profileError) {
+      logger.error('[trial] profile provisioning failed', profileError, { reference });
+      return NextResponse.json(
+        {
+          error: 'Workspace was created but the administrator profile could not be linked.',
+          correlationId: reference,
+        },
+        { status: 500 },
+      );
+    }
+
+    const { error: orgMembershipError } = await db
+      .from('organization_users')
+      .upsert(
+        {
+          organization_id: trial.organizationId,
+          user_id: authUser.id,
+          role: 'org_owner',
+          status: 'active',
+        },
+        { onConflict: 'organization_id,user_id' },
+      );
+
+    if (orgMembershipError) {
+      logger.error('[trial] organization membership provisioning failed', orgMembershipError, {
+        reference,
+        userId: authUser.id,
+        organizationId: trial.organizationId,
+      });
+      return NextResponse.json(
+        {
+          error: 'Workspace was created but organization access could not be provisioned.',
+          correlationId: reference,
+        },
+        { status: 500 },
+      );
+    }
+
+    const { error: tenantMembershipError } = await db
+      .from('tenant_memberships')
+      .upsert(
+        {
+          tenant_id: trial.tenantId,
+          user_id: authUser.id,
+          role: 'owner',
+        },
+        { onConflict: 'tenant_id,user_id' },
+      );
+
+    if (tenantMembershipError) {
+      logger.error('[trial] tenant membership provisioning failed', tenantMembershipError, {
+        reference,
+        userId: authUser.id,
+        tenantId: trial.tenantId,
+      });
+      return NextResponse.json(
+        {
+          error: 'Workspace was created but tenant access could not be provisioned.',
+          correlationId: reference,
+        },
+        { status: 500 },
+      );
+    }
+
+    const builderTrial = await startAppTrial(authUser.id, 'website-builder', db);
+    if (builderTrial.status === 'error') {
+      logger.error('[trial] Website Builder entitlement failed', new Error(builderTrial.message), {
+        reference,
+        userId: authUser.id,
+      });
+      return NextResponse.json(
+        {
+          error: 'Workspace was created but Website Builder access could not be provisioned.',
+          correlationId: reference,
+        },
+        { status: 500 },
+      );
     }
 
     const { data: website } = await db

@@ -7,6 +7,13 @@
 
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
+import {
+  competencyMappingSchema,
+  generatedAssessmentSchema,
+  generatedBlueprintSchema,
+  generatedLessonContentSchema,
+  parseStrictAIJson,
+} from './ai-contracts';
 import type { BlueprintLessonRef, QuizQuestion } from './types';
 
 export interface GeneratedLessonContent {
@@ -74,42 +81,22 @@ The content must be original, job-ready, factually grounded, and aligned to the 
       maxTokens: 5000,
     });
 
-    const raw = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    const parsed = JSON.parse(raw || '{}') as Partial<GeneratedLessonContent>;
-
-    const objective = String(parsed.objective || '').trim();
-    const html = String(parsed.content || '').trim();
-    const scenario = String(parsed.scenario || '').trim();
-    const learningPoints = Array.isArray(parsed.learning_points)
-      ? parsed.learning_points.map((point) => String(point).trim()).filter(Boolean)
-      : [];
-    const quizQuestions = Array.isArray(parsed.quiz_questions)
-      ? parsed.quiz_questions
-      : [];
-
-    if (!objective || !html || html.length < 500) {
-      throw new Error('Generated lesson is missing required objective or substantive content');
-    }
-    if (learningPoints.length < 3) {
-      throw new Error('Generated lesson must contain at least three learning points');
-    }
-    if (scenario.length < 80) {
-      throw new Error('Generated lesson must contain a substantive application scenario');
-    }
-    if (quizQuestions.length < 1) {
-      throw new Error('Generated lesson must contain at least one knowledge-check question');
-    }
+    const parsed = parseStrictAIJson(
+      response.content,
+      generatedLessonContentSchema,
+      'Lesson generation',
+    );
 
     return {
-      objective,
+      objective: parsed.objective,
       content: JSON.stringify({
-        html,
-        learning_points: learningPoints,
-        scenario,
+        html: parsed.content,
+        learning_points: parsed.learning_points,
+        scenario: parsed.scenario,
       }),
-      learning_points: learningPoints,
-      scenario,
-      quiz_questions: quizQuestions,
+      learning_points: parsed.learning_points,
+      scenario: parsed.scenario,
+      quiz_questions: parsed.quiz_questions,
     };
   } catch (error) {
     logger.error('[course-factory/content-generator] Lesson generation failed', error);
@@ -176,9 +163,17 @@ Return ONLY valid JSON.
       maxTokens: 3000,
     });
 
-    const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    const parsed = JSON.parse(content || '{}');
-    return { questions: parsed.questions || [] };
+    const parsed = parseStrictAIJson(
+      response.content,
+      generatedAssessmentSchema,
+      'Assessment generation',
+    );
+    if (parsed.questions.length < count) {
+      throw new Error(
+        `Assessment generation returned ${parsed.questions.length}/${count} required questions`,
+      );
+    }
+    return { questions: parsed.questions.slice(0, count) };
   } catch (error) {
     logger.error('[course-factory/content-generator] Assessment generation failed', error);
     throw error;
@@ -227,15 +222,17 @@ Return ONLY valid JSON.
       maxTokens: 5000,
     });
 
-    const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    const parsed = JSON.parse(content || '{}');
-    const questions = Array.isArray(parsed.questions) ? parsed.questions : [];
-    if (questions.length < questionCount) {
+    const parsed = parseStrictAIJson(
+      response.content,
+      generatedAssessmentSchema,
+      'Final exam generation',
+    );
+    if (parsed.questions.length < questionCount) {
       throw new Error(
-        `Final exam generation returned ${questions.length}/${questionCount} required questions`,
+        `Final exam generation returned ${parsed.questions.length}/${questionCount} required questions`,
       );
     }
-    return { questions: questions.slice(0, questionCount) };
+    return { questions: parsed.questions.slice(0, questionCount) };
   } catch (error) {
     logger.error('[course-factory/content-generator] Final exam generation failed', error);
     throw error;
@@ -315,10 +312,13 @@ Return ONLY valid JSON:
       maxTokens: 5000,
     });
 
-    const content = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    const parsed = JSON.parse(content || '{}');
-    if (!Array.isArray(parsed.modules) || parsed.modules.length === 0) {
-      throw new Error('AI blueprint generation returned no modules');
+    const parsed = parseStrictAIJson(
+      response.content,
+      generatedBlueprintSchema,
+      'Blueprint generation',
+    );
+    if (parsed.modules.length !== modules) {
+      throw new Error(`Blueprint generation returned ${parsed.modules.length}/${modules} required modules`);
     }
     return parsed;
   } catch (error) {
@@ -372,19 +372,11 @@ Only map standards that are genuinely applicable to the lesson.
       maxTokens: 1000,
     });
 
-    const raw = response.content?.replace(/```json\n?|```\n?/g, '').trim();
-    const parsed = JSON.parse(raw || '{}') as Partial<CompetencyMapping>;
-    return {
-      lessonSlug:
-        String(parsed.lessonSlug || '').trim() ||
-        lessonTitle.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-      competencies: Array.isArray(parsed.competencies)
-        ? parsed.competencies.map((value) => String(value).trim()).filter(Boolean)
-        : [],
-      standards: Array.isArray(parsed.standards)
-        ? parsed.standards.map((value) => String(value).trim()).filter(Boolean)
-        : [],
-    };
+    return parseStrictAIJson(
+      response.content,
+      competencyMappingSchema,
+      'Competency mapping',
+    );
   } catch (error) {
     logger.error('[course-factory/content-generator] Competency mapping failed', error);
     return {

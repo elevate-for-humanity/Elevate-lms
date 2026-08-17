@@ -102,8 +102,8 @@ export default async function CurriculumCourseEditorPage({
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs
             items={[
-              { label: 'Admin', href: '/admin' },
-              { label: 'Curriculum', href: '/admin/studio' },
+              { label: 'Admin', href: '/dashboard' },
+              { label: 'Curriculum', href: '/studio/courses' },
               { label: courseName ?? courseId },
             ]}
           />

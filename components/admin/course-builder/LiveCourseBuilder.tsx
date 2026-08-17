@@ -950,7 +950,7 @@ function EditPanel({
           Quick Links
         </p>
         <a
-          href={`/admin/studio/courseId`}
+          href="/studio/courses"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-700 py-1"
@@ -958,7 +958,7 @@ function EditPanel({
           <CheckSquare className="w-3.5 h-3.5" /> Manage Quiz Questions
         </a>
         <a
-          href={`/admin/studio`}
+          href="/studio"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-700 py-1"

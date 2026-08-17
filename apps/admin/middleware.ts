@@ -84,6 +84,22 @@ type PendingCookie = {
 
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
+
+  const legacyStudioPrefixes = ['/admin/studio', '/admin/dev-studio', '/dev-studio'];
+  const legacyStudioPrefix = legacyStudioPrefixes.find(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+  if (legacyStudioPrefix) {
+    const canonicalUrl = req.nextUrl.clone();
+    canonicalUrl.pathname = `/studio${pathname.slice(legacyStudioPrefix.length)}`;
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+  if (pathname === '/admin/dashboard') {
+    const canonicalUrl = req.nextUrl.clone();
+    canonicalUrl.pathname = '/dashboard';
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+
   if (isPublicPath(pathname)) return NextResponse.next();
 
   const ipBlocked = checkAdminIP(req);

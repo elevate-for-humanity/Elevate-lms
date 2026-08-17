@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   if (auth.error) return auth.error;
   return NextResponse.json(
     {
-      error: 'Studio Shell has been removed. Use Lizzy on /admin/dashboard for deploy and platform commands.',
+      error: 'Studio Shell has been removed. Use Lizzy on /dashboard for deploy and platform commands.',
       retired: true,
     },
     { status: 410 },

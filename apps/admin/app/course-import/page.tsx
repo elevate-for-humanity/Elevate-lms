@@ -23,7 +23,7 @@ const IMPORT_SOURCES = [
     label: 'CSV / Spreadsheet',
     description: 'Import lessons and modules from a structured CSV file.',
     icon: FileText,
-    href: '/admin/studio',
+    href: '/studio',
   },
   {
     id: 'external',

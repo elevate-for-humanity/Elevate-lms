@@ -321,7 +321,7 @@ export default function TemplateGallery() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Seeding failed');
-        router.push(`/admin/studio/${data.courseId ?? ''}`);
+        router.push(`/studio/courses/${data.courseId ?? ''}`);
       } else {
         // Scaffold: generate structure from topic, then publish to get a courseId
         const genRes = await fetch('/api/admin/courses/generate', {
@@ -343,7 +343,7 @@ export default function TemplateGallery() {
         });
         const pubData = await pubRes.json();
         if (!pubRes.ok) throw new Error(pubData.error || 'Failed to save course');
-        router.push(`/admin/studio/${pubData.courseId ?? ''}`);
+        router.push(`/studio/courses/${pubData.courseId ?? ''}`);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');

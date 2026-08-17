@@ -49,7 +49,7 @@ export default async function GeminiIntegrationPage() {
     },
     {
       surface: 'Course Pipeline',
-      route: '/admin/studio',
+      route: '/studio',
       description: 'AI-assisted course outline and lesson generation',
     },
     {

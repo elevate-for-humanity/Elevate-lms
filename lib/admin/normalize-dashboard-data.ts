@@ -75,7 +75,7 @@ function normalizeKpis(kpis: KPICard[] | null | undefined): KPICard[] {
     value: asCount(kpi.value),
     delta: asCount(kpi.delta),
     deltaLabel: typeof kpi.deltaLabel === 'string' ? kpi.deltaLabel : '',
-    href: typeof kpi.href === 'string' ? kpi.href : '/admin/dashboard',
+    href: typeof kpi.href === 'string' ? kpi.href : '/dashboard',
     urgent: kpi.urgent === true,
     sub: typeof kpi.sub === 'string' ? kpi.sub : undefined,
   }));

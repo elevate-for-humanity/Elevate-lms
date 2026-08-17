@@ -41,7 +41,7 @@ export function BlueprintPanel() {
         subtitle={`${modules.length} module${modules.length !== 1 ? 's' : ''} · ${state.lessons.length} lesson${state.lessons.length !== 1 ? 's' : ''}`}
         actions={
           <a
-            href={`/admin/studio`}
+            href="/studio"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-xs font-medium text-brand-blue-600 hover:text-brand-blue-800 transition"

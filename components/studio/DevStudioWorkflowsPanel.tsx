@@ -39,8 +39,8 @@ export default function DevStudioWorkflowsPanel() {
     setError(null);
     try {
       const [wfRes, runsRes] = await Promise.all([
-        fetch('/api/admin/studio/workflows'),
-        fetch('/api/admin/studio/workflows'),
+        fetch('/api/admin/workflows'),
+        fetch('/api/devstudio/workflows'),
       ]);
       const wfData = await wfRes.json().catch(() => ({}));
       const runsData = await runsRes.json().catch(() => ({}));
@@ -62,7 +62,7 @@ export default function DevStudioWorkflowsPanel() {
     setRunningId(id);
     setError(null);
     try {
-      const res = await fetch('/api/admin/studio/workflows', {
+      const res = await fetch('/api/admin/workflows/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflow_id: id }),

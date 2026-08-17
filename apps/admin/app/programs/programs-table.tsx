@@ -95,7 +95,7 @@ export function ProgramsTable({
                   <td className="px-6 py-4 text-sm text-black">{program.price ? `$${program.price.toLocaleString()}` : 'Free'}</td>
                   <td className="px-6 py-4 text-sm text-black">{new Date(program.created_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}</td>
                   <td className="px-6 py-4 text-right text-sm font-medium"><div className="flex items-center justify-end gap-2">
-                    <Link href={`/admin/studio?program=${program.id}`} className="inline-flex items-center gap-1 rounded-lg bg-brand-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-700 transition-colors">✦ Build Course</Link>
+                    <Link href={`/studio?program=${program.id}`} className="inline-flex items-center gap-1 rounded-lg bg-brand-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-700 transition-colors">✦ Build Course</Link>
                     <Link href={`/programs/${program.slug}/manage`} className="text-brand-blue-600 hover:text-brand-blue-900">Edit</Link>
                     {programCourseMap[program.id] ? (
                       <Link href={`${process.env.NEXT_PUBLIC_SITE_URL}/lms/courses/${programCourseMap[program.id]}`} target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-800 font-medium" title="View LMS course">Course</Link>

@@ -23,7 +23,7 @@ export default async function IntegrationSettingsPage() {
     {
       title: 'Dev Studio',
       description: 'Manage builder tools and internal platform workflows',
-      href: '/admin/studio',
+      href: '/studio',
     },
     {
       title: 'Social Media Accounts',

@@ -17,6 +17,37 @@ interface GenerateResult {
   errors_per_attempt?: string[][];
 }
 
+type GeneratedCourseDraft = {
+  title?: string;
+  modules?: Array<{ lessons?: unknown[] }>;
+};
+
+type GenerateDraftResponse = { course?: GeneratedCourseDraft; error?: string };
+type PublishCourseResponse = {
+  ok?: boolean;
+  courseId?: string;
+  lessonCount?: number;
+  status?: string;
+  error?: string;
+};
+
+async function readJsonResponse<T extends { error?: string }>(response: Response, operation: string): Promise<T> {
+  const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
+  if (contentType.includes('application/json')) return (await response.json()) as T;
+
+  const raw = await response.text();
+  console.error(`[course-generator] ${operation} returned a non-JSON response`, {
+    status: response.status,
+    contentType,
+    preview: raw.slice(0, 120),
+  });
+  throw new Error(
+    response.status === 404
+      ? `The ${operation} endpoint is not available on this Admin deployment. Please retry after the Admin service finishes deploying.`
+      : `${operation} returned an invalid response (HTTP ${response.status || 500}). Please retry.`,
+  );
+}
+
 const US_STATES = [
   'Alabama',
   'Alaska',
@@ -100,23 +131,54 @@ export default function AutomaticCourseBuilder() {
     setGenerating(true);
 
     try {
-      const res = await fetch('/api/ai/generate-and-publish-course', {
+      const requirements = [
+        `Create a complete workforce-ready course titled "${title.trim()}" for ${audience.trim()}.`,
+        'Use exactly 5 modules and 24 lessons total, including 3 checkpoint assessments and 1 final exam.',
+        hours ? `Total instructional time: ${parseInt(hours)} hours.` : '',
+        state ? `State or jurisdiction: ${state}.` : '',
+        credential.trim() ? `Credential or exam alignment: ${credential.trim()}.` : '',
+        deliveryFormat.trim() ? `Delivery format: ${deliveryFormat.trim()}.` : '',
+        prompt.trim(),
+      ].filter(Boolean).join('\n');
+
+      const generateResponse = await fetch('/api/admin/courses/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ raw_text: requirements, input_type: 'prompt' }),
+      });
+
+      const generated = await readJsonResponse<GenerateDraftResponse>(generateResponse, 'course generation');
+      if (!generateResponse.ok || !generated.course) throw new Error(generated.error || 'Course generation failed.');
+
+      const publishResponse = await fetch('/api/admin/courses/generate/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        cache: 'no-store',
         body: JSON.stringify({
-          title: title.trim(),
-          audience: audience.trim(),
-          hours: hours ? parseInt(hours) : undefined,
-          state: state || undefined,
-          credentialOrExam: credential.trim() || undefined,
-          deliveryFormat: deliveryFormat.trim() || undefined,
-          prompt: prompt.trim() || undefined,
-          programId: programId.trim() || undefined,
+          course: generated.course,
+          program_id: programId.trim() || undefined,
+          is_published: true,
         }),
       });
 
-      const data: GenerateResult = await res.json();
-      setResult(data);
+      const published = await readJsonResponse<PublishCourseResponse>(publishResponse, 'course publishing');
+      if (!publishResponse.ok || !published.ok || !published.courseId) {
+        throw new Error(published.error || 'Course publishing failed.');
+      }
+
+      setResult({
+        ok: true,
+        course_id: published.courseId,
+        title: generated.course.title || title.trim(),
+        modules_inserted: generated.course.modules?.length ?? 0,
+        lessons_published: published.lessonCount ?? generated.course.modules?.reduce(
+          (total, module) => total + (module.lessons?.length ?? 0), 0,
+        ) ?? 0,
+        curriculum_lessons_inserted: published.lessonCount ?? 0,
+        compliance_status: published.status || 'published',
+        generation_attempt: 1,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed');
     } finally {

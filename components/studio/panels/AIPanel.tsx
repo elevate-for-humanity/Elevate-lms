@@ -113,7 +113,7 @@ export function AIPanel() {
     }]);
 
     try {
-      const res = await fetch('/api/admin/studio/ai-chat', {
+      const res = await fetch('/api/devstudio/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,49 +148,17 @@ export function AIPanel() {
             try {
               const parsed = JSON.parse(data);
 
-              // New format: { type: 'delta'|'tool_call', ... }
-              if (parsed.type === 'delta') {
+              // Canonical Dev Studio chat streams token frames and executes tools server-side.
+              if (typeof parsed.token === 'string') {
+                fullContent += parsed.token;
+                setMessages(prev => prev.map(m =>
+                  m.id === assistantMsgId ? { ...m, content: fullContent } : m
+                ));
+              } else if (parsed.type === 'delta') {
                 fullContent += parsed.content ?? '';
                 setMessages(prev => prev.map(m =>
                   m.id === assistantMsgId ? { ...m, content: fullContent } : m
                 ));
-              } else if (parsed.type === 'tool_call') {
-                // AI wants to execute a tool — dispatch server-side
-                const toolName: string = parsed.name;
-                const toolArgs: Record<string, unknown> = parsed.args ?? {};
-
-                // Show tool execution indicator in the message
-                const indicator = `\n\n⚙️ Running: **${toolName}**...`;
-                fullContent += indicator;
-                setMessages(prev => prev.map(m =>
-                  m.id === assistantMsgId ? { ...m, content: fullContent } : m
-                ));
-
-                // Execute the tool
-                try {
-                  const toolRes = await fetch('/api/admin/studio/tool-execute', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      courseId: state.course.id,
-                      toolName,
-                      args: toolArgs,
-                    }),
-                  });
-                  const toolResult = await toolRes.json() as { ok: boolean; message: string; data?: Record<string, unknown> };
-                  const resultText = toolResult.ok
-                    ? ` ✅ ${toolResult.message}`
-                    : ` ❌ ${toolResult.message}`;
-                  fullContent = fullContent.replace(`⚙️ Running: **${toolName}**...`, `⚙️ **${toolName}**${resultText}`);
-                  setMessages(prev => prev.map(m =>
-                    m.id === assistantMsgId ? { ...m, content: fullContent } : m
-                  ));
-                } catch {
-                  fullContent = fullContent.replace(`⚙️ Running: **${toolName}**...`, `⚙️ **${toolName}** ❌ execution failed`);
-                  setMessages(prev => prev.map(m =>
-                    m.id === assistantMsgId ? { ...m, content: fullContent } : m
-                  ));
-                }
               } else {
                 // Legacy format: { choices: [{ delta: { content } }] }
                 const delta = parsed.choices?.[0]?.delta?.content ?? '';

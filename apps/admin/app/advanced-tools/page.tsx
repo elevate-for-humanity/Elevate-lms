@@ -106,10 +106,10 @@ const TOOL_SECTIONS = [
     description: 'Developer utilities, debugging, and studio tools.',
     tools: [
       { label: 'Operations Hub', href: '/admin/operations', desc: 'Cron jobs, workflows, dead letters, and admin alerts' },
-      { label: 'Dev Studio', href: '/admin/studio', desc: 'Container, deploy, secrets, terminal, and live preview' },
+      { label: 'Dev Studio', href: '/studio', desc: 'Container, deploy, secrets, terminal, and live preview' },
       { label: 'Automation', href: '/admin/automation', desc: 'Workflow automation rules' },
-      { label: 'Workflows', href: '/admin/studio/workflows', desc: 'Automated workflow definitions' },
-      { label: 'Studio', href: '/admin/studio', desc: 'Course Studio — builder, curriculum, video, and AI copilot' },
+      { label: 'Workflows', href: '/studio/workflows', desc: 'Automated workflow definitions' },
+      { label: 'Studio', href: '/studio', desc: 'Course Studio — builder, curriculum, video, and AI copilot' },
       { label: 'HVAC AI Instructor', href: '/admin/integrations/gemini', desc: 'Marcus Johnson — Gemini-powered HVAC lesson instructor' },
       { label: 'Sentry Test', href: '/api/sentry-test', desc: 'Dev only — trigger a test error to verify Sentry capture' },
     ],

@@ -22,7 +22,7 @@ export function WorkflowsOpsPanel() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/studio/workflows');
+      const res = await fetch('/api/admin/workflows');
       const data = await res.json().catch(() => ({}));
       const rows = Array.isArray(data?.workflows) ? data.workflows : Array.isArray(data?.data) ? data.data : [];
       setWorkflows(rows);
@@ -41,7 +41,7 @@ export function WorkflowsOpsPanel() {
     setRunningId(workflowId);
     setMessage(null);
     try {
-      const res = await fetch('/api/admin/studio/workflows', {
+      const res = await fetch('/api/admin/workflows/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ workflow_id: workflowId }),

@@ -1,0 +1,83 @@
+name: AI Regression Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/ai/**'
+      - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
+      - 'evals/**'
+      - 'scripts/ai-eval.ts'
+      - 'supabase/migrations/*ai_regression*'
+      - '.github/workflows/ai-regression.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lib/ai/**'
+      - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
+      - 'evals/**'
+      - 'scripts/ai-eval.ts'
+      - 'supabase/migrations/*ai_regression*'
+      - '.github/workflows/ai-regression.yml'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Evaluation mode'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - smoke
+          - full
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-regression-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ai-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      AI_EVAL_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'smoke' }}
+      AI_EVAL_QUALITY_THRESHOLD: '4'
+      AI_EVAL_MAX_BASELINE_DROP: '0.5'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify AI provider secret
+        shell: bash
+        run: |
+          if [[ -z "$OPENAI_API_KEY" && -z "$ANTHROPIC_API_KEY" && -z "$GEMINI_API_KEY" && -z "$GROQ_API_KEY" && -z "$AZURE_OPENAI_API_KEY" ]]; then
+            echo "No AI provider secret is configured for the AI regression gate." >&2
+            exit 1
+          fi
+
+      - name: Run AI regression suite
+        run: pnpm exec tsx scripts/ai-eval.ts

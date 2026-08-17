@@ -26,15 +26,17 @@ type Payload = {
   interactiveVideo?: any;
 };
 
-export default function InteractiveLessonExperience({ lessonSlug, lessonId }: { lessonSlug: string; lessonId: string }) {
+export default function InteractiveLessonExperience({ courseId, lessonSlug, lessonId }: { courseId: string; lessonSlug: string; lessonId: string }) {
   const [payload, setPayload] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     let active = true;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
     setLoading(true);
-    fetch(`/api/learner/interactions?lessonSlug=${encodeURIComponent(lessonSlug)}`, { cache: 'no-store' })
+    fetch(`/api/learner/interactions?courseId=${encodeURIComponent(courseId)}&lessonId=${encodeURIComponent(lessonId)}`, { cache: 'no-store', signal: controller.signal })
       .then(async (res) => {
         const body = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
@@ -42,9 +44,9 @@ export default function InteractiveLessonExperience({ lessonSlug, lessonId }: { 
       })
       .then((body) => { if (active) { setPayload(body); setError(''); } })
       .catch((err) => { if (active) setError(err instanceof Error ? err.message : 'Interactive activities unavailable'); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [lessonSlug]);
+      .finally(() => { window.clearTimeout(timeout); if (active) setLoading(false); });
+    return () => { active = false; window.clearTimeout(timeout); controller.abort(); };
+  }, [courseId, lessonId, lessonSlug]);
 
   const interactions = payload?.interactions ?? [];
   const flashcards = payload?.flashcards ?? [];

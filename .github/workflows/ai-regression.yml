@@ -1,0 +1,80 @@
+name: AI Regression Gate
+
+on:
+  pull_request:
+    paths:
+      - 'lib/ai/**'
+      - 'lib/course-factory/**'
+      - 'evals/ai/**'
+      - '.github/workflows/ai-regression.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lib/ai/**'
+      - 'lib/course-factory/**'
+      - 'evals/ai/**'
+      - '.github/workflows/ai-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CI: true
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  AI_PROVIDER: openai
+  PROMPTFOO_DISABLE_UPDATE: 'true'
+
+jobs:
+  course-factory-ai-contracts:
+    name: Course Factory AI contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install repository dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Run deterministic Course Factory contract tests
+        run: pnpm vitest run lib/course-factory/__tests__/ai-contracts.test.ts
+
+      - name: Require AI evaluation credentials
+        shell: bash
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "OPENAI_API_KEY is required for the AI regression release gate."
+            exit 1
+          fi
+
+      - name: Run Promptfoo Course Factory regression suite
+        run: >-
+          pnpm dlx promptfoo@0.121.20 eval
+          -c evals/ai/course-factory/promptfooconfig.yaml
+          --no-share
+          --no-cache
+          --no-progress-bar
+          --no-table
+          -o ai-regression-results.json
+
+      - name: Upload regression results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: course-factory-ai-regression-results
+          path: ai-regression-results.json
+          if-no-files-found: warn
+          retention-days: 14

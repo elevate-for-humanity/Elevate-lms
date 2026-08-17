@@ -87,6 +87,10 @@ jobs:
             echo '{"suite":"course-factory","status":"failed","reason":"Promptfoo did not produce ai-regression-results.json"}' > ai-regression-normalized.json
           fi
 
+      - name: Enforce approved regression baseline
+        if: always()
+        run: pnpm tsx scripts/ai/check-eval-baseline.ts ai-regression-normalized.json evals/ai/course-factory/baseline.json
+
       - name: Persist regression evidence to Supabase
         if: always() && vars.AI_EVAL_PERSIST == 'true'
         env:
@@ -102,5 +106,6 @@ jobs:
           path: |
             ai-regression-results.json
             ai-regression-normalized.json
+            ai-regression-baseline.json
           if-no-files-found: warn
           retention-days: 14

@@ -8,7 +8,17 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-type ApplicationStatus = 'pending' | 'approved' | 'rejected' | 'contacted';
+type ApplicationStatus =
+  | 'submitted'
+  | 'under_review'
+  | 'pending'
+  | 'pending_funding'
+  | 'pending_admin_review'
+  | 'contacted'
+  | 'approved'
+  | 'enrolled'
+  | 'rejected'
+  | 'withdrawn';
 
 interface Application {
   id: string;
@@ -19,20 +29,50 @@ interface Application {
   program_interest?: string;
   program_id?: string;
   reference_number?: string;
-  status: ApplicationStatus;
+  status: ApplicationStatus | string;
   submitted_at: string;
   support_notes?: string;
   notes?: string;
 }
 
-const statusConfig = {
-  pending: {
+const pendingStatus = {
+  icon: Clock,
+  color: 'text-yellow-600',
+  bg: 'bg-yellow-50',
+  border: 'border-yellow-200',
+  label: 'Under Review',
+  description: 'Your application has been received and is being reviewed by our team.',
+};
+
+const statusConfig: Record<
+  string,
+  {
+    icon: typeof Clock;
+    color: string;
+    bg: string;
+    border: string;
+    label: string;
+    description: string;
+  }
+> = {
+  submitted: pendingStatus,
+  under_review: pendingStatus,
+  pending: pendingStatus,
+  pending_admin_review: {
     icon: Clock,
     color: 'text-yellow-600',
     bg: 'bg-yellow-50',
     border: 'border-yellow-200',
-    label: 'Under Review',
-    description: 'Your application is being reviewed by our team.',
+    label: 'Pending Enrollment Review',
+    description: 'Your application is awaiting final enrollment and funding review.',
+  },
+  pending_funding: {
+    icon: Clock,
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    border: 'border-yellow-200',
+    label: 'Funding Action Required',
+    description: 'Your application is on hold while required funding steps are completed.',
   },
   contacted: {
     icon: Phone,
@@ -50,6 +90,14 @@ const statusConfig = {
     label: 'Approved',
     description: 'Congratulations! Your application has been approved.',
   },
+  enrolled: {
+    icon: CheckCircle,
+    color: 'text-brand-green-600',
+    bg: 'bg-brand-green-50',
+    border: 'border-brand-green-200',
+    label: 'Enrolled',
+    description: 'Your enrollment is active. Use your student account to continue onboarding and training.',
+  },
   rejected: {
     icon: XCircle,
     color: 'text-brand-orange-600',
@@ -58,6 +106,23 @@ const statusConfig = {
     label: 'Not Approved',
     description: 'Unfortunately, we cannot proceed with your application at this time.',
   },
+  withdrawn: {
+    icon: XCircle,
+    color: 'text-slate-600',
+    bg: 'bg-slate-50',
+    border: 'border-slate-200',
+    label: 'Withdrawn',
+    description: 'This application has been withdrawn and is no longer active.',
+  },
+};
+
+const unknownStatus = {
+  icon: Clock,
+  color: 'text-slate-600',
+  bg: 'bg-slate-50',
+  border: 'border-slate-200',
+  label: 'Status Update',
+  description: 'Your application has a status update. Contact admissions if you need clarification.',
 };
 
 export default function TrackApplicationPage() {
@@ -118,7 +183,7 @@ export default function TrackApplicationPage() {
     handleSearch();
   };
 
-  const status = application ? statusConfig[application.status] : null;
+  const status = application ? statusConfig[application.status] ?? unknownStatus : null;
   const StatusIcon = status?.icon;
 
   return (
@@ -274,11 +339,27 @@ export default function TrackApplicationPage() {
             <div className="mt-8 pt-6 border-t border-slate-200">
               <h3 className="font-bold text-black mb-4">What's Next?</h3>
 
-              {application.status === 'pending' && (
+              {['submitted', 'under_review', 'pending'].includes(application.status) && (
                 <div className="space-y-3 text-sm text-black">
-                  <p>• An advisor will review your application within 24 hours</p>
-                  <p>• We'll contact you within 1-2 business days</p>
+                  <p>• An advisor will review your application</p>
+                  <p>• We'll contact you with the next required enrollment step</p>
                   <p>• Check your email and phone for updates</p>
+                </div>
+              )}
+
+              {application.status === 'pending_admin_review' && (
+                <div className="space-y-3 text-sm text-black">
+                  <p>• Your application is in final enrollment review</p>
+                  <p>• Funding or payment authorization may be verified before activation</p>
+                  <p>• We'll contact you when your enrollment decision is ready</p>
+                </div>
+              )}
+
+              {application.status === 'pending_funding' && (
+                <div className="space-y-3 text-sm text-black">
+                  <p>• Complete the funding or WorkOne steps provided by your advisor</p>
+                  <p>• Enrollment cannot activate until required funding authorization is verified</p>
+                  <p>• Contact admissions if you need help completing the funding process</p>
                 </div>
               )}
 
@@ -292,9 +373,17 @@ export default function TrackApplicationPage() {
 
               {application.status === 'approved' && (
                 <div className="space-y-3 text-sm text-black">
-                  <p>• An advisor will contact you to complete enrollment</p>
-                  <p>• We'll discuss funding options (WIOA, WRG, Job Ready Indy)</p>
-                  <p>• You'll receive program start date and details</p>
+                  <p>• Complete any remaining enrollment and onboarding requirements</p>
+                  <p>• Verify your funding or payment authorization if requested</p>
+                  <p>• Use your student account for the next onboarding step</p>
+                </div>
+              )}
+
+              {application.status === 'enrolled' && (
+                <div className="space-y-3 text-sm text-black">
+                  <p>• Your enrollment is active</p>
+                  <p>• Sign in to your student account and complete onboarding</p>
+                  <p>• Open your assigned course from the LMS when access is available</p>
                 </div>
               )}
 
@@ -303,6 +392,14 @@ export default function TrackApplicationPage() {
                   <p>• Contact us to discuss alternative options</p>
                   <p>• We may have other programs that fit your needs</p>
                   <p>• Contact us at {PLATFORM_DEFAULTS.supportPhone} for more information</p>
+                </div>
+              )}
+
+              {application.status === 'withdrawn' && (
+                <div className="space-y-3 text-sm text-black">
+                  <p>• This application is no longer active</p>
+                  <p>• Contact admissions if you believe it was withdrawn in error</p>
+                  <p>• You may submit a new application when appropriate</p>
                 </div>
               )}
             </div>

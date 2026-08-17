@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { safeError } from '@/lib/api/safe-error';
+import { safeError, safeInternalError } from '@/lib/api/safe-error';
 import { aiChat, isAIAvailable } from '@/lib/ai/ai-service';
 import { hydrateProcessEnv } from '@/lib/secrets';
 
@@ -72,10 +72,7 @@ export async function POST(req: NextRequest) {
   const parsed = BodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return safeError('Invalid input', 400);
 
-  const fallback = deterministicExperience(parsed.data);
-  if (!isAIAvailable()) {
-    return NextResponse.json({ ok: true, provider: 'deterministic-fallback', experience: fallback });
-  }
+  if (!isAIAvailable()) return safeError('AI provider is required; generic fallback generation is disabled', 503);
 
   const { lessonTitle, courseTitle, moduleTitle, existingContent, instruction } = parsed.data;
   const prompt = `Create a complete interactive workforce-training lesson experience as JSON.
@@ -102,7 +99,6 @@ Include at least 4 flashcards and 3 knowledge checks. Make the task observable a
     const experience = parseJsonObject(result.content ?? '');
     return NextResponse.json({ ok: true, provider: 'ai', experience });
   } catch (error) {
-    console.error('[course-builder/ai-write] AI unavailable; using deterministic fallback', error);
-    return NextResponse.json({ ok: true, provider: 'deterministic-fallback', experience: fallback });
+    return safeInternalError(error, 'Evidence-grounded lesson generation failed');
   }
 }

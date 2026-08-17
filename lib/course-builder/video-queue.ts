@@ -1,6 +1,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createJob } from '@/lib/video/job-queue';
 import { logger } from '@/lib/logger';
+import { generateInstructorIntro, getInstructorForCourse } from '@/lib/ai-instructors';
 
 interface QueueCourseLessonVideosInput {
   courseId: string;
@@ -21,9 +22,21 @@ export async function queueCourseLessonVideos(
   input: QueueCourseLessonVideosInput,
 ): Promise<QueueCourseLessonVideosResult> {
   const db = await requireAdminClient();
+  const { data: course, error: courseError } = await db
+    .from('courses')
+    .select('title')
+    .eq('id', input.courseId)
+    .maybeSingle();
+
+  if (courseError || !course) {
+    throw new Error(`Failed to load course for instructor assignment: ${courseError?.message ?? 'not found'}`);
+  }
+
+  const instructor = getInstructorForCourse(course.title);
+
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id, title, script, bullet_points, video_url, video_status')
+    .select('id, title, script, bullet_points, video_url, video_status, order_index')
     .eq('course_id', input.courseId)
     .order('order_index', { ascending: true });
 
@@ -62,7 +75,10 @@ export async function queueCourseLessonVideos(
         lesson_id: lesson.id,
         course_id: input.courseId,
         lesson_title: lesson.title,
-        script: lesson.script ?? undefined,
+        script:
+          lesson.order_index === 0
+            ? `${generateInstructorIntro(instructor, course.title)} ${lesson.script ?? ''}`.trim()
+            : `Welcome back. I'm ${instructor.name}, your ${instructor.title}. ${lesson.script ?? ''}`.trim(),
         bullet_points: Array.isArray(lesson.bullet_points)
           ? (lesson.bullet_points as string[])
           : [],

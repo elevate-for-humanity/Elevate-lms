@@ -1,12 +1,10 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
-description: Elevate Course Factory AI regression gate
+description: Elevate Course Factory production-boundary AI regression gate
 
 prompts:
   - |
-      {{instruction}}
-
-      Return raw JSON only. Do not use markdown fences, commentary, or extra keys.
+      {{request}}
 
 providers:
   - file://./provider.ts
@@ -18,14 +16,17 @@ defaultTest:
 tests:
   - description: lesson generation preserves the canonical structured contract
     vars:
-      instruction: |
-        Create a workforce-training lesson titled "Barber Infection Control" for a barber apprenticeship course.
-        Return exactly these keys:
-        objective: non-empty string
-        learning_points: array of 3 to 5 non-empty strings
-        scenario: realistic workplace scenario of at least 80 characters
-        content: HTML instructional content of at least 500 characters
-        quiz_questions: array with at least 1 object, each containing question, exactly 4 options, correct integer 0-3, and explanation.
+      request: |
+        {
+          "operation": "lesson",
+          "input": {
+            "lessonTitle": "Barber Infection Control",
+            "lessonSlug": "barber-infection-control",
+            "moduleTitle": "Safety and Infection Control",
+            "courseTitle": "Barber Apprenticeship",
+            "state": "Indiana"
+          }
+        }
     assert:
       - type: is-json
         value:
@@ -60,16 +61,31 @@ tests:
       - type: javascript
         value: |
           const data = JSON.parse(output);
-          return !output.trim().startsWith('```') && data.content.includes('<') && data.learning_points.length >= 3;
+          const storedContent = JSON.parse(data.content);
+          return Boolean(
+            storedContent.html &&
+            storedContent.html.includes('<') &&
+            Array.isArray(storedContent.learning_points) &&
+            storedContent.learning_points.length >= 3 &&
+            storedContent.scenario
+          );
       - type: llm-rubric
         provider: openai:chat:gpt-4.1
-        value: The lesson is job-ready, specifically about barber infection control, and does not invent unrelated regulatory claims.
+        value: The generated lesson is job-ready, specifically about barber infection control, and does not invent unrelated regulatory claims.
 
   - description: assessment generation returns bounded answer choices and indexes
     vars:
-      instruction: |
-        Generate exactly 4 job-relevant knowledge-check questions for barber infection control.
-        Return one object with exactly one key named questions. Each question must contain question, exactly 4 options, correct as an integer from 0 through 3, and explanation.
+      request: |
+        {
+          "operation": "assessment",
+          "input": {
+            "lessonSlug": "barber-infection-control",
+            "lessonTitle": "Barber Infection Control",
+            "moduleTitle": "Safety and Infection Control",
+            "courseTitle": "Barber Apprenticeship",
+            "questionCount": 4
+          }
+        }
     assert:
       - type: is-json
         value:
@@ -101,9 +117,18 @@ tests:
 
   - description: blueprint generation preserves canonical module lesson shape
     vars:
-      instruction: |
-        Create a short workforce-training blueprint titled "Barber Safety Fundamentals".
-        Return exactly title, description, and modules. Return exactly 2 modules. Each module must contain exactly title, description, and lessons. Each module must contain 2 lessons. Each lesson must contain exactly title, slug, and stepType. Slugs must be lowercase kebab-case. stepType must be one of lesson, checkpoint, quiz, exam, lab, assignment.
+      request: |
+        {
+          "operation": "blueprint",
+          "input": {
+            "title": "Barber Safety Fundamentals",
+            "topic": "barber workplace safety and infection control",
+            "audience": "barber apprentices",
+            "state": "Indiana",
+            "moduleCount": 2,
+            "lessonsPerModule": 2
+          }
+        }
     assert:
       - type: is-json
         value:

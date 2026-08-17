@@ -27,6 +27,7 @@ import {
   generateLessonContent,
 } from './content-generator';
 import { publishCourse } from './publisher';
+import { buildCourseEvidenceContext } from './evidence-context';
 import { inferStepType, validateBlueprint } from './validator';
 import type {
   FactoryInput,
@@ -197,6 +198,7 @@ async function generateFreeFormBlueprint(
 async function enrichBlueprint(
   blueprint: CredentialBlueprint,
   progress: ProgressTracker,
+  standardsBlock: string,
 ): Promise<{
   blueprint: CredentialBlueprint;
   assessmentsGenerated: number;
@@ -226,6 +228,11 @@ async function enrichBlueprint(
           moduleTitle: courseModule.title,
           courseTitle: blueprint.credentialTitle,
           state: blueprint.state ?? undefined,
+          standardsBlock: [
+            standardsBlock,
+            `Current module: ${courseModule.title}`,
+            `Current module domain: ${courseModule.domainKey ?? courseModule.slug}`,
+          ].join('\n'),
         });
 
         lesson.objective = generated.objective;
@@ -397,7 +404,29 @@ export async function courseFactory(
         };
       }
 
-      const generated = await enrichBlueprint(blueprint, progress);
+      progress.emit('resolve', 'Assembling credential and workforce evidence.');
+      const evidence = await buildCourseEvidenceContext({
+        blueprint,
+        programSlug: program?.slug ?? input.programSlug ?? blueprint.programSlug,
+        state: input.state ?? blueprint.state,
+      });
+      if (!evidence.grounded) {
+        return {
+          ok: false,
+          status: 'incomplete',
+          expectedLessonCount,
+          errors: [
+            'Course generation blocked: no registered competencies or authoritative occupational evidence were available.',
+          ],
+          warnings: evidence.warnings,
+        };
+      }
+      progress.emit(
+        'resolve',
+        `Evidence ready from ${evidence.sources.join(', ')}${evidence.socCode ? ` for SOC ${evidence.socCode}` : ''}.`,
+      );
+
+      const generated = await enrichBlueprint(blueprint, progress, evidence.standardsBlock);
       completeBlueprint = generated.blueprint;
       assessmentsGenerated = generated.assessmentsGenerated;
       generationFailures = generated.failures;

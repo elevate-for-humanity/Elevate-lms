@@ -35,7 +35,7 @@ export default async function CourseLandingPage({
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
 
-  const [{ data: modules }, { data: lessons }] = await Promise.all([
+  const [{ data: modules }, { data: lessons }, { data: heroVisual }] = await Promise.all([
     supabase
       .from('course_modules')
       .select('id,title,description,order_index,is_published')
@@ -48,6 +48,15 @@ export default async function CourseLandingPage({
       .eq('course_id', course.id)
       .eq('is_published', true)
       .order('order_index'),
+    supabase
+      .from('course_visual_assets')
+      .select('asset_url,poster_url,alt_text,caption,media_type')
+      .eq('course_id', course.id)
+      .eq('placement', 'hero')
+      .eq('is_active', true)
+      .order('sort_order')
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const publishedModules = modules ?? [];
@@ -61,6 +70,30 @@ export default async function CourseLandingPage({
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          {heroVisual?.media_type === 'video' ? (
+            <figure className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
+              <video
+                className="aspect-[8/3] w-full object-cover motion-reduce:hidden"
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                poster={heroVisual.poster_url || undefined}
+                aria-label={heroVisual.alt_text}
+              >
+                <source src={heroVisual.asset_url} type="video/mp4" />
+              </video>
+              <img
+                className="hidden aspect-[8/3] w-full object-cover motion-reduce:block"
+                src={heroVisual.poster_url || '/images/pages/entrepreneurship.webp'}
+                alt={heroVisual.alt_text}
+              />
+              {heroVisual.caption ? (
+                <figcaption className="sr-only">{heroVisual.caption}</figcaption>
+              ) : null}
+            </figure>
+          ) : null}
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-cyan-800">Elevate LMS</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">{course.title}</h1>
           <p className="mt-4 max-w-4xl text-base font-medium leading-7 text-slate-700">

@@ -17,6 +17,7 @@ type Lesson = {
 type Module = { id: string; title: string; lessons: Lesson[] };
 
 type Experience = {
+  content?: string;
   narrationScript?: string;
   visualPrompt?: string;
   flashcards?: any[];
@@ -95,6 +96,7 @@ export default function CourseInteractionStudio({
       if (!res.ok) throw new Error(body.error ?? 'AI generation failed');
       const next = body.experience ?? body;
       const sanitized: Experience = {
+        content: next.content,
         narrationScript: next.narrationScript,
         visualPrompt: next.visualPrompt,
         flashcards: next.flashcards,

@@ -17,23 +17,29 @@ type ModuleWithInteractions = BlueprintModule & { interactionSpecs?: Record<stri
 export async function GET(request: NextRequest) {
   const { user, error: authError } = await requireAuth(request);
   if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const lessonSlug = request.nextUrl.searchParams.get('lessonSlug');
-  if (!lessonSlug) return NextResponse.json({ error: 'lessonSlug required' }, { status: 400 });
+  const courseId = request.nextUrl.searchParams.get('courseId');
+  const lessonId = request.nextUrl.searchParams.get('lessonId');
+  if (!courseId || !lessonId) return NextResponse.json({ error: 'courseId and lessonId required' }, { status: 400 });
 
   try {
     const db = await createClient();
     const { data: lesson, error: lessonError } = await db
       .from('course_lessons')
       .select('id,slug,title,course_id,module_id,content_json')
-      .eq('slug', lessonSlug)
+      .eq('id', lessonId)
+      .eq('course_id', courseId)
       .maybeSingle();
     if (lessonError) throw lessonError;
     if (!lesson) return NextResponse.json({ error: 'Lesson not found' }, { status: 404 });
 
+    const lessonSlug = lesson.slug;
     const contentJson = lesson.content_json && typeof lesson.content_json === 'object' ? lesson.content_json as Record<string, any> : {};
     const authored = contentJson.experience && typeof contentJson.experience === 'object' ? contentJson.experience as Record<string, any> : null;
-    const { data: progress } = await db.from('interaction_progress').select('*').eq('learner_id', user.id).eq('lesson_slug', lessonSlug);
-    const progressRows = progress ?? [];
+    // Interaction-specific persistence is optional; lesson completion remains canonical.
+    // Do not fail the entire lesson when the optional interaction_progress table is absent.
+    let progressRows: Array<Record<string, any>> = [];
+    const { data: progress, error: progressError } = await db.from('interaction_progress').select('*').eq('learner_id', user.id).eq('lesson_slug', lessonSlug);
+    if (!progressError && progress) progressRows = progress;
 
     if (authored && Object.keys(authored).length > 0) {
       const interactions = experienceToInteractions(lessonSlug, authored, progressRows);

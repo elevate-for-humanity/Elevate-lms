@@ -184,7 +184,7 @@ async function _GET(req: Request) {
       ready_for_exam: readyForExam && (stateBoardData?.lms_completed || false),
       practical_skills_verified: stateBoardData?.practical_skills_verified || false,
 
-      shop_id: enrollment?.shop_id || null,
+      shop_id: enrollment?.host_shop_id || null,
     };
 
     return NextResponse.json({ summary });

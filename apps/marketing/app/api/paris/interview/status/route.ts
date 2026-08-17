@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = getSupabaseAdmin();
+    const supabase = await requireAdminClient();
     const body = await request.json();
     const { referenceNumber, action } = body;
 

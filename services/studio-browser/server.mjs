@@ -184,5 +184,5 @@ async function shutdown() {
 process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  server.listen(port, '0.0.0.0', () => console.log(`Studio browser listening on ${port}`));
+  server.listen(port, '0.0.0.0', () => console.info(`Studio browser listening on ${port}`));
 }

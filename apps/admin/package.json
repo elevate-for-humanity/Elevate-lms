@@ -7,7 +7,7 @@
     "prebuild": "node ../../scripts/sync-pwa-public.mjs admin",
     "build": "next build",
     "prestart": "node ../../scripts/sync-pwa-public.mjs admin",
-    "start": "next start --port 3001",
+    "start": "node server.js",
     "lint": "next lint"
   },
   "dependencies": {

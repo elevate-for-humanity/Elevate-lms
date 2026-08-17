@@ -62,7 +62,9 @@ function priceFor(capability: PlatformCapability): string | null {
     return INDIVIDUAL_APP_CATALOG.grants.plans[0]?.priceLabel ?? null;
   }
 
-  const addon = ADD_ON_MARKETPLACE.find((candidate) => candidate.features.includes(capability.key));
+  const addon = ADD_ON_MARKETPLACE.find(
+    (candidate) => !candidate.hiddenFromMarketplace && candidate.features.includes(capability.key),
+  );
   if (addon) return `$${addon.priceMonthly}/mo add-on`;
 
   const includedPlan = Object.values(BASE_PLANS).find((plan) => plan.features.includes(capability.key));
@@ -81,6 +83,9 @@ export function UnifiedSalesMarketplace() {
   const items = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return CAPABILITY_CATALOG.filter((capability) => capability.status !== 'internal')
+      // Course Builder, AI Course Factory and LMS are one sellable platform.
+      // Keep the underlying feature flags, but expose a single commerce card.
+      .filter((capability) => capability.key !== 'course_factory' && capability.key !== 'lms')
       .filter((capability) => category === 'all' || capability.category === category)
       .filter((capability) => {
         if (!needle) return true;
@@ -138,6 +143,13 @@ export function UnifiedSalesMarketplace() {
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {items.map((capability) => {
+            const isUnifiedLearningPlatform = capability.key === 'course_builder';
+            const capabilityName = isUnifiedLearningPlatform
+              ? 'Course Creation & Learning Platform'
+              : capability.name;
+            const capabilityDescription = isUnifiedLearningPlatform
+              ? 'Build course structures, generate evidence-grounded lessons and assessments with AI, create instructor-led media, publish to the learner LMS, issue certificates and track student progress from one connected system.'
+              : capability.description;
             const price = priceFor(capability);
             const image = CAPABILITY_IMAGES[String(capability.key)];
             return (
@@ -146,7 +158,7 @@ export function UnifiedSalesMarketplace() {
                   {image ? (
                     <Image
                       src={image}
-                      alt={`${capability.name} platform capability`}
+                      alt={`${capabilityName} platform capability`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       className="object-cover"
@@ -154,7 +166,7 @@ export function UnifiedSalesMarketplace() {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-slate-800 p-8 text-center">
-                      <span className="text-2xl font-black text-white">{capability.name}</span>
+                      <span className="text-2xl font-black text-white">{capabilityName}</span>
                     </div>
                   )}
                 </div>
@@ -169,8 +181,8 @@ export function UnifiedSalesMarketplace() {
                     </span>
                   </div>
 
-                  <h3 className="mt-4 text-xl font-black text-white">{capability.name}</h3>
-                  <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-100">{capability.description}</p>
+                  <h3 className="mt-4 text-xl font-black text-white">{capabilityName}</h3>
+                  <p className="mt-2 flex-1 text-sm font-semibold leading-6 text-slate-100">{capabilityDescription}</p>
                   {price ? <p className="mt-4 text-sm font-black text-white">{price}</p> : null}
 
                   <div className="mt-5 flex flex-wrap gap-2">

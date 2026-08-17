@@ -66,6 +66,7 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [videoSrc, setVideoSrc] = useState(videoSrcDesktop || videoSrcMobile || '');
   const transcriptId = useId();
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
@@ -88,15 +89,20 @@ export default function HeroVideo({
   }, [chooseVideoSource]);
 
   useEffect(() => {
+    // Every source change starts a fresh media lifecycle. A failure from a
+    // previous route/source must never poison the next hero.
     setVideoFailed(false);
+    setVideoPlaying(false);
     setMuted(true);
     const video = videoRef.current;
     if (!video || !videoSrc) return;
     video.muted = true;
     video.loop = false;
+    video.load();
     void video.play().catch(() => {
-      // Browser autoplay policy may defer playback until interaction.
-      // The poster remains visible underneath until a frame can render.
+      // Autoplay can be deferred by browser policy. Keep the poster visible
+      // until the media element emits `playing` and a real frame is available.
+      setVideoPlaying(false);
     });
   }, [videoSrc]);
 
@@ -143,6 +149,7 @@ export default function HeroVideo({
 
   const showVideo = Boolean(videoSrc) && !videoFailed;
   const showPoster = Boolean(posterImage);
+  const posterVisible = showPoster && (!showVideo || !videoPlaying);
 
   return (
     <div className={`w-full ${className}`}>
@@ -152,7 +159,7 @@ export default function HeroVideo({
       >
         {showPoster ? (
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-300 ${posterVisible ? 'opacity-100' : 'opacity-0'}`}
             style={{ backgroundImage: `url(${posterImage})` }}
             aria-hidden="true"
           />
@@ -160,6 +167,7 @@ export default function HeroVideo({
 
         {showVideo ? (
           <video
+            key={videoSrc}
             ref={videoRef}
             src={videoSrc}
             poster={posterImage}
@@ -171,11 +179,13 @@ export default function HeroVideo({
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
+            onPlaying={() => setVideoPlaying(true)}
             onError={() => {
+              setVideoPlaying(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${showPoster && !videoPlaying ? 'opacity-0' : 'opacity-100'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           />
         ) : null}

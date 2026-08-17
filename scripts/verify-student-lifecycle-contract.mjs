@@ -56,11 +56,27 @@ for (const status of ['submitted', 'pending_funding', 'pending_admin_review']) {
 requireText(legacyStatus, 'redirect(`/apply/track${suffix}`)', 'legacy /apply/status must redirect to canonical /apply/track');
 requireText(trackerPage, 'fetch(`/api/applications/track?', 'tracker page must use canonical tracking API');
 requireText(trackerApi, ".from('applications')", 'tracker API must read canonical applications table');
-requireText(trackerApi, 'function toPublicTrackerStatus', 'tracker API must normalize internal workflow states for the public tracker');
-requireText(trackerApi, 'workflow_status: workflowStatus', 'tracker API must preserve the granular workflow state for diagnostics');
-for (const status of ['submitted', 'pending_funding', 'pending_admin_review']) {
-  requireText(trackerApi, `case '${status}':`, `tracker API must handle persisted workflow status ${status}`);
+requireText(trackerApi, '...data,', 'tracker API must preserve canonical persisted workflow status');
+
+for (const status of [
+  'submitted',
+  'under_review',
+  'pending',
+  'pending_funding',
+  'pending_admin_review',
+  'contacted',
+  'approved',
+  'enrolled',
+  'rejected',
+  'withdrawn',
+]) {
+  requireText(trackerPage, `${status}:`, `tracker UI must render canonical workflow status ${status}`);
 }
+requireText(
+  trackerPage,
+  'statusConfig[application.status] ?? unknownStatus',
+  'tracker UI must retain a safe visible fallback for future workflow states',
+);
 
 requireText(approvalApi, ".select('program_id, program_slug, program_interest, funding_type')", 'Admin approval must load canonical application program/funding context server-side');
 requireText(approvalApi, ".from('programs')", 'Admin approval must resolve a program record when application.program_id is absent');

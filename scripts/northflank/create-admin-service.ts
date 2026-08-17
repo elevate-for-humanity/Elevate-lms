@@ -64,14 +64,28 @@ function adminServicePayload(serviceId: string, branch: string) {
       },
     },
     buildConfiguration: {
+      // Northflank monorepo allow-list: do not rebuild Admin for Marketing/LMS-only commits.
+      // A commit should create a new Admin revision only when Admin itself or code/config
+      // that can affect the Admin production image has changed.
+      isAllowList: true,
       pathIgnoreRules: [
-        'exports/**',
-        '**/*.md',
-        '.git/**',
-        'node_modules/**',
-        '.next/**',
-        'apps/admin/.next/**',
+        'apps/admin/**',
+        'packages/**',
+        'lib/**',
+        'components/**',
+        'data/**',
+        'public/**',
+        'scripts/**',
+        'supabase/**',
+        'Dockerfile.northflank-admin',
+        'package.json',
+        'pnpm-lock.yaml',
+        'pnpm-workspace.yaml',
+        'tsconfig*.json',
+        'next.config.*',
+        '.npmrc',
       ],
+      ciIgnoreFlagsEnabled: true,
       ciIgnoreFlags: ['[skip ci]', '[ci skip]', '[northflank skip]', '[skip northflank]'],
     },
     runtimeEnvironment: {

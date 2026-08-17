@@ -9,13 +9,9 @@ export async function register(): Promise<void> {
   }
 
   try {
-    // Public Elevate domains are canonical deployment constants. Northflank builds also
-    // inject them as NEXT_PUBLIC_* build args, but runtime startup must not treat their
-    // absence as a secret/configuration failure.
-    process.env.NEXT_PUBLIC_SITE_URL ||= 'https://www.elevateforhumanity.org';
-    process.env.NEXT_PUBLIC_ADMIN_URL ||= 'https://admin.elevateforhumanity.org';
-    process.env.NEXT_PUBLIC_APP_URL ||= 'https://app.elevateforhumanity.org';
-
+    // NEXT_PUBLIC_* deployment URLs are build-time constants in Next.js.
+    // Do not assign to them at runtime: production bundling may inline the
+    // left-hand expression into a string literal, producing invalid JavaScript.
     const requiredSecrets = [
       'NEXT_PUBLIC_SUPABASE_URL',
       'NEXT_PUBLIC_SUPABASE_ANON_KEY',

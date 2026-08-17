@@ -19,7 +19,7 @@ create table if not exists public.course_visual_assets (
 create index if not exists course_visual_assets_course_active_idx
   on public.course_visual_assets(course_id, is_active, placement, sort_order);
 
-alter table public.course_visual_assets enable row level security;
+alter table public.course_visual_assets enable row level security;\n\n-- The learner course route requires table-level SELECT in addition to RLS.\n-- Anonymous visitors receive no grant; signed-in users still see only rows\n-- allowed by the active-visual policy below.\ngrant select on table public.course_visual_assets to authenticated;
 
 drop policy if exists "Public can read active course visuals" on public.course_visual_assets;
 create policy "Public can read active course visuals"

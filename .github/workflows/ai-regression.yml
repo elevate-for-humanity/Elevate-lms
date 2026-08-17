@@ -5,6 +5,7 @@ on:
     paths:
       - 'lib/ai/**'
       - 'lib/course-factory/**'
+      - 'tests/unit/course-factory/**'
       - 'evals/ai/**'
       - '.github/workflows/ai-regression.yml'
   push:
@@ -12,6 +13,7 @@ on:
     paths:
       - 'lib/ai/**'
       - 'lib/course-factory/**'
+      - 'tests/unit/course-factory/**'
       - 'evals/ai/**'
       - '.github/workflows/ai-regression.yml'
   workflow_dispatch:
@@ -50,7 +52,7 @@ jobs:
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Run deterministic Course Factory contract tests
-        run: pnpm vitest run lib/course-factory/__tests__/ai-contracts.test.ts
+        run: pnpm vitest run tests/unit/course-factory/ai-contracts.test.ts
 
       - name: Require AI evaluation credentials
         shell: bash

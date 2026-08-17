@@ -67,8 +67,10 @@ The content must be original, job-ready, factually grounded, and aligned to the 
 `.trim();
 
   try {
+    // Let the unified AI gateway select the provider's supported default model.
+    // Hard-coding an OpenAI model here broke Course Factory when the gateway
+    // correctly failed over to Anthropic, Gemini, Groq, or Azure.
     const response = await aiChat({
-      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -150,7 +152,6 @@ Return ONLY valid JSON.
 
   try {
     const response = await aiChat({
-      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -209,7 +210,6 @@ Return ONLY valid JSON.
 
   try {
     const response = await aiChat({
-      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -299,7 +299,6 @@ Return ONLY valid JSON:
 
   try {
     const response = await aiChat({
-      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',
@@ -359,7 +358,6 @@ Only map standards that are genuinely applicable to the lesson.
 
   try {
     const response = await aiChat({
-      model: 'gpt-4.1',
       messages: [
         {
           role: 'system',

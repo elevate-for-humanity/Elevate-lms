@@ -79,7 +79,7 @@ export default async function StudentDashboard() {
   ] = await Promise.all([
     supabase
       .from('program_enrollments')
-      .select('id, status, enrolled_at, program_id, programs(id, title, slug)')
+      .select('id, status, enrolled_at, program_id, programs!fk_program_enrollments_program(id, title, slug)')
       .eq('user_id', user.id)
       .order('enrolled_at', { ascending: false }),
     supabase

@@ -77,7 +77,9 @@ function checkAdminGuards() {
       const hasCanonicalGuard =
         content.includes('apiRequireAdmin') ||
         content.includes('apiAuthGuard') ||
-        content.includes('apiRequireInstructor');
+        content.includes('apiRequireInstructor') ||
+        content.includes('apiRequireDevStudio') ||
+        content.includes('capabilityHealthResponse');
       const hasLegacyGuard =
         content.includes('withAuth') ||
         content.includes('getCurrentUser') ||
@@ -196,8 +198,6 @@ function checkBrokenInternalRoutes() {
     scanFiles(walk(app.dir), routeSets.get(app.name), app.name);
   }
 
-  // Shared components can legitimately target more than one app. Validate them
-  // against the union instead of pretending they belong to only one domain.
   scanFiles(walk(path.join(ROOT, 'components')), unionRoutes, 'shared component');
 
   addCheck('brokenInternalRoutes', count, 'no obvious broken internal hrefs across app surfaces');

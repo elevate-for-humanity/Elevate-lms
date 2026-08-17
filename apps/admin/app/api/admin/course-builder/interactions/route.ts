@@ -9,6 +9,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const ExperienceSchema = z.object({
+  content: z.string().max(50000).optional(),
   narrationScript: z.string().optional(),
   visualPrompt: z.string().optional(),
   flashcards: z.array(z.any()).optional(),
@@ -62,9 +63,13 @@ export async function PATCH(req: NextRequest) {
     const practicalRequired = !!experience.practicalTask;
     const update = {
       content_json: { ...current, experience },
+      ...(experience.content ? { content: experience.content, rendered_html: experience.content } : {}),
       practical_required: body.practicalRequired ?? practicalRequired,
       requires_instructor_signoff: body.requiresInstructorSignoff ?? practicalRequired,
-      competency_checks: body.competencyChecks ?? undefined,
+      competency_checks: body.competencyChecks ?? experience.knowledgeChecks ?? undefined,
+      generation_status: 'completed',
+      ai_generated: true,
+      last_generated_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
     const { data, error } = await db.from('course_lessons').update(update).eq('id', body.lessonId).select('id,title,content_json,practical_required,requires_instructor_signoff,competency_checks').single();

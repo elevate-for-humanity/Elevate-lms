@@ -1,6 +1,21 @@
 name: Unified Platform Consolidation Gate
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'packages/**'
+      - 'supabase/**'
+      - 'consolidation/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/consolidation-gate.yml'
   pull_request:
     branches:
       - main
@@ -27,7 +42,6 @@ concurrency:
 
 jobs:
   static-safety:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/production-recovery-')
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -69,16 +83,7 @@ jobs:
           set -euo pipefail
           test -f scripts/check-redirect-conflicts.mjs
           node scripts/check-redirect-conflicts.mjs
-      - name: Confirm canonical integration branch
+      - name: Confirm release-contract scope
         run: |
           set -euo pipefail
-          branch="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
-          case "$branch" in
-            release/production-recovery-*)
-              echo "Static consolidation safety gate passed for $branch"
-              ;;
-            *)
-              echo "This gate is restricted to the canonical production recovery branch: $branch"
-              exit 1
-              ;;
-          esac
+          echo "Unified consolidation safety gate passed for ${GITHUB_EVENT_NAME} on ${GITHUB_REF_NAME}"

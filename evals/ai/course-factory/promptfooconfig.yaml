@@ -62,7 +62,7 @@ tests:
           const data = JSON.parse(output);
           return !output.trim().startsWith('```') && data.content.includes('<') && data.learning_points.length >= 3;
       - type: llm-rubric
-        provider: openai:chat:gpt-4.1
+        provider: file://./grader-provider.ts
         value: The lesson is job-ready, specifically about barber infection control, and does not invent unrelated regulatory claims.
 
   - description: assessment generation returns bounded answer choices and indexes

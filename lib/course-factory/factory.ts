@@ -444,7 +444,12 @@ export async function courseFactory(
           expectedLessonCount,
           assessmentsGenerated,
           generationFailures,
-          errors: ['The factory will not persist a partially generated course'],
+          errors: [
+            'The factory will not persist a partially generated course',
+            ...generationFailures.slice(0, 5).map(
+              (failure) => `${failure.slug}: ${failure.reason}`,
+            ),
+          ],
           warnings: [],
         };
       }

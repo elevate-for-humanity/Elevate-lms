@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest) {
       practical_required: body.practicalRequired ?? practicalRequired,
       requires_instructor_signoff: body.requiresInstructorSignoff ?? practicalRequired,
       competency_checks: body.competencyChecks ?? experience.knowledgeChecks ?? undefined,
-      generation_status: 'completed',
+      generation_status: 'generated',
       ai_generated: true,
       last_generated_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

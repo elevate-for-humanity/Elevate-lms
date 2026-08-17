@@ -57,7 +57,7 @@ const originalConsoleError = console.error;
 console.error = (...args) => {
   const message = args.join(' ');
   const isSuppressed = SUPPRESSED_ERROR_PATTERNS.some(pattern => pattern.test(message));
-  
+
   if (isSuppressed) {
     // Log as debug/info instead - not an error
     if (process.env.NODE_ENV === 'development') {
@@ -65,7 +65,7 @@ console.error = (...args) => {
     }
     return;
   }
-  
+
   originalConsoleError.apply(console, args);
 };
 
@@ -86,7 +86,6 @@ const rejectionMetrics = {
 };
 
 const UNHANDLED_REJECTION_WINDOW_MS = 60_000;
-const MAX_UNHANDLED_REJECTIONS_PER_WINDOW = 3;
 
 // Known safe-to-ignore error codes from Node.js
 const KNOWN_SAFE_ERROR_CODES = new Set([
@@ -132,7 +131,7 @@ function loadStandaloneConfig() {
     nextConfig = requiredServerFiles.config || {};
   } catch (err) {
     // Config load failure - warn in dev, error in prod
-    log.warn('Config file not loaded, using defaults', { 
+    log.warn('Config file not loaded, using defaults', {
       path: requiredServerFilesPath,
       error: err?.message ?? String(err),
       severity: process.env.NODE_ENV === 'production' ? 'error' : 'warning'
@@ -169,7 +168,7 @@ async function gracefulShutdown(signal, exitCode = 0) {
   }
   isShuttingDown = true;
 
-  log.info('Shutdown initiated', { 
+  log.info('Shutdown initiated', {
     event: 'shutdown_start',
     signal,
     rejectionMetrics: {
@@ -186,11 +185,11 @@ async function gracefulShutdown(signal, exitCode = 0) {
   const DRAIN_TIMEOUT_MS = 10_000;
 
   if (httpServer) {
-    log.info('Stopping HTTP server', { 
+    log.info('Stopping HTTP server', {
       event: 'http_stop',
-      drainTimeoutMs: DRAIN_TIMEOUT_MS 
+      drainTimeoutMs: DRAIN_TIMEOUT_MS
     });
-    
+
     await new Promise((resolve) => {
       const timer = setTimeout(() => {
         log.warn('Drain timeout exceeded, forcing close', { event: 'drain_timeout' });
@@ -218,7 +217,10 @@ async function gracefulShutdown(signal, exitCode = 0) {
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// Handle unhandled promise rejections with structured logging
+// Handle unhandled promise rejections with structured logging.
+// Only errors that are demonstrably fatal to the process trigger a shutdown.
+// Repeated non-fatal async failures remain visible in telemetry but must not
+// create an orchestrator restart loop by terminating an otherwise live server.
 process.on('unhandledRejection', (reason) => {
   rejectionMetrics.total++;
 
@@ -237,7 +239,7 @@ process.on('unhandledRejection', (reason) => {
       errorName,
       errorName_2: error.name,
     });
-    
+
     rejectionMetrics.suppressed++;
     rejectionMetrics.recentSuppressed.push({
       code: errorCode,
@@ -272,27 +274,24 @@ process.on('unhandledRejection', (reason) => {
   rejectionMetrics.unhandled++;
 
   if (isFatalError(errorCode, errorName)) {
-    log.error('FATAL error detected - initiating shutdown', { 
+    log.error('FATAL error detected - initiating shutdown', {
       event: 'fatal_error',
       errorId,
       errorCode,
-      errorName 
+      errorName
     });
     void gracefulShutdown('FATAL_ERROR', 1);
     return;
   }
 
-  // A single rejected background task is logged without mutating live Next.js
-  // modules or blocking the event loop. Repeated unhandled failures indicate an
-  // unhealthy process; drain it so the orchestrator can replace it cleanly.
-  if (rejectionMetrics.recentUnhandled.length >= MAX_UNHANDLED_REJECTIONS_PER_WINDOW) {
-    log.error('Unhandled rejection threshold exceeded - initiating shutdown', {
-      event: 'rejection_threshold',
+  if (rejectionMetrics.recentUnhandled.length >= 3) {
+    log.error('Repeated non-fatal unhandled rejections detected; process remains alive', {
+      event: 'rejection_degraded',
       errorId,
       count: rejectionMetrics.recentUnhandled.length,
       windowMs: UNHANDLED_REJECTION_WINDOW_MS,
+      action: 'logged_not_restarted',
     });
-    void gracefulShutdown('UNHANDLED_REJECTION_THRESHOLD', 1);
   }
 });
 
@@ -323,14 +322,14 @@ startServer({
   .then((server) => {
     httpServer = server;
     const startupDuration = Date.now() - startTime;
-    log.info('Server ready', { 
+    log.info('Server ready', {
       event: 'server_ready',
       host,
       port,
       pid: process.pid,
-      startupMs: startupDuration 
+      startupMs: startupDuration
     });
-    
+
     // Start memory monitoring after server is ready
     startMonitoring((level, msg, ctx) => {
       if (level === 'error') log.error(msg, ctx);
@@ -346,7 +345,7 @@ startServer({
     }
 
     const errorId = Date.now().toString(36);
-    log.error('Server startup failed', { 
+    log.error('Server startup failed', {
       event: 'startup_failed',
       errorId,
       error: err?.message ?? String(err)

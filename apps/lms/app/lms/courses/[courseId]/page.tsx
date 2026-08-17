@@ -50,7 +50,7 @@ export default async function CourseLandingPage({
       .order('order_index'),
     supabase
       .from('course_visual_assets')
-      .select('asset_url,poster_url,alt_text,caption,media_type')
+      .select('asset_url,poster_url,alt_text,caption,media_type,metadata')
       .eq('course_id', course.id)
       .eq('placement', 'hero')
       .eq('is_active', true)
@@ -61,6 +61,15 @@ export default async function CourseLandingPage({
 
   const publishedModules = modules ?? [];
   const publishedLessons = lessons ?? [];
+  const firstLesson = publishedLessons[0] ?? null;
+  const heroMetadata =
+    heroVisual?.metadata && typeof heroVisual.metadata === 'object' && !Array.isArray(heroVisual.metadata)
+      ? (heroVisual.metadata as Record<string, unknown>)
+      : {};
+  const heroCtaLabel =
+    typeof heroMetadata.cta_label === 'string' && heroMetadata.cta_label.trim()
+      ? heroMetadata.cta_label
+      : 'Start course';
   const totalMinutes = publishedLessons.reduce(
     (sum, lesson) => sum + Number(lesson.duration_minutes ?? 0),
     0,
@@ -71,7 +80,7 @@ export default async function CourseLandingPage({
       <section className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           {heroVisual?.media_type === 'video' ? (
-            <figure className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
+            <figure className="relative mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-xl">
               <video
                 className="aspect-[8/3] w-full object-cover motion-reduce:hidden"
                 autoPlay
@@ -79,6 +88,8 @@ export default async function CourseLandingPage({
                 loop
                 playsInline
                 preload="metadata"
+                controls
+                controlsList="nodownload"
                 poster={heroVisual.poster_url || undefined}
                 aria-label={heroVisual.alt_text}
               >
@@ -89,6 +100,14 @@ export default async function CourseLandingPage({
                 src={heroVisual.poster_url || '/images/pages/entrepreneurship.webp'}
                 alt={heroVisual.alt_text}
               />
+              {firstLesson ? (
+                <Link
+                  href={`/lms/courses/${course.id}/lessons/${firstLesson.id}`}
+                  className="absolute bottom-5 left-5 rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-slate-950 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-4 focus:ring-amber-200"
+                >
+                  {heroCtaLabel}
+                </Link>
+              ) : null}
               {heroVisual.caption ? (
                 <figcaption className="sr-only">{heroVisual.caption}</figcaption>
               ) : null}

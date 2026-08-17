@@ -30,6 +30,8 @@ export interface AddOnDefinition {
   features: PlatformFeatureKey[];
   bullets: string[];
   usageNote?: string;
+  /** Keep legacy billing slugs resolvable without advertising duplicate products. */
+  hiddenFromMarketplace?: boolean;
 }
 
 export const BASE_PLANS: Record<BasePlanId, BasePlanDefinition> = {
@@ -206,12 +208,35 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     usageNote: '500 SMS/mo included',
   },
   {
+    slug: 'course-creation-learning-platform',
+    name: 'Course Creation & Learning Platform',
+    priceMonthly: 79,
+    description: 'Build, generate, publish and deliver complete instructor-led courses from one unified workspace.',
+    features: [
+      PlatformFeature.COURSE_BUILDER,
+      PlatformFeature.COURSE_FACTORY,
+      PlatformFeature.AI_CONTENT,
+      PlatformFeature.LMS,
+      PlatformFeature.CERTIFICATES,
+    ],
+    bullets: [
+      'Unified Course Builder',
+      'AI blueprints, lessons and assessments',
+      'AI instructor video and narration workflows',
+      'Learner LMS delivery',
+      'Certificates and student progress tracking',
+      'Unlimited course structures',
+    ],
+    usageNote: 'AI media provider usage limits may apply',
+  },
+  {
     slug: 'online-courses-lms',
     name: 'Online Courses / LMS',
     priceMonthly: 29,
     description: 'Courses, certificates, and student tracking.',
     features: [PlatformFeature.LMS, PlatformFeature.CERTIFICATES],
     bullets: ['Unlimited courses', 'Certificates', 'Student tracking'],
+    hiddenFromMarketplace: true,
   },
   {
     slug: 'community-hub',
@@ -241,6 +266,7 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     description: 'Build and manage structured courses, lessons and curriculum.',
     features: [PlatformFeature.COURSE_BUILDER],
     bullets: ['Course structures', 'Lesson management', 'Curriculum workflows'],
+    hiddenFromMarketplace: true,
   },
   {
     slug: 'ai-course-factory',
@@ -249,6 +275,7 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     description: 'Generate course blueprints, lessons and assessments with AI.',
     features: [PlatformFeature.COURSE_FACTORY, PlatformFeature.COURSE_BUILDER, PlatformFeature.AI_CONTENT],
     bullets: ['AI blueprints', 'Lesson generation', 'Assessment generation', 'Course Builder access'],
+    hiddenFromMarketplace: true,
   },
   {
     slug: 'student-management',

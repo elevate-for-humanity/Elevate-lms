@@ -31,6 +31,15 @@ jobs:
         run: node scripts/verify-no-retired-admin-ui-routes.mjs
       - name: Recovery hardening regression check
         run: node scripts/verify-recovery-gate-hardening.mjs
+      - name: Canonical platform route and auth doctor
+        run: node scripts/platform-doctor-static.mjs
+      - name: Assemble canonical PWA runtime assets
+        run: |
+          node scripts/sync-pwa-public.mjs marketing
+          node scripts/sync-pwa-public.mjs lms
+          node scripts/sync-pwa-public.mjs admin
+      - name: Verify PWA runtime packaging contract
+        run: node scripts/verify-pwa-packaging-contract.mjs
 
   typecheck:
     name: TypeScript — ${{ matrix.app }}

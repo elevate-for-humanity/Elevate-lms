@@ -23,6 +23,8 @@ const submissionApi = 'apps/marketing/app/api/applications/route.ts';
 const trackerPage = 'apps/marketing/app/apply/track/page.tsx';
 const legacyStatus = 'apps/marketing/app/apply/status/page.tsx';
 const trackerApi = 'apps/marketing/app/api/applications/track/route.ts';
+const approvalApi = 'apps/admin/app/api/admin/applications/[id]/approve/route.ts';
+const approvalPipeline = 'lib/enrollment/approve.ts';
 
 for (const path of [
   studentForm,
@@ -30,6 +32,8 @@ for (const path of [
   trackerPage,
   legacyStatus,
   trackerApi,
+  approvalApi,
+  approvalPipeline,
   'lib/enrollment/create-enrollment.ts',
   'lib/enrollment/complete-enrollment.ts',
   'lib/enrollment/enrollment-flow.ts',
@@ -58,6 +62,16 @@ for (const status of ['submitted', 'pending_funding', 'pending_admin_review']) {
   requireText(trackerApi, `case '${status}':`, `tracker API must handle persisted workflow status ${status}`);
 }
 
+requireText(approvalApi, ".select('program_id, program_slug, program_interest, funding_type')", 'Admin approval must load canonical application program/funding context server-side');
+requireText(approvalApi, ".from('programs')", 'Admin approval must resolve a program record when application.program_id is absent');
+requireText(approvalApi, "'PROGRAM_NOT_RESOLVED:", 'Admin approval must fail closed when no canonical program can be resolved');
+requireText(approvalApi, 'programId: resolvedProgramId', 'Admin approval must pass the resolved program into the single approval pipeline');
+requireText(approvalPipeline, ".from('program_enrollments').upsert", 'single approval pipeline must activate canonical program enrollment');
+requireText(approvalPipeline, ".from('course_enrollments').insert", 'single approval pipeline must grant LMS course access');
+requireText(approvalPipeline, "status: 'approved'", 'single approval pipeline must mark application approved only in the enrollment pipeline');
+requireText(approvalPipeline, "enrollment_status: 'active'", 'single approval pipeline must activate the learner profile');
+requireText(approvalPipeline, 'ensureDigitalBinder({', 'single approval pipeline must provision the digital binder');
+
 if (failures.length) {
   console.error('[student-lifecycle-contract] FAILED');
   for (const failure of [...new Set(failures)]) console.error(`- ${failure}`);
@@ -65,4 +79,4 @@ if (failures.length) {
 }
 
 console.log('[student-lifecycle-contract] PASS');
-console.log('application -> confirmation -> tracker -> pending learner onboarding contracts are canonical');
+console.log('application -> confirmation -> tracker -> pending account -> canonical approval -> LMS access contracts are canonical');

@@ -107,7 +107,9 @@ requireText('.github/workflows/compliance-gate.yml', 'pnpm audit --audit-level h
 forbidText('.github/workflows/compliance-gate.yml', 'Security vulnerabilities found - review SECURITY_NOTES.md', 'Compliance security audit must not convert high vulnerabilities to success.');
 
 requireText('.github/workflows/consolidation-docker-northflank.yml', "'release/production-recovery-*'", 'Docker/Northflank gate must follow the canonical recovery branch.');
-requireText('.github/workflows/consolidation-gate.yml', "startsWith(github.head_ref, 'release/production-recovery-')", 'Consolidation gate must be limited to recovery branches.');
+requireText('.github/workflows/consolidation-gate.yml', 'push:', 'Consolidation gate must run for mainline pushes.');
+requireText('.github/workflows/consolidation-gate.yml', 'group: consolidation-gate-${{ github.event.pull_request.number || github.ref }}', 'Consolidation gate must serialize by PR or branch ref.');
+forbidText('.github/workflows/consolidation-gate.yml', "startsWith(github.head_ref, 'release/production-recovery-')", 'Mainline consolidation validation must not be restricted to temporary recovery branches.');
 forbidText('.github/workflows/consolidation-gate.yml', 'consolidation/unified-platform', 'Stale consolidation branch must not remain an approved integration branch.');
 
 requireText('.github/workflows/integrity-gate.yml', 'Platform media duplicate advisory', 'Visual duplicate checking must remain advisory.');

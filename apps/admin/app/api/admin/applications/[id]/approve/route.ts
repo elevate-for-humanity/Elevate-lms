@@ -18,7 +18,7 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
   const rateLimited = await applyRateLimit(req, 'api');
   if (rateLimited) return rateLimited;
 
-  // Auth guard — requires admin, admin, or staff
+  // Auth guard — requires an authorized Admin surface user.
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
   const adminUserId = auth.id;
@@ -36,11 +36,59 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
     const body = await req.json().catch(() => ({}));
     const { program_id, funding_type } = body;
 
-    // Single approval pipeline — admin bypasses payment gate (audited above)
+    // The public application contract primarily persists program_slug /
+    // program_interest. Do not depend on the Admin UI resending program_id:
+    // resolve the canonical program record server-side before approval so an
+    // "approved" application can never skip program_enrollments/LMS access.
+    const { data: application, error: applicationError } = await db
+      .from('applications')
+      .select('program_id, program_slug, program_interest, funding_type')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (applicationError || !application) {
+      return NextResponse.json({ error: 'Application not found' }, { status: 404 });
+    }
+
+    let resolvedProgramId = program_id || application.program_id || null;
+    const programSlug = application.program_slug || application.program_interest || null;
+
+    if (!resolvedProgramId && programSlug) {
+      const { data: programRow, error: programError } = await db
+        .from('programs')
+        .select('id')
+        .eq('slug', programSlug)
+        .maybeSingle();
+
+      if (programError) {
+        logger.warn('[approve route] Program resolution query failed', {
+          applicationId: id,
+          programSlug,
+          error: programError.message,
+        });
+      }
+      resolvedProgramId = programRow?.id || null;
+    }
+
+    if (!resolvedProgramId) {
+      return NextResponse.json(
+        {
+          error:
+            'PROGRAM_NOT_RESOLVED: This application cannot be approved until its program is mapped to a canonical program record.',
+        },
+        { status: 409 },
+      );
+    }
+
+    const resolvedFundingType = funding_type || application.funding_type || null;
+
+    // Single approval pipeline — admin bypasses payment gate (audited above).
+    // Program resolution is mandatory so approval and LMS access remain one
+    // atomic business outcome from the Admin API perspective.
     const result = await approveApplication(db, {
       applicationId: id,
-      programId: program_id || null,
-      fundingType: funding_type || null,
+      programId: resolvedProgramId,
+      fundingType: resolvedFundingType,
       bypassPaymentGate: true,
     });
 
@@ -56,8 +104,8 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
       entityId: id,
       metadata: {
         created_user_id: result.userId,
-        program_id: program_id || null,
-        funding_type: funding_type || null,
+        program_id: resolvedProgramId,
+        funding_type: resolvedFundingType,
         mode: 'admin',
       },
       req,
@@ -73,17 +121,20 @@ async function _POST(req: NextRequest, { params }: { params: Promise<{ id: strin
 
       if (app?.email) {
         const studentName = [app.first_name, app.last_name].filter(Boolean).join(' ') || app.email;
-        const programSlug = app.program_slug || app.program_interest || null;
+        const approvedProgramSlug = app.program_slug || app.program_interest || null;
 
         await runPostApprovalActions({
           db,
           applicationId: id,
-          programSlug,
+          programSlug: approvedProgramSlug,
           studentEmail: app.email,
           studentName,
           studentPhone: app.phone ?? null,
           studentCity: app.city ?? null,
-          fundingType: app.funding_type ?? (app.eligibility_data as Record<string,unknown>)?.funding_tag as string ?? null,
+          fundingType:
+            app.funding_type ??
+            ((app.eligibility_data as Record<string, unknown>)?.funding_tag as string) ??
+            null,
           passwordSetupLink: result.passwordSetupLink ?? null,
           tempPassword: null,
           enrollmentId: result.enrollmentId ?? null,

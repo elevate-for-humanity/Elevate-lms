@@ -13,6 +13,17 @@ describe('Admin Dashboard and Studio surface contract', () => {
     expect(contracts.surfaces.devStudio.canonical).toEqual({ app: 'admin', path: '/studio' });
   });
 
+  it('redirects legacy Admin surfaces before authentication middleware runs', () => {
+    const nextConfig = source('apps/admin/next.config.mjs');
+
+    expect(nextConfig).toContain("source: '/admin/studio/:path*'");
+    expect(nextConfig).toContain("source: '/admin/dev-studio/:path*'");
+    expect(nextConfig).toContain("source: '/dev-studio/:path*'");
+    expect(nextConfig).toContain("destination: '/studio/:path*'");
+    expect(nextConfig).toContain("source: '/admin/dashboard'");
+    expect(nextConfig).toContain("destination: '/dashboard'");
+  });
+
   it('uses Admin-owned course generation and publishing from the Studio UI', () => {
     const builder = source('components/course/AutomaticCourseBuilder.tsx');
 

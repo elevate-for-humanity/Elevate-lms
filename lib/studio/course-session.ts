@@ -75,13 +75,22 @@ export interface StudioLesson {
   is_required: boolean;
   passing_score: number | null;
   duration_minutes: number | null;
+  content: string | Record<string, unknown> | null;
+  rendered_html: string | null;
+  content_json: Record<string, unknown>;
   video_url: string | null;
+  media_asset_id: string | null;
+  video_status: string | null;
+  video_job_id: string | null;
+  video_error: string | null;
   video_config: Record<string, unknown> | null;
   activities: Record<string, unknown> | null;
   quiz_questions: unknown[] | null;
   ai_generated: boolean;
   approved: boolean;
   generation_status: string | null;
+  practical_required: boolean;
+  required_artifacts: string[] | null;
   requires_instructor_signoff: boolean;
   learning_objectives: unknown[] | null;
   competency_checks: unknown[] | null;
@@ -221,8 +230,10 @@ export async function loadCourseSession(courseId: string): Promise<CourseSession
       .select(`
         id, course_id, module_id, title, slug, lesson_type, order_index,
         status, is_published, is_required, passing_score, duration_minutes,
-        video_url, video_config, activities, quiz_questions, ai_generated,
-        approved, generation_status, requires_instructor_signoff,
+        content, rendered_html, content_json, video_url, media_asset_id,
+        video_status, video_job_id, video_error, video_config, activities,
+        quiz_questions, ai_generated, approved, generation_status,
+        practical_required, required_artifacts, requires_instructor_signoff,
         learning_objectives, competency_checks, created_at, updated_at
       `)
       .eq('course_id', courseId)

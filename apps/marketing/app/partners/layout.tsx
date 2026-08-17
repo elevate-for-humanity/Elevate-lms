@@ -1,17 +1,12 @@
 import type { ReactNode } from 'react';
-import HeroPicture from '@/components/marketing/HeroPicture';
 
+/**
+ * Partners route group layout.
+ *
+ * Visual hero content belongs to each partner page so routes can present the
+ * correct program, audience, CTA, image, and metadata without inheriting a
+ * second generic banner from the parent layout.
+ */
 export default function PartnersLayout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <HeroPicture
-        src="/images/pages/about-hero.webp"
-        alt="Community and workforce partnership collaboration"
-        microLabel="Partners"
-        analyticsName="partners"
-        priority={false}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

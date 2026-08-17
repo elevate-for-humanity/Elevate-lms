@@ -50,14 +50,42 @@ function normalizeProgram(value: unknown): string | null {
   return PROGRAM_ALIASES[key] ?? null;
 }
 
+/**
+ * Host-site intake historically stored the full location in one string. Parse
+ * from the right so commas inside a street line (for example "Suite 1") do not
+ * corrupt the city/state/ZIP fields.
+ */
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
-  const parts = raw.split(',').map((part) => part.trim());
-  const stateZip = (parts[2] ?? '').split(' ').filter(Boolean);
+  const parts = raw
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length < 2) {
+    return { address: raw.trim(), city: '', state: 'IN', zip: '' };
+  }
+
+  const stateZipPart = parts.at(-1) ?? '';
+  const stateZipMatch = stateZipPart.match(/^([A-Za-z]{2})(?:\s+(\d{5}(?:-\d{4})?))?$/);
+
+  // Standard format: street[, unit], city, ST ZIP
+  if (stateZipMatch && parts.length >= 3) {
+    const city = parts.at(-2) ?? '';
+    const address = parts.slice(0, -2).join(', ');
+    return {
+      address,
+      city,
+      state: stateZipMatch[1].toUpperCase(),
+      zip: stateZipMatch[2] ?? '',
+    };
+  }
+
+  // Legacy Indiana records may omit state/ZIP and end with the city.
   return {
-    address: parts[0] ?? raw,
-    city: parts[1] ?? '',
-    state: stateZip[0] ?? 'IN',
-    zip: stateZip[1] ?? '',
+    address: parts.slice(0, -1).join(', '),
+    city: parts.at(-1) ?? '',
+    state: 'IN',
+    zip: '',
   };
 }
 

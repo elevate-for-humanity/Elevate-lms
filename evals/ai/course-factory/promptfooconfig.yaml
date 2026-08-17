@@ -70,8 +70,8 @@ tests:
             storedContent.scenario
           );
       - type: llm-rubric
-        provider: openai:chat:gpt-4.1
-        value: The generated lesson is job-ready, specifically about barber infection control, and does not invent unrelated regulatory claims.
+        provider: file://./grader-provider.ts
+        value: The lesson is job-ready, specifically about barber infection control, and does not invent unrelated regulatory claims.
 
   - description: assessment generation returns bounded answer choices and indexes
     vars:

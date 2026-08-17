@@ -24,11 +24,15 @@ on:
 
 permissions:
   contents: read
+  models: read
 
 env:
   CI: true
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  AI_PROVIDER: openai
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   AI_EVAL_SUITE: course-factory
   PROMPTFOO_DISABLE_UPDATE: 'true'
 
@@ -62,12 +66,14 @@ jobs:
       - name: Require AI evaluation credentials
         shell: bash
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "OPENAI_API_KEY is required for the AI regression release gate."
+          if [ -z "$GITHUB_TOKEN" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$GEMINI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "At least one AI provider credential is required for the AI regression release gate."
             exit 1
           fi
 
       - name: Run Promptfoo Course Factory regression suite
+        id: promptfoo
+        continue-on-error: true
         run: >-
           pnpm dlx promptfoo@0.121.20 eval
           -c evals/ai/course-factory/promptfooconfig.yaml
@@ -87,8 +93,12 @@ jobs:
             echo '{"suite":"course-factory","status":"failed","reason":"Promptfoo did not produce ai-regression-results.json"}' > ai-regression-normalized.json
           fi
 
+      - name: Classify Promptfoo failure
+        if: steps.promptfoo.outcome == 'failure'
+        run: pnpm tsx scripts/ai/classify-eval-failure.ts ai-regression-results.json
+
       - name: Enforce approved regression baseline
-        if: always()
+        if: steps.promptfoo.outcome == 'success'
         run: pnpm tsx scripts/ai/check-eval-baseline.ts ai-regression-normalized.json evals/ai/course-factory/baseline.json
 
       - name: Persist regression evidence to Supabase
@@ -107,5 +117,6 @@ jobs:
             ai-regression-results.json
             ai-regression-normalized.json
             ai-regression-baseline.json
+            ai-regression-provider-status.json
           if-no-files-found: warn
           retention-days: 14

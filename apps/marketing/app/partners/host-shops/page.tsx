@@ -8,9 +8,9 @@ import { getApprovedShops, PROGRAM_LABELS } from '@/lib/programs/host-shops';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Apprenticeship Host Sites | Elevate for Humanity',
+  title: 'Host Shops | Elevate for Humanity',
   description:
-    'Become an approved apprenticeship Host Site for Barber, Cosmetology, Esthetics, or Nail Technician training, review requirements, and view approved partner sites.',
+    'Become an approved Elevate Host Shop, review requirements, apply for approval, access the Host Shop portal, and view approved partner locations.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/partners/host-shops',
   },
@@ -18,26 +18,26 @@ export const metadata: Metadata = {
 
 const PROGRAMS = [
   {
-    name: 'Barber Apprenticeship',
-    detail: 'Registered apprenticeship pathway with supervised on-the-job learning and structured RTI.',
+    name: 'Barber Host Shop',
+    detail: 'Host barber participants at an approved shop with licensed supervision, documented work-based learning, and Elevate program oversight.',
     image: '/images/pages/barber-training.webp',
     program: 'barber',
   },
   {
-    name: 'Cosmetology Apprenticeship',
-    detail: 'Licensed salon-based apprenticeship pathway with worksite supervision and progress verification.',
+    name: 'Cosmetology Host Shop',
+    detail: 'Operate as an approved salon training site with qualified supervision, compliant workplace practices, and structured progress verification.',
     image: '/images/pages/cosmetology.webp',
     program: 'cosmetology',
   },
   {
-    name: 'Esthetics Apprenticeship',
-    detail: 'Licensed spa and esthetics worksite pathway with supervised practical training.',
+    name: 'Esthetics Host Shop',
+    detail: 'Serve as an approved spa or esthetics training location with licensed supervision, appropriate equipment, and documented skills development.',
     image: '/images/beauty/esthetics-hero.webp',
     program: 'esthetician',
   },
   {
-    name: 'Nail Technician Apprenticeship',
-    detail: 'Licensed nail-salon apprenticeship pathway with documented worksite learning.',
+    name: 'Nail Technician Host Shop',
+    detail: 'Become an approved nail salon training site with licensed supervision, compliant workstations, and documented work-based learning.',
     image: '/images/pages/nail-technician.webp',
     program: 'nail',
   },
@@ -45,7 +45,7 @@ const PROGRAMS = [
 
 const REQUIREMENTS = [
   'Current business, shop, salon, spa, or establishment license appropriate to the occupation.',
-  'A currently licensed supervising professional who can oversee training and verify OJL hours and competencies.',
+  'A currently licensed supervising professional who can oversee training and verify work hours and competencies.',
   'Commercial/general liability insurance and workers’ compensation coverage or a valid exemption.',
   'Adequate chairs or workstations, equipment, client/service volume, and a safe training environment.',
   'EIN verification or W-9 and any applicable local business or occupancy documentation.',
@@ -54,20 +54,20 @@ const REQUIREMENTS = [
 
 const APPROVAL_STEPS = [
   {
-    title: 'Submit one Host Site application',
-    description: 'Select every apprenticeship occupation the location wants approval to host and upload the required business records.',
+    title: 'Submit one Host Shop application',
+    description: 'Tell us about the business, training location, supervising professional, and the occupations you want approval to host.',
   },
   {
-    title: 'License and document verification',
+    title: 'Business and license verification',
     description: 'Elevate verifies the worksite, supervising professional, insurance, workers’ compensation status, and EIN/W-9 information.',
   },
   {
-    title: 'Agreement and onboarding',
-    description: 'Approved sites complete the Host Site agreement and receive access to the hour, attendance, competency, and document workflows.',
+    title: 'Host Shop approval and onboarding',
+    description: 'Approved shops complete onboarding and receive access to the Host Shop portal for hours, attendance, competencies, and documents.',
   },
   {
-    title: 'Apprentice placement and oversight',
-    description: 'Apprentices may be assigned based on program fit and availability. The Host Site provides supervised OJL while Elevate manages sponsor governance and RTI.',
+    title: 'Participant placement and oversight',
+    description: 'Eligible participants may be assigned based on occupation, location, shop capacity, and program fit while Elevate manages training and compliance oversight.',
   },
 ];
 
@@ -79,7 +79,7 @@ export default async function HostShopsPage() {
       <section className="relative h-[clamp(280px,44vw,540px)] overflow-hidden bg-slate-950">
         <Image
           src="/images/instructors/sarah-chen.jpg"
-          alt="Licensed employer mentoring an apprentice at an approved training site"
+          alt="Licensed shop professional mentoring a participant at an approved Host Shop"
           fill
           priority
           sizes="100vw"
@@ -87,13 +87,12 @@ export default async function HostShopsPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 mx-auto max-w-6xl px-4 pb-8 text-white sm:pb-12">
-          <p className="text-sm font-black uppercase tracking-[0.15em] text-white">Apprenticeship employer partnership</p>
+          <p className="text-sm font-black uppercase tracking-[0.15em] text-white">Host Shop Partnership</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">
-            Become an approved apprenticeship Host Site
+            Become an approved Elevate Host Shop
           </h1>
           <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-100 sm:text-lg">
-            One employer pathway for Barber, Cosmetology, Esthetics, and Nail Technician apprenticeships.
-            Elevate remains the Registered Apprenticeship sponsor and RTI provider; approved businesses provide supervised on-the-job learning.
+            Partner with Elevate to provide supervised, real-world training in your licensed shop, salon, spa, or beauty business. One Host Shop approval can support eligible Barber, Cosmetology, Esthetics, and Nail Technician pathways.
           </p>
         </div>
       </section>
@@ -101,9 +100,9 @@ export default async function HostShopsPage() {
       <section className="border-b border-slate-200 bg-white py-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-black text-slate-950">One application. One approval workflow. One Host Site portal.</h2>
+            <h2 className="text-2xl font-black text-slate-950">One application. One approval workflow. One Host Shop portal.</h2>
             <p className="mt-2 text-base leading-7 text-slate-700">
-              This page replaces the former barber-only, host-shop, and employer-sponsorship entry points so businesses do not have to guess which form or portal to use.
+              Businesses use one Host Shop process for approval, onboarding, participant supervision, hour verification, competency tracking, and compliance documents.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -111,13 +110,13 @@ export default async function HostShopsPage() {
               href="/partners/host-shop/apply"
               className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800"
             >
-              Start Host Site Application
+              Apply to Become a Host Shop
             </Link>
             <a
               href={ROUTES.hostShopPortal}
               className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-6 py-3 font-black text-slate-950 hover:bg-slate-100"
             >
-              Host Site Portal
+              Host Shop Portal
             </a>
           </div>
         </div>
@@ -126,10 +125,10 @@ export default async function HostShopsPage() {
       <section className="bg-slate-50 py-12">
         <div className="mx-auto max-w-6xl px-4">
           <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Choose the occupation</p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950">Beauty apprenticeship Host Site pathways</h2>
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Host Shop pathways</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">Choose the services your location is qualified to host</h2>
             <p className="mt-3 text-base leading-7 text-slate-700">
-              The same application supports all four pathways. Select the occupations that match the business license, supervising professional, and worksite.
+              Select every occupation that matches your business license, supervising professional, workstations, equipment, and client-service environment.
             </p>
           </div>
 
@@ -139,7 +138,7 @@ export default async function HostShopsPage() {
                 <div className="relative aspect-[4/3] bg-slate-200">
                   <Image
                     src={program.image}
-                    alt={`${program.name} Host Site training environment`}
+                    alt={`${program.name} training environment`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
                     className="object-cover"
@@ -152,7 +151,7 @@ export default async function HostShopsPage() {
                     href={`/partners/host-shop/apply?program=${program.program}`}
                     className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800"
                   >
-                    Apply for this pathway
+                    Apply for this Host Shop pathway
                   </Link>
                 </div>
               </article>
@@ -166,17 +165,17 @@ export default async function HostShopsPage() {
           <div className="relative min-h-[380px] overflow-hidden rounded-2xl bg-slate-200">
             <Image
               src="/images/pages/apprenticeship-structure.webp"
-              alt="Structured apprenticeship supervision and skills training"
+              alt="Host Shop supervision, workplace training, and skills verification"
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover"
             />
           </div>
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Approval requirements</p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950">What an approved Host Site must provide</h2>
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Host Shop requirements</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">What an approved Host Shop must provide</h2>
             <p className="mt-3 text-base leading-7 text-slate-700">
-              Approval is based on the actual worksite and occupation. Submitting an application does not authorize a business to host an apprentice until verification and onboarding are complete.
+              Approval is based on the actual business location, licenses, supervising professional, insurance, equipment, and ability to support safe work-based training. Applying does not authorize a location until verification and onboarding are complete.
             </p>
             <ul className="mt-6 grid gap-3">
               {REQUIREMENTS.map((requirement) => (
@@ -193,27 +192,27 @@ export default async function HostShopsPage() {
         <div className="mx-auto max-w-6xl px-4">
           <div className="grid gap-8 lg:grid-cols-2">
             <div className="rounded-2xl border border-slate-700 bg-slate-900 p-6 sm:p-8">
-              <h2 className="text-2xl font-black text-white">What the Host Site provides</h2>
+              <h2 className="text-2xl font-black text-white">What the Host Shop provides</h2>
               <ul className="mt-5 space-y-3 text-base font-medium leading-7 text-slate-100">
-                <li>Supervised on-the-job learning at the approved worksite.</li>
+                <li>Supervised work-based training at the approved location.</li>
                 <li>Appropriate workspace, equipment, client/service exposure, and workplace safety.</li>
                 <li>Attendance, hour, and competency verification by the approved supervisor.</li>
-                <li>Employment and compensation practices consistent with the approved apprenticeship arrangement.</li>
+                <li>Employment and compensation practices consistent with the approved training arrangement.</li>
               </ul>
             </div>
             <div className="rounded-2xl border border-slate-700 bg-slate-900 p-6 sm:p-8">
               <h2 className="text-2xl font-black text-white">What Elevate handles</h2>
               <ul className="mt-5 space-y-3 text-base font-medium leading-7 text-slate-100">
-                <li>Registered Apprenticeship sponsor governance and program oversight.</li>
-                <li>Related Technical Instruction, curriculum, LMS access, and structured competencies.</li>
-                <li>Apprentice records, hour tracking workflows, documentation, and compliance reporting.</li>
-                <li>Host Site approval, onboarding, monitoring, and completion verification.</li>
+                <li>Program governance, training standards, and compliance oversight.</li>
+                <li>Related Technical Instruction, curriculum, LMS access, and structured competencies where required.</li>
+                <li>Participant records, hour tracking workflows, documentation, and compliance reporting.</li>
+                <li>Host Shop approval, onboarding, monitoring, and completion verification.</li>
               </ul>
               <Link
                 href={ROUTES.apprenticeshipSponsor}
                 className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-white px-5 py-2.5 text-sm font-black text-slate-950 hover:bg-slate-100"
               >
-                View Sponsor of Record & Governance
+                View Program Governance
               </Link>
             </div>
           </div>
@@ -224,7 +223,7 @@ export default async function HostShopsPage() {
         <div className="mx-auto max-w-6xl px-4">
           <div className="max-w-3xl">
             <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Approval workflow</p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950">From application to apprentice placement</h2>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">From Host Shop application to approved placement site</h2>
           </div>
           <div className="mt-8 grid gap-5 md:grid-cols-2">
             {APPROVAL_STEPS.map((step, index) => (
@@ -246,19 +245,17 @@ export default async function HostShopsPage() {
 
       <section className="border-y border-slate-200 bg-slate-50 py-14">
         <div className="mx-auto max-w-6xl px-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Current network</p>
-              <h2 className="mt-2 text-3xl font-black text-slate-950">Approved Host Sites</h2>
-              <p className="mt-3 text-base leading-7 text-slate-700">
-                Approved locations are shown from the live partner records. Placement depends on program approval, apprentice fit, worksite capacity, and current availability.
-              </p>
-            </div>
+          <div className="max-w-3xl">
+            <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Current network</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">Approved Host Shops</h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">
+              Approved locations are shown from live partner records. Placement depends on occupation approval, participant fit, current capacity, and availability.
+            </p>
           </div>
 
           {approvedShops.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-slate-300 bg-white p-6 text-base font-semibold text-slate-700">
-              The public approved-site list is currently unavailable. Contact Elevate for current placement partners.
+              The public approved Host Shop list is currently unavailable. Contact Elevate for current placement partners.
             </div>
           ) : (
             <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -274,7 +271,7 @@ export default async function HostShopsPage() {
                       {shop.supervisor ? (
                         <p className="mt-2 text-sm font-medium text-slate-700">Supervisor: {shop.supervisor}</p>
                       ) : null}
-                      <p className="mt-4 text-xs font-black uppercase tracking-wide text-emerald-800">Approved Host Site</p>
+                      <p className="mt-4 text-xs font-black uppercase tracking-wide text-emerald-800">Approved Host Shop</p>
                       <p className="mt-1 text-sm font-semibold leading-6 text-slate-700">
                         {shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug).join(' · ')}
                       </p>
@@ -291,33 +288,22 @@ export default async function HostShopsPage() {
         <div className="mx-auto grid max-w-6xl gap-8 px-4 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.14em] text-brand-red-700">Required uploads</p>
-            <h2 className="mt-2 text-3xl font-black text-slate-950">Submit the worksite once, with the documents needed for review</h2>
+            <h2 className="mt-2 text-3xl font-black text-slate-950">Submit your Host Shop once with the documents needed for approval</h2>
             <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700">
-              The universal application accepts the business/shop license, liability insurance certificate, workers’ compensation certificate or exemption, supervising professional license, EIN verification or W-9, and optional local business/occupancy records.
+              The universal application accepts the business/shop license, liability insurance certificate, workers’ compensation certificate or exemption, supervising professional license, EIN verification or W-9, and optional local business or occupancy documentation.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/partners/host-shop/apply"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-700 px-7 py-3 font-black text-white hover:bg-brand-red-800"
-              >
-                Start Host Site Application
-              </Link>
-              <Link
-                href={ROUTES.contact}
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-slate-900 bg-white px-7 py-3 font-black text-slate-950 hover:bg-slate-100"
-              >
-                Ask a Partnership Question
-              </Link>
-            </div>
           </div>
-          <div className="relative min-h-[300px] overflow-hidden rounded-2xl bg-slate-200">
-            <Image
-              src="/images/pages/about-employer-partners.webp"
-              alt="Employer partner reviewing apprenticeship training requirements"
-              fill
-              sizes="(max-width: 1024px) 100vw, 40vw"
-              className="object-cover"
-            />
+          <div className="rounded-2xl border border-slate-300 bg-slate-50 p-6 shadow-sm">
+            <h3 className="text-xl font-black text-slate-950">Ready to become a Host Shop?</h3>
+            <p className="mt-3 text-sm font-medium leading-6 text-slate-700">
+              Complete one application for the location and select every eligible service pathway you want the shop approved to host.
+            </p>
+            <Link
+              href="/partners/host-shop/apply"
+              className="mt-5 inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-700 px-6 py-3 font-black text-white hover:bg-brand-red-800"
+            >
+              Start Host Shop Application
+            </Link>
           </div>
         </div>
       </section>

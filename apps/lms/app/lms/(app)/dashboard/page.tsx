@@ -127,10 +127,12 @@ export default async function StudentDashboard() {
       .eq('user_id', user.id),
   ]);
 
-  if (programEnrollmentsRes.error) {
+  const isAdminPreview = String(profile?.role ?? '').toLowerCase() === 'admin';
+
+  if (programEnrollmentsRes.error && !isAdminPreview) {
     throw new Error(`STUDENT_PROGRAM_ENROLLMENTS_FAILED:${programEnrollmentsRes.error.message}`);
   }
-  if (courseEnrollmentsRes.error) {
+  if (courseEnrollmentsRes.error && !isAdminPreview) {
     throw new Error(`STUDENT_COURSE_ENROLLMENTS_FAILED:${courseEnrollmentsRes.error.message}`);
   }
 

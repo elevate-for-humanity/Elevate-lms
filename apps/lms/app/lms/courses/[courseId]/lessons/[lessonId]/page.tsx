@@ -168,7 +168,7 @@ export default async function LessonPage({
           </section>
         ) : null}
 
-        <InteractiveLessonExperience lessonSlug={lesson.slug} lessonId={lesson.id} />
+        <InteractiveLessonExperience courseId={course.id} lessonSlug={lesson.slug} lessonId={lesson.id} />
 
         <LessonProgressClient
           courseId={course.id}

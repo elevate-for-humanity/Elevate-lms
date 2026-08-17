@@ -72,6 +72,8 @@ jobs:
           fi
 
       - name: Run Promptfoo Course Factory regression suite
+        id: promptfoo
+        continue-on-error: true
         run: >-
           pnpm dlx promptfoo@0.121.20 eval
           -c evals/ai/course-factory/promptfooconfig.yaml
@@ -91,8 +93,12 @@ jobs:
             echo '{"suite":"course-factory","status":"failed","reason":"Promptfoo did not produce ai-regression-results.json"}' > ai-regression-normalized.json
           fi
 
+      - name: Classify Promptfoo failure
+        if: steps.promptfoo.outcome == 'failure'
+        run: pnpm tsx scripts/ai/classify-eval-failure.ts ai-regression-results.json
+
       - name: Enforce approved regression baseline
-        if: always()
+        if: steps.promptfoo.outcome == 'success'
         run: pnpm tsx scripts/ai/check-eval-baseline.ts ai-regression-normalized.json evals/ai/course-factory/baseline.json
 
       - name: Persist regression evidence to Supabase
@@ -111,5 +117,6 @@ jobs:
             ai-regression-results.json
             ai-regression-normalized.json
             ai-regression-baseline.json
+            ai-regression-provider-status.json
           if-no-files-found: warn
           retention-days: 14

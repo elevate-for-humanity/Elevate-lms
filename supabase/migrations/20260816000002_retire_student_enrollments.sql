@@ -49,7 +49,42 @@ LEFT JOIN public.program_enrollments pe
   )
 WHERE pe.id IS NULL;
 
+DROP POLICY IF EXISTS "Students view course media" ON public.media_assets;
+CREATE POLICY "Students view course media" ON public.media_assets
+FOR SELECT USING (
+  course_id IS NOT NULL
+  AND EXISTS (
+    SELECT 1 FROM public.program_enrollments pe
+    WHERE COALESCE(pe.user_id, pe.student_id) = (SELECT auth.uid())
+      AND pe.course_id = media_assets.course_id
+      AND pe.status = 'active'
+  )
+);
+
+DROP POLICY IF EXISTS authenticated_read_enrolled_sessions ON public.cohort_sessions;
+CREATE POLICY authenticated_read_enrolled_sessions ON public.cohort_sessions
+FOR SELECT TO authenticated USING (
+  cohort_id IN (
+    SELECT pe.cohort_id FROM public.program_enrollments pe
+    WHERE COALESCE(pe.user_id, pe.student_id) = (SELECT auth.uid())
+      AND pe.cohort_id IS NOT NULL
+  )
+);
+
+DROP POLICY IF EXISTS "students read own hours" ON public.student_hours;
+CREATE POLICY "students read own hours" ON public.student_hours
+FOR SELECT TO authenticated USING (
+  EXISTS (
+    SELECT 1 FROM public.program_enrollments pe
+    WHERE pe.id = student_hours.enrollment_id
+      AND COALESCE(pe.user_id, pe.student_id) = (SELECT auth.uid())
+  )
+);
+
 DROP TRIGGER IF EXISTS trg_enforce_student_enrollment_program_and_hours
   ON public.student_enrollments;
-DROP FUNCTION IF EXISTS public.enforce_student_enrollment_program_and_hours();
+DROP TRIGGER IF EXISTS trg_set_student_enrollment_hours_from_apprenticeship_program
+  ON public.student_enrollments;
 DROP TABLE public.student_enrollments;
+DROP FUNCTION IF EXISTS public.enforce_student_enrollment_program_and_hours();
+DROP FUNCTION IF EXISTS public.set_student_enrollment_hours_from_apprenticeship_program();

@@ -22,7 +22,7 @@ const validLesson = {
   ],
   scenario:
     'A learner arrives for a scheduled shift and notices that the normal work area has been rearranged after maintenance. The supervisor asks the learner to begin immediately because the team is behind schedule. The learner must decide how to verify the environment, identify hazards, follow the documented procedure, communicate delays, and record the completed work without bypassing required controls or creating a new safety risk for coworkers.',
-  content: `<h2>Procedure</h2>${'Follow the documented workforce procedure and verify each required control before continuing. '.repeat(12)}`,
+  content: `<h2>Procedure</h2>${'Follow the documented workforce procedure and verify each required control before continuing. '.repeat(12)}`.trim(),
   quiz_questions: [validQuestion],
 };
 

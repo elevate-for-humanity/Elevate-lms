@@ -19,6 +19,7 @@ export type StudioWorkspaceId =
   | 'deployments'
   | 'containers'
   | 'evaluations'
+  | 'claims'
   | 'collaboration'
   | 'cfd'
   | 'memory'
@@ -48,6 +49,7 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'deployments', label: 'Deployments', description: 'Build, deploy, verify and roll back services.', permission: 'studio.deployments.manage', route: '/studio/deployments', healthEndpoint: '/api/admin/dev-studio/deployments/health' },
   { id: 'containers', label: 'Containers', description: 'Manage isolated execution environments and canonical runtime configuration.', permission: 'studio.containers.manage', route: '/studio/containers', healthEndpoint: '/api/admin/dev-studio/containers/health' },
   { id: 'evaluations', label: 'Evaluation Center', description: 'Evidence-based platform and AI evaluation.', permission: 'studio.evaluations.manage', route: '/studio/evaluations', healthEndpoint: '/api/admin/dev-studio/evaluations/health' },
+  { id: 'claims', label: 'Claims & Evidence', description: 'Verify public product claims with code, benchmark, runtime and certification evidence.', permission: 'studio.settings.manage', route: '/studio/claims', healthEndpoint: '/api/admin/dev-studio/claims/health' },
   { id: 'collaboration', label: 'Collaboration', description: 'Comments and shared review context backed by Studio data.', permission: 'studio.collaboration.use', route: '/studio/collaboration', healthEndpoint: '/api/admin/dev-studio/collaboration/health' },
   { id: 'cfd', label: 'CFD Studio', description: 'OpenFOAM project configuration and execution.', permission: 'studio.cfd.manage', route: '/studio/cfd', healthEndpoint: '/api/admin/dev-studio/cfd/health', featureFlag: 'CFD_ENABLED' },
   { id: 'memory', label: 'AI Memory', description: 'Search and manage governed organizational memory.', permission: 'studio.memory.manage', route: '/studio/memory', healthEndpoint: '/api/admin/dev-studio/memory/health' },

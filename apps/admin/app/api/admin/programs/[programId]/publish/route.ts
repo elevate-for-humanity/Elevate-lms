@@ -34,7 +34,12 @@ export async function POST(
 
   const body = await request.json().catch(() => ({}));
   const autoGenerateCourse = body?.auto_generate_course !== false;
-  const autoMode = body?.auto_mode === 'replace' ? 'replace' : 'missing-only';
+  const autoMode =
+    body?.auto_mode === 'replace'
+      ? 'replace'
+      : body?.auto_mode === 'missing-only'
+        ? 'missing-only'
+        : 'refresh';
   const autoVideoMode = body?.auto_video_mode === 'off' ? 'off' : 'queue';
   const autoVideoQueueLimit =
     typeof body?.auto_video_queue_limit === 'number' ? Number(body.auto_video_queue_limit) : null;

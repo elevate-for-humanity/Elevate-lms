@@ -1,8 +1,8 @@
 /**
  * UNIFIED COURSE BUILDER - Single Entry Point
- * 
+ *
  * Generates complete courses: content → quizzes → videos → upload
- * 
+ *
  * Usage:
  *   pnpm tsx scripts/course-builder/run.ts --course hvac        # Full pipeline
  *   pnpm tsx scripts/course-builder/run.ts --course hvac --validate  # Validate only
@@ -23,7 +23,8 @@ const getArg = (flag: string) => {
 const COURSE = getArg('--course') ?? 'hvac';
 const MODULE = getArg('--module');
 const SLUG = getArg('--slug');
-const STEPS = args.filter(a => !a.startsWith('--')).map(a => a.replace('--', ''));
+const STEP_FLAGS = ['validate', 'build', 'content', 'videos', 'upload', 'verify', 'all'] as const;
+const STEPS = STEP_FLAGS.filter((step) => args.includes(`--${step}`));
 
 const ALL = !STEPS.length || STEPS.includes('all');
 
@@ -80,7 +81,7 @@ async function main() {
   console.log('═══════════════════════════════════════════════════════════════\n');
 }
 
-main().catch(e => {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });

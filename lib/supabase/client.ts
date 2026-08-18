@@ -14,6 +14,7 @@ import { getBrowserPublicSupabaseConfig } from '@/lib/supabase/public-config';
 // Chainable stub that returns empty data for every query method.
 // Prevents "Cannot read properties of null (reading 'from')" across 130+ components.
 const EMPTY_RESPONSE = { data: null, error: null, count: null, status: 200, statusText: 'OK' };
+const SUPABASE_NOT_CONFIGURED = { message: 'Supabase not configured' };
 
 function noOpChain(): any {
   const chain: any = new Proxy(() => chain, {
@@ -33,6 +34,21 @@ function noOpChain(): any {
   return chain;
 }
 
+const noOpMfa = {
+  listFactors: () =>
+    Promise.resolve({ data: { all: [], totp: [], phone: [] }, error: null }),
+  getAuthenticatorAssuranceLevel: () =>
+    Promise.resolve({
+      data: { currentLevel: null, nextLevel: null, currentAuthenticationMethods: [] },
+      error: SUPABASE_NOT_CONFIGURED,
+    }),
+  enroll: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+  challenge: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+  verify: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+  challengeAndVerify: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+  unenroll: () => Promise.resolve({ data: null, error: SUPABASE_NOT_CONFIGURED }),
+};
+
 const noOpAuth = {
   getUser: () => Promise.resolve({ data: { user: null }, error: null }),
   getSession: () => Promise.resolve({ data: { session: null }, error: null }),
@@ -40,21 +56,22 @@ const noOpAuth = {
   signInWithPassword: () =>
     Promise.resolve({
       data: { user: null, session: null },
-      error: { message: 'Supabase not configured' },
+      error: SUPABASE_NOT_CONFIGURED,
     }),
   signInWithOAuth: () =>
     Promise.resolve({
       data: { url: null, provider: null },
-      error: { message: 'Supabase not configured' },
+      error: SUPABASE_NOT_CONFIGURED,
     }),
   signUp: () =>
     Promise.resolve({
       data: { user: null, session: null },
-      error: { message: 'Supabase not configured' },
+      error: SUPABASE_NOT_CONFIGURED,
     }),
   onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
   resetPasswordForEmail: () => Promise.resolve({ data: null, error: null }),
   updateUser: () => Promise.resolve({ data: { user: null }, error: null }),
+  mfa: noOpMfa,
 };
 
 const noOpStorage = {

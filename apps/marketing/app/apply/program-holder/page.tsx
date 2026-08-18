@@ -17,12 +17,12 @@ export const metadata: Metadata = {
 const OTHER_APPLICATION_PATHS = [
   {
     label: 'Barber host shop (apprenticeship)',
-    href: '/partners/barber-host-shop/apply',
+    href: '/partners/host-shop/apply',
     hint: 'Licensed barbershop hosting apprentices',
   },
   {
     label: 'Beauty apprenticeship host shop',
-    href: '/partners/barber-host-shop/apply',
+    href: '/partners/host-shop/apply',
     hint: 'Licensed shop or salon hosting beauty apprentices',
   },
   {

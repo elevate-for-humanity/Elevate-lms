@@ -11,13 +11,13 @@
  *   npx tsx scripts/build-courses.ts --hvac --barber --cosmo  # Build specific courses
  * 
  * Options:
- *   --mode          'replace' | 'missing-only' (default: 'missing-only')
+ *   --mode          'refresh' | 'replace' | 'missing-only' (default: 'refresh')
  *   --content-mode  'ai' | 'blueprint-only' (default: 'ai')
  *   --videos        'queue' | 'off' (default: 'queue')
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { unifiedCourseBuilder, buildCourseByProgramSlug } from '../lib/course-builder/unified-builder';
+import { courseFactory } from '../lib/course-factory';
 import { getAllBlueprints } from '../lib/curriculum/blueprints';
 
 // Load env
@@ -81,12 +81,13 @@ async function listBlueprints() {
   console.log(`\nTotal: ${blueprints.length} blueprints\n`);
 }
 
-async function buildCourse(slug: string, options?: { mode?: 'replace' | 'missing-only'; contentMode?: 'ai' | 'blueprint-only'; videos?: 'queue' | 'off' }) {
+async function buildCourse(slug: string, options?: { mode?: 'replace' | 'missing-only' | 'refresh'; contentMode?: 'ai' | 'blueprint-only'; videos?: 'queue' | 'off' }) {
   console.log(`\n🚀 Building course for: ${slug}\n`);
   
-  const result = await buildCourseByProgramSlug(slug, {
-    mode: options?.mode ?? 'missing-only',
-    contentMode: options?.contentMode ?? 'blueprint-only',
+  const result = await courseFactory({
+    programSlug: slug,
+    mode: options?.mode ?? 'refresh',
+    contentSource: options?.contentMode === 'blueprint-only' ? 'blueprint' : 'ai',
     videoMode: options?.videos ?? 'queue',
   });
   
@@ -95,18 +96,18 @@ async function buildCourse(slug: string, options?: { mode?: 'replace' | 'missing
     console.log(`   Course ID: ${result.courseId}`);
     console.log(`   Modules: ${result.moduleCount}`);
     console.log(`   Lessons: ${result.lessonCount}`);
-    if (result.warnings.length > 0) {
-      console.log(`   Warnings: ${result.warnings.length}`);
+    if ((result.warnings?.length ?? 0) > 0) {
+      console.log(`   Warnings: ${result.warnings?.length ?? 0}`);
     }
   } else {
-    console.log(`❌ Build failed: ${result.error}`);
+    console.log(`❌ Build failed: ${result.errors?.join('; ') || 'Course Factory failed'}`);
     console.log(`   Status: ${result.status}`);
   }
   
   return result;
 }
 
-async function buildAll(options?: { mode?: 'replace' | 'missing-only'; contentMode?: 'ai' | 'blueprint-only'; videos?: 'queue' | 'off' }) {
+async function buildAll(options?: { mode?: 'replace' | 'missing-only' | 'refresh'; contentMode?: 'ai' | 'blueprint-only'; videos?: 'queue' | 'off' }) {
   console.log('\n🚀 Building ALL courses with blueprints...\n');
   
   const blueprints = await getAllBlueprints();
@@ -120,7 +121,7 @@ async function buildAll(options?: { mode?: 'replace' | 'missing-only'; contentMo
     
     try {
       const result = await buildCourse(bp.programSlug, options);
-      results.push({ slug: bp.programSlug, ok: result.ok, error: result.ok ? undefined : result.error });
+      results.push({ slug: bp.programSlug, ok: result.ok, error: result.ok ? undefined : result.errors?.join('; ') });
     } catch (err) {
       results.push({ slug: bp.programSlug, ok: false, error: String(err) });
     }
@@ -160,8 +161,8 @@ Options:
   --blueprints        List all available blueprints
   --slug <slug>       Build single course by program slug
   --all               Build all courses with blueprints
-  --mode <mode>       'replace' or 'missing-only' (default: missing-only)
-  --content-mode <m>  'ai' or 'blueprint-only' (default: blueprint-only)
+  --mode <mode>       'refresh', 'replace', or 'missing-only' (default: refresh)
+  --content-mode <m>  'ai' or 'blueprint-only' (default: ai)
   --videos <v>        'queue' or 'off' (default: queue)
   --hvac              Include HVAC
   --barber            Include Barbering
@@ -198,12 +199,12 @@ Examples:
   if (args.includes('--nail')) specificCourses.push('nail-technician-apprenticeship');
 
   const mode = args.includes('--mode') 
-    ? (args[args.indexOf('--mode') + 1] as 'replace' | 'missing-only')
-    : 'missing-only';
+    ? (args[args.indexOf('--mode') + 1] as 'replace' | 'missing-only' | 'refresh')
+    : 'refresh';
   
   const contentMode = args.includes('--content-mode')
     ? (args[args.indexOf('--content-mode') + 1] as 'ai' | 'blueprint-only')
-    : 'blueprint-only';
+    : 'ai';
   
   const videos = args.includes('--videos')
     ? (args[args.indexOf('--videos') + 1] as 'queue' | 'off')

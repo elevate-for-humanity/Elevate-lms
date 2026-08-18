@@ -1,6 +1,4 @@
 import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllLiveVideos, getAllCategories } from '@/lib/video/registry';
@@ -11,85 +9,69 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Training Videos',
   description:
-    'Watch free career training videos. Learn about our programs in healthcare, skilled trades, technology, and business.',
+    'Watch verified career training videos about Elevate programs and how to get started.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/videos',
   },
 };
 
 export default async function VideosPage() {
-  const supabase = await createClient();
-
-  // Fetch videos from database (for user-uploaded videos)
-  const { data: dbVideos } = await supabase
-    .from('videos')
-    .select('*')
-    .eq('published', true)
-    .order('created_at', { ascending: false });
-
-  // Get videos from canonical registry
   const videos = getAllLiveVideos();
   const categories = getAllCategories();
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Videos' }]} />
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="bg-brand-blue-700 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Training Videos</h1>
-          <p className="text-xl text-white max-w-3xl mx-auto">
-            Watch videos about our free career training programs. Learn what we offer and how to get
-            started.
+      <section className="bg-brand-blue-700 py-20 text-white">
+        <div className="mx-auto max-w-7xl px-4 text-center">
+          <h1 className="mb-6 text-4xl font-bold md:text-5xl">Training Videos</h1>
+          <p className="mx-auto max-w-3xl text-xl text-white">
+            Watch verified production videos about our programs and enrollment pathways.
           </p>
         </div>
       </section>
 
-      {/* Videos by Category */}
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="mx-auto max-w-7xl px-4">
           {categories.map((category) => {
-            const categoryVideos = videos.filter(
-              (v) => v.category === category && v.status === 'live',
-            );
+            const categoryVideos = videos.filter((video) => video.category === category);
 
             return (
               <div key={category} className="mb-16">
-                <h2 className="text-3xl font-bold text-black mb-8">{category}</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <h2 className="mb-8 text-3xl font-bold text-black">{category}</h2>
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                   {categoryVideos.map((video) => (
                     <Link
                       key={video.id}
                       href={`/videos/${video.id}`}
-                      className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition"
+                      className="group overflow-hidden rounded-lg bg-white shadow-sm transition hover:shadow-xl"
                     >
                       <div className="relative aspect-video bg-slate-200">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
+                        <Image
+                          placeholder="blur"
+                          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
                           src={video.thumbnail_url}
                           alt={video.title}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover group-hover:scale-105 transition"
+                          className="object-cover transition group-hover:scale-105"
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-                            <Play className="w-8 h-8 text-brand-orange-600 ml-1" />
+                          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 transition group-hover:scale-110">
+                            <Play className="ml-1 h-8 w-8 text-brand-orange-600" />
                           </div>
                         </div>
                       </div>
                       <div className="p-6">
-                        <h3 className="text-xl font-bold text-slate-900 mb-3 line-clamp-2">
+                        <h3 className="mb-3 line-clamp-2 text-xl font-bold text-slate-900">
                           {video.title}
                         </h3>
-                        <p className="text-slate-700 line-clamp-3">{video.description}</p>
+                        <p className="line-clamp-3 text-slate-700">{video.description}</p>
                       </div>
                     </Link>
                   ))}
@@ -100,23 +82,22 @@ export default async function VideosPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-black mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-black mb-8">
-            Apply now for funded career training. Real certifications, real careers.
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <h2 className="mb-6 text-3xl font-bold text-black">Ready to Get Started?</h2>
+          <p className="mb-8 text-xl text-black">
+            Apply for career training and complete the eligibility process for available funding.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center">
+          <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/start"
-              className="inline-flex items-center justify-center px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-orange-600 px-8 py-4 font-bold text-white transition hover:bg-brand-orange-700"
             >
               Apply Now
             </Link>
             <Link
               href="/programs"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-white text-black font-bold rounded-lg border-2 border-slate-300 transition"
+              className="inline-flex items-center justify-center rounded-lg border-2 border-slate-300 bg-white px-8 py-4 font-bold text-black transition"
             >
               View Programs
             </Link>

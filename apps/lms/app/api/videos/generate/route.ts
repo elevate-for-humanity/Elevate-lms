@@ -84,7 +84,11 @@ export async function POST(request: NextRequest) {
     durationSecs: lesson.duration_seconds ?? undefined,
   }).catch((err) => {
     // audit-safe: err goes to logger only, not HTTP response
-    logger.error('[VideoGenerate] Background render threw', normalizeError(err, 'Video generation error'), getErrorContext(err));
+    logger.error(
+      '[VideoGenerate] Background render threw',
+      normalizeError(err, 'Video generation error'),
+      getErrorContext(err),
+    );
   });
 
   return NextResponse.json(
@@ -116,6 +120,7 @@ async function runRender(opts: {
 
   try {
     const domainKey = inferDomainKey(courseTitle, lessonTitle);
+    const instructorId = inferInstructorId(courseTitle);
 
     const result = await renderLessonVideo({
       lessonId,
@@ -129,6 +134,7 @@ async function runRender(opts: {
       summary: script.substring(0, 150),
       quizTeaser: 'Complete the knowledge check to continue.',
       domainKey,
+      instructorId,
       courseName: courseTitle,
     });
 
@@ -149,4 +155,14 @@ async function runRender(opts: {
     const msg = err instanceof Error ? err.message : String(err);
     await markFailed(jobId, msg);
   }
+}
+
+function inferInstructorId(courseTitle: string): string {
+  const title = courseTitle.toLowerCase();
+  if (/barber|cosmetology|hair/.test(title)) return 'james-williams';
+  if (/business|entrepreneur|esb|marketing/.test(title)) return 'angela-thompson';
+  if (/health|medical|nursing|cna/.test(title)) return 'dr-sarah-chen';
+  if (/technology|cyber|computer|digital/.test(title)) return 'lisa-martinez';
+  if (/cdl|transport|logistics/.test(title)) return 'robert-davis';
+  return 'marcus-johnson';
 }

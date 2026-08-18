@@ -45,6 +45,7 @@ export interface CreateJobInput {
   lesson_title: string;
   script?: string;
   bullet_points?: string[];
+  scene_data?: unknown;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -70,6 +71,7 @@ export async function createJob(input: CreateJobInput): Promise<VideoJob> {
       lesson_title: input.lesson_title,
       script: input.script ?? null,
       bullet_points: input.bullet_points ?? [],
+      scene_data: input.scene_data ?? null,
       status: 'queued',
       queued_at: new Date().toISOString(),
     })
@@ -223,7 +225,7 @@ export async function resetJob(lessonId: string, courseId: string): Promise<Vide
   // Get current lesson data to carry forward
   const { data: lesson } = await supabase
     .from('course_lessons')
-    .select('title, script, bullet_points')
+    .select('title, script, bullet_points, scene_data')
     .eq('id', lessonId)
     .maybeSingle();
 
@@ -233,5 +235,6 @@ export async function resetJob(lessonId: string, courseId: string): Promise<Vide
     lesson_title: lesson?.title ?? 'Untitled',
     script: lesson?.script ?? undefined,
     bullet_points: Array.isArray(lesson?.bullet_points) ? lesson.bullet_points : [],
+    scene_data: lesson?.scene_data ?? null,
   });
 }

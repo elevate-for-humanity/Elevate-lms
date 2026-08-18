@@ -68,6 +68,8 @@ const nextConfig = {
       { source: '/beauty-apprenticeships', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/barber-and-beauty-apprenticeship', destination: '/barber-and-beauty-apprenticeships', permanent: true },
       { source: '/apprenticeships/ipla-exam', destination: '/testing', permanent: true },
+      { source: '/partners/barber-host-shop', destination: '/partners/host-shops', permanent: true },
+      { source: '/partners/barber-host-shop/apply', destination: '/partners/host-shop/apply', permanent: true },
     ];
   },
 
@@ -89,18 +91,11 @@ const nextConfig = {
         process: false,
       };
 
-      config.resolve.alias = {
-        ...(config.resolve.alias ?? {}),
-        buffer: false,
-        'process/browser': false,
-      };
-
       const { ProvidePlugin } = require('webpack');
       config.plugins.push(
         new ProvidePlugin({
           Buffer: ['buffer', 'Buffer'],
           buffer: ['buffer'],
-          process: ['process/browser'],
         }),
       );
 

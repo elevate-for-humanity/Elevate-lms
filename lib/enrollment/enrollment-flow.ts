@@ -101,7 +101,7 @@ export function getEnrollmentRoute(state: string | null | undefined): string {
   if (!normalized) return '/programs';
 
   if (LMS_ACCESS_STATES.includes(normalized)) {
-    return '/lms/dashboard';
+    return '/learner/dashboard';
   }
   if (TERMINAL_ENROLLMENT_STATES.includes(normalized)) {
     return '/unauthorized';

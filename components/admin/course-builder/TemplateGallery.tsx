@@ -29,6 +29,7 @@ import {
   ChevronUp,
   Play,
 } from 'lucide-react';
+import { runCourseFactoryPipeline } from './runCourseFactoryPipeline';
 
 // ── Template data ─────────────────────────────────────────────────────────────
 
@@ -263,7 +264,9 @@ export default function TemplateGallery() {
   const [fundingEligible, setFundingEligible] = useState(true);
   const [durationWeeks, setDurationWeeks] = useState('');
 
-  const filtered = TEMPLATES.filter((t) => {
+  // Only complete, registered blueprints belong in the production template
+  // gallery. Custom courses use the same Course Factory from the AI Builder.
+  const filtered = TEMPLATES.filter((t) => t.isBlueprint).filter((t) => {
     const matchCat = category === 'All' || t.category === category;
     const matchSearch =
       !search ||
@@ -282,8 +285,7 @@ export default function TemplateGallery() {
   }
 
   async function handleUseTemplate(template: CourseTemplate) {
-    // Blueprints: show program creation form first
-    if (template.isBlueprint && showForm !== template.id) {
+    if (showForm !== template.id) {
       openForm(template);
       return;
     }
@@ -292,28 +294,26 @@ export default function TemplateGallery() {
     setError(null);
 
     try {
-      if (template.isBlueprint && template.blueprintId) {
-        // Step 1: create the program row — get back a real UUID
-        const progRes = await fetch('/api/admin/programs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: programCode || template.id.toUpperCase().replace(/-/g, '_'),
-            title: programName || template.name,
-            funding_eligible: fundingEligible,
-            duration_weeks: durationWeeks
-              ? parseInt(durationWeeks)
-              : template.durationWeeks || null,
-            status: 'draft',
-            category: template.category,
-          }),
-        });
-        const progData = await progRes.json();
-        if (!progRes.ok) throw new Error(progData.error || 'Failed to create program');
-        const programId = progData.data?.id ?? progData.id;
-        if (!programId) throw new Error('Program created but no ID returned');
+      const progRes = await fetch('/api/admin/programs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: programCode || template.id.toUpperCase().replace(/-/g, '_'),
+          title: programName || template.name,
+          funding_eligible: fundingEligible,
+          duration_weeks: durationWeeks
+            ? parseInt(durationWeeks)
+            : template.durationWeeks || null,
+          status: 'draft',
+          category: template.category,
+        }),
+      });
+      const progData = await progRes.json();
+      if (!progRes.ok) throw new Error(progData.error || 'Failed to create program');
+      const programId = progData.data?.id ?? progData.id;
+      if (!programId) throw new Error('Program created but no ID returned');
 
-        // Step 2: seed the course from the blueprint
+      if (template.blueprintId) {
         const res = await fetch('/api/admin/course-builder/generate-from-blueprint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -323,27 +323,17 @@ export default function TemplateGallery() {
         if (!res.ok) throw new Error(data.error || 'Seeding failed');
         router.push(`/studio/courses/${data.courseId ?? ''}`);
       } else {
-        // Scaffold: generate structure from topic, then publish to get a courseId
-        const genRes = await fetch('/api/admin/courses/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            raw_text: `Create a ${template.name} course. ${template.tagline}`,
-            input_type: 'prompt',
-          }),
+        const result = await runCourseFactoryPipeline({
+          title: programName || template.name,
+          topic: template.tagline,
+          programId,
+          moduleCount: template.modules,
+          lessonsPerModule: Math.max(1, Math.ceil(template.lessons / template.modules)),
+          includeVideos: true,
+          dryRun: false,
         });
-        const genData = await genRes.json();
-        if (!genRes.ok) throw new Error(genData.error || 'Generation failed');
-
-        // Publish the generated structure to get a real courseId
-        const pubRes = await fetch('/api/admin/courses/generate/publish', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ course: genData.course, is_published: false }),
-        });
-        const pubData = await pubRes.json();
-        if (!pubRes.ok) throw new Error(pubData.error || 'Failed to save course');
-        router.push(`/studio/courses/${pubData.courseId ?? ''}`);
+        if (!result.courseId) throw new Error('Course Factory did not return a course ID');
+        router.push(`/studio/courses/${result.courseId}`);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -359,10 +349,10 @@ export default function TemplateGallery() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-500 mb-1">
             Course Builder
           </p>
-          <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Choose a template</h1>
+          <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Choose a complete blueprint</h1>
           <p className="text-slate-500 text-sm">
-            Start with a blueprint to seed a fully structured course, or pick a scaffold to
-            customize from scratch.
+            Every template runs through the canonical Course Factory for complete lessons,
+            assessments, interactions, narration, visuals, and media.
           </p>
 
           {/* Search + filter */}
@@ -410,10 +400,6 @@ export default function TemplateGallery() {
         <span className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-brand-red-500 inline-block" />
           Blueprint — seeds a real course with full content
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-slate-300 inline-block" />
-          Scaffold — empty structure to fill in
         </span>
       </div>
 

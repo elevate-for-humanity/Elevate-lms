@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Volume2 } from 'lucide-react';
 
 export interface HeroVideoCta {
@@ -66,50 +66,31 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(false);
-  const [videoSrc, setVideoSrc] = useState(videoSrcDesktop || videoSrcMobile || '');
   const transcriptId = useId();
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
-
-  const chooseVideoSource = useCallback(() => {
-    if (typeof window === 'undefined') return videoSrcDesktop || videoSrcMobile || '';
-    return window.innerWidth < 768
-      ? videoSrcMobile || videoSrcDesktop || ''
-      : videoSrcDesktop || videoSrcMobile || '';
-  }, [videoSrcDesktop, videoSrcMobile]);
+  const desktopSource = videoSrcDesktop || videoSrcMobile || '';
+  const mobileSource = videoSrcMobile || videoSrcDesktop || '';
 
   useEffect(() => {
-    const syncSource = () => {
-      const next = chooseVideoSource();
-      setVideoSrc((current) => (current === next ? current : next));
-    };
-    syncSource();
-    window.addEventListener('resize', syncSource);
-    return () => window.removeEventListener('resize', syncSource);
-  }, [chooseVideoSource]);
-
-  useEffect(() => {
-    // Every source change starts a fresh media lifecycle. A failure from a
-    // previous route/source must never poison the next hero.
+    // Native <source media> selection avoids a post-hydration source swap,
+    // which previously restarted the video and flashed the poster on mobile.
     setVideoFailed(false);
-    setVideoPlaying(false);
     setMuted(true);
     const video = videoRef.current;
-    if (!video || !videoSrc) return;
+    if (!video || !desktopSource) return;
     video.muted = true;
-    video.loop = false;
-    video.load();
     void video.play().catch(() => {
-      // Autoplay can be deferred by browser policy. Keep the poster visible
-      // until the media element emits `playing` and a real frame is available.
-      setVideoPlaying(false);
+      // Muted autoplay may still be deferred by a user browser policy. The
+      // native poster remains the stable fallback without a second fading layer.
     });
-  }, [videoSrc]);
+  }, [desktopSource, mobileSource]);
 
   useEffect(() => {
+    const video = videoRef.current;
+    const audio = audioRef.current;
     return () => {
-      videoRef.current?.pause();
-      audioRef.current?.pause();
+      video?.pause();
+      audio?.pause();
     };
   }, []);
 
@@ -147,9 +128,8 @@ export default function HeroVideo({
     }
   }
 
-  const showVideo = Boolean(videoSrc) && !videoFailed;
+  const showVideo = Boolean(desktopSource) && !videoFailed;
   const showPoster = Boolean(posterImage);
-  const posterVisible = showPoster && (!showVideo || !videoPlaying);
 
   return (
     <div className={`w-full ${className}`}>
@@ -157,9 +137,9 @@ export default function HeroVideo({
         className={`relative w-full overflow-hidden bg-black ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero media` : 'Hero media'}
       >
-        {showPoster ? (
+        {!showVideo && showPoster ? (
           <div
-            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-300 ${posterVisible ? 'opacity-100' : 'opacity-0'}`}
+            className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${posterImage})` }}
             aria-hidden="true"
           />
@@ -167,27 +147,31 @@ export default function HeroVideo({
 
         {showVideo ? (
           <video
-            key={videoSrc}
+            key={`${mobileSource}|${desktopSource}`}
             ref={videoRef}
-            src={videoSrc}
             poster={posterImage}
             preload="auto"
             autoPlay
+            loop
             playsInline
             muted
+            disablePictureInPicture
             onCanPlay={() => {
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
-            onPlaying={() => setVideoPlaying(true)}
             onError={() => {
-              setVideoPlaying(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${showPoster && !videoPlaying ? 'opacity-0' : 'opacity-100'}`}
+            className={`absolute inset-0 h-full w-full ${mediaClass} object-center`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
-          />
+          >
+            {mobileSource && mobileSource !== desktopSource ? (
+              <source media="(max-width: 767px)" src={mobileSource} type="video/mp4" />
+            ) : null}
+            <source src={desktopSource} type="video/mp4" />
+          </video>
         ) : null}
 
         {voiceoverSrc ? (

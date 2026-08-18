@@ -2,10 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BookOpen, CheckCircle, Loader2, Play, RotateCcw, Save, Sparkles, XCircle, Zap } from 'lucide-react';
+import { runCourseFactoryPipeline } from './runCourseFactoryPipeline';
 
 const DRAFT_KEY = 'course_pipeline_draft';
-const PIPELINE_API = '/api/admin/course-builder/pipeline';
-
 type Program = { id: string; title: string; slug?: string };
 type PipelineStage = 'blueprint' | 'lessons' | 'quizzes' | 'validate' | 'publish' | 'videos' | 'complete' | 'error';
 type PipelineResult = {
@@ -133,41 +132,14 @@ export default function CoursePipelineClient({ programs, onCourseCreated }: { pr
     setCurrentStage('blueprint');
     setDraftRestored(false);
     try {
-      const response = await fetch(PIPELINE_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), topic: topic.trim(), difficulty, programId, moduleCount, lessonsPerModule, includeVideos, dryRun }),
-      });
-      if (!response.ok || !response.body) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(body.error || 'Pipeline request failed');
-      }
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const chunks = buffer.split('\n\n');
-        buffer = chunks.pop() ?? '';
-        for (const chunk of chunks) {
-          if (!chunk.startsWith('data: ')) continue;
-          try {
-            const event = JSON.parse(chunk.slice(6)) as ProgressEvent;
-            addEvent(event);
-            if (event.stage === 'complete' && event.result) {
-              setResult(event.result);
-              if (event.result.success && !event.result.dryRun) {
-                clearDraft();
-                if (event.result.courseId) onCourseCreated?.(event.result.courseId);
-              }
-            }
-            if (event.stage === 'error') setError(event.message);
-          } catch {
-            continue;
-          }
-        }
+      const completed = await runCourseFactoryPipeline(
+        { title: title.trim(), topic: topic.trim(), difficulty, programId, moduleCount, lessonsPerModule, includeVideos, dryRun },
+        (event) => addEvent(event as ProgressEvent),
+      );
+      setResult(completed);
+      if (!completed.dryRun) {
+        clearDraft();
+        if (completed.courseId) onCourseCreated?.(completed.courseId);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Pipeline failed');

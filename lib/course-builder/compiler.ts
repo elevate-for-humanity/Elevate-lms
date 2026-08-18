@@ -38,8 +38,8 @@ import { logger } from '@/lib/logger';
 export type CompilerOptions = {
   template: CourseTemplate;
   db: SupabaseClient;
-  /** 'missing-only' skips existing slugs; 'replace' wipes and re-seeds */
-  mode?: 'missing-only' | 'replace';
+  /** `refresh` updates stable rows in place; replace is reserved for explicit destructive rebuilds. */
+  mode?: 'missing-only' | 'replace' | 'refresh';
   /** Validate and plan but do not write to DB */
   dryRun?: boolean;
 };
@@ -264,7 +264,7 @@ export function validatePlan(plan: CourseTemplate): { valid: boolean; errors: st
 // ─── Main compiler ────────────────────────────────────────────────────────────
 
 export async function compileBlueprintToCourse(opts: CompilerOptions): Promise<CompilerResult> {
-  const { db, mode = 'missing-only', dryRun = false } = opts;
+  const { db, mode = 'refresh', dryRun = false } = opts;
   let template = { ...opts.template };
 
   // Step 1: Parse

@@ -55,7 +55,7 @@ export default function PartnerDashboard() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Link href="/partners/join" className="bg-white rounded-xl p-6 hover:shadow-lg transition group"><Handshake className="w-10 h-10 text-purple-600 mb-4" /><h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600">Become a Partner</h3><p className="text-slate-600 text-sm">Join our network of training providers and workforce agencies</p></Link>
           <Link href="/partners/training-provider" className="bg-white rounded-xl p-6 hover:shadow-lg transition group"><Building2 className="w-10 h-10 text-purple-600 mb-4" /><h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600">Training Programs</h3><p className="text-slate-600 text-sm">Browse approved training programs and curricula</p></Link>
-          <Link href="/partners/barber-host-shop" className="bg-white rounded-xl p-6 hover:shadow-lg transition group"><Award className="w-10 h-10 text-purple-600 mb-4" /><h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600">Host Shop Program</h3><p className="text-slate-600 text-sm">Register as a host shop for barber apprentices</p></Link>
+          <Link href="https://www.elevateforhumanity.org/partners/host-shops" className="bg-white rounded-xl p-6 hover:shadow-lg transition group"><Award className="w-10 h-10 text-purple-600 mb-4" /><h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600">Host Shop Program</h3><p className="text-slate-600 text-sm">Register as a host shop for barber apprentices</p></Link>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-6">

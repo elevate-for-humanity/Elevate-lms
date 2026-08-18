@@ -61,7 +61,7 @@ export default function NailApplyIndexPage() {
           image="/images/pages/barber-apprenticeship.webp"
           title="I’m a Partner Nail Salon"
           description="Apply to host apprentices using the one beauty host-site compliance application for licensed businesses."
-          href="/partners/barber-host-shop/apply"
+          href="/partners/host-shop/apply"
           cta="Start Host Site Application"
         />
       </section>

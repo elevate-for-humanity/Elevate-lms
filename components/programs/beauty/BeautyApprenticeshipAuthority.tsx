@@ -161,7 +161,7 @@ export default function BeautyApprenticeshipAuthority({ program }: { program: Pr
             )}
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href={program.cta.applyHref} className="inline-flex items-center gap-2 rounded-xl bg-rose-700 px-4 py-2.5 text-sm font-black text-white hover:bg-rose-800">Apply to this track <ArrowRight className="h-4 w-4" /></Link>
-              <Link href="/partners/barber-host-shop" className="inline-flex items-center gap-2 rounded-xl border border-rose-300 bg-white px-4 py-2.5 text-sm font-black text-rose-900 hover:bg-rose-100">Become a Host Site</Link>
+              <Link href="/partners/host-shops" className="inline-flex items-center gap-2 rounded-xl border border-rose-300 bg-white px-4 py-2.5 text-sm font-black text-rose-900 hover:bg-rose-100">Become a Host Site</Link>
             </div>
           </aside>
         </div>

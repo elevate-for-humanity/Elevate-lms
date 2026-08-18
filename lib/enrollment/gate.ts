@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
+import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
+import { portalPathForProgramSlug } from '@/lib/portal/apprenticeship-portal-paths';
 import { redirect } from 'next/navigation';
 
 export type EnrollmentState =
@@ -28,6 +30,7 @@ export function getNextRequiredAction(enrollment: {
   orientation_completed_at: string | null;
   documents_submitted_at: string | null;
   program_slug?: string;
+  course_id?: string | null;
 }): { label: string; href: string; description: string } {
   const programSlug = enrollment.program_slug || 'barber-apprenticeship';
 
@@ -49,7 +52,7 @@ export function getNextRequiredAction(enrollment: {
     };
   }
 
-  const courseId = resolveCourseId(programSlug);
+  const courseId = enrollment.course_id;
   if (courseId) {
     return {
       label: 'Begin Your Program',
@@ -58,7 +61,7 @@ export function getNextRequiredAction(enrollment: {
     };
   }
 
-  const portalPath = SLUG_TO_PORTAL[programSlug];
+  const portalPath = portalPathForProgramSlug(programSlug);
   if (portalPath) {
     return {
       label: 'Go to Your Dashboard',
@@ -111,11 +114,14 @@ export async function gateApprenticeDashboard(): Promise<{
     redirect('/programs');
   }
 
+  const programSlug = enrollment.programs?.slug || 'barber-apprenticeship';
+  const courseId = await resolveCourseIdFromDb(supabase, programSlug);
   const nextAction = getNextRequiredAction({
     status: enrollment.status,
     orientation_completed_at: enrollment.orientation_completed_at,
     documents_submitted_at: enrollment.documents_submitted_at,
-    program_slug: enrollment.programs?.slug,
+    program_slug: programSlug,
+    course_id: courseId,
   });
 
   // If orientation or documents not complete, redirect

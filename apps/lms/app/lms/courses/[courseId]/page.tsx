@@ -69,7 +69,7 @@ export default async function CourseLandingPage({
   const heroCtaLabel =
     typeof heroMetadata.cta_label === 'string' && heroMetadata.cta_label.trim()
       ? heroMetadata.cta_label
-      : 'Start course';
+      : null;
   const totalMinutes = publishedLessons.reduce(
     (sum, lesson) => sum + Number(lesson.duration_minutes ?? 0),
     0,
@@ -100,7 +100,7 @@ export default async function CourseLandingPage({
                 src={heroVisual.poster_url || '/images/pages/entrepreneurship.webp'}
                 alt={heroVisual.alt_text}
               />
-              {firstLesson ? (
+              {firstLesson && heroCtaLabel ? (
                 <Link
                   href={`/lms/courses/${course.id}/lessons/${firstLesson.id}`}
                   className="absolute bottom-5 left-5 rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-slate-950 shadow-lg transition hover:bg-amber-300 focus:outline-none focus:ring-4 focus:ring-amber-200"

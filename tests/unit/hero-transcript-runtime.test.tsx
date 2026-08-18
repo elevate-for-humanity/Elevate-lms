@@ -24,7 +24,7 @@ describe('marketing hero transcript runtime behavior', () => {
     expect(screen.getByRole('button', { name: /image transcript/i })).toBeInTheDocument();
   });
 
-  it('keeps the configured poster on the video element and fallback layer', () => {
+  it('keeps one native poster owner while video is available', () => {
     const poster = '/images/heroes/hero-homepage.webp';
     const { container } = render(
       <HeroVideo
@@ -37,8 +37,7 @@ describe('marketing hero transcript runtime behavior', () => {
     expect(video).not.toBeNull();
     expect(video).toHaveAttribute('poster', poster);
 
-    const fallback = container.querySelector(`[style*="${poster}"]`);
-    expect(fallback).not.toBeNull();
+    expect(container.querySelector(`[style*="${poster}"]`)).toBeNull();
   });
 
   it('toggles the HeroVideo transcript without throwing at runtime', () => {

@@ -40,6 +40,7 @@ export interface RemotionLessonInput {
   domainKey?: string; // for Pexels topic lookup (e.g. 'hvac', 'foundations')
   instructorId?: string; // maps to voice + name
   courseName?: string;
+  visualPrompt?: string;
 }
 
 export interface RemotionRenderResult {
@@ -232,7 +233,10 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     // ── Step 2: Fetch background image ────────────────────────────────────────
     logger.info(`[RemotionRender] Fetching background image (domain: ${domainKey})`);
-    const backgroundImageSrc = (await getPexelsImage(domainKey)) ?? undefined;
+    const backgroundImageSrc =
+      (await getPexelsImage(domainKey, {
+        query: input.visualPrompt?.replace(/[^a-zA-Z0-9 ,'-]/g, ' ').slice(0, 180),
+      })) ?? undefined;
 
     // ── Step 3: Build Remotion props ──────────────────────────────────────────
     const segmentFrames = calcSegmentFrames(duration);

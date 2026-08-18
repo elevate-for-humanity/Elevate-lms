@@ -36,9 +36,9 @@ export async function POST(req: NextRequest) {
       programId: body.programId,
       programSlug: body.programId ? undefined : body.slug,
       blueprint,
-      mode: 'missing-only',
-      contentSource: 'blueprint',
-      videoMode: 'off',
+      mode: 'refresh',
+      contentSource: 'ai',
+      videoMode: 'queue',
     });
 
     return NextResponse.json(

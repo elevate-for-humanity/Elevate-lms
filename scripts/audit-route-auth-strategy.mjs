@@ -75,6 +75,7 @@ const PATTERNS = {
 // ─── File walker ──────────────────────────────────────────────────────────────
 
 function walk(dir, files = []) {
+  if (!statExists(dir)) return files;
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
@@ -85,6 +86,15 @@ function walk(dir, files = []) {
     }
   }
   return files;
+}
+
+function statExists(target) {
+  try {
+    statSync(target);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // ─── Classify a single file ───────────────────────────────────────────────────
@@ -98,7 +108,12 @@ function classify(src) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-const routes = walk(join(ROOT, 'app/api'));
+const apiRoots = [
+  join(ROOT, 'apps/marketing/app/api'),
+  join(ROOT, 'apps/lms/app/api'),
+  join(ROOT, 'apps/admin/app/api'),
+];
+const routes = apiRoots.flatMap((root) => walk(root));
 const results = { ADMIN: [], AUTH: [], WEBHOOK: [], CRON: [], PUBLIC: [], UNCLASSIFIED: [] };
 
 for (const file of routes) {

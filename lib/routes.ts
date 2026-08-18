@@ -43,5 +43,8 @@ export const ROUTES = {
   applyForProgram: (slug: string) => `/apply?program=${slug}`,
 
   // ── Partner / shop apply ──────────────────────────────────────────────────
-  PARTNER_BARBERSHOP_APPLY: '/partners/barber-host-shop/apply',
+  HOST_SHOPS: '/partners/host-shops',
+  HOST_SHOP_APPLY: '/partners/host-shop/apply',
+  /** @deprecated Use HOST_SHOP_APPLY. Kept as a source-compatible alias. */
+  PARTNER_BARBERSHOP_APPLY: '/partners/host-shop/apply',
 } as const;

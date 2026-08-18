@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Video } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import InteractiveLessonExperience from '@/components/lms/InteractiveLessonExperience';
 import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachingPlayer';
+import { getInstructorForCourse } from '@/lib/ai-instructors';
 import LessonProgressClient from './LessonProgressClient';
 
 export const dynamic = 'force-dynamic';
@@ -126,15 +127,15 @@ export default async function LessonPage({
     lesson.video_config && typeof lesson.video_config === 'object'
       ? (lesson.video_config as Record<string, unknown>)
       : {};
+  const assignedInstructor = getInstructorForCourse(course.title);
   const instructorName =
     typeof videoConfig.instructor === 'string'
       ? videoConfig.instructor
-      : /barber/i.test(course.title)
-        ? 'James Williams'
-        : 'Angela Thompson';
-  const instructorImage = /james/i.test(instructorName)
-    ? '/images/instructors/james-williams.jpg'
-    : '/images/instructors/angela-thompson.jpg';
+      : assignedInstructor.name;
+  const instructorImage =
+    typeof videoConfig.instructor_avatar === 'string'
+      ? videoConfig.instructor_avatar
+      : assignedInstructor.avatar;
   const lessonType = String(lesson.lesson_type ?? 'lesson');
   const passingScore = Number(lesson.passing_score ?? 70);
   const moduleOrder = Number(moduleRow?.order_index ?? 1);
@@ -161,11 +162,9 @@ export default async function LessonPage({
             <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2">
               <Clock3 className="h-4 w-4" /> {Number(lesson.duration_minutes ?? 0)} min
             </span>
-            {lesson.video_url ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-2 text-cyan-900">
-                <Video className="h-4 w-4" /> Video included
-              </span>
-            ) : null}
+            <span className="inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-2 text-cyan-900">
+              <Video className="h-4 w-4" /> {lesson.video_url ? 'Instructor video' : 'Interactive instructor'}
+            </span>
             {questions.length ? (
               <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-2 text-emerald-900">
                 <CheckCircle2 className="h-4 w-4" /> {questions.length} knowledge checks
@@ -176,29 +175,27 @@ export default async function LessonPage({
       </header>
 
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
-        <AITeachingPlayer
-          courseTitle={course.title}
-          lessonTitle={lesson.title}
-          instructorName={instructorName}
-          instructorImage={instructorImage}
-          slides={slides}
-        />
-
         {lesson.video_url ? (
-          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
-            <div className="bg-slate-900 px-5 py-3 text-sm font-black text-white">
-              Produced lesson video
-            </div>
+          <section className="overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 via-white to-cyan-50 p-2 shadow-xl">
             <video
               controls
               preload="metadata"
-              className="aspect-video w-full"
+              playsInline
+              className="aspect-video w-full rounded-2xl bg-black"
               src={lesson.video_url}
             >
               Your browser does not support HTML video.
             </video>
           </section>
-        ) : null}
+        ) : (
+          <AITeachingPlayer
+            courseTitle={course.title}
+            lessonTitle={lesson.title}
+            instructorName={instructorName}
+            instructorImage={instructorImage}
+            slides={slides}
+          />
+        )}
 
         {objectives.length ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -19,8 +19,8 @@ LEGACY_DIRS=(
 )
 APP_DIRS=("${PRODUCTION_DIRS[@]}" "${LEGACY_DIRS[@]}")
 
-ROUTES_FILE=$(mktemp)
-ADMIN_ROUTES_FILE=$(mktemp)
+ROUTES_FILE=$(mktemp "$ROOT/.audit-auth-routes.XXXXXX")
+ADMIN_ROUTES_FILE=$(mktemp "$ROOT/.audit-auth-admin-routes.XXXXXX")
 trap 'rm -f "$ROUTES_FILE" "$ADMIN_ROUTES_FILE"' EXIT
 
 for dir in "${APP_DIRS[@]}"; do

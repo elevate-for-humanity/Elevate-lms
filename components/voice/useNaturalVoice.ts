@@ -8,6 +8,8 @@ type PlayOptions = {
   voice?: string;
   style?: NaturalVoiceStyle;
   rate?: number;
+  onEnded?: () => void;
+  onError?: () => void;
 };
 
 export function useNaturalVoice() {
@@ -90,6 +92,7 @@ export function useNaturalVoice() {
         setIsPaused(false);
         audioRef.current = null;
         releaseObjectUrl();
+        options.onEnded?.();
       };
       audio.onerror = () => {
         audioRef.current = null;
@@ -98,6 +101,7 @@ export function useNaturalVoice() {
         setIsPlaying(false);
         setIsPaused(false);
         setError('Voice playback failed.');
+        options.onError?.();
       };
       audioRef.current = audio;
 
@@ -110,6 +114,7 @@ export function useNaturalVoice() {
       setIsPaused(false);
       setError(cause instanceof Error ? cause.message : 'Voice is temporarily unavailable.');
       releaseObjectUrl();
+      options.onError?.();
       return false;
     }
   }, [releaseObjectUrl, stop]);

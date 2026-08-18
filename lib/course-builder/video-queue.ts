@@ -29,14 +29,18 @@ export async function queueCourseLessonVideos(
     .maybeSingle();
 
   if (courseError || !course) {
-    throw new Error(`Failed to load course for instructor assignment: ${courseError?.message ?? 'not found'}`);
+    throw new Error(
+      `Failed to load course for instructor assignment: ${courseError?.message ?? 'not found'}`,
+    );
   }
 
   const instructor = getInstructorForCourse(course.title);
 
   const { data: lessons, error } = await db
     .from('course_lessons')
-    .select('id, title, script, bullet_points, video_url, video_status, order_index')
+    .select(
+      'id, module_id, title, script, bullet_points, scene_data, video_url, video_status, order_index',
+    )
     .eq('course_id', input.courseId)
     .order('order_index', { ascending: true });
 
@@ -44,7 +48,20 @@ export async function queueCourseLessonVideos(
     throw new Error(`Failed to load lessons for video queue: ${error.message}`);
   }
 
-  const rows = lessons ?? [];
+  const { data: modules, error: moduleError } = await db
+    .from('course_modules')
+    .select('id, order_index')
+    .eq('course_id', input.courseId);
+  if (moduleError) {
+    throw new Error(`Failed to load module order for video queue: ${moduleError.message}`);
+  }
+  const moduleOrder = new Map((modules ?? []).map((row) => [row.id, Number(row.order_index)]));
+  const rows = [...(lessons ?? [])].sort((left, right) => {
+    const moduleDelta =
+      (moduleOrder.get(left.module_id) ?? Number.MAX_SAFE_INTEGER) -
+      (moduleOrder.get(right.module_id) ?? Number.MAX_SAFE_INTEGER);
+    return moduleDelta || Number(left.order_index) - Number(right.order_index);
+  });
   const onlyMissing = input.onlyMissing !== false;
   const force = input.force === true;
 
@@ -69,19 +86,20 @@ export async function queueCourseLessonVideos(
   let queued = 0;
   let failed = 0;
 
-  for (const lesson of candidates) {
+  for (const [candidateIndex, lesson] of candidates.entries()) {
     try {
       await createJob({
         lesson_id: lesson.id,
         course_id: input.courseId,
         lesson_title: lesson.title,
         script:
-          lesson.order_index === 0
+          candidateIndex === 0
             ? `${generateInstructorIntro(instructor, course.title)} ${lesson.script ?? ''}`.trim()
             : `Welcome back. I'm ${instructor.name}, your ${instructor.title}. ${lesson.script ?? ''}`.trim(),
         bullet_points: Array.isArray(lesson.bullet_points)
           ? (lesson.bullet_points as string[])
           : [],
+        scene_data: lesson.scene_data ?? null,
       });
       queued += 1;
     } catch (err) {

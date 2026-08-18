@@ -7,8 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { loadAllBlueprints } from '@/lib/curriculum/load-blueprint';
-import { generateCourseFromBlueprint } from '@/lib/curriculum/generate-course-from-blueprint';
+import { courseFactory } from '@/lib/course-factory';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -44,27 +43,29 @@ export async function POST(
     return safeError('Course has no linked program — cannot determine blueprint', 400);
   }
 
-  const blueprint = (await loadAllBlueprints()).find((bp) => bp.programSlug === programSlug);
-  if (!blueprint) return safeError(`No blueprint registered for program slug: ${programSlug}`, 400);
-
   const programId = course.program_id as string | null;
   if (!programId) return safeError('Course has no program_id — cannot generate', 400);
 
   try {
-    const result = await generateCourseFromBlueprint({
-      courseId: course.id,
-      blueprintSlug: blueprint.id,
+    const result = await courseFactory({
       programId,
-      mode: 'missing-only',
+      programSlug,
+      mode: 'refresh',
+      contentSource: 'ai',
+      videoMode: 'queue',
     });
+
+    if (!result.ok) {
+      return NextResponse.json({ ok: false, ...result }, { status: 422 });
+    }
 
     return NextResponse.json({
       ok: true,
       courseId: result.courseId,
-      blueprintSlug: blueprint.id,
+      programSlug,
       moduleCount: result.moduleCount,
       lessonCount: result.lessonCount,
-      skipped: result.skipped,
+      skipped: result.skippedCount,
       warnings: result.warnings,
     });
   } catch (err) {

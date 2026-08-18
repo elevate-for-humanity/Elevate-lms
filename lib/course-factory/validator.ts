@@ -9,6 +9,7 @@
 import type { CredentialBlueprint, BlueprintModule } from '@/lib/curriculum/blueprints/types';
 import { validateBlueprint as validateBlueprintStructure } from '@/lib/curriculum/blueprints/validateBlueprint';
 import { logger } from '@/lib/logger';
+import { CourseExperienceSchema } from './experience-contract';
 
 export interface ValidationError {
   type: 'error' | 'warning';
@@ -45,6 +46,25 @@ export function inferStepType(slug: string): string {
 
 function visibleTextLength(html: string): number {
   return html.replace(/<[^>]*>/g, '').trim().length;
+}
+
+function readExperience(content: string): Record<string, any> | null {
+  try {
+    const parsed = JSON.parse(content);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      parsed.experience &&
+      typeof parsed.experience === 'object' &&
+      !Array.isArray(parsed.experience)
+    ) {
+      return parsed.experience as Record<string, any>;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 function validateLesson(
@@ -93,6 +113,32 @@ function validateLesson(
         field: 'content',
         message: `Content may be too short (${visibleTextLength(lesson.content)} chars, minimum 200)`,
       });
+    }
+  }
+
+  if (needsContent && lesson.content?.trim()) {
+    const experience = readExperience(lesson.content);
+    if (!experience) {
+      errors.push({
+        type: 'error',
+        module: moduleSlug,
+        lesson: lesson.slug,
+        field: 'experience',
+        message: 'Complete interactive lesson experience is required',
+      });
+    } else {
+      const parsedExperience = CourseExperienceSchema.safeParse(experience);
+      if (!parsedExperience.success) {
+        for (const issue of parsedExperience.error.issues) {
+          errors.push({
+            type: 'error',
+            module: moduleSlug,
+            lesson: lesson.slug,
+            field: `experience.${issue.path.join('.')}`,
+            message: issue.message,
+          });
+        }
+      }
     }
   }
 
@@ -165,7 +211,9 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   return result;
 }
 
-export function validateCourseTemplate(template: { modules?: BlueprintModule[] }): ValidationResult {
+export function validateCourseTemplate(template: {
+  modules?: BlueprintModule[];
+}): ValidationResult {
   const modules = template.modules ?? [];
   const blueprint: CredentialBlueprint = {
     id: 'course-template-validation',

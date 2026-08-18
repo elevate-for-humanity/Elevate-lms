@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CourseExperienceSchema } from './experience-contract';
 
 export const quizQuestionSchema = z
   .object({
@@ -15,7 +16,8 @@ export const generatedLessonContentSchema = z
     content: z.string().trim().min(500),
     learning_points: z.array(z.string().trim().min(1)).min(3).max(5),
     scenario: z.string().trim().min(80),
-    quiz_questions: z.array(quizQuestionSchema).min(1),
+    quiz_questions: z.array(quizQuestionSchema).min(3),
+    experience: CourseExperienceSchema,
   })
   .strict();
 
@@ -40,15 +42,11 @@ export const generatedBlueprintSchema = z
                 z
                   .object({
                     title: z.string().trim().min(1),
-                    slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
-                    stepType: z.enum([
-                      'lesson',
-                      'checkpoint',
-                      'quiz',
-                      'exam',
-                      'lab',
-                      'assignment',
-                    ]),
+                    slug: z
+                      .string()
+                      .trim()
+                      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+                    stepType: z.enum(['lesson', 'checkpoint', 'quiz', 'exam', 'lab', 'assignment']),
                   })
                   .strict(),
               )
@@ -86,6 +84,7 @@ export function parseStrictAIJson<T>(
   } catch (error) {
     throw new Error(
       `${label} returned malformed JSON: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     );
   }
 

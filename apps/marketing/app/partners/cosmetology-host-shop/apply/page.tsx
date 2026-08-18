@@ -5,5 +5,5 @@ export const metadata = {
 };
 
 export default function CosmetologyHostShopApplyRedirect() {
-  redirect('/partners/barber-host-shop/apply');
+  redirect('/partners/host-shop/apply');
 }

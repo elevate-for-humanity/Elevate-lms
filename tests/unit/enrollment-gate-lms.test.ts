@@ -9,6 +9,7 @@ describe('getNextRequiredAction', () => {
       orientation_completed_at: '2026-01-01T00:00:00Z',
       documents_submitted_at: '2026-01-02T00:00:00Z',
       program_slug: 'barber-apprenticeship',
+      course_id: BARBER_COURSE_ID,
     });
 
     expect(action.href).toBe(`/lms/courses/${BARBER_COURSE_ID}`);

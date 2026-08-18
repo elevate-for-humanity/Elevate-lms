@@ -12,6 +12,7 @@ const forbidden = ['components/studio/StudioShell.tsx'];
 for (const file of forbidden) if (exists(file)) fail(`parallel Studio implementation exists: ${file}`);
 
 for (const file of [
+  'apps/admin/app/layout.tsx',
   'apps/admin/app/studio/layout.tsx',
   'apps/admin/app/studio/StudioNavigation.client.tsx',
   'lib/devstudio/workspace-registry.ts',
@@ -27,8 +28,24 @@ for (const file of [
   'apps/admin/app/studio/courses/[courseId]/page.tsx',
 ]) if (!exists(file)) fail(`canonical Studio file is missing: ${file}`);
 
+const adminLayout = read('apps/admin/app/layout.tsx');
+for (const sharedSurface of ['AdminHeader', 'AdminFooter', 'LiveChatWidget']) {
+  if (!adminLayout.includes(sharedSurface)) fail(`Admin layout is missing shared surface: ${sharedSurface}`);
+}
+for (const standaloneBypass of ['isDevStudio', "x-pathname", "pathname.includes('/studio')"]) {
+  if (adminLayout.includes(standaloneBypass)) fail(`Admin layout bypasses its canonical shell for Studio: ${standaloneBypass}`);
+}
+
 const layout = read('apps/admin/app/studio/layout.tsx');
-if (!layout.includes('StudioNavigation')) fail('Studio layout does not own persistent navigation');
+if (!layout.includes('StudioNavigation')) fail('Studio layout does not provide contextual workspace navigation');
+for (const standaloneShell of ['min-h-screen', 'bg-slate-950 text-white']) {
+  if (layout.includes(standaloneShell)) fail(`Studio layout reintroduced a standalone application shell: ${standaloneShell}`);
+}
+
+const studioNavigation = read('apps/admin/app/studio/StudioNavigation.client.tsx');
+for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
+  if (studioNavigation.includes(standaloneNavigation)) fail(`Studio navigation reintroduced a standalone sidebar: ${standaloneNavigation}`);
+}
 
 const registry = read('lib/devstudio/workspace-registry.ts');
 const routes = [...registry.matchAll(/route:\s*'([^']+)'/g)].map((match) => match[1]);
@@ -81,4 +98,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: ${routes.length} canonical workspaces, one complete application, no parallel API routes.`);
+console.log(`Studio architecture verified: ${routes.length} canonical workspaces inside one Admin surface, no standalone shell, no parallel API routes.`);

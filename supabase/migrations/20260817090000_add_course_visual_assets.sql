@@ -19,7 +19,12 @@ create table if not exists public.course_visual_assets (
 create index if not exists course_visual_assets_course_active_idx
   on public.course_visual_assets(course_id, is_active, placement, sort_order);
 
-alter table public.course_visual_assets enable row level security;\n\n-- The learner course route requires table-level SELECT in addition to RLS.\n-- Anonymous visitors receive no grant; signed-in users still see only rows\n-- allowed by the active-visual policy below.\ngrant select on table public.course_visual_assets to authenticated;
+alter table public.course_visual_assets enable row level security;
+
+-- The learner course route requires table-level SELECT in addition to RLS.
+-- Anonymous visitors receive no grant; signed-in users still see only rows
+-- allowed by the active-visual policy below.
+grant select on table public.course_visual_assets to authenticated;
 
 drop policy if exists "Public can read active course visuals" on public.course_visual_assets;
 create policy "Public can read active course visuals"
@@ -34,7 +39,13 @@ select c.id, 'hero', 'video', '/videos/courses/elevate-esb-hero.mp4',
        'Entrepreneur presenting a small-business startup plan',
        'Elevate for Humanity Entrepreneurship and Small Business course',
        0, true,
-       jsonb_build_object('autoplay', true, 'muted', true, 'loop', true, 'brand', 'Elevate for Humanity')
+       jsonb_build_object(
+         'autoplay', true,
+         'muted', true,
+         'loop', true,
+         'brand', 'Elevate for Humanity',
+         'cta_label', 'Start Elevate ESB'
+       )
 from public.courses c
 where c.slug in ('entrepreneurship','cert-prep-esb-us-v2','cert-prep-esb-universal')
 on conflict (course_id, placement, sort_order) do update

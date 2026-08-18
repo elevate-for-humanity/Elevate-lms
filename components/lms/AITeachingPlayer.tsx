@@ -67,41 +67,43 @@ export default function AITeachingPlayer({
   useEffect(() => stop, []);
 
   return (
-    <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-950 via-slate-950 to-cyan-950 text-white shadow-2xl">
-      <div className="h-1.5 bg-white/15">
+    <section className="overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 via-white to-cyan-50 text-slate-950 shadow-xl">
+      <div className="h-2 bg-orange-100">
         <div
           className="h-full bg-gradient-to-r from-amber-400 via-pink-500 to-cyan-400 transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
       <div className="grid min-h-[430px] lg:grid-cols-[0.78fr_1.22fr]">
-        <div className="relative flex min-h-[300px] items-end overflow-hidden bg-gradient-to-b from-fuchsia-700/30 to-cyan-500/20">
+        <div className="relative flex min-h-[300px] items-end overflow-hidden bg-gradient-to-b from-amber-200 to-rose-200">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={instructorImage}
             alt={`${instructorName}, AI course instructor`}
-            className="absolute inset-0 h-full w-full object-cover object-top opacity-90"
+            className="absolute inset-0 h-full w-full object-cover object-top"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/15 to-transparent" />
-          <div className="relative z-10 p-6">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">
+          <div className="absolute inset-0 bg-gradient-to-t from-orange-950/80 via-transparent to-transparent" />
+          <div className="relative z-10 m-5 rounded-2xl bg-white/95 p-5 text-slate-950 shadow-lg backdrop-blur">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-orange-700">
               AI instructor
             </p>
             <h2 className="mt-1 text-2xl font-black">{instructorName}</h2>
-            <p className="text-sm font-semibold text-slate-200">Elevate course instructor</p>
+            <p className="text-sm font-semibold text-slate-600">Elevate course instructor</p>
           </div>
         </div>
 
         <div className="flex flex-col justify-between p-7 sm:p-10">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-300">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-700">
               {courseTitle}
             </p>
-            <p className="mt-3 text-sm font-bold text-cyan-200">
+            <p className="mt-3 inline-flex rounded-full bg-cyan-100 px-3 py-1 text-sm font-bold text-cyan-800">
               Slide {index + 1} of {slides.length}
             </p>
             <h3 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">{current.title}</h3>
-            <p className="mt-6 text-lg font-medium leading-8 text-slate-100">{current.narration}</p>
+            <p className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-lg font-medium leading-8 text-slate-800">
+              {current.narration}
+            </p>
           </div>
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -110,7 +112,7 @@ export default function AITeachingPlayer({
               onClick={() => move(index - 1)}
               disabled={index === 0}
               aria-label="Previous slide"
-              className="rounded-full bg-white/10 p-3 hover:bg-white/20 disabled:opacity-35"
+              className="rounded-full border border-orange-200 bg-white p-3 text-orange-700 shadow-sm hover:bg-orange-50 disabled:opacity-35"
             >
               <ChevronLeft />
             </button>
@@ -118,7 +120,7 @@ export default function AITeachingPlayer({
               type="button"
               onClick={() => (playing ? stop() : speak())}
               disabled={!supported}
-              className="inline-flex min-h-12 items-center gap-2 rounded-full bg-amber-400 px-6 py-3 font-black text-slate-950 hover:bg-amber-300 disabled:opacity-50"
+              className="inline-flex min-h-12 items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-black text-white shadow-md hover:from-orange-600 hover:to-pink-600 disabled:opacity-50"
             >
               {playing ? <Pause /> : <Play />} {playing ? 'Pause instructor' : 'Play lesson'}
             </button>
@@ -129,7 +131,7 @@ export default function AITeachingPlayer({
                 setIndex(0);
               }}
               aria-label="Restart lesson"
-              className="rounded-full bg-white/10 p-3 hover:bg-white/20"
+              className="rounded-full border border-cyan-200 bg-white p-3 text-cyan-700 shadow-sm hover:bg-cyan-50"
             >
               <RotateCcw />
             </button>
@@ -138,11 +140,11 @@ export default function AITeachingPlayer({
               onClick={() => move(index + 1)}
               disabled={index >= slides.length - 1}
               aria-label="Next slide"
-              className="rounded-full bg-white/10 p-3 hover:bg-white/20 disabled:opacity-35"
+              className="rounded-full border border-orange-200 bg-white p-3 text-orange-700 shadow-sm hover:bg-orange-50 disabled:opacity-35"
             >
               <ChevronRight />
             </button>
-            <span className="ml-auto inline-flex items-center gap-2 text-xs font-bold text-slate-300">
+            <span className="ml-auto inline-flex items-center gap-2 rounded-full bg-cyan-100 px-3 py-2 text-xs font-bold text-cyan-900">
               <Volume2 className="h-4 w-4" /> Narration and captions
             </span>
           </div>

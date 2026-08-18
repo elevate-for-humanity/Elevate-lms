@@ -12,7 +12,7 @@ const coreFeatures = [
   { icon: Users, title: 'Student Management', desc: 'Comprehensive student records, enrollment tracking, and communication tools' },
   { icon: Award, title: 'Credential Management', desc: 'Issue and verify industry-recognized credentials and certifications' },
   { icon: BarChart3, title: 'Analytics Dashboard', desc: 'Real-time reporting on student outcomes, completion rates, and program performance' },
-  { icon: Shield, title: 'Compliance & Security', desc: 'FERPA-compliant, SOC 2 certified with enterprise-grade security' },
+  { icon: Shield, title: 'Compliance & Security', desc: 'Role-based access, audit logging, encryption controls, privileged-role MFA enforcement, and evidence-gated compliance claims' },
   { icon: Clock, title: 'Flexible Scheduling', desc: 'Self-paced and instructor-led options to fit any program structure' },
   { icon: Globe, title: 'Remote Access', desc: 'Learn anywhere with mobile-responsive design and offline capabilities' },
   { icon: CheckCircle, title: 'Employer Integration', desc: 'Direct connection to hiring partners for job placement support' },
@@ -30,7 +30,7 @@ export default function Page() {
           <p className="text-xl text-blue-100 max-w-2xl">Everything you need to train, certify, and place workers in high-demand careers.</p>
         </div>
       </section>
-      
+
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -47,7 +47,7 @@ export default function Page() {
               );
             })}
           </div>
-          
+
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm mb-16">
             <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">For Training Providers</h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -71,7 +71,7 @@ export default function Page() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-brand-blue-700 rounded-2xl p-8 text-white text-center">
             <h2 className="text-2xl font-bold mb-4">Ready to See the Platform?</h2>
             <p className="text-blue-100 mb-6">Request a demo to see all features in action.</p>

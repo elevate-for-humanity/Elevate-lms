@@ -1,14 +1,15 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { getMyPartnerContext, getSessionUser } from '@/lib/partner/access';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * Authorization boundary for every /host-shop/dashboard/* route.
- * Access is relationship-aware: active shop_staff or partner_users membership
- * is sufficient, while platform operators use the explicit Host Shop selector.
+ * Single authorization + readiness boundary for every /host-shop/dashboard/* route.
+ * A valid Host Shop relationship is required, and operational access remains locked
+ * until the partner has completed the required onboarding/orientation contract.
  */
 export default async function HostShopDashboardLayout({ children }: { children: React.ReactNode }) {
   const context = await getMyPartnerContext();
@@ -17,6 +18,24 @@ export default async function HostShopDashboardLayout({ children }: { children: 
     const user = await getSessionUser();
     if (!user) redirect('/host-shop/login?redirect=/host-shop/dashboard');
     redirect('/host-shop/login?error=no_partner');
+  }
+
+  const partnerId = context.shops.find((row) => row.shop?.partner_id)?.shop?.partner_id;
+  if (!partnerId) redirect('/host-shop/orientation?error=no_partner');
+
+  const db = await requireAdminClient();
+  const { data: partner } = await db
+    .from('partners')
+    .select('id,onboarding_completed,mou_signed,documents_verified,status,approval_status,is_active')
+    .eq('id', partnerId)
+    .maybeSingle();
+
+  if (!partner || partner.status !== 'active' || partner.approval_status !== 'approved' || partner.is_active === false) {
+    redirect('/host-shop/login?error=no_partner');
+  }
+
+  if (!partner.onboarding_completed) {
+    redirect('/host-shop/orientation');
   }
 
   const supabase = await createClient();

@@ -8,14 +8,19 @@ export const dynamic = 'force-dynamic';
 
 const HOST_SHOP_ADMIN_COOKIE = '__efh_host_shop_partner';
 const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'org_admin']);
-const HOST_SHOP_API_ROLES = new Set([
-  'admin',
-  'super_admin',
-  'org_admin',
+const HOST_SHOP_PROFILE_ROLES = new Set([
   'partner',
   'host_shop',
   'host_shop_admin',
   'program_holder',
+]);
+const HOST_SHOP_MEMBERSHIP_ROLES = new Set([
+  'owner',
+  'partner_admin',
+  'admin',
+  'supervisor',
+  'mentor',
+  'manager',
 ]);
 
 function initials(name: string | null | undefined) {
@@ -35,19 +40,47 @@ async function getAuthContext() {
   if (!user) return null;
 
   const db = await requireAdminClient();
-  const { data: profile } = await db
-    .from('profiles')
-    .select('id, role, full_name, email')
-    .eq('id', user.id)
-    .maybeSingle();
+  const [{ data: profile }, { data: memberships }] = await Promise.all([
+    db
+      .from('profiles')
+      .select('id, role, full_name, email')
+      .eq('id', user.id)
+      .maybeSingle(),
+    db
+      .from('partner_users')
+      .select('partner_id, role, status')
+      .eq('user_id', user.id)
+      .eq('status', 'active'),
+  ]);
 
-  const role = String(profile?.role || '').trim().toLowerCase();
-  if (!HOST_SHOP_API_ROLES.has(role)) return null;
+  const profileRole = String(profile?.role || '').trim().toLowerCase();
+  const membership = (memberships || []).find((row: any) =>
+    HOST_SHOP_MEMBERSHIP_ROLES.has(String(row.role || '').trim().toLowerCase()),
+  );
+  const membershipRole = String(membership?.role || '').trim().toLowerCase();
+  const isPlatformAdmin = PLATFORM_ADMIN_ROLES.has(profileRole);
+  const isHostShopProfile = HOST_SHOP_PROFILE_ROLES.has(profileRole);
+  const isHostShopMember = Boolean(membership?.partner_id && HOST_SHOP_MEMBERSHIP_ROLES.has(membershipRole));
 
-  return { user, db, profile, role };
+  if (!isPlatformAdmin && !isHostShopProfile && !isHostShopMember) return null;
+
+  return {
+    user,
+    db,
+    profile,
+    profileRole,
+    membershipRole,
+    membershipPartnerId: membership?.partner_id || null,
+    isPlatformAdmin,
+  };
 }
 
-async function getAuthorizedShopIds(db: any, userId: string, role: string) {
+async function getAuthorizedShopIds(
+  db: any,
+  userId: string,
+  isPlatformAdmin: boolean,
+  membershipPartnerId: string | null,
+) {
   const { data: staffRows } = await db
     .from('shop_staff')
     .select('shop_id, active, shops:shops!inner(id, active, partner_id)')
@@ -58,18 +91,10 @@ async function getAuthorizedShopIds(db: any, userId: string, role: string) {
   const staffShopIds = (staffRows || []).map((row: any) => row.shop_id).filter(Boolean);
   if (staffShopIds.length) return Array.from(new Set(staffShopIds));
 
-  let partnerId: string | null = null;
-  if (PLATFORM_ADMIN_ROLES.has(role)) {
+  let partnerId: string | null = membershipPartnerId;
+  if (isPlatformAdmin) {
     const cookieStore = await cookies();
-    partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || null;
-  } else {
-    const { data: partnerUser } = await db
-      .from('partner_users')
-      .select('partner_id, status')
-      .eq('user_id', userId)
-      .eq('status', 'active')
-      .maybeSingle();
-    partnerId = partnerUser?.partner_id || null;
+    partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value || partnerId;
   }
 
   if (!partnerId) return [];
@@ -102,18 +127,23 @@ export async function GET() {
   const ctx = await getAuthContext();
   if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { user, db, role } = ctx;
-  const shopIds = await getAuthorizedShopIds(db, user.id, role);
+  const { user, db, membershipRole, membershipPartnerId, isPlatformAdmin } = ctx;
+  const shopIds = await getAuthorizedShopIds(db, user.id, isPlatformAdmin, membershipPartnerId);
   if (shopIds.length === 0) {
     return NextResponse.json({ error: 'No active Host Shop assignment found' }, { status: 403 });
   }
 
-  const { data: placements, error: placementError } = await db
+  let placementsQuery = db
     .from('apprentice_placements')
-    .select('id, student_id, program_slug, shop_id, start_date, status')
+    .select('id, student_id, program_slug, shop_id, start_date, status, supervisor_user_id')
     .in('shop_id', shopIds)
     .eq('status', 'active');
 
+  if (!isPlatformAdmin && ['supervisor', 'mentor'].includes(membershipRole)) {
+    placementsQuery = placementsQuery.eq('supervisor_user_id', user.id);
+  }
+
+  const { data: placements, error: placementError } = await placementsQuery;
   if (placementError) return NextResponse.json({ error: placementError.message }, { status: 500 });
 
   const studentIds = Array.from(new Set((placements || []).map((row: any) => row.student_id).filter(Boolean)));
@@ -191,7 +221,7 @@ export async function PATCH(req: NextRequest) {
   const ctx = await getAuthContext();
   if (!ctx) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { user, db, profile, role } = ctx;
+  const { user, db, profile, membershipPartnerId, isPlatformAdmin } = ctx;
   const body = await req.json().catch(() => null);
   const enrollmentId = typeof body?.enrollmentId === 'string' ? body.enrollmentId.trim() : '';
   const competencyId = typeof body?.competencyId === 'string' ? body.competencyId.trim() : '';
@@ -217,18 +247,25 @@ export async function PATCH(req: NextRequest) {
   const studentId = enrollment.user_id || enrollment.student_id;
   if (!studentId) return NextResponse.json({ error: 'Enrollment has no student identity' }, { status: 400 });
 
-  const shopIds = await getAuthorizedShopIds(db, user.id, role);
+  const shopIds = await getAuthorizedShopIds(db, user.id, isPlatformAdmin, membershipPartnerId);
   if (shopIds.length === 0) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   const { data: placement } = await db
     .from('apprentice_placements')
-    .select('id')
+    .select('id, supervisor_user_id')
     .eq('student_id', studentId)
     .eq('status', 'active')
     .in('shop_id', shopIds)
     .limit(1)
     .maybeSingle();
   if (!placement) return NextResponse.json({ error: 'You are not assigned to this apprentice' }, { status: 403 });
+
+  if (!isPlatformAdmin && placement.supervisor_user_id !== user.id) {
+    return NextResponse.json(
+      { error: 'Only the assigned supervisor may verify this apprentice competency' },
+      { status: 403 },
+    );
+  }
 
   const verifiedName = profile?.full_name || profile?.email || user.email || 'Verified mentor';
   const today = new Date().toISOString().slice(0, 10);

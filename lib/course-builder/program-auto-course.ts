@@ -7,7 +7,7 @@
  */
 import { courseFactory } from '@/lib/course-factory';
 
-export type ProgramAutoCourseMode = 'replace' | 'missing-only';
+export type ProgramAutoCourseMode = 'replace' | 'missing-only' | 'refresh';
 export type ProgramAutoCourseVideoMode = 'queue' | 'off';
 
 export async function autoGenerateCourseForProgram(args: {
@@ -18,7 +18,7 @@ export async function autoGenerateCourseForProgram(args: {
 }) {
   const result = await courseFactory({
     programId: args.programId,
-    mode: args.mode ?? 'missing-only',
+    mode: args.mode ?? 'refresh',
     contentSource: 'ai',
     videoMode: args.videoMode ?? 'queue',
     videoQueueLimit: args.videoQueueLimit ?? null,

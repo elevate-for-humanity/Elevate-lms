@@ -33,12 +33,12 @@ export default function Header() {
         {/* Keep compact laptop/tablet widths on the drawer navigation. The
             complete desktop nav only renders when there is enough horizontal
             space for every primary destination plus account actions. */}
-        <div className="hidden min-w-0 justify-center overflow-visible xl:flex">
+        <div className="hidden min-w-0 justify-center overflow-visible 2xl:flex">
           <HeaderDesktopNav items={NAV_ITEMS} />
         </div>
 
         <div className="flex min-w-0 flex-shrink-0 flex-nowrap items-center justify-end gap-1.5">
-          <div className="hidden flex-nowrap items-center gap-1 xl:flex">
+          <div className="hidden flex-nowrap items-center gap-1 2xl:flex">
             <Link
               href={ROUTES.login}
               className="inline-flex whitespace-nowrap px-1.5 py-2 text-[13px] font-semibold text-slate-800 hover:text-slate-950 xl:px-2 xl:text-sm"
@@ -55,7 +55,7 @@ export default function Header() {
 
           {/* Phones, tablets, and compact laptops use the dedicated drawer so
               Programs and every other navigation group remain reachable. */}
-          <div className="flex flex-nowrap items-center gap-1 xl:hidden">
+          <div className="flex flex-nowrap items-center gap-1 2xl:hidden">
             <span className="hidden whitespace-nowrap text-sm font-bold text-slate-700 sm:inline" aria-hidden="true">
               Menu
             </span>

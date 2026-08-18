@@ -149,7 +149,6 @@ export default function HeroVideo({
           <video
             key={`${mobileSource}|${desktopSource}`}
             ref={videoRef}
-            poster={posterImage}
             preload="auto"
             autoPlay
             loop

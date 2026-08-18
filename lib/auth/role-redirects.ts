@@ -6,7 +6,7 @@
 import { getRoleDestination, type UserRole } from '@/lib/auth/role-destinations';
 
 export function getDashboardForRole(role: UserRole | string | null | undefined): string {
-  if (!role) return '/learner/dashboard';
+  if (!role) return '/lms/dashboard';
   return getRoleDestination(role as UserRole);
 }
 

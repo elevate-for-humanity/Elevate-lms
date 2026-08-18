@@ -244,7 +244,7 @@ export default function ApprenticeshipSponsorPage() {
                 Barbershop Partner Program <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/partners/barber-host-shop/apply"
+                href="/partners/host-shop/apply"
                 className="bg-white hover:bg-slate-200 text-slate-900 font-semibold px-6 py-3 rounded-lg transition-colors"
               >
                 Apply as Partner Site

@@ -19,17 +19,6 @@ export async function getSessionUser() {
   return data.user ?? null;
 }
 
-// Roles that can legitimately enter partner/host-shop data views.
-const PARTNER_ROLES = new Set([
-  'partner',
-  'host_shop',
-  'host_shop_admin',
-  'program_holder',
-  'admin',
-  'super_admin',
-  'org_admin',
-]);
-
 export async function getMyPartnerContext() {
   const supabase = await createClient();
   const user = await getSessionUser();
@@ -42,9 +31,9 @@ export async function getMyPartnerContext() {
     .maybeSingle();
 
   const profileRole = (profile?.role ?? null) as string | null;
-  if (!profileRole || !PARTNER_ROLES.has(profileRole)) return null;
 
-  // First honor explicit shop_staff membership when present.
+  // Active relationships grant Host Shop access even when a legacy profile role
+  // has not yet been synchronized. The relationship tables remain authoritative.
   const { data: staffRows } = await supabase
     .from('shop_staff')
     .select('shop_id, role, active, shops:shops!inner(id, name, active, partner_id)')

@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,6 +8,13 @@ import { ArrowLeft } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
+
+function absoluteMediaUrl(value: string): string {
+  if (/^https?:\/\//i.test(value)) return value;
+  const base = PLATFORM_DEFAULTS.siteUrl.replace(/\/$/, '');
+  const relative = value.startsWith('/') ? value : `/${value}`;
+  return `${base}${relative}`;
+}
 
 export async function generateMetadata({
   params,
@@ -34,10 +40,10 @@ export async function generateMetadata({
       title: video.title,
       description: video.description,
       url: `${PLATFORM_DEFAULTS.siteUrl}/videos/${video.id}`,
-      type: `video.other`,
+      type: 'video.other',
       images: [
         {
-          url: video.thumbnailUrl,
+          url: absoluteMediaUrl(video.thumbnailUrl),
           width: 1280,
           height: 720,
           alt: video.title,
@@ -45,7 +51,7 @@ export async function generateMetadata({
       ],
       videos: [
         {
-          url: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
+          url: absoluteMediaUrl(video.videoUrl),
           width: 1280,
           height: 720,
           type: 'video/mp4',
@@ -57,16 +63,7 @@ export async function generateMetadata({
 
 export default async function VideoWatchPage({ params }: { params: Promise<{ videoId: string }> }) {
   const { videoId } = await params;
-  const supabase = await createClient();
-
-  // Try database first
-  const { data: dbVideo } = await supabase
-    .from('videos')
-    .select('*')
-    .eq('id', videoId)
-    .maybeSingle();
-
-  const video = dbVideo || getVideoById(videoId);
+  const video = getVideoById(videoId);
 
   if (!video) {
     notFound();
@@ -77,11 +74,11 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
     '@type': 'VideoObject',
     name: video.title,
     description: video.description,
-    thumbnailUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.thumbnailUrl}`,
+    thumbnailUrl: absoluteMediaUrl(video.thumbnailUrl),
     uploadDate: video.uploadDate,
     duration: video.duration,
-    contentUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
-    embedUrl: `${PLATFORM_DEFAULTS.siteUrl}${video.videoUrl}`,
+    contentUrl: absoluteMediaUrl(video.videoUrl),
+    embedUrl: absoluteMediaUrl(video.videoUrl),
     publisher: {
       '@type': 'Organization',
       name: PLATFORM_DEFAULTS.orgName,
@@ -95,7 +92,7 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Videos', href: '/videos' }, { label: '[Videoid]' }]} />
+        <Breadcrumbs items={[{ label: 'Videos', href: '/videos' }, { label: video.title }]} />
       </div>
       <script
         type="application/ld+json"
@@ -103,7 +100,6 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
       />
 
       <div className="min-h-screen bg-white">
-        {/* Back Navigation */}
         <div className="bg-white border-b">
           <div className="max-w-7xl mx-auto px-4 py-4">
             <Link
@@ -116,12 +112,11 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
           </div>
         </div>
 
-        {/* Video Player */}
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
             <video
               controls
-              preload="none"
+              preload="metadata"
               poster={video.thumbnailUrl}
               className="w-full aspect-video"
             >
@@ -130,7 +125,6 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
             </video>
           </div>
 
-          {/* Video Info */}
           <div className="mt-8 bg-white rounded-lg p-8 shadow-sm">
             <div className="mb-4">
               <span className="inline-block px-3 py-2 bg-brand-orange-100 text-brand-orange-800 rounded-full text-sm font-semibold">
@@ -140,7 +134,6 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
             <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">{video.title}</h1>
             <p className="text-lg text-black leading-relaxed">{video.description}</p>
 
-            {/* CTA */}
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/start"
@@ -157,12 +150,11 @@ export default async function VideoWatchPage({ params }: { params: Promise<{ vid
             </div>
           </div>
 
-          {/* Related Videos */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-black mb-6">More Videos</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {videos
-                .filter((v) => v.id !== video.id)
+                .filter((relatedVideo) => relatedVideo.id !== video.id)
                 .slice(0, 3)
                 .map((relatedVideo) => (
                   <Link

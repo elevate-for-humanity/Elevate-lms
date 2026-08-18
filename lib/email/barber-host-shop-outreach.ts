@@ -5,7 +5,7 @@ export const ICC_URL = 'https://www.indianacareerconnect.com';
 export const WORKONE_LOCATOR_URL = 'https://www.workone.in.gov/';
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.elevateforhumanity.org';
-export const HOST_SHOP_APPLY_URL = '/partners/barber-host-shop/apply';
+export const HOST_SHOP_APPLY_URL = '/partners/host-shop/apply';
 export const HOST_SHOP_INFO_URL = '/programs/barber-apprenticeship/host-shops';
 
 export function buildBarberHostShopFundingInterestEmail(

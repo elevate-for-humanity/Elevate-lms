@@ -107,7 +107,7 @@ function Logo({ accentColor }: { accentColor: string }) {
       </div>
       <span
         style={{
-          color: '#fff',
+          color: '#0f172a',
           fontWeight: 700,
           fontSize: 18,
           fontFamily: 'sans-serif',
@@ -160,7 +160,11 @@ function IntroSegment({
 
   return (
     <AbsoluteFill
-      style={{ background: props.backgroundColor, justifyContent: 'center', alignItems: 'center' }}
+      style={{
+        background: `linear-gradient(135deg, #fff7ed 0%, #fef3c7 44%, #cffafe 100%)`,
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
       <TopBar color={props.topBarColor} title={props.title} />
       <Logo accentColor={props.accentColor} />
@@ -174,7 +178,7 @@ function IntroSegment({
             transform: `translateY(${titleY}px)`,
             fontSize: 64,
             fontWeight: 900,
-            color: '#fff',
+            color: '#0f172a',
             fontFamily: 'sans-serif',
             lineHeight: 1.15,
             marginBottom: 24,
@@ -220,10 +224,12 @@ function IntroSegment({
           />
         )}
         <div>
-          <div style={{ color: '#fff', fontWeight: 700, fontSize: 18, fontFamily: 'sans-serif' }}>
+          <div
+            style={{ color: '#0f172a', fontWeight: 700, fontSize: 18, fontFamily: 'sans-serif' }}
+          >
             {props.instructorName}
           </div>
-          <div style={{ color: '#94a3b8', fontSize: 14, fontFamily: 'sans-serif' }}>
+          <div style={{ color: '#475569', fontSize: 14, fontFamily: 'sans-serif' }}>
             {props.instructorTitle}
           </div>
         </div>
@@ -259,7 +265,9 @@ function ConceptSegment({
 }) {
   const points = props.keyPoints.slice(0, 2);
   return (
-    <AbsoluteFill style={{ background: props.backgroundColor }}>
+    <AbsoluteFill
+      style={{ background: 'linear-gradient(135deg, #ecfeff 0%, #f5f3ff 50%, #fff7ed 100%)' }}
+    >
       <TopBar color={props.topBarColor} title={props.title} />
       <Logo accentColor={props.accentColor} />
 
@@ -289,7 +297,7 @@ function ConceptSegment({
               display: 'flex',
               alignItems: 'flex-start',
               gap: 24,
-              background: '#1e293b',
+              background: '#ffffffee',
               borderRadius: 16,
               padding: '28px 32px',
               borderLeft: `4px solid ${props.topBarColor}`,
@@ -314,7 +322,7 @@ function ConceptSegment({
               {i + 1}
             </div>
             <div
-              style={{ color: '#e2e8f0', fontSize: 26, fontFamily: 'sans-serif', lineHeight: 1.5 }}
+              style={{ color: '#0f172a', fontSize: 26, fontFamily: 'sans-serif', lineHeight: 1.5 }}
             >
               {point}
             </div>
@@ -338,7 +346,7 @@ function VisualSegment({
 }) {
   const points = props.keyPoints.slice(2);
   return (
-    <AbsoluteFill style={{ background: props.backgroundColor }}>
+    <AbsoluteFill style={{ background: '#f8fafc' }}>
       {/* Background image with overlay */}
       {props.backgroundImageSrc && (
         <>
@@ -350,14 +358,14 @@ function VisualSegment({
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              opacity: 0.15,
+              opacity: 0.48,
             }}
           />
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              background: `linear-gradient(135deg, ${props.backgroundColor}ee 0%, ${props.backgroundColor}99 100%)`,
+              background: 'linear-gradient(90deg, #ffffffed 0%, #ffffffb8 55%, #fff7ed9e 100%)',
             }}
           />
         </>
@@ -398,7 +406,7 @@ function VisualSegment({
               display: 'flex',
               alignItems: 'flex-start',
               gap: 24,
-              background: '#1e293bcc',
+              background: '#fffffff0',
               borderRadius: 16,
               padding: '28px 32px',
               borderLeft: `4px solid ${props.accentColor}`,
@@ -424,7 +432,7 @@ function VisualSegment({
               {i + 3}
             </div>
             <div
-              style={{ color: '#e2e8f0', fontSize: 26, fontFamily: 'sans-serif', lineHeight: 1.5 }}
+              style={{ color: '#0f172a', fontSize: 26, fontFamily: 'sans-serif', lineHeight: 1.5 }}
             >
               {point}
             </div>
@@ -448,7 +456,11 @@ function ApplicationSegment({
 }) {
   return (
     <AbsoluteFill
-      style={{ background: props.backgroundColor, justifyContent: 'center', alignItems: 'center' }}
+      style={{
+        background: 'linear-gradient(135deg, #fef3c7 0%, #ffedd5 48%, #ccfbf1 100%)',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
       <TopBar color={props.topBarColor} title={props.title} />
       <Logo accentColor={props.accentColor} />
@@ -473,7 +485,7 @@ function ApplicationSegment({
           style={{
             opacity: fadeIn(frame, fps, 15, 25),
             transform: `translateY(${slideUp(frame, fps, 15)}px)`,
-            background: '#1e293b',
+            background: '#ffffffee',
             borderRadius: 24,
             padding: '48px 56px',
             borderTop: `4px solid ${props.topBarColor}`,
@@ -494,7 +506,7 @@ function ApplicationSegment({
           </div>
           <div
             style={{
-              color: '#e2e8f0',
+              color: '#1e293b',
               fontSize: 28,
               fontFamily: 'sans-serif',
               lineHeight: 1.6,
@@ -522,7 +534,11 @@ function WrapupSegment({
 }) {
   return (
     <AbsoluteFill
-      style={{ background: props.backgroundColor, justifyContent: 'center', alignItems: 'center' }}
+      style={{
+        background: 'linear-gradient(135deg, #ede9fe 0%, #cffafe 50%, #fff7ed 100%)',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
       <TopBar color={props.topBarColor} title={props.title} />
       <Logo accentColor={props.accentColor} />
@@ -547,7 +563,7 @@ function WrapupSegment({
           style={{
             opacity: fadeIn(frame, fps, 15, 25),
             transform: `translateY(${slideUp(frame, fps, 15)}px)`,
-            color: '#fff',
+            color: '#0f172a',
             fontSize: 36,
             fontFamily: 'sans-serif',
             lineHeight: 1.5,

@@ -18,6 +18,7 @@ import { MarketingPwaClient } from '@/components/pwa/MarketingPwaClient';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { FirstPartyTraffic } from '@/components/analytics/FirstPartyTraffic';
 import { SkipToContent } from '@/components/accessibility/SkipToContent';
 import { AssociateFormLabels } from '@/components/accessibility/AssociateFormLabels';
 
@@ -136,6 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MarketingPwaClient />
         <ChunkRecovery />
         <GoogleAnalytics />
+        <FirstPartyTraffic />
         <AssociateFormLabels />
         <I18nProvider>
           <SkipToContent />

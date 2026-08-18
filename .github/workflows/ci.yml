@@ -89,6 +89,33 @@ jobs:
       - name: Lint repository
         run: pnpm lint
 
+  diagnostics:
+    name: Advisory Tests & Repo Hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Run Vitest suite (advisory baseline)
+        continue-on-error: true
+        run: pnpm test
+      - name: Audit repository hygiene (non-destructive)
+        if: always()
+        run: node scripts/audit-repo-hygiene.mjs
+      - name: Check three-container contract (advisory baseline)
+        if: always()
+        continue-on-error: true
+        run: node scripts/check-container-contract.mjs
+
   ci-gate:
     name: CI Required Gate
     runs-on: ubuntu-latest

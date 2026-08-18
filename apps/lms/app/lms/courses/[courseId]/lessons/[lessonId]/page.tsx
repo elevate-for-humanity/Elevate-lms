@@ -176,8 +176,19 @@ export default async function LessonPage({
       </header>
 
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
+        <AITeachingPlayer
+          courseTitle={course.title}
+          lessonTitle={lesson.title}
+          instructorName={instructorName}
+          instructorImage={instructorImage}
+          slides={slides}
+        />
+
         {lesson.video_url ? (
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
+            <div className="bg-slate-900 px-5 py-3 text-sm font-black text-white">
+              Produced lesson video
+            </div>
             <video
               controls
               preload="metadata"
@@ -187,15 +198,7 @@ export default async function LessonPage({
               Your browser does not support HTML video.
             </video>
           </section>
-        ) : (
-          <AITeachingPlayer
-            courseTitle={course.title}
-            lessonTitle={lesson.title}
-            instructorName={instructorName}
-            instructorImage={instructorImage}
-            slides={slides}
-          />
-        )}
+        ) : null}
 
         {objectives.length ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

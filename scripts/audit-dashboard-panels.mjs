@@ -32,7 +32,7 @@ const panels = [
   {
     panel: 'LizzyContainer',
     method: 'GET',
-    path: '/api/admin/devstudio/config',
+    path: '/api/admin/dev-studio/config',
     expectUnauth: [307, 401, 403],
   },
   {

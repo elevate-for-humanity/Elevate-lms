@@ -1,14 +1,14 @@
 /**
  * CANONICAL PROGRAM DATA - Single Source of Truth
  *
- * All program pages MUST pull from this file.
- * Do not hardcode program hours, durations, or credentials elsewhere.
- *
- * Apprenticeship registration details are sourced from RAPIDS_CONFIG where
- * available so Marketing, LMS, Admin, documents, and reporting cannot drift.
+ * DOL Registered Apprenticeship requirements come from RAPIDS_CONFIG, which
+ * derives occupation-specific values from the approved Appendix A. State
+ * licensure-hour rules remain a separate state-licensing concern and must not
+ * be presented as the DOL completion model for competency-based occupations.
  */
 
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { INDIANA_RULES } from '@/lib/licensureRules/IN';
 
 export interface ProgramData {
   slug: string;
@@ -31,13 +31,19 @@ export interface ProgramData {
   category: 'apprenticeship' | 'training' | 'certification';
   isRegisteredApprenticeship: boolean;
   rapidsCodes?: string[];
+  apprenticeshipApproach?: 'competency-based' | 'time-based' | 'hybrid';
+  competencyCount?: number;
+  probationaryHours?: number;
+  apprenticeToMentorRatio?: string;
+  wageMilestones?: readonly { completedCompetencies: number; hourlyRate: number }[];
+  dolProgressStatement?: string;
 }
 
 export const ADMINISTRATOR_STATEMENT =
   'Elevate for Humanity serves as the Program Administrator for registered apprenticeship pathways, coordinating training, employer participation, and funding access.';
 
 export const STATE_VARIATION_DISCLAIMER =
-  'Hour requirements may vary by state. Elevate for Humanity administers the pathway shown where required.';
+  'State licensing requirements and DOL registered-apprenticeship standards are separate controls. The applicable approved program and jurisdiction rules govern.';
 
 const BARBER_RAPIDS = RAPIDS_CONFIG.programs.barber;
 
@@ -46,26 +52,34 @@ export const PROGRAMS: Record<string, ProgramData> = {
     slug: BARBER_RAPIDS.slug,
     name: BARBER_RAPIDS.name,
     shortName: 'Barber',
-    // RAPIDS time-based requirement: 2,000 supervised OJL hours. RTI is a
-    // separate 144-hour requirement and must not be subtracted from OJL.
-    totalHours: BARBER_RAPIDS.totalHours,
+    // Compatibility/state-licensure tracking only. DOL progress is competency-based
+    // and MUST use the Appendix A fields below rather than this numeric hour value.
+    totalHours: INDIANA_RULES.required_total_hours,
     relatedInstructionHours: BARBER_RAPIDS.relatedInstructionHours,
-    ojtHours: BARBER_RAPIDS.totalHours,
-    durationRange: 'Approximately 50 weeks at 40 OJL hours/week, subject to approved schedule and progress',
+    ojtHours: INDIANA_RULES.required_total_hours,
+    durationRange: 'Varies by competency progression, approved work schedule, RTI completion, and applicable licensing requirements',
     durationMonths: { min: 12, max: 24 },
     credential: 'Indiana Barber License',
-    credentialFull: 'Indiana Barber License following completion and state licensing requirements',
+    credentialFull: 'Indiana Barber License following registered-apprenticeship completion and applicable state licensing requirements',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA', 'Workforce Ready Grant', 'JRI', 'Employer Sponsorship', 'Self-Pay'],
-    startingWage: 'Varies by host shop and wage schedule',
-    wageRange: 'Varies by participating employer and registered wage progression',
-    careerOutcomeRange: 'Varies by employer, experience, location, and business model',
+    fundingOptions: ['WIOA', 'WorkOne OJT', 'Employer Training Grant', 'Workforce Ready Grant where authorized', 'Employer Sponsorship', 'Self-Pay'],
+    startingWage: `$${BARBER_RAPIDS.startingHourlyRate.toFixed(2)}/hour Appendix A rate, subject to any higher applicable legal minimum`,
+    wageRange: BARBER_RAPIDS.wageMilestones
+      .map((milestone) => `$${milestone.hourlyRate.toFixed(2)} after ${milestone.completedCompetencies} competencies`)
+      .join(' · '),
+    careerOutcomeRange: 'Varies by employer, experience, location, clientele, commission structure, and business model',
     stateRequirements:
-      'Registered Apprenticeship completion requires the approved program standards. Indiana licensing requirements and examination requirements also apply.',
+      'DOL apprenticeship completion follows the approved competency-based Appendix A. Indiana licensing-hour/exam requirements are tracked separately and do not replace Appendix A RTI, competencies, wages, ratio, or probation requirements.',
     category: 'apprenticeship',
     isRegisteredApprenticeship: true,
-    rapidsCodes: [RAPIDS_CONFIG.registrationId],
+    rapidsCodes: [BARBER_RAPIDS.rapidsCode],
+    apprenticeshipApproach: BARBER_RAPIDS.approach,
+    competencyCount: BARBER_RAPIDS.competencyCount,
+    probationaryHours: BARBER_RAPIDS.probationaryHours,
+    apprenticeToMentorRatio: BARBER_RAPIDS.apprenticeToMentorRatio,
+    wageMilestones: BARBER_RAPIDS.wageMilestones,
+    dolProgressStatement: `DOL progress is competency-based: ${BARBER_RAPIDS.competencyCount} Appendix A competencies plus ${BARBER_RAPIDS.relatedInstructionHours} RTI hours, with a ${BARBER_RAPIDS.apprenticeToMentorRatio} mentor ratio and ${BARBER_RAPIDS.probationaryHours}-hour probationary period.`,
   },
 
   'cosmetology-apprenticeship': {
@@ -175,6 +189,9 @@ export function formatHours(hours: number): string {
 }
 
 export function formatHoursWithDuration(program: ProgramData): string {
+  if (program.apprenticeshipApproach === 'competency-based' && program.dolProgressStatement) {
+    return program.dolProgressStatement;
+  }
   return `${formatHours(program.totalHours)} OJL hours (${program.durationRange})`;
 }
 

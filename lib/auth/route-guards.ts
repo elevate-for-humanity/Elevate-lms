@@ -23,6 +23,7 @@ import {
 const PORTAL_ROLE_MAP: Record<string, readonly string[]> = {
   '/admin': ADMIN_ROLES,
   '/lms': ALL_AUTHENTICATED_ROLES,
+  '/learner': ALL_AUTHENTICATED_ROLES,
   '/apprentice': APPRENTICE_ROLES,
   '/portal': ['super_admin', 'admin', 'student', 'learner', 'apprentice'],
   '/instructor': INSTRUCTOR_ROLES,
@@ -34,6 +35,8 @@ const PORTAL_ROLE_MAP: Record<string, readonly string[]> = {
   '/workforce-board': [...WORKFORCE_ROLES, 'workforce_board', 'workforce_board_admin'],
   '/provider': ['super_admin', 'admin', 'provider', 'provider_admin'],
   '/program-holder': PROGRAM_HOLDER_ROLES,
+  '/parent-portal': ['parent', 'admin', 'staff'],
+  '/creator': ['creator', 'admin'],
   '/proctor': TESTING_CENTER_ROLES,
   '/testing-center': TESTING_CENTER_ROLES,
 };
@@ -41,6 +44,7 @@ const PORTAL_ROLE_MAP: Record<string, readonly string[]> = {
 const ROUTE_REDIRECTS: Record<string, string> = {
   '/admin': '/lms/dashboard',
   '/lms': '/lms/dashboard',
+  '/learner': '/lms/dashboard',
   '/apprentice': '/apprentice',
   '/portal': '/lms/dashboard',
   '/instructor': '/instructor/dashboard',
@@ -52,6 +56,8 @@ const ROUTE_REDIRECTS: Record<string, string> = {
   '/workforce-board': '/workforce-board/dashboard',
   '/provider': '/provider/dashboard',
   '/program-holder': '/program-holder/dashboard',
+  '/parent-portal': '/parent-portal/dashboard',
+  '/creator': '/creator/products',
   '/proctor': '/testing-center',
   '/testing-center': '/testing-center',
 };

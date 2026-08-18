@@ -13,13 +13,14 @@ import 'server-only';
 
 import path from 'path';
 import os from 'os';
-import { mkdir, writeFile, unlink } from 'fs/promises';
+import { mkdir, writeFile, unlink, rm } from 'fs/promises';
 import { generateEdgeTTS, buildLessonScript, EDGE_TTS_VOICES, type EdgeTTSVoice } from './edge-tts';
 import { getPexelsImage } from './pexels';
 import { logger } from '@/lib/logger';
 // Type-only import — never bundled, only used for type checking
 import type { ElevateLessonProps } from '@/remotion-src/compositions/ElevateLesson';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { lessonRenderTempPaths, uploadLessonFileFromDisk } from '@/lib/video/upload-lesson-media';
 
 // Remotion's inputProps requires Record<string, unknown> — this cast is safe
 // because ElevateLessonProps is a plain serialisable object.
@@ -159,13 +160,12 @@ function estimateDuration(script: string): number {
 // ── Output paths ──────────────────────────────────────────────────────────────
 
 function getOutputPaths(lessonId: string) {
-  const outputDir = path.join(process.cwd(), 'public', 'generated', 'lessons');
+  const temp = lessonRenderTempPaths(lessonId);
+  const outputDir = temp.dir;
   return {
     outputDir,
-    audioPath: path.join(outputDir, `lesson-${lessonId}.mp3`),
-    videoPath: path.join(outputDir, `lesson-${lessonId}.mp4`),
-    audioUrl: `/generated/lessons/lesson-${lessonId}.mp3`,
-    videoUrl: `/generated/lessons/lesson-${lessonId}.mp4`,
+    audioPath: temp.audioPath,
+    videoPath: temp.videoPath,
   };
 }
 
@@ -187,10 +187,7 @@ async function getBundleUrl(): Promise<string> {
     // get bundled into the browser-side Remotion bundle.
     webpackOverride: (config) => ({
       ...config,
-      externals: [
-        ...(Array.isArray(config.externals) ? config.externals : []),
-        'edge-tts',
-      ],
+      externals: [...(Array.isArray(config.externals) ? config.externals : []), 'edge-tts'],
     }),
   });
 
@@ -256,7 +253,7 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
       instructorImageSrc: instructor.imageSrc,
       topBarColor: instructor.topBarColor,
       accentColor: instructor.accentColor,
-      backgroundColor: '#0f172a',
+      backgroundColor: '#fff7ed',
       segmentFrames,
     };
 
@@ -309,10 +306,14 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     logger.info(`[RemotionRender] MP4 written: ${paths.videoPath}`);
 
+    const videoUrl = await uploadLessonFileFromDisk(paths.videoPath, lessonId, 'mp4');
+    const audioUrl = await uploadLessonFileFromDisk(paths.audioPath, lessonId, 'mp3');
+    await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
+
     return {
       success: true,
-      videoUrl: paths.videoUrl,
-      audioUrl: paths.audioUrl,
+      videoUrl,
+      audioUrl,
       duration,
       method: 'remotion-free',
     };
@@ -322,6 +323,8 @@ export async function renderLessonVideo(input: RemotionLessonInput): Promise<Rem
 
     // Clean up partial output
     await unlink(paths.videoPath).catch(() => {});
+    await unlink(paths.audioPath).catch(() => {});
+    await rm(paths.outputDir, { recursive: true, force: true }).catch(() => {});
 
     return {
       success: false,
@@ -383,6 +386,7 @@ export function inferDomainKey(courseName: string, lessonTitle = ''): string {
   if (text.match(/cultur|divers|equity|inclusion/)) return 'cultural_competency';
   if (text.match(/document|record|report|note/)) return 'documentation';
   if (text.match(/career|job|employ|resume|interview/)) return 'career_readiness';
+  if (text.match(/business|entrepreneur|market|customer|finance|startup|esb/)) return 'business';
   if (text.match(/found|intro|overview|basic|principle/)) return 'foundations';
 
   return 'default';

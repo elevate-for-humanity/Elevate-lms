@@ -1,40 +1,40 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { publicRouteGroups } from '@/lib/navigation/public-route-registry';
 
 export const metadata: Metadata = {
-  title: 'Sitemap | Elevate',
-  description: 'Navigate all pages on Elevate for Humanity.',
-};
-
-const pages = {
-  'Programs': ['/programs', '/apprenticeships', '/funding', '/career-services'],
-  'Support': ['/contact', '/help', '/student-resources'],
-  'About': ['/about', '/team', '/blog'],
-  'Legal': ['/privacy-policy', '/terms', '/accessibility'],
+  title: 'Sitemap | Elevate for Humanity',
+  description: 'Browse the public programs, funding, apprenticeships, testing, store, employer, and institutional pages on Elevate for Humanity.',
+  alternates: { canonical: '/sitemap' },
 };
 
 export default function SitemapPage() {
+  const groups = Array.from(publicRouteGroups().entries());
+
   return (
     <main className="min-h-screen bg-white">
-      <section className="py-20 px-4 bg-gradient-to-br from-blue-900 to-blue-800 text-white">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl font-bold mb-4">Sitemap</h1>
-          <p className="text-xl text-blue-100">Find what you need.</p>
+      <section className="bg-gradient-to-br from-blue-900 to-blue-800 px-4 py-16 text-white">
+        <div className="mx-auto max-w-6xl">
+          <h1 className="text-4xl font-black sm:text-5xl">Sitemap</h1>
+          <p className="mt-3 max-w-2xl text-lg text-blue-100">Canonical public pages available for visitors and search engines.</p>
         </div>
       </section>
-      <section className="py-16 px-4 max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {Object.entries(pages).map(([cat, links]) => (
-            <div key={cat}>
-              <h3 className="text-xl font-bold text-blue-900 mb-4">{cat}</h3>
-              <ul className="space-y-2">
-                {links.map((href) => (
-                  <li key={href}>
-                    <Link href={href} className="text-blue-600 hover:underline">{href}</Link>
+
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {groups.map(([category, routes]) => (
+            <section key={category} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-black text-slate-950">{category}</h2>
+              <ul className="mt-4 space-y-2">
+                {routes.map((route) => (
+                  <li key={route.path}>
+                    <Link href={route.path} className="font-semibold text-blue-700 hover:underline">
+                      {route.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
           ))}
         </div>
       </section>

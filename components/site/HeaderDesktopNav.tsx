@@ -74,10 +74,11 @@ const topLevelClass =
 
 export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
   // Preserve every destination from the canonical registry without forcing
-  // nine full-width labels into the header. Secondary destinations remain
-  // available under one accessible More menu instead of a duplicate hamburger.
+  // every label into the header. Resources is a primary destination because
+  // the blog is part of the public acquisition/education funnel, not a hidden
+  // About-page utility.
   const primaryItems = items.filter((item) =>
-    ['programs', 'apprenticeships', 'funding', 'employers', 'portals'].includes(item.id ?? ''),
+    ['programs', 'apprenticeships', 'funding', 'employers', 'resources', 'portals'].includes(item.id ?? ''),
   );
   const secondaryItems = items.filter((item) => !primaryItems.includes(item));
 

@@ -31,6 +31,7 @@ run "Route and SEO governance" node scripts/check-route-seo-governance.mjs
 run "Public route guards" node scripts/guard-public-routes.mjs
 run "Pre-auth registry" node scripts/check-pre-auth-registry.cjs
 run "Canonical portal contracts" node scripts/audit-portal-contracts.mjs
+run "Privileged MFA architecture" node scripts/check-privileged-mfa-config.mjs
 
 if [[ -f scripts/audit-public-html.mjs ]]; then
   if [[ -n "${PUBLIC_HTML_AUDIT_BASE_URL:-}" ]]; then

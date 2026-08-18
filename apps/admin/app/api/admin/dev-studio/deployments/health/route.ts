@@ -28,18 +28,14 @@ export async function GET(request: NextRequest) {
     let apiMessage = 'Northflank API was not tested because credentials are incomplete.';
 
     if (runtimeReady && projectId) {
-      try {
-        const results = await Promise.allSettled(
-          services.map((service) => getNorthflankService(projectId, service.id)),
-        );
-        reachableServices = results.filter((result) => result.status === 'fulfilled').length;
-        apiReachable = reachableServices === services.length;
-        apiMessage = apiReachable
-          ? `Northflank API authenticated successfully and all ${reachableServices} production services were resolved.`
-          : `Northflank API responded, but only ${reachableServices}/${services.length} production services were resolved.`;
-      } catch {
-        apiMessage = 'Northflank API authentication or service lookup failed.';
-      }
+      const results = await Promise.allSettled(
+        services.map((service) => getNorthflankService(projectId, service.id)),
+      );
+      reachableServices = results.filter((result) => result.status === 'fulfilled').length;
+      apiReachable = reachableServices === services.length;
+      apiMessage = apiReachable
+        ? `Northflank API authenticated successfully and all ${reachableServices} production services were resolved.`
+        : `Northflank API responded, but only ${reachableServices}/${services.length} production services were resolved.`;
     }
 
     return buildCapabilityHealth('deployments', [
@@ -80,7 +76,6 @@ export async function GET(request: NextRequest) {
         passed: apiReachable,
         required: true,
         message: apiMessage,
-        details: { reachableServices, expectedServices: services.length },
       },
     ]);
   });

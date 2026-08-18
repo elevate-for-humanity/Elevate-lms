@@ -29,12 +29,7 @@ import {
 import { publishCourse } from './publisher';
 import { buildCourseEvidenceContext } from './evidence-context';
 import { inferStepType, validateBlueprint } from './validator';
-import type {
-  FactoryInput,
-  FactoryOutput,
-  FactoryStage,
-  ProgressCallback,
-} from './types';
+import type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
 
 class ProgressTracker {
   private callbacks: ProgressCallback[] = [];
@@ -73,10 +68,48 @@ function normalizeGeneratedSlug(slug: string, stepType: string, fallback: string
   const base = slugify(slug || fallback);
   if (stepType === 'checkpoint' && !base.includes('checkpoint')) return `${base}-checkpoint`;
   if (stepType === 'quiz' && !base.includes('quiz')) return `${base}-quiz`;
-  if (stepType === 'exam' && !base.includes('exam') && !base.includes('final')) return `${base}-exam`;
+  if (stepType === 'exam' && !base.includes('exam') && !base.includes('final'))
+    return `${base}-exam`;
   if (stepType === 'lab' && !base.includes('lab')) return `${base}-lab`;
   if (stepType === 'assignment' && !base.includes('assignment')) return `${base}-assignment`;
   return base;
+}
+
+function synchronizeLessonExperience(lesson: Record<string, any>): void {
+  if (typeof lesson.content !== 'string' || !lesson.content.trim()) return;
+  let content: Record<string, any>;
+  try {
+    content = JSON.parse(lesson.content) as Record<string, any>;
+  } catch {
+    return;
+  }
+  if (!content.experience || typeof content.experience !== 'object') return;
+
+  const questions = Array.isArray(lesson.quizQuestions) ? lesson.quizQuestions : [];
+  content.experience.knowledgeChecks = questions.map((question: Record<string, any>) => ({
+    question: question.question,
+    options: question.options,
+    correct: question.correctAnswer,
+    explanation: question.explanation,
+  }));
+
+  const objectives = Array.isArray(lesson.learningObjectives)
+    ? lesson.learningObjectives.filter(
+        (objective: unknown): objective is string =>
+          typeof objective === 'string' && objective.trim().length > 0,
+      )
+    : [];
+  content.experience.remediation = {
+    ...(content.experience.remediation ?? {}),
+    passingScore: lesson.passingScore ?? content.experience.remediation?.passingScore ?? 80,
+    reviewMessage:
+      content.experience.remediation?.reviewMessage ??
+      'Review missed objectives, replay the relevant lesson section, and retry before continuing.',
+    objectiveMap: questions.map(
+      (_: unknown, index: number) => objectives[index % Math.max(objectives.length, 1)] ?? '',
+    ),
+  };
+  lesson.content = JSON.stringify(content);
 }
 
 async function generateFreeFormBlueprint(
@@ -153,7 +186,9 @@ async function generateFreeFormBlueprint(
     0,
   );
   const credentialTitle = input.credential || raw.title || input.title;
-  const credentialCode = slugify(input.credential || input.title).toUpperCase().slice(0, 24);
+  const credentialCode = slugify(input.credential || input.title)
+    .toUpperCase()
+    .slice(0, 24);
 
   return {
     id: `generated-${programSlug}-${Date.now().toString(36)}`,
@@ -236,6 +271,9 @@ async function enrichBlueprint(
         });
 
         lesson.objective = generated.objective;
+        lesson.learningObjectives = [generated.objective, ...generated.learning_points].filter(
+          (value, index, values) => values.indexOf(value) === index,
+        );
         lesson.content = generated.content;
         lesson.quizQuestions = generated.quiz_questions.map((question, index) => ({
           id: `${lesson.slug}-q${index + 1}`,
@@ -270,9 +308,7 @@ async function enrichBlueprint(
           assessmentsGenerated += 1;
         } else if (stepType === 'exam') {
           progress.emit('assess', `Generating final exam bank: ${lesson.title}`);
-          const rule = blueprint.assessmentRules?.find(
-            (entry) => entry.assessmentType === 'final',
-          );
+          const rule = blueprint.assessmentRules?.find((entry) => entry.assessmentType === 'final');
           const questionCount = Math.max(25, rule?.minQuestions ?? 25);
           const assessment = await generateFinalExam(
             blueprint.credentialTitle,
@@ -289,6 +325,8 @@ async function enrichBlueprint(
           lesson.passingScore = Math.round((rule?.passingThreshold ?? 0.75) * 100);
           assessmentsGenerated += 1;
         }
+
+        synchronizeLessonExperience(lesson as unknown as Record<string, any>);
       } catch (error) {
         failures.push({
           slug: lesson.slug,
@@ -364,11 +402,12 @@ export async function courseFactory(
           warnings: [],
         };
       }
-      progress.emit('blueprint', 'No registered blueprint found; generating one in Course Factory.');
+      progress.emit(
+        'blueprint',
+        'No registered blueprint found; generating one in Course Factory.',
+      );
       const generatedSlug =
-        program?.slug ||
-        input.programSlug ||
-        `${slugify(input.title)}-${Date.now().toString(36)}`;
+        program?.slug || input.programSlug || `${slugify(input.title)}-${Date.now().toString(36)}`;
       blueprint = await generateFreeFormBlueprint(input, generatedSlug);
     } else {
       return {
@@ -446,9 +485,9 @@ export async function courseFactory(
           generationFailures,
           errors: [
             'The factory will not persist a partially generated course',
-            ...generationFailures.slice(0, 5).map(
-              (failure) => `${failure.slug}: ${failure.reason}`,
-            ),
+            ...generationFailures
+              .slice(0, 5)
+              .map((failure) => `${failure.slug}: ${failure.reason}`),
           ],
           warnings: [],
         };
@@ -466,7 +505,8 @@ export async function courseFactory(
         expectedLessonCount,
         assessmentsGenerated,
         errors: validation.errors.map(
-          (issue) => `${issue.module ?? 'course'}${issue.lesson ? `/${issue.lesson}` : ''}: ${issue.message}`,
+          (issue) =>
+            `${issue.module ?? 'course'}${issue.lesson ? `/${issue.lesson}` : ''}: ${issue.message}`,
         ),
         warnings: validation.warnings.map((issue) => issue.message),
         dryRun: Boolean(input.dryRun),
@@ -495,7 +535,10 @@ export async function courseFactory(
         videosQueued: 0,
         generationFailures,
         warnings: validation.warnings.map((issue) => issue.message),
-        errors: completionRatio >= 1 ? [] : ['Generated lesson count does not satisfy the blueprint contract'],
+        errors:
+          completionRatio >= 1
+            ? []
+            : ['Generated lesson count does not satisfy the blueprint contract'],
         dryRun: true,
       };
     }
@@ -506,15 +549,14 @@ export async function courseFactory(
       courseSlug: completeBlueprint.programSlug ?? `course-${Date.now()}`,
       courseTitle: completeBlueprint.credentialTitle,
       blueprint: completeBlueprint.modules,
-      mode: input.mode ?? 'missing-only',
+      mode: input.mode ?? 'refresh',
       contentSource:
         input.contentSource === 'curriculum_lessons' ? 'curriculum_lessons' : 'blueprint',
       videoConfig: { enabled: input.videoMode === 'queue' },
     });
 
     const retainedLessons = publishResult.lessonCount + publishResult.skippedCount;
-    const completionRatio =
-      expectedLessonCount > 0 ? retainedLessons / expectedLessonCount : 1;
+    const completionRatio = expectedLessonCount > 0 ? retainedLessons / expectedLessonCount : 1;
 
     if (!publishResult.success || completionRatio < 1) {
       if (publishResult.courseId) {
@@ -593,7 +635,7 @@ export async function courseFactory(
 
 export interface SimpleCourseInput {
   programSlug: string;
-  mode?: 'replace' | 'missing-only';
+  mode?: 'replace' | 'missing-only' | 'refresh';
   contentSource?: 'ai' | 'blueprint';
   includeVideos?: boolean;
 }
@@ -605,7 +647,7 @@ export interface SimpleCourseInput {
 export async function createCourse(input: SimpleCourseInput): Promise<FactoryOutput> {
   return courseFactory({
     programSlug: input.programSlug,
-    mode: input.mode ?? 'missing-only',
+    mode: input.mode ?? 'refresh',
     contentSource: input.contentSource ?? 'ai',
     videoMode: input.includeVideos === false ? 'off' : 'queue',
   });
@@ -614,14 +656,14 @@ export async function createCourse(input: SimpleCourseInput): Promise<FactoryOut
 export async function factoryFromSlug(
   slug: string,
   options?: {
-    mode?: 'replace' | 'missing-only';
+    mode?: 'replace' | 'missing-only' | 'refresh';
     contentSource?: 'ai' | 'blueprint';
     includeVideos?: boolean;
   },
 ): Promise<FactoryOutput> {
   return createCourse({
     programSlug: slug,
-    mode: options?.mode ?? 'missing-only',
+    mode: options?.mode ?? 'refresh',
     contentSource: options?.contentSource ?? 'ai',
     includeVideos: options?.includeVideos ?? true,
   });

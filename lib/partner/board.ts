@@ -86,13 +86,13 @@ function isPending(row: HourRow) {
 }
 
 async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
-  const { data: partnerLink, error: partnerLinkError } = await db
+  const { data: partnerLinks, error: partnerLinkError } = await db
     .from('partner_users')
     .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
     .eq('user_id', userId)
-    .eq('status', 'active')
-    .maybeSingle();
+    .eq('status', 'active');
 
+  const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
   if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) {
     return partnerLink.partners as unknown as PartnerRecord;
   }
@@ -155,7 +155,7 @@ export async function getHostShopBoard(userId: string) {
   const { data: placements, error: placementsError } = shopIds.length
     ? await db
         .from('apprentice_placements')
-        .select('id, student_id, shop_id, program_slug, status, start_date, profiles(full_name, email)')
+        .select('id, student_id, shop_id, program_slug, status, start_date, supervisor_user_id, profiles(full_name, email)')
         .in('shop_id', shopIds)
         .eq('status', 'active')
     : { data: [], error: null };
@@ -165,6 +165,7 @@ export async function getHostShopBoard(userId: string) {
     id: placement.id,
     student_id: placement.student_id,
     shop_id: placement.shop_id,
+    supervisor_user_id: placement.supervisor_user_id || null,
     name: placement.profiles?.full_name || 'Unknown',
     email: placement.profiles?.email || '',
     program_slug: placement.program_slug || null,
@@ -174,7 +175,7 @@ export async function getHostShopBoard(userId: string) {
   const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
   const placementByStudent = new Map(apprentices.map((apprentice) => [
     apprentice.student_id,
-    { shopId: apprentice.shop_id, programSlug: apprentice.program_slug },
+    { shopId: apprentice.shop_id, programSlug: apprentice.program_slug, supervisorUserId: apprentice.supervisor_user_id },
   ]));
 
   const workProgress: Record<string, { completed: number; required: number | null; progressModel: 'time_based' | 'competency_based' }> = {};

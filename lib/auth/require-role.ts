@@ -24,6 +24,22 @@ export interface AuthResult {
   effectiveRoles: UserRole[];
 }
 
+const HOST_SHOP_MEMBERSHIP_ROLES = new Set([
+  'owner',
+  'partner_admin',
+  'admin',
+  'supervisor',
+  'mentor',
+  'manager',
+]);
+
+function membershipDerivedRoles(rows: any[] | null | undefined): UserRole[] {
+  const hasActiveHostShopMembership = (rows || []).some((row: any) =>
+    row?.status === 'active' && HOST_SHOP_MEMBERSHIP_ROLES.has(String(row?.role || '').trim().toLowerCase()),
+  );
+  return hasActiveHostShopMembership ? ['host_shop'] : [];
+}
+
 async function resolveCurrentPath(): Promise<string> {
   const headersList = await headers();
   const fromHeader =
@@ -64,9 +80,10 @@ export async function requireRole(allowedRoles: readonly (UserRole | string)[]):
     redirect('/login');
   }
 
-  const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
+  const [{ data: profile }, { data: userRoleRows }, { data: partnerMembershipRows }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
+    supabase.from('partner_users').select('partner_id, role, status').eq('user_id', user.id).eq('status', 'active'),
   ]);
 
   if (!profile) redirect('/unauthorized');
@@ -74,7 +91,11 @@ export async function requireRole(allowedRoles: readonly (UserRole | string)[]):
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
     .filter((value: unknown): value is string => typeof value === 'string');
-  const effectiveRoles = normalizeRoles([profile.role, ...secondaryRoles]);
+  const effectiveRoles = normalizeRoles([
+    profile.role,
+    ...secondaryRoles,
+    ...membershipDerivedRoles(partnerMembershipRows),
+  ]);
 
   if (!hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true })) {
     redirect('/unauthorized');
@@ -97,15 +118,20 @@ export async function hasRole(requiredRole: string): Promise<boolean> {
   } = await supabase.auth.getUser();
   if (!user) return false;
 
-  const [{ data: profile }, { data: userRoleRows }] = await Promise.all([
+  const [{ data: profile }, { data: userRoleRows }, { data: partnerMembershipRows }] = await Promise.all([
     supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
     supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
+    supabase.from('partner_users').select('partner_id, role, status').eq('user_id', user.id).eq('status', 'active'),
   ]);
 
   const secondaryRoles = (userRoleRows || [])
     .map((row: any) => row.roles?.name)
     .filter((value: unknown): value is string => typeof value === 'string');
-  const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
+  const effectiveRoles = normalizeRoles([
+    profile?.role,
+    ...secondaryRoles,
+    ...membershipDerivedRoles(partnerMembershipRows),
+  ]);
 
   return hasAnyRole(effectiveRoles, [requiredRole], { adminOverride: true });
 }

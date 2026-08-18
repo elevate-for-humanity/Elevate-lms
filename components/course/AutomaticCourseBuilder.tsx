@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Sparkles, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
+import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runCourseFactoryPipeline';
 
 interface GenerateResult {
   ok: boolean;
@@ -15,37 +16,6 @@ interface GenerateResult {
   generation_attempt?: number;
   error?: string;
   errors_per_attempt?: string[][];
-}
-
-type GeneratedCourseDraft = {
-  title?: string;
-  modules?: Array<{ lessons?: unknown[] }>;
-};
-
-type GenerateDraftResponse = { course?: GeneratedCourseDraft; error?: string };
-type PublishCourseResponse = {
-  ok?: boolean;
-  courseId?: string;
-  lessonCount?: number;
-  status?: string;
-  error?: string;
-};
-
-async function readJsonResponse<T extends { error?: string }>(response: Response, operation: string): Promise<T> {
-  const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
-  if (contentType.includes('application/json')) return (await response.json()) as T;
-
-  const raw = await response.text();
-  console.error(`[course-generator] ${operation} returned a non-JSON response`, {
-    status: response.status,
-    contentType,
-    preview: raw.slice(0, 120),
-  });
-  throw new Error(
-    response.status === 404
-      ? `The ${operation} endpoint is not available on this Admin deployment. Please retry after the Admin service finishes deploying.`
-      : `${operation} returned an invalid response (HTTP ${response.status || 500}). Please retry.`,
-  );
 }
 
 const US_STATES = [
@@ -126,57 +96,42 @@ export default function AutomaticCourseBuilder() {
       setError('Target audience is required.');
       return;
     }
+    if (!programId.trim()) {
+      setError('Select or enter the canonical program ID so the course can use registered standards and workforce evidence.');
+      return;
+    }
     setError(null);
     setResult(null);
     setGenerating(true);
 
     try {
-      const requirements = [
-        `Create a complete workforce-ready course titled "${title.trim()}" for ${audience.trim()}.`,
-        'Use exactly 5 modules and 24 lessons total, including 3 checkpoint assessments and 1 final exam.',
-        hours ? `Total instructional time: ${parseInt(hours)} hours.` : '',
-        state ? `State or jurisdiction: ${state}.` : '',
-        credential.trim() ? `Credential or exam alignment: ${credential.trim()}.` : '',
-        deliveryFormat.trim() ? `Delivery format: ${deliveryFormat.trim()}.` : '',
-        prompt.trim(),
-      ].filter(Boolean).join('\n');
-
-      const generateResponse = await fetch('/api/admin/courses/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({ raw_text: requirements, input_type: 'prompt' }),
+      const published = await runCourseFactoryPipeline({
+        title: title.trim(),
+        topic: prompt.trim() || `${title.trim()} workforce preparation`,
+        audience: audience.trim(),
+        hours: hours ? Number.parseInt(hours, 10) : undefined,
+        state,
+        credential: credential.trim() || undefined,
+        deliveryFormat: deliveryFormat.trim() || undefined,
+        additionalRequirements: prompt.trim() || undefined,
+        programId: programId.trim(),
+        difficulty: 'intermediate',
+        moduleCount: 5,
+        lessonsPerModule: 5,
+        includeVideos: true,
+        dryRun: false,
       });
 
-      const generated = await readJsonResponse<GenerateDraftResponse>(generateResponse, 'course generation');
-      if (!generateResponse.ok || !generated.course) throw new Error(generated.error || 'Course generation failed.');
-
-      const publishResponse = await fetch('/api/admin/courses/generate/publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        cache: 'no-store',
-        body: JSON.stringify({
-          course: generated.course,
-          program_id: programId.trim() || undefined,
-          is_published: true,
-        }),
-      });
-
-      const published = await readJsonResponse<PublishCourseResponse>(publishResponse, 'course publishing');
-      if (!publishResponse.ok || !published.ok || !published.courseId) {
-        throw new Error(published.error || 'Course publishing failed.');
-      }
+      if (!published.courseId) throw new Error('Course Factory did not return a course ID.');
 
       setResult({
         ok: true,
         course_id: published.courseId,
-        title: generated.course.title || title.trim(),
-        modules_inserted: generated.course.modules?.length ?? 0,
-        lessons_published: published.lessonCount ?? generated.course.modules?.reduce(
-          (total, module) => total + (module.lessons?.length ?? 0), 0,
-        ) ?? 0,
-        curriculum_lessons_inserted: published.lessonCount ?? 0,
-        compliance_status: published.status || 'published',
+        title: published.title || title.trim(),
+        modules_inserted: published.modulesGenerated,
+        lessons_published: published.lessonsGenerated,
+        curriculum_lessons_inserted: published.lessonsGenerated,
+        compliance_status: 'validated',
         generation_attempt: 1,
       });
     } catch (err) {
@@ -194,10 +149,9 @@ export default function AutomaticCourseBuilder() {
           AI Course Generator
         </h2>
         <p className="text-sm text-slate-700 mt-1">
-          Generates a complete 24-lesson course (5 modules, 3 checkpoints, 1 exam) using GPT-4o and
-          publishes it immediately. Requires{' '}
-          <code className="bg-slate-100 px-1 rounded text-xs">OPENAI_API_KEY</code> to be set in
-          environment variables.
+          Runs the canonical Course Factory end to end: grounded curriculum, complete lessons,
+          interactive checks, assessments, narration, visual direction, durable publication, and
+          queued lesson videos.
         </p>
       </div>
 
@@ -296,16 +250,13 @@ export default function AutomaticCourseBuilder() {
 
         <div>
           <label className="block text-sm font-medium text-slate-900 mb-1">
-            Program ID{' '}
-            <span className="text-slate-700 font-normal">
-              (optional — links course to a program)
-            </span>
+            Canonical Program ID <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={programId}
             onChange={(e) => setProgramId(e.target.value)}
-            placeholder="UUID from programs table"
+            placeholder="Required UUID from the program registry"
             className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-blue-500"
           />
         </div>
@@ -325,7 +276,7 @@ export default function AutomaticCourseBuilder() {
           {generating ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              Generating course… this takes 30–60 seconds
+              Running Course Factory…
             </>
           ) : (
             <>

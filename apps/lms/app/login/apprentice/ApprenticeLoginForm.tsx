@@ -3,14 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
-import { resolveStudentHomePath } from '@/lib/portal/resolve-student-home';
 
-const APPRENTICE_ROLES = new Set([
-  'apprentice',
-  'barber_apprentice',
-  'cosmetology_apprentice',
-]);
+type SignInResponse = {
+  success?: boolean;
+  error?: string;
+  message?: string;
+};
 
 export default function ApprenticeLoginForm() {
   const [email, setEmail] = useState('');
@@ -18,73 +16,28 @@ export default function ApprenticeLoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const supabase = createClient();
-
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ email: email.trim(), password }),
       });
-
-      if (authError) {
-        setError(authError.message || 'Invalid credentials');
-        return;
+      const body = (await response.json().catch(() => null)) as SignInResponse | null;
+      if (!response.ok || body?.success !== true) {
+        throw new Error(body?.error || body?.message || 'Invalid email or password.');
       }
 
-      if (!data.user) {
-        setError('Login failed');
-        return;
-      }
-
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, portal_type')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-      if (profileError || !profile) {
-        await supabase.auth.signOut();
-        throw new Error('Your learner profile could not be verified. Please use the main login or contact support.');
-      }
-
-      const { data: roleRows, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('roles(name)')
-        .eq('user_id', data.user.id);
-
-      if (rolesError) {
-        await supabase.auth.signOut();
-        throw new Error('Your apprenticeship access could not be verified. Please retry.');
-      }
-
-      const secondaryRoles = (roleRows ?? [])
-        .map((row) => (row as { roles?: { name?: unknown } | null }).roles?.name)
-        .filter((role): role is string => typeof role === 'string');
-      const effectiveRoles = new Set(
-        [profile.role, ...secondaryRoles].filter((role): role is string => typeof role === 'string'),
-      );
-
-      if (![...effectiveRoles].some((role) => APPRENTICE_ROLES.has(role))) {
-        await supabase.auth.signOut();
-        throw new Error('This account is not assigned to an apprenticeship portal. Please use the main student and partner login.');
-      }
-
-      const dest = await resolveStudentHomePath(
-        supabase,
-        data.user.id,
-        profile.portal_type,
-      );
-
-      window.location.href = dest;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Login failed';
-      setError(msg);
-    } finally {
+      // /apprentice resolves real program enrollment, including early
+      // enrollment states, instead of treating profiles.role as the authority.
+      window.location.assign('/apprentice');
+    } catch (caughtError) {
+      setError(caughtError instanceof Error ? caughtError.message : 'Login failed');
       setLoading(false);
     }
   }
@@ -92,35 +45,35 @@ export default function ApprenticeLoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-sm text-red-300">
+        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="apprentice-email" className="block text-sm font-medium text-slate-200 mb-1">Email</label>
+        <label htmlFor="apprentice-email" className="mb-1 block text-sm font-medium text-slate-200">Email</label>
         <input
           id="apprentice-email"
           type="email"
           autoComplete="email"
           required
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          onChange={(event) => setEmail(event.target.value)}
+          className="w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
           placeholder="you@example.com"
         />
       </div>
 
       <div>
-        <label htmlFor="apprentice-password" className="block text-sm font-medium text-slate-200 mb-1">Password</label>
+        <label htmlFor="apprentice-password" className="mb-1 block text-sm font-medium text-slate-200">Password</label>
         <input
           id="apprentice-password"
           type="password"
           autoComplete="current-password"
           required
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg bg-slate-800 border border-slate-600 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          onChange={(event) => setPassword(event.target.value)}
+          className="w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500"
         />
         <div className="mt-2 text-right">
           <Link href="/reset-password" className="text-xs font-semibold text-amber-400 hover:underline">
@@ -132,9 +85,9 @@ export default function ApprenticeLoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold transition disabled:opacity-60 flex items-center justify-center gap-2"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 py-3 font-semibold text-slate-900 transition hover:bg-amber-600 disabled:opacity-60"
       >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
         Sign In
       </button>
     </form>

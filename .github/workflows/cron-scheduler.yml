@@ -62,18 +62,20 @@ on:
           - low-hours-pace
           - ops-scan
           - qa-scan
+          - video-render-queue
 
   # ── Daily jobs — 8 AM UTC ──────────────────────────────────────────────────
   schedule:
-    - cron: '0 8 * * *'    # daily-8am
-    - cron: '0 20 * * *'   # daily-8pm (end-of-day)
-    - cron: '*/5 * * * *'  # every-5-min (queue processors)
-    - cron: '0 9 * * 1'    # weekly-monday-9am
-    - cron: '0 2 * * *'    # daily-2am (maintenance: guardrails + memory cleanup)
+    - cron: '0 8 * * *' # daily-8am
+    - cron: '0 20 * * *' # daily-8pm (end-of-day)
+    - cron: '*/5 * * * *' # every-5-min (queue processors)
+    - cron: '0 9 * * 1' # weekly-monday-9am
+    - cron: '0 2 * * *' # daily-2am (maintenance: guardrails + memory cleanup)
     - cron: '*/30 * * * *' # every-30-min (missed clock-out enforcement)
 
 env:
   ADMIN_URL: ${{ secrets.ADMIN_URL }}
+  APP_URL: https://app.elevateforhumanity.org
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
 jobs:
@@ -88,6 +90,7 @@ jobs:
          || github.event.inputs.job == 'workflow-event-processor'
          || github.event.inputs.job == 'workflow-schedule-processor'
          || github.event.inputs.job == 'ai-operator'
+         || github.event.inputs.job == 'video-render-queue'
          ))
     steps:
       - name: Process notifications
@@ -124,6 +127,13 @@ jobs:
             -H "Authorization: Bearer $CRON_SECRET" \
             -H "Content-Type: application/json" \
             --max-time 55 || echo "::warning::ai-operator failed"
+
+      - name: Start next lesson video render
+        run: |
+          curl -sf -X POST "$APP_URL/api/internal/videos/process-queue" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "Content-Type: application/json" \
+            --max-time 30 || echo "::warning::video-render-queue failed"
 
   # ── Daily 8 AM: follow-ups, reminders, compliance ─────────────────────────
   daily-morning:

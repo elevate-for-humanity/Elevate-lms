@@ -7,7 +7,7 @@ import { loadAllBlueprints, courseFactory } from '@/lib/course-factory';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const BodySchema = z.object({
   blueprintId: z.string().min(1),

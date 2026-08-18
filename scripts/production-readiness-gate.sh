@@ -58,6 +58,7 @@ if [[ -d data/programs ]]; then
 else
   echo "FAIL: Program data directory missing"; FAIL=$((FAIL+1))
 fi
+run "Barber USDOL Appendix A architecture" node scripts/check-barber-appendix-a-architecture.mjs
 
 section "SECTION 4: VERIFIED CLAIMS"
 [[ -f components/ComplianceBadges.tsx ]] && echo "OK: Compliance Badges component exists" || { echo "WARN: Compliance Badges component missing"; WARN=$((WARN+1)); }

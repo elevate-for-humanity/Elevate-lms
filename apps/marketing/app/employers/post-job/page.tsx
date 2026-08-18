@@ -36,7 +36,7 @@ export default function EmployerPostJobPage() {
           <article className="rounded-2xl border border-slate-200 p-6 shadow-sm">
             <h2 className="text-xl font-bold text-slate-950">Host an Apprentice</h2>
             <p className="mt-3 text-slate-600">Learn how a licensed business can participate as a barber or beauty apprenticeship host shop.</p>
-            <Link href="/partners/barber-host-shop" className="mt-5 inline-flex font-bold text-brand-blue-700 hover:underline">Host Shop Information →</Link>
+            <Link href="/partners/host-shops" className="mt-5 inline-flex font-bold text-brand-blue-700 hover:underline">Host Shop Information →</Link>
           </article>
         </div>
       </section>

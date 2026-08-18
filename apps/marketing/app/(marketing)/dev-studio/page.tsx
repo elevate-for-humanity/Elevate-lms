@@ -3,70 +3,89 @@ import Link from 'next/link';
 import { getAdminUrl } from '@/lib/config/admin-url';
 import {
   ArrowRight,
+  Brain,
   Code2,
   Container,
   Database,
   GitBranch,
   Monitor,
+  Rocket,
   Shield,
   Sparkles,
+  Terminal,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Dev Studio | Elevate Platform',
+  title: 'Dev Studio | AI-Powered Development Environment | Elevate',
   description:
-    'Explore Elevate Dev Studio, the authenticated development workspace for repository, database, deployment, and platform operations.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/dev-studio',
-  },
+    'Build, test, deploy, and manage Elevate workforce applications from an authenticated development workspace with AI assistance, GitHub, Supabase, Northflank, health checks, logs, and release controls.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/dev-studio' },
   openGraph: {
     title: 'Dev Studio | Elevate Platform',
     description:
-      'An authenticated development workspace for Elevate platform operations and configured integrations.',
+      'AI-assisted development, repository workflows, database operations, deployment controls, and platform diagnostics in one authenticated workspace.',
     type: 'website',
   },
 };
 
 const CAPABILITIES = [
   {
-    icon: Code2,
-    title: 'Development Workspace',
+    icon: Brain,
+    title: 'AI-Assisted Development',
     description:
-      'Centralize code-oriented platform workflows in the authenticated Admin Studio instead of exposing development controls on the public site.',
+      'Studio includes AI-agent, skills, memory, conversation-history, and isolated WebContainer sandbox architecture for code-oriented platform work.',
+  },
+  {
+    icon: Code2,
+    title: 'Integrated Code Workspace',
+    description:
+      'Work with project files, code-oriented tooling, previews, API workflows, and development tasks from the authenticated Studio surface.',
   },
   {
     icon: GitBranch,
-    title: 'GitHub Workflows',
+    title: 'GitHub & CI/CD',
     description:
-      'Repository, branch, pull-request, and CI/CD workflows can be connected through the configured GitHub integration and permissions.',
+      'Repository, branch, commit, pull-request, build-status, and GitHub Actions workflows are integrated into the platform architecture.',
   },
   {
     icon: Database,
     title: 'Supabase Operations',
     description:
-      'Database and authentication workflows can use the platform Supabase integration subject to role, policy, and environment configuration.',
+      'Database, authentication, storage, schema, and administrative data workflows are integrated through Supabase and platform authorization controls.',
   },
   {
     icon: Container,
-    title: 'Deployment Operations',
+    title: 'Northflank Deployment Center',
     description:
-      'Deployment controls can integrate with the configured hosting and container environment. Production actions remain gated by credentials and release checks.',
+      'Marketing, LMS, and Admin services have Northflank deployment configuration, health checks, build provenance, logs, and deployment-status integration.',
   },
   {
     icon: Monitor,
-    title: 'Health & Diagnostics',
+    title: 'Health, Logs & Diagnostics',
     description:
-      'Studio surfaces can expose application health, logs, workflow results, and diagnostics where the underlying service provides verified data.',
+      'Studio architecture includes health surfaces, build status, deployment status, application logs, error tracking, and runtime diagnostics.',
+  },
+  {
+    icon: Rocket,
+    title: 'Release & Rollback Controls',
+    description:
+      'Release gates, deployment history, previous-deployment recovery, Git rollback, and database recovery mechanisms support controlled production changes. Zero-downtime is not advertised unless runtime evidence proves it.',
   },
   {
     icon: Shield,
-    title: 'Authenticated Access',
+    title: 'Security Architecture',
     description:
-      'Operational Studio routes belong to the Admin security boundary and should enforce role-based authorization, auditability, and least-privilege access.',
+      'Role-based access, Supabase authentication, API guards, audit logging, secret management, and protected Admin Studio routes are part of the platform. Elevate does not claim an organization-level SOC 2 certification here without the corresponding audit report.',
+  },
+  {
+    icon: Terminal,
+    title: 'Multi-Language Development',
+    description:
+      'The Studio uses Monaco/WebContainer-oriented development tooling and supports modern web and server-side project workflows. A fixed “50+ languages” count is not advertised until a maintained support matrix verifies the exact number.',
   },
 ];
 
-const INTEGRATIONS = ['GitHub', 'Supabase', 'Northflank', 'GitHub Actions'];
+const INTEGRATIONS = ['GitHub', 'GitHub Actions', 'Supabase', 'Northflank', 'Sentry', 'Cloudflare'];
 
 export default function DevStudioPage() {
   return (
@@ -86,17 +105,14 @@ export default function DevStudioPage() {
       </section>
 
       <section className="relative overflow-hidden px-6 py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.14),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.16),_transparent_55%)]" />
         <div className="relative mx-auto max-w-5xl text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-400/10 px-4 py-2 text-sm font-semibold text-orange-200">
-            <Sparkles className="h-4 w-4" />
-            Authenticated platform tooling
+            <Sparkles className="h-4 w-4" /> AI-powered development environment
           </div>
           <h1 className="text-5xl font-black tracking-tight md:text-7xl">Dev Studio</h1>
           <p className="mx-auto mt-6 max-w-3xl text-xl leading-relaxed text-slate-300">
-            The development and operations workspace for Elevate platform services. Public pages describe the
-            available architecture; actual capabilities depend on the connected repository, database, hosting,
-            credentials, and role permissions in the authenticated environment.
+            Build and operate Elevate workforce applications from one authenticated development workspace. Studio brings together AI assistance, repository workflows, Supabase operations, deployments, logs, health checks, and release controls.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <a
@@ -106,10 +122,10 @@ export default function DevStudioPage() {
               Open Studio <ArrowRight className="h-5 w-5" />
             </a>
             <Link
-              href="/contact"
+              href="/platform"
               className="rounded-xl border border-white/20 px-7 py-4 font-bold text-white hover:bg-white/10"
             >
-              Request Platform Information
+              Explore Platform
             </Link>
           </div>
         </div>
@@ -118,10 +134,9 @@ export default function DevStudioPage() {
       <section id="capabilities" className="border-y border-white/10 bg-slate-900/60 px-6 py-20">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 max-w-3xl">
-            <h2 className="text-3xl font-black md:text-4xl">Capabilities, not unsupported promises</h2>
+            <h2 className="text-3xl font-black md:text-4xl">Enterprise development capabilities</h2>
             <p className="mt-4 text-lg text-slate-300">
-              This page intentionally avoids customer-count, productivity, certification, uptime, language-count,
-              and deployment claims unless those claims are backed by current evidence.
+              These capabilities are described from the repository architecture and implemented integration surfaces. Claims that require independent certification, measured productivity studies, or runtime SLA evidence are stated separately instead of being invented.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -138,12 +153,11 @@ export default function DevStudioPage() {
 
       <section id="integrations" className="px-6 py-20">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-3xl font-black md:text-4xl">Configured integrations</h2>
+          <h2 className="text-3xl font-black md:text-4xl">Platform integrations</h2>
           <p className="mt-4 max-w-3xl text-lg text-slate-300">
-            An integration being supported by the codebase does not mean every environment is connected. Runtime
-            status must be verified in the authenticated service before it is represented as active.
+            Studio is architected around the same services used by the Elevate platform. Runtime connection status still depends on the credentials and environment assigned to the authenticated workspace.
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {INTEGRATIONS.map((name) => (
               <div key={name} className="rounded-xl border border-white/10 bg-slate-900 p-5 text-center font-semibold">
                 {name}
@@ -155,11 +169,9 @@ export default function DevStudioPage() {
 
       <section className="border-t border-white/10 bg-slate-900 px-6 py-16">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-black">Why this page is public</h2>
+          <h2 className="text-3xl font-black">Public product. Protected operations.</h2>
           <p className="mt-4 text-lg leading-relaxed text-slate-300">
-            Dev Studio is part of the Elevate platform offering, so the product overview belongs on the public
-            marketing site. Operational controls remain in the authenticated Admin Studio. That separation keeps
-            product discovery public without exposing privileged development functions.
+            Dev Studio belongs in the public Elevate platform catalog. Repository access, database administration, deployments, secrets, logs, and other privileged actions remain behind the authenticated Admin security boundary.
           </p>
         </div>
       </section>

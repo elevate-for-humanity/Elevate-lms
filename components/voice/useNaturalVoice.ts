@@ -27,56 +27,41 @@ function chooseBrowserVoice(): SpeechSynthesisVoice | null {
 }
 
 export function useNaturalVoice() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const objectUrlRef = useRef<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const releaseObjectUrl = useCallback(() => {
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(objectUrlRef.current);
-      objectUrlRef.current = null;
-    }
-  }, []);
-
   const stop = useCallback(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      try {
-        audio.currentTime = 0;
-      } catch {
-        // Audio metadata may not be available yet.
-      }
-      audio.src = '';
-    }
-    audioRef.current = null;
-
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     utteranceRef.current = null;
-
-    releaseObjectUrl();
     setIsPlaying(false);
     setIsPaused(false);
     setIsLoading(false);
-  }, [releaseObjectUrl]);
+  }, []);
 
-  const playBrowserFallback = useCallback((text: string, options: PlayOptions) => {
+  const play = useCallback(async (text: string, options: PlayOptions = {}) => {
+    const clean = text.trim();
+    if (!clean) return false;
+
+    stop();
+    setError(null);
+
     if (
       typeof window === 'undefined' ||
       !('speechSynthesis' in window) ||
       typeof SpeechSynthesisUtterance === 'undefined'
     ) {
+      setError('Voice playback is not supported in this browser.');
+      options.onError?.();
       return false;
     }
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+    setIsLoading(true);
+    const utterance = new SpeechSynthesisUtterance(clean);
     const browserVoice = chooseBrowserVoice();
     if (browserVoice) utterance.voice = browserVoice;
     utterance.lang = browserVoice?.lang || 'en-US';
@@ -109,97 +94,9 @@ export function useNaturalVoice() {
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
     return true;
-  }, []);
-
-  const play = useCallback(async (text: string, options: PlayOptions = {}) => {
-    const clean = text.trim();
-    if (!clean) return false;
-
-    stop();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/voice/natural', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: clean,
-          voice: options.voice || 'coral',
-          style: options.style || 'default',
-        }),
-      });
-
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null);
-        const fallbackStarted = playBrowserFallback(clean, options);
-        if (fallbackStarted) return true;
-        throw new Error(payload?.error || 'Voice is temporarily unavailable.');
-      }
-
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      objectUrlRef.current = objectUrl;
-
-      const audio = new Audio(objectUrl);
-      audio.preload = 'auto';
-      audio.playbackRate = Math.min(2, Math.max(0.5, options.rate || 1));
-      audio.onplay = () => {
-        setIsLoading(false);
-        setIsPlaying(true);
-        setIsPaused(false);
-      };
-      audio.onpause = () => {
-        if (!audio.ended) {
-          setIsPlaying(false);
-          setIsPaused(audio.currentTime > 0);
-        }
-      };
-      audio.onended = () => {
-        setIsPlaying(false);
-        setIsPaused(false);
-        audioRef.current = null;
-        releaseObjectUrl();
-        options.onEnded?.();
-      };
-      audio.onerror = () => {
-        audioRef.current = null;
-        releaseObjectUrl();
-        const fallbackStarted = playBrowserFallback(clean, options);
-        if (!fallbackStarted) {
-          setIsLoading(false);
-          setIsPlaying(false);
-          setIsPaused(false);
-          setError('Voice playback failed.');
-          options.onError?.();
-        }
-      };
-      audioRef.current = audio;
-
-      await audio.play();
-      return true;
-    } catch (cause) {
-      audioRef.current = null;
-      releaseObjectUrl();
-
-      const fallbackStarted = playBrowserFallback(clean, options);
-      if (fallbackStarted) return true;
-
-      setIsLoading(false);
-      setIsPlaying(false);
-      setIsPaused(false);
-      setError(cause instanceof Error ? cause.message : 'Voice is temporarily unavailable.');
-      options.onError?.();
-      return false;
-    }
-  }, [playBrowserFallback, releaseObjectUrl, stop]);
+  }, [stop]);
 
   const pause = useCallback(() => {
-    const audio = audioRef.current;
-    if (audio && !audio.paused) {
-      audio.pause();
-      return;
-    }
     if (utteranceRef.current && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.pause();
       setIsPlaying(false);
@@ -208,24 +105,12 @@ export function useNaturalVoice() {
   }, []);
 
   const resume = useCallback(async () => {
-    const audio = audioRef.current;
-    if (audio) {
-      try {
-        await audio.play();
-        return true;
-      } catch {
-        setError('Voice playback could not resume.');
-        return false;
-      }
-    }
-
     if (utteranceRef.current && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.resume();
       setIsPlaying(true);
       setIsPaused(false);
       return true;
     }
-
     return false;
   }, []);
 

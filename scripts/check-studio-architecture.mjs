@@ -75,8 +75,10 @@ function sourceFiles(current) {
     return /\.(?:[cm]?[jt]sx?|mjs|cjs|sh)$/.test(entry.name) ? [target] : [];
   });
 }
+const checkerPath = path.join(root, 'scripts/check-studio-architecture.mjs');
 for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']) {
   for (const file of sourceFiles(path.join(root, sourceRoot))) {
+    if (file === checkerPath) continue;
     if (read(path.relative(root, file)).includes('/api/admin/devstudio')) {
       fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
     }

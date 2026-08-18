@@ -16,6 +16,13 @@ LEGACY_APP="$ROOT/apps/app/api/devstudio"
 
 echo "=== Dev Studio Production Integration Gate ==="
 
+echo "\n== Architecture convergence =="
+if node scripts/check-studio-architecture.mjs; then
+  pass "Canonical Studio architecture gate"
+else
+  fail "Canonical Studio architecture gate"
+fi
+
 echo "\n== Canonical API ownership =="
 if [[ -d "$CANONICAL" ]] && find "$CANONICAL" -name route.ts -type f | grep -q .; then
   pass "Admin owns canonical /api/admin/dev-studio"

@@ -61,6 +61,11 @@ begin
 end;
 $$;
 
+-- This function is trigger-only. Do not expose it through Supabase RPC.
+revoke all on function public.sync_blog_post_to_social_drafts() from public;
+revoke execute on function public.sync_blog_post_to_social_drafts() from anon;
+revoke execute on function public.sync_blog_post_to_social_drafts() from authenticated;
+
 drop trigger if exists trg_blog_post_social_drafts on public.blog_posts;
 create trigger trg_blog_post_social_drafts
 after insert or update of published, share_to_social, title, excerpt, slug,

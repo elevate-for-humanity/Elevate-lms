@@ -3,10 +3,12 @@ import { createClient } from '@/lib/supabase/server';
 
 export type PartnerRole =
   | 'owner'
+  | 'partner_admin'
   | 'site_coordinator'
   | 'staff'
   | 'instructor'
   | 'manager'
+  | 'mentor'
   | 'supervisor'
   | 'admin';
 
@@ -53,19 +55,21 @@ export async function getMyPartnerContext() {
     };
   }
 
-  // Host-shop owners are commonly linked through partner_users rather than shop_staff.
-  const { data: partnerUser } = await supabase
+  // Host-shop members are commonly linked through partner_users rather than shop_staff.
+  // Do not assume a user can only have one historical/active partner relationship.
+  const { data: partnerUsers } = await supabase
     .from('partner_users')
-    .select('partner_id, role, status')
+    .select('partner_id, role, status, created_at')
     .eq('user_id', user.id)
     .eq('status', 'active')
-    .maybeSingle();
+    .order('created_at', { ascending: false });
 
+  const partnerUser = (partnerUsers || []).find((row: any) => Boolean(row?.partner_id));
   let partnerId = partnerUser?.partner_id as string | undefined;
   let partnerRole = (partnerUser?.role || 'owner') as PartnerRole;
 
   // Platform admins may inspect a tenant selected from the Host Shop board.
-  if (!partnerId && ['admin', 'super_admin', 'org_admin'].includes(profileRole)) {
+  if (!partnerId && ['admin', 'super_admin', 'org_admin'].includes(profileRole || '')) {
     const cookieStore = await cookies();
     partnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
     partnerRole = 'admin';

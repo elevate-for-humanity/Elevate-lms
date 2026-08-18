@@ -73,12 +73,10 @@ const topLevelClass =
   'rounded-md px-1.5 py-2 text-[13px] font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 xl:px-2.5 xl:text-sm';
 
 export default function HeaderDesktopNav({ items }: { items: NavItem[] }) {
-  // Preserve every destination from the canonical registry without forcing
-  // every label into the header. Resources is a primary destination because
-  // the blog is part of the public acquisition/education funnel, not a hidden
-  // About-page utility.
+  // Platform and Resources are public discovery surfaces, not hidden utilities.
+  // Authenticated portals remain discoverable while authorization still gates data/actions.
   const primaryItems = items.filter((item) =>
-    ['programs', 'apprenticeships', 'funding', 'employers', 'resources', 'portals'].includes(item.id ?? ''),
+    ['programs', 'apprenticeships', 'funding', 'platform', 'employers', 'resources', 'portals'].includes(item.id ?? ''),
   );
   const secondaryItems = items.filter((item) => !primaryItems.includes(item));
 

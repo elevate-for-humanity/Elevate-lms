@@ -1,72 +1,77 @@
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { APPENDIX_A_REGISTRATION, APPENDIX_A_STANDARDS } from '@/lib/compliance/appendix-a-standards';
+
+const BARBER_APPENDIX = APPENDIX_A_STANDARDS.barber;
+
 /**
  * RAPIDS Registration Configuration
  *
- * Centralized source of truth for USDOL Registered Apprenticeship data.
- * This file is the authoritative reference for all RAPIDS-related information.
+ * IMPORTANT: Appendix A is the authoritative source for occupation-specific
+ * DOL apprenticeship requirements. Do not duplicate RTI hours, competency
+ * counts, wage progression, ratio, or probation values here.
  */
-
 export const RAPIDS_CONFIG = {
-  // Sponsor Information
-  // RAPIDS registered sponsor is the legal entity; brand is the program name
-  sponsorOfRecord: '2Exclusive LLC-S', // Legal entity on RAPIDS registration
-  programBrand: 'Elevate for Humanity Career & Technical Institute', // DBA of 2Exclusive LLC-S
+  sponsorOfRecord: APPENDIX_A_REGISTRATION.sponsor,
+  programBrand: 'Elevate for Humanity Career & Technical Institute',
 
-  // Registration Details
-  registrationId: process.env.RAPIDS_REGISTRATION_ID || '2025-IN-132301',
-  programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301',
+  registrationId: process.env.RAPIDS_REGISTRATION_ID || APPENDIX_A_REGISTRATION.registrationNumber,
+  programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || APPENDIX_A_REGISTRATION.registrationNumber,
+  registrationDate: APPENDIX_A_REGISTRATION.registrationDate,
+  revisionDate: APPENDIX_A_REGISTRATION.revisionDate,
 
-  // Program Details
   programs: {
     barber: {
-      slug: 'barber-apprenticeship',
+      slug: BARBER_APPENDIX.programSlugs[0],
       name: 'Barber Apprenticeship',
-      occupation: 'Barber',
-      occupationCode: '330.371-010', // DOT code
+      occupation: BARBER_APPENDIX.occupationTitle,
+      occupationCode: BARBER_APPENDIX.onetSocCode,
+      rapidsCode: BARBER_APPENDIX.rapidsCode,
       state: 'IN',
-      totalHours: 2000,
-      relatedInstructionHours: 144,
+      approach: BARBER_APPENDIX.approach,
+      competencyCount: BARBER_APPENDIX.competencyCount,
+      relatedInstructionHours: BARBER_APPENDIX.relatedInstructionHours,
+      apprenticeToMentorRatio: BARBER_APPENDIX.apprenticeToMentorRatio,
+      probationaryHours: BARBER_APPENDIX.probationaryHours,
+      startingHourlyRate: BARBER_APPENDIX.startingHourlyRate,
+      mentorHourlyRate: BARBER_APPENDIX.mentorHourlyRate,
+      wageMilestones: BARBER_APPENDIX.wageMilestones,
+      relatedInstruction: BARBER_APPENDIX.relatedInstruction,
+      competencies: BARBER_APPENDIX.competencies,
+      rtiProvider: BARBER_APPENDIX.rtiProvider,
       fundingType: 'self_pay',
       tuition: 4980,
     },
   },
 
-  // State Information
   state: 'Indiana',
   stateCode: 'IN',
   licensingAgency: 'Indiana Professional Licensing Agency',
 
-  // Compliance Flags
   isStateFunded: false,
   wagesGuaranteed: false,
   employmentGuaranteed: false,
 } as const;
 
-/**
- * Get RAPIDS metadata for Stripe checkout sessions (internal audit trail)
- */
 export function getRAPIDSMetadata(programSlug: string) {
   const program = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === programSlug);
-
   if (!program) return null;
 
   return {
-    rapids_sponsor_legal: RAPIDS_CONFIG.sponsorOfRecord, // Legal entity on RAPIDS
-    rapids_program_brand: RAPIDS_CONFIG.programBrand, // Program brand name
+    rapids_sponsor_legal: RAPIDS_CONFIG.sponsorOfRecord,
+    rapids_program_brand: RAPIDS_CONFIG.programBrand,
     rapids_program: program.name,
     rapids_state: RAPIDS_CONFIG.stateCode,
-    rapids_registration_id: RAPIDS_CONFIG.registrationId, // Internal only
-    rapids_occupation_code: program.occupationCode,
+    rapids_registration_id: RAPIDS_CONFIG.registrationId,
+    rapids_occupation_code: program.rapidsCode,
+    onet_soc_code: program.occupationCode,
+    apprenticeship_approach: program.approach,
+    competency_count: program.competencyCount,
+    related_instruction_hours: program.relatedInstructionHours,
     funding_type: program.fundingType,
   };
 }
 
-/**
- * Get RAPIDS enrollment data for database records
- */
 export function getRAPIDSEnrollmentData(programSlug: string) {
   const program = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === programSlug);
-
   if (!program) return null;
 
   return {
@@ -74,27 +79,27 @@ export function getRAPIDSEnrollmentData(programSlug: string) {
     rapids_program: program.name,
     rapids_state: RAPIDS_CONFIG.stateCode,
     rapids_registration_on_file: true,
-    rapids_occupation_code: program.occupationCode,
-    total_hours_required: program.totalHours,
+    rapids_occupation_code: program.rapidsCode,
+    onet_soc_code: program.occupationCode,
+    apprenticeship_approach: program.approach,
+    competency_count_required: program.competencyCount,
     related_instruction_hours: program.relatedInstructionHours,
+    probationary_hours: program.probationaryHours,
+    apprentice_to_mentor_ratio: program.apprenticeToMentorRatio,
+    starting_hourly_rate: program.startingHourlyRate,
+    wage_milestones: program.wageMilestones,
   };
 }
 
-/**
- * Check if a program is RAPIDS-registered
- */
 export function isRAPIDSProgram(programSlug: string): boolean {
   return Object.values(RAPIDS_CONFIG.programs).some((p) => p.slug === programSlug);
 }
 
-/**
- * Get public-safe registration details (no sensitive IDs or registration numbers)
- */
 export function getPublicRegistrationDetails() {
   return {
     sponsorLegalEntity: RAPIDS_CONFIG.sponsorOfRecord,
     programBrand: RAPIDS_CONFIG.programBrand,
-    publicStatement: `${RAPIDS_CONFIG.programBrand} is a DBA of ${RAPIDS_CONFIG.sponsorOfRecord}, the registered Sponsor of Record.`,
+    publicStatement: `${RAPIDS_CONFIG.programBrand} operates under ${RAPIDS_CONFIG.sponsorOfRecord}, the registered Sponsor of Record.`,
     state: RAPIDS_CONFIG.state,
     isStateFunded: RAPIDS_CONFIG.isStateFunded,
     licensingAgency: RAPIDS_CONFIG.licensingAgency,

@@ -30,6 +30,14 @@ function withMediaRevision(src?: string) {
   return `${src}${src.includes('?') ? '&' : '?'}v=${HOME_MEDIA_REVISION}`;
 }
 
+/** Public homepage trust labels must describe implemented workflows, not an
+ * implementation technology that has not been independently evidenced. */
+function publicTrustIndicators(items?: string[]) {
+  return items?.map((item) =>
+    item === 'Blockchain-Verified Credentials' ? 'Credential Verification Workflows' : item,
+  );
+}
+
 /**
  * Homepage video wrapper.
  * Video and narration URLs are revisioned with the deployed commit SHA so
@@ -51,7 +59,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       belowHeroHeadline={banner.belowHeroHeadline}
       belowHeroSubheadline={banner.belowHeroSubheadline}
       ctas={ctas}
-      trustIndicators={banner.trustIndicators}
+      trustIndicators={publicTrustIndicators(banner.trustIndicators)}
       transcript={banner.transcript}
       analyticsName={banner.analyticsName}
       heightClassName="h-[46vh] min-h-[340px] max-h-[620px]"

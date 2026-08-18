@@ -1,6 +1,6 @@
 /**
  * PARIS Voice Command System
- * Natural-language voice input with natural AI spoken responses.
+ * Natural-language voice input with free device/browser spoken responses.
  */
 
 'use client';
@@ -58,31 +58,25 @@ function responseText(data: { message?: string; error?: string; followUp?: strin
   return 'Done';
 }
 
-/**
- * Compatibility helper for callers outside React hooks. It deliberately uses
- * the shared natural-voice endpoint and never falls back to SpeechSynthesis.
- */
+/** Compatibility helper for callers outside React hooks. Uses the free browser/device voice engine. */
 export async function speakResponse(data: { message?: string; error?: string; followUp?: string; result?: unknown }) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
   const text = responseText(data).trim();
   if (!text) return;
 
-  try {
-    const response = await fetch('/api/voice/natural', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.slice(0, 2400), voice: 'coral', style: 'assistant' }),
-    });
-    if (!response.ok) return;
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.onended = () => URL.revokeObjectURL(url);
-    audio.onerror = () => URL.revokeObjectURL(url);
-    await audio.play();
-  } catch {
-    // Voice is an enhancement; command execution remains usable by text.
-  }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text.slice(0, 2400));
+  const voices = window.speechSynthesis.getVoices();
+  const preferred =
+    voices.find((voice) => /natural|neural|premium|enhanced/i.test(voice.name) && /^en(-|_)/i.test(voice.lang)) ||
+    voices.find((voice) => /^en-US$/i.test(voice.lang)) ||
+    voices.find((voice) => /^en(-|_)/i.test(voice.lang)) ||
+    voices[0];
+  if (preferred) utterance.voice = preferred;
+  utterance.lang = preferred?.lang || 'en-US';
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
 }
 
 export function useVoiceCommands() {
@@ -257,7 +251,7 @@ export function VoiceCommandChat() {
             {lastResult.followUp ? <p className="mt-2 text-sm font-medium text-slate-700">{lastResult.followUp}</p> : null}
           </div>
         ) : null}
-        {voiceError ? <p className="text-sm font-semibold text-red-800">Natural spoken response is temporarily unavailable; command results remain visible above.</p> : null}
+        {voiceError ? <p className="text-sm font-semibold text-red-800">Spoken response is unavailable in this browser; command results remain visible above.</p> : null}
       </div>
 
       <form onSubmit={handleSubmit} className="border-t border-slate-300 p-4">
@@ -276,12 +270,12 @@ export function VoiceCommandChat() {
   );
 }
 
-/** Compatibility hook: same call shape, natural AI output, no browser voices. */
+/** Compatibility hook: same call shape using free browser/device voices. */
 export function useSpeech() {
   const naturalVoice = useNaturalVoice();
   const speak = useCallback((text: string, options?: { rate?: number; pitch?: number; voice?: SpeechSynthesisVoice }) => {
     void naturalVoice.play(text.slice(0, 2400), {
-      voice: 'coral',
+      voice: 'browser',
       style: 'assistant',
       rate: options?.rate || 1,
     });
@@ -291,7 +285,7 @@ export function useSpeech() {
     speak,
     stop: naturalVoice.stop,
     isSpeaking: naturalVoice.isPlaying || naturalVoice.isLoading,
-    voices: [] as SpeechSynthesisVoice[],
+    voices: typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis.getVoices() : [] as SpeechSynthesisVoice[],
   };
 }
 

@@ -4,6 +4,7 @@ import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, BookOpen, CheckCircle2, Clock3, Video } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import InteractiveLessonExperience from '@/components/lms/InteractiveLessonExperience';
+import AITeachingPlayer, { type TeachingSlide } from '@/components/lms/AITeachingPlayer';
 import LessonProgressClient from './LessonProgressClient';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,33 @@ function htmlFromContent(content: unknown, renderedHtml?: string | null) {
   return '';
 }
 
+function plainText(value: string) {
+  return value
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function teachingSlides(title: string, html: string): TeachingSlide[] {
+  const parts = html.split(/<h[1-3][^>]*>([\s\S]*?)<\/h[1-3]>/gi);
+  const slides: TeachingSlide[] = [];
+  const introduction = plainText(parts[0] ?? '');
+  if (introduction) slides.push({ title, narration: introduction.slice(0, 900) });
+  for (let index = 1; index < parts.length; index += 2) {
+    const heading = plainText(parts[index] ?? '') || title;
+    const narration = plainText(parts[index + 1] ?? '');
+    if (narration) slides.push({ title: heading, narration: narration.slice(0, 1100) });
+  }
+  if (!slides.length) slides.push({ title, narration: plainText(html).slice(0, 1100) || title });
+  return slides.slice(0, 12);
+}
+
 export default async function LessonPage({
   params,
 }: {
@@ -35,23 +63,31 @@ export default async function LessonPage({
 }) {
   const { courseId, lessonId } = await params;
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`);
+    redirect(
+      `/login?redirect=${encodeURIComponent(`/lms/courses/${courseId}/lessons/${lessonId}`)}`,
+    );
   }
 
   let courseQuery = supabase
     .from('courses')
     .select('id,title,slug,is_active')
     .eq('is_active', true);
-  courseQuery = isUuid(courseId) ? courseQuery.eq('id', courseId) : courseQuery.eq('slug', courseId);
+  courseQuery = isUuid(courseId)
+    ? courseQuery.eq('id', courseId)
+    : courseQuery.eq('slug', courseId);
   const { data: course } = await courseQuery.maybeSingle();
   if (!course) notFound();
 
   const { data: lesson } = await supabase
     .from('course_lessons')
-    .select('id,module_id,title,slug,content,rendered_html,video_url,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index')
+    .select(
+      'id,module_id,title,slug,content,rendered_html,video_url,video_config,duration_minutes,lesson_type,learning_objectives,quiz_questions,key_terms,passing_score,is_published,order_index',
+    )
     .eq('id', lessonId)
     .eq('course_id', course.id)
     .eq('is_published', true)
@@ -79,11 +115,26 @@ export default async function LessonPage({
   const lessonList = orderedLessons ?? [];
   const currentIndex = lessonList.findIndex((item) => item.id === lesson.id);
   const previous = currentIndex > 0 ? lessonList[currentIndex - 1] : null;
-  const next = currentIndex >= 0 && currentIndex < lessonList.length - 1 ? lessonList[currentIndex + 1] : null;
+  const next =
+    currentIndex >= 0 && currentIndex < lessonList.length - 1 ? lessonList[currentIndex + 1] : null;
   const objectives = Array.isArray(lesson.learning_objectives) ? lesson.learning_objectives : [];
   const questions = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions : [];
   const keyTerms = Array.isArray(lesson.key_terms) ? lesson.key_terms : [];
   const lessonHtml = htmlFromContent(lesson.content, lesson.rendered_html);
+  const slides = teachingSlides(lesson.title, lessonHtml);
+  const videoConfig =
+    lesson.video_config && typeof lesson.video_config === 'object'
+      ? (lesson.video_config as Record<string, unknown>)
+      : {};
+  const instructorName =
+    typeof videoConfig.instructor === 'string'
+      ? videoConfig.instructor
+      : /barber/i.test(course.title)
+        ? 'James Williams'
+        : 'Angela Thompson';
+  const instructorImage = /james/i.test(instructorName)
+    ? '/images/instructors/james-williams.jpg'
+    : '/images/instructors/angela-thompson.jpg';
   const lessonType = String(lesson.lesson_type ?? 'lesson');
   const passingScore = Number(lesson.passing_score ?? 70);
   const moduleOrder = Number(moduleRow?.order_index ?? 1);
@@ -127,18 +178,36 @@ export default async function LessonPage({
       <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6">
         {lesson.video_url ? (
           <section className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-sm">
-            <video controls preload="metadata" className="aspect-video w-full" src={lesson.video_url}>
+            <video
+              controls
+              preload="metadata"
+              className="aspect-video w-full"
+              src={lesson.video_url}
+            >
               Your browser does not support HTML video.
             </video>
           </section>
-        ) : null}
+        ) : (
+          <AITeachingPlayer
+            courseTitle={course.title}
+            lessonTitle={lesson.title}
+            instructorName={instructorName}
+            instructorImage={instructorImage}
+            slides={slides}
+          />
+        )}
 
         {objectives.length ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="flex items-center gap-2 text-xl font-extrabold"><BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives</h2>
+            <h2 className="flex items-center gap-2 text-xl font-extrabold">
+              <BookOpen className="h-5 w-5 text-cyan-700" /> Learning objectives
+            </h2>
             <ul className="mt-4 space-y-2 text-base font-medium leading-7 text-slate-800">
               {objectives.map((objective, index) => (
-                <li key={index} className="flex gap-3"><span className="font-extrabold text-cyan-700">•</span><span>{String(objective)}</span></li>
+                <li key={index} className="flex gap-3">
+                  <span className="font-extrabold text-cyan-700">•</span>
+                  <span>{String(objective)}</span>
+                </li>
               ))}
             </ul>
           </section>
@@ -153,7 +222,8 @@ export default async function LessonPage({
           </section>
         ) : (
           <section className="rounded-xl border border-amber-200 bg-amber-50 p-5 font-semibold text-amber-950">
-            Lesson content is not available. Contact your instructor before marking this lesson complete.
+            Lesson content is not available. Contact your instructor before marking this lesson
+            complete.
           </section>
         )}
 
@@ -162,13 +232,22 @@ export default async function LessonPage({
             <h2 className="text-xl font-extrabold">Key terms</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {keyTerms.map((term, index) => (
-                <span key={index} className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800">{typeof term === 'string' ? term : JSON.stringify(term)}</span>
+                <span
+                  key={index}
+                  className="rounded-full bg-slate-100 px-3 py-2 text-sm font-bold text-slate-800"
+                >
+                  {typeof term === 'string' ? term : JSON.stringify(term)}
+                </span>
               ))}
             </div>
           </section>
         ) : null}
 
-        <InteractiveLessonExperience courseId={course.id} lessonSlug={lesson.slug} lessonId={lesson.id} />
+        <InteractiveLessonExperience
+          courseId={course.id}
+          lessonSlug={lesson.slug}
+          lessonId={lesson.id}
+        />
 
         <LessonProgressClient
           courseId={course.id}
@@ -181,12 +260,29 @@ export default async function LessonPage({
 
         <nav className="flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
           {previous ? (
-            <Link href={`/lms/courses/${course.id}/lessons/${previous.id}`} className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100">← {previous.title}</Link>
-          ) : <span />}
-          {next ? (
-            <Link href={`/lms/courses/${course.id}/lessons/${next.id}`} className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800">{next.title} →</Link>
+            <Link
+              href={`/lms/courses/${course.id}/lessons/${previous.id}`}
+              className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100"
+            >
+              ← {previous.title}
+            </Link>
           ) : (
-            <Link href={`/lms/courses/${course.id}`} className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800">Return to course</Link>
+            <span />
+          )}
+          {next ? (
+            <Link
+              href={`/lms/courses/${course.id}/lessons/${next.id}`}
+              className="rounded-lg bg-cyan-700 px-5 py-3 text-right font-bold text-white hover:bg-cyan-800"
+            >
+              {next.title} →
+            </Link>
+          ) : (
+            <Link
+              href={`/lms/courses/${course.id}`}
+              className="rounded-lg bg-cyan-700 px-5 py-3 font-bold text-white hover:bg-cyan-800"
+            >
+              Return to course
+            </Link>
           )}
         </nav>
       </div>

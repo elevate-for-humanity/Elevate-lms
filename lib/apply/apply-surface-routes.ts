@@ -81,13 +81,6 @@ export const APPLY_AUDIT_SURFACES: ApplySurface[] = [
   },
   {
     section: 'Providers & hosts',
-    name: 'Barber host apply',
-    href: '/partners/barber-host-shop/apply',
-    api: '/api/host-shop/apply-multipart',
-    note: 'Compatibility route redirects to /partners/host-shop/apply.',
-  },
-  {
-    section: 'Providers & hosts',
     name: 'Cosmetology host apply',
     href: '/partners/cosmetology-host-shop/apply',
     api: '/api/host-shop/apply-multipart',

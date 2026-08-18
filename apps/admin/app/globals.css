@@ -148,9 +148,12 @@ body {
     user-select: none;
   }
 
-  /* Links that look like buttons */
-  a[class*='bg-'],
-  a[class*='rounded'] {
+  /* Interactive links opt in explicitly. Utility fragments such as
+     hover:bg-* and rounded-* also appear on navigation links, so class-name
+     substring selectors must not change their display semantics. */
+  a.btn,
+  a[role='button'],
+  a[data-button='true'] {
     min-height: 44px;
     display: inline-flex;
     align-items: center;

@@ -112,7 +112,7 @@ function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string 
   const label = (banner.microLabel ?? 'Elevate for Humanity').trim();
   const compactTitle = title.length > 72 ? `${title.slice(0, 69).trim()}...` : title;
   const compactLabel = label.length > 40 ? `${label.slice(0, 37).trim()}...` : label;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${escapeSvgText(compactTitle)}"><rect width="1600" height="900" fill="#0f172a"/><rect x="0" y="0" width="18" height="900" fill="#b91c1c"/><text x="96" y="360" fill="#f8fafc" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="700" letter-spacing="2">${escapeSvgText(compactLabel.toUpperCase())}</text><text x="96" y="470" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800">${escapeSvgText(compactTitle)}</text><text x="96" y="790" fill="#cbd5e1" font-family="Arial,Helvetica,sans-serif" font-size="30">Elevate for Humanity · ${escapeSvgText(key)}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${escapeSvgText(compactTitle)}"><rect width="1600" height="900" fill="#eef4fb"/><rect x="0" y="0" width="18" height="900" fill="#b91c1c"/><rect x="72" y="250" width="1456" height="400" rx="30" fill="#ffffff"/><text x="112" y="360" fill="#1d4f7a" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="700" letter-spacing="2">${escapeSvgText(compactLabel.toUpperCase())}</text><text x="112" y="470" fill="#0f172a" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800">${escapeSvgText(compactTitle)}</text><circle cx="800" cy="590" r="54" fill="#b91c1c"/><polygon points="784,560 784,620 832,590" fill="#ffffff"/><text x="112" y="790" fill="#475569" font-family="Arial,Helvetica,sans-serif" font-size="30">Elevate for Humanity · ${escapeSvgText(key)}</text></svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
@@ -159,8 +159,6 @@ function normalizeBanner(
     };
   }
 
-  // Store may fall back to a poster only when it has no dedicated registry
-  // video. A live store assignment in VIDEO_REGISTRY always wins.
   if (key === 'store' && !dedicated) {
     normalized = {
       ...normalized,
@@ -185,7 +183,7 @@ function normalizeBanner(
       trustIndicators: [
         'AI-Driven Career Navigation',
         'Automated Compliance Tracking',
-        'Blockchain-Verified Credentials',
+        'Credential Verification Workflows',
       ],
       transcript:
         'Elevate for Humanity is an AI-powered workforce operating system — not just a training provider. We automate the journey from recruitment to employment. Our platform supports credentialing, compliance tracking, employer placement, and apprenticeship coordination through one connected ecosystem.',

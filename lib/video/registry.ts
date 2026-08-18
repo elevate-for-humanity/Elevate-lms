@@ -1,9 +1,8 @@
 /**
- * Canonical video registry.
+ * Canonical production video registry.
  *
- * Hero pages must resolve their media from HERO_VIDEO_BY_PAGE_KEY instead of
- * hard-coding MP4 URLs in page components. A hero video ID is assigned to at
- * most one marketing page key so unrelated pages never reuse the same film.
+ * Only verified, playable production videos belong here. Draft/demo placeholders
+ * and generated records without a real media URL must never be registered.
  */
 
 export interface VideoRecord {
@@ -20,7 +19,7 @@ export interface VideoRecord {
   page_slugs: string[];
   language: string;
   version: number;
-  status: 'draft' | 'live' | 'archived';
+  status: 'live';
   updated_at: string;
   mime_type: string;
   cors_enabled: boolean;
@@ -213,60 +212,9 @@ export const VIDEO_REGISTRY: Record<string, VideoRecord> = {
     mime_type: 'video/mp4',
     cors_enabled: true,
   },
-  'demo-lms-overview': {
-    id: 'demo-lms-overview',
-    title: 'LMS Platform Overview',
-    description: 'Student LMS demo.',
-    video_url: '/videos/demos/lms-overview.mp4',
-    thumbnail_url: '/images/pages/demos-hero.webp',
-    duration: 'PT15M',
-    upload_date: '2025-01-01',
-    category: 'Demo',
-    page_slugs: ['/demos'],
-    language: 'en',
-    version: 1,
-    status: 'draft',
-    updated_at: '2025-01-01T00:00:00Z',
-    mime_type: 'video/mp4',
-    cors_enabled: true,
-  },
-  'demo-employer-portal': {
-    id: 'demo-employer-portal',
-    title: 'Employer Portal Demo',
-    description: 'Employer portal demo.',
-    video_url: '/videos/demos/employer-portal.mp4',
-    thumbnail_url: '/images/pages/demos-hero.webp',
-    duration: 'PT10M',
-    upload_date: '2025-01-01',
-    category: 'Demo',
-    page_slugs: ['/demos'],
-    language: 'en',
-    version: 1,
-    status: 'draft',
-    updated_at: '2025-01-01T00:00:00Z',
-    mime_type: 'video/mp4',
-    cors_enabled: true,
-  },
-  'demo-admin-dashboard': {
-    id: 'demo-admin-dashboard',
-    title: 'Admin Dashboard Tour',
-    description: 'Admin dashboard demo.',
-    video_url: '/videos/demos/admin-dashboard.mp4',
-    thumbnail_url: '/images/pages/demos-hero.webp',
-    duration: 'PT20M',
-    upload_date: '2025-01-01',
-    category: 'Demo',
-    page_slugs: ['/demos'],
-    language: 'en',
-    version: 1,
-    status: 'draft',
-    updated_at: '2025-01-01T00:00:00Z',
-    mime_type: 'video/mp4',
-    cors_enabled: true,
-  },
 };
 
-/** One marketing hero page key -> one dedicated video ID. */
+/** One marketing hero page key -> one verified production video ID. */
 export const HERO_VIDEO_BY_PAGE_KEY: Readonly<Record<string, string>> = Object.freeze({
   home: 'hero-home',
   programs: 'programs-overview',
@@ -286,38 +234,24 @@ export function getVideoById(videoId: string): VideoRecord | null {
 
 export function getHeroVideoForPageKey(pageKey: string): VideoRecord | null {
   const id = HERO_VIDEO_BY_PAGE_KEY[pageKey];
-  if (!id) return null;
-  const video = getVideoById(id);
-  return video?.status === 'live' ? video : null;
+  return id ? getVideoById(id) : null;
 }
 
 export function getVideoForPage(pageSlug: string): VideoRecord | null {
   const normalizedSlug = pageSlug.startsWith('/') ? pageSlug : `/${pageSlug}`;
-  return (
-    Object.values(VIDEO_REGISTRY).find(
-      (video) => video.status === 'live' && video.page_slugs.includes(normalizedSlug),
-    ) || null
-  );
+  return Object.values(VIDEO_REGISTRY).find((video) => video.page_slugs.includes(normalizedSlug)) || null;
 }
 
 export function getVideosByCategory(category: string): VideoRecord[] {
-  return Object.values(VIDEO_REGISTRY).filter(
-    (video) => video.status === 'live' && video.category === category,
-  );
+  return Object.values(VIDEO_REGISTRY).filter((video) => video.category === category);
 }
 
 export function getAllLiveVideos(): VideoRecord[] {
-  return Object.values(VIDEO_REGISTRY).filter((video) => video.status === 'live');
+  return Object.values(VIDEO_REGISTRY);
 }
 
 export function getAllCategories(): string[] {
-  return Array.from(
-    new Set(
-      Object.values(VIDEO_REGISTRY)
-        .filter((video) => video.status === 'live')
-        .map((video) => video.category),
-    ),
-  );
+  return Array.from(new Set(Object.values(VIDEO_REGISTRY).map((video) => video.category)));
 }
 
 export function getVideoCacheUrl(video: VideoRecord): string {

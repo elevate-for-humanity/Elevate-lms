@@ -18,7 +18,6 @@ const IDENTITY_ERRORS: Record<string, string> = {
 export default function HostShopLoginPage() {
   const router = useRouter();
   const searchParams = useSafeSearchParams();
-  const supabase = createClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,26 +35,20 @@ export default function HostShopLoginPage() {
     setIsLoading(true);
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
-      if (authError) throw new Error('Invalid email or password.');
-      if (!data.user) throw new Error('Login failed. Please try again.');
-
-      // Host-shop authorization requires an explicit active partner_users link.
-      // A generic profiles.role value is never sufficient by itself.
-      const { data: partnerUser, error: partnerError } = await supabase
-        .from('partner_users')
-        .select('partner_id, role, status')
-        .eq('user_id', data.user.id)
-        .eq('status', 'active')
-        .maybeSingle();
-
-      if (partnerError || !partnerUser?.partner_id) {
-        await supabase.auth.signOut();
-        throw new Error('This login is not linked to an active Host Shop account. Use the Host Shop application or contact support.');
+      const response = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      const body = (await response.json().catch(() => null)) as { success?: boolean; error?: string } | null;
+      if (!response.ok || body?.success !== true) {
+        throw new Error(body?.error || 'Invalid email or password.');
       }
 
-      router.replace('/host-shop/dashboard');
-      router.refresh();
+      // The server-side dashboard boundary validates active partner_users and
+      // shop_staff relationships. Credentials never bypass that authorization.
+      window.location.assign('/host-shop/dashboard');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed. Please check your credentials.';
       setError(message);
@@ -73,6 +66,7 @@ export default function HostShopLoginPage() {
     setIsLoading(true);
     setError('');
     try {
+      const supabase = createClient();
       const { error: magicLinkError } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: { emailRedirectTo: `${window.location.origin}/auth/callback` },

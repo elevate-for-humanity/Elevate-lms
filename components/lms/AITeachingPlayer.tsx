@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
+import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 export type TeachingSlide = { title: string; narration: string };
 
@@ -21,50 +22,34 @@ export default function AITeachingPlayer({
   slides,
 }: Props) {
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const naturalVoice = useNaturalVoice();
   const current = slides[index] ?? { title: lessonTitle, narration: lessonTitle };
   const progress = Math.round(((index + 1) / Math.max(slides.length, 1)) * 100);
 
-  const supported = useMemo(() => typeof window !== 'undefined' && 'speechSynthesis' in window, []);
-
   function stop() {
-    if (typeof window !== 'undefined') window.speechSynthesis?.cancel();
-    utteranceRef.current = null;
-    setPlaying(false);
+    naturalVoice.stop();
   }
 
-  function speak(slideIndex = index) {
-    if (!supported) return;
-    window.speechSynthesis.cancel();
+  async function speak(slideIndex = index) {
     const slide = slides[slideIndex] ?? current;
-    const utterance = new SpeechSynthesisUtterance(`${slide.title}. ${slide.narration}`);
-    const voices = window.speechSynthesis.getVoices();
-    utterance.voice =
-      voices.find((voice) => /aria|jenny|samantha|female/i.test(voice.name)) ?? voices[0] ?? null;
-    utterance.rate = 0.92;
-    utterance.pitch = 1;
-    utterance.onend = () => {
-      if (slideIndex < slides.length - 1) {
-        const nextIndex = slideIndex + 1;
-        setIndex(nextIndex);
-        window.setTimeout(() => speak(nextIndex), 250);
-      } else {
-        setPlaying(false);
-      }
-    };
-    utterance.onerror = () => setPlaying(false);
-    utteranceRef.current = utterance;
-    setPlaying(true);
-    window.speechSynthesis.speak(utterance);
+    await naturalVoice.play(`${slide.title}. ${slide.narration}`, {
+      voice: 'coral',
+      style: 'instructor',
+      rate: 0.92,
+      onEnded: () => {
+        if (slideIndex < slides.length - 1) {
+          const nextIndex = slideIndex + 1;
+          setIndex(nextIndex);
+          window.setTimeout(() => void speak(nextIndex), 250);
+        }
+      },
+    });
   }
 
   function move(nextIndex: number) {
     stop();
     setIndex(Math.min(Math.max(nextIndex, 0), slides.length - 1));
   }
-
-  useEffect(() => stop, []);
 
   return (
     <section className="overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 via-white to-cyan-50 text-slate-950 shadow-xl">
@@ -118,11 +103,22 @@ export default function AITeachingPlayer({
             </button>
             <button
               type="button"
-              onClick={() => (playing ? stop() : speak())}
-              disabled={!supported}
+              onClick={() => {
+                if (naturalVoice.isLoading) stop();
+                else if (naturalVoice.isPlaying) naturalVoice.pause();
+                else if (naturalVoice.isPaused) void naturalVoice.resume();
+                else void speak();
+              }}
               className="inline-flex min-h-12 items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-black text-white shadow-md hover:from-orange-600 hover:to-pink-600 disabled:opacity-50"
             >
-              {playing ? <Pause /> : <Play />} {playing ? 'Pause instructor' : 'Play lesson'}
+              {naturalVoice.isPlaying || naturalVoice.isLoading ? <Pause /> : <Play />}{' '}
+              {naturalVoice.isLoading
+                ? 'Preparing instructor'
+                : naturalVoice.isPlaying
+                  ? 'Pause instructor'
+                  : naturalVoice.isPaused
+                    ? 'Resume instructor'
+                    : 'Play lesson'}
             </button>
             <button
               type="button"
@@ -148,6 +144,11 @@ export default function AITeachingPlayer({
               <Volume2 className="h-4 w-4" /> Narration and captions
             </span>
           </div>
+          {naturalVoice.error ? (
+            <p className="mt-3 text-sm font-semibold text-red-800" role="alert">
+              Natural instructor voice is temporarily unavailable. The complete lesson remains available in captions.
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

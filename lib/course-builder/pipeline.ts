@@ -16,22 +16,27 @@ import { courseFactory } from '@/lib/course-factory';
 import { logger } from '@/lib/logger';
 
 export function generateCourseCode(slug: string): string {
-  const parts = slug.replace(/[^a-z0-9]+/gi, '-').split('-').filter(Boolean);
-  const prefix = parts
-    .find((part) => /^[a-z]/i.test(part))
-    ?.replace(/[^a-z]/gi, '')
-    .toUpperCase()
-    .slice(0, 4) ?? 'CRS';
+  const parts = slug
+    .replace(/[^a-z0-9]+/gi, '-')
+    .split('-')
+    .filter(Boolean);
+  const prefix =
+    parts
+      .find((part) => /^[a-z]/i.test(part))
+      ?.replace(/[^a-z]/gi, '')
+      .toUpperCase()
+      .slice(0, 4) ?? 'CRS';
   const numMatch = slug.match(/\d+/);
   const suffix = numMatch
     ? numMatch[0].slice(-3).padStart(3, '0')
     : String(
-        slug.split('').reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) & 0xffff, 0) % 900 + 100,
+        (slug.split('').reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) & 0xffff, 0) % 900) +
+          100,
       );
   return `${prefix}${suffix}`;
 }
 
-export type PipelineMode = 'missing-only' | 'replace';
+export type PipelineMode = 'missing-only' | 'replace' | 'refresh';
 
 export type PipelineOptions = {
   template: CourseTemplate;
@@ -56,7 +61,7 @@ export type PipelineResult = {
  * No direct courses/course_modules/course_lessons writes are allowed here.
  */
 export async function runCoursePublishPipeline(opts: PipelineOptions): Promise<PipelineResult> {
-  const { template, mode = 'missing-only', dryRun = false } = opts;
+  const { template, mode = 'refresh', dryRun = false } = opts;
   const validation = validateCourseTemplate(template);
 
   if (!validation.valid) {
@@ -77,8 +82,8 @@ export async function runCoursePublishPipeline(opts: PipelineOptions): Promise<P
     programSlug: template.programSlug,
     blueprint,
     mode,
-    contentSource: 'blueprint',
-    videoMode: 'off',
+    contentSource: 'ai',
+    videoMode: 'queue',
     dryRun,
   });
 

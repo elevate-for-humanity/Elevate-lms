@@ -33,11 +33,11 @@ export const ROLE_ROUTE_CONFIG: Readonly<Record<string, RoleRouteConfig>> = {
   test_admin: { path: '/testing-center', host: 'admin', portalKey: 'testing', label: 'Test Admin' },
   proctor: { path: '/testing-center', host: 'admin', portalKey: 'testing', label: 'Proctor' },
 
-  student: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Student' },
-  learner: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Learner' },
-  user: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'User' },
-  delegate: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Delegate' },
-  grant_client: { path: '/lms/dashboard', host: 'lms', portalKey: 'lms', label: 'Grant Client' },
+  student: { path: '/learner/dashboard', host: 'lms', portalKey: 'lms', label: 'Student' },
+  learner: { path: '/learner/dashboard', host: 'lms', portalKey: 'lms', label: 'Learner' },
+  user: { path: '/learner/dashboard', host: 'lms', portalKey: 'lms', label: 'User' },
+  delegate: { path: '/learner/dashboard', host: 'lms', portalKey: 'lms', label: 'Delegate' },
+  grant_client: { path: '/learner/dashboard', host: 'lms', portalKey: 'lms', label: 'Grant Client' },
 
   apprentice: { path: '/apprentice', host: 'lms', portalKey: 'apprentice', label: 'Apprentice' },
   barber_apprentice: { path: '/apprentice', host: 'lms', portalKey: 'apprentice', label: 'Barber Apprentice' },

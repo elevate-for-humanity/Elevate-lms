@@ -27,6 +27,7 @@ run "API admin guards" bash scripts/audit-api-auth-guards.sh
 run "Auth gaps (strict production-sensitive enforcement)" bash scripts/audit-auth-gaps.sh --strict
 run "Env vars" bash scripts/audit-env-vars.sh
 run "Redirect conflicts" env BUILD_SCOPE=1 node scripts/check-redirect-conflicts.mjs
+run "Route and SEO governance" node scripts/check-route-seo-governance.mjs
 run "Public route guards" node scripts/guard-public-routes.mjs
 run "Pre-auth registry" node scripts/check-pre-auth-registry.cjs
 run "Canonical portal contracts" node scripts/audit-portal-contracts.mjs

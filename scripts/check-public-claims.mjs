@@ -1,8 +1,13 @@
 #!/usr/bin/env node
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ROOTS = ['apps/marketing/app', 'components/site'];
+const ROOTS = [
+  'apps/marketing/app',
+  'components/site',
+  'components/home',
+  'components/marketing',
+];
 const ALLOWED_EXT = new Set(['.ts', '.tsx', '.js', '.jsx', '.md', '.mdx']);
 const BLOCKED = [
   { pattern: /SOC\s*2\s*(Certified|Compliant)/i, label: 'SOC 2 certification/compliance without evidence gating' },
@@ -21,19 +26,28 @@ function extension(path) {
 }
 
 function filesUnder(root) {
+  if (!existsSync(root)) {
+    console.warn(`⚠️ Claim-scan root does not exist: ${root}`);
+    return [];
+  }
+  const stat = statSync(root);
+  if (stat.isFile()) return ALLOWED_EXT.has(extension(root)) ? [root] : [];
+
   const out = [];
   for (const entry of readdirSync(root)) {
     const path = join(root, entry);
-    const stat = statSync(path);
-    if (stat.isDirectory()) out.push(...filesUnder(path));
+    const child = statSync(path);
+    if (child.isDirectory()) out.push(...filesUnder(path));
     else if (ALLOWED_EXT.has(extension(path))) out.push(path);
   }
   return out;
 }
 
 let failures = 0;
+let scanned = 0;
 for (const root of ROOTS) {
   for (const file of filesUnder(root)) {
+    scanned += 1;
     const text = readFileSync(file, 'utf8');
     for (const rule of BLOCKED) {
       if (rule.pattern.test(text)) {
@@ -44,20 +58,35 @@ for (const root of ROOTS) {
   }
 }
 
-const marketingLayout = readFileSync('apps/marketing/app/layout.tsx', 'utf8');
-if (!marketingLayout.includes('<FirstPartyTraffic />')) {
-  console.error('❌ Marketing layout does not mount first-party traffic collection.');
-  failures += 1;
-} else {
-  console.log('✅ First-party traffic collection is mounted.');
+const requiredFiles = [
+  'apps/marketing/app/layout.tsx',
+  'scripts/check-dev-studio-claims.mjs',
+  'supabase/migrations/20260818221500_dev_studio_claim_evidence_and_benchmarks.sql',
+];
+for (const file of requiredFiles) {
+  if (!existsSync(file)) {
+    console.error(`❌ Required claim-governance file is missing: ${file}`);
+    failures += 1;
+  }
+}
+
+if (existsSync('apps/marketing/app/layout.tsx')) {
+  const marketingLayout = readFileSync('apps/marketing/app/layout.tsx', 'utf8');
+  if (!marketingLayout.includes('<FirstPartyTraffic />')) {
+    console.error('❌ Marketing layout does not mount first-party traffic collection.');
+    failures += 1;
+  } else {
+    console.log('✅ First-party traffic collection is mounted.');
+  }
 }
 
 const legalPageExists = ['apps/marketing/app/legal/page.tsx', 'apps/marketing/app/(marketing)/legal/page.tsx']
-  .some((path) => {
-    try { readFileSync(path, 'utf8'); return true; } catch { return false; }
-  });
-if (!legalPageExists) console.warn('⚠️ Legal index route not found at canonical locations; verify privacy-policy routing separately.');
+  .some((path) => existsSync(path));
+if (!legalPageExists) {
+  console.warn('⚠️ Legal index route not found at canonical locations; verify privacy-policy routing separately.');
+}
 
+console.log(`Scanned ${scanned} public-facing source files.`);
 if (failures) {
   console.error(`\n❌ Public claim gate failed with ${failures} issue(s).`);
   process.exit(1);

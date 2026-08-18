@@ -32,7 +32,7 @@
     "healthCheck": {
       "enabled": true,
       "path": "/api/health/northflank",
-      "port": 8080,
+      "port": 3000,
       "protocol": "HTTP"
     }
   }

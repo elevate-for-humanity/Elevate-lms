@@ -64,6 +64,7 @@ run "Barber USDOL Appendix A architecture" node scripts/check-barber-appendix-a-
 section "SECTION 4: VERIFIED CLAIMS"
 [[ -f components/ComplianceBadges.tsx ]] && echo "OK: Compliance Badges component exists" || { echo "WARN: Compliance Badges component missing"; WARN=$((WARN+1)); }
 [[ -f lib/automation/evidence-processor.ts ]] && echo "OK: Evidence processor exists" || { echo "WARN: Evidence processor missing"; WARN=$((WARN+1)); }
+run "Public claim integrity" node scripts/check-public-claims.mjs
 
 section "SECTION 5: WORKFLOW ENGINE"
 [[ -f lib/workflows/engine.ts ]] && echo "OK: Workflow Engine exists" || { echo "FAIL: Workflow Engine missing"; FAIL=$((FAIL+1)); }

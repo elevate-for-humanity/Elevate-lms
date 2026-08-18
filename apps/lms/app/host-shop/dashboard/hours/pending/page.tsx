@@ -14,6 +14,10 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+function isPlatformAdmin(effectiveRoles: readonly string[]) {
+  return effectiveRoles.includes('admin') || effectiveRoles.includes('super_admin') || effectiveRoles.includes('org_admin');
+}
+
 async function getAuthorizedHour(hourId: string) {
   const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
@@ -37,6 +41,14 @@ async function getAuthorizedHour(hourId: string) {
       (!apprentice.program_slug || !hour.program_slug || apprentice.program_slug === hour.program_slug),
   );
   if (!placement) throw new Error('HOUR_ENTRY_NOT_AUTHORIZED');
+
+  if (
+    hour.program_slug === 'barber-apprenticeship' &&
+    !isPlatformAdmin(effectiveRoles) &&
+    placement.supervisor_user_id !== user.id
+  ) {
+    throw new Error('BARBER_SUPERVISOR_REQUIRED');
+  }
 
   const pending = hour.status === 'pending' || hour.approval_status === 'pending';
   if (!pending) throw new Error('HOUR_ENTRY_NOT_PENDING');
@@ -64,7 +76,7 @@ async function approveHour(formData: FormData) {
       approved_by_role: effectiveRoles[0] || 'host_shop',
       approved_at: new Date().toISOString(),
       rejection_reason: null,
-      approval_notes: 'Verified by assigned Host Shop.',
+      approval_notes: 'Verified by assigned Host Shop supervisor.',
     })
     .eq('id', hourId)
     .eq('host_shop_id', hour.host_shop_id);
@@ -105,7 +117,7 @@ async function rejectHour(formData: FormData) {
 }
 
 export default async function PendingHoursPage() {
-  const { user } = await requireRole(HOST_SHOP_ROLES);
+  const { user, effectiveRoles } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
   const db = await requireAdminClient();
   const studentIds = board.apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
@@ -124,13 +136,18 @@ export default async function PendingHoursPage() {
   const apprenticeById = new Map(
     board.apprentices.map((apprentice) => [apprentice.student_id, apprentice]),
   );
+  const adminViewer = isPlatformAdmin(effectiveRoles);
   const rows = (pendingHours || []).filter((hour) => {
     const placement = apprenticeById.get(hour.user_id);
-    return Boolean(
-      placement &&
-      placement.shop_id === hour.host_shop_id &&
-      (!placement.program_slug || !hour.program_slug || placement.program_slug === hour.program_slug),
-    );
+    if (!placement) return false;
+    if (placement.shop_id !== hour.host_shop_id) return false;
+    if (placement.program_slug && hour.program_slug && placement.program_slug !== hour.program_slug) return false;
+    if (
+      hour.program_slug === 'barber-apprenticeship' &&
+      !adminViewer &&
+      placement.supervisor_user_id !== user.id
+    ) return false;
+    return true;
   });
 
   return (
@@ -143,7 +160,7 @@ export default async function PendingHoursPage() {
         <div>
           <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">{board.partner?.name || 'Host Shop'}</p>
           <h1 className="mt-2 text-3xl font-black text-slate-950">Pending OJT Hours</h1>
-          <p className="mt-2 text-slate-600">Only hour entries explicitly assigned to this Host Shop and an active apprentice placement are shown.</p>
+          <p className="mt-2 text-slate-600">Only hour entries assigned to this Host Shop, active placement, and—where Appendix A requires it—the assigned supervisor are shown.</p>
         </div>
         <div className="rounded-full bg-amber-100 px-4 py-2 text-sm font-black text-amber-900">{rows.length} pending</div>
       </div>
@@ -157,8 +174,8 @@ export default async function PendingHoursPage() {
       {rows.length === 0 ? (
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
           <CheckCircle2 className="mx-auto h-10 w-10 text-brand-green-600" />
-          <h2 className="mt-3 text-xl font-black text-slate-950">No Host Shop hours awaiting review</h2>
-          <p className="mt-1 text-sm text-slate-500">Transfer hours or entries not assigned to this shop are intentionally excluded.</p>
+          <h2 className="mt-3 text-xl font-black text-slate-950">No Host Shop hours awaiting your review</h2>
+          <p className="mt-1 text-sm text-slate-500">Transfer hours, other-shop entries, and Barber entries assigned to another supervisor are intentionally excluded.</p>
         </section>
       ) : (
         <div className="mt-6 space-y-4">

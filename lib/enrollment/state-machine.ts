@@ -55,15 +55,15 @@ export function getActionRoute(action: EnrollmentAction, programSlug?: string | 
     case 'complete_application':
       return slug ? `/apply/${slug}` : '/apply';
     case 'wait_for_approval':
-      return '/lms/dashboard';
+      return '/learner/dashboard';
     case 'complete_onboarding':
       return '/lms/onboarding';
     case 'complete_payment':
-      return slug ? `/apply/${slug}/payment` : '/lms/dashboard';
+      return slug ? `/apply/${slug}/payment` : '/learner/dashboard';
     case 'wait_for_funding_verification':
-      return '/lms/dashboard';
+      return '/learner/dashboard';
     case 'start_learning':
-      return '/lms/dashboard';
+      return '/learner/dashboard';
     case 'contact_support':
       return '/contact';
     default:

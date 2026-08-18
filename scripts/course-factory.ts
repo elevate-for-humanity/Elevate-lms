@@ -83,7 +83,7 @@ async function listPrograms() {
 
 async function buildCourse(
   slug: string, 
-  options?: { mode?: 'replace' | 'missing-only'; contentSource?: 'ai' | 'blueprint' }
+  options?: { mode?: 'replace' | 'missing-only' | 'refresh'; contentSource?: 'ai' | 'blueprint'; videoMode?: 'queue' | 'off' }
 ) {
   log(`\n🚀 Building course: ${slug}\n`, 'bright');
   log('─'.repeat(60), 'blue');
@@ -93,8 +93,9 @@ async function buildCourse(
   try {
     const result = await courseFactory({
       programSlug: slug,
-      mode: options?.mode ?? 'missing-only',
-      contentSource: options?.contentSource ?? 'blueprint',
+      mode: options?.mode ?? 'refresh',
+      contentSource: options?.contentSource ?? 'ai',
+      videoMode: options?.videoMode ?? 'queue',
     }, showProgress);
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -131,7 +132,7 @@ async function buildCourse(
 
 // ─── Build All Courses ────────────────────────────────────────────────────────
 
-async function buildAll(options?: { mode?: 'replace' | 'missing-only'; contentSource?: 'ai' | 'blueprint' }) {
+async function buildAll(options?: { mode?: 'replace' | 'missing-only' | 'refresh'; contentSource?: 'ai' | 'blueprint'; videoMode?: 'queue' | 'off' }) {
   log('\n🚀 Building ALL courses with blueprints...\n', 'bright');
 
   const { listBlueprints: getBlueprints } = await import('../lib/course-factory');
@@ -243,9 +244,9 @@ Commands:
   --all               Build all courses with blueprints
 
 Options:
-  --mode <mode>       'replace' or 'missing-only' (default: missing-only)
-  --content <src>     'ai' or 'blueprint' (default: blueprint)
-  --videos            Include video queue
+  --mode <mode>       'refresh', 'replace', or 'missing-only' (default: refresh)
+  --content <src>     'ai' or 'blueprint' (default: ai)
+  --no-videos         Do not queue lesson videos (default: queue)
 
 Examples:
   npx tsx scripts/course-factory.ts --list
@@ -271,14 +272,15 @@ Examples:
 
   // Get mode
   const mode = args.includes('--mode') 
-    ? (args[args.indexOf('--mode') + 1] as 'replace' | 'missing-only')
-    : 'missing-only';
+    ? (args[args.indexOf('--mode') + 1] as 'replace' | 'missing-only' | 'refresh')
+    : 'refresh';
 
   const contentSource = args.includes('--content')
     ? (args[args.indexOf('--content') + 1] as 'ai' | 'blueprint')
-    : 'blueprint';
+    : 'ai';
 
-  const options = { mode, contentSource };
+  const videoMode = args.includes('--no-videos') ? 'off' as const : 'queue' as const;
+  const options = { mode, contentSource, videoMode };
 
   if (args.includes('--check')) {
     const slug = args[args.indexOf('--check') + 1];

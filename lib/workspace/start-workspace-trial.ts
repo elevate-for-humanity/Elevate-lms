@@ -14,6 +14,7 @@ export type StartWorkspaceTrialInput = {
   ownerName?: string;
   industry?: string;
   plan?: string;
+  websiteMode?: 'new_site' | 'existing_site' | 'api_embed';
 };
 
 export type StartWorkspaceTrialResult =
@@ -28,6 +29,7 @@ export type StartWorkspaceTrialResult =
       dashboardUrl: string;
       trialEndsAt: string;
       status: string;
+      recovered?: boolean;
     }
   | { ok: false; error: string; status?: number };
 
@@ -55,18 +57,52 @@ export async function startWorkspaceTrial(
 
   const db = await requireAdminClient();
 
-  const { data: existingWorkspace } = await db
+  // Trial creation is intentionally idempotent. A user who refreshes, retries
+  // after a network failure, or returns to the trial form must recover the
+  // workspace that was already created instead of receiving a dead-end 409.
+  const { data: existingWorkspace, error: existingWorkspaceError } = await db
     .from('customer_workspaces')
-    .select('id, slug, workspace_url')
+    .select('id, slug, workspace_url, tenant_id, organization_id, trial_ends_at, status, metadata')
     .eq('owner_email', email)
     .in('status', ['pending', 'provisioning', 'active'])
+    .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
-  if (existingWorkspace?.id) {
+  if (existingWorkspaceError) {
+    logger.error('[startWorkspaceTrial] existing workspace lookup failed', existingWorkspaceError, { email });
+    return { ok: false, error: 'Could not check for an existing workspace', status: 500 };
+  }
+
+  if (
+    existingWorkspace?.id &&
+    existingWorkspace.slug &&
+    existingWorkspace.tenant_id &&
+    existingWorkspace.organization_id
+  ) {
+    const metadata = existingWorkspace.metadata && typeof existingWorkspace.metadata === 'object'
+      ? (existingWorkspace.metadata as Record<string, unknown>)
+      : {};
+    const publicPreviewUrl =
+      (typeof metadata.public_preview_url === 'string' && metadata.public_preview_url) ||
+      existingWorkspace.workspace_url ||
+      `https://${existingWorkspace.slug}.app.elevateforhumanity.org`;
+    const trialEndsAt =
+      existingWorkspace.trial_ends_at ||
+      new Date(Date.now() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+
     return {
-      ok: false,
-      error: 'A workspace already exists for this email',
-      status: 409,
+      ok: true,
+      workspaceId: existingWorkspace.id,
+      tenantId: existingWorkspace.tenant_id,
+      organizationId: existingWorkspace.organization_id,
+      slug: existingWorkspace.slug,
+      workspaceUrl: publicPreviewUrl,
+      publicPreviewUrl,
+      dashboardUrl: tenantAdminUrl(existingWorkspace.slug, '/admin'),
+      trialEndsAt,
+      status: existingWorkspace.status || 'active',
+      recovered: true,
     };
   }
 
@@ -139,7 +175,7 @@ export async function startWorkspaceTrial(
     trialEndsAt: trialEndsAt.toISOString(),
     contactEmail: email,
     industry: input.industry?.trim() || 'Training Provider',
-    websiteMode: 'new_site',
+    websiteMode: input.websiteMode ?? 'new_site',
   });
 
   if (!website.ok) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw, Volume2 } from 'lucide-react';
 import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
@@ -61,10 +62,12 @@ export default function AITeachingPlayer({
       </div>
       <div className="grid min-h-[430px] lg:grid-cols-[0.78fr_1.22fr]">
         <div className="relative flex min-h-[300px] items-end overflow-hidden bg-gradient-to-b from-amber-200 to-rose-200">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={instructorImage}
             alt={`${instructorName}, AI course instructor`}
+            fill
+            sizes="(min-width: 1024px) 44vw, 100vw"
+            unoptimized
             className="absolute inset-0 h-full w-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-orange-950/80 via-transparent to-transparent" />

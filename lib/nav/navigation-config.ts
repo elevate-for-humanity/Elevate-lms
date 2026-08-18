@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { ROUTES } from '@/lib/routes';
 /**
  * Navigation Configuration for Elevate for Humanity
  * Central source of truth for all navigation links
@@ -83,11 +84,11 @@ export const mainNavigation: NavItem[] = [
   },
   {
     label: 'Partner With Us',
-    href: '/partners/barber-host-shop',
+    href: ROUTES.HOST_SHOPS,
     description: 'Host apprentices and grow your team',
     subItems: [
-      { label: 'Barbershop Partner Program', href: '/partners/barber-host-shop' },
-      { label: 'Apply as Host Shop', href: '/partners/barber-host-shop/apply' },
+      { label: 'Host Shop Partner Program', href: ROUTES.HOST_SHOPS },
+      { label: 'Apply as Host Shop', href: ROUTES.HOST_SHOP_APPLY },
       { label: 'Partner Login', href: '/partner/login' },
       { label: 'Platform Licensing', href: '/partners/licensing' },
     ],

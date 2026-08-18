@@ -51,7 +51,7 @@ export function LizzyContainer({
   const [configPreview, setConfigPreview] = useState<DevStudioConfigPreview | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/devstudio/config')
+    fetch('/api/admin/dev-studio/config')
       .then((r) => (r.ok ? r.json() : null))
       .then((data: DevStudioConfigPreview | null) => {
         if (data && (data.previewTargets?.length || data.defaultPreviewUrl)) {

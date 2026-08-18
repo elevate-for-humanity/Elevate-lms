@@ -12,9 +12,9 @@ export const maxDuration = 60;
 const BodySchema = z.object({
   blueprintId: z.string().min(1),
   programId: z.string().uuid(),
-  mode: z.enum(['replace','missing-only']).default('missing-only'),
-  contentSource: z.enum(['ai','blueprint','curriculum_lessons']).default('ai'),
-  videoMode: z.enum(['queue','off']).default('queue'),
+  mode: z.enum(['replace', 'missing-only', 'refresh']).default('refresh'),
+  contentSource: z.enum(['ai', 'blueprint', 'curriculum_lessons']).default('ai'),
+  videoMode: z.enum(['queue', 'off']).default('queue'),
   videoQueueLimit: z.number().int().positive().nullable().optional(),
 });
 
@@ -32,14 +32,17 @@ export async function POST(req: NextRequest) {
     if (!blueprint) return safeError('Blueprint not found', 404);
 
     const progress: Array<{ stage: string; message: string; progress?: number }> = [];
-    const result = await courseFactory({
-      programId: parsed.data.programId,
-      blueprint,
-      mode: parsed.data.mode,
-      contentSource: parsed.data.contentSource,
-      videoMode: parsed.data.videoMode,
-      videoQueueLimit: parsed.data.videoQueueLimit,
-    }, (stage, message, percent) => progress.push({ stage, message, progress: percent }));
+    const result = await courseFactory(
+      {
+        programId: parsed.data.programId,
+        blueprint,
+        mode: parsed.data.mode,
+        contentSource: parsed.data.contentSource,
+        videoMode: parsed.data.videoMode,
+        videoQueueLimit: parsed.data.videoQueueLimit,
+      },
+      (stage, message, percent) => progress.push({ stage, message, progress: percent }),
+    );
 
     return NextResponse.json({ ...result, progress }, { status: result.ok ? 200 : 422 });
   } catch (error) {

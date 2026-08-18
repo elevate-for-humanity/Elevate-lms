@@ -21,7 +21,8 @@ export async function POST(
   if (!programId) return safeError('programId is required', 400);
 
   const body = await request.json().catch(() => ({}));
-  const mode = body?.mode === 'replace' ? 'replace' : 'missing-only';
+  const mode =
+    body?.mode === 'replace' ? 'replace' : body?.mode === 'missing-only' ? 'missing-only' : 'refresh';
   const videoMode = body?.videoMode === 'off' ? 'off' : 'queue';
   const videoQueueLimit =
     typeof body?.videoQueueLimit === 'number' ? Number(body.videoQueueLimit) : null;

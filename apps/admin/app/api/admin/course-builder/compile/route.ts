@@ -15,12 +15,25 @@ export async function POST(request: NextRequest) {
   if (rl) return rl;
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
-  let body: { template: CourseTemplate; mode?: 'missing-only' | 'replace'; dryRun?: boolean };
-  try { body = await request.json(); } catch { return safeError('Invalid JSON', 400); }
+  let body: {
+    template: CourseTemplate;
+    mode?: 'missing-only' | 'replace' | 'refresh';
+    dryRun?: boolean;
+  };
+  try {
+    body = await request.json();
+  } catch {
+    return safeError('Invalid JSON', 400);
+  }
   if (!body.template) return safeError('template is required', 400);
   try {
     const db = await requireAdminClient();
-    const result = await compileBlueprintToCourse({ template: body.template, db, mode: body.mode ?? 'missing-only', dryRun: body.dryRun ?? false });
+    const result = await compileBlueprintToCourse({
+      template: body.template,
+      db,
+      mode: body.mode ?? 'refresh',
+      dryRun: body.dryRun ?? false,
+    });
     return NextResponse.json(result, { status: result.success ? 200 : 422 });
   } catch (err) {
     return safeInternalError(err, 'Compiler failed');

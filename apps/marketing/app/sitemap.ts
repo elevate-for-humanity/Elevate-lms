@@ -1,11 +1,8 @@
 import type { MetadataRoute } from 'next';
-import { FEATURED_BEAUTY_HOST_PARTNERS } from '@/lib/apprenticeship-programs/host-partners';
-import {
-  PUBLIC_ROUTE_REGISTRY,
-  PUBLIC_SITE_ORIGIN,
-} from '@/lib/navigation/public-route-registry';
+import { PUBLIC_ROUTE_REGISTRY, PUBLIC_SITE_ORIGIN } from '@/lib/navigation/public-route-registry';
+import { listPublicHostShops } from '@/lib/partners/public-host-shops';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = PUBLIC_ROUTE_REGISTRY.map((route) => ({
     url: `${PUBLIC_SITE_ORIGIN}${route.path === '/' ? '' : route.path}`,
     lastModified: new Date(route.lastModified),
@@ -13,11 +10,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route.priority,
   }));
 
-  const hostShopRoutes: MetadataRoute.Sitemap = FEATURED_BEAUTY_HOST_PARTNERS.map((shop) => ({
-    url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.slug}`,
-    lastModified: new Date('2026-08-18T17:35:00-04:00'),
+  const shops = await listPublicHostShops();
+  const hostShopRoutes: MetadataRoute.Sitemap = shops.map((shop) => ({
+    url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.public_slug}`,
+    lastModified: new Date(shop.public_profile_published_at || new Date().toISOString()),
     changeFrequency: 'weekly',
-    priority: 0.82,
+    priority: shop.featured ? 0.86 : 0.82,
   }));
 
   const seen = new Set<string>();

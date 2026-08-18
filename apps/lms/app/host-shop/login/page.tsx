@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useSafeSearchParams } from '@/hooks/useSafeSearchParams';
 import { Building2, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
@@ -16,7 +15,6 @@ const IDENTITY_ERRORS: Record<string, string> = {
 };
 
 export default function HostShopLoginPage() {
-  const router = useRouter();
   const searchParams = useSafeSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

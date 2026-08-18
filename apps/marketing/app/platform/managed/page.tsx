@@ -9,38 +9,37 @@ import {
   BarChart3,
   Server,
   RefreshCw,
-  Lock,
-CheckCircle, } from 'lucide-react';
+} from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { createClient } from '@/lib/supabase/server';
 export const metadata: Metadata = {
   title: 'Managed Platform | Elevate Workforce OS',
   description:
-    'Fully managed workforce operating system. We operate it, you use it. Zero engineering burden, guaranteed uptime, compliance reporting included.',
+    'Managed workforce operating system with hosted infrastructure, support, compliance workflows, and role-based portals.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/platform/managed',
   },
 };
 
 const managedServices = [
-  { icon: Shield, title: '99.9% Uptime SLA', desc: 'Guaranteed availability with proactive monitoring and failover.' },
-  { icon: Headphones, title: 'Dedicated Support', desc: 'Priority support with a named account manager for your organization.' },
-  { icon: Clock, title: 'Same-Day Updates', desc: 'Security patches and feature updates deployed automatically.' },
-  { icon: BarChart3, title: 'Compliance Reporting', desc: 'Automated DOL/DWD reports generated on your schedule.' },
-  { icon: Server, title: 'Managed Infrastructure', desc: 'Hosting, backups, SSL, CDN — all handled for you.' },
-  { icon: RefreshCw, title: 'Continuous Improvement', desc: 'New features and improvements rolled out without disruption.' },
+  { icon: Shield, title: 'Availability Monitoring', desc: 'Health checks, deployment monitoring, and rollback controls support service continuity.' },
+  { icon: Headphones, title: 'Managed Support', desc: 'Operational support for configured platform services and organization workflows.' },
+  { icon: Clock, title: 'Managed Updates', desc: 'Security and application updates move through the platform release process.' },
+  { icon: BarChart3, title: 'Compliance Reporting', desc: 'Configurable reporting workflows support workforce and apprenticeship documentation needs.' },
+  { icon: Server, title: 'Managed Infrastructure', desc: 'Hosting, health probes, TLS, deployment configuration, and database operations are centrally managed.' },
+  { icon: RefreshCw, title: 'Release & Rollback Controls', desc: 'Application releases use health checks and rollback controls rather than unsupported uptime guarantees.' },
 ];
 
 const includedFeatures = [
-  'Full platform access (all 7 portals)',
-  'Automated enrollment orchestration',
-  'WIOA/WRG/JRI compliance reporting',
-  'Credential issuance and verification',
+  'Role-based access to the configured platform portals',
+  'Enrollment and participant workflow orchestration',
+  'Workforce and apprenticeship compliance workflows',
+  'Credential issuance and verification workflows',
   'Employer pipeline integration',
-  'Progress tracking and nudges',
+  'Progress tracking and notifications',
   'Audit logs and activity tracking',
-  'Data exports and API access',
+  'Data exports and API access where configured',
 ];
 
 const pricingTiers = [
@@ -49,7 +48,7 @@ const pricingTiers = [
     price: '$1,500',
     period: '/mo',
     desc: 'For small training providers getting started',
-    features: ['Up to 100 active learners', 'Core LMS features', 'Basic compliance reports', 'Email support', '99.5% uptime SLA'],
+    features: ['Up to 100 active learners', 'Core LMS features', 'Basic compliance reports', 'Email support', 'Managed availability monitoring'],
     popular: false,
   },
   {
@@ -57,22 +56,22 @@ const pricingTiers = [
     price: '$2,500',
     period: '/mo',
     desc: 'For established providers with multiple programs',
-    features: ['Up to 500 active learners', 'All platform features', 'Advanced compliance automation', 'Priority support', '99.9% uptime SLA', 'Custom branding'],
+    features: ['Up to 500 active learners', 'Expanded platform features', 'Advanced compliance automation', 'Priority support', 'Release and rollback controls', 'Custom branding'],
     popular: true,
   },
   {
     name: 'Enterprise',
     price: 'Custom',
     period: '',
-    desc: 'For large organizations and workforce boards',
-    features: ['Unlimited learners', 'Multi-org management', 'Dedicated infrastructure', 'Custom integrations', 'Named account manager', 'Quarterly business reviews'],
+    desc: 'For larger organizations and workforce boards',
+    features: ['Capacity sized to contract requirements', 'Multi-org management', 'Dedicated infrastructure options', 'Custom integrations', 'Named account support', 'Quarterly business reviews'],
     popular: false,
   },
 ];
 
 export default async function ManagedPlatformPage() {
   const supabase = await createClient();
-  const { data: dbRows } = await supabase.from('system_settings').select('*').limit(50);
+  await supabase.from('system_settings').select('id').limit(1);
 
   return (
     <div className="min-h-screen bg-white">
@@ -81,13 +80,12 @@ export default async function ManagedPlatformPage() {
         <p className="text-sm text-slate-600 font-medium">Part of the <Link href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</Link></p>
       </div>
 
-      {/* Hero */}
       <section className="bg-slate-900 text-white py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-brand-red-400 font-bold text-sm uppercase tracking-widest mb-4">Managed Platform</p>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight">We Operate It. You Use It.</h1>
           <p className="mt-6 text-lg sm:text-xl text-white/90 max-w-3xl mx-auto">
-            Zero engineering burden. Guaranteed uptime. Compliance reporting included. Focus on training — we handle the infrastructure.
+            Managed infrastructure, monitored releases, compliance workflows, and role-based portals in one operating system.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/store/licenses/managed-platform" className="px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors">
@@ -100,7 +98,6 @@ export default async function ManagedPlatformPage() {
         </div>
       </section>
 
-      {/* What's included */}
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black text-slate-900 text-center mb-12">What&apos;s Included</h2>
@@ -115,7 +112,6 @@ export default async function ManagedPlatformPage() {
         </div>
       </section>
 
-      {/* Managed services */}
       <section className="py-16 sm:py-20 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black text-slate-900 text-center mb-12">Managed Services</h2>
@@ -131,12 +127,11 @@ export default async function ManagedPlatformPage() {
         </div>
       </section>
 
-      {/* Pricing */}
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black text-slate-900 text-center mb-4">Pricing</h2>
           <p className="text-lg text-slate-800 text-center max-w-2xl mx-auto mb-12">
-            Transparent pricing. No hidden fees. Scale as you grow.
+            Published plan pricing and contract-scoped enterprise options.
           </p>
           <div className="grid md:grid-cols-3 gap-6">
             {pricingTiers.map((tier) => (

@@ -3,6 +3,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import SettingsFormClient, { SettingsField } from '@/components/admin/settings/SettingsFormClient';
+import MfaEnrollmentCard from '@/components/security/MfaEnrollmentCard';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Security | Admin Settings' };
@@ -99,12 +100,14 @@ export default async function SecuritySettingsPage() {
             </div>
             {posture.users_without_verified_mfa > 0 && (
               <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                Privileged accounts without a verified second factor remain a production security gap. Enroll a TOTP or another enabled factor before enforcing AAL2 for those users.
+                Privileged accounts without a verified second factor remain a production security gap. Enroll a TOTP factor below before enforcing AAL2 for those users.
               </div>
             )}
           </>
         ) : null}
       </section>
+
+      <MfaEnrollmentCard />
 
       <SettingsFormClient
         fields={FIELDS}

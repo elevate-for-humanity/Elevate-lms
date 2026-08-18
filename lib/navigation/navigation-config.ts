@@ -100,189 +100,93 @@ export interface ActionItem {
   variant?: 'primary' | 'secondary' | 'ghost';
 }
 
-export interface BreadcrumbItem {
-  label: string;
-  href?: string;
-}
-
-export interface NavSection {
-  id: string;
-  label?: string;
-  items: NavItem[];
-}
+export interface BreadcrumbItem { label: string; href?: string }
+export interface NavSection { id: string; label?: string; items: NavItem[] }
 
 const p = (key: Parameters<typeof PortalRouter.get>[0], path?: string) =>
   path ? PortalRouter.getPath(key, path) : PortalRouter.get(key);
 
 export const ROLE_NAVIGATION: Record<NavigationRole, NavSection[]> = {
-  student: [
-    {
-      id: 'learning',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('lms'), icon: LayoutDashboard },
-        { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), icon: BookOpen },
-        { id: 'progress', label: 'Progress', href: p('lms', 'progress'), icon: BarChart3 },
-        { id: 'assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: ClipboardCheck },
-        { id: 'calendar', label: 'Schedule', href: p('lms', 'calendar'), icon: Calendar },
-        { id: 'certificates', label: 'Certificates', href: p('lms', 'certificates'), icon: Award },
-      ],
-    },
-  ],
-  apprentice: [
-    {
-      id: 'apprenticeship',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
-        { id: 'hours', label: 'Hours', href: p('apprentice', 'hours'), icon: Clock },
-        { id: 'timeclock', label: 'Timeclock', href: p('apprentice', 'timeclock'), icon: Clock },
-        { id: 'competencies', label: 'Competencies', href: p('apprentice', 'competencies'), icon: Target },
-        { id: 'documents', label: 'Documents', href: p('apprentice', 'documents'), icon: FileText },
-        { id: 'rti', label: 'RTI Courses', href: p('lms', 'courses'), icon: BookOpen },
-      ],
-    },
-  ],
-  employer: [
-    {
-      id: 'operations',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('employer'), icon: LayoutDashboard },
-        { id: 'jobs', label: 'Job Postings', href: p('employer', 'jobs'), icon: Briefcase },
-        { id: 'applications', label: 'Applications', href: p('employer', 'applications'), icon: Users },
-        { id: 'apprenticeships', label: 'Apprenticeships', href: p('employer', 'apprenticeships'), icon: GraduationCap },
-        { id: 'company', label: 'Company Profile', href: p('employer', 'company'), icon: Building2 },
-        { id: 'reports', label: 'Reports', href: p('employer', 'reports'), icon: BarChart3 },
-      ],
-    },
-  ],
-  host_shop: [
-    {
-      id: 'host-shop',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('hostshop'), icon: LayoutDashboard },
-        { id: 'apprentices', label: 'Apprentices', href: p('hostshop', 'apprentices'), icon: GraduationCap },
-        { id: 'hours', label: 'Hours', href: p('hostshop', 'hours'), icon: Clock },
-        { id: 'competencies', label: 'Competencies', href: p('hostshop', 'competencies'), icon: ClipboardCheck },
-        { id: 'documents', label: 'Documents', href: p('hostshop', 'documents'), icon: FileText },
-        { id: 'mou', label: 'MOU', href: p('hostshop', 'mou'), icon: ClipboardList },
-      ],
-    },
-  ],
-  instructor: [
-    {
-      id: 'instruction',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('instructor'), icon: LayoutDashboard },
-        { id: 'students', label: 'Students', href: p('instructor', 'students'), icon: Users },
-        { id: 'courses', label: 'Courses', href: p('instructor', 'courses'), icon: BookOpen },
-        { id: 'attendance', label: 'Attendance', href: p('instructor', 'attendance'), icon: Calendar },
-      ],
-    },
-  ],
-  staff: [
-    {
-      id: 'staff',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('staff'), icon: LayoutDashboard },
-        { id: 'students', label: 'Students', href: p('staff', 'students'), icon: Users },
-        { id: 'courses', label: 'Courses', href: p('staff', 'courses'), icon: BookOpen },
-        { id: 'reports', label: 'Reports', href: p('admin', 'reports'), icon: BarChart3 },
-      ],
-    },
-  ],
-  testing: [
-    {
-      id: 'testing',
-      items: [{ id: 'dashboard', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck }],
-    },
-  ],
-  admin: [
-    {
-      id: 'main',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', href: p('admin'), icon: LayoutDashboard },
-        { id: 'applications', label: 'Applications', href: p('admin', 'applications'), icon: FileText },
-        { id: 'students', label: 'Students', href: p('admin', 'students'), icon: Users },
-        { id: 'programs', label: 'Programs', href: p('admin', 'programs'), icon: BookOpen },
-        { id: 'crm', label: 'CRM', href: p('admin', 'crm'), icon: Activity },
-        { id: 'compliance', label: 'Compliance', href: p('admin', 'compliance'), icon: Shield },
-        { id: 'studio', label: 'Studio', href: p('admin', 'studio'), icon: Settings },
-        { id: 'testing', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck },
-        { id: 'health', label: 'System Health', href: p('admin', 'system-health'), icon: Activity },
-      ],
-    },
-  ],
-  workforce: [
-    { id: 'workforce', items: [{ id: 'dashboard', label: 'Dashboard', href: p('workforce'), icon: LayoutDashboard }] },
-  ],
-  parent: [
-    { id: 'parent', items: [{ id: 'dashboard', label: 'Dashboard', href: p('parent'), icon: LayoutDashboard }] },
-  ],
-  case_manager: [
-    { id: 'case-manager', items: [{ id: 'dashboard', label: 'Dashboard', href: p('casemanager'), icon: LayoutDashboard }] },
-  ],
-  workforce_board: [
-    { id: 'workforce-board', items: [{ id: 'dashboard', label: 'Dashboard', href: p('workforceboard'), icon: LayoutDashboard }] },
-  ],
-  program_holder: [
-    { id: 'program-holder', items: [{ id: 'dashboard', label: 'Dashboard', href: p('programholder'), icon: LayoutDashboard }] },
-  ],
-  provider: [
-    { id: 'provider', items: [{ id: 'dashboard', label: 'Dashboard', href: p('provider'), icon: LayoutDashboard }] },
-  ],
+  student: [{ id: 'learning', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('lms'), icon: LayoutDashboard },
+    { id: 'courses', label: 'My Courses', href: p('lms', 'courses'), icon: BookOpen },
+    { id: 'progress', label: 'Progress', href: p('lms', 'progress'), icon: BarChart3 },
+    { id: 'assignments', label: 'Assignments', href: p('lms', 'assignments'), icon: ClipboardCheck },
+    { id: 'calendar', label: 'Schedule', href: p('lms', 'calendar'), icon: Calendar },
+    { id: 'certificates', label: 'Certificates', href: p('lms', 'certificates'), icon: Award },
+  ] }],
+  apprentice: [{ id: 'apprenticeship', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('apprentice'), icon: LayoutDashboard },
+    { id: 'hours', label: 'Work Hours', href: p('apprentice', 'hours'), icon: Clock },
+    { id: 'timeclock', label: 'Timeclock', href: p('apprentice', 'timeclock'), icon: Clock },
+    { id: 'competencies', label: 'Competencies', href: p('apprentice', 'competencies'), icon: Target },
+    { id: 'documents', label: 'Documents', href: p('apprentice', 'documents'), icon: FileText },
+    { id: 'rti', label: 'RTI Courses', href: p('lms', 'courses'), icon: BookOpen },
+  ] }],
+  employer: [{ id: 'operations', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('employer'), icon: LayoutDashboard },
+    { id: 'jobs', label: 'Job Postings', href: p('employer', 'jobs'), icon: Briefcase },
+    { id: 'applications', label: 'Applications', href: p('employer', 'applications'), icon: Users },
+    { id: 'apprenticeships', label: 'Apprenticeships', href: p('employer', 'apprenticeships'), icon: GraduationCap },
+    { id: 'company', label: 'Company Profile', href: p('employer', 'company'), icon: Building2 },
+    { id: 'reports', label: 'Reports', href: p('employer', 'reports'), icon: BarChart3 },
+  ] }],
+  host_shop: [{ id: 'host-shop', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('hostshop'), icon: LayoutDashboard },
+    { id: 'apprentices', label: 'Apprentices', href: p('hostshop', 'apprentices'), icon: GraduationCap },
+    { id: 'hours', label: 'Work Hours', href: p('hostshop', 'hours'), icon: Clock },
+    { id: 'competencies', label: 'Competencies', href: p('hostshop', 'competencies'), icon: ClipboardCheck },
+    { id: 'wages', label: 'Wage Compliance', href: p('hostshop', 'wages'), icon: BarChart3 },
+    { id: 'documents', label: 'Documents', href: p('hostshop', 'documents'), icon: FileText },
+    { id: 'mou', label: 'MOU', href: '/host-shop/onboarding/mou', icon: ClipboardList },
+  ] }],
+  instructor: [{ id: 'instruction', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('instructor'), icon: LayoutDashboard },
+    { id: 'students', label: 'Students', href: p('instructor', 'students'), icon: Users },
+    { id: 'courses', label: 'Courses', href: p('instructor', 'courses'), icon: BookOpen },
+    { id: 'attendance', label: 'Attendance', href: p('instructor', 'attendance'), icon: Calendar },
+  ] }],
+  staff: [{ id: 'staff', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('staff'), icon: LayoutDashboard },
+    { id: 'students', label: 'Students', href: p('staff', 'students'), icon: Users },
+    { id: 'courses', label: 'Courses', href: p('staff', 'courses'), icon: BookOpen },
+    { id: 'reports', label: 'Reports', href: p('admin', 'reports'), icon: BarChart3 },
+  ] }],
+  testing: [{ id: 'testing', items: [{ id: 'dashboard', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck }] }],
+  admin: [{ id: 'main', items: [
+    { id: 'dashboard', label: 'Dashboard', href: p('admin'), icon: LayoutDashboard },
+    { id: 'applications', label: 'Applications', href: p('admin', 'applications'), icon: FileText },
+    { id: 'students', label: 'Students', href: p('admin', 'students'), icon: Users },
+    { id: 'programs', label: 'Programs', href: p('admin', 'programs'), icon: BookOpen },
+    { id: 'crm', label: 'CRM', href: p('admin', 'crm'), icon: Activity },
+    { id: 'compliance', label: 'Compliance', href: p('admin', 'compliance'), icon: Shield },
+    { id: 'studio', label: 'Studio', href: p('admin', 'studio'), icon: Settings },
+    { id: 'testing', label: 'Testing Center', href: p('testing'), icon: ClipboardCheck },
+    { id: 'health', label: 'System Health', href: p('admin', 'system-health'), icon: Activity },
+  ] }],
+  workforce: [{ id: 'workforce', items: [{ id: 'dashboard', label: 'Dashboard', href: p('workforce'), icon: LayoutDashboard }] }],
+  parent: [{ id: 'parent', items: [{ id: 'dashboard', label: 'Dashboard', href: p('parent'), icon: LayoutDashboard }] }],
+  case_manager: [{ id: 'case-manager', items: [{ id: 'dashboard', label: 'Dashboard', href: p('casemanager'), icon: LayoutDashboard }] }],
+  workforce_board: [{ id: 'workforce-board', items: [{ id: 'dashboard', label: 'Dashboard', href: p('workforceboard'), icon: LayoutDashboard }] }],
+  program_holder: [{ id: 'program-holder', items: [{ id: 'dashboard', label: 'Dashboard', href: p('programholder'), icon: LayoutDashboard }] }],
+  provider: [{ id: 'provider', items: [{ id: 'dashboard', label: 'Dashboard', href: p('provider'), icon: LayoutDashboard }] }],
 };
 
 const ROLE_TO_NAVIGATION: Readonly<Record<UserRole, NavigationRole>> = {
-  student: 'student',
-  learner: 'student',
-  user: 'student',
-  delegate: 'student',
-  grant_client: 'student',
-  apprentice: 'apprentice',
-  barber_apprentice: 'apprentice',
-  cosmetology_apprentice: 'apprentice',
-  instructor: 'instructor',
-  employer: 'employer',
-  sponsor: 'employer',
-  recruiter: 'employer',
-  partner: 'host_shop',
-  partner_admin: 'host_shop',
-  host_shop: 'host_shop',
-  host_shop_admin: 'host_shop',
-  mentor: 'host_shop',
-  staff: 'staff',
-  case_manager: 'case_manager',
-  workforce: 'workforce',
-  workforce_partner: 'workforce',
-  workforce_board: 'workforce_board',
-  workforce_board_admin: 'workforce_board',
-  government: 'workforce_board',
-  program_holder: 'program_holder',
-  provider: 'provider',
-  provider_admin: 'provider',
-  parent: 'parent',
-  admin: 'admin',
-  org_admin: 'admin',
-  super_admin: 'admin',
-  advisor: 'admin',
-  financial_aid: 'admin',
-  compliance: 'admin',
-  dev_studio: 'admin',
-  test_admin: 'testing',
-  proctor: 'testing',
-  testing_center: 'testing',
+  student: 'student', learner: 'student', user: 'student', delegate: 'student', grant_client: 'student',
+  apprentice: 'apprentice', barber_apprentice: 'apprentice', cosmetology_apprentice: 'apprentice',
+  instructor: 'instructor', employer: 'employer', sponsor: 'employer', recruiter: 'employer',
+  partner: 'host_shop', partner_admin: 'host_shop', host_shop: 'host_shop', host_shop_admin: 'host_shop', mentor: 'host_shop',
+  staff: 'staff', case_manager: 'case_manager', workforce: 'workforce', workforce_partner: 'workforce',
+  workforce_board: 'workforce_board', workforce_board_admin: 'workforce_board', government: 'workforce_board',
+  program_holder: 'program_holder', provider: 'provider', provider_admin: 'provider', parent: 'parent',
+  admin: 'admin', org_admin: 'admin', super_admin: 'admin', advisor: 'admin', financial_aid: 'admin', compliance: 'admin', dev_studio: 'admin',
+  test_admin: 'testing', proctor: 'testing', testing_center: 'testing',
 };
 
-export function getNavigationRole(role: UserRole): NavigationRole {
-  return ROLE_TO_NAVIGATION[role] ?? 'student';
-}
-
-export function getNavigationForRole(role: UserRole): NavSection[] {
-  return ROLE_NAVIGATION[getNavigationRole(role)];
-}
-
-export function getFlatNavItems(role: UserRole): NavItem[] {
-  return getNavigationForRole(role).flatMap((section) => section.items);
-}
+export function getNavigationRole(role: UserRole): NavigationRole { return ROLE_TO_NAVIGATION[role] ?? 'student'; }
+export function getNavigationForRole(role: UserRole): NavSection[] { return ROLE_NAVIGATION[getNavigationRole(role)]; }
+export function getFlatNavItems(role: UserRole): NavItem[] { return getNavigationForRole(role).flatMap((section) => section.items); }
 
 export function isActiveNavItem(href: string, pathname: string): boolean {
   try {
@@ -305,20 +209,10 @@ export function generateBreadcrumbs(pathname: string): BreadcrumbItem[] {
 }
 
 const NAVIGATION_DISPLAY_NAMES: Record<NavigationRole, string> = {
-  student: 'Student Portal',
-  apprentice: 'Apprentice Portal',
-  instructor: 'Instructor Portal',
-  employer: 'Employer Portal',
-  host_shop: 'Host Shop Portal',
-  staff: 'Staff Portal',
-  case_manager: 'Case Manager',
-  workforce: 'Workforce Portal',
-  workforce_board: 'Workforce Board',
-  program_holder: 'Program Holder',
-  provider: 'Provider Portal',
-  parent: 'Parent Portal',
-  admin: 'Admin',
-  testing: 'Testing Center',
+  student: 'Student Portal', apprentice: 'Apprentice Portal', instructor: 'Instructor Portal', employer: 'Employer Portal',
+  host_shop: 'Host Shop Portal', staff: 'Staff Portal', case_manager: 'Case Manager', workforce: 'Workforce Portal',
+  workforce_board: 'Workforce Board', program_holder: 'Program Holder', provider: 'Provider Portal', parent: 'Parent Portal',
+  admin: 'Admin', testing: 'Testing Center',
 };
 
 export const ROLE_DISPLAY_NAMES: Record<UserRole, string> = Object.fromEntries(

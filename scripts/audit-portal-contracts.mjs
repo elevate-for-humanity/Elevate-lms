@@ -17,30 +17,30 @@ const portalMap = read('lib/routing/portal-map.ts');
 const roleDestinations = read('lib/auth/role-destinations.ts');
 const roleMatrix = read('lib/rbac/role-matrix.ts');
 const portalAccess = read('lib/auth/portal-access.ts');
+const publicAccessRegistry = read('apps/marketing/lib/platform-access-registry.ts');
+const publicNavigation = read('lib/navigation.ts');
 
 const PORTALS = [
-  { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner'] },
-  { key: 'apprentice', surface: 'apprenticePortal', app: 'lms', path: '/apprentice', roles: ['apprentice'] },
-  { key: 'employer', surface: 'employerPublic', app: 'lms', path: '/employer/dashboard', roles: ['employer', 'sponsor'] },
-  { key: 'hostshop', surface: 'hostSites', app: 'lms', path: '/host-shop/dashboard', roles: ['host_shop', 'host_shop_admin'] },
-  { key: 'parent', surface: 'parentPortal', app: 'lms', path: '/parent-portal/dashboard', roles: ['parent'] },
-  { key: 'workforce', surface: 'workforcePortal', app: 'lms', path: '/workforce/dashboard', roles: ['workforce_partner'] },
-  { key: 'programholder', surface: 'programHolderPortal', app: 'lms', path: '/program-holder/dashboard', roles: ['program_holder'] },
-  { key: 'admin', surface: 'adminPortal', app: 'admin', path: '/dashboard', roles: ['admin'] },
-  { key: 'instructor', surface: 'instructorPortal', app: 'admin', path: '/instructor/dashboard', roles: ['instructor'] },
-  { key: 'staff', surface: 'staffPortal', app: 'admin', path: '/staff-portal/dashboard', roles: ['staff'] },
-  { key: 'testing', surface: 'testingOperations', app: 'admin', path: '/testing-center', roles: ['test_admin', 'proctor'] },
-  { key: 'casemanager', surface: 'caseManagerPortal', app: 'marketing', path: '/case-manager/dashboard', roles: ['case_manager'] },
-  { key: 'workforceboard', surface: 'workforceBoardPortal', app: 'marketing', path: '/workforce-board/dashboard', roles: ['workforce_board', 'workforce_board_admin'] },
-  { key: 'provider', surface: 'providerPortal', app: 'marketing', path: '/provider/dashboard', roles: ['provider', 'provider_admin'] },
+  { key: 'lms', surface: 'studentPortal', app: 'lms', path: '/lms/dashboard', roles: ['student', 'learner'], publicHref: 'https://app.elevateforhumanity.org/lms/dashboard' },
+  { key: 'apprentice', surface: 'apprenticePortal', app: 'lms', path: '/apprentice', roles: ['apprentice'], publicHref: 'https://app.elevateforhumanity.org/apprentice' },
+  { key: 'employer', surface: 'employerPublic', app: 'lms', path: '/employer/dashboard', roles: ['employer', 'sponsor'], publicHref: 'https://app.elevateforhumanity.org/employer/dashboard' },
+  { key: 'hostshop', surface: 'hostSites', app: 'lms', path: '/host-shop/dashboard', roles: ['host_shop', 'host_shop_admin'], publicHref: 'https://app.elevateforhumanity.org/host-shop/dashboard' },
+  { key: 'parent', surface: 'parentPortal', app: 'lms', path: '/parent-portal/dashboard', roles: ['parent'], publicHref: 'https://app.elevateforhumanity.org/parent-portal/dashboard' },
+  { key: 'workforce', surface: 'workforcePortal', app: 'lms', path: '/workforce/dashboard', roles: ['workforce_partner'], publicHref: 'https://app.elevateforhumanity.org/workforce/dashboard' },
+  { key: 'programholder', surface: 'programHolderPortal', app: 'lms', path: '/program-holder/dashboard', roles: ['program_holder'], publicHref: 'https://app.elevateforhumanity.org/program-holder/dashboard' },
+  { key: 'admin', surface: 'adminPortal', app: 'admin', path: '/dashboard', roles: ['admin'], publicHref: 'https://admin.elevateforhumanity.org/dashboard' },
+  { key: 'instructor', surface: 'instructorPortal', app: 'admin', path: '/instructor/dashboard', roles: ['instructor'], publicHref: 'https://admin.elevateforhumanity.org/instructor/dashboard' },
+  { key: 'staff', surface: 'staffPortal', app: 'admin', path: '/staff-portal/dashboard', roles: ['staff'], publicHref: 'https://admin.elevateforhumanity.org/staff-portal/dashboard' },
+  { key: 'testing', surface: 'testingOperations', app: 'admin', path: '/testing-center', roles: ['test_admin', 'proctor'], publicHref: 'https://admin.elevateforhumanity.org/testing-center' },
+  { key: 'casemanager', surface: 'caseManagerPortal', app: 'marketing', path: '/case-manager/dashboard', roles: ['case_manager'], publicHref: 'https://www.elevateforhumanity.org/case-manager/dashboard' },
+  { key: 'workforceboard', surface: 'workforceBoardPortal', app: 'marketing', path: '/workforce-board/dashboard', roles: ['workforce_board', 'workforce_board_admin'], publicHref: 'https://www.elevateforhumanity.org/workforce-board/dashboard' },
+  { key: 'provider', surface: 'providerPortal', app: 'marketing', path: '/provider/dashboard', roles: ['provider', 'provider_admin'], publicHref: 'https://www.elevateforhumanity.org/provider/dashboard' },
 ];
 
 function routeFileCandidates(app, route) {
   const clean = route.replace(/^\//, '');
   const base = APP_DIR[app];
   const suffix = `${clean}${clean ? '/' : ''}page.tsx`;
-  // Next route groups do not participate in the URL. Keep the canonical learner
-  // workspace inside (app) while still proving that /lms/dashboard exists.
   const candidates = [`${base}/${suffix}`];
   if (app === 'lms' && clean.startsWith('lms/')) {
     candidates.push(`${base}/lms/(app)/${clean.slice('lms/'.length)}${clean.slice('lms/'.length) ? '/' : ''}page.tsx`);
@@ -73,6 +73,16 @@ for (const portal of PORTALS) {
     const rolePattern = new RegExp(`${role}:\\s*\\{[^}]*path:\\s*['\"]${escapedPath}['\"][^}]*portalKey:\\s*['\"]${portal.key}['\"]`);
     if (!rolePattern.test(roleDestinations)) fail(`${role}: role destination does not resolve to ${portal.key}:${portal.path}`); else pass(`${role}: role destination aligned`);
   }
+}
+
+console.log('\n── Public discovery contract ──');
+if (!exists('apps/marketing/app/online-apps/page.tsx')) fail('/online-apps: public portal directory missing');
+else pass('/online-apps: public portal directory exists');
+if (!publicNavigation.includes("id: 'platform'") || !publicNavigation.includes("href: '/online-apps'")) fail('Platform/Online Apps are not exposed from canonical public navigation');
+else pass('Platform/Online Apps exposed from canonical public navigation');
+for (const portal of PORTALS) {
+  if (!publicAccessRegistry.includes(portal.publicHref)) fail(`${portal.key}: canonical portal missing from public access registry`);
+  else pass(`${portal.key}: public access registry aligned`);
 }
 
 console.log('\n── Admin override invariant ──');

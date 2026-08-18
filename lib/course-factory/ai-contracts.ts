@@ -84,6 +84,7 @@ export function parseStrictAIJson<T>(
   } catch (error) {
     throw new Error(
       `${label} returned malformed JSON: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     );
   }
 

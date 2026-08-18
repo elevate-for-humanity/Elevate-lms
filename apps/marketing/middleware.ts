@@ -7,15 +7,9 @@ import {
 } from '@/lib/tenant/middleware-tenant-routing';
 
 const PROTECTED_PORTAL_PREFIXES = [
-  '/program-holder/dashboard',
-  '/program-holder/students',
-  '/program-holder/documents',
-  '/program-holder/hours',
-  '/program-holder/reports',
   '/case-manager/dashboard',
   '/workforce-board/dashboard',
   '/provider/dashboard',
-  '/creator/products',
 ] as const;
 
 const ELEVATE_PUBLIC_HOSTS = new Set([

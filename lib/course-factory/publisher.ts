@@ -7,6 +7,7 @@
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { getInstructorForCourse } from '@/lib/ai-instructors';
 import type { BlueprintModule, BuildMode, ValidationResult } from './types';
 import { inferStepType } from './validator';
 
@@ -80,7 +81,8 @@ function normalizeLessonType(lesson: Record<string, any>, slug: string): string 
   return inferStepType(slug);
 }
 
-function buildAtomicPayload(modules: BlueprintModule[]) {
+function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
+  const instructor = getInstructorForCourse(courseTitle);
   return [...modules]
     .sort((left, right) => left.orderIndex - right.orderIndex)
     .map((courseModule) => {
@@ -99,6 +101,21 @@ function buildAtomicPayload(modules: BlueprintModule[]) {
             const extra = lesson as typeof lesson & Record<string, any>;
             const stepType = normalizeLessonType(extra, lesson.slug);
             const content = normalizeLessonContent(lesson.content, lesson.objective);
+            const experience =
+              content?.experience &&
+              typeof content.experience === 'object' &&
+              !Array.isArray(content.experience)
+                ? (content.experience as Record<string, any>)
+                : null;
+            const learningPoints = Array.isArray(content?.learning_points)
+              ? content.learning_points.filter(
+                  (point): point is string => typeof point === 'string' && point.trim().length > 0,
+                )
+              : [];
+            const practicalTask =
+              experience?.practicalTask && typeof experience.practicalTask === 'object'
+                ? experience.practicalTask
+                : null;
             const renderedHtml =
               typeof extra.renderedHtml === 'string'
                 ? extra.renderedHtml
@@ -107,7 +124,7 @@ function buildAtomicPayload(modules: BlueprintModule[]) {
                   : null;
             const instructorNotes = Array.isArray(lesson.instructorNotes)
               ? lesson.instructorNotes.join('\n\n')
-              : lesson.instructorNotes ?? null;
+              : (lesson.instructorNotes ?? null);
 
             return {
               slug: lesson.slug,
@@ -116,6 +133,7 @@ function buildAtomicPayload(modules: BlueprintModule[]) {
               order_index: lesson.order,
               objective: lesson.objective ?? null,
               content,
+              content_json: experience ? { experience } : {},
               rendered_html: renderedHtml,
               quiz_questions:
                 lesson.quizQuestions?.map((question) => ({
@@ -127,31 +145,62 @@ function buildAtomicPayload(modules: BlueprintModule[]) {
               passing_score:
                 lesson.passingScore ??
                 (stepType === 'exam' ? 80 : ['checkpoint', 'quiz'].includes(stepType) ? 70 : null),
-              activities: extra.activities ?? null,
+              activities:
+                extra.activities ??
+                (practicalTask ? [{ type: 'practical', ...practicalTask }] : null),
               duration_minutes: lesson.durationMinutes ?? null,
               video_url: extra.videoUrl ?? lesson.videoFile ?? null,
-              video_config: extra.videoConfig ?? null,
+              video_config:
+                extra.videoConfig ??
+                (experience
+                  ? {
+                      enabled: true,
+                      instructor: instructor.name,
+                      instructor_id: instructor.id,
+                      instructor_avatar: instructor.avatar,
+                      narration: experience.narrationScript ?? null,
+                      visual_prompt: experience.visualPrompt ?? null,
+                    }
+                  : null),
               learning_objectives: lesson.learningObjectives ?? null,
-              competency_checks: lesson.competencyChecks ?? null,
+              competency_checks: lesson.competencyChecks ?? experience?.knowledgeChecks ?? null,
               instructor_notes: instructorNotes,
-              practical_required: extra.practicalRequired ?? stepType === 'lab',
+              practical_required:
+                extra.practicalRequired ?? (Boolean(practicalTask) || stepType === 'lab'),
               required_artifacts: Array.isArray(extra.requiredArtifacts)
                 ? extra.requiredArtifacts
-                : [],
+                : practicalTask?.evidence
+                  ? [String(practicalTask.evidence)]
+                  : [],
               unlock_rule: extra.unlockRule ?? null,
               partner_exam_code: lesson.partnerExamCode ?? null,
               domain_key: lesson.domainKey ?? courseModule.domainKey ?? null,
               hour_category: extra.hourCategory ?? null,
               evidence_type: extra.evidenceType ?? null,
               delivery_method: extra.deliveryMethod ?? null,
-              requires_instructor_signoff: extra.requiresInstructorSignoff ?? false,
+              requires_instructor_signoff:
+                extra.requiresInstructorSignoff ?? Boolean(practicalTask),
               instructor_requirement: extra.instructorRequirement ?? null,
               minimum_seat_time_minutes: extra.minimumSeatTimeMinutes ?? null,
               fieldwork_eligible: extra.fieldworkEligible ?? false,
               is_required: extra.isRequired ?? true,
-              ai_generated: extra.aiGenerated ?? false,
+              ai_generated: extra.aiGenerated ?? Boolean(experience),
               approved: extra.approved ?? false,
               compliance_profile_key: extra.complianceProfileKey ?? null,
+              script_text: extra.scriptText ?? experience?.narrationScript ?? null,
+              script: extra.script ?? experience?.narrationScript ?? null,
+              bullet_points: extra.bulletPoints ?? learningPoints,
+              scene_data:
+                extra.sceneData ??
+                (experience
+                  ? {
+                      visual_prompt: experience.visualPrompt ?? null,
+                      scenario: experience.scenario ?? null,
+                      case_study: experience.caseStudy ?? null,
+                    }
+                  : null),
+              generation_status: experience ? 'generated' : 'pending',
+              last_generated_at: experience ? new Date().toISOString() : null,
             };
           }),
       };
@@ -167,7 +216,7 @@ function buildAtomicPayload(modules: BlueprintModule[]) {
  */
 export async function publishCourse(input: PublishInput): Promise<PublishResult> {
   const db = await requireAdminClient();
-  const modules = buildAtomicPayload(input.blueprint);
+  const modules = buildAtomicPayload(input.blueprint, input.courseTitle);
 
   try {
     // Generated Supabase types may lag the migration by one generation cycle.

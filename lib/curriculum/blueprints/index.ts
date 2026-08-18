@@ -1,11 +1,6 @@
 /**
  * lib/curriculum/blueprints/index.ts
- *
  * Registry of all credential blueprints.
- * Import from here — do not import individual blueprint files directly.
- *
- * All blueprints use the single CredentialBlueprint type from types.ts.
- * The generator, builder, auditor, and validator all consume that type.
  */
 
 export type {
@@ -52,6 +47,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     { prsIndianaBlueprint },
     { itHelpDeskBlueprint },
     { entrepreneurshipBlueprint },
+    { hostShopApprenticeshipOrientationBlueprint },
   ] = await Promise.all([
     import('./bookkeeping-quickbooks'),
     import('./barber-apprenticeship'),
@@ -61,6 +57,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     import('./prs-indiana'),
     import('./it-help-desk'),
     import('./entrepreneurship'),
+    import('./host-shop-apprenticeship-orientation'),
   ]);
 
   const elevateEsbBlueprint: CredentialBlueprint = {
@@ -78,6 +75,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     prsIndianaBlueprint,
     itHelpDeskBlueprint,
     elevateEsbBlueprint,
+    hostShopApprenticeshipOrientationBlueprint,
   ];
 
   const explicitProgramSlugs = new Set(explicitBlueprints.map((bp) => bp.programSlug));
@@ -91,9 +89,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
   return _registry;
 }
 
-export async function getBlueprintByCredentialSlug(
-  credentialSlug: string,
-): Promise<CredentialBlueprint | null> {
+export async function getBlueprintByCredentialSlug(credentialSlug: string): Promise<CredentialBlueprint | null> {
   const registry = await getAllBlueprints();
   return registry.find((bp) => bp.credentialSlug === credentialSlug) ?? null;
 }
@@ -103,20 +99,12 @@ export async function getBlueprintById(id: string): Promise<CredentialBlueprint 
   return registry.find((bp) => bp.id === id) ?? null;
 }
 
-export async function getBlueprintByProgramSlug(
-  programSlug: string,
-): Promise<CredentialBlueprint | null> {
+export async function getBlueprintByProgramSlug(programSlug: string): Promise<CredentialBlueprint | null> {
   const registry = await getAllBlueprints();
   return registry.find((bp) => bp.programSlug === programSlug) ?? null;
 }
 
-/**
- * Returns the external courses declared on a blueprint for a given program slug.
- * Returns an empty array if the program has no blueprint or no external courses.
- */
-export async function getExternalCoursesForProgram(
-  programSlug: string,
-): Promise<NonNullable<CredentialBlueprint['externalCourses']>> {
+export async function getExternalCoursesForProgram(programSlug: string): Promise<NonNullable<CredentialBlueprint['externalCourses']>> {
   const bp = await getBlueprintByProgramSlug(programSlug);
   return bp?.externalCourses ?? [];
 }

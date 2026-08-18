@@ -163,6 +163,53 @@ async function recordCompletedCheckout(event: Stripe.Event, session: Stripe.Chec
   return { duplicate: false };
 }
 
+export type CareerCourseWebhookResult = {
+  handled: boolean;
+  response?: Record<string, boolean>;
+};
+
+/**
+ * Process career-course events after the caller has verified the Stripe
+ * signature. The canonical marketing webhook calls this so career-course
+ * purchases do not depend on a second Stripe endpoint or signing secret.
+ */
+export async function processCareerCourseStripeEvent(
+  event: Stripe.Event,
+): Promise<CareerCourseWebhookResult> {
+  switch (event.type) {
+    case 'checkout.session.completed':
+    case 'checkout.session.async_payment_succeeded': {
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      if (session.metadata?.type !== 'career_course') {
+        return { handled: false };
+      }
+
+      if (session.payment_status !== 'paid') {
+        return { handled: true, response: { received: true, pending: true } };
+      }
+
+      const result = await recordCompletedCheckout(event, session);
+      return { handled: true, response: { received: true, ...result } };
+    }
+
+    case 'checkout.session.async_payment_failed': {
+      const session = event.data.object as Stripe.Checkout.Session;
+      if (session.metadata?.type !== 'career_course') {
+        return { handled: false };
+      }
+
+      logger.info('Career-course asynchronous payment failed', {
+        checkoutSessionId: session.id,
+      });
+      return { handled: true, response: { received: true } };
+    }
+
+    default:
+      return { handled: false };
+  }
+}
+
 export async function handleCareerCourseStripeWebhook(req: Request) {
   await hydrateProcessEnv();
 
@@ -199,41 +246,10 @@ export async function handleCareerCourseStripeWebhook(req: Request) {
   }
 
   try {
-    switch (event.type) {
-      case 'checkout.session.completed':
-      case 'checkout.session.async_payment_succeeded': {
-        const session = event.data.object as Stripe.Checkout.Session;
-
-        if (session.metadata?.type !== 'career_course') {
-          return NextResponse.json({ received: true, skipped: true });
-        }
-
-        if (session.payment_status !== 'paid') {
-          return NextResponse.json({ received: true, pending: true });
-        }
-
-        const result = await recordCompletedCheckout(event, session);
-        return NextResponse.json({ received: true, ...result });
-      }
-
-      case 'checkout.session.async_payment_failed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        if (session.metadata?.type === 'career_course') {
-          logger.info('Career-course asynchronous payment failed', {
-            checkoutSessionId: session.id,
-          });
-        }
-        break;
-      }
-
-      case 'payment_intent.payment_failed': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        logger.info('Payment failed', { paymentIntentId: paymentIntent.id });
-        break;
-      }
-    }
-
-    return NextResponse.json({ received: true });
+    const result = await processCareerCourseStripeEvent(event);
+    return NextResponse.json(
+      result.handled ? result.response : { received: true, skipped: true },
+    );
   } catch (error) {
     Sentry.captureException(error, { tags: { subsystem: 'career_course_webhook' } });
     logger.error(

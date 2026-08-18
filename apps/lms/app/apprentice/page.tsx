@@ -34,6 +34,13 @@ type HourRow = {
   program_slug: string | null;
 };
 
+type RtiProgressRow = {
+  required_hours: number | string;
+  verified_hours: number | string;
+  pending_entries: number | string;
+  requirement_met: boolean;
+};
+
 function numericHours(value: unknown) {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
@@ -146,6 +153,26 @@ export default async function ApprenticePortalPage() {
     : 0;
   const requiredRtiHours = appendixStandard?.relatedInstructionHours ?? (Number(programConfig?.min_rti_hours ?? 0) || null);
 
+  let verifiedRtiHours = 0;
+  let pendingRtiEntries = 0;
+  let metRtiCategories = 0;
+  let totalRtiCategories = 0;
+  if (enrollment?.id && programSlug === 'barber-apprenticeship') {
+    const { data: rtiRows, error: rtiError } = await supabase
+      .from('barber_appendix_a_rti_progress')
+      .select('required_hours, verified_hours, pending_entries, requirement_met')
+      .eq('enrollment_id', enrollment.id);
+    if (rtiError) throw new Error(`APPRENTICE_RTI_LOAD_FAILED:${rtiError.message}`);
+    const rows = (rtiRows || []) as RtiProgressRow[];
+    verifiedRtiHours = rows.reduce((sum, row) => sum + numericHours(row.verified_hours), 0);
+    pendingRtiEntries = rows.reduce((sum, row) => sum + Number(row.pending_entries || 0), 0);
+    metRtiCategories = rows.filter((row) => row.requirement_met).length;
+    totalRtiCategories = rows.length;
+  }
+  const verifiedRtiProgress = requiredRtiHours
+    ? Math.min(100, Math.max(0, Math.round((verifiedRtiHours / requiredRtiHours) * 100)))
+    : digitalCourseProgress;
+
   let shopName: string | null = null;
   if (placement?.shop_id) {
     const { data: shop } = await supabase.from('shops').select('name').eq('id', placement.shop_id).maybeSingle();
@@ -192,20 +219,20 @@ export default async function ApprenticePortalPage() {
 
       {appendixStandard ? (
         <section className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-cyan-950">
-          <div className="flex gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0"/><div><h2 className="font-black">Your USDOL Appendix A progress contract</h2><p className="mt-1 text-sm font-semibold leading-6">Completion is based on verified mastery of {appendixStandard.competencyCount} competencies plus {appendixStandard.relatedInstructionHours} RTI hours under the approved standard. Work hours are retained as OJL/employment evidence, but this competency-based occupation is not completed by reaching a generic 2,000-hour counter.</p><p className="mt-2 text-xs font-bold uppercase tracking-wide">1:1 mentor ratio · {appendixStandard.probationaryHours}-hour probation · revision {APPENDIX_A_REGISTRATION.revisionDate}</p></div></div>
+          <div className="flex gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0"/><div><h2 className="font-black">Your USDOL Appendix A progress contract</h2><p className="mt-1 text-sm font-semibold leading-6">Completion is based on verified mastery of {appendixStandard.competencyCount} competencies plus {appendixStandard.relatedInstructionHours} RTI hours under the approved standard. Digital lesson completion is learning progress; RTI credit is counted only when instruction is documented and verified. Work hours are retained as OJL/employment evidence, but this competency-based occupation is not completed by reaching a generic 2,000-hour counter.</p><p className="mt-2 text-xs font-bold uppercase tracking-wide">1:1 mentor ratio · {appendixStandard.probationaryHours}-hour probation · revision {APPENDIX_A_REGISTRATION.revisionDate}</p></div></div>
         </section>
       ) : null}
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Apprentice progress">
         <Metric label={appendixStandard ? 'Appendix A competencies' : 'Approved OJT hours'} value={appendixStandard ? `${completedCompetencies} / ${appendixStandard.competencyCount}` : requiredOjlHours ? `${approvedHours.toLocaleString()} / ${requiredOjlHours.toLocaleString()}` : approvedHours.toLocaleString()} detail={appendixStandard ? `${competencyProgress}% verified competency progress` : requiredOjlHours ? `${ojtProgress}% of required OJT` : `${approvedHours.toLocaleString()} approved work hours recorded`} icon={CheckCircle2} />
-        <Metric label="RTI course progress" value={`${completedRtiLessons} / ${totalRtiLessons}`} detail={requiredRtiHours ? `${requiredRtiHours} RTI hours required; lesson completion is digital-course progress` : `${digitalCourseProgress}% verified lesson completion`} icon={BookOpen} />
+        <Metric label={appendixStandard ? 'Verified RTI hours' : 'RTI course progress'} value={appendixStandard && requiredRtiHours ? `${verifiedRtiHours.toFixed(2)} / ${requiredRtiHours}` : `${completedRtiLessons} / ${totalRtiLessons}`} detail={appendixStandard ? `${metRtiCategories} of ${totalRtiCategories} Appendix A RTI categories satisfied · ${pendingRtiEntries} pending evidence entries` : `${digitalCourseProgress}% verified lesson completion`} icon={BookOpen} />
         <Metric label="Approved work hours" value={approvedHours.toLocaleString()} detail={`${pendingEntries} pending entries · retained as supervised work evidence`} icon={Clock3} />
         <Metric label="Certificates / documents" value={String(certsRes.count ?? 0)} detail={`${verifiedDocs} of ${totalDocs} documents verified`} icon={Award} />
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
-        <ProgressPanel title={appendixStandard ? 'Appendix A competency mastery' : 'On-the-job learning (OJT)'} value={appendixStandard ? competencyProgress : ojtProgress} detail={appendixStandard ? `${completedCompetencies} of ${appendixStandard.competencyCount} competencies verified by the Host Shop mentor` : requiredOjlHours ? `${approvedHours.toLocaleString()} approved of ${requiredOjlHours.toLocaleString()} required hours` : `${approvedHours.toLocaleString()} approved hours recorded`} />
-        <ProgressPanel title="Digital RTI course" value={digitalCourseProgress} detail={`${completedRtiLessons} verified lessons complete of ${totalRtiLessons}${requiredRtiHours ? ` · Appendix A requires ${requiredRtiHours} RTI hours total` : ''}`} />
+        <ProgressPanel title={appendixStandard ? 'Appendix A competency mastery' : 'On-the-job learning (OJT)'} value={appendixStandard ? competencyProgress : ojtProgress} detail={appendixStandard ? `${completedCompetencies} of ${appendixStandard.competencyCount} competencies verified by the assigned Host Shop supervisor` : requiredOjlHours ? `${approvedHours.toLocaleString()} approved of ${requiredOjlHours.toLocaleString()} required hours` : `${approvedHours.toLocaleString()} approved hours recorded`} />
+        <ProgressPanel title={appendixStandard ? 'Verified Related Technical Instruction' : 'Digital RTI course'} value={appendixStandard ? verifiedRtiProgress : digitalCourseProgress} detail={appendixStandard && requiredRtiHours ? `${verifiedRtiHours.toFixed(2)} verified of ${requiredRtiHours} required RTI hours · digital course ${completedRtiLessons}/${totalRtiLessons} lessons complete` : `${completedRtiLessons} verified lessons complete of ${totalRtiLessons}`} />
       </section>
 
       {appendixStandard ? (
@@ -231,7 +258,8 @@ export default async function ApprenticePortalPage() {
         </div>
       </section>
 
-      {!shopName ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950"><div className="flex gap-3"><Building2 className="mt-0.5 h-5 w-5 shrink-0" /><div><h2 className="font-black">Host shop assignment needed</h2><p className="mt-1 text-sm font-medium leading-6">Your active apprentice placement does not currently resolve to a Host Shop. Contact apprenticeship administration before recording location-dependent work or competency verification.</p></div></div></section> : null}
+      {!shopName ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950"><div className="flex gap-3"><Building2 className="mt-0.5 h-5 w-5 shrink-0" /><div><h2 className="font-black">Host Shop assignment needed</h2><p className="mt-1 text-sm font-medium leading-6">Your active apprentice placement does not currently resolve to a Host Shop. Contact apprenticeship administration before recording location-dependent work or competency verification.</p></div></div></section> : null}
+      {shopName && appendixStandard && !placement?.supervisor_user_id ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950"><div className="flex gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" /><div><h2 className="font-black">Assigned supervisor required</h2><p className="mt-1 text-sm font-medium leading-6">Your Host Shop is assigned, but the active placement does not have a supervisor user attached. Barber hours and competencies cannot be verified until the 1:1 supervisor assignment is complete.</p></div></div></section> : null}
     </main>
   );
 }

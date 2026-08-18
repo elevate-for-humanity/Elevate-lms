@@ -19,6 +19,8 @@
     "SUPABASE_SERVICE_ROLE_KEY": "",
     "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org",
     "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org",
+    "NEXT_PUBLIC_APP_URL": "https://app.elevateforhumanity.org",
+    "NEXT_PUBLIC_CANONICAL_DOMAIN": "elevateforhumanity.org",
     "STRIPE_SECRET_KEY": "",
     "STRIPE_WEBHOOK_SECRET": "",
     "SENDGRID_API_KEY": "",
@@ -27,7 +29,9 @@
   },
   "buildArgs": {
     "NEXT_PUBLIC_SITE_URL": "https://www.elevateforhumanity.org",
-    "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org"
+    "NEXT_PUBLIC_ADMIN_URL": "https://admin.elevateforhumanity.org",
+    "NEXT_PUBLIC_APP_URL": "https://app.elevateforhumanity.org",
+    "NEXT_PUBLIC_CANONICAL_DOMAIN": "elevateforhumanity.org"
   },
   "deployment": {
     "healthCheck": {

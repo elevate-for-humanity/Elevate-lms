@@ -113,6 +113,14 @@ echo "\n== Database hardening migrations =="
 [[ -f "$ROOT/supabase/migrations/20260812024000_admin_approve_progress_entries_audit.sql" ]] && pass "Audited apprenticeship approval migration tracked" || fail "Apprenticeship approval migration missing"
 [[ -f "$ROOT/supabase/migrations/20260812024500_platform_secrets_scope.sql" ]] && pass "Canonical secret scope migration tracked" || fail "Secret scope migration missing"
 [[ -f "$ROOT/supabase/migrations/20260812025000_backfill_platform_secrets_from_legacy.sql" ]] && pass "Legacy secret backfill migration tracked" || fail "Secret backfill migration missing"
+[[ -f "$ROOT/supabase/migrations/20260818221500_dev_studio_claim_evidence_and_benchmarks.sql" ]] && pass "Dev Studio claim evidence migration tracked" || fail "Dev Studio claim evidence migration missing"
+
+echo "\n== Evidence-backed public claims =="
+if node scripts/check-dev-studio-claims.mjs; then
+  pass "Dev Studio public claim evidence gate"
+else
+  fail "Dev Studio public claim evidence gate"
+fi
 
 echo "\n== Result =="
 echo "Passes: $PASS"

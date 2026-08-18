@@ -2,10 +2,16 @@
 
 ## Ownership
 
-- Admin `/studio` is the only operational Studio shell.
+- Elevate Admin owns the only application shell.
+- Admin `/studio` is a section inside that shell, not a standalone product surface.
 - `lib/devstudio/workspace-registry.ts` is the workspace source of truth.
+- `StudioNavigation` provides contextual workspace links only; it must not become a fixed application sidebar.
 - Marketing Studio routes are informational product pages only.
 - LMS does not own an operational Studio.
+
+## Shared Admin surface
+
+Every Studio workspace inherits the canonical Admin header, session controls, notifications, footer, support widget, branding, and page lifecycle. The Admin root layout must never special-case `/studio` using request headers or pathname detection.
 
 ## Runtime boundaries
 
@@ -13,7 +19,7 @@
 - `/api/admin/dev-studio/*` contains capability-specific Admin health and configuration APIs.
 - The architecture gate rejects duplicate relative routes across those namespaces.
 - `lib/devstudio/*` owns shared runtime behavior.
-- Course Builder owns course authoring; the removed CourseProvider/StudioShell family was unused and duplicated those capabilities.
+- Course Builder owns course authoring; parallel provider or shell implementations are prohibited.
 
 ## Browser runtime
 
@@ -62,4 +68,4 @@ pnpm typecheck:studio
 bash scripts/dev-studio-integration-gate.sh
 ```
 
-These checks prevent parallel shells, registered redirect-only workspaces, duplicate API implementations and removal of the browser runtime contract.
+These checks prevent an Admin-shell bypass, a standalone Studio sidebar or shell, registered redirect-only workspaces, duplicate API implementations, and removal of the browser runtime contract.

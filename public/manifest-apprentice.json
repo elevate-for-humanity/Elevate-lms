@@ -2,7 +2,7 @@
   "id": "org.elevateforhumanity.apprentice",
   "name": "Elevate Apprentice Portal",
   "short_name": "Apprentice",
-  "description": "Track apprenticeship hours, RTI, competencies, documents, and host-site progress.",
+  "description": "Track apprenticeship work evidence, RTI, competencies, documents, and Host Shop progress.",
   "start_url": "/apprentice",
   "scope": "/apprentice",
   "display": "standalone",
@@ -39,14 +39,9 @@
       "url": "/apprentice"
     },
     {
-      "name": "Clock Hours",
+      "name": "Clock Work Hours",
       "short_name": "Hours",
       "url": "/apprentice/timeclock"
-    },
-    {
-      "name": "RTI Course",
-      "short_name": "RTI",
-      "url": "/apprentice/course"
     },
     {
       "name": "Competencies",

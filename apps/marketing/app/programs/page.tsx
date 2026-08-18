@@ -18,6 +18,7 @@ import {
 } from '@/lib/programs/public-programs-page';
 import { getProgramCardImage } from '@/lib/images/programImages';
 import { WORKONE_INDY_INTAKE_URL } from '@/lib/programs/funding-registry';
+import ProgramCardImage from './ProgramCardImage';
 
 export const revalidate = 0;
 export async function generateMetadata(): Promise<Metadata> {
@@ -32,12 +33,10 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
     <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/programs/${program.slug}`} className="block">
         <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-          <Image
+          <ProgramCardImage
             src={image}
             alt={`${program.title} training program`}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            category={program.category}
           />
           <div className="absolute left-3 top-3 flex flex-wrap gap-2">
             {funded ? (
@@ -60,6 +59,9 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
       </Link>
 
       <div className="p-5 sm:p-6">
+        <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-slate-500">
+          {program.category}
+        </p>
         <h3 className="text-xl font-extrabold leading-tight text-slate-950">
           <Link href={`/programs/${program.slug}`} className="hover:text-brand-red-700">
             {program.title}
@@ -103,6 +105,45 @@ function ProgramCard({ program }: { program: ProgramsPageRow }) {
   );
 }
 
+function groupPrograms(programs: ProgramsPageRow[]) {
+  const groups = new Map<string, ProgramsPageRow[]>();
+  for (const program of programs) {
+    const existing = groups.get(program.category) ?? [];
+    existing.push(program);
+    groups.set(program.category, existing);
+  }
+  return [...groups.entries()];
+}
+
+function ProgramGroups({ programs }: { programs: ProgramsPageRow[] }) {
+  return (
+    <div className="mt-10 space-y-12">
+      {groupPrograms(programs).map(([category, categoryPrograms]) => (
+        <section key={category} aria-labelledby={`category-${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+          <div className="mb-5 flex items-end justify-between gap-4 border-b border-slate-200 pb-3">
+            <div>
+              <h3
+                id={`category-${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                className="text-2xl font-black text-slate-950"
+              >
+                {category}
+              </h3>
+              <p className="mt-1 text-sm font-semibold text-slate-500">
+                {categoryPrograms.length} {categoryPrograms.length === 1 ? 'program' : 'programs'}
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {categoryPrograms.map((program) => (
+              <ProgramCard key={program.slug} program={program} />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export default async function ProgramsPage() {
   const { programs } = await getPublicProgramsPageData();
   const funded = programs.filter((p) => p.funding_tier === 'workforce-funded');
@@ -130,8 +171,8 @@ export default async function ProgramsPage() {
               Choose the right program — and the right funding path.
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-slate-700 sm:text-xl">
-              {PLATFORM_DEFAULTS.orgName} separates verified workforce-funded programs from regular
-              self-pay courses so applicants know exactly which enrollment process applies.
+              {PLATFORM_DEFAULTS.orgName} groups related programs by career pathway and separates
+              verified workforce-funded programs from regular self-pay courses.
             </p>
           </div>
         </div>
@@ -145,12 +186,12 @@ export default async function ProgramsPage() {
                 Verified Workforce-Funded Programs
               </p>
               <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
-                CDL, HVAC, Business & Financial Literacy
+                Approved pathways, organized by career category
               </h2>
               <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-700">
-                These are the four programs confirmed for workforce-funding consideration. WorkOne
-                or the responsible agency determines participant eligibility, covered costs, and
-                written authorization. Funding is not guaranteed.
+                These are the programs confirmed for workforce-funding consideration. WorkOne or the
+                responsible agency determines participant eligibility, covered costs, and written
+                authorization. Funding is not guaranteed.
               </p>
             </div>
             <a
@@ -163,16 +204,13 @@ export default async function ProgramsPage() {
             </a>
           </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {funded.map((program) => (
-              <ProgramCard key={program.slug} program={program} />
-            ))}
-          </div>
-          {funded.length === 0 ? (
+          {funded.length > 0 ? (
+            <ProgramGroups programs={funded} />
+          ) : (
             <p className="mt-8 rounded-xl bg-white p-6 text-slate-700">
               No programs are currently published in the verified funded registry.
             </p>
-          ) : null}
+          )}
         </div>
       </section>
 
@@ -183,18 +221,15 @@ export default async function ProgramsPage() {
               Regular Courses
             </p>
             <h2 className="mt-2 text-3xl font-black text-slate-950 sm:text-4xl">
-              Self-pay & payment-plan programs
+              Self-pay & payment-plan programs by career pathway
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-slate-700">
-              Every program outside the confirmed four appears here as a regular program. These
-              programs do not advertise WIOA or Workforce Ready Grant funding.
+              Related course names are consolidated into one public pathway wherever they represent
+              the same training program. Distinct occupational or industry-certification pathways
+              remain separate and are grouped under the same category.
             </p>
           </div>
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {selfPay.map((program) => (
-              <ProgramCard key={program.slug} program={program} />
-            ))}
-          </div>
+          <ProgramGroups programs={selfPay} />
         </div>
       </section>
 

@@ -18,6 +18,7 @@ const TOPIC_QUERIES: Record<string, string> = {
   hvac: 'hvac technician air conditioning',
   electrical: 'electrical wiring professional',
   barber: 'barbershop professional grooming',
+  business: 'diverse small business owners planning marketing finance customer service',
   default: 'professional learning education',
 };
 
@@ -34,15 +35,19 @@ interface PexelsResponse {
 
 export async function getPexelsImage(
   domainKey: string,
-  options: { orientation?: 'landscape' | 'portrait' | 'square'; perPage?: number } = {},
+  options: {
+    orientation?: 'landscape' | 'portrait' | 'square';
+    perPage?: number;
+    query?: string;
+  } = {},
 ): Promise<string | null> {
   const apiKey = process.env.PEXELS_API_KEY;
   if (!apiKey) {
     logger.warn('[pexels] PEXELS_API_KEY not set — falling back to Pollinations');
-    return getPollinationsImage(domainKey);
+    return getPollinationsImage(domainKey, options.query);
   }
 
-  const query = TOPIC_QUERIES[domainKey] ?? TOPIC_QUERIES.default;
+  const query = options.query?.trim() || TOPIC_QUERIES[domainKey] || TOPIC_QUERIES.default;
   const { orientation = 'landscape', perPage = 10 } = options;
 
   try {
@@ -59,22 +64,22 @@ export async function getPexelsImage(
 
     if (!res.ok) {
       logger.warn('[pexels] API error', { status: res.status });
-      return getPollinationsImage(domainKey);
+      return getPollinationsImage(domainKey, options.query);
     }
 
     const data: PexelsResponse = await res.json();
-    if (!data.photos?.length) return getPollinationsImage(domainKey);
+    if (!data.photos?.length) return getPollinationsImage(domainKey, options.query);
 
     const photo = data.photos[Math.floor(Math.random() * data.photos.length)];
     return photo.src.large2x ?? photo.src.landscape;
   } catch (err) {
     logger.warn('[pexels] fetch error', { err });
-    return getPollinationsImage(domainKey);
+    return getPollinationsImage(domainKey, options.query);
   }
 }
 
-export function getPollinationsImage(domainKey: string): string {
-  const prompt = TOPIC_QUERIES[domainKey] ?? TOPIC_QUERIES.default;
+export function getPollinationsImage(domainKey: string, customPrompt?: string): string {
+  const prompt = customPrompt?.trim() || TOPIC_QUERIES[domainKey] || TOPIC_QUERIES.default;
   const encoded = encodeURIComponent(
     `${prompt}, professional, cinematic lighting, high quality, 16:9`,
   );
@@ -121,12 +126,7 @@ export async function getPexelsVideoClip(
     return null;
   }
 
-  const {
-    minDuration = 5,
-    maxDuration = 30,
-    perPage = 10,
-    orientation = 'landscape',
-  } = options;
+  const { minDuration = 5, maxDuration = 30, perPage = 10, orientation = 'landscape' } = options;
 
   try {
     const url = new URL('https://api.pexels.com/videos/search');
@@ -156,13 +156,18 @@ export async function getPexelsVideoClip(
 
     const orientationMatches = (file: PexelsVideoFile) => {
       if (orientation === 'portrait') return file.height > file.width;
-      if (orientation === 'square') return Math.abs(file.width - file.height) <= Math.max(file.width, file.height) * 0.12;
+      if (orientation === 'square')
+        return Math.abs(file.width - file.height) <= Math.max(file.width, file.height) * 0.12;
       return file.width >= file.height;
     };
 
     const hdFile =
-      video.video_files.find((f) => orientationMatches(f) && f.quality === 'hd' && Math.max(f.width, f.height) >= 1280) ??
-      video.video_files.find((f) => orientationMatches(f) && f.quality === 'sd' && Math.max(f.width, f.height) >= 640) ??
+      video.video_files.find(
+        (f) => orientationMatches(f) && f.quality === 'hd' && Math.max(f.width, f.height) >= 1280,
+      ) ??
+      video.video_files.find(
+        (f) => orientationMatches(f) && f.quality === 'sd' && Math.max(f.width, f.height) >= 640,
+      ) ??
       video.video_files.find(orientationMatches) ??
       video.video_files.find((f) => f.quality === 'hd' && f.width >= 1280) ??
       video.video_files.find((f) => f.quality === 'sd' && f.width >= 640) ??

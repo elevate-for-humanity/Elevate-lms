@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { HOST_SHOP_ADMIN_COOKIE } from '@/lib/partner/board';
-import { HOST_SHOP_ROLES, hasAnyRole, normalizeRoles } from '@/lib/rbac/role-matrix';
+import { normalizeRoles } from '@/lib/rbac/role-matrix';
 
 export type CurrentHostShopPartner = {
   id: string;
@@ -69,10 +69,6 @@ export async function requireCurrentHostShopPartner() {
     .filter((value: unknown): value is string => typeof value === 'string');
   const effectiveRoles = normalizeRoles([profile?.role, ...secondaryRoles]);
 
-  if (!hasAnyRole(effectiveRoles, HOST_SHOP_ROLES, { adminOverride: false })) {
-    throw new Error('HOST_SHOP_FORBIDDEN');
-  }
-
   const isPlatformAdmin = effectiveRoles.some((role) =>
     ['super_admin', 'admin', 'org_admin'].includes(role),
   );
@@ -100,12 +96,41 @@ export async function requireCurrentHostShopPartner() {
 
   const { data: link, error: linkError } = await db
     .from('partner_users')
-    .select(`partner_id, status, partners(${PARTNER_SELECT})`)
+    .select('partner_id, status')
     .eq('user_id', user.id)
     .eq('status', 'active')
+    .limit(1)
     .maybeSingle();
 
-  if (linkError || !link?.partner_id || !link.partners) {
+  if (linkError) throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
+
+  let partnerId = link?.partner_id as string | null | undefined;
+  if (!partnerId) {
+    const { data: staffLink, error: staffError } = await db
+      .from('shop_staff')
+      .select('shop_id, active, shops!inner(partner_id, active)')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .eq('shops.active', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (staffError) throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
+    const shop = staffLink?.shops as unknown as { partner_id?: string | null } | null;
+    partnerId = shop?.partner_id;
+  }
+
+  if (!partnerId) throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
+
+  const { data: partner, error: partnerError } = await db
+    .from('partners')
+    .select(PARTNER_SELECT)
+    .eq('id', partnerId)
+    .eq('status', 'active')
+    .eq('approval_status', 'approved')
+    .maybeSingle();
+
+  if (partnerError || !partner || partner.is_active === false) {
     throw new Error('HOST_SHOP_PARTNER_NOT_FOUND');
   }
 
@@ -113,7 +138,7 @@ export async function requireCurrentHostShopPartner() {
     user,
     db,
     effectiveRoles,
-    partner: link.partners as unknown as CurrentHostShopPartner,
+    partner: partner as CurrentHostShopPartner,
     isPlatformAdmin: false,
   };
 }

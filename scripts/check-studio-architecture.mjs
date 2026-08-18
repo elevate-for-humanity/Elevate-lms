@@ -58,12 +58,30 @@ for (const route of routes) {
 
 const canonicalRoot = path.join(root, 'apps/admin/app/api/admin/dev-studio');
 const runtimeRoot = path.join(root, 'apps/admin/app/api/devstudio');
+const forbiddenLegacyRoot = path.join(root, 'apps/admin/app/api/admin/devstudio');
 function routeFiles(base, current = base) {
   if (!fs.existsSync(current)) return [];
   return fs.readdirSync(current, { withFileTypes: true }).flatMap((entry) => entry.isDirectory() ? routeFiles(base, path.join(current, entry.name)) : entry.name === 'route.ts' ? [path.relative(base, path.join(current, entry.name))] : []);
 }
 const capabilityRoutes = new Set(routeFiles(canonicalRoot));
 for (const route of routeFiles(runtimeRoot)) if (capabilityRoutes.has(route)) fail(`duplicate API route exists in both Studio namespaces: ${route}`);
+if (fs.existsSync(forbiddenLegacyRoot)) fail('legacy /api/admin/devstudio namespace exists; use /api/admin/dev-studio for Admin capability APIs');
+
+function sourceFiles(current) {
+  if (!fs.existsSync(current)) return [];
+  return fs.readdirSync(current, { withFileTypes: true }).flatMap((entry) => {
+    const target = path.join(current, entry.name);
+    if (entry.isDirectory()) return sourceFiles(target);
+    return /\.(?:[cm]?[jt]sx?|mjs|cjs|sh)$/.test(entry.name) ? [target] : [];
+  });
+}
+for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']) {
+  for (const file of sourceFiles(path.join(root, sourceRoot))) {
+    if (read(path.relative(root, file)).includes('/api/admin/devstudio')) {
+      fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
+    }
+  }
+}
 
 const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
 for (const dependency of ['CourseProvider', 'CourseStudioApplication', 'StudioWorkspace', 'loadCourseSession']) {
@@ -98,4 +116,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: ${routes.length} canonical workspaces inside one Admin surface, no standalone shell, no parallel API routes.`);
+console.log(`Studio architecture verified: ${routes.length} canonical workspaces inside one Admin surface, no standalone shell, no parallel API routes, no legacy admin/devstudio namespace.`);

@@ -1,9 +1,9 @@
 /**
  * HomeTrustBar
  *
- * Institutional validation strip — DOL registration, WIOA/ETPL approval,
- * RAPIDS tracking, JRI funding, WorkOne alignment. Each badge links to
- * the relevant proof/detail page. Rendered near the bottom of the homepage.
+ * Institutional verification strip. This surface deliberately distinguishes
+ * registrations, provider approvals, funding pathways, and partner alignment
+ * instead of presenting every relationship as an accreditation.
  */
 
 import Image from 'next/image';
@@ -13,37 +13,37 @@ const TRUST_ITEMS = [
   {
     img: '/images/pages/about-career-pathways.webp',
     label: 'DOL Registered',
-    sub: 'Federal apprenticeship sponsor',
+    sub: 'Registered Apprenticeship sponsor',
     href: '/compliance/apprenticeship-structure',
   },
   {
     img: '/images/pages/wioa-meeting.webp',
-    label: 'ETPL Approved',
-    sub: 'WIOA-funded tuition eligible',
-    href: '/federal-compliance',
+    label: 'ETPL Listed',
+    sub: 'Approved programs are listed by the state',
+    href: '/approvals',
   },
   {
     img: '/images/pages/about-career-training.webp',
-    label: 'WIOA Aligned',
-    sub: 'Title I & II compliant',
+    label: 'WIOA Pathways',
+    sub: 'Eligibility and authorization are program-specific',
     href: '/eligibility',
   },
   {
     img: '/images/pages/comp-state-career-hero.webp',
     label: 'RAPIDS Tracked',
-    sub: 'DOL apprenticeship system',
+    sub: 'Registered apprenticeship reporting workflow',
     href: '/compliance/apprenticeship-structure',
   },
   {
     img: '/images/pages/about-team-hero.webp',
-    label: 'WorkOne Partner',
-    sub: 'Indiana DWD aligned',
+    label: 'WorkOne Coordination',
+    sub: 'Workforce referral and funding coordination',
     href: '/for-agencies',
   },
   {
     img: '/images/pages/funding-impact-2.jpg',
-    label: 'JRI Approved',
-    sub: 'Marion County free tuition',
+    label: 'JRI Pathway',
+    sub: 'Availability depends on current authorization',
     href: '/partners/jri',
   },
 ];
@@ -51,7 +51,7 @@ const TRUST_ITEMS = [
 const PARTNER_LOGOS = [
   {
     src: '/images/pages/about-funding-nav.webp',
-    alt: 'US Department of Labor',
+    alt: 'US Department of Labor workforce system',
     href: '/federal-compliance',
   },
   {
@@ -61,23 +61,22 @@ const PARTNER_LOGOS = [
   },
   {
     src: '/images/pages/workforce-board-page-2.webp',
-    alt: 'WorkOne Indiana',
+    alt: 'WorkOne Indiana workforce system',
     href: '/for-agencies',
   },
-  { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs', href: '/eligibility' },
-  { src: '/images/pages/about-hero.webp', alt: 'OSHA Authorized', href: '/compliance' },
+  { src: '/images/pages/federal-funded.webp', alt: 'Next Level Jobs funding pathway', href: '/eligibility' },
+  { src: '/images/pages/about-hero.webp', alt: 'Workplace safety training', href: '/compliance' },
 ];
 
 export function HomeTrustBar() {
   return (
     <section
       className="bg-slate-50 border-t border-slate-200"
-      aria-label="Institutional credentials and partnerships"
+      aria-label="Institutional registrations, approvals, funding pathways, and workforce alignment"
     >
-      {/* Credential badges — 2 cols mobile, 3 cols sm, 6 cols lg */}
       <div className="max-w-6xl mx-auto px-4 py-10 md:py-12">
         <p className="text-center text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-6">
-          Accreditations &amp; Approvals
+          Registrations, approvals &amp; funding pathways
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
           {TRUST_ITEMS.map(({ img, label, sub, href }) => (
@@ -94,6 +93,7 @@ export function HomeTrustBar() {
                   height={56}
                   className="object-contain w-full h-full"
                   sizes="64px"
+                  loading="lazy"
                 />
               </div>
               <div>
@@ -107,11 +107,10 @@ export function HomeTrustBar() {
         </div>
       </div>
 
-      {/* Partner logos */}
       <div className="border-t border-slate-200 bg-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <p className="text-center text-[11px] font-semibold text-slate-600 uppercase tracking-widest mb-6">
-            Aligned with workforce development partners
+            Workforce systems and public-sector alignment
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
             {PARTNER_LOGOS.map((logo) => (

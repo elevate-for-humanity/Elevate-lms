@@ -45,6 +45,8 @@ jobs:
       NORTHFLANK_TARGET_SERVICE: admin
       DEPLOY_BRANCH: main
       NORTHFLANK_EPHEMERAL_STORAGE_MB: '32768'
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -110,6 +112,12 @@ jobs:
 
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Reconcile authoritative Cloudflare Admin DNS
+        run: pnpm tsx scripts/northflank/reconcile-cloudflare-admin-dns.ts
+
+      - name: Enforce canonical Admin domain attachment in Northflank
+        run: pnpm tsx scripts/northflank/configure-admin-domain.ts
 
       - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute

@@ -44,7 +44,7 @@ function requiredRoles(pathname: string): readonly UserRole[] {
     pathname.startsWith('/admin/dev-studio') ||
     pathname.startsWith('/dev-studio') ||
     pathname.startsWith('/api/devstudio') ||
-    pathname.startsWith('/api/admin/devstudio');
+    pathname.startsWith('/api/admin/dev-studio');
   if (isStudio) return ['super_admin', 'admin'];
 
   const isTesting =

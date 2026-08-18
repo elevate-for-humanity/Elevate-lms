@@ -10,11 +10,22 @@ export const maxDuration = 60;
 
 export const dynamic = 'force-dynamic';
 
+const SUPERVISOR_MEMBERSHIP_ROLES = new Set([
+  'owner',
+  'partner_admin',
+  'admin',
+  'supervisor',
+  'mentor',
+  'manager',
+]);
+
 /**
  * MANDATORY VERIFICATION ENFORCEMENT:
  * Matching is BLOCKED until required documents are VERIFIED for BOTH:
  * - Apprentice: photo_id verified
  * - Host Shop: shop_license AND barber_license verified
+ *
+ * Registered Barber placements also require a durable supervisor user identity.
  */
 async function _POST(req: Request) {
   try {
@@ -132,9 +143,60 @@ async function _POST(req: Request) {
       }
     }
 
+    let supervisorUserId: string | null = null;
+    let resolvedSupervisorName = typeof supervisorName === 'string' ? supervisorName.trim() : '';
+    let resolvedSupervisorEmail = typeof supervisorEmail === 'string' ? supervisorEmail.trim().toLowerCase() : '';
+
+    if (shopId) {
+      const { data: shop, error: shopError } = await supabase
+        .from('shops')
+        .select('id, partner_id, active')
+        .eq('id', shopId)
+        .maybeSingle();
+      if (shopError || !shop || shop.active === false || !shop.partner_id) {
+        return NextResponse.json({ error: 'Active Host Shop not found' }, { status: 422 });
+      }
+
+      if (resolvedSupervisorEmail) {
+        const { data: supervisorProfile } = await supabase
+          .from('profiles')
+          .select('id, full_name, email')
+          .ilike('email', resolvedSupervisorEmail)
+          .maybeSingle();
+
+        if (supervisorProfile?.id) {
+          const { data: supervisorMemberships } = await supabase
+            .from('partner_users')
+            .select('partner_id, role, status')
+            .eq('user_id', supervisorProfile.id)
+            .eq('partner_id', shop.partner_id)
+            .eq('status', 'active');
+
+          const validMembership = (supervisorMemberships || []).find((row: any) =>
+            SUPERVISOR_MEMBERSHIP_ROLES.has(String(row.role || '').trim().toLowerCase()),
+          );
+
+          if (validMembership) {
+            supervisorUserId = supervisorProfile.id;
+            resolvedSupervisorName = supervisorProfile.full_name || resolvedSupervisorName;
+            resolvedSupervisorEmail = supervisorProfile.email || resolvedSupervisorEmail;
+          }
+        }
+      }
+
+      if (programSlug === 'barber-apprenticeship' && !supervisorUserId) {
+        return NextResponse.json(
+          {
+            error: 'Registered Barber placement requires an assigned Host Shop supervisor',
+            message: 'Provide the email of an active owner, partner admin, supervisor, mentor, or manager attached to this Host Shop before activating the placement.',
+          },
+          { status: 422 },
+        );
+      }
+    }
+
     // Write canonical placement to apprentice_placements (FK-based).
-    // This is the table the OJT enforcement and supervisor verification
-    // routes read from. shop_id is required for supervisor auth.
+    // This is the table the OJT enforcement and supervisor verification routes read from.
     // program_slug comes from the validated enrollment — never inferred.
     if (shopId) {
       // Deactivate any existing active placement for this student+program
@@ -146,14 +208,14 @@ async function _POST(req: Request) {
         .eq('student_id', studentId)
         .eq('program_slug', programSlug)
         .eq('status', 'active')
-        .neq('shop_id', shopId); // only deactivate if reassigning to a different shop
+        .neq('shop_id', shopId);
 
       const { error: canonicalErr } = await supabase.from('apprentice_placements').upsert(
         {
           student_id: studentId,
           shop_id: shopId,
-          program_slug: programSlug, // validated against enrollment above
-          supervisor_user_id: null, // populated when supervisor registers
+          program_slug: programSlug,
+          supervisor_user_id: supervisorUserId,
           start_date: new Date().toISOString().split('T')[0],
           status: 'active',
         },
@@ -162,6 +224,20 @@ async function _POST(req: Request) {
 
       if (canonicalErr) {
         return NextResponse.json({ error: 'Placement failed' }, { status: 500 });
+      }
+
+      if (supervisorUserId) {
+        await supabase.from('shop_supervisors').upsert(
+          {
+            shop_id: shopId,
+            user_id: supervisorUserId,
+            name: resolvedSupervisorName || null,
+            email: resolvedSupervisorEmail || null,
+            is_active: true,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'shop_id,user_id' },
+        );
       }
     }
 
@@ -172,8 +248,8 @@ async function _POST(req: Request) {
         student_id: studentId,
         shop_name: shopName,
         shop_address: shopAddress,
-        supervisor_name: supervisorName,
-        supervisor_email: supervisorEmail,
+        supervisor_name: resolvedSupervisorName || supervisorName,
+        supervisor_email: resolvedSupervisorEmail || supervisorEmail,
         status: 'active',
         assigned_at: new Date().toISOString(),
       },
@@ -191,22 +267,26 @@ async function _POST(req: Request) {
       .eq('student_id', studentId);
 
     if (onboardingError) {
-      // Error: $1
       // Continue - placement was successful
     }
 
     await logAdminAudit({
       action: AdminAction.SHOP_PLACEMENT_ASSIGNED,
       actorId: user.id,
-      entityType: 'shop_placements',
+      entityType: 'apprentice_placements',
       entityId: studentId,
-      metadata: { shop_name: shopName },
+      metadata: {
+        shop_id: shopId,
+        shop_name: shopName,
+        program_slug: programSlug,
+        supervisor_user_id: supervisorUserId,
+        supervisor_email: resolvedSupervisorEmail || null,
+      },
       req,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, supervisorUserId });
   } catch (err: any) {
-    // Error: $1
     return NextResponse.json(
       { error: toErrorMessage(err) || 'Failed to assign shop placement' },
       { status: 500 },

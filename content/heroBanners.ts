@@ -68,9 +68,6 @@ const PAGE_PICTURE_OVERRIDES: Record<string, string> = {
   store: '/images/pages/store-licensing-hero.webp',
 };
 
-// Legacy JSON contains broad category films assigned to many unrelated pages.
-// A page-specific picture is more accurate than one of these shared films.
-// Dedicated assignments from VIDEO_REGISTRY still win before this guard runs.
 const SHARED_GENERIC_VIDEO_FILES = new Set([
   'hero-home-fast.mp4',
   'programs-overview-video-with-narration.mp4',
@@ -107,12 +104,6 @@ function escapeSvgText(value: string): string {
     .replace(/'/g, '&apos;');
 }
 
-/**
- * Final fallback for a page that has no dedicated packaged poster.
- * The poster is generated from that page's own canonical copy, so uncovered
- * pages remain visually distinct and semantically labeled without reusing an
- * unrelated photo or remote media URL.
- */
 function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string {
   const fallbackTitle = key
     .replace(/[-_]+/g, ' ')
@@ -168,9 +159,9 @@ function normalizeBanner(
     };
   }
 
-  // Store is intentionally poster-first. It must never inherit a generic or
-  // homepage mobile video from the JSON dataset.
-  if (key === 'store') {
+  // Store may fall back to a poster only when it has no dedicated registry
+  // video. A live store assignment in VIDEO_REGISTRY always wins.
+  if (key === 'store' && !dedicated) {
     normalized = {
       ...normalized,
       videoSrcDesktop: undefined,
@@ -228,11 +219,6 @@ function getData(): Record<string, HeroBannerConfig> {
   if (normalizedData) return normalizedData;
   const raw = loadJsonOnce<Record<string, RawHeroBannerConfig>>('hero-banners.json');
 
-  // Compute the video each page would effectively receive after the dedicated
-  // registry takes precedence. A legacy JSON fallback is allowed only when its
-  // final effective media key is unique across the complete page set. This also
-  // catches collisions between a JSON fallback and another page's dedicated
-  // registry assignment, not only JSON-to-JSON duplicates.
   const effectiveVideoCounts = new Map<string, number>();
   for (const [key, banner] of Object.entries(raw)) {
     const dedicated = getHeroVideoForPageKey(key);

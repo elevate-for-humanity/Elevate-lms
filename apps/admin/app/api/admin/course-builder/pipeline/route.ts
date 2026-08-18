@@ -57,6 +57,10 @@ export async function POST(req: NextRequest) {
     dryRun?: boolean;
     credential?: string;
     state?: string;
+    audience?: string;
+    hours?: number;
+    deliveryFormat?: string;
+    additionalRequirements?: string;
   };
 
   try {
@@ -66,10 +70,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.title || !body.topic || !body.programId) {
-    return new Response(
-      JSON.stringify({ error: 'title, topic, and programId are required' }),
-      { status: 400 },
-    );
+    return new Response(JSON.stringify({ error: 'title, topic, and programId are required' }), {
+      status: 400,
+    });
   }
 
   const encoder = new TextEncoder();
@@ -91,13 +94,16 @@ export async function POST(req: NextRequest) {
             lessonsPerModule: body.lessonsPerModule,
             credential: body.credential,
             state: body.state,
+            audience: body.audience,
+            hours: body.hours,
+            deliveryFormat: body.deliveryFormat,
+            additionalRequirements: body.additionalRequirements,
             contentSource: 'ai',
-            mode: 'replace',
+            mode: 'refresh',
             videoMode: body.includeVideos === false ? 'off' : 'queue',
             dryRun: Boolean(body.dryRun),
           },
-          (stage, message, progress) =>
-            write({ stage: toPipelineStage(stage), message, progress }),
+          (stage, message, progress) => write({ stage: toPipelineStage(stage), message, progress }),
         );
 
         write({
@@ -116,7 +122,10 @@ export async function POST(req: NextRequest) {
         });
       } catch (error) {
         logger.error('[course-builder/pipeline] Course Factory error', error);
-        write({ stage: 'error', message: 'Course Factory failed. Review server logs for details.' });
+        write({
+          stage: 'error',
+          message: 'Course Factory failed. Review server logs for details.',
+        });
       } finally {
         controller.close();
       }

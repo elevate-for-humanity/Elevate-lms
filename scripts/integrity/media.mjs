@@ -3,9 +3,9 @@
  * Media / visual integrity gate.
  *
  * Validates local media references, canonical program imagery, key portal
- * picture coverage, production-safe legacy image rewrites, and the production
- * rule that browser SpeechSynthesis is only used as a fallback behind the
- * shared natural-voice endpoint.
+ * picture coverage, production-safe legacy image rewrites, canonical live hero
+ * video references, and the production rule that browser SpeechSynthesis is
+ * only used as a fallback behind the shared natural-voice endpoint.
  */
 
 import fs from 'node:fs';
@@ -45,7 +45,7 @@ function scanSourceFiles(relativeRoots, visitor) {
 
 console.log('\n── Local media references ──');
 const mediaReferences = new Map();
-scanSourceFiles(['app', 'apps', 'components', 'data', 'lib'], (_file, relative, content) => {
+scanSourceFiles(['app', 'apps', 'components', 'content', 'data', 'lib'], (_file, relative, content) => {
   const patterns = [
     /(?:src|poster|imageSrc|image|heroImage|cardImage|thumbnailUrl|videoUrl)\s*[=:]\s*["'`](\/(?:images|videos)\/[^"'`$}]+)["'`]/g,
     /["'`](\/(?:images|videos)\/[^"'`$}]+\.(?:png|jpe?g|webp|gif|svg|mp4|webm|mov))["'`]/g,
@@ -62,6 +62,8 @@ scanSourceFiles(['app', 'apps', 'components', 'data', 'lib'], (_file, relative, 
 const missingLocalMedia = [];
 const aliasedLocalMedia = [];
 for (const [url, owners] of mediaReferences) {
+  // Historical/draft video references are not automatically production assets.
+  // Live canonical registry entries are validated separately below.
   if (url.startsWith('/videos/')) continue;
   const localPath = path.join(publicDir, url.replace(/^\//, ''));
   if (fs.existsSync(localPath)) continue;
@@ -100,6 +102,34 @@ for (const [source, destination] of Object.entries(ALL_IMAGE_ALIASES)) {
   const destinationPath = path.join(publicDir, destination.replace(/^\//, ''));
   if (!fs.existsSync(destinationPath)) fail(`Image rewrite target is missing: ${source} -> ${destination}`);
 }
+
+console.log('\n── Canonical live video coverage ──');
+const videoRegistrySource = fs.readFileSync(path.join(rootDir, 'lib/video/registry.ts'), 'utf8');
+const canonicalRegistryBody = videoRegistrySource.split('export const VIDEO_REGISTRY')[1]?.split('/** One marketing hero page key')[0] || '';
+const liveVideoBlocks = canonicalRegistryBody
+  .split(/\n\s{2}(?=['"][^'"\n]+['"]:\s*\{)/)
+  .filter((block) => /status:\s*['"]live['"]/.test(block));
+let parsedLiveVideos = 0;
+for (const block of liveVideoBlocks) {
+  const id = block.match(/id:\s*['"]([^'"]+)['"]/)?.[1] || 'unknown';
+  const rawUrl = block.match(/video_url:\s*(?:`([^`]+)`|'([^']+)'|"([^"]+)")/)?.slice(1).find(Boolean);
+  const thumbnail = block.match(/thumbnail_url:\s*['"]([^'"]+)['"]/)?.[1];
+  if (!rawUrl) {
+    fail(`Live video ${id} has no video_url`);
+    continue;
+  }
+  parsedLiveVideos += 1;
+  if (rawUrl.startsWith('/videos/')) {
+    const videoPath = path.join(publicDir, rawUrl.replace(/^\//, ''));
+    if (!fs.existsSync(videoPath)) fail(`Live video ${id} points to missing local asset ${rawUrl}`);
+  }
+  if (thumbnail?.startsWith('/images/')) {
+    const posterPath = path.join(publicDir, thumbnail.replace(/^\//, ''));
+    if (!fs.existsSync(posterPath)) fail(`Live video ${id} poster is missing: ${thumbnail}`);
+  }
+}
+if (parsedLiveVideos) pass(`${parsedLiveVideos} live video registry entries have valid local/remote media contracts`);
+else fail('No live entries could be parsed from the canonical video registry');
 
 console.log('\n── Static program image coverage ──');
 const indexSource = fs.readFileSync(path.join(rootDir, 'data/programs/index.ts'), 'utf8');

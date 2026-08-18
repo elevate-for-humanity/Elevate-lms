@@ -61,7 +61,7 @@ export default function EstheticianApplyIndexPage() {
           image="/images/pages/program-holder-page-1.webp"
           title="I’m a Partner Spa or Salon"
           description="Apply to host apprentices using the one beauty host-site compliance application for licensed businesses."
-          href="/partners/barber-host-shop/apply"
+          href="/partners/host-shop/apply"
           cta="Start Host Site Application"
         />
       </section>

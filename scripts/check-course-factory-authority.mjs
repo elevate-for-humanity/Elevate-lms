@@ -46,6 +46,14 @@ for (const [rel, needle, label] of requiredDelegations) {
   assertContains(rel, needle, `${label} must delegate to the canonical Course Factory`);
 }
 
+// Course Builder UI surfaces must not call the retired two-stage draft writer.
+for (const rel of [...walk('components/admin/course-builder'), ...walk('components/course')]) {
+  const text = fs.readFileSync(path.join(root, rel), 'utf8');
+  if (text.includes('/api/admin/courses/generate')) {
+    failures.push(`${rel}: retired draft generation API referenced from Course Builder UI`);
+  }
+}
+
 // Historical Supabase AI creator must remain non-executable.
 const edge = read('supabase/functions/ai-course-create/index.ts');
 if (

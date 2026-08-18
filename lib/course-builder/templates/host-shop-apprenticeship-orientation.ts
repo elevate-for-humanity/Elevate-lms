@@ -1,0 +1,166 @@
+import type { CourseTemplate } from '@/lib/course-builder/schema';
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+
+const BARBER = RAPIDS_CONFIG.programs.barber;
+
+export const HOST_SHOP_ORIENTATION_SLUG = 'host-shop-apprenticeship-orientation';
+export const HOST_SHOP_ORIENTATION_VERSION = '2026.08';
+export const BARBER_APPRENTICE_APPLICATION_URL =
+  'https://www.elevateforhumanity.org/apply/student?program=barber-apprenticeship';
+
+const lesson = (
+  slug: string,
+  title: string,
+  order: number,
+  html: string,
+  objectives: string[],
+) => ({
+  slug,
+  title,
+  type: 'reading' as const,
+  order,
+  durationMinutes: 15,
+  learningObjectives: objectives,
+  content: html,
+  renderedHtml: html,
+  isRequired: true,
+  approved: true,
+  generationStatus: 'published' as const,
+  hourCategory: 'didactic' as const,
+  deliveryMethod: 'online_async' as const,
+  evidenceType: 'attestation' as const,
+  activities: [{ type: 'reading' as const, label: 'Required orientation' }],
+});
+
+export const HOST_SHOP_APPRENTICESHIP_ORIENTATION: CourseTemplate = {
+  title: 'Host Shop Apprenticeship Orientation',
+  slug: HOST_SHOP_ORIENTATION_SLUG,
+  programSlug: 'host-shop-apprenticeship',
+  courseSlug: HOST_SHOP_ORIENTATION_SLUG,
+  description:
+    'Required orientation for approved host shops and supervisors on operating the Elevate registered apprenticeship program, supervising OJL, documenting competencies, and recruiting apprentices.',
+  credentialTarget: 'INTERNAL',
+  minimumHours: 1.5,
+  requiresFinalExam: false,
+  finalExam: { required: false },
+  certificateRequirements: {
+    includeHours: false,
+    includeCompetencies: false,
+    includeInstructorVerification: false,
+    includeCompletionDate: true,
+    includeVerificationUrl: true,
+  },
+  regulatory: {
+    complianceProfileKey: 'internal_basic',
+    credentialTarget: 'INTERNAL',
+    governingBody: 'Elevate for Humanity / Registered Apprenticeship Sponsor',
+    governingRegion: 'Indiana',
+    governingStandardVersion: HOST_SHOP_ORIENTATION_VERSION,
+    retentionPolicyDays: 2555,
+    auditNotes: 'Required host-shop operational orientation and supervisor acknowledgment.',
+  },
+  modules: [
+    {
+      slug: 'roles-and-program-structure',
+      title: '1. Sponsor, Host Shop, and Apprentice Roles',
+      order: 1,
+      orderIndex: 1,
+      domainKey: 'host-shop-governance',
+      targetHours: 0.25,
+      quizRequired: false,
+      practicalRequired: false,
+      lessons: [lesson(
+        'how-the-apprenticeship-works',
+        'How the Apprenticeship Works',
+        1,
+        `<h2>Your role as a Host Shop</h2><p>Elevate/2Exclusive remains the registered apprenticeship sponsor. The Host Shop provides the supervised worksite, qualified supervision, real job experience, accurate OJL records, and competency verification. A Host Shop does not create a separate apprenticeship program or issue its own sponsor certificate.</p><h3>Registered Barber pathway</h3><p>The barber pathway requires <strong>${BARBER.totalHours.toLocaleString()} approved OJL hours</strong> plus <strong>${BARBER.relatedInstructionHours} hours of RTI</strong>. RTI is delivered through the Prestige Elevation Barber Curriculum. OJL is the supervised hands-on work completed at the approved shop.</p><h3>What you are responsible for</h3><ul><li>Provide safe, lawful, supervised work.</li><li>Teach hands-on skills that match the apprentice's current training level.</li><li>Review and approve only hours actually worked.</li><li>Verify competencies only after the apprentice demonstrates them consistently.</li><li>Maintain required licenses, insurance, agreements, and shop documentation.</li><li>Communicate changes in supervisor, location, schedule, or apprentice status to Elevate.</li></ul>`,
+        ['Explain the sponsor/host-shop relationship', 'Distinguish OJL from RTI', 'Identify the host shop’s compliance responsibilities'],
+      )],
+    },
+    {
+      slug: 'recruiting-and-enrollment',
+      title: '2. Recruiting and Signing Up Apprentices',
+      order: 2,
+      orderIndex: 2,
+      domainKey: 'host-shop-recruiting',
+      targetHours: 0.25,
+      quizRequired: false,
+      practicalRequired: false,
+      lessons: [lesson(
+        'recruit-and-refer-apprentices',
+        'Recruit and Refer Prospective Apprentices',
+        1,
+        `<h2>You can recruit your own apprentice</h2><p>Host Shops may identify prospective apprentices. The person must still complete Elevate's official apprentice application and enrollment process before apprenticeship hours can be credited.</p><h3>Send this application link</h3><p><a href="${BARBER_APPRENTICE_APPLICATION_URL}">${BARBER_APPRENTICE_APPLICATION_URL}</a></p><p>Do not create a separate paper enrollment or promise that a person is registered before Elevate confirms enrollment and placement.</p><h3>Before OJL starts</h3><ul><li>The apprentice completes the official application and required onboarding.</li><li>Elevate confirms the program enrollment and Host Shop placement.</li><li>The shop confirms the qualified supervisor and schedule.</li><li>Only approved work after the authorized start may be submitted as program OJL.</li></ul>`,
+        ['Use the canonical apprentice application', 'Explain when OJL may begin', 'Avoid duplicate or unofficial enrollment processes'],
+      )],
+    },
+    {
+      slug: 'rti-and-hands-on-teaching',
+      title: '3. Match Hands-On Teaching to RTI',
+      order: 3,
+      orderIndex: 3,
+      domainKey: 'host-shop-instruction',
+      targetHours: 0.25,
+      quizRequired: false,
+      practicalRequired: false,
+      lessons: [lesson(
+        'hands-on-teaching-sequence',
+        'Hands-On Teaching Sequence',
+        1,
+        `<h2>Use the Prestige curriculum as the theory sequence</h2><p>The Host Shop does not need to recreate classroom theory. Use the apprentice's RTI progress to guide shop-floor coaching, then verify practical performance in the Host Shop portal.</p><ol><li><strong>Infection Control & Safety:</strong> workstation setup, disinfection, draping, consultation, exposure response.</li><li><strong>Hair Science & Scalp Analysis:</strong> consultation, growth patterns, density, texture, contraindications, service planning.</li><li><strong>Tools, Equipment & Ergonomics:</strong> clipper/trimmer/shear/razor handling, maintenance, body mechanics, sectioning.</li><li><strong>Haircutting Techniques:</strong> clipper cuts, tapers, fades, shear work, blending, lineups, finishing.</li><li><strong>Shaving & Beard Services:</strong> razor safety, hot-towel procedures, beard design, shaving sequence, aftercare.</li><li><strong>Chemical Services:</strong> consultation, safety, manufacturer directions, contraindications, authorized services.</li><li><strong>Professional & Business Skills:</strong> client service, booking, pricing, professionalism, documentation, shop operations.</li><li><strong>State Board Preparation:</strong> timed practical review, sanitation sequence, procedure recall, readiness checks.</li></ol><p>Advance hands-on work only when the supervisor determines the apprentice can perform the task safely.</p>`,
+        ['Align practical coaching to all eight RTI modules', 'Sequence practice from observation to supervised performance', 'Keep safety readiness ahead of production speed'],
+      )],
+    },
+    {
+      slug: 'hours-and-competencies',
+      title: '4. Hours, Competencies, and Evidence',
+      order: 4,
+      orderIndex: 4,
+      domainKey: 'host-shop-documentation',
+      targetHours: 0.25,
+      quizRequired: false,
+      practicalRequired: false,
+      lessons: [lesson(
+        'document-ojl-correctly',
+        'Document OJL Correctly',
+        1,
+        `<h2>Hours must reflect actual supervised work</h2><p>Review apprentice time entries regularly. Approve only time actually worked at the approved location under the authorized arrangement. Reject or correct inaccurate entries rather than approving them for convenience.</p><h3>Competency sign-off</h3><p>A competency is not the same as attendance. Sign only when the apprentice can demonstrate the skill safely, consistently, and with the level of independence expected at that stage.</p><h3>Useful evidence</h3><ul><li>Supervisor observation and competency rating</li><li>Service or practice log</li><li>Sanitation/tool checklist</li><li>Before/after work photos when client permission and shop policy allow</li><li>Correction/rework notes</li><li>Required documents or supervisor comments</li></ul><p>Never fabricate hours, backdate supervision, or sign a competency that was not observed.</p>`,
+        ['Approve accurate OJL records', 'Apply a consistent competency sign-off standard', 'Identify acceptable supporting evidence'],
+      )],
+    },
+    {
+      slug: 'supervision-and-compliance',
+      title: '5. Supervision, Safety, and Escalation',
+      order: 5,
+      orderIndex: 5,
+      domainKey: 'host-shop-compliance',
+      targetHours: 0.25,
+      quizRequired: false,
+      practicalRequired: false,
+      lessons: [lesson(
+        'supervise-and-escalate',
+        'Supervise, Protect, and Escalate',
+        1,
+        `<h2>Supervision is an operating requirement</h2><p>The apprentice should never be used as unsupervised labor in place of qualified staff. The shop must maintain the supervision and compliance conditions under which it was approved.</p><h3>Contact Elevate before continuing when</h3><ul><li>The qualified supervisor changes or is unavailable.</li><li>The apprentice moves to another location or shop.</li><li>The shop's license, insurance, workers' compensation status, ownership, or operating status changes.</li><li>There is a serious safety, conduct, attendance, wage, harassment, discrimination, or documentation concern.</li><li>The apprentice separates, takes extended leave, or stops reporting.</li></ul><p>Do not solve a program-status problem by creating a second apprentice record or moving hours between people or locations.</p>`,
+        ['Recognize supervision failures', 'Identify changes that must be reported', 'Use escalation rather than unofficial workarounds'],
+      )],
+    },
+    {
+      slug: 'final-acknowledgment',
+      title: '6. Required Host Shop Acknowledgment',
+      order: 6,
+      orderIndex: 6,
+      domainKey: 'host-shop-attestation',
+      targetHours: 0.25,
+      quizRequired: false,
+      practicalRequired: false,
+      lessons: [lesson(
+        'orientation-signoff',
+        'Orientation Review and Sign-Off',
+        1,
+        `<h2>Before completing onboarding</h2><p>Confirm that you understand the sponsor/Host Shop relationship, the ${BARBER.totalHours.toLocaleString()}-hour OJL and ${BARBER.relatedInstructionHours}-hour RTI structure, apprentice recruiting process, supervision rules, hour approval requirements, competency verification standard, documentation expectations, and escalation responsibilities.</p><p>After completing all orientation lessons, return to Host Shop Onboarding and submit the required electronic acknowledgment. That acknowledgment is retained with your onboarding record.</p>`,
+        ['Confirm understanding of the operating requirements', 'Complete the electronic host-shop acknowledgment'],
+      )],
+    },
+  ],
+};

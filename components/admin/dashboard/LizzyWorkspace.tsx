@@ -52,7 +52,7 @@ export function LizzyWorkspace({
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    fetch('/api/admin/devstudio/config').then((response) => response.ok ? response.json() : null).then((data: StudioConfig | null) => setConfig(data)).catch(() => setConfig(null));
+    fetch('/api/admin/dev-studio/config').then((response) => response.ok ? response.json() : null).then((data: StudioConfig | null) => setConfig(data)).catch(() => setConfig(null));
   }, []);
   useEffect(() => {
     fetch('/api/devstudio/health').then((response) => response.ok ? response.json() : null).then((data) => setHealth(data)).catch(() => setHealth(null));

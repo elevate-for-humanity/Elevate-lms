@@ -40,6 +40,7 @@ import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/ca
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { createOrUpdateEnrollment, linkOrphanedEnrollments } from '@/lib/enrollment-service';
 import { handleCheckoutSessionCompleted } from '@/lib/stripe/handlers/checkout-session-completed';
+import { processCareerCourseStripeEvent } from '@/lib/payments/career-course-webhook';
 import {
   getBillingAuthority,
   getUpdatableFields,
@@ -282,6 +283,22 @@ async function _POST(request: NextRequest) {
     type: event.type,
     livemode: event.livemode,
   });
+
+  // Career-course checkouts use the same canonical Stripe endpoint as every
+  // other marketing payment. This guarantees enrollment without requiring a
+  // second webhook endpoint or a separate signing secret in production.
+  try {
+    const careerCourseResult = await processCareerCourseStripeEvent(event);
+    if (careerCourseResult.handled) {
+      return NextResponse.json(careerCourseResult.response);
+    }
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { subsystem: 'career_course_webhook', event_type: event.type },
+    });
+    logger.error('[webhook] Career-course processing failed', error);
+    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+  }
 
   // Unified event tracking (secondary to stripe_webhook_events)
   claimWebhookEvent('stripe', event.id, event.type, { livemode: event.livemode }).then(()=>{}, ()=>{});

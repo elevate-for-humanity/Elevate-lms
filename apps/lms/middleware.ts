@@ -22,6 +22,8 @@ const PROTECTED_PREFIXES = [
   '/parent-portal/student',
   '/employer',
   '/workforce',
+  '/program-holder',
+  '/creator',
 ] as const;
 
 function isProtectedPath(pathname: string) {

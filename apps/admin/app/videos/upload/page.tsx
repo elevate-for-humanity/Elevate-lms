@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/require-role';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import VideoUploadClient from './VideoUploadClient';
 
@@ -10,48 +9,38 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/videos/upload' },
   title: 'Upload Videos | Elevate For Humanity',
-  description: 'Upload video content for courses and training materials.',
+  description: 'Upload verified production video content for the public library or course lessons.',
 };
 
 export default async function UploadVideosPage() {
   await requireRole(['admin']);
-  const supabase = await createClient();
 
   return (
     <div className="min-h-screen bg-white">
       <section className="relative h-[160px] sm:h-[220px] md:h-[280px]">
         <Image
           src="/images/pages/admin-videos-upload-hero.webp"
-          alt="Upload videos"
+          alt="Upload production videos"
           fill
           sizes="100vw"
           className="object-cover"
           priority
         />
       </section>
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8">
-          <nav className="text-sm mb-4">
+          <nav className="mb-4 text-sm">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li>
-                <Link href="/admin" className="hover:text-primary">
-                  Admin
-                </Link>
-              </li>
+              <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
               <li>/</li>
-              <li>
-                <Link href="/videos" className="hover:text-primary">
-                  Videos
-                </Link>
-              </li>
+              <li><Link href="/admin/videos" className="hover:text-primary">Videos</Link></li>
               <li>/</li>
-              <li className="text-slate-900 font-medium">Upload</li>
+              <li className="font-medium text-slate-900">Upload</li>
             </ol>
           </nav>
-          <h1 className="text-3xl font-bold text-slate-900">Upload Videos</h1>
-          <p className="text-slate-700 mt-2">
-            Upload video files to the course library. After uploading, copy the URL and paste it
-            into a lesson.
+          <h1 className="text-3xl font-bold text-slate-900">Upload Production Video</h1>
+          <p className="mt-2 text-slate-700">
+            Public videos are published only after a real playable file is stored. Course and lesson videos are stored privately and returned through signed playback URLs.
           </p>
         </div>
         <VideoUploadClient />

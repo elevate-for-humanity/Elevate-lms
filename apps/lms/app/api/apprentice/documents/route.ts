@@ -10,48 +10,32 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/**
- * GET /api/apprentice/documents
- * Get document types and uploaded documents for a program
- */
 async function _GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const programSlug = searchParams.get('program') || 'barber-apprenticeship';
 
-    // Get document types for this program
     const { data: documentTypes, error: typesError } = await supabase
       .from('apprentice_document_types')
       .select('*')
       .eq('program_slug', programSlug)
       .order('display_order', { ascending: true });
+    if (typesError) logger.error('[Documents API] Types error:', typesError);
 
-    if (typesError) {
-      logger.error('[Documents API] Types error:', typesError);
-    }
-
-    // Get student's uploaded documents — filter by program_slug stored in metadata
     const { data: uploadedDocuments, error: docsError } = await supabase
       .from('documents')
       .select('id, document_type, file_name, file_url, status, created_at, metadata')
       .eq('user_id', user.id)
+      .contains('metadata', { program_slug: programSlug })
       .order('created_at', { ascending: false });
-
-    if (docsError) {
-      logger.error('[Documents API] Docs error:', docsError);
-    }
+    if (docsError) logger.error('[Documents API] Docs error:', docsError);
 
     return NextResponse.json({
       documentTypes: documentTypes || [],
@@ -63,93 +47,69 @@ async function _GET(request: NextRequest) {
   }
 }
 
-/**
- * POST /api/apprentice/documents
- * Upload a document
- */
 async function _POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const documentTypeId = formData.get('documentTypeId') as string;
-    const programSlug = formData.get('programSlug') as string;
-
+    const documentTypeId = String(formData.get('documentTypeId') || '');
+    const programSlug = String(formData.get('programSlug') || '');
     if (!file || !documentTypeId || !programSlug) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Get document type to validate
-    const { data: docType } = await supabase
+    const { data: docType, error: docTypeError } = await supabase
       .from('apprentice_document_types')
       .select('*')
       .eq('id', documentTypeId)
+      .eq('program_slug', programSlug)
       .maybeSingle();
-
-    if (!docType) {
-      return NextResponse.json({ error: 'Invalid document type' }, { status: 400 });
+    if (docTypeError || !docType) {
+      return NextResponse.json({ error: 'Invalid document type for this program' }, { status: 400 });
     }
 
-    // Validate file size
-    if (file.size > docType.max_file_size_mb * 1024 * 1024) {
-      return NextResponse.json(
-        {
-          error: `File too large. Maximum size is ${docType.max_file_size_mb}MB`,
-        },
-        { status: 400 },
-      );
+    const maxBytes = Number(docType.max_file_size_mb || 10) * 1024 * 1024;
+    if (file.size <= 0 || file.size > maxBytes) {
+      return NextResponse.json({ error: `File too large. Maximum size is ${docType.max_file_size_mb || 10}MB` }, { status: 400 });
     }
 
-    // Validate file type
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    if (!docType.accepted_formats.includes(ext || '')) {
-      return NextResponse.json(
-        {
-          error: `Invalid file type. Accepted: ${docType.accepted_formats.join(', ')}`,
-        },
-        { status: 400 },
-      );
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const acceptedFormats = Array.isArray(docType.accepted_formats)
+      ? docType.accepted_formats.map((value: unknown) => String(value).toLowerCase().replace(/^\./, ''))
+      : [];
+    if (!acceptedFormats.includes(ext)) {
+      return NextResponse.json({ error: `Invalid file type. Accepted: ${acceptedFormats.join(', ')}` }, { status: 400 });
     }
 
-    // Generate unique filename
     const timestamp = Date.now();
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storagePath = `${user.id}/apprentice-documents/${docType.document_type}/${timestamp}_${safeFileName}`;
+    const storagePath = `${user.id}/apprentice-documents/${programSlug}/${docType.document_type}/${timestamp}_${safeFileName}`;
 
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('documents')
-      .upload(storagePath, file, {
-        contentType: file.type,
-        upsert: false,
-      });
-
+      .upload(storagePath, file, { contentType: file.type, upsert: false });
     if (uploadError) {
       logger.error('[Documents API] Upload error:', uploadError);
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
-    // Bucket is private — store file_path only, generate signed URLs on-demand
-
-    // Delete any existing document of this type for this user (replace)
-    await supabase
+    const { data: existingDocs, error: existingError } = await supabase
       .from('documents')
-      .delete()
+      .select('id, metadata, file_url')
       .eq('user_id', user.id)
-      .eq('document_type', docType.document_type);
+      .eq('document_type', docType.document_type)
+      .contains('metadata', { program_slug: programSlug });
+    if (existingError) {
+      await supabase.storage.from('documents').remove([storagePath]);
+      return NextResponse.json({ error: 'Failed to inspect existing document record' }, { status: 500 });
+    }
 
-    // Create document record — columns match live documents schema
     const { data: docRecord, error: recordError } = await supabase
       .from('documents')
       .insert({
@@ -160,138 +120,127 @@ async function _POST(request: NextRequest) {
         file_size_bytes: file.size,
         mime_type: file.type,
         status: 'pending',
-        metadata: programSlug ? { program_slug: programSlug } : null,
+        metadata: {
+          program_slug: programSlug,
+          storage_bucket: 'documents',
+          storage_path: storagePath,
+          document_type_id: documentTypeId,
+        },
       })
       .select()
       .maybeSingle();
 
-    if (recordError) {
+    if (recordError || !docRecord) {
+      await supabase.storage.from('documents').remove([storagePath]);
       logger.error('[Documents API] Record error:', recordError);
       return NextResponse.json({ error: 'Failed to save document record' }, { status: 500 });
     }
 
-    // PHASE 2: Notify staff of document upload
+    if (existingDocs?.length) {
+      const existingIds = existingDocs.map((doc) => doc.id);
+      const oldPaths = existingDocs
+        .map((doc) => doc.metadata?.storage_path ?? doc.file_url)
+        .filter((path): path is string => typeof path === 'string' && path.length > 0)
+        .map((path) => path.startsWith('documents/') ? path.slice('documents/'.length) : path);
+
+      const { error: deleteRecordError } = await supabase
+        .from('documents')
+        .delete()
+        .in('id', existingIds)
+        .eq('user_id', user.id);
+
+      if (deleteRecordError) {
+        logger.error('[Documents API] Previous document record cleanup failed:', deleteRecordError);
+      } else if (oldPaths.length) {
+        const { error: storageCleanupError } = await supabase.storage.from('documents').remove(oldPaths);
+        if (storageCleanupError) logger.error('[Documents API] Previous storage cleanup failed:', storageCleanupError);
+      }
+    }
+
     try {
-      // Get student profile for name
       const { data: studentProfile } = await supabase
         .from('profiles')
         .select('full_name, email')
         .eq('id', user.id)
         .maybeSingle();
-
-      // Get admin emails
       const { data: admins } = await supabase
         .from('profiles')
         .select('email')
         .in('role', ['admin', 'super_admin']);
 
-      if (admins && admins.length > 0) {
+      if (admins?.length) {
         const { emailService } = await import('@/lib/notifications/email');
         const studentName = studentProfile?.full_name || studentProfile?.email || 'Unknown Student';
-
-        // Send notification to all admins
         for (const admin of admins) {
           if (admin.email) {
-            await emailService
-              .sendDocumentUploadNotification(
-                admin.email,
-                studentName,
-                docType.name || docType.document_type,
-                programSlug,
-              )
-              .catch((err: Error) => {
-                logger.error('[Documents API] Staff notification failed', normalizeError(err, 'Staff notification failed'), getErrorContext(err));
-              });
+            await emailService.sendDocumentUploadNotification(
+              admin.email,
+              studentName,
+              docType.name || docType.document_type,
+              programSlug,
+            ).catch((err: Error) => {
+              logger.error('[Documents API] Staff notification failed', normalizeError(err, 'Staff notification failed'), getErrorContext(err));
+            });
           }
         }
-        logger.info('[Documents API] Staff notifications sent for document upload');
       }
     } catch (notifyError) {
-      // Log but don't fail the upload
       logger.error('[Documents API] Staff notification error:', notifyError);
     }
 
-    return NextResponse.json({
-      success: true,
-      document: docRecord,
-    });
+    return NextResponse.json({ success: true, document: docRecord });
   } catch (error) {
     logger.error('[Documents API] Error', normalizeError(error, 'Documents API error'), getErrorContext(error));
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-/**
- * DELETE /api/apprentice/documents
- * Delete a document
- */
 async function _DELETE(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const docId = new URL(request.url).searchParams.get('id');
+    if (!docId) return NextResponse.json({ error: 'Document ID required' }, { status: 400 });
 
-    const { searchParams } = new URL(request.url);
-    const docId = searchParams.get('id');
-
-    if (!docId) {
-      return NextResponse.json({ error: 'Document ID required' }, { status: 400 });
-    }
-
-    // Get document to verify ownership and get file path
     const { data: doc } = await supabase
       .from('documents')
       .select('*')
       .eq('id', docId)
       .eq('user_id', user.id)
       .maybeSingle();
-
-    if (!doc) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    if (!doc) return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+    if (doc.status === 'approved' || doc.status === 'accepted') {
+      return NextResponse.json({ error: 'Cannot delete an approved document' }, { status: 400 });
     }
 
-    // Don't allow deleting approved documents
-    if (doc.status === 'approved') {
-      return NextResponse.json({ error: 'Cannot delete approved documents' }, { status: 400 });
-    }
-
-    // Delete from storage — path stored in metadata.storage_path (file_url is null for private bucket)
     const storagePath: string | undefined = doc.metadata?.storage_path ?? doc.file_url ?? undefined;
     if (storagePath) {
-      // Strip bucket prefix if present (e.g. "documents/user-id/...")
-      const pathInBucket = storagePath.startsWith('documents/')
-        ? storagePath.slice('documents/'.length)
-        : storagePath;
-      await supabase.storage.from('documents').remove([pathInBucket]);
+      const pathInBucket = storagePath.startsWith('documents/') ? storagePath.slice('documents/'.length) : storagePath;
+      const { error: storageError } = await supabase.storage.from('documents').remove([pathInBucket]);
+      if (storageError) {
+        logger.error('[Documents API] Storage delete error:', storageError);
+        return NextResponse.json({ error: 'Failed to delete stored file' }, { status: 500 });
+      }
     }
 
-    // Delete record
-    const { error } = await supabase.from('documents').delete().eq('id', docId);
-
+    const { error } = await supabase.from('documents').delete().eq('id', docId).eq('user_id', user.id);
     if (error) {
       logger.error('[Documents API] Delete error', normalizeError(error, 'Delete error'), getErrorContext(error));
       return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
     }
 
-    // Audit: log document deletion
     await auditLog({
       actorId: user.id,
       actorRole: 'student',
       action: AuditAction.DOCUMENT_DELETED,
       entity: AuditEntity.DOCUMENT,
       entityId: docId,
-      metadata: {
-        document_type: doc.document_type,
-        reason: 'user_initiated',
-      },
+      metadata: { document_type: doc.document_type, reason: 'user_initiated' },
     });
 
     return NextResponse.json({ success: true });
@@ -300,6 +249,7 @@ async function _DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
 export const GET = withApiAudit('/api/apprentice/documents', _GET);
 export const POST = withApiAudit('/api/apprentice/documents', _POST);
 export const DELETE = withApiAudit('/api/apprentice/documents', _DELETE);

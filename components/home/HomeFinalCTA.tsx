@@ -25,8 +25,7 @@ export function HomeFinalCTA() {
             src={FINAL_CTA_IMAGE}
             alt="Student getting started with an Elevate for Humanity career training application"
             fill
-            priority
-            fetchPriority="high"
+            loading="lazy"
             sizes="(max-width: 1024px) 100vw, 45vw"
             className="object-cover"
           />

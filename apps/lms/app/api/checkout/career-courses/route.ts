@@ -1,147 +1,161 @@
 import { logger } from '@/lib/logger';
-// PUBLIC ROUTE: public career course checkout
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
+import { apiAuthGuard } from '@/lib/admin/guards';
+import { hydrateProcessEnv } from '@/lib/secrets';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
+
+type CheckoutBody = {
+  courseIds?: unknown;
+};
+
 async function _POST(req: Request) {
+  const rateLimited = await applyRateLimit(req, 'payment');
+  if (rateLimited) return rateLimited;
+
+  const auth = await apiAuthGuard(req);
+  if (auth.error) return auth.error;
+
   try {
-    const rateLimited = await applyRateLimit(req, 'contact');
-    if (rateLimited) return rateLimited;
+    const body = (await req.json()) as CheckoutBody;
+    const courseIds = Array.isArray(body.courseIds)
+      ? Array.from(
+          new Set(
+            body.courseIds
+              .filter((value): value is string => typeof value === 'string')
+              .map((value) => value.trim())
+              .filter(Boolean),
+          ),
+        )
+      : [];
 
-    const { courseIds, email, successUrl, cancelUrl, promoCode } = await req.json();
-
-    if (!courseIds || !Array.isArray(courseIds) || courseIds.length === 0) {
-      return NextResponse.json({ error: 'No courses selected' }, { status: 400 });
+    if (courseIds.length === 0 || courseIds.length > 10) {
+      return NextResponse.json({ error: 'Select between 1 and 10 courses.' }, { status: 400 });
     }
 
-    const stripe = getStripe();
-    if (!stripe) return NextResponse.json({ error: 'Payment processing not configured' }, { status: 503 });
     const supabase = await requireAdminClient();
+    const [{ data: courses, error: courseError }, { data: commerce, error: commerceError }] =
+      await Promise.all([
+        supabase
+          .from('courses')
+          .select(
+            'id, slug, title, short_description, governing_body, status, is_active, review_status',
+          )
+          .in('id', courseIds),
+        supabase
+          .from('course_commerce')
+          .select(
+            'course_id, currency, exam_voucher_cost_cents, retail_price_cents, exam_voucher_included, self_pay_enabled, bnpl_enabled',
+          )
+          .in('course_id', courseIds),
+      ]);
 
-    if (!supabase) {
-      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
+    if (courseError || commerceError) {
+      throw courseError || commerceError;
     }
 
-    // Fetch courses with Stripe price IDs
-    const { data: courses, error } = await supabase
-      .from('career_courses')
-      .select('id, title, price, stripe_price_id, slug')
-      .in('id', courseIds);
+    const courseById = new Map((courses || []).map((course) => [course.id, course]));
+    const commerceByCourseId = new Map(
+      (commerce || []).map((record) => [record.course_id, record]),
+    );
 
-    if (error || !courses || courses.length === 0) {
-      return NextResponse.json({ error: 'Courses not found' }, { status: 404 });
+    const selected = courseIds.map((courseId) => ({
+      course: courseById.get(courseId),
+      commerce: commerceByCourseId.get(courseId),
+    }));
+
+    const unavailable = selected.some(
+      ({ course, commerce: price }) =>
+        !course ||
+        !price ||
+        course.status !== 'published' ||
+        course.is_active !== true ||
+        course.review_status !== 'approved' ||
+        price.self_pay_enabled !== true ||
+        !Number.isSafeInteger(Number(price.retail_price_cents)) ||
+        Number(price.retail_price_cents) <= 0,
+    );
+
+    if (unavailable) {
+      return NextResponse.json(
+        { error: 'One or more selected courses are not available for self-pay enrollment.' },
+        { status: 409 },
+      );
     }
 
-    // Check if all courses have Stripe price IDs
-    const missingStripe = courses.filter((c) => !c.stripe_price_id);
-    if (missingStripe.length > 0) {
-      // Create Stripe products/prices on the fly
-      for (const course of missingStripe) {
-        const product = await stripe.products.create({
-          name: course.title,
+    await hydrateProcessEnv();
+    const stripe = getStripe();
+    if (!stripe) {
+      return NextResponse.json({ error: 'Payment processing not configured.' }, { status: 503 });
+    }
+
+    const lineItems = selected.map(({ course, commerce: price }) => ({
+      price_data: {
+        currency: String(price!.currency || 'usd').toLowerCase(),
+        product_data: {
+          name: course!.title,
+          description:
+            course!.short_description ||
+            `Professional certification preparation from ${course!.governing_body || PLATFORM_DEFAULTS.orgName}`,
           metadata: {
-            course_id: course.id,
-            course_slug: course.slug,
-            type: 'career_course',
+            course_id: course!.id,
+            course_slug: course!.slug,
+            exam_voucher_included: String(price!.exam_voucher_included),
           },
-        });
-
-        const price = await stripe.prices.create({
-          product: product.id,
-          unit_amount: Math.round(course.price * 100),
-          currency: 'usd',
-        });
-
-        // Update database
-        await supabase
-          .from('career_courses')
-          .update({
-            stripe_product_id: product.id,
-            stripe_price_id: price.id,
-          })
-          .eq('id', course.id);
-
-        course.stripe_price_id = price.id;
-      }
-    }
-
-    // Create line items
-    const lineItems = courses.map((course) => ({
-      price: course.stripe_price_id,
+        },
+        unit_amount: Number(price!.retail_price_cents),
+      },
       quantity: 1,
     }));
 
-    // Handle promo code - create Stripe coupon if needed
-    let discounts: Stripe.Checkout.SessionCreateParams.Discount[] | undefined;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      new URL(req.url).origin ||
+      PLATFORM_DEFAULTS.siteUrl;
 
-    if (promoCode) {
-      const { data: promo } = await supabase
-        .from('promo_codes')
-        .select('*')
-        .eq('code', promoCode.toUpperCase())
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (promo) {
-        // Create a Stripe coupon for this promo
-        try {
-          const coupon = await stripe.coupons.create({
-            ...(promo.discount_type === 'percentage'
-              ? { percent_off: Number(promo.discount_value) }
-              : { amount_off: Math.round(Number(promo.discount_value) * 100), currency: 'usd' }),
-            duration: 'once',
-            name: promo.code,
-            metadata: {
-              promo_id: promo.id,
-              promo_code: promo.code,
-            },
-          });
-
-          discounts = [{ coupon: coupon.id }];
-
-          // Increment usage count
-          await supabase
-            .from('promo_codes')
-            .update({ current_uses: (promo.current_uses || 0) + 1 })
-            .eq('id', promo.id);
-        } catch (e) {
-          logger.error('Failed to create Stripe coupon:', e);
-        }
-      }
-    }
-
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card', 'klarna', 'afterpay_clearpay'],
       line_items: lineItems,
-      discounts,
-      success_url:
-        successUrl ||
-        `${process.env.NEXT_PUBLIC_SITE_URL}/career-services/courses/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_SITE_URL}/career-services/courses`,
-      customer_email: email || undefined,
+      success_url: `${baseUrl}/career-services/courses/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/career-services/courses`,
+      client_reference_id: auth.userId,
+      customer_email: auth.email || undefined,
+      customer_creation: 'always',
+      billing_address_collection: 'required',
       metadata: {
         type: 'career_course',
+        payment_type: 'course_purchase',
+        funding_source: 'self_pay',
+        user_id: auth.userId,
+        course_id: courseIds[0],
         course_ids: courseIds.join(','),
-        promo_code: promoCode || '',
       },
-      allow_promotion_codes: !promoCode, // Only allow Stripe promos if no custom promo applied
+      allow_promotion_codes: true,
     });
+
+    if (!session.url) {
+      throw new Error('Stripe did not return a Checkout URL.');
+    }
 
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,
     });
-  } catch (error: any) {
-    logger.error('Checkout error', normalizeError(error, 'Checkout failed'), getErrorContext(error));
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    logger.error(
+      'Career-course checkout error',
+      normalizeError(error, 'Career-course checkout failed'),
+      getErrorContext(error),
+    );
+    return NextResponse.json({ error: 'Unable to start checkout.' }, { status: 500 });
   }
 }
+
 export const POST = withApiAudit('/api/checkout/career-courses', _POST);

@@ -12,8 +12,6 @@ export const NAV_ITEMS: NavItem[] = [
     name: 'Programs',
     href: ROUTES.programs,
     subItems: [
-      // Keep the canonical catalog entry outside category groups so mobile,
-      // desktop, and quick-menu navigation always expose the full catalog.
       { name: 'All Programs', href: ROUTES.programs, isSectionLink: true },
       { name: 'Healthcare', isHeader: true, href: ROUTES.programsHealthcare },
       { name: 'CNA', href: ROUTES.programsCNA, isSectionLink: true },
@@ -57,9 +55,17 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    id: 'foundation',
-    name: 'Foundation',
-    href: '/rise-forward-foundation',
+    id: 'platform',
+    name: 'Platform',
+    href: '/online-apps',
+    subItems: [
+      { name: 'Platform Overview', href: '/platform', isSectionLink: true },
+      { name: 'Online Apps & Portals', href: '/online-apps', isSectionLink: true },
+      { name: 'Workforce Board Platform', href: '/platform/workforce-boards', isSectionLink: true },
+      { name: 'Dev Studio', href: '/dev-studio', isSectionLink: true },
+      { name: 'Website Builder', href: '/store', isSectionLink: true },
+      { name: 'Plans & Products', href: '/store#marketplace', isSectionLink: true },
+    ],
   },
   {
     id: 'employers',
@@ -74,9 +80,23 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
+    id: 'resources',
+    name: 'Resources',
+    href: ROUTES.blog,
+    subItems: [
+      { name: 'Blog & Insights', href: ROUTES.blog, isSectionLink: true },
+      { name: 'FAQ', href: ROUTES.faq, isSectionLink: true },
+      { name: 'Approvals', href: ROUTES.aboutApprovals, isSectionLink: true },
+      { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },
+      { name: 'Contact', href: ROUTES.contact, isSectionLink: true },
+    ],
+  },
+  {
     id: 'portals',
     name: 'Portals',
+    href: '/online-apps',
     subItems: [
+      { name: 'All Apps & Portals', href: '/online-apps', isSectionLink: true },
       { name: 'Learners', isHeader: true },
       { name: 'Student / LMS Portal', href: ROUTES.studentPortal, isSectionLink: true, isAuth: true },
       { name: 'Apprentice Portal', href: ROUTES.apprenticePortal, isSectionLink: true, isAuth: true },
@@ -98,16 +118,17 @@ export const NAV_ITEMS: NavItem[] = [
   },
   { id: 'store', name: 'Store', href: ROUTES.store },
   {
+    id: 'foundation',
+    name: 'Foundation',
+    href: '/rise-forward-foundation',
+  },
+  {
     id: 'about',
     name: 'About',
     href: ROUTES.about,
     subItems: [
       { name: 'Mission', href: ROUTES.about, isSectionLink: true },
-      { name: 'Approvals', href: ROUTES.aboutApprovals, isSectionLink: true },
       { name: 'Apprenticeship Sponsor of Record', href: ROUTES.apprenticeshipSponsor, isSectionLink: true },
-      { name: 'Testing Center', href: ROUTES.testing, isSectionLink: true },
-      { name: 'Blog', href: ROUTES.blog, isSectionLink: true },
-      { name: 'FAQ', href: ROUTES.faq, isSectionLink: true },
       { name: 'Contact', href: ROUTES.contact, isSectionLink: true },
     ],
   },

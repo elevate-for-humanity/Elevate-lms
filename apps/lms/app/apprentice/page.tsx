@@ -9,12 +9,14 @@ import {
   Building2,
   CheckCircle2,
   Clock3,
+  ShieldCheck,
   UserRound,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { courseOverviewPath } from '@/lib/lms/routes';
 import { getProgramHeroImage } from '@/lib/images/programImages';
+import { APPENDIX_A_REGISTRATION, getAppendixAStandard } from '@/lib/compliance/appendix-a-standards';
 
 export const metadata: Metadata = {
   title: 'Apprentice Dashboard',
@@ -44,12 +46,14 @@ export default async function ApprenticePortalPage() {
 
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
   if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
+  const appendixStandard = getAppendixAStandard(programSlug);
+  const competencyBased = appendixStandard?.approach === 'competency-based';
 
   const [profileRes, enrollmentRes, placementRes, docsRes, certsRes] = await Promise.all([
     supabase.from('profiles').select('full_name, first_name, last_name').eq('id', user.id).maybeSingle(),
     supabase
       .from('program_enrollments')
-      .select('id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, course_id, programs(min_ojl_hours, min_rti_hours)')
+      .select('id, program_slug, enrollment_state, orientation_completed_at, documents_submitted_at, access_granted_at, course_id, rapids_status, rapids_id, programs(min_ojl_hours, min_rti_hours)')
       .eq('user_id', user.id)
       .eq('program_slug', programSlug)
       .order('created_at', { ascending: false })
@@ -57,7 +61,7 @@ export default async function ApprenticePortalPage() {
       .maybeSingle(),
     supabase
       .from('apprentice_placements')
-      .select('id, student_id, shop_id, program_slug, status, start_date')
+      .select('id, student_id, shop_id, program_slug, status, start_date, supervisor_user_id')
       .eq('student_id', user.id)
       .eq('program_slug', programSlug)
       .eq('status', 'active')
@@ -84,33 +88,46 @@ export default async function ApprenticePortalPage() {
     if (row.program_slug && row.program_slug !== programSlug) return false;
     return true;
   });
-
   const approvedHours = scopedHours
     .filter((row) => row.approval_status === 'approved' || row.status === 'approved')
-    .reduce(
-      (sum, row) =>
-        sum +
-        (numericHours(row.accepted_hours) || numericHours(row.hours) || numericHours(row.hours_claimed)),
-      0,
-    );
-  const pendingEntries = scopedHours.filter(
-    (row) => row.approval_status === 'pending' || row.status === 'pending',
-  ).length;
+    .reduce((sum, row) => sum + (numericHours(row.accepted_hours) || numericHours(row.hours) || numericHours(row.hours_claimed)), 0);
+  const pendingEntries = scopedHours.filter((row) => row.approval_status === 'pending' || row.status === 'pending').length;
 
   const configuredOjlHours = Number(programConfig?.min_ojl_hours ?? 0);
-  const requiredOjlHours = configuredOjlHours > 0 ? configuredOjlHours : null;
+  const requiredOjlHours = !competencyBased && configuredOjlHours > 0 ? configuredOjlHours : null;
   const ojtProgress = requiredOjlHours
     ? Math.min(100, Math.max(0, Math.round((approvedHours / requiredOjlHours) * 100)))
     : 0;
 
+  let completedCompetencies = 0;
+  if (enrollment?.id && appendixStandard) {
+    const { data: competencyRows, error: competencyError } = await supabase
+      .from('apprentice_competency_records')
+      .select('competency_id, completed')
+      .eq('enrollment_id', enrollment.id)
+      .eq('completed', true);
+    if (competencyError) throw new Error(`APPRENTICE_COMPETENCY_LOAD_FAILED:${competencyError.message}`);
+    completedCompetencies = new Set((competencyRows ?? []).map((row) => row.competency_id)).size;
+  }
+  const competencyProgress = appendixStandard
+    ? Math.min(100, Math.round((completedCompetencies / appendixStandard.competencyCount) * 100))
+    : 0;
+  const currentWageMilestone = appendixStandard
+    ? [...appendixStandard.wageMilestones]
+        .filter((step) => step.completedCompetencies <= completedCompetencies)
+        .sort((a, b) => b.completedCompetencies - a.completedCompetencies)[0]
+    : null;
+  const nextWageMilestone = appendixStandard?.wageMilestones.find((step) => step.completedCompetencies > completedCompetencies) ?? null;
+
   let totalRtiLessons = 0;
   let completedRtiLessons = 0;
   let courseTitle = 'Assigned RTI course';
+  let canonicalCourseHref = programSlug === 'barber-apprenticeship' ? '/lms/courses/barber-apprenticeship' : '/lms/courses';
 
   if (enrollment?.course_id) {
     const [courseRes, lessonCountRes, progressCountRes] = await Promise.all([
-      supabase.from('courses').select('title').eq('id', enrollment.course_id).maybeSingle(),
-      supabase.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', enrollment.course_id),
+      supabase.from('courses').select('title,slug').eq('id', enrollment.course_id).maybeSingle(),
+      supabase.from('course_lessons').select('id', { count: 'exact', head: true }).eq('course_id', enrollment.course_id).eq('is_published', true),
       supabase
         .from('lesson_progress')
         .select('id', { count: 'exact', head: true })
@@ -119,14 +136,15 @@ export default async function ApprenticePortalPage() {
         .eq('completed', true),
     ]);
     courseTitle = courseRes.data?.title || courseTitle;
+    canonicalCourseHref = courseOverviewPath(enrollment.course_id);
     totalRtiLessons = lessonCountRes.count ?? 0;
     completedRtiLessons = progressCountRes.count ?? 0;
   }
 
-  const rtiProgress = totalRtiLessons > 0
+  const digitalCourseProgress = totalRtiLessons > 0
     ? Math.min(100, Math.max(0, Math.round((completedRtiLessons / totalRtiLessons) * 100)))
     : 0;
-  const requiredRtiHours = Number(programConfig?.min_rti_hours ?? 0) || null;
+  const requiredRtiHours = appendixStandard?.relatedInstructionHours ?? (Number(programConfig?.min_rti_hours ?? 0) || null);
 
   let shopName: string | null = null;
   if (placement?.shop_id) {
@@ -143,30 +161,10 @@ export default async function ApprenticePortalPage() {
   const heroImage = getProgramHeroImage(programSlug);
 
   const actions = [
-    {
-      title: 'Clock hours',
-      text: 'Record and review your on-the-job training hours.',
-      href: '/apprentice/timeclock',
-      image: '/images/pages/apprenticeship-structure.webp',
-    },
-    {
-      title: 'Open RTI course',
-      text: courseTitle,
-      href: enrollment?.course_id ? courseOverviewPath(enrollment.course_id) : '/apprentice/course',
-      image: '/images/pages/training-classroom.webp',
-    },
-    {
-      title: 'Competencies',
-      text: 'Review required skills and supervisor verification.',
-      href: '/apprentice/competencies',
-      image: '/images/pages/competency-test-hero.webp',
-    },
-    {
-      title: 'Documents',
-      text: 'Review required agreements and uploaded records.',
-      href: '/apprentice/documents',
-      image: '/images/pages/comp-home-highlight-success.webp',
-    },
+    { title: 'Clock work hours', text: 'Record geofenced work time for Host Shop review. Hours are evidence; competency verification controls Appendix A progress.', href: '/apprentice/timeclock', image: '/images/pages/apprenticeship-structure.webp' },
+    { title: 'Open RTI course', text: courseTitle, href: canonicalCourseHref, image: '/images/pages/training-classroom.webp' },
+    { title: 'Competencies', text: appendixStandard ? `Review all ${appendixStandard.competencyCount} Appendix A competencies and supervisor verification.` : 'Review required skills and supervisor verification.', href: '/apprentice/competencies', image: '/images/pages/competency-test-hero.webp' },
+    { title: 'Documents', text: 'Review required agreements, signatures, and verified records.', href: '/apprentice/documents', image: '/images/pages/comp-home-highlight-success.webp' },
   ] as const;
 
   return (
@@ -182,96 +180,66 @@ export default async function ApprenticePortalPage() {
                 <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
                   <span className="rounded-full bg-slate-100 px-3 py-1.5 text-slate-800">Status: {enrollment?.enrollment_state || placement?.status || 'Active record'}</span>
                   <span className="rounded-full bg-slate-100 px-3 py-1.5 text-slate-800">Host Shop: {shopName || 'Not assigned'}</span>
+                  {appendixStandard ? <span className="rounded-full bg-cyan-100 px-3 py-1.5 text-cyan-900">RAPIDS {appendixStandard.rapidsCode} · competency-based</span> : null}
                 </div>
               </div>
               <Link href="/apprentice/profile" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 font-bold text-slate-900 hover:bg-slate-50"><UserRound className="h-5 w-5" /> Profile</Link>
             </div>
           </div>
-          <div className="relative min-h-[230px] lg:min-h-full">
-            <Image
-              src={heroImage}
-              alt={`${displayProgram} apprentice training`}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 40vw"
-              className="object-cover"
-            />
-          </div>
+          <div className="relative min-h-[230px] lg:min-h-full"><Image src={heroImage} alt={`${displayProgram} apprentice training`} fill priority sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover" /></div>
         </div>
       </section>
 
+      {appendixStandard ? (
+        <section className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-cyan-950">
+          <div className="flex gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0"/><div><h2 className="font-black">Your USDOL Appendix A progress contract</h2><p className="mt-1 text-sm font-semibold leading-6">Completion is based on verified mastery of {appendixStandard.competencyCount} competencies plus {appendixStandard.relatedInstructionHours} RTI hours under the approved standard. Work hours are retained as OJL/employment evidence, but this competency-based occupation is not completed by reaching a generic 2,000-hour counter.</p><p className="mt-2 text-xs font-bold uppercase tracking-wide">1:1 mentor ratio · {appendixStandard.probationaryHours}-hour probation · revision {APPENDIX_A_REGISTRATION.revisionDate}</p></div></div>
+        </section>
+      ) : null}
+
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Apprentice progress">
-        <Metric label="Approved OJT hours" value={requiredOjlHours ? `${approvedHours.toLocaleString()} / ${requiredOjlHours.toLocaleString()}` : approvedHours.toLocaleString()} detail={`${ojtProgress}% of required OJT`} icon={Clock3} />
-        <Metric label="RTI lessons complete" value={`${completedRtiLessons} / ${totalRtiLessons}`} detail={requiredRtiHours ? `${requiredRtiHours} minimum RTI hours required by program` : `${rtiProgress}% verified lesson completion`} icon={BookOpen} />
-        <Metric label="Pending hour entries" value={String(pendingEntries)} detail="Awaiting supervisor/admin review" icon={CheckCircle2} />
-        <Metric label="Certificates earned" value={String(certsRes.count ?? 0)} detail={`${verifiedDocs} of ${totalDocs} documents verified`} icon={Award} />
+        <Metric label={appendixStandard ? 'Appendix A competencies' : 'Approved OJT hours'} value={appendixStandard ? `${completedCompetencies} / ${appendixStandard.competencyCount}` : requiredOjlHours ? `${approvedHours.toLocaleString()} / ${requiredOjlHours.toLocaleString()}` : approvedHours.toLocaleString()} detail={appendixStandard ? `${competencyProgress}% verified competency progress` : requiredOjlHours ? `${ojtProgress}% of required OJT` : `${approvedHours.toLocaleString()} approved work hours recorded`} icon={CheckCircle2} />
+        <Metric label="RTI course progress" value={`${completedRtiLessons} / ${totalRtiLessons}`} detail={requiredRtiHours ? `${requiredRtiHours} RTI hours required; lesson completion is digital-course progress` : `${digitalCourseProgress}% verified lesson completion`} icon={BookOpen} />
+        <Metric label="Approved work hours" value={approvedHours.toLocaleString()} detail={`${pendingEntries} pending entries · retained as supervised work evidence`} icon={Clock3} />
+        <Metric label="Certificates / documents" value={String(certsRes.count ?? 0)} detail={`${verifiedDocs} of ${totalDocs} documents verified`} icon={Award} />
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
-        <ProgressPanel title="On-the-job learning (OJT)" value={ojtProgress} detail={requiredOjlHours ? `${approvedHours.toLocaleString()} approved of ${requiredOjlHours.toLocaleString()} required hours` : `${approvedHours.toLocaleString()} approved hours recorded`} />
-        <ProgressPanel title="Related Technical Instruction (RTI)" value={rtiProgress} detail={`${completedRtiLessons} verified lessons complete of ${totalRtiLessons}`} />
+        <ProgressPanel title={appendixStandard ? 'Appendix A competency mastery' : 'On-the-job learning (OJT)'} value={appendixStandard ? competencyProgress : ojtProgress} detail={appendixStandard ? `${completedCompetencies} of ${appendixStandard.competencyCount} competencies verified by the Host Shop mentor` : requiredOjlHours ? `${approvedHours.toLocaleString()} approved of ${requiredOjlHours.toLocaleString()} required hours` : `${approvedHours.toLocaleString()} approved hours recorded`} />
+        <ProgressPanel title="Digital RTI course" value={digitalCourseProgress} detail={`${completedRtiLessons} verified lessons complete of ${totalRtiLessons}${requiredRtiHours ? ` · Appendix A requires ${requiredRtiHours} RTI hours total` : ''}`} />
       </section>
 
+      {appendixStandard ? (
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-xl font-black text-slate-950">Progressive wage checkpoint</h2>
+          <p className="mt-2 text-sm font-medium leading-6 text-slate-700">Appendix A wage milestones are triggered by verified competency progress. The employer must always apply the higher of the registered schedule or any legally required wage.</p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold">
+            <span className="rounded-full bg-slate-100 px-3 py-2">Current Appendix step: ${Number(currentWageMilestone?.hourlyRate ?? appendixStandard.startingHourlyRate).toFixed(2)}/hr</span>
+            {nextWageMilestone ? <span className="rounded-full bg-amber-100 px-3 py-2 text-amber-900">Next: ${nextWageMilestone.hourlyRate.toFixed(2)}/hr at {nextWageMilestone.completedCompetencies} competencies</span> : <span className="rounded-full bg-emerald-100 px-3 py-2 text-emerald-900">Final Appendix wage milestone reached</span>}
+          </div>
+        </section>
+      ) : null}
+
       <section>
-        <div className="mb-4">
-          <h2 className="text-2xl font-black text-slate-950">Your workspaces</h2>
-          <p className="mt-1 text-sm font-medium text-slate-700">Each workspace uses the same apprentice enrollment and placement records shown above.</p>
-        </div>
+        <div className="mb-4"><h2 className="text-2xl font-black text-slate-950">Your workspaces</h2><p className="mt-1 text-sm font-medium text-slate-700">Each workspace uses this same enrollment, placement, RTI, competency, and compliance record.</p></div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {actions.map(({ title, text, href, image }) => (
             <Link key={title} href={href} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-brand-red-300 hover:shadow-md">
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
-                <Image src={image} alt={`${title} workspace`} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-              </div>
-              <div className="p-5">
-                <h3 className="text-lg font-black text-slate-950">{title}</h3>
-                <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{text}</p>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-extrabold text-brand-red-700">Open <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
-              </div>
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100"><Image src={image} alt={`${title} workspace`} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" /></div>
+              <div className="p-5"><h3 className="text-lg font-black text-slate-950">{title}</h3><p className="mt-2 text-sm font-medium leading-6 text-slate-700">{text}</p><span className="mt-4 inline-flex items-center gap-1 text-sm font-extrabold text-brand-red-700">Open <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span></div>
             </Link>
           ))}
         </div>
       </section>
 
-      {!shopName && (
-        <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
-          <div className="flex gap-3">
-            <Building2 className="mt-0.5 h-5 w-5 shrink-0" />
-            <div>
-              <h2 className="font-black">Host shop assignment needed</h2>
-              <p className="mt-1 text-sm font-medium leading-6">Your active apprentice placement does not currently resolve to a host shop. Contact apprenticeship administration before recording location-dependent OJT.</p>
-            </div>
-          </div>
-        </section>
-      )}
+      {!shopName ? <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950"><div className="flex gap-3"><Building2 className="mt-0.5 h-5 w-5 shrink-0" /><div><h2 className="font-black">Host shop assignment needed</h2><p className="mt-1 text-sm font-medium leading-6">Your active apprentice placement does not currently resolve to a Host Shop. Contact apprenticeship administration before recording location-dependent work or competency verification.</p></div></div></section> : null}
     </main>
   );
 }
 
 function ProgressPanel({ title, value, detail }: { title: string; value: number; detail: string }) {
-  return (
-    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-black text-slate-950">{title}</h2>
-          <p className="mt-1 text-sm font-medium text-slate-700">{detail}</p>
-        </div>
-        <span className="text-2xl font-black text-slate-950">{value}%</span>
-      </div>
-      <div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}>
-        <div className="h-full rounded-full bg-brand-red-600" style={{ width: `${value}%` }} />
-      </div>
-    </section>
-  );
+  return <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><div className="flex items-end justify-between gap-4"><div><h2 className="text-xl font-black text-slate-950">{title}</h2><p className="mt-1 text-sm font-medium text-slate-700">{detail}</p></div><span className="text-2xl font-black text-slate-950">{value}%</span></div><div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-valuenow={value} aria-valuemin={0} aria-valuemax={100}><div className="h-full rounded-full bg-brand-red-600" style={{ width: `${value}%` }} /></div></section>;
 }
 
 function Metric({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: React.ElementType }) {
-  return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-900"><Icon className="h-5 w-5" /></div>
-      <p className="mt-4 text-sm font-bold text-slate-700">{label}</p>
-      <p className="mt-1 text-2xl font-black text-slate-950">{value}</p>
-      <p className="mt-2 text-xs font-medium leading-5 text-slate-700">{detail}</p>
-    </article>
-  );
+  return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-900"><Icon className="h-5 w-5" /></div><p className="mt-4 text-sm font-bold text-slate-700">{label}</p><p className="mt-1 text-2xl font-black text-slate-950">{value}</p><p className="mt-2 text-xs font-medium leading-5 text-slate-700">{detail}</p></article>;
 }

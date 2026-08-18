@@ -31,9 +31,33 @@
   "deployment": {
     "healthCheck": {
       "enabled": true,
-      "path": "/api/health/northflank",
+      "path": "/api/ping",
       "port": 3000,
-      "protocol": "HTTP"
+      "protocol": "HTTP",
+      "initialDelaySeconds": 60,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 3
+    },
+    "startupProbe": {
+      "enabled": true,
+      "path": "/api/ping",
+      "port": 3000,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 30,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 12
+    },
+    "readinessProbe": {
+      "enabled": true,
+      "path": "/api/health",
+      "port": 3000,
+      "protocol": "HTTP",
+      "initialDelaySeconds": 10,
+      "periodSeconds": 10,
+      "timeoutSeconds": 5,
+      "failureThreshold": 3
     }
   }
 }

@@ -65,6 +65,10 @@ const adminConfig = {
     return {
       beforeFiles: [
         { source: '/api/devstudio/health', destination: '/api/admin/dev-studio/health' },
+        // Preserve historical Admin application URLs without changing the
+        // browser URL or maintaining a duplicate page tree. The Admin domain
+        // owns canonical pages at /applications/**.
+        { source: '/admin/applications/:path*', destination: '/applications/:path*' },
         ...legacyImageRewrites(),
       ],
       afterFiles: [],

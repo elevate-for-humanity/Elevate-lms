@@ -51,10 +51,11 @@ export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding
     sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
   },
   {
-    // This must remain the program slug. `/programs/business` is the Business
-    // category route and cannot also be a program canonical URL.
+    // This must remain the program slug. `/programs/business` is a compatibility
+    // alias and redirects to this canonical public program URL.
     slug: 'business-administration',
     title: 'Business Administration',
+    aliases: ['business'],
     description: 'Business, Microsoft Office, QuickBooks, entrepreneurship, and workplace administration training.',
     duration: '8 weeks',
     credential: 'Industry certification preparation',

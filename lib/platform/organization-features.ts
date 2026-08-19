@@ -175,11 +175,12 @@ export async function getOrganizationFeatures(
     PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
   }
 
-  // Add-ons cannot keep a tenant alive after the base subscription/trial has
-  // ended. They are only merged while the base subscription currently grants
-  // access.
+  // Standalone add-ons are valid when no base subscription exists. If a base
+  // subscription does exist, add-ons may not resurrect access after that base
+  // subscription/trial becomes past due, canceled, or expired.
   const activeAddonCodes: string[] = [];
-  if (subscriptionHasAccess) {
+  const allowStandaloneOrBaseAddons = !orgSub || subscriptionHasAccess;
+  if (allowStandaloneOrBaseAddons) {
     const { data: addonRows } = await supabase
       .from('addon_subscriptions')
       .select('addon_code, saas_addon_catalog ( feature_codes )')
@@ -235,7 +236,9 @@ export async function getOrganizationFeatures(
   const limits: PlanLimits = subscriptionHasAccess
     ? ((planRow?.limits as PlanLimits) ??
       (planSlug && PLAN_LIMITS_FALLBACK[planSlug] ? PLAN_LIMITS_FALLBACK[planSlug] : { users: 1 }))
-    : { users: 0 };
+    : !orgSub && featureSet.size > 0
+      ? { users: 1 }
+      : { users: 0 };
 
   return {
     organizationId: tenantId,

@@ -53,7 +53,6 @@ export default function TrainingModelPage() {
         <Breadcrumbs items={[{ label: 'Pathways', href: '/pathways' }, { label: 'Training Model' }]} />
       </div>
 
-      {/* Hero */}
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
@@ -69,7 +68,6 @@ export default function TrainingModelPage() {
         </div>
       </section>
 
-      {/* Training Approaches */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-black mb-8">Our Training Pillars</h2>
@@ -99,7 +97,6 @@ export default function TrainingModelPage() {
         </div>
       </section>
 
-      {/* Employer Partners */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
@@ -107,9 +104,9 @@ export default function TrainingModelPage() {
               <Building className="w-4 h-4" />
               Employer Partnerships
             </div>
-            <h2 className="text-2xl font-bold text-black mb-4">Training Backed by Top Employers</h2>
+            <h2 className="text-2xl font-bold text-black mb-4">Training Informed by Employer Needs</h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
-              Our curriculum is shaped by input from leading Indiana employers who are actively hiring.
+              Curriculum planning uses employer and occupational input to keep training aligned with job requirements.
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
@@ -122,7 +119,6 @@ export default function TrainingModelPage() {
         </div>
       </section>
 
-      {/* Credentials */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="bg-brand-blue-700 rounded-2xl p-12 text-center">
@@ -132,7 +128,7 @@ export default function TrainingModelPage() {
             </div>
             <h2 className="text-3xl font-bold text-white mb-4">Earn Recognized Credentials</h2>
             <p className="text-blue-100 max-w-2xl mx-auto mb-8">
-              Complete your program with certifications that employers recognize and value — from state licenses to national credentials.
+              Complete your program with the credential or license requirement connected to your selected pathway.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               {['State Licenses', 'NHA Certifications', 'EPA 608', 'CompTIA A+', 'AWS Certifications'].map((cert) => (
@@ -145,12 +141,11 @@ export default function TrainingModelPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-16 bg-brand-blue-700">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Training?</h2>
           <p className="text-blue-100 mb-8">
-            Join thousands of workers who have upgraded their careers through Elevate programs.
+            Explore available pathways, program requirements, and the application process.
           </p>
           <Link href="/pathways" className="inline-block bg-white text-brand-blue-700 font-bold py-3 px-8 rounded-lg hover:bg-blue-50">
             Explore Programs

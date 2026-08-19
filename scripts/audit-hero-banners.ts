@@ -97,14 +97,7 @@ for (const [pageKey, banner] of Object.entries(heroBanners)) {
   const posterKey = mediaKey(banner.posterImage);
   if (posterKey) posterUses.set(posterKey, [...(posterUses.get(posterKey) || []), pageKey]);
 
-  // The normalized catalog intentionally contains copy/config entries for
-  // surfaces that do not currently render a media hero. Those surfaces are
-  // protected at runtime by the canonical fallback resolver. Do not turn
-  // dormant configuration into a release blocker; active route contracts are
-  // checked below and every authored poster is still required to exist.
-  if (!src && !banner.posterImage) {
-    fallbackOnlyEntries += 1;
-  }
+  if (!src && !banner.posterImage) fallbackOnlyEntries += 1;
   if (banner.posterImage && !localPublicAssetExists(banner.posterImage)) { console.error(`FAIL ${pageKey} poster image does not exist: ${banner.posterImage}`); failures += 1; }
 }
 for (const [media, pageKeys] of videoUses) {
@@ -121,12 +114,59 @@ if (!fs.existsSync(marketingJson)) { console.error('FAIL apps/marketing/public/d
 if (fs.existsSync(canonicalJson) && fs.existsSync(marketingJson)) {
   if (fs.readFileSync(canonicalJson, 'utf8').trim() !== fs.readFileSync(marketingJson, 'utf8').trim()) { console.error('FAIL apps/marketing/public/data/hero-banners.json drifted from public/data/hero-banners.json'); failures += 1; }
 }
+
 const wrapperChecks = ['components/ui/HomeHeroVideo.tsx', 'components/ui/PageVideoHero.tsx'];
 for (const relative of wrapperChecks) {
   const source = readIfPresent(relative); if (source === null) continue;
   if (!source.includes("@/components/marketing/HeroVideo")) { console.error(`FAIL ${relative} does not delegate to canonical HeroVideo`); failures += 1; }
   if (/<video\b/i.test(source)) { console.error(`FAIL ${relative} contains its own <video> playback implementation`); failures += 1; }
 }
+
+// Layering regression contract: posters are fallback/base media, never a
+// foreground element. The canonical video must own the higher stacking layer
+// and must remain transparent until a real frame is ready so the poster cannot
+// flash over a playing video.
+const heroRenderer = readIfPresent('components/marketing/HeroVideo.tsx');
+if (heroRenderer === null) {
+  console.error('FAIL canonical HeroVideo renderer is missing');
+  failures += 1;
+} else {
+  if (!heroRenderer.includes('absolute inset-0 z-0 bg-cover')) {
+    console.error('FAIL HeroVideo poster is not locked to the base z-0 media layer');
+    failures += 1;
+  }
+  if (!heroRenderer.includes('absolute inset-0 z-10 h-full w-full')) {
+    console.error('FAIL HeroVideo video is not locked above the poster at z-10');
+    failures += 1;
+  }
+  if (!heroRenderer.includes("videoReady ? 'opacity-100' : 'opacity-0'")) {
+    console.error('FAIL HeroVideo does not gate video visibility on a ready frame');
+    failures += 1;
+  }
+  if (!heroRenderer.includes('relative isolate w-full overflow-hidden')) {
+    console.error('FAIL HeroVideo media stack is not isolated from outside stacking contexts');
+    failures += 1;
+  }
+}
+
+// Homepage desktop proportion regression contract. The prior compressed hero
+// used 46vh/340px and made the video appear letterboxed/undersized on desktop.
+const homeWrapper = readIfPresent('components/ui/HomeHeroVideo.tsx');
+if (homeWrapper === null) {
+  console.error('FAIL HomeHeroVideo wrapper is missing');
+  failures += 1;
+} else {
+  const expectedDesktopHeight = 'h-[52vh] min-h-[360px] max-h-[680px] md:h-[58vh] md:min-h-[480px] lg:h-[62vh]';
+  if (!homeWrapper.includes(expectedDesktopHeight)) {
+    console.error('FAIL homepage hero desktop proportions drifted from the production contract');
+    failures += 1;
+  }
+  if (homeWrapper.includes('h-[46vh] min-h-[340px]')) {
+    console.error('FAIL homepage hero reintroduced the compressed legacy desktop height');
+    failures += 1;
+  }
+}
+
 const criticalRouteChecks = [
   { file: 'apps/marketing/app/call-now/page.tsx', description: 'Get Started', acceptedMarkers: ["@/components/marketing/HeroPicture", "@/components/marketing/HeroVideo"] },
   { file: 'apps/marketing/app/page.tsx', description: 'Homepage', acceptedMarkers: ['HomeHeroVideo', "@/components/marketing/HeroVideo"] },
@@ -138,9 +178,6 @@ for (const check of criticalRouteChecks) {
   if (!check.acceptedMarkers.some((marker) => source.includes(marker))) { console.error(`FAIL ${check.description} bypasses the canonical hero system: ${check.file}`); failures += 1; }
 }
 
-// The active homepage, program landing surface, and store must always have an
-// authored/normalized media contract. Dynamic program-detail pages resolve
-// through the canonical program image registry.
 for (const pageKey of ['home', 'programs', 'store']) {
   const banner = heroBanners[pageKey];
   if (!banner || (!(banner.videoSrcDesktop || banner.videoSrcMobile) && !banner.posterImage)) {
@@ -157,4 +194,4 @@ console.log(`Audited ${Object.keys(HERO_VIDEO_BY_PAGE_KEY).length} dedicated her
 console.log(`Audited ${Object.keys(internalProgramHeroBanners).length} internal program banner contracts.`);
 console.log(`Audited ${criticalRouteChecks.length} critical active Marketing hero routes.`);
 if (failures > 0) { console.error(`\n${failures} hero-system failure(s). Fix before merging.\n`); process.exit(1); }
-console.log('Hero system passes renderer, media, asset, uniqueness, and active-route checks.');
+console.log('Hero system passes renderer, media, asset, uniqueness, layering, desktop sizing, and active-route checks.');

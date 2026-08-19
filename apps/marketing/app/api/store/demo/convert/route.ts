@@ -225,7 +225,7 @@ export async function POST(request: NextRequest) {
     source: 'demo_conversion',
     db,
   });
-  if (!access.ok) {
+  if (access.ok === false) {
     return NextResponse.json({
       error: `Demo workspace exists but onboarding could not complete at ${access.stage}. ${access.error}`,
       onboardingStage: access.stage,

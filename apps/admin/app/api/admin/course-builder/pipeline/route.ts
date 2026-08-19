@@ -1,16 +1,16 @@
 /**
  * POST /api/admin/course-builder/pipeline
  *
- * Canonical Course Factory endpoint.
- * The route only handles auth/rate limiting/SSE transport. All generation,
- * validation, persistence, assessments and media orchestration belong to
- * lib/course-factory/factory.ts.
+ * Canonical Course Factory endpoint. Generation, validation and persistence cross
+ * lib/course-factory; a post-persistence governance pass then normalizes the exact
+ * records the learner LMS will consume.
  */
 import { NextRequest } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { courseFactory } from '@/lib/course-factory';
 import type { FactoryStage } from '@/lib/course-factory';
+import { normalizeGeneratedCourseForGovernance } from '@/lib/course-factory/post-generation-governance';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
@@ -70,17 +70,19 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.title || !body.topic || !body.programId) {
-    return new Response(JSON.stringify({ error: 'title, topic, and programId are required' }), {
-      status: 400,
-    });
+    return new Response(JSON.stringify({ error: 'title, topic, and programId are required' }), { status: 400 });
+  }
+  if (body.moduleCount != null && (body.moduleCount < 1 || body.moduleCount > 40)) {
+    return new Response(JSON.stringify({ error: 'moduleCount must be between 1 and 40' }), { status: 400 });
+  }
+  if (body.lessonsPerModule != null && (body.lessonsPerModule < 1 || body.lessonsPerModule > 20)) {
+    return new Response(JSON.stringify({ error: 'lessonsPerModule must be between 1 and 20' }), { status: 400 });
   }
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
-      const write = (data: object) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-      };
+      const write = (data: object) => controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
 
       try {
         const result = await courseFactory(
@@ -106,6 +108,12 @@ export async function POST(req: NextRequest) {
           (stage, message, progress) => write({ stage: toPipelineStage(stage), message, progress }),
         );
 
+        let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null = null;
+        if (result.ok && result.courseId && !result.dryRun) {
+          write({ stage: 'validate', message: 'Normalizing competency traceability and self-paced learning assets.', progress: 96 });
+          governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+        }
+
         write({
           stage: 'complete',
           result: {
@@ -116,16 +124,14 @@ export async function POST(req: NextRequest) {
             lessonsGenerated: result.lessonCount ?? 0,
             lessonsWithQuizzes: result.assessmentsGenerated ?? 0,
             videosQueued: result.videosQueued ?? 0,
+            governance,
             errors: result.errors ?? [],
             dryRun: Boolean(result.dryRun),
           },
         });
       } catch (error) {
         logger.error('[course-builder/pipeline] Course Factory error', error);
-        write({
-          stage: 'error',
-          message: 'Course Factory failed. Review server logs for details.',
-        });
+        write({ stage: 'error', message: 'Course Factory failed. Review server logs for details.' });
       } finally {
         controller.close();
       }

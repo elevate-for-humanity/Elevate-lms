@@ -36,8 +36,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
+# Northflank has previously resolved Corepack's pnpm shim to the wrong pnpm
+# version. Remove the shim first, install the repository-pinned pnpm directly,
+# and fail the image build if the executable is not exactly the expected version.
+RUN corepack disable || true \
+    && npm install -g pnpm@10.28.2 \
+    && test "$(pnpm --version)" = "10.28.2"
 
 ENV PNPM_HOME="/app/.pnpm-home"
 ENV PATH="$PNPM_HOME:$PATH"

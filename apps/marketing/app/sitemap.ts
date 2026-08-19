@@ -2,6 +2,11 @@ import type { MetadataRoute } from 'next';
 import { PUBLIC_ROUTE_REGISTRY, PUBLIC_SITE_ORIGIN } from '@/lib/navigation/public-route-registry';
 import { listPublicHostShops } from '@/lib/partners/public-host-shops';
 
+// Host-shop entries are read from Supabase at request time. Keep sitemap
+// generation dynamic so the production image build never requires the
+// privileged service-role secret and published shops appear without rebuilding.
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = PUBLIC_ROUTE_REGISTRY.map((route) => ({
     url: `${PUBLIC_SITE_ORIGIN}${route.path === '/' ? '' : route.path}`,

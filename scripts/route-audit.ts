@@ -6,8 +6,8 @@
  * resolved pages, explicitly retired internal page routes, and banned API
  * namespaces. Small redirect-only pages are migration inventory: they are
  * reported, but they are not release failures unless they also match a retired
- * route rule above. This keeps intentional compatibility aliases visible
- * without allowing retired architecture back into production.
+ * route rule below. Current substantive production surfaces must not be placed
+ * on the retired list simply because an older architecture used the same name.
  *
  * Usage:
  *   pnpm route:audit
@@ -33,29 +33,24 @@ const APP_ROOTS: AppRoot[] = [
   { service: 'website-builder', dir: path.join(ROOT, 'apps/website-builder/app') },
 ].filter(({ dir }) => fs.existsSync(dir));
 
+// Retire only superseded portal/runtime namespaces. Current Admin management
+// surfaces (courses, licenses, program-holders), public career-services,
+// credential verification, payments, and licensing are canonical production
+// surfaces and are therefore intentionally not listed here.
 const BANNED_PAGE_PREFIXES = [
   'employer-portal',
   'partner-portal',
   'programs/admin',
-  'program-holders',
   'program-holder-portal',
   'student-portal',
   'learners',
   'dashboards',
-  'career-services/courses',
   'hvac/lesson',
   'cosmetology-host-shop',
 ];
 
 const BANNED_EXACT_PAGES = new Set([
-  'courses',
   'reset',
-  'pay',
-  'verify-credentials',
-  'store/licensing',
-  'license',
-  'licenses',
-  'licensing',
   'dev/barber-preview',
   'dev/hvac-preview',
   'dev/slide-preview',

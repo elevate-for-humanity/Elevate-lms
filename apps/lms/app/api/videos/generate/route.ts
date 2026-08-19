@@ -22,10 +22,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { safeError, safeInternalError } from '@/lib/api/safe-error';
+import { safeError } from '@/lib/api/safe-error';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { createJob, markRendering, markComplete, markFailed } from '@/lib/video/job-queue';
-import { renderLessonVideo, inferDomainKey } from '@/lib/video/remotion-render';
+
+// Remotion's bundler reaches native @rspack binaries. A static import causes
+// Next/Webpack to trace those ELF binaries during the LMS image build. Keep the
+// entire render pipeline behind the same runtime-only boundary used by Admin.
+type RemotionRender = typeof import('@/lib/video/remotion-render');
+let remotionRender: RemotionRender | null = null;
+async function getRemotionRender(): Promise<RemotionRender> {
+  if (!remotionRender) {
+    remotionRender = await import('@/lib/video/remotion-render');
+  }
+  return remotionRender;
+}
 
 export const runtime = 'nodejs';
 export const maxDuration = 600;
@@ -47,7 +58,6 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  // Fetch lesson + course
   const { data: lesson, error: lessonErr } = await supabase
     .from('course_lessons')
     .select('id, title, script, bullet_points, duration_seconds, course_id, video_status')
@@ -63,7 +73,6 @@ export async function POST(request: NextRequest) {
     .eq('id', lesson.course_id)
     .maybeSingle();
 
-  // Create job — returns immediately with job_id
   const job = await createJob({
     lesson_id: lessonId,
     course_id: lesson.course_id,
@@ -72,7 +81,6 @@ export async function POST(request: NextRequest) {
     bullet_points: Array.isArray(lesson.bullet_points) ? lesson.bullet_points : [],
   });
 
-  // Fire render in background — do not await
   runRender({
     jobId: job.id,
     lessonId,
@@ -83,7 +91,6 @@ export async function POST(request: NextRequest) {
     bulletPoints: Array.isArray(lesson.bullet_points) ? lesson.bullet_points : [],
     durationSecs: lesson.duration_seconds ?? undefined,
   }).catch((err) => {
-    // audit-safe: err goes to logger only, not HTTP response
     logger.error(
       '[VideoGenerate] Background render threw',
       normalizeError(err, 'Video generation error'),
@@ -102,8 +109,6 @@ export async function POST(request: NextRequest) {
   );
 }
 
-// ── Background render ─────────────────────────────────────────────────────────
-
 async function runRender(opts: {
   jobId: string;
   lessonId: string;
@@ -119,6 +124,7 @@ async function runRender(opts: {
   await markRendering(jobId);
 
   try {
+    const { renderLessonVideo, inferDomainKey } = await getRemotionRender();
     const domainKey = inferDomainKey(courseTitle, lessonTitle);
     const instructorId = inferInstructorId(courseTitle);
 
@@ -143,7 +149,6 @@ async function runRender(opts: {
       return;
     }
 
-    // renderLessonVideo uploads to Supabase course-videos and removes os.tmpdir() temps
     await markComplete(jobId, {
       video_url: result.videoUrl,
       audio_url: result.audioUrl ?? undefined,
@@ -151,7 +156,6 @@ async function runRender(opts: {
       scene_count: undefined,
     });
   } catch (err) {
-    // audit-safe: message stored in DB job record only, not HTTP response
     const msg = err instanceof Error ? err.message : String(err);
     await markFailed(jobId, msg);
   }

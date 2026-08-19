@@ -81,7 +81,7 @@ export default function EnrollPage() {
 
       setProgram(data);
 
-      await checkEligibility();
+      await checkEligibility(data.id);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       setMessage(`Error: ${errorMessage}`);
@@ -90,7 +90,7 @@ export default function EnrollPage() {
     }
   };
 
-  const checkEligibility = async () => {
+  const checkEligibility = async (resolvedProgramId?: string) => {
     try {
       const {
         data: { user },
@@ -99,7 +99,7 @@ export default function EnrollPage() {
 
       const { data, error } = await supabase.rpc('can_user_enroll', {
         p_user_id: user.id,
-        p_program_id: programId,
+        p_program_id: resolvedProgramId ?? program?.id ?? programId,
         p_license_key: licenseKey || null,
       });
 
@@ -179,7 +179,7 @@ export default function EnrollPage() {
               firstName: user.user_metadata?.first_name || '',
               lastName: user.user_metadata?.last_name || '',
               email: user.email,
-              preferredProgramId: programId,
+              preferredProgramId: program?.id || programId,
               licenseKey: licenseKey || null,
             }),
           });
@@ -338,7 +338,7 @@ export default function EnrollPage() {
                       value={licenseKey}
                       onChange={(e) => {
                         setLicenseKey(e.target.value);
-                        if (e.target.value) checkEligibility();
+                        if (e.target.value) checkEligibility(program.id);
                       }}
                       placeholder="Enter your license key"
                       className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-3 text-sm sm:text-base border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

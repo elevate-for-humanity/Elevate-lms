@@ -44,7 +44,7 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'workflows', label: 'Workflow Designer', description: 'Build versioned visual automations.', permission: 'studio.workflows.manage', route: '/studio/workflows', healthEndpoint: '/api/admin/dev-studio/workflows/health' },
   { id: 'repository', label: 'Repository Workspace', description: 'Edit and preview source, commit to GitHub, and run code in an isolated browser runtime.', permission: 'studio.repository.view', route: '/studio/repository', healthEndpoint: '/api/admin/dev-studio/repository/health' },
   { id: 'browser', label: 'Cloud Browser', description: 'Operate isolated Playwright Chromium sessions and capture live runtime evidence.', permission: 'studio.repository.view', route: '/studio/browser', healthEndpoint: '/api/devstudio/browser/session' },
-  { id: 'canvas', label: 'Live Canvas', description: 'Build, preview, review and publish visual projects with approval controls.', permission: 'studio.content.manage', route: '/studio/canvas', healthEndpoint: '/api/devstudio/health' },
+  { id: 'canvas', label: 'Live Canvas', description: 'Build, preview, review and publish visual projects with approval controls.', permission: 'studio.content.manage', route: '/studio/canvas', healthEndpoint: '/api/admin/dev-studio/health' },
   { id: 'tasks', label: 'AI Task Queue', description: 'Plan, approve, execute and verify AI work.', permission: 'studio.tasks.manage', route: '/studio/tasks', healthEndpoint: '/api/admin/dev-studio/tasks/health' },
   { id: 'deployments', label: 'Deployments', description: 'Build, deploy, verify and roll back services.', permission: 'studio.deployments.manage', route: '/studio/deployments', healthEndpoint: '/api/admin/dev-studio/deployments/health' },
   { id: 'containers', label: 'Containers', description: 'Manage isolated execution environments and canonical runtime configuration.', permission: 'studio.containers.manage', route: '/studio/containers', healthEndpoint: '/api/admin/dev-studio/containers/health' },
@@ -53,7 +53,7 @@ export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
   { id: 'collaboration', label: 'Collaboration', description: 'Comments and shared review context backed by Studio data.', permission: 'studio.collaboration.use', route: '/studio/collaboration', healthEndpoint: '/api/admin/dev-studio/collaboration/health' },
   { id: 'cfd', label: 'CFD Studio', description: 'OpenFOAM project configuration and execution.', permission: 'studio.cfd.manage', route: '/studio/cfd', healthEndpoint: '/api/admin/dev-studio/cfd/health', featureFlag: 'CFD_ENABLED' },
   { id: 'memory', label: 'AI Memory', description: 'Search and manage governed organizational memory.', permission: 'studio.memory.manage', route: '/studio/memory', healthEndpoint: '/api/admin/dev-studio/memory/health' },
-  { id: 'health', label: 'System Health', description: 'Capability status and configuration checks.', permission: 'studio.health.view', route: '/studio/health', healthEndpoint: '/api/devstudio/health' },
+  { id: 'health', label: 'System Health', description: 'Capability status and configuration checks.', permission: 'studio.health.view', route: '/studio/health', healthEndpoint: '/api/admin/dev-studio/health' },
   { id: 'settings', label: 'Settings', description: 'Providers, features and Studio permissions.', permission: 'studio.settings.manage', route: '/studio/settings', healthEndpoint: '/api/admin/dev-studio/settings/health' },
 ];
 

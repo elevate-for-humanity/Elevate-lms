@@ -92,12 +92,12 @@ export default async function HostShopDashboardView() {
     { href: '/host-shop/dashboard/documents', title: 'Required documents', value: board.requiredDocumentCount ? `${board.acceptedDocumentCount}/${board.requiredDocumentCount}` : board.partner?.documents_verified ? 'Complete' : 'Review', detail: 'Maintain MOU, licenses, insurance, payroll evidence, and required Host Shop records.', image: '/images/pages/comp-home-highlight-success.webp' },
   ];
   const toolCards: PortalCard[] = [
-    { href: '/host-shop/orientation', title: 'Required orientation', detail: 'Review recruiting, payroll, WIOA, geofencing, work approval, competencies, transfer-credit rules, RAPIDS, and compliance.', image: '/images/pages/enrollment-agreement-page-1.webp' },
+    { href: '/host-shop/orientation', title: 'Required orientation', detail: 'Review recruiting, payroll, WIOA, geofencing, work approval, competencies, transfer-credit rules, RAPIDS, and compliance.', image: '/images/pages/academic-integrity-hero.webp' },
     { href: '/host-shop/dashboard/match-requests', title: 'Match requests', detail: 'Review apprentice placement requests for your shop.', image: '/images/pages/workone-packet-2.webp' },
     { href: '/host-shop/dashboard/attendance/record', title: 'Record attendance', detail: 'Record attendance against the active apprentice placement.', image: '/images/pages/program-holder-page-1.webp' },
     { href: '/host-shop/dashboard/wages', title: 'Wage compliance', detail: 'Verify actual wages against the registered occupation and employer-specific RAPIDS schedule.', image: '/images/pages/admin-wioa-hero.webp' },
     { href: '/host-shop/dashboard/reports', title: 'Reporting center', detail: 'Review documented work, competencies, attendance, RTI, and compliance records.', image: '/images/heroes/lms-analytics.webp' },
-    { href: '/host-shop/dashboard/profile', title: 'Shop profile', detail: 'Maintain the approved shop profile, logo, flyer, and operating information.', image: '/images/pages/admin-signatures-hero.webp' },
+    { href: '/host-shop/dashboard/profile', title: 'Shop profile', detail: 'Maintain the approved shop profile, logo, flyer, and operating information.', image: '/images/pages/about-employer-partners.webp' },
   ];
 
   return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">

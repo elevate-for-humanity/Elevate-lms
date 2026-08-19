@@ -1,14 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
-import { getStripe, stripe } from '@/lib/stripe/client';
+import { stripe } from '@/lib/stripe/client';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { withRuntime } from '@/lib/api/withRuntime';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
 const webhookSecret =
@@ -27,43 +26,36 @@ async function _POST(request: Request) {
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    } catch (error) {
+    } catch {
       return NextResponse.json(
-        {
-          error: `Webhook Error: ${'Internal server error'}`,
-        },
+        { error: 'Webhook Error: Internal server error' },
         { status: 400 },
       );
     }
 
     const supabase = await createClient();
 
-    // Idempotency check
-    if (supabase) {
-      const { data: existing } = await supabase
-        .from('stripe_webhook_events')
-        .select('id')
-        .eq('stripe_event_id', event.id)
-        .maybeSingle();
+    const { data: existing } = await supabase
+      .from('stripe_webhook_events')
+      .select('id')
+      .eq('stripe_event_id', event.id)
+      .maybeSingle();
 
-      if (existing) {
-        return NextResponse.json({ received: true, duplicate: true });
-      }
-
-      await supabase
-        .from('stripe_webhook_events')
-        .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
-        .then(()=>{}, ()=>{});
+    if (existing) {
+      return NextResponse.json({ received: true, duplicate: true });
     }
 
-    // Handle the event
+    await supabase
+      .from('stripe_webhook_events')
+      .insert({ stripe_event_id: event.id, event_type: event.type, status: 'processing' })
+      .then(() => {}, () => {});
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const donationId = session.metadata?.donation_id;
 
         if (donationId) {
-          // Update donation status
           await supabase
             .from('donations')
             .update({
@@ -74,7 +66,6 @@ async function _POST(request: Request) {
             })
             .eq('id', donationId);
 
-          // Get donation details for receipt
           const { data: donation } = await supabase
             .from('donations')
             .select('*')
@@ -82,7 +73,6 @@ async function _POST(request: Request) {
             .maybeSingle();
 
           if (donation && !donation.receipt_sent) {
-            // Send receipt email
             await supabase.from('email_queue').insert({
               to_email: donation.donor_email,
               from_email: PLATFORM_DEFAULTS.emailFromAddress,
@@ -98,7 +88,6 @@ async function _POST(request: Request) {
               related_id: donation.id,
             });
 
-            // Mark receipt as sent
             await supabase
               .from('donations')
               .update({
@@ -108,7 +97,6 @@ async function _POST(request: Request) {
               .eq('id', donationId);
           }
 
-          // Track conversion
           if (donation?.user_id) {
             await supabase.from('conversions').insert({
               user_id: donation.user_id,
@@ -122,8 +110,6 @@ async function _POST(request: Request) {
 
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-
-        // Find donation by payment intent
         const { data: donation } = await supabase
           .from('donations')
           .select('id')
@@ -133,10 +119,7 @@ async function _POST(request: Request) {
         if (donation) {
           await supabase
             .from('donations')
-            .update({
-              payment_status: 'failed',
-              updated_at: new Date().toISOString(),
-            })
+            .update({ payment_status: 'failed', updated_at: new Date().toISOString() })
             .eq('id', donation.id);
         }
         break;
@@ -144,8 +127,6 @@ async function _POST(request: Request) {
 
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
-
-        // Find donation by payment intent
         const { data: donation } = await supabase
           .from('donations')
           .select('id')
@@ -155,10 +136,7 @@ async function _POST(request: Request) {
         if (donation) {
           await supabase
             .from('donations')
-            .update({
-              payment_status: 'refunded',
-              updated_at: new Date().toISOString(),
-            })
+            .update({ payment_status: 'refunded', updated_at: new Date().toISOString() })
             .eq('id', donation.id);
         }
         break;
@@ -166,8 +144,6 @@ async function _POST(request: Request) {
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
-
-        // Find donation by subscription ID
         const { data: donation } = await supabase
           .from('donations')
           .select('id')
@@ -177,23 +153,22 @@ async function _POST(request: Request) {
         if (donation) {
           await supabase
             .from('donations')
-            .update({
-              payment_status: 'cancelled',
-              updated_at: new Date().toISOString(),
-            })
+            .update({ payment_status: 'cancelled', updated_at: new Date().toISOString() })
             .eq('id', donation.id);
         }
         break;
       }
 
       default:
+        break;
     }
 
     return NextResponse.json({ received: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }
+
 export const POST = withRuntime(
-  withApiAudit('/api/donations/webhook', _POST, { actor_type: 'webhook', skip_body: true }),
+  withApiAudit('/api/donate/webhook', _POST, { actor_type: 'webhook', skip_body: true }),
 );

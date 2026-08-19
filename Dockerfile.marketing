@@ -25,9 +25,11 @@ COPY packages/db/package.json ./packages/db/package.json
 COPY packages/shared/package.json ./packages/shared/package.json
 COPY packages/ui/package.json ./packages/ui/package.json
 
-# Keep the dependency graph identical to source control. Mutating package.json
-# inside the image before a frozen install creates a manifest/lockfile mismatch
-# and makes production builds non-reproducible.
+# Marketing does not use the ffmpeg-static binary at runtime. The repository's
+# last known-good Northflank recovery removed it from pnpm's allowed build
+# scripts because its GitHub-hosted postinstall download repeatedly failed with
+# ECONNRESET/socket-hang-up and blocked otherwise valid images.
+RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder

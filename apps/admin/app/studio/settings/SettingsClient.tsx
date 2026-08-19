@@ -39,13 +39,12 @@ export default function SettingsClient() {
       detail: supabaseConfigured ? 'Canonical Supabase client configured' : 'Supabase unavailable',
     });
 
-    // Server-side health endpoint — granular provider + shell checks
+    // Canonical Admin-owned Dev Studio health endpoint — granular provider + shell checks
     try {
-      const res = await fetch('/api/devstudio/health');
+      const res = await fetch('/api/admin/dev-studio/health');
       if (!res.ok) throw new Error(await res.text());
       const health: HealthStatus = await res.json();
 
-      // AI Providers
       results.push({
         name: 'Groq',
         status: health.hasGroq ? 'healthy' : 'offline',
@@ -66,8 +65,6 @@ export default function SettingsClient() {
         status: health.hasAnthropic ? 'healthy' : 'offline',
         detail: health.hasAnthropic ? 'API key configured' : 'ANTHROPIC_API_KEY missing',
       });
-
-      // Infrastructure
       results.push({
         name: 'GitHub Token',
         status: health.hasGitHub ? 'healthy' : 'offline',
@@ -83,7 +80,7 @@ export default function SettingsClient() {
             : 'Not configured',
       });
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to reach /api/devstudio/health');
+      setError(e instanceof Error ? e.message : 'Failed to reach /api/admin/dev-studio/health');
       results.push({
         name: 'Dev Studio API',
         status: 'offline',
@@ -91,7 +88,9 @@ export default function SettingsClient() {
       });
     }
 
-    // Northflank connectivity check
+    // Northflank connectivity check. This endpoint is retained until its
+    // namespace is independently consolidated; do not couple that migration
+    // to the already-proven health route migration.
     try {
       const res = await fetch('/api/devstudio/builds');
       if (res.ok) {
@@ -164,7 +163,6 @@ export default function SettingsClient() {
           </div>
         )}
 
-        {/* Health Checks */}
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-slate-50 to-white px-6 py-4 border-b border-slate-100">
             <h2 className="text-sm font-bold text-slate-900">Service Health</h2>
@@ -207,7 +205,6 @@ export default function SettingsClient() {
           </div>
         </div>
 
-        {/* Deployment Info */}
         <div className="rounded-2xl border border-slate-200 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm">
           <h2 className="text-sm font-bold text-slate-900 mb-4">Deployment Configuration</h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -219,7 +216,7 @@ export default function SettingsClient() {
             <div className="rounded-xl bg-white border border-slate-200 p-4">
               <p className="text-xs text-slate-500 mb-1">LMS Service</p>
               <p className="font-mono text-sm font-bold text-emerald-700">elevate-lms</p>
-              <p className="text-xs text-slate-400 mt-1">www.elevateforhumanity.org</p>
+              <p className="text-xs text-slate-400 mt-1">app.elevateforhumanity.org</p>
             </div>
             <div className="rounded-xl bg-white border border-slate-200 p-4">
               <p className="text-xs text-slate-500 mb-1">Database</p>
@@ -236,7 +233,7 @@ export default function SettingsClient() {
       </div>
       {checks.length === 0 && !loading && !error && (
         <p className="py-8 text-center text-sm text-slate-500">
-          Health check unavailable — verify /api/devstudio/health endpoint is deployed
+          Health check unavailable — verify /api/admin/dev-studio/health endpoint is deployed
         </p>
       )}
     </div>

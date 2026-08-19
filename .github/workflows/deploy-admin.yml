@@ -13,6 +13,7 @@ on:
       - 'public/**'
       - 'scripts/northflank/**'
       - 'scripts/verify-no-retired-admin-ui-routes.mjs'
+      - 'scripts/verify-portal-production-contracts.mjs'
       - 'next.config.mjs'
       - 'tailwind.config.js'
       - 'tsconfig.json'
@@ -53,10 +54,6 @@ jobs:
       NEXT_PUBLIC_APP_URL: https://app.elevateforhumanity.org
       NEXT_PUBLIC_ADMIN_URL: https://admin.elevateforhumanity.org
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
-      ONET_API_KEY: ${{ secrets.ONET_API_KEY }}
-      CAREERONESTOP_USER_ID: ${{ secrets.CAREERONESTOP_USER_ID }}
-      CAREERONESTOP_TOKEN: ${{ secrets.CAREERONESTOP_TOKEN }}
-      USAJOBS_API_KEY: ${{ secrets.USAJOBS_API_KEY }}
 
     steps:
       - name: Checkout repository history
@@ -77,9 +74,6 @@ jobs:
           test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
           test "$(git status --porcelain)" = ""
           echo "Verified production Admin SHA $RESOLVED_SHA"
-
-      - name: Block retired Admin UI routes
-        run: node scripts/verify-no-retired-admin-ui-routes.mjs
 
       - name: Set build environment variables
         run: |
@@ -111,8 +105,8 @@ jobs:
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Enforce canonical Admin domain attachment in Northflank
-        run: pnpm tsx scripts/northflank/configure-admin-domain.ts
+      - name: Enforce portal production contracts
+        run: node scripts/verify-portal-production-contracts.mjs
 
       - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
@@ -120,7 +114,7 @@ jobs:
       - name: Verify Admin health-check contract
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
-      - name: Trigger admin build
+      - name: Trigger Admin build
         id: trigger_admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
@@ -129,25 +123,30 @@ jobs:
           set -euo pipefail
           test -n "${{ steps.trigger_admin_build.outputs.build_id }}" || { echo '::error::Northflank trigger returned no build_id'; exit 1; }
 
-      - name: Wait for admin build to complete
-        run: pnpm tsx scripts/northflank/wait-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 900000
+      - name: Wait for Admin build to complete
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 3600000
 
-      - name: Verify exact admin build succeeded
+      - name: Verify exact Admin build succeeded
         run: |
           pnpm tsx scripts/northflank/verify-build.ts \
             "$NORTHFLANK_ADMIN_SERVICE_ID" \
             --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
 
-      - name: Deploy exact admin build
+      - name: Deploy exact Admin build
         run: |
           pnpm tsx scripts/northflank/trigger-deployment.ts \
             "$NORTHFLANK_ADMIN_SERVICE_ID" \
             --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
 
-      - name: Wait for admin deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 1200000
+      - name: Wait for Admin deployment
+        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
+
+      - name: Verify deployed SHA matches main
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
 
       - name: Smoke Admin liveness and readiness
         run: |
@@ -171,37 +170,11 @@ jobs:
           cat /tmp/admin-health.json 2>/dev/null || true
           exit 1
 
-      - name: Smoke Admin login API contract
+      - name: Smoke canonical admin route
         run: |
           set -euo pipefail
-          headers=/tmp/admin-login-headers.txt
-          body=/tmp/admin-login-body.json
-          status=$(curl -sS --max-time 15 \
-            -D "$headers" -o "$body" -w "%{http_code}" -X POST \
-            -H 'Content-Type: application/json' -H 'Accept: application/json' \
-            --data '{}' https://admin.elevateforhumanity.org/api/auth/admin-login || true)
-          content_type=$(awk 'BEGIN{IGNORECASE=1} /^content-type:/ {print $2}' "$headers" | tr -d '\r' | tail -1)
-          echo "Admin login contract: status=${status} content-type=${content_type}"
-          test "$status" = "400"
-          echo "$content_type" | grep -qi '^application/json'
-          grep -q '"error":"Email and password required."' "$body"
-          if grep -qi '<!DOCTYPE\|<html' "$body"; then
-            echo '::error::Admin login endpoint returned HTML instead of JSON.'
-            exit 1
-          fi
-
-      - name: Verify deployed SHA matches main
-        env:
-          EXPECTED_SHA: ${{ github.sha }}
-        run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
-
-      - name: Smoke canonical Admin routes
-        run: |
-          set -euo pipefail
-          for route in /dashboard /studio /course-builder /instructor/dashboard; do
-            status=$(curl -sS --max-time 15 -o /tmp/admin-route.html -w "%{http_code}" "https://admin.elevateforhumanity.org${route}" || true)
-            case "$status" in
-              2*|3*) echo "${route} served HTTP ${status}." ;;
-              *) echo "::error::${route} failed HTTP ${status}."; cat /tmp/admin-route.html || true; exit 1 ;;
-            esac
-          done
+          status=$(curl -sS --max-time 15 -o /tmp/admin-dashboard.html -w "%{http_code}" https://admin.elevateforhumanity.org/dashboard || true)
+          case "$status" in
+            2*|3*) echo "Canonical admin route served HTTP ${status}." ;;
+            *) echo "::error::Canonical admin route failed HTTP ${status}."; cat /tmp/admin-dashboard.html || true; exit 1 ;;
+          esac

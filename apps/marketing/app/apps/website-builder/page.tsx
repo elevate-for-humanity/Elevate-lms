@@ -10,73 +10,63 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Website Builder | Elevate Apps',
-  description: 'Create, edit, preview, and publish training-provider websites.',
+  description: 'Create, edit, preview, and publish AI-built websites.',
   robots: { index: false, follow: false },
 };
 
+function interviewPending(config: unknown) {
+  const meta = config && typeof config === 'object' && (config as any).meta && typeof (config as any).meta === 'object'
+    ? (config as any).meta
+    : {};
+  return meta.parisInterviewCompleted === false;
+}
+
 export default async function WebsiteBuilderPage() {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect('/login?redirect=/apps/website-builder&message=login-required');
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/apps/website-builder&message=login-required');
 
   let subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
-
   if (!subscription) {
     const trial = await startAppTrial(user.id, 'website-builder', supabase);
-    if (trial.status === 'error') {
-      redirect('/store/apps/website-builder?error=trial-start-failed');
-    }
+    if (trial.status === 'error') redirect('/store/apps/website-builder?error=trial-start-failed');
     subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
   }
+  if (!subscription) redirect('/store/apps/website-builder?error=subscription-unavailable');
 
-  if (!subscription) {
-    redirect('/store/apps/website-builder?error=subscription-unavailable');
+  if (subscription.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
+    redirect('/store/apps/website-builder?expired=true');
   }
-
-  if (subscription.status === 'trial' && subscription.trial_ends_at) {
-    const trialEnd = new Date(subscription.trial_ends_at);
-    if (trialEnd < new Date()) {
-      redirect('/store/apps/website-builder?expired=true');
-    }
-  }
-
   if (subscription.status !== 'trial' && subscription.status !== 'active') {
     redirect(`/store/apps/website-builder?status=${encodeURIComponent(subscription.status || 'inactive')}`);
   }
 
   let trialDaysRemaining = 0;
   if (subscription.status === 'trial' && subscription.trial_ends_at) {
-    const trialEnd = new Date(subscription.trial_ends_at);
-    trialDaysRemaining = Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    trialDaysRemaining = Math.ceil((new Date(subscription.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   }
 
-  // user_websites.site_config is the canonical tenant-site content model.
-  // website_pages belongs to the admin content system and is intentionally not
-  // joined here, avoiding a second competing page-count source of truth.
-  const { data: websites } = await supabase
+  const { data: rawWebsites } = await supabase
     .from('user_websites')
-    .select('id, site_name, subdomain, is_published, updated_at')
+    .select('id, site_name, subdomain, is_published, updated_at, site_config')
     .eq('user_id', user.id)
     .order('updated_at', { ascending: false });
 
+  // Workspace trials intentionally contain an internal placeholder row so the
+  // organization and future site share one identity. It is not a customer site
+  // until PARIS completes the interview, so do not let it suppress onboarding.
+  const websites = (rawWebsites || [])
+    .filter((site) => !interviewPending(site.site_config))
+    .map(({ site_config: _siteConfig, ...site }) => site);
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Store', href: '/store/apps' }, { label: 'Website Builder' }]} />
         </div>
       </div>
-      <WebsiteBuilderApp
-        user={user}
-        subscription={subscription}
-        websites={websites || []}
-        trialDaysRemaining={trialDaysRemaining}
-      />
+      <WebsiteBuilderApp user={user} subscription={subscription} websites={websites} trialDaysRemaining={trialDaysRemaining} />
     </div>
   );
 }

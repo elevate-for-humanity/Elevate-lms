@@ -34,6 +34,13 @@ FROM base AS builder
 
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
+ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
+ARG NEXT_PUBLIC_APP_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_LMS_URL=https://app.elevateforhumanity.org
+ARG NEXT_PUBLIC_ADMIN_URL=https://admin.elevateforhumanity.org
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ENV NODE_ENV=production
 ENV CI=true
@@ -46,9 +53,20 @@ ENV NEXT_PUBLIC_GIT_SHA=$NF_GIT_SHA
 ENV NEXT_PUBLIC_BUILD_ID="marketing-$NF_GIT_SHA"
 ENV NEXT_PUBLIC_COMMIT_SHA=$NF_GIT_SHA
 ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_PUBLIC_SITE_URL=$NEXT_PUBLIC_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_LMS_URL=$NEXT_PUBLIC_LMS_URL
+ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
+
+RUN test -n "$NEXT_PUBLIC_SUPABASE_URL" \
+    && test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+    && echo "Marketing public build arguments verified"
 
 # Website Builder defaults and shared authenticated portal contracts are release
 # invariants. Stop the image before compilation if fake seeded claims or stale

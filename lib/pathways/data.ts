@@ -1,4 +1,4 @@
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { PROGRAMS } from '@/lib/programs/canonical-data';
 
 export type PathwayFunding =
@@ -39,7 +39,8 @@ export type Pathway = {
   stages: PathwayStage[];
 };
 
-const REGISTERED_BARBER = RAPIDS_CONFIG.programs.barber;
+const REGISTERED_BARBER = getRegisteredProgramStandard('barber-apprenticeship');
+if (!REGISTERED_BARBER) throw new Error('REGISTERED_BARBER_STANDARD_MISSING');
 const BARBER = PROGRAMS['barber-apprenticeship'];
 
 export const PATHWAYS: Pathway[] = [
@@ -85,7 +86,7 @@ export const PATHWAYS: Pathway[] = [
       {
         stage: 2,
         title: 'Competency-Based Apprenticeship',
-        description: `Complete supervised work/OJL evidence, all ${REGISTERED_BARBER.competencies.length} registered competency requirements, and ${BARBER.relatedInstructionHours} verified hours of Related Technical Instruction through assigned coursework. Work/OJL hours are auditable evidence and are not a fixed DOL completion denominator.`,
+        description: `Complete supervised work/OJL evidence, all ${REGISTERED_BARBER.completion.competencyCount} registered competency requirements, and ${REGISTERED_BARBER.completion.requiredRtiHours} verified hours of Related Technical Instruction through assigned coursework. Work/OJL hours are auditable evidence and are not a fixed DOL completion denominator.`,
         duration: 'Varies by verified competency progression, RTI completion, approved work schedule, and host-shop placement',
       },
       {
@@ -181,50 +182,10 @@ export const PATHWAYS: Pathway[] = [
     ctaHref: '/programs/cybersecurity-analyst',
     stages: [
       { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
-      { stage: 2, title: 'Security Training', description: 'Complete assigned security, threat, vulnerability, incident-response, and compliance coursework.', duration: 'Program schedule' },
+      { stage: 2, title: 'Technical Training', description: 'Complete assigned security, networking, systems, incident-response, and defensive-operations coursework.', duration: 'Program schedule' },
       { stage: 3, title: 'Credential Exam', description: 'Complete the credential exam assigned to the current program.', duration: 'Testing schedule' },
       { stage: 4, title: 'Job Placement', description: 'Use resume, interview, and employer-connection support.' },
-      { stage: 5, title: 'Advancement', description: 'Continue into more advanced cybersecurity roles and credentials.' },
-    ],
-  },
-  {
-    slug: 'welding',
-    title: 'Welding',
-    industry: 'Skilled Trades',
-    format: 'In-Person',
-    funding: ['WIOA Adult/DW', 'WRG', 'Employer-Sponsored'],
-    duration: 'See current program schedule',
-    location: 'Indianapolis, IN',
-    outcomes: ['Welder', 'Fabricator', 'Manufacturing/Construction Pathway'],
-    credential: 'Assigned welding/safety credential pathway',
-    credentialIssuer: 'Applicable credentialing bodies',
-    ctaHref: '/programs/welding',
-    stages: [
-      { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
-      { stage: 2, title: 'Welding Training', description: 'Complete assigned safety, welding-process, blueprint, fabrication, and shop training.', duration: 'Program schedule' },
-      { stage: 3, title: 'Credential Assessment', description: 'Complete assigned program credential assessments.', duration: 'Testing schedule' },
-      { stage: 4, title: 'Employer Placement', description: 'Use employer-connection and career-services support.' },
-      { stage: 5, title: 'Advancement', description: 'Pursue advanced welding processes and credentials as appropriate.' },
-    ],
-  },
-  {
-    slug: 'electrical',
-    title: 'Electrical',
-    industry: 'Skilled Trades',
-    format: 'Hybrid',
-    funding: ['WIOA Adult/DW', 'WRG', 'Employer-Sponsored'],
-    duration: 'See current program schedule',
-    location: 'Indianapolis, IN',
-    outcomes: ['Electrical Helper', 'Electrical Apprentice', 'Maintenance Electrical Pathway'],
-    credential: 'Assigned electrical/safety credential pathway',
-    credentialIssuer: 'Applicable credentialing bodies',
-    ctaHref: '/programs/electrical',
-    stages: [
-      { stage: 1, title: 'Eligibility Screening', description: 'Complete admissions and applicable funding steps.', duration: 'Varies' },
-      { stage: 2, title: 'Electrical Training', description: 'Complete assigned theory, code, wiring, conduit, troubleshooting, and safety training.', duration: 'Program schedule' },
-      { stage: 3, title: 'Credential Assessment', description: 'Complete assigned program credential assessments.', duration: 'Testing schedule' },
-      { stage: 4, title: 'Employer Placement', description: 'Use employer-connection and career-services support.' },
-      { stage: 5, title: 'Advancement', description: 'Continue into registered apprenticeship or advanced electrical pathways as appropriate.' },
+      { stage: 5, title: 'Advancement', description: 'Continue into advanced security, cloud, network, or governance pathways.' },
     ],
   },
 ];

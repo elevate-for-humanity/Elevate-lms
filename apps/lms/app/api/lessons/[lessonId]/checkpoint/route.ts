@@ -1,10 +1,9 @@
 /**
  * POST /api/lessons/[lessonId]/checkpoint
  *
- * Records a checkpoint/quiz/exam attempt via the engine's
- * recordCheckpointAttempt function. Returns pass/fail and attempt number.
- *
- * Body: { courseId, moduleOrder, score, passingScore, answers? }
+ * Records a checkpoint/quiz/exam attempt. The server is authoritative for
+ * scoring: clients submit answers only; score and passing threshold are loaded
+ * from the canonical lesson assessment contract.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,10 +14,48 @@ import { recordCheckpointAttempt } from '@/lib/lms/engine';
 import { logger } from '@/lib/logger';
 import { assertLessonAccess, accessErrorResponse } from '@/lib/lms/access-control';
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { sendTeamsMessage } from '@/lib/notifications/teams';
-export const runtime = 'nodejs';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+type StoredQuizQuestion = {
+  id?: string;
+  prompt?: string;
+  question?: string;
+  options?: string[];
+  correctAnswer?: number | string | boolean;
+};
+
+function scoreAnswers(questions: StoredQuizQuestion[], answers: Record<string, number>): number {
+  if (!questions.length) throw new Error('Assessment has no questions');
+
+  let correct = 0;
+  questions.forEach((question, index) => {
+    const questionId = String(question.id ?? index);
+    const selectedIndex = answers[questionId];
+    if (!Number.isInteger(selectedIndex)) return;
+
+    const options = Array.isArray(question.options) ? question.options : [];
+    const expected = question.correctAnswer;
+    if (typeof expected === 'number') {
+      if (selectedIndex === expected) correct += 1;
+      return;
+    }
+    if (typeof expected === 'boolean') {
+      const selected = options[selectedIndex] ?? (selectedIndex === 0 ? 'True' : selectedIndex === 1 ? 'False' : '');
+      if (selected.toLowerCase() === String(expected).toLowerCase()) correct += 1;
+      return;
+    }
+    if (typeof expected === 'string') {
+      const selected = options[selectedIndex];
+      if (selected !== undefined && selected.trim() === expected.trim()) correct += 1;
+    }
+  });
+
+  return Math.round((correct / questions.length) * 100);
+}
 
 export async function POST(
   request: NextRequest,
@@ -28,9 +65,7 @@ export async function POST(
   if (rateLimited) return rateLimited;
 
   const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { lessonId } = await params;
 
@@ -43,9 +78,7 @@ export async function POST(
 
   let body: {
     courseId: string;
-    moduleOrder: number;
-    score: number;
-    passingScore: number;
+    moduleOrder?: number;
     answers?: Record<string, number>;
   };
 
@@ -55,29 +88,11 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { courseId, moduleOrder, score, passingScore, answers } = body;
-
-  if (!courseId || moduleOrder === undefined || score === undefined || passingScore === undefined) {
-    return NextResponse.json(
-      { error: 'Missing required fields: courseId, moduleOrder, score, passingScore' },
-      { status: 400 },
-    );
+  const { courseId, moduleOrder = 0, answers = {} } = body;
+  if (!courseId) {
+    return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
   }
 
-  if (typeof score !== 'number' || score < 0 || score > 100) {
-    return NextResponse.json(
-      { error: 'score must be a number between 0 and 100' },
-      { status: 400 },
-    );
-  }
-
-  // assertLessonAccess checks the module unlock rule, but module-1 lessons are
-  // always unlocked (no prior module to gate on), so unenrolled users pass that
-  // check. Verify enrollment explicitly before writing checkpoint_scores.
-  //
-  // Status set must match the lesson-complete route so learners with
-  // 'enrolled', 'in_progress', or 'confirmed' status are not blocked here
-  // after being allowed to complete lessons.
   const supabase = await createClient();
   const { data: enrollment } = await supabase
     .from('program_enrollments')
@@ -92,6 +107,33 @@ export async function POST(
   }
 
   try {
+    const db = await requireAdminClient();
+    const { data: lesson, error: lessonError } = await db
+      .from('course_lessons')
+      .select('id, course_id, lesson_type, passing_score, quiz_questions, is_published')
+      .eq('id', lessonId)
+      .eq('course_id', courseId)
+      .maybeSingle();
+
+    if (lessonError || !lesson || !lesson.is_published) {
+      return NextResponse.json({ error: 'Published assessment not found' }, { status: 404 });
+    }
+    if (!['checkpoint', 'quiz', 'exam'].includes(String(lesson.lesson_type))) {
+      return NextResponse.json({ error: 'Lesson is not an assessment' }, { status: 400 });
+    }
+
+    const questions = Array.isArray(lesson.quiz_questions)
+      ? (lesson.quiz_questions as StoredQuizQuestion[])
+      : [];
+    if (!questions.length) {
+      return NextResponse.json({ error: 'Assessment questions are not configured' }, { status: 409 });
+    }
+
+    const score = scoreAnswers(questions, answers);
+    const passingScore = Number.isFinite(Number(lesson.passing_score))
+      ? Math.max(0, Math.min(100, Number(lesson.passing_score)))
+      : 80;
+
     const result = await recordCheckpointAttempt(
       user.id,
       lessonId,
@@ -99,11 +141,10 @@ export async function POST(
       moduleOrder,
       score,
       passingScore,
-      answers ?? {},
-      { supabase },
+      answers,
     );
 
-    logger.info('[checkpoint] Attempt recorded', {
+    logger.info('[checkpoint] Server-scored attempt recorded', {
       userId: user.id,
       lessonId,
       courseId,
@@ -112,7 +153,6 @@ export async function POST(
       attemptNumber: result.attemptNumber,
     });
 
-    // Teams alert on checkpoint fail (at-risk signal) — non-fatal, only if Teams is configured
     if (!result.passed) {
       sendTeamsMessage(
         'Checkpoint Failed',
@@ -120,7 +160,7 @@ export async function POST(
         {
           'User ID': user.id,
           'Lesson ID': lessonId,
-          'Course ID': courseId ?? 'Unknown',
+          'Course ID': courseId,
           Score: `${score}% (passing: ${passingScore}%)`,
           Attempt: String(result.attemptNumber),
         },

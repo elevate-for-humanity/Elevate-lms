@@ -21,7 +21,7 @@ ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
 
-RUN echo "nf-cache-invalidate-lms-2026-08-19-workspace-manifests"
+RUN echo "nf-cache-invalidate-lms-2026-08-19-webpack-cache-recovery"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -67,6 +67,10 @@ ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=LMS
 ENV CI=true
+# Proven Northflank recovery setting: do not persist Next/webpack filesystem
+# cache between image builds. The app's next.config.mjs honors this switch and
+# disables webpack's filesystem cache for deterministic container builds.
+ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false

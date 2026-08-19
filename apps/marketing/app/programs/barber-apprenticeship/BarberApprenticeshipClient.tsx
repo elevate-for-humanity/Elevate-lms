@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   ArrowRight,
   CheckCircle2,
-  Clock3,
   GraduationCap,
   Scissors,
   ShieldCheck,
@@ -16,7 +15,7 @@ import type { HeroBannerConfig } from '@/content/heroBanners';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { ACTIVE_BNPL_PROVIDERS } from '@/lib/bnpl-config';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
@@ -29,9 +28,10 @@ interface Props {
   enrollmentCount?: number;
 }
 
-const RAPIDS = RAPIDS_CONFIG.programs.barber;
-const RTI_HOURS = RAPIDS.relatedInstructionHours;
-const COMPETENCY_COUNT = RAPIDS.competencyCount;
+const REGISTERED_BARBER = getRegisteredProgramStandard('barber-apprenticeship');
+if (!REGISTERED_BARBER) throw new Error('REGISTERED_BARBER_STANDARD_MISSING');
+const RTI_HOURS = REGISTERED_BARBER.completion.requiredRtiHours;
+const COMPETENCY_COUNT = REGISTERED_BARBER.completion.competencyCount;
 
 export default function BarberApprenticeshipClient({
   program,
@@ -113,7 +113,7 @@ export default function BarberApprenticeshipClient({
             ))}
           </div>
           <p className="mt-5 text-sm leading-6 text-slate-800">
-            RAPIDS {RAPIDS.rapidsCode} is competency-based. Supervised work hours, attendance, placement, wage records, and location evidence remain part of the apprenticeship record, but DOL completion is controlled by all {COMPETENCY_COUNT} verified competencies plus {RTI_HOURS} verified RTI hours.{' '}
+            RAPIDS {REGISTERED_BARBER.standard.rapidsCode} is competency-based. Supervised work hours, attendance, placement, wage records, and location evidence remain part of the apprenticeship record, but DOL completion is controlled by all {COMPETENCY_COUNT} verified competencies plus {RTI_HOURS} verified RTI hours.{' '}
             {enrollmentCount > 0
               ? `${enrollmentCount} current enrollment records are reflected in the platform.`
               : 'Enrollment is currently available subject to host-shop placement and program review.'}

@@ -10,7 +10,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }));
 
-  const shops = await listPublicHostShops();
+  // Dynamic host-shop routes improve SEO when the production database is
+  // available, but a public sitemap must never make the entire Marketing image
+  // depend on a privileged service-role secret during Next.js prerendering.
+  // Build/preview environments therefore fall back to the canonical static
+  // registry; production requests can still enrich the sitemap at runtime.
+  let shops: Awaited<ReturnType<typeof listPublicHostShops>> = [];
+  try {
+    shops = await listPublicHostShops();
+  } catch {
+    shops = [];
+  }
+
   const hostShopRoutes: MetadataRoute.Sitemap = shops.map((shop) => ({
     url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.public_slug}`,
     lastModified: new Date(shop.public_profile_published_at || new Date().toISOString()),

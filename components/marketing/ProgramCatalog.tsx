@@ -28,9 +28,9 @@ const programs = [
     name: 'HVAC Technician',
     summary:
       'Heating, cooling, and refrigeration training to step into in-demand skilled trades roles.',
-    meta: '12 weeks · Skilled Trades',
+    meta: '6 weeks · Skilled Trades',
     href: '/programs/hvac-technician',
-    applyHref: '/programs/hvac-technician/apply',
+    applyHref: '/apply/student?program=hvac-technician',
     funding: 'WIOA / WRG Eligible',
     price: null,
   },

@@ -1,6 +1,14 @@
 /**
- * Single loader for /programs/[program] — static schema first, then registry, then DB.
- * Every resolved program renders through ProgramDetailPage (no legacy inline templates).
+ * Single loader for /programs/[program].
+ *
+ * Ownership order:
+ * 1. Full static schema for the exact slug.
+ * 2. Published Supabase row + its explicit canonical public-page mapping.
+ * 3. Legacy repository aliases/registry.
+ * 4. Database fallback.
+ *
+ * This order is intentional. A published Supabase program must never be silently
+ * collapsed into a different legacy alias before its page mapping is considered.
  */
 
 import { getStaticProgram, normalizePublicProgram } from '@/data/programs/index';
@@ -21,6 +29,16 @@ export type LoadedProgramPage = {
   synthesized: boolean;
 };
 
+type PublishedDbProgramRow = DbProgramRow & {
+  published?: boolean | null;
+  is_active?: boolean | null;
+  status?: string | null;
+  lms_config?: {
+    canonical_public_slug?: string;
+    public_page_path?: string;
+  } | null;
+};
+
 function withCanonicalProgramMedia(program: ProgramSchema, slug: string): ProgramSchema {
   return normalizePublicProgram({
     ...program,
@@ -29,28 +47,82 @@ function withCanonicalProgramMedia(program: ProgramSchema, slug: string): Progra
   });
 }
 
+async function fetchPublishedDbProgram(slug: string): Promise<PublishedDbProgramRow | null> {
+  const db = createPublicClient();
+  if (!db) return null;
+
+  const { data: row } = await db
+    .from('programs')
+    .select(
+      'slug,title,description,short_description,credential,duration_weeks,image_url,category,published,is_active,status,lms_config',
+    )
+    .eq('slug', slug)
+    .maybeSingle();
+
+  if (!row) return null;
+  if (row.published !== true || row.is_active !== true || row.status === 'archived') return null;
+  return row as PublishedDbProgramRow;
+}
+
+async function loadPublishedMappedProgram(
+  rawSlug: string,
+): Promise<LoadedProgramPage | null> {
+  const row = await fetchPublishedDbProgram(rawSlug);
+  if (!row) return null;
+
+  const mappedSlug =
+    row.lms_config?.canonical_public_slug?.toLowerCase().trim() || rawSlug;
+
+  if (isArchivedProgramSlug(mappedSlug)) return null;
+
+  if (mappedSlug !== rawSlug) {
+    const mappedStatic = getStaticProgram(mappedSlug);
+    if (mappedStatic) {
+      return {
+        program: withCanonicalProgramMedia(mappedStatic, mappedStatic.slug),
+        synthesized: false,
+      };
+    }
+
+    const mappedRow = await fetchPublishedDbProgram(mappedSlug);
+    if (mappedRow) {
+      return {
+        program: withCanonicalProgramMedia(
+          buildProgramSchemaFromDb(mappedRow as DbProgramRow),
+          mappedSlug,
+        ),
+        synthesized: true,
+      };
+    }
+
+    const mappedRegistry = resolveProgram(mappedSlug);
+    if (mappedRegistry?.active) {
+      return {
+        program: withCanonicalProgramMedia(
+          buildProgramSchemaFromRegistry(mappedRegistry),
+          mappedRegistry.slug,
+        ),
+        synthesized: true,
+      };
+    }
+  }
+
+  return {
+    program: withCanonicalProgramMedia(buildProgramSchemaFromDb(row as DbProgramRow), rawSlug),
+    synthesized: true,
+  };
+}
+
 /**
  * Database overlay is only allowed for synthesized registry entries that do not
  * have a full static ProgramSchema. Full static schemas are the public contract
  * for title, description, duration, credentials, pricing and compliance copy.
- * This prevents stale program-table seeds from changing a program page while
- * the catalog is using the canonical static definition.
  */
 async function overlayDbFieldsForSynthesizedProgram(
   program: ProgramSchema,
   slug: string,
 ): Promise<ProgramSchema> {
-  const db = createPublicClient();
-  if (!db) return withCanonicalProgramMedia(program, slug);
-
-  const { data: row } = await db
-    .from('programs')
-    .select(
-      'title, description, short_description, credential, duration_weeks, image_url, category',
-    )
-    .eq('slug', slug)
-    .maybeSingle();
-
+  const row = await fetchPublishedDbProgram(slug);
   if (!row) return withCanonicalProgramMedia(program, slug);
 
   return withCanonicalProgramMedia(
@@ -69,21 +141,13 @@ async function overlayDbFieldsForSynthesizedProgram(
   );
 }
 
-/**
- * Resolve slug → ProgramSchema for the program detail page.
- * Returns null when the slug is not recognized anywhere.
- *
- * Ownership order matters: a full static program definition is authoritative
- * for its own slug. Only slugs without a direct static definition are passed
- * through the legacy alias resolver and, if necessary, the database.
- */
+/** Resolve slug → ProgramSchema for the public program detail page. */
 export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgramPage | null> {
   const normalizedRawSlug = rawSlug.toLowerCase().trim();
 
-  if (isArchivedProgramSlug(normalizedRawSlug)) {
-    return null;
-  }
+  if (isArchivedProgramSlug(normalizedRawSlug)) return null;
 
+  // A complete exact-slug static schema remains the strongest contract.
   const directStaticProgram = getStaticProgram(normalizedRawSlug);
   if (directStaticProgram) {
     return {
@@ -92,11 +156,16 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
     };
   }
 
-  const slug = resolveSlug(normalizedRawSlug) ?? normalizedRawSlug;
+  // Published Supabase rows now own their explicit page mapping before any
+  // historical alias resolution. This is what guarantees every published row
+  // maps to the page recorded in lms_config.public_page_path.
+  const publishedMappedProgram = await loadPublishedMappedProgram(normalizedRawSlug);
+  if (publishedMappedProgram) return publishedMappedProgram;
 
-  if (isArchivedProgramSlug(slug)) {
-    return null;
-  }
+  // Legacy aliases are fallback-only for old inbound links that are not
+  // themselves current published Supabase program slugs.
+  const slug = resolveSlug(normalizedRawSlug) ?? normalizedRawSlug;
+  if (isArchivedProgramSlug(slug)) return null;
 
   const staticProgram = getStaticProgram(slug);
   if (staticProgram) {
@@ -115,22 +184,12 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
     };
   }
 
-  const db = createPublicClient();
-  if (db) {
-    const { data: row } = await db
-      .from('programs')
-      .select(
-        'slug, title, description, short_description, credential, duration_weeks, image_url, category',
-      )
-      .eq('slug', slug)
-      .maybeSingle();
-
-    if (row) {
-      return {
-        program: withCanonicalProgramMedia(buildProgramSchemaFromDb(row as DbProgramRow), slug),
-        synthesized: true,
-      };
-    }
+  const row = await fetchPublishedDbProgram(slug);
+  if (row) {
+    return {
+      program: withCanonicalProgramMedia(buildProgramSchemaFromDb(row as DbProgramRow), slug),
+      synthesized: true,
+    };
   }
 
   return null;

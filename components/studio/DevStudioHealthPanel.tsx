@@ -16,10 +16,17 @@ type HealthPayload = Record<string, unknown> & {
   hasOpenAI?: boolean;
   hasAnthropic?: boolean;
   hasGitHub?: boolean;
-  shell?: {
-    configured?: boolean;
+  supabaseUrlPresent?: boolean;
+  supabaseServiceKeyPresent?: boolean;
+  execution?: {
+    mode?: string;
     ready?: boolean;
-    probe?: { reachable?: boolean; ready?: boolean; status?: string; gitVersion?: string | null };
+    legacyShellRemoved?: boolean;
+  };
+  northflank?: {
+    ready?: boolean;
+    tokenPresent?: boolean;
+    projectIdPresent?: boolean;
   };
 };
 
@@ -59,9 +66,12 @@ export default function DevStudioHealthPanel() {
         ['OpenAI', flag(health.hasOpenAI)],
         ['Anthropic', flag(health.hasAnthropic)],
         ['Gemini', flag(health.hasGemini)],
-        ['Studio shell', health.shell?.ready ? 'connected' : health.shell?.configured ? 'configured, not ready' : 'not configured'],
-        ['Shell probe', String(health.shell?.probe?.status ?? '—')],
-        ['Git in shell', health.shell?.probe?.gitVersion ?? '—'],
+        ['Supabase URL', flag(health.supabaseUrlPresent)],
+        ['Supabase service key', flag(health.supabaseServiceKeyPresent)],
+        ['Execution mode', health.execution?.mode ?? 'admin-native'],
+        ['Dev Studio execution', health.execution?.ready ? 'ready' : 'needs GitHub token'],
+        ['Northflank API', flag(health.northflank?.tokenPresent)],
+        ['Northflank project', flag(health.northflank?.projectIdPresent)],
       ]
     : [];
 
@@ -92,9 +102,9 @@ export default function DevStudioHealthPanel() {
           </div>
         )}
 
-        {health?.shell && !health.shell.ready && (
+        {health?.northflank && (!health.northflank.tokenPresent || !health.northflank.projectIdPresent) && (
           <p className="text-xs leading-relaxed text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-            The <strong>studio shell container</strong> is separate from admin/LMS. Set <code className="rounded bg-white px-1">STUDIO_SHELL_WS_URL</code>, <code className="rounded bg-white px-1">STUDIO_SHELL_SECRET</code>, and <code className="rounded bg-white px-1">STUDIO_TOKEN_SECRET</code> in Dev Studio → Secrets, then deploy the studio service.
+            Dev Studio no longer uses the legacy Studio Shell. Container and deployment controls use Northflank directly. Configure <code className="rounded bg-white px-1">NORTHFLANK_API_TOKEN</code> and <code className="rounded bg-white px-1">NORTHFLANK_PROJECT_ID</code> in the Admin runtime to enable live service controls.
           </p>
         )}
 

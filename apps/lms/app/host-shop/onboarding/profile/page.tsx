@@ -18,7 +18,7 @@ async function loadContext() {
       redirect('/host-shop/login?redirect=/host-shop/onboarding/profile');
     }
     if (code === 'HOST_SHOP_ADMIN_PARTNER_REQUIRED') {
-      redirect('/host-shop/dashboard/board');
+      redirect('/host-shop/dashboard');
     }
     redirect('/unauthorized');
   }
@@ -168,7 +168,7 @@ export default async function HostShopOnboardingProfilePage({
             <button type="submit" className="rounded-xl bg-blue-700 px-6 py-3 font-black text-white hover:bg-blue-800">
               Save and continue to documents
             </button>
-            <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold text-slate-900 hover:bg-slate-50">
+            <Link href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-bold text-slate-900 hover:bg-slate-50">
               Return to dashboard
             </Link>
           </div>

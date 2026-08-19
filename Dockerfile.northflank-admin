@@ -49,7 +49,6 @@ COPY packages ./packages
 # Northflank with ECONNRESET.
 RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
 RUN set -eux; \
-    type -a pnpm; \
     PNPM_BIN="$(command -v pnpm)"; \
     test -n "${PNPM_BIN}"; \
     echo "pnpm=${PNPM_BIN} version=$(pnpm --version)"; \

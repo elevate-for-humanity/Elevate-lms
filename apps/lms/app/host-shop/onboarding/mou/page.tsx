@@ -30,7 +30,7 @@ async function loadContext() {
       redirect('/host-shop/login?redirect=/host-shop/onboarding/mou');
     }
     if (code === 'HOST_SHOP_ADMIN_PARTNER_REQUIRED') {
-      redirect('/host-shop/dashboard/board');
+      redirect('/host-shop/dashboard');
     }
     redirect('/unauthorized');
   }
@@ -172,8 +172,8 @@ export default async function HostShopMouPage({
             <p className="mt-2 text-sm leading-6 text-blue-900">
               You can inspect this Host Shop’s MOU, but only an authorized Host Shop signer can execute it.
             </p>
-            <Link href="/host-shop/dashboard/board" className="mt-4 inline-flex rounded-xl border border-blue-300 bg-white px-5 py-3 font-bold text-blue-950 hover:bg-blue-100">
-              Return to Host Shop board
+            <Link href="/host-shop/dashboard" className="mt-4 inline-flex rounded-xl border border-blue-300 bg-white px-5 py-3 font-bold text-blue-950 hover:bg-blue-100">
+              Return to Host Shop dashboard
             </Link>
           </div>
         ) : (

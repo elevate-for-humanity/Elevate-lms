@@ -1,6 +1,6 @@
 /**
  * PARIS Voice Command System
- * Natural-language voice input with free device/browser spoken responses.
+ * Natural-language voice input with shared natural-TTS spoken responses.
  */
 
 'use client';
@@ -58,25 +58,29 @@ function responseText(data: { message?: string; error?: string; followUp?: strin
   return 'Done';
 }
 
-/** Compatibility helper for callers outside React hooks. Uses the free browser/device voice engine. */
+/** Compatibility helper for non-hook callers. Natural TTS only; React callers use useNaturalVoice for managed fallback. */
 export async function speakResponse(data: { message?: string; error?: string; followUp?: string; result?: unknown }) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
-  const text = responseText(data).trim();
+  if (typeof window === 'undefined') return;
+  const text = responseText(data).trim().slice(0, 2400);
   if (!text) return;
 
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text.slice(0, 2400));
-  const voices = window.speechSynthesis.getVoices();
-  const preferred =
-    voices.find((voice) => /natural|neural|premium|enhanced/i.test(voice.name) && /^en(-|_)/i.test(voice.lang)) ||
-    voices.find((voice) => /^en-US$/i.test(voice.lang)) ||
-    voices.find((voice) => /^en(-|_)/i.test(voice.lang)) ||
-    voices[0];
-  if (preferred) utterance.voice = preferred;
-  utterance.lang = preferred?.lang || 'en-US';
-  utterance.rate = 1;
-  utterance.pitch = 1;
-  window.speechSynthesis.speak(utterance);
+  try {
+    const response = await fetch('/api/voice/natural', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, voice: 'coral', style: 'assistant' }),
+    });
+    if (!response.ok) return;
+    const blob = await response.blob();
+    if (!blob.size) return;
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => URL.revokeObjectURL(url);
+    audio.onerror = () => URL.revokeObjectURL(url);
+    await audio.play();
+  } catch {
+    // Compatibility callers remain non-blocking; the hook path owns browser fallback.
+  }
 }
 
 export function useVoiceCommands() {
@@ -270,12 +274,12 @@ export function VoiceCommandChat() {
   );
 }
 
-/** Compatibility hook: same call shape using free browser/device voices. */
+/** Compatibility hook retaining the older call shape while using shared natural voice. */
 export function useSpeech() {
   const naturalVoice = useNaturalVoice();
   const speak = useCallback((text: string, options?: { rate?: number; pitch?: number; voice?: SpeechSynthesisVoice }) => {
     void naturalVoice.play(text.slice(0, 2400), {
-      voice: 'browser',
+      voice: 'coral',
       style: 'assistant',
       rate: options?.rate || 1,
     });

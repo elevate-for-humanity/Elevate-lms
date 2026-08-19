@@ -1,6 +1,6 @@
 /**
  * PARIS Voice Command System
- * Natural-language voice input with free device/browser spoken responses.
+ * Natural-language voice input with shared natural-TTS spoken responses.
  */
 
 'use client';
@@ -56,27 +56,6 @@ function responseText(data: { message?: string; error?: string; followUp?: strin
   }
   if (typeof data.result === 'string') return data.result;
   return 'Done';
-}
-
-/** Compatibility helper for callers outside React hooks. Uses the free browser/device voice engine. */
-export async function speakResponse(data: { message?: string; error?: string; followUp?: string; result?: unknown }) {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
-  const text = responseText(data).trim();
-  if (!text) return;
-
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text.slice(0, 2400));
-  const voices = window.speechSynthesis.getVoices();
-  const preferred =
-    voices.find((voice) => /natural|neural|premium|enhanced/i.test(voice.name) && /^en(-|_)/i.test(voice.lang)) ||
-    voices.find((voice) => /^en-US$/i.test(voice.lang)) ||
-    voices.find((voice) => /^en(-|_)/i.test(voice.lang)) ||
-    voices[0];
-  if (preferred) utterance.voice = preferred;
-  utterance.lang = preferred?.lang || 'en-US';
-  utterance.rate = 1;
-  utterance.pitch = 1;
-  window.speechSynthesis.speak(utterance);
 }
 
 export function useVoiceCommands() {
@@ -270,12 +249,12 @@ export function VoiceCommandChat() {
   );
 }
 
-/** Compatibility hook: same call shape using free browser/device voices. */
+/** Compatibility hook retained for existing call sites; playback uses the shared natural voice engine. */
 export function useSpeech() {
   const naturalVoice = useNaturalVoice();
   const speak = useCallback((text: string, options?: { rate?: number; pitch?: number; voice?: SpeechSynthesisVoice }) => {
     void naturalVoice.play(text.slice(0, 2400), {
-      voice: 'browser',
+      voice: 'coral',
       style: 'assistant',
       rate: options?.rate || 1,
     });
@@ -285,7 +264,7 @@ export function useSpeech() {
     speak,
     stop: naturalVoice.stop,
     isSpeaking: naturalVoice.isPlaying || naturalVoice.isLoading,
-    voices: typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis.getVoices() : [] as SpeechSynthesisVoice[],
+    voices: [] as SpeechSynthesisVoice[],
   };
 }
 

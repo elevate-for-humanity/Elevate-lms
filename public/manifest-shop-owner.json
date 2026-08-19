@@ -36,7 +36,7 @@
     {
       "name": "Host Shop Dashboard",
       "short_name": "Dashboard",
-      "url": "/host-shop/dashboard/board"
+      "url": "/host-shop/dashboard"
     },
     {
       "name": "My Apprentices",

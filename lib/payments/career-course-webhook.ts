@@ -4,6 +4,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { hydrateProcessEnv } from '@/lib/secrets';
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
+import { processSubscriptionEvent } from '@/lib/platform/process-subscription-event';
 import type Stripe from 'stripe';
 import * as Sentry from '@sentry/nextjs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -168,14 +169,38 @@ export type CareerCourseWebhookResult = {
   response?: Record<string, boolean>;
 };
 
+const RECURRING_EVENT_TYPES = new Set<Stripe.Event.Type>([
+  'customer.subscription.created',
+  'customer.subscription.updated',
+  'customer.subscription.deleted',
+  'invoice.payment_succeeded',
+  'invoice.paid',
+  'invoice.payment_failed',
+]);
+
 /**
- * Process career-course events after the caller has verified the Stripe
- * signature. The canonical marketing webhook calls this so career-course
- * purchases do not depend on a second Stripe endpoint or signing secret.
+ * Pre-switch processing for the canonical /api/webhooks/stripe endpoint.
+ *
+ * The exported name is retained because the canonical webhook already imports
+ * it, but this function now has two deliberately narrow responsibilities:
+ *   1. route recognized recurring subscription families through the shared
+ *      organization/individual-app/Host-Shop lifecycle processor; and
+ *   2. activate career-course purchases.
+ *
+ * Returning handled=false preserves the existing legacy webhook switch for
+ * tuition, donation, legacy store subscriptions, and other older payment lanes.
  */
 export async function processCareerCourseStripeEvent(
   event: Stripe.Event,
 ): Promise<CareerCourseWebhookResult> {
+  if (RECURRING_EVENT_TYPES.has(event.type)) {
+    const stripe = getStripe();
+    if (!stripe) throw new Error('Stripe is not configured for subscription lifecycle processing.');
+    const db = await requireAdminClient();
+    const handled = await processSubscriptionEvent(db, stripe, event);
+    if (handled) return { handled: true, response: { received: true } };
+  }
+
   switch (event.type) {
     case 'checkout.session.completed':
     case 'checkout.session.async_payment_succeeded': {

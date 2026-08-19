@@ -71,7 +71,12 @@ const adminConfig = {
 
   async rewrites() {
     return {
-      beforeFiles: legacyImageRewrites(),
+      beforeFiles: [
+        // Temporary compatibility while remaining Studio clients are migrated
+        // to the canonical Admin-owned endpoint. No duplicate handler remains.
+        { source: '/api/devstudio/health', destination: '/api/admin/dev-studio/health' },
+        ...legacyImageRewrites(),
+      ],
       afterFiles: [],
       fallback: [],
     };

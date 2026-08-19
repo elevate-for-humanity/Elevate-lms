@@ -18,9 +18,6 @@ async function _GET(request: NextRequest) {
     const id = searchParams.get('id')?.trim();
     const email = searchParams.get('email')?.trim().toLowerCase();
 
-    // Public tracking intentionally requires two matching applicant-held values.
-    // Email-only lookup exposes too much applicant PII to anyone who knows an
-    // address, while ID-only lookup makes leaked reference numbers sufficient.
     if (!id || !email) {
       return NextResponse.json(
         { error: 'Application ID and email address are required' },
@@ -29,20 +26,20 @@ async function _GET(request: NextRequest) {
     }
 
     const supabase = await requireAdminClient();
-
     if (!supabase) {
       return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
     }
 
+    // Email is used only as a verifier and is never echoed back. The public
+    // status response is deliberately limited to fields needed to identify the
+    // application and explain its workflow state.
     let query = supabase
       .from('applications')
       .select(
-        'id, first_name, last_name, email, phone, program_interest, program_id, reference_number, status, created_at, submitted_at, support_notes',
+        'id, first_name, program_interest, program_id, reference_number, status, created_at, submitted_at',
       )
       .eq('normalized_email', email);
 
-    // Support both UUID and reference number (EFH-XXXXX), but always require
-    // the email to match the same row before returning applicant information.
     if (id.startsWith('EFH-')) {
       query = query.eq('reference_number', id);
     } else {
@@ -55,22 +52,26 @@ async function _GET(request: NextRequest) {
       .maybeSingle();
 
     if (error || !data) {
-      // Deliberately do not reveal whether the ID or email was the mismatch.
       return NextResponse.json(
         { error: 'We could not verify those application details.' },
         { status: 404 },
       );
     }
 
-    // Preserve the canonical persisted workflow status. The tracker UI owns
-    // presentation for current workflow states and has a safe fallback for
-    // future states so new statuses cannot silently blank the applicant view.
-    const normalized = {
-      ...data,
-      submitted_at: data.submitted_at || data.created_at,
-    };
-
-    return NextResponse.json({ application: normalized }, { status: 200 });
+    return NextResponse.json(
+      {
+        application: {
+          id: data.id,
+          first_name: data.first_name,
+          program_interest: data.program_interest,
+          program_id: data.program_id,
+          reference_number: data.reference_number,
+          status: data.status,
+          submitted_at: data.submitted_at || data.created_at,
+        },
+      },
+      { status: 200 },
+    );
   } catch {
     return NextResponse.json({ error: 'Failed to retrieve application' }, { status: 500 });
   }

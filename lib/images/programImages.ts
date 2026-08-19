@@ -329,7 +329,7 @@ export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
     alt: 'Finance and accounting student reviewing financial statements',
   },
   entrepreneurship: {
-    card: '/images/pexels/business.webp',
+    card: '/images/business/team-2.jpg',
     hero: '/images/hero/hero-business.webp',
     alt: 'Entrepreneur working on a business plan',
   },

@@ -1,13 +1,14 @@
 /**
- * CANONICAL PROGRAM DATA - Single Source of Truth
+ * CANONICAL PROGRAM DATA
  *
- * DOL Registered Apprenticeship requirements come from RAPIDS_CONFIG, which
- * derives occupation-specific values from the approved Appendix A. State
- * licensure-hour rules remain a separate state-licensing concern and must not
- * be presented as the DOL completion model for competency-based occupations.
+ * Registered-apprenticeship status and completion rules must resolve from the
+ * registered-program contract. Numeric state/licensure hours remain separate
+ * compatibility fields and must not be presented as the DOL completion basis
+ * for competency-based occupations.
  */
 
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { INDIANA_RULES } from '@/lib/licensureRules/IN';
 
 export interface ProgramData {
@@ -40,69 +41,75 @@ export interface ProgramData {
 }
 
 export const ADMINISTRATOR_STATEMENT =
-  'Elevate for Humanity serves as the Program Administrator for registered apprenticeship pathways, coordinating training, employer participation, and funding access.';
+  'Elevate for Humanity coordinates training, employer participation, and funding access for its workforce and apprenticeship pathways. Registered status is stated only when an approved registered-program standard is present in the canonical registry.';
 
 export const STATE_VARIATION_DISCLAIMER =
   'State licensing requirements and DOL registered-apprenticeship standards are separate controls. The applicable approved program and jurisdiction rules govern.';
 
-const BARBER_RAPIDS = RAPIDS_CONFIG.programs.barber;
+const BARBER = getRegisteredProgramStandard('barber-apprenticeship');
+if (!BARBER) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
+const ESTHETICIAN = getRegisteredProgramStandard('esthetician-apprenticeship');
+
+function registeredFields(contract: NonNullable<ReturnType<typeof getRegisteredProgramStandard>>) {
+  const standard = contract.standard;
+  return {
+    isRegisteredApprenticeship: true,
+    rapidsCodes: [standard.rapidsCode],
+    apprenticeshipApproach: 'competency-based' as const,
+    competencyCount: contract.completion.competencyCount,
+    probationaryHours: standard.probationaryHours,
+    apprenticeToMentorRatio: standard.apprenticeToMentorRatio,
+    wageMilestones: standard.wageMilestones,
+    relatedInstructionHours: contract.completion.requiredRtiHours,
+    startingWage: `$${standard.startingHourlyRate.toFixed(2)}/hour registered baseline, subject to any higher employer-specific schedule or legal wage floor`,
+    wageRange: standard.wageMilestones
+      .map((milestone) => `$${milestone.hourlyRate.toFixed(2)} after ${milestone.completedCompetencies} competencies`)
+      .join(' · '),
+    dolProgressStatement: `DOL progress is competency-based: ${contract.completion.competencyCount} verified competencies plus ${contract.completion.requiredRtiHours} verified RTI hours, with a ${standard.apprenticeToMentorRatio} mentor ratio and ${standard.probationaryHours}-hour probationary period. Work/OJL hours are auditable evidence and are not a fixed completion denominator.`,
+  };
+}
 
 export const PROGRAMS: Record<string, ProgramData> = {
   'barber-apprenticeship': {
-    slug: BARBER_RAPIDS.slug,
-    name: BARBER_RAPIDS.name,
+    slug: BARBER.programSlug,
+    name: 'Barber Apprenticeship',
     shortName: 'Barber',
-    // Compatibility/state-licensure tracking only. DOL progress is competency-based
-    // and MUST use the Appendix A fields below rather than this numeric hour value.
     totalHours: INDIANA_RULES.required_total_hours,
-    relatedInstructionHours: BARBER_RAPIDS.relatedInstructionHours,
     ojtHours: INDIANA_RULES.required_total_hours,
-    durationRange: 'Varies by competency progression, approved work schedule, RTI completion, and applicable licensing requirements',
+    durationRange: 'Varies by competency progression, RTI completion, approved work schedule, and applicable licensing requirements',
     durationMonths: { min: 12, max: 24 },
     credential: 'Indiana Barber License',
-    credentialFull: 'Indiana Barber License following registered-apprenticeship completion and applicable state licensing requirements',
+    credentialFull: 'Indiana Barber License following registered-program completion and applicable state licensing requirements',
     administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA', 'WorkOne OJT', 'Employer Training Grant', 'Workforce Ready Grant where authorized', 'Employer Sponsorship', 'Self-Pay'],
-    startingWage: `$${BARBER_RAPIDS.startingHourlyRate.toFixed(2)}/hour Appendix A rate, subject to any higher applicable legal minimum`,
-    wageRange: BARBER_RAPIDS.wageMilestones
-      .map((milestone) => `$${milestone.hourlyRate.toFixed(2)} after ${milestone.completedCompetencies} competencies`)
-      .join(' · '),
+    fundingOptions: ['WIOA where authorized', 'WorkOne OJT where authorized', 'Employer Sponsorship', 'Self-Pay'],
     careerOutcomeRange: 'Varies by employer, experience, location, clientele, commission structure, and business model',
     stateRequirements:
-      'DOL apprenticeship completion follows the approved competency-based Appendix A. Indiana licensing-hour/exam requirements are tracked separately and do not replace Appendix A RTI, competencies, wages, ratio, or probation requirements.',
+      'DOL completion follows the approved competency-based registered standard. Indiana licensing-hour/exam requirements are tracked separately and do not replace registered RTI, competencies, wage, ratio, or probation requirements.',
     category: 'apprenticeship',
-    isRegisteredApprenticeship: true,
-    rapidsCodes: [BARBER_RAPIDS.rapidsCode],
-    apprenticeshipApproach: BARBER_RAPIDS.approach,
-    competencyCount: BARBER_RAPIDS.competencyCount,
-    probationaryHours: BARBER_RAPIDS.probationaryHours,
-    apprenticeToMentorRatio: BARBER_RAPIDS.apprenticeToMentorRatio,
-    wageMilestones: BARBER_RAPIDS.wageMilestones,
-    dolProgressStatement: `DOL progress is competency-based: ${BARBER_RAPIDS.competencyCount} Appendix A competencies plus ${BARBER_RAPIDS.relatedInstructionHours} RTI hours, with a ${BARBER_RAPIDS.apprenticeToMentorRatio} mentor ratio and ${BARBER_RAPIDS.probationaryHours}-hour probationary period.`,
+    ...registeredFields(BARBER),
   },
 
   'cosmetology-apprenticeship': {
     slug: 'cosmetology-apprenticeship',
     name: 'Cosmetology Apprenticeship',
     shortName: 'Cosmetology',
-    totalHours: 1500,
-    relatedInstructionHours: 144,
-    ojtHours: 1356,
-    durationRange: '12-18 months',
-    durationMonths: { min: 12, max: 18 },
+    totalHours: 2000,
+    relatedInstructionHours: 0,
+    ojtHours: 2000,
+    durationRange: 'Varies by the current pathway and applicable Indiana licensing requirements',
+    durationMonths: { min: 12, max: 24 },
     credential: 'Indiana Cosmetology License',
-    credentialFull: 'Indiana Cosmetologist License (State Board Certified)',
-    administrator: 'Elevate for Humanity Career & Technical Institute',
+    credentialFull: 'Indiana Cosmetologist License, subject to current state requirements',
+    administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA', 'Workforce Ready Grant', 'Employer Sponsorship', 'Self-Pay'],
-    startingWage: '$10-12/hour + tips',
-    wageRange: '$10-16/hour during training',
-    careerOutcomeRange: '$30,000-$55,000+/year',
-    stateRequirements:
-      'Indiana requires 2,000 hours of apprenticeship training for cosmetology licensure.',
+    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship', 'Self-Pay'],
+    startingWage: 'Employer and legal wage requirements apply; no registered wage schedule is published from the canonical registry for this track',
+    wageRange: 'Employer/market dependent',
+    careerOutcomeRange: 'Employer/market dependent',
+    stateRequirements: 'Use the current Indiana cosmetology licensing and training requirements. This pathway must not be described as federally registered until an approved registered-program standard is present in the canonical registry.',
     category: 'apprenticeship',
-    isRegisteredApprenticeship: true,
+    isRegisteredApprenticeship: false,
   },
 
   'esthetician-apprenticeship': {
@@ -110,65 +117,69 @@ export const PROGRAMS: Record<string, ProgramData> = {
     name: 'Esthetician Apprenticeship',
     shortName: 'Esthetician',
     totalHours: 700,
-    relatedInstructionHours: 100,
-    ojtHours: 600,
-    durationRange: '6-12 months',
-    durationMonths: { min: 6, max: 12 },
+    ojtHours: 700,
+    durationRange: 'Varies by competency progression, RTI completion, approved work schedule, and applicable licensing requirements',
+    durationMonths: { min: 6, max: 18 },
     credential: 'Indiana Esthetician License',
-    credentialFull: 'Indiana Licensed Esthetician (State Board Certified)',
-    administrator: 'Elevate for Humanity Career & Technical Institute',
+    credentialFull: 'Indiana Esthetician License following registered-program completion and applicable state requirements',
+    administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA', 'Workforce Ready Grant', 'Self-Pay'],
-    startingWage: '$12-14/hour',
-    wageRange: '$12-18/hour during training',
-    careerOutcomeRange: '$28,000-$50,000+/year',
-    stateRequirements: 'Indiana requires 700 hours of training for esthetician licensure.',
+    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship', 'Self-Pay'],
+    careerOutcomeRange: 'Employer/market dependent',
+    stateRequirements: 'State licensing/training requirements are tracked separately from the approved competency-based registered standard.',
     category: 'apprenticeship',
-    isRegisteredApprenticeship: true,
+    ...(ESTHETICIAN
+      ? registeredFields(ESTHETICIAN)
+      : {
+          relatedInstructionHours: 0,
+          startingWage: 'Employer and legal wage requirements apply',
+          wageRange: 'Employer/market dependent',
+          isRegisteredApprenticeship: false,
+        }),
   },
 
   'hvac-apprenticeship': {
     slug: 'hvac-apprenticeship',
-    name: 'HVAC Technician Apprenticeship',
+    name: 'HVAC Technician Apprenticeship Pathway',
     shortName: 'HVAC',
     totalHours: 8000,
     relatedInstructionHours: 576,
     ojtHours: 7424,
-    durationRange: '3-4 years',
+    durationRange: 'Varies by the approved pathway/employer arrangement',
     durationMonths: { min: 36, max: 48 },
-    credential: 'HVAC Journeyman Certification',
-    credentialFull: 'EPA 608 Certification + HVAC Journeyman',
-    administrator: 'Elevate for Humanity Career & Technical Institute',
+    credential: 'HVAC credential pathway',
+    credentialFull: 'EPA 608 and other credentials as specifically assigned/earned',
+    administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA', 'Apprenticeship Grant', 'Employer Sponsorship'],
-    startingWage: '$15-18/hour',
-    wageRange: '$15-25/hour during training',
-    careerOutcomeRange: '$45,000-$75,000+/year',
-    stateRequirements: 'EPA 608 certification required. State journeyman requirements vary.',
+    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship'],
+    startingWage: 'Employer and legal wage requirements apply',
+    wageRange: 'Employer/market dependent',
+    careerOutcomeRange: 'Employer/market dependent',
+    stateRequirements: 'EPA 608 applies to covered refrigerant work. Do not describe this pathway as federally registered unless an approved registered-program standard is present in the canonical registry.',
     category: 'apprenticeship',
-    isRegisteredApprenticeship: true,
+    isRegisteredApprenticeship: false,
   },
 
   'electrical-apprenticeship': {
     slug: 'electrical-apprenticeship',
-    name: 'Electrical Apprenticeship',
+    name: 'Electrical Apprenticeship Pathway',
     shortName: 'Electrical',
     totalHours: 8000,
     relatedInstructionHours: 576,
     ojtHours: 7424,
-    durationRange: '4-5 years',
+    durationRange: 'Varies by the approved pathway/employer arrangement and local licensing jurisdiction',
     durationMonths: { min: 48, max: 60 },
-    credential: 'Journeyman Electrician License',
-    credentialFull: 'Indiana Journeyman Electrician License',
-    administrator: 'Elevate for Humanity Career & Technical Institute',
+    credential: 'Electrical credential/licensing pathway',
+    credentialFull: 'Credential or license depends on the applicable jurisdiction and approved program',
+    administrator: RAPIDS_CONFIG.programBrand,
     administratorStatement: ADMINISTRATOR_STATEMENT,
-    fundingOptions: ['WIOA', 'Apprenticeship Grant', 'Employer Sponsorship'],
-    startingWage: '$16-20/hour',
-    wageRange: '$16-28/hour during training',
-    careerOutcomeRange: '$50,000-$85,000+/year',
-    stateRequirements: 'Indiana requires 8,000 hours for journeyman electrician license.',
+    fundingOptions: ['Funding eligibility must be verified for the current program and participant', 'Employer Sponsorship'],
+    startingWage: 'Employer and legal wage requirements apply',
+    wageRange: 'Employer/market dependent',
+    careerOutcomeRange: 'Employer/market dependent',
+    stateRequirements: 'Electrical licensing requirements vary by Indiana jurisdiction. Do not describe this pathway as federally registered unless an approved registered-program standard is present in the canonical registry.',
     category: 'apprenticeship',
-    isRegisteredApprenticeship: true,
+    isRegisteredApprenticeship: false,
   },
 };
 
@@ -192,7 +203,7 @@ export function formatHoursWithDuration(program: ProgramData): string {
   if (program.apprenticeshipApproach === 'competency-based' && program.dolProgressStatement) {
     return program.dolProgressStatement;
   }
-  return `${formatHours(program.totalHours)} OJL hours (${program.durationRange})`;
+  return `${formatHours(program.totalHours)} pathway/state-tracking hours (${program.durationRange})`;
 }
 
 export function getApprenticeshipPrograms(): ProgramData[] {

@@ -29,10 +29,10 @@ export default async function BeautyApprenticeshipHostGuidePage() {
           </div>
           <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-5xl">Beauty & Grooming Apprenticeship Quick-Start Guide</h1>
           <p className="mt-4 max-w-3xl text-sm font-medium leading-7 text-slate-100 sm:text-base">
-            Use this guide for day-to-day Host Shop execution. The portal intentionally separates verified program facts from general apprenticeship guidance so shops do not repeat unsupported funding, registration, wage, or licensing claims.
+            Use this guide for day-to-day Host Shop execution. Registered tracks display their approved competency and RTI requirements; the portal does not substitute a generic work-hour completion counter.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/host-shop/dashboard/board" className="rounded-xl bg-white px-4 py-2.5 text-sm font-black text-slate-950">Back to Host Shop Board</Link>
+            <Link href="/host-shop/dashboard" className="rounded-xl bg-white px-4 py-2.5 text-sm font-black text-slate-950">Back to Host Shop Dashboard</Link>
             <Link href="/host-shop/dashboard/hours/pending" className="rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-black text-white">Review Hours</Link>
           </div>
         </section>
@@ -53,7 +53,7 @@ export default async function BeautyApprenticeshipHostGuidePage() {
         </section>
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-violet-700"><BookOpen className="h-5 w-5" /> Milestone maps</div>
+          <div className="flex items-center gap-2 text-sm font-black uppercase tracking-[0.14em] text-violet-700"><BookOpen className="h-5 w-5" /> Registered progress contracts</div>
           <div className="mt-6 grid gap-5 lg:grid-cols-3">
             {(Object.keys(BEAUTY_TRACKS) as Array<keyof typeof BEAUTY_TRACKS>).map((track) => {
               const config = BEAUTY_TRACKS[track];
@@ -65,8 +65,8 @@ export default async function BeautyApprenticeshipHostGuidePage() {
                   <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{fundingCopy(config.program)}</p>
                   <div className="mt-4 space-y-3">
                     {milestones.map((milestone) => (
-                      <div key={milestone.hours} className="rounded-xl bg-white p-3 shadow-sm">
-                        <div className="text-sm font-black text-violet-800">{milestone.hours.toLocaleString()} hours</div>
+                      <div key={`${track}-${milestone.label}`} className="rounded-xl bg-white p-3 shadow-sm">
+                        <div className="text-sm font-black text-violet-800">{milestone.label}</div>
                         <p className="mt-1 text-xs font-medium leading-5 text-slate-700">{milestone.milestone}</p>
                       </div>
                     ))}

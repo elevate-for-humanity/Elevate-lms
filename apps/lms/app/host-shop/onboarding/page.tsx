@@ -97,11 +97,11 @@ export default async function HostShopOnboardingPage() {
               <h2 className="font-black text-slate-950">{complete ? 'Onboarding requirements complete' : 'Onboarding still in progress'}</h2>
               <p className="mt-1 text-sm text-slate-600">
                 {complete
-                  ? 'Your core Host Site compliance requirements are on file. Continue to the operational board.'
+                  ? 'Your core Host Site compliance requirements are on file. Continue to the operational dashboard.'
                   : 'Complete the remaining items above. Elevate staff reviews submitted compliance documents before they count as accepted.'}
               </p>
-              <Link href="/host-shop/dashboard/board" className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-900 hover:bg-slate-50">
-                Open Host Shop Board
+              <Link href="/host-shop/dashboard" className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-900 hover:bg-slate-50">
+                Open Host Shop Dashboard
               </Link>
             </div>
           </div>

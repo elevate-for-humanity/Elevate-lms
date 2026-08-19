@@ -2,28 +2,51 @@ import { NextRequest } from 'next/server';
 
 import { buildCapabilityHealth } from '@/lib/devstudio/capability-health';
 import { capabilityHealthResponse } from '@/lib/devstudio/health-response';
-import { probeStudioShell } from '@/lib/devstudio/shell-probe';
+import { getNorthflankProjectId, isNorthflankReady } from '@/lib/northflank/runtime';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   return capabilityHealthResponse(request, async () => {
-    const shellUrl = process.env.STUDIO_SHELL_WS_URL ?? '';
-    const shellSecret = process.env.STUDIO_SHELL_SECRET ?? '';
-    const tokenSecret = process.env.STUDIO_TOKEN_SECRET ?? '';
-    const probe = shellUrl
-      ? await probeStudioShell(shellUrl)
-      : { reachable: false, ready: false, status: 'missing-url', error: 'Shell URL is missing.' };
+    const tokenPresent = Boolean(
+      process.env.NORTHFLANK_API_TOKEN ||
+        process.env.NORTHFLANK_API_KEY ||
+        process.env.NF_API_TOKEN,
+    );
+    const projectPresent = Boolean(getNorthflankProjectId());
 
     return buildCapabilityHealth('containers', [
-      { name: 'shell-url', passed: Boolean(shellUrl), required: true, message: shellUrl ? 'Studio shell URL is configured.' : 'STUDIO_SHELL_WS_URL is missing.' },
-      { name: 'shell-secret', passed: Boolean(shellSecret), required: true, message: shellSecret ? 'Studio shell secret is configured.' : 'STUDIO_SHELL_SECRET is missing.' },
-      { name: 'token-secret', passed: Boolean(tokenSecret), required: true, message: tokenSecret ? 'Studio token secret is configured.' : 'STUDIO_TOKEN_SECRET is missing.' },
-      { name: 'shell-probe', passed: Boolean(probe.ready), required: true, message: probe.ready ? 'Studio shell probe succeeded.' : probe.error || probe.status || 'Studio shell probe failed.' },
-      { name: 'northflank-api', passed: Boolean(process.env.NORTHFLANK_API_TOKEN || process.env.NORTHFLANK_API_KEY || process.env.NF_API_TOKEN), required: false, message: 'Northflank container API configuration checked.' },
-      { name: 'northflank-project', passed: Boolean(process.env.NORTHFLANK_PROJECT_ID), required: false, message: 'Northflank project configuration checked.' },
-      { name: 'docker-registry', passed: Boolean(process.env.DOCKER_TOKEN), required: false, message: 'Optional Docker registry configuration checked.' },
+      {
+        name: 'northflank-api',
+        passed: tokenPresent,
+        required: true,
+        message: tokenPresent
+          ? 'Northflank API token is configured.'
+          : 'NORTHFLANK_API_TOKEN is missing.',
+      },
+      {
+        name: 'northflank-project',
+        passed: projectPresent,
+        required: true,
+        message: projectPresent
+          ? 'Northflank project is configured.'
+          : 'NORTHFLANK_PROJECT_ID is missing.',
+      },
+      {
+        name: 'northflank-runtime',
+        passed: isNorthflankReady(),
+        required: true,
+        message: isNorthflankReady()
+          ? 'Northflank runtime control is ready.'
+          : 'Northflank runtime control is not ready.',
+      },
+      {
+        name: 'docker-registry',
+        passed: Boolean(process.env.DOCKER_TOKEN),
+        required: false,
+        message: 'Optional Docker registry configuration checked.',
+      },
     ]);
   });
 }

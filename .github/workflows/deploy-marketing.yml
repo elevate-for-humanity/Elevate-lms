@@ -195,7 +195,7 @@ jobs:
               && [ "$razors_bytes" -gt 1000 ] \
               && [ "$hero_bytes" -gt 1000 ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
-              && grep -q "AI-Powered 360° Humanitarian Workforce Hub" /tmp/www-home.html \
+              && grep -q "Career Training, Registered Apprenticeships & Workforce Technology in Indiana" /tmp/www-home.html \
               && grep -q "Barber Apprenticeship" /tmp/www-page.html; then
               echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with required visual assets"
               exit 0

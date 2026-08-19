@@ -1,10 +1,8 @@
 'use client';
 
-import React from 'react';
-
-import { useState, useEffect, useCallback } from 'react';
-import { Search, Clock, XCircle, Phone, Mail, CheckCircle } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { CheckCircle, Clock, Phone, Search, XCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -20,95 +18,89 @@ type ApplicationStatus =
   | 'rejected'
   | 'withdrawn';
 
-interface Application {
+type TrackedApplication = {
   id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone?: string;
+  first_name?: string;
   program_interest?: string;
   program_id?: string;
   reference_number?: string;
   status: ApplicationStatus | string;
   submitted_at: string;
-  support_notes?: string;
-  notes?: string;
-}
-
-const pendingStatus = {
-  icon: Clock,
-  color: 'text-yellow-600',
-  bg: 'bg-yellow-50',
-  border: 'border-yellow-200',
-  label: 'Under Review',
-  description: 'Your application has been received and is being reviewed by our team.',
 };
 
-const statusConfig: Record<
-  string,
-  {
-    icon: typeof Clock;
-    color: string;
-    bg: string;
-    border: string;
-    label: string;
-    description: string;
-  }
-> = {
+type StatusPresentation = {
+  icon: typeof Clock;
+  color: string;
+  bg: string;
+  border: string;
+  label: string;
+  description: string;
+};
+
+const pendingStatus: StatusPresentation = {
+  icon: Clock,
+  color: 'text-amber-700',
+  bg: 'bg-amber-50',
+  border: 'border-amber-200',
+  label: 'Under Review',
+  description: 'Your application has been received and is being reviewed.',
+};
+
+const statusConfig: Record<string, StatusPresentation> = {
   submitted: pendingStatus,
   under_review: pendingStatus,
   pending: pendingStatus,
-  pending_admin_review: {
-    icon: Clock,
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
-    label: 'Pending Enrollment Review',
-    description: 'Your application is awaiting final enrollment and funding review.',
-  },
   pending_funding: {
     icon: Clock,
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
+    color: 'text-amber-700',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
     label: 'Funding Action Required',
-    description: 'Your application is on hold while required funding steps are completed.',
+    description: 'Your application is waiting on a required funding or authorization step.',
+  },
+  pending_admin_review: {
+    icon: Clock,
+    color: 'text-amber-700',
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    label: 'Pending Enrollment Review',
+    description: 'Your application is awaiting final enrollment review.',
   },
   contacted: {
     icon: Phone,
-    color: 'text-brand-blue-600',
-    bg: 'bg-brand-blue-50',
-    border: 'border-brand-blue-200',
+    color: 'text-brand-blue-700',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
     label: 'Contacted',
-    description: 'An advisor has reached out to you. Please check your email or phone.',
+    description: 'An advisor has reached out. Check the contact information you provided with your application.',
   },
   approved: {
     icon: CheckCircle,
-    color: 'text-brand-green-600',
-    bg: 'bg-brand-green-50',
-    border: 'border-brand-green-200',
+    color: 'text-green-700',
+    bg: 'bg-green-50',
+    border: 'border-green-200',
     label: 'Approved',
-    description: 'Congratulations! Your application has been approved.',
+    description: 'Your application has been approved. Complete any remaining enrollment requirements.',
   },
   enrolled: {
     icon: CheckCircle,
-    color: 'text-brand-green-600',
-    bg: 'bg-brand-green-50',
-    border: 'border-brand-green-200',
+    color: 'text-green-700',
+    bg: 'bg-green-50',
+    border: 'border-green-200',
     label: 'Enrolled',
-    description: 'Your enrollment is active. Use your student account to continue onboarding and training.',
+    description: 'Your enrollment is active. Sign in to continue onboarding and training.',
   },
   rejected: {
     icon: XCircle,
-    color: 'text-brand-orange-600',
-    bg: 'bg-brand-red-50',
-    border: 'border-brand-red-200',
+    color: 'text-red-700',
+    bg: 'bg-red-50',
+    border: 'border-red-200',
     label: 'Not Approved',
-    description: 'Unfortunately, we cannot proceed with your application at this time.',
+    description: 'The application cannot proceed in its current form. Contact admissions if you need clarification.',
   },
   withdrawn: {
     icon: XCircle,
-    color: 'text-slate-600',
+    color: 'text-slate-700',
     bg: 'bg-slate-50',
     border: 'border-slate-200',
     label: 'Withdrawn',
@@ -116,28 +108,28 @@ const statusConfig: Record<
   },
 };
 
-const unknownStatus = {
+const unknownStatus: StatusPresentation = {
   icon: Clock,
-  color: 'text-slate-600',
+  color: 'text-slate-700',
   bg: 'bg-slate-50',
   border: 'border-slate-200',
   label: 'Status Update',
-  description: 'Your application has a status update. Contact admissions if you need clarification.',
+  description: 'Your application has a workflow update. Contact admissions if you need clarification.',
 };
 
 export default function TrackApplicationPage() {
   const [searchId, setSearchId] = useState('');
   const [searchEmail, setSearchEmail] = useState('');
-  const [application, setApplication] = useState<Application | null>(null);
+  const [application, setApplication] = useState<TrackedApplication | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSearch = useCallback(async (id?: string, email?: string) => {
-    const applicationId = id || searchId;
-    const applicationEmail = email || searchEmail;
+    const applicationId = (id ?? searchId).trim();
+    const applicationEmail = (email ?? searchEmail).trim();
 
-    if (!applicationId && !applicationEmail) {
-      setError('Please enter an Application ID or Email Address');
+    if (!applicationId || !applicationEmail) {
+      setError('Enter both your Application ID and the email address used on the application.');
       return;
     }
 
@@ -146,300 +138,124 @@ export default function TrackApplicationPage() {
     setApplication(null);
 
     try {
-      const params = new URLSearchParams();
-      if (applicationId) params.append('id', applicationId);
-      if (applicationEmail) params.append('email', applicationEmail);
-
+      const params = new URLSearchParams({ id: applicationId, email: applicationEmail });
       const response = await fetch(`/api/applications/track?${params.toString()}`);
+      const body = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error('We could not verify those details. Please confirm and try again.');
-        }
-        throw new Error('Failed to retrieve application status');
+        throw new Error(
+          response.status === 404
+            ? 'We could not verify those application details. Check both entries and try again.'
+            : body?.error || 'Unable to retrieve application status.',
+        );
       }
 
-      const data = await response.json();
-      setApplication(data.application ?? data);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to retrieve application status. Please try again.');
+      setApplication(body.application ?? null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to retrieve application status.');
     } finally {
       setLoading(false);
     }
-  }, [searchId, searchEmail]);
+  }, [searchEmail, searchId]);
 
-  // Pre-fill and auto-search when URL params are present (e.g. link from confirmation email)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    const email = params.get('email');
+    const id = params.get('id') || '';
+    const email = params.get('email') || '';
     if (id) setSearchId(id);
     if (email) setSearchEmail(email);
-    if (id && email) handleSearch(id, email);
+    if (id && email) void handleSearch(id, email);
   }, [handleSearch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch();
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void handleSearch();
   };
 
   const status = application ? statusConfig[application.status] ?? unknownStatus : null;
   const StatusIcon = status?.icon;
 
   return (
-    <div className="min-h-screen bg-white  via-white ">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+    <main className="min-h-screen bg-slate-50">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply', href: '/apply' }, { label: 'Track' }]} />
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-black mb-4">Track Your Application</h1>
-          <p className="text-lg text-black">
-            Enter your Application ID or Email Address to check your status
+      <section className="mx-auto max-w-4xl px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <h1 className="text-4xl font-black tracking-tight text-slate-950">Track Your Application</h1>
+          <p className="mt-4 text-lg text-slate-700">
+            For privacy, status lookup requires both your Application ID or reference number and the email address used on the application.
           </p>
         </div>
 
-        {/* Search Form */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="applicationId"
-                className="block text-sm font-semibold text-black mb-2"
-              >
-                Application ID (Optional)
-              </label>
-              <input
-                type="text"
-                id="applicationId"
-                value={searchId}
-                onChange={(e) => setSearchId(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
-                placeholder="e.g., EFH-ABC123 or UUID"
-              />
-            </div>
-
-            <div className="text-center text-sm text-black font-semibold">OR</div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-black mb-2">
-                Email Address (Optional)
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={searchEmail}
-                onChange={(e) => setSearchEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent"
-                placeholder="your.email@address.com"
-              />
-            </div>
-
-            {error && (
-              <div className="p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
-                <p className="text-sm text-brand-orange-600">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Searching...
-                </>
-              ) : (
-                <>
-                  <Search className="w-5 h-5" />
-                  Track Application
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-
-        {/* Application Status */}
-        {application && status && StatusIcon && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-            <div
-              className={`flex items-start gap-4 p-6 ${status.bg} ${status.border} border rounded-xl mb-6`}
-            >
-              <StatusIcon className={`w-8 h-8 ${status.color} flex-shrink-0`} />
-              <div className="flex-1">
-                <h2 className={`text-2xl font-bold ${status.color} mb-2`}>{status.label}</h2>
-                <p className="text-black">{status.description}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-black mb-1">Applicant Name</p>
-                  <p className="text-black font-medium">
-                    {application.first_name} {application.last_name}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-black mb-1">Email</p>
-                  <p className="text-black font-medium">{application.email}</p>
-                </div>
-              </div>
-
-              {application.phone && (
-                <div>
-                  <p className="text-sm font-semibold text-black mb-1">Phone</p>
-                  <p className="text-black font-medium">{application.phone}</p>
-                </div>
-              )}
-
-              {(application.program_interest || application.program_id) && (
-                <div>
-                  <p className="text-sm font-semibold text-black mb-1">Program Interest</p>
-                  <p className="text-black font-medium">
-                    {application.program_interest || application.program_id}
-                  </p>
-                </div>
-              )}
-
-              <div>
-                <p className="text-sm font-semibold text-black mb-1">Submitted</p>
-                <p className="text-black font-medium">
-                  {new Date(application.submitted_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
-
-              {application.reference_number && (
-                <div>
-                  <p className="text-sm font-semibold text-black mb-1">Reference Number</p>
-                  <p className="text-black font-mono font-bold">{application.reference_number}</p>
-                </div>
-              )}
-
-              <div>
-                <p className="text-sm font-semibold text-black mb-1">Application ID</p>
-                <p className="text-black font-mono text-sm">{application.id}</p>
-              </div>
-            </div>
-
-            {/* Next Steps */}
-            <div className="mt-8 pt-6 border-t border-slate-200">
-              <h3 className="font-bold text-black mb-4">What's Next?</h3>
-
-              {['submitted', 'under_review', 'pending'].includes(application.status) && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• An advisor will review your application</p>
-                  <p>• We'll contact you with the next required enrollment step</p>
-                  <p>• Check your email and phone for updates</p>
-                </div>
-              )}
-
-              {application.status === 'pending_admin_review' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• Your application is in final enrollment review</p>
-                  <p>• Funding or payment authorization may be verified before activation</p>
-                  <p>• We'll contact you when your enrollment decision is ready</p>
-                </div>
-              )}
-
-              {application.status === 'pending_funding' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• Complete the funding or WorkOne steps provided by your advisor</p>
-                  <p>• Enrollment cannot activate until required funding authorization is verified</p>
-                  <p>• Contact admissions if you need help completing the funding process</p>
-                </div>
-              )}
-
-              {application.status === 'contacted' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• Please respond to our advisor's message</p>
-                  <p>• Check your email inbox and spam folder</p>
-                  <p>• Contact us if you haven't heard from us: {PLATFORM_DEFAULTS.supportPhone}</p>
-                </div>
-              )}
-
-              {application.status === 'approved' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• Complete any remaining enrollment and onboarding requirements</p>
-                  <p>• Verify your funding or payment authorization if requested</p>
-                  <p>• Use your student account for the next onboarding step</p>
-                </div>
-              )}
-
-              {application.status === 'enrolled' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• Your enrollment is active</p>
-                  <p>• Sign in to your student account and complete onboarding</p>
-                  <p>• Open your assigned course from the LMS when access is available</p>
-                </div>
-              )}
-
-              {application.status === 'rejected' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• Contact us to discuss alternative options</p>
-                  <p>• We may have other programs that fit your needs</p>
-                  <p>• Contact us at {PLATFORM_DEFAULTS.supportPhone} for more information</p>
-                </div>
-              )}
-
-              {application.status === 'withdrawn' && (
-                <div className="space-y-3 text-sm text-black">
-                  <p>• This application is no longer active</p>
-                  <p>• Contact admissions if you believe it was withdrawn in error</p>
-                  <p>• You may submit a new application when appropriate</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Help Section */}
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <Phone className="w-8 h-8 text-brand-orange-600 mb-3" />
-            <h3 className="font-bold text-black mb-2">Need Help?</h3>
-            <p className="text-sm text-black mb-3">Contact us Monday-Friday, 9am-5pm</p>
-            <a
-              href="/support"
-              className="inline-block text-brand-orange-600 hover:text-brand-orange-700 font-semibold text-sm"
-            >
-              {PLATFORM_DEFAULTS.supportPhone}
-            </a>
+        <form onSubmit={handleSubmit} className="mx-auto mt-10 max-w-2xl space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div>
+            <label htmlFor="applicationId" className="block text-sm font-bold text-slate-900">Application ID or reference number</label>
+            <input
+              id="applicationId"
+              required
+              autoComplete="off"
+              value={searchId}
+              onChange={(event) => setSearchId(event.target.value)}
+              placeholder="EFH-XXXXX or application UUID"
+              className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-200"
+            />
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <Mail className="w-8 h-8 text-brand-orange-600 mb-3" />
-            <h3 className="font-bold text-black mb-2">Email Us</h3>
-            <p className="text-sm text-black mb-3">We respond within 24 hours</p>
-            <a
-              href="/contact"
-              className="inline-block text-brand-orange-600 hover:text-brand-orange-700 font-semibold text-sm"
-            >
-              our contact form
-            </a>
+          <div>
+            <label htmlFor="email" className="block text-sm font-bold text-slate-900">Application email address</label>
+            <input
+              id="email"
+              type="email"
+              required
+              autoComplete="email"
+              value={searchEmail}
+              onChange={(event) => setSearchEmail(event.target.value)}
+              placeholder="you@example.com"
+              className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-950 outline-none focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-200"
+            />
           </div>
-        </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-8">
-          <Link href="/" className="text-black hover:text-black font-semibold">
-            ← Back to Home
-          </Link>
-        </div>
-      </div>
-    </div>
+          {error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">{error}</div> : null}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-5 py-3 font-black text-white hover:bg-brand-blue-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Search className="h-5 w-5" aria-hidden="true" />
+            {loading ? 'Checking…' : 'Track Application'}
+          </button>
+        </form>
+
+        {application && status && StatusIcon ? (
+          <section className="mx-auto mt-8 max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-live="polite">
+            <div className={`rounded-xl border p-5 ${status.bg} ${status.border}`}>
+              <div className="flex items-start gap-3">
+                <StatusIcon className={`mt-0.5 h-7 w-7 shrink-0 ${status.color}`} aria-hidden="true" />
+                <div>
+                  <h2 className={`text-2xl font-black ${status.color}`}>{status.label}</h2>
+                  <p className="mt-1 text-sm font-medium leading-6 text-slate-800">{status.description}</p>
+                </div>
+              </div>
+            </div>
+
+            <dl className="mt-6 grid gap-5 sm:grid-cols-2">
+              {application.first_name ? <div><dt className="text-xs font-black uppercase tracking-wide text-slate-500">Applicant</dt><dd className="mt-1 font-bold text-slate-950">{application.first_name}</dd></div> : null}
+              <div><dt className="text-xs font-black uppercase tracking-wide text-slate-500">Application</dt><dd className="mt-1 break-all font-mono text-sm font-bold text-slate-950">{application.reference_number || application.id}</dd></div>
+              {(application.program_interest || application.program_id) ? <div><dt className="text-xs font-black uppercase tracking-wide text-slate-500">Program</dt><dd className="mt-1 font-bold text-slate-950">{application.program_interest || application.program_id}</dd></div> : null}
+              <div><dt className="text-xs font-black uppercase tracking-wide text-slate-500">Submitted</dt><dd className="mt-1 font-bold text-slate-950">{new Date(application.submitted_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</dd></div>
+            </dl>
+
+            <div className="mt-6 border-t border-slate-200 pt-5 text-sm text-slate-700">
+              Need help interpreting this status? <Link href="/contact" className="font-black text-brand-blue-700 hover:underline">Contact admissions</Link> or call {PLATFORM_DEFAULTS.supportPhone}.
+            </div>
+          </section>
+        ) : null}
+      </section>
+    </main>
   );
 }

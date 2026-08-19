@@ -1,0 +1,57 @@
+name: Registered Apprenticeship E2E
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: registered-apprenticeship-e2e
+  cancel-in-progress: false
+
+jobs:
+  production-authenticated-e2e:
+    name: Apprentice + Host Shop authenticated persistence
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
+      E2E_APPRENTICE_EMAIL: ${{ secrets.E2E_APPRENTICE_EMAIL }}
+      E2E_APPRENTICE_PASSWORD: ${{ secrets.E2E_APPRENTICE_PASSWORD }}
+      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}
+      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Require dedicated E2E identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in E2E_APPRENTICE_EMAIL E2E_APPRENTICE_PASSWORD E2E_HOST_SHOP_EMAIL E2E_HOST_SHOP_PASSWORD; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "::error::$name is not configured. Authenticated apprenticeship certification cannot be skipped."
+              exit 1
+            fi
+          done
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Install Chromium
+        run: pnpm exec playwright install chromium --with-deps
+      - name: Run registered-apprenticeship architecture gate
+        run: node scripts/check-registered-apprenticeship-architecture.mjs
+      - name: Run authenticated production E2E
+        run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=chromium
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: registered-apprenticeship-e2e-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 14

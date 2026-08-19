@@ -8,18 +8,10 @@
  */
 
 import { NextRequest } from 'next/server';
-import { forbidden } from '@/lib/api/responses';
-import { apiAuthGuard, type GuardedUser } from '@/lib/admin/guards';
+import { apiRequireRoles, type GuardedUser } from '@/lib/admin/guards';
 
-const DEV_STUDIO_ROLES = new Set(['admin', 'super_admin']);
+const DEV_STUDIO_ROLES = ['admin', 'super_admin'] as const;
 
 export async function apiRequireDevStudio(req?: NextRequest): Promise<GuardedUser> {
-  const user = await apiAuthGuard(req);
-  if (user.error) return user;
-
-  if (!user.role || !DEV_STUDIO_ROLES.has(user.role)) {
-    return { ...user, error: forbidden() };
-  }
-
-  return user;
+  return apiRequireRoles(req, DEV_STUDIO_ROLES, { adminOverride: false });
 }

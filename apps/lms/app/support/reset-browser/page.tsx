@@ -23,12 +23,16 @@ export default function ResetBrowserPage() {
     try {
       setStatus('Clearing localStorage...');
       localStorage.clear();
-    } catch {}
+    } catch {
+      // Storage can be blocked by browser/privacy policy; continue best-effort reset.
+    }
 
     try {
       setStatus('Clearing sessionStorage...');
       sessionStorage.clear();
-    } catch {}
+    } catch {
+      // Storage can be blocked by browser/privacy policy; continue best-effort reset.
+    }
 
     try {
       setStatus('Clearing Cache Storage...');
@@ -36,7 +40,9 @@ export default function ResetBrowserPage() {
         const keys = await caches.keys();
         await Promise.all(keys.map((key) => caches.delete(key)));
       }
-    } catch {}
+    } catch {
+      // Cache Storage is not guaranteed to be available in every browser context.
+    }
 
     try {
       setStatus('Clearing IndexedDB...');
@@ -56,7 +62,9 @@ export default function ResetBrowserPage() {
             : Promise.resolve()),
         );
       }
-    } catch {}
+    } catch {
+      // IndexedDB enumeration/deletion support varies; continue clearing other state.
+    }
 
     try {
       setStatus('Unregistering service workers...');
@@ -64,7 +72,9 @@ export default function ResetBrowserPage() {
         const registrations = await navigator.serviceWorker.getRegistrations();
         await Promise.all(registrations.map((registration) => registration.unregister()));
       }
-    } catch {}
+    } catch {
+      // Service-worker access may be unavailable; continue the reset.
+    }
 
     try {
       setStatus('Clearing cookies...');
@@ -73,7 +83,9 @@ export default function ResetBrowserPage() {
         const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie;
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
       });
-    } catch {}
+    } catch {
+      // HttpOnly or policy-controlled cookies cannot be cleared from JavaScript.
+    }
 
     setStatus('Complete! Reloading...');
     setTimeout(() => {

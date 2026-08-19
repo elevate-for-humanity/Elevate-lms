@@ -187,12 +187,12 @@ export async function loadPublicProgramList(): Promise<PublicProgramListResult> 
           const dbProgram = buildProgramSchemaFromDb({
             slug: p.slug,
             title: p.title,
-            subtitle: p.short_description,
+            short_description: p.short_description,
             description: p.description ?? p.short_description,
             category: p.category,
             credential: p.credential_name ?? p.credential ?? resolveCredentialLabel(p),
-            durationWeeks: p.duration_weeks,
-            imageUrl: p.image_url,
+            duration_weeks: p.duration_weeks,
+            image_url: p.image_url,
           });
           return fromProgramSchema(dbProgram, tuition);
         });

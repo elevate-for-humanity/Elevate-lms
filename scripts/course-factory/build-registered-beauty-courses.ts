@@ -1,3 +1,4 @@
+// Production certification runner for the registered beauty occupation courses.
 import { courseFactory, loadAllBlueprints } from '../../lib/course-factory';
 
 const TARGETS = [
@@ -23,9 +24,6 @@ async function main() {
     const source = blueprints.find((item) => item.id === target.blueprintId);
     if (!source) throw new Error(`Blueprint not found: ${target.blueprintId}`);
 
-    // Normalize stale metadata without creating a second course. Course Factory
-    // still publishes to the registered program slug, so refresh replaces the
-    // canonical package atomically.
     const blueprint = {
       ...source,
       programSlug: target.programSlug,

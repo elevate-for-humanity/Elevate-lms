@@ -3,6 +3,11 @@ import { redirect } from 'next/navigation';
 import { headers, cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import {
+  PRIVILEGED_MFA_ROLES,
+  checkPrivilegedMfa,
+  privilegedMfaEnforcementEnabled,
+} from '@/lib/auth/privileged-mfa';
+import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
   PROGRAM_HOLDER_ROLES,
@@ -88,6 +93,19 @@ async function loadEffectiveAuth() {
   return { supabase, user, profile, role, effectiveRoles };
 }
 
+function hasPrivilegedRole(effectiveRoles: readonly UserRole[]): boolean {
+  return effectiveRoles.some((role) => PRIVILEGED_MFA_ROLES.includes(role));
+}
+
+async function privilegedMfaRequiredAndUnsatisfied(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  effectiveRoles: readonly UserRole[],
+): Promise<boolean> {
+  if (!privilegedMfaEnforcementEnabled() || !hasPrivilegedRole(effectiveRoles)) return false;
+  const result = await checkPrivilegedMfa(supabase, effectiveRoles);
+  return result.required && !result.satisfied;
+}
+
 export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGuardResult> {
   const {
     requireAuth = true,
@@ -96,7 +114,7 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
     requireEmailVerified = false,
   } = options;
 
-  const { user, profile, role, effectiveRoles } = await loadEffectiveAuth();
+  const { supabase, user, profile, role, effectiveRoles } = await loadEffectiveAuth();
 
   if (requireAuth && !user) {
     let destination = redirectTo;
@@ -127,6 +145,20 @@ export async function authGuard(options: AuthGuardOptions = {}): Promise<AuthGua
     hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
   if (requireAuth && !isAuthorized) redirect('/unauthorized');
+
+  // MFA is enforced only on role-gated surfaces. General authenticated pages can
+  // still host the MFA enrollment/challenge flow without redirect loops.
+  if (
+    allowedRoles.length > 0 &&
+    isAuthorized &&
+    (await privilegedMfaRequiredAndUnsatisfied(supabase, effectiveRoles))
+  ) {
+    const currentPath = await resolveCurrentPath();
+    const safeCurrentPath = currentPath && currentPath !== '/mfa' ? currentPath : '/dashboard';
+    const mfaPath = `/mfa?redirect=${encodeURIComponent(safeCurrentPath)}`;
+    const adminBase = process.env.NEXT_PUBLIC_ADMIN_URL?.replace(/\/$/, '') ?? '';
+    redirect(adminBase ? `${adminBase}${mfaPath}` : mfaPath);
+  }
 
   return {
     user,
@@ -288,7 +320,7 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
   error?: string;
 }> {
   const { requireAuth = true, allowedRoles = [], requireEmailVerified = false } = options;
-  const { user, profile, role, effectiveRoles } = await loadEffectiveAuth();
+  const { supabase, user, profile, role, effectiveRoles } = await loadEffectiveAuth();
 
   if (requireAuth && !user) {
     return {
@@ -326,6 +358,21 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
     allowedRoles.length === 0 ||
     hasAnyRole(effectiveRoles, allowedRoles, { adminOverride: true });
 
+  if (
+    isAuthorized &&
+    allowedRoles.length > 0 &&
+    (await privilegedMfaRequiredAndUnsatisfied(supabase, effectiveRoles))
+  ) {
+    return {
+      authorized: false,
+      user,
+      profile,
+      role,
+      effectiveRoles,
+      error: 'MFA_REQUIRED',
+    };
+  }
+
   return {
     authorized: isAuthorized,
     user,
@@ -339,7 +386,14 @@ export async function apiAuthGuard(options: AuthGuardOptions = {}): Promise<{
 export async function apiRequireAdmin() {
   const result = await apiAuthGuard({ requireAuth: true, allowedRoles: ADMIN_ROLES });
   if (!result.authorized) {
-    return NextResponse.json({ error: result.error || 'Unauthorized' }, { status: 401 });
+    const status = result.error === 'MFA_REQUIRED' ? 403 : 401;
+    return NextResponse.json(
+      {
+        error: result.error || 'Unauthorized',
+        ...(result.error === 'MFA_REQUIRED' ? { mfaUrl: '/mfa' } : {}),
+      },
+      { status },
+    );
   }
   return result;
 }
@@ -347,7 +401,8 @@ export async function apiRequireAdmin() {
 export async function apiRequireInstructor() {
   const result = await apiAuthGuard({ requireAuth: true, allowedRoles: INSTRUCTOR_ROLES });
   if (!result.authorized) {
-    return NextResponse.json({ error: result.error || 'Unauthorized' }, { status: 401 });
+    const status = result.error === 'MFA_REQUIRED' ? 403 : 401;
+    return NextResponse.json({ error: result.error || 'Unauthorized' }, { status });
   }
   return result;
 }
@@ -358,7 +413,8 @@ export async function apiRequireStudent() {
     allowedRoles: ['student', 'learner'],
   });
   if (!result.authorized) {
-    return NextResponse.json({ error: result.error || 'Unauthorized' }, { status: 401 });
+    const status = result.error === 'MFA_REQUIRED' ? 403 : 401;
+    return NextResponse.json({ error: result.error || 'Unauthorized' }, { status });
   }
   return result;
 }

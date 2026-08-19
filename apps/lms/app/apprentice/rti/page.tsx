@@ -6,7 +6,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { APPRENTICE_ROLES } from '@/lib/rbac/role-matrix';
 import { createClient } from '@/lib/supabase/server';
 import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
-import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { getRegisteredProgramStandard, resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Verified RTI | Apprentice', description: 'Track documented Related Technical Instruction against the approved registered-program standard.', robots: { index: false, follow: false } };
@@ -16,13 +16,16 @@ async function submitRtiEvidence(formData: FormData) {
   const { user } = await requireRole(APPRENTICE_ROLES);
   const supabase = await createClient();
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
-  const programContract = getRegisteredProgramStandard(programSlug || '');
-  if (!programContract || programContract.standardKey !== 'barber') throw new Error('RTI_WORKSPACE_NOT_AVAILABLE');
+  const base = getRegisteredProgramStandard(programSlug || '');
+  if (!base || base.standardKey !== 'barber') throw new Error('RTI_WORKSPACE_NOT_AVAILABLE');
 
   const { data: enrollment } = await supabase.from('program_enrollments').select('id,program_slug')
     .eq('user_id', user.id).eq('program_slug', programSlug).in('enrollment_state', ['enrolled', 'active'])
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
   if (!enrollment) throw new Error('ACTIVE_ENROLLMENT_REQUIRED');
+
+  const contract = await resolveRegisteredProgramContract(supabase, { programSlug: enrollment.program_slug, enrollmentId: enrollment.id });
+  if (!contract) throw new Error('REGISTERED_PROGRAM_CONTRACT_REQUIRED');
 
   const requirementId = String(formData.get('requirementId') || '').trim();
   const instructionDate = String(formData.get('instructionDate') || '').trim();
@@ -35,11 +38,11 @@ async function submitRtiEvidence(formData: FormData) {
   if (!Number.isFinite(minutesClaimed) || minutesClaimed <= 0 || minutesClaimed > 720) throw new Error('INVALID_RTI_MINUTES');
 
   const { data: requirement } = await supabase.from('apprenticeship_rti_requirements').select('id,standard_key')
-    .eq('id', requirementId).eq('standard_key', 'barber-0030cb-2025-07-10').maybeSingle();
+    .eq('id', requirementId).eq('standard_key', contract.standardVersionKey).maybeSingle();
   if (!requirement) throw new Error('INVALID_RTI_CATEGORY');
 
   const { error } = await supabase.from('apprenticeship_rti_entries').insert({
-    enrollment_id: enrollment.id, user_id: user.id, standard_key: requirement.standard_key, requirement_id: requirement.id,
+    enrollment_id: enrollment.id, user_id: user.id, standard_key: contract.standardVersionKey, requirement_id: requirement.id,
     instruction_date: instructionDate, delivery_method: deliveryMethod, minutes_claimed: Math.round(minutesClaimed),
     evidence_url: evidenceUrl, evidence_notes: evidenceNotes, status: 'pending',
   });
@@ -52,21 +55,24 @@ export default async function ApprenticeRtiPage() {
   const { user } = await requireRole(APPRENTICE_ROLES);
   const supabase = await createClient();
   const programSlug = await resolveApprenticeProgramSlug(supabase, user.id);
-  const programContract = getRegisteredProgramStandard(programSlug || '');
-  if (!programContract || programContract.standardKey !== 'barber') redirect('/apprentice');
-  const standard = programContract.standard;
+  const base = getRegisteredProgramStandard(programSlug || '');
+  if (!base || base.standardKey !== 'barber') redirect('/apprentice');
 
-  const { data: enrollment } = await supabase.from('program_enrollments').select('id,course_id')
+  const { data: enrollment } = await supabase.from('program_enrollments').select('id,course_id,program_slug')
     .eq('user_id', user.id).eq('program_slug', programSlug).in('enrollment_state', ['enrolled', 'active'])
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
   if (!enrollment) redirect('/apprentice');
+
+  const programContract = await resolveRegisteredProgramContract(supabase, { programSlug: enrollment.program_slug, enrollmentId: enrollment.id });
+  if (!programContract) redirect('/apprentice');
+  const standard = programContract.standard;
 
   const [{ data: progressRows }, { data: entries }] = await Promise.all([
     supabase.from('barber_appendix_a_rti_progress')
       .select('requirement_id,requirement_title,required_hours,verified_hours,remaining_hours,pending_entries,requirement_met').eq('enrollment_id', enrollment.id),
     supabase.from('apprenticeship_rti_entries')
       .select('id,requirement_id,instruction_date,delivery_method,minutes_claimed,minutes_verified,status,evidence_notes,evidence_url,submitted_at:created_at,verified_at,rejection_reason')
-      .eq('enrollment_id', enrollment.id).order('instruction_date', { ascending: false }).limit(100),
+      .eq('enrollment_id', enrollment.id).eq('standard_key', programContract.standardVersionKey).order('instruction_date', { ascending: false }).limit(100),
   ]);
 
   const rows = progressRows || [];
@@ -77,10 +83,7 @@ export default async function ApprenticeRtiPage() {
 
   return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
     <Link href="/apprentice" className="inline-flex items-center gap-2 text-sm font-bold text-slate-700 hover:text-slate-950"><ArrowLeft className="h-4 w-4" /> Back to dashboard</Link>
-    <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-red-700">Registered Program · {standard.rapidsCode}</p><h1 className="mt-2 text-3xl font-black text-slate-950">Verified Related Technical Instruction</h1><p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">Document instruction against the approved {programContract.completion.requiredRtiHours}-hour RTI requirement. Lesson completion alone does not create RTI credit; evidence remains pending until authorized verification.</p></div><div className="rounded-2xl bg-slate-950 px-5 py-4 text-white"><p className="text-xs font-bold uppercase tracking-wide text-slate-300">Verified RTI</p><p className="mt-1 text-2xl font-black">{verifiedHours.toFixed(2)} / {programContract.completion.requiredRtiHours} hrs</p><p className="mt-1 text-xs text-slate-300">{metCount}/{rows.length} categories satisfied · {pendingCount} pending</p></div></div>
-      <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-brand-red-600" style={{ width: `${pct}%` }} /></div>
-    </section>
+    <section className="mt-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"><div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-red-700">Registered Program · {standard.rapidsCode}</p><h1 className="mt-2 text-3xl font-black text-slate-950">Verified Related Technical Instruction</h1><p className="mt-2 max-w-3xl text-sm font-medium leading-6 text-slate-700">Document instruction against the approved {programContract.completion.requiredRtiHours}-hour RTI requirement. Lesson completion alone does not create RTI credit; evidence remains pending until authorized verification.</p><p className="mt-2 text-xs font-bold text-slate-500">Standard version: {programContract.standardVersionKey}</p></div><div className="rounded-2xl bg-slate-950 px-5 py-4 text-white"><p className="text-xs font-bold uppercase tracking-wide text-slate-300">Verified RTI</p><p className="mt-1 text-2xl font-black">{verifiedHours.toFixed(2)} / {programContract.completion.requiredRtiHours} hrs</p><p className="mt-1 text-xs text-slate-300">{metCount}/{rows.length} categories satisfied · {pendingCount} pending</p></div></div><div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-200"><div className="h-full rounded-full bg-brand-red-600" style={{ width: `${pct}%` }} /></div></section>
 
     <section className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">{rows.map((row: any) => { const categoryPct = Math.min(100, Math.round((Number(row.verified_hours || 0) / Number(row.required_hours || 1)) * 100)); return <article key={row.requirement_id} className="rounded-2xl border border-slate-200 bg-white p-5"><div className="flex items-start justify-between gap-3"><BookOpen className="h-5 w-5 text-brand-red-700" />{row.requirement_met ? <CheckCircle2 className="h-5 w-5 text-brand-green-700" /> : null}</div><h2 className="mt-3 font-black leading-5 text-slate-950">{row.requirement_title}</h2><p className="mt-2 text-sm font-bold text-slate-700">{Number(row.verified_hours || 0).toFixed(2)} / {row.required_hours} hours verified</p><div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-brand-red-600" style={{ width: `${categoryPct}%` }} /></div><p className="mt-2 text-xs text-slate-500">{Number(row.remaining_hours || 0).toFixed(2)} hours remaining · {row.pending_entries || 0} pending</p></article>; })}</section>
 

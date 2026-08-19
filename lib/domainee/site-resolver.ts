@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { tenantPublicSiteUrl } from '@/lib/tenant/public-site-url';
-import { syncPaidAppSubscription } from '@/lib/apps/sync-paid-app-subscription';
+import { syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 
 const CUSTOM_DOMAIN_PLANS = new Set(['professional', 'enterprise']);
 
@@ -15,17 +15,11 @@ async function resolveWebsiteBuilderEntitlement(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
 ): Promise<WebsiteBuilderEntitlement> {
-  const { data } = await supabase
-    .from('user_app_subscriptions')
-    .select('id, app_slug, plan, status, stripe_subscription_id, current_period_end')
-    .eq('user_id', userId)
-    .eq('app_slug', 'website-builder')
-    .maybeSingle();
+  const synced = await syncIndividualAppSubscription(userId, 'website-builder', supabase).catch(() => null);
+  if (!synced) return { allowed: false, plan: null, status: null };
 
-  if (!data) return { allowed: false, plan: null, status: null };
-  const synced = await syncPaidAppSubscription(data).catch(() => data);
-  const plan = String(synced?.plan ?? '').toLowerCase();
-  const status = String(synced?.status ?? '').toLowerCase();
+  const plan = String(synced.plan ?? '').toLowerCase();
+  const status = String(synced.status ?? '').toLowerCase();
   return {
     allowed: status === 'active' && CUSTOM_DOMAIN_PLANS.has(plan),
     plan: plan || null,
@@ -61,11 +55,11 @@ export function requireCustomDomainEntitlement(entitlement: WebsiteBuilderEntitl
   if (entitlement.allowed) return null;
   return NextResponse.json(
     {
-      error: 'Custom domains require the Website Builder Professional or Enterprise plan.',
+      error: 'Custom domains require an active Website Builder Professional or Enterprise subscription.',
       code: 'UPGRADE_REQUIRED',
       plan: entitlement.plan,
       status: entitlement.status,
-      upgradeUrl: '/store/apps/website-builder',
+      upgradeUrl: '/store/apps/website-builder?reason=subscription-required',
     },
     { status: 403 },
   );

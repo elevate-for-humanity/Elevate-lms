@@ -1,5 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import type { PublishedTenantSite, TenantSitePage, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
@@ -22,7 +24,7 @@ function list(value: unknown): Array<Record<string, unknown>> {
   return Array.isArray(value) ? value.filter((item) => item && typeof item === 'object') as Array<Record<string, unknown>> : [];
 }
 
-function ActionLink({ href, children, primary, basePath }: { href: string; children: React.ReactNode; primary: string; basePath: string }) {
+function ActionLink({ href, children, primary, basePath }: { href: string; children: ReactNode; primary: string; basePath: string }) {
   const className = 'inline-flex rounded-full px-6 py-3 font-black text-white shadow-sm';
   const style = { backgroundColor: primary };
   if (external(href)) return <a href={href} target="_blank" rel="noreferrer" className={className} style={style}>{children}</a>;

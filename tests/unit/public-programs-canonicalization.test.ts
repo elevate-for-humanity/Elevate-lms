@@ -6,9 +6,10 @@ import {
 } from '../../lib/programs/public-programs-page';
 
 describe('public program canonicalization', () => {
-  it('consolidates duplicate business pathway slugs', () => {
-    expect(getCanonicalPublicProgramSlug('business')).toBe('business-administration');
-    expect(getCanonicalPublicProgramSlug('business-operations')).toBe('business-administration');
+  it('consolidates duplicate business pathway slugs to the detail-route canonical slug', () => {
+    expect(getCanonicalPublicProgramSlug('business')).toBe('business');
+    expect(getCanonicalPublicProgramSlug('business-administration')).toBe('business');
+    expect(getCanonicalPublicProgramSlug('business-operations')).toBe('business');
     expect(getCanonicalPublicProgramSlug('entrepreneurship')).toBe('business-startup');
     expect(getCanonicalPublicProgramSlug('entrepreneurship-small-business')).toBe('business-startup');
   });
@@ -19,7 +20,14 @@ describe('public program canonicalization', () => {
     expect(getCanonicalPublicProgramSlug('financial-literacy')).toBe('financial-literacy');
   });
 
-  it('keeps canonical aliases explicit and deterministic', () => {
+  it('never emits known detail-route aliases from public catalog canonicalization', () => {
+    expect(getCanonicalPublicProgramSlug('it-support-specialist')).toBe('it-help-desk');
+    expect(getCanonicalPublicProgramSlug('forklift-operator')).toBe('forklift');
+    expect(getCanonicalPublicProgramSlug('peer-support')).toBe('peer-recovery-specialist');
+    expect(getCanonicalPublicProgramSlug('recovery-coach')).toBe('peer-recovery-specialist');
+  });
+
+  it('keeps public consolidation aliases explicit and deterministic', () => {
     expect(PUBLIC_PROGRAM_ALIASES['customer-service-pro']).toBe('customer-service-representative');
     expect(PUBLIC_PROGRAM_ALIASES['it-support-specialist']).toBe('it-help-desk');
     expect(PUBLIC_PROGRAM_ALIASES['forklift-operator']).toBe('forklift');

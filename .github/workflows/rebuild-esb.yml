@@ -6,6 +6,14 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/rebuild-esb.yml'
+      - 'lib/curriculum/blueprints/entrepreneurship.ts'
+      - 'lib/course-builder/assessment-generator.ts'
+      - 'lib/video/edge-tts.ts'
+      - 'scripts/course-builder/run.ts'
+      - 'lib/course-factory/**'
+      - 'lib/course-builder/**'
+      - 'apps/admin/app/api/admin/course-builder/**'
+      - 'apps/admin/app/api/admin/lms/courses/generate/**'
 
 permissions:
   contents: read

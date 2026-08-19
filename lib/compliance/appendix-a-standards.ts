@@ -30,7 +30,6 @@ export type AppendixAStandard = {
   wageMilestones: readonly WageMilestone[];
   competencies: readonly AppendixACompetency[];
   relatedInstruction: readonly AppendixARTIItem[];
-  rtiProvider: string;
 };
 
 /**
@@ -45,6 +44,10 @@ export type AppendixAStandard = {
  * Source of truth: approved Appendix A Work Process Schedules and Related
  * Instruction Outlines. Do not replace these values with generic state-hour
  * rules or marketing copy. These occupations are competency-based.
+ *
+ * RTI provider assignments are operational RAPIDS data and are intentionally
+ * resolved from Supabase by registered-program-contract.ts rather than stored
+ * in this immutable standards definition.
  */
 export const APPENDIX_A_REGISTRATION = {
   sponsor: '2 Exclusive LLC-S',
@@ -96,7 +99,6 @@ export const APPENDIX_A_STANDARDS: Record<string, AppendixAStandard> = {
       { title: 'Business Practices', hours: 10 },
       { title: 'Preparation for State Licensing Examination', hours: 10 },
     ],
-    rtiProvider: 'Elevate for Humanity Career and Technical Institute',
   },
   esthetician: {
     occupationTitle: 'Esthetician',
@@ -147,7 +149,6 @@ export const APPENDIX_A_STANDARDS: Record<string, AppendixAStandard> = {
       { title: 'Retailing, Client Care & Business Practices', hours: 10 },
       { title: 'State Licensing Exam Preparation', hours: 10 },
     ],
-    rtiProvider: 'Elevate for Humanity Career and Technical Institute',
   },
   manicurist: {
     occupationTitle: 'Manicurist',
@@ -203,7 +204,6 @@ export const APPENDIX_A_STANDARDS: Record<string, AppendixAStandard> = {
       { title: 'Resume Building & Portfolio Development', hours: 10 },
       { title: 'Final Review & Virtual Practical Demonstration', hours: 45 },
     ],
-    rtiProvider: 'Grace Beauty College',
   },
 };
 

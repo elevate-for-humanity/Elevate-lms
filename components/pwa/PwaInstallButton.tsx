@@ -4,11 +4,11 @@
  * Canonical PWA install button.
  *
  * Shows:
- * - "Install App" when installable
- * - "Installed" when already installed
- * - Nothing when the platform doesn't support install (iOS)
+ * - an enabled install action when the browser exposes beforeinstallprompt
+ * - an installed state when already running as an installed app
+ * - no native-prompt button on iOS, where Add to Home Screen is browser-driven
  *
- * Each app can style it differently via className \u2014 the logic is shared.
+ * Each app can style it differently via className — the logic is shared.
  */
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 
@@ -21,7 +21,7 @@ interface PwaInstallButtonProps {
   className?: string;
   /** Show only when canInstall=true. Default: always show */
   showOnlyInstallable?: boolean;
-  /** Render as a different element (e.g. 'a', 'div') */
+  /** Render as a different element (reserved for compatibility) */
   as?: 'button' | 'a' | 'div';
 }
 
@@ -39,12 +39,13 @@ export function PwaInstallButton({
   if (isInstalled) {
     return (
       <button
+        type="button"
         disabled
         className={`${className} opacity-60 cursor-not-allowed`.trim()}
         title="App is installed"
         aria-label={installedLabel}
       >
-        <span aria-hidden="true">\u2713</span>
+        <span aria-hidden="true">✓</span>
         {installedLabel}
       </button>
     );
@@ -52,9 +53,13 @@ export function PwaInstallButton({
 
   return (
     <button
+      type="button"
       onClick={() => void promptInstall()}
-      className={className.trim()}
+      disabled={!canInstall}
+      className={`${className} ${!canInstall ? 'opacity-60 cursor-not-allowed' : ''}`.trim()}
       aria-label={label}
+      aria-disabled={!canInstall}
+      title={canInstall ? label : 'Install becomes available when this browser confirms the app is installable.'}
     >
       {label}
     </button>

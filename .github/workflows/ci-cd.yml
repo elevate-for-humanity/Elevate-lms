@@ -32,7 +32,7 @@ jobs:
           - name: production-typecheck
             command: pnpm run typecheck:all
           - name: route-governance
-            command: node scripts/run-platform-doctor-strict.mjs
+            command: pnpm run route:audit:strict
     env:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}

@@ -23,7 +23,7 @@ function cleanJson(content: string): any {
 
 function placeholder(config: unknown) {
   const meta = config && typeof config === 'object' && (config as any).meta && typeof (config as any).meta === 'object' ? (config as any).meta : {};
-  return meta.parisInterviewCompleted !== true;
+  return meta.parisInterviewCompleted === false;
 }
 
 export async function POST(request: NextRequest) {

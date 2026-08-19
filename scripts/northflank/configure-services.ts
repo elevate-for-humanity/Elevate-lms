@@ -33,7 +33,10 @@ type ServiceConfig = {
 type RolloutMode = 'custom' | 'rollout-steady' | 'recreate';
 
 const RUNTIME_PORT = 3000;
-const DESIRED_INSTANCES = 1;
+const DESIRED_INSTANCES = Number(
+  process.env.NORTHFLANK_DESIRED_INSTANCES ||
+    (process.env.NORTHFLANK_TARGET_SERVICE === 'admin' ? 2 : 1),
+);
 const BUILDKIT_CACHE_MB = 32768;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [
@@ -219,12 +222,10 @@ async function patchWithCapacitySafeStrategy(
 ): Promise<{ response: Record<string, any>; rolloutMode: RolloutMode }> {
   const path = combinedServicePatchPath(projectId, service.id);
 
-  // Production services currently run a single nf-compute-400 replica.
-  // maxSurge=1 requires capacity for a second full replica and can leave a
-  // replacement pending indefinitely when that allowance is unavailable.
-  // Use recreate for the single-replica topology so replacement occurs within
-  // the existing allowance. Startup/readiness/liveness probes and the deploy
-  // workflow's SHA verification still gate production success.
+  // Single-replica services use recreate to remain within their current capacity.
+  // The Admin production target defaults to two replicas so it can use a
+  // zero-unavailable rolling deployment and keep at least one healthy instance
+  // serving while a replacement starts and passes readiness.
   const rolloutMode: RolloutMode = DESIRED_INSTANCES === 1 ? 'recreate' : 'custom';
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',

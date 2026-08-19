@@ -1,17 +1,10 @@
 /**
- * lib/platform/platform-health.ts
- *
  * Centralized platform health aggregation layer.
- *
- * Single entry point for all health checks. Callers (Mission Control,
- * admin dashboard, alerting) call getPlatformHealth() instead of
- * hitting separate monitoring endpoints.
- *
- * Checks run in parallel with individual timeouts so one slow dependency
- * cannot block the rest of the health snapshot.
+ * Operational checks run in parallel with bounded timeouts.
  */
 
 import { logger } from '@/lib/logger';
+import { hydrateProcessEnv } from '@/lib/secrets';
 
 export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
 
@@ -27,6 +20,12 @@ export type AIProviderCheck = {
   name: string;
   configured: boolean;
   active: boolean;
+};
+
+export type PlatformAlert = {
+  severity: 'critical' | 'warning' | 'info';
+  service: string;
+  message: string;
 };
 
 export type PlatformHealthSnapshot = {
@@ -48,20 +47,10 @@ export type PlatformHealthSnapshot = {
   alerts: PlatformAlert[];
 };
 
-export type PlatformAlert = {
-  severity: 'critical' | 'warning' | 'info';
-  service: string;
-  message: string;
-};
-
-async function withTimeout<T>(
-  promise: Promise<T>,
-  ms: number,
-  fallback: T,
-): Promise<T> {
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
   return Promise.race([
     promise,
-    new Promise<T>(resolve => setTimeout(() => resolve(fallback), ms)),
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
   ]);
 }
 
@@ -74,10 +63,8 @@ async function checkDatabase(): Promise<ServiceCheck> {
       .from('profiles')
       .select('id', { count: 'exact', head: true })
       .limit(1);
-
     const latencyMs = Date.now() - start;
     if (error) throw error;
-
     return {
       name: 'Database',
       status: latencyMs > 3000 ? 'degraded' : 'healthy',
@@ -97,7 +84,6 @@ async function checkDatabase(): Promise<ServiceCheck> {
 
 async function checkRedis(): Promise<ServiceCheck> {
   const url = process.env.REDIS_URL?.trim();
-
   if (!url) {
     return {
       name: 'Redis',
@@ -110,8 +96,15 @@ async function checkRedis(): Promise<ServiceCheck> {
   const start = Date.now();
   let redis: import('ioredis').Redis | null = null;
   try {
-    const { Redis } = await import('ioredis');
-    redis = new Redis(url, {
+    // ioredis is CommonJS-compatible and Next/Node may expose the constructor as
+    // default or named depending on bundling. Resolve both forms explicitly.
+    const module = await import('ioredis');
+    const RedisCtor = module.default ?? module.Redis;
+    if (typeof RedisCtor !== 'function') {
+      throw new Error('ioredis constructor unavailable');
+    }
+
+    redis = new RedisCtor(url, {
       maxRetriesPerRequest: 1,
       connectTimeout: 5_000,
       enableReadyCheck: true,
@@ -119,7 +112,9 @@ async function checkRedis(): Promise<ServiceCheck> {
     });
     await redis.connect();
     const pong = await redis.ping();
-    if (pong !== 'PONG') throw new Error(`Unexpected Redis ping response: ${String(pong)}`);
+    if (pong !== 'PONG') {
+      throw new Error(`Unexpected Redis ping response: ${String(pong)}`);
+    }
 
     return {
       name: 'Redis',
@@ -140,7 +135,7 @@ async function checkRedis(): Promise<ServiceCheck> {
       try {
         redis.disconnect();
       } catch {
-        // Health checks must not fail while cleaning up a probe connection.
+        // A probe cleanup failure must not replace the probe result.
       }
     }
   }
@@ -197,15 +192,10 @@ async function checkEmail(): Promise<ServiceCheck> {
   try {
     const response = await fetch('https://api.sendgrid.com/v3/scopes', {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${key}`,
-        Accept: 'application/json',
-      },
+      headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
       cache: 'no-store',
     });
-    if (!response.ok) {
-      throw new Error(`SendGrid API returned HTTP ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`SendGrid API returned HTTP ${response.status}`);
     const latencyMs = Date.now() - start;
     return {
       name: 'Email (SendGrid)',
@@ -268,14 +258,12 @@ function checkAIProviders(): PlatformHealthSnapshot['ai'] {
     { name: 'gemini', configured: Boolean(process.env.GEMINI_API_KEY), active: false },
     { name: 'anthropic', configured: Boolean(process.env.ANTHROPIC_API_KEY), active: false },
   ];
-
-  const active = providers.find(p => p.configured);
+  const active = providers.find((provider) => provider.configured);
   if (active) active.active = true;
-
   return {
     activeProvider: active?.name ?? null,
     providers,
-    anyConfigured: providers.some(p => p.configured),
+    anyConfigured: providers.some((provider) => provider.configured),
   };
 }
 
@@ -299,23 +287,11 @@ function generateAlerts(
 
   for (const service of [services.stripe, services.email, services.storage]) {
     if (!service.configured) {
-      alerts.push({
-        severity: 'warning',
-        service: service.name,
-        message: service.message ?? `${service.name} is not configured`,
-      });
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is not configured` });
     } else if (service.status === 'down') {
-      alerts.push({
-        severity: 'warning',
-        service: service.name,
-        message: service.message ?? `${service.name} is unreachable`,
-      });
+      alerts.push({ severity: 'warning', service: service.name, message: service.message ?? `${service.name} is unreachable` });
     } else if (service.status === 'degraded') {
-      alerts.push({
-        severity: 'warning',
-        service: service.name,
-        message: `High latency: ${service.latencyMs}ms`,
-      });
+      alerts.push({ severity: 'warning', service: service.name, message: `High latency: ${service.latencyMs}ms` });
     }
   }
 
@@ -331,13 +307,12 @@ function determineOverall(
   alerts: PlatformAlert[],
 ): HealthStatus {
   if (services.database.status === 'down') return 'down';
-  if (alerts.some(a => a.severity === 'critical')) return 'degraded';
-  if (alerts.some(a => a.severity === 'warning')) return 'degraded';
+  if (alerts.some((alert) => alert.severity === 'critical')) return 'degraded';
+  if (alerts.some((alert) => alert.severity === 'warning')) return 'degraded';
   return 'healthy';
 }
 
 const TIMEOUT_MS = 5000;
-
 const DOWN_DB: ServiceCheck = { name: 'Database', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_STRIPE: ServiceCheck = { name: 'Stripe', status: 'down', configured: true, message: 'Timed out' };
@@ -348,6 +323,10 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   const start = Date.now();
 
   try {
+    // Canonical runtime secrets override stale container values. This is
+    // especially important after credential rotation (Stripe, Redis, AI, etc.).
+    await hydrateProcessEnv().catch(() => undefined);
+
     const [database, redis, stripe, email, storage] = await Promise.all([
       withTimeout(checkDatabase(), TIMEOUT_MS, DOWN_DB),
       withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
@@ -388,10 +367,7 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   }
 }
 
-/**
- * Configuration-only snapshot for server components that explicitly cannot
- * perform network probes. This must never be presented as operational health.
- */
+/** Configuration-only snapshot. Never present this as operational health. */
 export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'services'> {
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY?.startsWith('sk_'));
   const emailConfigured = Boolean(process.env.SENDGRID_API_KEY?.startsWith('SG.'));

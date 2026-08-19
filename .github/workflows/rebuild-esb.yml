@@ -10,10 +10,12 @@ on:
       - 'lib/course-builder/assessment-generator.ts'
       - 'lib/video/edge-tts.ts'
       - 'scripts/course-builder/run.ts'
+      - 'scripts/course-builder/verify-esb-runtime.ts'
       - 'lib/course-factory/**'
       - 'lib/course-builder/**'
       - 'apps/admin/app/api/admin/course-builder/**'
       - 'apps/admin/app/api/admin/lms/courses/generate/**'
+      - 'supabase/migrations/*course_factory*assessment*.sql'
 
 permissions:
   contents: read
@@ -73,3 +75,6 @@ jobs:
 
       - name: Validate ESB blueprint after rebuild
         run: pnpm tsx scripts/course-builder/run.ts --course entrepreneurship --validate
+
+      - name: Verify persisted ESB runtime contract
+        run: pnpm tsx scripts/course-builder/verify-esb-runtime.ts

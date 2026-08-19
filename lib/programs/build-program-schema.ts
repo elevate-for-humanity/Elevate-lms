@@ -233,7 +233,7 @@ export function buildProgramSchemaFromRegistry(entry: ProgramEntry): ProgramSche
     slug: entry.slug,
     title: entry.name,
     category: entry.category,
-    applyHref: entry.dedicatedApplyPage ?? `/apply?program=${entry.slug}`,
+    applyHref: `/apply?program=${entry.slug}`,
   });
 }
 

@@ -22,14 +22,7 @@ export type InteractionSpecs = {
   [key: string]: unknown;
 };
 
-/**
- * Curriculum metadata for registered apprenticeships.
- *
- * This describes how a course maps to a registered occupation. It does not own
- * the DOL standard. Runtime compliance requirements are resolved through the
- * registered-program contract. Competency-based occupations deliberately have
- * no fixed OJL completion denominator.
- */
+/** Curriculum metadata only. Runtime compliance is owned by the registered-program contract. */
 export type BlueprintApprenticeshipConfig = {
   approach: 'competency_based' | 'time_based' | 'hybrid';
   rtiHours: number;
@@ -37,9 +30,9 @@ export type BlueprintApprenticeshipConfig = {
   rapidsProgramCode: string;
   registeredProgramSlug: string;
   fixedOjlCompletionHours: number | null;
-  /** @deprecated Historical compatibility only. Do not use for completion logic. */
+  /** @deprecated Historical compatibility only; never use as competency-based completion logic. */
   totalHours?: number;
-  /** @deprecated Historical compatibility only. Do not use for competency-based completion logic. */
+  /** @deprecated Historical compatibility only; never use as competency-based completion logic. */
   ojlHours?: number;
   [key: string]: unknown;
 };
@@ -81,65 +74,162 @@ export type BlueprintLessonRef = {
   quizQuestions?: BlueprintQuizQuestion[];
   passingScore?: number;
   durationMinutes?: number;
-  type?: string;
-  isRequired?: boolean;
-  approved?: boolean;
+  videoFile?: string;
+  partnerExamCode?: string;
+  instructorNotes?: string | string[];
+  competencyChecks?: Array<string | BlueprintCompetencyCheck>;
   [key: string]: unknown;
 };
 
-export type BlueprintModuleRef = {
+export type BlueprintCompetency = {
+  competencyKey: string;
+  isCritical: boolean;
+  minimumTouchpoints: number;
+  assessmentMethod?: 'quiz' | 'lab' | 'exam' | 'observation' | 'assignment';
+  domainKey?: string;
+  requiresInstructorSignoff?: boolean;
+  [key: string]: unknown;
+};
+
+export type BlueprintLessonTypeRule = {
+  lessonType: string;
+  requiredCount: number;
+  [key: string]: unknown;
+};
+
+export type BlueprintModule = {
   slug: string;
   title: string;
+  description?: string;
   orderIndex: number;
+  minLessons: number;
+  maxLessons: number;
+  quizRequired: boolean;
+  practicalRequired: boolean;
+  isCritical: boolean;
+  requiredLessonTypes: BlueprintLessonTypeRule[];
+  competencies: BlueprintCompetency[];
+  suggestedLessonSkeleton?: string[];
+  lessons?: BlueprintLessonRef[];
   domainKey?: string;
-  minLessons?: number;
-  maxLessons?: number;
-  quizRequired?: boolean;
-  practicalRequired?: boolean;
-  isCritical?: boolean;
-  requiredLessonTypes?: Array<{ lessonType: string; requiredCount: number }>;
-  competencies?: Array<{ competencyKey: string; isCritical?: boolean; minimumTouchpoints?: number }>;
-  lessons: BlueprintLessonRef[];
+  interactionSpecs?: InteractionSpecs;
+  [key: string]: unknown;
+};
+
+export type BlueprintAssessmentRule = {
+  assessmentType: 'module' | 'type_specific' | 'universal_review' | 'final';
+  scope: string;
+  minQuestions: number;
+  maxQuestions: number;
+  passingThreshold: number;
+  distributionConstraints?: Record<string, number>;
+  [key: string]: unknown;
+};
+
+export type BlueprintGenerationRules = {
+  allowRemediation?: boolean;
+  allowExpansionLessons?: boolean;
+  maxTotalLessons?: number;
+  requiresFinalExam?: boolean;
+  requiresUniversalReview?: boolean;
+  generatorMode?: 'fixed' | 'flexible';
+  minModules?: number;
+  maxModules?: number;
+  minLessonsPerModule?: number;
+  maxLessonsPerModule?: number;
+  requireCheckpointPerModule?: boolean;
+  requireFinalExam?: boolean;
+  passingScore?: number;
+  allowedLessonTypes?: string[];
+  [key: string]: unknown;
+};
+
+export type BlueprintFinalExamConfig = {
+  questionCount: number;
+  passingScore: number;
+  domainDistribution?: Record<string, number>;
+  [key: string]: unknown;
+};
+
+export type BlueprintCertificateRequirements = {
+  includeHours: boolean;
+  includeCompetencies: boolean;
+  includeInstructorVerification: boolean;
+  includeCompletionDate?: boolean;
+  includeVerificationUrl?: boolean;
+  requireAllCriticalCompetencies?: boolean;
   [key: string]: unknown;
 };
 
 export type BlueprintVideoConfig = {
-  videoGenerator?: string;
-  template?: string;
-  instructorName?: string;
-  instructorTitle?: string;
-  instructorImagePath?: string;
+  videoGenerator: 'runway' | 'canvas-slides' | 'manual';
+  template: 'elevate-slide' | 'talking-head' | 'screencast' | 'custom';
+  instructorName: string;
+  instructorTitle: string;
+  instructorImagePath: string;
+  brandName?: string;
+  brandColor?: string;
   topBarColor?: string;
-  accentColor?: string;
   backgroundColor?: string;
-  ttsVoice?: string;
-  ttsSpeed?: number;
-  slideCount?: number;
-  segments?: string[];
-  generateDalleImage?: boolean;
-  dalleImageStyle?: string;
-  width?: number;
-  height?: number;
+  textColor?: string;
+  accentColor?: string;
+  logoPath?: string;
+  backgroundMusic?: boolean;
+  captions?: boolean;
+  [key: string]: unknown;
+};
+
+export type BlueprintExternalCourse = {
+  provider?: string;
+  title?: string;
+  url?: string;
+  courseId?: string;
+  examCode?: string;
+  required?: boolean;
+  notes?: string;
+  [key: string]: unknown;
+};
+
+export type BlueprintAuditViolation = {
+  code: string;
+  message: string;
+  severity?: 'info' | 'warning' | 'error';
+  path?: string;
+  [key: string]: unknown;
+};
+
+export type BlueprintAuditResult = {
+  ok: boolean;
+  violations: BlueprintAuditViolation[];
+  warnings?: BlueprintAuditViolation[];
+  score?: number;
   [key: string]: unknown;
 };
 
 export type CredentialBlueprint = {
   id: string;
-  version: string;
+  programSlug: string;
   credentialSlug: string;
   credentialTitle: string;
-  credentialCode?: string;
-  state?: string;
-  programSlug?: string;
-  trackVariants?: string[];
-  status?: string;
-  skipLqs?: boolean;
-  generationRules?: Record<string, unknown>;
-  expectedModuleCount?: number;
-  expectedLessonCount?: number;
+  credentialCode: string;
+  state: string;
+  status: string;
+  version: string;
+  expectedModuleCount: number;
+  expectedLessonCount: number;
+  modules: BlueprintModule[];
+  assessmentRules: BlueprintAssessmentRule[];
+  generationRules: BlueprintGenerationRules;
+  title?: string;
+  sourceAuthority?: string;
+  sourceReference?: string;
+  effectiveDate?: string;
+  programType?: string;
+  targetRole?: string;
+  finalExam?: BlueprintFinalExamConfig;
+  certificateRequirements?: BlueprintCertificateRequirements;
   videoConfig?: BlueprintVideoConfig;
-  assessmentRules?: Array<Record<string, unknown>>;
-  modules: BlueprintModuleRef[];
+  externalCourses?: BlueprintExternalCourse[];
   apprenticeshipConfig?: BlueprintApprenticeshipConfig;
   certificationPathway?: BlueprintCertificationPathway;
   [key: string]: unknown;

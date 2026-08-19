@@ -1,11 +1,18 @@
 /**
- * RAPIDS CSV Export for Bulk Upload
+ * RAPIDS bulk-upload export.
+ *
+ * Registered-apprenticeship facts must come from the same runtime contract and
+ * progress services used by Host Shop and Apprentice surfaces. This exporter
+ * must never invent 2,000 OJL hours, 144 RTI hours, a generic employer, or a
+ * fixed completion denominator for a competency-based occupation.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@/lib/supabase';
-import { RAPIDS_CONFIG } from './rapids-config';
 import { setAuditContext } from '@/lib/audit-context';
+import { resolveApprenticeshipRuntimeContext } from '@/lib/apprenticeship/runtime-context';
+import { loadRegisteredApprenticeshipProgress } from '@/lib/apprenticeship/progress-service';
+import { resolveApplicableWage } from '@/lib/apprenticeship/registered-program-contract';
 
 async function getSupabaseAdmin(): Promise<SupabaseClient> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -32,7 +39,51 @@ export const CANCELLATION_REASONS = {
   '08': 'Involuntary - Failed to meet standards',
   '09': 'Transfer to another program',
   '10': 'Other',
+} as const;
+
+type ExportProfile = {
+  id?: string | null;
+  full_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  date_of_birth?: string | null;
+  gender?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
+  ssn_encrypted?: string | null;
+  veteran_status?: boolean | null;
+  disability_status?: boolean | null;
+  education_level?: string | null;
+  race_ethnicity?: string | null;
 };
+
+function splitName(fullName: string | null | undefined) {
+  const parts = String(fullName || '').trim().split(/\s+/).filter(Boolean);
+  return {
+    firstName: parts[0] || '',
+    lastName: parts.length > 1 ? parts[parts.length - 1] : '',
+    middleName: parts.length > 2 ? parts.slice(1, -1).join(' ') : '',
+  };
+}
+
+function actualWage(enrollment: Record<string, any>) {
+  for (const value of [enrollment.current_wage, enrollment.starting_wage, enrollment.final_wage]) {
+    const amount = Number(value);
+    if (Number.isFinite(amount) && amount > 0) return amount;
+  }
+  return null;
+}
+
+async function loadExportContext(supabase: SupabaseClient, enrollmentId: string) {
+  const context = await resolveApprenticeshipRuntimeContext(supabase, {
+    enrollmentId,
+    requireRegisteredStandard: true,
+  });
+  if (!context?.contract) throw new Error(`REGISTERED_RUNTIME_CONTEXT_MISSING:${enrollmentId}`);
+  return context;
+}
 
 export async function exportNewRegistrations(
   startDate?: string,
@@ -41,66 +92,71 @@ export async function exportNewRegistrations(
   const errors: string[] = [];
   const supabase = await getSupabaseAdmin();
   await setAuditContext(supabase, { systemActor: 'rapids_export' });
+
   let query = supabase
     .from('program_enrollments')
-    .select(`*, profiles:user_id (id, full_name, email, phone, date_of_birth, gender, address, city, state, zip, ssn_encrypted, veteran_status, disability_status, education_level, race_ethnicity), programs:program_id (name, slug, type, occupation_code, total_hours, related_instruction_hours)`)
+    .select(`*, profiles:user_id (id, full_name, email, phone, date_of_birth, gender, address, city, state, zip, ssn_encrypted, veteran_status, disability_status, education_level, race_ethnicity)`)
     .eq('rapids_submitted', false)
-    .in('status', ['active', 'enrolled']);
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed']);
   if (startDate) query = query.gte('enrolled_at', startDate);
   if (endDate) query = query.lte('enrolled_at', endDate);
+
   const { data: enrollments, error } = await query;
   if (error) return { csv: '', count: 0, errors: ['Export failed'] };
   if (!enrollments?.length) return { csv: '', count: 0, errors: ['No new registrations to export'] };
 
   const rows: string[][] = [];
   for (const enrollment of enrollments) {
-    const profile = enrollment.profiles;
-    const program = enrollment.programs;
-    if (!profile || !program) {
-      errors.push(`Missing profile or program for enrollment ${enrollment.id}`);
-      continue;
+    try {
+      const profile = enrollment.profiles as ExportProfile | null;
+      if (!profile) throw new Error('profile missing');
+      const context = await loadExportContext(supabase, enrollment.id);
+      const contract = context.contract!;
+      const { firstName, lastName, middleName } = splitName(profile.full_name);
+      const employerName = context.partner?.legal_name || context.partner?.dba || context.partner?.name || context.shop?.name || enrollment.employer_name || '';
+      const startingWage = Number(enrollment.starting_wage) > 0
+        ? Number(enrollment.starting_wage)
+        : contract.employer?.wageSchedule?.startingHourlyRate ?? null;
+
+      if (!employerName) errors.push(`Enrollment ${enrollment.id}: employer identity is missing`);
+      if (startingWage == null) errors.push(`Enrollment ${enrollment.id}: starting wage is not recorded`);
+
+      rows.push([
+        contract.sponsor.registrationNumber,
+        lastName,
+        firstName,
+        middleName,
+        profile.ssn_encrypted ? '***-**-****' : '',
+        formatDate(profile.date_of_birth),
+        profile.gender || 'X',
+        profile.race_ethnicity || '',
+        profile.veteran_status ? 'Y' : 'N',
+        profile.disability_status ? 'Y' : 'N',
+        profile.education_level || '',
+        formatDate(enrollment.enrolled_at || enrollment.created_at),
+        contract.standard.rapidsCode,
+        contract.standard.occupationTitle,
+        contract.completion.fixedOjlCompletionHours == null ? '' : String(contract.completion.fixedOjlCompletionHours),
+        String(contract.completion.requiredRtiHours),
+        employerName,
+        enrollment.employer_fein || '',
+        enrollment.employer_address || context.shop?.address1 || '',
+        enrollment.employer_city || context.shop?.city || '',
+        enrollment.employer_state || context.shop?.state || '',
+        enrollment.employer_zip || context.shop?.zip || '',
+        startingWage == null ? '' : String(startingWage),
+        profile.address || '',
+        profile.city || '',
+        profile.state || '',
+        profile.zip || '',
+        profile.phone || '',
+        profile.email || '',
+      ]);
+    } catch (err) {
+      errors.push(`Enrollment ${enrollment.id}: ${err instanceof Error ? err.message : 'registered contract unavailable'}`);
     }
-    const nameParts = (profile.full_name || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts[nameParts.length - 1] || '';
-    const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : '';
-    const programConfig = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === program.slug);
-    const termLengthHours = program.total_hours;
-    if (termLengthHours == null && programConfig?.approach !== 'competency-based') {
-      errors.push(`Missing term length hours for enrollment ${enrollment.id}`);
-    }
-    rows.push([
-      RAPIDS_CONFIG.programNumber,
-      lastName,
-      firstName,
-      middleName,
-      profile.ssn_encrypted ? '***-**-****' : '',
-      formatDate(profile.date_of_birth),
-      profile.gender || 'X',
-      profile.race_ethnicity || '',
-      profile.veteran_status ? 'Y' : 'N',
-      profile.disability_status ? 'Y' : 'N',
-      profile.education_level || '',
-      formatDate(enrollment.enrolled_at),
-      programConfig?.occupationCode || program.occupation_code || '',
-      programConfig?.name || program.name || '',
-      termLengthHours == null ? '' : String(termLengthHours),
-      String(programConfig?.relatedInstructionHours || program.related_instruction_hours || 144),
-      enrollment.employer_name || RAPIDS_CONFIG.programBrand,
-      enrollment.employer_fein || '',
-      enrollment.employer_address || '8888 Keystone Crossing, Suite 1300',
-      enrollment.employer_city || 'Indianapolis',
-      enrollment.employer_state || 'IN',
-      enrollment.employer_zip || '46240',
-      String(enrollment.starting_wage || 0),
-      profile.address || '',
-      profile.city || '',
-      profile.state || 'IN',
-      profile.zip || '',
-      profile.phone || '',
-      profile.email || '',
-    ]);
   }
+
   return { csv: generateCSV(REGISTRATION_HEADERS, rows), count: rows.length, errors };
 }
 
@@ -109,45 +165,47 @@ export async function exportProgressUpdates(
 ): Promise<{ csv: string; count: number; errors: string[] }> {
   const errors: string[] = [];
   const supabase = await getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'rapids_export' });
+
   const { data: enrollments, error } = await supabase
     .from('program_enrollments')
-    .select(`*, profiles:user_id (id, full_name, ssn_encrypted), programs:program_id (name, slug)`)
-    .eq('status', 'active')
+    .select(`*, profiles:user_id (id, full_name, ssn_encrypted)`)
+    .in('status', ['active', 'enrolled', 'in_progress', 'confirmed'])
     .eq('rapids_submitted', true);
   if (error) return { csv: '', count: 0, errors: ['Export failed'] };
   if (!enrollments?.length) return { csv: '', count: 0, errors: ['No active apprentices to report'] };
 
   const rows: string[][] = [];
   for (const enrollment of enrollments) {
-    const profile = enrollment.profiles;
-    if (!profile) continue;
-    const nameParts = (profile.full_name || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts[nameParts.length - 1] || '';
-    const { data: hoursData } = await supabase
-      .from('hour_entries')
-      .select('hours_claimed, accepted_hours, source_type')
-      .eq('user_id', profile.id)
-      .eq('status', 'approved');
-    let ojlHours = 0;
-    let rtiHours = 0;
-    (hoursData || []).forEach((h: any) => {
-      const hrs = Number(h.accepted_hours) || Number(h.hours_claimed) || 0;
-      if (['ojl', 'host_shop', 'timeclock', 'manual'].includes(h.source_type)) ojlHours += hrs;
-      else if (['rti', 'in_state_barber_school', 'continuing_education'].includes(h.source_type)) rtiHours += hrs;
-    });
-    rows.push([
-      RAPIDS_CONFIG.programNumber,
-      profile.ssn_encrypted ? '***-**-****' : '',
-      lastName,
-      firstName,
-      reportDate,
-      String(ojlHours),
-      String(rtiHours),
-      String(enrollment.current_wage || 0),
-      'Active',
-    ]);
+    try {
+      const profile = enrollment.profiles as ExportProfile | null;
+      if (!profile) throw new Error('profile missing');
+      const context = await loadExportContext(supabase, enrollment.id);
+      const progress = await loadRegisteredApprenticeshipProgress(supabase, context);
+      const wage = resolveApplicableWage(context.contract!, progress.competencies.completed);
+      const recordedWage = actualWage(enrollment);
+      const { firstName, lastName } = splitName(profile.full_name);
+
+      if (recordedWage == null) {
+        errors.push(`Enrollment ${enrollment.id}: current wage is not recorded; required floor is ${wage.requiredRegisteredRate}`);
+      }
+
+      rows.push([
+        context.contract!.sponsor.registrationNumber,
+        profile.ssn_encrypted ? '***-**-****' : '',
+        lastName,
+        firstName,
+        reportDate,
+        String(progress.ojl.approvedHours),
+        String(progress.rti.verifiedHours),
+        recordedWage == null ? '' : String(recordedWage),
+        'Active',
+      ]);
+    } catch (err) {
+      errors.push(`Enrollment ${enrollment.id}: ${err instanceof Error ? err.message : 'progress unavailable'}`);
+    }
   }
+
   return { csv: generateCSV(PROGRESS_HEADERS, rows), count: rows.length, errors };
 }
 
@@ -157,36 +215,51 @@ export async function exportCompletions(
 ): Promise<{ csv: string; count: number; errors: string[] }> {
   const errors: string[] = [];
   const supabase = await getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'rapids_export' });
+
   let query = supabase
     .from('program_enrollments')
-    .select(`*, profiles:user_id (id, full_name, ssn_encrypted), programs:program_id (name, slug)`)
+    .select(`*, profiles:user_id (id, full_name, ssn_encrypted)`)
     .eq('status', 'completed')
     .eq('rapids_completion_submitted', false);
   if (startDate) query = query.gte('completed_at', startDate);
   if (endDate) query = query.lte('completed_at', endDate);
+
   const { data: enrollments, error } = await query;
   if (error) return { csv: '', count: 0, errors: ['Export failed'] };
   if (!enrollments?.length) return { csv: '', count: 0, errors: ['No completions to export'] };
 
   const rows: string[][] = [];
   for (const enrollment of enrollments) {
-    const profile = enrollment.profiles;
-    if (!profile) continue;
-    const nameParts = (profile.full_name || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts[nameParts.length - 1] || '';
-    rows.push([
-      RAPIDS_CONFIG.programNumber,
-      profile.ssn_encrypted ? '***-**-****' : '',
-      lastName,
-      firstName,
-      formatDate(enrollment.completed_at),
-      String(enrollment.final_ojt_hours || 0),
-      String(enrollment.final_rti_hours || 0),
-      String(enrollment.final_wage || 0),
-      enrollment.certificate_number || '',
-    ]);
+    try {
+      const profile = enrollment.profiles as ExportProfile | null;
+      if (!profile) throw new Error('profile missing');
+      const context = await loadExportContext(supabase, enrollment.id);
+      const progress = await loadRegisteredApprenticeshipProgress(supabase, context);
+      if (!progress.completionReady) {
+        errors.push(`Enrollment ${enrollment.id}: completion blocked — ${progress.competencies.completed}/${progress.competencies.required} competencies and ${progress.rti.verifiedHours}/${progress.rti.requiredHours} RTI hours verified`);
+        continue;
+      }
+      const { firstName, lastName } = splitName(profile.full_name);
+      const finalWage = actualWage(enrollment);
+      if (finalWage == null) errors.push(`Enrollment ${enrollment.id}: final wage is not recorded`);
+
+      rows.push([
+        context.contract!.sponsor.registrationNumber,
+        profile.ssn_encrypted ? '***-**-****' : '',
+        lastName,
+        firstName,
+        formatDate(enrollment.completed_at),
+        String(progress.ojl.approvedHours),
+        String(progress.rti.verifiedHours),
+        finalWage == null ? '' : String(finalWage),
+        enrollment.certificate_number || '',
+      ]);
+    } catch (err) {
+      errors.push(`Enrollment ${enrollment.id}: ${err instanceof Error ? err.message : 'completion evidence unavailable'}`);
+    }
   }
+
   return { csv: generateCSV(COMPLETION_HEADERS, rows), count: rows.length, errors };
 }
 
@@ -196,38 +269,47 @@ export async function exportCancellations(
 ): Promise<{ csv: string; count: number; errors: string[] }> {
   const errors: string[] = [];
   const supabase = await getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'rapids_export' });
+
   let query = supabase
     .from('program_enrollments')
-    .select(`*, profiles:user_id (id, full_name, ssn_encrypted), programs:program_id (name, slug)`)
+    .select(`*, profiles:user_id (id, full_name, ssn_encrypted)`)
     .in('status', ['cancelled', 'terminated', 'withdrawn'])
     .eq('rapids_cancellation_submitted', false);
   if (startDate) query = query.gte('cancelled_at', startDate);
   if (endDate) query = query.lte('cancelled_at', endDate);
+
   const { data: enrollments, error } = await query;
   if (error) return { csv: '', count: 0, errors: ['Export failed'] };
   if (!enrollments?.length) return { csv: '', count: 0, errors: ['No cancellations to export'] };
 
   const rows: string[][] = [];
   for (const enrollment of enrollments) {
-    const profile = enrollment.profiles;
-    if (!profile) continue;
-    const nameParts = (profile.full_name || '').split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts[nameParts.length - 1] || '';
-    const reasonCode = enrollment.cancellation_reason_code || '10';
-    const reasonDesc = CANCELLATION_REASONS[reasonCode as keyof typeof CANCELLATION_REASONS] || enrollment.cancellation_reason || 'Other';
-    rows.push([
-      RAPIDS_CONFIG.programNumber,
-      profile.ssn_encrypted ? '***-**-****' : '',
-      lastName,
-      firstName,
-      formatDate(enrollment.cancelled_at),
-      reasonCode,
-      reasonDesc,
-      String(enrollment.ojt_hours_at_cancellation || 0),
-      String(enrollment.rti_hours_at_cancellation || 0),
-    ]);
+    try {
+      const profile = enrollment.profiles as ExportProfile | null;
+      if (!profile) throw new Error('profile missing');
+      const context = await loadExportContext(supabase, enrollment.id);
+      const progress = await loadRegisteredApprenticeshipProgress(supabase, context);
+      const { firstName, lastName } = splitName(profile.full_name);
+      const reasonCode = String(enrollment.cancellation_reason_code || '10') as keyof typeof CANCELLATION_REASONS;
+      const reasonDesc = CANCELLATION_REASONS[reasonCode] || enrollment.cancellation_reason || 'Other';
+
+      rows.push([
+        context.contract!.sponsor.registrationNumber,
+        profile.ssn_encrypted ? '***-**-****' : '',
+        lastName,
+        firstName,
+        formatDate(enrollment.cancelled_at || enrollment.updated_at),
+        reasonCode,
+        reasonDesc,
+        String(progress.ojl.approvedHours),
+        String(progress.rti.verifiedHours),
+      ]);
+    } catch (err) {
+      errors.push(`Enrollment ${enrollment.id}: ${err instanceof Error ? err.message : 'cancellation evidence unavailable'}`);
+    }
   }
+
   return { csv: generateCSV(CANCELLATION_HEADERS, rows), count: rows.length, errors };
 }
 
@@ -242,7 +324,7 @@ function generateCSV(headers: string[], rows: string[][]): string {
 function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '';
   const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return '';
+  if (Number.isNaN(date.getTime())) return '';
   return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()}`;
 }
 
@@ -251,6 +333,7 @@ export async function markAsSubmitted(
   type: 'registration' | 'completion' | 'cancellation',
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = await getSupabaseAdmin();
+  await setAuditContext(supabase, { systemActor: 'rapids_export' });
   const updateField = {
     registration: 'rapids_submitted',
     completion: 'rapids_completion_submitted',

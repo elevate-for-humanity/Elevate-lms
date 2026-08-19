@@ -49,8 +49,8 @@ export default async function HostShopSchedulePage() {
           <Link href="/host-shop/dashboard/attendance/record" className="rounded-xl bg-brand-blue-700 px-4 py-2 text-sm font-bold text-white hover:bg-brand-blue-800">
             Record attendance
           </Link>
-          <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
-            Back to board
+          <Link href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+            Back to dashboard
           </Link>
         </div>
       </div>
@@ -62,26 +62,14 @@ export default async function HostShopSchedulePage() {
       ) : null}
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
-          <h2 className="font-black text-slate-950">Upcoming sessions</h2>
-        </div>
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6"><h2 className="font-black text-slate-950">Upcoming sessions</h2></div>
         {upcoming.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <Calendar className="mx-auto h-10 w-10 text-slate-300" />
-            <h3 className="mt-3 font-bold text-slate-900">No upcoming sessions</h3>
-            <p className="mt-1 text-sm text-slate-500">New hosted attendance sessions will appear here automatically.</p>
-          </div>
+          <div className="px-6 py-12 text-center"><Calendar className="mx-auto h-10 w-10 text-slate-300" /><h3 className="mt-3 font-bold text-slate-900">No upcoming sessions</h3><p className="mt-1 text-sm text-slate-500">New hosted attendance sessions will appear here automatically.</p></div>
         ) : (
           <div className="divide-y divide-slate-200">
             {upcoming.map((session) => (
               <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                <div>
-                  <p className="font-black text-slate-950">{session.title || 'Training session'}</p>
-                  <p className="mt-1 flex items-center gap-2 text-sm text-slate-600">
-                    <Clock className="h-4 w-4" />
-                    {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'}
-                  </p>
-                </div>
+                <div><p className="font-black text-slate-950">{session.title || 'Training session'}</p><p className="mt-1 flex items-center gap-2 text-sm text-slate-600"><Clock className="h-4 w-4" />{session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'}</p></div>
                 <span className="text-sm font-bold capitalize text-slate-700">{session.status || 'scheduled'}</span>
               </div>
             ))}
@@ -90,20 +78,11 @@ export default async function HostShopSchedulePage() {
       </section>
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-5 py-4 sm:px-6">
-          <h2 className="font-black text-slate-950">Recent sessions</h2>
-        </div>
-        {past.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-slate-500">No completed or past sessions are recorded for this account.</p>
-        ) : (
+        <div className="border-b border-slate-200 px-5 py-4 sm:px-6"><h2 className="font-black text-slate-950">Recent sessions</h2></div>
+        {past.length === 0 ? <p className="px-6 py-8 text-sm text-slate-500">No completed or past sessions are recorded for this account.</p> : (
           <div className="divide-y divide-slate-200">
             {past.map((session) => (
-              <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                <p className="font-semibold text-slate-900">{session.title || 'Training session'}</p>
-                <p className="text-sm text-slate-500">
-                  {session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'} · {session.status || 'recorded'}
-                </p>
-              </div>
+              <div key={session.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"><p className="font-semibold text-slate-900">{session.title || 'Training session'}</p><p className="text-sm text-slate-500">{session.scheduled_at ? new Date(session.scheduled_at).toLocaleString() : 'Time not set'} · {session.status || 'recorded'}</p></div>
             ))}
           </div>
         )}

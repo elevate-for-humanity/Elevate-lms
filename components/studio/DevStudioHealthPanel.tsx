@@ -36,7 +36,7 @@ export default function DevStudioHealthPanel() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/devstudio/health');
+      const res = await fetch('/api/admin/dev-studio/health');
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { error?: string }).error ?? `HTTP ${res.status}`);
       setHealth(data as HealthPayload);

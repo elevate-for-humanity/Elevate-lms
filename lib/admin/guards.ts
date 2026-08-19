@@ -8,6 +8,11 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { unauthorized, forbidden, serverError } from '@/lib/api/responses';
 import {
+  PRIVILEGED_MFA_ROLES,
+  checkPrivilegedMfa,
+  privilegedMfaEnforcementEnabled,
+} from '@/lib/auth/privileged-mfa';
+import {
   API_ADMIN_ROLES,
   INSTRUCTOR_ROLES as _INSTRUCTOR_ROLES,
   TESTING_CENTER_ROLES,
@@ -134,6 +139,37 @@ export async function apiAuthGuard(_req?: Request): Promise<GuardedUser> {
   }
 }
 
+async function requirePrivilegedMfaIfEnabled(user: GuardedUser): Promise<NextResponse | null> {
+  if (!privilegedMfaEnforcementEnabled()) return null;
+
+  const isPrivileged = user.effectiveRoles.some((role) =>
+    PRIVILEGED_MFA_ROLES.includes(role as UserRole),
+  );
+  if (!isPrivileged) return null;
+
+  try {
+    const supabase = await createClient();
+    const result = await checkPrivilegedMfa(supabase, user.effectiveRoles);
+    if (result.satisfied) return null;
+
+    return NextResponse.json(
+      {
+        error: 'MFA_REQUIRED',
+        message: 'Multi-factor authentication is required for privileged access.',
+        currentLevel: result.currentLevel,
+        nextLevel: result.nextLevel,
+        mfaUrl: '/mfa',
+      },
+      { status: 403 },
+    );
+  } catch {
+    return NextResponse.json(
+      { error: 'MFA_CHECK_FAILED', message: 'Unable to verify multi-factor authentication.' },
+      { status: 503 },
+    );
+  }
+}
+
 export async function apiRequireRoles(
   request: Request | undefined,
   allowedRoles: readonly UserRole[],
@@ -144,6 +180,10 @@ export async function apiRequireRoles(
   if (!hasAnyRole(user.effectiveRoles, allowedRoles, options)) {
     return { ...user, error: forbidden() };
   }
+
+  const mfaError = await requirePrivilegedMfaIfEnabled(user);
+  if (mfaError) return { ...user, error: mfaError };
+
   return user;
 }
 

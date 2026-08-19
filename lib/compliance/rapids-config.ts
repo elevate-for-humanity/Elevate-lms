@@ -53,45 +53,46 @@ export const RAPIDS_CONFIG = {
 } as const;
 
 export function getRAPIDSMetadata(programSlug: string) {
-  const program = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === programSlug);
-  if (!program) return null;
+  const registered = getRegisteredProgramStandard(programSlug);
+  if (!registered) return null;
+  const standard = registered.standard;
   return {
-    rapids_sponsor_legal: RAPIDS_CONFIG.sponsorOfRecord,
+    rapids_sponsor_legal: registered.sponsor.sponsor,
     rapids_program_brand: RAPIDS_CONFIG.programBrand,
-    rapids_program: program.name,
+    rapids_program: `${standard.occupationTitle} Apprenticeship`,
     rapids_state: RAPIDS_CONFIG.stateCode,
-    rapids_registration_id: RAPIDS_CONFIG.registrationId,
-    rapids_occupation_code: program.rapidsCode,
-    onet_soc_code: program.occupationCode,
-    apprenticeship_approach: program.approach,
-    competency_count: program.competencyCount,
-    related_instruction_hours: program.relatedInstructionHours,
-    funding_type: program.fundingType,
+    rapids_registration_id: registered.sponsor.registrationNumber,
+    rapids_occupation_code: standard.rapidsCode,
+    onet_soc_code: standard.onetSocCode,
+    apprenticeship_approach: standard.approach,
+    competency_count: registered.completion.competencyCount,
+    related_instruction_hours: registered.completion.requiredRtiHours,
   };
 }
 
 export function getRAPIDSEnrollmentData(programSlug: string) {
-  const program = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === programSlug);
-  if (!program) return null;
+  const registered = getRegisteredProgramStandard(programSlug);
+  if (!registered) return null;
+  const standard = registered.standard;
   return {
-    rapids_sponsor: RAPIDS_CONFIG.sponsorOfRecord,
-    rapids_program: program.name,
+    rapids_sponsor: registered.sponsor.sponsor,
+    rapids_program: `${standard.occupationTitle} Apprenticeship`,
     rapids_state: RAPIDS_CONFIG.stateCode,
     rapids_registration_on_file: true,
-    rapids_occupation_code: program.rapidsCode,
-    onet_soc_code: program.occupationCode,
-    apprenticeship_approach: program.approach,
-    competency_count_required: program.competencyCount,
-    related_instruction_hours: program.relatedInstructionHours,
-    probationary_hours: program.probationaryHours,
-    apprentice_to_mentor_ratio: program.apprenticeToMentorRatio,
-    starting_hourly_rate: program.startingHourlyRate,
-    wage_milestones: program.wageMilestones,
+    rapids_occupation_code: standard.rapidsCode,
+    onet_soc_code: standard.onetSocCode,
+    apprenticeship_approach: standard.approach,
+    competency_count_required: registered.completion.competencyCount,
+    related_instruction_hours: registered.completion.requiredRtiHours,
+    probationary_hours: standard.probationaryHours,
+    apprentice_to_mentor_ratio: standard.apprenticeToMentorRatio,
+    starting_hourly_rate: standard.startingHourlyRate,
+    wage_milestones: standard.wageMilestones,
   };
 }
 
 export function isRAPIDSProgram(programSlug: string): boolean {
-  return Object.values(RAPIDS_CONFIG.programs).some((p) => p.slug === programSlug);
+  return getRegisteredProgramStandard(programSlug) !== null;
 }
 
 export function getPublicRegistrationDetails() {

@@ -80,7 +80,7 @@ export const PLATFORM_SURFACES: Record<string, PlatformSurfaceContract> = {
     provisioningKind: 'lms_workspace',
   },
   course_builder: {
-    key: 'course_builder', label: 'Course Builder', runtime: 'lms',
+    key: 'course_builder', label: 'Course Builder', runtime: 'admin',
     entryPath: '/studio/courses', scope: 'organization', requiredFeature: PlatformFeature.COURSE_BUILDER,
     provisioningKind: 'course_workspace',
   },

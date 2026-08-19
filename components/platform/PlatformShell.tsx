@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Search,
   Menu,
+  X,
   ChevronDown,
   LogOut,
   ShieldCheck,
@@ -56,14 +57,38 @@ export function PlatformShell({
 }: PlatformShellProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const sections = getNavigationForRole(role);
   const autoBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSidebarOpen(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 0);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [sidebarOpen]);
 
   const userInitials =
     user.first_name && user.last_name
@@ -83,32 +108,29 @@ export function PlatformShell({
       : 'User');
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-dvh w-full overflow-x-clip bg-slate-50">
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
-        <div className="flex h-16 items-center justify-between px-4 lg:px-6">
-          <div className="flex items-center gap-4">
+        <div className="flex min-h-16 items-center justify-between gap-2 px-3 sm:px-4 lg:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="rounded-lg p-2 transition-colors hover:bg-slate-100 lg:hidden"
-              aria-label="Toggle portal navigation"
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 lg:hidden"
+              aria-label="Open portal navigation"
               aria-expanded={sidebarOpen}
+              aria-controls="portal-navigation-drawer"
             >
-              {sidebarOpen ? (
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              <Menu className="h-6 w-6" />
             </button>
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-red-600 shadow-sm">
+            <Link href="/" className="flex min-w-0 items-center gap-2">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-red-600 shadow-sm">
                 <span className="text-sm font-black text-white">E</span>
               </div>
-              <div className="hidden md:block">
-                <span className="block font-black text-slate-950">{ROLE_DISPLAY_NAMES[role]}</span>
+              <div className="hidden min-w-0 md:block">
+                <span className="block truncate font-black text-slate-950">{ROLE_DISPLAY_NAMES[role]}</span>
                 <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
-                  <ShieldCheck className="h-3 w-3" /> Secure role-restricted session
+                  <ShieldCheck className="h-3 w-3 shrink-0" /> Secure role-restricted session
                 </span>
               </div>
             </Link>
@@ -125,7 +147,7 @@ export function PlatformShell({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             {actions.length > 0 && (
               <div className="mr-4 hidden items-center gap-2 lg:flex">
                 {actions.slice(0, 2).map((action) =>
@@ -133,7 +155,7 @@ export function PlatformShell({
                     <Link
                       key={action.id}
                       href={action.href}
-                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors ${
+                      className={`flex min-h-11 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors ${
                         action.variant === 'primary'
                           ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                           : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
@@ -145,8 +167,9 @@ export function PlatformShell({
                   ) : (
                     <button
                       key={action.id}
+                      type="button"
                       onClick={action.onClick}
-                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors ${
+                      className={`flex min-h-11 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition-colors ${
                         action.variant === 'primary'
                           ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                           : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
@@ -161,14 +184,18 @@ export function PlatformShell({
             )}
 
             <div className="group relative">
-              <button className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-slate-100" aria-label="Open account menu">
+              <button
+                type="button"
+                className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500"
+                aria-label="Open account menu"
+              >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-blue-600 text-sm font-black text-white">
                   {userInitials}
                 </div>
                 <ChevronDown className="hidden h-4 w-4 text-slate-500 lg:block" />
               </button>
 
-              <div className="invisible absolute right-0 z-50 mt-2 w-64 rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-xl transition-all group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+              <div className="invisible absolute right-0 z-[80] mt-2 w-[min(16rem,calc(100vw-1rem))] rounded-xl border border-slate-200 bg-white py-2 opacity-0 shadow-xl transition-all group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                 <div className="border-b border-slate-100 px-4 py-3">
                   <p className="font-bold text-slate-950">{userName}</p>
                   <p className="truncate text-sm text-slate-600">{user.email}</p>
@@ -177,7 +204,7 @@ export function PlatformShell({
                   </p>
                 </div>
                 <form action="/api/auth/signout" method="post">
-                  <button type="submit" className="flex w-full items-center gap-2 px-4 py-2 text-left font-bold text-red-700 hover:bg-red-50">
+                  <button type="submit" className="flex min-h-11 w-full items-center gap-2 px-4 py-2 text-left font-bold text-red-700 hover:bg-red-50">
                     <LogOut className="h-4 w-4" /> Sign out securely
                   </button>
                 </form>
@@ -187,18 +214,21 @@ export function PlatformShell({
         </div>
 
         {autoBreadcrumbs.length > 0 && (
-          <div className="border-t border-slate-100 bg-slate-50 px-4 py-2">
-            <nav className="mx-auto flex max-w-7xl items-center gap-2 text-sm" aria-label="Breadcrumb">
-              <Link href="/" className="font-medium text-slate-600 hover:text-slate-900">Home</Link>
+          <div className="max-w-full border-t border-slate-100 bg-slate-50 px-3 py-2 sm:px-4">
+            <nav
+              className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto whitespace-nowrap text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              aria-label="Breadcrumb"
+            >
+              <Link href="/" className="shrink-0 font-medium text-slate-600 hover:text-slate-900">Home</Link>
               {autoBreadcrumbs.map((crumb, index) => (
                 <React.Fragment key={`${crumb.label}-${index}`}>
-                  <span className="text-slate-300">/</span>
+                  <span className="shrink-0 text-slate-300">/</span>
                   {crumb.href && index < autoBreadcrumbs.length - 1 ? (
-                    <Link href={crumb.href} className="font-medium text-slate-600 hover:text-slate-900">
+                    <Link href={crumb.href} className="shrink-0 font-medium text-slate-600 hover:text-slate-900">
                       {crumb.label}
                     </Link>
                   ) : (
-                    <span className="font-bold text-slate-950">{crumb.label}</span>
+                    <span className="shrink-0 font-bold text-slate-950">{crumb.label}</span>
                   )}
                 </React.Fragment>
               ))}
@@ -207,29 +237,51 @@ export function PlatformShell({
         )}
       </header>
 
-      <div className="flex">
+      <div className="flex min-w-0">
         {sidebarOpen && (
-          <div
-            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-            aria-hidden="true"
+          <button
+            type="button"
+            className="fixed inset-0 z-[60] cursor-default bg-black/60 backdrop-blur-[1px] lg:hidden"
+            onClick={() => {
+              setSidebarOpen(false);
+              menuButtonRef.current?.focus();
+            }}
+            aria-label="Close portal navigation"
           />
         )}
 
         <aside
-          className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-slate-950 text-white transition-transform duration-200 ease-in-out lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:shrink-0 lg:translate-x-0 ${
+          id="portal-navigation-drawer"
+          role={sidebarOpen ? 'dialog' : undefined}
+          aria-modal={sidebarOpen ? true : undefined}
+          aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}
+          className={`fixed inset-y-0 left-0 z-[70] w-[min(20rem,calc(100vw-2.5rem))] max-w-full transform bg-slate-950 text-white shadow-2xl transition-transform duration-200 ease-in-out lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:translate-x-0 lg:shadow-none ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-          <div className="flex h-full flex-col">
-            <div className="border-b border-slate-800 p-4">
-              <h2 className="text-xs font-black uppercase tracking-wider text-slate-300">
-                {ROLE_DISPLAY_NAMES[role]}
-              </h2>
-              <p className="mt-1 text-xs text-slate-400">Use this menu to move through your workspace.</p>
+          <div className="flex h-full min-h-0 flex-col pt-[env(safe-area-inset-top)] lg:pt-0">
+            <div className="flex min-h-16 items-center justify-between gap-3 border-b border-slate-800 p-4">
+              <div className="min-w-0">
+                <h2 className="truncate text-xs font-black uppercase tracking-wider text-slate-300">
+                  {ROLE_DISPLAY_NAMES[role]}
+                </h2>
+                <p className="mt-1 text-xs text-slate-400">Use this menu to move through your workspace.</p>
+              </div>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={() => {
+                  setSidebarOpen(false);
+                  menuButtonRef.current?.focus();
+                }}
+                className="inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg text-slate-200 hover:bg-slate-800 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white lg:hidden"
+                aria-label="Close portal navigation"
+              >
+                <X className="h-6 w-6" />
+              </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto py-4" aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation`}>
+            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-4 pb-[max(1rem,env(safe-area-inset-bottom))]" aria-label={`${ROLE_DISPLAY_NAMES[role]} navigation links`}>
               {sections.map((section) => (
                 <div key={section.id} className="mb-4">
                   {section.label && (
@@ -245,16 +297,17 @@ export function PlatformShell({
                         key={item.id}
                         href={item.href}
                         onClick={() => setSidebarOpen(false)}
-                        className={`mx-2 flex items-center gap-3 rounded-lg px-4 py-2.5 font-semibold transition-colors ${
+                        aria-current={active ? 'page' : undefined}
+                        className={`mx-2 flex min-h-11 items-center gap-3 rounded-lg px-4 py-2.5 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
                           active
                             ? 'bg-brand-blue-600 text-white shadow-sm'
                             : 'text-slate-200 hover:bg-slate-800 hover:text-white'
                         }`}
                       >
                         <Icon className="h-5 w-5 shrink-0" />
-                        <span className="flex-1">{item.label}</span>
+                        <span className="min-w-0 flex-1 truncate">{item.label}</span>
                         {item.badge && (
-                          <span className="rounded-full bg-brand-red-600 px-2 py-0.5 text-xs">
+                          <span className="shrink-0 rounded-full bg-brand-red-600 px-2 py-0.5 text-xs">
                             {item.badge}
                           </span>
                         )}
@@ -265,7 +318,7 @@ export function PlatformShell({
               ))}
             </nav>
 
-            <div className="border-t border-slate-800 p-4">
+            <div className="hidden shrink-0 border-t border-slate-800 p-4 sm:block">
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-100">
                 <div className="flex items-center gap-2 font-black"><ShieldCheck className="h-4 w-4" /> Secure workspace</div>
                 <p className="mt-1 leading-5 text-emerald-100/90">Your session is authenticated and portal access is role-restricted.</p>
@@ -274,21 +327,9 @@ export function PlatformShell({
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1">
-          <div className="p-4 lg:p-6">
-            {mounted ? (
-              children
-            ) : (
-              <div className="animate-pulse space-y-4">
-                <div className="h-8 w-1/4 rounded bg-slate-200" />
-                <div className="h-4 w-1/2 rounded bg-slate-200" />
-                <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="h-32 rounded bg-slate-200" />
-                  <div className="h-32 rounded bg-slate-200" />
-                  <div className="h-32 rounded bg-slate-200" />
-                </div>
-              </div>
-            )}
+        <main className="min-w-0 w-full flex-1 overflow-x-clip">
+          <div className="min-w-0 max-w-full p-3 sm:p-4 lg:p-6">
+            {children}
           </div>
         </main>
       </div>

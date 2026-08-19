@@ -12,14 +12,17 @@ WORKDIR /workspace
 FROM base AS dependencies
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json ./apps/admin/package.json
+COPY apps/lms/package.json ./apps/lms/package.json
 COPY apps/marketing/package.json ./apps/marketing/package.json
-COPY packages ./packages
+COPY packages/config/package.json ./packages/config/package.json
+COPY packages/db/package.json ./packages/db/package.json
+COPY packages/shared/package.json ./packages/shared/package.json
+COPY packages/ui/package.json ./packages/ui/package.json
 
-# Marketing never imports ffmpeg-static; runtime video tooling resolves FFmpeg
-# through @ffmpeg-installer/ffmpeg. Do not allow ffmpeg-static's postinstall to
-# download a GitHub-hosted binary during every production image build. That
-# external download has caused ECONNRESET/socket-hang-up failures on Northflank.
-RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\\n');"
+# Keep the dependency graph identical to source control. Mutating package.json
+# inside the image before a frozen install creates a manifest/lockfile mismatch
+# and makes production builds non-reproducible.
 RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
@@ -42,11 +45,8 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
 
-# Capture a real build timestamp even when Northflank does not inject one.
 RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); fs.writeFileSync('/tmp/elevate-build-timestamp', ts); console.log('Marketing build timestamp:', ts)"
 
-# Northflank injects NF_GIT_SHA for Git builds. Use it as the only immutable
-# build identity so deployment does not require a config PATCH per commit.
 RUN EFFECTIVE_SHA="${NF_GIT_SHA}" && \
     EFFECTIVE_BUILT_AT="$(cat /tmp/elevate-build-timestamp)" && \
     test -n "${EFFECTIVE_SHA}" && \
@@ -97,12 +97,6 @@ COPY --from=builder --chown=nextjs:nodejs \
     /workspace/apps/marketing/.next/static \
     ./apps/marketing/.next/static/
 
-# Root public/ is the single canonical Marketing asset tree. Do not overlay the
-# entire apps/marketing/public directory: broad overlays create two competing
-# sources of truth and can silently replace a corrected production asset.
-# The only app-local runtime asset not represented by root public/ is the
-# generated hero-banner data file, so copy that file explicitly after the
-# canonical public tree is installed.
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/public ./apps/marketing/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/marketing/public/data/hero-banners.json ./public/data/hero-banners.json

@@ -2,44 +2,17 @@ import { logger } from '@/lib/logger';
 /**
  * POST /api/videos/generate
  *
- * Accepts a lesson_id from the admin course builder, creates a video_jobs row,
- * then fires the render pipeline asynchronously (non-blocking response).
- *
- * The render runs in the background on the container which has
- * ffmpeg, chromium, and Remotion's native binaries available.
- *
- * Flow:
- *   Admin POST lesson_id
- *   → create video_jobs row (status: queued)
- *   → return job_id immediately
- *   → background: render MP4 → upload to Supabase Storage
- *   → markComplete() updates video_jobs + course_lessons
- *
- * Admin polls GET /api/videos/status/:job_id until status = 'complete'.
+ * Video rendering is an Admin-owned production capability. The learner LMS
+ * keeps this legacy endpoint only as a compatibility bridge so old clients do
+ * not pull Remotion/Rspack/TTS native tooling into the learner build graph.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
-import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
-import { createJob, markRendering, markComplete, markFailed } from '@/lib/video/job-queue';
-
-// Remotion's bundler reaches native @rspack binaries. A static import causes
-// Next/Webpack to trace those ELF binaries during the LMS image build. Keep the
-// entire render pipeline behind the same runtime-only boundary used by Admin.
-type RemotionRender = typeof import('@/lib/video/remotion-render');
-let remotionRender: RemotionRender | null = null;
-async function getRemotionRender(): Promise<RemotionRender> {
-  if (!remotionRender) {
-    remotionRender = await import('@/lib/video/remotion-render');
-  }
-  return remotionRender;
-}
 
 export const runtime = 'nodejs';
-export const maxDuration = 600;
 
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
@@ -57,116 +30,26 @@ export async function POST(request: NextRequest) {
     return safeError('Invalid JSON body', 400);
   }
 
-  const supabase = await createClient();
-  const { data: lesson, error: lessonErr } = await supabase
-    .from('course_lessons')
-    .select('id, title, script, bullet_points, duration_seconds, course_id, video_status')
-    .eq('id', lessonId)
-    .maybeSingle();
-
-  if (lessonErr || !lesson) return safeError('Lesson not found', 404);
-  if (lesson.video_status === 'rendering') return safeError('Video is already rendering', 409);
-
-  const { data: course } = await supabase
-    .from('courses')
-    .select('id, title')
-    .eq('id', lesson.course_id)
-    .maybeSingle();
-
-  const job = await createJob({
-    lesson_id: lessonId,
-    course_id: lesson.course_id,
-    lesson_title: lesson.title,
-    script: lesson.script ?? undefined,
-    bullet_points: Array.isArray(lesson.bullet_points) ? lesson.bullet_points : [],
-  });
-
-  runRender({
-    jobId: job.id,
+  const adminBase = (process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org').replace(/\/$/, '');
+  logger.warn('[VideoGenerate] Legacy LMS generation endpoint redirected to Admin-owned renderer', {
     lessonId,
-    courseId: lesson.course_id,
-    lessonTitle: lesson.title,
-    courseTitle: course?.title ?? 'Elevate LMS',
-    script: lesson.script ?? lesson.title,
-    bulletPoints: Array.isArray(lesson.bullet_points) ? lesson.bullet_points : [],
-    durationSecs: lesson.duration_seconds ?? undefined,
-  }).catch((err) => {
-    logger.error(
-      '[VideoGenerate] Background render threw',
-      normalizeError(err, 'Video generation error'),
-      getErrorContext(err),
-    );
   });
 
   return NextResponse.json(
     {
-      success: true,
-      job_id: job.id,
-      status: 'queued',
-      message: 'Video render queued. Poll /api/videos/status/' + job.id + ' for progress.',
+      success: false,
+      code: 'ADMIN_VIDEO_RENDER_REQUIRED',
+      message: 'Video generation is managed from Admin Dev Studio.',
+      admin_url: `${adminBase}/studio/courses`,
+      lesson_id: lessonId,
     },
-    { status: 202 },
+    {
+      status: 409,
+      headers: {
+        Deprecation: 'true',
+        Sunset: 'Wed, 30 Sep 2026 23:59:59 GMT',
+        Link: `<${adminBase}/studio/courses>; rel="alternate"`,
+      },
+    },
   );
-}
-
-async function runRender(opts: {
-  jobId: string;
-  lessonId: string;
-  courseId: string;
-  lessonTitle: string;
-  courseTitle: string;
-  script: string;
-  bulletPoints: string[];
-  durationSecs?: number;
-}) {
-  const { jobId, lessonId, courseTitle, lessonTitle, script, bulletPoints } = opts;
-
-  await markRendering(jobId);
-
-  try {
-    const { renderLessonVideo, inferDomainKey } = await getRemotionRender();
-    const domainKey = inferDomainKey(courseTitle, lessonTitle);
-    const instructorId = inferInstructorId(courseTitle);
-
-    const result = await renderLessonVideo({
-      lessonId,
-      title: lessonTitle,
-      moduleTitle: courseTitle,
-      objective: lessonTitle,
-      keyPoints: bulletPoints.length
-        ? bulletPoints
-        : script.split(/\.\s+/).filter(Boolean).slice(0, 5),
-      example: script.substring(0, 300),
-      summary: script.substring(0, 150),
-      quizTeaser: 'Complete the knowledge check to continue.',
-      domainKey,
-      instructorId,
-      courseName: courseTitle,
-    });
-
-    if (!result.success || !result.videoUrl) {
-      await markFailed(jobId, result.error ?? 'Render returned no video URL');
-      return;
-    }
-
-    await markComplete(jobId, {
-      video_url: result.videoUrl,
-      audio_url: result.audioUrl ?? undefined,
-      duration_seconds: result.duration,
-      scene_count: undefined,
-    });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    await markFailed(jobId, msg);
-  }
-}
-
-function inferInstructorId(courseTitle: string): string {
-  const title = courseTitle.toLowerCase();
-  if (/barber|cosmetology|hair/.test(title)) return 'james-williams';
-  if (/business|entrepreneur|esb|marketing/.test(title)) return 'angela-thompson';
-  if (/health|medical|nursing|cna/.test(title)) return 'dr-sarah-chen';
-  if (/technology|cyber|computer|digital/.test(title)) return 'lisa-martinez';
-  if (/cdl|transport|logistics/.test(title)) return 'robert-davis';
-  return 'marcus-johnson';
 }

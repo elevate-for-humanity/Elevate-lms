@@ -1,4 +1,5 @@
 // Production certification runner for the registered beauty occupation courses.
+// Re-run marker: server/CLI admin-client boundary verified before execution.
 import { courseFactory, loadAllBlueprints } from '../../lib/course-factory';
 
 const TARGETS = [

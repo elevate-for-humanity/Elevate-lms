@@ -29,7 +29,6 @@ export interface PublishResult {
   skippedCount: number;
   warnings: string[];
   errors: string[];
-  /** Compatibility marker: validation occurs in Course Factory before handoff. */
   validation: ValidationResult;
 }
 
@@ -136,10 +135,11 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               content_json: experience ? { experience } : {},
               rendered_html: renderedHtml,
               quiz_questions:
-                lesson.quizQuestions?.map((question) => ({
+                lesson.quizQuestions?.map((question, index) => ({
+                  id: question.id || `${lesson.slug}-q${index + 1}`,
                   question: question.question,
                   options: question.options,
-                  correct: question.correctAnswer,
+                  correctAnswer: question.correctAnswer,
                   explanation: question.explanation,
                 })) ?? null,
               passing_score:
@@ -207,20 +207,11 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
     });
 }
 
-/**
- * Persist an already-validated course package as a complete draft.
- *
- * The database function is atomic: replace-mode deletion and recreation occur
- * in a single PostgreSQL transaction. Any error rolls back the whole package,
- * leaving the previously valid course intact.
- */
 export async function publishCourse(input: PublishInput): Promise<PublishResult> {
   const db = await requireAdminClient();
   const modules = buildAtomicPayload(input.blueprint, input.courseTitle);
 
   try {
-    // Generated Supabase types may lag the migration by one generation cycle.
-    // Runtime RPC contract is enforced by the database migration.
     const { data, error } = await (db as any).rpc('publish_course_package_atomic', {
       p_program_id: input.programId ?? null,
       p_course_slug: input.courseSlug,
@@ -276,9 +267,6 @@ export async function publishCourse(input: PublishInput): Promise<PublishResult>
   }
 }
 
-/**
- * Promote a complete staged course through the database's atomic publication RPC.
- */
 export async function publishCourseAtomic(
   courseId: string,
   programId?: string | null,

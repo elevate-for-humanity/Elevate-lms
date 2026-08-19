@@ -1,4 +1,5 @@
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { PROGRAMS } from '@/lib/programs/canonical-data';
 
 export type PathwayFunding =
   | 'WIOA Adult/DW'
@@ -38,7 +39,8 @@ export type Pathway = {
   stages: PathwayStage[];
 };
 
-const BARBER = RAPIDS_CONFIG.programs.barber;
+const REGISTERED_BARBER = RAPIDS_CONFIG.programs.barber;
+const BARBER = PROGRAMS['barber-apprenticeship'];
 
 export const PATHWAYS: Pathway[] = [
   {
@@ -67,7 +69,7 @@ export const PATHWAYS: Pathway[] = [
     industry: 'Cosmetology',
     format: 'Hybrid',
     funding: ['State Grant', 'Employer-Sponsored', 'Self-Pay'],
-    duration: `Approximately ${Math.ceil(BARBER.totalHours / 40)} OJL weeks at 40 hours/week, plus ${BARBER.relatedInstructionHours} RTI hours`,
+    duration: BARBER.durationRange,
     location: 'Approved participating host shop',
     outcomes: ['Registered Barber Apprentice', 'Registered Apprenticeship Program Completer', 'Indiana Barber License pathway'],
     credential: 'Registered Apprenticeship Certificate of Completion / Indiana Barber License pathway',
@@ -82,21 +84,21 @@ export const PATHWAYS: Pathway[] = [
       },
       {
         stage: 2,
-        title: 'On-the-Job Learning',
-        description: `Complete ${BARBER.totalHours.toLocaleString()} approved supervised OJL hours at an approved host shop while completing ${BARBER.relatedInstructionHours} hours of Related Technical Instruction through the assigned LMS coursework.`,
-        duration: `Approximately ${Math.ceil(BARBER.totalHours / 40)} OJL weeks at the standard 40-hour schedule`,
+        title: 'Competency-Based Apprenticeship',
+        description: `Complete supervised work/OJL evidence, all ${REGISTERED_BARBER.competencies.length} registered competency requirements, and ${BARBER.relatedInstructionHours} verified hours of Related Technical Instruction through assigned coursework. Work/OJL hours are auditable evidence and are not a fixed DOL completion denominator.`,
+        duration: 'Varies by verified competency progression, RTI completion, approved work schedule, and host-shop placement',
       },
       {
         stage: 3,
-        title: 'Program Completion',
-        description: 'Complete registered competencies, OJL, RTI, and required completion documentation.',
-        duration: 'After all requirements are satisfied',
+        title: 'Registered Program Completion',
+        description: 'Complete registered competencies, verified RTI, supervised-work evidence, wage progression requirements, and required completion documentation under the approved standard.',
+        duration: 'After all registered-program requirements are satisfied',
       },
       {
         stage: 4,
         title: 'Indiana Licensing Process',
-        description: 'Submit the current Indiana licensing application and complete the examination or other requirements applicable at the time of application.',
-        duration: 'State processing/exam schedule',
+        description: `Track the separate Indiana licensing requirement of ${BARBER.totalHours.toLocaleString()} hours and complete the state examination or other requirements applicable at the time of application.`,
+        duration: 'State licensing and processing schedule',
       },
       {
         stage: 5,

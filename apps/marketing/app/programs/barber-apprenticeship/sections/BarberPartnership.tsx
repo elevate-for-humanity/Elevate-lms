@@ -129,7 +129,7 @@ export function BarberPartnership() {
             </div>
           </div>
           <div className="text-center">
-            <Link href="/programs/barber-apprenticeship/host-shops" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors">
+            <Link href="/partners/host-shop/apply" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors">
               Become a Partner Shop &rarr;
             </Link>
           </div>

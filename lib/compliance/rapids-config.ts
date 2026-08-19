@@ -1,40 +1,44 @@
-import { APPENDIX_A_REGISTRATION, APPENDIX_A_STANDARDS } from '@/lib/compliance/appendix-a-standards';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
-const BARBER_APPENDIX = APPENDIX_A_STANDARDS.barber;
+const BARBER_CONTRACT = getRegisteredProgramStandard('barber-apprenticeship');
+if (!BARBER_CONTRACT) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
+const BARBER = BARBER_CONTRACT.standard;
+const SPONSOR = BARBER_CONTRACT.sponsor;
 
 /**
- * Static RAPIDS registration metadata only.
+ * Static RAPIDS/public registration metadata only.
  *
- * Occupation standards come from Appendix A. Operational RAPIDS state —
- * employers, employer-specific wage schedules, RTI providers, placements and
- * registrations — is resolved exclusively by registered-program-contract.ts.
+ * The registered-program contract owns the occupation merge boundary.
+ * Operational RAPIDS state — employers, employer-specific wage schedules,
+ * RTI providers, placements and registrations — is resolved exclusively by
+ * resolveRegisteredProgramContract().
  */
 export const RAPIDS_CONFIG = {
-  sponsorOfRecord: APPENDIX_A_REGISTRATION.sponsor,
+  sponsorOfRecord: SPONSOR.sponsor,
   programBrand: 'Elevate for Humanity Career & Technical Institute',
-  registrationId: process.env.RAPIDS_REGISTRATION_ID || APPENDIX_A_REGISTRATION.registrationNumber,
-  programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || APPENDIX_A_REGISTRATION.registrationNumber,
-  registrationDate: APPENDIX_A_REGISTRATION.registrationDate,
-  revisionDate: APPENDIX_A_REGISTRATION.revisionDate,
+  registrationId: process.env.RAPIDS_REGISTRATION_ID || SPONSOR.registrationNumber,
+  programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || SPONSOR.registrationNumber,
+  registrationDate: SPONSOR.registrationDate,
+  revisionDate: SPONSOR.revisionDate,
 
   programs: {
     barber: {
-      slug: BARBER_APPENDIX.programSlugs[0],
+      slug: BARBER_CONTRACT.programSlug,
       name: 'Barber Apprenticeship',
-      occupation: BARBER_APPENDIX.occupationTitle,
-      occupationCode: BARBER_APPENDIX.onetSocCode,
-      rapidsCode: BARBER_APPENDIX.rapidsCode,
+      occupation: BARBER.occupationTitle,
+      occupationCode: BARBER.onetSocCode,
+      rapidsCode: BARBER.rapidsCode,
       state: 'IN',
-      approach: BARBER_APPENDIX.approach,
-      competencyCount: BARBER_APPENDIX.competencyCount,
-      relatedInstructionHours: BARBER_APPENDIX.relatedInstructionHours,
-      apprenticeToMentorRatio: BARBER_APPENDIX.apprenticeToMentorRatio,
-      probationaryHours: BARBER_APPENDIX.probationaryHours,
-      startingHourlyRate: BARBER_APPENDIX.startingHourlyRate,
-      mentorHourlyRate: BARBER_APPENDIX.mentorHourlyRate,
-      wageMilestones: BARBER_APPENDIX.wageMilestones,
-      relatedInstruction: BARBER_APPENDIX.relatedInstruction,
-      competencies: BARBER_APPENDIX.competencies,
+      approach: BARBER.approach,
+      competencyCount: BARBER_CONTRACT.completion.competencyCount,
+      relatedInstructionHours: BARBER_CONTRACT.completion.requiredRtiHours,
+      apprenticeToMentorRatio: BARBER.apprenticeToMentorRatio,
+      probationaryHours: BARBER.probationaryHours,
+      startingHourlyRate: BARBER.startingHourlyRate,
+      mentorHourlyRate: BARBER.mentorHourlyRate,
+      wageMilestones: BARBER.wageMilestones,
+      relatedInstruction: BARBER.relatedInstruction,
+      competencies: BARBER.competencies,
       fundingType: 'self_pay',
       tuition: 4980,
     },

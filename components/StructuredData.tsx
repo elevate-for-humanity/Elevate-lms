@@ -1,9 +1,9 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { PROGRAMS } from '@/lib/programs/canonical-data';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 export default function StructuredData() {
-  const barber = RAPIDS_CONFIG.programs.barber;
+  const barber = PROGRAMS['barber-apprenticeship'];
   const telephoneDigits = PLATFORM_DEFAULTS.supportPhone.replace(/\D/g, '');
   const telephone =
     telephoneDigits.length === 11 && telephoneDigits.startsWith('1')
@@ -63,7 +63,7 @@ export default function StructuredData() {
           itemOffered: {
             '@type': 'Course',
             name: barber.name,
-            description: `DOL Registered Apprenticeship requiring ${barber.totalHours.toLocaleString()} supervised OJL hours plus ${barber.relatedInstructionHours} hours of Related Technical Instruction under the registered program standards.`,
+            description: `DOL Registered Apprenticeship with competency-based completion and ${barber.relatedInstructionHours} verified hours of Related Technical Instruction. Indiana licensing-hour and examination requirements are tracked separately.`,
             url: `${canonicalSiteUrl}/programs/barber-apprenticeship`,
             provider: { '@id': `${canonicalSiteUrl}/#organization` },
             offers: {

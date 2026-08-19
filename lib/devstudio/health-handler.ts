@@ -5,8 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAnthropicConfigured } from '@/lib/ai/anthropic-client';
 import { isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { apiRequireDevStudio } from '@/lib/devstudio/api-auth';
-import { probeStudioShell } from '@/lib/devstudio/shell-probe';
-import { buildStudioRuntimeCompletion } from '@/lib/devstudio/studio-runtime';
 import { isGeminiConfigured } from '@/lib/gemini-client';
 import { isGroqConfigured } from '@/lib/groq-client';
 import {
@@ -19,8 +17,10 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 
 /**
  * Canonical Admin-owned Dev Studio health implementation.
- * Route files are intentionally thin so compatibility paths cannot drift into
- * separate health-check logic.
+ *
+ * Dev Studio execution is admin-native. The legacy Studio Shell was removed and
+ * is explicitly forbidden by scripts/verify-no-studio-shell.mjs, so health must
+ * never require STUDIO_SHELL_* variables or advertise a separate shell service.
  */
 export async function handleDevStudioHealth(req: NextRequest) {
   const auth = await apiRequireDevStudio(req);
@@ -63,23 +63,6 @@ export async function handleDevStudioHealth(req: NextRequest) {
     dbGitHub = false;
   }
 
-  const shellWsUrl = process.env.STUDIO_SHELL_WS_URL ?? '';
-  const shellSecret = process.env.STUDIO_SHELL_SECRET ?? '';
-  const tokenSecret = process.env.STUDIO_TOKEN_SECRET ?? '';
-  const shellWsPublic = process.env.STUDIO_SHELL_WS_URL_PUBLIC ?? '';
-  const shellProbe = await probeStudioShell(shellWsUrl);
-  const adminConfigured = Boolean(shellWsUrl && shellSecret && tokenSecret);
-
-  const shell = {
-    STUDIO_SHELL_WS_URL: shellWsUrl ? 'configured' : 'MISSING',
-    STUDIO_SHELL_SECRET: shellSecret ? 'configured' : 'MISSING',
-    STUDIO_TOKEN_SECRET: tokenSecret ? 'configured' : 'MISSING',
-    STUDIO_SHELL_WS_URL_PUBLIC: shellWsPublic ? 'configured' : 'MISSING',
-    configured: adminConfigured,
-    ready: adminConfigured && shellProbe.ready,
-    probe: shellProbe,
-  };
-
   const hasGroq = isGroqConfigured() || dbGroq;
   const hasGemini = isGeminiConfigured() || dbGemini;
   const hasOpenAI = isOpenAIConfigured() || dbOpenAI;
@@ -96,12 +79,12 @@ export async function handleDevStudioHealth(req: NextRequest) {
     id: service.id,
     configured: Boolean(service.id),
   }));
-  const studioRuntime = buildStudioRuntimeCompletion({
-    adminConfigured,
-    probe: shellProbe,
-    hasGitHubToken: hasGitHub,
-    aiConfigured,
-  });
+  const northflankTokenPresent = Boolean(
+    process.env.NORTHFLANK_API_TOKEN ||
+      process.env.NORTHFLANK_API_KEY ||
+      process.env.NF_API_TOKEN,
+  );
+  const northflankProjectIdPresent = Boolean(getNorthflankProjectId());
 
   let nextVersion = 'unknown';
   try {
@@ -137,18 +120,17 @@ export async function handleDevStudioHealth(req: NextRequest) {
       tokenPresent: hasGitHub,
       pushScript: 'pnpm run git:push-main',
     },
+    execution: {
+      mode: 'admin-native',
+      ready: hasGitHub,
+      legacyShellRemoved: true,
+    },
     northflank: {
       ready: isNorthflankReady(),
-      tokenPresent: Boolean(
-        process.env.NORTHFLANK_API_TOKEN ||
-          process.env.NORTHFLANK_API_KEY ||
-          process.env.NF_API_TOKEN,
-      ),
-      projectIdPresent: Boolean(getNorthflankProjectId()),
+      tokenPresent: northflankTokenPresent,
+      projectIdPresent: northflankProjectIdPresent,
       services: northflankServices,
     },
-    shell,
-    studioRuntime,
     runtime: 'nodejs',
     service: 'admin',
     nodeEnv: process.env.NODE_ENV ?? 'unknown',

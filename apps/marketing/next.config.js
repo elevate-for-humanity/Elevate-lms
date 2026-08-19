@@ -56,6 +56,7 @@ const nextConfig = {
       // intentionally absent so retired internal paths remain inaccessible.
       { source: '/course-factory', destination: '/ai/course-factory', permanent: true },
       { source: '/compare', destination: '/store#marketplace', permanent: true },
+      { source: '/store/white-label', destination: '/white-label', permanent: true },
       { source: '/wioa-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/wioa-funded-training', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/wioa', destination: '/wioa-eligibility', permanent: false },

@@ -158,18 +158,18 @@ const STEPS = [
   {
     num: '8',
     color: 'bg-brand-blue-600',
-    title: 'Support & SLA',
+    title: 'Support & Service Terms',
     image: '/images/pages/platform-page-9.webp',
-    imageAlt: 'Support portal and SLA documentation',
+    imageAlt: 'Support portal and service documentation',
     content: (
       <>
-        <p className="text-slate-600 mt-3 mb-4">All managed licenses include:</p>
+        <p className="text-slate-600 mt-3 mb-4">Managed licenses include:</p>
         <ul className="space-y-2">
           {[
-            'Email support — 24–48 hour response time',
-            '99.9% uptime SLA',
-            'Automatic security updates',
-            'Daily backups with 30-day retention',
+            'Support through documented service channels',
+            'Availability commitments defined by the active plan or agreement',
+            'Managed security updates',
+            'Managed backup and retention controls',
           ].map((item) => (
             <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-1.5 flex-shrink-0" />

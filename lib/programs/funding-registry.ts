@@ -51,9 +51,9 @@ export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding
     sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
   },
   {
-    slug: 'business-administration',
+    slug: 'business',
     title: 'Business Administration',
-    aliases: ['business'],
+    aliases: ['business-administration'],
     description: 'Business, Microsoft Office, QuickBooks, entrepreneurship, and workplace administration training.',
     duration: '8 weeks',
     credential: 'Industry certification preparation',

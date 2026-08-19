@@ -1,20 +1,20 @@
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+import { permanentRedirect } from 'next/navigation';
 
 export const metadata: Metadata = {
-  title: 'Check Workforce-Funding Eligibility | Elevate for Humanity',
+  title: 'Training Eligibility Quiz | Elevate for Humanity',
   description:
-    'Review the application pathway for CDL, HVAC, Business Administration, and Financial Literacy workforce-funding consideration. Agency authorization is required.',
-  alternates: { canonical: 'https://www.elevateforhumanity.org/check-eligibility' },
-  openGraph: {
-    title: 'Check Workforce-Funding Eligibility | Elevate for Humanity',
-    description:
-      'Review the four confirmed workforce-fundable programs and prepare for WorkOne or agency eligibility review.',
-    url: 'https://www.elevateforhumanity.org/check-eligibility',
-    type: 'website',
-  },
+    'Complete the preliminary training eligibility quiz before submitting a funded-program application. Final eligibility and authorization are determined by the responsible agency.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/eligibility/quiz' },
 };
 
-export default function CheckEligibilityLayout({ children }: { children: ReactNode }) {
-  return children;
+/**
+ * /check-eligibility is retained only as a legacy inbound route.
+ * The maintained eligibility experience is /eligibility/quiz.
+ * Redirect at the layout boundary so stale CTAs/bookmarks cannot boot the
+ * retired client funnel, while leaving that implementation untouched for the
+ * parallel development environment.
+ */
+export default function CheckEligibilityLegacyLayout() {
+  permanentRedirect('/eligibility/quiz');
 }

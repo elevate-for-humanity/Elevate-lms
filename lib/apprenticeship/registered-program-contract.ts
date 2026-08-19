@@ -51,6 +51,7 @@ export type RegisteredProgramContract = {
   standardKey: string;
   standardVersionKey: string;
   programSlug: string;
+  canonicalProgramSlug: string;
   standard: AppendixAStandard;
   completion: {
     basis: 'competency';
@@ -83,6 +84,7 @@ export function getRegisteredProgramStandard(programSlug: string) {
     sponsor: APPENDIX_A_REGISTRATION,
     standardKey: found.standardKey,
     programSlug,
+    canonicalProgramSlug: found.standard.programSlugs[0],
     standard: found.standard,
     completion: {
       basis: 'competency' as const,
@@ -91,6 +93,10 @@ export function getRegisteredProgramStandard(programSlug: string) {
       fixedOjlCompletionHours: null,
     },
   };
+}
+
+export function isRegisteredProgramSlug(programSlug: string | null | undefined) {
+  return Boolean(programSlug && findStandard(programSlug));
 }
 
 async function resolvePartnerId(
@@ -138,10 +144,13 @@ export async function resolveRegisteredProgramContract(
   if (!base) return null;
 
   const partnerId = await resolvePartnerId(supabase, input);
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Resolve by sponsor + occupation identity rather than by one route slug so
+  // aliases such as nail-tech/manicurist map to the same registered standard.
   const { data: standardVersion, error: standardVersionError } = await supabase
     .from('apprenticeship_standard_versions')
     .select('standard_key,program_slug,rapids_code,registration_number,revision_date,is_active')
-    .eq('program_slug', input.programSlug)
     .eq('rapids_code', base.standard.rapidsCode)
     .eq('registration_number', APPENDIX_A_REGISTRATION.registrationNumber)
     .eq('is_active', true)
@@ -149,9 +158,13 @@ export async function resolveRegisteredProgramContract(
     .limit(1)
     .maybeSingle();
   if (standardVersionError) throw standardVersionError;
+  if (!standardVersion) {
+    throw new Error(
+      `REGISTERED_STANDARD_VERSION_MISSING:${APPENDIX_A_REGISTRATION.registrationNumber}:${base.standard.rapidsCode}`,
+    );
+  }
 
-  const standardVersionKey = standardVersion?.standard_key ||
-    `${base.standardKey}-${base.standard.rapidsCode.toLowerCase()}-${APPENDIX_A_REGISTRATION.revisionDate}`;
+  const standardVersionKey = standardVersion.standard_key;
 
   const [providersResult, employerResult, wageResult] = await Promise.all([
     supabase
@@ -159,7 +172,7 @@ export async function resolveRegisteredProgramContract(
       .select('id, provider_name, partner_id, provider_user_id, status, added_at, source_system')
       .eq('sponsor_registration_number', APPENDIX_A_REGISTRATION.registrationNumber)
       .eq('standard_key', base.standardKey)
-      .eq('occupation_code', base.standard.rapidsCode)
+      .or(`occupation_code.eq.${base.standard.rapidsCode},occupation_code.is.null`)
       .eq('status', 'active')
       .order('provider_name'),
     partnerId
@@ -178,7 +191,8 @@ export async function resolveRegisteredProgramContract(
           .eq('standard_key', base.standardKey)
           .eq('occupation_code', base.standard.rapidsCode)
           .eq('is_active', true)
-          .or(`effective_from.is.null,effective_from.lte.${new Date().toISOString().slice(0, 10)}`)
+          .or(`effective_from.is.null,effective_from.lte.${today}`)
+          .or(`effective_to.is.null,effective_to.gte.${today}`)
           .order('effective_from', { ascending: false, nullsFirst: false })
           .limit(1)
           .maybeSingle()
@@ -197,27 +211,47 @@ export async function resolveRegisteredProgramContract(
       legalName: APPENDIX_A_REGISTRATION.sponsor,
       registrationNumber: APPENDIX_A_REGISTRATION.registrationNumber,
       registrationDate: APPENDIX_A_REGISTRATION.registrationDate,
-      revisionDate: standardVersion?.revision_date || APPENDIX_A_REGISTRATION.revisionDate,
+      revisionDate: standardVersion.revision_date || APPENDIX_A_REGISTRATION.revisionDate,
     },
     standardKey: base.standardKey,
     standardVersionKey,
     programSlug: input.programSlug,
+    canonicalProgramSlug: base.canonicalProgramSlug,
     standard: base.standard,
     completion: base.completion,
     employer: employerRow
       ? {
           partnerId: String(employerRow.id),
-          name: String(employerRow.dba || employerRow.shop_name || employerRow.legal_name || employerRow.name || 'Host Shop'),
-          rapidsEmployerNumber: employerRow.rapids_employer_number ? String(employerRow.rapids_employer_number) : null,
-          rapidsRegistrationStatus: employerRow.rapids_registration_status ? String(employerRow.rapids_registration_status) : null,
+          name: String(
+            employerRow.dba ||
+              employerRow.shop_name ||
+              employerRow.legal_name ||
+              employerRow.name ||
+              'Host Shop',
+          ),
+          rapidsEmployerNumber: employerRow.rapids_employer_number
+            ? String(employerRow.rapids_employer_number)
+            : null,
+          rapidsRegistrationStatus: employerRow.rapids_registration_status
+            ? String(employerRow.rapids_registration_status)
+            : null,
           wageSchedule: wageRow
             ? {
                 partnerId: String(wageRow.partner_id),
                 scheduleName: wageRow.schedule_name ? String(wageRow.schedule_name) : null,
                 scheduleVersion: wageRow.schedule_version ? String(wageRow.schedule_version) : null,
-                journeyworkerHourlyRate: wageRow.journeyworker_hourly_rate == null ? null : Number(wageRow.journeyworker_hourly_rate),
-                startingHourlyRate: wageRow.starting_hourly_rate == null ? null : Number(wageRow.starting_hourly_rate),
-                endingHourlyRate: wageRow.ending_hourly_rate == null ? null : Number(wageRow.ending_hourly_rate),
+                journeyworkerHourlyRate:
+                  wageRow.journeyworker_hourly_rate == null
+                    ? null
+                    : Number(wageRow.journeyworker_hourly_rate),
+                startingHourlyRate:
+                  wageRow.starting_hourly_rate == null
+                    ? null
+                    : Number(wageRow.starting_hourly_rate),
+                endingHourlyRate:
+                  wageRow.ending_hourly_rate == null
+                    ? null
+                    : Number(wageRow.ending_hourly_rate),
                 effectiveFrom: wageRow.effective_from ? String(wageRow.effective_from) : null,
                 effectiveTo: wageRow.effective_to ? String(wageRow.effective_to) : null,
                 sourceSystem: wageRow.source_system ? String(wageRow.source_system) : null,
@@ -255,17 +289,18 @@ export function resolveApplicableWage(
 
   const schedule = contract.employer?.wageSchedule || null;
   const employerStart = schedule?.startingHourlyRate ?? null;
-  const employerEnd = schedule?.endingHourlyRate ?? schedule?.journeyworkerHourlyRate ?? employerStart;
-  const employerRate = completedCompetencies >= contract.completion.competencyCount
-    ? employerEnd
-    : employerStart;
+  const employerEnd =
+    schedule?.endingHourlyRate ?? schedule?.journeyworkerHourlyRate ?? employerStart;
+  const employerRate =
+    completedCompetencies >= contract.completion.competencyCount ? employerEnd : employerStart;
 
   return {
     appendixRate,
     employerStartingRate: employerStart,
     employerEndingRate: employerEnd,
     employerApplicableRate: employerRate,
-    requiredRegisteredRate: employerRate == null ? appendixRate : Math.max(appendixRate, employerRate),
+    requiredRegisteredRate:
+      employerRate == null ? appendixRate : Math.max(appendixRate, employerRate),
     scheduleSource: schedule ? 'employer_rapids_schedule' : 'appendix_a_baseline',
   };
 }

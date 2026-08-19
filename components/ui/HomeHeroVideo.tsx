@@ -42,7 +42,8 @@ function publicTrustIndicators(items?: string[]) {
  * Homepage video wrapper.
  * Video and narration URLs are revisioned with the deployed commit SHA so
  * browsers, service workers, and intermediary caches cannot pin stale media.
- * Poster artwork remains visible until the video can render and on video failure.
+ * The poster remains a background layer beneath the video while the first frame
+ * loads, then the video owns the visible media plane.
  */
 export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
   const ctas = banner.secondaryCta
@@ -62,7 +63,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       trustIndicators={publicTrustIndicators(banner.trustIndicators)}
       transcript={banner.transcript}
       analyticsName={banner.analyticsName}
-      heightClassName="h-[46vh] min-h-[340px] max-h-[620px]"
+      heightClassName="h-[52vh] min-h-[360px] max-h-[680px] md:h-[58vh] md:min-h-[480px] lg:h-[62vh]"
     />
   );
 }

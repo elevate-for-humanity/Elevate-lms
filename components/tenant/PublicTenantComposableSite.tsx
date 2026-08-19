@@ -5,7 +5,12 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import type { PublishedTenantSite, TenantSitePage, TenantSiteSection } from '@/lib/tenant/site-types';
 import { ensureComposableSiteConfig, normalizePageSlug } from '@/lib/tenant/site-composition';
-import { TenantLeadForm } from '@/components/tenant/TenantSiteClientOps';
+import {
+  TenantCustomLeadForm,
+  TenantLeadForm,
+  TenantTrackedLink,
+  type TenantCustomFormField,
+} from '@/components/tenant/TenantSiteClientOps';
 
 function external(href: string) {
   return /^https?:\/\//i.test(href);
@@ -21,14 +26,61 @@ function text(value: unknown) {
 }
 
 function list(value: unknown): Array<Record<string, unknown>> {
-  return Array.isArray(value) ? value.filter((item) => item && typeof item === 'object') as Array<Record<string, unknown>> : [];
+  return Array.isArray(value)
+    ? value.filter((item) => item && typeof item === 'object') as Array<Record<string, unknown>>
+    : [];
 }
 
-function ActionLink({ href, children, primary, basePath }: { href: string; children: ReactNode; primary: string; basePath: string }) {
-  const className = 'inline-flex rounded-full px-6 py-3 font-black text-white shadow-sm';
-  const style = { backgroundColor: primary };
-  if (external(href)) return <a href={href} target="_blank" rel="noreferrer" className={className} style={style}>{children}</a>;
-  return <Link href={hrefFor(href, basePath)} className={className} style={style}>{children}</Link>;
+function customFields(value: unknown): TenantCustomFormField[] {
+  if (!Array.isArray(value)) return [];
+  const allowed = new Set(['text', 'email', 'tel', 'textarea', 'select']);
+  return value.slice(0, 20).flatMap((entry) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [];
+    const raw = entry as Record<string, unknown>;
+    const name = text(raw.name).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 80);
+    const label = text(raw.label).slice(0, 160);
+    if (!name || !label) return [];
+    const requestedType = text(raw.type);
+    const type = allowed.has(requestedType)
+      ? requestedType as TenantCustomFormField['type']
+      : 'text';
+    return [{
+      name,
+      label,
+      type,
+      required: raw.required === true,
+      options: Array.isArray(raw.options)
+        ? raw.options.map((option) => text(option).slice(0, 120)).filter(Boolean).slice(0, 30)
+        : undefined,
+    }];
+  });
+}
+
+function ActionLink({
+  href,
+  children,
+  primary,
+  basePath,
+  eventName = 'cta_click',
+}: {
+  href: string;
+  children: ReactNode;
+  primary: string;
+  basePath: string;
+  eventName?: 'cta_click' | 'booking_click' | 'product_click';
+}) {
+  const resolved = hrefFor(href, basePath);
+  return (
+    <TenantTrackedLink
+      href={resolved}
+      eventName={eventName}
+      external={external(resolved)}
+      className="inline-flex rounded-full px-6 py-3 font-black text-white shadow-sm"
+      style={{ backgroundColor: primary }}
+    >
+      {children}
+    </TenantTrackedLink>
+  );
 }
 
 function Section({ section, primary, secondary, basePath }: { section: TenantSiteSection; primary: string; secondary: string; basePath: string }) {
@@ -74,7 +126,7 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
 
   if (section.type === 'products') {
     const items = list(c.items);
-    return <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="text-3xl font-black">{text(c.title)}</h2> : null}<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((item, index) => <article key={`${text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.name)} className="aspect-square w-full object-cover" /> : null}<div className="p-5"><h3 className="text-lg font-black">{text(item.name)}</h3>{text(item.description) ? <p className="mt-2 text-sm leading-6 text-slate-600">{text(item.description)}</p> : null}{text(item.price) ? <p className="mt-3 text-lg font-black" style={{ color: primary }}>{text(item.price)}</p> : null}{text(item.href) ? <div className="mt-4"><ActionLink href={text(item.href)} primary={primary} basePath={basePath}>{text(item.buttonText) || 'View product'}</ActionLink></div> : null}</div></article>)}</div></section>;
+    return <section className="mx-auto max-w-7xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="text-3xl font-black">{text(c.title)}</h2> : null}<div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{items.map((item, index) => <article key={`${text(item.name)}-${index}`} className="overflow-hidden rounded-3xl border border-black/10 bg-white shadow-sm">{text(item.image) ? <img src={text(item.image)} alt={text(item.imageAlt) || text(item.name)} className="aspect-square w-full object-cover" /> : null}<div className="p-5"><h3 className="text-lg font-black">{text(item.name)}</h3>{text(item.description) ? <p className="mt-2 text-sm leading-6 text-slate-600">{text(item.description)}</p> : null}{text(item.price) ? <p className="mt-3 text-lg font-black" style={{ color: primary }}>{text(item.price)}</p> : null}{text(item.href) ? <div className="mt-4"><ActionLink href={text(item.href)} primary={primary} basePath={basePath} eventName="product_click">{text(item.buttonText) || 'View product'}</ActionLink></div> : null}</div></article>)}</div></section>;
   }
 
   if (section.type === 'testimonial') {
@@ -111,11 +163,18 @@ function Section({ section, primary, secondary, basePath }: { section: TenantSit
 
   if (section.type === 'booking') {
     const href = text(c.url) || text(c.bookingUrl);
-    return <section className="mx-auto max-w-4xl px-5 py-14 text-center sm:px-6"><h2 className="text-3xl font-black">{text(c.title) || 'Book an appointment'}</h2>{text(c.text) ? <p className="mt-4 text-slate-600">{text(c.text)}</p> : null}{href ? <div className="mt-7"><ActionLink href={href} primary={primary} basePath={basePath}>{text(c.buttonText) || 'Book now'}</ActionLink></div> : null}</section>;
+    return <section className="mx-auto max-w-4xl px-5 py-14 text-center sm:px-6"><h2 className="text-3xl font-black">{text(c.title) || 'Book an appointment'}</h2>{text(c.text) ? <p className="mt-4 text-slate-600">{text(c.text)}</p> : null}{href ? <div className="mt-7"><ActionLink href={href} primary={primary} basePath={basePath} eventName="booking_click">{text(c.buttonText) || 'Book now'}</ActionLink></div> : null}</section>;
   }
 
   if (section.type === 'contact_form') {
-    return <section className="mx-auto max-w-4xl px-5 py-14 sm:px-6">{text(c.title) ? <h2 className="mb-6 text-3xl font-black">{text(c.title)}</h2> : null}<TenantLeadForm accent={primary} /></section>;
+    const fields = customFields(c.fields);
+    return (
+      <section className="mx-auto max-w-4xl px-5 py-14 sm:px-6">
+        {fields.length
+          ? <TenantCustomLeadForm accent={primary} title={text(c.title) || 'Send a message'} fields={fields} />
+          : <><h2 className="mb-6 text-3xl font-black">{text(c.title) || 'Contact us'}</h2><TenantLeadForm accent={primary} /></>}
+      </section>
+    );
   }
 
   return null;
@@ -138,7 +197,7 @@ export function PublicTenantComposableSite({ site, pathname = '/', basePath = ''
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-4 py-4 sm:px-6">
           <Link href={hrefFor('/', basePath)} className="flex min-w-0 items-center gap-3">{config.branding.logoImage ? <img src={config.branding.logoImage} alt={`${config.branding.logoText} logo`} className="h-10 w-auto max-w-36 object-contain" /> : null}<span className="truncate text-lg font-black" style={{ color: primary }}>{config.branding.logoText || site.siteName}</span></Link>
           <nav className="hidden items-center gap-5 text-sm font-bold md:flex">{navigation.slice(0, 8).map((item) => <Link key={item.id} href={hrefFor(item.slug, basePath)} className={item.slug === page.slug ? 'font-black' : 'text-slate-600 hover:text-slate-950'} style={item.slug === page.slug ? { color: primary } : undefined}>{item.navLabel || item.title}</Link>)}</nav>
-          <Link href={hrefFor('/contact', basePath)} className="rounded-full px-4 py-2 text-sm font-black text-white" style={{ backgroundColor: primary }}>Contact</Link>
+          {navigation.some((item) => item.slug === '/contact') ? <Link href={hrefFor('/contact', basePath)} className="rounded-full px-4 py-2 text-sm font-black text-white" style={{ backgroundColor: primary }}>Contact</Link> : null}
         </div>
       </header>
       <main>{page.sections.map((section) => <Section key={section.id} section={section} primary={primary} secondary={secondary} basePath={basePath} />)}</main>

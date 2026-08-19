@@ -10,6 +10,18 @@ import { useNaturalVoice } from '@/components/voice/useNaturalVoice';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
+type SaveResponse = {
+  website?: { site_name?: string; site_config?: TenantSiteConfig; is_published?: boolean };
+  publicUrl?: string | null;
+  validation?: { errors?: Array<{ message?: string }>; warnings?: Array<{ message?: string }> };
+  error?: string;
+};
+
+function responseError(data: SaveResponse, fallback: string) {
+  const blocking = data.validation?.errors?.map((issue) => issue.message).filter(Boolean) || [];
+  return blocking.length ? `${data.error || fallback} ${blocking.slice(0, 3).join(' ')}` : data.error || fallback;
+}
+
 export function AutonomousWebsiteBuilder({
   websiteId,
   initialSiteName,
@@ -36,7 +48,7 @@ export function AutonomousWebsiteBuilder({
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'I’m PARIS. Tell me what you want built or changed. I can create pages, add or remove sections, rewrite content, reorganize the site, and change the visual brand while you watch the website update.' },
+    { role: 'assistant', content: 'I’m PARIS. Tell me what you want built or changed. I can create pages, add or remove sections, rewrite content, reorganize the site, change the visual brand, and publish when you explicitly tell me to go live.' },
   ]);
   const recognitionRef = useRef<any>(null);
   const naturalVoice = useNaturalVoice();
@@ -46,6 +58,21 @@ export function AutonomousWebsiteBuilder({
   const publicUrl = subdomain && published ? `https://${subdomain}.app.elevateforhumanity.org` : '';
   const site = useMemo(() => ({ id: websiteId, subdomain: subdomain || '', siteName, organizationId: null, config }), [websiteId, subdomain, siteName, config]);
 
+  async function persist(publish?: boolean) {
+    const response = await fetch(`/api/apps/website-builder/sites/${websiteId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ siteName, subdomain, ...(publish === undefined ? {} : { publish }), siteConfig: config }),
+    });
+    const data = await response.json() as SaveResponse;
+    if (!response.ok) throw new Error(responseError(data, publish === true ? 'Could not publish website' : 'Could not save website'));
+    if (data.website?.site_config) setConfig(ensureComposableSiteConfig(data.website.site_config));
+    if (data.website?.site_name) setSiteName(data.website.site_name);
+    if (publish === true) setPublished(true);
+    if (publish === false) setPublished(false);
+    return data;
+  }
+
   async function runCommand(raw: string) {
     const clean = raw.trim();
     if (!clean || busy) return;
@@ -53,13 +80,33 @@ export function AutonomousWebsiteBuilder({
     setMessages((current) => [...current, { role: 'user', content: clean }]);
     setInstruction('');
 
-    const context = [
-      page ? `The user is currently viewing page ${page.title} (${page.slug}).` : '',
-      selectedSectionId ? `The currently selected section id is ${selectedSectionId}.` : '',
-      clean,
-    ].filter(Boolean).join('\n');
+    const explicitPublish = /\b(publish(?: it| the site| the website)?|go live|make (?:it|the site|the website) live)\b/i.test(clean);
+    const explicitUnpublish = /\b(unpublish|take (?:it|the site|the website) offline|make (?:it|the site|the website) private)\b/i.test(clean);
 
     try {
+      if (explicitUnpublish) {
+        await persist(false);
+        const reply = 'I took the website offline and preserved the draft, domain settings, and version history.';
+        setMessages((current) => [...current, { role: 'assistant', content: reply }]);
+        setNotice('Website unpublished.');
+        return;
+      }
+
+      if (explicitPublish) {
+        if (!subdomain.trim()) throw new Error('Choose a subdomain before asking me to publish.');
+        await persist(true);
+        const reply = 'I ran the pre-publish QA gate and published the website.';
+        setMessages((current) => [...current, { role: 'assistant', content: reply }]);
+        setNotice('Website published.');
+        return;
+      }
+
+      const context = [
+        page ? `The user is currently viewing page ${page.title} (${page.slug}).` : '',
+        selectedSectionId ? `The currently selected section id is ${selectedSectionId}.` : '',
+        clean,
+      ].filter(Boolean).join('\n');
+
       const response = await fetch(`/api/apps/website-builder/sites/${websiteId}/paris`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,15 +131,7 @@ export function AutonomousWebsiteBuilder({
   async function saveIdentity(publish = false) {
     setSaving(true); setError(''); setNotice('');
     try {
-      const response = await fetch(`/api/apps/website-builder/sites/${websiteId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ siteName, subdomain, publish, siteConfig: config }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Could not save website');
-      if (data.website?.site_config) setConfig(ensureComposableSiteConfig(data.website.site_config as TenantSiteConfig));
-      if (publish) setPublished(true);
+      await persist(publish ? true : undefined);
       setNotice(publish ? 'Website published.' : 'Website saved.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save website');

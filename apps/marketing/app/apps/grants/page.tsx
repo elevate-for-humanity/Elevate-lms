@@ -27,11 +27,8 @@ export default async function GrantsPage() {
   if (!storedSubscription) redirect('/apps/grants/start-trial');
   const subscription = await syncPaidAppSubscription(storedSubscription);
 
-  if (subscription.status === 'trial' && subscription.trial_ends_at) {
-    if (new Date(subscription.trial_ends_at) < new Date()) redirect('/store/apps/grants?expired=true');
-  }
   if (subscription.status !== 'trial' && subscription.status !== 'active') {
-    redirect(`/store/apps/grants?status=${subscription.status}`);
+    redirect(subscription.upgrade_url || `/store/apps/grants?reason=${encodeURIComponent(subscription.access_reason || subscription.status || 'subscription-required')}`);
   }
 
   let trialDaysRemaining = 0;

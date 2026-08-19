@@ -41,7 +41,7 @@ const nextConfig = {
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: true },
     ];
   },
-  serverExternalPackages: ['@remotion/bundler', '@remotion/renderer', '@remotion/licensing', 'esbuild'],
+  serverExternalPackages: ['@remotion/bundler', '@remotion/renderer', '@remotion/licensing', 'esbuild', 'edge-tts'],
   webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
       config.plugins = config.plugins || [];

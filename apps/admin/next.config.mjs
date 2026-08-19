@@ -43,10 +43,6 @@ const adminConfig = {
   webpack(config, { isServer }) {
     config.resolve.alias['@'] = ROOT;
 
-    // Next 15.5.23's compiled next/dynamic can request this vendored context
-    // even though that file is not present in the published package. Point the
-    // request at Next's canonical shared runtime context instead. This keeps all
-    // existing dynamic imports functional without relying on a missing private file.
     config.resolve.alias[
       'next/dist/server/route-modules/app-page/vendored/contexts/loadable'
     ] = 'next/dist/shared/lib/loadable-context.shared-runtime.js';
@@ -58,10 +54,6 @@ const adminConfig = {
     config.parallelism = 1;
     if (process.env.DISABLE_WEBPACK_FILESYSTEM_CACHE === '1') config.cache = false;
 
-    // Next 15.5.23's webpack minifier crashes in this Admin bundle while
-    // wrapping minification errors (`WebpackError is not a constructor`).
-    // Keep webpack's normal module/chunk optimization but skip only the
-    // broken minimizer so the production build remains functionally intact.
     config.optimization = config.optimization || {};
     config.optimization.minimize = false;
     config.optimization.minimizer = [];
@@ -72,8 +64,6 @@ const adminConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        // Temporary compatibility while remaining Studio clients are migrated
-        // to the canonical Admin-owned endpoint. No duplicate handler remains.
         { source: '/api/devstudio/health', destination: '/api/admin/dev-studio/health' },
         ...legacyImageRewrites(),
       ],
@@ -84,6 +74,7 @@ const adminConfig = {
 
   async redirects() {
     return [
+      { source: '/', destination: '/dashboard', permanent: false },
       {
         source: '/admin/studio/:path*',
         destination: '/studio/:path*',

@@ -56,6 +56,10 @@ for (const status of ['submitted', 'pending_funding', 'pending_admin_review']) {
 requireText(legacyStatus, 'redirect(`/apply/track${suffix}`)', 'legacy /apply/status must redirect to canonical /apply/track');
 requireText(trackerPage, 'fetch(`/api/applications/track?', 'tracker page must use canonical tracking API');
 requireText(trackerApi, ".from('applications')", 'tracker API must read canonical applications table');
+requireText(trackerApi, "if (!id || !email)", 'public tracker must require both application ID and matching email');
+requireText(trackerApi, ".eq('normalized_email', email)", 'public tracker must bind the lookup to the applicant email');
+requireText(trackerApi, "query = query.eq('reference_number', id)", 'public tracker must bind reference-number lookups to the same applicant row');
+requireText(trackerApi, "query = query.eq('id', id)", 'public tracker must bind UUID lookups to the same applicant row');
 requireText(trackerApi, '...data,', 'tracker API must preserve canonical persisted workflow status');
 
 for (const status of [
@@ -95,4 +99,4 @@ if (failures.length) {
 }
 
 console.log('[student-lifecycle-contract] PASS');
-console.log('application -> confirmation -> tracker -> pending account -> canonical approval -> LMS access contracts are canonical');
+console.log('application -> confirmation -> paired private tracker -> pending account -> canonical approval -> LMS access contracts are canonical');

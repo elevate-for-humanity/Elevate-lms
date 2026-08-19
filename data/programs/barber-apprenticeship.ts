@@ -1,27 +1,29 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { INDIANA_RULES } from '@/lib/licensureRules/IN';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 
-const RAPIDS = RAPIDS_CONFIG.programs.barber;
-const OJL_HOURS = RAPIDS.totalHours;
-const RTI_HOURS = RAPIDS.relatedInstructionHours;
+const REGISTERED = getRegisteredProgramStandard('barber-apprenticeship');
+if (!REGISTERED) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
+const STANDARD = REGISTERED.standard;
+const RTI_HOURS = REGISTERED.completion.requiredRtiHours;
+const COMPETENCY_COUNT = REGISTERED.completion.competencyCount;
+const STATE_LICENSURE_HOURS = INDIANA_RULES.required_total_hours;
 const TUITION = BARBER_PRICING.fullPrice;
 const TUITION_LABEL = `$${TUITION.toLocaleString('en-US')}`;
 
 /**
  * Barber Apprenticeship — canonical public program record.
  *
- * Source hierarchy:
- *   1. RAPIDS_CONFIG for registered apprenticeship requirements
- *   2. BARBER_PRICING for self-pay tuition/payment terms
- *   3. This file for presentation/content only
- *
- * Do not hard-code alternate OJL/RTI totals in page components.
+ * Registered completion is competency-based. STATE_LICENSURE_HOURS is kept in
+ * the generic ProgramSchema hours fields only to represent the separate Indiana
+ * licensing/training record. It is not the DOL completion denominator.
  */
 export const BARBER_APPRENTICESHIP: ProgramSchema = {
-  slug: RAPIDS.slug,
-  title: RAPIDS.name,
-  subtitle: `DOL Registered Apprenticeship in barbering. Complete ${OJL_HOURS.toLocaleString()} hours of supervised on-the-job learning plus ${RTI_HOURS} hours of Related Technical Instruction under the registered program standards.`,
+  slug: REGISTERED.programSlug,
+  title: 'Barber Apprenticeship',
+  subtitle: `DOL Registered Apprenticeship in barbering (RAPIDS ${STANDARD.rapidsCode}). Registered completion requires ${COMPETENCY_COUNT} verified competencies plus ${RTI_HOURS} verified hours of Related Technical Instruction. Supervised work records are retained as apprenticeship and state-licensing evidence, not used as a fixed DOL completion counter.`,
   sector: 'personal-services',
   category: 'Personal Services',
   programType: 'apprenticeship',
@@ -37,11 +39,11 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   hoursPerWeekMax: 40,
   hoursBreakdown: {
     onlineInstruction: RTI_HOURS,
-    handsOnLab: OJL_HOURS,
+    handsOnLab: STATE_LICENSURE_HOURS,
     examPrep: 0,
     careerPlacement: 0,
   },
-  schedule: `40 OJL hours/week at the assigned host shop; ${RTI_HOURS} RTI hours are completed through the LMS across the program.`,
+  schedule: `Supervised host-shop work is scheduled according to the employment/placement agreement. ${RTI_HOURS} verified RTI hours and all ${COMPETENCY_COUNT} registered competencies are required; state licensing-hour records are tracked separately.`,
   cohortSize: 'Enrollment and host-shop capacity vary by placement availability',
   fundingStatement: `Funding eligibility varies by participant and funding source. Self-pay tuition is ${TUITION_LABEL}; payment plan and eligible BNPL options are available at checkout.`,
   selfPayCost: TUITION_LABEL,
@@ -58,7 +60,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       name: 'DOL Registered Apprenticeship Certificate',
       issuer: 'U.S. Department of Labor',
-      description: 'Certificate of Completion issued for successful completion of the registered apprenticeship program requirements.',
+      description: 'Certificate of Completion for successful completion of the registered apprenticeship requirements.',
       validity: 'Completion credential',
     },
     {
@@ -69,12 +71,13 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   outcomes: [
-    { statement: 'Perform standard haircut styles under qualified supervision and documented competency review', assessedAt: 'During OJL' },
-    { statement: 'Execute shaving and facial-hair services using required sanitation and safety procedures', assessedAt: 'During OJL' },
-    { statement: 'Recognize common hair/scalp conditions and know when referral is appropriate', assessedAt: 'During RTI/OJL' },
+    { statement: 'Perform standard haircut styles under qualified supervision and documented competency review', assessedAt: 'During supervised work' },
+    { statement: 'Execute shaving and facial-hair services using required sanitation and safety procedures', assessedAt: 'During supervised work' },
+    { statement: 'Recognize common hair/scalp conditions and know when referral is appropriate', assessedAt: 'During RTI/work' },
     { statement: 'Demonstrate required sanitation, disinfection, and workstation procedures', assessedAt: 'Beginning and throughout program' },
-    { statement: `Complete ${OJL_HOURS.toLocaleString()} approved OJL hours at an assigned host shop`, assessedAt: 'Program completion' },
-    { statement: `Complete ${RTI_HOURS} hours of Related Technical Instruction`, assessedAt: 'Program completion' },
+    { statement: `Complete all ${COMPETENCY_COUNT} registered Appendix A competencies`, assessedAt: 'Program completion' },
+    { statement: `Complete ${RTI_HOURS} verified hours of Related Technical Instruction`, assessedAt: 'Program completion' },
+    { statement: 'Maintain required supervised-work, wage, placement, and state-licensing evidence', assessedAt: 'Throughout program' },
     { statement: 'Prepare for the Indiana barber licensing examination', assessedAt: 'End of program' },
   ],
 
@@ -83,12 +86,12 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       title: 'Barber Apprentice',
       timeframe: 'During registered apprenticeship',
       requirements: 'Registered apprentice with an approved host-shop placement',
-      salaryRange: 'Employer-set under the registered wage schedule',
+      salaryRange: 'Employer-set under the applicable registered wage schedule and wage law',
     },
     {
       title: 'Licensed Barber',
       timeframe: 'After program and licensing requirements are completed',
-      requirements: 'Program completion plus Indiana licensing requirements',
+      requirements: 'Registered-program completion plus Indiana licensing requirements',
       salaryRange: 'Employer/market dependent',
     },
     {
@@ -110,10 +113,10 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     { week: 'Phase 2', title: 'Basic Cutting Techniques', competencyMilestone: 'Begin supervised cutting services and documented skill repetitions.' },
     { week: 'Phase 3', title: 'Shaving & Facial Hair', competencyMilestone: 'Demonstrate safe shaving, beard shaping, and client-preparation procedures.' },
     { week: 'Phase 4', title: 'Intermediate Cutting', competencyMilestone: 'Demonstrate fades, tapers, scissor-over-comb, and shape-up techniques under supervision.' },
-    { week: 'Phase 5', title: 'Advanced Techniques', competencyMilestone: 'Progress through advanced services and competency verification.' },
+    { week: 'Phase 5', title: 'Advanced Techniques', competencyMilestone: 'Progress through advanced services and registered competency verification.' },
     { week: 'Phase 6', title: 'Business & Client Management', competencyMilestone: 'Apply booking, pricing, client-service, and business fundamentals.' },
     { week: 'Phase 7', title: 'License Exam Preparation', competencyMilestone: 'Complete exam-preparation activities and required program documentation.' },
-    { week: 'Phase 8', title: 'Completion', competencyMilestone: `Complete ${OJL_HOURS.toLocaleString()} OJL hours, ${RTI_HOURS} RTI hours, required competencies, and completion documentation.` },
+    { week: 'Phase 8', title: 'Completion', competencyMilestone: `Verify all ${COMPETENCY_COUNT} registered competencies, ${RTI_HOURS} RTI hours, required work/wage evidence, and completion documentation.` },
   ],
 
   curriculum: [
@@ -144,10 +147,10 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   complianceAlignment: [
-    { standard: 'DOL Registered Apprenticeship', description: `Program standards require ${OJL_HOURS.toLocaleString()} supervised OJL hours plus ${RTI_HOURS} hours of Related Technical Instruction.` },
+    { standard: 'DOL Registered Apprenticeship', description: `RAPIDS ${STANDARD.rapidsCode} is competency-based: ${COMPETENCY_COUNT} verified competencies plus ${RTI_HOURS} verified RTI hours. Supervised work hours are maintained as evidence and are not a fixed DOL completion denominator.` },
     { standard: 'RAPIDS Program Registration', description: `Sponsor of Record: ${RAPIDS_CONFIG.sponsorOfRecord}; registration ID ${RAPIDS_CONFIG.registrationId}.` },
-    { standard: 'Indiana Professional Licensing Agency', description: 'Indiana accepts qualifying Department of Labor Registered Apprenticeship completion documentation as part of the barber licensing application process.' },
-    { standard: 'Indiana State Board of Cosmetology and Barber Examiners', description: 'Licensure remains subject to state application, examination, and other current requirements.' },
+    { standard: 'Indiana Professional Licensing Agency', description: `Indiana licensing/training evidence is tracked separately from the registered completion basis. The current generic state-tracking value in this program record is ${STATE_LICENSURE_HOURS.toLocaleString()} hours and must not be represented as the DOL completion requirement.` },
+    { standard: 'Indiana State Board of Cosmetology and Barber Examiners', description: 'Licensure remains subject to current state application, examination, documentation, and other requirements.' },
   ],
 
   trainingPhases: [
@@ -166,7 +169,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       phase: 2,
       title: 'Cutting & Styling Techniques',
-      weeks: 'Progressive OJL',
+      weeks: 'Progressive supervised work',
       focus: 'Clipper cuts, scissor cuts, fades, tapers, beard shaping, and styling.',
       labCompetencies: [
         'Perform fades and blending under supervision',
@@ -179,7 +182,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
     {
       phase: 3,
       title: 'Advanced Skills & Business',
-      weeks: 'Progressive OJL/RTI',
+      weeks: 'Progressive work/RTI',
       focus: 'Advanced services, client management, and business fundamentals.',
       labCompetencies: [
         'Perform advanced services within authorized scope',
@@ -192,11 +195,11 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       phase: 4,
       title: 'Completion & Exam Preparation',
       weeks: 'Final program phase',
-      focus: 'Completion of registered hours, competencies, documentation, and licensing preparation.',
+      focus: 'Completion of registered competencies, verified RTI, required evidence, documentation, and licensing preparation.',
       labCompetencies: [
-        `Complete ${OJL_HOURS.toLocaleString()} approved supervised OJL hours`,
-        `Complete ${RTI_HOURS} required RTI hours`,
-        'Complete required competency verification',
+        `Complete all ${COMPETENCY_COUNT} registered competency verifications`,
+        `Complete ${RTI_HOURS} verified RTI hours`,
+        'Maintain required supervised-work and wage evidence',
         'Complete licensing-exam preparation',
       ],
     },
@@ -248,28 +251,26 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   admissionRequirements: [
     'Meet the minimum age and other eligibility requirements applicable to the registered program and employment placement',
     'Complete Elevate admissions and apprenticeship onboarding',
-    'Be assigned to or approved with a participating host shop before OJL begins',
+    'Be assigned to or approved with a participating host shop before supervised work begins',
     'Provide required identity, employment, and program documentation',
   ],
   equipmentIncluded: 'Program-provided items are governed by the current enrollment agreement and program cost disclosure.',
-  modality: 'Hybrid — Related Technical Instruction through the LMS and supervised On-the-Job Learning at an approved host shop',
+  modality: 'Hybrid — Related Technical Instruction through the LMS and supervised work at an approved host shop',
   facilityInfo: 'Approved participating host shops',
   bilingualSupport: 'Support availability may vary; contact admissions for current language-support options.',
-  employerPartners: [
-    'Approved participating host shops',
-  ],
+  employerPartners: ['Approved participating host shops'],
   pricingIncludes: [
-    `${OJL_HOURS.toLocaleString()} supervised OJL-hour registered pathway`,
-    `${RTI_HOURS} hours of Related Technical Instruction`,
+    `${RTI_HOURS} hours of required Related Technical Instruction`,
+    `Tracking and verification of all ${COMPETENCY_COUNT} registered competencies`,
     'LMS access for assigned RTI coursework',
-    'Apprenticeship progress and compliance tracking',
+    'Supervised-work, wage, placement, and compliance tracking',
     'Licensing-exam preparation support',
   ],
   paymentTerms: `${TUITION_LABEL}. Payment plan and eligible BNPL options are available for self-pay applicants.`,
 
-  deliveryModel: 'partner',
+  deliveryModel: 'internal',
   deliveryModelDetail: 'hybrid',
-  partnerProvider: 'milady',
+  partnerProvider: 'Elevate for Humanity',
   fundingOptions: ['impact', 'employer_paid', 'self_pay'],
   funding: {
     fssa_eligible: true,
@@ -284,7 +285,7 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
       courseId: 'prestige-elevation-barber-curriculum',
       label: 'Prestige Elevation Barber Curriculum',
       partnerName: 'Elevate for Humanity',
-      credentialIssued: `RTI completion (${RTI_HOURS} hours)`,
+      credentialIssued: `RTI completion (${RTI_HOURS} verified hours)`,
       duration: `${RTI_HOURS} hours RTI`,
       required: true,
       enrollmentUrl: '/lms/courses/3fb5ce19-1cde-434c-a8c6-f138d7d7aa17',
@@ -304,9 +305,9 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
 
   faqs: [
     { question: 'How much does the program cost?', answer: `Current self-pay tuition is ${TUITION_LABEL}. Payment plan and eligible BNPL options are available. Public funding eligibility is determined separately.` },
-    { question: 'How long is the program?', answer: `The registered program requires ${OJL_HOURS.toLocaleString()} approved OJL hours plus ${RTI_HOURS} RTI hours. At a standard 40-hour OJL workweek, the OJL requirement is approximately 50 weeks; actual completion depends on approved hours, attendance, RTI completion, transfer credit, and the host-shop schedule.` },
-    { question: 'Do I need my own barbershop?', answer: 'No. Applicants without a host shop can request placement assistance. OJL can begin only at an approved participating host shop.' },
-    { question: 'What credential do I earn?', answer: 'Successful program completers receive the Registered Apprenticeship completion credential. Indiana barber licensure is a separate state process and requires satisfaction of current licensing and examination requirements.' },
+    { question: 'How long is the program?', answer: `This is a competency-based registered occupation. Completion requires all ${COMPETENCY_COUNT} competencies plus ${RTI_HOURS} verified RTI hours and the required placement, supervision, wage, work-evidence, and sponsor records. Calendar duration depends on competency progression, RTI completion, work schedule, transfer decisions, and applicable state licensing requirements.` },
+    { question: 'Do I need my own barbershop?', answer: 'No. Applicants without a host shop can request placement assistance. Supervised work can begin only at an approved participating host shop.' },
+    { question: 'What credential do I earn?', answer: 'Successful registered-program completers receive the Registered Apprenticeship completion credential. Indiana barber licensure is a separate state process and requires satisfaction of current licensing and examination requirements.' },
   ],
 
   breadcrumbs: [
@@ -316,5 +317,5 @@ export const BARBER_APPRENTICESHIP: ProgramSchema = {
   ],
 
   metaTitle: 'Barber Registered Apprenticeship | Indianapolis | Elevate for Humanity',
-  metaDescription: `DOL Registered Barber Apprenticeship: ${OJL_HOURS.toLocaleString()} supervised OJL hours plus ${RTI_HOURS} RTI hours. Host-shop placement, LMS instruction, progress tracking, and self-pay options available.`,
+  metaDescription: `DOL Registered Barber Apprenticeship (RAPIDS ${STANDARD.rapidsCode}): ${COMPETENCY_COUNT} verified competencies plus ${RTI_HOURS} verified RTI hours, with approved host-shop placement, supervised-work evidence, wage compliance, LMS instruction, and progress tracking.`,
 };

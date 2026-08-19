@@ -24,7 +24,7 @@ interface ProgramImageEntry {
 
 export const PROGRAM_IMAGES: Record<string, ProgramImageEntry> = {
   'business-administration': {
-    card: '/images/business/team-2.jpg',
+    card: '/images/pexels/business.webp',
     hero: '/hero-images/business-hero.webp',
     alt: 'Business administration learners collaborating in a professional setting',
   },
@@ -364,7 +364,7 @@ export function getProgramCardImage(slug: string): string {
   return PROGRAM_IMAGES[slug]?.card ?? `${P}/training-cohort.webp`;
 }
 export function getProgramHeroImage(slug: string): string {
-  return getProgramCardImage(slug);
+  return PROGRAM_IMAGES[slug]?.hero ?? `${P}/training-cohort.webp`;
 }
 export function getProgramImageAlt(slug: string, fallback: string): string {
   return PROGRAM_IMAGES[slug]?.alt ?? fallback;

@@ -35,6 +35,10 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/apps/admin/node_modules ./apps/admin/node_modules
 COPY . .
 
+# Fail before compilation if authenticated Admin regresses to public widgets,
+# stale proof/demo IDs, or Website Builder starts seeding invented business data.
+RUN node scripts/verify-portal-production-contracts.mjs
+
 # Capture a real build timestamp even when the platform does not inject one.
 RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('Admin build timestamp:', ts)"
 

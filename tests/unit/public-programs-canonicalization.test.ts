@@ -14,6 +14,12 @@ describe('public program canonicalization', () => {
     expect(getCanonicalPublicProgramSlug('entrepreneurship-small-business')).toBe('business-startup');
   });
 
+  it('preserves richer static public program ownership before thin registry aliases', () => {
+    expect(getCanonicalPublicProgramSlug('nail-technician-apprenticeship')).toBe(
+      'nail-technician-apprenticeship',
+    );
+  });
+
   it('consolidates bookkeeping variants without merging financial literacy', () => {
     expect(getCanonicalPublicProgramSlug('bookkeeping-fundamentals')).toBe('bookkeeping');
     expect(getCanonicalPublicProgramSlug('finance-bookkeeping-accounting')).toBe('bookkeeping');

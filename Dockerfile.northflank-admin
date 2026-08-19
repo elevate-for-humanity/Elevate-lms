@@ -2,16 +2,11 @@
 # Dockerfile.northflank-admin - Northflank Admin Service
 # Serves admin.elevateforhumanity.org
 #
-# Fixes applied:
-# 1. Native module dependencies (sharp, canvas, pdfkit, fontkit) installed and copied
-# 2. Font and image system libraries in both builder and runner stages
-# 3. node_modules copied into runtime stage for native module access
-# 4. Native module health check in builder stage (fails build if modules unavailable)
-# 5. Standalone output used correctly (preserves directory structure)
-# 6. Deterministic build identity from Northflank's injected NF_GIT_SHA
-# 7. FFmpeg + DejaVu fonts available in runtime for Media Studio commercial rendering
-# 8. Canonical Admin server entry is used at runtime (matches apps/admin/package.json start contract)
-# 9. Final packaged runtime is started and probed during image build before deployment
+# Production contract:
+# 1. Native module dependencies are installed and verified.
+# 2. Next.js standalone output is the authoritative production server.
+# 3. Build identity comes from Northflank's injected NF_GIT_SHA.
+# 4. The final packaged runtime must boot and serve /api/ping before the image is accepted.
 
 ARG BUILD_TIMESTAMP=unknown
 
@@ -22,9 +17,6 @@ ARG PNPM_VERSION=10.28.2
 ENV CI=true \
     NEXT_TELEMETRY_DISABLED=1
 
-# Northflank has previously resolved Corepack's pnpm shim to the wrong pnpm
-# version. Remove the shim first, install the repository-pinned pnpm directly,
-# and fail the image build if the executable is not exactly the expected version.
 RUN corepack disable || true \
     && npm install -g "pnpm@${PNPM_VERSION}" \
     && test "$(pnpm --version)" = "${PNPM_VERSION}"
@@ -45,29 +37,24 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
-RUN echo "nf-cache-invalidate-admin-2026-08-08-devstudio-import-repair"
+RUN echo "nf-cache-invalidate-admin-2026-08-19-generated-standalone-server"
 
 FROM base AS dependencies
 RUN echo "nf-deps-2026-08-13-block-ffmpeg-static-postinstall"
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json ./apps/admin/package.json
 COPY packages ./packages
+# Runtime ships Debian FFmpeg. Prevent ffmpeg-static from downloading a second
+# binary during dependency installation, which has historically failed on
+# Northflank with ECONNRESET.
 RUN node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); if (p.pnpm?.onlyBuiltDependencies) p.pnpm.onlyBuiltDependencies=p.pnpm.onlyBuiltDependencies.filter((name)=>name!=='ffmpeg-static'); fs.writeFileSync('package.json', JSON.stringify(p,null,2)+'\n');"
 RUN set -eux; \
-    echo "PATH=${PATH}"; \
-    echo "Available pnpm commands:"; \
     type -a pnpm; \
-    echo "Resolved pnpm executable:"; \
     PNPM_BIN="$(command -v pnpm)"; \
     test -n "${PNPM_BIN}"; \
-    echo "${PNPM_BIN}"; \
-    readlink -f "${PNPM_BIN}" || true; \
-    echo "Active pnpm version:"; \
-    pnpm --version; \
+    echo "pnpm=${PNPM_BIN} version=$(pnpm --version)"; \
     test "$(pnpm --version)" = "10.28.2"; \
-    echo "Confirming install command supports frozen lockfiles:"; \
     pnpm install --help | grep -E -- 'frozen-lockfile|lockfile'; \
-    echo "Installing workspace dependencies:"; \
     pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
 FROM base AS builder
@@ -79,7 +66,6 @@ ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 RUN set -eux; \
-    echo "Validating NF_GIT_SHA=${NF_GIT_SHA}"; \
     test -n "${NF_GIT_SHA}"; \
     echo "${NF_GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
     echo "NF_GIT_SHA validated: ${NF_GIT_SHA}"
@@ -99,30 +85,21 @@ ENV NEXT_PUBLIC_BUILD_ID="elevate-${NF_GIT_SHA}"
 ENV BUILD_TIMESTAMP="${BUILD_TIMESTAMP}"
 COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
-RUN echo "Verifying build arguments..." && \
-    echo "NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-MISSING}" && \
-    echo "NEXT_PUBLIC_ADMIN_URL: ${NEXT_PUBLIC_ADMIN_URL:-MISSING}" && \
-    echo "NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:+SET}" && \
-    echo "NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:+SET}" && \
-    echo "NF_GIT_SHA: ${NF_GIT_SHA:-MISSING}" && \
-    echo "GIT_SHA: ${GIT_SHA:-MISSING}" && \
-    echo "BUILD_TIMESTAMP: ${BUILD_TIMESTAMP:-MISSING}" && \
-    (test -n "$NEXT_PUBLIC_SUPABASE_URL" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_URL is not set" && exit 1)) && \
-    (test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY" || (echo "ERROR: NEXT_PUBLIC_SUPABASE_ANON_KEY is not set" && exit 1)) && \
-    (test -n "$NF_GIT_SHA" || (echo "ERROR: NF_GIT_SHA is not set" && exit 1)) && \
-    echo "All required build arguments verified."
+RUN set -eux; \
+    test -n "$NEXT_PUBLIC_SUPABASE_URL"; \
+    test -n "$NEXT_PUBLIC_SUPABASE_ANON_KEY"; \
+    test -n "$NF_GIT_SHA"; \
+    echo "Admin build arguments verified"
 RUN pnpm --filter @elevate/admin build
 RUN node scripts/verify-admin-critical-routes.mjs
 RUN set -eux; \
     ADMIN_NEXT_DIR="/workspace/apps/admin/.next"; \
     BUILD_ID_FILE="${ADMIN_NEXT_DIR}/BUILD_ID"; \
     GENERATED_SERVER_FILE="${ADMIN_NEXT_DIR}/standalone/apps/admin/server.js"; \
-    CANONICAL_SERVER_FILE="/workspace/apps/admin/server.js"; \
     test -d "${ADMIN_NEXT_DIR}/standalone"; \
     test -d "${ADMIN_NEXT_DIR}/static"; \
     test -f "${BUILD_ID_FILE}"; \
     test -f "${GENERATED_SERVER_FILE}"; \
-    test -f "${CANONICAL_SERVER_FILE}"; \
     test -n "${GIT_SHA}"; \
     test "${GIT_SHA}" != "unknown"; \
     echo "${GIT_SHA}" | grep -qE '^[a-f0-9]{7,40}$'; \
@@ -155,9 +132,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home nextjs
+
+# Keep Next.js's generated standalone launcher. Do not overwrite it with the
+# repository's custom development/server harness.
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/standalone/ /app/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/.next/static/ /app/apps/admin/.next/static/
-COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/server.js /app/apps/admin/server.js
 COPY --from=builder --chown=nextjs:nodejs /workspace/public/ /app/apps/admin/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/apps/admin/public/ /app/apps/admin/public/
 COPY --from=builder --chown=nextjs:nodejs /workspace/node_modules /app/node_modules
@@ -175,9 +154,6 @@ RUN set -eux; \
     command -v ffprobe; \
     fc-match 'DejaVu Sans'
 
-# Prove the exact final runtime filesystem can boot and serve the orchestration
-# liveness endpoint. This turns a post-deploy 503 into a build-time failure with
-# the actual Node startup error in Northflank build logs.
 RUN set -eux; \
     LOG=/tmp/admin-runtime-smoke.log; \
     node --max-http-header-size=32768 apps/admin/server.js >"${LOG}" 2>&1 & \
@@ -190,14 +166,14 @@ RUN set -eux; \
         break; \
       fi; \
       if ! kill -0 "${PID}" 2>/dev/null; then \
-        echo 'Admin process exited during packaged-runtime smoke test.'; \
+        echo 'Admin standalone process exited during packaged-runtime smoke test.'; \
         cat "${LOG}"; \
         exit 1; \
       fi; \
       sleep 2; \
     done; \
     if [ "${READY}" -ne 1 ]; then \
-      echo 'Admin packaged runtime did not become healthy.'; \
+      echo 'Admin packaged standalone runtime did not become healthy.'; \
       cat /tmp/admin-ping.err || true; \
       cat "${LOG}"; \
       exit 1; \
@@ -215,8 +191,6 @@ HEALTHCHECK \
     --timeout=10s \
     --start-period=90s \
     --retries=5 \
-    CMD curl --fail --silent --show-error \
-        http://127.0.0.1:3000/api/ping \
-        >/dev/null || exit 1
+    CMD curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/dev/null || exit 1
 
 CMD ["node", "--max-http-header-size=32768", "apps/admin/server.js"]

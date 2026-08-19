@@ -7,7 +7,6 @@ import { hvacCourse } from './program-hvac';
 import { cdlCourse } from './program-cdl';
 import { customerServiceCourse } from './program-customer-service';
 import { itSupportCourse } from './program-it-support';
-import { entrepreneurshipCourse } from './program-entrepreneurship';
 import { behavioralHealthCourse } from './program-behavioral-health';
 import { buildingMaintenanceCourse } from './program-building-maintenance';
 import { cdlHazmatCourse } from './program-cdl-hazmat';
@@ -40,7 +39,6 @@ export const allCourses: Course[] = [
   cdlCourse,
   customerServiceCourse,
   itSupportCourse,
-  entrepreneurshipCourse,
   behavioralHealthCourse,
   buildingMaintenanceCourse,
   cdlHazmatCourse,

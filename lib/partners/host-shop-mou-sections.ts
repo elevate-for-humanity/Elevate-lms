@@ -1,4 +1,5 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
 export type HostShopMouProgram = 'barber' | 'cosmetology' | 'esthetician' | 'nail';
 
@@ -14,564 +15,150 @@ export type HostShopMouMeta = {
   worksiteLabel: string;
   handbookHref: string;
   fullDocHref?: string;
-  rapidsId: string;
+  rapidsId: string | null;
+  registrationLabel: string;
+  registered: boolean;
 };
 
-const BARBER_SECTIONS: MouSection[] = [
-  {
-    title: '1. Parties and Purpose',
-    content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the barbershop identified at execution ("Worksite Partner" or "Shop").
-
-This MOU establishes the terms under which the Shop will serve as a worksite for the Indiana Barber Host Shop Program, RAPIDS Program ID: 2025-IN-132301, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
-
-WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Shop is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
-
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Shop a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the barber host shop. The Shop has no ownership rights, governance authority, or decision-making authority over Elevate's programs, curriculum, credentials, or brand.`,
-  },
-  {
-    title: '2. Program Structure — Non-Negotiable Federal Requirements',
-    content: `The Indiana Barber Host Shop Program is a USDOL Registered Apprenticeship. Its structure is set by federal law and the registered program standards. These terms are not negotiable.
-
-Program requirements:
-• 2,000 hours of on-the-job training (OJT) at the worksite, supervised by a licensed barber
-• Related Technical Instruction (RTI) coordinated by the Sponsor (Elevate)
-• Progressive skill development tracked through competency assessments per the registered standards
-• Apprentice must be registered with USDOL/RAPIDS before OJT hours begin
-• All OJT hours must be documented and submitted to the Sponsor monthly
-
-The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
-  },
-  {
-    title: '3. Sponsor Responsibilities',
-    content: `${PLATFORM_DEFAULTS.orgName} agrees to:
-
-• Maintain USDOL/RAPIDS registration and all required federal reporting
-• Develop, deliver, and update all Related Technical Instruction (RTI)
-• Maintain official apprentice records and program documentation
-• Issue completion certificates upon successful program completion
-• Screen and refer qualified apprentice candidates to the Shop
-• Provide the Shop with competency checklists and OJT tracking tools
-• Conduct periodic worksite visits to verify program compliance
-• Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
-  },
-  {
-    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
-    content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
-
-The Shop agrees to:
-
-SUPERVISION: Provide direct, on-site supervision of the apprentice by a currently licensed Indiana barber at all times during OJT hours. The supervising barber must hold an active Indiana barber license. No exceptions.
-
-EMPLOYMENT: The apprentice is a paid employee of the Shop — not a volunteer, intern, or independent contractor. The Shop is the employer of record for the apprentice during OJT. The Shop is responsible for payroll, withholding, workers' compensation, and all employer obligations under Indiana and federal law.
-
-WAGES: Pay the apprentice according to the agreed progressive wage schedule (see Section 5). Failure to pay the apprentice as agreed is grounds for immediate termination of this MOU and will be reported to USDOL.
-
-HOURS TRACKING: Accurately track and submit OJT hours to the Sponsor monthly using the provided tracking forms. Falsifying OJT hours is a federal offense.
-
-SAFETY: Maintain a safe workplace that complies with all OSHA standards and Indiana workplace safety requirements. Report any workplace injury involving the apprentice to the Sponsor within 24 hours.
-
-INSURANCE: Carry workers' compensation insurance covering the apprentice. Provide proof of coverage to the Sponsor before the apprentice begins OJT.
-
-LICENSES: Maintain all required business licenses, health permits, and barbershop operating licenses throughout the term of this MOU. Notify the Sponsor immediately if any license lapses.
-
-NONDISCRIMINATION: Comply with all federal nondiscrimination requirements under WIOA Section 188, Title VI of the Civil Rights Act, the ADA, and all applicable equal opportunity laws. The apprenticeship program is open to all qualified individuals regardless of race, color, religion, sex, national origin, age, or disability.`,
-  },
-  {
-    title: '5. Apprentice Compensation — Federal Minimum Standards',
-    content: `Apprentice compensation is governed by federal apprenticeship standards and Indiana minimum wage law. These minimums are not negotiable.
-
-The apprentice is a paid employee. Compensation on a sole commission basis is prohibited under federal apprenticeship rules.
-
-Approved compensation models:
-• HOURLY: $10.00–$15.00/hr recommended. Must meet Indiana minimum wage ($7.25/hr) at all times.
-• HYBRID: $8.00–$10.00/hr base wage PLUS 15%–25% commission on services performed. Base wage must meet Indiana minimum wage at all times.
-
-Progressive wage increases are required as the apprentice advances through the program. The wage schedule is set in the registered program standards and must be followed.
-
-Apprentices retain 100% of tips. Tips may not be counted toward the minimum wage requirement.
-
-The Shop is responsible for all payroll taxes, withholding, and employer contributions for the apprentice.`,
-  },
-  {
-    title: '6. Term and Termination — 30-Day Notice Right',
-    content: `This MOU is effective from the date signed and continues until the apprentice completes the program, withdraws, or the agreement is terminated.
-
-YOUR RIGHT TO EXIT: Either party — the Shop or the Sponsor — may terminate this MOU at any time for any reason by providing 30 days written notice. Send written notice (email is acceptable) to your assigned Elevate coordinator and copy elevate4humanityedu@gmail.com. You do not need to provide a reason. You do not need the other party's permission. This right is non-negotiable and cannot be waived.
-
-During the 30-day notice period: the apprentice continues their OJT and the Shop continues its obligations under this MOU. The Sponsor will work with the Shop and the apprentice on a transition plan.
-
-IMMEDIATE TERMINATION BY SPONSOR (no notice required): The Sponsor may terminate this MOU immediately — without the 30-day notice period — if the Shop:
-• Fails to pay the apprentice as agreed
-• Violates any workplace safety or OSHA requirement
-• Loses any required business license or insurance
-• Falsifies OJT hours or program records
-• Engages in misconduct affecting the apprentice's safety or welfare
-• Violates federal nondiscrimination requirements
-
-After termination: the Shop must submit all outstanding OJT hour records to the Sponsor within 10 business days. The apprentice's program records remain with the Sponsor.`,
-  },
-  {
-    title: '7. Confidentiality and Non-Disclosure',
-    content: `Both parties agree to maintain confidentiality of apprentice personally identifiable information (PII) in compliance with applicable privacy laws.
-
-The Shop may not disclose apprentice PII (name, contact information, wage information, program records) to any third party without written apprentice consent and Sponsor authorization, except as required for program administration or by law.
-
-The Shop also receives access to Elevate's operational procedures, program materials, and business information through this collaboration. This information is confidential. The Shop may not disclose or use Elevate's confidential information for any purpose other than fulfilling its obligations under this MOU.
-
-A full Non-Disclosure Agreement is available at ${PLATFORM_DEFAULTS.canonicalDomain}/legal/nda and is incorporated by reference into this MOU.`,
-  },
-  {
-    title: '8. Non-Compete and Non-Replication',
-    content: `The Shop receives access to Elevate's registered apprenticeship program structure, curriculum relationships, RAPIDS registration, and credential pathways through this collaboration. This access is provided to support the apprentice — not to enable the Shop to replicate the program independently.
-
-During the term of this MOU and for three (3) years following termination, the Shop agrees not to:
-• Use Elevate's program structure, RAPIDS registration, or DWD relationships to independently register or operate a competing USDOL Registered Apprenticeship program in barbering
-• Solicit or redirect Elevate apprentice candidates, instructors, or credential partners into a competing program derived from the Elevate apprenticeship model
-• Represent to any funding agency, employer, or student that the Shop independently operates the Indiana Barber Host Shop Program
-
-These restrictions do not prevent the Shop from: operating as a barbershop, employing licensed barbers, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.
-
-A full Non-Compete Agreement is available at ${PLATFORM_DEFAULTS.canonicalDomain}/legal/non-compete and is incorporated by reference into this MOU.`,
-  },
-  {
-    title: '9. Partner Handbook — Required Reading',
-    content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details the day-to-day responsibilities, compensation requirements, hour tracking procedures, prohibited practices, and communication expectations that govern the worksite relationship.
-
-By signing this MOU, the Shop confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/barber-host-shop/handbook
-
-Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU and may result in immediate termination of the partnership and notification to USDOL.`,
-  },
-  {
-    title: '10. Dispute Resolution',
-    content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
-
-If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
-
-USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulations and may be reported to the Indiana Department of Workforce Development or the U.S. Department of Labor, Office of Apprenticeship.`,
-  },
-];
-
-const COSMETOLOGY_SECTIONS: MouSection[] = [
-  {
-    title: '1. Parties and Purpose',
-    content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the salon identified at execution ("Worksite Partner" or "Salon").
-
-This MOU establishes the terms under which the Salon will serve as a worksite for the Indiana Cosmetology Apprenticeship Program, RAPIDS Program ID: 2025-IN-132302, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
-
-WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Salon is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
-
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the cosmetology apprenticeship. The Salon has no ownership rights, governance authority, or decision-making authority over Elevate's programs, curriculum, credentials, or brand.`,
-  },
-  {
-    title: '2. Program Structure — Non-Negotiable Federal Requirements',
-    content: `The Indiana Cosmetology Apprenticeship Program is a USDOL Registered Apprenticeship. Its structure is set by federal law and the registered program standards. These terms are not negotiable.
-
-Program requirements:
-• 2,000 hours of on-the-job training (OJT) at the worksite, supervised by a licensed cosmetologist
-• Related Technical Instruction (RTI) coordinated by the Sponsor (Elevate)
-• Progressive skill development tracked through competency assessments per the registered standards
-• Apprentice must be registered with USDOL/RAPIDS before OJT hours begin
-• All OJT hours must be documented and submitted to the Sponsor monthly
-
-The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
-  },
-  {
-    title: '3. Sponsor Responsibilities',
-    content: `${PLATFORM_DEFAULTS.orgName} agrees to:
-
-• Maintain USDOL/RAPIDS registration and all required federal reporting
-• Develop, deliver, and update all Related Technical Instruction (RTI)
-• Maintain official apprentice records and program documentation
-• Issue completion certificates upon successful program completion
-• Screen and refer qualified apprentice candidates to the Salon
-• Provide the Salon with competency checklists and OJT tracking tools
-• Conduct periodic worksite visits to verify program compliance
-• Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
-  },
-  {
-    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
-    content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
-
-The Salon agrees to:
-
-SUPERVISION: Provide direct, on-site supervision of the apprentice by a currently licensed Indiana cosmetologist at all times during OJT hours. The supervising cosmetologist must hold an active Indiana IPLA cosmetology license with at least 2 years of experience. No exceptions.
-
-EMPLOYMENT: The apprentice is a paid employee of the Salon — not a volunteer, intern, or independent contractor. The Salon is the employer of record for the apprentice during OJT. The Salon is responsible for payroll, withholding, workers' compensation, and all employer obligations under Indiana and federal law.
-
-WAGES: Pay the apprentice according to the agreed progressive wage schedule (see Section 5). Failure to pay the apprentice as agreed is grounds for immediate termination of this MOU and will be reported to USDOL.
-
-HOURS TRACKING: Accurately track and submit OJT hours to the Sponsor monthly using the provided tracking forms. Falsifying OJT hours is a federal offense.
-
-SAFETY: Maintain a safe workplace that complies with all OSHA standards and Indiana workplace safety requirements. Report any workplace injury involving the apprentice to the Sponsor within 24 hours.
-
-INSURANCE: Carry workers' compensation insurance covering the apprentice. Provide proof of coverage to the Sponsor before the apprentice begins OJT.
-
-LICENSES: Maintain all required business licenses, health permits, and salon operating licenses throughout the term of this MOU. Notify the Sponsor immediately if any license lapses.
-
-NONDISCRIMINATION: Comply with all federal nondiscrimination requirements under WIOA Section 188, Title VI of the Civil Rights Act, the ADA, and all applicable equal opportunity laws. The apprenticeship program is open to all qualified individuals regardless of race, color, religion, sex, national origin, age, or disability.`,
-  },
-  {
-    title: '5. Apprentice Compensation — Federal Minimum Standards',
-    content: `Apprentice compensation is governed by federal apprenticeship standards and Indiana minimum wage law. These minimums are not negotiable.
-
-The apprentice is a paid employee. Compensation on a sole commission basis is prohibited under federal apprenticeship rules.
-
-Approved compensation models:
-• HOURLY: $10.00–$15.00/hr recommended. Must meet Indiana minimum wage ($7.25/hr) at all times.
-• HYBRID: $8.00–$10.00/hr base wage PLUS 15%–25% commission on services performed. Base wage must meet Indiana minimum wage at all times.
-
-Progressive wage increases are required as the apprentice advances through the program. The wage schedule is set in the registered program standards and must be followed.
-
-Apprentices retain 100% of tips. Tips may not be counted toward the minimum wage requirement.
-
-The Salon is responsible for all payroll taxes, withholding, and employer contributions for the apprentice.`,
-  },
-  {
-    title: '6. Term and Termination — 30-Day Notice Right',
-    content: `This MOU is effective from the date signed and continues until the apprentice completes the program, withdraws, or the agreement is terminated.
-
-YOUR RIGHT TO EXIT: Either party — the Salon or the Sponsor — may terminate this MOU at any time for any reason by providing 30 days written notice. Send written notice (email is acceptable) to your assigned Elevate coordinator and copy elevate4humanityedu@gmail.com. You do not need to provide a reason. You do not need the other party's permission. This right is non-negotiable and cannot be waived.
-
-During the 30-day notice period: the apprentice continues their OJT and the Salon continues its obligations under this MOU. The Sponsor will work with the Salon and the apprentice on a transition plan.
-
-IMMEDIATE TERMINATION BY SPONSOR (no notice required): The Sponsor may terminate this MOU immediately — without the 30-day notice period — if the Salon:
-• Fails to pay the apprentice as agreed
-• Violates any workplace safety or OSHA requirement
-• Loses any required business license or insurance
-• Falsifies OJT hours or program records
-• Engages in misconduct affecting the apprentice's safety or welfare
-• Violates federal nondiscrimination requirements
-
-After termination: the Salon must submit all outstanding OJT hour records to the Sponsor within 10 business days. The apprentice's program records remain with the Sponsor.`,
-  },
-  {
-    title: '7. Confidentiality and Non-Disclosure',
-    content: `Both parties agree to maintain confidentiality of apprentice personally identifiable information (PII) in compliance with applicable privacy laws.
-
-The Salon may not disclose apprentice PII (name, contact information, wage information, program records) to any third party without written apprentice consent and Sponsor authorization, except as required for program administration or by law.
-
-The Salon also receives access to Elevate's operational procedures, program materials, and business information through this collaboration. This information is confidential. The Salon may not disclose or use Elevate's confidential information for any purpose other than fulfilling its obligations under this MOU.
-
-A full Non-Disclosure Agreement is available at ${PLATFORM_DEFAULTS.canonicalDomain}/legal/nda and is incorporated by reference into this MOU.`,
-  },
-  {
-    title: '8. Non-Compete and Non-Replication',
-    content: `The Salon receives access to Elevate's registered apprenticeship program structure, curriculum relationships, RAPIDS registration, and credential pathways through this collaboration. This access is provided to support the apprentice — not to enable the Salon to replicate the program independently.
-
-During the term of this MOU and for three (3) years following termination, the Salon agrees not to:
-• Use Elevate's program structure, RAPIDS registration, or DWD relationships to independently register or operate a competing USDOL Registered Apprenticeship program in cosmetology
-• Solicit or redirect Elevate apprentice candidates, instructors, or credential partners into a competing program derived from the Elevate apprenticeship model
-• Represent to any funding agency, employer, or student that the Salon independently operates the Indiana Cosmetology Apprenticeship Program
-
-These restrictions do not prevent the Salon from: operating as a salon, employing licensed cosmetologists, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.`,
-  },
-  {
-    title: '9. Partner Handbook — Required Reading',
-    content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details the day-to-day responsibilities, compensation requirements, hour tracking procedures, prohibited practices, and communication expectations that govern the worksite relationship.
-
-By signing this MOU, the Salon confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/cosmetology-host-shop/handbook
-
-Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU and may result in immediate termination of the partnership and notification to USDOL.`,
-  },
-  {
-    title: '10. Dispute Resolution',
-    content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
-
-If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
-
-USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulations and may be reported to the Indiana Department of Workforce Development or the U.S. Department of Labor, Office of Apprenticeship.`,
-  },
-];
-
-const ESTHETICIAN_SECTIONS: MouSection[] = [
-  {
-    title: '1. Parties and Purpose',
-    content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the esthetics spa or salon identified at execution ("Worksite Partner" or "Spa/Salon").
-
-This MOU establishes the terms under which the Spa/Salon will serve as a worksite for the Indiana Esthetics Apprenticeship Program, RAPIDS Program ID: 2025-IN-132303, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
-
-WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Spa/Salon is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
-
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Spa/Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the esthetics apprenticeship. The Spa/Salon has no ownership rights, governance authority, or decision-making authority over Elevate's programs, curriculum, credentials, or brand.`,
-  },
-  {
-    title: '2. Program Structure — Non-Negotiable Federal Requirements',
-    content: `The Indiana Esthetics Apprenticeship Program is a USDOL Registered Apprenticeship. Its structure is set by federal law and the registered program standards. These terms are not negotiable.
-
-Program requirements:
-• 1,200 hours of on-the-job training (OJT) at the worksite, supervised by a licensed esthetician
-• Related Technical Instruction (RTI) coordinated by the Sponsor (Elevate)
-• Progressive skill development tracked through competency assessments per the registered standards
-• Apprentice must be registered with USDOL/RAPIDS before OJT hours begin
-• All OJT hours must be documented and submitted to the Sponsor monthly
-
-The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
-  },
-  {
-    title: '3. Sponsor Responsibilities',
-    content: `${PLATFORM_DEFAULTS.orgName} agrees to:
-
-• Maintain USDOL/RAPIDS registration and all required federal reporting
-• Develop, deliver, and update all Related Technical Instruction (RTI)
-• Maintain official apprentice records and program documentation
-• Issue completion certificates upon successful program completion
-• Screen and refer qualified apprentice candidates to the Spa/Salon
-• Provide the Spa/Salon with competency checklists and OJT tracking tools
-• Conduct periodic worksite visits to verify program compliance
-• Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
-  },
-  {
-    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
-    content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
-
-The Spa/Salon agrees to:
-
-SUPERVISION: Provide direct, on-site supervision of the apprentice by a currently licensed Indiana esthetician at all times during OJT hours. The supervising esthetician must hold an active Indiana IPLA esthetics license with at least 2 years of experience. No exceptions.
-
-EMPLOYMENT: The apprentice is a paid employee of the Spa/Salon — not a volunteer, intern, or independent contractor. The Spa/Salon is the employer of record for the apprentice during OJT. The Spa/Salon is responsible for payroll, withholding, workers' compensation, and all employer obligations under Indiana and federal law.
-
-WAGES: Pay the apprentice according to the agreed progressive wage schedule (see Section 5). Failure to pay the apprentice as agreed is grounds for immediate termination of this MOU and will be reported to USDOL.
-
-HOURS TRACKING: Accurately track and submit OJT hours to the Sponsor monthly using the provided tracking forms. Falsifying OJT hours is a federal offense.
-
-SAFETY: Maintain a safe, sanitary workplace that complies with all OSHA standards, Indiana health codes, and spa/salon safety requirements. Report any workplace injury involving the apprentice to the Sponsor within 24 hours.
-
-INSURANCE: Carry workers' compensation insurance covering the apprentice. Provide proof of coverage to the Sponsor before the apprentice begins OJT.
-
-LICENSES: Maintain all required business licenses, health permits, and esthetics operating licenses throughout the term of this MOU. Notify the Sponsor immediately if any license lapses.
-
-NONDISCRIMINATION: Comply with all federal nondiscrimination requirements under WIOA Section 188, Title VI of the Civil Rights Act, the ADA, and all applicable equal opportunity laws.`,
-  },
-  {
-    title: '5. Apprentice Compensation — Federal Minimum Standards',
-    content: `Apprentice compensation is governed by federal apprenticeship standards and Indiana minimum wage law. These minimums are not negotiable.
-
-The apprentice is a paid employee. Compensation on a sole commission basis is prohibited under federal apprenticeship rules.
-
-Approved compensation models:
-• HOURLY: $10.00–$15.00/hr recommended. Must meet Indiana minimum wage ($7.25/hr) at all times.
-• HYBRID: $8.00–$10.00/hr base wage PLUS 15%–25% commission on services performed. Base wage must meet Indiana minimum wage at all times.
-
-Apprentices retain 100% of tips. Tips may not be counted toward the minimum wage requirement.
-
-The Spa/Salon is responsible for all payroll taxes, withholding, and employer contributions for the apprentice.`,
-  },
-  {
-    title: '6. Term and Termination — 30-Day Notice Right',
-    content: `This MOU is effective from the date signed and continues until the apprentice completes the program, withdraws, or the agreement is terminated.
-
-YOUR RIGHT TO EXIT: Either party — the Spa/Salon or the Sponsor — may terminate this MOU at any time for any reason by providing 30 days written notice. Send written notice (email is acceptable) to your assigned Elevate coordinator and copy elevate4humanityedu@gmail.com. You do not need to provide a reason. You do not need the other party's permission.
-
-IMMEDIATE TERMINATION BY SPONSOR (no notice required): The Sponsor may terminate immediately if the Spa/Salon fails to pay the apprentice, violates safety requirements, loses licenses or insurance, falsifies records, or engages in misconduct.
-
-After termination: Submit all outstanding OJT hour records within 10 business days.`,
-  },
-  {
-    title: '7. Confidentiality and Non-Disclosure',
-    content: `Both parties agree to maintain confidentiality of apprentice personally identifiable information (PII) in compliance with applicable privacy laws.
-
-The Spa/Salon may not disclose apprentice PII to any third party without written apprentice consent and Sponsor authorization, except as required for program administration or by law.
-
-The Spa/Salon also receives access to Elevate's operational procedures, program materials, and business information. This information is confidential and may not be used for any purpose other than fulfilling obligations under this MOU.`,
-  },
-  {
-    title: '8. Non-Compete and Non-Replication',
-    content: `The Spa/Salon receives access to Elevate's registered apprenticeship program structure, curriculum relationships, RAPIDS registration, and credential pathways through this collaboration. This access is provided to support the apprentice — not to enable the Spa/Salon to replicate the program independently.
-
-During the term of this MOU and for three (3) years following termination, the Spa/Salon agrees not to:
-• Use Elevate's program structure, RAPIDS registration, or DWD relationships to independently register or operate a competing USDOL Registered Apprenticeship program in esthetics
-• Solicit or redirect Elevate apprentice candidates, instructors, or credential partners into a competing program
-
-These restrictions do not prevent the Spa/Salon from: operating as a spa/salon, employing licensed estheticians, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.`,
-  },
-  {
-    title: '9. Partner Handbook — Required Reading',
-    content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details day-to-day responsibilities, compensation requirements, hour tracking procedures, and communication expectations.
-
-By signing this MOU, the Spa/Salon confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/esthetician-host-shop/handbook
-
-Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU.`,
-  },
-  {
-    title: '10. Dispute Resolution',
-    content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
-
-If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
-
-USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulations and may be reported to the Indiana Department of Workforce Development or the U.S. Department of Labor.`,
-  },
-];
-
-const NAIL_SECTIONS: MouSection[] = [
-  {
-    title: '1. Parties and Purpose',
-    content: `This Memorandum of Understanding ("MOU") is entered into between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the nail salon or spa identified at execution ("Worksite Partner" or "Nail Salon").
-
-This MOU establishes the terms under which the Nail Salon will serve as a worksite for the Indiana Nail Technician Apprenticeship Program, RAPIDS Program ID: 2025-IN-132304, a USDOL Registered Apprenticeship sponsored by ${PLATFORM_DEFAULTS.orgName}.
-
-WHAT THIS AGREEMENT IS: This is a worksite hosting agreement for a federally registered apprenticeship program. The Nail Salon is hosting an apprentice employee and providing on-the-job training under federal Department of Labor oversight.
-
-WHAT THIS AGREEMENT IS NOT: This MOU does not make the Nail Salon a Training Network Partner, a co-owner of Elevate programs, a revenue-sharing partner, or a program delivery site for any Elevate training program other than the nail technician apprenticeship.`,
-  },
-  {
-    title: '2. Program Structure — Non-Negotiable Federal Requirements',
-    content: `The Indiana Nail Technician Apprenticeship Program is a USDOL Registered Apprenticeship. Its structure is set by federal law and the registered program standards. These terms are not negotiable.
-
-Program requirements:
-• 800 hours of on-the-job training (OJT) at the worksite, supervised by a licensed nail technician
-• Related Technical Instruction (RTI) coordinated by the Sponsor (Elevate)
-• Progressive skill development tracked through competency assessments per the registered standards
-• Apprentice must be registered with USDOL/RAPIDS before OJT hours begin
-• All OJT hours must be documented and submitted to the Sponsor monthly
-
-The Sponsor maintains sole authority over: RTI curriculum and delivery; competency assessment standards; RAPIDS registration and reporting; completion certificate issuance; program standards and modifications.`,
-  },
-  {
-    title: '3. Sponsor Responsibilities',
-    content: `${PLATFORM_DEFAULTS.orgName} agrees to:
-
-• Maintain USDOL/RAPIDS registration and all required federal reporting
-• Develop, deliver, and update all Related Technical Instruction (RTI)
-• Maintain official apprentice records and program documentation
-• Issue completion certificates upon successful program completion
-• Screen and refer qualified apprentice candidates to the Nail Salon
-• Provide the Nail Salon with competency checklists and OJT tracking tools
-• Conduct periodic worksite visits to verify program compliance
-• Serve as the point of contact with Indiana DWD and USDOL for all program matters`,
-  },
-  {
-    title: '4. Worksite Partner Responsibilities — Non-Negotiable',
-    content: `These responsibilities are required by federal apprenticeship law and USDOL program standards. They are not optional and are not subject to modification.
-
-The Nail Salon agrees to:
-
-SUPERVISION: Provide direct, on-site supervision of the apprentice by a currently licensed Indiana nail technician at all times during OJT hours. The supervising nail technician must hold an active Indiana IPLA nail technician license with at least 2 years of experience. No exceptions.
-
-EMPLOYMENT: The apprentice is a paid employee of the Nail Salon — not a volunteer, intern, or independent contractor. The Nail Salon is the employer of record for the apprentice during OJT. The Nail Salon is responsible for payroll, withholding, workers' compensation, and all employer obligations under Indiana and federal law.
-
-WAGES: Pay the apprentice according to the agreed progressive wage schedule (see Section 5). Failure to pay the apprentice as agreed is grounds for immediate termination of this MOU and will be reported to USDOL.
-
-HOURS TRACKING: Accurately track and submit OJT hours to the Sponsor monthly using the provided tracking forms. Falsifying OJT hours is a federal offense.
-
-SAFETY: Maintain a safe, sanitary workspace that complies with all OSHA standards, Indiana health codes for nail salons, and sanitation requirements. Report any workplace injury involving the apprentice to the Sponsor within 24 hours.
-
-INSURANCE: Carry workers' compensation insurance covering the apprentice. Provide proof of coverage to the Sponsor before the apprentice begins OJT.
-
-LICENSES: Maintain all required business licenses, health permits, and nail technician operating licenses throughout the term of this MOU. Notify the Sponsor immediately if any license lapses.
-
-NONDISCRIMINATION: Comply with all federal nondiscrimination requirements under WIOA Section 188, Title VI of the Civil Rights Act, the ADA, and all applicable equal opportunity laws.`,
-  },
-  {
-    title: '5. Apprentice Compensation — Federal Minimum Standards',
-    content: `Apprentice compensation is governed by federal apprenticeship standards and Indiana minimum wage law. These minimums are not negotiable.
-
-The apprentice is a paid employee. Compensation on a sole commission basis is prohibited under federal apprenticeship rules.
-
-Approved compensation models:
-• HOURLY: $10.00–$15.00/hr recommended. Must meet Indiana minimum wage ($7.25/hr) at all times.
-• HYBRID: $8.00–$10.00/hr base wage PLUS 15%–25% commission on services performed. Base wage must meet Indiana minimum wage at all times.
-
-Apprentices retain 100% of tips. Tips may not be counted toward the minimum wage requirement.
-
-The Nail Salon is responsible for all payroll taxes, withholding, and employer contributions for the apprentice.`,
-  },
-  {
-    title: '6. Term and Termination — 30-Day Notice Right',
-    content: `This MOU is effective from the date signed and continues until the apprentice completes the program, withdraws, or the agreement is terminated.
-
-YOUR RIGHT TO EXIT: Either party — the Nail Salon or the Sponsor — may terminate this MOU at any time for any reason by providing 30 days written notice. Send written notice (email is acceptable) to your assigned Elevate coordinator and copy elevate4humanityedu@gmail.com.
-
-IMMEDIATE TERMINATION BY SPONSOR (no notice required): The Sponsor may terminate immediately if the Nail Salon fails to pay the apprentice, violates safety or sanitation requirements, loses licenses or insurance, falsifies records, or engages in misconduct.
-
-After termination: Submit all outstanding OJT hour records within 10 business days.`,
-  },
-  {
-    title: '7. Confidentiality and Non-Disclosure',
-    content: `Both parties agree to maintain confidentiality of apprentice personally identifiable information (PII) in compliance with applicable privacy laws.
-
-The Nail Salon may not disclose apprentice PII to any third party without written apprentice consent and Sponsor authorization, except as required for program administration or by law.
-
-The Nail Salon also receives access to Elevate's operational procedures, program materials, and business information. This information is confidential and may not be used for any purpose other than fulfilling obligations under this MOU.`,
-  },
-  {
-    title: '8. Non-Compete and Non-Replication',
-    content: `The Nail Salon receives access to Elevate's registered apprenticeship program structure, curriculum relationships, RAPIDS registration, and credential pathways through this collaboration. This access is provided to support the apprentice — not to enable the Nail Salon to replicate the program independently.
-
-During the term of this MOU and for three (3) years following termination, the Nail Salon agrees not to:
-• Use Elevate's program structure, RAPIDS registration, or DWD relationships to independently register or operate a competing USDOL Registered Apprenticeship program in nail technology
-• Solicit or redirect Elevate apprentice candidates, instructors, or credential partners into a competing program
-
-These restrictions do not prevent the Nail Salon from: operating as a nail salon, employing licensed nail technicians, hiring apprentices through other registered programs, or participating in training programs that are not substantially similar to the Elevate apprenticeship model.`,
-  },
-  {
-    title: '9. Partner Handbook — Required Reading',
-    content: `The Worksite Partner Handbook is incorporated by reference into this MOU and forms part of this agreement. The Handbook details day-to-day responsibilities, compensation requirements, hour tracking procedures, and communication expectations.
-
-By signing this MOU, the Nail Salon confirms that it has read and understood the Partner Handbook in full prior to signing. The Handbook is available at: ${PLATFORM_DEFAULTS.canonicalDomain}/partners/nail-technician-host-shop/handbook
-
-Failure to comply with the standards set out in the Handbook constitutes a breach of this MOU.`,
-  },
-  {
-    title: '10. Dispute Resolution',
-    content: `The parties agree to attempt to resolve any disputes through good-faith negotiation first. If a dispute cannot be resolved through negotiation within 15 business days, either party may submit the dispute to mediation.
-
-If mediation is unsuccessful, the parties consent to jurisdiction in Marion County, Indiana. This MOU is governed by the laws of the State of Indiana.
-
-USDOL/RAPIDS compliance disputes are subject to federal apprenticeship regulations and may be reported to the Indiana Department of Workforce Development or the U.S. Department of Labor.`,
-  },
-];
-
-const META: Record<HostShopMouProgram, HostShopMouMeta> = {
+const PROGRAM_SLUG: Record<HostShopMouProgram, string | null> = {
+  barber: 'barber-apprenticeship',
+  cosmetology: null,
+  esthetician: 'esthetician-apprenticeship',
+  nail: 'nail-technician-apprenticeship',
+};
+
+const LABELS: Record<HostShopMouProgram, { title: string; worksite: string; handbook: string; fullDoc?: string }> = {
   barber: {
-    documentType: 'Memorandum of Understanding',
     title: 'Indiana Barber Host Shop Program',
-    subtitle: 'Worksite Partner Agreement',
-    worksiteLabel: 'Your barbershop',
-    handbookHref: '/partners/barber-host-shop/handbook',
-    fullDocHref: '/docs/Indiana-Barbershop-Apprenticeship-MOU',
-    rapidsId: '2025-IN-132301',
+    worksite: 'barbershop',
+    handbook: '/partners/barber-host-shop/handbook',
+    fullDoc: '/docs/Indiana-Barbershop-Apprenticeship-MOU',
   },
   cosmetology: {
-    documentType: 'Memorandum of Understanding',
-    title: 'Indiana Cosmetology Apprenticeship Program',
-    subtitle: 'Host Salon Worksite Agreement',
-    worksiteLabel: 'Your salon',
-    handbookHref: '/partners/cosmetology-host-shop/handbook',
-    rapidsId: '2025-IN-132302',
+    title: 'Indiana Cosmetology Host Site Pathway',
+    worksite: 'salon',
+    handbook: '/partners/cosmetology-host-shop/handbook',
   },
   esthetician: {
-    documentType: 'Memorandum of Understanding',
-    title: 'Indiana Esthetics Apprenticeship Program',
-    subtitle: 'Host Spa/Salon Worksite Agreement',
-    worksiteLabel: 'Your spa or salon',
-    handbookHref: '/partners/esthetician-host-shop/handbook',
-    rapidsId: '2025-IN-132303',
+    title: 'Indiana Esthetician Host Site Program',
+    worksite: 'spa or salon',
+    handbook: '/partners/esthetician-host-shop/handbook',
   },
   nail: {
-    documentType: 'Memorandum of Understanding',
-    title: 'Indiana Nail Technician Apprenticeship Program',
-    subtitle: 'Host Nail Salon Worksite Agreement',
-    worksiteLabel: 'Your nail salon',
-    handbookHref: '/partners/nail-technician-host-shop/handbook',
-    rapidsId: '2025-IN-132304',
+    title: 'Indiana Nail Technician Host Site Program',
+    worksite: 'nail salon',
+    handbook: '/partners/nail-technician-host-shop/handbook',
   },
 };
 
-export function getHostShopMouSections(program: HostShopMouProgram): MouSection[] {
-  switch (program) {
-    case 'barber':
-      return BARBER_SECTIONS;
-    case 'cosmetology':
-      return COSMETOLOGY_SECTIONS;
-    case 'esthetician':
-      return ESTHETICIAN_SECTIONS;
-    case 'nail':
-      return NAIL_SECTIONS;
-    default:
-      return BARBER_SECTIONS;
+function registeredContract(program: HostShopMouProgram) {
+  const slug = PROGRAM_SLUG[program];
+  return slug ? getRegisteredProgramStandard(slug) : null;
+}
+
+function wageText(program: HostShopMouProgram) {
+  const contract = registeredContract(program);
+  if (!contract) {
+    return 'No federal registered wage schedule is asserted by this MOU for this pathway. The Worksite must comply with the applicable employment agreement and all current wage laws.';
   }
+  const standard = contract.standard;
+  const milestones = standard.wageMilestones
+    .map((step) => `${step.completedCompetencies} verified competencies: $${step.hourlyRate.toFixed(2)}/hour registered baseline`)
+    .join('\n• ');
+  return `The approved occupation standard contains a registered starting baseline of $${standard.startingHourlyRate.toFixed(2)}/hour and the following competency milestones:\n• ${milestones}\n\nThe Worksite must apply the applicable employer-specific RAPIDS wage schedule and any higher wage required by law. The platform stores employer wage schedules separately from the immutable occupation standard so a host-specific schedule is not overwritten by generic copy.`;
+}
+
+function authorityText(program: HostShopMouProgram) {
+  const contract = registeredContract(program);
+  if (!contract) {
+    return `The current canonical registry does not contain an approved federal registered-program standard for this specific ${LABELS[program].title}. This MOU therefore establishes host-site operating responsibilities only and must not be used as evidence that this pathway is federally registered. If an approved standard is later added, the registered standard must be incorporated before registered-apprenticeship claims or RAPIDS reporting are made.`;
+  }
+  const standard = contract.standard;
+  return `This worksite relationship operates under Sponsor registration ${contract.sponsor.registrationNumber}, occupation RAPIDS code ${standard.rapidsCode} (${standard.occupationTitle}), revision ${contract.sponsor.revisionDate}. The approved occupation is competency-based. Registered completion requires all ${contract.completion.competencyCount} verified competencies plus ${contract.completion.requiredRtiHours} verified RTI hours. The approved apprentice-to-mentor ratio is ${standard.apprenticeToMentorRatio}; the probationary period is ${standard.probationaryHours} hours. Supervised work/OJL hours remain auditable employment and training evidence but are not a fixed completion denominator for this occupation.`;
+}
+
+function worksiteResponsibilities(program: HostShopMouProgram) {
+  const contract = registeredContract(program);
+  const supervision = contract
+    ? `Maintain the approved ${contract.standard.apprenticeToMentorRatio} apprentice-to-mentor ratio and ensure competency verification is performed only by the assigned authorized supervisor.`
+    : 'Maintain supervision required by the applicable licensing rules, employment arrangement, and approved pathway.';
+  return `The Worksite agrees to:\n\n• Employ and compensate each apprentice/trainee in accordance with the applicable employment agreement and law.\n• ${supervision}\n• Maintain current establishment/business licensing, required professional licenses, insurance, workers-compensation coverage or valid exemption, and other required worksite records.\n• Maintain truthful attendance, supervised-work, wage/payroll, location, safety, and competency evidence.\n• Never backdate, duplicate, falsify, spoof, or approve work, attendance, location, or competency records that were not actually earned.\n• Notify the Sponsor promptly of changes in employment, supervisor, worksite, licensing, insurance, safety status, or apprentice status that affect the approved arrangement.\n• Permit authorized Sponsor or regulatory review of records relevant to the apprenticeship/pathway.\n• Follow applicable nondiscrimination, accessibility, workplace-safety, sanitation, privacy, and employment requirements.`;
+}
+
+function sponsorResponsibilities(program: HostShopMouProgram) {
+  const contract = registeredContract(program);
+  return `${PLATFORM_DEFAULTS.orgName} agrees to:\n\n• Maintain the canonical program, enrollment, placement, document, and audit records used to administer the pathway.\n• Provide or coordinate assigned related instruction and maintain verified RTI records where required.\n• Maintain competency definitions and verification workflows from the approved registered standard where one exists.\n• Review Host Site documents and operating eligibility before treating the site as active/approved.\n• Maintain sponsor-level RAPIDS reporting and completion records for occupations that are actually present in the approved registered-program registry.\n• Keep funding authorization separate from enrollment and never treat WIOA, OJT reimbursement, or other public funding as approved without the applicable workforce authorization.\n• Provide reasonable compliance support and communicate material program changes to active Host Sites.${contract ? `\n• Preserve the occupation requirements for RAPIDS ${contract.standard.rapidsCode} without replacing them with generic state-school or marketing hour totals.` : ''}`;
+}
+
+function buildSections(program: HostShopMouProgram): MouSection[] {
+  const labels = LABELS[program];
+  const contract = registeredContract(program);
+  const registeredStatement = contract
+    ? `This MOU is a worksite agreement under the registered sponsor structure for occupation ${contract.standard.rapidsCode}. It does not transfer sponsor status, ownership of the registered program, or authority to alter the approved occupation standard to the Worksite.`
+    : `This MOU is a host-site operating agreement. It does not itself create federal registered-apprenticeship status or authorize the Worksite to make RAPIDS/registered-program claims.`;
+
+  return [
+    {
+      title: '1. Parties and Purpose',
+      content: `This Memorandum of Understanding ("MOU") is between 2Exclusive LLC-S d/b/a ${PLATFORM_DEFAULTS.orgName} Career & Technical Institute ("Sponsor") and the ${labels.worksite} identified at execution ("Worksite").\n\n${registeredStatement}\n\nThe purpose is to define supervision, employment, recordkeeping, training, safety, document, funding, and compliance responsibilities for apprentices/participants assigned to the Worksite.`,
+    },
+    {
+      title: '2. Program Authority and Completion Basis',
+      content: authorityText(program),
+    },
+    {
+      title: '3. Sponsor Responsibilities',
+      content: sponsorResponsibilities(program),
+    },
+    {
+      title: '4. Worksite Responsibilities',
+      content: worksiteResponsibilities(program),
+    },
+    {
+      title: '5. Compensation and Wage Evidence',
+      content: `${wageText(program)}\n\nThe Worksite is responsible for payroll, withholding, required employer contributions, wage statements, and retention of sufficient wage evidence to support program review. No revenue, reimbursement, commission, funding, or profit is guaranteed by participation in this pathway.`,
+    },
+    {
+      title: '6. Work Records, RTI, and Competency Verification',
+      content: `Work records, RTI evidence, and competency verification are separate records. Work time must reflect actual supervised employment/training activity. RTI credit is counted only when instruction is documented and verified under the applicable program standard. Competency completion may be recorded only after an authorized verifier has observed sufficient evidence of mastery.\n\nFor competency-based registered occupations, elapsed work hours do not automatically complete competencies and do not replace the required RTI total.`,
+    },
+    {
+      title: '7. Workforce Funding and Reimbursement',
+      content: `WIOA, WorkOne OJT reimbursement, supportive services, grants, and other public funding are subject to separate participant/employer eligibility, allowable-cost rules, and written authorization. The Worksite must not represent funding as guaranteed or submit the same allowable cost for duplicate reimbursement. Payroll and training evidence required by an authorized funding agreement must be retained and must agree with the apprenticeship/work records.`,
+    },
+    {
+      title: '8. Privacy, Confidentiality, and Record Access',
+      content: `Both parties must protect apprentice/participant personally identifiable information and use it only for authorized program, employment, compliance, funding, or legal purposes. Access to platform records is role-scoped. The Worksite may not share account credentials or disclose protected records to unauthorized persons. Required records may be provided to authorized regulators, funders, auditors, or program administrators when permitted or required by law and the applicable agreement.`,
+    },
+    {
+      title: '9. Term, Changes, and Termination',
+      content: `This MOU becomes effective when electronically signed and continues while the Worksite remains approved or until terminated. Either party may provide 30 days written notice to end the worksite relationship, subject to any immediate suspension or termination required for safety, licensing, wage, fraud, discrimination, record-integrity, or other material compliance concerns.\n\nA change in registered occupation requirements, supervisor, worksite, employer registration, wage schedule, licensing, or funding authorization must be documented in the appropriate system of record; it must not be silently changed by editing marketing copy or local spreadsheets.`,
+    },
+    {
+      title: '10. Electronic Signature and Governing Records',
+      content: `The electronic signature record, signer identity, document version, timestamp, IP/user-agent audit data, Host Site document record, applicable registered-program standard, employer-specific RAPIDS data, and subsequent approved amendments together form the operational evidence for this worksite agreement.\n\nIf a page, handbook, dashboard, or marketing statement conflicts with an approved registered-program standard or a later signed amendment, the approved standard and controlling signed record govern.`,
+    },
+  ];
 }
 
 export function getHostShopMouMeta(program: HostShopMouProgram): HostShopMouMeta {
-  return META[program];
+  const labels = LABELS[program];
+  const contract = registeredContract(program);
+  return {
+    documentType: 'Memorandum of Understanding',
+    title: labels.title,
+    subtitle: contract ? 'Registered Apprenticeship Worksite Agreement' : 'Host Site Operating Agreement',
+    worksiteLabel: `Your ${labels.worksite}`,
+    handbookHref: labels.handbook,
+    fullDocHref: labels.fullDoc,
+    rapidsId: contract?.sponsor.registrationNumber || null,
+    registrationLabel: contract
+      ? `Sponsor ${contract.sponsor.registrationNumber} · occupation ${contract.standard.rapidsCode}`
+      : 'No approved registered occupation is present in the canonical registry for this pathway',
+    registered: Boolean(contract),
+  };
+}
+
+export function getHostShopMouSections(program: HostShopMouProgram): MouSection[] {
+  return buildSections(program);
 }

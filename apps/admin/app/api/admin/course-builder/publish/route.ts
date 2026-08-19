@@ -5,17 +5,18 @@ import { auditCourseTemplate } from '@/lib/course-builder/audit';
 import type { ProgramBuilderTemplate } from '@/lib/course-builder/schema';
 import { adaptProgramTemplateToBlueprint } from '@/lib/course-builder/publish-adapter';
 import { courseFactory } from '@/lib/course-factory';
+import { runGovernmentProcurementGate } from '@/lib/course-factory/procurement-gate';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 /**
- * Compatibility publish endpoint for the Admin Program Builder.
+ * Canonical course publication boundary.
  *
- * The request contract is intentionally preserved, but all validated course
- * creation/persistence now crosses the canonical lib/course-factory boundary.
- * Do not reintroduce an independent persistence pipeline here.
+ * Publication is intentionally stricter than draft generation. Every course
+ * must pass both the regulatory audit and the enterprise/government procurement
+ * readiness gate before Course Factory is allowed to persist a publishable build.
  */
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -27,8 +28,18 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as ProgramBuilderTemplate;
     const audit = auditCourseTemplate(body);
-    if (!audit.ok) {
-      return NextResponse.json({ ok: false, error: 'Audit failed', audit }, { status: 400 });
+    const procurement = runGovernmentProcurementGate(body);
+
+    if (!audit.ok || !procurement.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Publication blocked by course governance gate',
+          audit,
+          procurement,
+        },
+        { status: 400 },
+      );
     }
 
     const blueprint = adaptProgramTemplateToBlueprint(body);
@@ -42,7 +53,7 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { ok: result.ok, audit, result },
+      { ok: result.ok, audit, procurement, result },
       { status: result.ok ? 200 : 422 },
     );
   } catch (error) {

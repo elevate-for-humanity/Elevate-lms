@@ -13,6 +13,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
+  const commit = process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown';
+
   return NextResponse.json(
     {
       service: 'lms',
@@ -20,7 +22,7 @@ export async function GET() {
       ready: true,
       canonicalDashboard: '/lms/dashboard',
       healthContract: 'lms-v2',
-      commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
+      commit,
       buildId: process.env.NEXT_PUBLIC_BUILD_ID ?? 'unknown',
       builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
       environment: process.env.NODE_ENV,
@@ -31,6 +33,8 @@ export async function GET() {
       status: 200,
       headers: {
         'Cache-Control': 'no-store',
+        'X-EFH-Service': 'lms',
+        'X-EFH-Commit': commit,
       },
     },
   );

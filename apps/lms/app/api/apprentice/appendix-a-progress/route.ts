@@ -1,51 +1,40 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
+import { getRegisteredProgramStandard, resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = await requireAdminClient();
-  const { data: enrollments, error } = await db
-    .from('program_enrollments')
+  const { data: enrollments, error } = await db.from('program_enrollments')
     .select('id, user_id, program_id, program_slug, status, created_at')
-    .eq('user_id', user.id)
-    .in('status', ['active', 'enrolled', 'in_progress'])
-    .order('created_at', { ascending: false });
-
+    .eq('user_id', user.id).in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const enrollment = (enrollments || []).find((row: any) => getRegisteredProgramStandard(row.program_slug));
-  if (!enrollment) return NextResponse.json({ enrollment: null, standard: null, records: [] });
+  if (!enrollment) return NextResponse.json({ enrollment: null, standard: null, records: [], rtiProviders: [] });
 
-  const contract = getRegisteredProgramStandard(enrollment.program_slug);
-  if (!contract) return NextResponse.json({ enrollment: null, standard: null, records: [] });
+  const contract = await resolveRegisteredProgramContract(db, { programSlug: enrollment.program_slug, enrollmentId: enrollment.id });
+  if (!contract) return NextResponse.json({ enrollment: null, standard: null, records: [], rtiProviders: [] });
 
-  const { data: records, error: recordError } = await db
-    .from('apprentice_competency_records')
+  const { data: records, error: recordError } = await db.from('apprentice_competency_records')
     .select('id, enrollment_id, competency_id, completed, date_completed, verified_by_name, notes, updated_at')
-    .eq('enrollment_id', enrollment.id)
-    .order('updated_at', { ascending: false });
-
+    .eq('enrollment_id', enrollment.id).order('updated_at', { ascending: false });
   if (recordError) return NextResponse.json({ error: recordError.message }, { status: 500 });
 
-  const completedCompetencies = (records || []).filter((row: any) => row.completed).length;
   return NextResponse.json({
-    enrollment: {
-      id: enrollment.id,
-      programSlug: enrollment.program_slug,
-    },
+    enrollment: { id: enrollment.id, programSlug: enrollment.program_slug },
     standard: contract.standard,
     completion: contract.completion,
     sponsor: contract.sponsor,
+    employer: contract.employer,
+    rtiProviders: contract.rtiProviders,
     records: records || [],
-    completedCompetencies,
+    completedCompetencies: (records || []).filter((row: any) => row.completed).length,
   });
 }

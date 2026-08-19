@@ -7,7 +7,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 import { getHostShopBoard } from '@/lib/partner/board';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { APPENDIX_A_REGISTRATION, APPENDIX_A_STANDARDS } from '@/lib/compliance/appendix-a-standards';
+import { resolveRegisteredProgramContract } from '@/lib/apprenticeship/registered-program-contract';
 import {
   BARBER_APPRENTICE_APPLICATION_URL,
   HOST_SHOP_APPRENTICESHIP_ORIENTATION,
@@ -17,13 +17,13 @@ import {
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Required Orientation | Host Shop Portal', robots: { index: false, follow: false } };
 
-const BARBER = APPENDIX_A_STANDARDS.barber;
+const PROGRAM_SLUG = 'barber-apprenticeship';
 const REQUIRED_POLICIES = [
-  'appendix-a-source-of-truth',
+  'registered-standard-source-of-truth',
   'competency-based-progression',
-  'rti-260-hours',
-  'mentor-ratio-1-to-1',
-  'probation-500-hours',
+  'required-rti',
+  'mentor-ratio',
+  'probation',
   'progressive-wage-schedule',
   'paid-worker',
   'no-revenue-guarantee',
@@ -44,15 +44,14 @@ async function completeOrientation(formData: FormData) {
   }
 
   const db = await requireAdminClient();
+  const contract = await resolveRegisteredProgramContract(db, { programSlug: PROGRAM_SLUG, partnerId: board.partner.id });
+  if (!contract) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
+  const standard = contract.standard;
+
   const { data: profile } = await db.from('profiles').select('full_name').eq('id', user.id).maybeSingle();
   const signerName = String(formData.get('signerName') || '').trim();
-  if (!profile?.full_name || signerName.toLowerCase() !== profile.full_name.trim().toLowerCase()) {
-    redirect('/host-shop/orientation?error=signature');
-  }
-
-  for (const policy of REQUIRED_POLICIES) {
-    if (formData.get(policy) !== 'on') redirect('/host-shop/orientation?error=acknowledgment');
-  }
+  if (!profile?.full_name || signerName.toLowerCase() !== profile.full_name.trim().toLowerCase()) redirect('/host-shop/orientation?error=signature');
+  for (const policy of REQUIRED_POLICIES) if (formData.get(policy) !== 'on') redirect('/host-shop/orientation?error=acknowledgment');
 
   const requestHeaders = await headers();
   const ip = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || requestHeaders.get('x-real-ip') || 'unknown';
@@ -64,17 +63,21 @@ async function completeOrientation(formData: FormData) {
     signerName,
     signerUserId: user.id,
     orientationVersion: HOST_SHOP_ORIENTATION_VERSION,
-    appendixRegistration: APPENDIX_A_REGISTRATION.registrationNumber,
-    appendixRevision: APPENDIX_A_REGISTRATION.revisionDate,
-    occupation: BARBER.occupationTitle,
-    rapidsCode: BARBER.rapidsCode,
-    approach: BARBER.approach,
-    competencyCount: BARBER.competencyCount,
-    rtiHours: BARBER.relatedInstructionHours,
-    mentorRatio: BARBER.apprenticeToMentorRatio,
-    probationaryHours: BARBER.probationaryHours,
-    startingHourlyRate: BARBER.startingHourlyRate,
-    wageMilestones: BARBER.wageMilestones,
+    sponsorRegistration: contract.sponsor.registrationNumber,
+    standardRevision: contract.sponsor.revisionDate,
+    occupation: standard.occupationTitle,
+    rapidsCode: standard.rapidsCode,
+    approach: standard.approach,
+    competencyCount: contract.completion.competencyCount,
+    rtiHours: contract.completion.requiredRtiHours,
+    fixedOjlCompletionHours: contract.completion.fixedOjlCompletionHours,
+    mentorRatio: standard.apprenticeToMentorRatio,
+    probationaryHours: standard.probationaryHours,
+    baselineStartingHourlyRate: standard.startingHourlyRate,
+    baselineWageMilestones: standard.wageMilestones,
+    rapidsEmployerNumber: contract.employer?.rapidsEmployerNumber || null,
+    employerWageSchedule: contract.employer?.wageSchedule || null,
+    activeRtiProviders: contract.rtiProviders.map((provider) => ({ id: provider.id, name: provider.providerName })),
     policies: [...REQUIRED_POLICIES],
     signedAt,
   };
@@ -82,16 +85,9 @@ async function completeOrientation(formData: FormData) {
   const documentHash = createHash('sha256').update(signatureData).digest('hex');
 
   const { error: signatureError } = await db.from('onboarding_signatures').insert({
-    user_id: user.id,
-    signature_data: signatureData,
-    signed_at: signedAt,
-    role: 'host_shop',
-    signature_type: 'host_shop_orientation',
-    document_version: HOST_SHOP_ORIENTATION_VERSION,
-    document_hash: documentHash,
-    ip_address: ip,
-    user_agent: userAgent,
-    is_valid: true,
+    user_id: user.id, signature_data: signatureData, signed_at: signedAt, role: 'host_shop',
+    signature_type: 'host_shop_orientation', document_version: HOST_SHOP_ORIENTATION_VERSION,
+    document_hash: documentHash, ip_address: ip, user_agent: userAgent, is_valid: true,
   });
   if (signatureError) throw new Error(`HOST_SHOP_ORIENTATION_SIGNATURE_FAILED:${signatureError.message}`);
 
@@ -99,9 +95,7 @@ async function completeOrientation(formData: FormData) {
     shop_name: signedPayload.shopName,
     signer_name: signerName,
     policies_acknowledged: [...REQUIRED_POLICIES, `orientation-version:${HOST_SHOP_ORIENTATION_VERSION}`, `document-hash:${documentHash}`],
-    acknowledged_at: signedAt,
-    ip_address: ip,
-    user_agent: userAgent,
+    acknowledged_at: signedAt, ip_address: ip, user_agent: userAgent,
   });
   if (acknowledgmentError) throw new Error(`HOST_SHOP_ACKNOWLEDGMENT_FAILED:${acknowledgmentError.message}`);
 
@@ -111,69 +105,48 @@ async function completeOrientation(formData: FormData) {
     updated_at: signedAt,
   }).eq('id', board.partner.id);
   if (partnerError) throw new Error(`HOST_SHOP_ONBOARDING_UPDATE_FAILED:${partnerError.message}`);
-
-  redirect('/host-shop/dashboard/board');
+  redirect('/host-shop/dashboard');
 }
 
 export default async function HostShopOrientationPage({ searchParams }: { searchParams?: Promise<{ error?: string }> }) {
   const { user } = await requireRole(HOST_SHOP_ROLES);
   const board = await getHostShopBoard(user.id);
+  const db = await requireAdminClient();
+  const contract = await resolveRegisteredProgramContract(db, { programSlug: PROGRAM_SLUG, partnerId: board.partner.id });
+  if (!contract) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
+  const standard = contract.standard;
   const params = searchParams ? await searchParams : {};
   const canSign = Boolean(board.partner?.mou_signed) && board.missingDocuments.length === 0 && board.pendingDocuments.length === 0;
 
   return <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-    <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Required Host Shop Training · Appendix A · Version {HOST_SHOP_ORIENTATION_VERSION}</p>
+    <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">Required Host Shop Training · RAPIDS {standard.rapidsCode} · Version {HOST_SHOP_ORIENTATION_VERSION}</p>
     <h1 className="mt-2 text-3xl font-black text-slate-950">{HOST_SHOP_APPRENTICESHIP_ORIENTATION.title}</h1>
-    <p className="mt-3 max-w-3xl text-slate-700">{board.partner?.name || 'Your shop'} must complete the DOL Appendix A-based orientation and electronic acknowledgment before operational dashboard access unlocks.</p>
+    <p className="mt-3 max-w-3xl text-slate-700">{board.partner?.name || 'Your shop'} must complete the registered-program orientation and electronic acknowledgment before operational dashboard access unlocks.</p>
 
-    {params?.error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">Complete the MOU and required documents, accept every Appendix A and funding acknowledgment, and sign with the exact account name before continuing.</div> : null}
+    {params?.error ? <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-900">Complete the MOU and required documents, accept every registered-program and funding acknowledgment, and sign with the exact account name before continuing.</div> : null}
 
-    <section className="mt-6 rounded-2xl border border-brand-blue-200 bg-brand-blue-50 p-5">
-      <h2 className="font-black text-slate-950">Recruit an apprentice</h2>
-      <p className="mt-1 text-sm text-slate-700">Send prospective barber apprentices the canonical application. Elevate handles application, eligibility, enrollment, placement, and any workforce-funding authorization workflow.</p>
-      <a href={BARBER_APPRENTICE_APPLICATION_URL} className="mt-3 inline-flex rounded-xl bg-brand-blue-700 px-4 py-2 font-black text-white">Open apprentice application</a>
-    </section>
+    <section className="mt-6 rounded-2xl border border-brand-blue-200 bg-brand-blue-50 p-5"><h2 className="font-black text-slate-950">Recruit an apprentice</h2><p className="mt-1 text-sm text-slate-700">Send prospective barber apprentices the canonical application. Elevate handles application, eligibility, enrollment, placement, and workforce-funding authorization workflow.</p><a href={BARBER_APPRENTICE_APPLICATION_URL} className="mt-3 inline-flex rounded-xl bg-brand-blue-700 px-4 py-2 font-black text-white">Open apprentice application</a></section>
 
-    <div className="mt-6 space-y-5">
-      {HOST_SHOP_APPRENTICESHIP_ORIENTATION.modules.map((courseModule) => (
-        <section key={courseModule.slug} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
-          <h2 className="text-xl font-black text-slate-950">{courseModule.title}</h2>
-          <div className="mt-4 space-y-5">
-            {courseModule.lessons.map((courseLesson) => (
-              <article key={courseLesson.slug}>
-                <h3 className="font-black text-slate-900">{courseLesson.title}</h3>
-                <div className="prose prose-slate mt-2 max-w-none" dangerouslySetInnerHTML={{ __html: courseLesson.renderedHtml || courseLesson.content || '' }} />
-              </article>
-            ))}
-          </div>
-        </section>
-      ))}
-    </div>
+    <section className="mt-6 rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-sm text-cyan-950"><h2 className="font-black">Current registered contract</h2><p className="mt-1 font-semibold">Sponsor {contract.sponsor.registrationNumber} · {contract.completion.competencyCount} competencies · {contract.completion.requiredRtiHours} RTI hours · {standard.apprenticeToMentorRatio} supervision · {standard.probationaryHours}-hour probation.</p>{contract.employer?.wageSchedule ? <p className="mt-1 font-semibold">Employer RAPIDS wage schedule: ${Number(contract.employer.wageSchedule.startingHourlyRate || 0).toFixed(2)} start → ${Number(contract.employer.wageSchedule.endingHourlyRate || 0).toFixed(2)} end.</p> : <p className="mt-1 font-semibold">No employer-specific RAPIDS wage schedule is stored yet; the registered baseline and applicable wage law still apply.</p>}<p className="mt-1 font-semibold">Active RTI providers recorded: {contract.rtiProviders.length}.</p></section>
 
-    <form action={completeOrientation} className="mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5">
-      <div className="flex gap-3"><ShieldCheck className="mt-1 h-6 w-6 shrink-0 text-amber-800"/><div className="w-full">
-        <h2 className="font-black text-amber-950">Required Appendix A acknowledgment and electronic signature</h2>
-        <div className="mt-4 space-y-3 text-sm font-semibold text-amber-950">
-          <label className="flex gap-2"><input required type="checkbox" name="appendix-a-source-of-truth" /> I understand the approved DOL Appendix A is the source of truth for this registered Barber apprenticeship.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="competency-based-progression" /> I understand DOL progress is competency-based and requires completion of {BARBER.competencyCount} Appendix A competencies.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="rti-260-hours" /> I understand the approved Appendix A requires {BARBER.relatedInstructionHours} hours of RTI.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="mentor-ratio-1-to-1" /> I will maintain the Appendix A {BARBER.apprenticeToMentorRatio} apprentice-to-mentor ratio.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="probation-500-hours" /> I understand the Appendix A probationary period is {BARBER.probationaryHours} hours.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="progressive-wage-schedule" /> I will follow the Appendix A progressive wage milestones and any higher wage required by applicable law.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="paid-worker" /> I understand apprentices are paid workers and payroll evidence must support compensation.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="no-revenue-guarantee" /> I understand apprenticeship participation does not guarantee shop revenue or profit.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="truthful-ojl" /> I will approve only time, OJL activity, and competencies that are accurate and supported.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="geofence-integrity" /> I will not falsify or bypass geofence, timeclock, attendance, or location records.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="wioa-authorization-required" /> I understand WIOA/WorkOne funding or OJT reimbursement is not guaranteed and requires workforce authorization before it is treated as funded.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="no-double-billing" /> I will not submit the same allowable cost for reimbursement from multiple funding sources.</label>
-          <label className="flex gap-2"><input required type="checkbox" name="transfer-credit-sponsor-approval" /> I understand the shop cannot promise or award transfer credit; sponsor/jurisdiction review controls official credit.</label>
-        </div>
-        <label className="mt-5 block text-sm font-black text-amber-950">Electronic signature — type your account name exactly<input name="signerName" required className="mt-2 min-h-11 w-full rounded-xl border border-amber-400 bg-white px-3 text-slate-950" /></label>
-        <button type="submit" disabled={!canSign} className="mt-5 min-h-12 rounded-xl bg-amber-800 px-5 py-3 font-black text-white disabled:cursor-not-allowed disabled:opacity-50">Electronically sign and unlock Host Shop dashboard</button>
-        {!canSign ? <p className="mt-3 text-sm font-bold text-amber-950">The electronically signed MOU and all required Host Shop evidence documents must be complete before final orientation signature.</p> : null}
-      </div></div>
-    </form>
+    <div className="mt-6 space-y-5">{HOST_SHOP_APPRENTICESHIP_ORIENTATION.modules.map((courseModule) => <section key={courseModule.slug} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6"><h2 className="text-xl font-black text-slate-950">{courseModule.title}</h2><div className="mt-4 space-y-5">{courseModule.lessons.map((courseLesson) => <article key={courseLesson.slug}><h3 className="font-black text-slate-900">{courseLesson.title}</h3><div className="prose prose-slate mt-2 max-w-none" dangerouslySetInnerHTML={{ __html: courseLesson.renderedHtml || courseLesson.content || '' }} /></article>)}</div></section>)}</div>
 
-    {board.partner?.onboarding_completed ? <div className="mt-6"><Link href="/host-shop/dashboard/board" className="inline-flex rounded-xl bg-brand-green-700 px-4 py-2 font-black text-white">Return to Host Shop dashboard</Link></div> : null}
+    <form action={completeOrientation} className="mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-5"><div className="flex gap-3"><ShieldCheck className="mt-1 h-6 w-6 shrink-0 text-amber-800"/><div className="w-full"><h2 className="font-black text-amber-950">Required registered-program acknowledgment and electronic signature</h2><div className="mt-4 space-y-3 text-sm font-semibold text-amber-950">
+      <label className="flex gap-2"><input required type="checkbox" name="registered-standard-source-of-truth" /> I understand the approved registered-program standard is the source of truth for this Barber apprenticeship.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="competency-based-progression" /> I understand progress is competency-based and requires {contract.completion.competencyCount} verified competencies.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="required-rti" /> I understand the approved program requires {contract.completion.requiredRtiHours} hours of verified RTI.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="mentor-ratio" /> I will maintain the registered {standard.apprenticeToMentorRatio} apprentice-to-mentor ratio.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="probation" /> I understand the registered probationary period is {standard.probationaryHours} hours.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="progressive-wage-schedule" /> I will follow the applicable registered employer wage schedule, occupation baseline, and any higher wage required by law.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="paid-worker" /> I understand apprentices are paid workers and payroll evidence must support compensation.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="no-revenue-guarantee" /> I understand apprenticeship participation does not guarantee shop revenue or profit.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="truthful-ojl" /> I will approve only time, OJL activity, and competencies that are accurate and supported.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="geofence-integrity" /> I will not falsify or bypass geofence, timeclock, attendance, or location records.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="wioa-authorization-required" /> I understand WIOA/WorkOne funding or OJT reimbursement requires workforce authorization before it is treated as funded.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="no-double-billing" /> I will not submit the same allowable cost for reimbursement from multiple funding sources.</label>
+      <label className="flex gap-2"><input required type="checkbox" name="transfer-credit-sponsor-approval" /> I understand the shop cannot promise or award transfer credit; sponsor/jurisdiction review controls official credit.</label>
+    </div><label className="mt-5 block text-sm font-black text-amber-950">Electronic signature — type your account name exactly<input name="signerName" required className="mt-2 min-h-11 w-full rounded-xl border border-amber-400 bg-white px-3 text-slate-950" /></label><button type="submit" disabled={!canSign} className="mt-5 min-h-12 rounded-xl bg-amber-800 px-5 py-3 font-black text-white disabled:cursor-not-allowed disabled:opacity-50">Electronically sign and unlock Host Shop dashboard</button>{!canSign ? <p className="mt-3 text-sm font-bold text-amber-950">The electronically signed MOU and all required Host Shop evidence documents must be complete before final orientation signature.</p> : null}</div></div></form>
+
+    {board.partner?.onboarding_completed ? <div className="mt-6"><Link href="/host-shop/dashboard" className="inline-flex rounded-xl bg-brand-green-700 px-4 py-2 font-black text-white">Return to Host Shop dashboard</Link></div> : null}
   </main>;
 }

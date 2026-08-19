@@ -5,10 +5,10 @@
  *
  * Single entry point for all health checks. Callers (Mission Control,
  * admin dashboard, alerting) call getPlatformHealth() instead of
- * hitting 6 separate monitoring endpoints.
+ * hitting separate monitoring endpoints.
  *
- * Checks run in parallel with individual timeouts so one slow check
- * cannot block the others.
+ * Checks run in parallel with individual timeouts so one slow dependency
+ * cannot block the rest of the health snapshot.
  */
 
 import { logger } from '@/lib/logger';
@@ -146,36 +146,119 @@ async function checkRedis(): Promise<ServiceCheck> {
   }
 }
 
-function checkStripe(): ServiceCheck {
-  const key = process.env.STRIPE_SECRET_KEY;
+async function checkStripe(): Promise<ServiceCheck> {
+  const key = process.env.STRIPE_SECRET_KEY?.trim();
   const configured = Boolean(key && key.startsWith('sk_'));
-  return {
-    name: 'Stripe',
-    status: configured ? 'healthy' : 'unknown',
-    configured,
-    message: configured ? undefined : 'STRIPE_SECRET_KEY not set',
-  };
+  if (!configured) {
+    return {
+      name: 'Stripe',
+      status: 'unknown',
+      configured: false,
+      message: 'STRIPE_SECRET_KEY not set',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const { getStripeServer } = await import('@/lib/stripe/get-stripe-server');
+    const stripe = await getStripeServer();
+    await stripe.balance.retrieve();
+    const latencyMs = Date.now() - start;
+    return {
+      name: 'Stripe',
+      status: latencyMs > 3000 ? 'degraded' : 'healthy',
+      latencyMs,
+      configured: true,
+    };
+  } catch (err) {
+    return {
+      name: 'Stripe',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'Stripe API probe failed',
+    };
+  }
 }
 
-function checkEmail(): ServiceCheck {
-  const key = process.env.SENDGRID_API_KEY;
+async function checkEmail(): Promise<ServiceCheck> {
+  const key = process.env.SENDGRID_API_KEY?.trim();
   const configured = Boolean(key && key.startsWith('SG.'));
-  return {
-    name: 'Email (SendGrid)',
-    status: configured ? 'healthy' : 'unknown',
-    configured,
-    message: configured ? undefined : 'SENDGRID_API_KEY not set',
-  };
+  if (!configured) {
+    return {
+      name: 'Email (SendGrid)',
+      status: 'unknown',
+      configured: false,
+      message: 'SENDGRID_API_KEY not set',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const response = await fetch('https://api.sendgrid.com/v3/scopes', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+    if (!response.ok) {
+      throw new Error(`SendGrid API returned HTTP ${response.status}`);
+    }
+    const latencyMs = Date.now() - start;
+    return {
+      name: 'Email (SendGrid)',
+      status: latencyMs > 3000 ? 'degraded' : 'healthy',
+      latencyMs,
+      configured: true,
+    };
+  } catch (err) {
+    return {
+      name: 'Email (SendGrid)',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'SendGrid API probe failed',
+    };
+  }
 }
 
-function checkStorage(): ServiceCheck {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const configured = Boolean(url);
-  return {
-    name: 'Storage (Supabase)',
-    status: configured ? 'healthy' : 'unknown',
-    configured,
-  };
+async function checkStorage(): Promise<ServiceCheck> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const configured = Boolean(url && serviceKey);
+  if (!configured) {
+    return {
+      name: 'Storage (Supabase)',
+      status: 'unknown',
+      configured: false,
+      message: 'Supabase URL or service-role key not configured',
+    };
+  }
+
+  const start = Date.now();
+  try {
+    const { createAdminClient } = await import('@/lib/supabase/admin');
+    const db = createAdminClient();
+    const { error } = await db.storage.listBuckets();
+    if (error) throw error;
+    const latencyMs = Date.now() - start;
+    return {
+      name: 'Storage (Supabase)',
+      status: latencyMs > 3000 ? 'degraded' : 'healthy',
+      latencyMs,
+      configured: true,
+    };
+  } catch (err) {
+    return {
+      name: 'Storage (Supabase)',
+      status: 'down',
+      latencyMs: Date.now() - start,
+      configured: true,
+      message: err instanceof Error ? err.message : 'Storage API probe failed',
+    };
+  }
 }
 
 function checkAIProviders(): PlatformHealthSnapshot['ai'] {
@@ -214,12 +297,26 @@ function generateAlerts(
     alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — REDIS_URL is not configured' });
   }
 
-  if (!services.stripe.configured) {
-    alerts.push({ severity: 'warning', service: 'Stripe', message: 'Payments not configured' });
-  }
-
-  if (!services.email.configured) {
-    alerts.push({ severity: 'warning', service: 'Email', message: 'Email delivery not configured' });
+  for (const service of [services.stripe, services.email, services.storage]) {
+    if (!service.configured) {
+      alerts.push({
+        severity: 'warning',
+        service: service.name,
+        message: service.message ?? `${service.name} is not configured`,
+      });
+    } else if (service.status === 'down') {
+      alerts.push({
+        severity: 'warning',
+        service: service.name,
+        message: service.message ?? `${service.name} is unreachable`,
+      });
+    } else if (service.status === 'degraded') {
+      alerts.push({
+        severity: 'warning',
+        service: service.name,
+        message: `High latency: ${service.latencyMs}ms`,
+      });
+    }
   }
 
   if (!ai.anyConfigured) {
@@ -243,21 +340,23 @@ const TIMEOUT_MS = 5000;
 
 const DOWN_DB: ServiceCheck = { name: 'Database', status: 'down', configured: true, message: 'Timed out' };
 const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STRIPE: ServiceCheck = { name: 'Stripe', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_EMAIL: ServiceCheck = { name: 'Email (SendGrid)', status: 'down', configured: true, message: 'Timed out' };
+const DOWN_STORAGE: ServiceCheck = { name: 'Storage (Supabase)', status: 'down', configured: true, message: 'Timed out' };
 
 export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   const start = Date.now();
 
   try {
-    const [database, redis] = await Promise.all([
+    const [database, redis, stripe, email, storage] = await Promise.all([
       withTimeout(checkDatabase(), TIMEOUT_MS, DOWN_DB),
       withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
+      withTimeout(checkStripe(), TIMEOUT_MS, DOWN_STRIPE),
+      withTimeout(checkEmail(), TIMEOUT_MS, DOWN_EMAIL),
+      withTimeout(checkStorage(), TIMEOUT_MS, DOWN_STORAGE),
     ]);
 
-    const stripe = checkStripe();
-    const email = checkEmail();
-    const storage = checkStorage();
     const ai = checkAIProviders();
-
     const services = { database, redis, stripe, email, storage };
     const alerts = generateAlerts(services, ai);
     const overall = determineOverall(services, alerts);
@@ -279,9 +378,9 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
       services: {
         database: DOWN_DB,
         redis: DOWN_REDIS,
-        stripe: { name: 'Stripe', status: 'unknown', configured: false },
-        email: { name: 'Email', status: 'unknown', configured: false },
-        storage: { name: 'Storage', status: 'unknown', configured: false },
+        stripe: DOWN_STRIPE,
+        email: DOWN_EMAIL,
+        storage: DOWN_STORAGE,
       },
       ai: { activeProvider: null, providers: [], anyConfigured: false },
       alerts: [{ severity: 'critical', service: 'Platform', message: 'Health check failed entirely' }],
@@ -289,24 +388,45 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   }
 }
 
+/**
+ * Configuration-only snapshot for server components that explicitly cannot
+ * perform network probes. This must never be presented as operational health.
+ */
 export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'services'> {
-  const stripe = checkStripe();
-  const email = checkEmail();
-  const storage = checkStorage();
+  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY?.startsWith('sk_'));
+  const emailConfigured = Boolean(process.env.SENDGRID_API_KEY?.startsWith('SG.'));
+  const storageConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
+  );
   const ai = checkAIProviders();
 
   return {
     services: {
-      database: { name: 'Database', status: 'unknown', configured: true },
+      database: { name: 'Database', status: 'unknown', configured: true, message: 'Not probed' },
       redis: {
         name: 'Redis',
         status: 'unknown',
         configured: Boolean(process.env.REDIS_URL),
-        message: process.env.REDIS_URL ? undefined : 'REDIS_URL not configured',
+        message: process.env.REDIS_URL ? 'Not probed' : 'REDIS_URL not configured',
       },
-      stripe,
-      email,
-      storage,
+      stripe: {
+        name: 'Stripe',
+        status: 'unknown',
+        configured: stripeConfigured,
+        message: stripeConfigured ? 'Not probed' : 'STRIPE_SECRET_KEY not set',
+      },
+      email: {
+        name: 'Email (SendGrid)',
+        status: 'unknown',
+        configured: emailConfigured,
+        message: emailConfigured ? 'Not probed' : 'SENDGRID_API_KEY not set',
+      },
+      storage: {
+        name: 'Storage (Supabase)',
+        status: 'unknown',
+        configured: storageConfigured,
+        message: storageConfigured ? 'Not probed' : 'Supabase URL or service-role key not configured',
+      },
     },
     ai,
   };

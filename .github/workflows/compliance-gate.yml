@@ -37,6 +37,18 @@ jobs:
       - name: Dependency security audit
         run: pnpm audit --audit-level high
 
+  registered-apprenticeship:
+    name: Registered Apprenticeship Architecture
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Enforce canonical registered-apprenticeship architecture
+        run: node scripts/check-registered-apprenticeship-architecture.mjs
+
   e2e-enrollment:
     name: E2E Enrollment Flow
     runs-on: ubuntu-latest

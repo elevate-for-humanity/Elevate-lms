@@ -6,6 +6,8 @@ on:
     paths:
       - 'scripts/course-factory/build-registered-beauty-courses.ts'
       - '.github/workflows/build-registered-beauty-courses.yml'
+  issues:
+    types: [opened]
   workflow_dispatch:
 
 permissions:
@@ -24,6 +26,7 @@ env:
 
 jobs:
   build-and-certify:
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN REGISTERED BEAUTY COURSE BUILD'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:

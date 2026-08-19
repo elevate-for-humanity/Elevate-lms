@@ -72,9 +72,31 @@ async function overlayDbFields(program: ProgramSchema, slug: string): Promise<Pr
 /**
  * Resolve slug → ProgramSchema for the program detail page.
  * Returns null when the slug is not recognized anywhere.
+ *
+ * Ownership order matters: a full static program definition is authoritative
+ * for its own slug. Only slugs without a direct static definition are passed
+ * through the legacy alias resolver. This prevents a thin registry alias from
+ * shadowing a richer public program page.
  */
 export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgramPage | null> {
-  const slug = resolveSlug(rawSlug) ?? rawSlug.toLowerCase().trim();
+  const normalizedRawSlug = rawSlug.toLowerCase().trim();
+
+  if (isArchivedProgramSlug(normalizedRawSlug)) {
+    return null;
+  }
+
+  const directStaticProgram = getStaticProgram(normalizedRawSlug);
+  if (directStaticProgram) {
+    return {
+      program: withCanonicalProgramMedia(
+        await overlayDbFields(directStaticProgram, normalizedRawSlug),
+        directStaticProgram.slug,
+      ),
+      synthesized: false,
+    };
+  }
+
+  const slug = resolveSlug(normalizedRawSlug) ?? normalizedRawSlug;
 
   if (isArchivedProgramSlug(slug)) {
     return null;
@@ -83,7 +105,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   const staticProgram = getStaticProgram(slug);
   if (staticProgram) {
     return {
-      program: withCanonicalProgramMedia(await overlayDbFields(staticProgram, slug), slug),
+      program: withCanonicalProgramMedia(await overlayDbFields(staticProgram, slug), staticProgram.slug),
       synthesized: false,
     };
   }

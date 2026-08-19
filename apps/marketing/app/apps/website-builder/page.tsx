@@ -29,21 +29,18 @@ export default async function WebsiteBuilderPage() {
   let subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
   if (!subscription) {
     const trial = await startAppTrial(user.id, 'website-builder', supabase);
-    if (trial.status === 'error') redirect('/store/apps/website-builder?error=trial-start-failed');
+    if (trial.status === 'error') redirect('/store/apps/website-builder?reason=trial-start-failed');
     subscription = await syncIndividualAppSubscription(user.id, 'website-builder', supabase);
   }
-  if (!subscription) redirect('/store/apps/website-builder?error=subscription-unavailable');
+  if (!subscription) redirect('/store/apps/website-builder?reason=subscription-unavailable');
 
-  if (subscription.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) {
-    redirect('/store/apps/website-builder?expired=true');
-  }
   if (subscription.status !== 'trial' && subscription.status !== 'active') {
-    redirect(`/store/apps/website-builder?status=${encodeURIComponent(subscription.status || 'inactive')}`);
+    redirect(subscription.upgrade_url || `/store/apps/website-builder?reason=${encodeURIComponent(subscription.access_reason || subscription.status || 'subscription-required')}`);
   }
 
   let trialDaysRemaining = 0;
   if (subscription.status === 'trial' && subscription.trial_ends_at) {
-    trialDaysRemaining = Math.ceil((new Date(subscription.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    trialDaysRemaining = Math.max(0, Math.ceil((new Date(subscription.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
   }
 
   const { data: rawWebsites } = await supabase

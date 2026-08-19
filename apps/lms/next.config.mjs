@@ -30,6 +30,7 @@ const nextConfig = {
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
       { source: '/partners/dashboard', destination: '/host-shop/dashboard', permanent: true },
       { source: '/partners/workforce', destination: '/workforce', permanent: true },
+      { source: '/host-shop/dashboard/board', destination: '/host-shop/dashboard', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },
       { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: true },

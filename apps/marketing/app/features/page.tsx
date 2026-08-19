@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { 
-  GraduationCap, Users, Building2, Award, Clock, DollarSign,
-  CheckCircle, Brain, Zap, Shield, BarChart3, Users2,
+import {
+  GraduationCap, Users, Building2, Clock,
+  CheckCircle, Brain, Zap, Shield, BarChart3,
   BookOpen, MessageSquare, FileText, TrendingUp, ArrowRight
 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Platform Features',
-  description: 'Discover the powerful features of Elevate for Humanity\'s workforce development platform. AI-powered tools, employer integrations, and comprehensive student tracking.',
+  description: 'Explore Elevate for Humanity platform capabilities for learning, apprenticeship operations, workforce workflows, reporting, and organization administration.',
 };
 
 const PLATFORM_FEATURES = [
@@ -16,65 +16,61 @@ const PLATFORM_FEATURES = [
     category: 'For Students',
     icon: GraduationCap,
     features: [
-      { title: 'AI Career Assessment', description: 'PARiS AI interviews guide you to the right career path based on your skills and goals.' },
-      { title: 'Self-Paced Learning', description: 'Access coursework 24/7 with interactive modules and progress tracking.' },
-      { title: 'Certification Prep', description: 'Built-in exam preparation for NHA, Certiport, EPA 608, and more.' },
-      { title: 'Career Services', description: 'Resume building, interview coaching, and job placement support.' },
+      { title: 'PARiS Guidance', description: 'Guided AI-assisted intake and support workflows help users navigate available platform and career resources.' },
+      { title: 'Self-Paced Learning', description: 'Access assigned coursework with lesson and progress tracking.' },
+      { title: 'Certification Preparation', description: 'Course content can support preparation for program-aligned credentialing exams where configured.' },
+      { title: 'Career Tools', description: 'Resume, interview, and employment-support workflows can be delivered through the learner experience.' },
     ],
   },
   {
     category: 'For Employers',
     icon: Building2,
     features: [
-      { title: 'OJL Tracking', description: 'Track on-the-job learning hours with digital competency sign-offs.' },
-      { title: 'RTI Management', description: 'Monitor related technical instruction progress for each apprentice.' },
-      { title: 'Talent Pipeline', description: 'Access pre-screened graduates ready for immediate hire.' },
-      { title: 'Grant Support', description: 'We help you navigate employer apprenticeship grants.' },
+      { title: 'OJL Tracking', description: 'Record on-the-job learning activity and competency sign-offs for configured apprenticeship programs.' },
+      { title: 'RTI Management', description: 'Monitor related technical instruction progress for apprentices.' },
+      { title: 'Participant Coordination', description: 'Coordinate employer and participant activity through role-based workflows.' },
+      { title: 'Program Documentation', description: 'Maintain program and apprenticeship records used by authorized staff and partners.' },
     ],
   },
   {
     category: 'For Workforce Partners',
     icon: Users,
     features: [
-      { title: 'Grant Management', description: 'Track WIOA and WRG funding allocation and utilization.' },
-      { title: 'Outcomes Reporting', description: 'Real-time dashboards showing graduate employment rates.' },
-      { title: 'Partner Network', description: 'Connect training providers, employers, and job seekers.' },
-      { title: 'Compliance Tools', description: 'DOL-registered apprenticeship management built-in.' },
+      { title: 'Funding Records', description: 'Record funding and eligibility information used in configured workforce workflows.' },
+      { title: 'Operational Reporting', description: 'Review available enrollment, progress, and program data through role-based dashboards.' },
+      { title: 'Partner Workflows', description: 'Connect authorized training-provider, employer, and participant workflows.' },
+      { title: 'Compliance Records', description: 'Maintain apprenticeship and workforce documentation required by configured programs.' },
     ],
   },
 ];
 
 const CORE_FEATURES = [
-  { icon: Brain, title: 'PARiS AI Assistant', description: 'AI-powered career guidance and enrollment support available 24/7.' },
-  { icon: Zap, title: 'Fast Enrollment', description: 'Complete applications in under 5 minutes with AI assistance.' },
-  { icon: Shield, title: 'Secure & Compliant', description: 'SOC 2 compliant with FERPA and DOL standards built-in.' },
-  { icon: BarChart3, title: 'Real-Time Analytics', description: 'Track progress, outcomes, and ROI with live dashboards.' },
-  { icon: BookOpen, title: 'LMS Integration', description: 'Seamless learning management with progress sync.' },
-  { icon: MessageSquare, title: 'CRM Built-In', description: 'Student relationship management with automated follow-ups.' },
-  { icon: FileText, title: 'Digital Binder', description: 'All student documents, contracts, and credentials in one place.' },
-  { icon: TrendingUp, title: 'Placement Tracking', description: 'Follow graduates through their first 90 days of employment.' },
+  { icon: Brain, title: 'PARiS AI Assistant', description: 'AI-assisted guidance and workflow support within configured platform experiences.' },
+  { icon: Zap, title: 'Digital Enrollment', description: 'Online application and enrollment workflows with required-field and status handling.' },
+  { icon: Shield, title: 'Role-Based Access', description: 'Authentication and authorization controls restrict protected platform functions by user and role.' },
+  { icon: BarChart3, title: 'Operational Analytics', description: 'Dashboards surface available progress, activity, and workflow data.' },
+  { icon: BookOpen, title: 'Learning Management', description: 'Course delivery, lesson access, progress tracking, and administrative course workflows.' },
+  { icon: MessageSquare, title: 'CRM Workflows', description: 'Lead and participant records can be managed through configured communication and follow-up workflows.' },
+  { icon: FileText, title: 'Digital Records', description: 'Store and manage authorized participant documents, records, and credentials.' },
+  { icon: TrendingUp, title: 'Outcome Records', description: 'Record available completion, credential, and employment outcome information when supplied.' },
 ];
 
-const STATS = [
-  { value: '95%', label: 'Certification Pass Rate' },
-  { value: '87%', label: 'Job Placement Rate' },
-  { value: '$0', label: 'Cost to Students (with funding)' },
-  { value: '48hrs', label: 'Average Enrollment Time' },
+const PLATFORM_FACTS = [
+  { value: '3', label: 'Production service surfaces' },
+  { value: 'Role-based', label: 'Protected access model' },
+  { value: 'Digital', label: 'Application and enrollment workflows' },
+  { value: 'Tracked', label: 'Course and apprenticeship progress' },
 ];
 
 export default function FeaturesPage() {
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Hero */}
       <section className="bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              A Complete Workforce Platform
-            </h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">A Workforce Operations Platform</h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8">
-              Everything you need to recruit, train, certify, and place workers — 
-              all in one integrated platform.
+              Learning, apprenticeship, workforce, organization, and reporting workflows in one platform architecture.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/demo" className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 font-bold py-4 px-8 rounded-xl hover:bg-blue-50 transition-colors">
@@ -88,28 +84,24 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="py-16 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-brand-blue-600 mb-2">{stat.value}</div>
-                <div className="text-slate-600">{stat.label}</div>
+            {PLATFORM_FACTS.map((fact) => (
+              <div key={fact.label} className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-brand-blue-600 mb-2">{fact.value}</div>
+                <div className="text-slate-600">{fact.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Core Features Grid */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Platform Capabilities</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Built for workforce development professionals who need powerful tools without the complexity.
-            </p>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Capabilities are shown as implemented platform functions, not guaranteed participant or business outcomes.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {CORE_FEATURES.map((feature) => {
@@ -128,14 +120,11 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* Role-Based Features */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Built for Every Stakeholder</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Role-based dashboards and tools designed specifically for students, employers, and workforce agencies.
-            </p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Role-Based Workflows</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Different users receive workflows and data appropriate to their authorized role.</p>
           </div>
           <div className="space-y-16">
             {PLATFORM_FEATURES.map((category) => {
@@ -144,28 +133,20 @@ export default function FeaturesPage() {
                 <div key={category.category} className="grid lg:grid-cols-2 gap-12 items-center">
                   <div>
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 bg-brand-blue-600 rounded-xl flex items-center justify-center">
-                        <IconComponent className="w-6 h-6 text-white" />
-                      </div>
+                      <div className="w-12 h-12 bg-brand-blue-600 rounded-xl flex items-center justify-center"><IconComponent className="w-6 h-6 text-white" /></div>
                       <h3 className="text-2xl font-bold text-slate-900">{category.category}</h3>
                     </div>
                     <div className="space-y-6">
                       {category.features.map((feature) => (
                         <div key={feature.title} className="flex gap-4">
                           <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <h4 className="font-bold text-slate-900 mb-1">{feature.title}</h4>
-                            <p className="text-slate-600">{feature.description}</p>
-                          </div>
+                          <div><h4 className="font-bold text-slate-900 mb-1">{feature.title}</h4><p className="text-slate-600">{feature.description}</p></div>
                         </div>
                       ))}
                     </div>
                   </div>
                   <div className="bg-slate-100 rounded-2xl aspect-video flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <IconComponent className="w-16 h-16 text-brand-blue-300 mx-auto mb-4" />
-                      <p className="text-slate-500">{category.category} Dashboard</p>
-                    </div>
+                    <div className="text-center p-8"><IconComponent className="w-16 h-16 text-brand-blue-300 mx-auto mb-4" /><p className="text-slate-500">{category.category} workspace</p></div>
                   </div>
                 </div>
               );
@@ -174,55 +155,12 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* Integrations */}
       <section className="py-20 bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Seamless Integrations</h2>
-              <p className="text-slate-300 text-lg mb-8">
-                Connect with the tools you already use. Our API-first platform integrates with 
-                Stripe, Calendly, government portals, and more.
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                {['Stripe Payments', 'Calendly Scheduling', 'Indiana FSSA', 'WorkOne Network', 'DOL Systems', 'WIOA Portals'].map((integration) => (
-                  <div key={integration} className="flex items-center gap-2 text-slate-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>{integration}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="bg-slate-800 rounded-2xl p-8">
-              <h3 className="font-bold text-lg mb-4">API Available</h3>
-              <p className="text-slate-400 mb-6">
-                Build custom integrations with our REST API and webhooks.
-              </p>
-              <Link href="/docs/api" className="inline-flex items-center gap-2 text-brand-blue-400 hover:text-brand-blue-300">
-                View API Documentation <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-brand-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Transform Your Workforce?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join hundreds of workforce agencies, employers, and training providers who trust Elevate for Humanity.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/demo" className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 font-bold py-4 px-8 rounded-xl hover:bg-blue-50 transition-colors">
-              Start Free Trial <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link href="/contact" className="inline-flex items-center justify-center gap-2 border-2 border-white text-white font-bold py-4 px-8 rounded-xl hover:bg-white/10 transition-colors">
-              Talk to Sales
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Clock className="w-10 h-10 mx-auto mb-4 text-blue-300" />
+          <h2 className="text-3xl font-bold mb-4">Evaluate the platform against your requirements</h2>
+          <p className="text-slate-300 mb-8 max-w-2xl mx-auto">Use the demo and trial paths to verify the workflows, permissions, integrations, and reporting your organization requires before purchase.</p>
+          <Link href="/store" className="inline-flex items-center gap-2 bg-white text-slate-900 font-bold py-3 px-6 rounded-lg">View Store <ArrowRight className="w-5 h-5" /></Link>
         </div>
       </section>
     </div>

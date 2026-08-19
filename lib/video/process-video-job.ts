@@ -4,7 +4,18 @@ import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { markComplete, markFailed, type VideoJob } from './job-queue';
-import { inferDomainKey, renderLessonVideo } from './remotion-render';
+
+// Remotion reaches @rspack native binaries and edge-tts TypeScript sources.
+// Keep the renderer behind a runtime-only dynamic boundary so importing the
+// queue processor does not force Next/Webpack to parse those dependencies.
+type RemotionRender = typeof import('./remotion-render');
+let remotionRender: RemotionRender | null = null;
+async function getRemotionRender(): Promise<RemotionRender> {
+  if (!remotionRender) {
+    remotionRender = await import('./remotion-render');
+  }
+  return remotionRender;
+}
 
 /** Render one already-claimed video job using the universal Elevate pipeline. */
 export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
@@ -24,6 +35,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       : {};
 
   try {
+    const { inferDomainKey, renderLessonVideo } = await getRemotionRender();
     const result = await renderLessonVideo({
       lessonId: job.lesson_id,
       title: job.lesson_title,

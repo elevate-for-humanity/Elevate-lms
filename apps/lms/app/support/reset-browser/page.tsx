@@ -23,12 +23,16 @@ export default function ResetBrowserPage() {
     try {
       setStatus('Clearing localStorage...');
       localStorage.clear();
-    } catch {}
+    } catch {
+      // Some browsers block storage access; continue with the remaining reset steps.
+    }
 
     try {
       setStatus('Clearing sessionStorage...');
       sessionStorage.clear();
-    } catch {}
+    } catch {
+      // Session storage may be unavailable in restricted browser contexts.
+    }
 
     try {
       setStatus('Clearing Cache Storage...');
@@ -36,7 +40,9 @@ export default function ResetBrowserPage() {
         const keys = await caches.keys();
         await Promise.all(keys.map((key) => caches.delete(key)));
       }
-    } catch {}
+    } catch {
+      // Cache Storage cleanup is best-effort so one browser API cannot stop the reset.
+    }
 
     try {
       setStatus('Clearing IndexedDB...');
@@ -56,7 +62,9 @@ export default function ResetBrowserPage() {
             : Promise.resolve()),
         );
       }
-    } catch {}
+    } catch {
+      // IndexedDB enumeration is not supported consistently across browsers.
+    }
 
     try {
       setStatus('Unregistering service workers...');
@@ -64,7 +72,9 @@ export default function ResetBrowserPage() {
         const registrations = await navigator.serviceWorker.getRegistrations();
         await Promise.all(registrations.map((registration) => registration.unregister()));
       }
-    } catch {}
+    } catch {
+      // Continue even if a browser refuses service-worker access.
+    }
 
     try {
       setStatus('Clearing cookies...');
@@ -73,7 +83,9 @@ export default function ResetBrowserPage() {
         const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie;
         document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
       });
-    } catch {}
+    } catch {
+      // Cookie cleanup is best-effort; the redirect below still completes the reset flow.
+    }
 
     setStatus('Complete! Reloading...');
     setTimeout(() => {

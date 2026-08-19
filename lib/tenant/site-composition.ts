@@ -134,6 +134,7 @@ export function sanitizePages(value: unknown): TenantSitePage[] {
 }
 
 export function legacyPages(config: TenantSiteConfig): TenantSitePage[] {
+  const catalogHref = config.products?.length ? '/shop' : '/programs';
   const home: TenantSitePage = {
     id: 'page_home',
     slug: '/',
@@ -151,7 +152,7 @@ export function legacyPages(config: TenantSiteConfig): TenantSitePage[] {
           title: config.homepage.heroTitle,
           text: config.homepage.heroSubtitle,
           buttonText: config.homepage.heroCtaText,
-          buttonHref: config.homepage.heroCtaHref || '/programs',
+          buttonHref: config.homepage.heroCtaHref || catalogHref,
           image: config.homepage.heroImage || '',
           imageAlt: config.homepage.heroImageAlt || '',
         },
@@ -169,7 +170,7 @@ export function legacyPages(config: TenantSiteConfig): TenantSitePage[] {
 
   const catalog: TenantSitePage = {
     id: 'page_catalog',
-    slug: config.products?.length ? '/shop' : '/programs',
+    slug: catalogHref,
     title: config.products?.length ? 'Shop' : 'Programs',
     navLabel: config.products?.length ? 'Shop' : 'Programs',
     showInNavigation: true,

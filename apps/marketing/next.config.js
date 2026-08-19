@@ -60,6 +60,7 @@ const nextConfig = {
       { source: '/programs/wioa-funding', destination: '/wioa-eligibility', permanent: false },
       { source: '/programs/construction', destination: '/programs/skilled-trades', permanent: false },
       { source: '/programs/drug-test', destination: '/programs/drug-collector', permanent: false },
+      { source: '/programs/hvac-technician/apply', destination: '/apply/student?program=hvac-technician', permanent: true },
       { source: '/governance/security', destination: '/legal/disclosures', permanent: false },
       { source: '/legal/agreements', destination: '/legal', permanent: false },
       { source: '/intake', destination: '/apply', permanent: false },

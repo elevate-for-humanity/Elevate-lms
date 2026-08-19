@@ -1,9 +1,10 @@
 import { redirect, notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { WebsiteEditorClient } from './WebsiteEditorClient';
 import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
 import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
+import { AutonomousWebsiteBuilder } from '@/components/website-builder/AutonomousWebsiteBuilder';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
+import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
@@ -14,16 +15,11 @@ type Props = { params: Promise<{ websiteId: string }> };
 export default async function WebsiteEditorPage({ params }: Props) {
   const { websiteId } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?redirect=/apps/website-builder/edit/${websiteId}`);
 
   const access = await getWebsiteBuilderAccess(user.id, supabase);
-  if (!access.allowed) {
-    const reason = access.reason || 'inactive';
-    redirect(`/store/apps/website-builder?access=${encodeURIComponent(reason)}`);
-  }
+  if (!access.allowed) redirect(`/store/apps/website-builder?access=${encodeURIComponent(access.reason || 'inactive')}`);
 
   const { data: site } = await supabase
     .from('user_websites')
@@ -31,26 +27,27 @@ export default async function WebsiteEditorPage({ params }: Props) {
     .eq('id', websiteId)
     .maybeSingle();
 
-  if (!site || (site.user_id && site.user_id !== user.id)) notFound();
+  if (!site || site.user_id !== user.id) notFound();
 
   const name = (site.site_name as string | null) ?? 'My Site';
   const base = buildDefaultSiteConfig({ organizationName: name });
-  const config =
+  const config = ensureComposableSiteConfig(
     site.site_config && typeof site.site_config === 'object'
       ? mergeSiteConfig(base, site.site_config as Partial<TenantSiteConfig>)
-      : base;
+      : base,
+  );
 
   return (
     <>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
-      <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
-      <WebsiteEditorClient
+      <AutonomousWebsiteBuilder
         websiteId={site.id}
-        siteName={name}
-        subdomain={(site.subdomain as string | null) ?? null}
-        isPublished={Boolean(site.is_published)}
+        initialSiteName={name}
+        initialSubdomain={(site.subdomain as string | null) ?? null}
+        initiallyPublished={Boolean(site.is_published)}
         initialConfig={config}
       />
+      <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
     </>
   );
 }

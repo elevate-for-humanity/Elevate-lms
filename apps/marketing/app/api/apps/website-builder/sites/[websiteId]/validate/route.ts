@@ -15,7 +15,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ web
   if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
   const access = await getWebsiteBuilderAccess(user.id, supabase);
-  if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required' }, { status: 403 });
+  if (!access.allowed) return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason, upgradeUrl: access.upgradeUrl }, { status: 403 });
 
   const { data: site, error } = await supabase.from('user_websites').select('id, user_id, site_name, site_config').eq('id', websiteId).maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

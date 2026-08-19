@@ -1,6 +1,7 @@
 /** Shared server data for /programs — canonical HTML, RSC and metadata source. */
 
 import type { Metadata } from 'next';
+import { getStaticProgram } from '@/data/programs/index';
 import { createPublicClient, isPublicSupabaseConfigured } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { SITE_STATS } from '@/lib/site-stats';
@@ -93,9 +94,15 @@ export type PublicProgramsPageData = {
 
 export function getCanonicalPublicProgramSlug(slug: string): string {
   const publicCanonical = PUBLIC_PROGRAM_ALIASES[slug] ?? slug;
-  // Finalize every catalog destination through the same canonical registry used
-  // by /programs/[program]. This prevents catalog cards from emitting aliases
-  // that immediately redirect again (for example business-administration -> business).
+
+  // A full static definition owns its public slug. normalizePublicProgram(),
+  // used by getStaticProgram(), can still move a genuinely superseded static
+  // slug to another canonical slug (Business Administration -> business).
+  // This prevents thin registry aliases from shadowing richer pages such as the
+  // Nail Technician Apprenticeship static definition.
+  const staticProgram = getStaticProgram(publicCanonical);
+  if (staticProgram) return staticProgram.slug;
+
   return resolveSlug(publicCanonical) ?? publicCanonical;
 }
 

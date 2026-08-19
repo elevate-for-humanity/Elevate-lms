@@ -3,16 +3,15 @@ import { APPENDIX_A_REGISTRATION, APPENDIX_A_STANDARDS } from '@/lib/compliance/
 const BARBER_APPENDIX = APPENDIX_A_STANDARDS.barber;
 
 /**
- * RAPIDS Registration Configuration
+ * Static RAPIDS registration metadata only.
  *
- * IMPORTANT: Appendix A is the authoritative source for occupation-specific
- * DOL apprenticeship requirements. Do not duplicate RTI hours, competency
- * counts, wage progression, ratio, or probation values here.
+ * Occupation standards come from Appendix A. Operational RAPIDS state —
+ * employers, employer-specific wage schedules, RTI providers, placements and
+ * registrations — is resolved exclusively by registered-program-contract.ts.
  */
 export const RAPIDS_CONFIG = {
   sponsorOfRecord: APPENDIX_A_REGISTRATION.sponsor,
   programBrand: 'Elevate for Humanity Career & Technical Institute',
-
   registrationId: process.env.RAPIDS_REGISTRATION_ID || APPENDIX_A_REGISTRATION.registrationNumber,
   programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || APPENDIX_A_REGISTRATION.registrationNumber,
   registrationDate: APPENDIX_A_REGISTRATION.registrationDate,
@@ -36,7 +35,6 @@ export const RAPIDS_CONFIG = {
       wageMilestones: BARBER_APPENDIX.wageMilestones,
       relatedInstruction: BARBER_APPENDIX.relatedInstruction,
       competencies: BARBER_APPENDIX.competencies,
-      rtiProvider: BARBER_APPENDIX.rtiProvider,
       fundingType: 'self_pay',
       tuition: 4980,
     },
@@ -45,7 +43,6 @@ export const RAPIDS_CONFIG = {
   state: 'Indiana',
   stateCode: 'IN',
   licensingAgency: 'Indiana Professional Licensing Agency',
-
   isStateFunded: false,
   wagesGuaranteed: false,
   employmentGuaranteed: false,
@@ -54,7 +51,6 @@ export const RAPIDS_CONFIG = {
 export function getRAPIDSMetadata(programSlug: string) {
   const program = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === programSlug);
   if (!program) return null;
-
   return {
     rapids_sponsor_legal: RAPIDS_CONFIG.sponsorOfRecord,
     rapids_program_brand: RAPIDS_CONFIG.programBrand,
@@ -73,7 +69,6 @@ export function getRAPIDSMetadata(programSlug: string) {
 export function getRAPIDSEnrollmentData(programSlug: string) {
   const program = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === programSlug);
   if (!program) return null;
-
   return {
     rapids_sponsor: RAPIDS_CONFIG.sponsorOfRecord,
     rapids_program: program.name,

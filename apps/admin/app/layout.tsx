@@ -1,14 +1,16 @@
 /**
- * Admin group layout - shared UI wrapper with proper branding.
- * Auth check is handled by middleware to avoid redirect loops.
+ * Admin application root layout.
+ *
+ * The authenticated Admin surface owns its navigation and operational UI.
+ * Public/marketing support widgets and marketing-style footers must not be
+ * mounted here because they compete with the mobile admin navigation layer and
+ * expose canned public actions inside a privileged workspace.
  */
 import type { Metadata } from "next";
 import "./globals.css";
 import '../../../styles/contrast-guardrails.css';
 import BuildVersionSync from '@/components/BuildVersionSync';
-import { LiveChatWidget } from '@/components/support/LiveChatWidget';
 import AdminHeader from '@/components/admin/AdminHeader';
-import { AdminFooter } from '@/components/admin/AdminFooter';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
 import { AdminUpdateNotice } from '@/components/pwa/AdminUpdateNotice';
@@ -75,14 +77,12 @@ export default async function AdminGroupLayout({
         <AdminPwaRegister />
         <AdminUpdateNotice />
         <I18nProvider>
-          <div className="min-h-screen flex flex-col bg-slate-50">
+          <div className="min-h-dvh min-w-0 overflow-x-clip bg-slate-50">
             <BuildVersionSync />
             <AdminHeader />
-            <main className="flex-1">
+            <main className="min-w-0 overflow-x-clip">
               {children}
             </main>
-            <AdminFooter />
-            <LiveChatWidget />
           </div>
         </I18nProvider>
       </body>

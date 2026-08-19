@@ -18,7 +18,7 @@ export interface HeroDemoSlide {
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
-  /** Poster shown while video buffers and as the permanent fallback on video failure. */
+  /** Poster is the base media layer and remains behind the video at all times. */
   posterImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
@@ -66,22 +66,22 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const transcriptId = useId();
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
   const desktopSource = videoSrcDesktop || videoSrcMobile || '';
   const mobileSource = videoSrcMobile || videoSrcDesktop || '';
 
   useEffect(() => {
-    // Native <source media> selection avoids a post-hydration source swap,
-    // which previously restarted the video and flashed the poster on mobile.
     setVideoFailed(false);
+    setVideoReady(false);
     setMuted(true);
     const video = videoRef.current;
     if (!video || !desktopSource) return;
     video.muted = true;
     void video.play().catch(() => {
-      // Muted autoplay may still be deferred by a user browser policy. The
-      // native poster remains the stable fallback without a second fading layer.
+      // Browser autoplay policy can defer playback. The poster stays beneath the
+      // transparent video layer until a real video frame is ready.
     });
   }, [desktopSource, mobileSource]);
 
@@ -134,12 +134,12 @@ export default function HeroVideo({
   return (
     <div className={`w-full ${className}`}>
       <section
-        className={`relative w-full overflow-hidden bg-black ${heightClassName}`}
+        className={`relative isolate w-full overflow-hidden bg-black ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero media` : 'Hero media'}
       >
-        {!showVideo && showPoster ? (
+        {showPoster ? (
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${posterImage})` }}
             aria-hidden="true"
           />
@@ -155,15 +155,19 @@ export default function HeroVideo({
             playsInline
             muted
             disablePictureInPicture
+            onLoadedData={() => setVideoReady(true)}
+            onPlaying={() => setVideoReady(true)}
             onCanPlay={() => {
+              setVideoReady(true);
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
             onError={() => {
+              setVideoReady(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-150 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (

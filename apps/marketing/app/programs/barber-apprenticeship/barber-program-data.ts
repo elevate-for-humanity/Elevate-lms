@@ -1,40 +1,23 @@
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 export const SITE_URL = PLATFORM_DEFAULTS.siteUrl;
 
-const RAPIDS = RAPIDS_CONFIG.programs.barber;
-const OJL_HOURS = RAPIDS.totalHours;
-const RTI_HOURS = RAPIDS.relatedInstructionHours;
+const REGISTERED = getRegisteredProgramStandard('barber-apprenticeship');
+if (!REGISTERED) throw new Error('REGISTERED_BARBER_CONTRACT_MISSING');
+const STANDARD = REGISTERED.standard;
+const RTI_HOURS = REGISTERED.completion.requiredRtiHours;
+const COMPETENCY_COUNT = REGISTERED.completion.competencyCount;
 
 export const QUICK_STATS = [
-  { val: OJL_HOURS.toLocaleString(), label: `OJL Hours + ${RTI_HOURS} RTI` },
-  { val: '40 hrs/wk', label: 'Standard OJL Schedule' },
+  { val: `${COMPETENCY_COUNT}`, label: 'Registered Competencies' },
+  { val: `${RTI_HOURS}`, label: 'Verified RTI Hours' },
+  { val: STANDARD.apprenticeToMentorRatio, label: 'Apprentice-to-Mentor Ratio' },
   { val: `$${BARBER_PRICING.fullPrice.toLocaleString()}`, label: 'Self-Pay Tuition' },
-  { val: '3', label: 'Completion / Career Credentials' },
 ];
 
-export const COMPETENCIES = [
-  'Tool disinfection procedures',
-  'Workstation sanitation standards',
-  'PPE and hygiene practices',
-  'Chemical handling and safety',
-  'Clipper handling and guard usage',
-  'Fading and blending techniques',
-  'Tapering and line-ups',
-  'Shear cutting fundamentals',
-  'Straight razor safety',
-  'Beard shaping and lining',
-  'Skin protection and sanitation',
-  'Client consultation',
-  'Communication and professionalism',
-  'Time management and service efficiency',
-  'Equipment setup and breakdown',
-  'Shop sanitation maintenance',
-  'Appointment flow and customer service',
-  'Workplace safety compliance',
-];
+export const COMPETENCIES = STANDARD.competencies.map((competency) => competency.description);
 
 export const CREDENTIALS = [
   {
@@ -55,14 +38,11 @@ export const CREDENTIALS = [
 ];
 
 export const CURRICULUM = [
-  { title: 'Haircutting Techniques', description: 'Fades, tapers, lineups, and precision cutting under licensed supervision in a real shop environment.' },
-  { title: 'Clipper & Shear Mastery', description: 'Tool selection, maintenance, guard systems, and advanced clipper-over-comb and shear techniques.' },
-  { title: 'Sanitation & Safety', description: 'Sanitation standards, chemical safety, bloodborne-pathogen precautions, and workstation compliance.' },
-  { title: 'Shaving & Beard Grooming', description: 'Straight razor safety, beard shaping, lining, skin protection, and hot-towel service techniques.' },
-  { title: 'Client Services & Professionalism', description: 'Client consultation, communication, time management, and repeat-client service.' },
-  { title: 'Shop Operations & Business', description: 'Booking, pricing, business fundamentals, and shop-operations preparation.' },
-  { title: 'License Exam Preparation', description: 'Indiana barber licensing-exam preparation and completion-document review.' },
-  { title: 'Competency Evaluations', description: 'Documented employer/program competency review throughout OJL.' },
+  ...STANDARD.relatedInstruction.map((item) => ({
+    title: item.title,
+    description: `${item.hours} verified RTI hours mapped to the approved registered occupation standard.`,
+  })),
+  { title: 'Registered Competency Verification', description: `Host Shop supervisors verify all ${COMPETENCY_COUNT} approved competencies from the registered Work Process Schedule. Work hours remain auditable evidence and do not replace competency verification.` },
 ];
 
 export const CAREERS = [
@@ -74,9 +54,9 @@ export const CAREERS = [
 
 export const ENROLLMENT_STEPS = [
   { title: 'Complete Intake', description: 'Submit the application and funding information. Inquiry and enrollment are separate workflows.' },
-  { title: 'Get Matched', description: 'Complete host-shop matching or verify your existing approved shop placement before OJL begins.' },
-  { title: 'Earn & Learn', description: `Complete ${OJL_HOURS.toLocaleString()} approved supervised OJL hours and ${RTI_HOURS} RTI hours while your progress is tracked in the platform.` },
-  { title: 'Complete & Apply for Licensure', description: 'Finish registered-program requirements, receive completion documentation, then complete the current Indiana licensing and examination process.' },
+  { title: 'Get Matched', description: 'Complete host-shop matching or verify your existing approved shop placement before supervised work begins.' },
+  { title: 'Earn & Learn', description: `Complete supervised work under the approved placement while progressing through all ${COMPETENCY_COUNT} registered competencies and ${RTI_HOURS} verified RTI hours. Work records, wages, RTI, and competency verification remain separate evidence streams.` },
+  { title: 'Complete & Apply for Licensure', description: 'Finish the registered competency/RTI requirements and required sponsor records, receive completion documentation, then complete the current Indiana licensing and examination process.' },
 ];
 
 export const ELIGIBILITY = [
@@ -88,19 +68,19 @@ export const ELIGIBILITY = [
 
 export const PARTNER_REQUIREMENTS = [
   'Active Indiana shop/business licensing required for the hosted occupation',
-  'Qualified licensed supervisor or mentor available for oversight',
+  'Qualified licensed supervisor or mentor available for the registered 1:1 supervision requirement',
   'Required insurance and employment coverage',
   'Physical training location approved for the apprenticeship',
-  'Commitment to structured OJL and competency verification',
-  'Compliance with workplace, sanitation, and program requirements',
+  'Commitment to truthful supervised-work records and registered competency verification',
+  'Compliance with workplace, sanitation, wage, and program requirements',
   'Signed Memorandum of Understanding (MOU) before activation',
 ];
 
 export const PARTNER_BENEFITS = [
   'Access to apprenticeship candidates matched to approved sites',
-  'Digital OJL-hour and competency tracking',
+  'Digital supervised-work evidence and registered competency tracking',
   'Program administration and compliance support',
   'Host-shop onboarding documents and MOU workflow',
-  'Visibility into assigned apprentice progress',
+  'Visibility into assigned apprentice RTI and competency progress',
   'Centralized records instead of duplicate paper processes',
 ];

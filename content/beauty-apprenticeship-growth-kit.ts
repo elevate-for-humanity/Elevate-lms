@@ -2,7 +2,7 @@ import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 import { COSMETOLOGY } from '@/data/programs/cosmetology-apprenticeship';
 import { NAIL_TECH } from '@/data/programs/nail-technician-apprenticeship';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
-import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
 export type BeautyTrackKey = 'barber' | 'cosmetology' | 'nail';
 
@@ -37,9 +37,11 @@ export function fundingCopy(program: ProgramSchema): string {
 }
 
 export function registrationCopy(program: ProgramSchema): string {
-  return isRAPIDSProgram(program.slug)
-    ? 'This track is listed in Elevate’s canonical Registered Apprenticeship program registry.'
-    : 'This track is an apprenticeship pathway in the platform; staff must confirm current DOL/RAPIDS registration status before describing this specific track as federally registered.';
+  const registered = getRegisteredProgramStandard(program.slug);
+  if (!registered) {
+    return 'This track is an apprenticeship pathway in the platform; staff must confirm an approved registered-program standard before describing this specific track as federally registered.';
+  }
+  return `This track is governed by registered occupation ${registered.standard.rapidsCode}: ${registered.completion.competencyCount} verified competencies plus ${registered.completion.requiredRtiHours} verified RTI hours. Work/OJL hours remain auditable training evidence and are not a fixed completion denominator for this competency-based occupation.`;
 }
 
 export function backlinkSnippet(track: BeautyTrackKey): string {
@@ -51,17 +53,20 @@ export function backlinkSnippet(track: BeautyTrackKey): string {
 export function applicantSms(track: BeautyTrackKey): string {
   const config = BEAUTY_TRACKS[track];
   const program = config.program;
-  const hours = trainingHours(program).toLocaleString();
+  const registered = getRegisteredProgramStandard(program.slug);
+  const training = registered
+    ? `Complete ${registered.completion.competencyCount} verified competencies plus ${registered.completion.requiredRtiHours} verified RTI hours under the registered competency-based standard.`
+    : `Follow the current ${trainingHours(program).toLocaleString()}-hour pathway shown in the program record; staff must separately verify registration and licensing requirements.`;
   const funding = program.funding?.wioa_eligible && program.funding?.etpl_approved
     ? 'Ask WorkOne to review your funding eligibility.'
     : 'Ask Elevate about current funding, employer-paid, supportive-service, and self-pay options.';
-  return `Hey [Name]! Elevate’s ${config.label} is open. Train through a supervised host-site pathway with ${hours} structured hours. ${funding} Apply: https://www.elevateforhumanity.org${config.path}`;
+  return `Hey [Name]! Elevate’s ${config.label} is open. ${training} ${funding} Apply: https://www.elevateforhumanity.org${config.path}`;
 }
 
 export const SOCIAL_CAPTIONS = {
-  applicant: `Skip the guesswork and choose the exact beauty license path you want. Elevate now has dedicated Barbering, Cosmetology, and Nail Technician apprenticeship pages with host-site training, program-specific hours, funding status, and direct application links. Funding eligibility varies by program and participant; it is reviewed before enrollment. #IndianaApprenticeship #EarnWhileYouLearn #BarberApprentice #CosmetologyApprenticeship #NailTech`,
-  hostShop: `Indiana salon, spa, and barbershop owners: build talent in-house through the Elevate Host Site network. Elevate supports sponsor governance, related instruction, digital hour tracking, documents, and progress verification while your licensed team provides supervised on-the-job learning. Apply to become a Host Site at Elevate for Humanity.`,
-  reelHook: `How do beauty apprenticeships work in Indiana? Pick the exact license path, apply to the track, complete supervised host-site training plus required instruction, track progress digitally, and prepare for licensing requirements. Funding and placement depend on the specific program and participant—check your track before you enroll.`,
+  applicant: `Choose the exact beauty license path you want. Elevate has dedicated Barbering, Cosmetology, and Nail Technician apprenticeship pages with host-site training, track-specific requirements, funding status, and direct application links. Registered tracks use their approved competency and RTI standards; funding eligibility varies by program and participant and is reviewed before enrollment. #IndianaApprenticeship #EarnWhileYouLearn #BarberApprentice #CosmetologyApprenticeship #NailTech`,
+  hostShop: `Indiana salon, spa, and barbershop owners: build talent in-house through the Elevate Host Site network. Elevate supports sponsor governance, related instruction, digital work records, documents, and progress verification while your licensed team provides supervised on-the-job learning. Apply to become a Host Site at Elevate for Humanity.`,
+  reelHook: `How do beauty apprenticeships work in Indiana? Pick the exact license path, apply to the track, complete supervised host-site training plus required instruction, document progress, and prepare for licensing requirements. Registered competency-based tracks are completed under their approved competency and RTI standards—not a generic hour counter. Funding and placement depend on the specific program and participant.`,
 } as const;
 
 export const SOCIAL_IMAGE_PROMPTS = {
@@ -72,6 +77,7 @@ export const SOCIAL_IMAGE_PROMPTS = {
 export const ADMISSIONS_PHONE_CHECKLIST = [
   'Identify the exact license path: Barbering, Cosmetology, or Nail Technician. Do not leave the lead categorized only as “beauty.”',
   'State the training model accurately: supervised host-site learning plus required related instruction. Do not promise wages, placement, licensing, or funding that the canonical record does not guarantee.',
+  'For a registered competency-based track, quote the approved competency count and RTI requirement rather than substituting a school-hour or OJL-hour completion counter.',
   'Ask whether the applicant already has a licensed shop/salon that may want to host them or needs placement assistance.',
   'Record city/region, host-site status, WorkOne/case-manager status, and preferred contact method in CRM.',
   'Send the direct canonical track URL while the applicant is still on the call.',
@@ -83,15 +89,16 @@ export const HOST_SHOP_QUICK_START = [
     title: 'Employment and wage compliance',
     bullets: [
       'Use the employment classification and wage progression required by the applicable registered standards, wage law, and approved employer agreement.',
-      'Do not treat unlicensed apprentices as independent contractors when that conflicts with law or the approved apprenticeship arrangement.',
+      'Do not treat apprentices as independent contractors when that conflicts with law or the approved apprenticeship arrangement.',
       'Keep payroll and wage-progression records available for audit.',
     ],
   },
   {
-    title: 'Supervision and hour tracking',
+    title: 'Supervision and work records',
     bullets: [
-      'Provide supervision required by the applicable Indiana licensing rules and program standards.',
-      'Review and verify practical/OJL hours in the Elevate Host Shop portal on the required cadence.',
+      'Provide supervision required by the applicable licensing rules and registered-program standards.',
+      'Review and verify practical/OJL work records in the Elevate Host Shop portal on the required cadence.',
+      'For competency-based registered occupations, work hours are evidence; completion is controlled by verified competencies plus required RTI.',
       'Use competency sign-offs only when the apprentice has demonstrated the skill under the approved supervision process.',
     ],
   },
@@ -99,7 +106,7 @@ export const HOST_SHOP_QUICK_START = [
     title: 'Related technical instruction',
     bullets: [
       'Ensure the apprentice has time to remain current with required RTI/LMS work.',
-      'Do not count unverified theory or practical activity as completed program hours.',
+      'Do not count unverified theory or practical activity as verified RTI or completed competency progress.',
       'Escalate attendance, academic, or safety concerns through the Host Shop portal.',
     ],
   },
@@ -107,29 +114,43 @@ export const HOST_SHOP_QUICK_START = [
     title: 'Inspection and audit readiness',
     bullets: [
       'Maintain current shop and supervisor licensing records.',
-      'Keep the active apprenticeship/employer agreement and recent hour records accessible.',
+      'Keep the active apprenticeship/employer agreement, work records, competency verification, RTI evidence, and wage records accessible.',
       'Use Elevate’s document workspace rather than relying on informal texts or paper-only records.',
     ],
   },
 ] as const;
 
-export const MILESTONE_MAP = {
+export type ProgressMilestone = {
+  label: string;
+  milestone: string;
+};
+
+function registeredMilestones(program: ProgramSchema): ProgressMilestone[] | null {
+  const registered = getRegisteredProgramStandard(program.slug);
+  if (!registered) return null;
+  const standard = registered.standard;
+  return [
+    ...standard.wageMilestones.map((step) => ({
+      label: `${step.completedCompetencies} / ${registered.completion.competencyCount} competencies`,
+      milestone: `Verified competency milestone. Registered wage baseline at this step is $${step.hourlyRate.toFixed(2)}/hour before applying any higher employer-specific RAPIDS schedule or legal wage floor.`,
+    })),
+    {
+      label: `${registered.completion.requiredRtiHours} verified RTI hours`,
+      milestone: `Complete the approved RTI requirement in addition to all ${registered.completion.competencyCount} competencies. OJL/work hours remain evidence and do not replace either requirement.`,
+    },
+  ];
+}
+
+export const MILESTONE_MAP: Record<BeautyTrackKey, ProgressMilestone[]> = {
+  barber: registeredMilestones(BARBER_APPRENTICESHIP) || [],
+  nail: registeredMilestones(NAIL_TECH) || [],
   cosmetology: [
-    { hours: 250, milestone: 'Sanitation, shampooing, blow-dry, workstation and basic client-service validation.' },
-    { hours: 1000, milestone: 'Mid-program competency review covering cutting, color/chemical safety, client consultation, and portfolio progress.' },
-    { hours: 2000, milestone: 'Program-hour completion review, portfolio, licensing preparation, and final competency verification.' },
+    {
+      label: 'Current program record',
+      milestone: 'Use the current Cosmetology program, licensing, supervision, and funding records. Do not describe this track as federally registered unless an approved registered-program standard is present in the canonical registry.',
+    },
   ],
-  barber: [
-    { hours: 300, milestone: 'Sanitation, tool handling, clipper fundamentals, workstation safety, and supervised service basics.' },
-    { hours: 1100, milestone: 'Mid-program review covering fades/tapers, shaving, client service, and documented skill progression.' },
-    { hours: 2000, milestone: 'OJL completion review plus confirmation that the separate 144 RTI hours and required competencies are complete.' },
-  ],
-  nail: [
-    { hours: 150, milestone: 'Natural nail anatomy, sanitation, standard manicuring and pedicuring under supervision.' },
-    { hours: 400, milestone: 'Mid-program review covering enhancements, gels/acrylic systems, client safety, and portfolio progress.' },
-    { hours: 600, milestone: 'Final supervised-hours review, sanitation competency, portfolio, and licensing preparation.' },
-  ],
-} as const;
+};
 
 export function workOnePitch(track: BeautyTrackKey): string {
   const config = BEAUTY_TRACKS[track];
@@ -143,12 +164,12 @@ export function nurtureSequence(track: BeautyTrackKey) {
     {
       delayMinutes: 0,
       subject: `We received your ${config.label} interest — here are the next steps`,
-      body: `Hi [Apprentice Name],\n\nThank you for your interest in Elevate’s ${config.label}. Your next steps are to complete the application, confirm your city and host-site needs, and review the exact program requirements. ${funding}\n\nA coordinator can help you understand placement, required documents, payment/funding options, and the training schedule.\n\nProgram page: https://www.elevateforhumanity.org${config.path}\n\nElevate Admissions`,
+      body: `Hi [Apprentice Name],\n\nThank you for your interest in Elevate’s ${config.label}. Your next steps are to complete the application, confirm your city and host-site needs, and review the exact program requirements. ${registrationCopy(config.program)} ${funding}\n\nA coordinator can help you understand placement, required documents, payment/funding options, and the training schedule.\n\nProgram page: https://www.elevateforhumanity.org${config.path}\n\nElevate Admissions`,
     },
     {
       delayMinutes: 2880,
       subject: `See how the ${config.label} host-site model works`,
-      body: `Hi [Apprentice Name],\n\nThe Elevate model combines supervised training in an approved host site with required instruction and digital progress tracking. You build real workplace experience while completing the program requirements for your selected track. Employment, funding, and placement depend on the approved arrangement and are not guaranteed by the application alone.\n\nIf you have a preferred licensed shop or salon, reply with its name and city so our team can review whether it can enter the Host Site process.\n\nElevate Admissions`,
+      body: `Hi [Apprentice Name],\n\nThe Elevate model combines supervised training in an approved host site with required instruction and digital progress tracking. Registered competency-based tracks follow their approved competency and RTI completion requirements. Employment, funding, and placement depend on the approved arrangement and are not guaranteed by the application alone.\n\nIf you have a preferred licensed shop or salon, reply with its name and city so our team can review whether it can enter the Host Site process.\n\nElevate Admissions`,
     },
     {
       delayMinutes: 5760,
@@ -158,4 +179,4 @@ export function nurtureSequence(track: BeautyTrackKey) {
   ];
 }
 
-export const PRESS_RELEASE_DRAFT = `FOR IMMEDIATE RELEASE\n\nELEVATE FOR HUMANITY EXPANDS BEAUTY AND GROOMING APPRENTICESHIP PATHWAYS IN INDIANA\n\nINDIANAPOLIS, IN — Elevate for Humanity has expanded dedicated public pathways for Barbering, Cosmetology, and Nail Technician apprenticeship training. The pages separate program hours, host-site expectations, related instruction, application steps, and track-specific funding information so applicants and workforce partners can review the correct requirements before enrollment.\n\nElevate operates Registered Apprenticeship infrastructure and an Indiana workforce-training platform. Program-specific registration and funding claims are published only when they are supported by the current canonical program record. Host-site availability varies by region.\n\nProspective apprentices and licensed Indiana businesses interested in becoming Host Sites can learn more at www.elevateforhumanity.org.\n\nAbout Elevate for Humanity\nElevate for Humanity provides career training, apprenticeship infrastructure, credentialing, employer coordination, and workforce technology serving learners, employers, and partner agencies.`;
+export const PRESS_RELEASE_DRAFT = `FOR IMMEDIATE RELEASE\n\nELEVATE FOR HUMANITY EXPANDS BEAUTY AND GROOMING APPRENTICESHIP PATHWAYS IN INDIANA\n\nINDIANAPOLIS, IN — Elevate for Humanity has expanded dedicated public pathways for Barbering, Cosmetology, and Nail Technician apprenticeship training. The pages separate host-site expectations, related instruction, application steps, track-specific progress requirements, and funding information so applicants and workforce partners can review the correct requirements before enrollment.\n\nElevate operates Registered Apprenticeship infrastructure and an Indiana workforce-training platform. Program-specific registration and funding claims are published only when they are supported by the current canonical program record. Host-site availability varies by region.\n\nProspective apprentices and licensed Indiana businesses interested in becoming Host Sites can learn more at www.elevateforhumanity.org.\n\nAbout Elevate for Humanity\nElevate for Humanity provides career training, apprenticeship infrastructure, credentialing, employer coordination, and workforce technology serving learners, employers, and partner agencies.`;

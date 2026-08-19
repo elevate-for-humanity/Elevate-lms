@@ -1,11 +1,7 @@
-/** Shared server data for /programs — canonical HTML, RSC and metadata source. */
-
+/** Shared server data for /programs — Supabase is the only publication source. */
 import type { Metadata } from 'next';
-import { getStaticProgram } from '@/data/programs/index';
-import { createPublicClient, isPublicSupabaseConfigured } from '@/lib/supabase/public';
+import { createPublicClient } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { SITE_STATS } from '@/lib/site-stats';
-import { resolveSlug } from '@/lib/program-registry';
 import { loadPublishedProgramsListing, type ProgramsListingItem } from '@/lib/programs/load-program-catalog';
 import {
   getProgramFundingTier,
@@ -20,27 +16,8 @@ export const buildProgramsCatalogMetadata = buildProgramsListingMetadata;
 export const getPublicProgramsCatalogPage = getPublicProgramsPageData;
 export type PublicCatalogProgram = ProgramsPageRow;
 
-/**
- * Historical catalog slugs that represent the same public pathway.
- * The public programs page must never render these as competing programs.
- * Detail-route redirects can continue to preserve old inbound links.
- */
-export const PUBLIC_PROGRAM_ALIASES: Readonly<Record<string, string>> = {
-  business: 'business-administration',
-  'business-operations': 'business-administration',
-  entrepreneurship: 'business-startup',
-  'entrepreneurship-small-business': 'business-startup',
-  'bookkeeping-fundamentals': 'bookkeeping',
-  'finance-bookkeeping-accounting': 'bookkeeping',
-  'customer-service-pro': 'customer-service-representative',
-  'it-support-specialist': 'it-help-desk',
-  'forklift-operator': 'forklift',
-};
-
-const PUBLIC_PROGRAM_TITLES: Readonly<Record<string, string>> = {
-  'business-startup': 'Entrepreneurship & Small Business',
-  bookkeeping: 'Bookkeeping & Accounting',
-};
+/** No program slugs are hidden or redirected. Published Supabase rows are the catalog. */
+export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set<string>();
 
 const CATEGORY_LABELS: Readonly<Record<string, string>> = {
   business: 'Business & Financial',
@@ -59,19 +36,9 @@ const CATEGORY_LABELS: Readonly<Record<string, string>> = {
   'human-services': 'Human Services',
   'human services': 'Human Services',
   hospitality: 'Hospitality',
+  apprenticeship: 'Apprenticeship',
+  special: 'Career Readiness',
 };
-
-export const PROGRAMS_PAGE_SUPPRESSED_SLUGS = new Set([
-  'cna-training', 'hvac', 'hvac-technician-program', 'hvac-2024', 'medical-assistant-program',
-  'phlebotomy-technician', 'phlebotomy-technician-program', 'barber', 'barber-program', 'cosmetology',
-  'nail-technician', 'cpr-cert', 'health-safety', 'tax-prep', 'it-support', 'cybersecurity',
-  'peer-recovery-specialist-jri', 'ai-advanced-project-management-1774494313718',
-  'ai-forklift-safety-certification-1774495387731', 'jri-badge-1-mindsets', 'jri-badge-2-self-management',
-  'jri-badge-3-learning-strategies', 'jri-badge-4-social-skills', 'jri-badge-5-workplace-skills',
-  'jri-badge-6-launch-a-career', 'jri-introduction', 'jri', 'micro-programs', 'healthcare',
-  'skilled-trades', 'technology', 'building-maintenance-wrg', 'life-coach-certification-wioa',
-  'nha-medical-assistant', 'nha-phlebotomy', 'nha-pharmacy-technician', 'cna-cert',
-]);
 
 export type ProgramsPageRow = {
   slug: string;
@@ -89,21 +56,12 @@ export type ProgramsPageRow = {
 export type PublicProgramsPageData = {
   programs: ProgramsPageRow[];
   programCount: number;
-  catalogSource: 'database' | 'static-fallback';
+  catalogSource: 'database';
 };
 
+/** Exact-slug contract: there are no public program aliases. */
 export function getCanonicalPublicProgramSlug(slug: string): string {
-  const publicCanonical = PUBLIC_PROGRAM_ALIASES[slug] ?? slug;
-
-  // A full static definition owns its public slug. normalizePublicProgram(),
-  // used by getStaticProgram(), can still move a genuinely superseded static
-  // slug to another canonical slug (Business Administration -> business).
-  // This prevents thin registry aliases from shadowing richer pages such as the
-  // Nail Technician Apprenticeship static definition.
-  const staticProgram = getStaticProgram(publicCanonical);
-  if (staticProgram) return staticProgram.slug;
-
-  return resolveSlug(publicCanonical) ?? publicCanonical;
+  return slug.toLowerCase().trim();
 }
 
 export function getPublicProgramCategoryLabel(category: string | null | undefined): string {
@@ -116,14 +74,11 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
   const rows = new Map<string, ProgramsPageRow>();
 
   for (const program of listing) {
-    const canonicalSlug = getCanonicalPublicProgramSlug(program.slug);
-    const verified = getVerifiedProgramFunding(canonicalSlug) ?? getVerifiedProgramFunding(program.slug);
-    const slug = verified?.slug ?? canonicalSlug;
-    if (rows.has(slug)) continue;
-
+    const slug = getCanonicalPublicProgramSlug(program.slug);
+    const verified = getVerifiedProgramFunding(slug);
     rows.set(slug, {
       slug,
-      title: verified?.title ?? PUBLIC_PROGRAM_TITLES[slug] ?? program.title,
+      title: verified?.title ?? program.title,
       description: sanitizePublicFundingDescription(slug, verified?.description ?? program.description),
       category: getPublicProgramCategoryLabel(verified?.category ?? program.sectionKey),
       duration: verified?.duration ?? program.duration,
@@ -136,9 +91,10 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
   }
 
   for (const verified of VERIFIED_WORKFORCE_FUNDED_PROGRAMS) {
-    const slug = getCanonicalPublicProgramSlug(verified.slug);
-    rows.set(slug, {
-      slug,
+    if (!rows.has(verified.slug)) continue;
+    const current = rows.get(verified.slug)!;
+    rows.set(verified.slug, {
+      ...current,
       title: verified.title,
       description: verified.description,
       category: getPublicProgramCategoryLabel(verified.category),
@@ -146,36 +102,28 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
       credential: verified.credential,
       funding_eligible: true,
       funding_tier: 'workforce-funded',
-      funding_labels: getPublicFundingLabels(slug),
+      funding_labels: getPublicFundingLabels(verified.slug),
       top_jobs_stars: verified.topJobsStars,
     });
   }
 
-  return [...rows.values()].sort((a, b) => {
-    const categoryOrder = a.category.localeCompare(b.category);
-    return categoryOrder || a.title.localeCompare(b.title);
-  });
+  return [...rows.values()].sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
 }
 
 export async function getPublicProgramsPageData(): Promise<PublicProgramsPageData> {
   const db = createPublicClient();
-  const { programs: listing, source } = await loadPublishedProgramsListing(db, {
-    suppressSlugs: PROGRAMS_PAGE_SUPPRESSED_SLUGS,
-    suppressFallbackWarning: !isPublicSupabaseConfigured(),
-  });
+  const { programs: listing } = await loadPublishedProgramsListing(db);
   const programs = mapListingToRows(listing);
-  return { programs, programCount: programs.length, catalogSource: source };
+  return { programs, programCount: programs.length, catalogSource: 'database' };
 }
 
 export function resolvePublicProgramCount(programCount: number): number {
-  if (programCount > 0) return programCount;
-  return SITE_STATS.programsOffered;
+  return Math.max(0, programCount);
 }
 
 export async function buildProgramsListingMetadata(): Promise<Metadata> {
   const { programCount } = await getPublicProgramsPageData();
-  const count = resolvePublicProgramCount(programCount);
-  const description = `${count} career training programs grouped by pathway in healthcare, skilled trades, technology, beauty, human services, and business. Verified workforce-funded programs are identified separately from self-pay courses.`;
+  const description = `${programCount} career training programs grouped by pathway in healthcare, skilled trades, technology, beauty, human services, and business. Verified workforce-funded programs are identified separately from self-pay courses.`;
   const canonical = `${PLATFORM_DEFAULTS.siteUrl.replace(/\/$/, '')}/programs`;
   return {
     title: { absolute: 'Career Training Programs | Elevate for Humanity' },

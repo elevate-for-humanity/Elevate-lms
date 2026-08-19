@@ -40,8 +40,6 @@ export class FeatureUpgradeRequiredError extends Error {
   }
 }
 
-const ACCESSIBLE_SUBSCRIPTION_STATUSES = new Set(['active', 'trialing']);
-
 function addFeature(featureSet: Set<FeatureCode>, raw: string | null | undefined) {
   if (!raw) return;
   const normalized = normalizeFeatureCode(raw);
@@ -52,6 +50,17 @@ function applyAddonFallback(featureSet: Set<FeatureCode>, addonCode: string) {
   for (const feature of ADDON_FEATURE_FALLBACK[addonCode] ?? []) {
     featureSet.add(feature);
   }
+}
+
+function subscriptionAccessState(status: string | null | undefined, currentPeriodEnd: string | null | undefined) {
+  if (status === 'active') return { hasAccess: true, effectiveStatus: 'active' };
+  if (status !== 'trialing') return { hasAccess: false, effectiveStatus: status ?? null };
+
+  const end = currentPeriodEnd ? new Date(currentPeriodEnd).getTime() : NaN;
+  if (!Number.isFinite(end) || end <= Date.now()) {
+    return { hasAccess: false, effectiveStatus: 'trial_expired' };
+  }
+  return { hasAccess: true, effectiveStatus: 'trialing' };
 }
 
 /**
@@ -137,7 +146,8 @@ export async function getOrganizationFeatures(
   const planRow = Array.isArray(planJoin) ? planJoin[0] : planJoin;
   const planSlug = planRow?.slug ?? null;
   const planId = orgSub?.plan_id as string | undefined;
-  const subscriptionHasAccess = ACCESSIBLE_SUBSCRIPTION_STATUSES.has(orgSub?.status ?? '');
+  const accessState = subscriptionAccessState(orgSub?.status, orgSub?.current_period_end);
+  const subscriptionHasAccess = accessState.hasAccess;
 
   const featureSet = new Set<FeatureCode>();
 
@@ -165,49 +175,53 @@ export async function getOrganizationFeatures(
     PLAN_FEATURE_FALLBACK[planSlug].forEach((c) => featureSet.add(c));
   }
 
-  // Add-ons are tenant-keyed and may be sold independently of a base plan.
-  const { data: addonRows } = await supabase
-    .from('addon_subscriptions')
-    .select('addon_code, saas_addon_catalog ( feature_codes )')
-    .eq('organization_id', tenantId)
-    .eq('active', true);
-
+  // Add-ons cannot keep a tenant alive after the base subscription/trial has
+  // ended. They are only merged while the base subscription currently grants
+  // access.
   const activeAddonCodes: string[] = [];
-  for (const row of addonRows ?? []) {
-    const addonCode = normalizeAddonCode(row.addon_code);
-    activeAddonCodes.push(addonCode);
-    const catalogJoin = row.saas_addon_catalog as
-      | { feature_codes: string[] }
-      | { feature_codes: string[] }[]
-      | null;
-    const cat = Array.isArray(catalogJoin) ? catalogJoin[0] : catalogJoin;
-    const dbFeatureCodes = cat?.feature_codes ?? [];
-    for (const code of dbFeatureCodes) addFeature(featureSet, code);
-    if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);
-  }
+  if (subscriptionHasAccess) {
+    const { data: addonRows } = await supabase
+      .from('addon_subscriptions')
+      .select('addon_code, saas_addon_catalog ( feature_codes )')
+      .eq('organization_id', tenantId)
+      .eq('active', true);
 
-  const { data: legacyAddons } = await supabase
-    .from('organization_addons')
-    .select('addon_slug')
-    .eq('tenant_id', tenantId)
-    .eq('status', 'active');
+    for (const row of addonRows ?? []) {
+      const addonCode = normalizeAddonCode(row.addon_code);
+      activeAddonCodes.push(addonCode);
+      const catalogJoin = row.saas_addon_catalog as
+        | { feature_codes: string[] }
+        | { feature_codes: string[] }[]
+        | null;
+      const cat = Array.isArray(catalogJoin) ? catalogJoin[0] : catalogJoin;
+      const dbFeatureCodes = cat?.feature_codes ?? [];
+      for (const code of dbFeatureCodes) addFeature(featureSet, code);
+      if (!dbFeatureCodes.length) applyAddonFallback(featureSet, addonCode);
+    }
 
-  for (const leg of legacyAddons ?? []) {
-    const code = normalizeAddonCode(leg.addon_slug);
-    if (!activeAddonCodes.includes(code)) activeAddonCodes.push(code);
-    const { data: cat } = await supabase
-      .from('saas_addon_catalog')
-      .select('feature_codes')
-      .eq('code', code)
-      .maybeSingle();
-    const dbFeatureCodes = cat?.feature_codes ?? [];
-    for (const c of dbFeatureCodes) addFeature(featureSet, c);
-    if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
+    const { data: legacyAddons } = await supabase
+      .from('organization_addons')
+      .select('addon_slug')
+      .eq('tenant_id', tenantId)
+      .eq('status', 'active');
+
+    for (const leg of legacyAddons ?? []) {
+      const code = normalizeAddonCode(leg.addon_slug);
+      if (!activeAddonCodes.includes(code)) activeAddonCodes.push(code);
+      const { data: cat } = await supabase
+        .from('saas_addon_catalog')
+        .select('feature_codes')
+        .eq('code', code)
+        .maybeSingle();
+      const dbFeatureCodes = cat?.feature_codes ?? [];
+      for (const c of dbFeatureCodes) addFeature(featureSet, c);
+      if (!dbFeatureCodes.length) applyAddonFallback(featureSet, code);
+    }
   }
 
   // A legacy/manual license is a compatibility source only when there is no
   // recurring organization subscription. It must never resurrect features for
-  // a canceled or past-due Stripe subscription.
+  // a canceled, past-due, or expired Stripe subscription/trial.
   if (featureSet.size === 0 && !orgSub) {
     const { data: license } = await supabase
       .from('licenses')
@@ -218,16 +232,17 @@ export async function getOrganizationFeatures(
     for (const f of (license?.features as string[]) ?? []) addFeature(featureSet, f);
   }
 
-  const limits: PlanLimits =
-    (planRow?.limits as PlanLimits) ??
-    (planSlug && PLAN_LIMITS_FALLBACK[planSlug] ? PLAN_LIMITS_FALLBACK[planSlug] : { users: 1 });
+  const limits: PlanLimits = subscriptionHasAccess
+    ? ((planRow?.limits as PlanLimits) ??
+      (planSlug && PLAN_LIMITS_FALLBACK[planSlug] ? PLAN_LIMITS_FALLBACK[planSlug] : { users: 1 }))
+    : { users: 0 };
 
   return {
     organizationId: tenantId,
     billingOrganizationId,
     planSlug,
     planName: planRow?.name ?? null,
-    status: orgSub?.status ?? null,
+    status: accessState.effectiveStatus,
     features: [...featureSet],
     limits,
     activeAddonCodes: [...new Set(activeAddonCodes)],

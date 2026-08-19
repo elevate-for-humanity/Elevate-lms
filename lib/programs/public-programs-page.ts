@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { createPublicClient, isPublicSupabaseConfigured } from '@/lib/supabase/public';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { SITE_STATS } from '@/lib/site-stats';
+import { resolveSlug } from '@/lib/program-registry';
 import { loadPublishedProgramsListing, type ProgramsListingItem } from '@/lib/programs/load-program-catalog';
 import {
   getProgramFundingTier,
@@ -91,7 +92,11 @@ export type PublicProgramsPageData = {
 };
 
 export function getCanonicalPublicProgramSlug(slug: string): string {
-  return PUBLIC_PROGRAM_ALIASES[slug] ?? slug;
+  const publicCanonical = PUBLIC_PROGRAM_ALIASES[slug] ?? slug;
+  // Finalize every catalog destination through the same canonical registry used
+  // by /programs/[program]. This prevents catalog cards from emitting aliases
+  // that immediately redirect again (for example business-administration -> business).
+  return resolveSlug(publicCanonical) ?? publicCanonical;
 }
 
 export function getPublicProgramCategoryLabel(category: string | null | undefined): string {
@@ -124,8 +129,9 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
   }
 
   for (const verified of VERIFIED_WORKFORCE_FUNDED_PROGRAMS) {
-    rows.set(verified.slug, {
-      slug: verified.slug,
+    const slug = getCanonicalPublicProgramSlug(verified.slug);
+    rows.set(slug, {
+      slug,
       title: verified.title,
       description: verified.description,
       category: getPublicProgramCategoryLabel(verified.category),
@@ -133,7 +139,7 @@ function mapListingToRows(listing: ProgramsListingItem[]): ProgramsPageRow[] {
       credential: verified.credential,
       funding_eligible: true,
       funding_tier: 'workforce-funded',
-      funding_labels: getPublicFundingLabels(verified.slug),
+      funding_labels: getPublicFundingLabels(slug),
       top_jobs_stars: verified.topJobsStars,
     });
   }

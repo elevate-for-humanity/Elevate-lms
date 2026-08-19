@@ -59,6 +59,7 @@ export function PlatformShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
 
   const sections = getNavigationForRole(role);
   const autoBreadcrumbs = breadcrumbs || generateBreadcrumbs(pathname);
@@ -77,6 +78,25 @@ export function PlatformShell({
       if (event.key === 'Escape') {
         setSidebarOpen(false);
         menuButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !drawerRef.current) return;
+      const focusable = Array.from(
+        drawerRef.current.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
@@ -251,6 +271,7 @@ export function PlatformShell({
         )}
 
         <aside
+          ref={drawerRef}
           id="portal-navigation-drawer"
           role={sidebarOpen ? 'dialog' : undefined}
           aria-modal={sidebarOpen ? true : undefined}
@@ -328,7 +349,7 @@ export function PlatformShell({
         </aside>
 
         <main className="min-w-0 w-full flex-1 overflow-x-clip">
-          <div className="min-w-0 max-w-full p-3 sm:p-4 lg:p-6">
+          <div className="min-w-0 max-w-full overflow-x-auto break-words p-3 sm:p-4 lg:p-6">
             {children}
           </div>
         </main>

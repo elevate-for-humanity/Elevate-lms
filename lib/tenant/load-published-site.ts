@@ -1,9 +1,11 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { PublishedTenantSite, TenantSiteConfig } from '@/lib/tenant/site-types';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 type WebsiteRow = {
   id: string;
+  user_id: string | null;
   subdomain: string | null;
   site_name: string | null;
   organization_id: string | null;
@@ -19,6 +21,12 @@ function parseConfig(raw: unknown, fallbackName: string): TenantSiteConfig {
   return buildDefaultSiteConfig({ organizationName: fallbackName });
 }
 
+async function userOwnedSiteCanServe(db: Awaited<ReturnType<typeof requireAdminClient>>, userId: string | null) {
+  if (!userId) return true;
+  const access = await getWebsiteBuilderAccess(userId, db);
+  return access.allowed;
+}
+
 export async function loadPublishedSiteBySubdomain(
   subdomain: string,
 ): Promise<PublishedTenantSite | null> {
@@ -28,13 +36,14 @@ export async function loadPublishedSiteBySubdomain(
 
   const { data: site, error } = await db
     .from('user_websites')
-    .select('id, subdomain, site_name, organization_id, site_config, is_published')
+    .select('id, user_id, subdomain, site_name, organization_id, site_config, is_published')
     .eq('subdomain', slug)
     .eq('is_published', true)
     .maybeSingle();
 
   if (!error && site) {
     const row = site as WebsiteRow;
+    if (!(await userOwnedSiteCanServe(db, row.user_id))) return null;
     return {
       id: row.id,
       subdomain: row.subdomain ?? slug,
@@ -54,7 +63,7 @@ export async function loadPublishedSiteBySubdomain(
 
   const { data: orgSite } = await db
     .from('user_websites')
-    .select('id, subdomain, site_name, organization_id, site_config, is_published')
+    .select('id, user_id, subdomain, site_name, organization_id, site_config, is_published')
     .eq('organization_id', org.id)
     .order('updated_at', { ascending: false })
     .limit(1)
@@ -63,6 +72,7 @@ export async function loadPublishedSiteBySubdomain(
   if (orgSite) {
     const row = orgSite as WebsiteRow;
     if (row.is_published) {
+      if (!(await userOwnedSiteCanServe(db, row.user_id))) return null;
       return {
         id: row.id,
         subdomain: row.subdomain ?? slug,

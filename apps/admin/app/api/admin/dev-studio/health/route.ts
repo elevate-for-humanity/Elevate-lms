@@ -6,6 +6,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /** Canonical Admin-owned Dev Studio health endpoint. */
+// AUTH: Enforced inside handler via apiRequireDevStudio.
 export async function GET(req: NextRequest) {
   return handleDevStudioHealth(req);
 }

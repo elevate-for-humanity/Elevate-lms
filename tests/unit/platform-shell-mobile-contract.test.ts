@@ -48,11 +48,19 @@ describe('canonical portal shell mobile contract', () => {
     expect(shell).toContain('menuButtonRef.current?.focus()');
   });
 
-  it('protects mobile layouts from horizontal overflow and unsafe fixed widths', () => {
+  it('traps keyboard focus inside the open mobile drawer', () => {
+    expect(shell).toContain('const drawerRef = useRef<HTMLElement>(null)');
+    expect(shell).toContain("event.key !== 'Tab'");
+    expect(shell).toContain('drawerRef.current.querySelectorAll<HTMLElement>');
+    expect(shell).toContain('event.preventDefault()');
+  });
+
+  it('protects mobile layouts from page-level horizontal overflow and unsafe fixed widths', () => {
     expect(shell).toContain('min-h-dvh');
     expect(shell).toContain('overflow-x-clip');
     expect(shell).toContain('w-[min(20rem,calc(100vw-2.5rem))]');
     expect(shell).toContain('overflow-x-auto whitespace-nowrap');
+    expect(shell).toContain('max-w-full overflow-x-auto break-words');
   });
 
   it('enforces touch-sized navigation controls and links', () => {

@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { tenantSlugFromAppHost } from '@/lib/tenant/middleware-tenant-routing';
+import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 const RESERVED_ELEVATE_HOSTS = new Set([
   'elevateforhumanity.org',
@@ -24,7 +25,16 @@ export type ResolvedPublicTenant = {
   host: string;
 };
 
-/** Resolve only a currently published Website Builder tenant. */
+async function ownerCanServeWebsite(db: Awaited<ReturnType<typeof requireAdminClient>>, ownerUserId: string | null) {
+  // Legacy organization-owned sites without a user owner continue through the
+  // organization path. User-owned Website Builder sites require a current paid
+  // subscription or unexpired trial every time the public host is resolved.
+  if (!ownerUserId) return true;
+  const access = await getWebsiteBuilderAccess(ownerUserId, db);
+  return access.allowed;
+}
+
+/** Resolve only a currently published Website Builder tenant with active access. */
 export async function resolvePublishedTenantFromRequest(
   request: NextRequest,
 ): Promise<ResolvedPublicTenant | null> {
@@ -40,9 +50,9 @@ export async function resolvePublishedTenantFromRequest(
       .eq('subdomain', slug)
       .eq('is_published', true)
       .maybeSingle();
-    return data
-      ? { websiteId: data.id, ownerUserId: data.user_id ?? null, subdomain: data.subdomain, host }
-      : null;
+    if (!data) return null;
+    if (!(await ownerCanServeWebsite(db, data.user_id ?? null))) return null;
+    return { websiteId: data.id, ownerUserId: data.user_id ?? null, subdomain: data.subdomain, host };
   }
 
   if (RESERVED_ELEVATE_HOSTS.has(host) || host.endsWith('.elevateforhumanity.org')) {
@@ -63,7 +73,7 @@ export async function resolvePublishedTenantFromRequest(
     .eq('id', domain.website_id)
     .eq('is_published', true)
     .maybeSingle();
-  return website
-    ? { websiteId: website.id, ownerUserId: website.user_id ?? null, subdomain: website.subdomain, host }
-    : null;
+  if (!website) return null;
+  if (!(await ownerCanServeWebsite(db, website.user_id ?? null))) return null;
+  return { websiteId: website.id, ownerUserId: website.user_id ?? null, subdomain: website.subdomain, host };
 }

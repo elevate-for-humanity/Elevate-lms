@@ -1,364 +1,182 @@
 export const dynamic = 'force-static';
 
+import type { Metadata } from 'next';
 import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowRight, AlertTriangle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, CreditCard, Globe2, LockKeyhole, ShieldCheck, UsersRound } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
   title: 'Platform Licensing Guide',
   description:
-    'How the Elevate LMS platform license works — tiers, provisioning, billing, enforcement, and what you own versus what you access.',
+    'How Elevate platform licensing, checkout, organization access, roles, domains, billing enforcement, and support work.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/store/guides/licensing' },
   robots: { index: true, follow: true },
 };
 
-const MASTER_STATEMENT =
-  `All platform products are licensed access to systems operated by ${PLATFORM_DEFAULTS.orgName}. Ownership of software, infrastructure, and intellectual property is not transferred.`;
+const steps = [
+  {
+    icon: CreditCard,
+    title: 'Choose the current Store offer',
+    description:
+      'Use the Store or the applicable license product page for current pricing, included features, billing terms, and checkout. This guide does not duplicate commercial terms that can change.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Complete checkout and account setup',
+    description:
+      'Checkout and subscription state are handled through the platform payment workflow. Access is granted only through the entitlement and organization records created for the purchased product.',
+  },
+  {
+    icon: UsersRound,
+    title: 'Configure your organization and roles',
+    description:
+      'Authorized organization users receive role-based access. Admin, staff, instructor, learner, employer, Host Shop, workforce, and other protected surfaces remain subject to their server-side authorization rules.',
+  },
+  {
+    icon: Globe2,
+    title: 'Configure your platform address',
+    description:
+      'Supported products can use an Elevate-hosted address and, where the purchased plan includes it, a verified custom-domain workflow. Domain availability and verification are checked before use.',
+  },
+  {
+    icon: LockKeyhole,
+    title: 'Keep the subscription active',
+    description:
+      'Protected subscription features require a current entitlement. Expired trials and subscriptions that no longer qualify for access are blocked by the subscription gate while the underlying customer data is preserved according to the applicable product workflow.',
+  },
+];
 
-const STEPS = [
-  {
-    num: '1',
-    color: 'bg-brand-blue-600',
-    title: 'Choose Your License Type',
-    image: '/images/pages/store-guides-hero.webp',
-    imageAlt: 'License tier comparison — managed vs source-use',
-    content: null, // rendered inline below
-  },
-  {
-    num: '2',
-    color: 'bg-brand-blue-600',
-    title: 'Complete Checkout',
-    image: '/images/pages/platform-page-3.webp',
-    imageAlt: 'Stripe checkout for managed platform license',
-    content: (
-      <>
-        <p className="text-slate-600 mt-3 mb-4">
-          Managed licenses use self-service checkout. Pay the setup fee and first month via Stripe.
-          No sales call required — a link is sent to your email automatically after payment.
-        </p>
-        <ul className="space-y-2">
-          {['Enter your organization details', 'Accept the license agreement', 'Complete payment via Stripe'].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-1.5 flex-shrink-0" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </>
-    ),
-  },
-  {
-    num: '3',
-    color: 'bg-brand-blue-600',
-    title: 'Tenant Provisioning',
-    image: '/images/pages/store-licensing-hero.jpg',
-    imageAlt: 'Admin dashboard showing tenant provisioning and organization setup',
-    content: (
-      <>
-        <p className="text-slate-600 mt-3 mb-4">
-          After payment, your dedicated organization space is provisioned within 24 hours. You receive:
-        </p>
-        <ul className="space-y-2">
-          {[
-            'Admin account credentials',
-            'Organization subdomain (yourorg.elevateforhumanity.org)',
-            'Onboarding checklist and setup guide',
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-1.5 flex-shrink-0" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </>
-    ),
-  },
-  {
-    num: '4',
-    color: 'bg-brand-blue-600',
-    title: 'Invite Team & Assign Roles',
-    image: '/images/pages/store-licensing-enterprise-hero.webp',
-    imageAlt: 'Admin user management interface showing role assignment',
-    content: (
-      <>
-        <p className="text-slate-600 mt-3 mb-4">Add your team and assign roles based on what each person needs to do:</p>
-        <div className="space-y-2">
-          {[
-            { role: 'Admin', desc: 'Full platform access, user management, settings' },
-            { role: 'Instructor', desc: 'Course creation, grading, student management' },
-            { role: 'Staff', desc: 'Limited admin access, enrollment management' },
-          ].map((r) => (
-            <div key={r.role} className="flex items-start gap-2 text-sm">
-              <span className="font-semibold text-slate-900 w-20 flex-shrink-0">{r.role}</span>
-              <span className="text-slate-600">{r.desc}</span>
-            </div>
-          ))}
-        </div>
-      </>
-    ),
-  },
-  {
-    num: '5',
-    color: 'bg-brand-blue-600',
-    title: 'Add Programs & Content',
-    image: '/images/pages/admin-courses-partners-hero.webp',
-    imageAlt: 'Course builder interface showing program and content setup',
-    content: (
-      <>
-        <p className="text-slate-600 mt-3 mb-4">Set up your training programs and content. You can:</p>
-        <ul className="space-y-2">
-          {[
-            'Create courses from scratch using the course builder',
-            'Import existing content (SCORM, video, documents)',
-            'Use Elevate course templates as a starting point',
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-1.5 flex-shrink-0" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </>
-    ),
-  },
-  {
-    num: '6',
-    color: 'bg-brand-blue-600',
-    title: 'Domain Options',
-    image: '/images/pages/platform-page-5.webp',
-    imageAlt: 'Domain configuration options for the platform',
-    content: (
-      <>
-        <p className="text-slate-600 mt-3 mb-4">Choose how users access your platform:</p>
-        <div className="space-y-3">
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <h4 className="font-semibold text-slate-900 text-sm mb-1">Default: Subdomain</h4>
-            <p className="text-xs text-slate-600">yourorg.elevateforhumanity.org — works immediately, no setup required.</p>
-          </div>
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <h4 className="font-semibold text-slate-900 text-sm mb-1">Optional: Custom Domain</h4>
-            <p className="text-xs text-slate-600">lms.yourcompany.com — requires DNS configuration. We provide step-by-step instructions.</p>
-          </div>
-        </div>
-      </>
-    ),
-  },
-  {
-    num: '7',
-    color: 'bg-amber-500',
-    title: 'Billing & Enforcement',
-    image: '/images/pages/project-management.webp',
-    imageAlt: 'Billing and subscription management interface',
-    content: null, // rendered inline below
-  },
-  {
-    num: '8',
-    color: 'bg-brand-blue-600',
-    title: 'Support & SLA',
-    image: '/images/pages/platform-page-9.webp',
-    imageAlt: 'Support portal and SLA documentation',
-    content: (
-      <>
-        <p className="text-slate-600 mt-3 mb-4">All managed licenses include:</p>
-        <ul className="space-y-2">
-          {[
-            'Email support — 24–48 hour response time',
-            '99.9% uptime SLA',
-            'Automatic security updates',
-            'Daily backups with 30-day retention',
-          ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-blue-500 mt-1.5 flex-shrink-0" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </>
-    ),
-  },
+const verifiedCapabilities = [
+  'Role-based authentication and authorization for protected platform surfaces',
+  'Stripe-backed checkout and subscription status handling for configured Store products',
+  'Organization, tenant, membership, and entitlement records used to control access',
+  'Trial-expiration enforcement for configured self-service applications',
+  'Website Builder subscription enforcement for editor APIs and user-owned public hosting',
+  'Custom-domain verification workflows where the purchased Website Builder plan includes them',
+  'Health, deployment, audit, and integrity checks used by the production release process',
 ];
 
 export default function LicensingGuidePage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative h-56 md:h-72 overflow-hidden">
+    <main className="min-h-screen bg-white">
+      <section className="relative isolate overflow-hidden bg-slate-950">
+        <div className="absolute inset-0">
           <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/hero/hero-beauty-wellness.webp"
-          alt="Elevate platform licensing guide"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-slate-900/55" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-4xl mx-auto px-6 pb-8 w-full">
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">Platform Licensing Guide</h1>
-            <p className="text-slate-200 text-base max-w-xl">
-              How the license works, what you get, and what happens if you don&apos;t pay.
-            </p>
-          </div>
+            src="/images/pages/store-guides-licensing-hero.jpg"
+            alt="Platform licensing and organization administration"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-35"
+          />
+        </div>
+        <div className="relative mx-auto max-w-5xl px-6 py-20 sm:py-24">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-cyan-300">Store Guide</p>
+          <h1 className="mt-3 max-w-3xl text-4xl font-black tracking-tight text-white sm:text-5xl">
+            Platform licensing without hidden assumptions
+          </h1>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-200">
+            Understand how licensing connects checkout, organization access, role permissions, domains, and subscription enforcement. Current prices and contractual terms remain on the applicable Store product page.
+          </p>
         </div>
       </section>
 
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-5xl px-4 py-3">
           <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Guides', href: '/store/guides' }, { label: 'Licensing' }]} />
         </div>
       </div>
 
-      {/* Steps */}
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto space-y-12">
-
-          {/* Step 1 — License Type */}
-          <div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
-              <h2 className="text-xl font-bold text-slate-900">Choose Your License Type</h2>
-            </div>
-            <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-square" style={{ aspectRatio: '16/7' }}>
-              <Image
-                src="/images/pages/store-guides-licensing-hero.jpg"
-                alt="License tier comparison — managed vs source-use"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px" placeholder="empty"
-              />
-            </div>
-            <div className="grid md:grid-cols-2 gap-5">
-              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
-                <h3 className="font-bold text-brand-blue-900 mb-3">Managed Platform <span className="text-xs font-normal text-brand-blue-600 ml-1">(Recommended)</span></h3>
-                <ul className="text-sm text-brand-blue-800 space-y-1.5 mb-4">
-                  <li>• Setup: $7,500–$15,000</li>
-                  <li>• Monthly: $1,500–$3,500</li>
-                  <li>• Hosting, security, and updates handled by Elevate</li>
-                  <li>• Self-service checkout — no sales call required</li>
-                </ul>
-                <Link href="/store/licenses/managed-platform" className="text-brand-blue-600 font-semibold text-sm hover:underline inline-flex items-center gap-1">
-                  View Managed License <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-              <div className="bg-white border border-slate-200 rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-3">Source-Use <span className="text-xs font-normal text-slate-500 ml-1">(Enterprise)</span></h3>
-                <ul className="text-sm text-slate-600 space-y-1.5 mb-4">
-                  <li>• Starting at $75,000</li>
-                  <li>• Requires enterprise approval before purchase</li>
-                  <li>• Internal use only — no resale or sublicensing</li>
-                  <li>• You assume full operational responsibility</li>
-                </ul>
-                <Link href="/store/licenses" className="text-slate-600 font-semibold text-sm hover:underline inline-flex items-center gap-1">
-                  View Source-Use License <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
+      <section className="px-4 py-14">
+        <div className="mx-auto max-w-5xl">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 text-blue-950">
+            <h2 className="text-xl font-black">What a platform license means</h2>
+            <p className="mt-2 leading-7">
+              Platform purchases provide licensed access to systems operated by {PLATFORM_DEFAULTS.orgName}. Unless a separately executed agreement explicitly says otherwise, purchasing access does not transfer ownership of Elevate software, infrastructure, source code, trademarks, or other intellectual property.
+            </p>
           </div>
 
-          {/* Steps 2–6 and 8 */}
-          {STEPS.filter((s) => !['1', '7'].includes(s.num)).map((step) => (
-            <div key={step.num}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className={`w-8 h-8 ${step.color} text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0`}>
-                  {step.num}
-                </span>
-                <h2 className="text-xl font-bold text-slate-900">{step.title}</h2>
-              </div>
-              <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
-                <Image
-                  src={step.image}
-                  alt={step.imageAlt}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 896px" placeholder="empty"
-                />
-              </div>
-              {step.content}
-            </div>
-          ))}
-
-          {/* Step 7 — Billing & Enforcement (special treatment) */}
-          <div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="w-8 h-8 bg-amber-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">7</span>
-              <h2 className="text-xl font-bold text-slate-900">Billing &amp; Enforcement</h2>
-            </div>
-            <div className="relative w-full rounded-xl overflow-hidden mb-5 aspect-[4/3]" style={{ aspectRatio: '16/7' }}>
-              <Image
-                src="/images/pages/store-licensing-hero.webp"
-                alt="Billing and subscription management"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 896px" placeholder="empty"
-              />
-            </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-amber-900 mb-2">Payment Enforcement Policy</h4>
-                  <p className="text-amber-800 text-sm mb-3">
-                    An active subscription is required for continued platform access. Non-payment results in automatic lockout. This is not negotiable.
-                  </p>
-                  <ul className="space-y-1.5 text-sm text-amber-800">
-                    {[
-                      'Invoices sent monthly via Stripe',
-                      '7-day grace period after a failed payment',
-                      'Platform access suspended after the grace period',
-                      'Data retained for 30 days after suspension',
-                      'Reactivation requires payment of the outstanding balance',
-                    ].map((item) => (
-                      <li key={item} className="flex items-start gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber-600 mt-1.5 flex-shrink-0" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
+          <div className="mt-12 grid gap-5 lg:grid-cols-2">
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              return (
+                <article key={step.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-white">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.12em] text-slate-500">Step {index + 1}</p>
+                      <h2 className="mt-1 text-xl font-black text-slate-950">{step.title}</h2>
+                      <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{step.description}</p>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
           </div>
-
         </div>
       </section>
 
-      {/* Master Statement */}
-      <section className="py-8 px-4 bg-slate-50 border-t border-slate-200">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-sm text-slate-500 italic text-center">{MASTER_STATEMENT}</p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16 px-4 bg-brand-blue-700">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-white mb-8">
-            Try the full demo first, or go straight to license setup.
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-14">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-2xl font-black text-slate-950">Capabilities this guide can verify from the platform</h2>
+          <p className="mt-2 max-w-3xl text-slate-700">
+            These statements describe implemented platform controls. They are not uptime guarantees, support-response guarantees, certification claims, or promises of participant outcomes.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/store/demos"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition-colors"
-            >
-              Try Demo First
+          <div className="mt-7 grid gap-3 md:grid-cols-2">
+            {verifiedCapabilities.map((item) => (
+              <div key={item} className="flex gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-700" aria-hidden="true" />
+                <p className="text-sm font-semibold leading-6 text-slate-800">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-14">
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 p-7">
+            <h2 className="text-xl font-black text-slate-950">Self-service plans and products</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Use the Store as the current source for plan pricing, trial availability, included modules, add-ons, and checkout.
+            </p>
+            <Link href="/store#marketplace" className="mt-5 inline-flex items-center gap-2 font-black text-brand-blue-700 hover:underline">
+              View current Store offers <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link
-              href="/store/licenses/managed-platform"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-900 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition-colors"
-            >
-              Start License Setup <ArrowRight className="w-5 h-5" />
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 p-7">
+            <h2 className="text-xl font-black text-slate-950">Managed or enterprise licensing</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Enterprise scope, source-use rights, service commitments, implementation responsibilities, and any negotiated service levels must be stated in the applicable executed agreement rather than inferred from this public guide.
+            </p>
+            <Link href="/store/licenses" className="mt-5 inline-flex items-center gap-2 font-black text-brand-blue-700 hover:underline">
+              Review licensing options <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
       </section>
-    </div>
+
+      <section className="bg-slate-950 px-4 py-14 text-white">
+        <div className="mx-auto max-w-5xl text-center">
+          <h2 className="text-2xl font-black">Verify the exact product before purchase</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-slate-300">
+            Review the current Store offer and, for enterprise purchases, the executed agreement for the exact features, price, implementation scope, support terms, and service commitments that apply to your organization.
+          </p>
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/store" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-black text-slate-950">
+              Open Store
+            </Link>
+            <Link href="/contact" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/30 px-6 py-3 font-black text-white hover:bg-white/10">
+              Contact Elevate
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

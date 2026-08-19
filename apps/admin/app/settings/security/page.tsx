@@ -3,7 +3,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import SettingsFormClient, { SettingsField } from '@/components/admin/settings/SettingsFormClient';
-import MfaEnrollmentCard from '@/components/security/MfaEnrollmentCard';
+import MfaEnrollmentCard from '../../../components/security/MfaEnrollmentCard';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Security | Admin Settings' };

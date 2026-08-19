@@ -65,9 +65,10 @@ const adminConfig = {
     return {
       beforeFiles: [
         { source: '/api/devstudio/health', destination: '/api/admin/dev-studio/health' },
-        // Preserve historical Admin application URLs without changing the
-        // browser URL or maintaining a duplicate page tree. The Admin domain
-        // owns canonical pages at /applications/**.
+        // Preserve the historical application URL without maintaining a second
+        // application page tree. The broad /admin compatibility redirects below
+        // handle normal browser navigation; this rewrite protects callers that
+        // still expect the old application path to resolve transparently.
         { source: '/admin/applications/:path*', destination: '/applications/:path*' },
         ...legacyImageRewrites(),
       ],
@@ -97,6 +98,20 @@ const adminConfig = {
       {
         source: '/admin/dashboard',
         destination: '/dashboard',
+        permanent: true,
+      },
+      // Root-level compatibility for historical Admin links. The Admin domain
+      // is already the ownership boundary, so /admin/* is redundant. Keeping a
+      // single compatibility redirect prevents legacy breadcrumbs, emails and
+      // saved bookmarks from 404ing while all canonical UI stays at /*.
+      {
+        source: '/admin',
+        destination: '/dashboard',
+        permanent: true,
+      },
+      {
+        source: '/admin/:path*',
+        destination: '/:path*',
         permanent: true,
       },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },

@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "updated": "2026-08-14",
+  "version": 7,
+  "updated": "2026-08-19",
   "surfaces": {
     "studentApplication": {
       "function": "Complete public student training application",
@@ -121,8 +121,11 @@
       "canonical": { "app": "admin", "path": "/testing-center" }
     },
     "courseBuilder": {
-      "function": "Create and manage course content",
-      "canonical": { "app": "admin", "path": "/course-builder" },
+      "function": "Create and manage course content inside the Admin-owned Dev Studio",
+      "canonical": { "app": "admin", "path": "/studio/courses" },
+      "compatibility": [
+        { "app": "admin", "path": "/course-builder", "target": "/studio/courses" }
+      ],
       "informational": [
         { "app": "marketing", "path": "/store/course-builder", "purpose": "Public Store description that launches the Admin builder" }
       ]

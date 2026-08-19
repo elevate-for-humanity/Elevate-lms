@@ -15,7 +15,7 @@ export type ApplySurface = {
 export const PROGRAM_APPLY_LINKS: ApplySurface[] = [
   { section: 'Program applies', name: 'Barber apprentice apply', href: '/programs/barber-apprenticeship/apply', api: '/api/applications' },
   { section: 'Program applies', name: 'Cosmetology apprentice apply', href: '/programs/cosmetology-apprenticeship/apply', api: '/api/applications' },
-  { section: 'Program applies', name: 'HVAC technician apply', href: '/programs/hvac-technician/apply', api: '/api/applications' },
+  { section: 'Program applies', name: 'HVAC technician apply', href: '/apply/student?program=hvac-technician', api: '/api/applications', note: 'Canonical student application; legacy HVAC apply route redirects here.' },
   { section: 'Program applies', name: 'Esthetician apprentice apply', href: '/programs/esthetician-apprenticeship/apply', api: '/api/applications' },
   { section: 'Program applies', name: 'Nail technician apprentice apply', href: '/programs/nail-technician-apprenticeship/apply', api: '/api/applications' },
   { section: 'Program applies', name: 'Peer recovery specialist apply', href: '/programs/peer-recovery-specialist/apply', api: '/api/applications' },

@@ -27,7 +27,7 @@ export async function POST(
 
   const access = await getWebsiteBuilderAccess(user.id, supabase);
   if (!access.allowed) {
-    return NextResponse.json({ error: 'Website Builder subscription or active trial required' }, { status: 403 });
+    return NextResponse.json({ error: 'Website Builder subscription or active trial required', reason: access.reason, upgradeUrl: access.upgradeUrl }, { status: 403 });
   }
 
   const { data: site } = await supabase

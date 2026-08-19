@@ -10,6 +10,7 @@ import StoreFAQ from './StoreFAQ';
 import { ROICalculator } from '@/components/store/ROICalculator';
 import { UnifiedSalesMarketplace } from '@/components/store/UnifiedSalesMarketplace';
 import { GuidedProductInterview } from '@/components/store/GuidedProductInterview';
+import { StoreGlossary } from '@/components/store/StoreGlossary';
 import WebsiteBuilderCommercial from '@/components/store/WebsiteBuilderCommercial';
 
 export const metadata: Metadata = {
@@ -88,6 +89,8 @@ export default function StorePage() {
           <div className="mt-10"><ROICalculator /></div>
         </div>
       </section>
+
+      <StoreGlossary />
 
       <section className="border-y border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto grid max-w-5xl gap-6 px-5 md:grid-cols-[1fr_auto] md:items-center">

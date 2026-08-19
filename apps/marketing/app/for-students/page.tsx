@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { GraduationCap, Briefcase, DollarSign, Users, ArrowRight, CheckCircle } from 'lucide-react';
+import { GraduationCap, Briefcase, DollarSign, Users, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'For Students | Elevate for Humanity',
@@ -47,17 +47,17 @@ export default function ForStudentsPage() {
             <span className="bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium">Student Resources</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">For Students</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">Your gateway to learning and career support. Start your journey to a rewarding career today.</p>
+          <p className="text-xl text-blue-100 max-w-2xl">Your gateway to learning and career support. Explore training, funding, credentials, and next steps in one place.</p>
         </div>
       </section>
-      
+
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 mb-4">Your Path to Success</h2>
             <p className="text-xl text-slate-600">Follow these steps to start your career training journey</p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
             {steps.map((step, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm text-center relative">
@@ -71,13 +71,13 @@ export default function ForStudentsPage() {
               </div>
             ))}
           </div>
-          
+
           <div className="text-center mb-12">
             <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700 transition-colors">
               Start Your Application <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
-          
+
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-sm mb-16">
             <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Explore Programs</h2>
             <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -89,7 +89,7 @@ export default function ForStudentsPage() {
               ))}
             </div>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {benefits.map((benefit, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
@@ -99,7 +99,7 @@ export default function ForStudentsPage() {
               </div>
             ))}
           </div>
-          
+
           <div className="bg-brand-blue-700 rounded-2xl p-8 md:p-12 text-white mb-16">
             <h2 className="text-2xl font-bold mb-8 text-center">Funding Options</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -116,10 +116,10 @@ export default function ForStudentsPage() {
               </Link>
             </div>
           </div>
-          
+
           <div className="text-center">
             <h3 className="text-xl font-bold text-slate-900 mb-4">Ready to Get Started?</h3>
-            <p className="text-slate-600 mb-6">Join thousands of students who have transformed their careers with Elevate.</p>
+            <p className="text-slate-600 mb-6">Review your program options, funding eligibility, and application steps with Elevate.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/apply" className="bg-brand-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-brand-blue-700 transition-colors">
                 Apply Now
@@ -134,4 +134,3 @@ export default function ForStudentsPage() {
     </div>
   );
 }
-

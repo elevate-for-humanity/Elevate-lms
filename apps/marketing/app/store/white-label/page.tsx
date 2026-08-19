@@ -2,91 +2,21 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Cloud, Shield, Zap, Headphones, Globe, Palette } from 'lucide-react';
+import { Check, Cloud, Shield, Zap, Headphones, Globe, Palette, ArrowRight } from 'lucide-react';
 
 const FEATURES = [
-  {
-    icon: Cloud,
-    title: 'Zero DevOps',
-    description: 'We handle hosting, updates, security patches, and scaling. You focus on training.',
-  },
-  {
-    icon: Palette,
-    title: 'Your Branding',
-    description: 'Custom logo, colors, domain. Your students see your brand, not ours.',
-  },
-  {
-    icon: Globe,
-    title: 'Custom Domain',
-    description: 'Use your own domain (training.yourorg.com) or get a hosted portal (app.elevateforhumanity.org/admin?org=yourorg).',
-  },
-  {
-    icon: Shield,
-    title: '99.9% Uptime SLA',
-    description: 'Enterprise-grade infrastructure with guaranteed availability.',
-  },
-  {
-    icon: Zap,
-    title: 'Instant Updates',
-    description: 'Get new features automatically. No manual upgrades needed.',
-  },
-  {
-    icon: Headphones,
-    title: 'Priority Support',
-    description: 'Dedicated support team with 4-hour response time.',
-  },
+  { icon: Cloud, title: 'Managed Infrastructure', description: 'Hosting, deployment configuration, health checks, and application updates are operated through the managed platform release process.' },
+  { icon: Palette, title: 'Organization Branding', description: 'Configure approved organization branding, including logo, colors, and supported presentation settings.' },
+  { icon: Globe, title: 'Domain Options', description: 'Use the platform address or connect an approved custom domain through the supported DNS and TLS workflow.' },
+  { icon: Shield, title: 'Security Controls', description: 'Role-based access, audit logging, RLS-protected data, privileged-role MFA enforcement, and controlled server credentials support the security model.' },
+  { icon: Zap, title: 'Managed Releases', description: 'Application changes move through source control, CI validation, immutable builds, health verification, and production deployment controls.' },
+  { icon: Headphones, title: 'Support', description: 'Support channels and response commitments follow the purchased plan or signed agreement.' },
 ];
 
-const PRICING = [
-  {
-    name: 'Growth',
-    price: '$499',
-    interval: '/month',
-    description: 'For growing training providers',
-    features: [
-      'Up to 1,000 students',
-      'Custom subdomain',
-      'Your logo & colors',
-      'Email support',
-      'Weekly backups',
-    ],
-    cta: 'Start Free Trial',
-    highlighted: false,
-  },
-  {
-    name: 'Scale',
-    price: '$999',
-    interval: '/month',
-    description: 'For established organizations',
-    features: [
-      'Up to 5,000 students',
-      'Custom domain included',
-      'Full white-label branding',
-      'Priority support (4hr)',
-      'Daily backups',
-      'API access',
-      'SSO integration',
-    ],
-    cta: 'Start Free Trial',
-    highlighted: true,
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    interval: '',
-    description: 'For large organizations',
-    features: [
-      'Unlimited students',
-      'Multiple domains',
-      'Dedicated infrastructure',
-      'Dedicated success manager',
-      'Custom integrations',
-      'SLA guarantee',
-      'On-premise option',
-    ],
-    cta: 'Contact Sales',
-    highlighted: false,
-  },
+const PLAN_SCOPE = [
+  { name: 'Growth', description: 'For a training organization using standard managed-platform workflows.', features: ['Organization workspace', 'Brand configuration', 'Managed hosting', 'Standard support terms', 'Plan-scoped capacity'] },
+  { name: 'Scale', description: 'For organizations requiring expanded operations and integrations.', features: ['Expanded role-based workspaces', 'Custom-domain option', 'Integration options', 'Expanded support terms', 'Plan-scoped capacity'] },
+  { name: 'Enterprise', description: 'For larger organizations with procurement-defined requirements.', features: ['Contract-scoped capacity', 'Deployment and identity options', 'Custom integration scope', 'Security and acceptance requirements', 'Contract-defined service terms'] },
 ];
 
 export default function WhiteLabelPage() {
@@ -96,169 +26,54 @@ export default function WhiteLabelPage() {
 
   const checkSubdomain = async () => {
     if (!subdomain || subdomain.length < 3) return;
-    
     setChecking(true);
     try {
-      const res = await fetch(`/api/provisioning/tenant?subdomain=${subdomain}`);
+      const res = await fetch(`/api/provisioning/tenant?subdomain=${encodeURIComponent(subdomain)}`);
       const data = await res.json();
-      setAvailable(data.available);
+      setAvailable(Boolean(data.available));
     } catch {
       setAvailable(null);
+    } finally {
+      setChecking(false);
     }
-    setChecking(false);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="bg-slate-50 py-16 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
-            White-Label Solution
-          </span>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-            Your LMS. Your Brand.<br />We Handle the Rest.
-          </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
-            Launch a fully-branded learning platform in minutes. No servers to manage,
-            no code to write. Just your training content and your students.
-          </p>
+    <main className="min-h-screen bg-white">
+      <section className="bg-slate-950 px-4 py-20 text-white">
+        <div className="mx-auto max-w-6xl text-center">
+          <span className="inline-block rounded-full bg-brand-blue-500/15 px-4 py-1 text-sm font-bold text-brand-blue-200">Managed organization platform</span>
+          <h1 className="mx-auto mt-5 max-w-4xl text-4xl font-black sm:text-5xl">Your Organization. Your Brand. One Managed Platform.</h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">Configure an organization workspace without creating a second codebase or unsupported infrastructure promise.</p>
 
-          {/* Subdomain Checker */}
-          <div className="max-w-md mx-auto bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-            <label className="block text-left text-sm font-medium text-slate-700 mb-2">
-              Check your organization ID availability
-            </label>
-            <div className="flex gap-2">
-              <div className="flex-1 flex items-center bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
-                <input
-                  type="text"
-                  value={subdomain}
-                  onChange={(e) => {
-                    setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-                    setAvailable(null);
-                  }}
-                  placeholder="yourorg"
-                  className="flex-1 px-4 py-3 text-slate-900 placeholder-slate-400 outline-none bg-transparent"
-                />
-                <span className="text-slate-500 pr-4 text-xs">app.elevateforhumanity.org/admin?org=</span>
-              </div>
-              <button
-                onClick={checkSubdomain}
-                disabled={checking || subdomain.length < 3}
-                className="px-6 py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
-              >
-                {checking ? '...' : 'Check'}
-              </button>
+          <div className="mx-auto mt-9 max-w-xl rounded-2xl border border-white/10 bg-white p-6 text-left text-slate-950 shadow-xl">
+            <label className="block text-sm font-bold text-slate-800">Check organization ID availability</label>
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+              <input type="text" value={subdomain} onChange={(event) => { setSubdomain(event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')); setAvailable(null); }} placeholder="yourorg" className="min-h-12 flex-1 rounded-xl border border-slate-300 px-4 outline-none focus:ring-2 focus:ring-brand-blue-600" />
+              <button type="button" onClick={checkSubdomain} disabled={checking || subdomain.length < 3} className="min-h-12 rounded-xl bg-brand-blue-700 px-6 font-bold text-white disabled:opacity-50">{checking ? 'Checking…' : 'Check'}</button>
             </div>
-            {available !== null && (
-              <p className={`mt-2 text-sm ${available ? 'text-brand-green-600' : 'text-red-600'}`}>
-                {available ? '✓ Available!' : '✗ Already taken'}
-              </p>
-            )}
+            {available !== null ? <p className={`mt-2 text-sm font-bold ${available ? 'text-green-700' : 'text-red-700'}`}>{available ? 'Available' : 'Already in use'}</p> : null}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-12">
-            Everything You Need, Nothing You Don't
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {FEATURES.map((feature) => (
-              <div key={feature.title} className="p-6 rounded-xl border border-slate-200 hover:border-blue-300 transition-colors">
-                <feature.icon className="w-10 h-10 text-blue-600 mb-4" />
-                <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
-                <p className="text-slate-600">{feature.description}</p>
-              </div>
-            ))}
-          </div>
+      <section className="mx-auto max-w-6xl px-4 py-16">
+        <h2 className="text-center text-3xl font-black text-slate-950">Managed capabilities</h2>
+        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((feature) => <article key={feature.title} className="rounded-2xl border border-slate-200 p-6 shadow-sm"><feature.icon className="h-9 w-9 text-brand-blue-700" /><h3 className="mt-4 text-lg font-black text-slate-950">{feature.title}</h3><p className="mt-2 leading-7 text-slate-600">{feature.description}</p></article>)}
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-4">
-            Simple, Predictable Pricing
-          </h2>
-          <p className="text-center text-slate-600 mb-12">
-            All plans include 14-day free trial. No credit card required to start.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {PRICING.map((plan) => (
-              <div
-                key={plan.name}
-                className={`rounded-2xl p-8 ${
-                  plan.highlighted
-                    ? 'bg-slate-900 text-white ring-4 ring-blue-500'
-                    : 'bg-white border border-slate-200'
-                }`}
-              >
-                <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-                <p className={`text-sm mb-4 ${plan.highlighted ? 'text-slate-300' : 'text-slate-600'}`}>
-                  {plan.description}
-                </p>
-                <div className="mb-6">
-                  <span className="text-4xl font-black">{plan.price}</span>
-                  <span className={plan.highlighted ? 'text-slate-300' : 'text-slate-500'}>
-                    {plan.interval}
-                  </span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <Check className={`w-5 h-5 flex-shrink-0 ${plan.highlighted ? 'text-blue-400' : 'text-brand-green-600'}`} />
-                      <span className={plan.highlighted ? 'text-slate-200' : 'text-slate-700'}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={plan.name === 'Enterprise' ? '/contact?subject=license' : '/store/white-label/signup'}
-                  className={`block text-center py-3 rounded-lg font-bold transition-colors ${
-                    plan.highlighted
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-slate-900 hover:bg-slate-800 text-white'
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <h2 className="text-center text-3xl font-black text-slate-950">Choose scope before price</h2>
+          <p className="mx-auto mt-3 max-w-3xl text-center leading-7 text-slate-600">Current pricing and included limits are presented in the applicable store offer or agreement. This page describes service scope without inventing learner, storage, response-time, backup, or availability guarantees.</p>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {PLAN_SCOPE.map((plan) => <article key={plan.name} className="rounded-2xl border border-slate-200 bg-white p-7"><h3 className="text-2xl font-black text-slate-950">{plan.name}</h3><p className="mt-2 min-h-16 text-slate-600">{plan.description}</p><ul className="mt-5 space-y-3">{plan.features.map((feature) => <li key={feature} className="flex gap-2 text-sm font-semibold text-slate-700"><Check className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />{feature}</li>)}</ul></article>)}
           </div>
+          <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/store/licenses" className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-blue-700 px-7 py-3 font-bold text-white">View Current License Offers <ArrowRight className="h-4 w-4" /></Link><Link href="/contact" className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-7 py-3 font-bold text-slate-900">Discuss Enterprise Scope</Link></div>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="py-20">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black mb-4">
-            Ready to Launch Your Training Platform?
-          </h2>
-          <p className="text-slate-600 mb-8">
-            Join 50+ organizations already using Elevate LMS to train their workforce.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/store/white-label"
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold"
-            >
-              Start Free Trial
-            </Link>
-            <Link
-              href="/contact?subject=license"
-              className="px-8 py-4 border-2 border-slate-900 hover:bg-slate-900 hover:text-white rounded-lg font-bold transition-colors"
-            >
-              Talk to Sales
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

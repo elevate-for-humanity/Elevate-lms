@@ -6,10 +6,8 @@
 import { getStaticProgram, normalizePublicProgram } from '@/data/programs/index';
 import { resolveProgram, resolveSlug } from '@/lib/program-registry';
 import { createPublicClient } from '@/lib/supabase/public';
-import { isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 import {
   buildProgramSchemaFromDb,
-  buildProgramSchemaFromPartial,
   buildProgramSchemaFromRegistry,
   type DbProgramRow,
 } from '@/lib/programs/build-program-schema';
@@ -31,9 +29,19 @@ function withCanonicalProgramMedia(program: ProgramSchema, slug: string): Progra
   });
 }
 
-async function overlayDbFields(program: ProgramSchema, slug: string): Promise<ProgramSchema> {
+/**
+ * Database overlay is only allowed for synthesized registry entries that do not
+ * have a full static ProgramSchema. Full static schemas are the public contract
+ * for title, description, duration, credentials, pricing and compliance copy.
+ * This prevents stale program-table seeds from changing a program page while
+ * the catalog is using the canonical static definition.
+ */
+async function overlayDbFieldsForSynthesizedProgram(
+  program: ProgramSchema,
+  slug: string,
+): Promise<ProgramSchema> {
   const db = createPublicClient();
-  if (!db) return program;
+  if (!db) return withCanonicalProgramMedia(program, slug);
 
   const { data: row } = await db
     .from('programs')
@@ -43,15 +51,7 @@ async function overlayDbFields(program: ProgramSchema, slug: string): Promise<Pr
     .eq('slug', slug)
     .maybeSingle();
 
-  if (!row) return program;
-
-  // Registered-apprenticeship requirements and public compliance copy are
-  // governed by RAPIDS_CONFIG through the static ProgramSchema. Database rows
-  // may carry historical values from older seeds, so they must never override
-  // the registered OJL/RTI requirements, descriptive copy, or canonical media.
-  if (isRAPIDSProgram(slug)) {
-    return withCanonicalProgramMedia(program, slug);
-  }
+  if (!row) return withCanonicalProgramMedia(program, slug);
 
   return withCanonicalProgramMedia(
     {
@@ -75,8 +75,7 @@ async function overlayDbFields(program: ProgramSchema, slug: string): Promise<Pr
  *
  * Ownership order matters: a full static program definition is authoritative
  * for its own slug. Only slugs without a direct static definition are passed
- * through the legacy alias resolver. This prevents a thin registry alias from
- * shadowing a richer public program page.
+ * through the legacy alias resolver and, if necessary, the database.
  */
 export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgramPage | null> {
   const normalizedRawSlug = rawSlug.toLowerCase().trim();
@@ -88,10 +87,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   const directStaticProgram = getStaticProgram(normalizedRawSlug);
   if (directStaticProgram) {
     return {
-      program: withCanonicalProgramMedia(
-        await overlayDbFields(directStaticProgram, normalizedRawSlug),
-        directStaticProgram.slug,
-      ),
+      program: withCanonicalProgramMedia(directStaticProgram, directStaticProgram.slug),
       synthesized: false,
     };
   }
@@ -105,7 +101,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   const staticProgram = getStaticProgram(slug);
   if (staticProgram) {
     return {
-      program: withCanonicalProgramMedia(await overlayDbFields(staticProgram, slug), staticProgram.slug),
+      program: withCanonicalProgramMedia(staticProgram, staticProgram.slug),
       synthesized: false,
     };
   }
@@ -114,10 +110,7 @@ export async function loadProgramForPage(rawSlug: string): Promise<LoadedProgram
   if (registryEntry?.active) {
     const base = buildProgramSchemaFromRegistry(registryEntry);
     return {
-      program: withCanonicalProgramMedia(
-        await overlayDbFields(base, registryEntry.slug),
-        registryEntry.slug,
-      ),
+      program: await overlayDbFieldsForSynthesizedProgram(base, registryEntry.slug),
       synthesized: true,
     };
   }

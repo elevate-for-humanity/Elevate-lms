@@ -62,8 +62,6 @@ scanSourceFiles(['app', 'apps', 'components', 'content', 'data', 'lib'], (_file,
 const missingLocalMedia = [];
 const aliasedLocalMedia = [];
 for (const [url, owners] of mediaReferences) {
-  // Historical/draft video references are not automatically production assets.
-  // Live canonical registry entries are validated separately below.
   if (url.startsWith('/videos/')) continue;
   const localPath = path.join(publicDir, url.replace(/^\//, ''));
   if (fs.existsSync(localPath)) continue;
@@ -177,7 +175,7 @@ if (duplicateProgramImages.length) {
 console.log('\n── Portal picture coverage ──');
 const portalRequirements = [
   ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'learningTools']],
-  ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Your workspaces']],
+  ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Apprentice tools']],
   ['Host Shop', 'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
   ['Program Holder', 'apps/lms/app/program-holder/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
 ];

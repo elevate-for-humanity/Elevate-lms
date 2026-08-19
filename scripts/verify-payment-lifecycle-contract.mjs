@@ -48,7 +48,7 @@ requireText(affirmCapture, 'await createEnrollmentFromPayment({', 'Affirm must u
 requireText(affirmCapture, "paymentProvider: 'affirm'", 'Affirm enrollment must persist the provider');
 requireText(affirmCapture, "'enrollment_review_required'", 'Post-capture enrollment failure must route to operations review without recapture');
 requireText(enrollmentActivator, "payment_status: 'paid'", 'Canonical payment enrollment must persist paid status');
-requireText(enrollmentActivator, "payment_provider: input.paymentProvider", 'Canonical payment enrollment must persist payment provider');
+requireText(enrollmentActivator, 'payment_provider: paymentProvider', 'Canonical payment enrollment must persist payment provider');
 
 // Platform Stripe checkout: authenticated workspace billing, canonical prices,
 // no duplicate active subscription, lifecycle synchronization, and traceability.

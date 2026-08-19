@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+// Deployment retrigger: 2026-08-19 Admin zero-downtime rollout.
 /**
  * Canonical Northflank production service configurator.
  *

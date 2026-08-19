@@ -51,15 +51,16 @@ export async function getUserEntitlements(userId: string): Promise<string[]> {
     .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
 
   if (error) {
-    logger.error('Error fetching entitlements:', error);
+    logger.error('Error fetching entitlement:', error);
     return [];
   }
 
-  return data.map((e) => e.entitlement_key);
+  return data.map((e: any) => e.entitlement_key);
 }
 
 /**
- * Get user's active subscription
+ * Get user's active subscription. A stale local `trialing` status never grants
+ * access after its recorded Stripe trial end.
  */
 export async function getActiveSubscription(userId: string) {
   const supabaseAdmin = await getSupabaseAdmin();
@@ -68,10 +69,16 @@ export async function getActiveSubscription(userId: string) {
     .select('*, store_products(*), store_prices(*)')
     .eq('user_id', userId)
     .in('status', ['trialing', 'active'])
-    .single();
+    .maybeSingle();
 
-  if (error) {
-    return null;
+  if (error || !data) return null;
+
+  if (data.status === 'trialing') {
+    const trialEnd = data.trial_end ? new Date(data.trial_end).getTime() : NaN;
+    if (!Number.isFinite(trialEnd) || trialEnd <= Date.now()) {
+      // Fail closed even when Stripe/webhook synchronization is delayed.
+      return null;
+    }
   }
 
   return data;
@@ -175,7 +182,7 @@ export async function hasDigitalProductAccess(userId: string, productId: string)
     .eq('user_id', userId)
     .eq('product_id', productId)
     .eq('status', 'active')
-    .single();
+    .maybeSingle();
 
   if (error) {
     return false;

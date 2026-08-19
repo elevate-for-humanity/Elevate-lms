@@ -19,10 +19,21 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError } from '@/lib/api/safe-error';
 import { resetJob, markRendering, markComplete, markFailed } from '@/lib/video/job-queue';
-import { renderLessonVideo, inferDomainKey } from '@/lib/video/remotion-render';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
 import { readFile, unlink } from 'fs/promises';
 import path from 'path';
+
+// Keep Remotion/Rspack native binaries out of the LMS webpack graph. The
+// renderer is loaded only when an authenticated admin actually requests a
+// regeneration, matching the canonical Admin video-generation boundary.
+type RemotionRender = typeof import('@/lib/video/remotion-render');
+let remotionRender: RemotionRender | null = null;
+async function getRemotionRender(): Promise<RemotionRender> {
+  if (!remotionRender) {
+    remotionRender = await import('@/lib/video/remotion-render');
+  }
+  return remotionRender;
+}
 
 export const runtime = 'nodejs';
 export const maxDuration = 600;
@@ -45,9 +56,7 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createClient();
   const adminDb = await requireAdminClient();
-  if (!adminDb) return safeError('Service unavailable', 503);
 
-  // Fetch lesson + course
   const { data: lesson } = await supabase
     .from('course_lessons')
     .select('id, title, script, bullet_points, course_id, video_status')
@@ -63,10 +72,8 @@ export async function POST(request: NextRequest) {
     .eq('id', lesson.course_id)
     .maybeSingle();
 
-  // Create fresh job (preserves old job history)
   const job = await resetJob(lessonId, lesson.course_id);
 
-  // Fire render in background
   runRender({
     jobId: job.id,
     lessonId,
@@ -76,7 +83,6 @@ export async function POST(request: NextRequest) {
     bulletPoints: Array.isArray(lesson.bullet_points) ? lesson.bullet_points : [],
     adminDb,
   }).catch((err) => {
-    // audit-safe: err goes to logger only, not HTTP response
     logger.error('[VideoRegenerate] Background render threw', normalizeError(err, 'Video regeneration error'), getErrorContext(err));
   });
 
@@ -90,8 +96,6 @@ export async function POST(request: NextRequest) {
     { status: 202 },
   );
 }
-
-// ── Background render (shared with /generate) ─────────────────────────────────
 
 async function runRender(opts: {
   jobId: string;
@@ -107,6 +111,7 @@ async function runRender(opts: {
   await markRendering(jobId);
 
   try {
+    const { renderLessonVideo, inferDomainKey } = await getRemotionRender();
     const result = await renderLessonVideo({
       lessonId,
       title: lessonTitle,
@@ -152,7 +157,6 @@ async function runRender(opts: {
       duration_seconds: result.duration,
     });
   } catch (err) {
-    // audit-safe: message stored in DB job record only, not HTTP response
     const failMsg = err instanceof Error ? err.message : String(err);
     await markFailed(jobId, failMsg);
   }

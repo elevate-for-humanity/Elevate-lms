@@ -31,9 +31,11 @@ const nextConfig = {
     };
   },
   async redirects() {
-    // Public cross-service convenience routes only. Private Admin aliases are
-    // intentionally absent; callers must use the canonical Admin hostname.
+    // Compatibility redirects live here instead of redirect-only page files.
+    // Internal application code must point directly at the canonical routes.
     return [
+      { source: '/reset', destination: '/support/reset-browser', permanent: true },
+      { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },
       { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: true },

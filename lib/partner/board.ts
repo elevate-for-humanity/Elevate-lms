@@ -11,11 +11,16 @@ import {
 export const HOST_SHOP_ADMIN_COOKIE = '__efh_host_shop_partner';
 
 export type TradeTarget = {
-  hours: number | null;
+  programSlug: string | null;
+  hours: null;
   label: string;
-  progressModel: 'time_based' | 'competency_based';
+  progressModel: 'competency_based' | 'unconfigured';
+  registered: boolean;
   competencyCount?: number;
   rtiHours?: number;
+  rapidsCode?: string;
+  mentorRatio?: string;
+  blockingReason?: string;
 };
 
 const REGISTERED_PROGRAM_ALIASES: Record<string, string> = {
@@ -25,36 +30,42 @@ const REGISTERED_PROGRAM_ALIASES: Record<string, string> = {
   esthetics: 'esthetician-apprenticeship',
   'esthetician-apprenticeship': 'esthetician-apprenticeship',
   'esthetics-apprenticeship': 'esthetics-apprenticeship',
-  'nail-tech': 'nail-tech-apprenticeship',
-  nail_tech: 'nail-tech-apprenticeship',
+  'nail-tech': 'nail-technician-apprenticeship',
+  nail_tech: 'nail-technician-apprenticeship',
   nail_technician: 'nail-technician-apprenticeship',
-  'nail-tech-apprenticeship': 'nail-tech-apprenticeship',
+  nail: 'nail-technician-apprenticeship',
+  'nail-tech-apprenticeship': 'nail-technician-apprenticeship',
   'nail-technician-apprenticeship': 'nail-technician-apprenticeship',
-  manicurist: 'manicurist-apprenticeship',
-  'manicurist-apprenticeship': 'manicurist-apprenticeship',
-};
-
-const LEGACY_NONREGISTERED_TARGETS: Record<string, TradeTarget> = {
-  cosmetology: { hours: 2000, label: 'Cosmetology Apprenticeship', progressModel: 'time_based' },
-  'cosmetology-apprenticeship': { hours: 2000, label: 'Cosmetology Apprenticeship', progressModel: 'time_based' },
-  hairstylist: { hours: 2000, label: 'Cosmetology Apprenticeship', progressModel: 'time_based' },
-  training_site: { hours: 2000, label: 'Apprenticeship', progressModel: 'time_based' },
+  manicurist: 'nail-technician-apprenticeship',
+  'manicurist-apprenticeship': 'nail-technician-apprenticeship',
 };
 
 export function resolveTradeTarget(programSlug: string | null | undefined): TradeTarget {
-  const raw = programSlug || 'training_site';
+  const raw = String(programSlug || '').trim().toLowerCase();
   const canonical = REGISTERED_PROGRAM_ALIASES[raw] || raw;
-  const registered = getRegisteredProgramStandard(canonical);
+  const registered = canonical ? getRegisteredProgramStandard(canonical) : null;
   if (registered) {
     return {
-      hours: registered.completion.fixedOjlCompletionHours,
+      programSlug: registered.canonicalProgramSlug,
+      hours: null,
       label: `Registered ${registered.standard.occupationTitle} Apprenticeship`,
       progressModel: 'competency_based',
+      registered: true,
       competencyCount: registered.completion.competencyCount,
       rtiHours: registered.completion.requiredRtiHours,
+      rapidsCode: registered.standard.rapidsCode,
+      mentorRatio: registered.standard.apprenticeToMentorRatio,
     };
   }
-  return LEGACY_NONREGISTERED_TARGETS[raw] || LEGACY_NONREGISTERED_TARGETS.training_site;
+
+  return {
+    programSlug: canonical || null,
+    hours: null,
+    label: raw ? `${raw.replaceAll('-', ' ')} — registered standard not configured` : 'Registered apprenticeship standard not configured',
+    progressModel: 'unconfigured',
+    registered: false,
+    blockingReason: 'No active approved registered-program standard is configured for this occupation. Regulated apprenticeship progress is blocked until the sponsor standard is represented in the canonical contract.',
+  };
 }
 
 type PartnerRecord = {
@@ -67,6 +78,7 @@ type PartnerRecord = {
   mou_signed?: boolean | null;
   onboarding_completed?: boolean | null;
   documents_verified?: boolean | null;
+  verification_status?: string | null;
   name?: string | null;
   city?: string | null;
   state?: string | null;
@@ -99,7 +111,7 @@ function isPending(row: HourRow) {
 async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerRecord> {
   const { data: partnerLinks, error: partnerLinkError } = await db
     .from('partner_users')
-    .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state)')
+    .select('partner_id, status, partners(id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, city, state)')
     .eq('user_id', userId)
     .eq('status', 'active');
 
@@ -116,7 +128,7 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
 
   const { data: selectedPartner, error: selectedPartnerError } = await db
     .from('partners')
-    .select('id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, name, city, state')
+    .select('id, partner_type, program_type, programs, approval_status, status, mou_signed, onboarding_completed, documents_verified, verification_status, name, city, state')
     .eq('id', selectedPartnerId)
     .maybeSingle();
   if (selectedPartnerError || !selectedPartner) throw new Error('HOST_SHOP_ADMIN_PARTNER_REQUIRED');
@@ -127,7 +139,7 @@ export async function getHostShopAdminPartnerOptions() {
   const db = await requireAdminClient();
   const { data, error } = await db
     .from('partners')
-    .select('id, name, partner_type, program_type, programs, approval_status, status, city, state')
+    .select('id, name, partner_type, program_type, programs, approval_status, status, verification_status, city, state')
     .order('name', { ascending: true });
   if (error) throw new Error(`HOST_SHOP_PARTNER_OPTIONS_FAILED:${error.message}`);
   return (data ?? []).filter((partner: any) => {
@@ -174,13 +186,17 @@ export async function getHostShopBoard(userId: string) {
     program_slug: placement.program_slug || null,
     discipline: placement.program_slug || null,
     start_date: placement.start_date,
+    tradeInfo: resolveTradeTarget(placement.program_slug),
   }));
   const studentIds = apprentices.map((a) => a.student_id).filter(Boolean);
   const placementByStudent = new Map(apprentices.map((a) => [a.student_id, {
-    shopId: a.shop_id, programSlug: a.program_slug, supervisorUserId: a.supervisor_user_id,
+    shopId: a.shop_id,
+    programSlug: a.program_slug,
+    supervisorUserId: a.supervisor_user_id,
+    tradeInfo: a.tradeInfo,
   }]));
 
-  const workProgress: Record<string, { completed: number; required: number | null; progressModel: 'time_based' | 'competency_based' }> = {};
+  const workProgress: Record<string, { completed: number; required: null; progressModel: 'competency_based' | 'unconfigured' }> = {};
   let pendingHoursCount = 0;
   if (studentIds.length) {
     const { data: hourRows, error: hourError } = await db.from('hour_entries')
@@ -188,13 +204,13 @@ export async function getHostShopBoard(userId: string) {
       .in('user_id', studentIds);
     if (hourError) throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${hourError.message}`);
     for (const studentId of studentIds) {
-      const target = resolveTradeTarget(placementByStudent.get(studentId)?.programSlug);
-      workProgress[studentId] = { completed: 0, required: target.hours, progressModel: target.progressModel };
+      const target = placementByStudent.get(studentId)?.tradeInfo || resolveTradeTarget(null);
+      workProgress[studentId] = { completed: 0, required: null, progressModel: target.progressModel };
     }
     for (const row of (hourRows || []) as HourRow[]) {
       if (!row.user_id || !workProgress[row.user_id]) continue;
       const placement = placementByStudent.get(row.user_id);
-      if (!placement) continue;
+      if (!placement || !placement.tradeInfo.registered) continue;
       if (row.host_shop_id && row.host_shop_id !== placement.shopId) continue;
       if (placement.programSlug && row.program_slug && row.program_slug !== placement.programSlug) continue;
       if (isPending(row)) pendingHoursCount += 1;
@@ -209,12 +225,12 @@ export async function getHostShopBoard(userId: string) {
     const { data: enrollmentRows } = await db.from('program_enrollments')
       .select('id,user_id,student_id,program_slug,status,created_at')
       .or(`user_id.in.(${studentIds.join(',')}),student_id.in.(${studentIds.join(',')})`)
-      .in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });
+      .in('status', ['active', 'enrolled', 'in_progress', 'confirmed']).order('created_at', { ascending: false });
     for (const row of enrollmentRows || []) {
       const studentId = row.user_id || row.student_id;
       if (!studentId || enrollmentByStudent.has(studentId)) continue;
       const placement = placementByStudent.get(studentId);
-      if (!placement || (placement.programSlug && row.program_slug && placement.programSlug !== row.program_slug)) continue;
+      if (!placement || !placement.tradeInfo.registered || (placement.programSlug && row.program_slug && placement.programSlug !== row.program_slug)) continue;
       enrollmentByStudent.set(studentId, row.id);
     }
     const enrollmentIds = [...enrollmentByStudent.values()];
@@ -228,8 +244,8 @@ export async function getHostShopBoard(userId: string) {
       sets.get(row.enrollment_id)!.add(row.competency_id);
     }
     for (const [studentId, enrollmentId] of enrollmentByStudent.entries()) {
-      const target = resolveTradeTarget(placementByStudent.get(studentId)?.programSlug);
-      if (target.progressModel === 'competency_based' && target.competencyCount) {
+      const target = placementByStudent.get(studentId)?.tradeInfo;
+      if (target?.registered && target.competencyCount) {
         competencyProgress[studentId] = { completed: sets.get(enrollmentId)?.size || 0, required: target.competencyCount };
       }
     }
@@ -264,12 +280,38 @@ export async function getHostShopBoard(userId: string) {
   const acceptedDocumentCount = documentStatuses.filter((d: any) => d.is_required && d.status === 'accepted').length;
   const requiredDocumentCount = documentStatuses.filter((d: any) => d.is_required).length;
 
+  const registeredPrograms = Array.from(
+    new Map(
+      apprentices
+        .filter((apprentice) => apprentice.tradeInfo.registered)
+        .map((apprentice) => [apprentice.tradeInfo.rapidsCode, apprentice.tradeInfo]),
+    ).values(),
+  );
+  const unconfiguredPrograms = Array.from(
+    new Map(
+      apprentices
+        .filter((apprentice) => !apprentice.tradeInfo.registered)
+        .map((apprentice) => [apprentice.program_slug || 'unknown', apprentice.tradeInfo]),
+    ).values(),
+  );
+
   return {
-    partner, shops, tradeKey: programType, tradeInfo, programType, onboardingPaths,
-    documentStatuses, missingDocuments, pendingDocuments, acceptedDocumentCount, requiredDocumentCount,
+    partner,
+    shops,
+    tradeKey: programType,
+    tradeInfo,
+    programType,
+    onboardingPaths,
+    registeredPrograms,
+    unconfiguredPrograms,
+    documentStatuses,
+    missingDocuments,
+    pendingDocuments,
+    acceptedDocumentCount,
+    requiredDocumentCount,
     apprentices: apprentices.map((apprentice) => ({
       ...apprentice,
-      ojt: workProgress[apprentice.student_id] || { completed: 0, required: tradeInfo.hours, progressModel: tradeInfo.progressModel },
+      ojt: workProgress[apprentice.student_id] || { completed: 0, required: null, progressModel: apprentice.tradeInfo.progressModel },
       competency: competencyProgress[apprentice.student_id] || null,
     })),
     pendingHoursCount,

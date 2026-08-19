@@ -19,6 +19,10 @@ const nextConfig = {
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
+  // edge-tts@1.0.1 ships TypeScript source in node_modules. The LMS imports it
+  // from server-only video generation code, so Next must transpile the package
+  // instead of feeding its raw `export type` syntax to Webpack.
+  transpilePackages: ['edge-tts'],
   async rewrites() {
     return { beforeFiles: legacyImageRewrites(), afterFiles: [], fallback: [] };
   },

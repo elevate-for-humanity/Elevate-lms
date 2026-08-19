@@ -23,11 +23,16 @@ function forbidText(path, text, message) {
   if (content && content.includes(text)) failures.push(message || `${path} must not contain ${text}`);
 }
 
+function requireMissing(path, message) {
+  if (existsSync(join(root, path))) failures.push(message || `${path} should not exist`);
+}
+
 const studentForm = 'apps/marketing/app/apply/student/StudentApplicationForm.tsx';
 const submissionApi = 'apps/marketing/app/api/applications/route.ts';
 const trackerPage = 'apps/marketing/app/apply/track/page.tsx';
-const legacyStatus = 'apps/marketing/app/apply/status/page.tsx';
 const trackerApi = 'apps/marketing/app/api/applications/track/route.ts';
+const marketingConfig = 'apps/marketing/next.config.js';
+const retiredPublicStatusPage = 'apps/marketing/app/apply/status/page.tsx';
 const approvalApi = 'apps/admin/app/api/admin/applications/[id]/approve/route.ts';
 const approvalPipeline = 'lib/enrollment/approve.ts';
 
@@ -35,8 +40,8 @@ for (const path of [
   studentForm,
   submissionApi,
   trackerPage,
-  legacyStatus,
   trackerApi,
+  marketingConfig,
   approvalApi,
   approvalPipeline,
   'lib/enrollment/create-enrollment.ts',
@@ -56,11 +61,21 @@ for (const status of ['submitted', 'pending_funding', 'pending_admin_review']) {
   requireText(submissionApi, `'${status}'`, `submission API must retain canonical workflow status ${status}`);
 }
 
-requireText(legacyStatus, 'redirect(`/apply/track${suffix}`)', 'legacy /apply/status must redirect to canonical /apply/track');
+requireText(
+  marketingConfig,
+  "{ source: '/apply/status', destination: '/apply/track', permanent: true }",
+  'public /apply/status compatibility must be centralized in Marketing redirects',
+);
+requireMissing(
+  retiredPublicStatusPage,
+  'retired public /apply/status page implementation must not exist once compatibility is centralized',
+);
+
 requireText(trackerPage, 'fetch(`/api/applications/track?', 'tracker page must use canonical tracking API');
 requireText(trackerPage, 'if (!applicationId || !applicationEmail)', 'tracker UI must require both verification values before lookup');
-requireText(trackerPage, 'required\n              autoComplete="off"', 'tracker UI must require the application identifier');
-requireText(trackerPage, 'type="email"\n              required', 'tracker UI must require the application email');
+requireText(trackerPage, 'new URLSearchParams({ id: applicationId, email: applicationEmail })', 'tracker UI must submit both verification values together');
+requireText(trackerPage, 'id="applicationId"', 'tracker UI must expose the application identifier field');
+requireText(trackerPage, 'id="email"', 'tracker UI must expose the application email field');
 requireText(trackerApi, ".from('applications')", 'tracker API must read canonical applications table');
 requireText(trackerApi, "if (!id || !email)", 'public tracker must require both application ID and matching email');
 requireText(trackerApi, ".eq('normalized_email', email)", 'public tracker must bind the lookup to the applicant email');

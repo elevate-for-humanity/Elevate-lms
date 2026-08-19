@@ -8,7 +8,7 @@
  */
 
 import { loadJsonOnce } from '@/lib/data/json-cache';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { PROGRAMS } from '@/lib/programs/canonical-data';
 import { PROGRAM_IMAGES, getProgramHeroImage } from '@/lib/images/programImages';
 import { getHeroVideoForPageKey } from '@/lib/video/registry';
 
@@ -192,19 +192,19 @@ function normalizeBanner(
   }
 
   if (key === 'barber-apprenticeship') {
-    const barber = RAPIDS_CONFIG.programs.barber;
+    const barber = PROGRAMS['barber-apprenticeship'];
     const programBanner = normalized as ProgramHeroBannerConfig;
-    const credential = programBanner.credentialLabel || 'Indiana Barber License';
-    const duration = programBanner.durationLabel || `${barber.totalHours.toLocaleString('en-US')} hours`;
-    const salary = programBanner.salaryRangeLabel || '$28,000 to $52,000';
+    const credential = programBanner.credentialLabel || barber.credential || 'Indiana Barber License';
+    const duration = programBanner.durationLabel || barber.durationRange;
+    const salary = programBanner.salaryRangeLabel || barber.careerOutcomeRange;
     normalized = {
       ...normalized,
       microLabel: 'DOL Registered Apprenticeship',
       belowHeroHeadline: 'Earn your Indiana Barber License through registered apprenticeship.',
-      belowHeroSubheadline: `Complete ${barber.totalHours.toLocaleString('en-US')} hours of supervised on-the-job learning plus ${barber.relatedInstructionHours} hours of Related Technical Instruction under the registered program standards.`,
+      belowHeroSubheadline: `Complete the approved competency-based registered apprenticeship standard, including ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing hours are tracked separately under the applicable state requirements.`,
       primaryCta: { label: 'Enroll Now', href: '/programs/barber-apprenticeship/apply' },
       secondaryCta: { label: 'Request Information', href: '/programs/barber-apprenticeship/request-info', variant: 'secondary' },
-      transcript: `The Barber Apprenticeship prepares participants for the ${credential} through ${duration} of structured training, including supervised on-the-job learning and Related Technical Instruction. The published wage range for this pathway is ${salary}, with actual earnings varying by employer, experience, schedule, and compensation structure.`,
+      transcript: `The Barber Apprenticeship prepares participants for the ${credential} through structured competency-based training and verified Related Technical Instruction. Program duration ${duration.toLowerCase()}. Career outcomes ${salary.toLowerCase()}.`,
     };
   }
 

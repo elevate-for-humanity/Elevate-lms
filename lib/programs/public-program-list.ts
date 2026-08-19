@@ -1,6 +1,7 @@
 import { createPublicClient } from '@/lib/supabase/public';
-import { STATIC_PROGRAM_MAP } from '@/data/programs/index';
+import { STATIC_PROGRAM_MAP, getStaticProgram, normalizePublicProgram } from '@/data/programs/index';
 import type { ProgramSchema } from '@/lib/programs/program-schema';
+import { buildProgramSchemaFromDb } from '@/lib/programs/build-program-schema';
 import { resolveCredentialLabel } from '@/lib/programs/category-normalize';
 import {
   getProgramFundingTier,
@@ -66,9 +67,13 @@ const SECTOR_TO_CATEGORY: Record<ProgramSchema['sector'], string> = {
 };
 
 function getPriceLabel(tuition: number | null): string | null {
-  if (tuition === null) return 'Contact admissions';
-  if (tuition === 0) return 'Contact admissions';
+  if (tuition === null || tuition === 0) return 'Contact admissions';
   return `$${tuition.toLocaleString('en-US')}`;
+}
+
+function parsePrice(value: unknown): number | null {
+  const parsed = Number(String(value ?? '').replace(/[^0-9.]/g, ''));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 function trimDescription(text: string | undefined | null): string | null {
@@ -92,36 +97,44 @@ function fundingFields(slug: string) {
   } as const;
 }
 
+function fromProgramSchema(program: ProgramSchema, fallbackTuition: number | null = null): PublicProgramListItem {
+  const normalized = normalizePublicProgram(program);
+  const verified = getVerifiedProgramFunding(normalized.slug);
+  const rawDescription =
+    trimDescription(normalized.subtitle) ?? trimDescription(normalized.programDescription?.[0]);
+  const description =
+    verified?.description ??
+    (sanitizePublicFundingText(rawDescription, normalized.slug, '') || null);
+  const staticTuition = parsePrice(normalized.selfPayCost);
+  const tuition = staticTuition ?? fallbackTuition;
+
+  return {
+    slug: verified?.slug ?? normalized.slug,
+    title: verified?.title ?? normalized.title,
+    description,
+    category: verified?.category ?? SECTOR_TO_CATEGORY[normalized.sector] ?? 'other',
+    duration:
+      verified?.duration ??
+      (normalized.durationWeeks ? `${normalized.durationWeeks} weeks` : (normalized.schedule ?? null)),
+    credential:
+      verified?.credential ?? normalized.credentials?.[0]?.name ?? normalized.badge ?? null,
+    ...fundingFields(verified?.slug ?? normalized.slug),
+    tuition,
+    price_label: getPriceLabel(tuition),
+  };
+}
+
 function fromStaticCatalog(): PublicProgramListItem[] {
   const seen = new Set<string>();
   const items: PublicProgramListItem[] = [];
 
-  for (const program of STATIC_PROGRAM_MAP.values()) {
+  for (const rawProgram of STATIC_PROGRAM_MAP.values()) {
+    const program = getStaticProgram(rawProgram.slug) ?? normalizePublicProgram(rawProgram);
     const verified = getVerifiedProgramFunding(program.slug);
     const slug = verified?.slug ?? program.slug;
     if (seen.has(slug) || SUPPRESSED.has(program.slug)) continue;
     seen.add(slug);
-
-    const rawDescription =
-      trimDescription(program.subtitle) ?? trimDescription(program.programDescription?.[0]);
-    const description =
-      verified?.description ?? (sanitizePublicFundingText(rawDescription, slug, '') || null);
-    const funding = fundingFields(slug);
-    const parsedCost = Number(String(program.selfPayCost ?? '').replace(/[^0-9.]/g, '')) || null;
-
-    items.push({
-      slug,
-      title: verified?.title ?? program.title,
-      description,
-      category: SECTOR_TO_CATEGORY[program.sector] ?? 'other',
-      duration:
-        verified?.duration ??
-        (program.durationWeeks ? `${program.durationWeeks} weeks` : (program.schedule ?? null)),
-      credential: verified?.credential ?? program.credentials?.[0]?.name ?? program.badge ?? null,
-      ...funding,
-      tuition: parsedCost,
-      price_label: getPriceLabel(parsedCost),
-    });
+    items.push(fromProgramSchema(program));
   }
 
   return items.sort((a, b) => a.title.localeCompare(b.title));
@@ -151,7 +164,7 @@ export async function loadPublicProgramList(): Promise<PublicProgramListResult> 
     const { data } = await db
       .from('programs')
       .select(
-        'slug,title,short_description,description,category,duration,credential_type,credential_name,published,status,tuition,price',
+        'slug,title,short_description,description,category,duration,duration_weeks,credential,credential_type,credential_name,image_url,published,status,tuition,price',
       )
       .eq('is_active', true)
       .eq('published', true)
@@ -162,28 +175,26 @@ export async function loadPublicProgramList(): Promise<PublicProgramListResult> 
       const programs = data
         .filter((p) => !SUPPRESSED.has(p.slug))
         .map((p) => {
-          const verified = getVerifiedProgramFunding(p.slug);
-          const slug = verified?.slug ?? p.slug;
+          // Full static schemas are the public contract for known programs.
+          // The detail page already follows this ownership order; the catalog
+          // must do the same so stale database seeds cannot change duration,
+          // title, credentials, tuition, or apprenticeship disclosures.
+          const staticProgram = getStaticProgram(p.slug);
+          if (staticProgram) return fromProgramSchema(staticProgram);
+
           const rawTuition = p.tuition ?? p.price ?? null;
-          const tuition = rawTuition ? parseFloat(String(rawTuition)) : null;
-          return {
-            slug,
-            title: verified?.title ?? p.title,
-            description:
-              verified?.description ??
-              (sanitizePublicFundingText(
-                trimDescription(p.short_description || p.description),
-                slug,
-                '',
-              ) ||
-                null),
-            category: verified?.category ?? (p.category || 'other'),
-            duration: verified?.duration ?? p.duration ?? null,
-            credential: verified?.credential ?? resolveCredentialLabel(p),
-            ...fundingFields(slug),
-            tuition: tuition && !isNaN(tuition) ? tuition : null,
-            price_label: getPriceLabel(tuition && !isNaN(tuition) ? tuition : null),
-          };
+          const tuition = parsePrice(rawTuition);
+          const dbProgram = buildProgramSchemaFromDb({
+            slug: p.slug,
+            title: p.title,
+            subtitle: p.short_description,
+            description: p.description ?? p.short_description,
+            category: p.category,
+            credential: p.credential_name ?? p.credential ?? resolveCredentialLabel(p),
+            durationWeeks: p.duration_weeks,
+            imageUrl: p.image_url,
+          });
+          return fromProgramSchema(dbProgram, tuition);
         });
 
       if (programs.length > 0) {

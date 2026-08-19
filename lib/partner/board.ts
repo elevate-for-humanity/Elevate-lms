@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { normalizeRole } from '@/lib/rbac/role-matrix';
-import { getAppendixAStandard } from '@/lib/compliance/appendix-a-standards';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import {
   getHostShopOnboardingPaths,
   mergeHostShopDocumentRequirements,
@@ -18,33 +18,44 @@ export type TradeTarget = {
   rtiHours?: number;
 };
 
-const BARBER_STANDARD = getAppendixAStandard('barber-apprenticeship');
+const REGISTERED_PROGRAM_ALIASES: Record<string, string> = {
+  barber: 'barber-apprenticeship',
+  'barber-apprenticeship': 'barber-apprenticeship',
+  esthetician: 'esthetician-apprenticeship',
+  esthetics: 'esthetician-apprenticeship',
+  'esthetician-apprenticeship': 'esthetician-apprenticeship',
+  'esthetics-apprenticeship': 'esthetics-apprenticeship',
+  'nail-tech': 'nail-tech-apprenticeship',
+  nail_tech: 'nail-tech-apprenticeship',
+  nail_technician: 'nail-technician-apprenticeship',
+  'nail-tech-apprenticeship': 'nail-tech-apprenticeship',
+  'nail-technician-apprenticeship': 'nail-technician-apprenticeship',
+  manicurist: 'manicurist-apprenticeship',
+  'manicurist-apprenticeship': 'manicurist-apprenticeship',
+};
 
-export const TRADE_TARGETS: Record<string, TradeTarget> = {
-  barber: {
-    hours: null,
-    label: 'Registered Barber Apprenticeship',
-    progressModel: 'competency_based',
-    competencyCount: BARBER_STANDARD?.competencyCount ?? 14,
-    rtiHours: BARBER_STANDARD?.relatedInstructionHours ?? 260,
-  },
-  'barber-apprenticeship': {
-    hours: null,
-    label: 'Registered Barber Apprenticeship',
-    progressModel: 'competency_based',
-    competencyCount: BARBER_STANDARD?.competencyCount ?? 14,
-    rtiHours: BARBER_STANDARD?.relatedInstructionHours ?? 260,
-  },
+const LEGACY_NONREGISTERED_TARGETS: Record<string, TradeTarget> = {
   cosmetology: { hours: 2000, label: 'Cosmetology Apprenticeship', progressModel: 'time_based' },
   'cosmetology-apprenticeship': { hours: 2000, label: 'Cosmetology Apprenticeship', progressModel: 'time_based' },
   hairstylist: { hours: 2000, label: 'Cosmetology Apprenticeship', progressModel: 'time_based' },
-  'nail-tech': { hours: 450, label: 'Nail Technician Apprenticeship', progressModel: 'time_based' },
-  nail_tech: { hours: 450, label: 'Nail Technician Apprenticeship', progressModel: 'time_based' },
-  nail_technician: { hours: 450, label: 'Nail Technician Apprenticeship', progressModel: 'time_based' },
-  esthetician: { hours: 700, label: 'Esthetician Apprenticeship', progressModel: 'time_based' },
-  'esthetician-apprenticeship': { hours: 700, label: 'Esthetician Apprenticeship', progressModel: 'time_based' },
   training_site: { hours: 2000, label: 'Apprenticeship', progressModel: 'time_based' },
 };
+
+export function resolveTradeTarget(programSlug: string | null | undefined): TradeTarget {
+  const raw = programSlug || 'training_site';
+  const canonical = REGISTERED_PROGRAM_ALIASES[raw] || raw;
+  const registered = getRegisteredProgramStandard(canonical);
+  if (registered) {
+    return {
+      hours: registered.completion.fixedOjlCompletionHours,
+      label: `Registered ${registered.standard.occupationTitle} Apprenticeship`,
+      progressModel: 'competency_based',
+      competencyCount: registered.completion.competencyCount,
+      rtiHours: registered.completion.requiredRtiHours,
+    };
+  }
+  return LEGACY_NONREGISTERED_TARGETS[raw] || LEGACY_NONREGISTERED_TARGETS.training_site;
+}
 
 type PartnerRecord = {
   id: string;
@@ -93,14 +104,11 @@ async function resolvePartnerForBoard(db: any, userId: string): Promise<PartnerR
     .eq('status', 'active');
 
   const partnerLink = (partnerLinks || []).find((row: any) => row?.partner_id && row?.partners);
-  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) {
-    return partnerLink.partners as unknown as PartnerRecord;
-  }
+  if (!partnerLinkError && partnerLink?.partner_id && partnerLink.partners) return partnerLink.partners as unknown as PartnerRecord;
 
   const { data: profile } = await db.from('profiles').select('role').eq('id', userId).maybeSingle();
   const role = normalizeRole(profile?.role);
-  const isPlatformAdmin = role === 'admin' || role === 'super_admin' || role === 'org_admin';
-  if (!isPlatformAdmin) throw new Error('HOST_SHOP_ACCESS_DENIED');
+  if (!['admin', 'super_admin', 'org_admin'].includes(role)) throw new Error('HOST_SHOP_ACCESS_DENIED');
 
   const cookieStore = await cookies();
   const selectedPartnerId = cookieStore.get(HOST_SHOP_ADMIN_COOKIE)?.value;
@@ -122,12 +130,9 @@ export async function getHostShopAdminPartnerOptions() {
     .select('id, name, partner_type, program_type, programs, approval_status, status, city, state')
     .order('name', { ascending: true });
   if (error) throw new Error(`HOST_SHOP_PARTNER_OPTIONS_FAILED:${error.message}`);
-
   return (data ?? []).filter((partner: any) => {
     const values = [partner.partner_type, partner.program_type, ...(Array.isArray(partner.programs) ? partner.programs : [])]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
+      .filter(Boolean).join(' ').toLowerCase();
     return /(barber|cosmet|nail|esthetic|salon|shop|training_site)/.test(values);
   });
 }
@@ -153,11 +158,9 @@ export async function getHostShopBoard(userId: string) {
   const shopIds = shops.map((shop) => shop.id as string);
 
   const { data: placements, error: placementsError } = shopIds.length
-    ? await db
-        .from('apprentice_placements')
+    ? await db.from('apprentice_placements')
         .select('id, student_id, shop_id, program_slug, status, start_date, supervisor_user_id, profiles(full_name, email)')
-        .in('shop_id', shopIds)
-        .eq('status', 'active')
+        .in('shop_id', shopIds).eq('status', 'active')
     : { data: [], error: null };
   if (placementsError) throw new Error(`HOST_SHOP_PLACEMENTS_QUERY_FAILED:${placementsError.message}`);
 
@@ -172,28 +175,22 @@ export async function getHostShopBoard(userId: string) {
     discipline: placement.program_slug || null,
     start_date: placement.start_date,
   }));
-  const studentIds = apprentices.map((apprentice) => apprentice.student_id).filter(Boolean);
-  const placementByStudent = new Map(apprentices.map((apprentice) => [
-    apprentice.student_id,
-    { shopId: apprentice.shop_id, programSlug: apprentice.program_slug, supervisorUserId: apprentice.supervisor_user_id },
-  ]));
+  const studentIds = apprentices.map((a) => a.student_id).filter(Boolean);
+  const placementByStudent = new Map(apprentices.map((a) => [a.student_id, {
+    shopId: a.shop_id, programSlug: a.program_slug, supervisorUserId: a.supervisor_user_id,
+  }]));
 
   const workProgress: Record<string, { completed: number; required: number | null; progressModel: 'time_based' | 'competency_based' }> = {};
   let pendingHoursCount = 0;
-
   if (studentIds.length) {
-    const { data: hourRows, error: hourError } = await db
-      .from('hour_entries')
+    const { data: hourRows, error: hourError } = await db.from('hour_entries')
       .select('user_id, host_shop_id, program_slug, status, approval_status, accepted_hours, hours, hours_claimed')
       .in('user_id', studentIds);
     if (hourError) throw new Error(`HOST_SHOP_HOURS_QUERY_FAILED:${hourError.message}`);
-
     for (const studentId of studentIds) {
-      const placement = placementByStudent.get(studentId);
-      const target = TRADE_TARGETS[placement?.programSlug || ''] || TRADE_TARGETS.training_site;
+      const target = resolveTradeTarget(placementByStudent.get(studentId)?.programSlug);
       workProgress[studentId] = { completed: 0, required: target.hours, progressModel: target.progressModel };
     }
-
     for (const row of (hourRows || []) as HourRow[]) {
       if (!row.user_id || !workProgress[row.user_id]) continue;
       const placement = placementByStudent.get(row.user_id);
@@ -209,13 +206,10 @@ export async function getHostShopBoard(userId: string) {
   const enrollmentByStudent = new Map<string, string>();
   const competencyProgress: Record<string, { completed: number; required: number }> = {};
   if (studentIds.length) {
-    const { data: enrollmentRows } = await db
-      .from('program_enrollments')
+    const { data: enrollmentRows } = await db.from('program_enrollments')
       .select('id,user_id,student_id,program_slug,status,created_at')
       .or(`user_id.in.(${studentIds.join(',')}),student_id.in.(${studentIds.join(',')})`)
-      .in('status', ['active','enrolled','in_progress'])
-      .order('created_at', { ascending: false });
-
+      .in('status', ['active', 'enrolled', 'in_progress']).order('created_at', { ascending: false });
     for (const row of enrollmentRows || []) {
       const studentId = row.user_id || row.student_id;
       if (!studentId || enrollmentByStudent.has(studentId)) continue;
@@ -223,10 +217,10 @@ export async function getHostShopBoard(userId: string) {
       if (!placement || (placement.programSlug && row.program_slug && placement.programSlug !== row.program_slug)) continue;
       enrollmentByStudent.set(studentId, row.id);
     }
-
     const enrollmentIds = [...enrollmentByStudent.values()];
     const { data: competencyRows } = enrollmentIds.length
-      ? await db.from('apprentice_competency_records').select('enrollment_id,competency_id,completed').in('enrollment_id', enrollmentIds).eq('completed', true)
+      ? await db.from('apprentice_competency_records').select('enrollment_id,competency_id,completed')
+          .in('enrollment_id', enrollmentIds).eq('completed', true)
       : { data: [] };
     const sets = new Map<string, Set<string>>();
     for (const row of competencyRows || []) {
@@ -234,36 +228,29 @@ export async function getHostShopBoard(userId: string) {
       sets.get(row.enrollment_id)!.add(row.competency_id);
     }
     for (const [studentId, enrollmentId] of enrollmentByStudent.entries()) {
-      const standard = getAppendixAStandard(placementByStudent.get(studentId)?.programSlug || '');
-      if (standard) competencyProgress[studentId] = { completed: sets.get(enrollmentId)?.size || 0, required: standard.competencyCount };
+      const target = resolveTradeTarget(placementByStudent.get(studentId)?.programSlug);
+      if (target.progressModel === 'competency_based' && target.competencyCount) {
+        competencyProgress[studentId] = { completed: sets.get(enrollmentId)?.size || 0, required: target.competencyCount };
+      }
     }
   }
 
   const programType = resolveHostShopProgram(partner);
-  const tradeInfo = TRADE_TARGETS[programType] || TRADE_TARGETS.barber;
+  const tradeInfo = resolveTradeTarget(programType);
   const onboardingPaths = getHostShopOnboardingPaths(programType);
 
-  const { data: programAccess } = await db
-    .from('partner_program_access')
-    .select('program_id')
-    .eq('partner_id', partner.id)
-    .is('revoked_at', null);
+  const { data: programAccess } = await db.from('partner_program_access').select('program_id')
+    .eq('partner_id', partner.id).is('revoked_at', null);
   const programIds = Array.from(new Set([
     programType,
-    ...(programAccess || []).map((row: { program_id?: string }) => row.program_id).filter((value): value is string => Boolean(value)),
+    ...(programAccess || []).map((row: { program_id?: string }) => row.program_id).filter((v): v is string => Boolean(v)),
   ]));
-
-  const { data: dbRequirements } = await db
-    .from('partner_document_requirements')
-    .select('*')
-    .in('program_id', [...programIds, 'ALL'])
-    .in('state', [partner.state || 'Indiana', 'ALL']);
+  const { data: dbRequirements } = await db.from('partner_document_requirements').select('*')
+    .in('program_id', [...programIds, 'ALL']).in('state', [partner.state || 'Indiana', 'ALL']);
   const requirements = mergeHostShopDocumentRequirements(dbRequirements, programType);
-  const { data: uploadedDocs, error: uploadedDocsError } = await db
-    .from('partner_documents')
+  const { data: uploadedDocs, error: uploadedDocsError } = await db.from('partner_documents')
     .select('id, document_type, display_name, file_name, file_url, status, rejection_reason, expiration_date, uploaded_at')
-    .eq('partner_id', partner.id)
-    .order('uploaded_at', { ascending: false });
+    .eq('partner_id', partner.id).order('uploaded_at', { ascending: false });
   if (uploadedDocsError) throw new Error(`HOST_SHOP_DOCUMENTS_QUERY_FAILED:${uploadedDocsError.message}`);
 
   const latestDocs = new Map<string, any>();
@@ -272,23 +259,14 @@ export async function getHostShopBoard(userId: string) {
     const document = latestDocs.get(requirement.document_type);
     return { ...requirement, uploaded: Boolean(document), document: document || null, status: document?.status || 'missing' };
   });
-  const missingDocuments = documentStatuses.filter((document: any) => document.is_required && (!document.uploaded || ['missing','rejected','expired'].includes(document.status)));
-  const pendingDocuments = documentStatuses.filter((document: any) => document.is_required && document.status === 'pending');
-  const acceptedDocumentCount = documentStatuses.filter((document: any) => document.is_required && document.status === 'accepted').length;
-  const requiredDocumentCount = documentStatuses.filter((document: any) => document.is_required).length;
+  const missingDocuments = documentStatuses.filter((d: any) => d.is_required && (!d.uploaded || ['missing', 'rejected', 'expired'].includes(d.status)));
+  const pendingDocuments = documentStatuses.filter((d: any) => d.is_required && d.status === 'pending');
+  const acceptedDocumentCount = documentStatuses.filter((d: any) => d.is_required && d.status === 'accepted').length;
+  const requiredDocumentCount = documentStatuses.filter((d: any) => d.is_required).length;
 
   return {
-    partner,
-    shops,
-    tradeKey: programType,
-    tradeInfo,
-    programType,
-    onboardingPaths,
-    documentStatuses,
-    missingDocuments,
-    pendingDocuments,
-    acceptedDocumentCount,
-    requiredDocumentCount,
+    partner, shops, tradeKey: programType, tradeInfo, programType, onboardingPaths,
+    documentStatuses, missingDocuments, pendingDocuments, acceptedDocumentCount, requiredDocumentCount,
     apprentices: apprentices.map((apprentice) => ({
       ...apprentice,
       ojt: workProgress[apprentice.student_id] || { completed: 0, required: tradeInfo.hours, progressModel: tradeInfo.progressModel },

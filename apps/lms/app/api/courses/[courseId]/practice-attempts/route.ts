@@ -1,3 +1,4 @@
+// pre-auth-registry: exempt - requireAuth and active enrollment are verified before every practice_attempts write; user_id always comes from the authenticated session.
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth/requireAuth';

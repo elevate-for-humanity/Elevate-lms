@@ -1,4 +1,12 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +16,8 @@ const service = process.argv[2];
 const config = {
   marketing: {
     appDir: 'apps/marketing',
+    worker: 'sw-marketing.js',
+    cachePrefix: 'elevate-marketing-',
     files: [
       'sw-marketing.js',
       'manifest-marketing.json',
@@ -16,6 +26,8 @@ const config = {
   },
   lms: {
     appDir: 'apps/lms',
+    worker: 'sw-lms.js',
+    cachePrefix: 'elevate-lms-',
     files: [
       'sw-lms.js',
       'manifest-lms.json',
@@ -29,6 +41,8 @@ const config = {
   },
   admin: {
     appDir: 'apps/admin',
+    worker: 'sw-admin.js',
+    cachePrefix: 'elevate-admin-',
     files: ['sw-admin.js', 'manifest-admin.json', 'offline.html'],
   },
 };
@@ -64,6 +78,23 @@ for (const filename of config[service].files) {
   }
   copyFileSync(source, join(targetDir, filename));
   copied += 1;
+}
+
+// Production containers build each app from its app-local public directory.
+// Stamp the copied worker here as well as in the root source so Northflank
+// cannot ship the literal __CACHE_VERSION__ placeholder and retain stale
+// Admin/LMS/Marketing caches across releases.
+const sha = process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? process.env.NEXT_PUBLIC_GIT_SHA;
+if (sha && /^[a-f0-9]{7,40}$/i.test(sha)) {
+  const workerPath = join(targetDir, config[service].worker);
+  const workerSource = readFileSync(workerPath, 'utf8');
+  const cacheVersion = `${config[service].cachePrefix}${sha.slice(0, 12)}`;
+  const stamped = workerSource.replaceAll('__CACHE_VERSION__', cacheVersion);
+  if (stamped.includes('__CACHE_VERSION__')) {
+    throw new Error(`[sync-pwa-public] Failed to stamp ${workerPath}`);
+  }
+  writeFileSync(workerPath, stamped, 'utf8');
+  console.log(`[sync-pwa-public] ${service}: stamped ${config[service].worker} → ${cacheVersion}`);
 }
 
 console.log(

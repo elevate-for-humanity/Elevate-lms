@@ -5,15 +5,17 @@ import { CheckCircle2, ClipboardCheck, FileCheck2, ShieldCheck } from 'lucide-re
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { BARBER_SECTIONS } from './barber-rubric-data';
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { PROGRAMS } from '@/lib/programs/canonical-data';
 
 export const revalidate = 3600;
 
-const BARBER = RAPIDS_CONFIG.programs.barber;
+const REGISTERED_BARBER = RAPIDS_CONFIG.programs.barber;
+const BARBER = PROGRAMS['barber-apprenticeship'];
 
 export const metadata: Metadata = {
   title: 'Barber Apprenticeship Competency Verification | Elevate for Humanity',
   description:
-    'Review the competency-verification framework used with Elevate’s Barber Registered Apprenticeship and the canonical RAPIDS hour requirements.',
+    'Review the competency-verification framework used with Elevate’s Barber Registered Apprenticeship and the separate Indiana licensing-hour requirements.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/compliance/competency-verification/barber',
   },
@@ -56,7 +58,7 @@ export default function BarberCompetencyRubricPage() {
               Barber Apprenticeship Competency Framework
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-100">
-              The competency rubric documents skill progression. Apprenticeship hour requirements come from the centralized RAPIDS configuration, not from adding the suggested practice hours attached to individual rubric items.
+              The registered apprenticeship is competency-based. Competency verification and required Related Technical Instruction are DOL completion controls; Indiana licensing hours are tracked separately for state licensure.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -79,9 +81,9 @@ export default function BarberCompetencyRubricPage() {
       <section className="border-b border-slate-200 bg-slate-50 py-8">
         <dl className="mx-auto grid max-w-6xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
           <Stat label="Sponsor of record" value={RAPIDS_CONFIG.sponsorOfRecord} />
-          <Stat label="Occupation" value={BARBER.occupation} />
-          <Stat label="On-the-job learning" value={`${BARBER.totalHours.toLocaleString()} hours`} />
-          <Stat label="Related instruction" value={`${BARBER.relatedInstructionHours} hours`} />
+          <Stat label="Occupation" value={REGISTERED_BARBER.occupation} />
+          <Stat label="Verified RTI" value={`${BARBER.relatedInstructionHours} hours`} />
+          <Stat label="Indiana licensing hours" value={`${BARBER.totalHours.toLocaleString()} hours`} />
         </dl>
       </section>
 
@@ -91,22 +93,22 @@ export default function BarberCompetencyRubricPage() {
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-red-700">How to read this rubric</p>
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950">
-                Competency evidence and hour accounting are separate controls.
+                Competency evidence and licensing-hour accounting are separate controls.
               </h2>
               <div className="mt-6 space-y-4 text-base leading-7 text-slate-700">
                 <p>
                   This page contains {competencyCount} practical checkpoints across {BARBER_SECTIONS.length} skill areas. Supervisors and instructors use the checkpoints to document whether the apprentice can perform required work safely and consistently.
                 </p>
                 <p>
-                  The practice-hour values attached to individual rubric items are planning guidance only. They are not the authoritative apprenticeship total and must not replace approved OJL or RTI records.
+                  The registered apprenticeship completion basis is competency-based. Work/OJL hours remain auditable evidence but are not a fixed DOL completion denominator. Required RTI and verified competency completion remain controlled by the registered-program contract.
                 </p>
                 <p>
-                  Completion requires the program’s official hour records, competency sign-offs, related instruction completion, and the licensing steps that apply to the apprentice.
+                  Indiana licensing-hour and examination requirements are tracked separately so state licensure requirements do not overwrite the registered apprenticeship completion standard.
                 </p>
               </div>
 
               <div className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
-                <strong>Do not combine Indiana school-hour requirements with the registered apprenticeship hour schedule.</strong> They are separate training pathways. The registered apprenticeship values displayed above are pulled from the centralized RAPIDS configuration.
+                <strong>Do not treat Indiana licensing hours as the DOL registered-apprenticeship completion denominator.</strong> The platform keeps the registered competency/RTI standard and the state licensing-hour requirement as separate controls.
               </div>
             </div>
 
@@ -119,7 +121,7 @@ export default function BarberCompetencyRubricPage() {
               <ControlCard
                 icon={FileCheck2}
                 title="Documented evidence"
-                body="Hour logs, evaluations, course completion, and required records must support the completion decision."
+                body="Work logs, evaluations, course completion, and required records support competency and licensing verification."
               />
               <ControlCard
                 icon={CheckCircle2}
@@ -128,8 +130,8 @@ export default function BarberCompetencyRubricPage() {
               />
               <ControlCard
                 icon={ShieldCheck}
-                title="Central source of truth"
-                body="RAPIDS status and hour requirements are read from the centralized compliance configuration rather than duplicated page text."
+                title="Canonical controls"
+                body="Registered-program requirements and Indiana licensing requirements resolve from their respective canonical data sources rather than duplicated page text."
               />
             </div>
           </div>
@@ -142,7 +144,7 @@ export default function BarberCompetencyRubricPage() {
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-300">Competency areas</p>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white">Practical evaluation framework</h2>
             <p className="mt-4 leading-7 text-slate-200">
-              Each item below states the competency, the assessment method, and the minimum evidence expected. Suggested hours are intentionally omitted from the public cards so they cannot be mistaken for the official apprenticeship schedule.
+              Each item below states the competency, assessment method, and minimum evidence expected. Suggested practice hours are intentionally omitted from the public cards so they cannot be mistaken for an official completion denominator.
             </p>
           </div>
 
@@ -192,7 +194,7 @@ export default function BarberCompetencyRubricPage() {
           <div className="rounded-3xl border border-slate-200 bg-slate-50 p-7 sm:p-9">
             <h2 className="text-2xl font-extrabold text-slate-950">Need the official program requirements?</h2>
             <p className="mt-3 max-w-3xl leading-7 text-slate-700">
-              Use the Barber Apprenticeship page for tuition, admissions, host-shop, funding, and current program requirements. Internal completion decisions must use the apprentice’s actual verified records rather than this public overview alone.
+              Use the Barber Apprenticeship page for tuition, admissions, host-shop, funding, and current program requirements. Internal completion decisions must use the apprentice’s actual verified records and the applicable registered/state requirements rather than this public overview alone.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link href="/programs/barber-apprenticeship" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-slate-950 px-6 py-3 font-bold text-white hover:bg-slate-800">

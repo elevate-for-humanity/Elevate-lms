@@ -7,15 +7,26 @@ export type TenantSiteConfigPatch = Omit<Partial<TenantSiteConfig>, 'homepage' |
   branding?: Partial<TenantSiteConfig['branding']>;
 };
 
+/**
+ * Creates a safe blank website configuration.
+ *
+ * Defaults may provide layout and branding structure, but they must never invent
+ * enrollment counts, ratings, completion rates, testimonials, programs, services,
+ * pricing, credentials, or other business claims. Those values must come from the
+ * organization/user or an approved connected data source before publication.
+ */
 export function buildDefaultSiteConfig(params: {
   organizationName: string;
   organizationType?: string;
   industry?: string;
   contactEmail?: string;
 }): TenantSiteConfig {
-  const { organizationName, organizationType = 'Training Provider', industry = 'General' } = params;
+  const {
+    organizationName,
+    organizationType = 'Organization',
+    industry = 'General',
+  } = params;
   const template = getRecommendedTemplate(industry, organizationType);
-  const contactEmail = params.contactEmail ?? `info@${organizationName.toLowerCase().replace(/[^a-z0-9]+/g, '')}.org`;
 
   const legacy: TenantSiteConfig = {
     schemaVersion: 2,
@@ -33,40 +44,29 @@ export function buildDefaultSiteConfig(params: {
       backgroundColor: template.colors.background,
       textColor: template.colors.text,
       logoText: organizationName,
-      tagline: 'Quality training for career advancement',
+      tagline: '',
     },
     homepage: {
-      heroTitle: `Welcome to ${organizationName}`,
-      heroSubtitle: 'Industry-recognized training programs designed to help learners build skills and advance their careers.',
-      heroCtaText: 'View Programs',
-      heroCtaHref: '/programs',
-      features: [
-        { title: 'Expert-Led Training', description: 'Learn from instructors with real-world experience in your field.' },
-        { title: 'Flexible Learning', description: 'Programs designed for working adults and career changers.' },
-        { title: 'Career Support', description: 'Guidance from enrollment through completion and job placement.' },
-      ],
+      heroTitle: organizationName,
+      heroSubtitle: '',
+      heroCtaText: 'Contact Us',
+      heroCtaHref: '/contact',
+      features: [],
     },
-    programs: [
-      { name: 'Foundations', description: 'Core skills and safety fundamentals for new learners.', duration: '4 weeks', level: 'Beginner' },
-      { name: 'Professional Track', description: 'Hands-on training aligned with employer expectations.', duration: '8 weeks', level: 'Intermediate' },
-      { name: 'Certification Prep', description: 'Exam-ready preparation with practice assessments.', duration: '12 weeks', level: 'Advanced' },
-    ],
-    stats: { students: 250, completionRate: '92%', employers: 40, rating: '4.8' },
-    testimonial: {
-      quote: 'The training team helped me move from entry-level work into a skilled role with clear next steps.',
-      author: 'Program Graduate',
-    },
+    programs: [],
     navigation: [
       { label: 'Home', href: '/' },
-      { label: 'Programs', href: '/programs' },
       { label: 'About', href: '/about' },
       { label: 'Contact', href: '/contact' },
     ],
-    footer: { description: `${organizationName} provides workforce training and education.`, contactEmail },
+    footer: {
+      description: organizationName,
+      contactEmail: params.contactEmail,
+    },
     seo: {
-      title: `${organizationName} | Training Programs`,
-      description: `${organizationName} offers professional training and certification pathways.`,
-      keywords: ['training', 'workforce', 'certification', organizationName],
+      title: organizationName,
+      description: '',
+      keywords: [organizationName],
     },
     meta: {
       organizationName,
@@ -75,6 +75,7 @@ export function buildDefaultSiteConfig(params: {
       generatedAt: new Date().toISOString(),
       source: 'default-site-config',
       parisInterviewCompleted: false,
+      requiresContentReview: true,
     },
   };
 

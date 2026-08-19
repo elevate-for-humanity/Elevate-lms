@@ -21,6 +21,9 @@ const mustExist = [
   'apps/lms/app/api/courses/[courseId]/readiness-report/route.ts',
   'apps/lms/app/api/courses/[courseId]/flashcards/route.ts',
   'apps/lms/app/api/courses/[courseId]/flashcards/[cardId]/rate/route.ts',
+  'apps/lms/app/api/courses/[courseId]/tutor/route.ts',
+  'components/lms/CourseTutor.tsx',
+  'apps/lms/app/lms/courses/[courseId]/lessons/[lessonId]/layout.tsx',
   'supabase/migrations/20260819212000_harden_nha_self_paced_rls.sql',
   'supabase/migrations/20260819213000_complete_self_paced_learner_rls.sql',
 ];
@@ -48,9 +51,11 @@ if (failures.length === 0) {
     'review_status',
     'governing_standard_version',
     'AI lesson not human-approved',
-    'question 1',
-    'competency graph/mappings',
+    'rationale missing',
+    'standards/competency mapping missing',
     'interactive self-paced lesson experiences',
+    'mastery remediation plan missing',
+    'authorized human sign-off missing',
     'module_completion_rules',
   ]) {
     if (!persistedPublish.includes(invariant)) fail(`persisted publish gate missing: ${invariant}`);
@@ -73,8 +78,13 @@ if (failures.length === 0) {
   }
 
   const governance = read('lib/course-factory/post-generation-governance.ts');
-  for (const invariant of ['competency_checks', 'competencyKeys', "source: 'course_factory'", 'approved = false']) {
+  for (const invariant of ['competency_checks', 'competencyKeys', "source: 'course_factory'", 'update.approved = false']) {
     if (!governance.includes(invariant)) fail(`post-generation governance missing: ${invariant}`);
+  }
+
+  const tutor = read('apps/lms/app/api/courses/[courseId]/tutor/route.ts');
+  for (const invariant of ['Course access required', 'Never change grades', 'approved course context', 'canModifyGrades: false', 'canApproveCompetencies: false']) {
+    if (!tutor.includes(invariant)) fail(`grounded learner tutor missing: ${invariant}`);
   }
 
   const rls = read('supabase/migrations/20260819212000_harden_nha_self_paced_rls.sql') + read('supabase/migrations/20260819213000_complete_self_paced_learner_rls.sql');
@@ -90,4 +100,4 @@ if (failures.length) {
 }
 
 console.log('Course Builder procurement architecture gate: PASS');
-console.log('Verified: one generation authority, one persisted publish authority, human AI review, standards traceability, mastery/remediation services, spaced review, readiness reporting, practical sign-off controls, and hardened RLS.');
+console.log('Verified: one generation authority, one persisted publish authority, human AI review, standards traceability, mastery/remediation services, spaced review, readiness reporting, grounded AI tutoring, practical sign-off controls, and hardened RLS.');

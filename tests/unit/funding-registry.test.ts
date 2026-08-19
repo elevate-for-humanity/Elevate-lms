@@ -9,7 +9,7 @@ import {
 import { sanitizePublicFundingText } from '@/lib/programs/public-funding-copy';
 
 const EXPECTED = [
-  'business-administration',
+  'business',
   'cdl-training',
   'financial-literacy',
   'hvac-technician',
@@ -22,9 +22,11 @@ describe('public funding registry', () => {
     );
   });
 
-  it('canonicalizes the business alias and excludes Peer Recovery', () => {
-    expect(getVerifiedProgramFunding('business')?.slug).toBe('business-administration');
+  it('canonicalizes the legacy business-administration alias and excludes Peer Recovery', () => {
+    expect(getVerifiedProgramFunding('business')?.slug).toBe('business');
+    expect(getVerifiedProgramFunding('business-administration')?.slug).toBe('business');
     expect(getProgramFundingTier('business')).toBe('workforce-funded');
+    expect(getProgramFundingTier('business-administration')).toBe('workforce-funded');
     expect(getProgramFundingTier('peer-recovery-specialist')).toBe('self-pay');
   });
 

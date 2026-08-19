@@ -17,18 +17,10 @@ const nextConfig = {
   },
 
   images: { unoptimized: true },
-  typescript: {
-    ignoreBuildErrors: false,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  typescript: { ignoreBuildErrors: false },
+  eslint: { ignoreDuringBuilds: true },
   async rewrites() {
-    return {
-      beforeFiles: legacyImageRewrites(),
-      afterFiles: [],
-      fallback: [],
-    };
+    return { beforeFiles: legacyImageRewrites(), afterFiles: [], fallback: [] };
   },
   async redirects() {
     // Compatibility redirects live here instead of redirect-only page files.
@@ -36,6 +28,8 @@ const nextConfig = {
     return [
       { source: '/reset', destination: '/support/reset-browser', permanent: true },
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
+      { source: '/partners/dashboard', destination: '/host-shop/dashboard', permanent: true },
+      { source: '/partners/workforce', destination: '/workforce', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },
       { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: true },
@@ -46,21 +40,11 @@ const nextConfig = {
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: true },
     ];
   },
-  serverExternalPackages: [
-    '@remotion/bundler',
-    '@remotion/renderer',
-    '@remotion/licensing',
-    'esbuild',
-  ],
+  serverExternalPackages: ['@remotion/bundler', '@remotion/renderer', '@remotion/licensing', 'esbuild'],
   webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
       config.plugins = config.plugins || [];
-      config.plugins.push(
-        new webpack.ProvidePlugin({
-          Buffer: ['buffer', 'Buffer'],
-          buffer: 'buffer',
-        }),
-      );
+      config.plugins.push(new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'], buffer: 'buffer' }));
     }
     return config;
   },

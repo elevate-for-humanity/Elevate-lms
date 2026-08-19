@@ -7,33 +7,33 @@ import { Check, Cloud, Shield, Zap, Headphones, Globe, Palette } from 'lucide-re
 const FEATURES = [
   {
     icon: Cloud,
-    title: 'Zero DevOps',
-    description: 'We handle hosting, updates, security patches, and scaling. You focus on training.',
+    title: 'Managed Hosting',
+    description: 'We manage the hosted application environment, updates, security patches, and platform maintenance.',
   },
   {
     icon: Palette,
     title: 'Your Branding',
-    description: 'Custom logo, colors, domain. Your students see your brand, not ours.',
+    description: 'Custom logo, colors, and domain options keep the learner experience aligned with your organization.',
   },
   {
     icon: Globe,
     title: 'Custom Domain',
-    description: 'Use your own domain (training.yourorg.com) or get a hosted portal (app.elevateforhumanity.org/admin?org=yourorg).',
+    description: 'Use your own domain or a hosted Elevate organization URL, based on your selected configuration.',
   },
   {
     icon: Shield,
-    title: '99.9% Uptime SLA',
-    description: 'Enterprise-grade infrastructure with guaranteed availability.',
+    title: 'Documented Service Terms',
+    description: 'Availability and support commitments are governed by the service terms documented for your active plan or agreement.',
   },
   {
     icon: Zap,
-    title: 'Instant Updates',
-    description: 'Get new features automatically. No manual upgrades needed.',
+    title: 'Managed Updates',
+    description: 'Platform updates are delivered through the managed service without customer-managed application upgrades.',
   },
   {
     icon: Headphones,
-    title: 'Priority Support',
-    description: 'Dedicated support team with 4-hour response time.',
+    title: 'Support',
+    description: 'Support is provided through the service channels and response targets documented for your active plan.',
   },
 ];
 
@@ -48,7 +48,7 @@ const PRICING = [
       'Custom subdomain',
       'Your logo & colors',
       'Email support',
-      'Weekly backups',
+      'Managed backups',
     ],
     cta: 'Start Free Trial',
     highlighted: false,
@@ -62,8 +62,8 @@ const PRICING = [
       'Up to 5,000 students',
       'Custom domain included',
       'Full white-label branding',
-      'Priority support (4hr)',
-      'Daily backups',
+      'Priority support',
+      'Managed backups',
       'API access',
       'SSO integration',
     ],
@@ -76,13 +76,13 @@ const PRICING = [
     interval: '',
     description: 'For large organizations',
     features: [
-      'Unlimited students',
+      'Capacity configured by agreement',
       'Multiple domains',
-      'Dedicated infrastructure',
-      'Dedicated success manager',
+      'Dedicated infrastructure options',
+      'Dedicated success management options',
       'Custom integrations',
-      'SLA guarantee',
-      'On-premise option',
+      'Custom service terms',
+      'Deployment options by agreement',
     ],
     cta: 'Contact Sales',
     highlighted: false,
@@ -96,7 +96,7 @@ export default function WhiteLabelPage() {
 
   const checkSubdomain = async () => {
     if (!subdomain || subdomain.length < 3) return;
-    
+
     setChecking(true);
     try {
       const res = await fetch(`/api/provisioning/tenant?subdomain=${subdomain}`);
@@ -110,21 +110,18 @@ export default function WhiteLabelPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
       <section className="bg-slate-50 py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
             White-Label Solution
           </span>
           <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-            Your LMS. Your Brand.<br />We Handle the Rest.
+            Your LMS. Your Brand.<br />We Handle the Platform.
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
-            Launch a fully-branded learning platform in minutes. No servers to manage,
-            no code to write. Just your training content and your students.
+            Launch a branded learning environment without managing the application servers or platform upgrade cycle yourself.
           </p>
 
-          {/* Subdomain Checker */}
           <div className="max-w-md mx-auto bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
             <label className="block text-left text-sm font-medium text-slate-700 mb-2">
               Check your organization ID availability
@@ -160,12 +157,9 @@ export default function WhiteLabelPage() {
         </div>
       </section>
 
-      {/* Features */}
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-12">
-            Everything You Need, Nothing You Don't
-          </h2>
+          <h2 className="text-3xl font-black text-center mb-12">Managed Platform Capabilities</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {FEATURES.map((feature) => (
               <div key={feature.title} className="p-6 rounded-xl border border-slate-200 hover:border-blue-300 transition-colors">
@@ -178,16 +172,13 @@ export default function WhiteLabelPage() {
         </div>
       </section>
 
-      {/* Pricing */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-black text-center mb-4">
-            Simple, Predictable Pricing
-          </h2>
+          <h2 className="text-3xl font-black text-center mb-4">Simple, Predictable Pricing</h2>
           <p className="text-center text-slate-600 mb-12">
-            All plans include 14-day free trial. No credit card required to start.
+            Eligible self-service plans include a 14-day trial with no credit card required to start.
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {PRICING.map((plan) => (
               <div
@@ -204,17 +195,13 @@ export default function WhiteLabelPage() {
                 </p>
                 <div className="mb-6">
                   <span className="text-4xl font-black">{plan.price}</span>
-                  <span className={plan.highlighted ? 'text-slate-300' : 'text-slate-500'}>
-                    {plan.interval}
-                  </span>
+                  <span className={plan.highlighted ? 'text-slate-300' : 'text-slate-500'}>{plan.interval}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className={`w-5 h-5 flex-shrink-0 ${plan.highlighted ? 'text-blue-400' : 'text-brand-green-600'}`} />
-                      <span className={plan.highlighted ? 'text-slate-200' : 'text-slate-700'}>
-                        {feature}
-                      </span>
+                      <span className={plan.highlighted ? 'text-slate-200' : 'text-slate-700'}>{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -234,14 +221,11 @@ export default function WhiteLabelPage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-20">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-black mb-4">
-            Ready to Launch Your Training Platform?
-          </h2>
+          <h2 className="text-3xl font-black mb-4">Ready to Launch Your Training Platform?</h2>
           <p className="text-slate-600 mb-8">
-            Join 50+ organizations already using Elevate LMS to train their workforce.
+            Configure a branded Elevate learning environment around your organization, programs, and users.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -12,12 +12,19 @@ const requireFile = (path) => {
 };
 
 const adminLayout = requireFile('apps/admin/app/layout.tsx');
+const adminHeader = requireFile('components/admin/AdminHeader.tsx');
 const dashboard = requireFile('components/admin/dashboard/DashboardShell.tsx');
 const defaultSite = requireFile('lib/tenant/default-site-config.ts');
 
 for (const forbidden of ['AdminFooter', 'LiveChatWidget']) {
   if (adminLayout.includes(forbidden)) {
     failures.push(`Admin root must not mount public component: ${forbidden}`);
+  }
+}
+
+for (const forbidden of ['https://www.elevateforhumanity.org/online-apps', 'target="_blank"']) {
+  if (adminHeader.includes(forbidden)) {
+    failures.push(`Admin header contains external navigation dependency: ${forbidden}`);
   }
 }
 
@@ -61,4 +68,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log('Portal production contracts verified: authenticated Admin has no public widgets or stale proof IDs; Website Builder does not seed fake business claims.');
+console.log('Portal production contracts verified: authenticated Admin has no public widgets, stale proof IDs, or external nav dependencies; Website Builder does not seed fake business claims.');

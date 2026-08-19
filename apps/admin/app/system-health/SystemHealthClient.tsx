@@ -7,45 +7,41 @@ import {
 } from 'lucide-react';
 import type { PlatformHealthSnapshot, ServiceCheck } from '@/lib/platform/platform-health';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function statusColor(s: string) {
   if (s === 'healthy') return 'text-green-400';
   if (s === 'degraded') return 'text-amber-400';
-  if (s === 'down')     return 'text-red-400';
+  if (s === 'down') return 'text-red-400';
   return 'text-slate-500';
 }
 
 function statusBg(s: string) {
   if (s === 'healthy') return 'bg-green-950/40 border-green-800';
   if (s === 'degraded') return 'bg-amber-950/40 border-amber-800';
-  if (s === 'down')     return 'bg-red-950/40 border-red-800';
+  if (s === 'down') return 'bg-red-950/40 border-red-800';
   return 'bg-slate-800/40 border-slate-700';
 }
 
 function StatusDot({ status }: { status: string }) {
   const color =
-    status === 'healthy'  ? 'bg-green-400' :
+    status === 'healthy' ? 'bg-green-400' :
     status === 'degraded' ? 'bg-amber-400' :
-    status === 'down'     ? 'bg-red-400'   : 'bg-slate-600';
+    status === 'down' ? 'bg-red-400' : 'bg-slate-600';
   return <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${color}`} />;
 }
 
 function formatRelative(iso: string, nowMs: number) {
   const diff = Math.max(0, nowMs - new Date(iso).getTime());
   const s = Math.floor(diff / 1000);
-  if (s < 60)  return `${s}s ago`;
+  if (s < 60) return `${s}s ago`;
   const m = Math.floor(s / 60);
-  if (m < 60)  return `${m}m ago`;
+  if (m < 60) return `${m}m ago`;
   return `${Math.floor(m / 60)}h ago`;
 }
 
-// ─── Service card ─────────────────────────────────────────────────────────────
-
 const SERVICE_ICONS: Record<string, React.ElementType> = {
   Database: Database,
-  Redis:    Zap,
-  Stripe:   Shield,
+  Redis: Zap,
+  Stripe: Shield,
   'Email (SendGrid)': Mail,
   'Storage (Supabase)': Server,
 };
@@ -79,14 +75,12 @@ function ServiceCard({ check }: { check: ServiceCheck }) {
   );
 }
 
-// ─── Alert row ────────────────────────────────────────────────────────────────
-
 function AlertRow({ alert }: { alert: PlatformHealthSnapshot['alerts'][number] }) {
   const Icon = alert.severity === 'critical' ? XCircle :
-               alert.severity === 'warning'  ? AlertTriangle : Activity;
+    alert.severity === 'warning' ? AlertTriangle : Activity;
   const color = alert.severity === 'critical' ? 'text-red-400 border-red-800 bg-red-950/30' :
-                alert.severity === 'warning'  ? 'text-amber-400 border-amber-800 bg-amber-950/30' :
-                                                'text-blue-400 border-blue-800 bg-blue-950/30';
+    alert.severity === 'warning' ? 'text-amber-400 border-amber-800 bg-amber-950/30' :
+      'text-blue-400 border-blue-800 bg-blue-950/30';
   return (
     <div className={`flex items-start gap-3 rounded-lg border px-4 py-3 ${color}`}>
       <Icon className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -98,8 +92,6 @@ function AlertRow({ alert }: { alert: PlatformHealthSnapshot['alerts'][number] }
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
 export default function SystemHealthClient({
   initialSnapshot,
 }: {
@@ -107,8 +99,6 @@ export default function SystemHealthClient({
 }) {
   const [snap, setSnap] = useState<PlatformHealthSnapshot>(initialSnapshot);
   const [refreshing, setRefreshing] = useState(false);
-  // Keep the SSR/client hydration text identical. Relative time starts only
-  // after hydration, so Date.now() can never change the server HTML.
   const [nowMs, setNowMs] = useState<number | null>(null);
 
   const refresh = useCallback(async () => {
@@ -130,7 +120,6 @@ export default function SystemHealthClient({
     return () => clearInterval(clockId);
   }, []);
 
-  // 30s auto-refresh
   useEffect(() => {
     const id = setInterval(refresh, 30_000);
     return () => clearInterval(id);
@@ -138,17 +127,15 @@ export default function SystemHealthClient({
 
   const services = Object.values(snap.services);
   const overallBg =
-    snap.overall === 'healthy'  ? 'bg-green-950/40 border-green-800' :
+    snap.overall === 'healthy' ? 'bg-green-950/40 border-green-800' :
     snap.overall === 'degraded' ? 'bg-amber-950/40 border-amber-800' :
-                                  'bg-red-950/40 border-red-800';
+      'bg-red-950/40 border-red-800';
   const OverallIcon =
     snap.overall === 'healthy' ? CheckCircle :
     snap.overall === 'degraded' ? AlertTriangle : XCircle;
 
   return (
     <div className="space-y-6">
-
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">System Health</h1>
@@ -167,13 +154,12 @@ export default function SystemHealthClient({
         </button>
       </div>
 
-      {/* Overall status banner */}
       <div className={`rounded-xl border p-4 flex items-center gap-3 ${overallBg}`}>
         <OverallIcon className={`w-5 h-5 flex-shrink-0 ${statusColor(snap.overall)}`} />
         <div>
           <p className={`font-semibold ${statusColor(snap.overall)}`}>
-            {snap.overall === 'healthy'  ? 'All Systems Operational' :
-             snap.overall === 'degraded' ? 'Platform Degraded'       : 'Platform Down'}
+            {snap.overall === 'healthy' ? 'All Systems Operational' :
+             snap.overall === 'degraded' ? 'Platform Degraded' : 'Platform Down'}
           </p>
           <p className="text-slate-400 text-xs mt-0.5">
             {snap.alerts.length === 0
@@ -183,7 +169,6 @@ export default function SystemHealthClient({
         </div>
       </div>
 
-      {/* Active alerts */}
       {snap.alerts.length > 0 && (
         <div className="space-y-2">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wide">Active Alerts</h2>
@@ -191,7 +176,6 @@ export default function SystemHealthClient({
         </div>
       )}
 
-      {/* Service grid */}
       <div>
         <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-3">Services</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -199,7 +183,6 @@ export default function SystemHealthClient({
         </div>
       </div>
 
-      {/* AI providers */}
       <div>
         <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wide mb-3">AI Providers</h2>
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
@@ -211,21 +194,23 @@ export default function SystemHealthClient({
                 </div>
                 <div>
                   <p className="text-white text-sm capitalize">{p.name}</p>
-                  <p className={`text-xs ${p.configured ? (p.active ? 'text-green-400' : 'text-slate-400') : 'text-slate-600'}`}>
-                    {p.configured ? (p.active ? 'Active' : 'Configured') : 'Not set'}
+                  <p className={`text-xs ${p.configured ? 'text-slate-400' : 'text-slate-600'}`}>
+                    {p.configured ? (p.active ? 'Primary configured' : 'Configured') : 'Not set'}
                   </p>
                 </div>
               </div>
             ))}
           </div>
+          <p className="text-slate-500 text-xs mt-3">
+            Provider labels reflect configuration. Runtime provider calls are verified by feature-specific health and regression tests.
+          </p>
           {!snap.ai.anyConfigured && (
             <p className="text-red-400 text-sm mt-3">
-              ⚠ No AI provider configured — all AI features offline
+              No AI provider configured — all AI features offline
             </p>
           )}
         </div>
       </div>
-
     </div>
   );
 }

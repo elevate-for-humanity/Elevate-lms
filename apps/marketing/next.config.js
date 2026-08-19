@@ -52,8 +52,11 @@ const nextConfig = {
         permanent: true,
       },
 
-      // Public marketing aliases only. Private portal/Admin/LMS aliases are
-      // intentionally absent so retired internal paths remain inaccessible.
+      // Public compatibility aliases live here so internal application code
+      // can point directly at one canonical implementation. Next preserves
+      // incoming query parameters for these redirects when the destination
+      // does not replace them.
+      { source: '/apply/status', destination: '/apply/track', permanent: true },
       { source: '/course-factory', destination: '/ai/course-factory', permanent: true },
       { source: '/compare', destination: '/store#marketplace', permanent: true },
       { source: '/store/white-label', destination: '/white-label', permanent: true },

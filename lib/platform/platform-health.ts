@@ -13,8 +13,6 @@
 
 import { logger } from '@/lib/logger';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type HealthStatus = 'healthy' | 'degraded' | 'down' | 'unknown';
 
 export type ServiceCheck = {
@@ -55,8 +53,6 @@ export type PlatformAlert = {
   service: string;
   message: string;
 };
-
-// ─── Individual checks ────────────────────────────────────────────────────────
 
 async function withTimeout<T>(
   promise: Promise<T>,
@@ -100,19 +96,37 @@ async function checkDatabase(): Promise<ServiceCheck> {
 }
 
 async function checkRedis(): Promise<ServiceCheck> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.REDIS_URL?.trim();
 
-  if (!url || !token) {
-    return { name: 'Redis', status: 'unknown', configured: false, message: 'Not configured' };
+  if (!url) {
+    return {
+      name: 'Redis',
+      status: 'unknown',
+      configured: false,
+      message: 'REDIS_URL not configured',
+    };
   }
 
   const start = Date.now();
+  let redis: import('ioredis').Redis | null = null;
   try {
-    const { Redis } = await import('@upstash/redis');
-    const redis = new Redis({ url, token });
-    await redis.ping();
-    return { name: 'Redis', status: 'healthy', latencyMs: Date.now() - start, configured: true };
+    const { Redis } = await import('ioredis');
+    redis = new Redis(url, {
+      maxRetriesPerRequest: 1,
+      connectTimeout: 5_000,
+      enableReadyCheck: true,
+      lazyConnect: true,
+    });
+    await redis.connect();
+    const pong = await redis.ping();
+    if (pong !== 'PONG') throw new Error(`Unexpected Redis ping response: ${String(pong)}`);
+
+    return {
+      name: 'Redis',
+      status: 'healthy',
+      latencyMs: Date.now() - start,
+      configured: true,
+    };
   } catch (err) {
     return {
       name: 'Redis',
@@ -121,6 +135,14 @@ async function checkRedis(): Promise<ServiceCheck> {
       message: err instanceof Error ? err.message : 'Ping failed',
       configured: true,
     };
+  } finally {
+    if (redis) {
+      try {
+        redis.disconnect();
+      } catch {
+        // Health checks must not fail while cleaning up a probe connection.
+      }
+    }
   }
 }
 
@@ -158,13 +180,12 @@ function checkStorage(): ServiceCheck {
 
 function checkAIProviders(): PlatformHealthSnapshot['ai'] {
   const providers: AIProviderCheck[] = [
-    { name: 'openai',    configured: Boolean(process.env.OPENAI_API_KEY),    active: false },
-    { name: 'groq',      configured: Boolean(process.env.GROQ_API_KEY),      active: false },
-    { name: 'gemini',    configured: Boolean(process.env.GEMINI_API_KEY),    active: false },
+    { name: 'openai', configured: Boolean(process.env.OPENAI_API_KEY), active: false },
+    { name: 'groq', configured: Boolean(process.env.GROQ_API_KEY), active: false },
+    { name: 'gemini', configured: Boolean(process.env.GEMINI_API_KEY), active: false },
     { name: 'anthropic', configured: Boolean(process.env.ANTHROPIC_API_KEY), active: false },
   ];
 
-  // Mark the first configured provider as active (matches aiChat() fallback order)
   const active = providers.find(p => p.configured);
   if (active) active.active = true;
 
@@ -174,8 +195,6 @@ function checkAIProviders(): PlatformHealthSnapshot['ai'] {
     anyConfigured: providers.some(p => p.configured),
   };
 }
-
-// ─── Alert generation ─────────────────────────────────────────────────────────
 
 function generateAlerts(
   services: PlatformHealthSnapshot['services'],
@@ -190,7 +209,9 @@ function generateAlerts(
   }
 
   if (services.redis.status === 'down') {
-    alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — Redis is down' });
+    alerts.push({ severity: 'warning', service: 'Redis', message: services.redis.message ?? 'Rate limiting unavailable — Redis is down' });
+  } else if (!services.redis.configured) {
+    alerts.push({ severity: 'warning', service: 'Redis', message: 'Rate limiting unavailable — REDIS_URL is not configured' });
   }
 
   if (!services.stripe.configured) {
@@ -208,8 +229,6 @@ function generateAlerts(
   return alerts;
 }
 
-// ─── Overall status ───────────────────────────────────────────────────────────
-
 function determineOverall(
   services: PlatformHealthSnapshot['services'],
   alerts: PlatformAlert[],
@@ -220,12 +239,10 @@ function determineOverall(
   return 'healthy';
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
-
 const TIMEOUT_MS = 5000;
 
 const DOWN_DB: ServiceCheck = { name: 'Database', status: 'down', configured: true, message: 'Timed out' };
-const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'unknown', configured: false, message: 'Timed out' };
+const DOWN_REDIS: ServiceCheck = { name: 'Redis', status: 'down', configured: true, message: 'Timed out' };
 
 export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   const start = Date.now();
@@ -236,14 +253,14 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
       withTimeout(checkRedis(), TIMEOUT_MS, DOWN_REDIS),
     ]);
 
-    const stripe  = checkStripe();
-    const email   = checkEmail();
+    const stripe = checkStripe();
+    const email = checkEmail();
     const storage = checkStorage();
-    const ai      = checkAIProviders();
+    const ai = checkAIProviders();
 
     const services = { database, redis, stripe, email, storage };
-    const alerts   = generateAlerts(services, ai);
-    const overall  = determineOverall(services, alerts);
+    const alerts = generateAlerts(services, ai);
+    const overall = determineOverall(services, alerts);
 
     return {
       overall,
@@ -261,10 +278,10 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
       responseTimeMs: Date.now() - start,
       services: {
         database: DOWN_DB,
-        redis:    DOWN_REDIS,
-        stripe:   { name: 'Stripe',  status: 'unknown', configured: false },
-        email:    { name: 'Email',   status: 'unknown', configured: false },
-        storage:  { name: 'Storage', status: 'unknown', configured: false },
+        redis: DOWN_REDIS,
+        stripe: { name: 'Stripe', status: 'unknown', configured: false },
+        email: { name: 'Email', status: 'unknown', configured: false },
+        storage: { name: 'Storage', status: 'unknown', configured: false },
       },
       ai: { activeProvider: null, providers: [], anyConfigured: false },
       alerts: [{ severity: 'critical', service: 'Platform', message: 'Health check failed entirely' }],
@@ -272,20 +289,21 @@ export async function getPlatformHealth(): Promise<PlatformHealthSnapshot> {
   }
 }
 
-/**
- * Lightweight version — skips async checks (DB, Redis).
- * Use for server components that need fast config-only status.
- */
 export function getPlatformHealthSync(): Pick<PlatformHealthSnapshot, 'ai' | 'services'> {
-  const stripe  = checkStripe();
-  const email   = checkEmail();
+  const stripe = checkStripe();
+  const email = checkEmail();
   const storage = checkStorage();
-  const ai      = checkAIProviders();
+  const ai = checkAIProviders();
 
   return {
     services: {
       database: { name: 'Database', status: 'unknown', configured: true },
-      redis:    { name: 'Redis',    status: 'unknown', configured: Boolean(process.env.UPSTASH_REDIS_REST_URL) },
+      redis: {
+        name: 'Redis',
+        status: 'unknown',
+        configured: Boolean(process.env.REDIS_URL),
+        message: process.env.REDIS_URL ? undefined : 'REDIS_URL not configured',
+      },
       stripe,
       email,
       storage,

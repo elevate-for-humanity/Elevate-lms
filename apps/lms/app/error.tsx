@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { captureError } from '@/lib/monitoring';
+import { captureError } from '@/lib/monitoring/index';
 
 export default function LmsError({
   error,

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Clock, Play, CheckCircle, Video, Scissors, ArrowRight, Award } from 'lucide-react';
+import { BookOpen, Play, Scissors } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
@@ -22,13 +22,6 @@ export default async function LMSCoursesPage() {
     .select('id,status,progress_percent,started_at,last_activity_at,course:course_id(id,title,slug,short_description,thumbnail_url,total_lessons,duration_hours)')
     .eq('user_id', user.id)
     .eq('course.is_active', true);
-
-  const { data: barberCourse } = await supabase
-    .from('courses')
-    .select('id,title,slug,short_description,thumbnail_url,total_lessons,duration_hours')
-    .eq('slug', 'barber-apprenticeship')
-    .eq('is_active', true)
-    .maybeSingle();
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -52,13 +45,8 @@ export default async function LMSCoursesPage() {
               </article>;
             })}
           </div>
-        ) : barberCourse ? (
-          <article className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="bg-gradient-to-r from-cyan-600 to-blue-700 p-8 text-white"><div className="flex items-center gap-4"><div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20"><Scissors className="h-10 w-10" /></div><div><div className="mb-1 flex items-center gap-2 text-sm text-cyan-100"><Award className="h-4 w-4" /> Barber Apprenticeship Training</div><h2 className="text-2xl font-bold">{barberCourse.title}</h2></div></div></div>
-            <div className="p-6"><div className="mb-6 flex flex-wrap gap-6 text-sm text-slate-700"><span className="flex items-center gap-2"><Video className="h-5 w-5 text-cyan-600" />{barberCourse.total_lessons || 0} lessons</span><span className="flex items-center gap-2"><Clock className="h-5 w-5 text-cyan-600" />{barberCourse.duration_hours || 0}h training</span><span className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-emerald-600" />Exam preparation</span></div><div className="flex flex-wrap gap-4"><Link href="/apprentice/course" className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 font-bold text-white"><Play className="h-5 w-5" /> Start Training</Link><Link href="/apprentice" className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-6 py-3 font-medium text-slate-700">View Dashboard <ArrowRight className="h-4 w-4" /></Link></div></div>
-          </article>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center"><BookOpen className="mx-auto mb-4 h-16 w-16 text-slate-300" /><h2 className="text-xl font-bold">No Courses Yet</h2><Link href="/programs" className="mt-6 inline-flex rounded-lg bg-blue-600 px-6 py-3 font-medium text-white">Browse Programs</Link></div>
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center"><BookOpen className="mx-auto mb-4 h-16 w-16 text-slate-300" /><h2 className="text-xl font-bold">No Courses Yet</h2><p className="mt-2 text-sm text-slate-500">Courses appear here only after an enrollment grants access.</p><Link href="/programs" className="mt-6 inline-flex rounded-lg bg-blue-600 px-6 py-3 font-medium text-white">Browse Programs</Link></div>
         )}
       </div></section>
     </main>

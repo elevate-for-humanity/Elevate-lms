@@ -94,7 +94,7 @@ export default function StorePage() {
 
       <section className="border-y border-slate-200 bg-slate-50 py-12">
         <div className="mx-auto grid max-w-5xl gap-6 px-5 md:grid-cols-[1fr_auto] md:items-center">
-          <div><h2 className="text-2xl font-black">Ready to use your own workspace?</h2><p className="mt-2 font-semibold text-slate-700">Start free, keep guided recommendations or demo state where supported, then choose a paid plan only when you are ready.</p></div>
+          <div><h2 className="text-2xl font-black">Ready to use your own workspace?</h2><p className="mt-2 font-semibold text-slate-700">Start free, keep guided recommendations or sample progress where supported, then choose a paid plan only when you are ready.</p></div>
           <div className="flex flex-wrap gap-3"><Link href="/store/trial" className="inline-flex items-center gap-2 rounded-xl bg-brand-red-700 px-5 py-3 font-black text-white hover:bg-brand-red-800">Start Free Trial <ArrowRight className="h-4 w-4" /></Link><Link href="/store/plans" className="rounded-xl border-2 border-slate-800 bg-white px-5 py-3 font-black text-slate-950 hover:bg-slate-100">Compare Plans</Link></div>
         </div>
       </section>

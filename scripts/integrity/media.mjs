@@ -178,7 +178,7 @@ console.log('\n── Portal picture coverage ──');
 const portalRequirements = [
   ['Learner', 'apps/lms/app/lms/(app)/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'learningTools']],
   ['Apprentice', 'apps/lms/app/apprentice/page.tsx', ['<Image', 'getProgramHeroImage', 'Your workspaces']],
-  ['Host Shop', 'apps/lms/app/host-shop/dashboard/board/page.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
+  ['Host Shop', 'apps/lms/app/host-shop/dashboard/HostShopDashboardView.tsx', ['<Image', 'PortalImageCard', 'Host Shop tools']],
   ['Program Holder', 'apps/lms/app/program-holder/dashboard/page.tsx', ['<Image', 'getProgramCardImage', 'Your programs']],
 ];
 for (const [name, relPath, markers] of portalRequirements) {

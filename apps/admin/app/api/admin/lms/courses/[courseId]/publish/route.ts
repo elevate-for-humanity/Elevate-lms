@@ -2,8 +2,8 @@
  * POST /api/admin/lms/courses/[courseId]/publish
  *
  * Canonical persisted-course publication boundary. The Studio publish panel and
- * all Admin course publishing must cross this gate. The gate validates the
- * actual rows that the learner LMS will render; it does not trust UI state.
+ * all Admin course publishing cross this gate. It validates the actual rows that
+ * the learner LMS will render; it never trusts client state.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,8 +16,8 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam']);
-const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation']);
+const ASSESSMENT_TYPES = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
+const PRACTICAL_TYPES = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
 
 function asArray(value: unknown): any[] {
   return Array.isArray(value) ? value : [];
@@ -40,9 +40,7 @@ async function runProcurementHealthCheck(
     .maybeSingle();
 
   if (courseError) throw courseError;
-  if (!course) {
-    return { pass: false, blocking_issues: ['course not found'], metrics: {} };
-  }
+  if (!course) return { pass: false, blocking_issues: ['course not found'], metrics: {} };
 
   if (!course.title?.trim()) blocking.push('course title is missing');
   if (!course.slug?.trim()) blocking.push('course slug is missing');
@@ -63,7 +61,7 @@ async function runProcurementHealthCheck(
     .select(`
       id,title,slug,domain_key,target_hours,order_index,
       course_lessons(
-        id,title,slug,lesson_type,content,rendered_html,video_url,quiz_questions,
+        id,title,slug,lesson_type,content,rendered_html,video_url,video_config,quiz_questions,
         passing_score,duration_minutes,generation_status,ai_generated,approved,
         domain_key,hour_category,delivery_method,learning_objectives,
         competency_checks,practical_required,evidence_type,requires_instructor_signoff,
@@ -83,6 +81,7 @@ async function runProcurementHealthCheck(
   let practicals = 0;
   let competencyMappings = 0;
   let interactiveLessons = 0;
+  let accessibleNarrationLessons = 0;
 
   for (const [mi, module] of (mods as any[]).entries()) {
     if (!module.title?.trim()) blocking.push(`module ${mi + 1}: title missing`);
@@ -107,7 +106,7 @@ async function runProcurementHealthCheck(
         ? (lesson.content_json as Record<string, any>)
         : {};
       const experience = contentJson.experience && typeof contentJson.experience === 'object'
-        ? contentJson.experience
+        ? contentJson.experience as Record<string, any>
         : null;
 
       if (lesson.approved === true) approvedLessons += 1;
@@ -118,6 +117,7 @@ async function runProcurementHealthCheck(
       if (isPractical) practicals += 1;
       competencyMappings += competencies.length;
       if (experience && Object.keys(experience).length > 0) interactiveLessons += 1;
+      if (String(experience?.narrationScript ?? '').trim()) accessibleNarrationLessons += 1;
 
       if (!type) issues.push('lesson_type missing');
       if (!lesson.slug?.trim()) issues.push('slug missing');
@@ -138,8 +138,26 @@ async function runProcurementHealthCheck(
           if (!String(question?.explanation ?? '').trim()) issues.push(`question ${qi + 1} rationale missing`);
           if (!question?.domainKey && asArray(question?.competencyKeys).length === 0) issues.push(`question ${qi + 1} standards/competency mapping missing`);
         });
-      } else if (!hasContent(lesson.content) && !String(lesson.rendered_html ?? '').trim() && !String(lesson.video_url ?? '').trim()) {
-        issues.push('instructional content missing');
+      } else {
+        if (!hasContent(lesson.content) && !String(lesson.rendered_html ?? '').trim() && !String(lesson.video_url ?? '').trim()) {
+          issues.push('instructional content missing');
+        }
+        if (lesson.ai_generated === true && !isPractical) {
+          if (!experience) {
+            issues.push('canonical interactive lesson experience missing');
+          } else {
+            if (!String(experience.narrationScript ?? '').trim()) issues.push('narration/transcript missing');
+            if (!String(experience.visualPrompt ?? '').trim()) issues.push('visual specification missing');
+            if (asArray(experience.flashcards).length < 4) issues.push('fewer than 4 flashcards');
+            if (asArray(experience.knowledgeChecks).length < 3) issues.push('fewer than 3 formative knowledge checks');
+            if (!experience.remediation || Number(experience.remediation.passingScore ?? 0) <= 0) issues.push('mastery remediation plan missing');
+          }
+        }
+        if (lesson.video_url) {
+          const videoConfig = lesson.video_config && typeof lesson.video_config === 'object' ? lesson.video_config as Record<string, any> : {};
+          const hasAccessibleText = Boolean(String(experience?.narrationScript ?? '').trim() || String(videoConfig.transcript ?? '').trim());
+          if (!hasAccessibleText) issues.push('video has no transcript/narration text for accessibility');
+        }
       }
 
       if (isPractical) {
@@ -180,6 +198,7 @@ async function runProcurementHealthCheck(
       practicals,
       competencyMappings,
       interactiveLessons,
+      accessibleNarrationLessons,
     },
   };
 }
@@ -196,12 +215,7 @@ export async function POST(
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
     if (!profile || !['admin', 'staff', 'super_admin'].includes(profile.role)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -227,7 +241,6 @@ export async function POST(
     }
 
     const result = await publishCourse(supabase, courseId, user.id, label);
-
     await logAdminAudit({
       action: AdminAction.COURSE_PUBLISHED,
       actorId: user.id,

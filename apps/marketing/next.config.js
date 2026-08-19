@@ -33,7 +33,9 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   staticPageGenerationTimeout: 300,
   skipTrailingSlashRedirect: true,
-  transpilePackages: ['buffer', 'process'],
+  // edge-tts ships TypeScript source and is reachable through shared server-side
+  // video generation code. Transpile it explicitly for the Marketing build too.
+  transpilePackages: ['buffer', 'process', 'edge-tts'],
 
   async rewrites() {
     return {

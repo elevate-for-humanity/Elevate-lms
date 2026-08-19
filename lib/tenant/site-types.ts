@@ -18,7 +18,49 @@ export type TenantSiteContact = {
   hours?: string[];
 };
 
+export type TenantSiteSectionType =
+  | 'hero'
+  | 'rich_text'
+  | 'features'
+  | 'services'
+  | 'products'
+  | 'testimonial'
+  | 'stats'
+  | 'gallery'
+  | 'image'
+  | 'video'
+  | 'faq'
+  | 'team'
+  | 'pricing'
+  | 'cta'
+  | 'contact_form'
+  | 'booking';
+
+export type TenantSiteSection = {
+  id: string;
+  type: TenantSiteSectionType;
+  visible?: boolean;
+  content: Record<string, unknown>;
+  settings?: Record<string, unknown>;
+};
+
+export type TenantSitePage = {
+  id: string;
+  slug: string;
+  title: string;
+  navLabel?: string;
+  showInNavigation?: boolean;
+  seo?: {
+    title?: string;
+    description?: string;
+    keywords?: string[];
+  };
+  sections: TenantSiteSection[];
+};
+
 export type TenantSiteConfig = {
+  schemaVersion?: 1 | 2;
+  pages?: TenantSitePage[];
   template: {
     id: string;
     name: string;

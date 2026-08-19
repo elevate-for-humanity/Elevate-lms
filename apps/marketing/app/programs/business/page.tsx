@@ -2,9 +2,8 @@ import { permanentRedirect } from 'next/navigation';
 
 /**
  * Compatibility alias retained for historical business-program links.
- * The former /programs/business-administration target is not a live page, so
- * route visitors to the maintained program catalog instead of a redirect-to-404.
+ * Business Administration is published at the canonical slug below.
  */
 export default function BusinessAliasPage() {
-  permanentRedirect('/programs');
+  permanentRedirect('/programs/business-administration');
 }

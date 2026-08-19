@@ -29,8 +29,21 @@ for (const file of [
 ]) if (!exists(file)) fail(`canonical Studio file is missing: ${file}`);
 
 const adminLayout = read('apps/admin/app/layout.tsx');
-for (const sharedSurface of ['AdminHeader', 'AdminFooter', 'LiveChatWidget']) {
-  if (!adminLayout.includes(sharedSurface)) fail(`Admin layout is missing shared surface: ${sharedSurface}`);
+// Studio is part of the privileged Admin application and must inherit the same
+// operational shell. Public marketing/support surfaces are intentionally not
+// mounted in this root because they compete with admin/PWA navigation and can
+// expose public actions inside an authenticated workspace.
+for (const sharedSurface of [
+  'AdminHeader',
+  'BuildVersionSync',
+  'AdminPwaRegister',
+  'AdminUpdateNotice',
+  'SupabaseConfigBootstrap',
+]) {
+  if (!adminLayout.includes(sharedSurface)) fail(`Admin layout is missing privileged shared surface: ${sharedSurface}`);
+}
+for (const publicSurface of ['AdminFooter', 'LiveChatWidget']) {
+  if (adminLayout.includes(publicSurface)) fail(`Admin layout reintroduced public surface into privileged workspace: ${publicSurface}`);
 }
 for (const standaloneBypass of ['isDevStudio', "x-pathname", "pathname.includes('/studio')"]) {
   if (adminLayout.includes(standaloneBypass)) fail(`Admin layout bypasses its canonical shell for Studio: ${standaloneBypass}`);
@@ -118,4 +131,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: ${routes.length} canonical workspaces inside one Admin surface, no standalone shell, no parallel API routes, no legacy admin/devstudio namespace.`);
+console.log(`Studio architecture verified: ${routes.length} canonical workspaces inside the hardened Admin surface, no public-shell leakage, no standalone shell, no parallel API routes, no legacy admin/devstudio namespace.`);

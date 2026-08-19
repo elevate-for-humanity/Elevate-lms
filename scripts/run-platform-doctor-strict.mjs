@@ -6,7 +6,9 @@ import { spawnSync } from 'node:child_process';
 const root = process.cwd();
 const reportPath = path.join(root, 'artifacts', 'platform-doctor-report.json');
 const branch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || '';
+const isPullRequest = Boolean(process.env.GITHUB_HEAD_REF);
 const isRecovery = branch.startsWith('release/production-recovery-');
+const useRegressionDelta = isPullRequest || isRecovery;
 
 function validateTimeouts(report) {
   const checks = Array.isArray(report?.checks) ? report.checks : [];
@@ -67,9 +69,10 @@ function runStatic(cwd, outPath) {
   return result.status ?? 1;
 }
 
-function runRecoveryDelta() {
-  // Keep a full current report for operator visibility. It is intentionally
-  // advisory here because recovery acceptance is based on regression delta.
+function runRegressionDelta() {
+  // Keep the full current report for operator visibility. Pull-request and
+  // recovery acceptance is based on whether this change introduces new
+  // CRITICAL findings relative to the target mainline, not on inherited debt.
   const full = spawnSync('node', ['scripts/platform-doctor.mjs'], {
     cwd: root,
     stdio: 'inherit',
@@ -94,9 +97,9 @@ function runRecoveryDelta() {
     return 1;
   }
 
-  const currentStatic = path.join(root, 'artifacts', 'platform-doctor-recovery-static.json');
+  const currentStatic = path.join(root, 'artifacts', 'platform-doctor-regression-static.json');
   if (runStatic(root, currentStatic) !== 0 || !fs.existsSync(currentStatic)) {
-    console.error('Current recovery static Platform Doctor scan failed to produce evidence.');
+    console.error('Current static Platform Doctor scan failed to produce evidence.');
     return 1;
   }
 
@@ -151,16 +154,16 @@ function runRecoveryDelta() {
     const resolved = [...baseCounts].reduce((total, [key, count]) => total + Math.max(0, count - (currentCounts.get(key) || 0)), 0);
     const newCount = regressions.reduce((total, item) => total + item.delta, 0);
 
-    console.log(`Platform Doctor recovery delta: base=${baseCritical.length} current=${currentCritical.length} new=${newCount} resolved=${resolved}`);
+    console.log(`Platform Doctor regression delta: base=${baseCritical.length} current=${currentCritical.length} new=${newCount} resolved=${resolved}`);
     if (regressions.length > 0) {
-      console.error('FAIL: Recovery introduced new Platform Doctor CRITICAL findings:');
+      console.error('FAIL: Change introduced new Platform Doctor CRITICAL findings:');
       for (const item of regressions.slice(0, 50)) console.error(` - ${item.delta}x ${item.key}`);
       exitCode = 1;
     } else {
-      console.log('PASS: Recovery introduced no new Platform Doctor CRITICAL findings.');
+      console.log('PASS: Change introduced no new Platform Doctor CRITICAL findings.');
     }
   } catch (error) {
-    console.error(`Platform Doctor recovery comparison failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`Platform Doctor regression comparison failed: ${error instanceof Error ? error.message : String(error)}`);
     exitCode = 1;
   } finally {
     spawnSync('git', ['worktree', 'remove', '--force', tempDir], { cwd: root, stdio: 'inherit' });
@@ -168,4 +171,4 @@ function runRecoveryDelta() {
   return exitCode;
 }
 
-process.exit(isRecovery ? runRecoveryDelta() : runStrictProduction());
+process.exit(useRegressionDelta ? runRegressionDelta() : runStrictProduction());

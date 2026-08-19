@@ -21,9 +21,18 @@ function text(value: unknown) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function isMediaAsset(value: string) {
+  const clean = value.split('?')[0].split('#')[0].toLowerCase();
+  return /\.(?:avif|gif|jpe?g|png|svg|webp|mp4|m4v|mov|webm|ogg|mp3|wav|pdf)$/i.test(clean)
+    || /^\/(?:images|videos|audio|uploads|storage|assets|media)\//i.test(clean)
+    || /^data:/i.test(value)
+    || /^blob:/i.test(value);
+}
+
 function inspectHref(value: unknown, knownPaths: Set<string>, issues: SiteValidationIssue[], page: TenantSitePage, section?: TenantSiteSection) {
   const href = text(value);
   if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+  if (isMediaAsset(href)) return;
   if (/^https?:\/\//i.test(href)) {
     try { new URL(href); } catch {
       issues.push({ severity: 'error', code: 'invalid_external_link', message: `Invalid external link: ${href}`, page: page.slug, sectionId: section?.id });

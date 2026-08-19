@@ -65,6 +65,10 @@ export async function exportNewRegistrations(
     const lastName = nameParts[nameParts.length - 1] || '';
     const middleName = nameParts.length > 2 ? nameParts.slice(1, -1).join(' ') : '';
     const programConfig = Object.values(RAPIDS_CONFIG.programs).find((p) => p.slug === program.slug);
+    const termLengthHours = program.total_hours;
+    if (termLengthHours == null && programConfig?.approach !== 'competency-based') {
+      errors.push(`Missing term length hours for enrollment ${enrollment.id}`);
+    }
     rows.push([
       RAPIDS_CONFIG.programNumber,
       lastName,
@@ -80,7 +84,7 @@ export async function exportNewRegistrations(
       formatDate(enrollment.enrolled_at),
       programConfig?.occupationCode || program.occupation_code || '',
       programConfig?.name || program.name || '',
-      String(programConfig?.totalHours || program.total_hours || 2000),
+      termLengthHours == null ? '' : String(termLengthHours),
       String(programConfig?.relatedInstructionHours || program.related_instruction_hours || 144),
       enrollment.employer_name || RAPIDS_CONFIG.programBrand,
       enrollment.employer_fein || '',

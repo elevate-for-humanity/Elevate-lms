@@ -30,7 +30,7 @@ const PROGRAM_ALIASES: Record<string, HostShopProgramType> = {
   'esthetician-apprenticeship': 'esthetician',
 };
 
-/** One canonical authenticated Host Shop onboarding route tree for every trade. */
+/** One canonical authenticated Host Shop route tree for every trade. */
 export const HOST_SHOP_ONBOARDING_PATHS: Record<
   HostShopProgramType,
   { signMou: string; forms: string; documents: string; dashboard: string }
@@ -39,25 +39,25 @@ export const HOST_SHOP_ONBOARDING_PATHS: Record<
     signMou: '/host-shop/onboarding/mou',
     forms: '/host-shop/onboarding/profile',
     documents: '/host-shop/onboarding/documents',
-    dashboard: '/host-shop/dashboard/board',
+    dashboard: '/host-shop/dashboard',
   },
   cosmetology: {
     signMou: '/host-shop/onboarding/mou',
     forms: '/host-shop/onboarding/profile',
     documents: '/host-shop/onboarding/documents',
-    dashboard: '/host-shop/dashboard/board',
+    dashboard: '/host-shop/dashboard',
   },
   nail_technician: {
     signMou: '/host-shop/onboarding/mou',
     forms: '/host-shop/onboarding/profile',
     documents: '/host-shop/onboarding/documents',
-    dashboard: '/host-shop/dashboard/board',
+    dashboard: '/host-shop/dashboard',
   },
   esthetician: {
     signMou: '/host-shop/onboarding/mou',
     forms: '/host-shop/onboarding/profile',
     documents: '/host-shop/onboarding/documents',
-    dashboard: '/host-shop/dashboard/board',
+    dashboard: '/host-shop/dashboard',
   },
 };
 
@@ -159,9 +159,6 @@ function normalizeLegacyRequirement(
   } else if (rawType === 'insurance_coi') {
     documentType = 'liability_insurance';
   } else if (rawType === 'w9') {
-    // The public Host Site application accepts EIN verification OR W-9 in one
-    // tax-identity upload. Treat the legacy global W-9 requirement as that same
-    // canonical record so the portal does not demand a duplicate upload.
     documentType = 'ein_letter';
   }
 
@@ -177,13 +174,7 @@ function normalizeLegacyRequirement(
     normalized.description = 'IRS CP 575/147C EIN verification or an acceptable W-9 business identity record.';
     normalized.is_required = true;
   }
-  if (documentType === 'business_license') {
-    // The public application explicitly treats the local business/occupancy
-    // document as optional. Do not turn an optional upload into a second
-    // approval blocker because of an older requirement row.
-    normalized.is_required = false;
-  }
-
+  if (documentType === 'business_license') normalized.is_required = false;
   return normalized;
 }
 
@@ -193,7 +184,6 @@ export function mergeHostShopDocumentRequirements(
 ) {
   const defaults = getDefaultHostShopDocumentRequirements(program);
   const byType = new Map<string, Record<string, unknown>>();
-
   for (const req of defaults) byType.set(req.document_type, req);
   for (const raw of dbRequirements ?? []) {
     const req = normalizeLegacyRequirement(raw, program);

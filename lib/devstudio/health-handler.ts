@@ -130,7 +130,7 @@ export async function handleDevStudioHealth(req: NextRequest) {
       anthropic: hasAnthropic,
     },
     git: {
-      endpoint: '/api/admin/dev-studio/git',
+      endpoint: '/api/devstudio/git',
       remoteUrlPresent: Boolean(
         process.env.GITHUB_REMOTE_URL || process.env.GITHUB_REPO,
       ),

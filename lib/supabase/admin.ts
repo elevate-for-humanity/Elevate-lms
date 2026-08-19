@@ -10,7 +10,9 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  * yet hydrated — which happens on every cold serverless start. That causes a
  * 500 on the first request to any page that calls this directly.
  *
- * `getAdminClient()` calls `hydrateProcessEnv()` first and is safe on cold starts.
+ * `getAdminClient()` calls `hydrateProcessEnv()` only when credentials are
+ * absent. Trusted CLI/build workers with preloaded credentials do not import
+ * the Next-only secrets hydrator.
  *
  * The only valid remaining uses of `createAdminClient()` are:
  *   - `lib/` utilities called after hydration is guaranteed (e.g. from within getAdminClient itself)
@@ -21,31 +23,21 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
  */
 // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
 export function createAdminClient(): SupabaseClient<any> {
-  // ── Request-context guard ────────────────────────────────────────────────
-  // Next.js sets NEXT_RUNTIME in all serverless function contexts.
-  // If SUPABASE_SERVICE_ROLE_KEY is absent at call time, we are almost
-  // certainly on a cold start before hydrateProcessEnv() has run.
-  // Callers in app/ must use getAdminClient() instead.
-  // Callers in lib/ that are invoked from request paths must also use
-  // getAdminClient() — see the @deprecated notice above.
-  //
-  // We detect the likely-cold-start condition (NEXT_RUNTIME set but key
-  // missing) and throw with an actionable message rather than letting the
-  // Supabase client silently fail on the first query.
+  // Next.js sets NEXT_RUNTIME in request/serverless contexts. If the service
+  // key is absent there, request-time callers must use getAdminClient() so the
+  // secret store can hydrate before the client is created.
   if (process.env.NEXT_RUNTIME && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error(
-      // SAFE: non-request-time context — scripts/ or internal admin.ts, hydration guaranteed by caller
       'createAdminClient() called before env hydration in a Next.js runtime context. ' +
-        'Use getAdminClient() instead — it calls hydrateProcessEnv() first.',
+        'Use getAdminClient() instead — it hydrates secrets when required.',
     );
   }
-  // ────────────────────────────────────────────────────────────────────────
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url) {
-    throw new Error('MISSING_ENV: NEXT_PUBLIC_SUPABASE_URL is not set');
+    throw new Error('MISSING_ENV: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_URL is not set');
   }
   if (!key) {
     throw new Error('MISSING_ENV: SUPABASE_SERVICE_ROLE_KEY is not set');
@@ -61,31 +53,34 @@ export function createAdminClient(): SupabaseClient<any> {
 }
 
 /**
- * Async version of createAdminClient that hydrates secrets first.
- * Use this in API routes instead of createAdminClient() to guarantee
- * SUPABASE_SERVICE_ROLE_KEY is loaded even on cold starts.
+ * Async version of createAdminClient that hydrates secrets only when the
+ * process does not already have a service-role credential.
  *
- * Returns null if SUPABASE_SERVICE_ROLE_KEY is absent (e.g. build-time prerender).
- * Use `requireAdminClient()` when null is not acceptable.
+ * This distinction is intentional:
+ * - Next request runtimes may start before secret hydration and therefore need
+ *   `hydrateProcessEnv()`.
+ * - trusted server/CLI/CI workers receive credentials before process startup;
+ *   importing the Next-only secret hydrator there is both unnecessary and can
+ *   trip the `server-only` package guard.
  *
- * Usage:
- *   const db = await requireAdminClient();
+ * Returns null if SUPABASE_SERVICE_ROLE_KEY remains absent. Use
+ * `requireAdminClient()` when null is not acceptable.
  */
 export async function getAdminClient(): Promise<SupabaseClient<any> | null> {
-  try {
-    const { hydrateProcessEnv } = await import('@/lib/secrets');
-    await hydrateProcessEnv();
-  } catch {
-    // Secrets hydration unavailable (build-time prerender, local dev).
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const { hydrateProcessEnv } = await import('@/lib/secrets');
+      await hydrateProcessEnv();
+    } catch {
+      // Secrets hydration unavailable (build-time prerender, local tooling).
+    }
   }
 
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    // Key absent — caller must handle null (fall back to anon client or skip write).
     return null;
   }
 
   try {
-    // SAFE: hydration attempted above; key confirmed present
     return createAdminClient();
   } catch {
     return null;
@@ -94,11 +89,6 @@ export async function getAdminClient(): Promise<SupabaseClient<any> | null> {
 
 /**
  * Like getAdminClient() but throws if the service role key is absent.
- * Use in server components and pages where a null client would cause a broken page.
- * The error boundary will catch this and show a 500 rather than a silently broken UI.
- *
- * Usage:
- *   const db = await requireAdminClient();
  */
 export async function requireAdminClient(): Promise<SupabaseClient<any>> {
   const client = await getAdminClient();
@@ -114,17 +104,12 @@ export async function requireAdminClient(): Promise<SupabaseClient<any>> {
 /**
  * Create an admin client with audit context pre-set.
  * The audit trigger will read these session variables to attribute the write.
- *
- * Usage:
- *   const db = await createAuditedAdminClient({ actorUserId: user.id, systemActor: 'admin_api' });
- *   await db.from('profiles').update({ role: 'admin' }).eq('id', targetId);
  */
 export async function createAuditedAdminClient(ctx: {
   actorUserId?: string | null;
   systemActor?: string | null;
   requestId?: string | null;
 }): Promise<SupabaseClient<any>> {
-  // Hydrate secrets before creating the client — same guarantee as getAdminClient().
   const client = await requireAdminClient();
 
   try {

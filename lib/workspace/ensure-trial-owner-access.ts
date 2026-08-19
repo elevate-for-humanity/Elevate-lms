@@ -5,6 +5,13 @@ import { logger } from '@/lib/logger';
 import { startAppTrial } from '@/lib/trial/start-app-trial';
 
 type AdminClient = Awaited<ReturnType<typeof requireAdminClient>>;
+type AccessStage =
+  | 'identity_ready'
+  | 'profile_ready'
+  | 'organization_access_ready'
+  | 'tenant_access_ready'
+  | 'entitlements_ready'
+  | 'builder_ready';
 
 export type EnsureTrialOwnerAccessInput = {
   organizationId: string;
@@ -22,23 +29,8 @@ export type EnsureTrialOwnerAccessInput = {
 };
 
 export type EnsureTrialOwnerAccessResult =
-  | {
-      ok: true;
-      userId: string;
-      loginUrl: string;
-      builderUrl: string;
-    }
-  | {
-      ok: false;
-      error: string;
-      stage:
-        | 'identity_ready'
-        | 'profile_ready'
-        | 'organization_access_ready'
-        | 'tenant_access_ready'
-        | 'entitlements_ready'
-        | 'builder_ready';
-    };
+  | { ok: true; userId: string; loginUrl: string; builderUrl: string }
+  | { ok: false; error: string; stage: AccessStage };
 
 function asObject(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value)
@@ -49,7 +41,7 @@ function asObject(value: unknown): Record<string, unknown> {
 async function recordStage(
   db: AdminClient,
   workspaceId: string,
-  stage: string,
+  stage: AccessStage,
   source: EnsureTrialOwnerAccessInput['source'],
   reference: string,
   error?: string,
@@ -59,36 +51,31 @@ async function recordStage(
     .select('metadata')
     .eq('id', workspaceId)
     .maybeSingle();
-
   const metadata = asObject(workspace?.metadata);
   const onboarding = asObject(metadata.onboarding);
   const stages = asObject(onboarding.stages);
-
-  await db
-    .from('customer_workspaces')
-    .update({
-      metadata: {
-        ...metadata,
-        onboarding: {
-          ...onboarding,
-          source,
-          reference,
-          last_stage: stage,
-          last_error: error ?? null,
-          updated_at: new Date().toISOString(),
-          stages: {
-            ...stages,
-            [stage]: {
-              status: error ? 'failed' : 'ready',
-              at: new Date().toISOString(),
-              ...(error ? { error } : {}),
-            },
+  await db.from('customer_workspaces').update({
+    metadata: {
+      ...metadata,
+      onboarding: {
+        ...onboarding,
+        source,
+        reference,
+        last_stage: stage,
+        last_error: error ?? null,
+        updated_at: new Date().toISOString(),
+        stages: {
+          ...stages,
+          [stage]: {
+            status: error ? 'failed' : 'ready',
+            at: new Date().toISOString(),
+            ...(error ? { error } : {}),
           },
         },
       },
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', workspaceId);
+    },
+    updated_at: new Date().toISOString(),
+  }).eq('id', workspaceId);
 }
 
 export async function ensureTrialOwnerAccess(
@@ -99,11 +86,7 @@ export async function ensureTrialOwnerAccess(
   const ownerName = input.ownerName.trim();
   const builderUrl = input.builderUrl || '/apps/website-builder';
 
-  const fail = async (
-    stage: EnsureTrialOwnerAccessResult extends { ok: false; stage: infer S } ? S : never,
-    error: string,
-    cause?: unknown,
-  ): Promise<EnsureTrialOwnerAccessResult> => {
+  const fail = async (stage: AccessStage, error: string, cause?: unknown): Promise<EnsureTrialOwnerAccessResult> => {
     logger.error('[trial-owner-access] provisioning stage failed', cause instanceof Error ? cause : undefined, {
       workspaceId: input.workspaceId,
       tenantId: input.tenantId,
@@ -113,8 +96,8 @@ export async function ensureTrialOwnerAccess(
       reference: input.reference,
       error,
     });
-    await recordStage(db, input.workspaceId, stage as string, input.source, input.reference, error).catch(() => {});
-    return { ok: false, stage, error } as EnsureTrialOwnerAccessResult;
+    await recordStage(db, input.workspaceId, stage, input.source, input.reference, error).catch(() => {});
+    return { ok: false, stage, error };
   };
 
   const generated = await db.auth.admin.generateLink({
@@ -122,108 +105,51 @@ export async function ensureTrialOwnerAccess(
     email: ownerEmail,
     options: {
       redirectTo: builderUrl,
-      data: {
-        full_name: ownerName,
-        role: 'org_admin',
-        organization_id: input.organizationId,
-        tenant_id: input.tenantId,
-      },
+      data: { full_name: ownerName, role: 'org_admin', organization_id: input.organizationId, tenant_id: input.tenantId },
     },
   });
-
   if (generated.error || !generated.data?.user?.id) {
-    return fail(
-      'identity_ready',
-      'Administrator sign-in could not be provisioned.',
-      generated.error ?? undefined,
-    );
+    return fail('identity_ready', 'Administrator sign-in could not be provisioned.', generated.error ?? undefined);
   }
-
   const authUser = generated.data.user;
   await recordStage(db, input.workspaceId, 'identity_ready', input.source, input.reference).catch(() => {});
 
-  const { data: existingProfile, error: profileLookupError } = await db
-    .from('profiles')
+  const { data: existingProfile, error: profileLookupError } = await db.from('profiles')
     .select('id, email, full_name, role, organization_id, tenant_id')
     .eq('id', authUser.id)
     .maybeSingle();
-
-  if (profileLookupError) {
-    return fail('profile_ready', 'Administrator profile could not be checked.', profileLookupError);
-  }
+  if (profileLookupError) return fail('profile_ready', 'Administrator profile could not be checked.', profileLookupError);
 
   const profilePayload = existingProfile
-    ? {
-        id: authUser.id,
-        email: ownerEmail,
-        full_name: ownerName,
-        role: existingProfile.role ?? 'org_admin',
-        organization_id: existingProfile.organization_id ?? input.organizationId,
-        tenant_id: existingProfile.tenant_id ?? input.tenantId,
-      }
-    : {
-        id: authUser.id,
-        email: ownerEmail,
-        full_name: ownerName,
-        role: 'org_admin',
-        organization_id: input.organizationId,
-        tenant_id: input.tenantId,
-      };
-
-  const { error: profileError } = await db
-    .from('profiles')
-    .upsert(profilePayload, { onConflict: 'id' });
-  if (profileError) {
-    return fail('profile_ready', 'Administrator profile could not be linked.', profileError);
-  }
+    ? { id: authUser.id, email: ownerEmail, full_name: ownerName, role: existingProfile.role ?? 'org_admin', organization_id: existingProfile.organization_id ?? input.organizationId, tenant_id: existingProfile.tenant_id ?? input.tenantId }
+    : { id: authUser.id, email: ownerEmail, full_name: ownerName, role: 'org_admin', organization_id: input.organizationId, tenant_id: input.tenantId };
+  const { error: profileError } = await db.from('profiles').upsert(profilePayload, { onConflict: 'id' });
+  if (profileError) return fail('profile_ready', 'Administrator profile could not be linked.', profileError);
   await recordStage(db, input.workspaceId, 'profile_ready', input.source, input.reference).catch(() => {});
 
   const { error: orgMembershipError } = await db.from('organization_users').upsert(
-    {
-      organization_id: input.organizationId,
-      user_id: authUser.id,
-      role: 'org_owner',
-      status: 'active',
-    },
+    { organization_id: input.organizationId, user_id: authUser.id, role: 'org_owner', status: 'active' },
     { onConflict: 'organization_id,user_id' },
   );
-  if (orgMembershipError) {
-    return fail(
-      'organization_access_ready',
-      'Organization access could not be provisioned.',
-      orgMembershipError,
-    );
-  }
+  if (orgMembershipError) return fail('organization_access_ready', 'Organization access could not be provisioned.', orgMembershipError);
   await recordStage(db, input.workspaceId, 'organization_access_ready', input.source, input.reference).catch(() => {});
 
   const { error: tenantMembershipError } = await db.from('tenant_memberships').upsert(
-    {
-      tenant_id: input.tenantId,
-      user_id: authUser.id,
-      role: 'owner',
-    },
+    { tenant_id: input.tenantId, user_id: authUser.id, role: 'owner' },
     { onConflict: 'tenant_id,user_id' },
   );
-  if (tenantMembershipError) {
-    return fail('tenant_access_ready', 'Tenant access could not be provisioned.', tenantMembershipError);
-  }
+  if (tenantMembershipError) return fail('tenant_access_ready', 'Tenant access could not be provisioned.', tenantMembershipError);
   await recordStage(db, input.workspaceId, 'tenant_access_ready', input.source, input.reference).catch(() => {});
 
   const builderTrial = await startAppTrial(authUser.id, 'website-builder', db);
-  if (builderTrial.status === 'error') {
-    return fail('entitlements_ready', 'Website Builder access could not be provisioned.');
-  }
+  if (builderTrial.status === 'error') return fail('entitlements_ready', 'Website Builder access could not be provisioned.');
   await recordStage(db, input.workspaceId, 'entitlements_ready', input.source, input.reference).catch(() => {});
 
-  const { data: website, error: websiteLookupError } = await db
-    .from('user_websites')
+  const { data: website, error: websiteLookupError } = await db.from('user_websites')
     .select('id, site_config')
     .eq('organization_id', input.organizationId)
     .maybeSingle();
-
-  if (websiteLookupError) {
-    return fail('builder_ready', 'Website Builder workspace could not be checked.', websiteLookupError);
-  }
+  if (websiteLookupError) return fail('builder_ready', 'Website Builder workspace could not be checked.', websiteLookupError);
 
   if (website?.id) {
     const currentConfig = asObject(website.site_config);
@@ -240,32 +166,22 @@ export async function ensureTrialOwnerAccess(
         onboardingSource: input.source,
       },
     };
-
-    const { error: websiteUpdateError } = await db
-      .from('user_websites')
-      .update({
-        user_id: authUser.id,
-        site_config: updatedConfig,
-        is_published: false,
-        status: 'draft',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', website.id);
-
-    if (websiteUpdateError) {
-      return fail('builder_ready', 'Website Builder ownership could not be linked.', websiteUpdateError);
-    }
+    const { error: websiteUpdateError } = await db.from('user_websites').update({
+      user_id: authUser.id,
+      site_config: updatedConfig,
+      is_published: false,
+      status: 'draft',
+      updated_at: new Date().toISOString(),
+    }).eq('id', website.id);
+    if (websiteUpdateError) return fail('builder_ready', 'Website Builder ownership could not be linked.', websiteUpdateError);
   }
-
   await recordStage(db, input.workspaceId, 'builder_ready', input.source, input.reference).catch(() => {});
 
   const fallbackLogin = `https://app.elevateforhumanity.org/login?redirect=${encodeURIComponent(builderUrl)}`;
-  const loginUrl = generated.data?.properties?.action_link ?? fallbackLogin;
-
   return {
     ok: true,
     userId: authUser.id,
-    loginUrl,
+    loginUrl: generated.data?.properties?.action_link ?? fallbackLogin,
     builderUrl,
   };
 }

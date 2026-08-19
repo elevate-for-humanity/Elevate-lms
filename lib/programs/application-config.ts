@@ -1,70 +1,71 @@
 /**
- * lib/programs/application-config.ts
+ * Central application-routing contract.
  *
- * Central configuration for all student application flows.
- * Determines which form engine handles each program and carries
- * program-specific application metadata (funding options, pricing, CTAs).
- *
- * HOW TO ADD A NEW PROGRAM:
- * 1. Add to this config with the correct formEngine.
- * 2. formEngine 'canonical'  → rendered by /apply/student (preferred).
- * 3. formEngine 'dedicated'  → keeps its static page under app/programs/<slug>/apply.
- * 4. formEngine 'external'   → redirect to an external URL.
- *
- * Do NOT add per-program page files for programs that use 'canonical'.
+ * Programs use the canonical /apply/student flow unless they intentionally
+ * retain a dedicated chooser/payment surface. Keep program facts out of this
+ * file; duration, credentials and public funding claims belong to the program
+ * schema and funding registry.
  */
 
 export type ApplicationFormEngine = 'canonical' | 'dedicated' | 'external';
 
-/** Funding types available for a program */
 export type FundingType =
-  | 'wioa'         // WIOA / WorkOne — free for eligible Indiana residents
-  | 'employer'      // Employer or workforce grant sponsored
-  | 'self_pay'      // Out of pocket — full or deposit + payment plan
-  | 'unsure'        // Not sure yet — intake call will help determine
-  | 'scholarship'   // Other grant / scholarship
-  | 'payment_plan'; // BNPL or internal payment arrangement
+  | 'wioa'
+  | 'employer'
+  | 'self_pay'
+  | 'unsure'
+  | 'scholarship'
+  | 'payment_plan';
 
 export interface ProgramFundingOptions {
-  /** Which funding types are available for this program */
   available: FundingType[];
-  /** WIOA eligibility flow is shown for this program */
   supportsWioa: boolean;
-  /** BNPL / payment-plan checkout is available */
   supportsBnpl: boolean;
-  /** Deposit amount in cents (for self-pay programs) */
   depositCents?: number;
-  /** Full tuition in cents */
   fullTuitionCents?: number;
-  /** Stripe payment link — deposit */
   stripeDepositLink?: string;
-  /** Stripe payment link — full */
   stripeFullLink?: string;
 }
 
 export interface ProgramApplicationConfig {
-  /** URL slug — matches the directory name */
   slug: string;
-  /** Display name */
   name: string;
-  /** Short name for badges / headings */
   shortName: string;
-  /** Which form engine handles applications for this program */
   formEngine: ApplicationFormEngine;
-  /** Path to the form page (for 'dedicated') or redirect target (for 'external') */
   formPath?: string;
-  /** Program-specific funding options */
   funding: ProgramFundingOptions;
-  /** Tailwind color token e.g. "blue", "purple", "rose" */
   color: string;
-  /** Redirect to this URL after submission (canonical form reads this for success redirect) */
   successRedirect?: string;
 }
 
+function canonicalProgram(
+  slug: string,
+  name: string,
+  shortName: string,
+  color: string,
+  options: { supportsWioa?: boolean; supportsBnpl?: boolean } = {},
+): ProgramApplicationConfig {
+  const supportsWioa = Boolean(options.supportsWioa);
+  return {
+    slug,
+    name,
+    shortName,
+    formEngine: 'canonical',
+    color,
+    funding: {
+      available: supportsWioa
+        ? ['wioa', 'employer', 'self_pay', 'unsure']
+        : ['self_pay', 'employer', 'unsure'],
+      supportsWioa,
+      supportsBnpl: Boolean(options.supportsBnpl),
+    },
+  };
+}
+
 const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
-  // ─── BEAUTY / APPRENTICESHIP ─────────────────────────────────────────────
-  // These have dedicated static flows with complex apprenticeship + payment logic.
-  // They remain 'dedicated' but their success pages now redirect to /apply/confirmation.
+  // Beauty apprenticeship chooser pages intentionally remain dedicated because
+  // they split apprentice and Host Site enrollment before entering the canonical
+  // student application.
   'barber-apprenticeship': {
     slug: 'barber-apprenticeship',
     name: 'Barber Apprenticeship',
@@ -134,20 +135,16 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
     },
   },
 
-  // ─── TRADES ────────────────────────────────────────────────────────────────
-  'hvac-technician': {
-    slug: 'hvac-technician',
-    name: 'HVAC Technician',
-    shortName: 'HVAC',
-    formEngine: 'dedicated',
-    formPath: '/programs/hvac-technician/apply',
-    color: 'emerald',
-    funding: {
-      available: ['self_pay', 'employer', 'scholarship', 'unsure'],
-      supportsWioa: false,
-      supportsBnpl: true,
-    },
-  },
+  // HVAC is a canonical student application. The former dedicated HVAC page is
+  // a compatibility redirect only and must never be selected as the form engine.
+  'hvac-technician': canonicalProgram(
+    'hvac-technician',
+    'HVAC Certification',
+    'HVAC',
+    'emerald',
+    { supportsWioa: true, supportsBnpl: true },
+  ),
+
   'peer-recovery-specialist': {
     slug: 'peer-recovery-specialist',
     name: 'Peer Recovery Specialist',
@@ -162,201 +159,23 @@ const ALL_PROGRAMS: Record<string, ProgramApplicationConfig> = {
     },
   },
 
-  // ─── HEALTHCARE ────────────────────────────────────────────────────────────
-  // Use canonical /apply/student with program preselection
-  'cna': {
-    slug: 'cna',
-    name: 'Certified Nursing Assistant (CNA)',
-    shortName: 'CNA',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'phlebotomy': {
-    slug: 'phlebotomy',
-    name: 'Phlebotomy Technician',
-    shortName: 'Phlebotomy',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'medical-assistant': {
-    slug: 'medical-assistant',
-    name: 'Medical Assistant',
-    shortName: 'Med Assistant',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'qma': {
-    slug: 'qma',
-    name: 'Qualified Medication Aide (QMA)',
-    shortName: 'QMA',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'billing-coding': {
-    slug: 'billing-coding',
-    name: 'Medical Billing & Coding',
-    shortName: 'Billing & Coding',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'patient-care-technician': {
-    slug: 'patient-care-technician',
-    name: 'Patient Care Technician',
-    shortName: 'PCT',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'ehr-specialist': {
-    slug: 'ehr-specialist',
-    name: 'EHR Specialist',
-    shortName: 'EHR Specialist',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'pharmacy-tech': {
-    slug: 'pharmacy-tech',
-    name: 'Pharmacy Technician',
-    shortName: 'Pharmacy Tech',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-  'dental-assistant': {
-    slug: 'dental-assistant',
-    name: 'Dental Assistant',
-    shortName: 'Dental Asst',
-    formEngine: 'canonical',
-    color: 'blue',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-
-  // ─── IT ───────────────────────────────────────────────────────────────────
-  'it-help-desk': {
-    slug: 'it-help-desk',
-    name: 'IT Help Desk Specialist',
-    shortName: 'IT Help Desk',
-    formEngine: 'canonical',
-    color: 'slate',
-    funding: {
-      available: ['wioa', 'employer', 'self_pay', 'unsure'],
-      supportsWioa: true,
-      supportsBnpl: false,
-    },
-  },
-
-  // ─── HOSPITALITY ─────────────────────────────────────────────────────────
-  'food-safety-handler': {
-    slug: 'food-safety-handler',
-    name: 'Food Safety Handler',
-    shortName: 'Food Safety',
-    formEngine: 'canonical',
-    color: 'amber',
-    funding: {
-      available: ['self_pay', 'employer', 'unsure'],
-      supportsWioa: false,
-      supportsBnpl: false,
-    },
-  },
-  'servsafe-alcohol': {
-    slug: 'servsafe-alcohol',
-    name: 'ServSafe Alcohol Certification',
-    shortName: 'ServSafe Alcohol',
-    formEngine: 'canonical',
-    color: 'amber',
-    funding: {
-      available: ['self_pay', 'employer', 'unsure'],
-      supportsWioa: false,
-      supportsBnpl: false,
-    },
-  },
-
-  // ─── TESTING ──────────────────────────────────────────────────────────────
-  // Testing products use a separate testing application flow
-  'act-workkeys': {
-    slug: 'act-workkeys',
-    name: 'ACT WorkKeys',
-    shortName: 'ACT WorkKeys',
-    formEngine: 'canonical',
-    color: 'violet',
-    funding: {
-      available: ['self_pay', 'employer', 'unsure'],
-      supportsWioa: false,
-      supportsBnpl: false,
-    },
-  },
-  'osha-10': {
-    slug: 'osha-10',
-    name: 'OSHA 10-Hour Construction',
-    shortName: 'OSHA 10',
-    formEngine: 'canonical',
-    color: 'orange',
-    funding: {
-      available: ['self_pay', 'employer', 'unsure'],
-      supportsWioa: false,
-      supportsBnpl: false,
-    },
-  },
-  'cpr-first-aid': {
-    slug: 'cpr-first-aid',
-    name: 'CPR / First Aid',
-    shortName: 'CPR / First Aid',
-    formEngine: 'canonical',
-    color: 'red',
-    funding: {
-      available: ['self_pay', 'employer', 'unsure'],
-      supportsWioa: false,
-      supportsBnpl: false,
-    },
-  },
+  cna: canonicalProgram('cna', 'Certified Nursing Assistant (CNA)', 'CNA', 'blue'),
+  phlebotomy: canonicalProgram('phlebotomy', 'Phlebotomy Technician', 'Phlebotomy', 'blue'),
+  'medical-assistant': canonicalProgram('medical-assistant', 'Medical Assistant', 'Med Assistant', 'blue'),
+  qma: canonicalProgram('qma', 'Qualified Medication Aide (QMA)', 'QMA', 'blue'),
+  'billing-coding': canonicalProgram('billing-coding', 'Medical Billing & Coding', 'Billing & Coding', 'blue'),
+  'patient-care-technician': canonicalProgram('patient-care-technician', 'Patient Care Technician', 'PCT', 'blue'),
+  'ehr-specialist': canonicalProgram('ehr-specialist', 'EHR Specialist', 'EHR Specialist', 'blue'),
+  'pharmacy-tech': canonicalProgram('pharmacy-tech', 'Pharmacy Technician', 'Pharmacy Tech', 'blue'),
+  'dental-assistant': canonicalProgram('dental-assistant', 'Dental Assistant', 'Dental Asst', 'blue'),
+  'it-help-desk': canonicalProgram('it-help-desk', 'IT Help Desk Specialist', 'IT Help Desk', 'slate'),
+  'food-safety-handler': canonicalProgram('food-safety-handler', 'Food Safety Handler', 'Food Safety', 'amber'),
+  'servsafe-alcohol': canonicalProgram('servsafe-alcohol', 'ServSafe Alcohol Certification', 'ServSafe Alcohol', 'amber'),
+  'act-workkeys': canonicalProgram('act-workkeys', 'ACT WorkKeys', 'ACT WorkKeys', 'violet'),
+  'osha-10': canonicalProgram('osha-10', 'OSHA 10-Hour Construction', 'OSHA 10', 'orange'),
+  'cpr-first-aid': canonicalProgram('cpr-first-aid', 'CPR / First Aid', 'CPR / First Aid', 'red'),
 };
 
-/**
- * Legacy program slugs retained for old links, bookmarks, emails, and previous deployments.
- * Maps an old short slug to its canonical key in ALL_PROGRAMS.
- */
 const PROGRAM_SLUG_ALIASES: Readonly<Record<string, string>> = {
   esthetician: 'esthetician-apprenticeship',
   'nail-technician': 'nail-technician-apprenticeship',
@@ -364,10 +183,6 @@ const PROGRAM_SLUG_ALIASES: Readonly<Record<string, string>> = {
   barber: 'barber-apprenticeship',
 };
 
-/**
- * Normalizes a program slug for lookup in ALL_PROGRAMS.
- * Handles: lowercase, hyphen replacement, URL decoding, and legacy aliases.
- */
 function normalizeProgramSlug(value: string): string {
   const slug = decodeURIComponent(value)
     .trim()
@@ -378,11 +193,6 @@ function normalizeProgramSlug(value: string): string {
   return PROGRAM_SLUG_ALIASES[slug] ?? slug;
 }
 
-/**
- * Returns the application config for a program slug.
- * Returns null if the program is not found.
- * Handles legacy/short slugs via aliases.
- */
 export function getProgramApplicationConfig(
   slug: string,
 ): ProgramApplicationConfig | null {
@@ -390,32 +200,14 @@ export function getProgramApplicationConfig(
   return ALL_PROGRAMS[canonicalSlug] ?? null;
 }
 
-/**
- * Returns all programs that use the canonical form engine.
- * These can all be handled by /apply/student?program=<slug>.
- */
 export function getCanonicalPrograms(): ProgramApplicationConfig[] {
-  return Object.values(ALL_PROGRAMS).filter(
-    (p) => p.formEngine === 'canonical',
-  );
+  return Object.values(ALL_PROGRAMS).filter((p) => p.formEngine === 'canonical');
 }
 
-/**
- * Returns all programs that use dedicated form engines.
- */
 export function getDedicatedPrograms(): ProgramApplicationConfig[] {
-  return Object.values(ALL_PROGRAMS).filter(
-    (p) => p.formEngine === 'dedicated',
-  );
+  return Object.values(ALL_PROGRAMS).filter((p) => p.formEngine === 'dedicated');
 }
 
-/**
- * Returns the canonical form URL for a program.
- * For 'canonical' programs: /apply/student?program=<slug>
- * For 'dedicated' programs: the formPath
- * For 'external' programs: the formPath
- * Handles legacy/short slugs via aliases.
- */
 export function getApplyUrl(slug: string): string | null {
   const cfg = getProgramApplicationConfig(slug);
   if (!cfg) return null;

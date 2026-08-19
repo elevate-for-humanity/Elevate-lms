@@ -21,7 +21,7 @@ ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
 
-RUN echo "nf-cache-invalidate-lms-2026-08-19-dependency-layer"
+RUN echo "nf-cache-invalidate-lms-2026-08-19-workspace-manifests"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -45,9 +45,14 @@ ENV FFMPEG_BIN=/usr/bin/ffmpeg
 WORKDIR /app
 
 # Dependency metadata is copied before application source so ordinary code
-# changes do not invalidate the expensive pnpm install layer.
+# changes do not invalidate the expensive pnpm install layer. Every workspace
+# package declared by pnpm-workspace.yaml must exist before pnpm resolves the
+# workspace, even when this image only builds the LMS application.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/admin/package.json apps/admin/package.json
 COPY apps/lms/package.json apps/lms/package.json
+COPY apps/marketing/package.json apps/marketing/package.json
+COPY packages/config/package.json packages/config/package.json
 COPY packages/db/package.json packages/db/package.json
 COPY packages/shared/package.json packages/shared/package.json
 COPY packages/ui/package.json packages/ui/package.json

@@ -16,7 +16,7 @@ export default async function WebsiteResponsivePreviewPage({ params }: Props) {
   if (!user) redirect(`/login?redirect=/apps/website-builder/edit/${websiteId}/preview`);
 
   const access = await getWebsiteBuilderAccess(user.id, supabase);
-  if (!access.allowed) redirect(`/store/apps/website-builder?access=${encodeURIComponent(access.reason || 'inactive')}`);
+  if (!access.allowed) redirect(access.upgradeUrl || `/store/apps/website-builder?reason=${encodeURIComponent(access.reason || 'inactive')}`);
 
   const { data: site } = await supabase
     .from('user_websites')

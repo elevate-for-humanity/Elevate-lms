@@ -23,8 +23,6 @@ const nextConfig = {
     return { beforeFiles: legacyImageRewrites(), afterFiles: [], fallback: [] };
   },
   async redirects() {
-    // Compatibility redirects live here instead of redirect-only page files.
-    // Internal application code must point directly at the canonical routes.
     return [
       { source: '/reset', destination: '/support/reset-browser', permanent: true },
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
@@ -41,7 +39,6 @@ const nextConfig = {
       { source: '/store', destination: 'https://www.elevateforhumanity.org/store', permanent: true },
     ];
   },
-  serverExternalPackages: ['@remotion/bundler', '@remotion/renderer', '@remotion/licensing', 'esbuild', 'edge-tts'],
   webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
       config.plugins = config.plugins || [];

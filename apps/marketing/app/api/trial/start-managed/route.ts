@@ -116,7 +116,7 @@ async function _POST(request: NextRequest) {
       db,
     });
 
-    if (!access.ok) {
+    if (access.ok === false) {
       return NextResponse.json({
         error: `Workspace exists but onboarding could not complete at ${access.stage}. ${access.error}`,
         correlationId: reference,

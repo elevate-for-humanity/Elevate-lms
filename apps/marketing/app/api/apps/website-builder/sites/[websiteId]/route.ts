@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import { bridgeLegacyPatchIntoComposition } from '@/lib/tenant/legacy-composition-bridge';
+import { validateSiteConfig } from '@/lib/tenant/site-validation';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
@@ -82,9 +83,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     update.subdomain = requestedSubdomain;
   }
 
+  let validation = validateSiteConfig(merged);
   if (body.publish === true) {
     const target = requestedSubdomain !== undefined ? requestedSubdomain : site.subdomain;
     if (!target) return NextResponse.json({ error: 'Choose a valid subdomain before publishing' }, { status: 400 });
+    if (!validation.valid) {
+      return NextResponse.json({
+        error: 'Website failed pre-publish QA. Fix the blocking issues before publishing.',
+        validation,
+      }, { status: 422 });
+    }
     update.subdomain = target;
     update.is_published = true;
     update.status = 'published';
@@ -99,8 +107,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const { data: saved, error: saveError } = await supabase.from('user_websites').update(update).eq('id', websiteId).eq('user_id', user.id).select('id, site_name, subdomain, is_published, site_config').maybeSingle();
   if (saveError || !saved) return NextResponse.json({ error: saveError?.message || 'Could not save website' }, { status: 500 });
 
+  validation = validateSiteConfig(saved.site_config as TenantSiteConfig);
   const publicUrl = saved.subdomain && saved.is_published ? `https://${saved.subdomain}.app.elevateforhumanity.org` : null;
-  return NextResponse.json({ website: saved, publicUrl });
+  return NextResponse.json({ website: saved, publicUrl, validation });
 }
 
 export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ websiteId: string }> }) {

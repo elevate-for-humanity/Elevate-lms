@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import { getAppendixAStandard } from '@/lib/compliance/appendix-a-standards';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,10 +22,12 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const enrollment = (enrollments || []).find((row: any) => getAppendixAStandard(row.program_slug));
+  const enrollment = (enrollments || []).find((row: any) => getRegisteredProgramStandard(row.program_slug));
   if (!enrollment) return NextResponse.json({ enrollment: null, standard: null, records: [] });
 
-  const standard = getAppendixAStandard(enrollment.program_slug);
+  const contract = getRegisteredProgramStandard(enrollment.program_slug);
+  if (!contract) return NextResponse.json({ enrollment: null, standard: null, records: [] });
+
   const { data: records, error: recordError } = await db
     .from('apprentice_competency_records')
     .select('id, enrollment_id, competency_id, completed, date_completed, verified_by_name, notes, updated_at')
@@ -40,7 +42,9 @@ export async function GET() {
       id: enrollment.id,
       programSlug: enrollment.program_slug,
     },
-    standard,
+    standard: contract.standard,
+    completion: contract.completion,
+    sponsor: contract.sponsor,
     records: records || [],
     completedCompetencies,
   });

@@ -24,6 +24,7 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      { source: '/', destination: '/login', permanent: false },
       { source: '/reset', destination: '/support/reset-browser', permanent: true },
       { source: '/reset/done', destination: '/support/reset-browser/done', permanent: true },
       { source: '/partners/dashboard', destination: '/host-shop/dashboard', permanent: true },

@@ -26,8 +26,8 @@ export default async function HostShopStorePage() {
           <h1 className="mt-2 text-3xl font-black text-slate-950">Host Shop Store</h1>
           <p className="mt-2 text-slate-600">Only verified products with an active checkout should be offered here.</p>
         </div>
-        <Link href="/host-shop/dashboard/board" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
-          Back to board
+        <Link href="/host-shop/dashboard" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">
+          Back to dashboard
         </Link>
       </div>
 

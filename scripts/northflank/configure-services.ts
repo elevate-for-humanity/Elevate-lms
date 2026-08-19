@@ -34,6 +34,7 @@ type RolloutMode = 'custom' | 'rollout-steady' | 'recreate';
 
 const RUNTIME_PORT = 3000;
 const DESIRED_INSTANCES = 1;
+const BUILDKIT_CACHE_MB = 32768;
 
 export const NORTHFLANK_SERVICE_CONFIGS: ServiceConfig[] = [
   {
@@ -202,7 +203,7 @@ function buildPatch(service: ServiceConfig, storageMb: number, rolloutMode: Roll
         buildEngine: 'buildkit',
         dockerFilePath: service.dockerfile,
         dockerWorkDir: '/',
-        buildkit: { useCache: false, cacheStorageSize: 0 },
+        buildkit: { useCache: true, cacheStorageSize: BUILDKIT_CACHE_MB },
       },
     },
     buildConfiguration: {
@@ -280,7 +281,7 @@ async function configureService(
       `port=${RUNTIME_PORT} instances=${DESIRED_INSTANCES} rollout=${appliedRolloutMode} ` +
       `${availabilitySummary} health=startup:/api/ping,readiness:/api/health,liveness:/api/ping ` +
       `ci=github-actions buildPlan=${billing.buildPlan} deploymentPlan=${billing.deploymentPlan} ` +
-      `ephemeralMB=${appliedEphemeralMb}`,
+      `ephemeralMB=${appliedEphemeralMb} buildkitCacheMB=${BUILDKIT_CACHE_MB}`,
   );
 }
 
@@ -308,7 +309,8 @@ async function main() {
     for (const service of services) {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
-          `rollout=${rolloutMode}, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ci=github-actions`,
+          `rollout=${rolloutMode}, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ` +
+          `ci=github-actions, buildkitCacheMB=${BUILDKIT_CACHE_MB}`,
       );
     }
     return;

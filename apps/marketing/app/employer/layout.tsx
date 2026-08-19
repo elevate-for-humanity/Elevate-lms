@@ -1,6 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { headers, cookies } from 'next/headers';
 import { PlatformShell } from '@/components/platform/PlatformShell';
+import { requireRole } from '@/lib/auth/require-role';
 import { generateBreadcrumbs } from '@/lib/navigation/navigation-config';
 
 export const dynamic = 'force-dynamic';
@@ -11,47 +11,25 @@ export const metadata = {
   description: 'Employer dashboard, hiring, and apprenticeship management.',
 };
 
-// Only require login - no role restrictions
-
 export default async function EmployerLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user, profile } = await requireRole(['employer', 'sponsor', 'admin', 'staff']);
 
-  if (!user) {
-    const [{ headers: headersList }, { cookies }] = await Promise.all([
-      import('next/headers'),
-      import('next/headers'),
-    ]);
-    const headers = await headersList();
-    const cookieStore = await cookies();
-    const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/employer';
-    redirect(`/login?redirect=${encodeURIComponent(pathname)}`);
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, verified, full_name, first_name, last_name, avatar_url, email')
-    .eq('id', user.id)
-    .maybeSingle();
-
-  const [{ headers: headersList }, { cookies }] = await Promise.all([
-    import('next/headers'),
-    import('next/headers'),
-  ]);
-  const headers = await headersList();
+  const headersList = await headers();
   const cookieStore = await cookies();
-  const pathname = headers.get('x-pathname') || cookieStore.get('__efh_pathname')?.value || '/employer';
+  const pathname =
+    headersList.get('x-pathname') ||
+    cookieStore.get('__efh_pathname')?.value ||
+    '/employer';
   const breadcrumbs = generateBreadcrumbs(pathname);
 
   return (
     <PlatformShell
       user={{
         id: user.id,
-        email: user.email || profile?.email || '',
-        full_name: profile?.full_name || undefined,
-        first_name: profile?.first_name || undefined,
-        last_name: profile?.last_name || undefined,
-        avatar_url: profile?.avatar_url || undefined,
+        email: user.email || profile.email || '',
+        full_name: profile.full_name || undefined,
+        first_name: profile.first_name || undefined,
+        last_name: profile.last_name || undefined,
       }}
       role="employer"
       breadcrumbs={breadcrumbs}

@@ -18,6 +18,11 @@ function requireText(path, text, message) {
   if (content && !content.includes(text)) failures.push(message || `${path} missing ${text}`);
 }
 
+function forbidText(path, text, message) {
+  const content = read(path);
+  if (content && content.includes(text)) failures.push(message || `${path} must not contain ${text}`);
+}
+
 const studentForm = 'apps/marketing/app/apply/student/StudentApplicationForm.tsx';
 const submissionApi = 'apps/marketing/app/api/applications/route.ts';
 const trackerPage = 'apps/marketing/app/apply/track/page.tsx';
@@ -37,9 +42,7 @@ for (const path of [
   'lib/enrollment/create-enrollment.ts',
   'lib/enrollment/complete-enrollment.ts',
   'lib/enrollment/enrollment-flow.ts',
-]) {
-  read(path);
-}
+]) read(path);
 
 requireText(studentForm, "fetch('/api/applications'", 'student application must submit through canonical /api/applications');
 requireText(studentForm, "'X-Idempotency-Key': idempotencyKey", 'student application must preserve idempotent submission');
@@ -55,12 +58,17 @@ for (const status of ['submitted', 'pending_funding', 'pending_admin_review']) {
 
 requireText(legacyStatus, 'redirect(`/apply/track${suffix}`)', 'legacy /apply/status must redirect to canonical /apply/track');
 requireText(trackerPage, 'fetch(`/api/applications/track?', 'tracker page must use canonical tracking API');
+requireText(trackerPage, 'if (!applicationId || !applicationEmail)', 'tracker UI must require both verification values before lookup');
+requireText(trackerPage, 'required\n              autoComplete="off"', 'tracker UI must require the application identifier');
+requireText(trackerPage, 'type="email"\n              required', 'tracker UI must require the application email');
 requireText(trackerApi, ".from('applications')", 'tracker API must read canonical applications table');
 requireText(trackerApi, "if (!id || !email)", 'public tracker must require both application ID and matching email');
 requireText(trackerApi, ".eq('normalized_email', email)", 'public tracker must bind the lookup to the applicant email');
 requireText(trackerApi, "query = query.eq('reference_number', id)", 'public tracker must bind reference-number lookups to the same applicant row');
 requireText(trackerApi, "query = query.eq('id', id)", 'public tracker must bind UUID lookups to the same applicant row');
-requireText(trackerApi, '...data,', 'tracker API must preserve canonical persisted workflow status');
+requireText(trackerApi, 'status: data.status', 'tracker API must preserve the canonical persisted workflow status');
+forbidText(trackerApi, 'last_name, email, phone', 'public tracker response selection must not include unnecessary applicant PII');
+forbidText(trackerApi, 'support_notes', 'public tracker response must not expose internal support notes');
 
 for (const status of [
   'submitted',
@@ -99,4 +107,4 @@ if (failures.length) {
 }
 
 console.log('[student-lifecycle-contract] PASS');
-console.log('application -> confirmation -> paired private tracker -> pending account -> canonical approval -> LMS access contracts are canonical');
+console.log('application -> confirmation -> paired minimized tracker -> pending account -> canonical approval -> LMS access contracts are canonical');

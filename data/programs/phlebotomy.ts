@@ -20,7 +20,7 @@ export const PHLEBOTOMY: ProgramSchema = {
 
   deliveryMode: 'hybrid',
   deliveredBy: 'Elevate',
-  durationWeeks: 8,
+  durationWeeks: 4,
   hoursPerWeekMin: 28,
   hoursPerWeekMax: 32,
   hoursBreakdown: {
@@ -141,7 +141,6 @@ export const PHLEBOTOMY: ProgramSchema = {
   paymentTerms:
     'Self-pay program. $1,500 total tuition. 20% deposit ($300) required at enrollment. Pay the balance weekly, in full, or via BNPL. All options available at checkout.',
 
-  // ─── Content model ──────────────────────────────────────────────
   deliveryModel: 'internal',
   deliveryModelDetail: 'internal_lms',
   fundingOptions: ['impact', 'self_pay'],
@@ -170,21 +169,28 @@ export const PHLEBOTOMY: ProgramSchema = {
 
   weeklySchedule: [
     {
-      week: 'Weeks 1–2',
-      title: 'Anatomy & Blood Collection Fundamentals',
+      week: 'Week 1',
+      title: 'Foundations & Safety',
       competencyMilestone:
-        'Identify venipuncture sites and demonstrate proper technique on mannequin',
+        'Identify venipuncture sites, apply infection-control procedures, and demonstrate safe equipment handling.',
     },
     {
-      week: 'Weeks 3–4',
-      title: 'Specimen Handling & Safety',
+      week: 'Week 2',
+      title: 'Venipuncture Technique',
       competencyMilestone:
-        'Process and label specimens correctly; pass OSHA bloodborne pathogens assessment',
+        'Demonstrate venipuncture and capillary-puncture technique on training equipment with instructor sign-off.',
     },
     {
-      week: 'Week 5',
+      week: 'Week 3',
+      title: 'Specimen Handling & Clinical Skills',
+      competencyMilestone:
+        'Collect, label, process, and document specimens correctly while meeting OSHA bloodborne-pathogen requirements.',
+    },
+    {
+      week: 'Week 4',
       title: 'Clinical Practicum & Certification Prep',
-      competencyMilestone: 'Complete 50 supervised venipunctures; pass NHA CPT practice exam',
+      competencyMilestone:
+        'Complete required supervised clinical practice and NHA CPT exam preparation.',
     },
   ],
 
@@ -229,8 +235,10 @@ export const PHLEBOTOMY: ProgramSchema = {
     'No prior healthcare experience required',
     'Government-issued photo ID',
   ],
-  equipmentIncluded: 'All lab supplies, NHA CPT exam voucher, CPR/BLS certification, and Bloodborne Pathogens certificate included',
-  modality: 'Hybrid — In-person lab practice and supervised clinical draws, LMS-supported theory',
+  equipmentIncluded:
+    'All lab supplies, NHA CPT exam voucher, CPR/BLS certification, and Bloodborne Pathogens certificate included',
+  modality:
+    'Hybrid — In-person lab practice and supervised clinical draws, LMS-supported theory',
   facilityInfo: 'Elevate training center, Indianapolis',
   pricingIncludes: [
     '120 instructional hours',

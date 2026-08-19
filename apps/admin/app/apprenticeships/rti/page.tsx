@@ -42,7 +42,9 @@ async function reviewRti(formData: FormData) {
 export default async function RegisteredRtiReviewPage() {
   const { user, effectiveRoles } = await requireRole(['admin', 'super_admin', 'org_admin', 'staff', 'instructor']);
   const db = await requireAdminClient();
-  const instructorOnly = effectiveRoles.includes('instructor') && !effectiveRoles.some((role) => ['admin', 'super_admin', 'org_admin', 'staff'].includes(role));
+  const hasSponsorWideRole = effectiveRoles.some((role) => ['admin', 'super_admin', 'staff'].includes(role));
+  const instructorOnly = effectiveRoles.includes('instructor') && !hasSponsorWideRole && !effectiveRoles.includes('org_admin');
+  const orgAdminOnly = effectiveRoles.includes('org_admin') && !hasSponsorWideRole;
 
   const { data: activeStandards, error: standardsError } = await db
     .from('apprenticeship_standard_versions')
@@ -70,6 +72,24 @@ export default async function RegisteredRtiReviewPage() {
         .select('id')
         .in('program_id', programIds);
       if (enrollmentError) throw new Error(`INSTRUCTOR_ENROLLMENTS_LOAD_FAILED:${enrollmentError.message}`);
+      allowedEnrollmentIds = (enrollments || []).map((row: any) => row.id);
+    }
+  } else if (orgAdminOnly) {
+    const { data: memberships, error: membershipError } = await db
+      .from('organization_users')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .in('role', ['org_owner', 'org_admin']);
+    if (membershipError) throw new Error(`ORG_ADMIN_MEMBERSHIP_LOAD_FAILED:${membershipError.message}`);
+    const organizationIds = (memberships || []).map((row: any) => row.organization_id).filter(Boolean);
+    if (!organizationIds.length) allowedEnrollmentIds = [];
+    else {
+      const { data: enrollments, error: enrollmentError } = await db
+        .from('program_enrollments')
+        .select('id')
+        .in('organization_id', organizationIds);
+      if (enrollmentError) throw new Error(`ORG_ADMIN_ENROLLMENTS_LOAD_FAILED:${enrollmentError.message}`);
       allowedEnrollmentIds = (enrollments || []).map((row: any) => row.id);
     }
   }

@@ -35,10 +35,11 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=dependencies /app/apps/lms/node_modules ./apps/lms/node_modules
 COPY . .
 
-# Portal shell regressions are release-blocking. This test verifies the canonical
-# mobile drawer layering, scroll lock, keyboard dismissal, responsive overflow
-# contract, touch targets, and that primary LMS roles use the shared shell.
-RUN pnpm exec vitest run tests/unit/platform-shell-mobile-contract.test.ts
+# Portal regressions are release-blocking. These tests verify the canonical
+# responsive/mobile shell contract and server-side authorization boundaries
+# across learner, apprentice, employer, workforce, host-shop, program-holder,
+# parent, provider, case-manager, and workforce-board portal surfaces.
+RUN pnpm exec vitest run tests/unit/platform-shell-mobile-contract.test.ts tests/unit/portal-auth-boundaries-contract.test.ts
 
 # Capture a real build timestamp even when the platform does not inject one.
 RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); console.log('LMS build timestamp:', ts)"

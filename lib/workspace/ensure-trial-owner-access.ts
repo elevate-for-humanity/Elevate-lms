@@ -3,6 +3,7 @@ import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { startAppTrial } from '@/lib/trial/start-app-trial';
+import { hasIndividualAppAccess, syncIndividualAppSubscription } from '@/lib/apps/sync-subscription';
 
 type AdminClient = Awaited<ReturnType<typeof requireAdminClient>>;
 type AccessStage =
@@ -143,6 +144,14 @@ export async function ensureTrialOwnerAccess(
 
   const builderTrial = await startAppTrial(authUser.id, 'website-builder', db);
   if (builderTrial.status === 'error') return fail('entitlements_ready', 'Website Builder access could not be provisioned.');
+
+  const effectiveSubscription = await syncIndividualAppSubscription(authUser.id, 'website-builder', db);
+  if (!hasIndividualAppAccess(effectiveSubscription)) {
+    const reason = effectiveSubscription?.access_reason === 'trial_expired'
+      ? 'Website Builder trial has expired. Choose a paid plan to continue.'
+      : 'Website Builder access is not active.';
+    return fail('entitlements_ready', reason);
+  }
   await recordStage(db, input.workspaceId, 'entitlements_ready', input.source, input.reference).catch(() => {});
 
   const { data: website, error: websiteLookupError } = await db.from('user_websites')

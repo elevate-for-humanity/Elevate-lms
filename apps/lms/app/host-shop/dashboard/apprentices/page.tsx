@@ -16,7 +16,7 @@ export default async function HostShopApprenticesPage() {
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div><p className="text-xs font-black uppercase tracking-[0.14em] text-brand-blue-700">{board.partner?.name || 'Host Shop'}</p><h1 className="mt-2 text-3xl font-black text-slate-950">Assigned Apprentices</h1><p className="mt-2 text-slate-600">Only active placements assigned to this Host Shop are shown.</p></div>
-        <Link href="/host-shop/dashboard/board" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">Back to Host Shop Board</Link>
+        <Link href="/host-shop/dashboard" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 hover:bg-slate-50">Back to Host Shop Dashboard</Link>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">

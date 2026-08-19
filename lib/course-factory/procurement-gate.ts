@@ -21,14 +21,21 @@ export type ProcurementGateResult = {
   };
 };
 
-const assessed = new Set(['quiz', 'checkpoint', 'exam']);
-const practical = new Set(['practical', 'lab', 'fieldwork', 'observation']);
+const assessed = new Set(['quiz', 'checkpoint', 'exam', 'final_exam']);
+const practical = new Set(['practical', 'lab', 'fieldwork', 'observation', 'practicum']);
 
 function hasSubstantiveContent(lesson: BuilderLesson): boolean {
   if (lesson.renderedHtml?.trim()) return true;
   if (lesson.videoUrl?.trim()) return true;
   if (lesson.content && Object.keys(lesson.content).length > 0) return true;
   return false;
+}
+
+function experienceFor(lesson: BuilderLesson): Record<string, any> | null {
+  const content = lesson.content as Record<string, any> | undefined;
+  if (!content || typeof content !== 'object') return null;
+  const experience = content.experience;
+  return experience && typeof experience === 'object' ? experience as Record<string, any> : null;
 }
 
 export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): ProcurementGateResult {
@@ -65,7 +72,11 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
 
     for (const [li, lesson] of (module.lessons ?? []).entries()) {
       const path = `modules[${mi}].lessons[${li}]`;
-      if (!hasSubstantiveContent(lesson) && !assessed.has(lesson.lessonType)) {
+      const isAssessment = assessed.has(lesson.lessonType);
+      const isPractical = Boolean(lesson.practicalRequired) || practical.has(lesson.lessonType);
+      const experience = experienceFor(lesson);
+
+      if (!hasSubstantiveContent(lesson) && !isAssessment) {
         add('error', 'LESSON_CONTENT_EMPTY', path, 'Instructional lesson has no substantive content, rendered material, or video.');
       }
       if (!lesson.learningObjectives?.length) {
@@ -81,7 +92,19 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
         add('error', 'HOUR_CATEGORY_REQUIRED', `${path}.hourCategory`, 'Instructional hours must be categorized.');
       }
 
-      if (assessed.has(lesson.lessonType)) {
+      if (!isAssessment && !isPractical && lesson.aiGenerated) {
+        if (!experience) {
+          add('error', 'SELF_PACED_EXPERIENCE_REQUIRED', `${path}.content.experience`, 'AI-generated self-paced instruction must include the canonical interactive lesson experience.');
+        } else {
+          if (!String(experience.narrationScript ?? '').trim()) add('error', 'NARRATION_REQUIRED', `${path}.content.experience.narrationScript`, 'Self-paced lesson requires narration/transcript content.');
+          if (!String(experience.visualPrompt ?? '').trim()) add('error', 'VISUAL_SPEC_REQUIRED', `${path}.content.experience.visualPrompt`, 'Self-paced lesson requires an accessible visual specification.');
+          if (!Array.isArray(experience.flashcards) || experience.flashcards.length < 4) add('error', 'FLASHCARDS_REQUIRED', `${path}.content.experience.flashcards`, 'Self-paced lesson requires at least four review flashcards.');
+          if (!Array.isArray(experience.knowledgeChecks) || experience.knowledgeChecks.length < 3) add('error', 'KNOWLEDGE_CHECKS_REQUIRED', `${path}.content.experience.knowledgeChecks`, 'Self-paced lesson requires at least three formative knowledge checks.');
+          if (!experience.remediation || Number(experience.remediation.passingScore ?? 0) <= 0) add('error', 'REMEDIATION_REQUIRED', `${path}.content.experience.remediation`, 'Self-paced lesson requires a mastery threshold and remediation plan.');
+        }
+      }
+
+      if (isAssessment) {
         if (!lesson.quizQuestions?.length) {
           add('error', 'QUESTIONS_REQUIRED', `${path}.quizQuestions`, 'Assessment has no questions.');
         }
@@ -98,7 +121,7 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
         }
       }
 
-      if (lesson.practicalRequired || practical.has(lesson.lessonType)) {
+      if (isPractical) {
         if (!lesson.competencyChecks?.length) {
           add('error', 'PRACTICAL_COMPETENCY_REQUIRED', `${path}.competencyChecks`, 'Practical work must identify observable competencies.');
         }
@@ -114,8 +137,8 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
         add('error', 'AI_REVIEW_REQUIRED', `${path}.approved`, 'AI-generated lessons require human approval before publication.');
       }
 
-      if (template.status === 'published' && lesson.generationStatus && lesson.generationStatus !== 'published') {
-        add('error', 'STATE_CONTRADICTION', `${path}.generationStatus`, 'Published course contains a lesson that is not in published generation state.');
+      if (template.status === 'published' && lesson.generationStatus && !['published', 'completed'].includes(lesson.generationStatus)) {
+        add('error', 'STATE_CONTRADICTION', `${path}.generationStatus`, 'Published course contains a lesson that is not in a completed/published generation state.');
       }
     }
   }
@@ -149,7 +172,7 @@ export function runGovernmentProcurementGate(template: ProgramBuilderTemplate): 
       practicals: practicalLessons.length,
       competencies: competencyKeys.size,
       approvedLessons: lessons.filter((l) => l.approved === true).length,
-      publishedLessons: lessons.filter((l) => l.generationStatus === 'published').length,
+      publishedLessons: lessons.filter((l) => ['published', 'completed'].includes(l.generationStatus ?? '')).length,
     },
   };
 }

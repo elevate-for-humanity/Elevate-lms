@@ -50,6 +50,11 @@ ENV BUILD_TIMESTAMP=$BUILD_TIMESTAMP
 COPY --from=dependencies /workspace/node_modules ./node_modules
 COPY . .
 
+# Website Builder defaults and shared authenticated portal contracts are release
+# invariants. Stop the image before compilation if fake seeded claims or stale
+# proof/demo links return.
+RUN node scripts/verify-portal-production-contracts.mjs
+
 RUN node -e "const fs=require('fs'); const raw=process.env.BUILD_TIMESTAMP; const ts=raw&&raw!=='unknown'?raw:new Date().toISOString(); fs.writeFileSync('lib/version/generated-build-timestamp.ts', 'export const GENERATED_BUILD_TIMESTAMP = '+JSON.stringify(ts)+';\n'); fs.writeFileSync('/tmp/elevate-build-timestamp', ts); console.log('Marketing build timestamp:', ts)"
 
 RUN EFFECTIVE_SHA="${NF_GIT_SHA}" && \

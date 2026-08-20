@@ -1,9 +1,10 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
 export const metadata = {
-  robots: { index: false, follow: false },
+  title: 'Privacy Policy',
+  robots: { index: false, follow: true },
 };
 
-export default function PrivacyPolicyPage() {
-  redirect('/legal/privacy');
+export default function PrivacyPolicyAliasPage() {
+  permanentRedirect('/privacy');
 }

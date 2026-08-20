@@ -55,7 +55,7 @@ export default async function VideosPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
-        <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Videos' }]} />
+        <Breadcrumbs items={[{ label: 'Admin', href: '/' }, { label: 'Videos' }]} />
         <section className="overflow-hidden rounded-3xl bg-slate-950 text-white shadow-lg">
           <div className="relative min-h-52 p-7">
             <Image src="/images/pages/admin-videos-hero.webp" alt="Video management" fill priority sizes="100vw" className="object-cover opacity-35" />
@@ -64,7 +64,7 @@ export default async function VideosPage() {
               <p className="text-xs font-black uppercase tracking-widest text-blue-200">Production media library</p>
               <h1 className="mt-2 text-3xl font-black">Training Videos</h1>
               <p className="mt-2 text-sm text-slate-200">Only verified, published videos with a real playback URL are shown here.</p>
-              <Link href="/admin/videos/upload" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950"><Upload className="h-4 w-4" />Upload production video</Link>
+              <Link href="/videos/upload" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950"><Upload className="h-4 w-4" />Upload production video</Link>
             </div>
           </div>
         </section>

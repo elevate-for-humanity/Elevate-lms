@@ -1,6 +1,7 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowRight, BadgeCheck, BookOpen, Building2, Scissors, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BadgeCheck, BookOpen, Building2, Clock3, Scissors, ShieldCheck } from 'lucide-react';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
@@ -15,6 +16,13 @@ export const fetchCache = 'force-no-store';
 const BARBER_HERO_IMAGE =
   'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
 
+const FLOW = [
+  { icon: BookOpen, title: 'Learn the theory', body: 'Complete verified Related Technical Instruction alongside your hands-on training.' },
+  { icon: Scissors, title: 'Train in a host shop', body: 'Build real barbering skills under approved supervision in the workplace.' },
+  { icon: Clock3, title: 'Track progress', body: 'Document OJL, RTI, skills, attendance, and required apprenticeship milestones.' },
+  { icon: BadgeCheck, title: 'Prepare for licensing', body: 'Complete the pathway requirements tied to Indiana barber licensing preparation.' },
+] as const;
+
 export default async function BarberApprenticeshipPage() {
   const loaded = await loadProgramForPage('barber-apprenticeship');
   if (!loaded) return notFound();
@@ -25,20 +33,6 @@ export default async function BarberApprenticeshipPage() {
     heroImage: BARBER_HERO_IMAGE,
   });
 
-  const hero = (
-    <HeroPicture
-      src={BARBER_HERO_IMAGE}
-      alt="Barber apprentice completing supervised hands-on training in Indiana"
-      belowHeroHeadline="Registered Barber Apprenticeship"
-      belowHeroSubheadline="Competency-based registered apprenticeship with verified Related Technical Instruction, supervised host-shop training, digital progress records, and Indiana licensing preparation."
-      ctas={[
-        { label: 'Apply for Barber Apprenticeship', href: program.cta.applyHref },
-        { label: 'Become a Host Shop', href: '/partners/host-shops' },
-      ]}
-      trustIndicators={['DOL Registered Apprenticeship', 'Host-Shop Training', 'Digital OJL / RTI Records']}
-    />
-  );
-
   return (
     <main className="min-h-screen bg-white text-slate-950">
       <script
@@ -46,59 +40,87 @@ export default async function BarberApprenticeshipPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
 
-      {hero}
+      <HeroPicture
+        src={BARBER_HERO_IMAGE}
+        alt="Barber apprentice completing supervised hands-on training in Indiana"
+        analyticsName="barber-apprenticeship"
+        heightStyle="h-[46vh] min-h-[320px] max-h-[620px] sm:h-[54vh]"
+      />
 
-      <section className="border-b border-slate-200 bg-white px-4 py-10">
-        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-4">
-          <Fact icon={ShieldCheck} label="Registered model" value="Competency based" />
-          <Fact icon={BookOpen} label="Required RTI" value="144 verified hours" />
-          <Fact icon={Scissors} label="Training setting" value="Approved host shop" />
-          <Fact icon={BadgeCheck} label="Self-pay tuition" value={program.selfPayCost || 'See enrollment disclosure'} />
-        </div>
-      </section>
-
-      <section className="px-4 py-14">
+      <section className="border-b border-slate-200 bg-white px-4 py-9 sm:py-12">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-8 lg:grid-cols-[1.05fr_.95fr]">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.15em] text-brand-red-700">How the program works</p>
-              <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">One barber pathway. One set of requirements.</h1>
-              <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">{program.subtitle}</p>
-
-              <div className="mt-8 grid gap-4 sm:grid-cols-2">
-                {program.outcomes.slice(0, 6).map((outcome) => (
-                  <div key={outcome.statement} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                    <h2 className="font-black text-slate-950">{outcome.statement}</h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-600">Checked: {outcome.assessedAt}</p>
-                  </div>
-                ))}
-              </div>
+          <div className="max-w-4xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Registered Barber Apprenticeship</p>
+            <h1 className="mt-3 text-3xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
+              Learn the trade where the work happens.
+            </h1>
+            <p className="mt-4 max-w-3xl text-base font-medium leading-7 text-slate-700 sm:text-lg sm:leading-8">
+              A competency-based barber apprenticeship combining verified technical instruction, supervised host-shop training, digital progress records, and Indiana licensing preparation.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link href={program.cta.applyHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 text-sm font-black text-white hover:bg-brand-red-700">
+                Apply for Barber Apprenticeship <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-300 bg-white px-7 py-3.5 text-sm font-black text-slate-950 hover:border-slate-500 hover:bg-slate-50">
+                Become a Host Shop <Building2 className="h-4 w-4" />
+              </Link>
             </div>
-
-            <aside className="rounded-3xl border border-slate-200 bg-slate-950 p-7 text-white">
-              <h2 className="text-2xl font-black">Start the right path</h2>
-              <p className="mt-3 leading-7 text-slate-300">Apply as an apprentice, or register a licensed shop as a host site. Funding is reviewed separately and is never assumed from provider status.</p>
-              <div className="mt-6 space-y-3">
-                <Link href={program.cta.applyHref} className="flex items-center justify-between rounded-xl bg-brand-red-600 px-5 py-4 font-black hover:bg-brand-red-700">Apply as an Apprentice <ArrowRight className="h-5 w-5" /></Link>
-                <Link href="/partners/host-shops" className="flex items-center justify-between rounded-xl bg-white px-5 py-4 font-black text-slate-950 hover:bg-slate-100">Become a Host Shop <Building2 className="h-5 w-5" /></Link>
-                <Link href="/contact" className="block rounded-xl border border-slate-600 px-5 py-4 text-center font-bold hover:border-slate-400">Talk to Admissions</Link>
-              </div>
-            </aside>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-slate-50 px-4 py-14">
+      <section className="border-b border-slate-200 bg-slate-50 px-4 py-8">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-3 lg:grid-cols-4">
+          <Fact icon={ShieldCheck} label="Registered model" value="Competency based" />
+          <Fact icon={BookOpen} label="Required RTI" value="144 verified hours" />
+          <Fact icon={Scissors} label="Training setting" value="Approved host shop" />
+          <Fact icon={BadgeCheck} label="Self-pay tuition" value={program.selfPayCost || 'See program details'} />
+        </div>
+      </section>
+
+      <section className="px-4 py-14 sm:py-18">
         <div className="mx-auto max-w-6xl">
-          <p className="text-sm font-black uppercase tracking-[0.15em] text-brand-red-700">Curriculum</p>
-          <h2 className="mt-3 text-3xl font-black">What you learn</h2>
-          <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <div className="relative min-h-[320px] overflow-hidden rounded-3xl bg-slate-100 sm:min-h-[460px]">
+              <Image
+                src="/images/pages/barber-hero-main.webp"
+                alt="Barber apprentice practicing supervised haircutting and grooming skills"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 48vw"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">How it works</p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">One pathway from training to documented progress.</h2>
+              <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg sm:leading-8">{program.subtitle}</p>
+              <div className="mt-7 grid gap-4 sm:grid-cols-2">
+                {FLOW.map(({ icon: Icon, title, body }) => (
+                  <article key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <Icon className="h-6 w-6 text-brand-red-700" aria-hidden="true" />
+                    <h3 className="mt-3 text-lg font-black text-slate-950">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-700">{body}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-slate-950 px-4 py-14 text-white">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-red-300 sm:text-sm">Skills you build</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Training that connects theory to the shop floor.</h2>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {program.curriculum.map((module, index) => (
-              <article key={module.title} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <div className="text-xs font-black uppercase tracking-widest text-slate-400">Module {index + 1}</div>
-                <h3 className="mt-2 text-xl font-black">{module.title}</h3>
-                <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-700">
-                  {module.topics.map((topic) => <li key={topic}>• {topic}</li>)}
+              <article key={module.title} className="rounded-2xl border border-white/15 bg-white/5 p-5">
+                <p className="text-xs font-black uppercase tracking-widest text-red-300">Module {index + 1}</p>
+                <h3 className="mt-2 text-xl font-black text-white">{module.title}</h3>
+                <ul className="mt-4 space-y-2 text-sm leading-6 text-slate-200">
+                  {module.topics.slice(0, 4).map((topic) => <li key={topic}>• {topic}</li>)}
                 </ul>
               </article>
             ))}
@@ -109,12 +131,12 @@ export default async function BarberApprenticeshipPage() {
       <BeautyTheoryDailyPolicy programTitle="Barber Apprenticeship" />
       <BeautyApprenticeshipAuthority program={program} />
 
-      <section className="px-4 py-14">
+      <section className="px-4 py-14 sm:py-18">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.15em] text-brand-red-700">Host-shop network</p>
-            <h2 className="mt-3 text-3xl font-black">Train where the work happens.</h2>
-            <p className="mt-3 leading-7 text-slate-700">Approved host shops are part of the supervised apprenticeship workflow. Availability is verified during placement rather than implied for locations without an active host record.</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
           </div>
           <FeaturedHostPartners />
           <div className="mt-10"><BarberWorkforceNetworkMap /></div>
@@ -123,8 +145,8 @@ export default async function BarberApprenticeshipPage() {
 
       <section className="bg-slate-950 px-4 py-14 text-white">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl font-black sm:text-4xl">Ready to enter the barber apprenticeship?</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-300">Review the exact program, host-shop, payment, and funding path before enrollment. Public funding requires current participant authorization.</p>
+          <h2 className="text-3xl font-black sm:text-4xl">Ready to start the barber apprenticeship?</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Apply as an apprentice or start the host-shop process. Funding and placement are verified separately before enrollment is finalized.</p>
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href={program.cta.applyHref} className="rounded-xl bg-brand-red-600 px-8 py-4 font-black text-white hover:bg-brand-red-700">Apply Now</Link>
             <Link href="/partners/host-shops" className="rounded-xl bg-white px-8 py-4 font-black text-slate-950 hover:bg-slate-100">Host a Barber Apprentice</Link>
@@ -137,10 +159,10 @@ export default async function BarberApprenticeshipPage() {
 
 function Fact({ icon: Icon, label, value }: { icon: typeof ShieldCheck; label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <Icon className="h-6 w-6 text-brand-red-700" />
-      <div className="mt-3 text-xs font-black uppercase tracking-widest text-slate-500">{label}</div>
-      <div className="mt-1 text-lg font-black text-slate-950">{value}</div>
+    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+      <Icon className="h-5 w-5 text-brand-red-700 sm:h-6 sm:w-6" />
+      <div className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-500 sm:text-xs">{label}</div>
+      <div className="mt-1 text-sm font-black leading-5 text-slate-950 sm:text-lg">{value}</div>
     </div>
   );
 }

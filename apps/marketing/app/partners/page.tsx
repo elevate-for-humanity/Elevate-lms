@@ -22,13 +22,13 @@ export default function PartnersPage() {
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <Building2 className="w-12 h-12 text-purple-600 mb-4" />
               <h2 className="text-2xl font-bold text-slate-900 mb-3">For Employers</h2>
-              <p className="text-slate-600 mb-4">Build your talent pipeline, access tax credits, and partner with apprenticeship programs.</p>
+              <p className="text-slate-600 mb-4">Build your talent pipeline, explore applicable employer incentives, and partner with apprenticeship programs.</p>
               <Link href="/for-employers" className="text-purple-600 font-semibold hover:underline flex items-center gap-1">Learn More <ArrowRight className="w-4 h-4" /></Link>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <Users className="w-12 h-12 text-purple-600 mb-4" />
               <h2 className="text-2xl font-bold text-slate-900 mb-3">For Workforce Agencies</h2>
-              <p className="text-slate-600 mb-4">Connect your participants to ETPL-approved training and apprenticeship programs.</p>
+              <p className="text-slate-600 mb-4">Connect participants to training programs with program-specific ETPL or funding eligibility where applicable, plus registered-apprenticeship pathways.</p>
               <Link href="/for-agencies" className="text-purple-600 font-semibold hover:underline flex items-center gap-1">Learn More <ArrowRight className="w-4 h-4" /></Link>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg">

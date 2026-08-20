@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ExternalLink, FileCheck, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
-import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { getRegisteredProgramStandard } from '@/lib/apprenticeship/registered-program-contract';
 import { listPublicRegulatoryEvidence } from '@/lib/compliance/public-regulatory-evidence';
 
 export const dynamic = 'force-dynamic';
@@ -37,7 +37,10 @@ export default async function ApprovalsPage() {
     byProgram.set(row.slug, rows);
   }
 
-  const barber = RAPIDS_CONFIG.programs.barber;
+  const barber = getRegisteredProgramStandard('barber-apprenticeship');
+  if (!barber) {
+    throw new Error('Canonical Barber registered-apprenticeship standard is missing.');
+  }
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
@@ -62,12 +65,12 @@ export default async function ApprovalsPage() {
           <div className="flex items-center gap-3"><ShieldCheck className="h-7 w-7 text-brand-red-700" /><h2 className="text-3xl font-black">Registered Apprenticeship</h2></div>
           <div className="mt-5 rounded-3xl border border-slate-200 p-6 sm:p-8">
             <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Sponsor of Record</dt><dd className="mt-1 font-black">{RAPIDS_CONFIG.sponsorOfRecord}</dd></div>
-              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Registration</dt><dd className="mt-1 font-black">{RAPIDS_CONFIG.registrationId}</dd></div>
-              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Occupation</dt><dd className="mt-1 font-black">{barber.occupation}</dd></div>
-              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Approach</dt><dd className="mt-1 font-black capitalize">{barber.approach}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Sponsor of Record</dt><dd className="mt-1 font-black">{barber.sponsor.legalName}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Registration</dt><dd className="mt-1 font-black">{barber.sponsor.registrationNumber}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Occupation</dt><dd className="mt-1 font-black">{barber.standard.occupationTitle}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Approach</dt><dd className="mt-1 font-black capitalize">{barber.standard.approach}</dd></div>
             </dl>
-            <p className="mt-6 leading-7 text-slate-700">The canonical Barber registered-program record requires {barber.competencyCount} verified competencies and {barber.relatedInstructionHours} verified RTI hours. Supervised work, wage, and state-licensing records are maintained separately according to the applicable program and licensing requirements.</p>
+            <p className="mt-6 leading-7 text-slate-700">The canonical Barber registered-program record requires {barber.completion.competencyCount} verified competencies and {barber.completion.requiredRtiHours} verified RTI hours. Supervised work, wage, and state-licensing records are maintained separately according to the applicable program and licensing requirements.</p>
             <div className="mt-5 flex flex-wrap gap-3"><Link href="/programs/barber-apprenticeship" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">View Barber Apprenticeship</Link><Link href="/compliance/apprenticeship-structure" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Review apprenticeship structure</Link></div>
           </div>
         </section>

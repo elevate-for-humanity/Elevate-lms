@@ -1,7 +1,7 @@
 /**
  * Canonical approved Host Shop loader.
  * Operational approval remains authoritative; public partner profiles only enrich
- * approved records with promotional media, website, map, and public slug data.
+ * approved records with promotional media, website, map, and verified address data.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -130,7 +130,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .order('shop_name'),
     db
       .from('public_host_shops')
-      .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, media_gallery, video_url, google_maps_url'),
+      .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, state, zip, media_gallery, video_url, google_maps_url'),
   ]);
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
@@ -181,6 +181,11 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       if (!profile) return shop;
       return {
         ...shop,
+        address: profile.address_line1 || shop.address,
+        city: profile.city || shop.city,
+        state: profile.state || shop.state,
+        zip: profile.zip || shop.zip,
+        phone: profile.phone || shop.phone,
         publicSlug: profile.public_slug ?? undefined,
         description: profile.description ?? undefined,
         website: profile.website_url || profile.website || undefined,
@@ -197,4 +202,10 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
     return all.filter((shop) => shop.programs.includes(slug));
   }
   return all;
+}
+
+/** Resolve an individual public profile back to the operationally approved Host Site. */
+export async function getApprovedShopByPublicSlug(publicSlug: string): Promise<HostShop | null> {
+  const shops = await getApprovedShops();
+  return shops.find((shop) => shop.publicSlug === publicSlug) ?? null;
 }

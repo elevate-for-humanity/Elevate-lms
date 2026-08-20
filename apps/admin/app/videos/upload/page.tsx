@@ -7,7 +7,7 @@ import VideoUploadClient from './VideoUploadClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/videos/upload' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/videos/upload' },
   title: 'Upload Videos | Elevate For Humanity',
   description: 'Upload verified production video content for the public library or course lessons.',
 };
@@ -31,9 +31,9 @@ export default async function UploadVideosPage() {
         <div className="mb-8">
           <nav className="mb-4 text-sm">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
+              <li><Link href="/" className="hover:text-primary">Admin</Link></li>
               <li>/</li>
-              <li><Link href="/admin/videos" className="hover:text-primary">Videos</Link></li>
+              <li><Link href="/videos" className="hover:text-primary">Videos</Link></li>
               <li>/</li>
               <li className="font-medium text-slate-900">Upload</li>
             </ol>

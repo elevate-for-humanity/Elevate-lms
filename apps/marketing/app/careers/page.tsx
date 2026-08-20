@@ -66,7 +66,7 @@ export default async function CareersPage() {
                           </span>
                         )}
                         {job.job_type && <span>{jobTypeLabel(job.job_type)}</span>}
-                        {formatSalary(job) && <span>{formatSalary(job)}</span>}
+                        <span>{formatSalary(job)}</span>
                       </div>
                       {job.description && (
                         <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-700">
@@ -75,7 +75,7 @@ export default async function CareersPage() {
                       )}
                     </div>
                     <Link
-                      href={`/jobs/${job.slug || job.id}`}
+                      href={`/jobs/${job.id}`}
                       className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
                     >
                       Review posting <ArrowRight className="h-4 w-4" aria-hidden="true" />

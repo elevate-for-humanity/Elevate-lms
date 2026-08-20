@@ -109,6 +109,9 @@ jobs:
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
+      - name: Enforce public government-claim integrity
+        run: node scripts/check-public-claims.mjs
+
       - name: Verify production deployment credentials
         run: |
           set -euo pipefail

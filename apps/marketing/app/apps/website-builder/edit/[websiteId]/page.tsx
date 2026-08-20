@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { WebsiteLifecyclePanel } from '@/components/website-builder/WebsiteLifecyclePanel';
 import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdvancedSettings';
 import { AutonomousWebsiteBuilder } from '@/components/website-builder/AutonomousWebsiteBuilder';
+import { ZeroCodeStructureEditor } from '@/components/website-builder/ZeroCodeStructureEditor';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
@@ -40,6 +41,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
   return (
     <>
       <WebsiteLifecyclePanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
+      <ZeroCodeStructureEditor websiteId={site.id} initialConfig={config} />
       <AutonomousWebsiteBuilder
         websiteId={site.id}
         initialSiteName={name}

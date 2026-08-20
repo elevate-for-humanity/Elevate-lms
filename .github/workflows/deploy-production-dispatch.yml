@@ -5,6 +5,8 @@ name: Deploy production (all services)
 # Marketing, LMS, and Admin from the same commit.
 on:
   workflow_dispatch:
+  issues:
+    types: [opened]
 
 permissions:
   contents: read
@@ -15,6 +17,7 @@ concurrency:
 
 jobs:
   deploy-all:
+    if: github.event_name != 'issues' || github.event.issue.title == 'DEPLOY PRODUCTION ALL SERVICES'
     name: Sync, configure, build, and verify Marketing + LMS + Admin
     runs-on: ubuntu-latest
     env:

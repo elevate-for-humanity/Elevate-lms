@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, Scissors, Sparkles } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Sparkles } from 'lucide-react';
 
 const TRACKS = [
   {
@@ -15,7 +15,7 @@ const TRACKS = [
     title: 'Esthetician Apprenticeship',
     hours: 'Supervised work-based training with related technical instruction',
     focus: 'Skin care, sanitation, client consultation, services, safety, and professional practice',
-    image: '/images/pages/esthetician-hero.webp',
+    image: '/images/beauty/esthetics-hero.webp',
     href: '/programs/esthetician-apprenticeship',
     icon: Sparkles,
   },

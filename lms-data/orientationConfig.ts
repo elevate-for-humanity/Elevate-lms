@@ -17,7 +17,7 @@ export interface OrientationProgramConfig {
     total: number;
     setupFeePercent: number;
     paymentFrequency: string;
-    fundingNote: string; // Note about funding eligibility
+    fundingNote: string;
   };
   accentColor: string;
   estimatedTime: string;
@@ -48,22 +48,22 @@ export const orientationConfigs: Record<string, OrientationProgramConfig> = {
   },
   'esthetician-apprenticeship': {
     programSlug: 'esthetician-apprenticeship',
-    programTitle: 'Esthetician Apprenticeship',
+    programTitle: 'Esthetician Apprenticeship Pathway',
     licenseTitle: 'Indiana Esthetician License',
     licensingBody: 'Indiana Professional Licensing Agency (IPLA)',
-    salaryRange: '$35,000 - $65,000+',
+    salaryRange: 'Varies by employer, experience, and service model',
     totalHours: 700,
     hoursLabel: '700 hours',
     ojtDescription:
-      'Work in a licensed spa or salon under a mentor. Learn real skills with real clients.',
+      'Complete supervised esthetics practice at an approved spa or salon site with documented client-care, sanitation, skin-analysis, treatment, and professional-practice activities.',
     rtiDescription:
-      'Complete theory courses online. Learn skincare science, sanitation, and business skills.',
+      'Complete related esthetics instruction covering skin science, sanitation, safety, client consultation, documentation, and licensing preparation.',
     tuition: {
-      total: 3200,
-      setupFeePercent: 35,
-      paymentFrequency: 'Billed every Friday',
+      total: 4980,
+      setupFeePercent: 0,
+      paymentFrequency: 'Options shown at checkout',
       fundingNote:
-        'If you received funding approval (WRG, WIOA, employer sponsorship), your costs may be partially or fully covered. Check your enrollment confirmation for details.',
+        'This pathway is published as self-pay. Any employer or workforce funding must be verified and authorized in writing for the individual participant before enrollment.',
     },
     accentColor: 'purple',
     estimatedTime: '8-10 minutes',

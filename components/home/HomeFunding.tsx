@@ -1,6 +1,17 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BadgeDollarSign, BriefcaseBusiness, GraduationCap, Landmark } from 'lucide-react';
+import {
+  ArrowRight,
+  BadgeDollarSign,
+  BriefcaseBusiness,
+  CalendarDays,
+  ClipboardList,
+  GraduationCap,
+  Landmark,
+} from 'lucide-react';
+
+const WORKONE_ORIENTATION_URL =
+  'https://workoneindy.as.me/schedule/e8f310c0/appointment/91381838/calendar/9483996?calendarIds=9483996';
 
 const FUNDING_SOURCES = [
   {
@@ -62,6 +73,30 @@ export function HomeFunding() {
                   <p className="mt-2 text-base leading-7 text-slate-700">{desc}</p>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-8 rounded-3xl border border-orange-200 bg-orange-50 p-5 sm:p-6">
+              <p className="text-xs font-black uppercase tracking-widest text-orange-800">WorkOne Funding</p>
+              <h3 className="mt-2 text-2xl font-black text-slate-950">Ready to start the WorkOne process?</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-700">
+                Schedule your WorkOne orientation with the official Indianapolis link, then complete the Elevate funding intake so your application and funding progress stay connected.
+              </p>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <a
+                  href={WORKONE_ORIENTATION_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-600 px-5 py-3 text-sm font-black text-white hover:bg-orange-700"
+                >
+                  <CalendarDays className="h-5 w-5" /> Schedule Your WorkOne Orientation for Funding
+                </a>
+                <Link
+                  href="/funding/workone-intake"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-slate-900 bg-white px-5 py-3 text-sm font-black text-slate-950 hover:bg-slate-50"
+                >
+                  <ClipboardList className="h-5 w-5" /> Start Funding Intake
+                </Link>
+              </div>
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">

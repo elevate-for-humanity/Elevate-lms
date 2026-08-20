@@ -28,9 +28,12 @@ permissions:
   contents: read
   actions: read
 
+# Keep Marketing deploys serialized, but do not cancel a healthy in-flight build
+# because an unrelated service changed global main. Each run builds, verifies,
+# and deploys the exact SHA that triggered it; later Marketing runs queue behind it.
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   EXPECTED_SHA: ${{ github.sha }}
@@ -66,25 +69,22 @@ jobs:
       NEXT_PUBLIC_FACEBOOK_PIXEL_ID: ${{ secrets.NEXT_PUBLIC_FACEBOOK_PIXEL_ID }}
 
     steps:
-      - name: Checkout repository history
+      - name: Checkout exact triggering revision
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           clean: true
 
-      - name: Require current main revision
+      - name: Require exact triggering revision
         shell: bash
         run: |
           set -Eeuo pipefail
           REQUESTED_SHA="${{ github.sha }}"
-          git fetch origin main --depth=200
           RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
-          CURRENT_MAIN="$(git rev-parse origin/main)"
           test -n "$RESOLVED_SHA" || { echo '::error::Deployment SHA cannot be resolved'; exit 1; }
           test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
-          test "$RESOLVED_SHA" = "$CURRENT_MAIN" || { echo "::error::Stale Marketing deployment refused: requested=$RESOLVED_SHA current_main=$CURRENT_MAIN"; exit 1; }
           test "$(git status --porcelain)" = ""
-          echo "Verified latest production Marketing SHA $RESOLVED_SHA"
+          echo "Verified exact Marketing deployment SHA $RESOLVED_SHA"
 
       - name: Set build environment variables
         run: |
@@ -172,13 +172,13 @@ jobs:
             --build-id "${{ steps.trigger_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
 
-      - name: Reconfirm latest main before deployment
+      - name: Reconfirm exact checkout before deployment
         shell: bash
         run: |
           set -Eeuo pipefail
-          git fetch origin main --depth=20
-          CURRENT_MAIN="$(git rev-parse origin/main)"
-          test "${{ github.sha }}" = "$CURRENT_MAIN" || { echo "::error::Newer main revision exists; refusing stale Marketing cutover. current_main=$CURRENT_MAIN"; exit 1; }
+          test "$(git rev-parse HEAD)" = "${{ github.sha }}" || { echo '::error::Checkout moved during deployment'; exit 1; }
+          test "$(git status --porcelain)" = "" || { echo '::error::Checkout became dirty during deployment'; exit 1; }
+          echo "Exact verified Marketing SHA remains ready for deployment: ${{ github.sha }}"
 
       - name: Deploy exact Marketing build
         run: |
@@ -205,13 +205,18 @@ jobs:
             sitemap_status=$(curl -sS --max-time 15 -o /tmp/www-sitemap.xml -w "%{http_code}" "https://www.elevateforhumanity.org/sitemap.xml?deploy=${EXPECTED_SHA}" || true)
             razors_status=$(curl -sS --max-time 15 -o /tmp/razors-image.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/partners/razors-image-storefront.webp?deploy=${EXPECTED_SHA}" || true)
             hero_status=$(curl -sS --max-time 15 -o /tmp/home-hero.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/heroes/hero-homepage.webp?deploy=${EXPECTED_SHA}" || true)
+            audio_status=$(curl -sS --max-time 15 -o /tmp/home-audio.mp3 -w "%{http_code}" "https://www.elevateforhumanity.org/audio/heroes/home.mp3?deploy=${EXPECTED_SHA}" || true)
             LIVE_SHA="$(node -e "try{const d=require('/tmp/www-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
             razors_bytes=$(wc -c < /tmp/razors-image.webp 2>/dev/null || echo 0)
             hero_bytes=$(wc -c < /tmp/home-hero.webp 2>/dev/null || echo 0)
-            echo "Attempt $i/30: health=$health_status version=$version_status home=$home_status barber=$barber_status esthetics=$esthetics_status sitemap=$sitemap_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes live_sha=${LIVE_SHA:-missing}"
+            audio_bytes=$(wc -c < /tmp/home-audio.mp3 2>/dev/null || echo 0)
+            echo "Attempt $i/30: health=$health_status version=$version_status home=$home_status barber=$barber_status esthetics=$esthetics_status sitemap=$sitemap_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes audio=$audio_status/$audio_bytes live_sha=${LIVE_SHA:-missing}"
 
             html_ok=false
             if grep -qi '<html' /tmp/www-home.html \
+              && grep -q 'Workforce Training &amp; Technology\|Workforce Training & Technology' /tmp/www-home.html \
+              && grep -q 'Career Training, Registered Apprenticeships &amp; Workforce Technology in Indiana\|Career Training, Registered Apprenticeships & Workforce Technology in Indiana' /tmp/www-home.html \
+              && grep -q '/audio/heroes/home.mp3' /tmp/www-home.html \
               && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
               && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \
               && grep -q '700-hour' /tmp/www-esthetics.html \
@@ -229,16 +234,18 @@ jobs:
               && [ "$sitemap_status" = "200" ] \
               && [ "$razors_status" = "200" ] \
               && [ "$hero_status" = "200" ] \
+              && [ "$audio_status" = "200" ] \
               && [ "$razors_bytes" -gt 1000 ] \
               && [ "$hero_bytes" -gt 1000 ] \
+              && [ "$audio_bytes" -gt 1000 ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
               && [ "$html_ok" = "true" ]; then
-              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live, healthy, canonical, and Esthetician content is not mixed with the certificate program"
+              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with the homepage poster, hero copy, and audio asset"
               exit 0
             fi
             sleep 20
           done
-          echo "::error::DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required runtime, canonical, and Esthetician regression checks"
+          echo "::error::DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required runtime, homepage media, canonical, and Esthetician regression checks"
           cat /tmp/www-health.json 2>/dev/null || true
           cat /tmp/www-version.json 2>/dev/null || true
           grep -Eo '<title>[^<]+' /tmp/www-esthetics.html 2>/dev/null || true

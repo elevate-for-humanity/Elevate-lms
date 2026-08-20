@@ -2,14 +2,14 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, Flower2, BookOpen, Clock, Phone } from 'lucide-react';
+import { Flower2, BookOpen, Clock, Phone } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Enrolled | Esthetician Apprenticeship',
-  description: 'Your enrollment in the USDOL Registered Esthetician Apprenticeship is confirmed.',
+  title: 'Enrolled | Esthetician Apprenticeship Pathway',
+  description: 'Your Esthetician Apprenticeship Pathway enrollment confirmation and next steps.',
 };
 
 export default async function EnrollmentSuccessPage() {
@@ -20,10 +20,21 @@ export default async function EnrollmentSuccessPage() {
 
   if (!user) redirect('/login?redirect=/programs/esthetician-apprenticeship/enrollment-success');
 
+  const { data: canonicalProgram } = await supabase
+    .from('programs')
+    .select('id,title,slug')
+    .eq('slug', 'esthetician-apprenticeship')
+    .eq('published', true)
+    .eq('is_active', true)
+    .maybeSingle();
+
+  if (!canonicalProgram) redirect('/programs/esthetician-apprenticeship');
+
   let { data: enrollment } = await supabase
     .from('program_enrollments')
-    .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
+    .select('id, enrolled_at, status, program_id, program_slug, user_id, title')
     .eq('user_id', user.id)
+    .eq('program_id', canonicalProgram.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -31,18 +42,21 @@ export default async function EnrollmentSuccessPage() {
   if (!enrollment && user.email) {
     const { data: emailMatch } = await supabase
       .from('program_enrollments')
-      .select('id, enrolled_at, status, program_id, user_id, programs(name, slug)')
+      .select('id, enrolled_at, status, program_id, program_slug, user_id, title')
       .ilike('email', user.email.toLowerCase().trim())
+      .eq('program_id', canonicalProgram.id)
       .is('user_id', null)
       .order('enrolled_at', { ascending: false })
       .limit(1)
       .maybeSingle();
+
     if (emailMatch) {
-      await supabase
+      const { error: linkError } = await supabase
         .from('program_enrollments')
-        .update({ user_id: user.id })
-        .eq('id', emailMatch.id);
-      enrollment = { ...emailMatch, user_id: user.id };
+        .update({ user_id: user.id, program_slug: 'esthetician-apprenticeship' })
+        .eq('id', emailMatch.id)
+        .is('user_id', null);
+      if (!linkError) enrollment = { ...emailMatch, user_id: user.id, program_slug: 'esthetician-apprenticeship' };
     }
   }
 
@@ -51,12 +65,16 @@ export default async function EnrollmentSuccessPage() {
   if (enrollment.status === 'paid' || enrollment.status === 'approved') {
     await supabase
       .from('program_enrollments')
-      .update({ status: 'confirmed', enrollment_confirmed_at: new Date().toISOString() })
-      .eq('id', enrollment.id);
+      .update({
+        status: 'confirmed',
+        program_slug: 'esthetician-apprenticeship',
+        enrollment_confirmed_at: new Date().toISOString(),
+      })
+      .eq('id', enrollment.id)
+      .eq('program_id', canonicalProgram.id);
   }
 
-  const programName =
-    (enrollment.programs as { name?: string })?.name || 'Esthetician Apprenticeship';
+  const programName = canonicalProgram.title || 'Esthetician Apprenticeship Pathway';
   const enrolledDate = enrollment.enrolled_at ? new Date(enrollment.enrolled_at) : new Date();
   const daysUntilMonday = (8 - enrolledDate.getDay()) % 7 || 7;
   const startDate = new Date(enrolledDate);
@@ -76,10 +94,10 @@ export default async function EnrollmentSuccessPage() {
             <Flower2 className="w-12 h-12 text-white" />
           </div>
           <p className="text-teal-400 font-bold text-sm uppercase tracking-widest mb-2">
-            USDOL Registered Apprenticeship
+            Indiana Esthetics Pathway
           </p>
-          <h1 className="text-4xl font-black text-white mb-2">You're officially enrolled.</h1>
-          <p className="text-slate-400">Welcome to the Esthetician Apprenticeship program.</p>
+          <h1 className="text-4xl font-black text-white mb-2">You&apos;re enrolled.</h1>
+          <p className="text-slate-400">Welcome to the Esthetician Apprenticeship Pathway.</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden mb-6">
@@ -95,23 +113,19 @@ export default async function EnrollmentSuccessPage() {
               <span className="text-slate-600">Status</span>
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-brand-green-100 text-brand-green-700 rounded-full font-bold text-sm">
                 <span className="w-2 h-2 bg-brand-green-500 rounded-full" />
-                Active
+                Confirmed
               </span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
-              <span className="text-slate-600">Orientation Starts</span>
+              <span className="text-slate-600">Orientation Target</span>
               <span className="font-bold text-slate-900">{formattedStartDate}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-slate-100">
-              <span className="text-slate-600">OJT Hours Required</span>
-              <span className="font-bold text-slate-900">2,000 hours</span>
+              <span className="text-slate-600">Indiana Education Requirement</span>
+              <span className="font-bold text-slate-900">700 hours</span>
             </div>
-            <div className="flex justify-between items-center py-3">
-              <span className="text-slate-600">Sponsor</span>
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-teal-500" />
-                <span className="font-bold text-slate-900">{PLATFORM_DEFAULTS.orgName}</span>
-              </div>
+            <div className="py-3 text-sm text-slate-600">
+              Federal Registered Apprenticeship status is not currently published for this occupation in Elevate&apos;s canonical RAPIDS registry. Licensing is controlled by the applicable Indiana authority.
             </div>
           </div>
         </div>
@@ -123,17 +137,17 @@ export default async function EnrollmentSuccessPage() {
               {
                 n: 1,
                 title: 'Complete orientation',
-                desc: 'Sanitation, skin care protocols, and safety — required before hands-on training',
+                desc: 'Review sanitation, client safety, supervised-practice expectations, documentation, and payment terms.',
               },
               {
                 n: 2,
-                title: 'Apply for your Indiana Esthetician License',
-                desc: '700 hours required for licensure — we guide you through the PLA application',
+                title: 'Complete required education and supervised practice',
+                desc: 'Indiana currently publishes a 700-hour minimum education requirement for esthetician applicants.',
               },
               {
                 n: 3,
-                title: 'Log OJT hours weekly',
-                desc: '2,000 hours required — track via your apprentice dashboard',
+                title: 'Prepare for the Indiana licensing process',
+                desc: 'Current examination, application, and licensing requirements are controlled by the Indiana Professional Licensing Agency.',
               },
             ].map(({ n, title, desc }) => (
               <div key={n} className="flex items-start gap-3">
@@ -150,7 +164,7 @@ export default async function EnrollmentSuccessPage() {
         </div>
 
         <Link
-          href="/login"
+          href="/programs/esthetician-apprenticeship/orientation"
           className="block w-full bg-teal-500 hover:bg-teal-600 text-white text-center py-5 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg mb-3"
         >
           Start Orientation →
@@ -160,7 +174,7 @@ export default async function EnrollmentSuccessPage() {
           className="block w-full bg-slate-700 hover:bg-slate-600 text-white text-center py-4 rounded-xl font-bold transition-all mb-6"
         >
           <BookOpen className="inline w-4 h-4 mr-2" />
-          Open Esthetician App
+          Open Student Portal
         </Link>
 
         <div className="text-center space-y-1">

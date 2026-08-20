@@ -1,171 +1,89 @@
-export const revalidate = 3600;
-
-import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import Image from 'next/image';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Accessibility, Mail, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/accessibility',
-  },
   title: 'Accessibility Statement',
-  description: `Accessibility commitment and support for ${PLATFORM_DEFAULTS.orgName} services.`,
+  description: `Accessibility commitment, conformance target, accommodation process, and feedback channels for ${PLATFORM_DEFAULTS.orgName}.`,
+  alternates: { canonical: 'https://www.elevateforhumanity.org/accessibility' },
 };
+
+const practices = [
+  'Use semantic headings, labels, landmarks, and meaningful link text.',
+  'Support keyboard navigation and visible focus states for interactive controls.',
+  'Provide text alternatives for meaningful images and non-text content.',
+  'Maintain readable contrast and avoid relying on color alone to convey meaning.',
+  'Support zoom, responsive layouts, and common assistive technologies.',
+  'Provide captions, transcripts, alternative formats, or another reasonable format when required for program access.',
+  'Include accessibility checks in ongoing design, engineering, content, and release work.',
+] as const;
 
 export default function AccessibilityPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Accessibility' }]} />
+    <main className="min-h-screen bg-white text-slate-900">
+      <div className="border-b border-slate-200">
+        <div className="mx-auto max-w-5xl px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Accessibility Statement' }]} />
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative h-48 md:h-64 overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/accessibility-hero.jpg"
-          alt="Accessibility Commitment"
-          fill
-          className="object-cover"
-          quality={90}
-          priority
-          sizes="100vw" 
-        />
+      <section className="bg-slate-950 px-4 py-16 text-white">
+        <div className="mx-auto max-w-4xl">
+          <p className="text-sm font-bold uppercase tracking-widest text-slate-300">Accessibility</p>
+          <h1 className="mt-3 text-4xl font-black">Accessibility Statement</h1>
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+            {PLATFORM_DEFAULTS.orgName} is committed to providing accessible digital services and reasonable access to its programs and services.
+          </p>
+          <p className="mt-5 text-sm font-semibold text-slate-400">Reviewed: August 19, 2026</p>
+        </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
-          <p className="text-xl text-black leading-relaxed mb-6">
-            {PLATFORM_DEFAULTS.orgName} is committed to accessibility for all individuals.
+      <section className="mx-auto max-w-4xl px-4 py-12">
+        <section>
+          <h2 className="text-2xl font-black">Conformance target</h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            We use WCAG 2.1 Level AA as the current accessibility target for public and authenticated web experiences. This is an ongoing engineering and content objective; this statement does not claim that every page, document, third-party tool, or historical asset has been independently certified as fully conformant.
           </p>
+        </section>
 
-          <p className="text-lg text-black leading-relaxed mb-6">
-            We strive to ensure our website, programs, and services are accessible to people with
-            disabilities. We are continuously working to improve the accessibility of our content
-            and services.
-          </p>
-
-          <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 my-6">
-            <p className="text-lg text-black font-semibold">
-              If you experience difficulty accessing content or services, please contact us and we
-              will assist promptly.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
-          <h2 className="text-2xl font-bold text-black mb-6">Our Commitment Includes</h2>
-
-          <ul className="space-y-4 text-black">
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Providing alternative formats for documents and materials when requested</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>
-                Ensuring physical locations are accessible or providing alternative arrangements
-              </span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Offering accommodations for program participation</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Working with partners to ensure accessible training environments</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Providing support services to address barriers</span>
-            </li>
+        <section className="mt-10">
+          <h2 className="text-2xl font-black">Practices we maintain</h2>
+          <ul className="mt-4 space-y-3">
+            {practices.map((practice) => (
+              <li key={practice} className="flex gap-3 leading-7 text-slate-700">
+                <span aria-hidden="true" className="mt-2 h-2 w-2 shrink-0 rounded-full bg-brand-blue-700" />
+                <span>{practice}</span>
+              </li>
+            ))}
           </ul>
-        </div>
+        </section>
 
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
-          <h2 className="text-2xl font-bold text-black mb-6">Website Accessibility</h2>
-
-          <p className="text-black mb-4">
-            We aim to meet WCAG 2.1 Level AA standards and are working to:
+        <section className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+          <h2 className="text-2xl font-black">Third-party content</h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            Some services, examinations, payment flows, embedded content, or partner systems are operated by third parties. We work to choose and configure accessible services where practical, but third-party accessibility is also governed by the provider that operates that service.
           </p>
+        </section>
 
-          <ul className="space-y-3 text-black">
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Ensure proper heading structure and navigation</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Provide text alternatives for images</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Maintain sufficient color contrast</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Support keyboard navigation</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0" />
-              <span>Ensure compatibility with screen readers</span>
-            </li>
-          </ul>
-        </div>
-
-        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
-          <h3 className="text-xl font-bold text-black mb-4">Need Assistance?</h3>
-          <p className="text-black mb-4">
-            If you need help accessing our website, programs, or services, please contact us:
+        <section className="mt-10">
+          <h2 className="text-2xl font-black">Accommodations and alternative access</h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            If a disability-related barrier prevents access to a page, document, application, class, testing process, or other service, contact us with the affected resource and the format or accommodation needed. Program, testing-provider, employer, or workforce-agency procedures may also apply.
           </p>
+        </section>
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-brand-blue-600" />
-              <a href="/contact" className="text-brand-blue-600 hover:underline font-semibold">
-                our contact form
-              </a>
-            </div>
-            <div className="flex items-center gap-3">
-              <Phone className="w-5 h-5 text-brand-blue-600" />
-              <a href="/support" className="text-brand-blue-600 hover:underline font-semibold">
-                Visit Support Center
-              </a>
-            </div>
+        <section className="mt-10 rounded-2xl border border-brand-blue-200 bg-brand-blue-50 p-6">
+          <h2 className="text-2xl font-black">Report an accessibility barrier</h2>
+          <p className="mt-3 leading-7 text-slate-700">
+            Include the page or service involved, what prevented access, the assistive technology or device being used if relevant, and a way to contact you. We will review the issue and provide a reasonable response or alternative access path.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link href="/contact" className="rounded-lg bg-brand-blue-700 px-5 py-3 font-bold text-white hover:bg-brand-blue-800">Contact us</Link>
+            <Link href="/federal-compliance" className="rounded-lg border border-slate-300 bg-white px-5 py-3 font-bold text-slate-900 hover:bg-slate-100">Compliance controls</Link>
           </div>
-
-          <p className="text-black mt-4">
-            We will work with you to provide the information or service you need in an accessible
-            format.
-          </p>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm p-8 mb-8">
-          <h2 className="text-2xl font-bold text-black mb-4">Feedback</h2>
-          <p className="text-black">
-            We welcome feedback on the accessibility of our services. If you encounter accessibility
-            barriers or have suggestions for improvement, please let us know. Your feedback helps us
-            improve access for everyone.
-          </p>
-        </div>
-
-        <div className="text-center">
-          <Link
-            href="/contact"
-            className="inline-block px-8 py-4 bg-brand-blue-600 text-white rounded-lg text-lg font-bold hover:bg-brand-blue-700 transition-colors"
-          >
-            Contact Us
-          </Link>
-        </div>
-      </div>
-    </div>
+        </section>
+      </section>
+    </main>
   );
 }

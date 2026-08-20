@@ -7,29 +7,35 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function StudioCoursesPage() {
   return (
-    <>
-      <div className="border-b border-slate-800 bg-slate-950 px-5 py-3 text-sm text-slate-300">
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-2">
-          <Link href="/studio" className="font-semibold text-slate-300 hover:text-white">
-            ← Dev Studio
-          </Link>
-          <div className="flex flex-wrap gap-2">
+    <main className="min-h-screen bg-white text-slate-950">
+      <header className="border-b border-slate-200 bg-white px-5 py-4">
+        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3">
+          <div>
+            <Link href="/studio" className="text-sm font-semibold text-slate-600 hover:text-slate-950">
+              ← Admin AI
+            </Link>
+            <h1 className="mt-1 text-2xl font-black tracking-tight">Course Builder</h1>
+            <p className="mt-1 text-sm text-slate-600">
+              Create, govern, review, and publish courses through the canonical Course Factory.
+            </p>
+          </div>
+          <nav className="flex flex-wrap gap-2" aria-label="Course Builder tools">
             <Link
               href="/studio/courses/bulk-operations"
-              className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2 font-bold text-slate-200 hover:bg-slate-800"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 shadow-sm hover:bg-slate-50"
             >
               Bulk Operations
             </Link>
             <Link
               href="/studio/courses/lifecycle"
-              className="rounded-lg border border-cyan-700 bg-cyan-950/40 px-4 py-2 font-bold text-cyan-300 hover:bg-cyan-950"
+              className="rounded-xl bg-slate-950 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-slate-800"
             >
               Governance · Versions · SCORM
             </Link>
-          </div>
+          </nav>
         </div>
-      </div>
+      </header>
       <UnifiedCourseBuilder />
-    </>
+    </main>
   );
 }

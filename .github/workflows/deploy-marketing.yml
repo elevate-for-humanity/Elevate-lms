@@ -28,12 +28,9 @@ permissions:
   contents: read
   actions: read
 
-# Keep Marketing deploys serialized, but do not cancel a healthy in-flight build
-# because an unrelated service changed global main. Each run builds, verifies,
-# and deploys the exact SHA that triggered it; later Marketing runs queue behind it.
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   EXPECTED_SHA: ${{ github.sha }}
@@ -75,16 +72,18 @@ jobs:
           fetch-depth: 0
           clean: true
 
-      - name: Require exact triggering revision
+      - name: Prove deployment SHA belongs to main
         shell: bash
         run: |
           set -Eeuo pipefail
           REQUESTED_SHA="${{ github.sha }}"
+          git fetch origin main --depth=200
           RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
           test -n "$RESOLVED_SHA" || { echo '::error::Deployment SHA cannot be resolved'; exit 1; }
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Refusing production deploy of SHA not contained in main: $RESOLVED_SHA"; exit 1; }
           test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
           test "$(git status --porcelain)" = ""
-          echo "Verified exact Marketing deployment SHA $RESOLVED_SHA"
+          echo "Verified production Marketing SHA $RESOLVED_SHA belongs to main"
 
       - name: Set build environment variables
         run: |
@@ -176,7 +175,9 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
+          git fetch origin main --depth=200
           test "$(git rev-parse HEAD)" = "${{ github.sha }}" || { echo '::error::Checkout moved during deployment'; exit 1; }
+          git merge-base --is-ancestor "${{ github.sha }}" origin/main || { echo '::error::Deployment SHA no longer belongs to main'; exit 1; }
           test "$(git status --porcelain)" = "" || { echo '::error::Checkout became dirty during deployment'; exit 1; }
           echo "Exact verified Marketing SHA remains ready for deployment: ${{ github.sha }}"
 

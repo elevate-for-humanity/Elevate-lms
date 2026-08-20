@@ -11,6 +11,9 @@ on:
       - 'lib/course-factory/**'
       - 'lib/course-builder/video-queue.ts'
       - 'lib/video/job-queue.ts'
+      - 'lib/video/edge-tts.ts'
+      - 'lib/video/process-video-job.ts'
+      - 'lib/video/remotion-render.ts'
       - 'supabase/migrations/20260820121500_harden_course_publish_completeness_gate.sql'
   issues:
     types: [opened]
@@ -37,7 +40,7 @@ jobs:
     timeout-minutes: 75
     concurrency:
       group: esb-course-builder-production-acceptance
-      cancel-in-progress: false
+      cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
 

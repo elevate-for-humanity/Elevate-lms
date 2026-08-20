@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { withResilience, breakers, CircuitBreaker } from '@/lib/resilience';
+import { withResilience, breakers, CircuitBreaker, CircuitOpenError } from '@/lib/resilience';
 import type {
   AIProvider,
   AIImageProvider,
@@ -38,6 +38,11 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 };
 
 const chatProviderOrder = ['openai', 'anthropic', 'gemini', 'groq', 'azure'] as const;
+const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function resolveChatProvider(): AIProvider {
   const preferred = (process.env.AI_PROVIDER || 'openai') as AIProviderName;
@@ -101,30 +106,44 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
   }
 
   let lastError: unknown;
+  const allowCircuitRecoveryWait = process.env.AI_CIRCUIT_RECOVERY_WAIT === '1';
+  const passes = allowCircuitRecoveryWait ? 2 : 1;
 
-  for (const provider of providers) {
-    try {
-      const providerOptions = { ...options, provider: provider.name as AIProviderName };
-      const result = await withResilience(() => provider.chat(providerOptions), {
-        circuitBreaker: CircuitBreaker.for(`ai:${provider.name}`, {
-          failureThreshold: 5,
-          resetTimeoutMs: 30_000,
-        }),
-        attempts: 2,
-        baseDelayMs: 1000,
-        label: `aiChat:${provider.name}`,
-        shouldRetry: (err) => {
-          const msg = err instanceof Error ? err.message : String(err);
-          return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
-        },
-      });
-      return { ...result, provider: provider.name };
-    } catch (error) {
-      lastError = error;
-      logger.warn(`[aiChat] provider "${provider.name}" failed; trying next configured provider`, {
-        error: error instanceof Error ? error.message : String(error),
-      });
+  for (let pass = 0; pass < passes; pass += 1) {
+    for (const provider of providers) {
+      try {
+        const providerOptions = { ...options, provider: provider.name as AIProviderName };
+        const result = await withResilience(() => provider.chat(providerOptions), {
+          circuitBreaker: CircuitBreaker.for(`ai:${provider.name}`, {
+            failureThreshold: 5,
+            resetTimeoutMs: 30_000,
+          }),
+          attempts: 2,
+          baseDelayMs: 1000,
+          label: `aiChat:${provider.name}`,
+          shouldRetry: (err) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+          },
+        });
+        return { ...result, provider: provider.name };
+      } catch (error) {
+        lastError = error;
+        logger.warn(`[aiChat] provider "${provider.name}" failed; trying next configured provider`, {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
     }
+
+    if (pass === 0 && allowCircuitRecoveryWait && lastError instanceof CircuitOpenError) {
+      logger.warn('[aiChat] all configured provider attempts ended with an open circuit; waiting for provider recovery window', {
+        waitMs: CIRCUIT_RECOVERY_WAIT_MS,
+      });
+      await sleep(CIRCUIT_RECOVERY_WAIT_MS);
+      continue;
+    }
+
+    break;
   }
 
   throw lastError instanceof Error ? lastError : new Error('All configured AI chat providers failed');

@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Metadata } from 'next';
 import { 
   Users, BookOpen, Award, Settings, BarChart3, Shield, 
@@ -24,7 +23,6 @@ interface NavCard {
   color: string;
 }
 
-// Ensure all nav cards have required href
 const MAIN_NAV_CARDS: NavCard[] = [
   {
     title: 'Programs',
@@ -89,23 +87,18 @@ const FEATURES = [
 ];
 
 export default async function AdminHomePage() {
-  const auth = await requireRole(['admin', 'staff', 'admin']);
+  const auth = await requireRole(['admin', 'staff']);
   const { profile } = auth;
   const firstName = profile.first_name || profile.full_name?.split(' ')[0] || 'Admin';
 
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative h-72 sm:h-80 w-full overflow-hidden">
-        <Image
-          src="/images/pages/admin-dashboard-hero.webp"
-          alt="Admin Portal"
-          fill
-          className="object-cover object-center"
-          priority
-          placeholder="empty"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-blue-900/90 to-brand-blue-900/40" />
+      <section className="relative h-72 sm:h-80 w-full overflow-hidden bg-gradient-to-br from-brand-blue-950 via-brand-blue-900 to-slate-800">
+        <div className="absolute inset-0 opacity-30" aria-hidden="true">
+          <div className="absolute -left-20 -top-24 h-72 w-72 rounded-full border border-white/20" />
+          <div className="absolute right-10 top-10 h-40 w-40 rounded-full border border-white/10" />
+          <div className="absolute bottom-0 right-1/4 h-32 w-80 -skew-x-12 bg-white/5" />
+        </div>
         <div className="relative z-10 flex h-full flex-col justify-center px-6 sm:px-12 max-w-6xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-brand-red-400 mb-2">
             {PLATFORM_DEFAULTS.orgName}
@@ -114,13 +107,12 @@ export default async function AdminHomePage() {
             Admin Portal
           </h1>
           <p className="mt-3 text-slate-200 text-sm sm:text-base max-w-xl">
-            Welcome back, {firstName}. Manage your workforce development programs, 
+            Welcome back, {firstName}. Manage your workforce development programs,
             track student progress, and oversee operations.
           </p>
         </div>
       </section>
 
-      {/* Quick Actions Bar */}
       <section className="bg-slate-50 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex flex-wrap gap-2">
@@ -138,7 +130,6 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      {/* Main Navigation Cards */}
       <section className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-slate-900 mb-6">Manage Your Platform</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -170,7 +161,6 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="bg-slate-900 py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-white mb-8">Platform Capabilities</h2>
@@ -185,7 +175,6 @@ export default async function AdminHomePage() {
         </div>
       </section>
 
-      {/* Secondary Navigation */}
       <section className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-xl font-semibold text-slate-900 mb-6">Additional Tools</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">

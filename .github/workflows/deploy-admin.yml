@@ -12,6 +12,7 @@ on:
       - 'components/studio/**'
       - 'public/**'
       - 'scripts/northflank/**'
+      - 'scripts/verify-admin-instrumentation-boundary.mjs'
       - 'scripts/verify-no-retired-admin-ui-routes.mjs'
       - 'scripts/verify-portal-production-contracts.mjs'
       - 'next.config.mjs'
@@ -104,6 +105,9 @@ jobs:
 
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Enforce Admin instrumentation boundary
+        run: node scripts/verify-admin-instrumentation-boundary.mjs
 
       - name: Enforce portal production contracts
         run: node scripts/verify-portal-production-contracts.mjs

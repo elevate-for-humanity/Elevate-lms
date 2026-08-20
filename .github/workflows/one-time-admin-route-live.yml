@@ -1,0 +1,96 @@
+name: One-time Admin route live fix
+
+on:
+  push:
+    branches:
+      - fix/admin-route-gate-live
+
+permissions:
+  contents: write
+
+jobs:
+  canonicalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/admin-route-gate-live
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Canonicalize retired Admin UI routes by service ownership
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          extensions = {'.ts', '.tsx', '.js', '.jsx', '.mjs'}
+
+          def source_files(root):
+              p = Path(root)
+              if not p.exists():
+                  return []
+              return [f for f in p.rglob('*') if f.is_file() and f.suffix in extensions]
+
+          def admin_owned(text):
+              # Admin is mounted at admin.elevateforhumanity.org root.
+              # Match only quoted UI paths beginning exactly /admin; /api/admin is untouched.
+              text = re.sub(r'(["\'`])/admin(?=/)', r'\1', text)
+              text = re.sub(r'(["\'`])/admin(["\'`])', r'\1/\2', text)
+              return text
+
+          def cross_service(text):
+              # LMS/shared callers must cross to the Admin host rather than become LMS-local.
+              text = re.sub(r'(["\'`])/admin(?=/)', r'\1https://admin.elevateforhumanity.org', text)
+              text = re.sub(r'(["\'`])/admin(["\'`])', r'\1https://admin.elevateforhumanity.org/\2', text)
+              return text
+
+          changed = []
+          for path in source_files('apps/admin/app'):
+              before = path.read_text(encoding='utf-8')
+              after = admin_owned(before)
+              if after != before:
+                  path.write_text(after, encoding='utf-8')
+                  changed.append(str(path))
+
+          for root in ['apps/lms/app', 'components', 'lib/routes']:
+              for path in source_files(root):
+                  before = path.read_text(encoding='utf-8')
+                  after = cross_service(before)
+                  if after != before:
+                      path.write_text(after, encoding='utf-8')
+                      changed.append(str(path))
+
+          print(f'Canonicalized {len(changed)} files')
+          for path in changed:
+              print(path)
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Verify exact route consolidation unit test
+        run: pnpm exec vitest run tests/unit/course-builder-route-consolidation.test.ts
+      - name: Verify Course Factory authority
+        run: node scripts/check-course-factory-authority.mjs
+      - name: Verify TypeScript surfaces
+        run: pnpm typecheck:production
+      - name: Remove one-time workflow and commit only verified source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/one-time-admin-route-live.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '418982c+github-actions[bot]@users.noreply.github.com'
+          git add apps/admin/app apps/lms/app components lib/routes .github/workflows/one-time-admin-route-live.yml
+          if git diff --cached --quiet; then
+            echo 'No source changes required.'
+            exit 0
+          fi
+          git commit -m 'fix(routes): canonicalize Admin UI navigation by service ownership'
+          git push origin HEAD:fix/admin-route-gate-live

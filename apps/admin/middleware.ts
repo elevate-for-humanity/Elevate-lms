@@ -22,6 +22,10 @@ const PUBLIC_PATHS = [
   '/api/health',
   '/api/ping',
   '/api/version',
+  // This internal worker authenticates with CRON_SECRET in its route handler.
+  // It must bypass session middleware or cron/local worker calls are redirected
+  // to /login before bearer authentication can run.
+  '/api/internal/videos/process-queue',
   '/auth/confirm',
   '/auth/reset-password',
   '/install',

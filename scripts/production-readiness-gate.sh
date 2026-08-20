@@ -44,13 +44,22 @@ if [[ -f scripts/audit-public-html.mjs ]]; then
   fi
 fi
 
-section "SECTION 2: AUTHORITATIVE DATA LAYER"
-[[ -f lib/operations/service.ts ]] && echo "OK: Operations Service exists" || { echo "FAIL: Operations Service missing"; FAIL=$((FAIL+1)); }
-[[ -f lib/operations/types.ts ]] && echo "OK: Operations Types exist" || { echo "FAIL: Operations Types missing"; FAIL=$((FAIL+1)); }
-if find supabase/migrations -name '*.sql' -exec grep -l "program_registry\|verified_claims\|funding_rules\|notification_outbox\|workflow_instances" {} \; 2>/dev/null | head -1 | grep -q .; then
-  echo "OK: Authoritative data layer migrations found"
+section "SECTION 2: CANONICAL DATA & CLAIM EVIDENCE"
+[[ -f lib/registry/programs.ts ]] && echo "OK: Canonical program registry adapter exists" || { echo "FAIL: Canonical program registry adapter missing"; FAIL=$((FAIL+1)); }
+[[ -f supabase/migrations/20260820023000_program_regulatory_claim_controls.sql ]] && echo "OK: Program regulatory claim controls migration exists" || { echo "FAIL: Program regulatory claim controls migration missing"; FAIL=$((FAIL+1)); }
+[[ -f supabase/migrations/20260820030000_claim_evidence_runtime_hardening.sql ]] && echo "OK: Runtime claim-evidence migration exists" || { echo "FAIL: Runtime claim-evidence migration missing"; FAIL=$((FAIL+1)); }
+if grep -q "program_regulatory_status" supabase/migrations/20260820023000_program_regulatory_claim_controls.sql \
+  && grep -q "program_claim_evidence" supabase/migrations/20260820023000_program_regulatory_claim_controls.sql \
+  && grep -q "credential_integrity_records" supabase/migrations/20260820030000_claim_evidence_runtime_hardening.sql \
+  && grep -q "student_risk_events" supabase/migrations/20260820030000_claim_evidence_runtime_hardening.sql; then
+  echo "OK: Canonical regulatory, credential-integrity, and risk-evidence contracts found"
 else
-  echo "WARN: Authoritative data layer migration may be pending"; WARN=$((WARN+1))
+  echo "FAIL: Canonical claim-evidence contracts are incomplete"; FAIL=$((FAIL+1))
+fi
+if grep -R "from('program_registry')\|from(\"program_registry\")\|from('verified_claims')\|from(\"verified_claims\")\|from('workflow_instances')\|from(\"workflow_instances\")" lib apps components --include='*.ts' --include='*.tsx' 2>/dev/null | grep -vE '(\.test\.|\.spec\.)' >/dev/null; then
+  echo "FAIL: Retired authoritative-data table names are still referenced by runtime code"; FAIL=$((FAIL+1))
+else
+  echo "OK: No runtime references to retired authoritative-data tables"
 fi
 
 section "SECTION 3: PROGRAM REGISTRY"

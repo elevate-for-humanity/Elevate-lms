@@ -113,7 +113,7 @@ const organizationJsonLd = {
   ],
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

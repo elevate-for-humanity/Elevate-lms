@@ -1,7 +1,9 @@
-name: Video Worker Smoke
+name: Video Worker Scheduler
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
   push:
     branches: [main]
     paths:
@@ -10,13 +12,17 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: canonical-video-worker-scheduler
+  cancel-in-progress: false
+
 env:
   ADMIN_URL: ${{ secrets.ADMIN_URL }}
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
 jobs:
-  smoke:
-    name: Verify and kick canonical video worker
+  process-next-video:
+    name: Process next canonical video job
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

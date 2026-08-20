@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/host-shops' },
 };
 
+const HOST_SITE_APPLY_HREF = '/host-shop/apply';
+
 const REQUIREMENTS = [
   'Current business or establishment license appropriate to the occupation.',
   'A currently licensed supervising professional who can oversee training and verify competencies.',
@@ -47,7 +49,7 @@ export default async function HostShopsPage() {
           <h1 className="mt-4 max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">Meet the businesses training the next generation.</h1>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">Approved barbershops, salons, spas, and beauty businesses provide supervised work-based learning while Elevate manages registered-program governance, RTI, records, and compliance workflows.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/partners/host-shop/apply" className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Become a Host Site</Link>
+            <Link href={HOST_SITE_APPLY_HREF} className="rounded-xl bg-brand-red-600 px-6 py-3 font-black text-white hover:bg-brand-red-700">Become a Host Site</Link>
             <a href={ROUTES.hostShopPortal} className="rounded-xl border border-white/25 px-6 py-3 font-black text-white hover:bg-white/10">Host Site Portal</a>
           </div>
         </div>
@@ -124,7 +126,7 @@ export default async function HostShopsPage() {
         <div className="mx-auto max-w-4xl">
           <h2 className="text-3xl font-black">Want your business in the Host Site network?</h2>
           <p className="mx-auto mt-4 max-w-2xl leading-7 text-slate-300">Submit one application. Elevate verifies the worksite, supervisor, licenses, insurance, and program fit before a location is published or assigned apprentices.</p>
-          <Link href="/partners/host-shop/apply" className="mt-7 inline-flex rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white">Start Host Site Application</Link>
+          <Link href={HOST_SITE_APPLY_HREF} className="mt-7 inline-flex rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white">Start Host Site Application</Link>
         </div>
       </section>
     </main>

@@ -61,13 +61,30 @@ const adminConfig = {
     return config;
   },
 
+  async headers() {
+    return [
+      {
+        source: '/sw-admin.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+      {
+        source: '/manifest-admin.json',
+        headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }],
+      },
+      {
+        source: '/offline.html',
+        headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' }],
+      },
+    ];
+  },
+
   async rewrites() {
     return {
       beforeFiles: [
         { source: '/api/devstudio/health', destination: '/api/admin/dev-studio/health' },
-        // Preserve historical Admin application URLs without changing the
-        // browser URL or maintaining a duplicate page tree. The Admin domain
-        // owns canonical pages at /applications/**.
         { source: '/admin/applications/:path*', destination: '/applications/:path*' },
         ...legacyImageRewrites(),
       ],
@@ -79,26 +96,10 @@ const adminConfig = {
   async redirects() {
     return [
       { source: '/', destination: '/dashboard', permanent: false },
-      {
-        source: '/admin/studio/:path*',
-        destination: '/studio/:path*',
-        permanent: true,
-      },
-      {
-        source: '/admin/dev-studio/:path*',
-        destination: '/studio/:path*',
-        permanent: true,
-      },
-      {
-        source: '/dev-studio/:path*',
-        destination: '/studio/:path*',
-        permanent: true,
-      },
-      {
-        source: '/admin/dashboard',
-        destination: '/dashboard',
-        permanent: true,
-      },
+      { source: '/admin/studio/:path*', destination: '/studio/:path*', permanent: true },
+      { source: '/admin/dev-studio/:path*', destination: '/studio/:path*', permanent: true },
+      { source: '/dev-studio/:path*', destination: '/studio/:path*', permanent: true },
+      { source: '/admin/dashboard', destination: '/dashboard', permanent: true },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply', permanent: false },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility', permanent: false },
       { source: '/about', destination: 'https://www.elevateforhumanity.org/about', permanent: false },

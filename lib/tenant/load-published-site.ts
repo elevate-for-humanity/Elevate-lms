@@ -1,6 +1,7 @@
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { PublishedTenantSite, TenantSiteConfig } from '@/lib/tenant/site-types';
 import { buildDefaultSiteConfig } from '@/lib/tenant/default-site-config';
+import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import { getWebsiteBuilderAccess } from '@/lib/apps/website-builder-access';
 
 type WebsiteRow = {
@@ -16,9 +17,11 @@ type WebsiteRow = {
 function parseConfig(raw: unknown, fallbackName: string): TenantSiteConfig {
   if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
     const cfg = raw as TenantSiteConfig;
-    if (cfg.homepage?.heroTitle && cfg.branding?.primaryColor) return cfg;
+    if (cfg.homepage?.heroTitle && cfg.branding?.primaryColor) {
+      return ensureComposableSiteConfig(cfg);
+    }
   }
-  return buildDefaultSiteConfig({ organizationName: fallbackName });
+  return ensureComposableSiteConfig(buildDefaultSiteConfig({ organizationName: fallbackName }));
 }
 
 async function userOwnedSiteCanServe(db: Awaited<ReturnType<typeof requireAdminClient>>, userId: string | null) {
@@ -88,6 +91,6 @@ export async function loadPublishedSiteBySubdomain(
     subdomain: slug,
     siteName: org.name,
     organizationId: org.id,
-    config: buildDefaultSiteConfig({ organizationName: org.name }),
+    config: ensureComposableSiteConfig(buildDefaultSiteConfig({ organizationName: org.name })),
   };
 }

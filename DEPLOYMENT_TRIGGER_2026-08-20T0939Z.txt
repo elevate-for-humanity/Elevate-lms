@@ -1,0 +1,3 @@
+Production deployment trigger for GEO/AI-SEO cleanup.
+Target branch: main
+Purpose: force hosting platform rebuild/redeploy after verified public-claim cleanup.

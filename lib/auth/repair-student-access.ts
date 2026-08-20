@@ -1,11 +1,11 @@
 // Auto-repair service for broken student portal access.
-// Creates missing auth users, activates accounts, and seeds missing enrollments.
+// Creates missing auth users, activates accounts, and repairs existing canonical enrollments.
 // Admin-only — never call from public-facing routes.
 //
-// Schema reality:
-//   profiles.id = auth.users.id (direct FK)
-//   profiles.is_active — account active flag
-//   enrollments.user_id → profiles.id
+// Canonical enrollment rule:
+//   program_enrollments is the operational enrollment authority.
+//   This repair helper MUST NOT invent a programless enrollment. New enrollment
+//   creation must cross the governed application/enrollment RPC boundary.
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 
@@ -17,7 +17,6 @@ export async function repairStudentPortalAccess(
 
   const db = await requireAdminClient();
 
-  // ── Find profile ─────────────────────────────────────────────────────────
   const { data: profile, error: profileError } = await db
     .from('profiles')
     .select('id, email, is_active, enrollment_status')
@@ -28,7 +27,6 @@ export async function repairStudentPortalAccess(
     throw new Error('Profile record missing — cannot repair. Create the account first.');
   }
 
-  // ── Ensure auth user exists ──────────────────────────────────────────────
   const { data: authData } = await db.auth.admin.getUserById(profile.id as string);
 
   if (!authData?.user) {
@@ -48,7 +46,6 @@ export async function repairStudentPortalAccess(
     actions.push('Auth user already exists — skipped.');
   }
 
-  // ── Activate profile ─────────────────────────────────────────────────────
   if (!profile.is_active) {
     const { error: updateError } = await db
       .from('profiles')
@@ -61,41 +58,53 @@ export async function repairStudentPortalAccess(
     actions.push('Profile already active — skipped.');
   }
 
-  // ── Ensure enrollment exists ─────────────────────────────────────────────
-  const { data: enrollment } = await db
-    .from('enrollments')
-    .select('id, enrollment_state')
+  const { data: enrollment, error: enrollmentError } = await db
+    .from('program_enrollments')
+    .select('id, program_id, program_slug, enrollment_state, status, revoked_at')
     .eq('user_id', profile.id)
     .order('enrolled_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (!enrollment) {
-    const { error: enrollError } = await db.from('enrollments').insert({
-      user_id: profile.id,
-      status: 'active',
-      enrollment_state: 'active',
-      enrolled_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    });
+  if (enrollmentError) throw enrollmentError;
 
-    if (enrollError) throw enrollError;
-    actions.push('Created missing enrollment record (enrollment_state: active).');
-  } else if (!['active', 'started', 'onboarding'].includes(enrollment.enrollment_state as string)) {
+  if (!enrollment) {
+    throw new Error(
+      'No canonical program enrollment exists for this student. Portal repair will not create a programless enrollment; approve/enroll the application through the governed enrollment workflow first.',
+    );
+  }
+
+  if (!enrollment.program_id && !enrollment.program_slug) {
+    throw new Error(
+      `Enrollment ${enrollment.id} has no program identity. Resolve the enrollment record before granting portal access.`,
+    );
+  }
+
+  if (enrollment.revoked_at) {
+    throw new Error(
+      `Enrollment ${enrollment.id} is revoked. Portal repair cannot override a revocation; resolve the underlying enrollment decision first.`,
+    );
+  }
+
+  if (!['active', 'started', 'onboarding'].includes(String(enrollment.enrollment_state ?? ''))) {
     const { error: stateError } = await db
-      .from('enrollments')
-      .update({ enrollment_state: 'active' })
+      .from('program_enrollments')
+      .update({
+        enrollment_state: 'active',
+        status: enrollment.status === 'completed' ? enrollment.status : 'active',
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', enrollment.id);
 
     if (stateError) throw stateError;
-    actions.push(`Updated enrollment_state: ${enrollment.enrollment_state} → active.`);
+    actions.push(`Updated canonical enrollment_state: ${enrollment.enrollment_state ?? 'unset'} → active.`);
   } else {
-    actions.push(`Enrollment already in active state (${enrollment.enrollment_state}) — skipped.`);
+    actions.push(`Canonical enrollment already active (${enrollment.enrollment_state}) — skipped.`);
   }
 
   return {
     success: true,
-    message: 'Student portal access repaired.',
+    message: 'Student portal access repaired against the canonical program enrollment.',
     actions,
   };
 }

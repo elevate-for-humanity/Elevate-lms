@@ -1,11 +1,9 @@
 /**
- * Platform Knowledge Graph
+ * Canonical platform knowledge graph used by Admin AI.
  *
- * Structured registry of routes, APIs, DB tables, components, and their
- * relationships. Used by the AI console to reason about the platform
- * architecturally rather than answering from isolated context.
- *
- * Update this file when adding new systems, routes, or DB tables.
+ * This file describes CURRENT ownership and write authority, not historical
+ * table names. Compatibility/projection stores are documented as debt instead
+ * of being presented to the AI as equal sources of truth.
  */
 
 export interface RouteNode {
@@ -38,315 +36,170 @@ export interface SystemNode {
   status: 'active' | 'partial' | 'stub';
 }
 
-// ── Systems ─────────────────────────────────────────────────────────────────
-
 export const SYSTEMS: SystemNode[] = [
   {
-    id: 'lms',
-    name: 'LMS (Learning Management System)',
-    description: 'Course delivery, lesson progress, checkpoints, certificates',
+    id: 'admin-core',
+    name: 'Admin Operations',
+    description: 'Privileged operational dashboard and manual record views. Admin AI is the primary control surface; these routes are governed manual views.',
     routes: [
+      '/dashboard',
+      '/applications',
+      '/students',
+      '/programs',
+      '/operations',
+      '/reports',
+      '/system-health',
+    ],
+    apis: ['/api/admin/*'],
+    tables: [
+      'applications',
+      'program_enrollments',
+      'profiles',
+      'programs',
+      'audit_logs',
+      'admin_activity_log',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'admin-ai',
+    name: 'Admin AI / Studio',
+    description: 'Conversation-first administrative control plane. Natural-language requests select internal capabilities; advanced Studio routes are manual inspection/editing surfaces.',
+    routes: [
+      '/studio',
+      '/studio/courses',
+      '/studio/repository',
+      '/studio/workflows',
+      '/studio/browser',
+      '/studio/deployments',
+      '/studio/health',
+      '/studio/settings',
+    ],
+    apis: [
+      '/api/devstudio/chat',
+      '/api/admin/ai-assistant',
+      '/api/admin/ai-assistant/approve',
+      '/api/devstudio/jobs',
+      '/api/devstudio/upload',
+      '/api/admin/dev-studio/*',
+    ],
+    tables: [
+      'devstudio_chat_log',
+      'studio_conversations',
+      'devstudio_jobs',
+      'devstudio_documents',
+      'ai_conversation_memory',
+      'ellie_pending_actions',
+      'audit_logs',
+    ],
+    status: 'active',
+  },
+  {
+    id: 'course-authoring',
+    name: 'Course Factory / Course Authoring',
+    description: 'Single course generation, validation, governance, and persistence authority. Canonical writes are atomic: courses → course_modules → course_lessons plus assessment_questions.',
+    routes: ['/studio/courses', '/studio/courses/[courseId]'],
+    apis: [
+      '/api/admin/course-builder/pipeline',
+      '/api/admin/course-builder/publish',
+      '/api/admin/lms/courses/[courseId]/publish',
+    ],
+    tables: ['courses', 'course_modules', 'course_lessons', 'assessment_questions'],
+    status: 'active',
+  },
+  {
+    id: 'learner-lms',
+    name: 'Learner LMS',
+    description: 'Learner delivery, progress, assessments, remediation, credentials, and course access.',
+    routes: [
+      '/lms/dashboard',
       '/lms/courses',
       '/lms/courses/[courseId]',
       '/lms/courses/[courseId]/lessons/[lessonId]',
-      '/lms/courses/[courseId]/certification',
-      '/lms/dashboard',
-      '/lms/programs',
       '/lms/certificates',
     ],
     apis: [
-      '/api/lms/progress',
-      '/api/lms/complete',
-      '/api/lms/checkpoint',
-      '/api/admin/courses',
-      '/api/admin/enrollments',
+      '/api/learner/*',
+      '/api/courses/[courseId]/*',
+      '/api/lms/*',
     ],
     tables: [
-      'curriculum_lessons',
-      'training_lessons',
-      'lms_lessons',
-      'modules',
-      'lesson_progress',
-      'checkpoint_scores',
-      'step_submissions',
-      'program_completion_certificates',
-      'courses',
-      'course_modules',
+      'program_enrollments',
+      'course_enrollments',
       'course_lessons',
+      'lesson_progress',
+      'assessment_questions',
+      'program_completion_certificates',
     ],
     status: 'active',
   },
   {
-    id: 'programs',
-    name: 'Program Catalog',
-    description: 'Public program pages, apply flows, enrollment routing',
-    routes: [
-      '/programs',
-      '/programs/[program]',
-      '/programs/[program]/apply',
-      '/programs/healthcare',
-      '/programs/skilled-trades',
-      '/programs/apprenticeships',
-    ],
-    apis: [
-      '/api/admin/programs',
-      '/api/programs/[slug]',
-    ],
-    tables: ['programs', 'courses', 'training_courses'],
+    id: 'admissions',
+    name: 'Admissions & Enrollment',
+    description: 'Application intake and conversion to the operational enrollment record.',
+    routes: ['/apply', '/apply/status', '/applications'],
+    apis: ['/api/apply', '/api/admin/applications/*'],
+    tables: ['applications', 'program_enrollments'],
     status: 'active',
   },
   {
-    id: 'enrollment',
-    name: 'Enrollment & Application Flow',
-    description: 'Student intake, application submission, enrollment confirmation',
-    routes: [
-      '/apply',
-      '/apply/intake',
-      '/apply/student',
-      '/apply/start',
-      '/apply/success',
-      '/apply/status',
-      '/enrollment',
-      '/enrollment/confirmed',
-      '/checkout/[program]',
-      '/checkout/success',
-    ],
-    apis: [
-      '/api/apply',
-      '/api/enrollment/create',
-      '/api/admin/applications',
-      '/api/admin/applications/[id]/approve',
-      '/api/stripe/create-checkout',
-    ],
-    tables: [
-      'applications',
-      'enrollments',
-      'intake_submissions',
-      'waitlist_entries',
-    ],
+    id: 'workflow-engine',
+    name: 'Workflow & Automation Engine',
+    description: 'Versioned workflows, runs, triggers, and platform event orchestration.',
+    routes: ['/studio/workflows', '/operations'],
+    apis: ['/api/admin/workflows/*', '/api/admin/automations/run'],
+    tables: ['workflows', 'workflow_runs', 'workflow_triggers', 'platform_events'],
+    status: 'active',
+  },
+  {
+    id: 'testing-center',
+    name: 'Testing Center',
+    description: 'Exam scheduling, administration, funding, and completion records.',
+    routes: ['/testing-center'],
+    apis: ['/api/admin/testing/*'],
+    tables: ['exam_bookings', 'exam_funding_authorizations'],
     status: 'active',
   },
   {
     id: 'payments',
     name: 'Payments & Billing',
-    description: 'Stripe checkout, BNPL, payment plans, invoices, payroll',
-    routes: [
-      '/checkout/[program]',
-      '/lms/payments',
-      '/lms/payments/checkout',
-      '/account/billing',
-    ],
-    apis: [
-      '/api/stripe/create-checkout',
-      '/api/stripe/checkout',
-      '/api/stripe/invoice/create',
-      '/api/stripe/webhook',
-      '/api/payments/plan',
-      '/api/payments/bnpl',
-    ],
+    description: 'Payment lifecycle, checkout, subscriptions, revenue and funding state.',
+    routes: ['/billing'],
+    apis: ['/api/stripe/*', '/api/payments/*'],
     tables: [
+      'program_enrollments',
       'payments',
-      'payment_plans',
-      'stripe_customers',
-      'invoices',
-      'ita_vouchers',
+      'stripe_sessions_staging',
+      'barber_subscriptions',
+      'cosmetology_subscriptions',
+      'barber_payments',
     ],
-    status: 'active',
-  },
-  {
-    id: 'admin',
-    name: 'Admin Dashboard',
-    description: 'Platform administration — users, programs, enrollments, reports',
-    routes: [
-      '/admin/dashboard',
-      '/admin/applications',
-      '/admin/enrollments',
-      '/admin/users',
-      '/admin/programs',
-      '/admin/courses',
-      '/admin/studio',
-      '/admin/payroll',
-      '/admin/reports',
-      '/admin/analytics',
-      '/admin/dashboard',
-      '/admin/monitoring',
-      '/admin/audit-logs',
-    ],
-    apis: [
-      '/api/admin/*',
-      '/api/devstudio/*',
-    ],
-    tables: [
-      'profiles',
-      'audit_logs',
-      'admin_audit_log',
-      'ai_audit_log',
-    ],
-    status: 'active',
-  },
-  {
-    id: 'staff-portal',
-    name: 'Staff Portal',
-    description: 'Case management, applications review, enrollment management',
-    routes: [
-      '/admin/staff-portal',
-      '/admin/staff-portal/applications',
-      '/admin/staff-portal/applications/[id]',
-      '/admin/staff-portal/enrollments',
-      '/admin/staff-portal/students',
-      '/admin/staff-portal/reports',
-    ],
-    apis: [
-      '/api/staff/*',
-    ],
-    tables: ['applications', 'enrollments', 'profiles'],
     status: 'active',
   },
   {
     id: 'employer-portal',
-    name: 'Employer Portal',
-    description: 'Apprentice tracking, hours logging, job postings, compliance',
-    routes: [
-      '/employer/dashboard',
-      '/employer/apprentices',
-      '/employer/hours',
-      '/employer/jobs',
-      '/employer/compliance',
-      '/employer/documents',
-    ],
-    apis: [
-      '/api/employer/apprentices',
-      '/api/employer/apprentices/[id]/hours',
-      '/api/employer/jobs',
-    ],
-    tables: [
-      'employer_profiles',
-      'apprenticeship_placements',
-      'hour_entries',
-      'job_postings',
-    ],
+    name: 'Employer / Host Shop Operations',
+    description: 'Apprentice placement, hours, employer records, and host-shop oversight.',
+    routes: ['/employer/dashboard', '/employer/apprentices', '/employer/hours'],
+    apis: ['/api/employer/*'],
+    tables: ['employer_profiles', 'program_enrollments', 'apprenticeship_placements', 'hour_entries'],
     status: 'active',
-  },
-  {
-    id: 'instructor-portal',
-    name: 'Instructor Portal',
-    description: 'Course management, student progress, sign-offs',
-    routes: [
-      '/instructor/dashboard',
-      '/instructor/[[...slug]]',
-    ],
-    apis: [
-      '/api/instructor/*',
-    ],
-    tables: [
-      'instructor_assignments',
-      'step_submissions',
-      'lesson_progress',
-    ],
-    status: 'active',
-  },
-  {
-    id: 'workforce-board',
-    name: 'Workforce Board Portal',
-    description: 'WIOA case management, funding authorization, reporting',
-    routes: [
-      '/workforce-board',
-      '/workforce-board/cases',
-      '/workforce-board/reports',
-    ],
-    apis: [],
-    tables: [
-      'wioa_cases',
-      'funding_authorizations',
-      'exam_funding_authorizations',
-    ],
-    status: 'partial',
   },
   {
     id: 'program-holder',
-    name: 'Program Holder / Partner Portal',
-    description: 'Partner salon/barbershop management, apprentice oversight, MOU signing',
-    routes: [
-      '/program-holder/dashboard',
-      '/program-holder/apprentices',
-      '/program-holder/documents',
-      '/program-holder/compliance',
-    ],
-    apis: [
-      '/api/program-holder/*',
-    ],
-    tables: [
-      'program_holder_profiles',
-      'partner_shops',
-      'mou_documents',
-    ],
-    status: 'active',
-  },
-  {
-    id: 'ellie',
-    name: 'Ellie — AI Ops',
-    description: 'Platform AI operator — tool-calling, SSE execution, Q&A, platform state',
-    routes: ['/admin/dashboard', '/admin/dashboard'],
-    apis: [
-      '/api/devstudio/execute',
-      '/api/devstudio/chat',
-      '/api/devstudio/platform-state',
-      '/api/devstudio/knowledge-graph',
-    ],
-    tables: ['ai_audit_log', 'ai_assistant_conversations', 'ai_chat_history'],
-    status: 'active',
-  },
-  {
-    id: 'grants',
-    name: 'Grants & Funding Engine',
-    description: 'WIOA, ITA vouchers, grant eligibility, package builder',
-    routes: ['/funding', '/funding/grant-programs', '/funding/federal-programs'],
-    apis: [
-      '/api/grants/eligibility',
-      '/api/grants/match',
-      '/api/grants/package',
-      '/api/grants/submit',
-    ],
-    tables: [
-      'grant_applications',
-      'ita_vouchers',
-      'wioa_cases',
-      'funding_authorizations',
-    ],
-    status: 'active',
-  },
-  {
-    id: 'certificates',
-    name: 'Certificate & Credential Engine',
-    description: 'Completion certificates, public verification, exam funding',
-    routes: [
-      '/lms/certificates',
-      '/lms/courses/[courseId]/certification',
-      '/verify/[certificateId]',
-    ],
-    apis: [
-      '/api/admin/certificates/bulk',
-      '/api/certificates/verify',
-    ],
-    tables: [
-      'program_completion_certificates',
-      'exam_funding_authorizations',
-      'checkpoint_scores',
-    ],
+    name: 'Program Holder Operations',
+    description: 'Program-holder onboarding, approval, documents, and partner operations.',
+    routes: ['/program-holder/dashboard', '/program-holder/apprentices', '/program-holder/documents'],
+    apis: ['/api/program-holder/*'],
+    tables: ['program_holder_profiles', 'program_holder_documents', 'program_enrollments'],
     status: 'active',
   },
 ];
 
-// ── Route → System map ───────────────────────────────────────────────────────
-
 export const ROUTE_SYSTEM_MAP: Record<string, string> = {};
 for (const system of SYSTEMS) {
-  for (const route of system.routes) {
-    ROUTE_SYSTEM_MAP[route] = system.id;
-  }
+  for (const route of system.routes) ROUTE_SYSTEM_MAP[route] = system.id;
 }
-
-// ── DB Table → System map ────────────────────────────────────────────────────
 
 export const TABLE_SYSTEM_MAP: Record<string, string[]> = {};
 for (const system of SYSTEMS) {
@@ -356,183 +209,164 @@ for (const system of SYSTEMS) {
   }
 }
 
-// ── Dependency graph ─────────────────────────────────────────────────────────
-// Maps a route to what it depends on (tables + APIs)
-
-export const ROUTE_DEPENDENCIES: Record<string, { tables: string[]; apis: string[]; components: string[] }> = {
-  '/programs/[program]': {
-    tables: ['programs', 'courses'],
-    apis: ['/api/admin/programs'],
-    components: ['ProgramDetailPageComponent', 'HeroBanner', 'ApplyButton'],
+export const ROUTE_DEPENDENCIES: Record<
+  string,
+  { tables: string[]; apis: string[]; components: string[] }
+> = {
+  '/dashboard': {
+    tables: ['applications', 'program_enrollments', 'profiles', 'programs'],
+    apis: ['/api/admin/*', '/api/devstudio/chat', '/api/admin/ai-assistant'],
+    components: ['AdminDashboardContent', 'StatsOverviewBar', 'SystemHealthPanel'],
+  },
+  '/studio': {
+    tables: ['devstudio_chat_log', 'studio_conversations', 'ellie_pending_actions'],
+    apis: ['/api/devstudio/chat', '/api/admin/ai-assistant', '/api/admin/ai-assistant/approve'],
+    components: ['UnifiedEllieChat', 'StudioWorkspaceGrid'],
+  },
+  '/studio/courses': {
+    tables: ['courses', 'course_modules', 'course_lessons', 'assessment_questions'],
+    apis: ['/api/admin/course-builder/pipeline', '/api/admin/course-builder/publish'],
+    components: ['UnifiedCourseBuilder'],
+  },
+  '/studio/courses/[courseId]': {
+    tables: ['courses', 'course_modules', 'course_lessons', 'assessment_questions'],
+    apis: ['/api/admin/lms/courses/[courseId]/publish'],
+    components: ['CourseProvider', 'CourseStudioApplication', 'StudioWorkspace'],
+  },
+  '/applications': {
+    tables: ['applications'],
+    apis: ['/api/admin/applications/*'],
+    components: ['RecentApplicationsList'],
+  },
+  '/students': {
+    tables: ['profiles', 'program_enrollments'],
+    apis: ['/api/admin/*'],
+    components: [],
+  },
+  '/operations': {
+    tables: ['workflows', 'workflow_runs', 'platform_events', 'admin_activity_log'],
+    apis: ['/api/admin/workflows/*', '/api/admin/automations/run'],
+    components: ['SystemHealthPanel'],
   },
   '/lms/courses/[courseId]/lessons/[lessonId]': {
-    tables: ['curriculum_lessons', 'lms_lessons', 'lesson_progress', 'checkpoint_scores'],
-    apis: ['/api/lms/progress', '/api/lms/complete'],
-    components: ['QuizPlayer', 'HvacLessonVideo', 'SpacedRepetitionReview', 'StepSubmissionForm'],
-  },
-  '/checkout/[program]': {
-    tables: ['programs', 'enrollments', 'stripe_customers'],
-    apis: ['/api/stripe/create-checkout', '/api/payments/plan'],
-    components: ['BNPLOptions', 'PaymentPlanCalculator'],
-  },
-  '/apply/intake': {
-    tables: ['applications', 'intake_submissions'],
-    apis: ['/api/apply'],
-    components: ['IntakeForm'],
-  },
-  '/admin/dashboard': {
-    tables: ['ai_audit_log'],
-    apis: ['/api/devstudio/execute', '/api/devstudio/chat', '/api/devstudio/platform-state'],
-    components: ['AIChat', 'XTerminal', 'DevStudioClient'],
+    tables: ['course_lessons', 'lesson_progress', 'assessment_questions', 'program_enrollments'],
+    apis: ['/api/learner/*', '/api/courses/[courseId]/*'],
+    components: ['CourseTutor'],
   },
 };
 
-// ── Known platform debt ──────────────────────────────────────────────────────
-
 export const PLATFORM_DEBT = [
   {
-    id: 'programs-vs-courses-terminology',
-    severity: 'medium',
-    description: 'Public LMS uses "Programs" (/lms/programs) while authenticated app uses "Courses" (/lms/courses). Canonical term is "Program".',
-    affectedRoutes: ['/lms/courses', '/lms/programs'],
-    resolution: 'Add redirects, update 20+ inbound hrefs, update nav labels',
-  },
-  {
-    id: 'workforce-board-no-api',
+    id: 'legacy-enrollments-table',
     severity: 'high',
-    description: 'Workforce board portal has 5 pages but 0 API routes. Pages are stubs.',
-    affectedRoutes: ['/workforce-board', '/workforce-board/cases', '/workforce-board/reports'],
-    resolution: 'Build /api/workforce-board/* routes',
+    description: 'enrollments and program_enrollments are both populated with the same 19 record IDs. program_enrollments is the canonical operational table; remaining enrollments readers must be migrated before the mirror can be retired.',
+    affectedRoutes: ['/students', '/lms/dashboard'],
+    resolution: 'Move remaining runtime readers/writers to program_enrollments, prove parity, then retire enrollments or replace it with an explicitly read-only compatibility projection.',
   },
   {
-    id: 'lab-assignment-signoff-ui',
-    severity: 'medium',
-    description: 'step_submissions table exists but instructor sign-off UI is not built.',
-    affectedRoutes: ['/lms/courses/[courseId]/lessons/[lessonId]'],
-    resolution: 'Build instructor sign-off UI in lesson page',
-  },
-  {
-    id: 'auth-gaps',
+    id: 'legacy-course-projections',
     severity: 'high',
-    description: '62 routes with no auth check, 13 admin routes with identity-only auth (no role check)',
-    affectedRoutes: [],
-    resolution: 'Run scripts/audit-auth-gaps.sh and fix each route',
+    description: 'lms_courses, training_courses, modules, curriculum_lessons, lms_lessons, and training_lessons remain populated historical/projection stores. Course Factory is the only canonical authoring writer and persists to courses/course_modules/course_lessons.',
+    affectedRoutes: ['/studio/courses', '/lms/courses'],
+    resolution: 'Inventory remaining consumers, classify required read projections, eliminate parallel writers, and retire or formally version compatibility projections.',
   },
   {
-    id: 'console-log-pollution',
-    severity: 'low',
-    description: '~1,521 console.log occurrences across 118 files. Use lib/logger.ts instead.',
-    affectedRoutes: [],
-    resolution: 'Replace console.log with logger.info/warn/error',
+    id: 'deployment-table-convergence',
+    severity: 'medium',
+    description: 'ai_deployments and copilot_deployments both exist and require ownership mapping before any consolidation. workspace_deployments belongs to customer workspaces and is not part of Studio cleanup.',
+    affectedRoutes: ['/studio/deployments'],
+    resolution: 'Map active deployment writers/readers and assign one Admin AI deployment authority without touching customer workspace deployments.',
+  },
+  {
+    id: 'build-evidence-required',
+    severity: 'high',
+    description: 'Repository architecture gates exist, but a current green Admin build, Studio typecheck/integration gate, and deployed authenticated smoke evidence are still required before procurement certification.',
+    affectedRoutes: ['/dashboard', '/studio'],
+    resolution: 'Run the repository gates in CI, deploy main, and capture authenticated production health/smoke evidence.',
   },
 ];
-
-// ── Canonical architecture decisions ────────────────────────────────────────
 
 export const CANONICAL_DECISIONS = [
   {
-    id: 'program-routes',
-    decision: 'All programs use /programs/[program] via the dynamic route. Dedicated pages only when unique client components are needed.',
-    rationale: 'Prevents route sprawl. DB-driven via programs table.',
+    id: 'admin-ai-front-door',
+    decision: 'Admin /studio is the conversation-first control plane. Course Builder, workflows, repository, browser, deployment and other Studio pages are capabilities behind the AI plus advanced manual surfaces.',
+    rationale: 'Administrators describe outcomes instead of selecting separate mini-products.',
   },
   {
-    id: 'supabase-imports',
-    decision: 'Import Supabase clients from @/lib/supabase/* only. All 10 deprecated root-level shims deleted.',
-    rationale: 'Single canonical import path prevents version drift.',
+    id: 'admin-route-root',
+    decision: 'Admin-host routes are root-level (/dashboard, /applications, /students, /programs, /operations, /studio), not /admin/* page paths.',
+    rationale: 'Matches the deployed Admin application shell and prevents stale navigation metadata.',
   },
   {
-    id: 'rate-limiting',
-    decision: 'Use applyRateLimit() from @/lib/api/withRateLimit. lib/rateLimit.ts (in-memory) is deprecated.',
-    rationale: 'Upstash Redis works in serverless; in-memory does not.',
+    id: 'application-source-of-truth',
+    decision: 'applications is the canonical application/intake table. Admin AI and dashboard counts must use the same pending-status set.',
+    rationale: 'Prevents conflicting application counts and removes the retired intake_submissions contract.',
+  },
+  {
+    id: 'enrollment-source-of-truth',
+    decision: 'program_enrollments is the canonical operational enrollment table.',
+    rationale: 'It contains the complete funding, access, apprenticeship, payout, progress, and compliance state and drives current Admin/LMS operations.',
+  },
+  {
+    id: 'course-write-authority',
+    decision: 'Course Factory is the only course authoring persistence authority. Its atomic database function writes courses, course_modules, course_lessons, and assessment_questions.',
+    rationale: 'Eliminates partial course writes and parallel builder persistence.',
+  },
+  {
+    id: 'studio-data-boundary',
+    decision: 'Canonical Admin AI data is devstudio_chat_log, studio_conversations, devstudio_jobs, devstudio_documents, ai_conversation_memory, and ellie_pending_actions. Privileged Studio data requires Admin authorization and AAL2/MFA.',
+    rationale: 'Matches the Admin-only trust boundary and the hardened live RLS policies.',
+  },
+  {
+    id: 'studio-api-boundaries',
+    decision: '/api/devstudio/* owns operational runtime APIs; /api/admin/dev-studio/* owns Admin capability health/configuration APIs. Duplicate relative implementations are forbidden.',
+    rationale: 'Keeps runtime operations separate from privileged capability configuration without duplicate behavior.',
+  },
+  {
+    id: 'high-impact-approval',
+    decision: 'High-impact administrative actions are staged in ellie_pending_actions and executed only after explicit human approval, with audit logging.',
+    rationale: 'Government operations require traceable human authorization for consequential changes.',
+  },
+  {
+    id: 'pwa-admin-shell',
+    decision: 'Studio inherits the Admin application shell and Admin PWA. It is not a standalone PWA or parallel application shell.',
+    rationale: 'One authenticated navigation/session/update lifecycle reduces drift and operator confusion.',
   },
   {
     id: 'api-auth',
-    decision: 'Use apiAuthGuard / apiRequireAdmin / apiRequireInstructor from @/lib/admin/guards.',
-    rationale: 'Canonical auth pattern. Legacy patterns (withAuth, getCurrentUser) are correct but non-canonical.',
-  },
-  {
-    id: 'middleware',
-    decision: 'All middleware logic goes in proxy.ts. Do NOT create middleware.ts.',
-    rationale: 'middleware.ts conflicts with proxy.ts and breaks the build.',
-  },
-  {
-    id: 'error-responses',
-    decision: 'All API errors use safeError/safeInternalError/safeDbError from @/lib/api/safe-error.',
-    rationale: 'Prevents error.message leakage in production responses.',
-  },
-  {
-    id: 'lms-step-types',
-    decision: 'Course engine routes by step_type column on curriculum_lessons. No per-program hardcoded logic.',
-    rationale: 'DB-driven rendering is program-agnostic and scalable.',
-  },
-  {
-    id: 'resilience-wrapper',
-    decision: 'All external service calls (OpenAI, Groq, Gemini, Stripe, SendGrid) use withResilience() from @/lib/resilience/with-resilience. Convenience wrappers: resilientOpenAI, resilientStripe, resilientSendGrid, etc.',
-    rationale: 'Circuit breaker + retry in one call. Shared breaker singletons prevent cascade failures.',
-  },
-  {
-    id: 'ai-orchestration',
-    decision: 'All AI task execution routes through executeAiTask() from @/lib/ai/execute-ai-task (alias for runAITask from orchestrator). No direct provider instantiation in route handlers.',
-    rationale: 'Single governance point for provider selection, fallback, and logging.',
-  },
-  {
-    id: 'event-bus',
-    decision: 'All significant platform events (enrollments, payments, cron failures, deploys) emit via emitEvent() from @/lib/events/emit. Events stored in platform_events table and broadcast via Supabase Realtime.',
-    rationale: 'Institutional memory. Powers Mission Control realtime feed and audit trail.',
-  },
-  {
-    id: 'canonical-admin-routes',
-    decision: 'All admin nav items, redirects, and action hrefs reference ADMIN constants from @/lib/routes/canonical-routes. Never hardcode /admin/* paths.',
-    rationale: 'Single source of truth eliminates navigation entropy and orphan flows.',
-  },
-  {
-    id: 'realtime-telemetry',
-    decision: 'Global operational status bar (RealtimeSystemStatus) is mounted once in the admin layout. Powered by useRealtimeMetrics hook — polls /api/admin/platform-health every 30s + Supabase realtime subscriptions.',
-    rationale: 'Platform feels alive. Admins see failures immediately without refreshing.',
-  },
-  {
-    id: 'northflank-health-gate',
-    decision:
-      'LMS and Admin deploy workflows (Northflank) run post-deploy curl smoke on /api/ping. Failed deploys fail the GitHub Action; fix forward on main.',
-    rationale: 'No blind deployments. Broken images are caught in CI before operators assume production is healthy.',
-  },
-  {
-    id: 'mission-control-canonical',
-    decision: 'Admin Dashboard (/admin/dashboard) is the single operational home. Mission Control, command-center, and monitoring aliases redirect to /admin/dashboard. Lizzy (single preview container with workspace tabs) is the only control surface on that page.',
-    rationale: 'One operational surface eliminates context switching and duplicate maintenance.',
+    decision: 'Privileged Admin/Studio APIs use canonical Admin/Dev Studio guards, rate limiting, safe errors, and database RLS as defense in depth.',
+    rationale: 'UI routing alone is not an authorization boundary.',
   },
 ];
 
-/**
- * Get the full knowledge graph as a structured context string for AI injection.
- */
 export function getKnowledgeGraphContext(): string {
   const lines: string[] = [
-    '=== ELEVATE LMS PLATFORM KNOWLEDGE GRAPH ===',
+    '=== ELEVATE PLATFORM CANONICAL KNOWLEDGE GRAPH ===',
     '',
     '## SYSTEMS',
-    ...SYSTEMS.map(s =>
-      `[${s.status.toUpperCase()}] ${s.name} (${s.id})\n  ${s.description}\n  Routes: ${s.routes.slice(0, 3).join(', ')}${s.routes.length > 3 ? ` +${s.routes.length - 3} more` : ''}\n  Tables: ${s.tables.slice(0, 4).join(', ')}${s.tables.length > 4 ? ` +${s.tables.length - 4} more` : ''}`
+    ...SYSTEMS.map(
+      (system) =>
+        `[${system.status.toUpperCase()}] ${system.name} (${system.id})\n` +
+        `  ${system.description}\n` +
+        `  Routes: ${system.routes.slice(0, 4).join(', ')}${system.routes.length > 4 ? ` +${system.routes.length - 4} more` : ''}\n` +
+        `  Tables: ${system.tables.slice(0, 5).join(', ')}${system.tables.length > 5 ? ` +${system.tables.length - 5} more` : ''}`,
     ),
     '',
-    '## PLATFORM DEBT',
-    ...PLATFORM_DEBT.map(d => `[${d.severity.toUpperCase()}] ${d.id}: ${d.description}`),
+    '## OPEN CONSOLIDATION DEBT',
+    ...PLATFORM_DEBT.map((debt) => `[${debt.severity.toUpperCase()}] ${debt.id}: ${debt.description}`),
     '',
     '## CANONICAL DECISIONS',
-    ...CANONICAL_DECISIONS.map(d => `• ${d.id}: ${d.decision}`),
+    ...CANONICAL_DECISIONS.map((decision) => `• ${decision.id}: ${decision.decision}`),
   ];
   return lines.join('\n');
 }
 
-/**
- * Look up which system owns a route or table.
- */
-export function lookupRoute(path: string): SystemNode | undefined {
-  const systemId = ROUTE_SYSTEM_MAP[path];
-  return systemId ? SYSTEMS.find(s => s.id === systemId) : undefined;
+export function lookupRoute(routePath: string): SystemNode | undefined {
+  const systemId = ROUTE_SYSTEM_MAP[routePath];
+  return systemId ? SYSTEMS.find((system) => system.id === systemId) : undefined;
 }
 
 export function lookupTable(table: string): SystemNode[] {
   const systemIds = TABLE_SYSTEM_MAP[table] ?? [];
-  return SYSTEMS.filter(s => systemIds.includes(s.id));
+  return SYSTEMS.filter((system) => systemIds.includes(system.id));
 }

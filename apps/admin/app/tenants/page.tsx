@@ -7,7 +7,7 @@ import TenantsClient from './TenantsClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/admin/tenants' },
+  alternates: { canonical: 'https://admin.elevateforhumanity.org/tenants' },
   title: 'Tenant Management | Elevate For Humanity',
   description: 'Manage multi-tenant organizations and configurations.',
 };
@@ -27,7 +27,7 @@ export default async function TenantsPage() {
         <div className="mb-6">
           <nav className="text-sm mb-4">
             <ol className="flex items-center space-x-2 text-slate-700">
-              <li><Link href="/admin" className="hover:text-brand-blue-600">Admin</Link></li>
+              <li><Link href="/" className="hover:text-brand-blue-600">Admin</Link></li>
               <li>/</li>
               <li className="text-slate-900 font-medium">Tenants</li>
             </ol>

@@ -55,10 +55,7 @@ export async function checkPrivilegedMfa(
   };
 }
 
-/**
- * Rollout switch. This lets the MFA UI/enrollment flow ship before middleware
- * becomes blocking, avoiding an accidental admin lockout.
- */
+/** Privileged MFA is a production security invariant, not a rollout feature flag. */
 export function privilegedMfaEnforcementEnabled(): boolean {
-  return process.env.REQUIRE_PRIVILEGED_MFA === 'true';
+  return true;
 }

@@ -4,6 +4,18 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'apps/admin/**'
+      - 'components/admin/**'
+      - 'lib/admin/**'
+      - 'apps/lms/**'
+      - 'components/lms/**'
+      - '.github/workflows/deploy-admin.yml'
+      - '.github/workflows/deploy-lms.yml'
+      - 'scripts/verify-admin-*.mjs'
+      - 'scripts/verify-lms-*.mjs'
+      - 'public/manifest-admin.json'
+      - 'public/sw-admin.js'
   workflow_dispatch:
     inputs:
       sync_secrets:
@@ -18,8 +30,6 @@ permissions:
 
 concurrency:
   group: northflank-marketing-deploy
-  # Production must converge on the newest main revision. Obsolete runs are unsafe
-  # because they can overwrite a newer Marketing release after a long build.
   cancel-in-progress: true
 
 env:

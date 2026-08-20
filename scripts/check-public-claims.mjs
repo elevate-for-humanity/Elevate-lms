@@ -25,12 +25,18 @@ const BLOCKED = [
   { pattern: /funding\s+available\s+nationwide/i, label: 'nationwide funding availability claim' },
   { pattern: /all\s+programs\s+(?:are\s+)?(?:approved|eligible).*ETPL/i, label: 'provider-wide ETPL claim; approval must be program-specific' },
   { pattern: /all\s+programs\s+(?:are\s+)?(?:WIOA|WRG|workforce)[-\s]*(?:approved|eligible|funded)/i, label: 'provider-wide workforce funding claim; approval must be program-specific' },
+  { pattern: /\bWIOA[-\s]*compliant\b/i, label: 'blanket WIOA-compliant claim; describe implemented controls and program evidence instead' },
+  { pattern: /full\s+compliance\s+with\s+(?:the\s+)?Workforce\s+Innovation\s+and\s+Opportunity\s+Act/i, label: 'absolute WIOA compliance claim' },
+  { pattern: /\bETPL[-\s]*(?:certified|approved)\b/i, label: 'blanket ETPL certification/approval wording; ETPL evidence is program-specific' },
   { pattern: /blockchain[-\s]*(?:verified|verification|anchored)|on[-\s]*chain\s+credential/i, label: 'blockchain credential claim without a production chain anchor' },
   { pattern: /\b100%\s+compliant\b/i, label: 'absolute compliance claim' },
   { pattern: /\$300K\s*[–-]\s*\$650K|\$300,000\s*[–-]\s*\$650,000/i, label: 'credential-value claim without published methodology' },
   { pattern: /\b4\s*[–-]\s*8\s+years?\s+saved\b/i, label: 'time-saved claim without published methodology' },
   { pattern: /\blaunch\s+in\s+30\s+days\b/i, label: 'unqualified implementation-time guarantee' },
   { pattern: /\bno\s+paperwork\b/i, label: 'absolute paperwork claim' },
+  { pattern: /\b50\+\s+partner\s+organizations\b/i, label: 'partner-count claim without canonical evidence' },
+  { pattern: /\bcredentials?\s+(?:are\s+)?issued\s+on[-\s]*site\b/i, label: 'credential issuance location claim without program-specific evidence' },
+  { pattern: /\breal[-\s]*time\s+reporting\s+on\s+placement,?\s+retention,?\s+and\s+wages\b/i, label: 'real-time outcome reporting claim without a measured source contract' },
 ];
 
 function extension(path) {
@@ -78,6 +84,8 @@ const requiredFiles = [
   'lib/programs/funding-registry.ts',
   'lib/programs/public-funding-copy.ts',
   'supabase/migrations/20260820023000_program_regulatory_claim_controls.sql',
+  'supabase/migrations/20260820030000_claim_evidence_runtime_hardening.sql',
+  'supabase/migrations/20260820031500_correct_program_regulatory_evidence.sql',
 ];
 for (const file of requiredFiles) {
   if (!existsSync(file)) {

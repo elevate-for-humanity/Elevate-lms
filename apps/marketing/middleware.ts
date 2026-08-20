@@ -1,5 +1,6 @@
 import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
+import crossAppOwnership from '@/lib/routes/cross-app-ownership.json';
 import {
   rewriteCustomDomainRequest,
   rewriteTenantAppHostRequest,
@@ -21,6 +22,35 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
   'store.elevateforhumanity.org',
   'testing.elevateforhumanity.org',
 ]);
+
+const APP_ORIGINS: Record<string, string> = {
+  admin: 'https://admin.elevateforhumanity.org',
+  lms: 'https://app.elevateforhumanity.org',
+};
+
+type CrossAppRule = {
+  source?: string;
+  sourcePrefix?: string;
+  owner: string;
+  target?: string;
+  stripPrefix?: string;
+};
+
+function resolveCrossAppPath(pathname: string) {
+  const rules = crossAppOwnership.routes as CrossAppRule[];
+  for (const rule of rules) {
+    if (rule.source && pathname === rule.source) {
+      return { owner: rule.owner, pathname: rule.target || pathname };
+    }
+    if (rule.sourcePrefix && pathname.startsWith(rule.sourcePrefix)) {
+      const stripped = rule.stripPrefix && pathname.startsWith(rule.stripPrefix)
+        ? pathname.slice(rule.stripPrefix.length) || '/'
+        : pathname;
+      return { owner: rule.owner, pathname: rule.target || stripped };
+    }
+  }
+  return null;
+}
 
 function isProtectedPortal(pathname: string) {
   return PROTECTED_PORTAL_PREFIXES.some(
@@ -72,8 +102,6 @@ export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-pathname', `${pathname}${search}`);
 
-  // Tenant forms/analytics APIs must execute as API routes on the tenant host;
-  // they resolve the published tenant from Host/x-forwarded-host themselves.
   if (pathname.startsWith('/api/tenant-sites/')) {
     return NextResponse.next({ request: { headers: requestHeaders } });
   }
@@ -85,6 +113,19 @@ export async function middleware(req: NextRequest) {
 
   if (isCustomTenantHost(host)) {
     return rewriteCustomDomainRequest(req, host, pathname, requestHeaders);
+  }
+
+  // Root-relative links from historical Marketing pages must resolve to the
+  // service that owns them. This boundary redirect keeps old bookmarks and
+  // embedded links working while canonical UI remains on the owning domain.
+  if (host === 'www.elevateforhumanity.org' || host === 'elevateforhumanity.org') {
+    const crossApp = resolveCrossAppPath(pathname);
+    const targetOrigin = crossApp ? APP_ORIGINS[crossApp.owner] : undefined;
+    if (crossApp && targetOrigin) {
+      const target = new URL(crossApp.pathname, targetOrigin);
+      target.search = search;
+      return NextResponse.redirect(target, 307);
+    }
   }
 
   if (!isProtectedPortal(pathname)) return NextResponse.next();

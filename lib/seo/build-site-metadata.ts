@@ -11,7 +11,7 @@ export type SiteMetadataInput = {
   description: string;
   /** Path only, e.g. `/programs` or `/education` */
   path: string;
-  /** When true, adds Open Graph + Twitter (default true for public marketing). */
+  /** When true, adds Open Graph metadata (default true for public marketing). */
   social?: boolean;
   noindex?: boolean;
 };
@@ -43,11 +43,6 @@ export function buildSiteMetadata(input: SiteMetadataInput): Metadata {
       siteName: org,
       type: 'website',
       locale: 'en_US',
-    };
-    metadata.twitter = {
-      card: 'summary_large_image',
-      title: fullTitle,
-      description: input.description,
     };
   }
 

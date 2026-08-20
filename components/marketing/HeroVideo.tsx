@@ -27,11 +27,9 @@ export interface HeroDemoSlide {
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
-  /** Poster is the permanent base media layer underneath video and hero copy. */
   posterImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
-  /** Deprecated for hero rendering. Branding is kept out of the video frame. */
   showBrandBug?: boolean;
   belowHeroHeadline?: string;
   belowHeroSubheadline?: string;
@@ -42,11 +40,11 @@ export interface HeroVideoProps {
   className?: string;
   children?: React.ReactNode;
   mediaFit?: 'cover' | 'contain';
-  /** Demo slides are intentionally not rendered over canonical hero video. */
   demoSlides?: HeroDemoSlide[];
   demoStartSeconds?: number;
   demoSlideSeconds?: number;
   heightClassName?: string;
+  overlayMode?: 'default' | 'none';
 }
 
 export default function HeroVideo({
@@ -69,6 +67,7 @@ export default function HeroVideo({
   demoStartSeconds: _demoStartSeconds = 6,
   demoSlideSeconds: _demoSlideSeconds = 4.5,
   heightClassName = 'min-h-[520px] sm:min-h-[560px] lg:min-h-[620px]',
+  overlayMode = 'default',
 }: HeroVideoProps) {
   const heroRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -186,7 +185,7 @@ export default function HeroVideo({
 
   const hasHeroContent = Boolean(
     microLabel || belowHeroHeadline || belowHeroSubheadline || ctas?.length ||
-    trustIndicators?.length || children || voiceoverSrc || showVideo,
+    trustIndicators?.length || children,
   );
 
   return (
@@ -237,8 +236,12 @@ export default function HeroVideo({
           </video>
         ) : null}
 
-        <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20" aria-hidden="true" />
-        <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10" aria-hidden="true" />
+        {overlayMode === 'default' ? (
+          <>
+            <div className="absolute inset-0 z-20 bg-gradient-to-r from-slate-950/90 via-slate-950/62 to-slate-950/20" aria-hidden="true" />
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-slate-950/65 via-transparent to-slate-950/10" aria-hidden="true" />
+          </>
+        ) : null}
 
         {voiceoverSrc ? (
           <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" className="hidden" onEnded={() => setMuted(true)} />
@@ -270,13 +273,14 @@ export default function HeroVideo({
                   ) : null}
                 </>
               )}
-              {(voiceoverSrc || showVideo) ? (
-                <button type="button" onClick={() => void toggleSound()} aria-label={muted ? 'Play hero audio' : 'Pause hero audio'} className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/60 bg-slate-950/35 px-4 py-2 text-xs font-black text-white backdrop-blur-sm transition hover:bg-slate-950/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-                  {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}<span>{muted ? 'Play audio' : 'Pause audio'}</span>
-                </button>
-              ) : null}
             </div>
           </div>
+        ) : null}
+
+        {(voiceoverSrc || showVideo) ? (
+          <button type="button" onClick={() => void toggleSound()} aria-label={muted ? 'Play hero audio' : 'Pause hero audio'} className="absolute bottom-4 right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/70 bg-slate-950/45 px-4 py-2 text-xs font-black text-white backdrop-blur-sm transition hover:bg-slate-950/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
+            {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}<span>{muted ? 'Play audio' : 'Pause audio'}</span>
+          </button>
         ) : null}
       </section>
 

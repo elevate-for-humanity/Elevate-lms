@@ -35,7 +35,7 @@ const FAQS = [
   },
   {
     q: 'Does the platform support WIOA and workforce reporting?',
-    a: 'The production data model includes participant, service, PIRL mapping/export, performance, document, regulatory-evidence, and report-run infrastructure. That supports workforce reporting workflows, but it does not itself certify an organization as WIOA compliant or guarantee participant eligibility, funding authorization, or reporting accuracy.',
+    a: 'The production data model includes participant, service, PIRL mapping/export, performance, document, regulatory-evidence, and report-run infrastructure. Those capabilities support workforce reporting workflows, but platform functionality by itself does not establish legal or program compliance with WIOA and does not determine participant eligibility, funding authorization, or reporting accuracy.',
   },
   {
     q: 'What is the difference between managed and source-use licensing?',

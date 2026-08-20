@@ -19,6 +19,26 @@ function fail(message: string): never {
   throw new Error(`[ESB acceptance] ${message}`);
 }
 
+async function logAcceptance(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  courseId: string,
+  stage: string,
+  metadata: Record<string, unknown> = {},
+) {
+  const { error } = await db.from('course_audit_log').insert({
+    course_id: courseId,
+    actor_id: null,
+    action: 'updated',
+    metadata: {
+      acceptance_test: 'esb-course-builder-v2',
+      stage,
+      github_sha: process.env.GITHUB_SHA ?? null,
+      ...metadata,
+    },
+  });
+  if (error) throw new Error(`[ESB acceptance] failed to write audit telemetry: ${error.message}`);
+}
+
 function experienceIsComplete(contentJson: unknown) {
   if (!contentJson || typeof contentJson !== 'object') return false;
   const row = contentJson as Record<string, any>;
@@ -117,6 +137,7 @@ async function auditPersistedPackage(courseId: string) {
 async function waitForMedia(courseId: string) {
   const db = await requireAdminClient();
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
+  let lastReported = -1;
 
   while (Date.now() < deadline) {
     const { data, error } = await db
@@ -135,6 +156,10 @@ async function waitForMedia(courseId: string) {
       (row) => row.video_status === 'complete' && typeof row.video_url === 'string' && row.video_url.length > 0,
     ).length;
     console.log(`[ESB acceptance] media ${complete}/${EXPECTED_LESSONS} complete`);
+    if (complete !== lastReported) {
+      lastReported = complete;
+      await logAcceptance(db, courseId, 'media_progress', { complete, expected: EXPECTED_LESSONS });
+    }
     if (complete === EXPECTED_LESSONS) return;
 
     await new Promise((resolve) => setTimeout(resolve, MEDIA_POLL_MS));
@@ -153,6 +178,12 @@ async function main() {
     .maybeSingle();
   if (existingError) fail(`could not resolve existing ESB course: ${existingError.message}`);
   if (!existingCourse?.program_id) fail('ESB course is not tied to a canonical program_id');
+
+  await logAcceptance(db, existingCourse.id, 'started', {
+    expected_modules: EXPECTED_MODULES,
+    expected_lessons: EXPECTED_LESSONS,
+    blueprint: entrepreneurshipBlueprint.credentialCode,
+  });
 
   console.log('[ESB acceptance] running registered ESB v2 blueprint through canonical Course Factory');
   const build = await courseFactory({
@@ -180,8 +211,15 @@ async function main() {
   if (beforePublish.course.status !== 'draft' || beforePublish.course.is_active) {
     fail('Course Factory must persist a complete package as draft before final promotion');
   }
+  await logAcceptance(db, build.courseId, 'factory_package_passed', {
+    modules: build.moduleCount,
+    lessons: build.lessonCount,
+    assessments_generated: build.assessmentsGenerated ?? 0,
+    videos_queued: build.videosQueued ?? 0,
+  });
 
   await waitForMedia(build.courseId);
+  await logAcceptance(db, build.courseId, 'media_complete', { videos: EXPECTED_LESSONS });
 
   const { data: publishResult, error: publishError } = await db.rpc('publish_course_from_staging', {
     p_course_id: build.courseId,
@@ -205,6 +243,13 @@ async function main() {
   if (afterPublish.lessons.some((lesson) => !lesson.is_published || lesson.status !== 'published')) {
     fail('one or more lessons are not in the final published state');
   }
+
+  await logAcceptance(db, build.courseId, 'passed', {
+    modules: EXPECTED_MODULES,
+    lessons: EXPECTED_LESSONS,
+    videos: EXPECTED_LESSONS,
+    publish_result: publishResult as unknown,
+  });
 
   console.log('[ESB acceptance] PASS', {
     courseId: build.courseId,

@@ -1,6 +1,15 @@
 // Production certification runner for the registered beauty occupation courses.
 // Re-run marker: server/CLI admin-client boundary verified before execution.
 import { courseFactory, loadAllBlueprints } from '../../lib/course-factory';
+import { requireAdminClient } from '../../lib/supabase/admin';
+
+const AI_SECRET_KEYS = [
+  'OPENAI_API_KEY',
+  'GROQ_API_KEY',
+  'GEMINI_API_KEY',
+  'ANTHROPIC_API_KEY',
+  'AZURE_OPENAI_API_KEY',
+] as const;
 
 const TARGETS = [
   {
@@ -17,7 +26,36 @@ const TARGETS = [
   },
 ] as const;
 
+async function hydrateProductionAISecrets() {
+  const db = await requireAdminClient();
+  const available: string[] = [];
+
+  for (const key of AI_SECRET_KEYS) {
+    if (process.env[key]?.trim()) {
+      available.push(key);
+      continue;
+    }
+
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
+    if (error) {
+      console.warn(`[registered-beauty] ${key} could not be hydrated from platform secrets: ${error.message}`);
+      continue;
+    }
+    if (typeof data === 'string' && data.trim()) {
+      process.env[key] = data.trim();
+      available.push(key);
+    }
+  }
+
+  if (!available.length) {
+    throw new Error('No production AI provider credential is available for registered beauty acceptance');
+  }
+
+  console.log(`[registered-beauty] AI provider pool hydrated (${available.length} configured provider credential(s))`);
+}
+
 async function main() {
+  await hydrateProductionAISecrets();
   const blueprints = await loadAllBlueprints();
   const results: unknown[] = [];
 

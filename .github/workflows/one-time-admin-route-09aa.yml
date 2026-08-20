@@ -1,0 +1,62 @@
+name: One-time Admin route source-aware fix
+on:
+  push:
+    branches: [fix/admin-route-gate-09aa]
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/admin-route-gate-09aa
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Rewrite retired Admin UI paths by service ownership
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+          exts={'.ts','.tsx','.js','.jsx','.mjs'}
+          def files(root):
+            p=Path(root)
+            return [f for f in p.rglob('*') if f.is_file() and f.suffix in exts] if p.exists() else []
+          def admin(text):
+            text=re.sub(r'(["\'`])/admin(?=/)',r'\1',text)
+            return re.sub(r'(["\'`])/admin(["\'`])',r'\1/\2',text)
+          def cross(text):
+            text=re.sub(r'(["\'`])/admin(?=/)',r'\1https://admin.elevateforhumanity.org',text)
+            return re.sub(r'(["\'`])/admin(["\'`])',r'\1https://admin.elevateforhumanity.org/\2',text)
+          changed=[]
+          for f in files('apps/admin/app'):
+            b=f.read_text(); a=admin(b)
+            if a!=b: f.write_text(a); changed.append(str(f))
+          for root in ['apps/lms/app','components','lib/routes']:
+            for f in files(root):
+              b=f.read_text(); a=cross(b)
+              if a!=b: f.write_text(a); changed.append(str(f))
+          print('\n'.join(changed))
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - run: pnpm exec vitest run tests/unit/course-builder-route-consolidation.test.ts
+      - run: node scripts/check-course-factory-authority.mjs
+      - run: pnpm typecheck:production
+      - name: Commit verified source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm .github/workflows/one-time-admin-route-09aa.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add apps/admin/app apps/lms/app components lib/routes .github/workflows/one-time-admin-route-09aa.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'fix(routes): canonicalize Admin UI navigation by service ownership'
+          git push origin HEAD:fix/admin-route-gate-09aa

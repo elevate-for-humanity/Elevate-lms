@@ -323,9 +323,9 @@ const TOOLS: any[] = [
     function: {
       name: 'save_course',
       description:
-        'Save a course_draft to the database (training_courses + modules + curriculum_lessons). ' +
-        'Call this after the user confirms they want to save the course. ' +
-        'Returns a course_saved object with the courseId and a link.',
+        'Persist a reviewed course through the canonical Course Factory. ' +
+        'This never inserts into legacy course/module/lesson tables directly. ' +
+        'Returns a governed course_saved result with the canonical courseId and Studio link.',
       parameters: {
         type: 'object',
         properties: {
@@ -929,7 +929,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       if (!title) return 'title is required to build a course';
 
-      // Call the existing ai-builder chat API to generate the course JSON
       try {
         const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
         const res = await fetch(`${baseUrl}/api/admin/courses/ai-builder/generate`, {
@@ -944,7 +943,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         }
       } catch { /* fall through to inline generation */ }
 
-      // Inline generation when the generate endpoint isn't available
       const moduleList = Array.from({ length: modules }, (_, mi) => ({
         title: `Module ${mi + 1}`,
         sort_order: mi + 1,
@@ -978,62 +976,56 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const course = args.course as Record<string, unknown>;
       if (!course?.title) return 'course object with title is required';
 
-      const db = await requireAdminClient();
+      const courseModules = Array.isArray(course.modules) ? course.modules as Array<Record<string, unknown>> : [];
+      const moduleCount = Math.max(1, Math.min(40, courseModules.length || 5));
+      const lessonsPerModule = Math.max(
+        1,
+        Math.min(
+          20,
+          courseModules.length
+            ? Math.max(...courseModules.map((module) => Array.isArray(module.lessons) ? module.lessons.length : 0), 1)
+            : 3,
+        ),
+      );
+      const { courseFactory } = await import('@/lib/course-factory');
+      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
+      const result = await courseFactory({
+        title: String(course.title),
+        topic: String(course.description || course.subtitle || course.title),
+        audience: String(course.audience || 'adult workforce learners'),
+        hours: Number(course.duration_hours || 0) || undefined,
+        moduleCount,
+        lessonsPerModule,
+        contentSource: 'ai',
+        mode: 'refresh',
+        videoMode: 'queue',
+        dryRun: false,
+      });
 
-      // 1. Create the course record
-      const { data: courseRow, error: courseErr } = await db
-        .from('lms_courses')
-        .insert({
-          title: course.title,
-          subtitle: course.subtitle || null,
-          description: course.description || null,
-          audience: course.audience || null,
-          duration_hours: course.duration_hours || null,
-          category: course.category || 'general',
-          passing_score: course.passing_score || 70,
-          completion_rule: course.completion_rule || 'all_lessons',
-          status: 'draft',
-        })
-        .select('id')
-        .single();
-
-      if (courseErr) return 'Failed to save course: Database error';
-      const courseId = courseRow.id;
-
-      // 2. Create modules + lessons
-      const modules = (course.modules as any[]) || [];
-      for (const mod of modules) {
-        const { data: modRow, error: modErr } = await db
-          .from('modules')
-          .insert({ title: mod.title, sort_order: mod.sort_order, course_id: courseId })
-          .select('id')
-          .single();
-        if (modErr) continue;
-
-        const lessons = (mod.lessons as any[]) || [];
-        for (const lesson of lessons) {
-          await db.from('curriculum_lessons').insert({
-            title: lesson.title,
-            description: lesson.description || null,
-            content: lesson.content || null,
-            duration_minutes: lesson.duration_minutes || 30,
-            step_type: lesson.step_type || 'lesson',
-            lesson_order: lesson.lesson_number,
-            module_id: modRow.id,
-            course_id: courseId,
-            status: 'draft',
-            quiz_questions: lesson.quiz_questions?.length ? lesson.quiz_questions : null,
-          });
-        }
+      let governance = null;
+      if (result.ok && result.courseId) {
+        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
       }
 
       return JSON.stringify({
         __type: 'course_saved',
-        courseId,
-        title: course.title,
-        url: `/admin/courses/${courseId}`,
-        message: `Course "${course.title}" saved with ${modules.length} modules. Ready to generate videos.`,
-      });
+        success: result.ok,
+        courseId: result.courseId ?? null,
+        courseSlug: result.courseSlug ?? null,
+        title: result.title ?? String(course.title),
+        modulesGenerated: result.moduleCount ?? 0,
+        lessonsGenerated: result.lessonCount ?? 0,
+        assessmentsGenerated: result.assessmentsGenerated ?? 0,
+        videosQueued: result.videosQueued ?? 0,
+        governance,
+        warnings: result.warnings ?? [],
+        errors: result.errors ?? [],
+        status: result.status ?? null,
+        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
+        message: result.ok
+          ? `Course "${result.title ?? String(course.title)}" was persisted through the canonical Course Factory and normalized for governance.`
+          : 'Course persistence was blocked because the canonical Course Factory did not pass its completeness or validation gates.',
+      }, null, 2);
     }
 
     case 'generate_videos': {
@@ -1077,7 +1069,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       }
     }
 
-    // ── Document intelligence ──────────────────────────────────────────────
     case 'analyze_document': {
       const documentId = String(args.document_id || '');
       if (!documentId) return 'document_id is required';
@@ -1094,8 +1085,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const fields = doc.extracted_data as Record<string, unknown> || {};
       const fieldCount = Object.keys(fields).length;
       const ocrPreview = (doc.ocr_text as string || '').slice(0, 500);
-
-      // Flag anomalies
       const anomalies: string[] = [];
       if (!fields.full_name && !fields.name) anomalies.push('No name detected');
       if (!fields.date_of_birth && !fields.dob) anomalies.push('No date of birth detected');
@@ -1122,8 +1111,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       if (!documentId || !applicationId) return 'document_id and application_id are required';
 
       const db = await requireAdminClient();
-
-      // Get extracted fields
       const { data: doc } = await db
         .from('documents')
         .select('extracted_data, document_type, file_name')
@@ -1133,8 +1120,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       if (!doc) return `Document ${documentId} not found`;
 
       const fields = doc.extracted_data as Record<string, unknown> || {};
-
-      // Map extracted fields to application columns
       const applicationUpdate: Record<string, unknown> = {};
       if (fields.full_name || fields.name) applicationUpdate.full_name = fields.full_name || fields.name;
       if (fields.date_of_birth || fields.dob) applicationUpdate.date_of_birth = fields.date_of_birth || fields.dob;
@@ -1156,7 +1141,6 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
       if (error) return `Failed to update application`;
 
-      // Mark document as applied
       await db.from('documents').update({
         application_id: applicationId,
         status: 'applied',
@@ -1190,7 +1174,6 @@ async function _POST(req: NextRequest) {
     const body = await req.json();
     const { fileContext, documentsContext, provider: rawProvider, model: rawModel } = body;
 
-    // Accept both { messages: [...] } and legacy { message: "..." } shapes
     let messages: ChatMessage[] = [];
     if (Array.isArray(body.messages)) {
       messages = body.messages
@@ -1217,7 +1200,6 @@ async function _POST(req: NextRequest) {
     const providerPreference = normalizeProvider(rawProvider);
     const lastUserMessage = messages.findLast((m: { role: string }) => m.role === 'user')?.content ?? '';
 
-    // RAG + evidence run in parallel — no reason to serialize these
     const [ragContext, automaticEvidence] = await Promise.all([
       getRAGContext(lastUserMessage),
       collectAutomaticEvidence(lastUserMessage),
@@ -1354,7 +1336,6 @@ async function _POST(req: NextRequest) {
         try {
           const selectedModel = modelFor('anthropic', rawModel);
           const anthropic = getAnthropicClient();
-          // Convert OpenAI-style tools to Anthropic format
           const anthropicTools = TOOLS.map((t) => ({
             name: t.function.name,
             description: t.function.description,
@@ -1367,7 +1348,6 @@ async function _POST(req: NextRequest) {
             messages: toChatMessages(messages),
             tools: anthropicTools,
           });
-          // Handle tool use blocks
           const toolUseBlocks = initial.content.filter((b) => b.type === 'tool_use');
           if (toolUseBlocks.length > 0) {
             const toolResults = await Promise.all(
@@ -1427,7 +1407,6 @@ async function _POST(req: NextRequest) {
       }
     }
 
-    // Final fallback — use canonical aiChat() (no tool calling, text only)
     if (!assistantMessage) {
       try {
         const { aiChat } = await import('@/lib/ai/ai-service');
@@ -1470,7 +1449,6 @@ async function _POST(req: NextRequest) {
 
     assistantMessage = enforceEvidenceBoundary(assistantMessage, lastUserMessage, toolCalls);
 
-    // Fire-and-forget DB log — do not block the response
     (async () => {
       try {
         const supabase = await createClient();
@@ -1490,19 +1468,13 @@ async function _POST(req: NextRequest) {
       }
     })();
 
-    // Stream the response as SSE so the client sees tokens immediately.
-    // Format: each chunk is a JSON line prefixed with "data: " followed by "\n\n".
-    // Final chunk carries metadata (provider, model, toolCalls) with done:true.
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
-        // Stream the message word-by-word so the UI feels responsive.
-        // Split on spaces but preserve them so reassembly is lossless.
         const words = (assistantMessage ?? '').split(/(?<= )/);
         for (const word of words) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: word })}\n\n`));
         }
-        // Final frame carries metadata
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({
           done: true,
           provider,

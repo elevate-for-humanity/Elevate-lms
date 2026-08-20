@@ -2,15 +2,26 @@ import { describe, expect, it } from 'vitest';
 import { routeEllieMessage } from '@/lib/devstudio/ellie-message-router';
 
 describe('routeEllieMessage', () => {
-  it('routes deploy commands to command', () => {
+  it('routes explicit deploy commands to command execution', () => {
     expect(routeEllieMessage('Deploy the LMS service')).toBe('command');
   });
 
-  it('routes ops queries to ops', () => {
+  it('routes live admin queries to ops', () => {
     expect(routeEllieMessage('How many pending applications are there?')).toBe('ops');
   });
 
-  it('routes code search to platform', () => {
+  it('routes code search to platform tools', () => {
     expect(routeEllieMessage('Search code for proxy.ts middleware errors')).toBe('platform');
+  });
+
+  it('routes course creation to the tool orchestrator instead of raw command execution', () => {
+    expect(routeEllieMessage('Build a course for medical assistants')).toBe('platform');
+    expect(routeEllieMessage('Generate a course about workplace safety')).toBe('platform');
+    expect(routeEllieMessage('Use the course builder to make a CNA course')).toBe('platform');
+  });
+
+  it('routes website creation and publishing to the tool orchestrator', () => {
+    expect(routeEllieMessage('Build a website for a training provider')).toBe('platform');
+    expect(routeEllieMessage('Publish the website after checking it')).toBe('platform');
   });
 });

@@ -36,7 +36,7 @@ const SYSTEM_FEATURES = [
   { label: 'Geofenced attendance', detail: 'Automatic check-in at employer and training sites' },
   { label: 'Compliance automation', detail: 'WIOA documentation, RAPIDS exports, audit trails' },
   { label: 'Predictive risk alerts', detail: 'Early intervention when learners show at-risk signals' },
-  { label: 'Credential verification', detail: 'Public blockchain-anchored credential verification' },
+  { label: 'Credential verification', detail: 'Public credential records with verification metadata and status checks' },
   { label: 'Employer coordination', detail: 'OJT agreements, wage tracking, placement pipelines' },
 ];
 

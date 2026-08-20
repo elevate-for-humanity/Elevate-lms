@@ -72,7 +72,6 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(false);
   const [heroInView, setHeroInView] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
@@ -84,10 +83,10 @@ export default function HeroVideo({
   const desktopSource = safeDesktop || safeMobile || '';
   const mobileSource = safeMobile || safeDesktop || '';
   const showVideo = Boolean(desktopSource) && !videoFailed;
+  const showStaticFallback = Boolean(posterImage) && !showVideo;
 
   useEffect(() => {
     setVideoFailed(false);
-    setVideoPlaying(false);
     setMuted(true);
     setManualAudioOverride(false);
     const video = videoRef.current;
@@ -188,9 +187,9 @@ export default function HeroVideo({
         className={`relative isolate flex w-full items-end overflow-hidden bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {posterImage ? (
+        {showStaticFallback ? (
           <Image
-            src={posterImage}
+            src={posterImage!}
             alt=""
             fill
             priority
@@ -205,26 +204,22 @@ export default function HeroVideo({
           <video
             key={`${mobileSource}|${desktopSource}`}
             ref={videoRef}
-            preload="metadata"
+            preload="auto"
             autoPlay
             loop
             playsInline
             muted
             disablePictureInPicture
             poster={posterImage}
-            onPlaying={() => setVideoPlaying(true)}
-            onWaiting={() => setVideoPlaying(false)}
-            onStalled={() => setVideoPlaying(false)}
             onCanPlay={() => {
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
             onError={() => {
-              setVideoPlaying(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${videoPlaying ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (

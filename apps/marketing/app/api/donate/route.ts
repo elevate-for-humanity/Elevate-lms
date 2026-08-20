@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const common = {
-      payment_method_types: ['card'] as const,
+      payment_method_types: ['card'] as Array<'card'>,
       line_items: [
         {
           price_data: {

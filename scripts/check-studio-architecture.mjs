@@ -13,9 +13,13 @@ for (const file of forbidden) if (exists(file)) fail(`parallel Studio implementa
 
 for (const file of [
   'apps/admin/app/layout.tsx',
+  'apps/admin/app/studio/page.tsx',
   'apps/admin/app/studio/layout.tsx',
+  'apps/admin/app/studio/ai/page.tsx',
   'apps/admin/app/studio/StudioNavigation.client.tsx',
+  'components/studio/UnifiedEllieChat.tsx',
   'lib/devstudio/workspace-registry.ts',
+  'lib/devstudio/ellie-message-router.ts',
   'services/studio-browser/server.mjs',
   'apps/admin/app/api/devstudio/browser/session/route.ts',
   'apps/admin/app/api/devstudio/browser/agent/route.ts',
@@ -26,13 +30,10 @@ for (const file of [
   'components/dev-studio/live-canvas/LiveCanvas.tsx',
   'apps/admin/app/studio/canvas/page.tsx',
   'apps/admin/app/studio/courses/[courseId]/page.tsx',
+  'apps/admin/app/api/admin/courses/ai-builder/generate/route.ts',
 ]) if (!exists(file)) fail(`canonical Studio file is missing: ${file}`);
 
 const adminLayout = read('apps/admin/app/layout.tsx');
-// Studio is part of the privileged Admin application and must inherit the same
-// operational shell. Public marketing/support surfaces are intentionally not
-// mounted in this root because they compete with admin/PWA navigation and can
-// expose public actions inside an authenticated workspace.
 for (const sharedSurface of [
   'AdminHeader',
   'BuildVersionSync',
@@ -60,13 +61,36 @@ for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
   if (studioNavigation.includes(standaloneNavigation)) fail(`Studio navigation reintroduced a standalone sidebar: ${standaloneNavigation}`);
 }
 
+// Conversation-first invariant: /studio is the only AI operating surface.
+const studioRoot = read('apps/admin/app/studio/page.tsx');
+for (const invariant of ['UnifiedEllieChat', "requireRole(['super_admin', 'admin'])", 'Advanced capability surfaces']) {
+  if (!studioRoot.includes(invariant)) fail(`conversation-first Studio root missing invariant: ${invariant}`);
+}
+for (const forbiddenRootPattern of ['bg-slate-950 text-white', '<StudioWorkspaceGrid workspaces={workspaces} />\n      </div>\n    </main>']) {
+  if (studioRoot.includes(forbiddenRootPattern)) fail(`Studio root regressed to capability-grid-first UI: ${forbiddenRootPattern}`);
+}
+
+const legacyAiPage = read('apps/admin/app/studio/ai/page.tsx');
+if (!legacyAiPage.includes("redirect('/studio')")) fail('legacy /studio/ai is not redirected to the canonical Admin AI surface');
+
 const registry = read('lib/devstudio/workspace-registry.ts');
+if (/id:\s*'ai'/.test(registry) || /route:\s*'\/studio\/ai'/.test(registry)) {
+  fail('workspace registry reintroduced a second AI/chat workspace');
+}
 const routes = [...registry.matchAll(/route:\s*'([^']+)'/g)].map((match) => match[1]);
 for (const route of routes) {
   const relative = route.replace(/^\/studio\/?/, '');
   const page = relative ? `apps/admin/app/studio/${relative}/page.tsx` : 'apps/admin/app/studio/page.tsx';
   if (!exists(page)) fail(`registered Studio route has no page: ${route}`);
   else if (/\bredirect\s*\(/.test(read(page))) fail(`registered Studio workspace redirects instead of rendering: ${route}`);
+}
+
+const messageRouter = read('lib/devstudio/ellie-message-router.ts');
+for (const outcome of ['build (a )?course', 'create (a )?course', 'generate (a )?course', 'build (a )?website', 'publish (the )?website']) {
+  if (!messageRouter.includes(outcome)) fail(`Admin AI router does not recognize outcome-oriented tool request: ${outcome}`);
+}
+if (/COMMAND_RE[\s\S]{0,300}build courses?/i.test(messageRouter)) {
+  fail('course creation was routed back to raw command execution');
 }
 
 const canonicalRoot = path.join(root, 'apps/admin/app/api/admin/dev-studio');
@@ -96,6 +120,14 @@ for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']
       fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
     }
   }
+}
+
+const courseDraftAdapter = read('apps/admin/app/api/admin/courses/ai-builder/generate/route.ts');
+for (const invariant of ['generateBlueprintFromAI', "generation_authority: 'course-factory'", "persistence_authority: 'courseFactory()'", 'draft_only: true']) {
+  if (!courseDraftAdapter.includes(invariant)) fail(`Admin AI course draft adapter bypasses canonical Course Factory contract: ${invariant}`);
+}
+for (const forbiddenWrite of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert", ".from('lms_courses').insert", ".from('curriculum_lessons').insert"]) {
+  if (courseDraftAdapter.includes(forbiddenWrite)) fail(`Admin AI course draft adapter contains direct persistence: ${forbiddenWrite}`);
 }
 
 const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
@@ -131,4 +163,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: ${routes.length} canonical workspaces inside the hardened Admin surface, no public-shell leakage, no standalone shell, no parallel API routes, no legacy admin/devstudio namespace.`);
+console.log(`Studio architecture verified: conversation-first Admin AI plus ${routes.length} advanced capability surfaces inside the hardened Admin shell; no second AI workspace, public-shell leakage, standalone shell, parallel API routes, or legacy admin/devstudio namespace.`);

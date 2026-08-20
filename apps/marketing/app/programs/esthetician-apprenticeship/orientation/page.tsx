@@ -19,28 +19,25 @@ export default function EstheticianOrientationPage() {
       icon: Shield,
       content: (
         <div className="space-y-4">
-          <p>Upon successful completion of this program, you will be eligible to:</p>
+          <p>After completing the required education, you can prepare to pursue the Indiana licensing process for this occupation.</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
               <span>
-                Obtain your {config.licenseTitle} through the {config.licensingBody}
+                Prepare to apply for the {config.licenseTitle} through the {config.licensingBody}, subject to the agency’s current requirements
               </span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-              <span>Work legally as a licensed esthetician in the state of Indiana</span>
+              <span>Build supervised esthetics service, sanitation, documentation, and client-care skills</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-              <span>
-                Earn {config.salaryRange} annually depending on location and specialization
-              </span>
+              <span>Pursue esthetics employment or business opportunities after satisfying applicable licensing requirements</span>
             </li>
           </ul>
           <p className="text-sm text-slate-600 mt-4">
-            This is a USDOL Registered Apprenticeship program. Your credential is nationally
-            recognized.
+            Federal Registered Apprenticeship status is not currently published for the esthetician occupation in Elevate’s canonical RAPIDS registry. This orientation does not represent the pathway as federally registered.
           </p>
         </div>
       ),
@@ -51,22 +48,20 @@ export default function EstheticianOrientationPage() {
       content: (
         <div className="space-y-4">
           <p>
-            The {config.programTitle} requires <strong>{config.hoursLabel}</strong> of combined
-            training:
+            The {config.programTitle} is aligned to <strong>{config.hoursLabel}</strong> of Indiana esthetics education and supervised practice.
           </p>
           <div className="grid gap-4 mt-4">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-bold text-blue-900">On-the-Job Training (OJT)</h4>
+              <h4 className="font-bold text-blue-900">Supervised Practice</h4>
               <p className="text-blue-800 text-sm">{config.ojtDescription}</p>
             </div>
             <div className="bg-indigo-50 p-4 rounded-lg">
-              <h4 className="font-bold text-indigo-900">Related Technical Instruction (RTI)</h4>
+              <h4 className="font-bold text-indigo-900">Related Instruction</h4>
               <p className="text-indigo-800 text-sm">{config.rtiDescription}</p>
             </div>
           </div>
           <p className="text-sm text-slate-600 mt-4">
-            Your hours are logged digitally and verified by your instructor. Track progress in your
-            dashboard.
+            Your education and supervised-practice records are tracked digitally. Licensing credit and acceptance remain subject to the applicable Indiana authority.
           </p>
         </div>
       ),
@@ -76,43 +71,23 @@ export default function EstheticianOrientationPage() {
       icon: Users,
       content: (
         <div className="space-y-4">
-          <p>As an apprentice, you are expected to:</p>
+          <p>As a participant, you are expected to:</p>
           <ul className="space-y-3">
             <li className="flex items-start gap-2">
-              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                1
-              </span>
-              <span>
-                <strong>Attend consistently.</strong> Missed hours must be made up. Excessive
-                absences may result in program dismissal.
-              </span>
+              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">1</span>
+              <span><strong>Attend consistently.</strong> Required education and supervised-practice hours must be completed and documented.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                2
-              </span>
-              <span>
-                <strong>Maintain professionalism.</strong> You represent the spa and the program.
-                Dress code and conduct standards apply.
-              </span>
+              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">2</span>
+              <span><strong>Maintain professionalism.</strong> Host-site dress, conduct, safety, and client-care standards apply.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                3
-              </span>
-              <span>
-                <strong>Complete coursework on time.</strong> RTI modules have deadlines. Falling
-                behind affects your progress.
-              </span>
+              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">3</span>
+              <span><strong>Complete instruction on time.</strong> Coursework and documented practice must remain current.</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                4
-              </span>
-              <span>
-                <strong>Communicate proactively.</strong> If issues arise, contact your coordinator
-                immediately.
-              </span>
+              <span className="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">4</span>
+              <span><strong>Communicate proactively.</strong> Contact your coordinator when schedule, placement, documentation, or support issues arise.</span>
             </li>
           </ul>
         </div>
@@ -123,25 +98,24 @@ export default function EstheticianOrientationPage() {
       icon: DollarSign,
       content: (
         <div className="space-y-4">
-          <p>Your enrollment includes the following payment structure:</p>
+          <p>Your current self-pay enrollment record uses the following published program amount:</p>
           <div className="bg-slate-50 p-4 rounded-lg space-y-3">
             <div className="flex justify-between">
               <span>Program Total</span>
               <span className="font-bold">{formatCurrency(config.tuition.total)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Setup Fee (paid at enrollment)</span>
-              <span className="font-bold">{config.tuition.setupFeePercent}%</span>
+              <span>Initial Payment Structure</span>
+              <span className="font-bold">Confirmed at checkout</span>
             </div>
             <div className="flex justify-between">
-              <span>Weekly Payments</span>
+              <span>Installment Availability</span>
               <span className="font-bold">{config.tuition.paymentFrequency}</span>
             </div>
           </div>
           <p className="text-sm text-slate-600">{config.tuition.fundingNote}</p>
           <p className="text-sm text-red-600 font-medium">
-            Missed payments may result in program suspension. Contact us immediately if you
-            anticipate payment issues.
+            Review the signed enrollment agreement and checkout terms for the controlling payment, cancellation, and refund provisions.
           </p>
         </div>
       ),
@@ -155,25 +129,24 @@ export default function EstheticianOrientationPage() {
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-              <span>This is a state-regulated apprenticeship program with legal requirements</span>
+              <span>This pathway is designed around Indiana esthetics education and licensing requirements</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-              <span>You must complete all required hours and coursework to earn your license</span>
+              <span>You must complete required education and satisfy the licensing authority’s current requirements before licensure</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-              <span>Your progress is tracked and reported to regulatory bodies</span>
+              <span>Your program progress and supporting records are maintained for verification and applicable reporting</span>
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle className="w-5 h-5 text-brand-green-500 flex-shrink-0 mt-0.5" />
-              <span>Withdrawal or dismissal does not automatically entitle you to a refund</span>
+              <span>Payment, withdrawal, cancellation, and refund rights are controlled by your signed enrollment documents and applicable law</span>
             </li>
           </ul>
           <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg mt-6">
             <p className="text-yellow-800 text-sm">
-              <strong>Important:</strong> Enrollment is program-based. Courses, projects, and work
-              activities are part of your program and cannot be accessed independently.
+              <strong>Important:</strong> Enrollment is program-based. Courses, projects, supervised practice, and documentation are components of the pathway and must remain connected to the participant’s program record.
             </p>
           </div>
         </div>
@@ -182,29 +155,26 @@ export default function EstheticianOrientationPage() {
   ];
 
   const handleNext = () => {
-    if (currentSection < sections.length - 1) {
-      setCurrentSection(currentSection + 1);
-    }
+    if (currentSection < sections.length - 1) setCurrentSection(currentSection + 1);
   };
 
   const handlePrevious = () => {
-    if (currentSection > 0) {
-      setCurrentSection(currentSection - 1);
-    }
+    if (currentSection > 0) setCurrentSection(currentSection - 1);
   };
 
   const handleComplete = async () => {
     if (!acknowledged) return;
     setSubmitting(true);
     try {
-      await fetch('/api/enrollment/complete-orientation', {
+      const response = await fetch('/api/enrollment/complete-orientation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ program: 'esthetician-apprenticeship' }),
       });
+      if (!response.ok) throw new Error('Orientation completion was not saved');
       router.push('/programs/esthetician-apprenticeship/documents');
     } catch {
-      router.push('/programs/esthetician-apprenticeship/documents');
+      setSubmitting(false);
     }
   };
 
@@ -218,15 +188,10 @@ export default function EstheticianOrientationPage() {
         <div className="max-w-3xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-600">Orientation Progress</span>
-            <span className="text-sm font-bold text-slate-900">
-              {currentSection + 1} of {sections.length}
-            </span>
+            <span className="text-sm font-bold text-slate-900">{currentSection + 1} of {sections.length}</span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-600 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>
@@ -257,8 +222,7 @@ export default function EstheticianOrientationPage() {
                   <strong>I understand my responsibilities and agree to proceed.</strong>
                   <br />
                   <span className="text-sm text-slate-500">
-                    By checking this box, I confirm I have read and understood all orientation
-                    materials.
+                    By checking this box, I confirm I have read and understood all orientation materials.
                   </span>
                 </span>
               </label>
@@ -291,9 +255,7 @@ export default function EstheticianOrientationPage() {
             )}
           </div>
         </div>
-        <p className="text-center text-slate-500 text-sm mt-6">
-          Estimated time: {config.estimatedTime}
-        </p>
+        <p className="text-center text-slate-500 text-sm mt-6">Estimated time: {config.estimatedTime}</p>
       </div>
     </div>
   );

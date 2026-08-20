@@ -26,6 +26,7 @@ const groups = [
       { title: 'End User License Agreement', href: '/legal/eula', desc: 'Terms governing use of Elevate software and digital services.' },
       { title: 'Acceptable Use Agreement', href: '/legal/acceptable-use', desc: 'Permitted and prohibited use of technology resources.' },
       { title: 'Software License Agreement', href: '/legal/license-agreement', desc: 'License terms for organizations using the platform.' },
+      { title: 'Program License Agreement', href: '/legal/program-license-agreement', desc: 'Terms governing licensed delivery of Elevate training programs by external organizations.' },
       { title: 'Marketplace Terms', href: '/legal/marketplace-terms', desc: 'Terms governing purchases through the Elevate store.' },
     ],
   },
@@ -33,6 +34,7 @@ const groups = [
     title: 'Program & partner documents',
     links: [
       { title: 'Enrollment Agreement', href: '/legal/enrollment-agreement', desc: 'Enrollment terms and participant obligations.' },
+      { title: 'Participation Agreement', href: '/legal/participation-agreement', desc: 'Participant responsibilities, conduct expectations, acknowledgments, and rights.' },
       { title: 'Employer Agreement', href: '/legal/employer-agreement', desc: 'Terms for participating employers and work-based learning relationships.' },
       { title: 'Partner Memorandum of Understanding', href: '/legal/partner-mou', desc: 'Organizational partner responsibilities and operating expectations.' },
       { title: 'Policies', href: '/policies', desc: 'Academic, enrollment, conduct, refund, and related operational policies.' },

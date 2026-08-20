@@ -1,13 +1,11 @@
 import 'server-only';
 
 import { logger } from '@/lib/logger';
-import { requireAdminClient } from '@/lib/supabase/admin';
-import type { VideoJob } from './job-queue';
-import { processClaimedVideoJob } from './process-video-job';
+import { getSecret } from '@/lib/secrets';
 
-const IDLE_DELAY_MS = 30_000;
+const START_DELAY_MS = 15_000;
+const TICK_DELAY_MS = 30_000;
 const ERROR_DELAY_MS = 60_000;
-const STALE_RENDER_MS = 45 * 60 * 1000;
 
 type WorkerGlobal = typeof globalThis & {
   __elevateAdminVideoWorkerStarted?: boolean;
@@ -19,94 +17,53 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function recoverStaleRender(): Promise<void> {
-  const db = await requireAdminClient();
-  const staleBefore = new Date(Date.now() - STALE_RENDER_MS).toISOString();
-  const { data: recovered, error } = await db
-    .from('video_jobs')
-    .update({
-      status: 'queued',
-      started_at: null,
-      error_message: 'Recovered after render worker timeout',
-      updated_at: new Date().toISOString(),
-    })
-    .eq('status', 'rendering')
-    .lt('started_at', staleBefore)
-    .select('lesson_id');
-
-  if (error) {
-    logger.warn('[video-background-worker] stale render recovery failed', { error: error.message });
+async function kickCanonicalWorker(): Promise<void> {
+  const secret = await getSecret('CRON_SECRET');
+  if (!secret?.trim()) {
+    logger.warn('[video-background-worker] CRON_SECRET is unavailable; queue tick skipped');
     return;
   }
 
-  const lessonIds = (recovered ?? []).map((row) => row.lesson_id).filter(Boolean);
-  if (lessonIds.length > 0) {
-    await db
-      .from('course_lessons')
-      .update({ video_status: 'queued', video_error: null })
-      .in('id', lessonIds);
-    logger.info('[video-background-worker] recovered stale renders', { count: lessonIds.length });
+  // Keep Remotion and all Node-only rendering dependencies isolated in the
+  // Node API route. Instrumentation only makes a localhost HTTP request.
+  const port = process.env.PORT?.trim() || '3000';
+  const response = await fetch(`http://127.0.0.1:${port}/api/internal/videos/process-queue`, {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${secret}`,
+      'content-type': 'application/json',
+    },
+    cache: 'no-store',
+  });
+
+  const text = await response.text();
+  if (!response.ok) {
+    logger.warn('[video-background-worker] canonical worker tick rejected', {
+      status: response.status,
+      body: text.slice(0, 500),
+    });
+    return;
   }
-}
 
-async function claimNextJob(): Promise<VideoJob | null> {
-  const db = await requireAdminClient();
-
-  const { count: activeCount, error: activeError } = await db
-    .from('video_jobs')
-    .select('id', { count: 'exact', head: true })
-    .eq('status', 'rendering');
-  if (activeError) throw activeError;
-  if ((activeCount ?? 0) > 0) return null;
-
-  const { data: candidate, error: queueError } = await db
-    .from('video_jobs')
-    .select('*')
-    .eq('status', 'queued')
-    .order('queued_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  if (queueError) throw queueError;
-  if (!candidate) return null;
-
-  const now = new Date().toISOString();
-  const { data: claimed, error: claimError } = await db
-    .from('video_jobs')
-    .update({ status: 'rendering', started_at: now, updated_at: now, error_message: null })
-    .eq('id', candidate.id)
-    .eq('status', 'queued')
-    .select('*')
-    .maybeSingle();
-
-  if (claimError || !claimed) return null;
-
-  await db
-    .from('course_lessons')
-    .update({ video_status: 'rendering', video_error: null })
-    .eq('id', claimed.lesson_id);
-
-  return claimed as VideoJob;
+  logger.info('[video-background-worker] canonical worker tick accepted', {
+    status: response.status,
+    body: text.slice(0, 500),
+  });
 }
 
 async function runLoop(): Promise<void> {
-  await recoverStaleRender();
-  logger.info('[video-background-worker] Admin queue loop started');
+  await sleep(START_DELAY_MS);
+  logger.info('[video-background-worker] Admin queue trigger loop started');
 
   for (;;) {
     try {
-      const job = await claimNextJob();
-      if (!job) {
-        await sleep(IDLE_DELAY_MS);
-        continue;
-      }
-
-      logger.info('[video-background-worker] processing job', {
-        jobId: job.id,
-        lessonId: job.lesson_id,
-      });
-      await processClaimedVideoJob(job);
+      await kickCanonicalWorker();
+      await sleep(TICK_DELAY_MS);
     } catch (error) {
-      logger.error('[video-background-worker] loop error', error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        '[video-background-worker] trigger loop error',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       await sleep(ERROR_DELAY_MS);
     }
   }
@@ -119,6 +76,9 @@ export function startAdminVideoWorker(): void {
   workerGlobal.__elevateAdminVideoWorkerStarted = true;
   void runLoop().catch((error) => {
     workerGlobal.__elevateAdminVideoWorkerStarted = false;
-    logger.error('[video-background-worker] fatal worker error', error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      '[video-background-worker] fatal trigger loop error',
+      error instanceof Error ? error : new Error(String(error)),
+    );
   });
 }

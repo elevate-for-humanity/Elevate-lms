@@ -74,6 +74,9 @@ const specializedPackageWriters = new Set([
   'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
   // version rollback restores an immutable prior snapshot
   'lib/course-factory/versioning.ts',
+  // post-generation governance runs after canonical Course Factory persistence;
+  // it normalizes governance metadata and does not own a parallel generator.
+  'lib/course-factory/post-generation-governance.ts',
   // generic/manual entity CRUD and lifecycle services
   'lib/db/courses.ts',
   'lib/lms/course-service.ts',

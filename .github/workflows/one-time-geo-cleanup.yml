@@ -1,0 +1,47 @@
+name: One-time GEO cleanup
+
+on:
+  push:
+    paths:
+      - '.github/workflows/one-time-geo-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Remove retired public MOU link and broad funding CTA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          footer = Path('components/site/ServerFooter.tsx')
+          text = footer.read_text()
+          text = text.replace("    { name: 'Workforce MOU', href: '/contracts/workforce-mou' },\n", "")
+          text = text.replace(
+              'Ready to start your career? Explore funded training programs.',
+              'Ready to start your career? Review programs and program-specific funding options.'
+          )
+          footer.write_text(text)
+          PY
+      - name: Verify AI GEO claim integrity
+        run: node scripts/audit-geo-claims.mjs
+      - name: Commit verified cleanup directly to main
+        run: |
+          git config user.name 'Elevate GEO Cleanup'
+          git config user.email 'actions@users.noreply.github.com'
+          git add components/site/ServerFooter.tsx
+          if git diff --cached --quiet; then
+            echo 'No cleanup changes needed.'
+            exit 0
+          fi
+          git commit -m 'seo: remove retired MOU link and broad funding CTA'
+          git pull --rebase origin main
+          git push origin HEAD:main

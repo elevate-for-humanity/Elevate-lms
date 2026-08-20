@@ -35,6 +35,11 @@ for (const [owner, cfg] of Object.entries(APPS)) {
   for (const host of cfg.hosts) HOST_OWNER.set(host, owner);
 }
 
+const crossAppOwnershipPath = path.join(ROOT, 'lib/routes/cross-app-ownership.json');
+const CROSS_APP_RULES = fs.existsSync(crossAppOwnershipPath)
+  ? JSON.parse(fs.readFileSync(crossAppOwnershipPath, 'utf8')).routes ?? []
+  : [];
+
 const failures = [];
 const warnings = [];
 const stats = { pages: {}, aliases: {}, linksScanned: 0, assetsScanned: 0, contracts: 0 };
@@ -146,6 +151,22 @@ function ownerForSource(file) {
   return 'marketing';
 }
 
+function resolveCrossAppReference(sourceOwner, pathname) {
+  if (sourceOwner !== 'marketing') return null;
+  for (const rule of CROSS_APP_RULES) {
+    if (rule.source && pathname === rule.source) {
+      return { owner: rule.owner, pathname: rule.target || pathname };
+    }
+    if (rule.sourcePrefix && pathname.startsWith(rule.sourcePrefix)) {
+      const targetPath = rule.stripPrefix && pathname.startsWith(rule.stripPrefix)
+        ? pathname.slice(rule.stripPrefix.length) || '/'
+        : pathname;
+      return { owner: rule.owner, pathname: rule.target || targetPath };
+    }
+  }
+  return null;
+}
+
 function shouldSkipPath(value) {
   if (!value || value === '/' || value.startsWith('//')) return false;
   if (value.startsWith('/#') || value === '#') return true;
@@ -182,6 +203,17 @@ function inspectReference({ file, line, value }) {
 
   if (shouldSkipPath(cleanPath)) return;
   stats.linksScanned += 1;
+
+  if (!absolute) {
+    const crossApp = resolveCrossAppReference(owner, cleanPath);
+    if (crossApp) {
+      if (!routeExists(crossApp.owner, crossApp.pathname)) {
+        failures.push(`BROKEN_CROSS_APP_ROUTE ${path.relative(ROOT, file)}:${line} -> ${value} [owner=${crossApp.owner}, target=${crossApp.pathname}]`);
+      }
+      return;
+    }
+  }
+
   if (!routeExists(owner, cleanPath)) {
     const kind = absolute ? 'BROKEN_CROSS_APP_ROUTE' : 'BROKEN_INTERNAL_ROUTE';
     failures.push(`${kind} ${path.relative(ROOT, file)}:${line} -> ${value} [owner=${owner}]`);

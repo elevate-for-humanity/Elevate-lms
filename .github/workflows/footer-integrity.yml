@@ -1,0 +1,41 @@
+name: Footer & Legal Integrity
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'components/site-footer.tsx'
+      - 'lib/navigation/routes.ts'
+      - 'apps/marketing/app/legal/**'
+      - 'apps/marketing/app/privacy/**'
+      - 'apps/marketing/app/terms-of-service/**'
+      - 'apps/marketing/app/security-and-data-protection/**'
+      - 'apps/marketing/app/accessibility/**'
+      - 'apps/marketing/app/federal-compliance/**'
+      - 'scripts/audit-footer-links.mjs'
+      - '.github/workflows/footer-integrity.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'components/site-footer.tsx'
+      - 'lib/navigation/routes.ts'
+      - 'apps/marketing/app/legal/**'
+      - 'apps/marketing/app/privacy/**'
+      - 'apps/marketing/app/terms-of-service/**'
+      - 'apps/marketing/app/security-and-data-protection/**'
+      - 'apps/marketing/app/accessibility/**'
+      - 'apps/marketing/app/federal-compliance/**'
+      - 'scripts/audit-footer-links.mjs'
+
+jobs:
+  footer-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Audit footer labels and canonical destinations
+        run: node scripts/audit-footer-links.mjs

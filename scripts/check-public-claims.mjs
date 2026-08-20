@@ -7,6 +7,7 @@ const ROOTS = [
   'components/site',
   'components/home',
   'components/marketing',
+  'content/blog',
 ];
 const ALLOWED_EXT = new Set(['.ts', '.tsx', '.js', '.jsx', '.md', '.mdx']);
 const BLOCKED = [
@@ -18,6 +19,12 @@ const BLOCKED = [
   { pattern: /\b1000\+?\s+concurrent/i, label: 'concurrency claim without load-test evidence' },
   { pattern: /minimal\s+technical\s+debt/i, label: 'technical-debt quality claim without audit evidence' },
   { pattern: /first[- ]mover\s+advantage/i, label: 'market-position claim without competitive evidence' },
+  { pattern: /\$0\s+with\s+(?:WIOA|WRG|funding)/i, label: 'zero-cost workforce funding guarantee' },
+  { pattern: /(?:covers?|covered)\s+100%\s+of\s+(?:program\s+)?tuition/i, label: '100% tuition coverage guarantee' },
+  { pattern: /100%\s+of\s+(?:program\s+)?tuition/i, label: '100% tuition coverage guarantee' },
+  { pattern: /funding\s+available\s+nationwide/i, label: 'nationwide funding availability claim' },
+  { pattern: /all\s+programs\s+(?:are\s+)?(?:approved|eligible).*ETPL/i, label: 'provider-wide ETPL claim; approval must be program-specific' },
+  { pattern: /all\s+programs\s+(?:are\s+)?(?:WIOA|WRG|workforce)[-\s]*(?:approved|eligible|funded)/i, label: 'provider-wide workforce funding claim; approval must be program-specific' },
 ];
 
 function extension(path) {
@@ -62,6 +69,9 @@ const requiredFiles = [
   'apps/marketing/app/layout.tsx',
   'scripts/check-dev-studio-claims.mjs',
   'supabase/migrations/20260818221500_dev_studio_claim_evidence_and_benchmarks.sql',
+  'lib/programs/funding-registry.ts',
+  'lib/programs/public-funding-copy.ts',
+  'supabase/migrations/20260820023000_program_regulatory_claim_controls.sql',
 ];
 for (const file of requiredFiles) {
   if (!existsSync(file)) {

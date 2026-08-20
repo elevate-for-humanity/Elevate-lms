@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import MarqueeBanner from '@/components/MarqueeBanner';
+import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
@@ -61,16 +62,17 @@ export default function HomePage() {
   return (
     <>
       <StructuredData />
-      <HomeHeroVideo banner={heroBanners.home} />
+      <HomeHeroVideo banner={{ ...heroBanners.home, posterImage: '/images/pages/comp-home-hero.webp' }} />
       <MarqueeBanner />
+      <HomePlatformOverview />
       <HomeCareerPathways />
-      <HomeTrustBar />
       <HomeHowItWorks />
-      <HomeFoundationPartner />
       <HomeFunding />
       <HomeApprenticeshipInfra />
       <HomeEmployerStrip />
       <HomeBeautyPriority />
+      <HomeFoundationPartner />
+      <HomeTrustBar />
       <HomeFinalCTA />
       <ParisFloatingButton />
     </>

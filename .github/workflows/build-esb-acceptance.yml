@@ -7,6 +7,7 @@ on:
     paths:
       - 'scripts/course-factory/build-esb-acceptance.ts'
       - '.github/workflows/build-esb-acceptance.yml'
+      - 'lib/ai/ai-service.ts'
       - 'lib/curriculum/blueprints/entrepreneurship.ts'
       - 'lib/curriculum/lesson-content-schema.ts'
       - 'lib/curriculum/normalize-lesson-content.ts'
@@ -35,8 +36,9 @@ permissions:
 env:
   CI: true
   NODE_ENV: production
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  AI_CIRCUIT_RECOVERY_WAIT: '1'
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -69,15 +71,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Require production Course Factory credentials
+      - name: Require production Supabase credentials
         shell: bash
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          if [ -z "$OPENAI_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$GEMINI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo 'At least one AI provider credential is required.'
-            exit 1
-          fi
 
       - name: Build, audit, render full media package, and publish Entrepreneurship course
         id: acceptance

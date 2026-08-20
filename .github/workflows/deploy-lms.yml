@@ -52,9 +52,13 @@ on:
 permissions:
   contents: read
 
+# Production releases are serialized. Never cancel an in-flight Northflank build
+# because a newer commit landed on main; doing so can strand the public LMS on
+# an old or unhealthy deployment. Each queued run still verifies and deploys
+# its exact triggering SHA before the next run starts.
 concurrency:
   group: northflank-lms-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy-lms:

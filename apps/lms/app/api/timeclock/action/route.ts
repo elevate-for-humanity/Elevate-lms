@@ -1,6 +1,6 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -8,298 +8,142 @@ import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { checkBarberSuspension } from '@/lib/barber/suspension';
 import { sendEmail } from '@/lib/email/service';
 import { emitEvent } from '@/lib/events/emit';
+import { syncProgressEntryToHourEntries } from '@/lib/timeclock/sync-to-hour-entries';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
+const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 
 type TimeclockAction = 'clock_in' | 'lunch_start' | 'lunch_end' | 'clock_out';
 
-interface ActionPayload {
+type ActionPayload = {
   action: TimeclockAction;
   apprentice_id?: string;
-  partner_id?: string;
   program_id?: string;
   site_id: string;
   progress_entry_id?: string;
   lat: number;
   lng: number;
   accuracy_m?: number;
-}
+};
 
-/**
- * Haversine formula to calculate distance between two GPS coordinates
- */
-function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371000; // Earth's radius in meters
+function haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const earthRadiusM = 6371000;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+      Math.sin(dLng / 2) ** 2;
+  return earthRadiusM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
-const FROM_EMAIL = 'noreply@elevateforhumanity.org';
-
-/**
- * Write an admin alert with full operational context in metadata.
- * The details object is stored verbatim — include apprentice_id, site_id,
- * distances, shift_id, hours, and any violation metadata so downstream
- * AI, investigations, and escalation workflows have the full picture.
- *
- * For missing_lunch and excessive_lunch, also emails the apprentice and admin.
- * Geofence violation emails are sent inline at the call site (with emitEvent).
- *
- * @param userId - authenticated user id; used to look up profile for email
- */
-async function raiseAdminAlert(
-  supabase: any,
+async function writeComplianceAlert(
+  db: any,
   alertType: string,
-  details: Record<string, any>,
-  userId?: string,
+  details: Record<string, unknown>,
 ) {
-  try {
-    const message = buildAlertMessage(alertType, details);
-    await supabase.from('admin_alerts').insert({
-      alert_type: alertType,
-      severity: details.severity ?? 'warning',
-      apprentice_id: details.apprentice_id ?? null,
-      progress_entry_id: details.progress_entry_id ?? null,
-      site_id: details.site_id ?? null,
-      message,
-      metadata: details,
-      created_at: new Date().toISOString(),
-    });
-  } catch (error) {
-    logger.error('[Timeclock] Failed to raise admin alert', normalizeError(error, 'Admin alert error'), getErrorContext(error));
-  }
+  const message =
+    alertType === 'geofence_violation'
+      ? `Geofence violation: ${details.distance_m}m from ${details.site_name ?? 'site'} (allowed ${details.radius_m}m) during ${details.action}`
+      : alertType === 'missing_lunch'
+        ? `No lunch break recorded for ${details.shift_hours}h shift`
+        : alertType === 'excessive_lunch'
+          ? `Lunch exceeded standard: ${details.lunch_minutes}min (standard ${details.standard_minutes}min)`
+          : alertType.replace(/_/g, ' ');
 
-  // Send escalation emails for lunch compliance violations.
-  // Geofence violations are emailed inline at the call site.
-  const lunchAlertTypes = new Set(['missing_lunch', 'excessive_lunch']);
-  if (!lunchAlertTypes.has(alertType) || !userId) return;
+  const { error } = await db.from('admin_alerts').insert({
+    alert_type: alertType,
+    severity: 'warning',
+    apprentice_id: details.apprentice_id ?? null,
+    progress_entry_id: details.progress_entry_id ?? null,
+    site_id: details.site_id ?? null,
+    message,
+    metadata: details,
+    created_at: new Date().toISOString(),
+  });
 
-  try {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('full_name, email')
-      .eq('id', userId)
-      .maybeSingle();
-
-    const name = profile?.full_name || 'Apprentice';
-    const email = profile?.email || '';
-    const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
-
-    if (alertType === 'missing_lunch') {
-      const { shift_hours } = details;
-      if (email) {
-        await sendEmail({
-          to: email,
-          subject: 'Timeclock alert: no lunch break recorded',
-          html: `
-            <p>Hi ${name},</p>
-            <p>You clocked out after a <strong>${shift_hours}-hour shift</strong> without recording a lunch break.</p>
-            <p>Shifts of 6 hours or more require a meal break. Please speak with your supervisor to correct your timesheet if needed.</p>
-            <p>— Elevate for Humanity</p>
-          `,
-        }).catch((err) => logger.warn('[Timeclock] missing_lunch email failed', { userId, err }));
-      }
-      await sendEmail({
-        to: ADMIN_EMAIL,
-        subject: `[Admin] Missing lunch break — ${name}`,
-        html: `
-          <p><strong>${name}</strong> clocked out after a <strong>${shift_hours}-hour shift</strong> with no lunch break recorded.</p>
-          <p>User ID: ${userId}</p>
-          <p><a href="https://www.elevateforhumanity.org/admin/timeclock">Review in Admin →</a></p>
-        `,
-      }).catch((err) => logger.warn('[Timeclock] missing_lunch admin email failed', { err }));
-    }
-
-    if (alertType === 'excessive_lunch') {
-      const { lunch_minutes, standard_minutes } = details;
-      if (email) {
-        await sendEmail({
-          to: email,
-          subject: 'Timeclock alert: extended lunch break',
-          html: `
-            <p>Hi ${name},</p>
-            <p>Your lunch break today was <strong>${lunch_minutes} minutes</strong>, which exceeds the standard ${standard_minutes}-minute break.</p>
-            <p>Extended breaks may affect your logged hours. Please speak with your supervisor if you have questions.</p>
-            <p>— Elevate for Humanity</p>
-          `,
-        }).catch((err) => logger.warn('[Timeclock] excessive_lunch email failed', { userId, err }));
-      }
-      await sendEmail({
-        to: ADMIN_EMAIL,
-        subject: `[Admin] Extended lunch break — ${name}`,
-        html: `
-          <p><strong>${name}</strong> took a <strong>${lunch_minutes}-minute lunch break</strong> (standard: ${standard_minutes} min).</p>
-          <p>User ID: ${userId}</p>
-          <p><a href="https://www.elevateforhumanity.org/admin/timeclock">Review in Admin →</a></p>
-        `,
-      }).catch((err) => logger.warn('[Timeclock] excessive_lunch admin email failed', { err }));
-    }
-  } catch (err) {
-    logger.warn('[Timeclock] raiseAdminAlert email lookup failed', { alertType, userId, err });
-  }
+  if (error) logger.error('[Timeclock] compliance alert insert failed', error);
 }
 
-function buildAlertMessage(alertType: string, d: Record<string, any>): string {
-  switch (alertType) {
-    case 'geofence_violation':
-      return `Geofence violation: ${d.distance_m}m from ${d.site_name ?? 'site'} (allowed ${d.radius_m}m) during ${d.action}`;
-    case 'excessive_lunch':
-      return `Lunch exceeded standard: ${d.lunch_minutes}min (standard ${d.standard_minutes}min)`;
-    case 'missing_lunch':
-      return `No lunch break recorded for ${d.shift_hours}h shift`;
-    case 'missed_clock_out':
-      return `Auto-closed shift after ${d.open_hours}h without clock-out`;
-    case 'low_hours_pace':
-      return `Behind OJL pace: ${d.completed_hours}h completed, need ${d.required_pace_hours}h/week to finish on time`;
-    default:
-      return alertType.replace(/_/g, ' ');
-  }
-}
+async function emitGeofenceEvidence(params: {
+  userId: string;
+  apprenticeId: string;
+  progressEntryId?: string | null;
+  siteId: string;
+  siteName: string | null;
+  action: TimeclockAction;
+  lat: number;
+  lng: number;
+  accuracyM: number | null;
+  distanceM: number;
+  radiusM: number;
+  accepted: boolean;
+}) {
+  const eventType = params.accepted
+    ? 'timeclock.geofence_verified'
+    : 'timeclock.geofence_violation';
 
-/**
- * Sync a completed progress_entries shift to hour_entries (OJL timeclock bucket).
- * Idempotent: skips if hour_entry_id is already set on the progress entry.
- *
- * This is the authoritative bridge between the GPS timeclock and the
- * apprenticeship hours pipeline. Without this, clock-out events never
- * reach OJL totals, dashboards, or RAPIDS.
- */
-async function syncShiftToHourEntries(
-  supabase: any,
-  params: {
-    progressEntryId: string;
-    apprenticeId: string;   // apprentices.id (UUID)
-    programId: string;
-    workDate: string;
-    hoursWorked: number;
-    siteId: string | null;
-  },
-): Promise<string | null> {
-  const { progressEntryId, apprenticeId, programId, workDate, hoursWorked, siteId } = params;
-
-  // Skip if already synced
-  const { data: existing } = await supabase
-    .from('progress_entries')
-    .select('hour_entry_id')
-    .eq('id', progressEntryId)
-    .maybeSingle();
-
-  if (existing?.hour_entry_id) {
-    return existing.hour_entry_id;
-  }
-
-  // Resolve user_id from apprentices table
-  const { data: apprentice } = await supabase
-    .from('apprentices')
-    .select('user_id, program_id')
-    .eq('id', apprenticeId)
-    .maybeSingle();
-
-  if (!apprentice?.user_id) {
-    logger.warn('[Timeclock] syncShiftToHourEntries: no user_id for apprentice', { apprenticeId });
-    return null;
-  }
-
-  // Insert into hour_entries as a timeclock OJL entry (pending approval)
-  const { data: hourEntry, error: insertError } = await supabase
-    .from('hour_entries')
-    .insert({
-      user_id: apprentice.user_id,
-      source_type: 'timeclock',
-      work_date: workDate,
-      hours_claimed: hoursWorked,
-      status: 'pending',
-      entered_by_email: apprentice.user_id,
-      entered_at: new Date().toISOString(),
-      program_slug: programId,
-      notes: `Auto-synced from timeclock shift ${progressEntryId}`,
-      legacy_source: 'progress_entries',
-      legacy_id: progressEntryId,
-    })
-    .select('id')
-    .maybeSingle();
-
-  if (insertError) {
-    logger.error('[Timeclock] syncShiftToHourEntries insert failed:', insertError);
-    return null;
-  }
-
-  // Back-link the hour_entry_id onto the progress entry for idempotency
-  await supabase
-    .from('progress_entries')
-    .update({ hour_entry_id: hourEntry.id })
-    .eq('id', progressEntryId);
-
-  return hourEntry.id;
+  await emitEvent(eventType, 'compliance', {
+    severity: params.accepted ? 'info' : 'warning',
+    actor_type: 'user',
+    actor_id: params.userId,
+    subject_id: params.progressEntryId ?? params.siteId,
+    subject_type: params.progressEntryId ? 'progress_entry' : 'apprentice_site',
+    payload: {
+      apprentice_id: params.apprenticeId,
+      progress_entry_id: params.progressEntryId ?? null,
+      site_id: params.siteId,
+      site_name: params.siteName,
+      action: params.action,
+      lat: params.lat,
+      lng: params.lng,
+      accuracy_m: params.accuracyM,
+      distance_m: params.distanceM,
+      radius_m: params.radiusM,
+      accepted: params.accepted,
+      evaluated_at: new Date().toISOString(),
+    },
+    message: params.accepted
+      ? `Geofence verified: ${params.distanceM}m from ${params.siteName ?? 'site'} during ${params.action}`
+      : `Geofence violation: ${params.distanceM}m from ${params.siteName ?? 'site'} during ${params.action}`,
+  }).catch((error) => logger.warn('[Timeclock] geofence event emission failed', error));
 }
 
 async function notifyClockIn(
-  supabase: any,
-  params: {
-    entryId: string;
-    apprenticeUserId: string;
-    siteName: string | null;
-    clockInAt: string;
-  },
+  db: any,
+  params: { entryId: string; userId: string; siteName: string | null; clockInAt: string },
 ) {
-  const { entryId, apprenticeUserId, siteName, clockInAt } = params;
-
-  await supabase
+  await db
     .from('notifications')
     .insert({
-      user_id: apprenticeUserId,
+      user_id: params.userId,
       type: 'timeclock',
       title: 'Clock-in recorded',
-      message: `Your clock-in was recorded${siteName ? ` at ${siteName}` : ''}.`,
+      message: `Your clock-in was recorded${params.siteName ? ` at ${params.siteName}` : ''}.`,
       action_label: 'View timeclock',
       action_url: '/apprentice/timeclock',
       link: '/apprentice/timeclock',
       read: false,
       metadata: {
-        progress_entry_id: entryId,
-        site_name: siteName,
-        clock_in_at: clockInAt,
+        progress_entry_id: params.entryId,
+        site_name: params.siteName,
+        clock_in_at: params.clockInAt,
       },
-      idempotency_key: `timeclock-clock-in-learner-${entryId}-${apprenticeUserId}`,
+      idempotency_key: `timeclock-clock-in-${params.entryId}-${params.userId}`,
     })
     .then(() => {}, () => {});
+}
 
-  const { data: admins } = await supabase
-    .from('profiles')
-    .select('id')
-    .in('role', ['admin', 'super_admin', 'staff'])
-    .limit(200);
-
-  if (admins?.length) {
-    const adminRows = admins.map((admin: { id: string }) => ({
-      user_id: admin.id,
-      type: 'timeclock',
-      title: 'Student clocked in',
-      message: `A student clocked in${siteName ? ` at ${siteName}` : ''}.`,
-      action_label: 'Review timeclock',
-      action_url: '/admin/notifications',
-      link: '/admin/notifications',
-      read: false,
-      metadata: {
-        progress_entry_id: entryId,
-        apprentice_user_id: apprenticeUserId,
-        site_name: siteName,
-        clock_in_at: clockInAt,
-      },
-      idempotency_key: `timeclock-clock-in-admin-${entryId}-${admin.id}`,
-    }));
-    await supabase.from('notifications').insert(adminRows).then(() => {}, () => {});
+function validateCoordinates(lat: number, lng: number, accuracyM?: number) {
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return 'Valid GPS coordinates are required';
   }
+  if (accuracyM !== undefined && (!Number.isFinite(accuracyM) || accuracyM < 0 || accuracyM > MAX_ACCURACY_M)) {
+    return `GPS accuracy must be between 0 and ${MAX_ACCURACY_M} meters`;
+  }
+  return null;
 }
 
 async function _POST(request: NextRequest) {
@@ -307,7 +151,7 @@ async function _POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
-    const body: ActionPayload = await request.json();
+    const body = (await request.json()) as ActionPayload;
     const {
       action,
       apprentice_id,
@@ -319,78 +163,42 @@ async function _POST(request: NextRequest) {
       accuracy_m,
     } = body;
 
-    // Require authenticated user for all timeclock actions.
+    if (!['clock_in', 'lunch_start', 'lunch_end', 'clock_out'].includes(action) || !site_id) {
+      return NextResponse.json({ error: 'Valid action and site_id are required' }, { status: 400 });
+    }
+
+    const coordinateError = validateCoordinates(lat, lng, accuracy_m);
+    if (coordinateError) {
+      return NextResponse.json({ error: coordinateError }, { status: 400 });
+    }
+
     const authClient = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await authClient.auth.getUser();
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Suspension gate — block hour logging for suspended/past-due accounts
     const db = await requireAdminClient();
-    if (db) {
-      const suspended = await checkBarberSuspension(user.id, db);
-      if (suspended) return suspended;
-    }
+    if (!db) return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
 
-    if (!action || !site_id) {
-      return NextResponse.json(
-        { error: 'Missing required fields: action, site_id' },
-        { status: 400 },
-      );
-    }
+    const suspended = await checkBarberSuspension(user.id, db);
+    if (suspended) return suspended;
 
-    if (lat === undefined || lng === undefined) {
-      return NextResponse.json({ error: 'GPS coordinates required' }, { status: 400 });
-    }
-
-    // Validate GPS accuracy
-    if (accuracy_m && accuracy_m > MAX_ACCURACY_M) {
-      return NextResponse.json(
-        { error: 'GPS accuracy too low', accuracy_m, max_allowed: MAX_ACCURACY_M },
-        { status: 400 },
-      );
-    }
-
-    const supabase = await requireAdminClient();
-    if (!supabase) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
-    }
-
-    // Resolve apprentice from authenticated user (authoritative server-side mapping).
-    let resolvedApprentice: { id: string; employer_id: string | null; shop_id: string | null } | null = null;
-    const { data: byUserId } = await supabase
+    const { data: apprentice } = await db
       .from('apprentices')
       .select('id, employer_id, shop_id')
       .eq('user_id', user.id)
       .eq('status', 'active')
       .maybeSingle();
-    if (byUserId) {
-      resolvedApprentice = byUserId;
-    }
 
-    if (!resolvedApprentice) {
+    if (!apprentice) {
       return NextResponse.json({ error: 'No active apprentice profile found' }, { status: 403 });
     }
-
-    if (apprentice_id && apprentice_id !== resolvedApprentice.id) {
-      return NextResponse.json(
-        { error: 'Forbidden: apprentice_id does not match authenticated user' },
-        { status: 403 },
-      );
+    if (apprentice_id && apprentice_id !== apprentice.id) {
+      return NextResponse.json({ error: 'Forbidden: apprentice_id does not match authenticated user' }, { status: 403 });
     }
 
-    const resolvedApprenticeId = resolvedApprentice.id;
-    const resolvedPartnerId = resolvedApprentice.employer_id;
-    const resolvedShopId = resolvedApprentice.shop_id || resolvedApprentice.employer_id;
-
-    // Resolve program id server-side when clients do not provide it.
-    let resolvedProgramId = program_id;
+    let resolvedProgramId = program_id ?? null;
     if (!resolvedProgramId) {
-      const { data: enrollment } = await supabase
+      const { data: enrollment } = await db
         .from('program_enrollments')
         .select('program_id')
         .eq('user_id', user.id)
@@ -398,350 +206,267 @@ async function _POST(request: NextRequest) {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
-      resolvedProgramId = enrollment?.program_id || null;
+      resolvedProgramId = enrollment?.program_id ?? null;
     }
-
     if (!resolvedProgramId) {
-      return NextResponse.json(
-        { error: 'No active enrollment found to determine program_id' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'No active enrollment found to determine program_id' }, { status: 400 });
     }
 
-    // Load site geofence from apprentice_sites
-    const { data: site, error: siteError } = await supabase
+    const { data: site, error: siteError } = await db
       .from('apprentice_sites')
       .select('id, latitude, longitude, radius_meters, name, shop_id')
       .eq('id', site_id)
       .maybeSingle();
+    if (siteError || !site) return NextResponse.json({ error: 'Site not found' }, { status: 404 });
 
-    if (siteError || !site) {
-      return NextResponse.json({ error: 'Site not found' }, { status: 404 });
-    }
-
-    if (resolvedShopId && site.shop_id !== resolvedShopId) {
+    const assignedShopId = apprentice.shop_id || apprentice.employer_id;
+    if (assignedShopId && site.shop_id !== assignedShopId) {
       return NextResponse.json({ error: 'Forbidden: selected site is not assigned to apprentice' }, { status: 403 });
     }
 
-    // Validate inside geofence
-    const distance = haversineDistance(lat, lng, site.latitude, site.longitude);
-    const withinGeofence = distance <= site.radius_meters;
+    const distanceM = Math.round(haversineDistance(lat, lng, Number(site.latitude), Number(site.longitude)));
+    const radiusM = Number(site.radius_meters);
+    const accepted = distanceM <= radiusM;
 
-    if (!withinGeofence) {
-      const violationDetails = {
-        apprentice_id: resolvedApprenticeId,
+    if (!accepted) {
+      const details = {
+        apprentice_id: apprentice.id,
+        progress_entry_id: progress_entry_id ?? null,
         site_id,
         site_name: site.name,
         action,
-        distance_m: Math.round(distance),
-        radius_m: site.radius_meters,
+        distance_m: distanceM,
+        radius_m: radiusM,
         lat,
         lng,
+        accuracy_m: accuracy_m ?? null,
         timestamp: new Date().toISOString(),
       };
-
-      // Write alert with full context
-      await raiseAdminAlert(supabase, 'geofence_violation', violationDetails);
-
-      // Escalate: email admin immediately (geofence violations are active compliance events)
+      await writeComplianceAlert(db, 'geofence_violation', details);
+      await emitGeofenceEvidence({
+        userId: user.id,
+        apprenticeId: apprentice.id,
+        progressEntryId: progress_entry_id,
+        siteId: site_id,
+        siteName: site.name ?? null,
+        action,
+        lat,
+        lng,
+        accuracyM: accuracy_m ?? null,
+        distanceM,
+        radiusM,
+        accepted: false,
+      });
       sendEmail({
         to: ADMIN_EMAIL,
-        subject: `Geofence Violation: ${site.name ?? 'Unknown site'} — ${action}`,
-        html: `
-<h2>Geofence Violation Detected</h2>
-<p><strong>Site:</strong> ${site.name ?? site_id}</p>
-<p><strong>Action attempted:</strong> ${action}</p>
-<p><strong>Distance from site:</strong> ${Math.round(distance)}m (allowed: ${site.radius_meters}m)</p>
-<p><strong>GPS coordinates:</strong> ${lat}, ${lng}</p>
-<p><strong>Time:</strong> ${new Date().toLocaleString('en-US', { timeZone: 'America/Indiana/Indianapolis' })} ET</p>
-<p>The clock-in was blocked. No hours were recorded.</p>
-<p><a href="https://www.elevateforhumanity.org/admin/apprentices">Review in admin dashboard</a></p>
-        `.trim(),
-        text: `Geofence violation at ${site.name ?? site_id}: ${Math.round(distance)}m from site (allowed ${site.radius_meters}m) during ${action}. Clock-in blocked.`,
-      }).then(() => {}, () => {});
-
-      // Platform event for audit trail and AI review
-      emitEvent('timeclock.geofence_violation', 'compliance', {
-        severity: 'warning',
-        actor_type: 'user',
-        actor_id: user.id,
-        subject_id: site_id,
-        subject_type: 'apprentice_site',
-        payload: violationDetails,
-        message: `Geofence violation: ${Math.round(distance)}m from ${site.name ?? 'site'} during ${action}`,
-      }).then(() => {}, () => {});
-
-      return NextResponse.json(
-        {
-          error: 'Outside geofence',
-          distance_m: Math.round(distance),
-          radius_m: site.radius_meters,
-        },
-        { status: 403 },
-      );
+        subject: `Geofence violation: ${site.name ?? site_id}`,
+        text: `Blocked ${action}: apprentice ${apprentice.id} was ${distanceM}m from the approved site (allowed ${radiusM}m).`,
+        html: `<p>Blocked <strong>${action}</strong> for apprentice ${apprentice.id}.</p><p>Distance: ${distanceM}m; allowed radius: ${radiusM}m.</p><p>No time was accepted for this action.</p>`,
+      }).catch((error) => logger.warn('[Timeclock] geofence email failed', error));
+      return NextResponse.json({ error: 'Outside geofence', distance_m: distanceM, radius_m: radiusM }, { status: 403 });
     }
 
-    // Server time only - never trust client
     const serverNow = new Date().toISOString();
-    const serverDate = serverNow.split('T')[0];
+    const serverDate = serverNow.slice(0, 10);
+    const weekEndingDate = new Date(`${serverDate}T12:00:00Z`);
+    const daysToSaturday = (6 - weekEndingDate.getUTCDay() + 7) % 7;
+    weekEndingDate.setUTCDate(weekEndingDate.getUTCDate() + daysToSaturday);
+    const weekEnding = weekEndingDate.toISOString().slice(0, 10);
+    const normalizedAccuracy = accuracy_m === undefined ? null : Math.round(accuracy_m);
 
-    // Calculate week_ending (Saturday)
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
-    const weekEnding = new Date(today);
-    weekEnding.setDate(today.getDate() + daysUntilSaturday);
-    const weekEndingStr = weekEnding.toISOString().split('T')[0];
+    if (action === 'clock_in') {
+      const { data: openShift } = await db
+        .from('progress_entries')
+        .select('id, site_id, clock_in_at')
+        .eq('apprentice_id', apprentice.id)
+        .is('clock_out_at', null)
+        .order('clock_in_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (openShift) {
+        return NextResponse.json(
+          { error: 'An open shift already exists', progress_entry_id: openShift.id },
+          { status: 409 },
+        );
+      }
 
-    switch (action) {
-      case 'clock_in': {
-        // Insert new progress_entries row
-        const { data: newEntry, error: insertError } = await supabase
-          .from('progress_entries')
-          .insert({
-            apprentice_id: resolvedApprenticeId,
-            partner_id: resolvedPartnerId,
-            program_id: resolvedProgramId,
-            site_id,
-            work_date: serverDate,
-            week_ending: weekEndingStr,
-            clock_in_at: serverNow,
-            status: 'submitted',
-            auto_clocked_out: false,
-          })
-          .select('id')
-          .maybeSingle();
-
-        if (insertError) {
-          logger.error('[Timeclock] clock_in insert error:', insertError);
-          return NextResponse.json({ error: 'Failed to clock in' }, { status: 500 });
-        }
-
-        await notifyClockIn(supabase, {
-          entryId: newEntry.id,
-          apprenticeUserId: user.id,
-          siteName: site.name ?? null,
-          clockInAt: serverNow,
-        });
-
-        return NextResponse.json({
-          success: true,
-          action: 'clock_in',
-          progress_entry_id: newEntry.id,
+      const { data: newEntry, error: insertError } = await db
+        .from('progress_entries')
+        .insert({
+          apprentice_id: apprentice.id,
+          partner_id: apprentice.employer_id,
+          program_id: resolvedProgramId,
+          site_id,
+          work_date: serverDate,
+          week_ending: weekEnding,
           clock_in_at: serverNow,
-        });
+          clock_in_lat: lat,
+          clock_in_lng: lng,
+          clock_in_accuracy_m: normalizedAccuracy,
+          last_known_lat: lat,
+          last_known_lng: lng,
+          last_location_at: serverNow,
+          status: 'submitted',
+          auto_clocked_out: false,
+        })
+        .select('id')
+        .single();
+
+      if (insertError || !newEntry) {
+        logger.error('[Timeclock] clock_in insert failed', insertError);
+        return NextResponse.json({ error: 'Failed to clock in' }, { status: 500 });
       }
 
-      case 'lunch_start': {
-        if (!progress_entry_id) {
-          return NextResponse.json(
-            { error: 'progress_entry_id required for lunch_start' },
-            { status: 400 },
-          );
-        }
+      await emitGeofenceEvidence({
+        userId: user.id,
+        apprenticeId: apprentice.id,
+        progressEntryId: newEntry.id,
+        siteId: site_id,
+        siteName: site.name ?? null,
+        action,
+        lat,
+        lng,
+        accuracyM: normalizedAccuracy,
+        distanceM,
+        radiusM,
+        accepted: true,
+      });
+      await notifyClockIn(db, { entryId: newEntry.id, userId: user.id, siteName: site.name ?? null, clockInAt: serverNow });
 
-        // Verify open shift exists
-        const { data: entry, error: entryError } = await supabase
-          .from('progress_entries')
-          .select('id, clock_in_at, clock_out_at, lunch_start_at')
-          .eq('id', progress_entry_id)
-          .eq('apprentice_id', resolvedApprenticeId)
-          .maybeSingle();
-
-        if (entryError || !entry) {
-          return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
-        }
-
-        if (entry.clock_out_at) {
-          return NextResponse.json({ error: 'Shift already closed' }, { status: 400 });
-        }
-
-        if (entry.lunch_start_at) {
-          return NextResponse.json({ error: 'Lunch already started' }, { status: 400 });
-        }
-
-        const { error: updateError } = await supabase
-          .from('progress_entries')
-          .update({ lunch_start_at: serverNow })
-          .eq('id', progress_entry_id);
-
-        if (updateError) {
-          return NextResponse.json({ error: 'Failed to start lunch' }, { status: 500 });
-        }
-
-        return NextResponse.json({
-          success: true,
-          action: 'lunch_start',
-          progress_entry_id,
-          lunch_start_at: serverNow,
-        });
-      }
-
-      case 'lunch_end': {
-        if (!progress_entry_id) {
-          return NextResponse.json(
-            { error: 'progress_entry_id required for lunch_end' },
-            { status: 400 },
-          );
-        }
-
-        // Verify lunch was started
-        const { data: entry, error: entryError } = await supabase
-          .from('progress_entries')
-          .select('id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at')
-          .eq('id', progress_entry_id)
-          .eq('apprentice_id', resolvedApprenticeId)
-          .maybeSingle();
-
-        if (entryError || !entry) {
-          return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
-        }
-
-        if (!entry.lunch_start_at) {
-          return NextResponse.json({ error: 'Lunch not started' }, { status: 400 });
-        }
-
-        if (entry.lunch_end_at) {
-          return NextResponse.json({ error: 'Lunch already ended' }, { status: 400 });
-        }
-
-        // Check lunch duration
-        const lunchStart = new Date(entry.lunch_start_at);
-        const lunchEnd = new Date(serverNow);
-        const lunchMinutes = (lunchEnd.getTime() - lunchStart.getTime()) / (1000 * 60);
-
-        const { error: updateError } = await supabase
-          .from('progress_entries')
-          .update({ lunch_end_at: serverNow })
-          .eq('id', progress_entry_id);
-
-        if (updateError) {
-          return NextResponse.json({ error: 'Failed to end lunch' }, { status: 500 });
-        }
-
-        // Raise alert if lunch exceeded standard duration
-        if (lunchMinutes > LUNCH_DURATION_MINUTES) {
-          await raiseAdminAlert(supabase, 'excessive_lunch', {
-            apprentice_id: resolvedApprenticeId,
-            progress_entry_id,
-            lunch_minutes: Math.round(lunchMinutes),
-            standard_minutes: LUNCH_DURATION_MINUTES,
-            timestamp: serverNow,
-          }, user.id);
-        }
-
-        return NextResponse.json({
-          success: true,
-          action: 'lunch_end',
-          progress_entry_id,
-          lunch_end_at: serverNow,
-          lunch_duration_minutes: Math.round(lunchMinutes),
-          exceeded_standard: lunchMinutes > LUNCH_DURATION_MINUTES,
-        });
-      }
-
-      case 'clock_out': {
-        if (!progress_entry_id) {
-          return NextResponse.json(
-            { error: 'progress_entry_id required for clock_out' },
-            { status: 400 },
-          );
-        }
-
-        // Verify open shift exists
-        const { data: entry, error: entryError } = await supabase
-          .from('progress_entries')
-          .select('id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at')
-          .eq('id', progress_entry_id)
-          .eq('apprentice_id', resolvedApprenticeId)
-          .maybeSingle();
-
-        if (entryError || !entry) {
-          return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
-        }
-
-        if (entry.clock_out_at) {
-          return NextResponse.json({ error: 'Already clocked out' }, { status: 400 });
-        }
-
-        // Check for missing lunch after 6 hours
-        const clockIn = new Date(entry.clock_in_at);
-        const clockOut = new Date(serverNow);
-        const shiftHours = (clockOut.getTime() - clockIn.getTime()) / (1000 * 60 * 60);
-
-        if (shiftHours >= 6 && !entry.lunch_start_at) {
-          await raiseAdminAlert(supabase, 'missing_lunch', {
-            apprentice_id: resolvedApprenticeId,
-            progress_entry_id,
-            shift_hours: Math.round(shiftHours * 10) / 10,
-            timestamp: serverNow,
-          }, user.id);
-        }
-
-        // DB trigger will derive hours_worked and enforce weekly cap
-        const { error: updateError } = await supabase
-          .from('progress_entries')
-          .update({ clock_out_at: serverNow })
-          .eq('id', progress_entry_id);
-
-        if (updateError) {
-          return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
-        }
-
-        // Reload to get derived hours (DB trigger calculates hours_worked on clock_out_at update)
-        const { data: updatedEntry } = await supabase
-          .from('progress_entries')
-          .select('hours_worked')
-          .eq('id', progress_entry_id)
-          .maybeSingle();
-
-        const hoursWorked = updatedEntry?.hours_worked ?? 0;
-
-        // Sync to hour_entries — this is the authoritative OJL pipeline bridge.
-        // Without this, timeclock hours never reach dashboards, OJL totals, or RAPIDS.
-        if (hoursWorked > 0) {
-          const hourEntryId = await syncShiftToHourEntries(supabase, {
-            progressEntryId: progress_entry_id,
-            apprenticeId: resolvedApprenticeId,
-            programId: resolvedProgramId,
-            workDate: serverDate,
-            hoursWorked,
-            siteId: site_id,
-          });
-          if (!hourEntryId) {
-            logger.warn('[Timeclock] clock_out: hour_entries sync failed for entry', { progress_entry_id });
-          }
-
-          // Non-blocking RAPIDS update — fire and forget so clock-out response is never delayed.
-          if (resolvedApprenticeId) {
-            fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/api/rapids/safe-update`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                apprentice_id: resolvedApprenticeId,
-                trigger: 'clock_out',
-                progress_entry_id,
-                hours_worked: hoursWorked,
-              }),
-            }).catch((err) => logger.warn('[Timeclock] RAPIDS update failed (non-blocking)', err));
-          }
-        }
-
-        return NextResponse.json({
-          success: true,
-          action: 'clock_out',
-          progress_entry_id,
-          clock_out_at: serverNow,
-          hours_worked: hoursWorked,
-        });
-      }
-
-      default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+      return NextResponse.json({
+        success: true,
+        action,
+        progress_entry_id: newEntry.id,
+        clock_in_at: serverNow,
+        geofence_verified: true,
+        distance_m: distanceM,
+        radius_m: radiusM,
+      });
     }
+
+    if (!progress_entry_id) {
+      return NextResponse.json({ error: `progress_entry_id required for ${action}` }, { status: 400 });
+    }
+
+    const { data: entry, error: entryError } = await db
+      .from('progress_entries')
+      .select('id, site_id, clock_in_at, clock_out_at, lunch_start_at, lunch_end_at')
+      .eq('id', progress_entry_id)
+      .eq('apprentice_id', apprentice.id)
+      .maybeSingle();
+    if (entryError || !entry) return NextResponse.json({ error: 'Progress entry not found' }, { status: 404 });
+    if (entry.site_id !== site_id) {
+      return NextResponse.json({ error: 'Selected site does not match the active shift' }, { status: 403 });
+    }
+    if (entry.clock_out_at) return NextResponse.json({ error: 'Shift already closed' }, { status: 400 });
+
+    if (action === 'lunch_start') {
+      if (entry.lunch_start_at) return NextResponse.json({ error: 'Lunch already started' }, { status: 400 });
+      const { error } = await db.from('progress_entries').update({ lunch_start_at: serverNow }).eq('id', entry.id);
+      if (error) return NextResponse.json({ error: 'Failed to start lunch' }, { status: 500 });
+      return NextResponse.json({ success: true, action, progress_entry_id: entry.id, lunch_start_at: serverNow });
+    }
+
+    if (action === 'lunch_end') {
+      if (!entry.lunch_start_at) return NextResponse.json({ error: 'Lunch not started' }, { status: 400 });
+      if (entry.lunch_end_at) return NextResponse.json({ error: 'Lunch already ended' }, { status: 400 });
+      const lunchMinutes = (new Date(serverNow).getTime() - new Date(entry.lunch_start_at).getTime()) / 60000;
+      const { error } = await db.from('progress_entries').update({ lunch_end_at: serverNow }).eq('id', entry.id);
+      if (error) return NextResponse.json({ error: 'Failed to end lunch' }, { status: 500 });
+      if (lunchMinutes > LUNCH_DURATION_MINUTES) {
+        await writeComplianceAlert(db, 'excessive_lunch', {
+          apprentice_id: apprentice.id,
+          progress_entry_id: entry.id,
+          site_id,
+          lunch_minutes: Math.round(lunchMinutes),
+          standard_minutes: LUNCH_DURATION_MINUTES,
+          timestamp: serverNow,
+        });
+      }
+      return NextResponse.json({
+        success: true,
+        action,
+        progress_entry_id: entry.id,
+        lunch_end_at: serverNow,
+        lunch_duration_minutes: Math.round(lunchMinutes),
+        exceeded_standard: lunchMinutes > LUNCH_DURATION_MINUTES,
+      });
+    }
+
+    const shiftHours = (new Date(serverNow).getTime() - new Date(entry.clock_in_at).getTime()) / 3600000;
+    if (shiftHours >= 6 && !entry.lunch_start_at) {
+      await writeComplianceAlert(db, 'missing_lunch', {
+        apprentice_id: apprentice.id,
+        progress_entry_id: entry.id,
+        site_id,
+        shift_hours: Math.round(shiftHours * 10) / 10,
+        timestamp: serverNow,
+      });
+    }
+
+    const { error: clockOutError } = await db
+      .from('progress_entries')
+      .update({
+        clock_out_at: serverNow,
+        clock_out_lat: lat,
+        clock_out_lng: lng,
+        clock_out_accuracy_m: normalizedAccuracy,
+        last_known_lat: lat,
+        last_known_lng: lng,
+        last_location_at: serverNow,
+      })
+      .eq('id', entry.id);
+    if (clockOutError) return NextResponse.json({ error: 'Failed to clock out' }, { status: 500 });
+
+    await emitGeofenceEvidence({
+      userId: user.id,
+      apprenticeId: apprentice.id,
+      progressEntryId: entry.id,
+      siteId: site_id,
+      siteName: site.name ?? null,
+      action: 'clock_out',
+      lat,
+      lng,
+      accuracyM: normalizedAccuracy,
+      distanceM,
+      radiusM,
+      accepted: true,
+    });
+
+    const syncResult = await syncProgressEntryToHourEntries(db, entry.id);
+    if (!syncResult) logger.warn('[Timeclock] completed shift did not sync to hour_entries', { progress_entry_id: entry.id });
+
+    if (syncResult?.hoursWorked && apprentice.id) {
+      fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/api/rapids/safe-update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apprentice_id: apprentice.id,
+          trigger: 'clock_out',
+          progress_entry_id: entry.id,
+          hours_worked: syncResult.hoursWorked,
+        }),
+      }).catch((error) => logger.warn('[Timeclock] RAPIDS update failed (non-blocking)', error));
+    }
+
+    return NextResponse.json({
+      success: true,
+      action: 'clock_out',
+      progress_entry_id: entry.id,
+      clock_out_at: serverNow,
+      hours_worked: syncResult?.hoursWorked ?? 0,
+      geofence_verified: true,
+      distance_m: distanceM,
+      radius_m: radiusM,
+    });
   } catch (error) {
-    logger.error('[Timeclock] Unexpected error', normalizeError(error, 'Timeclock unexpected error'), getErrorContext(error));
+    logger.error(
+      '[Timeclock] Unexpected error',
+      normalizeError(error, 'Timeclock unexpected error'),
+      getErrorContext(error),
+    );
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
 export const POST = withApiAudit('/api/timeclock/action', _POST);

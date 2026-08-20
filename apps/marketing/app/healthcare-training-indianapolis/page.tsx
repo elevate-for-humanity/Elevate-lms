@@ -9,12 +9,12 @@ const CANONICAL = 'https://www.elevateforhumanity.org/healthcare-training-indian
 export const metadata: Metadata = {
   title: 'Healthcare Training Indianapolis | CNA, HHA & Medical Assistant',
   description:
-    'CNA, HHA, Medical Assistant, and Patient Care Technician training in Indianapolis. State-approved programs. WIOA funding may be available for eligible Indiana residents.',
+    'CNA, HHA, Medical Assistant, and Patient Care Technician training in Indianapolis. Program requirements vary by pathway. Workforce funding may be available for eligible participants and eligible programs.',
   alternates: { canonical: CANONICAL },
   openGraph: {
     title: 'Healthcare Training Indianapolis | CNA, HHA & Medical Assistant',
     description:
-      'CNA, HHA, Medical Assistant, Phlebotomy, and Patient Care Tech training in Indianapolis. State-approved. WIOA funding may be available.',
+      'CNA, HHA, Medical Assistant, Phlebotomy, and Patient Care Tech training in Indianapolis. Review each program for current requirements and funding options.',
     url: CANONICAL,
     siteName: 'Elevate for Humanity',
     images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Healthcare Training Indianapolis' }],
@@ -37,27 +37,27 @@ const faqs = [
   {
     question: 'Are your healthcare programs approved by the state of Indiana?',
     answer:
-      'Our CNA training program follows Indiana State Department of Health (ISDH) training hour requirements. Graduates are eligible to sit for the Indiana Nurse Aide Competency Evaluation. Final certification is issued by the Indiana State Department of Health through the testing and registry process, not by Elevate for Humanity.',
+      'Approval and oversight are program-specific. Our CNA pathway follows the applicable Indiana nurse-aide training requirements reflected in its controlling program record. Final certification and registry decisions are made by the responsible state or credentialing authority, not by Elevate for Humanity.',
   },
   {
     question: 'Does the program include clinical or on-the-job training?',
     answer:
-      'Healthcare programs include hands-on clinical or lab components where applicable to meet state and industry requirements. Our CNA program includes required clinical hours at approved healthcare facilities.',
+      'Healthcare programs include hands-on clinical or lab components where required by the applicable program standard. Review the individual program record for the exact clinical, lab, or work-based-learning requirement.',
   },
   {
     question: 'Can WIOA pay for healthcare training?',
     answer:
-      'Many participants have received WIOA funding for healthcare training at Elevate for Humanity. However, WIOA eligibility is determined by your local WorkOne office, not by us. Contact WorkOne or our admissions team to begin the eligibility process.',
+      'WIOA may fund an eligible participant in an eligible program when the responsible workforce agency approves the training and issues the required authorization. Contact WorkOne for the controlling eligibility and funding decision.',
   },
   {
     question: 'What does "third-party credentialing" mean?',
     answer:
-      'Credentials like CNA, HHA, or Medical Assistant certifications are issued by independent certifying bodies or state agencies — not by Elevate for Humanity. We prepare you for the examination; the certifying organization determines pass/fail and issues the credential.',
+      'Credentials such as CNA or Medical Assistant certifications are issued by independent certifying bodies or state agencies — not by Elevate for Humanity. Training may prepare a participant for an examination; the responsible authority determines eligibility, pass/fail status, and credential issuance.',
   },
   {
     question: 'Do you help place graduates with healthcare employers?',
     answer:
-      'Yes. We work with Indianapolis and Indiana healthcare employers to connect trained graduates with job opportunities. Employment outcomes are not guaranteed and depend on individual performance, credential attainment, and local market conditions.',
+      'We provide employer-connection and placement-support workflows. Employment is not guaranteed and depends on the participant, credential requirements, employer selection, and labor-market conditions.',
   },
 ];
 
@@ -74,7 +74,7 @@ export default function HealthcareTrainingIndianapolisPage() {
       <FAQStructuredData faqs={faqs} />
       <ProgramStructuredData
         name="Healthcare Training Programs"
-        description="CNA, HHA, Medical Assistant, Phlebotomy, and Patient Care Technician training in Indianapolis. State-approved. WIOA funding may be available."
+        description="CNA, HHA, Medical Assistant, Phlebotomy, and Patient Care Technician training in Indianapolis. Review each program for its controlling requirements and current funding options."
         url="/healthcare-training-indianapolis"
         category="Healthcare"
       />
@@ -84,104 +84,104 @@ export default function HealthcareTrainingIndianapolisPage() {
           tag: 'CNA · HHA · Medical Assistant · Indianapolis',
           heading: 'Healthcare Career Training in Indianapolis',
           subtitle:
-            'Train for a career in Indiana\'s growing healthcare industry. Elevate for Humanity offers state-supervised CNA, HHA, Medical Assistant, and Patient Care Technician programs in Indianapolis. WIOA funding may be available for eligible residents.',
+            'Explore CNA, HHA, Medical Assistant, and Patient Care Technician pathways in Indianapolis. Requirements, credential authorities, clinical components, and funding eligibility are disclosed at the individual program level.',
           primaryCta: { label: 'Apply Now', href: '/apply' },
           secondaryCta: { label: 'View Programs', href: '/programs/healthcare' },
         }}
         trustBadges={[
-          { label: 'State-Supervised CNA Training', detail: 'ISDH Requirements' },
-          { label: 'ETPL Approved', detail: 'Indiana Training Provider List' },
-          { label: 'WIOA Eligible Programs', detail: 'WorkOne Referrals Accepted' },
-          { label: 'Employer Placement Support', detail: 'Indianapolis Healthcare Network' },
+          { label: 'Program Requirements', detail: 'Review the Controlling Program Record' },
+          { label: 'Program-Specific Funding', detail: 'Verify Current Listing With WorkOne' },
+          { label: 'Agency Authorization Required', detail: 'Participant Eligibility Is Determined Externally' },
+          { label: 'Employer Connection Support', detail: 'No Employment Guarantee' },
         ]}
         whoHeading="Who Healthcare Training Is For"
         whoItems={[
           {
             heading: 'Adults Entering Healthcare',
             description:
-              'Adults 18+ with no prior healthcare experience who want to enter the industry quickly through a short-term certificate program.',
+              'Adults seeking an occupational training pathway into healthcare support roles. Admission and credential requirements vary by program.',
           },
           {
             heading: 'CNA Candidates',
             description:
-              'Individuals seeking Certified Nursing Assistant credentials to work in long-term care, hospitals, and home settings across Indiana.',
+              'Individuals seeking nurse-aide training who will complete the applicable training, testing, and registry process required by the responsible authority.',
           },
           {
             heading: 'Home Health Aide Candidates',
             description:
-              'Adults seeking to provide in-home healthcare support. HHA training prepares you for state registry and direct-care employment.',
+              'Adults seeking training for in-home healthcare support roles. Review the current HHA program record for applicable training and registry requirements.',
           },
           {
             heading: 'Medical Office & Clinical Support',
             description:
-              'Individuals interested in Medical Assisting, phlebotomy, or patient care support roles in physician offices, clinics, and hospitals.',
+              'Individuals interested in Medical Assisting, phlebotomy, patient care, or related clinical-support roles in physician offices, clinics, and hospitals.',
           },
           {
             heading: 'WIOA & Agency Referrals',
             description:
-              'Participants referred by WorkOne, FSSA, or other workforce agencies for healthcare training. We work with your case manager to coordinate enrollment.',
+              'Participants referred by WorkOne or other workforce agencies. Enrollment and funding coordination follows the participant and program authorization issued by the responsible agency.',
           },
           {
             heading: 'Career Changers',
             description:
-              'Individuals leaving other industries and seeking stable, in-demand careers in Indiana\'s healthcare sector.',
+              'Individuals moving from another industry who want to evaluate healthcare training pathways and their current admission and credential requirements.',
           },
         ]}
         funding={{
           heading: 'Funding for Healthcare Training',
           paragraphs: [
-            'Healthcare programs at Elevate for Humanity are ETPL-approved, which means eligible Indiana residents may fund their training through WIOA, Workforce Ready Grant, or FSSA IMPACT.',
-            'Healthcare is consistently listed among Indiana\'s high-demand occupation sectors, which may increase funding eligibility for some programs. Your WorkOne advisor can confirm your specific options.',
+            'Some healthcare programs may have current ETPL, Workforce Ready Grant, WIOA, or other workforce-funding eligibility. Listing and funding status are program-specific and can change.',
+            'Your WorkOne advisor or other responsible agency must confirm participant eligibility, program eligibility, available funds, covered costs, and written authorization before training begins.',
           ],
           bullets: [
-            'WIOA Individual Training Account (ITA) — adults and dislocated workers',
-            'Workforce Ready Grant — high-demand credentials (DWD eligibility required)',
-            'FSSA IMPACT — public-assistance recipient referrals',
-            'Job Ready Indy — Marion County initiative',
-            'Self-pay and payment plan options available',
+            'WIOA Individual Training Account (ITA) — subject to agency and participant eligibility',
+            'Workforce Ready Grant — subject to current program and DWD eligibility',
+            'Other workforce-agency referrals — subject to the applicable agency authorization',
+            'Employer-supported training — where separately approved by the employer or agency',
+            'Self-pay and current payment-plan options shown through the applicable enrollment path',
           ],
           eligibilityNote:
-            'Funding eligibility is determined by your local WorkOne office, FSSA case worker, or the applicable agency — not by Elevate for Humanity. Contact us or WorkOne to start the process.',
+            'Funding eligibility is determined by your local WorkOne office or other responsible agency — not by Elevate for Humanity. Do not begin training in reliance on workforce funding until written authorization is issued.',
         }}
         pathwaysHeading="Healthcare Training Pathways"
         pathways={[
           {
             name: 'Certified Nursing Assistant (CNA)',
             description:
-              'State-supervised CNA training meeting Indiana State Department of Health hours requirements. Prepares graduates for the Indiana Nurse Aide Competency Evaluation and ISDH registry.',
+              'Nurse-aide training with requirements disclosed in the current program record. The responsible Indiana authority controls competency evaluation and registry decisions.',
             href: '/programs/cna',
           },
           {
             name: 'Home Health Aide (HHA)',
             description:
-              'Training for direct-care roles in home health settings. Prepares participants for home health aide registry and employment with home health agencies.',
+              'Training for direct-care roles in home health settings. Review the current program record for required training, testing, and registry steps.',
             href: '/programs/cna',
           },
           {
             name: 'Medical Assistant / Patient Care Technician',
             description:
-              'Clinical and administrative training for medical office and hospital support roles. Phlebotomy, EKG, and patient care components included where applicable.',
+              'Clinical and administrative training for medical office and hospital support roles. Components vary by the selected program and credential pathway.',
             href: '/programs/healthcare',
           },
           {
             name: 'All Healthcare Programs',
             description:
-              'See the full catalog of healthcare training programs at Elevate for Humanity.',
+              'See the current catalog of healthcare training programs at Elevate for Humanity.',
             href: '/programs/healthcare',
           },
         ]}
         employer={{
-          heading: 'Healthcare Employer Placement',
+          heading: 'Healthcare Employer Connections',
           paragraphs: [
-            'We work with Indianapolis and Indiana healthcare employers — hospitals, long-term care facilities, home health agencies, and physician practices — to connect trained graduates with job opportunities.',
-            'Employers can partner with Elevate for Humanity to build a trained candidate pipeline, coordinate OJT reimbursement, and participate in registered apprenticeship pathways.',
+            'Employer-partnership workflows can connect trained participants with healthcare employers and work-based-learning opportunities where an employer elects to participate.',
+            'Employers can also discuss OJT or apprenticeship pathways where the applicable program and agency requirements are met.',
           ],
           bullets: [
-            'Pre-screened, credentialed healthcare candidates',
-            'CNA, HHA, and Medical Assistant pipelines for Indianapolis employers',
-            'OJT wage reimbursement coordination for eligible employer partners',
-            'No recruiting fee for partner employers',
-            'Ongoing workforce training for incumbent employees',
+            'Candidate referral and employer-connection workflows',
+            'Healthcare training pipelines based on current program availability',
+            'OJT coordination where separately authorized by the responsible workforce agency',
+            'Registered-apprenticeship coordination where an approved occupation and employer structure apply',
+            'Incumbent-worker training discussions based on employer requirements',
           ],
           cta: { label: 'Employer Partnership Inquiry', href: '/employer-workforce-partnerships-indiana' },
         }}
@@ -196,14 +196,14 @@ export default function HealthcareTrainingIndianapolisPage() {
           { label: 'Contact Us', href: '/contact' },
         ]}
         complianceNotes={[
-          'Healthcare certifications (CNA, HHA, Medical Assistant, Phlebotomy) are issued by independent state agencies or third-party certifying bodies, not by Elevate for Humanity. Passing the credentialing examination is required to earn the credential.',
-          'CNA training at Elevate for Humanity follows Indiana State Department of Health (ISDH) training requirements. State registry is maintained by ISDH, not by Elevate for Humanity.',
-          'Elevate for Humanity is a workforce training provider. We do not grant degrees and do not hold regional academic accreditation.',
-          'Funding eligibility under WIOA, Workforce Ready Grant, FSSA IMPACT, or any other program is determined by the applicable workforce agency, not by Elevate for Humanity.',
-          'Employment outcomes are not guaranteed. Results depend on individual performance, credential attainment, and local market conditions. Content reviewed 2026.',
+          'Healthcare certifications are issued by the applicable state agency or third-party credentialing body, not by Elevate for Humanity. The responsible authority controls eligibility, examination, and credential issuance.',
+          'Healthcare program requirements are program-specific. Review the controlling program record and responsible authority requirements before enrollment.',
+          'Elevate for Humanity is a workforce training provider. We do not grant degrees and do not represent institutional academic accreditation unless separately documented.',
+          'Funding eligibility under WIOA, Workforce Ready Grant, or any other program is determined by the applicable workforce agency, not by Elevate for Humanity.',
+          'Employment outcomes are not guaranteed. Results depend on individual performance, credential attainment, employer selection, and market conditions. Content reviewed 2026.',
         ]}
-        ctaHeading="Start Your Healthcare Career in Indianapolis"
-        ctaSubtitle="Apply today or contact our team to learn which healthcare programs and funding options are right for you."
+        ctaHeading="Explore Healthcare Training in Indianapolis"
+        ctaSubtitle="Review the current healthcare programs, credential pathways, and funding process before you apply."
         ctaPrimary={{ label: 'Apply Now', href: '/apply' }}
         ctaSecondary={{ label: 'View Healthcare Programs', href: '/programs/healthcare' }}
       />

@@ -38,7 +38,7 @@ async function _GET(request: Request) {
     const threeDaysFromNow = new Date(now.getTime() + 3 * 86400000);
     const threeDaysStart = new Date(now.getTime() + 2 * 86400000);
     const { data: expiringIn3 } = await supabase
-      .from('licenses')
+      .from('managed_licenses')
       .select('id, organization_id, expires_at')
       .eq('tier', 'trial')
       .eq('status', 'active')
@@ -59,7 +59,7 @@ async function _GET(request: Request) {
 
     const oneDayFromNow = new Date(now.getTime() + 86400000);
     const { data: expiringIn1 } = await supabase
-      .from('licenses')
+      .from('managed_licenses')
       .select('id, organization_id, expires_at')
       .eq('tier', 'trial')
       .eq('status', 'active')
@@ -80,7 +80,7 @@ async function _GET(request: Request) {
 
     const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
     const { data: oldTrials } = await supabase
-      .from('licenses')
+      .from('managed_licenses')
       .select('id, organization_id, created_at')
       .eq('tier', 'trial')
       .eq('status', 'active')
@@ -107,16 +107,20 @@ async function _GET(request: Request) {
     }
 
     const { data: overdue } = await supabase
-      .from('licenses')
+      .from('managed_licenses')
       .select('id, organization_id')
       .eq('tier', 'trial')
       .eq('status', 'active')
       .lte('expires_at', now.toISOString());
 
     for (const license of overdue ?? []) {
-      const { error } = await supabase.from('licenses').update({ status: 'expired' }).eq('id', license.id);
+      const { error } = await supabase
+        .from('managed_licenses')
+        .update({ status: 'expired', updated_at: now.toISOString() })
+        .eq('id', license.id)
+        .eq('status', 'active');
       if (error) {
-        results.errors.push('Failed to expire license: see logs');
+        results.errors.push('Failed to expire managed trial license: see logs');
         continue;
       }
       results.expired++;

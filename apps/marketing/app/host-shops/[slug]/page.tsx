@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const [profile, approved] = await Promise.all([getPublicHostShopBySlug(slug), getApprovedShopByPublicSlug(slug)]);
   if (!profile || !approved) return {};
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
-  const description = profile.description || `${approved.name} is an approved Elevate apprenticeship Host Site${approved.city ? ` in ${approved.city}, ${approved.state}` : ''}.`;
+  const description = approved.description || `${approved.name} is an approved Elevate apprenticeship Host Site${approved.city ? ` in ${approved.city}, ${approved.state}` : ''}.`;
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const image = gallery[0]?.url || profile.logo_url || profile.flyer_url;
   return {
@@ -50,7 +50,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
 
   const address = [approved.address, approved.city, approved.state, approved.zip].filter(Boolean).join(', ');
   const externalUrl = profile.website_url || profile.website;
-  const mapUrl = profile.google_maps_url || (address ? directionsUrl(address) : undefined);
+  const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
   const items = [
     ...gallery,
@@ -64,7 +64,7 @@ export default async function HostShopProfilePage({ params }: PageProps) {
     '@type': 'HealthAndBeautyBusiness',
     name: approved.name,
     url: canonical,
-    description: profile.description || undefined,
+    description: approved.description || undefined,
     telephone: approved.phone || undefined,
     image: items.map((item) => item.url),
     address: address ? { '@type': 'PostalAddress', streetAddress: approved.address || undefined, addressLocality: approved.city || undefined, addressRegion: approved.state || undefined, postalCode: approved.zip || undefined, addressCountry: 'US' } : undefined,
@@ -80,30 +80,30 @@ export default async function HostShopProfilePage({ params }: PageProps) {
           <div>
             <p className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
             <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">{approved.name}</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">{profile.description || 'Approved worksite participating in supervised apprenticeship training through Elevate.'}</p>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">{approved.description || 'Approved worksite participating in supervised apprenticeship training through Elevate.'}</p>
             {programs.length ? <div className="mt-5 flex flex-wrap gap-2">{programs.map((program) => <span key={program} className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-black">{programLabel(program)}</span>)}</div> : null}
             {approved.supervisor ? <p className="mt-4 text-sm font-semibold text-slate-300">Approved supervisor: {approved.supervisor}</p> : null}
             <div className="mt-7 flex flex-wrap gap-3">
               {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
-              {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-sm font-extrabold text-white"><Navigation className="h-4 w-4" /> Google Maps</a> : null}
+              {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-sm font-extrabold text-white"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
               {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-sm font-extrabold text-white">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
-          {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || undefined} /> : address ? <div className="h-[360px] overflow-hidden rounded-3xl border border-white/10"><iframe title={`Map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+          {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || undefined} /> : address ? <div className="h-[360px] overflow-hidden rounded-3xl border border-white/10"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
         </div>
       </section>
 
       <section className="px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <h2 className="text-2xl font-black">Visit the Host Site</h2>
+            <h2 className="text-2xl font-black">Approved Training Worksite</h2>
             <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-6">
               {address ? <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span>{address}</span></p> : null}
               {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="mt-4 flex items-center gap-3 font-bold"><Phone className="h-5 w-5 text-brand-red-700" /> {approved.phone}</a> : null}
             </div>
-            <p className="mt-5 text-sm leading-6 text-slate-600">Placement at a specific Host Site depends on occupation approval, apprentice fit, supervisor capacity, and current availability. A public profile does not guarantee an open placement.</p>
+            <p className="mt-5 text-sm leading-6 text-slate-600">The address shown here is the worksite on the approved apprenticeship Host Site record. A business may maintain other public storefront, mailing, booking, or service addresses. Placement at this worksite depends on occupation approval, apprentice fit, supervisor capacity, and current availability.</p>
           </div>
-          {address ? <div className="h-[380px] overflow-hidden rounded-2xl border border-slate-300 sm:h-[500px]"><iframe title={`Map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+          {address ? <div className="h-[380px] overflow-hidden rounded-2xl border border-slate-300 sm:h-[500px]"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
         </div>
       </section>
 

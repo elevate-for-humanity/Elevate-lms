@@ -27,7 +27,7 @@ export default function BeautyTheoryDailyPolicy({ programTitle, className = '' }
         </ul>
         <p className="text-sm text-slate-600">
           {programTitle} apprentices complete bookwork in Elevate LMS.{' '}
-          <Link href="/apprentice" className="text-brand-blue-600 font-semibold hover:underline">
+          <Link href="https://app.elevateforhumanity.org/apprentice/dashboard" className="text-brand-blue-600 font-semibold hover:underline">
             Open apprentice portal
           </Link>{' '}
           to start today&apos;s theory.

@@ -74,6 +74,70 @@ function scanImages(value: unknown, issues: SiteValidationIssue[], page: TenantS
   for (const item of Object.values(obj)) if (item && typeof item === 'object') scanImages(item, issues, page, section);
 }
 
+function flattenStrings(value: unknown, out: string[] = []): string[] {
+  if (typeof value === 'string') out.push(value);
+  else if (Array.isArray(value)) value.forEach((item) => flattenStrings(item, out));
+  else if (value && typeof value === 'object') Object.values(value as Record<string, unknown>).forEach((item) => flattenStrings(item, out));
+  return out;
+}
+
+function looksLikeConsumerWellnessStore(config: TenantSiteConfig): boolean {
+  const meta = config.meta && typeof config.meta === 'object' ? config.meta as Record<string, unknown> : {};
+  const siteKind = text(meta.siteKind).toLowerCase();
+  const corpus = flattenStrings([config.branding, config.seo, config.products, config.pages]).join(' ').toLowerCase();
+  return siteKind === 'standalone_store' || /\b(cosmetic|skin care|skincare|hair care|body care|wellness oil|soap|beauty)\b/.test(corpus);
+}
+
+function scanWellnessClaims(config: TenantSiteConfig, issues: SiteValidationIssue[]) {
+  if (!looksLikeConsumerWellnessStore(config)) return;
+  const treatmentVerb = /\b(cure|cures|cured|treat|treats|treated|heal|heals|healed|prevent|prevents|diagnose|diagnoses|eliminate|eliminates)\b/i;
+  const condition = /\b(eczema|psoriasis|acne|infection|yeast infection|disease|arthritis|diabetes|cancer|depression|anxiety|inflammation|pain)\b/i;
+  for (const page of config.pages || []) {
+    for (const section of page.sections) {
+      for (const phrase of flattenStrings(section.content)) {
+        const compact = phrase.replace(/\s+/g, ' ').trim();
+        if (!compact) continue;
+        if ((treatmentVerb.test(compact) && condition.test(compact)) || /\bperfect for (?:those with )?(eczema|psoriasis|acne|infection)\b/i.test(compact)) {
+          issues.push({
+            severity: 'error',
+            code: 'unsupported_health_treatment_claim',
+            message: 'Consumer wellness/cosmetic content contains a treatment-style medical claim. Remove it or provide a separately reviewed, legally supported regulated-product claim before publishing.',
+            page: page.slug,
+            sectionId: section.id,
+          });
+          break;
+        }
+      }
+    }
+  }
+}
+
+function scanProductDestinations(config: TenantSiteConfig, issues: SiteValidationIssue[]) {
+  for (const page of config.pages || []) {
+    for (const section of page.sections) {
+      if (section.type !== 'products') continue;
+      const items = Array.isArray(section.content?.items) ? section.content.items : [];
+      items.forEach((raw, index) => {
+        if (!raw || typeof raw !== 'object') return;
+        const item = raw as Record<string, unknown>;
+        const href = text(item.href);
+        const offerId = text(item.offerId || item.offer_id);
+        const checkoutUrl = text(item.checkoutUrl || item.checkout_url);
+        const normalizedHref = href ? normalizePageSlug(href.split('?')[0].split('#')[0]) : '';
+        if ((!href && !offerId && !checkoutUrl) || (normalizedHref === page.slug && !offerId && !checkoutUrl)) {
+          issues.push({
+            severity: 'error',
+            code: 'product_without_purchase_destination',
+            message: `Product ${index + 1} has no real product or checkout destination; it cannot link back to the same Shop page.`,
+            page: page.slug,
+            sectionId: section.id,
+          });
+        }
+      });
+    }
+  }
+}
+
 export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResult {
   const config = ensureComposableSiteConfig(input);
   const issues: SiteValidationIssue[] = [];
@@ -112,6 +176,9 @@ export function validateSiteConfig(input: TenantSiteConfig): SiteValidationResul
   }
 
   for (const nav of config.navigation || []) inspectHref(nav.href, knownPaths, issues, pages.find((page) => page.slug === nav.href) || pages[0] || { id: 'site', slug: '/', title: 'Site', sections: [] });
+
+  scanWellnessClaims(config, issues);
+  scanProductDestinations(config, issues);
 
   const errors = issues.filter((issue) => issue.severity === 'error');
   const warnings = issues.filter((issue) => issue.severity === 'warning');

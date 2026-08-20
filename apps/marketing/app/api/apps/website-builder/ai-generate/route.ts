@@ -9,7 +9,7 @@ import { consumeWebsiteBuilderCredits } from '@/lib/apps/website-builder-trial';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 const PLAN_SITE_LIMITS: Record<string, number | null> = { starter: 1, professional: 3, enterprise: null };
 
@@ -32,11 +32,16 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user?.id) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
-  const { data: subscription } = await supabase.from('user_app_subscriptions').select('plan, status, trial_ends_at').eq('user_id', user.id).eq('app_slug', 'website-builder').maybeSingle();
+  const [subscriptionResult, sitesResult] = await Promise.all([
+    supabase.from('user_app_subscriptions').select('plan, status, trial_ends_at').eq('user_id', user.id).eq('app_slug', 'website-builder').maybeSingle(),
+    supabase.from('user_websites').select('id, site_config, organization_id, subdomain').eq('user_id', user.id).order('updated_at', { ascending: false }),
+  ]);
+  const subscription = subscriptionResult.data;
+  const ownedSites = sitesResult.data;
+
   if (!subscription || !['trial', 'active'].includes(subscription.status || '')) return NextResponse.json({ error: 'Website Builder subscription required' }, { status: 403 });
   if (subscription.status === 'trial' && subscription.trial_ends_at && new Date(subscription.trial_ends_at) < new Date()) return NextResponse.json({ error: 'Website Builder trial has expired', upgradeUrl: '/store/apps/website-builder' }, { status: 403 });
 
-  const { data: ownedSites } = await supabase.from('user_websites').select('id, site_config, organization_id, subdomain').eq('user_id', user.id).order('updated_at', { ascending: false });
   const reusable = (ownedSites || []).find((site) => placeholder(site.site_config));
   const completedCount = (ownedSites || []).filter((site) => !placeholder(site.site_config)).length;
   const plan = subscription.plan || 'starter';
@@ -51,7 +56,7 @@ export async function POST(request: NextRequest) {
   const industry = safeString(body.industry, 'Professional Services', 200);
   const services = safeString(body.services, '', 2500);
   const audience = safeString(body.audience, '', 1200);
-  const style = safeString(body.style, 'professional, modern, trustworthy', 1000);
+  const style = safeString(body.style, 'professional, modern, distinctive', 1000);
   const goal = safeString(body.goal, 'generate qualified leads', 1200);
   const contactEmail = safeString(body.contactEmail, user.email || '', 240);
   const extra = safeString(body.extra, '', 3000);
@@ -75,15 +80,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await aiChat({
+      provider: 'groq',
       messages: [
         {
           role: 'system',
-          content: `You are PARIS, the autonomous website architect inside Elevate Website Builder. Build a complete multi-page website from the business interview. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nCreate the pages the business actually needs, not a fixed template. Usually include Home and Contact plus appropriate pages such as About, Services, Programs, Shop, Booking, FAQ, Gallery, Team, Pricing, or other pages when justified. Use only these section types: hero, rich_text, features, services, products, testimonial, stats, gallery, image, video, faq, team, pricing, cta, contact_form, booking. Each page should have 1-7 useful sections. Every contact page should include contact_form. A contact_form may use content.fields. Supported field types are text, email, tel, textarea, and select. Each field must contain name, label, type, and required; select fields may include options. Every custom lead form MUST include an email field named exactly "email" so the business can contact the lead. Only collect information reasonably needed for the user's stated business purpose; do not request passwords, Social Security numbers, payment-card data, health records, or other unnecessary sensitive data. Use internal links that match the generated page slugs. Do not invent addresses, licenses, accreditations, testimonials, ratings, outcomes, clients, staff members, prices, or legal claims unless supplied by the user. If information is unknown, omit it rather than fabricating it. The generated website must be useful, conversion-focused, responsive-friendly, and specific to the interview.`,
+          content: `You are PARIS, a senior website strategist and designer inside Elevate Website Builder. Build a polished, specific website from the business brief. Return ONLY valid JSON matching this shape:\n${JSON.stringify(responseShape, null, 2)}\n\nThe result must look intentionally designed for this exact business, never like a generic SaaS template. Avoid generic phrases such as "welcome to", "quality service", "your trusted partner", "solutions for you", "we are committed to excellence", or filler statistics. Give the hero a distinctive point of view based on the business, audience, location, services, and requested style. Choose a coherent color system rather than default blue/purple gradients. Create only pages the business truly needs, normally 2-5 pages, and keep each page focused with 1-5 strong sections. Use only these section types: hero, rich_text, features, services, products, testimonial, stats, gallery, image, video, faq, team, pricing, cta, contact_form, booking. Every contact page should include contact_form. Supported field types are text, email, tel, textarea, and select. Every custom lead form MUST include an email field named exactly "email". Only collect information reasonably needed for the stated purpose. Never request passwords, Social Security numbers, payment-card data, health records, or unnecessary sensitive data. Use internal links matching generated slugs. Do not invent addresses, licenses, accreditations, testimonials, ratings, outcomes, clients, staff, prices, or legal claims. If information is unknown, omit it. Make the experience conversion-focused, accessible, mobile-first, and visually distinctive.`,
         },
         { role: 'user', content: `Business name: ${businessName}\nIndustry: ${industry}\nServices/programs: ${services}\nTarget customer: ${audience}\nPreferred style: ${style}\nPrimary website goal: ${goal}\nContact email: ${contactEmail}\nAdditional notes: ${extra}` },
       ],
-      temperature: 0.4,
-      maxTokens: 7000,
+      temperature: 0.5,
+      maxTokens: 3500,
     });
 
     const generated = cleanJson(result.content);

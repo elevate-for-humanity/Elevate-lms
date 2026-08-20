@@ -79,4 +79,4 @@ jobs:
       - name: Verify persisted ESB runtime contract
         run: pnpm tsx scripts/course-builder/verify-esb-runtime.ts
 
-# 2026-08-19 production acceptance rebuild trigger
+# 2026-08-19 20:33 EDT production acceptance rebuild trigger

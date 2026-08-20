@@ -30,6 +30,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 env:
   CI: true
@@ -53,6 +54,9 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
 
       - uses: pnpm/action-setup@v4
         with:
@@ -76,4 +80,37 @@ jobs:
           fi
 
       - name: Build, audit, render full media package, and publish Entrepreneurship course
-        run: pnpm tsx scripts/course-factory/build-esb-acceptance.ts
+        id: acceptance
+        shell: bash
+        run: |
+          set +e
+          pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/esb-acceptance.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log
+          exit 0
+
+      - name: Post result to issue 703
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          EXIT_CODE: ${{ steps.acceptance.outputs.exit_code }}
+        with:
+          script: |
+            const fs = require('fs');
+            const code = process.env.EXIT_CODE || '1';
+            const ok = code === '0';
+            const tail = fs.existsSync('/tmp/esb-acceptance-tail.log')
+              ? fs.readFileSync('/tmp/esb-acceptance-tail.log', 'utf8').slice(-24000)
+              : 'Acceptance command did not produce a log.';
+            const body = `${ok ? 'ESB ACCEPTANCE PASS' : 'ESB ACCEPTANCE FAIL'}\n\nCommit: ${context.sha}\nExit code: ${code}\n\n\`\`\`text\n${tail}\n\`\`\``;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: 703,
+              body,
+            });
+
+      - name: Fail workflow when acceptance failed
+        if: steps.acceptance.outputs.exit_code != '0'
+        run: exit 1

@@ -94,15 +94,6 @@ jobs:
           echo "BUILD_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
           echo "BUILD_TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
 
-      - name: Generate version file
-        run: |
-          node - <<'NODE'
-          const fs = require('fs');
-          const payload = { service: 'marketing', commit: process.env.GITHUB_SHA, builtAt: process.env.BUILD_TIMESTAMP };
-          fs.writeFileSync('public/version.json', JSON.stringify(payload, null, 2) + '\n');
-          NODE
-          cat public/version.json
-
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -117,6 +108,9 @@ jobs:
 
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Audit all canonical hero videos
+        run: pnpm tsx scripts/verify-hero-video-registry.ts --live
 
       - name: Enforce public government-claim integrity
         run: node scripts/check-public-claims.mjs
@@ -178,7 +172,7 @@ jobs:
           git fetch origin main --depth=200
           test "$(git rev-parse HEAD)" = "${{ github.sha }}" || { echo '::error::Checkout moved during deployment'; exit 1; }
           git merge-base --is-ancestor "${{ github.sha }}" origin/main || { echo '::error::Deployment SHA no longer belongs to main'; exit 1; }
-          test "$(git status --porcelain)" = "" || { echo '::error::Checkout became dirty during deployment'; exit 1; }
+          test "$(git status --porcelain)" = "" || { echo '::error::Checkout became dirty during deployment'; git status --short; exit 1; }
           echo "Exact verified Marketing SHA remains ready for deployment: ${{ github.sha }}"
 
       - name: Deploy exact Marketing build
@@ -241,7 +235,7 @@ jobs:
               && [ "$audio_bytes" -gt 1000 ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
               && [ "$html_ok" = "true" ]; then
-              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with the homepage poster, hero copy, and audio asset"
+              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with canonical homepage media and hero registry audit"
               exit 0
             fi
             sleep 20

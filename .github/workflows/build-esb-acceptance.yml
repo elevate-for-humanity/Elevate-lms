@@ -26,7 +26,7 @@ on:
       - 'supabase/migrations/20260820181000_course_microvideo_jobs.sql'
       - 'supabase/migrations/20260820182500_course_domain_readiness.sql'
   issues:
-    types: [opened]
+    types: [opened, reopened]
 
 permissions:
   contents: read

@@ -9,6 +9,7 @@ export type PublicRouteCategory =
   | 'Funding'
   | 'Employers'
   | 'Testing'
+  | 'Platform'
   | 'Store'
   | 'About'
   | 'Legal';
@@ -23,12 +24,13 @@ export type PublicRouteDefinition = {
   index: true;
 };
 
-const changed = '2026-08-18T17:35:00-04:00';
+const changed = '2026-08-20T00:00:00-04:00';
 
 export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: ROUTES.home, label: 'Home', category: 'Main', changeFrequency: 'weekly', priority: 1, lastModified: changed, index: true },
   { path: ROUTES.programs, label: 'All Programs', category: 'Programs', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
   { path: ROUTES.apply, label: 'Apply', category: 'Main', changeFrequency: 'monthly', priority: 0.95, lastModified: changed, index: true },
+
   { path: ROUTES.apprenticeships, label: 'Apprenticeships', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
   { path: ROUTES.apprenticeshipsHowItWorks, label: 'How Apprenticeships Work', category: 'Apprenticeships', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
   { path: ROUTES.programsBeauty, label: 'Barber & Beauty Apprenticeships', category: 'Apprenticeships', changeFrequency: 'weekly', priority: 0.95, lastModified: changed, index: true },
@@ -65,6 +67,10 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: ROUTES.employersHireGraduates, label: 'Hire Graduates', category: 'Employers', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
   { path: ROUTES.forAgencies, label: 'For Agencies', category: 'Employers', changeFrequency: 'monthly', priority: 0.75, lastModified: changed, index: true },
 
+  { path: '/platform', label: 'Platform', category: 'Platform', changeFrequency: 'weekly', priority: 0.9, lastModified: changed, index: true },
+  { path: '/platform/providers', label: 'Training Providers & Program Holders', category: 'Platform', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
+  { path: '/licenses/enterprise-review', label: 'Enterprise Review', category: 'Platform', changeFrequency: 'monthly', priority: 0.85, lastModified: changed, index: true },
+
   { path: ROUTES.testing, label: 'Testing Center', category: 'Testing', changeFrequency: 'weekly', priority: 0.9, lastModified: changed, index: true },
 
   { path: ROUTES.store, label: 'Store', category: 'Store', changeFrequency: 'weekly', priority: 0.9, lastModified: changed, index: true },
@@ -79,6 +85,8 @@ export const PUBLIC_ROUTE_REGISTRY: readonly PublicRouteDefinition[] = [
   { path: '/store/dev-studio', label: 'Dev Studio', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/ai-studio', label: 'AI Studio', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
   { path: '/store/testing', label: 'Testing App', category: 'Store', changeFrequency: 'weekly', priority: 0.8, lastModified: changed, index: true },
+  { path: '/store/compliance', label: 'Compliance Controls', category: 'Store', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
+  { path: '/store/compliance/wioa', label: 'WIOA Reporting Tools', category: 'Store', changeFrequency: 'monthly', priority: 0.75, lastModified: changed, index: true },
 
   { path: ROUTES.about, label: 'About / Mission', category: 'About', changeFrequency: 'monthly', priority: 0.8, lastModified: changed, index: true },
   { path: ROUTES.aboutApprovals, label: 'Approvals', category: 'About', changeFrequency: 'monthly', priority: 0.9, lastModified: changed, index: true },

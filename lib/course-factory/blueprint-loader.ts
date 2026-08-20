@@ -74,7 +74,8 @@ export function resolveBlueprintForProgram(
 }
 
 export async function loadAllBlueprints(): Promise<CredentialBlueprint[]> {
-  return getAllBlueprints().map(sanitizeElevateAuthoredBlueprint);
+  const blueprints = await getAllBlueprints();
+  return blueprints.map(sanitizeElevateAuthoredBlueprint);
 }
 
 export async function getBlueprintBySlug(slug: string): Promise<CredentialBlueprint | null> {

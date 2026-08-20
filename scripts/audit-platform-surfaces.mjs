@@ -188,7 +188,6 @@ function inspectReference({ file, line, value }) {
   }
 }
 
-// Validate the repository's existing canonical surface contract instead of maintaining a second route list.
 const contractsPath = path.join(ROOT, 'lib/routes/platform-surface-contracts.json');
 if (!fs.existsSync(contractsPath)) {
   failures.push('MISSING_CONTRACT lib/routes/platform-surface-contracts.json');
@@ -241,22 +240,33 @@ const literalPattern = /(?:href|src|poster|url|destination|redirectTo)\s*[=:]\s*
 for (const root of sourceRoots) {
   for (const file of walk(root)) {
     const rel = path.relative(ROOT, file).replaceAll('\\', '/');
-    // Page/surface audit. API-generated URLs are audited separately because their
-    // ownership context may be email/SMS rather than the service hosting the route file.
     if (rel.includes('/app/api/')) continue;
     if (!SOURCE_EXTS.has(path.extname(file).toLowerCase())) continue;
     let text;
     try { text = fs.readFileSync(file, 'utf8'); } catch { continue; }
     const lines = text.split(/\r?\n/);
+    let inBlockComment = false;
     for (let index = 0; index < lines.length; index += 1) {
-      for (const match of lines[index].matchAll(literalPattern)) {
+      const line = lines[index];
+      const trimmed = line.trim();
+
+      if (inBlockComment) {
+        if (trimmed.includes('*/')) inBlockComment = false;
+        continue;
+      }
+      if (trimmed.startsWith('/*')) {
+        if (!trimmed.includes('*/', 2)) inBlockComment = true;
+        continue;
+      }
+      if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue;
+
+      for (const match of line.matchAll(literalPattern)) {
         inspectReference({ file, line: index + 1, value: match[1].trim() });
       }
     }
   }
 }
 
-// Store and acquisition-specific surfaces not yet represented in the platform contract.
 const acquisitionRoutes = {
   marketing: ['/', '/programs', '/programs/barber-apprenticeship', '/store', '/store/demo', '/store/trial', '/online-apps'],
   admin: ['/dashboard', '/applications', '/students', '/programs', '/funding', '/partners', '/crm', '/compliance', '/studio', '/studio/courses', '/system-health', '/login'],
@@ -292,8 +302,6 @@ if (failures.length) {
   }
   for (const [kind, items] of grouped) {
     console.error(`\n--- ${kind}: ${items.length} ---`);
-    // Keep CI logs actionable. Full counts remain visible while each category
-    // prints the first 100 concrete failures for repair iterations.
     console.error(items.slice(0, 100).map((item) => `AUDIT_ERROR ${item}`).join('\n'));
   }
   process.exit(1);

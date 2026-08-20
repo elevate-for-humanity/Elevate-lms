@@ -46,6 +46,9 @@ jobs:
       - name: Portal/database schema drift — live production contract
         if: github.event_name != 'pull_request'
         run: pnpm audit:schema:strict
+      - name: Supabase write payloads — live production contract
+        if: github.event_name != 'pull_request'
+        run: pnpm tsx scripts/audit-supabase-mutations.ts
       - name: Portal/database schema drift — PR advisory
         if: github.event_name == 'pull_request'
         run: pnpm audit:schema

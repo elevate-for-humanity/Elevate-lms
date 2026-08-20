@@ -5,6 +5,7 @@ import { WebsiteAdvancedSettings } from '@/components/website-builder/WebsiteAdv
 import { AutonomousWebsiteBuilder } from '@/components/website-builder/AutonomousWebsiteBuilder';
 import { ZeroCodeStructureEditor } from '@/components/website-builder/ZeroCodeStructureEditor';
 import { DomainPanel } from '@/components/website-builder/DomainPanel';
+import { BusinessCardsPanel } from '@/components/website-builder/BusinessCardsPanel';
 import { buildDefaultSiteConfig, mergeSiteConfig } from '@/lib/tenant/default-site-config';
 import { ensureComposableSiteConfig } from '@/lib/tenant/site-composition';
 import type { TenantSiteConfig } from '@/lib/tenant/site-types';
@@ -50,6 +51,7 @@ export default async function WebsiteEditorPage({ params }: Props) {
         initiallyPublished={Boolean(site.is_published)}
         initialConfig={config}
       />
+      <BusinessCardsPanel websiteId={site.id} />
       <DomainPanel websiteId={site.id} isPublished={Boolean(site.is_published)} />
       <WebsiteAdvancedSettings websiteId={site.id} initialConfig={config} />
     </>

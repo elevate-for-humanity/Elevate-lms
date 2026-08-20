@@ -1,6 +1,8 @@
 import 'server-only';
 import { requireAdminClient } from '@/lib/supabase/admin';
 
+export type PublicHostShopMedia = { url: string; alt?: string; source?: string };
+
 export type PublicHostShop = {
   id: string;
   public_slug: string;
@@ -20,6 +22,11 @@ export type PublicHostShop = {
   featured: boolean | null;
   display_order: number | null;
   public_profile_published_at: string | null;
+  media_gallery: PublicHostShopMedia[] | null;
+  video_url: string | null;
+  source_url: string | null;
+  google_maps_url: string | null;
+  media_verified_at: string | null;
 };
 
 export async function listPublicHostShops(): Promise<PublicHostShop[]> {

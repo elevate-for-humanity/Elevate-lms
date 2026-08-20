@@ -61,9 +61,25 @@ export async function submitProviderProgram(formData: FormData) {
     throw new Error('Program approval submission could not be created');
   }
 
-  await db.from('provider_onboarding_steps').update({ completed: true, completed_at: new Date().toISOString(), completed_by: access.user.id }).eq('tenant_id', tenantId).eq('step', 'first_program_submitted');
+  const { error: onboardingError } = await db
+    .from('provider_onboarding_steps')
+    .update({
+      status: 'completed',
+      completed_at: new Date().toISOString(),
+      completed_by: access.user.id,
+    })
+    .eq('tenant_id', tenantId)
+    .eq('step', 'first_program_submitted');
+
+  if (onboardingError) {
+    // The program and its approval request are valid and must not be destroyed
+    // merely because a derived onboarding marker failed. Surface the failure so
+    // operations can repair it instead of silently reporting false completion.
+    throw new Error(`Program submitted, but provider onboarding could not be updated: ${onboardingError.message}`);
+  }
 
   revalidatePath('/provider/programs');
+  revalidatePath('/provider/dashboard');
   const suffix = access.isPlatformAdmin ? `?tenant=${encodeURIComponent(tenantId)}` : '';
   redirect(`/provider/programs${suffix}`);
 }

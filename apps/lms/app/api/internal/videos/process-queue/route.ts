@@ -10,11 +10,15 @@ const ADMIN_URL = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevatefor
  * Compatibility shim only. Rendering belongs to the Admin/Course Factory runtime.
  * Keeping this lightweight endpoint preserves existing scheduler callers without
  * pulling Remotion, esbuild/Rspack, or edge-tts into the learner application.
+ *
+ * The LMS does not own CRON_SECRET. It only requires a bearer credential to be
+ * present and forwards it unchanged; the Admin-owned worker is the single
+ * authority that validates the secret. This avoids coupling queue processing to
+ * a duplicate secret configuration in the learner container.
  */
 export async function POST(request: NextRequest) {
-  const secret = process.env.CRON_SECRET;
   const authorization = request.headers.get('authorization');
-  if (!secret || authorization !== `Bearer ${secret}`) {
+  if (!authorization?.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

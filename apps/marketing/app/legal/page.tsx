@@ -23,6 +23,7 @@ const groups = [
   {
     title: 'Platform & commercial terms',
     links: [
+      { title: 'Terms of Service', href: '/terms-of-service', desc: 'General terms governing use of Elevate websites, training services, accounts, platform features, and related services.' },
       { title: 'End User License Agreement', href: '/legal/eula', desc: 'Terms governing use of Elevate software and digital services.' },
       { title: 'Acceptable Use Agreement', href: '/legal/acceptable-use', desc: 'Permitted and prohibited use of technology resources.' },
       { title: 'Software License Agreement', href: '/legal/license-agreement', desc: 'License terms for organizations using the platform.' },

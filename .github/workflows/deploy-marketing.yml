@@ -21,7 +21,10 @@ permissions:
 
 concurrency:
   group: northflank-marketing-deploy
-  cancel-in-progress: true
+  # Multiple environments commit to main. Do not cancel a running production
+  # build when a newer revision arrives; queue it so at least one known-good
+  # revision can converge, then the newer revision deploys behind it.
+  cancel-in-progress: false
 
 env:
   EXPECTED_SHA: ${{ github.sha }}

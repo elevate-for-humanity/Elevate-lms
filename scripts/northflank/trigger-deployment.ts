@@ -1,16 +1,17 @@
 #!/usr/bin/env tsx
 /**
- * Deploy one exact Northflank build without changing the service replica count.
+ * Deploy one exact Northflank build.
  *
- * The image is built and verified before this script runs. For the one-replica
- * service, recreate is applied only at this deployment step so Northflank does
- * not require capacity for a second full-size replica during cutover.
+ * The build is created and verified before this script runs. Deployment must use
+ * Northflank's deployment endpoint with the exact build service, build ID, and
+ * commit SHA. Updating combined-service configuration alone does not guarantee
+ * that the running container is replaced.
  *
  * Usage:
  *   npx tsx scripts/northflank/trigger-deployment.ts <service-id> --build-id <build-id> --sha <sha>
  */
 
-import { combinedServicePatchPath, nfFetch, resolveProjectId } from './lib';
+import { nfFetch, projectApiPath, resolveProjectId } from './lib';
 
 function readArgument(name: string): string | undefined {
   const index = process.argv.indexOf(name);
@@ -45,13 +46,13 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  console.log('=== EXACT SINGLE-REPLICA DEPLOYMENT ===');
+  console.log('=== EXACT NORTHFLANK DEPLOYMENT ===');
   console.log(`Service:  ${serviceId}`);
   console.log(`Build ID: ${buildId}`);
   console.log(`SHA:      ${sha}`);
   console.log(`Branch:   ${branch}`);
 
-  const patchPath = combinedServicePatchPath(projectId, serviceId);
+  const deploymentPath = projectApiPath(projectId, `/services/${serviceId}/deployment`);
   const deploymentPayload = {
     internal: {
       id: serviceId,
@@ -60,18 +61,15 @@ async function main(): Promise<void> {
       buildId,
     },
     docker: { configType: 'default' as const },
-    deployment: {
-      strategy: { type: 'recreate' as const },
-    },
   };
 
-  await nfFetch(patchPath, {
-    method: 'PATCH',
+  await nfFetch(deploymentPath, {
+    method: 'POST',
     body: JSON.stringify(deploymentPayload),
   });
 
-  console.log('Exact recreate deployment accepted after build verification.');
-  console.log('Replica count was preserved; readiness and SHA checks will verify recovery.');
+  console.log('Exact Northflank deployment request accepted.');
+  console.log(`Deployment source locked to build ${buildId} at ${sha}.`);
 }
 
 main().catch((error) => {

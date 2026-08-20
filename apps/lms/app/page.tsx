@@ -1,9 +1,8 @@
 import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
 export default function LMSRootPage() {
-  // Keep the service root deterministic and dependency-free. The login flow
-  // resolves the authenticated user's authoritative portal after sign-in.
+  // Bare LMS root must never depend on Supabase, cookies, or another runtime
+  // service. The config-level redirect handles the normal request path; this
+  // page is the dependency-free fallback if routing reaches the app layer.
   redirect('/login');
 }

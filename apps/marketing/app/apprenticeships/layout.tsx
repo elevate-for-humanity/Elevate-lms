@@ -3,26 +3,35 @@ import type { Metadata } from 'next';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export const metadata: Metadata = {
-  title: 'Apprenticeship Programs | Earn While You Learn',
+  title: 'Registered Apprenticeship Programs in Indiana | Elevate for Humanity',
   description:
-    'DOL-registered apprenticeship programs in barbering, cosmetology, culinary arts, and skilled trades. Earn while you learn with hands-on training and job placement.',
+    'Explore Indiana apprenticeship pathways in barbering, cosmetology, esthetics, and nail technology with supervised host-site training, related instruction, progress tracking, and licensing preparation.',
+  keywords: [
+    'registered apprenticeship Indiana',
+    'apprenticeship programs Indianapolis',
+    'barber apprenticeship Indiana',
+    'cosmetology apprenticeship Indiana',
+    'esthetician apprenticeship Indiana',
+    'nail technician apprenticeship Indiana',
+    'beauty apprenticeship Indiana',
+    'earn while you learn Indiana',
+  ],
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apprenticeships',
   },
   openGraph: {
-    title: 'Apprenticeship Programs - Earn While You Learn',
+    title: 'Registered Apprenticeship Programs in Indiana',
     description:
-      'DOL-registered apprenticeships in barbering, cosmetology, culinary arts, and skilled trades. Hands-on training with job placement.',
+      'Compare barber, cosmetology, esthetician, and nail technician apprenticeship pathways with supervised host-site training and related instruction.',
     url: 'https://www.elevateforhumanity.org/apprenticeships',
     siteName: PLATFORM_DEFAULTS.orgName,
-    images: [{ url: '/og-default.webp', width: 1200, height: 630, alt: 'Apprenticeship Programs' }],
+    images: [{
+      url: '/og-default.webp',
+      width: 1200,
+      height: 630,
+      alt: 'Indiana registered apprenticeship programs at Elevate for Humanity',
+    }],
     type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Apprenticeship Programs - Earn While You Learn',
-    description: 'Paid apprenticeships with hands-on training and job placement.',
-    images: ['/og-default.webp'],
   },
 };
 

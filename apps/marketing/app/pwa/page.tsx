@@ -10,7 +10,7 @@ export const revalidate = 300;
 
 export default function MarketingPwaPage() {
   return (
-    <main className="min-h-[70vh] bg-white px-5 py-10 text-slate-950">
+    <main className="min-h-[70vh] bg-white px-5 py-10 text-slate-950" data-pwa-launcher="marketing">
       <div className="mx-auto max-w-5xl">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Elevate app</p>
         <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Choose where you want to go.</h1>

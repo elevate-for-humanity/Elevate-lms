@@ -100,13 +100,13 @@ export const FEATURE_REGISTRY: FeatureDefinition[] = [
 
   // ── Admin ────────────────────────────────────────────────────────────────
   {
-    id: 'blockchain-credential-verification',
-    name: 'Blockchain Credential Verification',
-    description: 'On-chain credential issuance and verification UI.',
+    id: 'credential-integrity-verification',
+    name: 'Cryptographic Credential Verification',
+    description: 'SHA-256 integrity evidence and live credential-record verification backed by the canonical certificate registry.',
     component: '@/components/BlockchainCredentialVerification',
     surface: 'admin-compliance',
     category: 'compliance',
-    status: 'beta',
+    status: 'enabled',
   },
   {
     id: 'job-placement-tracking',

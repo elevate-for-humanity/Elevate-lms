@@ -37,6 +37,10 @@ jobs:
         run: node scripts/verify-payment-lifecycle-contract.mjs
       - name: Canonical platform route and auth doctor
         run: node scripts/platform-doctor-static.mjs
+      - name: Canonical portal contracts
+        run: node scripts/audit-portal-contracts.mjs
+      - name: Portal/database schema drift
+        run: pnpm audit:schema:strict
       - name: Assemble canonical PWA runtime assets
         run: |
           node scripts/sync-pwa-public.mjs marketing

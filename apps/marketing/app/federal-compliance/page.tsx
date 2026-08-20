@@ -76,7 +76,7 @@ export default function FederalCompliancePage() {
             <Link href="/accessibility" className="rounded-lg border border-slate-200 bg-white p-4 font-bold hover:bg-slate-100">Accessibility Statement</Link>
             <Link href="/security-and-data-protection" className="rounded-lg border border-slate-200 bg-white p-4 font-bold hover:bg-slate-100">Security & Data Protection</Link>
             <Link href="/equal-opportunity" className="rounded-lg border border-slate-200 bg-white p-4 font-bold hover:bg-slate-100">Equal Opportunity</Link>
-            <Link href="/about/approvals" className="rounded-lg border border-slate-200 bg-white p-4 font-bold hover:bg-slate-100">Approvals & Evidence</Link>
+            <Link href="/approvals" className="rounded-lg border border-slate-200 bg-white p-4 font-bold hover:bg-slate-100">Approvals & Evidence</Link>
             <Link href="/legal" className="rounded-lg border border-slate-200 bg-white p-4 font-bold hover:bg-slate-100">Legal Document Index</Link>
           </div>
         </section>

@@ -2,9 +2,8 @@ import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Authenticated LMS namespaces. Authorization remains enforced by the route
- * layouts/pages, but these paths must never render for an anonymous request.
- * Public portal landing/login pages are intentionally excluded.
+ * Authenticated LMS namespaces. This is a defense-in-depth request boundary;
+ * route layouts/pages must still enforce role/tenant authorization.
  */
 const PROTECTED_PREFIXES = [
   '/lms/dashboard',
@@ -24,9 +23,18 @@ const PROTECTED_PREFIXES = [
   '/workforce',
   '/program-holder',
   '/creator',
+  '/account',
+  '/billing',
+  '/builder',
+  '/ai',
+  '/ai-chat',
+  '/ai-chat-standalone',
 ] as const;
 
 function isProtectedPath(pathname: string) {
+  // Any route explicitly named as a dashboard is private even if a new role
+  // namespace is added and forgotten in PROTECTED_PREFIXES.
+  if (pathname === '/dashboard' || pathname.includes('/dashboard/')) return true;
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
@@ -54,9 +62,8 @@ function authCookieOptions(
 
 /**
  * Refresh Supabase sessions once at the LMS request boundary and persist any
- * rotated cookies to the browser. Protected portal namespaces also receive an
- * authenticated-user gate here so a missing/expired session cannot reach a
- * dashboard before page-level role authorization runs.
+ * rotated cookies. Protected portal routes fail closed for anonymous/expired
+ * sessions before React renders anything.
  */
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
@@ -100,7 +107,10 @@ export async function middleware(req: NextRequest) {
     if (protectedPath && (error || !user)) {
       const loginUrl = new URL(loginPathFor(pathname), req.url);
       loginUrl.searchParams.set('redirect', `${pathname}${req.nextUrl.search}`);
-      return NextResponse.redirect(loginUrl);
+      const redirectResponse = NextResponse.redirect(loginUrl);
+      redirectResponse.headers.set('Cache-Control', 'private, no-store, max-age=0');
+      redirectResponse.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+      return redirectResponse;
     }
   }
 
@@ -114,6 +124,7 @@ export async function middleware(req: NextRequest) {
 
   if (protectedPath) {
     response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
   }
 
   return response;

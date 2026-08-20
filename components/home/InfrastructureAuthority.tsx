@@ -1,117 +1,79 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { ScrollReveal } from '@/components/ui/ScrollReveal';
-import { Shield, BarChart3, Lock, FileCheck, Users, Globe } from 'lucide-react';
+import { ShieldCheck, BarChart3, LockKeyhole, FileCheck2, Users, BadgeCheck } from 'lucide-react';
 
 const CAPABILITIES = [
   {
-    icon: Shield,
-    title: 'WIOA / WRG / JRI Compliant',
-    desc: 'Every enrollment, credential, and outcome tracked to federal and state reporting standards.',
+    icon: ShieldCheck,
+    title: 'Program-Specific Funding Controls',
+    desc: 'Public WIOA, ETPL, and Workforce Ready Grant statements are limited to program records with verified evidence and do not guarantee participant authorization.',
   },
   {
     icon: BarChart3,
-    title: 'Real-Time Outcome Tracking',
-    desc: 'Enrollment, completion, credential attainment, employment, and wage gains — all auditable.',
+    title: 'Recorded Outcome Evidence',
+    desc: 'Enrollment, completion, credential, intervention, employment, and wage-related records can be retained when the applicable workflow is used.',
   },
   {
-    icon: Lock,
-    title: 'FERPA-Compliant Data Handling',
-    desc: 'Role-based access, encrypted PII, audit logs on every record access.',
+    icon: LockKeyhole,
+    title: 'Education Data Access Controls',
+    desc: 'Authentication, role-based access, tenant scoping, row-level security, consent records, and audit events support protected learner-data administration.',
   },
   {
-    icon: FileCheck,
-    title: 'Audit-Ready Documentation',
-    desc: 'Exportable reports, compliance dashboards, and automated alert systems.',
+    icon: FileCheck2,
+    title: 'Audit & Reporting Infrastructure',
+    desc: 'PIRL mapping/export, compliance-report, apprenticeship, credential, and administrative evidence can be reviewed by authorized roles.',
   },
   {
     icon: Users,
-    title: 'Multi-Tenant Architecture',
-    desc: 'Partner portals, employer dashboards, and workforce board views — each with scoped access.',
+    title: 'Role-Scoped Portals',
+    desc: 'Learner, apprentice, employer, partner, workforce, instructor, and administrative experiences are governed through authenticated role and data boundaries.',
   },
   {
-    icon: Globe,
-    title: 'ETPL-Approved Provider',
-    desc: "Listed on Indiana's Eligible Training Provider List. Programs aligned with state demand occupations.",
+    icon: BadgeCheck,
+    title: 'Registered Apprenticeship Sponsor Evidence',
+    desc: 'The organization maintains U.S. Department of Labor sponsor registration evidence. Individual occupations and participants remain governed by their applicable registered standards.',
   },
 ];
 
 export default function InfrastructureAuthority() {
   return (
-    <section className="py-20 sm:py-28 border-t border-slate-100">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left: positioning */}
+    <section className="border-t border-slate-100 py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid items-center gap-16 lg:grid-cols-2">
           <ScrollReveal direction="left">
             <div>
-              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
-                Workforce Infrastructure
-              </p>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-6 leading-tight">
-                Not a training center.
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue-600 to-brand-blue-800">
-                  A workforce delivery system.
-                </span>
+              <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-500">Workforce infrastructure</p>
+              <h2 className="mb-6 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">
+                Training delivery backed by inspectable workforce records.
               </h2>
-              <p className="text-lg text-slate-600 mb-8">
-                Secure, trackable, compliant workforce training infrastructure. Multi-tenant portals
-                for students, employers, and government partners — each with role-based access and
-                real-time reporting.
+              <p className="mb-8 text-lg text-slate-600">
+                Elevate combines public program information with authenticated training, apprenticeship, employer, agency, credential, and reporting workflows. Claims are constrained by the evidence and controls implemented for the exact program or feature.
               </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/platform"
-                  className="inline-flex items-center justify-center gap-2 bg-slate-900 text-white font-bold px-8 py-4 rounded-xl hover:bg-slate-800 transition-all"
-                >
-                  Platform Overview
-                </Link>
-                <Link
-                  href="/compliance"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-xl hover:bg-slate-50 transition-all"
-                >
-                  Compliance Details
-                </Link>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <Link href="/platform" className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-8 py-4 font-bold text-white transition-all hover:bg-slate-800">Platform Overview</Link>
+                <Link href="/store/compliance" className="inline-flex items-center justify-center rounded-xl border-2 border-slate-300 px-8 py-4 font-semibold text-slate-700 transition-all hover:bg-slate-50">Compliance Controls</Link>
               </div>
 
-              {/* Partner logos */}
-              <div className="mt-12 pt-8 border-t border-slate-200">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
-                  Approved &amp; Recognized By
+              <div className="mt-12 border-t border-slate-200 pt-8">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Evidence model</p>
+                <p className="text-sm leading-relaxed text-slate-600">
+                  Organization-level sponsor or provider evidence does not automatically make every program funded, approved, certified, or compliant. Program-level regulatory records control those public statements.
                 </p>
-                <div className="flex items-center gap-3 flex-wrap">
-                  {[
-                    { label: 'U.S. Department of Labor', sub: 'DOL Registered', color: 'bg-blue-50 text-blue-700' },
-                    { label: 'Indiana DWD', sub: 'WIOA Approved', color: 'bg-emerald-50 text-emerald-700' },
-                    { label: 'WorkOne Indiana', sub: 'Workforce Partner', color: 'bg-amber-50 text-amber-700' },
-                    { label: 'Next Level Jobs', sub: 'State Funded', color: 'bg-purple-50 text-purple-700' },
-                  ].map((partner) => (
-                    <div
-                      key={partner.label}
-                      className={`px-4 py-2.5 rounded-xl border border-slate-200 ${partner.color} opacity-80 hover:opacity-100 transition-opacity text-center min-w-[130px]`}
-                    >
-                      <div className="text-xs font-bold leading-tight">{partner.label}</div>
-                      <div className="text-[10px] font-medium opacity-75 mt-0.5">{partner.sub}</div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
           </ScrollReveal>
 
-          {/* Right: capability grid */}
-          <div className="grid sm:grid-cols-2 gap-4">
-            {CAPABILITIES.map((cap, i) => {
+          <div className="grid gap-4 sm:grid-cols-2">
+            {CAPABILITIES.map((cap, index) => {
               const Icon = cap.icon;
               return (
-                <ScrollReveal key={i} delay={i * 80} direction="right">
-                  <div className="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all bg-white group">
-                    <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-brand-blue-50 flex items-center justify-center mb-3 transition-colors">
-                      <Icon className="w-5 h-5 text-slate-600 group-hover:text-brand-blue-600 transition-colors" />
+                <ScrollReveal key={cap.title} delay={index * 80} direction="right">
+                  <div className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all hover:border-slate-300 hover:shadow-md">
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 transition-colors group-hover:bg-brand-blue-50">
+                      <Icon className="h-5 w-5 text-slate-600 transition-colors group-hover:text-brand-blue-600" />
                     </div>
-                    <h3 className="font-bold text-slate-900 mb-1">{cap.title}</h3>
-                    <p className="text-sm text-slate-500">{cap.desc}</p>
+                    <h3 className="mb-1 font-bold text-slate-900">{cap.title}</h3>
+                    <p className="text-sm leading-relaxed text-slate-500">{cap.desc}</p>
                   </div>
                 </ScrollReveal>
               );

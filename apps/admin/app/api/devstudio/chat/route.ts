@@ -38,7 +38,7 @@ import {
   isOperationalDiagnosticRequest,
 } from '@/lib/platform/admin-ai-assistant';
 import { existsSync, readFileSync } from 'fs';
-import { execFileSync, execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import path from 'path';
 
 type ToolCallRecord = { tool: string; args: Record<string, unknown>; result: string };
@@ -92,7 +92,7 @@ const TOOLS: any[] = [
     type: 'function',
     function: {
       name: 'list_enrollments',
-      description: 'List recent enrollments with status and timestamps.',
+      description: 'List recent canonical program enrollments with status and timestamps.',
       parameters: {
         type: 'object',
         properties: {
@@ -107,7 +107,7 @@ const TOOLS: any[] = [
     type: 'function',
     function: {
       name: 'get_dashboard_stats',
-      description: 'Get headline metrics: enrollments, pending applications, certificates, active programs.',
+      description: 'Get headline metrics from the same canonical tables used by the Admin dashboard.',
       parameters: { type: 'object', properties: {}, required: [] },
     },
   },
@@ -115,7 +115,7 @@ const TOOLS: any[] = [
     type: 'function',
     function: {
       name: 'get_recent_applications',
-      description: 'List recent intake submissions with status and applicant info.',
+      description: 'List recent applications from the canonical applications table.',
       parameters: {
         type: 'object',
         properties: {
@@ -302,9 +302,9 @@ const TOOLS: any[] = [
     function: {
       name: 'build_course',
       description:
-        'Generate a complete course draft (modules + lessons + checkpoints) from a title and description. ' +
-        'Returns a course_draft object the user can review and save. ' +
-        'Use when the user says "build a course", "create a course", "make a course about", "generate a course", etc.',
+        'Generate, validate, persist, and governance-normalize a complete course as a governed draft through the canonical Course Factory. ' +
+        'Use when the user says "build a course", "create a course", "make a course about", or "generate a course". ' +
+        'The course is saved in one tool call; publishing remains a separate governed action.',
       parameters: {
         type: 'object',
         properties: {
@@ -313,6 +313,9 @@ const TOOLS: any[] = [
           audience:           { type: 'string',  description: 'Target learner (e.g. "adult workforce learners")' },
           modules:            { type: 'number',  description: 'Number of modules (default 5)' },
           lessons_per_module: { type: 'number',  description: 'Lessons per module (default 3)' },
+          hours:              { type: 'number',  description: 'Target training hours when known' },
+          state:              { type: 'string',  description: 'State/jurisdiction when relevant' },
+          credential:         { type: 'string',  description: 'Credential or license target when relevant' },
         },
         required: ['title'],
       },
@@ -323,15 +326,13 @@ const TOOLS: any[] = [
     function: {
       name: 'save_course',
       description:
-        'Persist a reviewed course through the canonical Course Factory. ' +
-        'This never inserts into legacy course/module/lesson tables directly. ' +
-        'Returns a governed course_saved result with the canonical courseId and Studio link.',
+        'Compatibility tool for an older reviewed course draft. It persists only through the canonical Course Factory; it never writes legacy course/module/lesson tables directly.',
       parameters: {
         type: 'object',
         properties: {
           course: {
             type: 'object',
-            description: 'The course draft object returned by build_course',
+            description: 'A legacy course draft object that has not already been persisted',
           },
         },
         required: ['course'],
@@ -344,12 +345,11 @@ const TOOLS: any[] = [
       name: 'generate_videos',
       description:
         'Start video generation for a saved course. Uses TTS narration (OpenAI) + Pexels b-roll + ffmpeg pipeline. ' +
-        'Call after save_course returns a courseId. ' +
         'Use when user says "generate videos", "make videos for this course", "add videos", etc.',
       parameters: {
         type: 'object',
         properties: {
-          course_id:  { type: 'string',  description: 'Course ID from save_course' },
+          course_id:  { type: 'string',  description: 'Canonical course ID from build_course/save_course' },
           voice:      { type: 'string',  description: 'TTS voice: alloy | echo | fable | onyx | nova | shimmer (default alloy)' },
           use_pexels: { type: 'boolean', description: 'Use Pexels b-roll footage (default true)' },
         },
@@ -665,7 +665,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-
 export const metadata: Metadata = {
   title: '${pageTitle} | \${PLATFORM_DEFAULTS.orgName}',
   description: '${pageTitle} for ${audience}.',
@@ -744,11 +743,12 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     case 'get_dashboard_stats': {
       const db = await requireAdminClient();
+      const pendingStatuses = ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review'];
       const [enrollRes, appRes, certRes, progRes] = await Promise.all([
         db.from('program_enrollments').select('id', { count: 'exact', head: true }),
-        db.from('intake_submissions')
+        db.from('applications')
           .select('id', { count: 'exact', head: true })
-          .eq('status', 'pending'),
+          .in('status', pendingStatuses),
         db.from('program_completion_certificates').select('id', {
           count: 'exact',
           head: true,
@@ -773,11 +773,15 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
       const db = await requireAdminClient();
       const limit = typeof args.limit === 'number' ? args.limit : 10;
       let q = db
-        .from('intake_submissions')
-        .select('id, status, created_at, program_interest, first_name, last_name, email')
+        .from('applications')
+        .select('id, status, created_at, submitted_at, program_interest, program_slug, first_name, last_name, full_name, email')
         .order('created_at', { ascending: false })
         .limit(limit);
-      if (args.status) q = (q as typeof q).eq('status', String(args.status));
+      if (args.status === 'pending') {
+        q = q.in('status', ['pending', 'submitted', 'in_review', 'under_review', 'pending_admin_review']);
+      } else if (args.status) {
+        q = q.eq('status', String(args.status));
+      }
       const { data, error } = await q;
       if (error) return `Error: Database query failed`;
       return JSON.stringify(data, null, 2);
@@ -921,60 +925,75 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
 
     // ── Course generation ──────────────────────────────────────────────────
     case 'build_course': {
-      const title       = String(args.title || '');
-      const description = String(args.description || '');
-      const audience    = String(args.audience || 'adult learners');
-      const modules     = Number(args.modules || 5);
-      const lessonsEach = Number(args.lessons_per_module || 3);
-
+      const title = String(args.title || '').trim();
       if (!title) return 'title is required to build a course';
 
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
-        const res = await fetch(`${baseUrl}/api/admin/courses/ai-builder/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-internal-key': process.env.INTERNAL_API_KEY || '' },
-          body: JSON.stringify({ title, description, audience, modules, lessons_per_module: lessonsEach }),
-        }).catch(() => null);
+      const description = String(args.description || title).trim();
+      const audience = String(args.audience || 'adult workforce learners').trim();
+      const moduleCount = Math.max(1, Math.min(40, Number(args.modules || 5)));
+      const lessonsPerModule = Math.max(1, Math.min(20, Number(args.lessons_per_module || 3)));
+      const hours = Number(args.hours || 0) || undefined;
+      const state = typeof args.state === 'string' ? args.state.trim() || undefined : undefined;
+      const credential = typeof args.credential === 'string' ? args.credential.trim() || undefined : undefined;
 
-        if (res?.ok) {
-          const data = await res.json();
-          return JSON.stringify({ __type: 'course_draft', course: data.course }, null, 2);
-        }
-      } catch { /* fall through to inline generation */ }
-
-      const moduleList = Array.from({ length: modules }, (_, mi) => ({
-        title: `Module ${mi + 1}`,
-        sort_order: mi + 1,
-        lessons: Array.from({ length: lessonsEach }, (_, li) => ({
-          lesson_number: mi * lessonsEach + li + 1,
-          title: `Lesson ${mi * lessonsEach + li + 1}`,
-          description: '',
-          content: '',
-          duration_minutes: 30,
-          step_type: li === lessonsEach - 1 ? 'checkpoint' : 'lesson',
-          quiz_questions: [],
-        })),
-      }));
-
-      const draft = {
+      const { courseFactory } = await import('@/lib/course-factory');
+      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
+      const result = await courseFactory({
         title,
-        subtitle: description,
-        description,
+        topic: description,
         audience,
-        duration_hours: modules * lessonsEach * 0.5,
-        category: 'general',
-        passing_score: 70,
-        completion_rule: 'all_lessons',
-        modules: moduleList,
-      };
+        hours,
+        state,
+        credential,
+        moduleCount,
+        lessonsPerModule,
+        contentSource: 'ai',
+        mode: 'refresh',
+        videoMode: 'queue',
+        dryRun: false,
+      });
 
-      return JSON.stringify({ __type: 'course_draft', course: draft }, null, 2);
+      let governance = null;
+      if (result.ok && result.courseId) {
+        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+      }
+
+      return JSON.stringify({
+        __type: 'course_saved',
+        success: result.ok,
+        courseId: result.courseId ?? null,
+        courseSlug: result.courseSlug ?? null,
+        title: result.title ?? title,
+        modulesGenerated: result.moduleCount ?? 0,
+        lessonsGenerated: result.lessonCount ?? 0,
+        assessmentsGenerated: result.assessmentsGenerated ?? 0,
+        videosQueued: result.videosQueued ?? 0,
+        governance,
+        warnings: result.warnings ?? [],
+        errors: result.errors ?? [],
+        status: result.status ?? null,
+        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
+        message: result.ok
+          ? `Course "${result.title ?? title}" was generated and saved through the canonical Course Factory as a governed draft.`
+          : 'Course generation did not persist because the canonical Course Factory did not pass its evidence, completeness, or validation gates.',
+      }, null, 2);
     }
 
     case 'save_course': {
       const course = args.course as Record<string, unknown>;
       if (!course?.title) return 'course object with title is required';
+
+      const existingId = String(course.courseId || course.course_id || '').trim();
+      if (existingId) {
+        return JSON.stringify({
+          __type: 'course_saved',
+          success: true,
+          courseId: existingId,
+          title: String(course.title),
+          url: `/studio/courses/${existingId}`,
+          message: 'This course is already persisted through the canonical Course Factory. No duplicate save was performed.',
+        }, null, 2);
+      }
 
       const courseModules = Array.isArray(course.modules) ? course.modules as Array<Record<string, unknown>> : [];
       const moduleCount = Math.max(1, Math.min(40, courseModules.length || 5));
@@ -1062,7 +1081,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         return JSON.stringify({
           __type: 'video_generation_started',
           courseId,
-          message: 'Video generation queued. Check /admin/courses/' + courseId + ' for progress.',
+          message: 'Video generation queued. Check /studio/courses/' + courseId + ' for progress.',
         });
       } catch {
         return 'Video generation failed';
@@ -1106,7 +1125,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
     }
 
     case 'apply_document_to_application': {
-      const documentId   = String(args.document_id || '');
+      const documentId = String(args.document_id || '');
       const applicationId = String(args.application_id || '');
       if (!documentId || !applicationId) return 'document_id and application_id are required';
 
@@ -1139,7 +1158,7 @@ async function execTool(name: string, args: Record<string, unknown>): Promise<st
         .update({ ...applicationUpdate, updated_at: new Date().toISOString() })
         .eq('id', applicationId);
 
-      if (error) return `Failed to update application`;
+      if (error) return 'Failed to update application';
 
       await db.from('documents').update({
         application_id: applicationId,

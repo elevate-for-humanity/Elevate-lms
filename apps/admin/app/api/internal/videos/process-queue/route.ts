@@ -14,6 +14,21 @@ function renderConcurrency(): number {
   return Math.max(1, Math.min(Math.trunc(parsed), 4));
 }
 
+async function syncLessonQueueState(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  rows: Array<{ lesson_id?: string | null; asset_kind?: string | null }>,
+) {
+  const lessonIds = rows
+    .filter((row) => (row.asset_kind ?? 'lesson') === 'lesson' && row.lesson_id)
+    .map((row) => row.lesson_id as string);
+  if (!lessonIds.length) return;
+
+  await db
+    .from('course_lessons')
+    .update({ video_status: 'queued', video_error: null })
+    .in('id', lessonIds);
+}
+
 export async function POST(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
@@ -21,29 +36,44 @@ export async function POST(request: NextRequest) {
   }
 
   const db = await requireAdminClient();
+  const now = new Date().toISOString();
+
+  // Recover workers that died after claiming a job.
   const staleBefore = new Date(Date.now() - 45 * 60 * 1000).toISOString();
   const { data: recovered } = await db
     .from('video_jobs')
     .update({
       status: 'queued',
       started_at: null,
+      completed_at: null,
       error_message: 'Recovered after render worker timeout',
-      updated_at: new Date().toISOString(),
+      queued_at: now,
+      updated_at: now,
     })
     .eq('status', 'rendering')
     .lt('started_at', staleBefore)
     .select('lesson_id,asset_kind,asset_key');
+  await syncLessonQueueState(db, recovered ?? []);
 
-  const recoveredLessonIds = (recovered ?? [])
-    .filter((row) => (row.asset_kind ?? 'lesson') === 'lesson')
-    .map((row) => row.lesson_id)
-    .filter(Boolean);
-  if (recoveredLessonIds.length > 0) {
-    await db
-      .from('course_lessons')
-      .update({ video_status: 'queued', video_error: null })
-      .in('id', recoveredLessonIds);
-  }
+  // One-time recovery path for the historical Edge TTS datacenter 403 failures.
+  // Current narration code falls back to authenticated speech, so these jobs are
+  // safe to retry instead of remaining permanently dead.
+  const retryCutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+  const { data: retried403 } = await db
+    .from('video_jobs')
+    .update({
+      status: 'queued',
+      started_at: null,
+      completed_at: null,
+      error_message: 'Retrying after authenticated narration fallback upgrade',
+      queued_at: now,
+      updated_at: now,
+    })
+    .eq('status', 'failed')
+    .eq('error_message', 'Unexpected server response: 403')
+    .lt('updated_at', retryCutoff)
+    .select('lesson_id,asset_kind,asset_key');
+  await syncLessonQueueState(db, retried403 ?? []);
 
   const maxConcurrent = renderConcurrency();
   const { count: activeCount, error: activeError } = await db
@@ -53,61 +83,87 @@ export async function POST(request: NextRequest) {
   if (activeError) {
     return NextResponse.json({ error: 'Unable to inspect the video queue' }, { status: 500 });
   }
-  if ((activeCount ?? 0) >= maxConcurrent) {
+
+  const active = activeCount ?? 0;
+  const availableSlots = Math.max(0, maxConcurrent - active);
+  if (availableSlots === 0) {
     return NextResponse.json({
       ok: true,
       started: 0,
       reason: 'render-capacity-full',
-      active: activeCount ?? 0,
+      active,
       maxConcurrent,
+      recovered: recovered?.length ?? 0,
+      retried403: retried403?.length ?? 0,
     });
   }
 
-  const { data: candidate, error: queueError } = await db
+  const { data: candidates, error: queueError } = await db
     .from('video_jobs')
     .select('*')
     .eq('status', 'queued')
-    // Alphabetically, lesson sorts before microclip. Preserve learner-critical
-    // full lesson media priority while the short-clip queue drains behind it.
+    // Full lesson media is learner-critical and drains before microclips.
     .order('asset_kind', { ascending: true })
     .order('queued_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .limit(availableSlots);
   if (queueError) {
     return NextResponse.json({ error: 'Unable to read the video queue' }, { status: 500 });
   }
-  if (!candidate) return NextResponse.json({ ok: true, started: 0, reason: 'queue-empty' });
+  if (!candidates?.length) {
+    return NextResponse.json({
+      ok: true,
+      started: 0,
+      reason: 'queue-empty',
+      recovered: recovered?.length ?? 0,
+      retried403: retried403?.length ?? 0,
+    });
+  }
 
-  const startedAt = new Date().toISOString();
-  const { data: claimed, error: claimError } = await db
-    .from('video_jobs')
-    .update({ status: 'rendering', started_at: startedAt, updated_at: startedAt })
-    .eq('id', candidate.id)
-    .eq('status', 'queued')
-    .select('*')
-    .maybeSingle();
-  if (claimError || !claimed) {
+  const claimedJobs: VideoJob[] = [];
+  for (const candidate of candidates) {
+    const startedAt = new Date().toISOString();
+    const { data: claimed, error: claimError } = await db
+      .from('video_jobs')
+      .update({ status: 'rendering', started_at: startedAt, updated_at: startedAt })
+      .eq('id', candidate.id)
+      .eq('status', 'queued')
+      .select('*')
+      .maybeSingle();
+
+    if (claimError || !claimed) continue;
+    await markRendering(claimed.id);
+    claimedJobs.push(claimed as VideoJob);
+  }
+
+  if (!claimedJobs.length) {
     return NextResponse.json({ ok: true, started: 0, reason: 'already-claimed' });
   }
 
-  await markRendering(claimed.id);
-
   after(async () => {
-    await processClaimedVideoJob(claimed as VideoJob).catch((error) => {
-      logger.error('[video-worker] Background processor failed', error, { jobId: claimed.id });
+    const results = await Promise.allSettled(claimedJobs.map((job) => processClaimedVideoJob(job)));
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        logger.error('[video-worker] Background processor failed', result.reason, {
+          jobId: claimedJobs[index]?.id,
+        });
+      }
     });
   });
 
   return NextResponse.json(
     {
       ok: true,
-      started: 1,
-      jobId: claimed.id,
-      lessonId: claimed.lesson_id,
-      assetKind: claimed.asset_kind ?? 'lesson',
-      assetKey: claimed.asset_key ?? null,
-      activeBeforeClaim: activeCount ?? 0,
+      started: claimedJobs.length,
+      jobs: claimedJobs.map((job) => ({
+        jobId: job.id,
+        lessonId: job.lesson_id,
+        assetKind: job.asset_kind ?? 'lesson',
+        assetKey: job.asset_key ?? null,
+      })),
+      activeBeforeClaim: active,
       maxConcurrent,
+      recovered: recovered?.length ?? 0,
+      retried403: retried403?.length ?? 0,
     },
     { status: 202 },
   );

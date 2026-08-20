@@ -1,17 +1,16 @@
 /**
  * Derives the six workforce questions every program page must answer above the fold.
+ *
+ * Government-facing funding copy MUST come from the verified funding registry.
+ * Legacy ProgramSchema fundingOptions/fundingStatement values are intentionally
+ * ignored here so stale course data cannot create a public WIOA/WRG claim.
  */
 
-import type { FundingType, ProgramSchema } from '@/lib/programs/program-schema';
-
-const FUNDING_LABELS: Record<FundingType, string> = {
-  wioa: 'WIOA',
-  wrg: 'Workforce Ready Grant',
-  impact: 'FSSA IMPACT',
-  self_pay: 'Self-pay',
-  employer_paid: 'Employer-paid',
-  unknown: 'Funding varies',
-};
+import type { ProgramSchema } from '@/lib/programs/program-schema';
+import {
+  getPublicFundingDisclosure,
+  getVerifiedProgramFunding,
+} from '@/lib/programs/funding-registry';
 
 export type ProgramAtAGlanceRow = {
   question: string;
@@ -36,7 +35,9 @@ function primaryJob(program: ProgramSchema): string {
 }
 
 function enrollmentStartLabel(program: ProgramSchema): string {
-  if (program.enrollmentStartLabel) return program.enrollmentStartLabel;
+  const configured = (program as ProgramSchema & { enrollmentStartLabel?: string })
+    .enrollmentStartLabel;
+  if (configured) return configured;
   if (program.enrollmentType === 'waitlist') {
     return 'Waitlist open — cohort date confirmed at intake';
   }
@@ -47,13 +48,11 @@ function enrollmentStartLabel(program: ProgramSchema): string {
 }
 
 function fundingSummary(program: ProgramSchema): string {
-  const opts = program.fundingOptions?.filter((f) => f !== 'unknown' && f !== 'self_pay') ?? [];
-  if (opts.length > 0) {
-    return `${opts.map((f) => FUNDING_LABELS[f]).join(', ')} for eligible participants`;
+  const verified = getVerifiedProgramFunding(program.slug);
+  if (!verified) {
+    return 'Self-pay program. No public WIOA or Workforce Ready Grant claim is made.';
   }
-  if (program.isSelfPay) return 'Self-pay — payment plans available';
-  const first = program.fundingStatement.split('.')[0];
-  return first ? `${first}.` : 'Contact an advisor for funding options';
+  return getPublicFundingDisclosure(program.slug);
 }
 
 /** Six-row summary for program detail pages (workforce reviewer checklist). */
@@ -63,6 +62,15 @@ export function buildProgramAtAGlance(program: ProgramSchema): ProgramAtAGlanceR
     weeks >= 52
       ? `${weeks} weeks (${program.schedule})`
       : `${weeks} ${weeks === 1 ? 'week' : 'weeks'} · ${program.hoursPerWeekMin}–${program.hoursPerWeekMax} hrs/week`;
+
+  const costDetail = program.regularPrice || program.salePrice
+    ? [
+        program.regularPrice ? `Regular price ${program.regularPrice}` : null,
+        program.salePrice ? `Current price ${program.salePrice}` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+    : undefined;
 
   return [
     {
@@ -87,9 +95,7 @@ export function buildProgramAtAGlance(program: ProgramSchema): ProgramAtAGlanceR
     {
       question: 'What does it cost?',
       answer: program.selfPayCost,
-      detail: program.selfPayCost
-        ? `Regular price ${program.selfPayCost}${program.selfPayCost ? ` · Sale ${program.selfPayCost}` : ''}`
-        : undefined,
+      detail: costDetail,
     },
     {
       question: 'Is funding available?',

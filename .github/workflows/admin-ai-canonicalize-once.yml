@@ -1,0 +1,138 @@
+name: Admin AI Canonicalize Once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/admin-ai-canonicalize-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  canonicalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Canonicalize Admin AI course tool
+        shell: bash
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('apps/admin/app/api/devstudio/chat/route.ts')
+          text = path.read_text()
+
+          build = r'''    case 'build_course': {
+      const title = String(args.title || '').trim();
+      const description = String(args.description || '').trim();
+      const audience = String(args.audience || 'adult workforce learners').trim();
+      const moduleCount = Math.max(1, Math.min(40, Number(args.modules || 5)));
+      const lessonsPerModule = Math.max(1, Math.min(20, Number(args.lessons_per_module || 3)));
+      if (!title) return 'title is required to build a course';
+
+      const { courseFactory } = await import('@/lib/course-factory');
+      const { normalizeGeneratedCourseForGovernance } = await import('@/lib/course-factory/post-generation-governance');
+      const result = await courseFactory({
+        title,
+        topic: description || title,
+        audience,
+        moduleCount,
+        lessonsPerModule,
+        contentSource: 'ai',
+        mode: 'refresh',
+        videoMode: 'queue',
+        dryRun: false,
+      });
+
+      let governance = null;
+      if (result.ok && result.courseId) {
+        governance = await normalizeGeneratedCourseForGovernance(result.courseId);
+      }
+
+      return JSON.stringify({
+        __type: 'course_saved',
+        success: result.ok,
+        courseId: result.courseId ?? null,
+        courseSlug: result.courseSlug ?? null,
+        title: result.title ?? title,
+        modulesGenerated: result.moduleCount ?? 0,
+        lessonsGenerated: result.lessonCount ?? 0,
+        assessmentsGenerated: result.assessmentsGenerated ?? 0,
+        videosQueued: result.videosQueued ?? 0,
+        governance,
+        warnings: result.warnings ?? [],
+        errors: result.errors ?? [],
+        status: result.status ?? null,
+        url: result.courseId ? `/studio/courses/${result.courseId}` : null,
+        message: result.ok
+          ? `Course "${result.title ?? title}" was generated through the canonical Course Factory and saved as a governed draft.`
+          : `Course generation did not persist because the canonical Course Factory did not pass its completeness and validation gates.`,
+      }, null, 2);
+    }
+
+    case 'save_course': {
+      const course = args.course as Record<string, unknown> | undefined;
+      const courseId = String(course?.courseId || course?.course_id || '').trim();
+      if (!courseId) {
+        return 'Course drafts are persisted by build_course through the canonical Course Factory. Run build_course instead of using a separate save path.';
+      }
+      return JSON.stringify({
+        __type: 'course_saved',
+        courseId,
+        title: String(course?.title || 'Course'),
+        url: `/studio/courses/${courseId}`,
+        message: 'This course is already persisted through the canonical Course Factory. No parallel save operation was performed.',
+      }, null, 2);
+    }
+
+'''
+
+          pattern = re.compile(r"    case 'build_course': \{.*?\n    case 'generate_videos': \{", re.S)
+          replacement = build + "    case 'generate_videos': {"
+          new_text, count = pattern.subn(replacement, text, count=1)
+          if count != 1:
+            raise SystemExit('Could not locate build_course/save_course block exactly once')
+
+          new_text = new_text.replace(
+            "'Generate a complete course draft (modules + lessons + checkpoints) from a title and description. ' +\n        'Returns a course_draft object the user can review and save. ' +",
+            "'Generate, validate, govern, and persist a complete draft course through the canonical Course Factory. ' +\n        'Returns the saved governed draft and course ID. ' +",
+          )
+          new_text = new_text.replace(
+            "'Save a course_draft to the database (training_courses + modules + curriculum_lessons). ' +\n        'Call this after the user confirms they want to save the course. ' +\n        'Returns a course_saved object with the courseId and a link.',",
+            "'Compatibility acknowledgement for a course already persisted by build_course. ' +\n        'This tool never writes course tables directly; Course Factory is the only persistence authority.',",
+          )
+          path.write_text(new_text)
+
+          gate = Path('scripts/check-studio-architecture.mjs')
+          gate_text = gate.read_text()
+          marker = "const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');"
+          guard = """const adminAiChat = read('apps/admin/app/api/devstudio/chat/route.ts');\nif (!adminAiChat.includes("courseFactory")) fail('Admin AI does not delegate course creation to canonical Course Factory');\nfor (const forbiddenWrite of [\".from('lms_courses').insert\", \".from('modules').insert\", \".from('curriculum_lessons').insert\"]) {\n  if (adminAiChat.includes(forbiddenWrite)) fail(`Admin AI reintroduced parallel course persistence: ${forbiddenWrite}`);\n}\n\n"""
+          if guard not in gate_text:
+            if marker not in gate_text:
+              raise SystemExit('Architecture gate insertion marker not found')
+            gate_text = gate_text.replace(marker, guard + marker)
+            gate.write_text(gate_text)
+
+          wf = Path('.github/workflows/admin-ai-canonicalize-once.yml')
+          wf.unlink()
+          PY
+
+      - name: Run focused architecture tests
+        run: |
+          node scripts/check-studio-architecture.mjs
+          pnpm exec vitest run tests/unit/ellie-message-router.test.ts
+      - name: Commit root-level canonicalization
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/admin/app/api/devstudio/chat/route.ts scripts/check-studio-architecture.mjs .github/workflows/admin-ai-canonicalize-once.yml
+          git commit -m "fix(admin-ai): enforce canonical course factory"
+          git push origin HEAD:main

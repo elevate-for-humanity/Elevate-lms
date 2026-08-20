@@ -193,7 +193,7 @@ export default function HeroVideo({
     <div className={`w-full ${className}`}>
       <section
         ref={heroRef}
-        className={`relative isolate flex w-full items-end overflow-hidden bg-slate-950 ${heightClassName}`}
+        className={`relative isolate w-full overflow-hidden flex items-end bg-slate-950 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
         {posterImage ? (

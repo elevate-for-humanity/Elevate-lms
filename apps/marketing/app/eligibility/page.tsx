@@ -1,110 +1,80 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2, DollarSign, Users, Building2, ArrowRight, Clock, GraduationCap, FileText, HelpCircle } from 'lucide-react';
+import { ArrowRight, Building2, DollarSign, FileCheck2, GraduationCap, ShieldCheck } from 'lucide-react';
+import { VERIFIED_WORKFORCE_FUNDED_PROGRAMS } from '@/lib/programs/funding-registry';
 
 export const metadata: Metadata = {
-  title: 'Check Your Eligibility | WIOA & Workforce Funding',
-  description: 'Find out if you qualify for free or subsidized workforce training. WIOA funding, state grants, and employer sponsorships available for eligible Indiana residents.',
+  title: 'Funding Eligibility Review | Elevate for Humanity',
+  description:
+    'Start a workforce-funding eligibility review. Screening does not guarantee WIOA, Workforce Ready Grant, employer, or other third-party funding.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/eligibility' },
 };
 
 export default function EligibilityPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Hero */}
-      <section className="bg-gradient-to-br from-brand-blue-700 via-brand-blue-800 to-brand-blue-900 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <p className="text-blue-200 font-semibold mb-3 tracking-wide uppercase text-sm">Funding & Eligibility</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Is Workforce Training Really Free?
-            </h1>
-            <p className="text-xl text-blue-100 leading-relaxed">
-              Many of our participants pay nothing out-of-pocket. Funding is available through WIOA, state grants, and employer sponsorships.
-            </p>
-          </div>
+    <main className="min-h-screen bg-slate-50">
+      <section className="bg-slate-950 text-white py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-brand-red-400 font-bold uppercase tracking-widest text-xs">Funding review</p>
+          <h1 className="text-4xl md:text-5xl font-extrabold mt-3">Check the exact program and participant</h1>
+          <p className="text-lg text-slate-300 leading-relaxed max-w-3xl mt-6">
+            Elevate can screen information for possible funding pathways, but a website answer is not
+            an eligibility determination or award. The responsible agency controls participant
+            eligibility, program eligibility, covered costs, funding availability, and authorization.
+          </p>
+          <Link href="/apply" className="inline-flex items-center gap-2 mt-8 bg-brand-red-600 hover:bg-brand-red-700 px-7 py-3.5 rounded-lg font-bold">
+            Start Application <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </section>
 
-      {/* Quick Eligibility Quiz */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
-              Quick Eligibility Check
-            </h2>
-            <div className="space-y-6">
-              <div className="bg-slate-50 rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-4">1. Are you currently unemployed, underemployed, or looking to change careers?</h3>
-                <div className="flex gap-4">
-                  <button className="flex-1 py-3 px-6 bg-green-100 text-green-800 font-semibold rounded-lg hover:bg-green-200">Yes</button>
-                  <button className="flex-1 py-3 px-6 bg-slate-100 text-slate-600 font-semibold rounded-lg hover:bg-slate-200">No</button>
-                </div>
-              </div>
-              <div className="bg-slate-50 rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-4">2. Do you live in Indiana?</h3>
-                <div className="flex gap-4">
-                  <button className="flex-1 py-3 px-6 bg-green-100 text-green-800 font-semibold rounded-lg hover:bg-green-200">Yes</button>
-                  <button className="flex-1 py-3 px-6 bg-yellow-100 text-yellow-800 font-semibold rounded-lg hover:bg-yellow-200">Outside Indiana</button>
-                </div>
-              </div>
-              <div className="bg-slate-50 rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-4">3. Are you 18 years or older and legally able to work?</h3>
-                <div className="flex gap-4">
-                  <button className="flex-1 py-3 px-6 bg-green-100 text-green-800 font-semibold rounded-lg hover:bg-green-200">Yes</button>
-                  <button className="flex-1 py-3 px-6 bg-slate-100 text-slate-600 font-semibold rounded-lg hover:bg-slate-200">No</button>
-                </div>
-              </div>
-            </div>
-            <div className="mt-10 text-center bg-gradient-to-r from-brand-orange-50 to-brand-orange-100 rounded-xl p-8">
-              <h3 className="text-xl font-bold text-slate-900 mb-2">You May Qualify!</h3>
-              <p className="text-slate-600 mb-6">Get a free eligibility review to confirm and find your funding path.</p>
-              <Link href="/check-eligibility" className="inline-flex items-center gap-2 bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg hover:bg-brand-orange-700">
-                Get Free Eligibility Review <ArrowRight className="w-5 h-5" />
+      <section className="py-14 px-6">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6">
+          {[
+            { icon: DollarSign, title: 'WIOA / WorkOne', text: 'May support eligible participants in approved program records when local workforce requirements and written authorization are satisfied.' },
+            { icon: GraduationCap, title: 'Workforce Ready Grant', text: 'May support qualifying Indiana participants in qualifying programs under the state rules and award limits in effect.' },
+            { icon: Building2, title: 'Employer or other funding', text: 'Employer sponsorship, reimbursement, grants, and supportive-service funding have separate requirements and must be documented before being treated as approved.' },
+          ].map((item) => (
+            <article key={item.title} className="bg-white border border-slate-200 rounded-xl p-6">
+              <item.icon className="w-6 h-6 text-brand-red-600" />
+              <h2 className="font-bold text-slate-900 text-lg mt-4">{item.title}</h2>
+              <p className="text-sm text-slate-600 leading-relaxed mt-3">{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="py-14 px-6 bg-white border-y border-slate-200">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center gap-3">
+            <FileCheck2 className="w-6 h-6 text-brand-red-600" />
+            <h2 className="text-2xl font-extrabold text-slate-900">Verified public workforce-funding records</h2>
+          </div>
+          <p className="text-slate-600 max-w-3xl mt-3 mb-7">
+            These are the programs currently permitted by Elevate&apos;s canonical funding registry to
+            display public workforce-funding claims. Inclusion does not guarantee an individual award.
+          </p>
+          <div className="grid md:grid-cols-2 gap-5">
+            {VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => (
+              <Link key={program.slug} href={`/programs/${program.slug}`} className="rounded-xl border border-slate-200 p-6 hover:border-brand-red-300">
+                <h3 className="font-bold text-slate-900">{program.title}</h3>
+                <p className="text-sm text-slate-600 mt-2">{program.description}</p>
               </Link>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Funding Options */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">Funding Options</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-2xl p-6 border border-blue-200">
-              <DollarSign className="w-10 h-10 text-brand-blue-600 mb-4" />
-              <h3 className="text-xl font-bold mb-2">WIOA Funding</h3>
-              <p className="text-slate-600 text-sm">Workforce Innovation and Opportunity Act may cover tuition, books, and supplies.</p>
-            </div>
-            <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
-              <GraduationCap className="w-10 h-10 text-green-600 mb-4" />
-              <h3 className="text-xl font-bold mb-2">Next Level Jobs</h3>
-              <p className="text-slate-600 text-sm">Indiana program covering 100% tuition for eligible programs in high-demand fields.</p>
-            </div>
-            <div className="bg-purple-50 rounded-2xl p-6 border border-purple-200">
-              <Building2 className="w-10 h-10 text-purple-600 mb-4" />
-              <h3 className="text-xl font-bold mb-2">Employer Sponsorship</h3>
-              <p className="text-slate-600 text-sm">Earn while you learn with employer-paid training and guaranteed employment.</p>
-            </div>
-          </div>
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto rounded-xl bg-amber-50 border border-amber-200 p-6 flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-amber-800 flex-none mt-0.5" />
+          <p className="text-sm text-amber-950 leading-relaxed">
+            Do not rely on a screening result as proof of funding. Elevate should treat an enrollment
+            as third-party funded only after receiving the applicable written authorization or other
+            documentary evidence from the responsible source.
+          </p>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="py-16 bg-gradient-to-br from-brand-blue-700 to-brand-blue-900 text-white text-center">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-4">Ready to See What You Qualify For?</h2>
-          <p className="text-xl text-blue-100 mb-8">Get a free review — no commitment required.</p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/check-eligibility" className="bg-brand-orange-600 text-white font-bold py-4 px-8 rounded-lg hover:bg-brand-orange-700">
-              Check My Eligibility
-            </Link>
-            <Link href="/contact" className="bg-white text-brand-blue-700 font-bold py-4 px-8 rounded-lg hover:bg-blue-50">
-              Talk to an Advisor
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

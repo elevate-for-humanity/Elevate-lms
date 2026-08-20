@@ -46,7 +46,6 @@ alter table public.public_claim_registry enable row level security;
 comment on table public.public_claim_registry is
   'Institution-wide evidence ledger for material public claims. Only verified records explicitly allowed for publication may render publicly.';
 
--- Public, read-only view. Expired claims are excluded automatically.
 create or replace view public.public_verified_claims as
 select
   id, claim_key, claim_text, claim_category, scope_type, scope_id,
@@ -59,7 +58,6 @@ where public_claim_allowed = true
   and (valid_from is null or valid_from <= current_date)
   and (valid_through is null or valid_through >= current_date);
 
--- Isolated synthetic demo identities. These records are not production participants.
 create table if not exists public.demo_personas (
   id uuid primary key default gen_random_uuid(),
   persona_key text not null unique,
@@ -109,23 +107,17 @@ on conflict (persona_key) do update set
   active = true,
   updated_at = now();
 
--- Establish governance statements as records but do not self-verify factual claims.
 insert into public.public_claim_registry
-  (claim_key, claim_text, claim_category, scope_type, status, public_claim_allowed, evidence_type, evidence_reference, notes)
+  (claim_key, claim_text, claim_category, scope_type, status, public_claim_allowed, evidence_type, evidence_reference, verified_at, notes)
 values
   ('claim-governance-policy',
    'Material public claims must be backed by evidence and explicitly approved for publication.',
    'governance','institution','verified',true,'system_control',
-   'Database constraint and public_verified_claims view',
+   'Database constraint and public_verified_claims view',now(),
    'This statement describes the platform control implemented by this migration.'),
   ('demo-data-policy',
    'Public product demonstrations use synthetic demo personas and must not expose production participant records.',
    'demo','demo','verified',true,'system_control',
-   'demo_personas synthetic constraint',
+   'demo_personas synthetic constraint',now(),
    'This statement describes the platform control implemented by this migration.')
 on conflict (claim_key) do nothing;
-
-update public.public_claim_registry
-set verified_at = coalesce(verified_at, now()), updated_at = now()
-where claim_key in ('claim-governance-policy','demo-data-policy')
-  and status = 'verified';

@@ -66,7 +66,7 @@ export const ROUTES = {
   fundingJobReadyIndy: '/jri',
   fundingVocRehab: '/funding/state-programs',
   scholarships: '/scholarships',
-  eligibility: '/eligibility/quiz',
+  eligibility: '/check-eligibility',
 
   // Employers
   employers: '/employers',

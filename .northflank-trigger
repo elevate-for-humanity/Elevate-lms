@@ -1,5 +1,5 @@
 # Trigger Northflank VCS build
 # Production deploy requested from current main
-merge_sha=13f385cb27cde64ed476cacc199d56b376948f38
-requested_at=2026-08-20T07:16:00-04:00
+merge_sha=6ffc995d555008be1cbbf20fd5f85e35e888eaa5
+requested_at=2026-08-20T07:19:00-04:00
 services=marketing

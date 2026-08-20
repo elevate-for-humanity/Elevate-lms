@@ -8,9 +8,10 @@
 #   - Build context: /
 #   - Public port: 3000
 #
-# Northflank injects NF_GIT_SHA for Git builds. This Dockerfile uses that
-# canonical SHA for Next.js build identity so production builds do not depend
-# on manually maintained GIT_SHA/GITHUB_SHA arguments.
+# Production contract:
+#   - dependency graph must match pnpm-lock.yaml exactly
+#   - the packaged standalone runtime must actually boot and serve /api/ping
+#   - build identity comes from Northflank's injected NF_GIT_SHA
 ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP=unknown
 ARG BUILD_ID
@@ -21,7 +22,8 @@ ARG NF_GIT_SHA
 ARG BUILD_TIMESTAMP
 ARG BUILD_ID
 
-RUN echo "nf-cache-invalidate-lms-2026-08-19-webpack-cache-recovery"
+# Force a clean recovery build after the August 20 production 503 incident.
+RUN echo "nf-cache-invalidate-lms-2026-08-20-packaged-runtime-smoke"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -36,9 +38,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     && rm -rf /var/lib/apt/lists/*
 
-# Northflank has previously resolved Corepack's pnpm shim to the wrong pnpm
-# version. Remove the shim first, install the repository-pinned pnpm directly,
-# and fail the image build if the executable is not exactly the expected version.
 RUN corepack disable || true \
     && npm install -g pnpm@10.28.2 \
     && test "$(pnpm --version)" = "10.28.2"
@@ -48,10 +47,6 @@ ENV PATH="$PNPM_HOME:$PATH"
 ENV FFMPEG_BIN=/usr/bin/ffmpeg
 WORKDIR /app
 
-# Dependency metadata is copied before application source so ordinary code
-# changes do not invalidate the expensive pnpm install layer. Every workspace
-# package declared by pnpm-workspace.yaml must exist before pnpm resolves the
-# workspace, even when this image only builds the LMS application.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/admin/package.json apps/admin/package.json
 COPY apps/lms/package.json apps/lms/package.json
@@ -67,25 +62,18 @@ ENV NODE_OPTIONS=--max-old-space-size=12288
 ENV NEXT_STANDALONE_OUTPUT=1
 ENV BUILD_SCOPE=LMS
 ENV CI=true
-# Proven Northflank recovery setting: do not persist Next/webpack filesystem
-# cache between image builds. The app's next.config.mjs honors this switch and
-# disables webpack's filesystem cache for deterministic container builds.
 ENV DISABLE_WEBPACK_FILESYSTEM_CACHE=1
 
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
-RUN pnpm install --no-frozen-lockfile --strict-peer-dependencies=false
+# Production containers must be reproducible. Never mutate dependency resolution
+# during an image build.
+RUN pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-# The repository preinstall hook historically called `corepack enable`, which
-# can recreate a stale pnpm shim inside this same stage. Reassert the pinned
-# executable before any subsequent pnpm command so the compile step cannot drift.
+# Reassert the pinned pnpm executable after repository lifecycle hooks.
 RUN corepack disable || true \
     && npm install -g pnpm@10.28.2 \
     && test "$(pnpm --version)" = "10.28.2"
 
-# Source is copied only after dependencies have been installed. With Northflank
-# BuildKit persistent cache enabled, this keeps dependency installation reusable
-# across code-only releases while still invalidating correctly when manifests or
-# the lockfile change.
 COPY . .
 
 ARG NEXT_PUBLIC_SITE_URL=https://www.elevateforhumanity.org
@@ -186,18 +174,50 @@ RUN echo "=== RUNTIME VERIFICATION ===" && \
     fi
 
 COPY --from=builder /app/apps/lms/.next/static ./apps/lms/.next/static
-
-# Package repository-level public assets used by shared components and registries.
 COPY --from=builder /app/public ./apps/lms/public
-# App-specific public assets override shared assets when paths overlap.
 COPY --from=builder /app/apps/lms/public ./apps/lms/public
 
 RUN test -d /app/apps/lms/public/images
 RUN test -x "$FFMPEG_BIN" && "$FFMPEG_BIN" -version >/dev/null
 
+# Do not publish an image that merely contains a server file. Boot the exact
+# packaged runtime and require the same health endpoint Northflank will probe.
+RUN set -eux; \
+    LOG=/tmp/lms-runtime-smoke.log; \
+    if [ -f /app/apps/lms/server.js ]; then \
+      node --max-http-header-size=32768 /app/apps/lms/server.js >"${LOG}" 2>&1 & \
+    else \
+      node --max-http-header-size=32768 /app/server.js >"${LOG}" 2>&1 & \
+    fi; \
+    PID=$!; \
+    trap 'cat "${LOG}" || true; kill "${PID}" 2>/dev/null || true' EXIT; \
+    READY=0; \
+    for attempt in $(seq 1 45); do \
+      if curl --fail --silent --show-error http://127.0.0.1:3000/api/ping >/tmp/lms-ping.json 2>/tmp/lms-ping.err; then \
+        READY=1; \
+        break; \
+      fi; \
+      if ! kill -0 "${PID}" 2>/dev/null; then \
+        echo 'LMS standalone process exited during packaged-runtime smoke test.'; \
+        cat "${LOG}"; \
+        exit 1; \
+      fi; \
+      sleep 2; \
+    done; \
+    if [ "${READY}" -ne 1 ]; then \
+      echo 'LMS packaged standalone runtime did not become healthy.'; \
+      cat /tmp/lms-ping.err || true; \
+      cat "${LOG}"; \
+      exit 1; \
+    fi; \
+    cat /tmp/lms-ping.json; \
+    kill "${PID}"; \
+    wait "${PID}" || true; \
+    trap - EXIT
+
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
   CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/ping" || exit 1
 
 CMD ["sh", "-c", "if [ -f /app/apps/lms/server.js ]; then exec node --max-http-header-size=32768 /app/apps/lms/server.js; else exec node --max-http-header-size=32768 /app/server.js; fi"]

@@ -33,9 +33,18 @@ function lowerText(value: unknown): string {
   }
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function containsForbiddenBrand(text: string, brand: string) {
+  const pattern = escapeRegExp(brand).replace(/\s+/g, '\\s+');
+  return new RegExp(`\\b${pattern}\\b`, 'i').test(text);
+}
+
 function assertNoProviderBranding(label: string, value: unknown) {
   const text = lowerText(value);
-  const match = FORBIDDEN_BRANDS.find((brand) => text.includes(brand));
+  const match = FORBIDDEN_BRANDS.find((brand) => containsForbiddenBrand(text, brand));
   if (match) fail(`${label} still contains third-party course branding: ${match}`);
 }
 

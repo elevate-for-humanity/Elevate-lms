@@ -61,13 +61,6 @@ export const metadata: Metadata = {
       'One connected ecosystem for learning, training, testing, apprenticeships, credentials, workforce funding, employment, employers, supportive services, and advancement.',
     images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
   },
-  twitter: {
-    card: 'summary',
-    title: 'Elevate for Humanity | AI-Powered 360° Humanitarian Workforce Hub',
-    description:
-      'Training, LMS learning, testing, apprenticeships, workforce funding, employment, employers, supportive services, and AI-enabled operations in one connected hub.',
-    images: [logoUrl],
-  },
   robots: {
     index: true,
     follow: true,

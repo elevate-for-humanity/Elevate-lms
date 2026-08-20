@@ -21,6 +21,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route.priority,
   }));
 
+  const trustAndBuyerRoutes: MetadataRoute.Sitemap = [
+    {
+      url: `${PUBLIC_SITE_ORIGIN}/trust`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${PUBLIC_SITE_ORIGIN}/procurement`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${PUBLIC_SITE_ORIGIN}/platform/demo`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+  ];
+
   const programRoutes: MetadataRoute.Sitemap = [...STATIC_PROGRAM_MAP.keys()].map((slug) => ({
     url: `${PUBLIC_SITE_ORIGIN}/programs/${slug}`,
     lastModified: new Date(),
@@ -60,9 +81,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let hostShopRoutes: MetadataRoute.Sitemap = [];
   try {
-    // Host Site SEO must use the same approval authority as the directory/profile
-    // pages. A broader verified partner record cannot create an indexable Host
-    // Site profile unless an operational Host Site approval also exists.
     const shops = await getApprovedShops();
     hostShopRoutes = shops
       .filter((shop) => Boolean(shop.publicSlug))
@@ -73,13 +91,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.82,
       }));
   } catch {
-    // Dynamic discovery is optional during image compilation. The canonical
-    // static sitemap remains publishable even when privileged secrets are absent.
+    // Dynamic discovery is optional during image compilation.
   }
 
   const seen = new Set<string>();
   return [
     ...staticRoutes,
+    ...trustAndBuyerRoutes,
     ...programRoutes,
     ...staticBlogRoutes,
     ...databaseBlogRoutes,

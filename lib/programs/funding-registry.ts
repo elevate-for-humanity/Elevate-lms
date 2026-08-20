@@ -20,11 +20,11 @@ export type VerifiedProgramFunding = {
 /**
  * Public workforce-funding allowlist.
  *
- * This is intentionally narrower than the internal program catalog. A program
- * belongs here only when exact program-level evidence supports the public
- * funding statement. Participant eligibility, covered costs, available funds,
- * and written authorization remain decisions of the responsible workforce
- * agency; Elevate does not guarantee funding.
+ * This list is deliberately narrower than the internal program catalog. A
+ * program belongs here only when current program-level evidence supports the
+ * exact public funding label. Participant eligibility, covered costs, available
+ * funds, and written authorization remain decisions of the responsible agency;
+ * Elevate does not guarantee funding.
  *
  * Regulatory evidence is also persisted in Supabase `program_regulatory_status`.
  */
@@ -32,30 +32,19 @@ export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding
   {
     slug: 'cdl-training',
     title: 'CDL Training',
-    description: 'Commercial driver training with permit support, safety instruction, and coordinated road training.',
+    description:
+      'Commercial driver training with permit support, safety instruction, and coordinated road training.',
     duration: '6 weeks',
     credential: 'CDL Class A License',
     category: 'trades',
     etplListedFor2Exclusive: true,
     topJobsStars: null,
-    wioaEligible: true,
+    // The evidence in the canonical record verifies WRG approval. Do not infer
+    // WIOA eligibility from provider status or WRG approval alone.
+    wioaEligible: false,
     wrgEligible: true,
     sourceNote:
       'Indiana DWD INTraining approved the Commercial Driver’s License program location for Workforce Ready Grant on July 1, 2026 (Program Location ID 10005156). Participant authorization remains required.',
-  },
-  {
-    slug: 'hvac-technician',
-    title: 'HVAC Technician',
-    description: 'Hands-on heating, cooling, refrigeration, safety, diagnostics, installation, and maintenance training.',
-    duration: '6 weeks',
-    credential: 'EPA 608 Universal',
-    category: 'trades',
-    etplListedFor2Exclusive: true,
-    topJobsStars: null,
-    wioaEligible: true,
-    wrgEligible: true,
-    sourceNote:
-      'Indiana’s current workforce-training directory identifies Elevate for Humanity as an HVAC Technician training provider; participant authorization remains required.',
   },
 ] as const;
 

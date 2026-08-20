@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { PUBLIC_ROUTE_REGISTRY, PUBLIC_SITE_ORIGIN } from '@/lib/navigation/public-route-registry';
-import { listPublicHostShops } from '@/lib/partners/public-host-shops';
+import { getApprovedShops } from '@/lib/programs/host-shops';
 import { STATIC_PROGRAM_MAP } from '@/data/programs';
 import { STATIC_POSTS } from '@/content/blog/posts';
 import { getDb } from '@/lib/lms/api';
@@ -60,13 +60,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let hostShopRoutes: MetadataRoute.Sitemap = [];
   try {
-    const shops = await listPublicHostShops();
-    hostShopRoutes = shops.map((shop) => ({
-      url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.public_slug}`,
-      lastModified: new Date(shop.public_profile_published_at || new Date().toISOString()),
-      changeFrequency: 'weekly',
-      priority: shop.featured ? 0.86 : 0.82,
-    }));
+    // Host Site SEO must use the same approval authority as the directory/profile
+    // pages. A broader verified partner record cannot create an indexable Host
+    // Site profile unless an operational Host Site approval also exists.
+    const shops = await getApprovedShops();
+    hostShopRoutes = shops
+      .filter((shop) => Boolean(shop.publicSlug))
+      .map((shop) => ({
+        url: `${PUBLIC_SITE_ORIGIN}/host-shops/${shop.publicSlug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.82,
+      }));
   } catch {
     // Dynamic discovery is optional during image compilation. The canonical
     // static sitemap remains publishable even when privileged secrets are absent.

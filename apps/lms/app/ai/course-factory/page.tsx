@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Sparkles, FileText, CheckCircle, Clock, Award, Users, Zap, Video, FileQuestion, GraduationCap } from 'lucide-react';
+import { Sparkles, FileText, CheckCircle, Clock, Award, Video, FileQuestion, GraduationCap } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Course Factory | AI-Powered Curriculum Generation',

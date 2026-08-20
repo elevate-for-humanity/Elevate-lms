@@ -8,15 +8,23 @@ type BeforeInstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 };
 
-const apps = [
+type InstallableApp = {
+  name: string;
+  description: string;
+  href: string;
+  local: boolean;
+  manifest?: string;
+};
+
+const apps: readonly InstallableApp[] = [
   { name: 'Admin', description: 'Administrative operations and Dev Studio', href: 'https://admin.elevateforhumanity.org/dashboard', manifest: '/manifest-admin.json', local: true },
-  { name: 'Student / Learner', description: 'Courses, assignments, progress and credentials', href: 'https://app.elevateforhumanity.org/lms' },
-  { name: 'Apprentice', description: 'OJL, RTI, skills and apprenticeship progress', href: 'https://app.elevateforhumanity.org/apprentice' },
-  { name: 'Employer', description: 'Employer workforce and participant workspace', href: 'https://app.elevateforhumanity.org/employer' },
-  { name: 'Program Holder', description: 'Program-holder operations and compliance', href: 'https://app.elevateforhumanity.org/program-holder' },
-  { name: 'Host Shop', description: 'Host-shop apprenticeship workspace', href: 'https://app.elevateforhumanity.org/host-shop' },
-  { name: 'Elevate', description: 'Public Elevate for Humanity application', href: 'https://www.elevateforhumanity.org/' },
-] as const;
+  { name: 'Student / Learner', description: 'Courses, assignments, progress and credentials', href: 'https://app.elevateforhumanity.org/lms', local: false },
+  { name: 'Apprentice', description: 'OJL, RTI, skills and apprenticeship progress', href: 'https://app.elevateforhumanity.org/apprentice', local: false },
+  { name: 'Employer', description: 'Employer workforce and participant workspace', href: 'https://app.elevateforhumanity.org/employer', local: false },
+  { name: 'Program Holder', description: 'Program-holder operations and compliance', href: 'https://app.elevateforhumanity.org/program-holder', local: false },
+  { name: 'Host Shop', description: 'Host-shop apprenticeship workspace', href: 'https://app.elevateforhumanity.org/host-shop', local: false },
+  { name: 'Elevate', description: 'Public Elevate for Humanity application', href: 'https://www.elevateforhumanity.org/', local: false },
+];
 
 export function PwaInstallCenter() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);

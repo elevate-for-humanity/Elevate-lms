@@ -82,7 +82,7 @@ export default async function EstheticianApprenticeshipPage() {
       videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
       posterImage={banner.posterImage || program.heroImage}
       voiceoverSrc={banner.voiceoverSrc}
-      microLabel={banner.microLabel}
+      microLabel="Indiana Esthetics Pathway"
       analyticsName={banner.analyticsName}
       belowHeroHeadline="Esthetician Apprenticeship Pathway — Indiana"
       belowHeroSubheadline="Supervised esthetics education and practice aligned to Indiana’s 700-hour education requirement, with documented progress and licensing preparation."

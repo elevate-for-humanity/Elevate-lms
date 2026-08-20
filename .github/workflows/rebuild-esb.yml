@@ -48,7 +48,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -80,3 +80,4 @@ jobs:
         run: pnpm tsx scripts/course-builder/verify-esb-runtime.ts
 
 # 2026-08-19 20:33 EDT production acceptance rebuild trigger
+# 2026-08-19 runtime parity: use platform-standard Node 22

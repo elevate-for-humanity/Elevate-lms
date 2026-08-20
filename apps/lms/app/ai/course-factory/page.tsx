@@ -1,3 +1,4 @@
+// Validation-only no-op comment to trigger app-path release gates.
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Sparkles, FileText, CheckCircle, Clock, Award, Video, FileQuestion, GraduationCap } from 'lucide-react';

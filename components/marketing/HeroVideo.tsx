@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
@@ -53,7 +54,6 @@ export default function HeroVideo({
   posterImage,
   voiceoverSrc,
   microLabel,
-  showBrandBug: _showBrandBug = false,
   belowHeroHeadline,
   belowHeroSubheadline,
   ctas,
@@ -63,9 +63,6 @@ export default function HeroVideo({
   className = '',
   children,
   mediaFit = 'cover',
-  demoSlides: _demoSlides = [],
-  demoStartSeconds: _demoStartSeconds = 6,
-  demoSlideSeconds: _demoSlideSeconds = 4.5,
   heightClassName = 'min-h-[520px] sm:min-h-[560px] lg:min-h-[620px]',
   overlayMode = 'default',
 }: HeroVideoProps) {
@@ -75,11 +72,12 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [heroInView, setHeroInView] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
   const transcriptId = useId();
+
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
   const safeDesktop = allowVideoSource(videoSrcDesktop);
   const safeMobile = allowVideoSource(videoSrcMobile);
@@ -89,7 +87,7 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
-    setVideoReady(false);
+    setVideoPlaying(false);
     setMuted(true);
     setManualAudioOverride(false);
     const video = videoRef.current;
@@ -140,13 +138,9 @@ export default function HeroVideo({
     void audio.play().then(() => setMuted(false)).catch(() => setMuted(true));
   }, [heroInView, manualAudioOverride, userActivated, voiceoverSrc]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    const audio = audioRef.current;
-    return () => {
-      video?.pause();
-      audio?.pause();
-    };
+  useEffect(() => () => {
+    videoRef.current?.pause();
+    audioRef.current?.pause();
   }, []);
 
   async function toggleSound() {
@@ -184,21 +178,25 @@ export default function HeroVideo({
   }
 
   const hasHeroContent = Boolean(
-    microLabel || belowHeroHeadline || belowHeroSubheadline || ctas?.length ||
-    trustIndicators?.length || children,
+    microLabel || belowHeroHeadline || belowHeroSubheadline || ctas?.length || trustIndicators?.length || children,
   );
 
   return (
     <div className={`w-full ${className}`}>
       <section
         ref={heroRef}
-        className={`relative isolate w-full overflow-hidden flex items-end bg-slate-950 ${heightClassName}`}
+        className={`relative isolate flex w-full items-end overflow-hidden bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
         {posterImage ? (
-          <div
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${posterImage})` }}
+          <Image
+            src={posterImage}
+            alt=""
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
             aria-hidden="true"
           />
         ) : null}
@@ -207,26 +205,26 @@ export default function HeroVideo({
           <video
             key={`${mobileSource}|${desktopSource}`}
             ref={videoRef}
-            preload="auto"
+            preload="metadata"
             autoPlay
             loop
             playsInline
             muted
             disablePictureInPicture
             poster={posterImage}
-            onLoadedData={() => setVideoReady(true)}
-            onPlaying={() => setVideoReady(true)}
+            onPlaying={() => setVideoPlaying(true)}
+            onWaiting={() => setVideoPlaying(false)}
+            onStalled={() => setVideoPlaying(false)}
             onCanPlay={() => {
-              setVideoReady(true);
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
             onError={() => {
-              setVideoReady(false);
+              setVideoPlaying(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-500 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center transition-opacity duration-300 ${videoPlaying ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (
@@ -251,7 +249,7 @@ export default function HeroVideo({
           <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-9 pt-24 sm:px-8 sm:pb-12 lg:px-10 lg:pb-16">
             <div className="max-w-4xl">
               {microLabel ? <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/95 sm:text-sm">{microLabel}</p> : null}
-              {children ? children : (
+              {children ?? (
                 <>
                   {belowHeroHeadline ? <h1 className="max-w-4xl text-4xl font-black leading-[1.02] tracking-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl">{belowHeroHeadline}</h1> : null}
                   {belowHeroSubheadline ? <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/90 sm:text-lg sm:leading-8">{belowHeroSubheadline}</p> : null}

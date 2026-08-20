@@ -23,6 +23,30 @@ const FLOW = [
   { icon: BadgeCheck, title: 'Prepare for licensing', body: 'Complete the pathway requirements tied to Indiana barber licensing preparation.' },
 ] as const;
 
+const VISUAL_STORY = [
+  {
+    image: '/images/pages/comp-pathway-classroom.webp',
+    alt: 'Barber apprentice completing related technical instruction in a classroom setting',
+    label: 'Related Technical Instruction',
+    title: 'Learn the why behind the work.',
+    body: 'Theory, sanitation, client safety, professional practice, and technical knowledge support what happens in the shop.',
+  },
+  {
+    image: '/images/pages/barber-hero-main.webp',
+    alt: 'Barber apprentice practicing supervised haircutting and grooming skills',
+    label: 'Hands-on Barbering',
+    title: 'Build skill through supervised practice.',
+    body: 'Apprentices develop barbering skills through real practice, documented competencies, and structured supervision.',
+  },
+  {
+    image: '/images/pages/shop-hero.webp',
+    alt: 'Licensed host barbershop supporting apprenticeship training',
+    label: 'Host Shop Experience',
+    title: 'Train in the environment where the job happens.',
+    body: 'Approved host shops provide the workplace setting for supervised on-the-job learning and progress verification.',
+  },
+] as const;
+
 export default async function BarberApprenticeshipPage() {
   const loaded = await loadProgramForPage('barber-apprenticeship');
   if (!loaded) return notFound();
@@ -108,6 +132,37 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-14 sm:py-18" aria-labelledby="barber-visual-story-heading">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">See the apprenticeship</p>
+            <h2 id="barber-visual-story-heading" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Theory, practice, and workplace learning belong together.</h2>
+            <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">On a phone, each stage now reads as a visual story instead of another wall of text.</p>
+          </div>
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            {VISUAL_STORY.map((item) => (
+              <article key={item.title} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                  <Image
+                    src={item.image}
+                    alt={item.alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-5 sm:p-6">
+                  <p className="text-[11px] font-black uppercase tracking-[0.16em] text-brand-red-700">{item.label}</p>
+                  <h3 className="mt-2 text-xl font-black leading-tight text-slate-950">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-700">{item.body}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-slate-200 bg-slate-950 px-4 py-14 text-white">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
@@ -133,10 +188,22 @@ export default async function BarberApprenticeshipPage() {
 
       <section className="px-4 py-14 sm:py-18">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
-            <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
+          <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_1.2fr] lg:items-end">
+            <div className="relative min-h-[240px] overflow-hidden rounded-3xl bg-slate-100 sm:min-h-[320px]">
+              <Image
+                src="/images/pages/shop-hero.webp"
+                alt="Licensed barber shop serving as an apprenticeship host site"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 42vw"
+                loading="lazy"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
+              <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
+            </div>
           </div>
           <FeaturedHostPartners />
           <div className="mt-10"><BarberWorkforceNetworkMap /></div>

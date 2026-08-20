@@ -1,125 +1,48 @@
 export const dynamic = 'force-dynamic';
-import { Metadata } from 'next';
+
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import HeroVideo from '@/components/marketing/HeroVideo';
-import heroBanners from '@/content/heroBanners';
-import {
-  Shield,
-  GraduationCap,
-  Building2,
-  Award,
-  FileCheck,
-  Clock,
-  Users,
-  BarChart3,
-  Monitor,
-  Phone,
-  Mail,
-  MapPin,
-} from 'lucide-react';
-import { PrintButton } from './PrintButton';
+import { Building2, FileCheck, ShieldCheck, Award } from 'lucide-react';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import {
+  VERIFIED_WORKFORCE_FUNDED_PROGRAMS,
+  getPublicFundingLabels,
+} from '@/lib/programs/funding-registry';
+import { RAPIDS_SPONSOR_LABEL } from '@/lib/workforce-ids';
 
 export const metadata: Metadata = {
-  title: 'Workforce Partnership Packet | Compliance',
+  title: 'Workforce Partnership Packet | Elevate for Humanity',
   description:
-    'Ready-to-share partnership packet for workforce boards, community organizations, and employer partners. Program list, delivery model, progress reporting, credential structure, and cohort timeline.',
+    'Workforce partnership information based on current documented program, apprenticeship, funding, and enrollment records. Funding is never inferred from provider status alone.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/compliance/workforce-partnership-packet',
   },
 };
 
-/* ── Program Summary Data ── */
-const PROGRAMS = [
+const controls = [
   {
-    name: 'Barber Apprenticeship',
-    duration: '~18 months',
-    format: 'In-Person + LMS',
-    rtiHours: 144,
-    ojtHours: 1500,
-    credential: 'Indiana Barber License',
-    funding: 'Self-Pay / Employer-Sponsored',
-    registered: true,
+    icon: FileCheck,
+    title: 'Program-level evidence controls public claims',
+    text: 'Provider approval, a funding relationship, or a listing does not make every Elevate program eligible for the same funding source. Public funding labels come from the canonical program funding registry.',
   },
   {
-    name: 'CNA Certification',
-    duration: '4–6 weeks',
-    format: 'Hybrid',
-    rtiHours: 105,
-    ojtHours: 45,
-    credential: 'CNA Certification (ISDH)',
-    funding: 'WIOA / Job Ready Indy / Self-Pay',
-    registered: false,
+    icon: ShieldCheck,
+    title: 'Participant authorization is separate',
+    text: 'Even when a program has a documented funding approval, the responsible agency determines participant eligibility, covered costs, available funds, and written authorization.',
   },
   {
-    name: 'CDL Commercial Driving',
-    duration: '4–6 weeks',
-    format: 'In-Person',
-    rtiHours: 40,
-    ojtHours: 120,
-    credential: 'CDL Class A/B (BMV)',
-    funding: 'WIOA / WRG / Self-Pay',
-    registered: false,
-  },
-  {
-    name: 'HVAC Technician',
-    duration: '8–16 weeks',
-    format: 'Hybrid',
-    rtiHours: 200,
-    ojtHours: 200,
-    credential: 'EPA 608 + OSHA 10',
-    funding: 'WIOA / WRG / Employer',
-    registered: false,
-  },
-  {
-    name: 'IT Help Desk',
-    duration: '8 weeks',
-    format: 'In-Person + Labs',
-    rtiHours: 280,
-    ojtHours: 40,
-    credential: 'Certiport IT Specialist',
-    funding: 'WIOA / Job Ready Indy / Self-Pay',
-    registered: false,
-  },
-  {
-    name: 'Cybersecurity Analyst',
-    duration: '12 weeks',
-    format: 'In-Person + Labs',
-    rtiHours: 440,
-    ojtHours: 40,
-    credential: 'Certiport IT Specialist — Cybersecurity',
-    funding: 'WIOA / Job Ready Indy / Self-Pay',
-    registered: false,
-  },
-  {
-    name: 'Welding',
-    duration: '10–16 weeks',
-    format: 'In-Person',
-    rtiHours: 160,
-    ojtHours: 240,
-    credential: 'AWS D1.1 + OSHA 10',
-    funding: 'WIOA / WRG / Employer',
-    registered: false,
-  },
-  {
-    name: 'Electrical',
-    duration: '10–16 weeks',
-    format: 'Hybrid',
-    rtiHours: 200,
-    ojtHours: 200,
-    credential: 'OSHA 10 + NCCER Core',
-    funding: 'WIOA / WRG / Employer',
-    registered: false,
+    icon: Building2,
+    title: 'Registered Apprenticeship is occupation-specific',
+    text: 'Registered Apprenticeship claims are limited to occupations covered by the sponsor standards and current sponsor records. Host employers participate within that sponsor structure.',
   },
 ];
 
 export default function WorkforcePartnershipPacketPage() {
   return (
-    <div className="bg-white min-h-screen print:bg-white">
-      {/* Breadcrumbs — hidden on print */}
-      <div className="bg-white border-b print:hidden">
-        <div className="max-w-6xl mx-auto px-4 py-3">
+    <main className="min-h-screen bg-white text-slate-950">
+      <div className="border-b border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-4">
           <Breadcrumbs
             items={[
               { label: 'Compliance', href: '/compliance' },
@@ -129,493 +52,121 @@ export default function WorkforcePartnershipPacketPage() {
         </div>
       </div>
 
-      <div className="print:hidden">
-        <HeroVideo
-          videoSrcDesktop="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero.mp4"
-          posterImage="/images/pages/admin-automation-qa-hero.webp"
-          microLabel="Partnership"
-          belowHeroHeadline="Workforce Partnership Packet"
-          belowHeroSubheadline="Share-ready partner packet covering delivery model, credential chain, reporting practices, and implementation timeline."
-          ctas={[
-            { label: 'Request Information', href: '/contact?program=workforce-partnership' },
-            { label: 'Instructional Framework', href: '/instructional-framework', variant: 'secondary' },
-          ]}
-          analyticsName="Workforce Partnership Packet"
-        />
-      </div>
-
-      {/* Print header */}
-      <div className="hidden print:block px-8 pt-8 pb-4 border-b-2 border-slate-900">
-        <h1 className="text-2xl font-bold text-slate-900">Workforce Partnership Packet</h1>
-        <p className="text-sm text-slate-600">{PLATFORM_DEFAULTS.orgName} — Partnership Documentation</p>
-        <p className="text-xs text-slate-500 mt-1">
-          RAPIDS ID: 2025-IN-132301 | INTraining Location ID: 10004621
-        </p>
-      </div>
-
-      {/* Organization Overview */}
-      <section className="py-10">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Organization Overview</h2>
-
-          <div className="grid sm:grid-cols-2 gap-6 mb-8">
-            <div>
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Organization
-                  </dt>
-                  <dd className="text-slate-900 font-medium">
-                    {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Legal Entity
-                  </dt>
-                  <dd className="text-slate-900">
-                    2Exclusive LLC-S (DBA {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute)
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Classification
-                  </dt>
-                  <dd className="text-slate-900">
-                    Hybrid Workforce Training Provider & Registered Apprenticeship Sponsor
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Location
-                  </dt>
-                  <dd className="text-slate-900">Indianapolis, Indiana</dd>
-                </div>
-              </dl>
-            </div>
-            <div>
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    RAPIDS Registration
-                  </dt>
-                  <dd className="text-slate-900">2025-IN-132301</dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    INTraining Location
-                  </dt>
-                  <dd className="text-slate-900">10004621</dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Approvals
-                  </dt>
-                  <dd className="text-slate-900">
-                    WIOA Eligible Training Provider, WRG Provider, Indiana DWD Listed
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-slate-500 text-xs uppercase tracking-wider">
-                    Cohort Setup Time
-                  </dt>
-                  <dd className="text-slate-900 font-medium">
-                    ~2 weeks from agreement to enrollment
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-
-          {/* Delivery Model Summary */}
-          <div className="bg-white rounded-lg p-6 border print:bg-white print:border-slate-300">
-            <h3 className="font-bold text-slate-900 mb-3">Delivery Model</h3>
-            <p className="text-sm text-slate-700 leading-relaxed mb-4">
-              Training is delivered through licensed credential partners and approved program
-              holders under centralized institutional oversight, with employer partners providing
-              structured on-the-job training. Elevate manages enrollment, funding navigation,
-              progress tracking, competency assessment, and career services. All instruction is
-              tracked through the institutional LMS.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-3 text-sm">
-              <div className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                />
-                <span className="text-slate-700">
-                  RTI via licensed credential partners (mapped hours)
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                />
-                <span className="text-slate-700">OJT via approved employer partners</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                />
-                <span className="text-slate-700">
-                  Competency-based assessment with mapped standards
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                />
-                <span className="text-slate-700">
-                  LMS tracking for RTI hours, modules, and evaluations
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                />
-                <span className="text-slate-700">
-                  Credentials issued by licensed authorities (not Elevate)
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span
-                  aria-hidden
-                  className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                />
-                <span className="text-slate-700">MOU-governed partner relationships</span>
-              </div>
-            </div>
+      <section className="bg-slate-950 px-6 py-16 text-white">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-brand-red-400">
+            Government & Workforce Partner Information
+          </p>
+          <h1 className="text-4xl font-extrabold md:text-5xl">Workforce Partnership Packet</h1>
+          <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-300">
+            This page is intentionally limited to claims supported by current institutional,
+            program-level, apprenticeship, and funding records. It is not a blanket funding or
+            outcome statement.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/workone-partner-packet"
+              className="rounded-lg bg-brand-red-600 px-6 py-3 font-bold text-white hover:bg-brand-red-700"
+            >
+              Program Funding Records
+            </Link>
+            <Link
+              href="/contact"
+              className="rounded-lg border border-white/30 px-6 py-3 font-bold text-white hover:bg-white/10"
+            >
+              Request Documentation
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Program Catalog */}
-      <section className="py-10 print: print:border-t">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Program Catalog</h2>
-          <p className="text-slate-600 text-sm mb-6">
-            All programs include mapped RTI hours, OJT hours, and industry-recognized credentials.
-          </p>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs border-collapse print:text-[10px]">
-              <thead>
-                <tr className="bg-white print:bg-white">
-                  <th className="text-left p-2.5 font-semibold text-slate-900 border-b">Program</th>
-                  <th className="text-left p-2.5 font-semibold text-slate-900 border-b">Duration</th>
-                  <th className="text-left p-2.5 font-semibold text-slate-900 border-b">Format</th>
-                  <th className="text-center p-2.5 font-semibold text-slate-900 border-b">
-                    RTI Hrs
-                  </th>
-                  <th className="text-center p-2.5 font-semibold text-slate-900 border-b">
-                    OJT Hrs
-                  </th>
-                  <th className="text-left p-2.5 font-semibold text-slate-900 border-b">
-                    Credential
-                  </th>
-                  <th className="text-left p-2.5 font-semibold text-slate-900 border-b">Funding</th>
-                </tr>
-              </thead>
-              <tbody>
-                {PROGRAMS.map((p, i) => (
-                  <tr key={i} className={i % 2 === 0 ? 'bg-white/50' : 'bg-white'}>
-                    <td className="p-2.5 font-medium text-slate-900 border-b">
-                      {p.name}
-                      {p.registered && (
-                        <span className="ml-1 text-[10px] text-brand-green-700 font-semibold">
-                          (RAPIDS)
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-2.5 text-slate-700 border-b">{p.duration}</td>
-                    <td className="p-2.5 text-slate-700 border-b">{p.format}</td>
-                    <td className="p-2.5 text-center text-brand-blue-700 font-semibold border-b print:text-slate-900">
-                      {p.rtiHours}
-                    </td>
-                    <td className="p-2.5 text-center text-slate-700 border-b">
-                      {p.ojtHours.toLocaleString()}
-                    </td>
-                    <td className="p-2.5 text-slate-700 border-b">{p.credential}</td>
-                    <td className="p-2.5 text-slate-600 border-b">{p.funding}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <section className="px-6 py-12">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-2xl font-extrabold">Institutional identity</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <article className="rounded-xl border border-slate-200 p-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Organization</p>
+              <p className="mt-2 font-bold">{PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                2Exclusive LLC-S d/b/a {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute,
+                Indianapolis, Indiana.
+              </p>
+            </article>
+            <article className="rounded-xl border border-slate-200 p-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Registered Apprenticeship</p>
+              <p className="mt-2 font-bold">DOL Registered Apprenticeship Sponsor</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{RAPIDS_SPONSOR_LABEL}</p>
+            </article>
           </div>
         </div>
       </section>
 
-      {/* Progress Reporting */}
-      <section className="py-10">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Progress Reporting for Partners</h2>
-          <p className="text-slate-600 text-sm mb-6">
-            Workforce partners and cohort sponsors receive structured progress reports through the
-            institutional LMS. Reports are available on a schedule agreed upon in the partnership
-            MOU.
-          </p>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            {[
-              {
-                icon: BarChart3,
-                title: 'Enrollment Report',
-                desc: 'Student enrollment status, demographic data (as permitted), program assignment, and start dates.',
-              },
-              {
-                icon: Clock,
-                title: 'RTI Hour Tracking',
-                desc: 'Hours completed vs. required per student. Broken down by classroom, online, and lab hours.',
-              },
-              {
-                icon: Monitor,
-                title: 'Module Completion',
-                desc: 'Per-student module progress, assessment scores, and competency verification status.',
-              },
-              {
-                icon: Building2,
-                title: 'OJT Hour Logging',
-                desc: 'Employer-submitted OJT hours with supervisor verification. Skill area breakdown included.',
-              },
-              {
-                icon: Award,
-                title: 'Credential Status',
-                desc: 'Exam readiness, exam dates, pass/fail results, and credential issuance confirmation.',
-              },
-              {
-                icon: Users,
-                title: 'Cohort Summary',
-                desc: 'Aggregate cohort metrics: completion rate, credential attainment, employment placement, and retention.',
-              },
-            ].map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={i}
-                  className="bg-white rounded-lg p-4 border print:bg-white print:border-slate-300"
-                >
-                  <Icon className="w-5 h-5 text-brand-blue-600 mb-2 print:text-slate-700" />
-                  <h3 className="font-semibold text-slate-900 text-sm mb-1">{item.title}</h3>
-                  <p className="text-slate-600 text-xs">{item.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 print:bg-white print:border-slate-300">
-            <p className="text-sm text-slate-700">
-              <span className="font-semibold">Reporting frequency:</span> Weekly, biweekly, or
-              monthly — configured per partnership agreement. Real-time dashboard access available
-              for authorized partner contacts.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Cohort Timeline */}
-      <section className="py-10 print: print:border-t">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Cohort Setup Timeline</h2>
-          <p className="text-slate-600 text-sm mb-6">
-            From initial agreement to student enrollment in approximately 2 weeks.
-          </p>
-
-          <div className="space-y-3">
-            {[
-              {
-                day: 'Day 1–2',
-                title: 'Partnership Agreement',
-                desc: 'MOU execution, cohort parameters defined (size, program, timeline, reporting requirements).',
-              },
-              {
-                day: 'Day 3–5',
-                title: 'Student Intake',
-                desc: 'Eligibility screening, enrollment forms, funding determination (WIOA/Job Ready Indy/WRG/self-pay).',
-              },
-              {
-                day: 'Day 5–7',
-                title: 'Credential Partner Alignment',
-                desc: 'RTI provider confirmed, instructor assignment, module sequencing, LMS accounts created.',
-              },
-              {
-                day: 'Day 7–10',
-                title: 'Employer OJT Setup',
-                desc: 'OJT agreements signed, work process schedules documented, supervisors designated (if applicable).',
-              },
-              {
-                day: 'Day 10–14',
-                title: 'Cohort Launch',
-                desc: 'Orientation, first RTI session, LMS access activated, progress tracking begins.',
-              },
-            ].map((step, i) => (
-              <div
-                key={i}
-                className="flex gap-4 items-start bg-white rounded-lg p-4 border print:border-slate-300"
-              >
-                <div className="flex-shrink-0 w-20 text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded text-center print:bg-white print:text-slate-900">
-                  {step.day}
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-900 text-sm">{step.title}</p>
-                  <p className="text-slate-600 text-xs mt-0.5">{step.desc}</p>
-                </div>
-              </div>
+      <section className="border-y border-slate-200 bg-slate-50 px-6 py-12">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-2xl font-extrabold">Public claim controls</h2>
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
+            {controls.map((item) => (
+              <article key={item.title} className="rounded-xl border border-slate-200 bg-white p-6">
+                <item.icon className="h-6 w-6 text-brand-red-600" />
+                <h3 className="mt-4 font-bold">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{item.text}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Assessment & Verification */}
-      <section className="py-10">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            Assessment & Competency Verification
-          </h2>
-          <p className="text-slate-600 text-sm mb-6">
-            Competency-based assessment aligned to industry skill standards.
+      <section className="px-6 py-12">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex items-center gap-3">
+            <Award className="h-6 w-6 text-brand-red-600" />
+            <h2 className="text-2xl font-extrabold">Currently evidenced public funding records</h2>
+          </div>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+            Only programs with exact program-level evidence appear below. Programs not shown here
+            should not be described publicly as WIOA-, ETPL-, or Workforce Ready Grant-funded unless
+            the canonical registry is updated with current evidence.
           </p>
 
-          <div className="bg-white rounded-lg p-6 border print:bg-white print:border-slate-300">
-            <div className="space-y-4 text-sm">
-              <div>
-                <p className="font-semibold text-slate-900 mb-1">Assessment Authority</p>
-                <ul className="space-y-1 text-slate-700 text-xs">
-                  <li className="flex items-start gap-2">
+          <div className="mt-7 grid gap-5 md:grid-cols-2">
+            {VERIFIED_WORKFORCE_FUNDED_PROGRAMS.map((program) => (
+              <article key={program.slug} className="rounded-xl border border-slate-200 p-6">
+                <h3 className="text-lg font-bold">{program.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{program.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {getPublicFundingLabels(program.slug).map((label) => (
                     <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    RTI competencies verified by Credential Partner / Instructor
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    OJT competencies verified by Employer Supervisor
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    Final completion verified by Program Holder + Sponsor (Elevate)
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900 mb-1">Evaluation Checkpoints</p>
-                <ul className="space-y-1 text-slate-700 text-xs">
-                  <li className="flex items-start gap-2">
-                    <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    30-day evaluation (initial progress review)
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    Midpoint evaluation (competency milestone check)
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    Final competency review (certification readiness)
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span
-                      aria-hidden
-                      className="w-1.5 h-1.5 rounded-full bg-brand-red-500 flex-shrink-0 mt-2"
-                    />
-                    Completion documentation (credential issuance + placement)
-                  </li>
-                </ul>
-              </div>
-            </div>
+                      key={label}
+                      className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-4 text-xs leading-5 text-slate-500">{program.sourceNote}</p>
+                <Link
+                  href={`/programs/${program.slug}`}
+                  className="mt-5 inline-flex font-bold text-brand-red-700 hover:underline"
+                >
+                  Review program record
+                </Link>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Contact */}
-      <section className="py-10 print: print:border-t">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Partnership Inquiries</h2>
-          <div className="bg-white rounded-lg border p-6 print:border-slate-300">
-            <div className="grid sm:grid-cols-2 gap-4 text-sm">
-              <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-brand-blue-600 flex-shrink-0 print:text-slate-700" />
-                <div>
-                  <p className="font-semibold text-slate-900">Email</p>
-                  <p className="text-slate-700">info@elevateforhumanity.org</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-brand-blue-600 flex-shrink-0 print:text-slate-700" />
-                <div>
-                  <p className="font-semibold text-slate-900">Phone</p>
-                  <p className="text-slate-700">(317) 314-3757</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-brand-blue-600 flex-shrink-0 print:text-slate-700" />
-                <div>
-                  <p className="font-semibold text-slate-900">Location</p>
-                  <p className="text-slate-700">Indianapolis, Indiana</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 print:text-slate-700" />
-                <div>
-                  <p className="font-semibold text-slate-900">Website</p>
-                  <p className="text-slate-700">www.elevateforhumanity.org</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <section className="border-t border-amber-200 bg-amber-50 px-6 py-10">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="font-bold text-amber-950">Partner use notice</h2>
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-amber-950">
+            Use the exact program page, current funding record, enrollment documentation, and agency
+            authorization when making a referral or funding decision. Do not rely on archived packets,
+            screenshots, marketing copy, or provider-level status as proof that a specific participant
+            or program is funded.
+          </p>
         </div>
       </section>
-
-      {/* Navigation — hidden on print */}
-      <section className="py-10 print:hidden">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/compliance/apprenticeship-structure"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition"
-            >
-              Apprenticeship & RTI Structure
-            </Link>
-            <Link
-              href="/compliance/credential-partners"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-white transition"
-            >
-              Credential Partner Registry
-            </Link>
-            <Link
-              href="/instructional-framework"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-white transition"
-            >
-              Instructional Framework
-            </Link>
-            <Link
-              href="/workone-partner-packet"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-white transition"
-            >
-              WorkOne Partner Packet
-            </Link>
-            <PrintButton />
-          </div>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

@@ -14,6 +14,7 @@
 import * as dotenv from 'dotenv';
 import { courseFactory } from '../../lib/course-factory';
 import type { BuildMode } from '../../lib/course-factory';
+import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 
 dotenv.config({ path: '.env.local' });
 
@@ -33,7 +34,12 @@ async function main() {
   const dryRun = args.includes('--validate') || args.includes('--dry-run');
   const videoMode = args.includes('--no-videos') || dryRun ? 'off' : 'queue';
 
-  const result = await courseFactory(
+  const progress = (stage: Parameters<NonNullable<Parameters<typeof courseFactory>[1]>>[0], message: string, progressValue?: number) => {
+    const percent = typeof progressValue === 'number' ? ` ${progressValue}%` : '';
+    console.log(`[${stage}]${percent} ${message}`);
+  };
+
+  let result = await courseFactory(
     {
       programSlug,
       mode,
@@ -41,11 +47,30 @@ async function main() {
       videoMode,
       dryRun,
     },
-    (stage, message, progress) => {
-      const percent = typeof progress === 'number' ? ` ${progress}%` : '';
-      console.log(`[${stage}]${percent} ${message}`);
-    },
+    progress,
   );
+
+  // Some credential courses are intentionally standalone and therefore do not
+  // have a row in `programs`. A registered blueprint is still a canonical
+  // Course Factory source and must remain rebuildable. Only fall back when the
+  // program-bound resolution reports not_found; never bypass a different
+  // validation or generation failure.
+  if (!result.ok && result.status === 'not_found') {
+    const registeredBlueprint = await getBlueprintBySlug(programSlug);
+    if (registeredBlueprint) {
+      console.log(`[resolve] No programs row for ${programSlug}; using registered credential blueprint ${registeredBlueprint.id}.`);
+      result = await courseFactory(
+        {
+          blueprint: registeredBlueprint,
+          mode,
+          contentSource: 'ai',
+          videoMode,
+          dryRun,
+        },
+        progress,
+      );
+    }
+  }
 
   if (!result.ok) {
     throw new Error(result.errors?.join('; ') || 'Course Factory failed');

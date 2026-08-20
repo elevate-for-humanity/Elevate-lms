@@ -75,10 +75,10 @@ export default async function CareersPage() {
                       )}
                     </div>
                     <Link
-                      href={`/jobs/${job.id}`}
+                      href="/jobs"
                       className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
                     >
-                      Review posting <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      Open jobs board <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   </div>
                 </article>

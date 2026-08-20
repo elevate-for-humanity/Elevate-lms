@@ -31,11 +31,11 @@ export default async function EstheticianApprenticeshipPage() {
   const published = await loadProgramForPage('esthetician-apprenticeship');
   if (!published) return notFound();
 
-  const program = normalizePublicProgram({
+  const normalizedProgram = normalizePublicProgram({
     ...ESTHETICIAN_APPRENTICESHIP,
-    title: 'Esthetician Apprenticeship Pathway',
+    title: 'Esthetician Apprenticeship',
     subtitle:
-      'Indiana esthetician apprenticeship pathway with supervised spa or salon training, related instruction, documented progress, and preparation for the state licensing pathway. Indiana requires 700 hours of esthetics education. Federal Registered Apprenticeship status is not currently published for this occupation in Elevate’s canonical RAPIDS registry.',
+      'Indiana esthetician pathway with supervised spa or salon training, related instruction, documented progress, and preparation for the state licensing pathway. Indiana requires 700 hours of esthetics education.',
     durationWeeks: 28,
     hoursPerWeekMin: 25,
     hoursPerWeekMax: 25,
@@ -49,8 +49,6 @@ export default async function EstheticianApprenticeshipPage() {
     fundingStatement:
       'Self-pay enrollment is available. Any employer or workforce funding must be confirmed in writing for the individual participant before enrollment.',
     fundingOptions: ['self_pay'],
-    badge: 'Indiana Esthetics Pathway',
-    badgeColor: 'blue',
     complianceAlignment: [
       {
         standard: 'Indiana State Board of Cosmetology and Barber Examiners — Esthetics Education',
@@ -58,10 +56,19 @@ export default async function EstheticianApprenticeshipPage() {
           'Indiana publishes a 700-hour minimum education requirement for esthetician applicants. Program completion and licensure remain subject to current state requirements and board review.',
       },
     ],
+  });
+
+  // Keep the public search-intent name explicit while retaining the canonical
+  // normalizer's funding and federal-registration disclosure protections.
+  const program = {
+    ...normalizedProgram,
+    title: 'Esthetician Apprenticeship Pathway',
+    badge: 'Indiana Esthetics Pathway',
+    badgeColor: 'blue' as const,
     metaTitle: 'Esthetician Apprenticeship Pathway | Indiana | Elevate for Humanity',
     metaDescription:
       'Indiana esthetician apprenticeship pathway with supervised training, related instruction, documented progress and preparation for Indiana’s 700-hour esthetics education and licensing requirements.',
-  });
+  };
 
   const rawBanner = heroBanners['esthetician-apprenticeship'] ?? null;
   const safeBanner: HeroBannerConfig | null = rawBanner

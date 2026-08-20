@@ -1,5 +1,5 @@
 import { logger } from '@/lib/logger';
-import { withResilience, breakers } from '@/lib/resilience';
+import { withResilience, breakers, CircuitBreaker } from '@/lib/resilience';
 import type {
   AIProvider,
   AIImageProvider,
@@ -37,6 +37,8 @@ const imageProviders: Record<string, () => AIImageProvider> = {
   stability: () => new StabilityProvider(),
 };
 
+const chatProviderOrder = ['openai', 'anthropic', 'gemini', 'groq', 'azure'] as const;
+
 function resolveChatProvider(): AIProvider {
   const preferred = (process.env.AI_PROVIDER || 'openai') as AIProviderName;
 
@@ -46,7 +48,7 @@ function resolveChatProvider(): AIProvider {
     logger.warn(`AI provider "${preferred}" not available, trying fallbacks`);
   }
 
-  for (const name of ['openai', 'anthropic', 'gemini', 'groq', 'azure']) {
+  for (const name of chatProviderOrder) {
     if (name === preferred) continue;
     const provider = chatProviders[name]();
     if (provider.isAvailable()) {
@@ -58,6 +60,20 @@ function resolveChatProvider(): AIProvider {
   throw new Error(
     'No AI chat provider available. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
   );
+}
+
+function resolveChatCandidates(options: ChatCompletionOptions): AIProvider[] {
+  const explicit = options.provider && options.provider !== 'none' && chatProviders[options.provider]
+    ? String(options.provider)
+    : null;
+  const preferred = explicit || String(process.env.AI_PROVIDER || 'openai');
+  const names = [preferred, ...chatProviderOrder].filter(
+    (name, index, list) => name !== 'none' && Boolean(chatProviders[name]) && list.indexOf(name) === index,
+  );
+
+  return names
+    .map((name) => chatProviders[name]())
+    .filter((provider) => provider.isAvailable());
 }
 
 function resolveImageProvider(): AIImageProvider {
@@ -77,25 +93,41 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-  let provider: AIProvider;
-  if (options.provider && options.provider !== 'none' && chatProviders[options.provider]) {
-    const explicit = chatProviders[options.provider]();
-    provider = explicit.isAvailable() ? explicit : resolveChatProvider();
-  } else {
-    provider = resolveChatProvider();
+  const providers = resolveChatCandidates(options);
+  if (!providers.length) {
+    throw new Error(
+      'No AI chat provider available. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
+    );
   }
 
-  const result = await withResilience(() => provider.chat(options), {
-    circuitBreaker: breakers.openai,
-    attempts: 2,
-    baseDelayMs: 1000,
-    label: `aiChat:${provider.name}`,
-    shouldRetry: (err) => {
-      const msg = err instanceof Error ? err.message : String(err);
-      return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
-    },
-  });
-  return { ...result, provider: provider.name };
+  let lastError: unknown;
+
+  for (const provider of providers) {
+    try {
+      const providerOptions = { ...options, provider: provider.name as AIProviderName };
+      const result = await withResilience(() => provider.chat(providerOptions), {
+        circuitBreaker: CircuitBreaker.for(`ai:${provider.name}`, {
+          failureThreshold: 5,
+          resetTimeoutMs: 30_000,
+        }),
+        attempts: 2,
+        baseDelayMs: 1000,
+        label: `aiChat:${provider.name}`,
+        shouldRetry: (err) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          return !msg.includes('401') && !msg.includes('400') && !msg.includes('content_policy');
+        },
+      });
+      return { ...result, provider: provider.name };
+    } catch (error) {
+      lastError = error;
+      logger.warn(`[aiChat] provider "${provider.name}" failed; trying next configured provider`, {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('All configured AI chat providers failed');
 }
 
 export async function* aiChatStream(options: ChatCompletionOptions): AsyncIterable<string> {
@@ -220,7 +252,7 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
     const provider = new AnthropicProvider();
     try {
       const result = await withResilience(() => provider.chat({ ...options, provider: 'anthropic' }), {
-        circuitBreaker: breakers.openai,
+        circuitBreaker: CircuitBreaker.for('ai:anthropic', { failureThreshold: 5, resetTimeoutMs: 30_000 }),
         attempts: 2,
         baseDelayMs: 1500,
         label: 'aiReason:anthropic',
@@ -242,7 +274,7 @@ export async function aiReason(options: ChatCompletionOptions): Promise<ChatComp
     if (provider.isAvailable()) {
       try {
         const result = await withResilience(() => provider.reason(options), {
-          circuitBreaker: breakers.openai,
+          circuitBreaker: CircuitBreaker.for('ai:azure', { failureThreshold: 5, resetTimeoutMs: 30_000 }),
           attempts: 2,
           baseDelayMs: 2000,
           label: 'aiReason:azure',

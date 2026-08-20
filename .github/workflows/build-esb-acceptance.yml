@@ -8,13 +8,23 @@ on:
       - 'scripts/course-factory/build-esb-acceptance.ts'
       - '.github/workflows/build-esb-acceptance.yml'
       - 'lib/curriculum/blueprints/entrepreneurship.ts'
+      - 'lib/curriculum/lesson-content-schema.ts'
+      - 'lib/curriculum/normalize-lesson-content.ts'
       - 'lib/course-factory/**'
       - 'lib/course-builder/video-queue.ts'
       - 'lib/video/job-queue.ts'
       - 'lib/video/edge-tts.ts'
       - 'lib/video/process-video-job.ts'
       - 'lib/video/remotion-render.ts'
+      - 'components/lms/CommercialLessonExperience.tsx'
+      - 'components/lms/LessonContentRenderer.tsx'
+      - 'apps/lms/app/lms/courses/**'
+      - 'apps/admin/app/api/internal/videos/process-queue/route.ts'
       - 'supabase/migrations/20260820121500_harden_course_publish_completeness_gate.sql'
+      - 'supabase/migrations/20260820174500_course_factory_experience_assets.sql'
+      - 'supabase/migrations/20260820175500_course_factory_asset_trigger_idempotent.sql'
+      - 'supabase/migrations/20260820181000_course_microvideo_jobs.sql'
+      - 'supabase/migrations/20260820182500_course_domain_readiness.sql'
   issues:
     types: [opened]
 
@@ -37,7 +47,7 @@ jobs:
   build-audit-publish:
     if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 120
     concurrency:
       group: esb-course-builder-production-acceptance
       cancel-in-progress: true
@@ -50,7 +60,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
@@ -65,5 +75,5 @@ jobs:
             exit 1
           fi
 
-      - name: Build, audit, render media, and publish ESB v2
+      - name: Build, audit, render full media package, and publish Entrepreneurship course
         run: pnpm tsx scripts/course-factory/build-esb-acceptance.ts

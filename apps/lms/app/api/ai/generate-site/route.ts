@@ -6,8 +6,6 @@ import { getRecommendedTemplate } from '@/lib/templates/designs';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { apiAuthGuard } from '@/lib/admin/guards';
-import { saveWebsiteConfig } from '@/lib/websites/save-site-config';
-import type { TenantSiteConfig } from '@/lib/tenant/site-types';
 
 /**
  * POST /api/ai/generate-site
@@ -38,13 +36,11 @@ async function _POST(request: NextRequest) {
       return NextResponse.json({ error: 'Organization name and type required' }, { status: 400 });
     }
 
-    // Get recommended template based on industry/org type
     const template = getRecommendedTemplate(
       industry || 'General',
       organizationType || 'Training Provider',
     );
 
-    // Generate site configuration using AI
     const prompt = `You are a learning management system configuration expert. Generate compelling content for a training organization website.
 
 Organization Details:
@@ -82,24 +78,18 @@ Return ONLY valid JSON, no markdown.`;
 
     const responseText = completion.content || '';
 
-    // Parse JSON from response
     let siteConfig;
     try {
-      // Remove markdown code blocks if present
       const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
       siteConfig = JSON.parse(jsonStr);
     } catch (parseError) {
       logger.error('Failed to parse AI response', new Error(String(parseError)));
-      // Return default config if parsing fails
       siteConfig = getDefaultConfig(organizationName, organizationType);
     }
 
-    // Generate unique preview ID
     const previewId = `preview_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
-    // Merge AI content with template design
     const finalConfig = {
-      // Template design system
       template: {
         id: template.id,
         name: template.name,
@@ -107,7 +97,6 @@ Return ONLY valid JSON, no markdown.`;
         colors: template.colors,
         style: template.style,
       },
-      // Branding (use template colors, override with user preference if provided)
       branding: {
         primaryColor: brandColors || template.colors.primary,
         secondaryColor: template.colors.secondary,
@@ -117,7 +106,6 @@ Return ONLY valid JSON, no markdown.`;
         logoText: organizationName,
         tagline: siteConfig.homepage?.heroSubtitle?.slice(0, 60) || 'Empowering learners',
       },
-      // AI-generated content
       homepage: {
         heroTitle: siteConfig.homepage?.heroTitle || `Welcome to ${organizationName}`,
         heroSubtitle: siteConfig.homepage?.heroSubtitle || 'Start your learning journey today.',
@@ -129,24 +117,9 @@ Return ONLY valid JSON, no markdown.`;
         ],
       },
       programs: siteConfig.programs || [
-        {
-          name: 'Fundamentals',
-          description: 'Build your foundation',
-          duration: '4 weeks',
-          level: 'Beginner',
-        },
-        {
-          name: 'Advanced',
-          description: 'Take skills further',
-          duration: '8 weeks',
-          level: 'Intermediate',
-        },
-        {
-          name: 'Professional',
-          description: 'Industry certification',
-          duration: '12 weeks',
-          level: 'Advanced',
-        },
+        { name: 'Fundamentals', description: 'Build your foundation', duration: '4 weeks', level: 'Beginner' },
+        { name: 'Advanced', description: 'Take skills further', duration: '8 weeks', level: 'Intermediate' },
+        { name: 'Professional', description: 'Industry certification', duration: '12 weeks', level: 'Advanced' },
       ],
       stats: siteConfig.stats || {
         students: 500,
@@ -155,8 +128,7 @@ Return ONLY valid JSON, no markdown.`;
         rating: '4.9',
       },
       testimonial: siteConfig.testimonial || {
-        quote:
-          'This program changed my career trajectory completely. The instructors were amazing.',
+        quote: 'This program changed my career trajectory completely. The instructors were amazing.',
         author: 'Recent Graduate',
       },
       navigation: [
@@ -224,24 +196,9 @@ function getDefaultConfig(name: string, type: string) {
       ],
     },
     programs: [
-      {
-        name: 'Fundamentals Course',
-        description: 'Build your foundation',
-        duration: '4 weeks',
-        level: 'Beginner',
-      },
-      {
-        name: 'Advanced Training',
-        description: 'Take your skills further',
-        duration: '8 weeks',
-        level: 'Intermediate',
-      },
-      {
-        name: 'Professional Certification',
-        description: 'Industry-recognized credential',
-        duration: '12 weeks',
-        level: 'Advanced',
-      },
+      { name: 'Fundamentals Course', description: 'Build your foundation', duration: '4 weeks', level: 'Beginner' },
+      { name: 'Advanced Training', description: 'Take your skills further', duration: '8 weeks', level: 'Intermediate' },
+      { name: 'Professional Certification', description: 'Industry-recognized credential', duration: '12 weeks', level: 'Advanced' },
     ],
     navigation: [
       { label: 'Home', href: '/' },
@@ -260,4 +217,5 @@ function getDefaultConfig(name: string, type: string) {
     },
   };
 }
+
 export const POST = withApiAudit('/api/ai/generate-site', _POST);

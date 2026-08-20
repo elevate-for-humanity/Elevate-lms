@@ -12,36 +12,42 @@ import Link from 'next/link';
 const TRUST_ITEMS = [
   {
     img: '/images/pages/about-career-pathways.webp',
+    alt: 'Registered apprenticeship career pathway at Elevate for Humanity',
     label: 'DOL Registered',
     sub: 'Registered Apprenticeship sponsor',
     href: '/compliance/apprenticeship-structure',
   },
   {
     img: '/images/pages/wioa-meeting.webp',
+    alt: 'Indiana workforce training and ETPL program coordination',
     label: 'ETPL Listed',
     sub: 'Approved programs are listed by the state',
     href: '/approvals',
   },
   {
     img: '/images/pages/about-career-training.webp',
+    alt: 'WIOA career training pathway at Elevate for Humanity',
     label: 'WIOA Pathways',
     sub: 'Eligibility and authorization are program-specific',
     href: '/eligibility',
   },
   {
     img: '/images/pages/comp-state-career-hero.webp',
+    alt: 'Registered apprenticeship RAPIDS reporting and compliance workflow',
     label: 'RAPIDS Tracked',
     sub: 'Registered apprenticeship reporting workflow',
     href: '/compliance/apprenticeship-structure',
   },
   {
     img: '/images/pages/about-team-hero.webp',
+    alt: 'WorkOne workforce referral and training coordination in Indiana',
     label: 'WorkOne Coordination',
     sub: 'Workforce referral and funding coordination',
     href: '/for-agencies',
   },
   {
     img: '/images/pages/funding-impact-2.jpg',
+    alt: 'Job Ready Indy workforce training pathway and participant support',
     label: 'JRI Pathway',
     sub: 'Availability depends on current authorization',
     href: '/partners/jri',
@@ -79,7 +85,7 @@ export function HomeTrustBar() {
           Registrations, approvals &amp; funding pathways
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {TRUST_ITEMS.map(({ img, label, sub, href }) => (
+          {TRUST_ITEMS.map(({ img, alt, label, sub, href }) => (
             <Link
               key={label}
               href={href}
@@ -88,7 +94,7 @@ export function HomeTrustBar() {
               <div className="relative w-16 h-16 rounded-lg bg-white border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden p-2">
                 <Image
                   src={img}
-                  alt=""
+                  alt={alt}
                   width={56}
                   height={56}
                   className="object-contain w-full h-full"

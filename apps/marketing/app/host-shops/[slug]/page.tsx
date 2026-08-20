@@ -26,6 +26,15 @@ function programLabel(program: string) {
   if (program.includes('nail')) return 'Nail Technician Apprenticeship';
   return 'Barber Apprenticeship';
 }
+function dedupeMedia(items: Array<{ url: string; alt?: string; source?: string }>) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.url.trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -52,11 +61,11 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   const externalUrl = profile.website_url || profile.website;
   const mapUrl = approved.googleMapsUrl || (address ? directionsUrl(address) : undefined);
   const gallery = Array.isArray(profile.media_gallery) ? profile.media_gallery : [];
-  const items = [
+  const items = dedupeMedia([
     ...gallery,
     ...(profile.logo_url ? [{ url: profile.logo_url, alt: `${approved.name} logo`, source: profile.source_url || externalUrl || undefined }] : []),
     ...(profile.flyer_url ? [{ url: profile.flyer_url, alt: `${approved.name} flyer`, source: profile.source_url || externalUrl || undefined }] : []),
-  ];
+  ]);
   const programs = approved.programs;
   const canonical = `${SITE_URL}/host-shops/${profile.public_slug}`;
   const jsonLd = {
@@ -72,46 +81,48 @@ export default async function HostShopProfilePage({ params }: PageProps) {
   };
 
   return (
-    <main className="bg-white text-slate-950">
+    <main className="overflow-x-hidden bg-white text-slate-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
 
-      <section className="border-b border-slate-800 bg-slate-950 text-white">
-        <div className="mx-auto grid max-w-6xl gap-9 px-4 py-10 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-center lg:py-16">
-          <div>
-            <p className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
-            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">{approved.name}</h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">{approved.description || 'Approved worksite participating in supervised apprenticeship training through Elevate.'}</p>
-            {programs.length ? <div className="mt-5 flex flex-wrap gap-2">{programs.map((program) => <span key={program} className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-black">{programLabel(program)}</span>)}</div> : null}
-            {approved.supervisor ? <p className="mt-4 text-sm font-semibold text-slate-300">Approved supervisor: {approved.supervisor}</p> : null}
-            <div className="mt-7 flex flex-wrap gap-3">
-              {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-brand-red-600 px-5 py-2.5 text-sm font-extrabold text-white"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
-              {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-sm font-extrabold text-white"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
-              {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-white/25 px-5 py-2.5 text-sm font-extrabold text-white">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
+      <section className="border-b border-slate-200 bg-gradient-to-b from-white to-slate-50">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-12 lg:py-16">
+          <div className="min-w-0">
+            <p className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-800"><ShieldCheck className="h-4 w-4" /> Approved Elevate apprenticeship Host Site</p>
+            <h1 className="mt-4 break-words text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">{approved.name}</h1>
+            {approved.description ? <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">{approved.description}</p> : null}
+            {programs.length ? <div className="mt-5 flex flex-wrap gap-2">{programs.map((program) => <span key={program} className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-800 shadow-sm">{programLabel(program)}</span>)}</div> : null}
+            {approved.supervisor ? <p className="mt-4 text-sm font-semibold text-slate-600">Approved supervisor: <span className="text-slate-950">{approved.supervisor}</span></p> : null}
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-5 py-3 text-sm font-extrabold text-white sm:justify-start"><Phone className="h-4 w-4" /> Call {approved.phone}</a> : null}
+              {mapUrl ? <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start"><Navigation className="h-4 w-4" /> Approved Worksite Map</a> : null}
+              {externalUrl ? <a href={externalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-extrabold text-slate-900 sm:justify-start">Shop website <ExternalLink className="h-4 w-4" /></a> : null}
             </div>
           </div>
-          {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || undefined} /> : address ? <div className="h-[360px] overflow-hidden rounded-3xl border border-white/10"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+          <div className="min-w-0">
+            {items.length || profile.video_url ? <HostShopMediaCarousel shopName={approved.name} items={items} videoUrl={profile.video_url || undefined} /> : address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:rounded-3xl"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+          </div>
         </div>
       </section>
 
-      <section className="px-4 py-12 sm:px-6 sm:py-16">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
+      <section className="px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8">
+          <div className="min-w-0">
             <h2 className="text-2xl font-black">Approved Training Worksite</h2>
-            <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              {address ? <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span>{address}</span></p> : null}
-              {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="mt-4 flex items-center gap-3 font-bold"><Phone className="h-5 w-5 text-brand-red-700" /> {approved.phone}</a> : null}
+            <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+              {address ? <p className="flex items-start gap-3 font-bold"><MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-red-700" /><span className="break-words">{address}</span></p> : null}
+              {approved.phone ? <a href={`tel:${approved.phone.replace(/[^0-9+]/g, '')}`} className="mt-4 flex items-center gap-3 font-bold"><Phone className="h-5 w-5 shrink-0 text-brand-red-700" /> {approved.phone}</a> : null}
             </div>
             <p className="mt-5 text-sm leading-6 text-slate-600">The address shown here is the worksite on the approved apprenticeship Host Site record. A business may maintain other public storefront, mailing, booking, or service addresses. Placement at this worksite depends on occupation approval, apprentice fit, supervisor capacity, and current availability.</p>
           </div>
-          {address ? <div className="h-[380px] overflow-hidden rounded-2xl border border-slate-300 sm:h-[500px]"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
+          {address ? <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-slate-300 sm:aspect-[16/10]"><iframe title={`Approved worksite map — ${approved.name}`} src={mapEmbedUrl(address)} className="h-full w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div> : null}
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-slate-50 px-4 py-12 text-center sm:px-6">
+      <section className="border-y border-slate-200 bg-slate-50 px-4 py-10 text-center sm:px-6 sm:py-12">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-3xl font-black">Train at {approved.name}</h2>
           <p className="mx-auto mt-4 max-w-3xl leading-7 text-slate-700">Apply through Elevate and identify this approved Host Site. Admissions and apprenticeship staff confirm the correct occupation and current placement availability.</p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row sm:flex-wrap">
             {programs.map((program) => <Link key={program} href={applyHref(program, approved.name, approved.id)} className="rounded-xl bg-brand-red-600 px-6 py-3 font-extrabold text-white">Apply — {programLabel(program)}</Link>)}
             <Link href="/partners/host-shops" className="rounded-xl border border-slate-300 bg-white px-6 py-3 font-extrabold">View all Host Sites</Link>
           </div>

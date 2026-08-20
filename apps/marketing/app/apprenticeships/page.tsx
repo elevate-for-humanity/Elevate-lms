@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import HeroPicture from '@/components/marketing/HeroPicture';
+import { ArrowRight, BriefcaseBusiness, GraduationCap, MapPin, ShieldCheck } from 'lucide-react';
 import { BARBER_APPRENTICESHIP } from '@/data/programs/barber-apprenticeship';
 
 export const metadata: Metadata = {
   title: 'Apprenticeship Programs | Elevate for Humanity',
   description:
-    'Explore Elevate apprenticeship pathways in barbering, cosmetology, esthetics, and nail technology, including verified registered-apprenticeship information and state licensing pathways.',
+    'Explore Elevate apprenticeship pathways in barbering, cosmetology, esthetics, and nail technology, including supervised work-based learning, related instruction, progress tracking, and licensing pathways.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/apprenticeships' },
 };
 
@@ -21,8 +21,7 @@ const PATHWAYS = [
     image: PROGRAM.heroImage || '/images/pexels/barber-hero.webp',
     imageAlt: PROGRAM.heroImageAlt || 'Barber apprentice training at a licensed host shop',
     badge: 'DOL Registered Pathway',
-    description:
-      'The verified registered occupation in Elevate’s canonical RAPIDS configuration. Includes supervised on-the-job learning, related technical instruction, progress documentation, and Indiana barber licensing preparation.',
+    description: 'Structured on-the-job learning, related technical instruction, documented progress, and preparation for Indiana barber licensing requirements.',
   },
   {
     title: 'Cosmetology Apprenticeship',
@@ -31,8 +30,7 @@ const PATHWAYS = [
     image: '/images/pexels/cosmetology.webp',
     imageAlt: 'Cosmetology apprentice receiving supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
-    description:
-      'Supervised salon training and related instruction covering hair services, client care, sanitation, business practices, progress tracking, and preparation for Indiana cosmetology licensing requirements.',
+    description: 'Supervised salon learning in hair services, client care, sanitation, business practices, and documented progress toward the applicable licensing pathway.',
   },
   {
     title: 'Esthetics Apprenticeship',
@@ -41,8 +39,7 @@ const PATHWAYS = [
     image: '/images/pexels/esthetician.webp',
     imageAlt: 'Esthetics apprentice completing supervised skincare training',
     badge: 'Beauty Apprenticeship Pathway',
-    description:
-      'Hands-on esthetics training with supervised practice, sanitation, skincare services, client safety, progress documentation, and preparation for the applicable Indiana licensing pathway.',
+    description: 'Hands-on skincare training with supervision, sanitation, client safety, service practice, and progress documentation.',
   },
   {
     title: 'Nail Technician Apprenticeship',
@@ -51,127 +48,88 @@ const PATHWAYS = [
     image: '/images/pexels/nail-tech.webp',
     imageAlt: 'Nail technician apprentice completing supervised salon training',
     badge: 'Beauty Apprenticeship Pathway',
-    description:
-      'Supervised nail-technology training covering sanitation, manicuring, nail services, client care, documented training progress, and preparation for the applicable Indiana licensing pathway.',
+    description: 'Supervised nail-services training covering sanitation, manicuring, client care, service skills, and documented training progress.',
   },
 ] as const;
 
-const STEPS = [
-  {
-    number: '01',
-    title: 'Choose the pathway',
-    body: 'Open the full program page for current training requirements, tuition, admission rules, licensing objective, and funding disclosures.',
-  },
-  {
-    number: '02',
-    title: 'Complete the application',
-    body: 'Submit the apprenticeship application and required documentation. Prior training or transfer-hour evidence is reviewed before any credit is granted.',
-  },
-  {
-    number: '03',
-    title: 'Confirm host-site placement and funding',
-    body: 'A participating host site and any third-party funding authorization must be confirmed for the individual apprentice. Neither is guaranteed by a website statement.',
-  },
-  {
-    number: '04',
-    title: 'Train and document progress',
-    body: 'Complete the applicable program requirements, related instruction, supervised on-the-job learning, competency documentation, and licensing steps.',
-  },
+const EXPERIENCE = [
+  { icon: GraduationCap, title: 'Learn the craft', body: 'Complete structured instruction connected to your occupation and licensing pathway.' },
+  { icon: BriefcaseBusiness, title: 'Train on the job', body: 'Build skills through supervised work-based learning at an approved participating site.' },
+  { icon: ShieldCheck, title: 'Track real progress', body: 'Hours, competencies, documents, RTI, and required milestones are recorded in the apprenticeship workflow.' },
+  { icon: MapPin, title: 'Work with a host site', body: 'Host-site availability is confirmed during enrollment and depends on current participating capacity.' },
 ] as const;
 
 export default function ApprenticeshipsPage() {
   return (
     <main className="min-h-screen bg-white text-slate-950">
-      <HeroPicture
-        src="/images/pages/admin-apprenticeships-hero.webp"
-        alt="Apprentice receiving supervised hands-on training"
-        analyticsName="apprenticeship-programs"
-      />
-
-      <section className="bg-slate-950 py-14 text-white sm:py-18">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="max-w-4xl">
-            <Link
-              href="/programs"
-              className="inline-flex min-h-10 items-center rounded-full border border-white/30 bg-white/5 px-4 py-2 text-sm font-bold text-white hover:bg-white/10"
-            >
-              View all career programs
-            </Link>
-            <h1 className="mt-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Apprenticeship pathways should show the full program family, not only one occupation.
+      <section className="relative isolate min-h-[620px] overflow-hidden bg-slate-950 sm:min-h-[680px]">
+        <Image
+          src="/images/pages/admin-apprenticeships-hero.webp"
+          alt="Apprentice receiving supervised hands-on training"
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/94 via-slate-950/72 to-slate-950/20" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-slate-950/15" aria-hidden="true" />
+        <div className="relative z-10 mx-auto flex min-h-[620px] max-w-7xl items-end px-5 pb-12 pt-28 sm:min-h-[680px] sm:px-8 sm:pb-16 lg:px-10">
+          <div className="max-w-3xl">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-red-300">Learn by doing</p>
+            <h1 className="mt-4 text-4xl font-black leading-[1.02] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Apprenticeship puts training where the work happens.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200 sm:text-xl">
-              Explore Barber, Cosmetology, Esthetics, and Nail Technician apprenticeship pathways. Barber is identified separately where the repository contains verified federal registered-apprenticeship evidence; the other beauty pathways retain their own program and licensing information without being mislabeled as federally registered.
+            <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/90 sm:text-xl sm:leading-8">
+              Build real skills through supervised work-based learning, structured instruction, progress tracking, and a clear path toward occupation-specific requirements.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/programs"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-7 py-3 font-bold text-white hover:bg-brand-red-700"
-              >
-                Browse All Programs
-              </Link>
-              <Link
-                href="/partners/host-shops"
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white px-7 py-3 font-bold text-white hover:bg-white/10"
-              >
-                Host Shop Information
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <a href="#programs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-red-600 px-7 py-3.5 font-black text-white hover:bg-brand-red-700">
+                Explore Apprenticeships <ArrowRight className="h-4 w-4" />
+              </a>
+              <Link href="/partners/host-shops" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/70 bg-slate-950/30 px-7 py-3.5 font-black text-white backdrop-blur-sm hover:bg-white hover:text-slate-950">
+                Find Host-Site Information
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-slate-50 py-7">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <p className="text-center text-sm leading-6 text-slate-700 sm:text-base">
-            <strong className="text-slate-950">Funding notice:</strong> apprenticeship or program status does not automatically provide WIOA, ETPL, Workforce Ready Grant, employer, or other third-party funding. Funding remains participant- and program-specific and requires authorization from the responsible funder.
-          </p>
+      <section className="border-b border-slate-200 bg-white px-4 py-10 sm:py-12">
+        <div className="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {EXPERIENCE.map(({ icon: Icon, title, body }) => (
+            <article key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 text-white"><Icon className="h-5 w-5" /></div>
+              <h2 className="mt-4 text-lg font-black text-slate-950">{title}</h2>
+              <p className="mt-2 text-sm font-medium leading-6 text-slate-700">{body}</p>
+            </article>
+          ))}
         </div>
       </section>
 
-      <section className="py-16 sm:py-20" id="programs">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+      <section id="programs" className="px-4 py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-red-700">Apprenticeship programs</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-              Choose your apprenticeship pathway
-            </h2>
-            <p className="mt-4 text-lg leading-8 text-slate-700">
-              Each card opens the canonical program page so requirements, pricing, enrollment, and licensing information stay in one place.
-            </p>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-brand-red-700">Choose your pathway</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">See the work before you read the details.</h2>
+            <p className="mt-4 text-base font-medium leading-7 text-slate-700 sm:text-lg">Each pathway has its own requirements, tuition, licensing objective, and enrollment record. Open the program that fits what you want to do.</p>
           </div>
 
-          <div className="mt-10 grid gap-7 md:grid-cols-2">
+          <div className="mt-9 grid gap-6 md:grid-cols-2">
             {PATHWAYS.map((pathway) => (
-              <article key={pathway.href} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+              <article key={pathway.href} className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
                 <Link href={pathway.href} className="block">
-                  <div className="relative min-h-[260px] overflow-hidden bg-slate-100">
-                    <Image
-                      src={pathway.image}
-                      alt={pathway.imageAlt}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
-                    />
+                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                    <Image src={pathway.image} alt={pathway.imageAlt} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.04]" sizes="(max-width: 768px) 100vw, 50vw" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/65 via-transparent to-transparent" aria-hidden="true" />
+                    <span className="absolute left-4 top-4 rounded-full bg-slate-950/85 px-3 py-1.5 text-xs font-black uppercase tracking-wide text-white backdrop-blur-sm">{pathway.badge}</span>
+                    <h3 className="absolute bottom-5 left-5 right-5 text-2xl font-black text-white sm:text-3xl">{pathway.title}</h3>
                   </div>
                 </Link>
-                <div className="p-7">
-                  <p className="text-sm font-bold uppercase tracking-[0.14em] text-brand-red-700">{pathway.badge}</p>
-                  <h3 className="mt-2 text-2xl font-extrabold text-slate-950">{pathway.title}</h3>
-                  <p className="mt-4 leading-7 text-slate-700">{pathway.description}</p>
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                    <Link
-                      href={pathway.href}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800"
-                    >
-                      Review Full Program
-                    </Link>
-                    <Link
-                      href={pathway.applyHref}
-                      className="inline-flex min-h-11 flex-1 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold text-slate-950 hover:bg-slate-50"
-                    >
-                      Apply
-                    </Link>
+                <div className="p-6">
+                  <p className="text-sm font-medium leading-6 text-slate-700 sm:text-base">{pathway.description}</p>
+                  <div className="mt-5 grid grid-cols-2 gap-3">
+                    <Link href={pathway.href} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white hover:bg-slate-800">Program</Link>
+                    <Link href={pathway.applyHref} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-black text-slate-950 hover:bg-slate-50">Apply</Link>
                   </div>
                 </div>
               </article>
@@ -180,47 +138,41 @@ export default function ApprenticeshipsPage() {
         </div>
       </section>
 
-      <section className="bg-slate-950 py-16 text-white sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-red-300">Enrollment process</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">What happens before and during apprenticeship</h2>
-          </div>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {STEPS.map((step) => (
-              <article key={step.number} className="rounded-2xl border border-white/15 bg-white/5 p-6">
-                <p className="text-sm font-extrabold tracking-[0.16em] text-red-300">{step.number}</p>
-                <h3 className="mt-2 text-xl font-bold text-white">{step.title}</h3>
-                <p className="mt-2 leading-7 text-slate-200">{step.body}</p>
-              </article>
-            ))}
+      <section className="bg-slate-950 px-4 py-14 text-white sm:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <div className="relative min-h-[340px] overflow-hidden rounded-3xl sm:min-h-[440px]">
+              <Image src="/images/pages/apprenticeship-sponsor-page-1.webp" alt="Apprentice working with an on-site supervisor" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+            </div>
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-red-300">How it works</p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">A clear path from application to documented progress.</h2>
+              <div className="mt-7 space-y-5">
+                {[
+                  ['01', 'Choose and apply', 'Select the occupation, review the full program record, and submit the required application and documents.'],
+                  ['02', 'Confirm the training site', 'Host-site placement and any third-party funding are confirmed for the individual participant before they are treated as approved.'],
+                  ['03', 'Train and learn', 'Complete supervised on-the-job learning together with the required instruction and competencies.'],
+                  ['04', 'Track the record', 'Hours, skills, documents, and program milestones remain visible in the apprenticeship workflow.'],
+                ].map(([n, title, body]) => (
+                  <div key={n} className="flex gap-4 border-b border-white/10 pb-5 last:border-0">
+                    <span className="text-sm font-black text-red-300">{n}</span>
+                    <div><h3 className="font-black text-white">{title}</h3><p className="mt-1 text-sm font-medium leading-6 text-slate-300 sm:text-base">{body}</p></div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto grid max-w-6xl gap-7 px-4 sm:px-6 lg:grid-cols-3">
-          <article className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
-            <h2 className="text-2xl font-extrabold text-slate-950">All career programs</h2>
-            <p className="mt-3 leading-7 text-slate-700">Healthcare, skilled trades, business, technology, beauty, and other published programs remain available from the full catalog.</p>
-            <Link href="/programs" className="mt-6 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline decoration-2 underline-offset-4">
-              Open all programs
-            </Link>
-          </article>
-          <article className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
-            <h2 className="text-2xl font-extrabold text-slate-950">Need a host shop?</h2>
-            <p className="mt-3 leading-7 text-slate-700">Review participating host shops and the host-site process. Placement capacity varies and a listed shop is not a guarantee of employment or assignment.</p>
-            <Link href="/partners/host-shops" className="mt-6 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline decoration-2 underline-offset-4">
-              Browse host-shop information
-            </Link>
-          </article>
-          <article className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
-            <h2 className="text-2xl font-extrabold text-slate-950">Using workforce funding?</h2>
-            <p className="mt-3 leading-7 text-slate-700">Confirm the exact participant authorization and approved amount with WorkOne or the responsible funding agency before treating tuition as funded.</p>
-            <Link href="/funding/wioa" className="mt-6 inline-flex min-h-11 items-center font-bold text-brand-blue-800 underline decoration-2 underline-offset-4">
-              Review WIOA funding steps
-            </Link>
-          </article>
+      <section className="bg-slate-50 px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-5 md:grid-cols-3">
+            <Link href="/partners/host-shops" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">Host sites</p><h2 className="mt-2 text-xl font-black">Need a place to train?</h2><p className="mt-2 text-sm leading-6 text-slate-700">Review the participating host-site process and current placement information.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">Host-site information <ArrowRight className="h-4 w-4" /></span></Link>
+            <Link href="/funding/wioa" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">Funding</p><h2 className="mt-2 text-xl font-black">Using workforce funding?</h2><p className="mt-2 text-sm leading-6 text-slate-700">Funding is participant- and program-specific and requires authorization from the responsible agency.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">Review funding steps <ArrowRight className="h-4 w-4" /></span></Link>
+            <Link href="/programs" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md"><p className="text-xs font-black uppercase tracking-wider text-brand-red-700">More programs</p><h2 className="mt-2 text-xl font-black">Explore the full catalog.</h2><p className="mt-2 text-sm leading-6 text-slate-700">Compare apprenticeship with healthcare, skilled trades, business, technology, and other pathways.</p><span className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-blue-800">All programs <ArrowRight className="h-4 w-4" /></span></Link>
+          </div>
+          <p className="mx-auto mt-8 max-w-4xl text-center text-xs font-medium leading-5 text-slate-600">Apprenticeship or program status does not automatically provide WIOA, ETPL, Workforce Ready Grant, employer, or other third-party funding. Funding and placement require the applicable authorization and current capacity.</p>
         </div>
       </section>
     </main>

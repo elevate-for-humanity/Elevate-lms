@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-// Deployment retrigger: 2026-08-19 Admin zero-downtime rollout.
+// Deployment retrigger: 2026-08-20 zero-downtime rollout hardening.
 /**
  * Canonical Northflank production service configurator.
  *
@@ -9,7 +9,7 @@
  *   - elevate-admin     -> /Dockerfile.northflank-admin
  *
  * This file owns infrastructure/runtime shape: Dockerfile, public port,
- * service role, runtime port, capacity-safe rollout strategy, health probes,
+ * service role, runtime port, zero-downtime rollout strategy, health probes,
  * billing, and build storage. Privileged credentials are managed separately
  * by sync-env.ts through the shared elevate-production-env secret group.
  */
@@ -223,11 +223,12 @@ async function patchWithCapacitySafeStrategy(
 ): Promise<{ response: Record<string, any>; rolloutMode: RolloutMode }> {
   const path = combinedServicePatchPath(projectId, service.id);
 
-  // Single-replica services use recreate to remain within their current capacity.
-  // The Admin production target defaults to two replicas so it can use a
-  // zero-unavailable rolling deployment and keep at least one healthy instance
-  // serving while a replacement starts and passes readiness.
-  const rolloutMode: RolloutMode = DESIRED_INSTANCES === 1 ? 'recreate' : 'custom';
+  // Production must remain available during deployments. Keep desired capacity
+  // unchanged, allow one temporary surge instance, and never make an existing
+  // healthy instance unavailable until its replacement passes readiness.
+  // This provides zero-downtime rollouts even for services whose steady-state
+  // desired replica count is one.
+  const rolloutMode: RolloutMode = 'custom';
   const response = await nfFetch<Record<string, any>>(path, {
     method: 'PATCH',
     body: JSON.stringify(buildPatch(service, storageMb, rolloutMode)),
@@ -307,11 +308,12 @@ async function main() {
   console.info(`Targets: ${services.map((s) => `${s.role}:${s.id}`).join(', ')}`);
 
   if (dryRun) {
-    const rolloutMode: RolloutMode = DESIRED_INSTANCES === 1 ? 'recreate' : 'custom';
+    const rolloutMode: RolloutMode = 'custom';
     for (const service of services) {
       console.info(
         `[dry-run] ${service.id} -> ${service.dockerfile}, port=${RUNTIME_PORT}, instances=${DESIRED_INSTANCES}, ` +
-          `rollout=${rolloutMode}, health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ` +
+          `rollout=${rolloutMode}, maxUnavailable=0, maxSurge=1, ` +
+          `health=startup:/api/ping,readiness:/api/health,liveness:/api/ping, ` +
           `ci=github-actions, buildkitCacheMB=${BUILDKIT_CACHE_MB}`,
       );
     }
@@ -322,7 +324,7 @@ async function main() {
     await configureService(projectId, service, requestedEphemeralMb);
   }
 
-  console.info('Northflank capacity-safe configuration applied to all requested production services.');
+  console.info('Northflank zero-downtime configuration applied to all requested production services.');
 }
 
 main().catch((error) => {

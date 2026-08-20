@@ -13,6 +13,8 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
+const COMPLETE_PROVIDER_STATUSES = '(complete,completed,approved,verified)';
+
 export async function GET(request: Request) {
   await hydrateProcessEnv();
   const authHeader = request.headers.get('authorization');
@@ -27,7 +29,8 @@ export async function GET(request: Request) {
   const { data: incomplete, error } = await db
     .from('provider_onboarding_steps')
     .select('tenant_id')
-    .eq('completed', false);
+    .is('completed_at', null)
+    .not('status', 'in', COMPLETE_PROVIDER_STATUSES);
 
   if (error) {
     logger.error('onboarding-reminder cron: query failed', error);
@@ -35,7 +38,7 @@ export async function GET(request: Request) {
   }
   if (!incomplete?.length) return NextResponse.json({ queued: 0, message: 'All providers fully onboarded' });
 
-  const tenantIds = [...new Set(incomplete.map((row) => row.tenant_id))];
+  const tenantIds = [...new Set(incomplete.map((row) => row.tenant_id).filter(Boolean))];
   let queued = 0;
 
   for (const tenantId of tenantIds) {
@@ -54,7 +57,8 @@ export async function GET(request: Request) {
       .from('provider_onboarding_steps')
       .select('step')
       .eq('tenant_id', tenantId)
-      .eq('completed', false)
+      .is('completed_at', null)
+      .not('status', 'in', COMPLETE_PROVIDER_STATUSES)
       .order('created_at')
       .limit(1)
       .maybeSingle();

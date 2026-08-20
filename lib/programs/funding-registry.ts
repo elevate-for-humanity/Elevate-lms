@@ -18,10 +18,15 @@ export type VerifiedProgramFunding = {
 };
 
 /**
- * Public workforce-funding source of truth.
- * Only these four programs may display workforce-funding labels or claims.
- * WorkOne/the responsible agency determines participant eligibility, covered
- * costs and written authorization. Elevate does not guarantee approval.
+ * Public workforce-funding allowlist.
+ *
+ * This is intentionally narrower than the internal program catalog. A program
+ * belongs here only when exact program-level evidence supports the public
+ * funding statement. Participant eligibility, covered costs, available funds,
+ * and written authorization remain decisions of the responsible workforce
+ * agency; Elevate does not guarantee funding.
+ *
+ * Regulatory evidence is also persisted in Supabase `program_regulatory_status`.
  */
 export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding[] = [
   {
@@ -35,7 +40,8 @@ export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding
     topJobsStars: null,
     wioaEligible: true,
     wrgEligible: true,
-    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
+    sourceNote:
+      'Indiana DWD INTraining approved the Commercial Driver’s License program location for Workforce Ready Grant on July 1, 2026 (Program Location ID 10005156). Participant authorization remains required.',
   },
   {
     slug: 'hvac-technician',
@@ -48,36 +54,8 @@ export const VERIFIED_WORKFORCE_FUNDED_PROGRAMS: readonly VerifiedProgramFunding
     topJobsStars: null,
     wioaEligible: true,
     wrgEligible: true,
-    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
-  },
-  {
-    // This must remain the program slug. `/programs/business` is a compatibility
-    // alias and redirects to this canonical public program URL.
-    slug: 'business-administration',
-    title: 'Business Administration',
-    aliases: ['business'],
-    description: 'Business, Microsoft Office, QuickBooks, entrepreneurship, and workplace administration training.',
-    duration: '8 weeks',
-    credential: 'Industry certification preparation',
-    category: 'business',
-    etplListedFor2Exclusive: true,
-    topJobsStars: null,
-    wioaEligible: true,
-    wrgEligible: false,
-    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
-  },
-  {
-    slug: 'financial-literacy',
-    title: 'Financial Literacy',
-    description: 'Practical training in budgeting, banking, credit, debt management, saving, taxes, and financial decision-making.',
-    duration: null,
-    credential: null,
-    category: 'business',
-    etplListedFor2Exclusive: true,
-    topJobsStars: null,
-    wioaEligible: true,
-    wrgEligible: false,
-    sourceNote: 'Confirmed workforce-fundable program. WorkOne authorization is required.',
+    sourceNote:
+      'Indiana’s current workforce-training directory identifies Elevate for Humanity as an HVAC Technician training provider; participant authorization remains required.',
   },
 ] as const;
 
@@ -113,9 +91,8 @@ const FUNDING_CLAIM_PATTERN = /\b(?:wioa|workforce innovation and opportunity ac
 
 /**
  * Prevent legacy descriptions from overriding the canonical funding registry.
- * For a self-pay program, any sentence containing a public funding claim is
- * removed before rendering. This is intentionally applied at the data boundary
- * so badges and descriptive copy cannot contradict each other.
+ * For a program without exact public evidence, any sentence containing a public
+ * funding claim is removed before rendering.
  */
 export function sanitizePublicFundingDescription(
   slug: string,
@@ -137,7 +114,14 @@ export function sanitizePublicFundingDescription(
 
 export function getPublicFundingDisclosure(slug: string): string {
   const record = getVerifiedProgramFunding(slug);
-  if (!record) return 'Self-pay program. Ask admissions about employer sponsorship or payment-plan options.';
-  const programs = [record.wioaEligible ? 'WIOA' : null, record.wrgEligible ? 'Workforce Ready Grant' : null].filter(Boolean).join(' and ');
-  return `${programs} may be available for eligible participants in this approved program. Written authorization from the responsible workforce agency is required before training begins.`;
+  if (!record) {
+    return 'No public workforce-funding claim is made for this program unless exact program-level evidence and participant authorization are recorded.';
+  }
+  const programs = [
+    record.wioaEligible ? 'WIOA' : null,
+    record.wrgEligible ? 'Workforce Ready Grant' : null,
+  ]
+    .filter(Boolean)
+    .join(' and ');
+  return `${programs} may be available for eligible participants in this evidenced program. Written authorization from the responsible workforce agency is required before training begins.`;
 }

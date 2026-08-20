@@ -115,6 +115,18 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               experience?.practicalTask && typeof experience.practicalTask === 'object'
                 ? experience.practicalTask
                 : null;
+            const generatedExercises = Array.isArray(experience?.exercises)
+              ? experience.exercises.map((exercise: Record<string, any>) => ({
+                  type: 'exercise',
+                  ...exercise,
+                }))
+              : [];
+            const generatedResources = Array.isArray(experience?.resources)
+              ? experience.resources
+              : [];
+            const generatedQuickClips = Array.isArray(experience?.quickClips)
+              ? experience.quickClips
+              : [];
             const renderedHtml =
               typeof extra.renderedHtml === 'string'
                 ? extra.renderedHtml
@@ -125,6 +137,12 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               ? lesson.instructorNotes.join('\n\n')
               : (lesson.instructorNotes ?? null);
 
+            const activities = [
+              ...(Array.isArray(extra.activities) ? extra.activities : []),
+              ...generatedExercises,
+              ...(practicalTask ? [{ type: 'practical', ...practicalTask }] : []),
+            ];
+
             return {
               slug: lesson.slug,
               title: lesson.title,
@@ -132,6 +150,8 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               order_index: lesson.order,
               objective: lesson.objective ?? null,
               content,
+              // Persist the whole canonical experience so LMS renderers, analytics,
+              // remediation, and future exports consume one data contract.
               content_json: experience ? { experience } : {},
               rendered_html: renderedHtml,
               quiz_questions:
@@ -141,13 +161,13 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                   options: question.options,
                   correctAnswer: question.correctAnswer,
                   explanation: question.explanation,
+                  domainKey: lesson.domainKey ?? courseModule.domainKey ?? null,
                 })) ?? null,
               passing_score:
                 lesson.passingScore ??
                 (stepType === 'exam' ? 80 : ['checkpoint', 'quiz'].includes(stepType) ? 70 : null),
-              activities:
-                extra.activities ??
-                (practicalTask ? [{ type: 'practical', ...practicalTask }] : null),
+              activities: activities.length > 0 ? activities : null,
+              resources: generatedResources.length > 0 ? generatedResources : (extra.resources ?? null),
               duration_minutes: lesson.durationMinutes ?? null,
               video_url: extra.videoUrl ?? lesson.videoFile ?? null,
               video_config:
@@ -160,6 +180,9 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                       instructor_avatar: instructor.avatar,
                       narration: experience.narrationScript ?? null,
                       visual_prompt: experience.visualPrompt ?? null,
+                      quick_clips: generatedQuickClips,
+                      captions: true,
+                      transcript: experience.narrationScript ?? null,
                     }
                   : null),
               learning_objectives: lesson.learningObjectives ?? null,
@@ -177,11 +200,11 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
               domain_key: lesson.domainKey ?? courseModule.domainKey ?? null,
               hour_category: extra.hourCategory ?? null,
               evidence_type: extra.evidenceType ?? null,
-              delivery_method: extra.deliveryMethod ?? null,
+              delivery_method: extra.deliveryMethod ?? 'self_paced',
               requires_instructor_signoff:
-                extra.requiresInstructorSignoff ?? Boolean(practicalTask),
+                extra.requiresInstructorSignoff ?? Boolean(practicalTask && stepType === 'lab'),
               instructor_requirement: extra.instructorRequirement ?? null,
-              minimum_seat_time_minutes: extra.minimumSeatTimeMinutes ?? null,
+              minimum_seat_time_minutes: extra.minimumSeatTimeMinutes ?? lesson.durationMinutes ?? null,
               fieldwork_eligible: extra.fieldworkEligible ?? false,
               is_required: extra.isRequired ?? true,
               ai_generated: extra.aiGenerated ?? Boolean(experience),
@@ -197,6 +220,10 @@ function buildAtomicPayload(modules: BlueprintModule[], courseTitle: string) {
                       visual_prompt: experience.visualPrompt ?? null,
                       scenario: experience.scenario ?? null,
                       case_study: experience.caseStudy ?? null,
+                      quick_clips: generatedQuickClips,
+                      reading_guide: experience.readingGuide ?? null,
+                      glossary: experience.glossary ?? null,
+                      readiness: experience.readiness ?? null,
                     }
                   : null),
               generation_status: experience ? 'generated' : 'pending',

@@ -23,7 +23,7 @@ export default function GovernmentPage() {
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <Building2 className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">WIOA Title I Services</h3>
-              <p className="text-slate-600 text-sm">ETPL-approved training provider delivering WIOA-funded programs with full compliance and reporting.</p>
+              <p className="text-slate-600 text-sm">Training and reporting workflows for programs that are individually listed or approved for applicable workforce funding. Participant eligibility and funding authorization are determined by the responsible workforce agency.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <BarChart3 className="w-10 h-10 text-brand-blue-600 mb-4" />
@@ -33,12 +33,12 @@ export default function GovernmentPage() {
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <FileCheck className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Compliance & Auditing</h3>
-              <p className="text-slate-600 text-sm">DOL-registered apprenticeship sponsor with full federal and state compliance documentation.</p>
+              <p className="text-slate-600 text-sm">Registered-apprenticeship and workforce documentation workflows support evidence collection, review, reporting, and audit preparation.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Participant Tracking</h3>
-              <p className="text-slate-600 text-sm">End-to-end tracking from enrollment through employment with measurable outcomes.</p>
+              <p className="text-slate-600 text-sm">Track configured enrollment, training, credential, and employment outcome records through authorized workflows.</p>
             </div>
           </div>
         </div>

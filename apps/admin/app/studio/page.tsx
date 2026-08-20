@@ -3,12 +3,15 @@ import Link from 'next/link';
 import { ArrowLeft, Bot, ShieldCheck } from 'lucide-react';
 
 import StudioWorkspaceGrid from './StudioWorkspaceGrid.client';
+import { requireRole } from '@/lib/auth/require-role';
 import { getAvailableWorkspaces } from '@/lib/devstudio/workspace-registry';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export default function StudioPage() {
+export default async function StudioPage() {
+  await requireRole(['super_admin', 'admin']);
+
   const workspaces = getAvailableWorkspaces().map(({ id, label, description, route, healthEndpoint }) => ({
     id,
     label,

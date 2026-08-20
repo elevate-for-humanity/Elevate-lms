@@ -1,8 +1,12 @@
 /**
- * Single source of truth for fetching and normalising approved host shops.
+ * Canonical approved Host Shop loader.
+ * Operational approval remains authoritative; public partner profiles only enrich
+ * approved records with promotional media, website, map, and public slug data.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
+
+export type HostShopMedia = { url: string; alt?: string; source?: string };
 
 export type HostShop = {
   id: string;
@@ -16,6 +20,14 @@ export type HostShop = {
   supervisor: string;
   programs: string[];
   badge: string;
+  publicSlug?: string;
+  description?: string;
+  website?: string;
+  googleMapsUrl?: string;
+  logoUrl?: string;
+  flyerUrl?: string;
+  videoUrl?: string;
+  mediaGallery?: HostShopMedia[];
 };
 
 export const PROGRAM_SLUGS = {
@@ -46,47 +58,51 @@ const PROGRAM_ALIASES: Record<string, string> = {
 };
 
 function normalizeProgram(value: unknown): string | null {
-  const key = String(value ?? '').trim().toLowerCase();
-  return PROGRAM_ALIASES[key] ?? null;
+  const normalized = String(value ?? '').trim().toLowerCase();
+  return PROGRAM_ALIASES[normalized] ?? null;
 }
 
-/**
- * Host-site intake historically stored the full location in one string. Parse
- * from the right so commas inside a street line (for example "Suite 1") do not
- * corrupt the city/state/ZIP fields.
- */
 function parseAddress(raw: string): { address: string; city: string; state: string; zip: string } {
-  const parts = raw
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  if (parts.length < 2) {
-    return { address: raw.trim(), city: '', state: 'IN', zip: '' };
-  }
-
+  const parts = raw.split(',').map((part) => part.trim()).filter(Boolean);
+  if (parts.length < 2) return { address: raw.trim(), city: '', state: 'IN', zip: '' };
   const stateZipPart = parts.at(-1) ?? '';
   const stateZipMatch = stateZipPart.match(/^([A-Za-z]{2})(?:\s+(\d{5}(?:-\d{4})?))?$/);
-
-  // Standard format: street[, unit], city, ST ZIP
   if (stateZipMatch && parts.length >= 3) {
-    const city = parts.at(-2) ?? '';
-    const address = parts.slice(0, -2).join(', ');
     return {
-      address,
-      city,
+      address: parts.slice(0, -2).join(', '),
+      city: parts.at(-2) ?? '',
       state: stateZipMatch[1].toUpperCase(),
       zip: stateZipMatch[2] ?? '',
     };
   }
+  return { address: parts.slice(0, -1).join(', '), city: parts.at(-1) ?? '', state: 'IN', zip: '' };
+}
 
-  // Legacy Indiana records may omit state/ZIP and end with the city.
-  return {
-    address: parts.slice(0, -1).join(', '),
-    city: parts.at(-1) ?? '',
-    state: 'IN',
-    zip: '',
-  };
+function digits(value: string | null | undefined) {
+  return (value ?? '').replace(/\D/g, '');
+}
+
+function businessKey(value: string | null | undefined) {
+  return (value ?? '')
+    .toLowerCase()
+    .replace(/\b(llc|inc|dba|studio|salon|barbershop|barber shop)\b/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
+function parseMedia(value: unknown): HostShopMedia[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null;
+      const row = item as Record<string, unknown>;
+      if (typeof row.url !== 'string' || !row.url) return null;
+      return {
+        url: row.url,
+        alt: typeof row.alt === 'string' ? row.alt : undefined,
+        source: typeof row.source === 'string' ? row.source : undefined,
+      };
+    })
+    .filter((item): item is HostShopMedia => Boolean(item));
 }
 
 function isPubliclyListedHostShop(shop: HostShop): boolean {
@@ -100,9 +116,8 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   } catch {
     return [];
   }
-  if (!db) return [];
 
-  const [{ data: barberRows }, { data: hostRows }] = await Promise.all([
+  const [{ data: barberRows }, { data: hostRows }, { data: publicRows }] = await Promise.all([
     db
       .from('barbershop_partner_applications')
       .select('id, shop_legal_name, shop_dba_name, shop_address_line1, shop_city, shop_state, shop_zip, contact_phone, contact_email, supervisor_name')
@@ -113,6 +128,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .select('id, shop_name, address, phone, email, intake')
       .eq('status', 'approved')
       .order('shop_name'),
+    db
+      .from('public_host_shops')
+      .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, media_gallery, video_url, google_maps_url'),
   ]);
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
@@ -132,10 +150,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
   const hostShops: HostShop[] = (hostRows ?? []).map((shop) => {
     const parsed = parseAddress(shop.address ?? '');
     const rawPrograms: unknown[] = Array.isArray(shop.intake?.programs) ? shop.intake.programs : [];
-    const programs: string[] = rawPrograms
-      .map(normalizeProgram)
-      .filter((value): value is string => typeof value === 'string');
-
+    const programs = rawPrograms.map(normalizeProgram).filter((value): value is string => typeof value === 'string');
     return {
       id: shop.id,
       name: shop.shop_name,
@@ -143,24 +158,43 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       phone: shop.phone ?? '',
       email: shop.email ?? '',
       supervisor: '',
-      programs: programs.length ? [...new Set<string>(programs)] : [PROGRAM_SLUGS.cosmetology],
+      programs: programs.length ? [...new Set(programs)] : [PROGRAM_SLUGS.cosmetology],
       badge: 'partner',
     };
   });
 
-  const barberNameMap = new Map(barberShops.map((shop) => [shop.name.toLowerCase(), shop]));
+  const barberNameMap = new Map(barberShops.map((shop) => [businessKey(shop.name), shop]));
   barberShops.forEach((barberShop) => {
-    const match = hostShops.find((hostShop) => hostShop.name.toLowerCase() === barberShop.name.toLowerCase());
-    if (match) barberShop.programs = [...new Set<string>([...barberShop.programs, ...match.programs])];
+    const match = hostShops.find((hostShop) => businessKey(hostShop.name) === businessKey(barberShop.name));
+    if (match) barberShop.programs = [...new Set([...barberShop.programs, ...match.programs])];
   });
 
-  const hostOnly = hostShops.filter((shop) => !barberNameMap.has(shop.name.toLowerCase()));
-  const all = [...barberShops, ...hostOnly].filter(isPubliclyListedHostShop);
+  const all = [...barberShops, ...hostShops.filter((shop) => !barberNameMap.has(businessKey(shop.name)))]
+    .filter(isPubliclyListedHostShop)
+    .map((shop) => {
+      const profile = (publicRows ?? []).find((row) => {
+        const phoneMatch = digits(shop.phone) && digits(shop.phone) === digits(row.phone);
+        const addressMatch = businessKey(shop.address) && businessKey(shop.address) === businessKey(row.address_line1) && businessKey(shop.city) === businessKey(row.city);
+        const nameMatch = businessKey(shop.name) && businessKey(shop.name) === businessKey(row.display_name);
+        return Boolean(phoneMatch || addressMatch || nameMatch);
+      });
+      if (!profile) return shop;
+      return {
+        ...shop,
+        publicSlug: profile.public_slug ?? undefined,
+        description: profile.description ?? undefined,
+        website: profile.website_url || profile.website || undefined,
+        googleMapsUrl: profile.google_maps_url ?? undefined,
+        logoUrl: profile.logo_url ?? undefined,
+        flyerUrl: profile.flyer_url ?? undefined,
+        videoUrl: profile.video_url ?? undefined,
+        mediaGallery: parseMedia(profile.media_gallery),
+      };
+    });
 
   if (program) {
     const slug = PROGRAM_SLUGS[program];
     return all.filter((shop) => shop.programs.includes(slug));
   }
-
   return all;
 }

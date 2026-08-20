@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "routes": [
+    { "source": "/admin", "owner": "admin", "target": "/dashboard" },
+    { "sourcePrefix": "/admin/", "owner": "admin", "stripPrefix": "/admin" },
+    { "source": "/student-portal", "owner": "lms", "target": "/lms/dashboard" },
+    { "source": "/learner/dashboard", "owner": "lms", "target": "/lms/dashboard" },
+    { "sourcePrefix": "/lms/", "owner": "lms" },
+    { "sourcePrefix": "/apprentice/", "owner": "lms" },
+    { "sourcePrefix": "/host-shop/", "owner": "lms" },
+    { "sourcePrefix": "/program-holder/", "owner": "lms" },
+    { "sourcePrefix": "/employer/", "owner": "lms" },
+    { "sourcePrefix": "/workforce/", "owner": "lms" },
+    { "sourcePrefix": "/parent-portal/", "owner": "lms" },
+    { "source": "/cosmetology-host-shop/dashboard", "owner": "lms", "target": "/host-shop/dashboard" }
+  ]
+}

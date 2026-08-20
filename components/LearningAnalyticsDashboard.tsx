@@ -1,362 +1,172 @@
 'use client';
-import { logger } from '@/lib/logger';
 
+import React, { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-
-import React from 'react';
-
-import { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 
-interface PredictiveInsight {
+type RiskFactor = {
+  factor?: string;
+  days?: number;
+  pct?: number;
+  count?: number;
+};
+
+type RiskResult = {
+  status: string;
+  score: number;
+  days: number;
+  progress: number;
+  overdue: number;
+  factors: RiskFactor[];
+};
+
+type Intervention = {
   id: string;
-  type: 'risk' | 'opportunity' | 'recommendation';
-  title: string;
-  description: string;
-  confidence: number;
-  action?: string;
+  intervention_type: string;
+  status: string;
+  notes: string | null;
+  outcome: string | null;
+  due_at: string | null;
+  completed_at: string | null;
+};
+
+function factorLabel(factor: RiskFactor) {
+  if (factor.factor === 'inactivity') return `No recorded learning activity for ${factor.days ?? 0} days`;
+  if (factor.factor === 'low_progress') return `Active-enrollment progress is ${Math.round(factor.pct ?? 0)}%`;
+  if (factor.factor === 'overdue_requirements') return `${factor.count ?? 0} required item(s) are overdue`;
+  return 'Documented risk factor';
 }
 
 export default function LearningAnalyticsDashboard() {
-  const [timeRange, setTimeRange] = useState('30');
-  const [insights, setInsights] = useState<PredictiveInsight[]>([]);
-  const [learningMetrics, setLearningMetrics] = useState({
-    studyTime: 0,
-    completionRate: 0,
-    averageScore: 0,
-    engagementScore: 0,
-    predictedGrade: 'N/A',
-    onTrackPercentage: 0,
-  });
+  const [risk, setRisk] = useState<RiskResult | null>(null);
+  const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load analytics from database
-  React.useEffect(() => {
-    const loadAnalytics = async () => {
+  useEffect(() => {
+    const load = async () => {
       const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        setError('Sign in to view learning analytics.');
         setLoading(false);
         return;
       }
 
       try {
-        // Fetch learning activity
-        const daysAgo = parseInt(timeRange);
-        const startDate = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
+        const { data: riskData, error: riskError } = await supabase.rpc('calculate_student_risk_status', {
+          p_student_id: user.id,
+        });
+        if (riskError) throw riskError;
 
-        const { data: activity } = await supabase
-          .from('learning_activity')
-          .select('*')
-          .eq('user_id', user.id)
-          .gte('created_at', startDate);
-
-        // Fetch grades
-        const { data: grades } = await supabase
-          .from('grades')
-          .select('points, max_points')
-          .eq('student_id', user.id);
-
-        // Fetch enrollments
-        const { data: enrollments } = await supabase
-          .from('program_enrollments')
-          .select('status, progress_percent')
-          .eq('user_id', user.id);
-
-        // Calculate metrics
-        const totalStudyMinutes =
-          activity?.reduce((sum, a) => sum + (a.duration_minutes || 0), 0) || 0;
-        const avgScore = grades?.length
-          ? grades.reduce((sum, g) => sum + (g.points / g.max_points) * 100, 0) / grades.length
-          : 0;
-        const completionRate = enrollments?.length
-          ? (enrollments.filter((e) => e.status === 'completed').length / enrollments.length) * 100
-          : 0;
-
-        setLearningMetrics({
-          studyTime: Math.round(totalStudyMinutes / 60),
-          completionRate: Math.round(completionRate),
-          averageScore: Math.round(avgScore),
-          engagementScore: Math.min(100, Math.round(((activity?.length || 0) / daysAgo) * 10)),
-          predictedGrade: avgScore >= 90 ? 'A' : avgScore >= 80 ? 'B' : avgScore >= 70 ? 'C' : 'D',
-          onTrackPercentage: Math.round(
-            enrollments?.reduce((sum, e) => sum + (e.progress_percent || 0), 0) /
-              (enrollments?.length || 1),
-          ),
+        const parsed = riskData && typeof riskData === 'object' ? riskData as Record<string, unknown> : {};
+        setRisk({
+          status: typeof parsed.status === 'string' ? parsed.status : 'unknown',
+          score: Number(parsed.score ?? 0),
+          days: Number(parsed.days ?? 0),
+          progress: Number(parsed.progress ?? 0),
+          overdue: Number(parsed.overdue ?? 0),
+          factors: Array.isArray(parsed.factors) ? parsed.factors as RiskFactor[] : [],
         });
 
-        // Generate insights based on data
-        const generatedInsights: PredictiveInsight[] = [];
-        if (avgScore < 70) {
-          generatedInsights.push({
-            id: '1',
-            type: 'risk',
-            title: 'At-Risk of Course Failure',
-            description: 'Based on current scores, consider additional study time',
-            confidence: 78,
-            action: 'Schedule tutoring session',
-          });
-        }
-        if (avgScore >= 85) {
-          generatedInsights.push({
-            id: '2',
-            type: 'opportunity',
-            title: 'Ready for Advanced Topics',
-            description: 'Your performance indicates readiness for advanced courses',
-            confidence: 92,
-            action: 'Enroll in advanced course',
-          });
-        }
-        setInsights(
-          generatedInsights.length > 0
-            ? generatedInsights
-            : [
-                {
-                  id: '1',
-                  type: 'recommendation',
-                  title: 'Keep Up the Good Work',
-                  description: 'You are on track with your learning goals',
-                  confidence: 85,
-                },
-              ],
-        );
+        const { data: interventionRows, error: interventionError } = await supabase
+          .from('student_interventions')
+          .select('id, intervention_type, status, notes, outcome, due_at, completed_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (interventionError) throw interventionError;
+        setInterventions((interventionRows ?? []) as Intervention[]);
       } catch (err) {
-        logger.error('Error loading analytics:', err);
+        logger.error('Error loading canonical learning risk analytics', err);
+        setError('Learning analytics are temporarily unavailable.');
       } finally {
         setLoading(false);
       }
     };
-    loadAnalytics();
-  }, [timeRange]);
 
-  const weeklyActivity = [
-    { day: 'Mon', hours: 6, score: 85 },
-    { day: 'Tue', hours: 4, score: 78 },
-    { day: 'Wed', hours: 8, score: 92 },
-    { day: 'Thu', hours: 5, score: 88 },
-    { day: 'Fri', hours: 7, score: 90 },
-    { day: 'Sat', hours: 3, score: 75 },
-    { day: 'Sun', hours: 9, score: 95 },
-  ];
-
-  const maxHours = Math.max(...weeklyActivity.map((d) => d.hours));
+    void load();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="   text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-2 text-2xl md:text-3xl lg:text-4xl">
-            Learning Analytics
-          </h1>
-          <p className="text-white">Automated insights into your learning journey</p>
+      <div className="bg-slate-950 py-12 text-white">
+        <div className="mx-auto max-w-7xl px-4">
+          <h1 className="text-3xl font-bold md:text-4xl">Learning Risk & Progress</h1>
+          <p className="mt-2 text-slate-200">
+            Evidence-based indicators calculated from recorded activity, enrollment progress, and overdue requirements.
+          </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Performance Overview</h2>
-          <select
-            value={timeRange}
-            onChange={(
-              e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-            ) => setTimeRange(e.target.value)}
-            className="px-4 py-2 border rounded"
-          >
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 90 days</option>
-          </select>
-        </div>
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        {loading && <p className="text-slate-600">Calculating current status…</p>}
+        {error && <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">{error}</p>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="p-6">
-            <h3 className="text-sm text-black mb-2">Study Time (hours)</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">{learningMetrics.studyTime}</p>
-            <p className="text-sm text-brand-green-600">↑ 12% from last period</p>
-          </Card>
+        {!loading && !error && risk && (
+          <>
+            <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="p-6">
+                <h2 className="text-sm font-semibold text-slate-600">Risk status</h2>
+                <p className="mt-2 text-3xl font-bold capitalize text-slate-950">{risk.status.replace('_', ' ')}</p>
+                <p className="mt-2 text-sm text-slate-500">Calculated by the canonical student-risk rules engine.</p>
+              </Card>
+              <Card className="p-6">
+                <h2 className="text-sm font-semibold text-slate-600">Risk score</h2>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{Math.round(risk.score)}/100</p>
+                <p className="mt-2 text-sm text-slate-500">Higher scores indicate more documented risk factors.</p>
+              </Card>
+              <Card className="p-6">
+                <h2 className="text-sm font-semibold text-slate-600">Active progress</h2>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{Math.round(risk.progress)}%</p>
+                <p className="mt-2 text-sm text-slate-500">Average progress across active program enrollments.</p>
+              </Card>
+              <Card className="p-6">
+                <h2 className="text-sm font-semibold text-slate-600">Overdue requirements</h2>
+                <p className="mt-2 text-3xl font-bold text-slate-950">{risk.overdue}</p>
+                <p className="mt-2 text-sm text-slate-500">Required items currently past their recorded due date.</p>
+              </Card>
+            </div>
 
-          <Card className="p-6">
-            <h3 className="text-sm text-black mb-2">Completion Rate</h3>
-            <p className="text-3xl font-bold text-brand-orange-500">
-              {learningMetrics.completionRate}%
-            </p>
-            <p className="text-sm text-brand-green-600">↑ 5% from last period</p>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-sm text-black mb-2">Average Score</h3>
-            <p className="text-3xl font-bold text-brand-green-600">
-              {learningMetrics.averageScore}%
-            </p>
-            <p className="text-sm text-brand-green-600">↑ 3% from last period</p>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-sm text-black mb-2">Engagement Score</h3>
-            <p className="text-3xl font-bold text-brand-blue-600">
-              {learningMetrics.engagementScore}%
-            </p>
-            <p className="text-sm text-yellow-600">→ Stable</p>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-sm text-black mb-2">Predicted Final Grade</h3>
-            <p className="text-3xl font-bold text-purple-600">{learningMetrics.predictedGrade}</p>
-            <p className="text-sm text-black">Based on current trajectory</p>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-sm text-black mb-2">On Track</h3>
-            <p className="text-3xl font-bold text-brand-green-600">
-              {learningMetrics.onTrackPercentage}%
-            </p>
-            <p className="text-sm text-black">Meeting milestones</p>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">Weekly Activity</h3>
-            <div className="space-y-3">
-              {weeklyActivity.map((day) => (
-                <div key={day.day}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium">{day.day}</span>
-                    <span className="text-black">
-                      {day.hours}h • {day.score}%
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex-1 bg-slate-200 rounded-full h-2">
-                      <div
-                        className="   h-2 rounded-full"
-                        style={{ width: `${(day.hours / maxHours) * 100}%` }}
-                      />
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <Card className="p-6">
+                <h2 className="text-xl font-bold text-slate-950">Documented risk factors</h2>
+                <p className="mt-1 text-sm text-slate-500">No invented confidence values or sample activity are used here.</p>
+                <div className="mt-5 space-y-3">
+                  {risk.factors.length === 0 ? (
+                    <p className="rounded-xl bg-emerald-50 p-4 text-sm font-medium text-emerald-900">No current rule-based risk factors were detected.</p>
+                  ) : risk.factors.map((factor, index) => (
+                    <div key={`${factor.factor ?? 'factor'}-${index}`} className="rounded-xl border border-slate-200 p-4 text-sm text-slate-800">
+                      {factorLabel(factor)}
                     </div>
-                    <div className="w-20 bg-slate-200 rounded-full h-2">
-                      <div
-                        className="bg-white h-2 rounded-full"
-                        style={{ width: `${day.score}%` }}
-                      />
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Card>
+                <p className="mt-5 text-xs text-slate-500">Last inactivity measure: {risk.days} day(s). Risk scoring supports staff intervention; it does not guarantee completion or placement outcomes.</p>
+              </Card>
 
-          <Card className="p-6">
-            <h3 className="text-xl font-bold mb-4">Learning Patterns</h3>
-            <div className="space-y-4">
-              <div className="p-4 bg-brand-blue-50 rounded">
-                <h4 className="font-semibold text-brand-blue-900 mb-1">Peak Performance Time</h4>
-                <p className="text-sm text-brand-blue-700">9:00 AM - 11:00 AM</p>
-                <p className="text-xs text-brand-blue-600 mt-1">
-                  Highest scores achieved during this window
-                </p>
-              </div>
-
-              <div className="p-4 bg-purple-50 rounded">
-                <h4 className="font-semibold text-purple-900 mb-1">Preferred Learning Style</h4>
-                <p className="text-sm text-purple-700">Visual & Interactive</p>
-                <p className="text-xs text-purple-600 mt-1">
-                  Video content and hands-on exercises work best
-                </p>
-              </div>
-
-              <div className="p-4 bg-brand-orange-50 rounded">
-                <h4 className="font-semibold text-brand-orange-900 mb-1">Optimal Session Length</h4>
-                <p className="text-sm text-brand-orange-700">45-60 minutes</p>
-                <p className="text-xs text-brand-orange-600 mt-1">
-                  Performance drops after 60 minutes
-                </p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <Card className="p-6 mb-8">
-          <h3 className="text-xl font-bold mb-4">AI-Powered Insights</h3>
-          <div className="space-y-4">
-            {insights.map((insight) => (
-              <div
-                key={insight.id}
-                className={`p-4 rounded-lg border-l-4 ${
-                  insight.type === 'risk'
-                    ? 'bg-brand-red-50 border-brand-red-500'
-                    : insight.type === 'opportunity'
-                      ? 'bg-brand-green-50 border-brand-green-500'
-                      : 'bg-brand-blue-50 border-brand-blue-500'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className={`text-lg ${
-                          insight.type === 'risk'
-                            ? '⚠️'
-                            : insight.type === 'opportunity'
-                              ? '🎯'
-                              : '💡'
-                        }`}
-                      >
-                        {insight.type === 'risk'
-                          ? '⚠️'
-                          : insight.type === 'opportunity'
-                            ? '🎯'
-                            : '💡'}
-                      </span>
-                      <h4 className="font-bold">{insight.title}</h4>
+              <Card className="p-6">
+                <h2 className="text-xl font-bold text-slate-950">Interventions</h2>
+                <p className="mt-1 text-sm text-slate-500">Actions recorded in the canonical student-intervention workflow.</p>
+                <div className="mt-5 space-y-3">
+                  {interventions.length === 0 ? (
+                    <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-700">No interventions are currently recorded for this learner.</p>
+                  ) : interventions.map((item) => (
+                    <div key={item.id} className="rounded-xl border border-slate-200 p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="font-bold text-slate-950">{item.intervention_type}</p>
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase text-slate-700">{item.status}</span>
+                      </div>
+                      {item.notes && <p className="mt-2 text-sm text-slate-700">{item.notes}</p>}
+                      {item.outcome && <p className="mt-2 text-sm text-slate-700"><strong>Outcome:</strong> {item.outcome}</p>}
+                      {item.due_at && <p className="mt-2 text-xs text-slate-500">Due: {new Date(item.due_at).toLocaleDateString()}</p>}
                     </div>
-                    <p className="text-sm text-black mb-2">{insight.description}</p>
-                    <p className="text-xs text-black">Confidence: {insight.confidence}%</p>
-                  </div>
-                  {insight.action && (
-                    <Button size="sm" variant="secondary">
-                      {insight.action}
-                    </Button>
-                  )}
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-6   ">
-          <h3 className="text-xl font-bold mb-4">Recommendations</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-white rounded">
-              <h4 className="font-semibold mb-2">📚 Study Strategy</h4>
-              <p className="text-sm text-black">
-                Focus on JavaScript fundamentals before moving to frameworks. Your assessment scores
-                suggest gaps in core concepts.
-              </p>
+              </Card>
             </div>
-            <div className="p-4 bg-white rounded">
-              <h4 className="font-semibold mb-2">⏰ Time Management</h4>
-              <p className="text-sm text-black">
-                Increase study time by 5 hours/week to stay on track for certification deadline.
-              </p>
-            </div>
-            <div className="p-4 bg-white rounded">
-              <h4 className="font-semibold mb-2">🤝 Peer Learning</h4>
-              <p className="text-sm text-black">
-                Join study groups for React topics. Collaborative learning improves retention by
-                40%.
-              </p>
-            </div>
-            <div className="p-4 bg-white rounded">
-              <h4 className="font-semibold mb-2">🎯 Next Milestone</h4>
-              <p className="text-sm text-black">
-                Complete Module 5 by Friday to maintain your current pace and predicted grade.
-              </p>
-            </div>
-          </div>
-        </Card>
+          </>
+        )}
       </div>
     </div>
   );

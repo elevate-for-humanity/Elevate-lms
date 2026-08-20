@@ -29,13 +29,18 @@ export interface ValidationResult {
 }
 
 /**
- * Infer the canonical persistence type. Rich instructional labels such as
- * orientation, concept, and scenario are authored as normal lesson rows because
- * the database lesson_type enum does not define separate values for them.
+ * Infer the canonical persistence type. Practice/benchmark assessments are
+ * scored exam simulations, not ordinary reading lessons.
  */
 export function inferStepType(slug: string): string {
   const lower = slug.toLowerCase();
   if (lower.includes('checkpoint')) return 'checkpoint';
+  if (
+    lower.includes('practice-assessment') ||
+    lower.includes('practice-exam') ||
+    lower.includes('benchmark-assessment') ||
+    lower.includes('readiness-assessment')
+  ) return 'exam';
   if (lower.includes('exam') || lower.includes('final')) return 'exam';
   if (lower.includes('quiz')) return 'quiz';
   if (lower.includes('lab') || lower.includes('practical')) return 'lab';
@@ -81,51 +86,28 @@ function validateLesson(
   const errors: ValidationError[] = [];
   const warnings: ValidationError[] = [];
   const stepType = inferStepType(lesson.slug);
+  const lowerSlug = lesson.slug.toLowerCase();
 
   const needsContent = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
   const needsQuiz = ['checkpoint', 'quiz', 'exam'].includes(stepType);
   const needsObjective = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
 
   if (needsObjective && !lesson.objective?.trim()) {
-    errors.push({
-      type: 'error',
-      module: moduleSlug,
-      lesson: lesson.slug,
-      field: 'objective',
-      message: 'Lesson objective is required',
-    });
+    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'objective', message: 'Lesson objective is required' });
   }
 
   if (needsContent) {
     if (!lesson.content?.trim()) {
-      errors.push({
-        type: 'error',
-        module: moduleSlug,
-        lesson: lesson.slug,
-        field: 'content',
-        message: 'Lesson content is required',
-      });
+      errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'content', message: 'Lesson content is required' });
     } else if (visibleTextLength(lesson.content) < 200) {
-      warnings.push({
-        type: 'warning',
-        module: moduleSlug,
-        lesson: lesson.slug,
-        field: 'content',
-        message: `Content may be too short (${visibleTextLength(lesson.content)} chars, minimum 200)`,
-      });
+      warnings.push({ type: 'warning', module: moduleSlug, lesson: lesson.slug, field: 'content', message: `Content may be too short (${visibleTextLength(lesson.content)} chars, minimum 200)` });
     }
   }
 
   if (needsContent && lesson.content?.trim()) {
     const experience = readExperience(lesson.content);
     if (!experience) {
-      errors.push({
-        type: 'error',
-        module: moduleSlug,
-        lesson: lesson.slug,
-        field: 'experience',
-        message: 'Complete interactive lesson experience is required',
-      });
+      errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'experience', message: 'Complete commercial self-paced lesson experience is required' });
     } else {
       const parsedExperience = CourseExperienceSchema.safeParse(experience);
       if (!parsedExperience.success) {
@@ -142,28 +124,22 @@ function validateLesson(
     }
   }
 
-  if (needsQuiz && (!lesson.quizQuestions || lesson.quizQuestions.length === 0)) {
-    errors.push({
-      type: 'error',
-      module: moduleSlug,
-      lesson: lesson.slug,
-      field: 'quizQuestions',
-      message: 'Quiz questions are required',
-    });
+  const questionCount = lesson.quizQuestions?.length ?? 0;
+  if (needsQuiz && questionCount === 0) {
+    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Assessment questions are required' });
+  }
+  if (stepType === 'checkpoint' && questionCount > 0 && questionCount < 10) {
+    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Domain checkpoint requires at least 10 questions' });
+  }
+  if (stepType === 'exam' && lowerSlug.includes('practice') && questionCount > 0 && questionCount < 25) {
+    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Practice/readiness exam requires at least 25 questions' });
+  }
+  if (stepType === 'exam' && (lowerSlug.includes('final') || lowerSlug.includes('course-exam')) && questionCount > 0 && questionCount < 25) {
+    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Final exam requires at least 25 questions' });
   }
 
-  if (
-    needsQuiz &&
-    lesson.passingScore != null &&
-    (lesson.passingScore < 0 || lesson.passingScore > 100)
-  ) {
-    errors.push({
-      type: 'error',
-      module: moduleSlug,
-      lesson: lesson.slug,
-      field: 'passingScore',
-      message: 'Passing score must be between 0 and 100',
-    });
+  if (needsQuiz && lesson.passingScore != null && (lesson.passingScore < 0 || lesson.passingScore > 100)) {
+    errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'passingScore', message: 'Passing score must be between 0 and 100' });
   }
 
   return [...errors, ...warnings];
@@ -176,13 +152,10 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   try {
     validateBlueprintStructure(blueprint);
   } catch (error) {
-    allErrors.push({
-      type: 'error',
-      field: 'blueprint',
-      message: error instanceof Error ? error.message : String(error),
-    });
+    allErrors.push({ type: 'error', field: 'blueprint', message: error instanceof Error ? error.message : String(error) });
   }
 
+  const lessons = (blueprint.modules ?? []).flatMap((courseModule) => courseModule.lessons ?? []);
   for (const courseModule of blueprint.modules ?? []) {
     for (const lesson of courseModule.lessons ?? []) {
       for (const issue of validateLesson(lesson, courseModule.slug)) {
@@ -190,6 +163,14 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
         else allWarnings.push(issue);
       }
     }
+  }
+
+  if (blueprint.generationRules?.requiresFinalExam) {
+    const hasFinal = lessons.some((lesson) => {
+      const slug = lesson.slug.toLowerCase();
+      return inferStepType(slug) === 'exam' && (slug.includes('final') || slug.includes('course-exam'));
+    });
+    if (!hasFinal) allErrors.push({ type: 'error', field: 'finalExam', message: 'Course requires a cumulative final exam' });
   }
 
   const result: ValidationResult = {
@@ -202,18 +183,13 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   };
 
   if (!result.ok) {
-    logger.warn('[course-factory/validator] Course package validation failed', {
-      errors: allErrors.length,
-      warnings: allWarnings.length,
-    });
+    logger.warn('[course-factory/validator] Course package validation failed', { errors: allErrors.length, warnings: allWarnings.length });
   }
 
   return result;
 }
 
-export function validateCourseTemplate(template: {
-  modules?: BlueprintModule[];
-}): ValidationResult {
+export function validateCourseTemplate(template: { modules?: BlueprintModule[] }): ValidationResult {
   const modules = template.modules ?? [];
   const blueprint: CredentialBlueprint = {
     id: 'course-template-validation',
@@ -226,22 +202,10 @@ export function validateCourseTemplate(template: {
     version: '1',
     modules,
     expectedModuleCount: modules.length,
-    expectedLessonCount: modules.reduce(
-      (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
-      0,
-    ),
-    assessmentRules: [
-      {
-        assessmentType: 'module',
-        scope: 'all',
-        minQuestions: 1,
-        maxQuestions: 1,
-        passingThreshold: 0.7,
-      },
-    ],
+    expectedLessonCount: modules.reduce((count, courseModule) => count + (courseModule.lessons?.length ?? 0), 0),
+    assessmentRules: [{ assessmentType: 'module', scope: 'all', minQuestions: 1, maxQuestions: 1, passingThreshold: 0.7 }],
     generationRules: {},
     contentSource: 'blueprint',
   };
-
   return validateBlueprint(blueprint);
 }

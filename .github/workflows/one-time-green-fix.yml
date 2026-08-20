@@ -60,6 +60,24 @@ jobs:
                   raise SystemExit('hero transcript insertion marker missing')
               hero.write_text(text.replace(marker, guard + marker, 1))
 
+          affirm = Path('apps/lms/app/api/affirm/capture/route.ts')
+          text = affirm.read_text()
+          old = "logger.error('[Affirm capture] No canonical self-pay price found', { program });"
+          new = "logger.error('[Affirm capture] No canonical self-pay price found', undefined, { program });"
+          if old in text:
+              affirm.write_text(text.replace(old, new, 1))
+          elif new not in text:
+              raise SystemExit('Affirm logger contract marker missing')
+
+          checkout = Path('apps/lms/app/api/courses/checkout/route.ts')
+          text = checkout.read_text()
+          old = "logger.error('Course checkout rejected invalid server pricing', {\n        courseId,\n        priceInCents,\n        currency,\n      });"
+          new = "logger.error('Course checkout rejected invalid server pricing', undefined, {\n        courseId,\n        priceInCents,\n        currency,\n      });"
+          if old in text:
+              checkout.write_text(text.replace(old, new, 1))
+          elif new not in text:
+              raise SystemExit('Course checkout logger contract marker missing')
+
           audit = Path('scripts/audit-schema-drift.ts')
           text = audit.read_text()
           old = "const failOnDrift = args.includes('--fail-on-drift');\nconst forceMigrations = args.includes('--source') && args[args.indexOf('--source') + 1] === 'migrations';"
@@ -95,6 +113,8 @@ jobs:
           PY
       - name: Verify all production typechecks
         run: pnpm run typecheck:all
+      - name: Verify logger contract
+        run: pnpm run audit:logger
       - name: Verify hero audit
         run: pnpm run audit:hero-banners
       - name: Capture current live schema-debt baseline
@@ -105,10 +125,11 @@ jobs:
         run: |
           git config user.name 'Elevate CI Fix'
           git config user.email 'actions@users.noreply.github.com'
-          git add apps/marketing/app/approvals/page.tsx lib/programs/host-shops.ts content/heroBanners.ts scripts/audit-schema-drift.ts scripts/production-readiness-gate.sh scripts/schema-drift-baseline.json
+          git add apps/marketing/app/approvals/page.tsx lib/programs/host-shops.ts content/heroBanners.ts apps/lms/app/api/affirm/capture/route.ts apps/lms/app/api/courses/checkout/route.ts scripts/audit-schema-drift.ts scripts/production-readiness-gate.sh scripts/schema-drift-baseline.json
           if git diff --cached --quiet; then
             echo 'No patch changes needed.'
             exit 0
           fi
-          git commit -m 'fix(release): clear typecheck hero and schema regression blockers'
+          git commit -m 'fix(release): clear typecheck hero logger and schema blockers'
+          git pull --rebase origin main
           git push origin HEAD:main

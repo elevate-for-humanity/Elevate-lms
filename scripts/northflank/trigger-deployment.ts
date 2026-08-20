@@ -3,9 +3,9 @@
  * Deploy one exact Northflank build.
  *
  * The build is created and verified before this script runs. Deployment must use
- * Northflank's deployment endpoint with the exact build service, build ID, and
- * commit SHA. Updating combined-service configuration alone does not guarantee
- * that the running container is replaced.
+ * Northflank's deployment endpoint with the concrete verified build ID. The SHA
+ * is validated and logged here, but Northflank rejects deployment requests that
+ * specify both buildId and buildSHA in the same payload.
  *
  * Usage:
  *   npx tsx scripts/northflank/trigger-deployment.ts <service-id> --build-id <build-id> --sha <sha>
@@ -49,7 +49,7 @@ async function main(): Promise<void> {
   console.log('=== EXACT NORTHFLANK DEPLOYMENT ===');
   console.log(`Service:  ${serviceId}`);
   console.log(`Build ID: ${buildId}`);
-  console.log(`SHA:      ${sha}`);
+  console.log(`Verified SHA: ${sha}`);
   console.log(`Branch:   ${branch}`);
 
   const deploymentPath = projectApiPath(projectId, `/services/${serviceId}/deployment`);
@@ -57,7 +57,6 @@ async function main(): Promise<void> {
     internal: {
       id: serviceId,
       branch,
-      buildSHA: sha,
       buildId,
     },
     docker: { configType: 'default' as const },
@@ -69,7 +68,7 @@ async function main(): Promise<void> {
   });
 
   console.log('Exact Northflank deployment request accepted.');
-  console.log(`Deployment source locked to build ${buildId} at ${sha}.`);
+  console.log(`Deployment source locked to verified build ${buildId} for SHA ${sha}.`);
 }
 
 main().catch((error) => {

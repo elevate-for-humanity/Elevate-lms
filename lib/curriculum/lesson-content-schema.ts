@@ -1,18 +1,8 @@
 /**
- * lib/curriculum/lesson-content-schema.ts
- *
- * Zod schema for structured lesson content stored in course_lessons.content_structured.
- *
- * Every lesson type uses this schema. Fields that are not applicable to a given
- * lesson type are left at their defaults (empty string, empty array, false).
- *
- * The schema is versioned (version: 1) so future migrations can detect and
- * upgrade old content without breaking existing lessons.
+ * Canonical structured lesson content schema.
  */
 
 import { z } from 'zod';
-
-// ─── Sub-schemas ──────────────────────────────────────────────────────────────
 
 export const EvidenceRequirementSchema = z.object({
   enabled: z.boolean().default(false),
@@ -57,8 +47,6 @@ export const CompletionRuleSchema = z.object({
   requiresAttempts: z.number().int().min(0).default(0),
 });
 
-// ─── Root schema ──────────────────────────────────────────────────────────────
-
 export const LessonContentSchema = z.object({
   version: z.literal(1),
   summary: z.string().default(''),
@@ -67,6 +55,10 @@ export const LessonContentSchema = z.object({
   transcript: z.string().default(''),
   materials: z.array(z.string()).default([]),
   activityInstructions: z.string().default(''),
+  // Portable Course Factory experience. Kept structurally open here so the
+  // curriculum layer does not import the higher-level factory schema and form a
+  // circular dependency. Course Factory validates the strict experience shape.
+  experience: z.record(z.string(), z.unknown()).optional(),
   evidence: EvidenceRequirementSchema.default({
     enabled: false,
     submissionModes: [],
@@ -87,16 +79,12 @@ export const LessonContentSchema = z.object({
   }),
 });
 
-// ─── Inferred types ───────────────────────────────────────────────────────────
-
 export type LessonContent = z.infer<typeof LessonContentSchema>;
 export type EvidenceRequirement = z.infer<typeof EvidenceRequirementSchema>;
 export type RubricCriterion = z.infer<typeof RubricCriterionSchema>;
 export type VideoConfig = z.infer<typeof VideoConfigSchema>;
 export type PracticalConfig = z.infer<typeof PracticalConfigSchema>;
 export type CompletionRule = z.infer<typeof CompletionRuleSchema>;
-
-// ─── Empty defaults ───────────────────────────────────────────────────────────
 
 export function emptyLessonContent(): LessonContent {
   return LessonContentSchema.parse({ version: 1 });

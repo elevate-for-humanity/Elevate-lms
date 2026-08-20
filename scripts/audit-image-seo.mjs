@@ -57,17 +57,33 @@ for (const root of ROOTS) {
       inspected += 1;
       const tag = match[0];
       const line = lineNumber(text, match.index);
-      const altMatch = tag.match(/\balt\s*=\s*(?:["']([^"']*)["']|\{`([^`]*)`\}|\{["']([^"']*)["']\})/i);
+      const hasAlt = /\balt\s*=/.test(tag);
 
-      if (!altMatch) {
+      if (!hasAlt) {
         findings.push({ file, line, type: 'missing-alt', detail: 'Image has no alt attribute.' });
         continue;
       }
 
-      const staticAlt = (altMatch[1] ?? altMatch[2] ?? altMatch[3] ?? '').trim();
+      // Dynamic expressions such as alt={logo.alt}, alt={title}, or alt={getAlt()}
+      // are valid contracts. Their value must be verified where the prop/data is defined,
+      // not misclassified here as a missing JSX attribute.
       const dynamicAlt = /\balt\s*=\s*\{(?!["'`])/.test(tag);
+      if (dynamicAlt) continue;
 
-      if (!dynamicAlt && staticAlt === '' && !isExplicitlyDecorative(tag)) {
+      const altMatch = tag.match(/\balt\s*=\s*(?:["']([^"']*)["']|\{`([^`]*)`\}|\{["']([^"']*)["']\})/i);
+      if (!altMatch) {
+        findings.push({
+          file,
+          line,
+          type: 'unsupported-alt',
+          detail: 'Alt attribute exists but could not be validated as a supported literal or expression.',
+        });
+        continue;
+      }
+
+      const staticAlt = (altMatch[1] ?? altMatch[2] ?? altMatch[3] ?? '').trim();
+
+      if (staticAlt === '' && !isExplicitlyDecorative(tag)) {
         findings.push({
           file,
           line,
@@ -77,7 +93,7 @@ for (const root of ROOTS) {
         continue;
       }
 
-      if (!dynamicAlt && GENERIC_ALT.has(staticAlt.toLowerCase())) {
+      if (GENERIC_ALT.has(staticAlt.toLowerCase())) {
         findings.push({
           file,
           line,

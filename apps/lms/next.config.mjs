@@ -19,6 +19,28 @@ const nextConfig = {
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: false },
   eslint: { ignoreDuringBuilds: true },
+
+  async headers() {
+    const noStore = 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+    return [
+      {
+        source: '/sw-lms.js',
+        headers: [
+          { key: 'Cache-Control', value: noStore },
+          { key: 'Service-Worker-Allowed', value: '/' },
+        ],
+      },
+      {
+        source: '/manifest-:role.json',
+        headers: [{ key: 'Cache-Control', value: noStore }],
+      },
+      {
+        source: '/offline.html',
+        headers: [{ key: 'Cache-Control', value: noStore }],
+      },
+    ];
+  },
+
   async rewrites() {
     return { beforeFiles: legacyImageRewrites(), afterFiles: [], fallback: [] };
   },

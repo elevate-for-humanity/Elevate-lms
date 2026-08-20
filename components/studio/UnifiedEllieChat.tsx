@@ -5,12 +5,16 @@ import Link from 'next/link';
 import {
   AlertTriangle,
   Bot,
+  CheckCircle2,
+  ChevronDown,
   Loader2,
   PanelRightOpen,
   Rocket,
   Send,
   Sparkles,
   User,
+  Wrench,
+  XCircle,
 } from 'lucide-react';
 import {
   ELLIE_ROUTE_LABEL,
@@ -21,6 +25,8 @@ import {
   streamPlatformChat,
   type EllieMessageRoute,
 } from '@/lib/devstudio/ellie-unified-handlers';
+
+type ToolCall = { tool: string; args: Record<string, unknown>; result: string };
 
 interface EllieAction {
   id: string;
@@ -37,7 +43,9 @@ interface ChatMessage {
   content: string;
   provider?: string;
   route?: EllieMessageRoute;
+  toolCalls?: ToolCall[];
   action?: EllieAction | null;
+  actionOutcome?: { status: 'executed' | 'rejected' | 'failed'; message: string };
 }
 
 interface UnifiedEllieChatProps {
@@ -74,6 +82,90 @@ const QUICK = [
   },
 ];
 
+function ToolActivity({ toolCalls }: { toolCalls: ToolCall[] }) {
+  if (!toolCalls.length) return null;
+
+  return (
+    <details className="mt-3 rounded-xl border border-gray-200 bg-white">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 marker:hidden">
+        <Wrench className="h-3.5 w-3.5" aria-hidden="true" />
+        {toolCalls.length === 1 ? '1 tool used' : `${toolCalls.length} tools used`}
+        <ChevronDown className="ml-auto h-3.5 w-3.5 text-gray-400" aria-hidden="true" />
+      </summary>
+      <div className="space-y-2 border-t border-gray-100 p-3">
+        {toolCalls.map((call, index) => (
+          <details key={`${call.tool}-${index}`} className="rounded-lg border border-gray-100 bg-gray-50">
+            <summary className="cursor-pointer px-3 py-2 text-xs font-medium text-gray-700">
+              {call.tool}
+            </summary>
+            <pre className="max-h-48 overflow-auto whitespace-pre-wrap border-t border-gray-100 bg-white p-3 text-[11px] leading-5 text-gray-600">
+              {call.result.slice(0, 6000)}
+            </pre>
+          </details>
+        ))}
+      </div>
+    </details>
+  );
+}
+
+function ActionCard({
+  action,
+  onDecision,
+}: {
+  action: EllieAction;
+  onDecision: (decision: 'approve' | 'reject') => Promise<void>;
+}) {
+  const [resolving, setResolving] = useState(false);
+  const highImpact = action.dangerLevel === 'high';
+
+  async function decide(decision: 'approve' | 'reject') {
+    if (resolving) return;
+    setResolving(true);
+    try {
+      await onDecision(decision);
+    } finally {
+      setResolving(false);
+    }
+  }
+
+  return (
+    <div className={`mt-3 overflow-hidden rounded-xl border ${highImpact ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
+      <div className="px-4 py-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-gray-950">{action.label}</p>
+            {action.description && <p className="mt-1 text-xs leading-5 text-gray-600">{action.description}</p>}
+          </div>
+          <span className="shrink-0 rounded-full border border-current/10 bg-white/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-600">
+            {action.dangerLevel} impact
+          </span>
+        </div>
+        {action.targetCount > 1 && (
+          <p className="mt-2 text-xs font-medium text-gray-700">Affects {action.targetCount} records.</p>
+        )}
+      </div>
+      <div className="flex gap-2 border-t border-black/5 bg-white/70 px-4 py-3">
+        <button
+          type="button"
+          disabled={resolving}
+          onClick={() => void decide('approve')}
+          className="rounded-lg bg-gray-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-800 disabled:opacity-50"
+        >
+          {resolving ? 'Working…' : 'Confirm action'}
+        </button>
+        <button
+          type="button"
+          disabled={resolving}
+          onClick={() => void decide('reject')}
+          className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function UnifiedEllieChat({
   onOpenDeploy,
   onOpenPreview,
@@ -99,6 +191,47 @@ export default function UnifiedEllieChat({
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  async function resolveAction(messageIndex: number, action: EllieAction, decision: 'approve' | 'reject') {
+    try {
+      const response = await fetch('/api/admin/ai-assistant/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionId: action.id, decision }),
+      });
+      const data = await response.json().catch(() => ({ error: `HTTP ${response.status}` }));
+      const outcome: NonNullable<ChatMessage['actionOutcome']> = response.ok
+        ? {
+            status: decision === 'reject' ? 'rejected' : data.result?.success === false ? 'failed' : 'executed',
+            message:
+              decision === 'reject'
+                ? 'Action cancelled.'
+                : data.result?.message ?? (data.result?.success === false ? 'Action failed.' : 'Action completed.'),
+          }
+        : { status: 'failed', message: data.error ?? 'Action failed.' };
+
+      setMessages((current) =>
+        current.map((message, index) =>
+          index === messageIndex ? { ...message, action: null, actionOutcome: outcome } : message,
+        ),
+      );
+    } catch (error) {
+      setMessages((current) =>
+        current.map((message, index) =>
+          index === messageIndex
+            ? {
+                ...message,
+                action: null,
+                actionOutcome: {
+                  status: 'failed',
+                  message: error instanceof Error ? error.message : 'Action failed.',
+                },
+              }
+            : message,
+        ),
+      );
+    }
+  }
 
   async function send() {
     const text = input.trim();
@@ -159,7 +292,11 @@ export default function UnifiedEllieChat({
               const next = [...prev];
               const row = next[assistantIdx];
               if (row?.role === 'assistant') {
-                next[assistantIdx] = { ...row, provider: meta.provider ?? row.provider };
+                next[assistantIdx] = {
+                  ...row,
+                  provider: meta.provider ?? row.provider,
+                  toolCalls: meta.toolCalls ?? row.toolCalls,
+                };
               }
               return next;
             });
@@ -277,18 +414,47 @@ export default function UnifiedEllieChat({
                     <Bot className="h-4 w-4 text-gray-800" aria-hidden="true" />
                   </div>
                 )}
-                <div
-                  className={`max-w-[min(100%,42rem)] rounded-2xl px-4 py-3 text-sm leading-6 ${
-                    message.role === 'user' ? 'bg-gray-900 text-white' : assistantClass
-                  }`}
-                >
-                  {message.provider && message.role === 'assistant' && (
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-                      {message.provider}
-                      {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
-                    </p>
-                  )}
-                  <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                <div className="max-w-[min(100%,44rem)]">
+                  <div
+                    className={`rounded-2xl px-4 py-3 text-sm leading-6 ${
+                      message.role === 'user' ? 'bg-gray-900 text-white' : assistantClass
+                    }`}
+                  >
+                    {message.provider && message.role === 'assistant' && (
+                      <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                        {message.provider}
+                        {message.route ? ` · ${ELLIE_ROUTE_LABEL[message.route]}` : ''}
+                      </p>
+                    )}
+                    <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                    {message.role === 'assistant' && message.toolCalls?.length ? (
+                      <ToolActivity toolCalls={message.toolCalls} />
+                    ) : null}
+                    {message.role === 'assistant' && message.action ? (
+                      <ActionCard
+                        action={message.action}
+                        onDecision={(decision) => resolveAction(index, message.action as EllieAction, decision)}
+                      />
+                    ) : null}
+                    {message.actionOutcome ? (
+                      <div
+                        className={`mt-3 flex items-start gap-2 rounded-xl border px-3 py-2 text-xs ${
+                          message.actionOutcome.status === 'executed'
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                            : message.actionOutcome.status === 'rejected'
+                              ? 'border-gray-200 bg-gray-50 text-gray-700'
+                              : 'border-red-200 bg-red-50 text-red-800'
+                        }`}
+                      >
+                        {message.actionOutcome.status === 'executed' ? (
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                        ) : (
+                          <XCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                        )}
+                        <span>{message.actionOutcome.message}</span>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
                 {message.role === 'user' && (
                   <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
@@ -303,9 +469,7 @@ export default function UnifiedEllieChat({
                 <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm">
                   <Loader2 className="h-4 w-4 animate-spin text-gray-700" aria-hidden="true" />
                 </div>
-                <div className={`rounded-2xl px-4 py-3 text-sm ${assistantClass}`}>
-                  Working…
-                </div>
+                <div className={`rounded-2xl px-4 py-3 text-sm ${assistantClass}`}>Working…</div>
               </div>
             )}
             <div ref={endRef} />
@@ -341,7 +505,7 @@ export default function UnifiedEllieChat({
             </button>
           </div>
           <p className="mt-2 text-center text-[11px] text-gray-500">
-            High-impact actions remain subject to authorization, MFA, validation, and audit logging.
+            High-impact actions require confirmation and are written to the audit trail.
           </p>
         </div>
       </div>

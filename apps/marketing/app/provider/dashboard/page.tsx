@@ -9,6 +9,11 @@ export const dynamic = 'force-dynamic';
 
 function host(value: string | undefined, fallback: string) { try { return new URL((value || fallback).trim()).host; } catch { return fallback.replace(/^https?:\/\//, ''); } }
 
+function onboardingStepComplete(step: { status?: string | null; completed_at?: string | null }) {
+  const status = String(step.status || '').trim().toLowerCase();
+  return Boolean(step.completed_at) || ['complete', 'completed', 'approved', 'verified'].includes(status);
+}
+
 export default async function ProviderDashboardPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
   const { tenant } = await searchParams;
   const access = await requireProviderPortal(tenant);
@@ -21,7 +26,7 @@ export default async function ProviderDashboardPage({ searchParams }: { searchPa
   const [tenantRes, orgRes, onboardingRes, programsRes, enrollmentsRes, completedRes, certsRes, complianceRes] = await Promise.all([
     db.from('tenants').select('id, name, slug, status, active').eq('id', tenantId).maybeSingle(),
     db.from('organizations').select('id, name, slug, domain').eq('tenant_id', tenantId).maybeSingle(),
-    db.from('provider_onboarding_steps').select('id, step, completed').eq('tenant_id', tenantId).order('created_at'),
+    db.from('provider_onboarding_steps').select('id, step, status, completed_at').eq('tenant_id', tenantId).order('created_at'),
     db.from('programs').select('id, title, status, published, is_active, created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(8),
     db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId),
     db.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('tenant_id', tenantId).eq('status', 'completed'),
@@ -32,7 +37,7 @@ export default async function ProviderDashboardPage({ searchParams }: { searchPa
   const tenantRecord = tenantRes.data;
   const programs = programsRes.data ?? [];
   const onboarding = onboardingRes.data ?? [];
-  const onboardingPct = onboarding.length ? Math.round((onboarding.filter((step: any) => step.completed).length / onboarding.length) * 100) : 100;
+  const onboardingPct = onboarding.length ? Math.round((onboarding.filter(onboardingStepComplete).length / onboarding.length) * 100) : 100;
   const expiring = (complianceRes.data ?? []).filter((row: any) => row.expires_at && new Date(row.expires_at).getTime() <= Date.now() + 30 * 86400000).length;
   const p = (path: string) => `${path}${tenantSuffix}`;
 

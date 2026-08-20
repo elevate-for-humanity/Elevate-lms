@@ -18,8 +18,8 @@ permissions:
 env:
   CI: true
   NODE_ENV: production
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -53,15 +53,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
-      - name: Require production credentials
+      - name: Require production Supabase credentials
         shell: bash
         run: |
           test -n "$SUPABASE_URL"
           test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          if [ -z "$OPENAI_API_KEY" ] && [ -z "$GROQ_API_KEY" ] && [ -z "$GEMINI_API_KEY" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo 'At least one AI provider credential is required.'
-            exit 1
-          fi
 
       - name: Build canonical Esthetician and Nail courses
         id: build

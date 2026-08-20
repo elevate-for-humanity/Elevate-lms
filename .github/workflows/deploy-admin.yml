@@ -30,9 +30,11 @@ on:
 permissions:
   contents: read
 
+# Serialize exact-SHA production releases. A newer main commit must not cancel an
+# active Northflank Admin build and leave production on a stale or unhealthy image.
 concurrency:
   group: northflank-admin-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy-admin:

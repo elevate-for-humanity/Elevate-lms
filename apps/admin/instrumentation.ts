@@ -27,6 +27,12 @@ export async function register(): Promise<void> {
       console.warn(`[admin] Missing required env vars: ${missing.join(', ')}`);
     } else {
       console.info('[admin] Environment validated');
+
+      // Rendering belongs to the Admin/Course Factory runtime. Starting the
+      // guarded queue loop here makes video processing self-contained in the
+      // production Admin service instead of depending on an external cron hop.
+      const { startAdminVideoWorker } = await import('../../lib/video/background-worker');
+      startAdminVideoWorker();
     }
   } catch (error) {
     console.warn('[admin] Environment validation error:', error);

@@ -49,7 +49,12 @@ export interface FactoryOutput {
   completionRatio?: number;
   skippedCount?: number;
   assessmentsGenerated?: number;
+  /** Total media jobs queued by this build (lesson videos + microclips). */
   videosQueued?: number;
+  /** Full-length lesson video jobs queued by this build. */
+  lessonVideosQueued?: number;
+  /** Short concept-clip jobs queued by this build. */
+  microclipsQueued?: number;
   generationFailures?: Array<{ slug: string; reason: string }>;
   warnings?: string[];
   errors?: string[];

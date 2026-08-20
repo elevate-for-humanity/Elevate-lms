@@ -183,7 +183,7 @@ export async function startWorkspaceTrial(
       trialStartedAt,
       trialEndsAt,
     });
-    if (!license.ok) {
+    if ('error' in license) {
       return { ok: false, error: license.error, status: 500 };
     }
 
@@ -250,7 +250,7 @@ export async function startWorkspaceTrial(
   });
 
   if (!license.ok || license.status !== 'active') {
-    const licenseError = license.ok ? `Trial license is ${license.status}` : license.error;
+    const licenseError = 'error' in license ? license.error : `Trial license is ${license.status}`;
     await db
       .from('customer_workspaces')
       .update({

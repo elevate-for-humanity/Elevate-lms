@@ -66,13 +66,11 @@ export default function HeroVideo({
   heightClassName = 'min-h-[520px] sm:min-h-[560px] lg:min-h-[620px]',
   overlayMode = 'default',
 }: HeroVideoProps) {
-  const heroRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
-  const [heroInView, setHeroInView] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
   const transcriptId = useId();
@@ -83,7 +81,6 @@ export default function HeroVideo({
   const desktopSource = safeDesktop || safeMobile || '';
   const mobileSource = safeMobile || safeDesktop || '';
   const showVideo = Boolean(desktopSource) && !videoFailed;
-  const showStaticFallback = Boolean(posterImage) && !showVideo;
 
   useEffect(() => {
     setVideoFailed(false);
@@ -94,17 +91,6 @@ export default function HeroVideo({
     video.muted = true;
     void video.play().catch(() => {});
   }, [desktopSource, mobileSource]);
-
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero || typeof IntersectionObserver === 'undefined') return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroInView(entry.isIntersecting && entry.intersectionRatio >= 0.3),
-      { threshold: [0, 0.3, 0.65] },
-    );
-    observer.observe(hero);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const unlock = () => setUserActivated(true);
@@ -120,22 +106,22 @@ export default function HeroVideo({
     };
   }, []);
 
+  // Voiceover playback is intentionally independent from hero viewport visibility.
+  // Once the user has interacted with the page, narration continues while they
+  // scroll through the content and only stops on explicit user action or unmount.
   useEffect(() => {
     if (!voiceoverSrc || !userActivated || manualAudioOverride) return;
     const audio = audioRef.current;
     const video = videoRef.current;
     if (!audio) return;
-    if (!heroInView) {
-      audio.pause();
-      setMuted(true);
-      return;
-    }
+
     if (video) {
       video.muted = true;
       if (video.paused) void video.play().catch(() => {});
     }
+
     void audio.play().then(() => setMuted(false)).catch(() => setMuted(true));
-  }, [heroInView, manualAudioOverride, userActivated, voiceoverSrc]);
+  }, [manualAudioOverride, userActivated, voiceoverSrc]);
 
   useEffect(() => () => {
     videoRef.current?.pause();
@@ -183,13 +169,12 @@ export default function HeroVideo({
   return (
     <div className={`w-full ${className}`}>
       <section
-        ref={heroRef}
         className={`relative isolate flex w-full items-end overflow-hidden bg-slate-900 ${heightClassName}`}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {showStaticFallback ? (
+        {posterImage ? (
           <Image
-            src={posterImage!}
+            src={posterImage}
             alt=""
             fill
             priority
@@ -210,7 +195,6 @@ export default function HeroVideo({
             playsInline
             muted
             disablePictureInPicture
-            poster={posterImage}
             onCanPlay={() => {
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});

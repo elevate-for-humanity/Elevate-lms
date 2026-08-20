@@ -1,9 +1,9 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { DollarSign, ArrowLeft, FileText, ExternalLink } from 'lucide-react';
+import { ArrowLeft, FileCheck2, ShieldCheck } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { normalizeError } from '@/lib/errors/normalize-error';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
@@ -11,11 +11,19 @@ import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Confirm Funding',
+  title: 'Request Funding Review',
   robots: { index: false, follow: false },
 };
 
-async function confirmFunding(formData: FormData) {
+const ALLOWED_SOURCES = [
+  'WIOA / WorkOne',
+  'Workforce Ready Grant',
+  'Employer / Host-Site Payment',
+  'Other Third-Party Funding',
+  'Self-Pay',
+] as const;
+
+async function requestFundingReview(formData: FormData) {
   'use server';
   const { createClient: createServerClient } = await import('@/lib/supabase/server');
   const supabase = await createServerClient();
@@ -24,22 +32,38 @@ async function confirmFunding(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const fundingSource = formData.get('funding_source') as string;
+  const requestedSource = String(formData.get('funding_source') || '');
+  if (!ALLOWED_SOURCES.includes(requestedSource as (typeof ALLOWED_SOURCES)[number])) {
+    redirect('/funding/confirm?error=invalid-source');
+  }
 
-  const { error } = await supabase
+  const { error: profileError } = await supabase
     .from('profiles')
     .update({
-      funding_source: fundingSource || 'pending',
-      funding_confirmed: true,
+      funding_source: requestedSource,
+      funding_confirmed: false,
     })
     .eq('id', user.id);
 
-  if (error) {
-    logger.error('Funding confirm failed', normalizeError(error, 'Funding confirm failed'));
+  if (profileError) {
+    logger.error('Funding request profile update failed', normalizeError(profileError, 'Funding request profile update failed'));
     redirect('/funding/confirm?error=save-failed');
   }
 
-  redirect('/onboarding/learner');
+  if (requestedSource !== 'Self-Pay') {
+    const { error: requestError } = await supabase.from('participant_funding_authorizations').insert({
+      participant_id: user.id,
+      funding_source: requestedSource,
+      status: 'pending',
+    });
+
+    if (requestError) {
+      logger.error('Funding authorization request failed', normalizeError(requestError, 'Funding authorization request failed'));
+      redirect('/funding/confirm?error=request-failed');
+    }
+  }
+
+  redirect('/onboarding/learner?funding=pending-review');
 }
 
 export default async function ConfirmFundingPage({
@@ -54,102 +78,67 @@ export default async function ConfirmFundingPage({
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const fundingOptions = [
-    {
-      name: 'WIOA (Workforce Innovation and Opportunity Act)',
-      desc: 'Covers tuition, materials, exam fees, and supportive services for eligible participants. Contact your local WorkOne office.',
-      eligible: 'Adults, dislocated workers, youth 16-24',
-    },
-    {
-      name: 'Next Level Jobs — Workforce Ready Grant',
-      desc: 'Indiana state funding for high-demand certification programs. Covers full training costs.',
-      eligible: 'Indiana residents in approved programs',
-    },
-    {
-      name: 'Employer Sponsorship',
-      desc: 'Your employer pays training costs, often with OJT wage reimbursement (50-75% of wages during training).',
-      eligible: 'Employed individuals with employer agreement',
-    },
-    {
-      name: 'Self-Pay',
-      desc: 'Pay tuition directly. Payment plans available. $2,700 per program.',
-      eligible: 'All applicants',
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-white p-6">
+    <main className="min-h-screen bg-white p-6">
       <div className="max-w-2xl mx-auto">
-        <Breadcrumbs
-          items={[
-            { label: 'Onboarding', href: '/onboarding/learner' },
-            { label: 'Confirm Funding' },
-          ]}
-        />
-        <Link
-          href="/funding/confirm"
-          className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4"
-        >
+        <Breadcrumbs items={[{ label: 'Onboarding', href: '/onboarding/learner' }, { label: 'Funding Review' }]} />
+        <Link href="/onboarding/learner" className="text-sm text-brand-blue-600 flex items-center gap-1 mt-4 mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to Onboarding
         </Link>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Confirm Your Funding</h1>
-        <p className="text-sm text-slate-600 mb-6">
-          Select your funding source. Most students qualify for $0 out-of-pocket through workforce
-          funding.
+
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Request Funding Review</h1>
+        <p className="text-sm text-slate-600 mb-6 leading-relaxed">
+          Select the source you want reviewed. Your selection does not confirm eligibility, coverage,
+          or an award. Third-party funding remains pending until authorized evidence is verified.
         </p>
-        {errorParam === 'save-failed' && (
+
+        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <ShieldCheck className="w-5 h-5 text-amber-800 flex-none mt-0.5" />
+          <p className="text-sm text-amber-950 leading-relaxed">
+            Elevate will not mark your profile as funding-confirmed from this form. A current verified
+            authorization record is required before the database permits that status.
+          </p>
+        </div>
+
+        {errorParam && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">
-            Failed to save your funding selection. Please try again or call {PLATFORM_DEFAULTS.supportPhone} for help.
+            The funding review request could not be saved. Please try again or contact {PLATFORM_DEFAULTS.supportPhone}.
           </div>
         )}
-        <form action={confirmFunding} className="space-y-4">
-          {fundingOptions.map((f, i) => (
-            <label
-              key={i}
-              className="block bg-white rounded-xl border border-slate-200 p-5 cursor-pointer hover:border-brand-blue-300 transition-colors"
-            >
+
+        <form action={requestFundingReview} className="space-y-4">
+          {ALLOWED_SOURCES.map((source) => (
+            <label key={source} className="block bg-white rounded-xl border border-slate-200 p-5 cursor-pointer hover:border-brand-blue-300 transition-colors">
               <div className="flex items-start gap-3">
-                <input
-                  type="radio"
-                  name="funding_source"
-                  value={f.name}
-                  required
-                  className="mt-1"
-                />
+                <input type="radio" name="funding_source" value={source} required className="mt-1" />
                 <div>
-                  <div className="text-sm font-semibold text-slate-900">{f.name}</div>
-                  <div className="text-xs text-black mt-1">{f.desc}</div>
-                  <div className="text-[10px] text-black mt-1">Eligible: {f.eligible}</div>
+                  <div className="text-sm font-semibold text-slate-900">{source}</div>
+                  <div className="text-xs text-slate-600 mt-1">
+                    {source === 'Self-Pay'
+                      ? 'Choose this when you intend to use the published self-pay pathway and enrollment agreement.'
+                      : 'Request review only. The responsible source must verify participant and program eligibility and provide the applicable authorization.'}
+                  </div>
                 </div>
               </div>
             </label>
           ))}
 
-          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4">
-            <div className="flex items-start gap-2">
-              <FileText className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <div className="text-xs font-semibold text-brand-blue-800">
-                  Need help with funding?
-                </div>
-                <div className="text-xs text-brand-blue-700 mt-1">
-                  Contact us at (317) 316-3077 or email info@elevateforhumanity.org. We will help
-                  you determine eligibility and connect you with the right funding source.
-                </div>
-              </div>
-            </div>
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-start gap-2">
+            <FileCheck2 className="w-4 h-4 text-slate-700 flex-none mt-0.5" />
+            <p className="text-xs text-slate-600 leading-relaxed">
+              If a third party is expected to pay, keep the authorization letter, voucher, award,
+              contract, or equivalent evidence that identifies the participant, program, approved
+              amount, and terms. The authorization record must be verified by an authorized workflow.
+            </p>
           </div>
 
           <div className="flex justify-end pt-4">
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-5 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700"
-            >
-              <span className="w-4 h-4 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> Confirm Funding
+            <button type="submit" className="px-5 py-2.5 bg-brand-blue-600 text-white rounded-lg text-sm font-bold hover:bg-brand-blue-700">
+              Save Funding Review Request
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 }

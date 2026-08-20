@@ -7,10 +7,14 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const services = {
   marketing: {
     appDir: 'apps/marketing',
+    worker: 'sw-marketing.js',
+    cachePrefix: 'elevate-marketing-',
     files: ['sw-marketing.js', 'manifest-marketing.json', 'offline.html'],
   },
   lms: {
     appDir: 'apps/lms',
+    worker: 'sw-lms.js',
+    cachePrefix: 'elevate-lms-',
     files: [
       'sw-lms.js',
       'manifest-lms.json',
@@ -24,6 +28,8 @@ const services = {
   },
   admin: {
     appDir: 'apps/admin',
+    worker: 'sw-admin.js',
+    cachePrefix: 'elevate-admin-',
     files: ['sw-admin.js', 'manifest-admin.json', 'offline.html'],
   },
 };
@@ -94,6 +100,12 @@ function verifyManifest(filename, sourceText) {
   }
 }
 
+function normalizeStampedWorker(source, cachePrefix) {
+  const escapedPrefix = cachePrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const stampedCache = new RegExp(`${escapedPrefix}[a-f0-9]{7,12}`, 'gi');
+  return source.replace(stampedCache, '__CACHE_VERSION__');
+}
+
 for (const [service, config] of Object.entries(services)) {
   for (const filename of config.files) {
     const canonicalPath = join(ROOT, 'public', filename);
@@ -102,7 +114,16 @@ for (const [service, config] of Object.entries(services)) {
     const runtime = readRequired(runtimePath, `${service} runtime PWA asset`);
 
     if (canonical === null || runtime === null) continue;
-    if (canonical !== runtime) {
+
+    if (filename === config.worker) {
+      const normalizedRuntime = normalizeStampedWorker(runtime, config.cachePrefix);
+      if (canonical !== normalizedRuntime) {
+        fail(`${service} runtime worker differs from canonical public/${filename} beyond the expected cache-version stamp`);
+      }
+      if (runtime.includes('__CACHE_VERSION__')) {
+        fail(`${service} runtime worker still contains the unstamped __CACHE_VERSION__ placeholder`);
+      }
+    } else if (canonical !== runtime) {
       fail(`${service} runtime asset differs from canonical public/${filename}`);
     }
 

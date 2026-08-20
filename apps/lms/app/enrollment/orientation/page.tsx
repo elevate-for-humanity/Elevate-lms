@@ -12,6 +12,9 @@ import {
   normalizeEnrollmentState,
 } from '@/lib/enrollment/enrollment-flow';
 
+const ORIENTATION_VIDEO =
+  'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4';
+
 export default function EnrollMentorientationPage() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -92,7 +95,7 @@ export default function EnrollMentorientationPage() {
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
-      v.play();
+      void v.play();
       setPlaying(true);
     } else {
       v.pause();
@@ -147,7 +150,6 @@ export default function EnrollMentorientationPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
-        {/* Step 1 — Video */}
         <div className="rounded-2xl border border-slate-200 overflow-hidden">
           <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center gap-3">
             <span className="w-7 h-7 rounded-full bg-brand-blue-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0">
@@ -155,7 +157,7 @@ export default function EnrollMentorientationPage() {
             </span>
             <h2 className="font-bold text-black text-sm">Watch the Orientation Video</h2>
             {videoWatched && (
-              <span className="w-5 h-5 rounded-full bg-brand-green-600 inline-block flex-shrink-0 ml-auto flex-shrink-0" aria-hidden="true" />
+              <span className="w-5 h-5 rounded-full bg-brand-green-600 inline-block flex-shrink-0 ml-auto" aria-hidden="true" />
             )}
           </div>
 
@@ -171,7 +173,7 @@ export default function EnrollMentorientationPage() {
               playsInline
               preload="metadata"
             >
-              <source src="/videos/orientation-full.mp4" type="video/mp4" />
+              <source src={ORIENTATION_VIDEO} type="video/mp4" />
             </video>
 
             {!playing && (
@@ -187,24 +189,13 @@ export default function EnrollMentorientationPage() {
             )}
 
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 py-3 flex items-center gap-3">
-              <button
-                onClick={togglePlay}
-                className="text-white hover:text-white/80 transition-colors"
-                aria-label={playing ? 'Pause' : 'Play'}
-              >
+              <button onClick={togglePlay} className="text-white hover:text-white/80 transition-colors" aria-label={playing ? 'Pause' : 'Play'}>
                 {playing ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </button>
               <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-brand-blue-400 rounded-full transition-all duration-300"
-                  style={{ width: `${videoProgress}%` }}
-                />
+                <div className="h-full bg-brand-blue-400 rounded-full transition-all duration-300" style={{ width: `${videoProgress}%` }} />
               </div>
-              <button
-                onClick={toggleMute}
-                className="text-white hover:text-white/80 transition-colors"
-                aria-label={muted ? 'Unmute' : 'Mute'}
-              >
+              <button onClick={toggleMute} className="text-white hover:text-white/80 transition-colors" aria-label={muted ? 'Unmute' : 'Mute'}>
                 {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
               </button>
             </div>
@@ -213,36 +204,28 @@ export default function EnrollMentorientationPage() {
           <div className="px-5 py-3 bg-slate-50 border-t border-slate-200">
             {videoWatched ? (
               <p className="text-brand-green-700 text-sm font-semibold flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" /> Video complete — sign below to finish
-                orientation
+                <span className="w-4 h-4 rounded-full bg-brand-blue-600 inline-block flex-shrink-0" aria-hidden="true" />
+                Video complete — sign below to finish orientation
               </p>
             ) : (
               <p className="text-black text-sm">
                 Watch at least 80% of the video to unlock the sign-off.
                 {videoProgress > 0 && (
-                  <span className="ml-2 text-brand-blue-600 font-semibold">
-                    {Math.round(videoProgress)}% watched
-                  </span>
+                  <span className="ml-2 text-brand-blue-600 font-semibold">{Math.round(videoProgress)}% watched</span>
                 )}
               </p>
             )}
           </div>
         </div>
 
-        {/* Step 2 — Acknowledgment */}
-        <div
-          className={`rounded-2xl border overflow-hidden transition-opacity duration-300 ${videoWatched ? 'border-slate-200 opacity-100' : 'border-slate-100 opacity-40 pointer-events-none select-none'}`}
-        >
+        <div className={`rounded-2xl border overflow-hidden transition-opacity duration-300 ${videoWatched ? 'border-slate-200 opacity-100' : 'border-slate-100 opacity-40 pointer-events-none select-none'}`}>
           <div className="bg-slate-50 border-b border-slate-200 px-5 py-3 flex items-center gap-3">
-            <span className="w-7 h-7 rounded-full bg-brand-blue-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0">
-              2
-            </span>
+            <span className="w-7 h-7 rounded-full bg-brand-blue-600 text-white text-xs font-black flex items-center justify-center flex-shrink-0">2</span>
             <h2 className="font-bold text-black text-sm">Sign Orientation Acknowledgment</h2>
           </div>
           <div className="p-6 space-y-4">
             <p className="text-black text-sm leading-relaxed">
-              By checking the box below, you confirm you have watched the orientation video and
-              agree to the following:
+              By checking the box below, you confirm you have watched the orientation video and agree to the following:
             </p>
             <ul className="space-y-2.5">
               {[
@@ -268,17 +251,14 @@ export default function EnrollMentorientationPage() {
                 className="mt-0.5 h-5 w-5 rounded border-slate-300 text-brand-blue-600 focus:ring-brand-blue-500"
               />
               <span className="text-black text-sm font-medium">
-                I have watched the orientation video and agree to all program policies, attendance
-                requirements, and safety protocols listed above.
+                I have watched the orientation video and agree to all program policies, attendance requirements, and safety protocols listed above.
               </span>
             </label>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-            {error}
-          </div>
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{error}</div>
         )}
 
         <button
@@ -292,8 +272,7 @@ export default function EnrollMentorientationPage() {
         >
           {submitting ? (
             <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />{' '}
-              Saving...
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" /> Saving...
             </>
           ) : (
             <>
@@ -304,7 +283,7 @@ export default function EnrollMentorientationPage() {
 
         <p className="text-center text-black text-xs">
           Questions? Call{' '}
-          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`} className="text-brand-blue-600 font-semibold hover:underline">
+          <a href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, '')}`} className="text-brand-blue-600 font-semibold hover:underline">
             {PLATFORM_DEFAULTS.supportPhone}
           </a>
         </p>

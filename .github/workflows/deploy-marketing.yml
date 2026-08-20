@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    # Marketing imports shared monorepo code from many root-level directories.
-    # Deploy every main revision so a hand-maintained path allowlist cannot leave
-    # a merged website change out of production.
   workflow_dispatch:
     inputs:
       sync_secrets:
@@ -21,10 +18,9 @@ permissions:
 
 concurrency:
   group: northflank-marketing-deploy
-  # Multiple environments commit to main. Do not cancel a running production
-  # build when a newer revision arrives; queue it so at least one known-good
-  # revision can converge, then the newer revision deploys behind it.
-  cancel-in-progress: false
+  # Production must converge on the newest main revision. Obsolete runs are unsafe
+  # because they can overwrite a newer Marketing release after a long build.
+  cancel-in-progress: true
 
 env:
   EXPECTED_SHA: ${{ github.sha }}
@@ -66,18 +62,19 @@ jobs:
           fetch-depth: 0
           clean: true
 
-      - name: Prove deployment SHA belongs to main
+      - name: Require current main revision
         shell: bash
         run: |
           set -Eeuo pipefail
           REQUESTED_SHA="${{ github.sha }}"
           git fetch origin main --depth=200
           RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
+          CURRENT_MAIN="$(git rev-parse origin/main)"
           test -n "$RESOLVED_SHA" || { echo '::error::Deployment SHA cannot be resolved'; exit 1; }
-          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Refusing production deploy of SHA not contained in main: $RESOLVED_SHA"; exit 1; }
           test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
+          test "$RESOLVED_SHA" = "$CURRENT_MAIN" || { echo "::error::Stale Marketing deployment refused: requested=$RESOLVED_SHA current_main=$CURRENT_MAIN"; exit 1; }
           test "$(git status --porcelain)" = ""
-          echo "Verified production Marketing SHA $RESOLVED_SHA"
+          echo "Verified latest production Marketing SHA $RESOLVED_SHA"
 
       - name: Set build environment variables
         run: |
@@ -165,6 +162,14 @@ jobs:
             --build-id "${{ steps.trigger_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
 
+      - name: Reconfirm latest main before deployment
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git fetch origin main --depth=20
+          CURRENT_MAIN="$(git rev-parse origin/main)"
+          test "${{ github.sha }}" = "$CURRENT_MAIN" || { echo "::error::Newer main revision exists; refusing stale Marketing cutover. current_main=$CURRENT_MAIN"; exit 1; }
+
       - name: Deploy exact Marketing build
         run: |
           set -euo pipefail
@@ -172,7 +177,7 @@ jobs:
             "$NORTHFLANK_MARKETING_SERVICE_ID" \
             --build-id "${{ steps.trigger_build.outputs.build_id }}" \
             --sha "${{ github.sha }}"
-          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 3600000
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --timeout-ms 900000
 
       - name: Verify Northflank deployment SHA
         run: pnpm tsx scripts/northflank/verify-sha.ts "$NORTHFLANK_MARKETING_SERVICE_ID" --sha "${{ github.sha }}"

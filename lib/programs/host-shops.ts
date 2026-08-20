@@ -93,7 +93,7 @@ function parseMedia(value: unknown): HostShopMedia[] {
   if (!Array.isArray(value)) return [];
   const seen = new Set<string>();
   return value
-    .map((item) => {
+    .map((item): HostShopMedia | null => {
       if (!item || typeof item !== 'object') return null;
       const row = item as Record<string, unknown>;
       if (typeof row.url !== 'string' || !row.url) return null;
@@ -106,7 +106,7 @@ function parseMedia(value: unknown): HostShopMedia[] {
         source: typeof row.source === 'string' ? row.source : undefined,
       };
     })
-    .filter((item): item is HostShopMedia => Boolean(item));
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 function isPubliclyListedHostShop(shop: HostShop): boolean {

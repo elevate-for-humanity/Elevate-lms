@@ -1,233 +1,113 @@
-import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { requireAdminClient } from '@/lib/supabase/admin';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Download } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FileText, Hourglass } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { resolveApprenticeProgramSlug } from '@/lib/portal/resolve-apprentice-program';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import UploadDocuments from './UploadDocuments';
 
 export const metadata: Metadata = {
   title: 'Documents | Apprentice Portal',
-  description: 'Access your apprenticeship documents and forms.',
+  description: 'Required apprenticeship records, signatures, and uploads.',
 };
-
 export const dynamic = 'force-dynamic';
+
+const approvedStates = new Set(['approved', 'accepted', 'verified']);
 
 export default async function ApprenticeDocumentsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login?redirect=/apprentice/documents');
 
-  if (!user) {
-    redirect('/login?redirect=/apprentice/documents');
-  }
-
-  // Use admin client for all data reads to bypass RLS
   const admin = await requireAdminClient();
+  const programSlug = await resolveApprenticeProgramSlug(admin, user.id);
+  if (!programSlug) redirect('/lms/dashboard?notice=apprentice-access-required');
 
-  // Get apprentice profile
-  const { data: apprentice } = await admin
-    .from('apprentices')
-    .select('*')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  const [{ data: requirements }, { data: documents }] = await Promise.all([
+    admin
+      .from('apprentice_document_types')
+      .select('id,name,document_type,is_required,accepted_formats,max_file_size_mb,display_order')
+      .eq('program_slug', programSlug)
+      .order('display_order', { ascending: true }),
+    admin
+      .from('documents')
+      .select('id,document_type,file_name,status,verification_status,created_at,metadata')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+  ]);
 
-  // Get documents by user_id
-  const { data: documents } = await admin
-    .from('documents')
-    .select('id, name, document_type, status, verification_status, file_url, created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  // Get required forms
-  const { data: requiredForms } = await admin
-    .from('apprentice_forms')
-    .select('*')
-    .eq('program_id', apprentice?.program_id)
-    .eq('is_required', true);
-
-  const displayDocuments = documents ?? [];
+  const docs = documents ?? [];
+  const required = (requirements ?? []).filter((item: any) => item.is_required);
+  const rows = (requirements ?? []).map((requirement: any) => {
+    const document = docs.find((doc: any) => doc.document_type === requirement.document_type);
+    const raw = String(document?.verification_status || document?.status || 'missing').toLowerCase();
+    const status = approvedStates.has(raw) ? 'complete' : raw === 'pending' ? 'pending' : raw === 'rejected' ? 'rejected' : 'missing';
+    return { requirement, document, status };
+  });
+  const missingRequired = rows.filter(({ requirement, status }: any) => requirement.is_required && status !== 'complete').length;
 
   return (
-    <div className="min-h-screen bg-white">
-      <Breadcrumbs
-        items={[{ label: 'Apprentice Portal', href: '/apprentice' }, { label: 'Documents' }]}
-      />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Documents</h1>
-            <p className="text-slate-700">Access your apprenticeship documents and forms</p>
-          </div>
-        </div>
-        
-        {/* Upload Section */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4">Upload Documents</h2>
-          <UploadDocuments />
-        </div>
-
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-          <h2 className="text-lg font-semibold text-blue-900 mb-3">📋 Document Upload Instructions</h2>
-          <div className="space-y-2 text-sm text-blue-800">
-            <p><strong>Required Documents:</strong></p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Government-issued ID (driver's license, passport, or state ID)</li>
-              <li>Social Security Card or official SSN document</li>
-              <li>High school diploma or GED certificate</li>
-              <li>Employment verification letter from host shop</li>
-              <li> Signed apprenticeship agreement</li>
-            </ul>
-            <p className="mt-3"><strong>Upload Tips:</strong></p>
-            <ul className="list-disc list-inside space-y-1 ml-4">
-              <li>Accepted formats: PDF, JPG, PNG (max 10MB per file)</li>
-              <li>Ensure documents are clear and readable</li>
-              <li>Documents will be verified within 3-5 business days</li>
-              <li>Click "Upload Document" to add new files</li>
-            </ul>
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <Breadcrumbs items={[{ label: 'Apprentice Portal', href: '/apprentice' }, { label: 'Documents' }]} />
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+          <h1 className="text-3xl font-black">Apprenticeship documents</h1>
+          <p className="mt-2 text-slate-700">Required records stay visible until accepted. Missing or rejected items are shown in red.</p>
+          <div className={`mt-5 rounded-xl border p-4 ${missingRequired ? 'border-red-300 bg-red-50 text-red-950' : 'border-green-300 bg-green-50 text-green-950'}`}>
+            {missingRequired ? (
+              <div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-black">Action required: {missingRequired} required document{missingRequired === 1 ? '' : 's'} incomplete.</p><p className="mt-1 text-sm font-semibold">Upload each missing item below. The signed apprenticeship agreement is required and remains red until accepted.</p></div></div>
+            ) : (
+              <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><p className="font-black">All {required.length} required apprenticeship documents are complete.</p></div>
+            )}
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Documents */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-6 border-b">
-                <h2 className="text-lg font-semibold">My Documents</h2>
-              </div>
-              {displayDocuments.length > 0 ? (
-                <div className="divide-y">
-                  {displayDocuments.map((doc: any) => {
-                    const label = (doc.name || doc.document_type || 'Document')
-                      .replace(/_/g, ' ')
-                      .replace(/\b\w/g, (c: string) => c.toUpperCase());
-                    const statusColor =
-                      doc.status === 'approved' ? 'text-brand-green-600' :
-                      doc.status === 'rejected' ? 'text-red-600' : 'text-amber-600';
-                    return (
-                      <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-slate-50">
-                        <div className="flex items-center gap-4">
-                          <FileText className="w-9 h-9 text-brand-blue-500 shrink-0" />
-                          <div>
-                            <h3 className="font-medium text-slate-900">{label}</h3>
-                            <p className="text-sm text-slate-500">
-                              {new Date(doc.created_at).toLocaleDateString()}
-                              {doc.status && (
-                                <span className={`ml-2 font-medium capitalize ${statusColor}`}>
-                                  · {doc.status}
-                                </span>
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        {doc.file_url && (
-                          <a
-                            href={doc.file_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
-                          >
-                            <Download className="w-5 h-5" />
-                          </a>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="p-10 text-center">
-                  <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="font-medium text-slate-700">No documents uploaded yet</p>
-                  <p className="text-sm text-slate-400 mt-1">
-                    Use the Upload button to add your photo ID, proof of residency, or other required documents.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-xl font-black">Upload or replace a document</h2>
+          <p className="mt-1 text-sm text-slate-600">Approved evidence is locked. Missing, pending, or rejected evidence can be uploaded through the secure document endpoint.</p>
+          <div className="mt-5"><UploadDocuments programSlug={programSlug} /></div>
+        </section>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Required Documents Instructions */}
-            <div className="bg-blue-50 rounded-xl border border-blue-100 p-6">
-              <h3 className="font-semibold text-blue-900 mb-3">Required Documents</h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-start gap-2">
-                  <span className="w-5 h-5 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</span>
-                  <div>
-                    <p className="font-medium text-blue-900">Photo ID</p>
-                    <p className="text-blue-700 text-xs mt-0.5">Drivers license, state ID, or passport</p>
+        <section className="mt-6 grid gap-4">
+          {rows.map(({ requirement, document, status }: any) => {
+            const complete = status === 'complete';
+            const pending = status === 'pending';
+            const classes = complete
+              ? 'border-green-300 bg-green-50'
+              : pending
+                ? 'border-amber-300 bg-amber-50'
+                : 'border-red-300 bg-red-50';
+            return (
+              <article key={requirement.id} className={`rounded-2xl border p-5 ${classes}`}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex gap-3">
+                    <FileText className="mt-1 h-6 w-6 shrink-0" />
+                    <div>
+                      <h2 className="font-black">{requirement.name}</h2>
+                      <p className="mt-1 text-sm font-semibold">{requirement.is_required ? 'Required' : 'Optional'} · Accepted: {(requirement.accepted_formats ?? []).join(', ').toUpperCase()} · Max {requirement.max_file_size_mb || 10} MB</p>
+                      {document?.file_name ? <p className="mt-2 text-xs font-semibold">Latest upload: {document.file_name}</p> : null}
+                    </div>
                   </div>
+                  {complete ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-700 px-3 py-1 text-xs font-black text-white"><CheckCircle2 className="h-4 w-4" /> Complete</span>
+                  ) : pending ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-700 px-3 py-1 text-xs font-black text-white"><Hourglass className="h-4 w-4" /> In review</span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-700 px-3 py-1 text-xs font-black text-white"><AlertCircle className="h-4 w-4" /> {status === 'rejected' ? 'Rejected — replace' : 'Missing — upload'}</span>
+                  )}
                 </div>
-                <div className="flex items-start gap-2">
-                  <span className="w-5 h-5 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</span>
-                  <div>
-                    <p className="font-medium text-blue-900">Proof of Residency</p>
-                    <p className="text-blue-700 text-xs mt-0.5">Recent utility bill or lease (within 60 days)</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="w-5 h-5 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</span>
-                  <div>
-                    <p className="font-medium text-blue-900">High School Diploma/GED</p>
-                    <p className="text-blue-700 text-xs mt-0.5">Copy of diploma, transcript, or GED</p>
-                  </div>
-                </div>
-                <p className="text-blue-600 text-xs mt-2 pt-2 border-t border-blue-100">Accepted: PDF, JPG, PNG (max 10MB)</p>
-              </div>
-            </div>
+              </article>
+            );
+          })}
+        </section>
 
-            {/* Required Forms */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="font-semibold mb-4">Required Forms</h3>
-              {requiredForms && requiredForms.length > 0 ? (
-                <ul className="space-y-3">
-                  {requiredForms.map((form: any) => (
-                    <li key={form.id}>
-                      <a
-                        href={form.url || '#'}
-                        className="flex items-center gap-2 text-brand-blue-600 hover:underline"
-                      >
-                        <FileText className="w-4 h-4" />
-                        {form.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-slate-700 text-sm">No forms available yet.</p>
-              )}
-            </div>
-
-            {/* Quick Links */}
-            <div className="bg-white rounded-xl shadow-sm border p-6">
-              <h3 className="font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link href="/apprentice/handbook" className="text-brand-blue-600 hover:underline">
-                    Apprentice Handbook
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/apprentice/hours" className="text-brand-blue-600 hover:underline">
-                    Log Hours
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/apprentice/transfer-hours"
-                    className="text-brand-blue-600 hover:underline"
-                  >
-                    Transfer Hours
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/apprentice" className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-bold hover:bg-slate-100">Return to dashboard</Link>
+          <Link href="/apprentice/hours" className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800">Hours & timeclock</Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

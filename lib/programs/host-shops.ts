@@ -91,13 +91,17 @@ function businessKey(value: string | null | undefined) {
 
 function parseMedia(value: unknown): HostShopMedia[] {
   if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
   return value
     .map((item) => {
       if (!item || typeof item !== 'object') return null;
       const row = item as Record<string, unknown>;
       if (typeof row.url !== 'string' || !row.url) return null;
+      const url = row.url.trim();
+      if (!url || seen.has(url)) return null;
+      seen.add(url);
       return {
-        url: row.url,
+        url,
         alt: typeof row.alt === 'string' ? row.alt : undefined,
         source: typeof row.source === 'string' ? row.source : undefined,
       };
@@ -121,9 +125,8 @@ function approvedMapsUrl(shop: HostShop) {
 function approvedDescription(shop: HostShop) {
   const programNames = shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug);
   const location = [shop.city, shop.state].filter(Boolean).join(', ');
-  const supervisor = shop.supervisor ? ` under approved supervisor ${shop.supervisor}` : '';
   const pathways = programNames.length === 1 ? programNames[0] : programNames.join(' and ');
-  return `${shop.name} is an approved Elevate Host Site${location ? ` in ${location}` : ''} for ${pathways}${supervisor}. The approved worksite provides supervised work-based learning subject to current apprentice placement capacity.`;
+  return `${shop.name}${location ? ` — ${location}` : ''}. Approved Elevate Host Site record for ${pathways}.`;
 }
 
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
@@ -142,8 +145,9 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .order('shop_legal_name'),
     db
       .from('host_shop_applications')
-      .select('id, shop_name, address, phone, email, intake')
+      .select('id, shop_name, address, phone, email, intake, approved_by')
       .eq('status', 'approved')
+      .neq('approved_by', 'system_verification')
       .order('shop_name'),
     db
       .from('public_host_shops')

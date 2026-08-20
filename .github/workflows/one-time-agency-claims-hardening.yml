@@ -1,0 +1,67 @@
+name: One-time agency claims hardening
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/one-time-agency-claims-hardening.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply exact agency copy corrections
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('apps/marketing/app/for-agencies/page.tsx')
+          s = p.read_text()
+          replacements = {
+            "Indiana ETPL Certified Provider": "Program-Specific ETPL Listings",
+            "WIOA / WRG / JRI / Job Ready Indy Approved": "Program and Participant Funding Eligibility Varies",
+            "ETPL-approved. WIOA-funded. RAPIDS-tracked. We handle enrollment, training, and\n              outcome reporting — you focus on your clients.": "Program-specific funding records and RAPIDS-tracked apprenticeship activity support enrollment, training, and outcome reporting. The responsible agency controls participant eligibility and funding authorization.",
+            "{totalEnrollments ?? '500'}+": "{totalEnrollments ?? '—'}",
+            "{completedEnrollments ?? '300'}+": "{completedEnrollments ?? '—'}",
+            "{programs?.length ?? 20}+": "{programs?.length ?? '—'}",
+            "ETPL-Approved Programs": "Current Program Listings",
+            "Funding Accepted": "Funding Coordination",
+            "We Handle Eligibility": "Coordinate Eligibility Documentation",
+            "Our enrollment team screens for WIOA, WRG, and program-specific eligibility. We notify you of the outcome.": "Our enrollment team helps gather program and participant documentation. WorkOne or the responsible agency determines eligibility and authorizes funding.",
+            "Eligibility verification, IEP alignment, and RAPIDS-compatible outcome tracking. Every participant record is audit-ready.": "Eligibility documentation, IEP alignment, and RAPIDS-compatible outcome tracking support authorized case management and audit preparation.",
+            "Every certificate issued is publicly verifiable. Employers and agencies can confirm credentials instantly via a unique verification link.": "Configured credential records can be checked through verification workflows when a verification link is available.",
+            "FERPA-compliant data access": "Role-based data access",
+          }
+          for old, new in replacements.items():
+            if old in s:
+              s = s.replace(old, new)
+          p.write_text(s)
+          PY
+      - name: Verify public claims
+        run: node scripts/check-public-claims.mjs
+      - name: Remove one-time workflow
+        run: rm .github/workflows/one-time-agency-claims-hardening.yml
+      - name: Commit verified migration
+        run: |
+          git config user.name "elevate-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add apps/marketing/app/for-agencies/page.tsx .github/workflows/one-time-agency-claims-hardening.yml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "compliance(marketing): qualify agency funding claims"
+          git push origin HEAD:main

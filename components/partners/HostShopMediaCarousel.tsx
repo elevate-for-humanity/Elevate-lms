@@ -28,7 +28,7 @@ export default function HostShopMediaCarousel({
   const [index, setIndex] = useState(0);
 
   if (!media.length) return null;
-  const active = media[Math.min(index, media.length - 1)];
+  const active = media[Math.min(index, media.length - 1)]!;
   const previous = () => setIndex((current) => (current - 1 + media.length) % media.length);
   const next = () => setIndex((current) => (current + 1) % media.length);
 

@@ -24,7 +24,16 @@ export default function Header() {
           className="flex min-w-0 flex-shrink-0 items-center gap-2"
           aria-label={`${PLATFORM_DEFAULTS.orgName} home`}
         >
-          <LogoImage alt="Elevate" width={44} height={56} className="h-10 w-auto" />
+          <LogoImage
+            alt="Elevate"
+            width={32}
+            height={40}
+            priority
+            fetchPriority="high"
+            sizes="32px"
+            className="h-10 w-8 shrink-0 object-contain"
+            style={{ width: 32, height: 40 }}
+          />
           <span className="hidden whitespace-nowrap text-sm font-extrabold tracking-tight text-slate-950 2xl:inline">
             Elevate
           </span>

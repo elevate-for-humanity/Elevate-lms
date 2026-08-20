@@ -67,8 +67,9 @@ export async function POST(request: NextRequest) {
     .from('video_jobs')
     .select('*')
     .eq('status', 'queued')
-    // Main lesson media is learner-critical; microclips drain immediately after.
-    .order('asset_kind', { ascending: false })
+    // Alphabetically, lesson sorts before microclip. Preserve learner-critical
+    // full lesson media priority while the short-clip queue drains behind it.
+    .order('asset_kind', { ascending: true })
     .order('queued_at', { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -89,8 +90,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, started: 0, reason: 'already-claimed' });
   }
 
-  // State synchronization is asset-aware in the canonical job manager. Never
-  // mutate the parent lesson's full-video status for a microclip job.
   await markRendering(claimed.id);
 
   after(async () => {

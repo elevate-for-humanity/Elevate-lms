@@ -65,3 +65,5 @@ jobs:
       - name: Fail workflow when build failed
         if: steps.build.outputs.exit_code != '0'
         run: exit 1
+
+# diagnostic-trigger: 2026-08-20-course-factory-await-fix

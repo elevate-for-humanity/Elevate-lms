@@ -2,6 +2,11 @@
  * Admin app entry — validates environment variables at startup.
  * Required because `next build` runs from apps/admin; Next only loads instrumentation.ts
  * from the app project root.
+ *
+ * IMPORTANT: instrumentation must stay web-runtime safe. Do not import the video
+ * rendering worker here. That worker depends on Node filesystem/OS/native Remotion
+ * modules and must run from an explicit server-only worker entry, not the Next
+ * instrumentation graph.
  */
 export async function register(): Promise<void> {
   if (process.env.NEXT_RUNTIME !== 'nodejs') {
@@ -9,9 +14,6 @@ export async function register(): Promise<void> {
   }
 
   try {
-    // NEXT_PUBLIC_* deployment URLs are build-time constants in Next.js.
-    // Do not assign to them at runtime: production bundling may inline the
-    // left-hand expression into a string literal, producing invalid JavaScript.
     const requiredSecrets = [
       'NEXT_PUBLIC_SUPABASE_URL',
       'NEXT_PUBLIC_SUPABASE_ANON_KEY',
@@ -27,20 +29,12 @@ export async function register(): Promise<void> {
       console.warn(`[admin] Missing required env vars: ${missing.join(', ')}`);
     } else {
       console.info('[admin] Environment validated');
-
-      // Rendering belongs to the Admin/Course Factory runtime. Starting the
-      // guarded queue loop here makes video processing self-contained in the
-      // production Admin service instead of depending on an external cron hop.
-      const { startAdminVideoWorker } = await import('../../lib/video/background-worker');
-      startAdminVideoWorker();
     }
   } catch (error) {
     console.warn('[admin] Environment validation error:', error);
-    // Do not crash the server solely because observability validation failed.
   }
 }
 
-// Required by @sentry/nextjs 8+ to capture server-side request errors.
 export const onRequestError = async (
   err: unknown,
   request: { path: string; method: string; headers?: Headers },

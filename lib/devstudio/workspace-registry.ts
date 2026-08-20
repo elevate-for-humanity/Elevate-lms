@@ -1,13 +1,14 @@
 import 'server-only';
 
 /**
- * Single source of truth for the Admin-owned Dev Studio.
- * Admin is the privileged Studio role; there is no separate super-admin tier.
- * Every advertised workspace must have one canonical route and one health endpoint.
+ * Single source of truth for the Admin-owned Studio capability surfaces.
+ *
+ * /studio itself is the AI operating surface. The entries below are advanced
+ * capability/audit surfaces that Admin AI may invoke or an administrator may
+ * open directly for inspection. Do not register a second AI/chat workspace.
  */
 
 export type StudioWorkspaceId =
-  | 'ai'
   | 'courses'
   | 'content'
   | 'media'
@@ -37,8 +38,7 @@ export interface StudioWorkspaceDefinition {
 }
 
 export const STUDIO_WORKSPACES: StudioWorkspaceDefinition[] = [
-  { id: 'ai', label: 'AI Studio', description: 'PARIS, Lizzy and specialized AI agents.', permission: 'studio.ai.use', route: '/studio/ai', healthEndpoint: '/api/admin/dev-studio/ai/health' },
-  { id: 'courses', label: 'Course Builder', description: 'Courses, lessons, assessments and credentials.', permission: 'studio.courses.manage', route: '/studio/courses', healthEndpoint: '/api/admin/dev-studio/courses/health' },
+  { id: 'courses', label: 'Course Builder', description: 'Canonical Course Factory inspection and authoring surface.', permission: 'studio.courses.manage', route: '/studio/courses', healthEndpoint: '/api/admin/dev-studio/courses/health' },
   { id: 'content', label: 'Content Studio', description: 'Generate and manage reviewed content.', permission: 'studio.content.manage', route: '/studio/content', healthEndpoint: '/api/admin/dev-studio/content/health' },
   { id: 'media', label: 'Media Studio', description: 'Organization-scoped media and documents.', permission: 'studio.media.manage', route: '/studio/media', healthEndpoint: '/api/admin/dev-studio/media/health' },
   { id: 'workflows', label: 'Workflow Designer', description: 'Build versioned visual automations.', permission: 'studio.workflows.manage', route: '/studio/workflows', healthEndpoint: '/api/admin/dev-studio/workflows/health' },

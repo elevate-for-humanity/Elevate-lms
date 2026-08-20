@@ -23,21 +23,16 @@ export function routeEllieMessage(message: string): EllieMessageRoute {
   const text = message.trim();
   if (!text) return 'platform';
 
-  // Outcome-oriented builder requests are intentionally evaluated before the
-  // command route so the AI can choose and compose internal tools.
   if (PLATFORM_RE.test(text)) return 'platform';
   if (COMMAND_RE.test(text)) return 'command';
   if (OPS_RE.test(text)) return 'ops';
 
-  // Short operational questions are handled by the live-data assistant.
   if (/^(how many|what('s| is) the|show (me )?|list )/i.test(text) && text.length < 120) return 'ops';
 
-  // Default to the tool-capable platform orchestrator instead of exposing raw
-  // execution primitives to ordinary natural-language requests.
   return 'platform';
 }
 
-export const ELLIE_ROUTE_LABEL: Record<EllIEMessageRoute, string> = {
+export const ELLIE_ROUTE_LABEL: Record<EllieMessageRoute, string> = {
   command: 'Command',
   ops: 'Ops',
   platform: 'Platform tools',

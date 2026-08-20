@@ -64,8 +64,8 @@ export default function RiseForwardFoundationPage() {
               <Link href="/apply/student" className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-500 px-6 py-3 font-black text-slate-950 hover:bg-emerald-400">
                 Apply for Training <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/eligibility/quiz" className="inline-flex min-h-12 items-center rounded-xl border border-white/30 px-6 py-3 font-black text-white hover:bg-white/10">
-                Check Funding Eligibility
+              <Link href="/check-eligibility" className="inline-flex min-h-12 items-center rounded-xl border border-white/30 px-6 py-3 font-black text-white hover:bg-white/10">
+                Prepare for Funding Review
               </Link>
             </div>
           </div>

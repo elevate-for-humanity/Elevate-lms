@@ -4,6 +4,7 @@ import path from 'node:path';
 const ROOTS = [
   'apps/marketing/app',
   'components/marketing',
+  'components/hero',
   'components/home',
   'components/site',
   'components/ui',

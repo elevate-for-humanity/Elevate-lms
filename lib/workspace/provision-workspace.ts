@@ -79,6 +79,7 @@ export async function provisionWorkspace(
       name: params.displayName,
       slug,
       status: 'active',
+      active: true,
       type: 'customer',
       is_platform_owner: false,
       parent_tenant_id: ownerTenantId,

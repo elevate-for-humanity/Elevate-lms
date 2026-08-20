@@ -64,8 +64,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid enrollment context' }, { status: 400 });
   }
 
-  // The order ID originates in our checkout page and binds this Affirm loan to
-  // the same program/application pair. Reject mismatched or replayed context.
   const expectedOrderPrefix = `${program}--${applicationId}--`;
   if (!orderId.startsWith(expectedOrderPrefix) || orderId.length > 128) {
     return redirectToCheckout(request, program, applicationId, 'invalid_order');
@@ -115,8 +113,6 @@ export async function GET(request: NextRequest) {
       return redirectToCheckout(request, program, applicationId, 'program_mismatch');
     }
 
-    // A completed application is our local idempotency gate. The Affirm client
-    // also sends deterministic Idempotency-Key headers to protect network retries.
     if (
       application.payment_status === 'paid' &&
       application.payment_provider === 'affirm' &&
@@ -127,7 +123,7 @@ export async function GET(request: NextRequest) {
 
     const expectedAmount = expectedPriceCents(program);
     if (!expectedAmount) {
-      logger.error('[Affirm capture] No canonical self-pay price found', { program });
+      logger.error('[Affirm capture] No canonical self-pay price found', undefined, { program });
       return redirectToCheckout(request, program, applicationId, 'price_unavailable');
     }
 
@@ -169,9 +165,6 @@ export async function GET(request: NextRequest) {
     });
 
     if (!enrollment.success) {
-      // Funds are captured at this point; never hide this as a generic retry.
-      // The application payment fields are updated by the shared activator before
-      // enrollment creation, allowing operations to reconcile without recapture.
       logger.error('[Affirm capture] Enrollment activation failed after capture', undefined, {
         applicationId,
         program,

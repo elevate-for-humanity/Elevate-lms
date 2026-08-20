@@ -18,7 +18,7 @@ export interface HeroDemoSlide {
 export interface HeroVideoProps {
   videoSrcDesktop?: string;
   videoSrcMobile?: string;
-  /** Poster is the base media layer and remains behind the video at all times. */
+  /** Poster is mounted as the base media layer but is only revealed if no video is available or video playback fails. */
   posterImage?: string;
   voiceoverSrc?: string;
   microLabel?: string;
@@ -80,8 +80,8 @@ export default function HeroVideo({
     if (!video || !desktopSource) return;
     video.muted = true;
     void video.play().catch(() => {
-      // Browser autoplay policy can defer playback. The poster stays beneath the
-      // transparent video layer until a real video frame is ready.
+      // Browser autoplay policy can defer playback. Keep the poster mounted but
+      // visually hidden so it never flashes in front of the hero video.
     });
   }, [desktopSource, mobileSource]);
 
@@ -130,6 +130,7 @@ export default function HeroVideo({
 
   const showVideo = Boolean(desktopSource) && !videoFailed;
   const showPoster = Boolean(posterImage);
+  const revealPosterFallback = showPoster && !showVideo;
 
   return (
     <div className={`w-full ${className}`}>
@@ -139,7 +140,7 @@ export default function HeroVideo({
       >
         {showPoster ? (
           <div
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            className={`absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-opacity duration-150 ${revealPosterFallback ? 'opacity-100' : 'opacity-0'}`}
             style={{ backgroundImage: `url(${posterImage})` }}
             aria-hidden="true"
           />

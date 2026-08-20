@@ -1,14 +1,25 @@
 {
-  "version": 1,
+  "version": 2,
   "routes": [
     { "source": "/admin", "owner": "admin", "target": "/dashboard" },
     { "sourcePrefix": "/admin/", "owner": "admin", "stripPrefix": "/admin" },
+
     { "source": "/student-portal", "owner": "lms", "target": "/lms/dashboard" },
+    { "source": "/student-portal/resources", "owner": "lms", "target": "/lms/resources" },
     { "source": "/learner/dashboard", "owner": "lms", "target": "/lms/dashboard" },
+
+    { "source": "/lms", "owner": "lms", "target": "/lms/dashboard" },
+    { "source": "/lms/login", "owner": "lms", "target": "/login" },
+    { "source": "/lms/ai-tutor", "owner": "lms", "target": "/ai-tutor" },
     { "sourcePrefix": "/lms/", "owner": "lms" },
+
+    { "source": "/apprentice/dashboard", "owner": "lms", "target": "/apprentice" },
     { "sourcePrefix": "/apprentice/", "owner": "lms" },
-    { "sourcePrefix": "/host-shop/", "owner": "lms" },
+
+    { "source": "/program-holder", "owner": "lms", "target": "/program-holder/dashboard" },
     { "sourcePrefix": "/program-holder/", "owner": "lms" },
+
+    { "sourcePrefix": "/host-shop/", "owner": "lms" },
     { "sourcePrefix": "/employer/", "owner": "lms" },
     { "sourcePrefix": "/workforce/", "owner": "lms" },
     { "sourcePrefix": "/parent-portal/", "owner": "lms" },

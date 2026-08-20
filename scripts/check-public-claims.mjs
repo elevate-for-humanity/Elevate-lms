@@ -25,6 +25,12 @@ const BLOCKED = [
   { pattern: /funding\s+available\s+nationwide/i, label: 'nationwide funding availability claim' },
   { pattern: /all\s+programs\s+(?:are\s+)?(?:approved|eligible).*ETPL/i, label: 'provider-wide ETPL claim; approval must be program-specific' },
   { pattern: /all\s+programs\s+(?:are\s+)?(?:WIOA|WRG|workforce)[-\s]*(?:approved|eligible|funded)/i, label: 'provider-wide workforce funding claim; approval must be program-specific' },
+  { pattern: /blockchain[-\s]*(?:verified|verification|anchored)|on[-\s]*chain\s+credential/i, label: 'blockchain credential claim without a production chain anchor' },
+  { pattern: /\b100%\s+compliant\b/i, label: 'absolute compliance claim' },
+  { pattern: /\$300K\s*[–-]\s*\$650K|\$300,000\s*[–-]\s*\$650,000/i, label: 'credential-value claim without published methodology' },
+  { pattern: /\b4\s*[–-]\s*8\s+years?\s+saved\b/i, label: 'time-saved claim without published methodology' },
+  { pattern: /\blaunch\s+in\s+30\s+days\b/i, label: 'unqualified implementation-time guarantee' },
+  { pattern: /\bno\s+paperwork\b/i, label: 'absolute paperwork claim' },
 ];
 
 function extension(path) {

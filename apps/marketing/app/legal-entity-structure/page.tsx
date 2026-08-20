@@ -31,7 +31,7 @@ const ENTITIES = [
     role: 'DBA / training provider brand',
     name: 'Elevate for Humanity Career & Technical Institute',
     detail:
-      'Public-facing career and technical institute brand used for ETPL-listed training, related technical instruction (RTI), and program marketing.',
+      'Public-facing career and technical institute brand used for training delivery, related technical instruction (RTI), and program marketing. ETPL status is maintained at the individual program/listing level where applicable.',
   },
   {
     role: 'Apprenticeship sponsor (DOL / RAPIDS)',
@@ -88,7 +88,7 @@ export default function LegalEntityStructurePage() {
               },
               {
                 title: 'WIOA / ETPL referrals',
-                desc: `Training provider listings use ${PLATFORM_DEFAULTS.orgName} and ETPL-approved program titles.`,
+                desc: `Use ${PLATFORM_DEFAULTS.orgName} together with the exact program title and current program-specific listing or approval record applicable to the referral.`,
               },
               {
                 title: 'Insurance COI certificate holder',
@@ -133,7 +133,7 @@ export default function LegalEntityStructurePage() {
           <p className="text-slate-500 text-xs mt-6 leading-relaxed">
             Elevate does not issue professional licenses (barber, cosmetology, nail, etc.). State
             boards issue licenses; Elevate coordinates registered apprenticeship and training
-            pathways.             Credential verification:{' '}
+            pathways. Credential verification:{' '}
             <Link href="/about/approvals" className="text-brand-blue-600 underline">
               /about/approvals
             </Link>

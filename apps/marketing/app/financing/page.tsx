@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   DollarSign,
   CheckCircle,
-  Clock,
   Shield,
   ChevronRight,
   CreditCard,
@@ -15,69 +14,74 @@ import {
 
 const FINANCING_OPTIONS = [
   {
-    id: 'affirm',
-    name: 'Affirm',
-    tagline: 'Pay over time — no hidden fees',
+    id: 'third-party-financing',
+    name: 'Third-Party Financing',
+    tagline: 'Review terms before accepting an offer',
     description:
-      'Split your program cost into monthly payments. Rates from 0–36% APR. Check your rate without affecting your credit score.',
+      'Where a third-party financing option is offered at checkout, the finance provider controls approval, rates, fees, repayment terms, disclosures, and credit-related decisions.',
     terms: [
-      '3, 6, or 12 month plans',
-      'No prepayment penalty',
-      'Instant decision',
-      'Soft credit check only',
+      'Availability varies by program and checkout',
+      'Provider terms control the financing agreement',
+      'Review APR, fees, and repayment schedule',
+      'Financing approval is not guaranteed by Elevate',
     ],
     icon: CreditCard,
     color: 'blue',
-    cta: 'Apply with Affirm',
-    href: '/apply?payment=affirm',
+    cta: 'Review Program Options',
+    href: '/programs',
   },
   {
     id: 'wioa',
     name: 'WIOA / WorkOne Funding',
-    tagline: 'Free training for eligible workers',
+    tagline: 'Agency-authorized workforce funding',
     description:
-      'The Workforce Innovation and Opportunity Act funds training for unemployed and underemployed workers. No repayment required if you qualify.',
+      'WIOA is not consumer financing and is not approved by Elevate. WorkOne or the responsible workforce entity determines participant eligibility, approved programs, allowable costs, available funds, and authorization.',
     terms: [
-      'Full tuition covered',
-      'No income repayment',
-      'Must meet eligibility',
-      'WorkOne referral required',
+      'Program-specific eligibility applies',
+      'Participant eligibility is determined externally',
+      'Covered costs and amounts vary',
+      'Written authorization is required',
     ],
     icon: Landmark,
     color: 'green',
-    cta: 'Check Eligibility',
-    href: '/check-eligibility',
+    cta: 'Review Funding Process',
+    href: '/funding',
   },
   {
     id: 'payment-plan',
-    name: 'Elevate Payment Plan',
-    tagline: 'Split into 2–4 installments',
+    name: 'Elevate Payment Arrangement',
+    tagline: 'Ask whether installments are available',
     description:
-      'Pay your program cost in installments directly with Elevate. No interest, no credit check. First payment due at enrollment.',
-    terms: ['2–4 installments', '0% interest', 'No credit check', 'Auto-pay available'],
+      'Some self-pay programs may offer an installment arrangement. The enrollment agreement and checkout terms for the selected program control amounts, due dates, fees, cancellation, and refund obligations.',
+    terms: [
+      'Availability varies by program',
+      'Review the written enrollment agreement',
+      'Confirm the total program price',
+      'Do not rely on a generic payment example',
+    ],
     icon: Wallet,
     color: 'amber',
-    cta: 'Enroll with Payment Plan',
-    href: '/apply?payment=plan',
+    cta: 'Review Programs',
+    href: '/programs',
   },
 ];
 
 const FAQS = [
   {
-    q: 'Does Affirm affect my credit score?',
-    a: 'Checking your rate with Affirm is a soft inquiry and does not affect your credit score. A hard inquiry only occurs if you accept a loan.',
+    q: 'Does Elevate approve third-party financing?',
+    a: 'No. Any lender or buy-now-pay-later provider controls its own application, approval, credit process, rates, fees, and repayment terms. Review that provider’s disclosures before accepting an offer.',
   },
   {
-    q: 'Can I combine WIOA funding with a payment plan?',
-    a: 'If WIOA covers part of your program cost, you can use a payment plan for any remaining balance.',
+    q: 'Can workforce funding and self-pay both apply?',
+    a: 'Do not assume a remaining balance or funding amount. First obtain the responsible agency’s written authorization showing what is approved. Then review the program enrollment agreement for any participant responsibility that remains.',
   },
   {
-    q: "What if I can't make a payment?",
-    a: 'Contact us before your payment is due. We work with students on hardship deferrals on a case-by-case basis.',
+    q: "What if I cannot make a scheduled self-pay payment?",
+    a: 'Contact the billing or enrollment team before the due date and review the written agreement governing your account. Any change must be documented rather than assumed from this page.',
   },
   {
-    q: 'Are all programs eligible for financing?',
-    a: 'Most programs are eligible. Some short-term workshops require full payment at registration.',
+    q: 'Are all programs eligible for financing or workforce funding?',
+    a: 'No. Funding and financing are program specific. Workforce funding also requires participant eligibility and agency authorization.',
   },
 ];
 
@@ -85,23 +89,23 @@ export default function FinancingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero */}
+    <main className="min-h-screen bg-white">
       <section className="bg-gradient-to-br from-slate-900 to-slate-800 text-white py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 text-white text-sm font-medium px-4 py-2 rounded-full mb-6">
-            <DollarSign className="w-4 h-4" /> Flexible Financing
+            <DollarSign className="w-4 h-4" aria-hidden="true" /> Payment & Funding Paths
           </div>
-          <h1 className="text-4xl font-extrabold mb-4">Don't let cost stop you</h1>
+          <h1 className="text-4xl font-extrabold mb-4">Understand the payment path before you enroll</h1>
           <p className="text-slate-300 text-lg leading-relaxed">
-            Elevate offers multiple ways to fund your training — from interest-free payment plans to
-            full WIOA grants. Find the option that works for you.
+            Self-pay arrangements, third-party financing, and government workforce funding are different processes with different decision-makers and written terms.
           </p>
         </div>
       </section>
 
-      {/* Options */}
       <section className="max-w-5xl mx-auto px-4 py-16">
+        <div className="mb-8 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
+          This page is informational. It does not approve credit, create a financing offer, determine WIOA eligibility, guarantee funding, or replace the program enrollment agreement or a funding agency's written authorization.
+        </div>
         <div className="grid md:grid-cols-3 gap-6">
           {FINANCING_OPTIONS.map((opt) => {
             const Icon = opt.icon;
@@ -116,89 +120,77 @@ export default function FinancingPage() {
               amber: 'bg-amber-600 hover:bg-amber-700',
             };
             return (
-              <div
-                key={opt.id}
-                className={`rounded-2xl border-2 p-6 flex flex-col ${colors[opt.color]}`}
-              >
+              <article key={opt.id} className={`rounded-2xl border-2 p-6 flex flex-col ${colors[opt.color]}`}>
                 <div className="mb-4">
-                  <Icon className="w-8 h-8 text-slate-700 mb-3" />
+                  <Icon className="w-8 h-8 text-slate-700 mb-3" aria-hidden="true" />
                   <h2 className="text-xl font-bold text-slate-900">{opt.name}</h2>
                   <p className="text-sm font-medium text-slate-600 mt-1">{opt.tagline}</p>
                 </div>
-                <p className="text-slate-600 text-sm leading-relaxed mb-4">{opt.description}</p>
+                <p className="text-slate-700 text-sm leading-relaxed mb-4">{opt.description}</p>
                 <ul className="space-y-2 mb-6 flex-1">
-                  {opt.terms.map((t) => (
-                    <li key={t} className="flex items-center gap-2 text-sm text-slate-700">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      {t}
+                  {opt.terms.map((term) => (
+                    <li key={term} className="flex items-start gap-2 text-sm text-slate-700">
+                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                      {term}
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href={opt.href}
-                  className={`flex items-center justify-center gap-2 w-full text-white font-bold px-4 py-3 rounded-xl transition-colors text-sm ${btnColors[opt.color]}`}
-                >
-                  {opt.cta} <ChevronRight className="w-4 h-4" />
+                <Link href={opt.href} className={`flex items-center justify-center gap-2 w-full text-white font-bold px-4 py-3 rounded-xl transition-colors text-sm ${btnColors[opt.color]}`}>
+                  {opt.cta} <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </Link>
-              </div>
+              </article>
             );
           })}
         </div>
       </section>
 
-      {/* Trust bar */}
       <section className="bg-slate-50 border-y border-slate-100 py-10 px-4">
         <div className="max-w-4xl mx-auto grid sm:grid-cols-3 gap-6 text-center">
           {[
-            { icon: Shield, label: 'Secure payments', sub: 'Stripe & Affirm encrypted' },
-            { icon: Clock, label: 'Instant decisions', sub: 'Know in seconds with Affirm' },
-            { icon: CheckCircle, label: 'No hidden fees', sub: 'What you see is what you pay' },
+            { icon: Shield, label: 'Written terms control', sub: 'Use the applicable agreement and disclosures' },
+            { icon: Landmark, label: 'Agency decisions stay external', sub: 'Elevate does not issue WIOA approval' },
+            { icon: CheckCircle, label: 'Program-specific review', sub: 'Costs and available options can differ by program' },
           ].map(({ icon: Icon, label, sub }) => (
             <div key={label} className="flex flex-col items-center gap-2">
-              <Icon className="w-6 h-6 text-slate-400" />
+              <Icon className="w-6 h-6 text-slate-500" aria-hidden="true" />
               <p className="font-semibold text-slate-800 text-sm">{label}</p>
-              <p className="text-slate-500 text-xs">{sub}</p>
+              <p className="text-slate-600 text-xs">{sub}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="max-w-2xl mx-auto px-4 py-16">
         <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Common questions</h2>
         <div className="space-y-3">
           {FAQS.map((faq, i) => (
-            <div key={i} className="border border-slate-200 rounded-xl overflow-hidden">
+            <div key={faq.q} className="border border-slate-200 rounded-xl overflow-hidden">
               <button
+                type="button"
+                aria-expanded={openFaq === i}
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50 transition-colors"
               >
                 {faq.q}
-                <ChevronRight
-                  className={`w-4 h-4 text-slate-400 transition-transform ${openFaq === i ? 'rotate-90' : ''}`}
-                />
+                <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${openFaq === i ? 'rotate-90' : ''}`} aria-hidden="true" />
               </button>
               {openFaq === i && (
-                <div className="px-5 pb-4 text-sm text-slate-600 leading-relaxed">{faq.a}</div>
+                <div className="px-5 pb-4 text-sm text-slate-700 leading-relaxed">{faq.a}</div>
               )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Bottom CTA */}
       <section className="bg-slate-900 text-white py-14 px-4 text-center">
-        <h2 className="text-2xl font-bold mb-3">Ready to get started?</h2>
-        <p className="text-slate-400 mb-6 text-sm">
-          Choose your program and select your payment option at checkout.
+        <h2 className="text-2xl font-bold mb-3">Review the exact program first</h2>
+        <p className="text-slate-300 mb-6 text-sm">
+          Confirm tuition, required fees, refund terms, credential requirements, and the payment or funding path that applies to your enrollment.
         </p>
-        <Link
-          href="/apply"
-          className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors"
-        >
-          Browse Programs <ChevronRight className="w-4 h-4" />
+        <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white font-bold px-8 py-4 rounded-full transition-colors">
+          Browse Programs <ChevronRight className="w-4 h-4" aria-hidden="true" />
         </Link>
       </section>
-    </div>
+    </main>
   );
 }

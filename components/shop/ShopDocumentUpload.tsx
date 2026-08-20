@@ -1,12 +1,10 @@
 'use client';
 
 import { createClient } from '@/lib/supabase/client';
-
-import React, { useEffect } from 'react';
-
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Upload, FileText, AlertCircle } from 'lucide-react';
+import { Upload, FileText, AlertCircle, ShieldCheck } from 'lucide-react';
 
 interface Requirement {
   document_type: string;
@@ -41,7 +39,6 @@ export function ShopDocumentUpload({
     text: string;
   } | null>(null);
 
-  // Load previously uploaded documents from DB
   useEffect(() => {
     async function loadUploadedDocs() {
       const { data } = await supabase
@@ -80,44 +77,34 @@ export function ShopDocumentUpload({
       if (res.ok) {
         setMessage({
           type: 'success',
-          text: 'Document uploaded successfully! Awaiting sponsor approval.',
+          text: 'Document uploaded successfully. It is now awaiting sponsor review.',
         });
         setFile(null);
-        setTimeout(() => {
-          router.refresh();
-        }, 2000);
+        setTimeout(() => router.refresh(), 2000);
       } else {
         const error = await res.json();
-        setMessage({
-          type: 'error',
-          text: error.error || 'Upload failed',
-        });
+        setMessage({ type: 'error', text: error.error || 'Upload failed' });
       }
-    } catch (error) {
-      /* Error handled silently */
-      setMessage({
-        type: 'error',
-        text: 'Network error. Please try again.',
-      });
+    } catch {
+      setMessage({ type: 'error', text: 'Network error. Please try again.' });
     } finally {
       setUploading(false);
     }
   }
 
+  const uploadedByType = new Map(uploadedDocs.map((doc) => [doc.document_type, doc]));
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-          <h1 className="text-3xl font-bold text-black">Upload Documents</h1>
-          <p className="mt-2 text-black">Upload required documents for shop partner onboarding</p>
+          <h1 className="text-3xl font-bold text-black">Host Shop Documents</h1>
+          <p className="mt-2 text-black">Upload the documents assigned to your Host Shop onboarding record.</p>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Upload Form */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-6">
               <Upload className="w-6 h-6 text-brand-blue-600" />
@@ -135,8 +122,7 @@ export function ShopDocumentUpload({
                 >
                   {requirements.map((req) => (
                     <option key={req.document_type} value={req.document_type}>
-                      {req.display_name}
-                      {req.required ? ' *' : ''}
+                      {req.display_name}{req.required ? ' *' : ''}
                     </option>
                   ))}
                 </select>
@@ -148,37 +134,25 @@ export function ShopDocumentUpload({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-black mb-2">File (PDF) *</label>
+                <label className="block text-sm font-bold text-black mb-2">Signed PDF *</label>
                 <input
                   type="file"
-                  accept=".pdf"
+                  accept=".pdf,application/pdf"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
-                <p className="mt-2 text-xs text-black">
-                  Upload signed PDF documents only. Max size: 10MB
-                </p>
+                <p className="mt-2 text-xs text-black">Upload signed PDF documents only. Maximum file size: 10 MB.</p>
               </div>
 
               {message && (
-                <div
-                  className={`rounded-lg p-4 flex items-start gap-3 ${
-                    message.type === 'success'
-                      ? 'bg-brand-green-50 border border-brand-green-200'
-                      : 'bg-brand-red-50 border border-brand-red-200'
-                  }`}
-                >
+                <div className={`rounded-lg p-4 flex items-start gap-3 ${message.type === 'success' ? 'bg-brand-green-50 border border-brand-green-200' : 'bg-brand-red-50 border border-brand-red-200'}`}>
                   {message.type === 'success' ? (
-                    <span className="text-slate-500 flex-shrink-0">•</span>
+                    <ShieldCheck className="w-5 h-5 text-brand-green-700 mt-0.5" />
                   ) : (
                     <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5" />
                   )}
-                  <div
-                    className={`text-sm ${
-                      message.type === 'success' ? 'text-brand-green-800' : 'text-brand-red-800'
-                    }`}
-                  >
+                  <div className={`text-sm ${message.type === 'success' ? 'text-brand-green-800' : 'text-brand-red-800'}`}>
                     {message.text}
                   </div>
                 </div>
@@ -194,60 +168,40 @@ export function ShopDocumentUpload({
             </form>
           </div>
 
-          {/* Document Templates */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-6">
               <FileText className="w-6 h-6 text-brand-blue-600" />
-              <h2 className="text-xl font-bold text-black">Document Templates</h2>
+              <h2 className="text-xl font-bold text-black">Required Documents</h2>
             </div>
 
             <div className="space-y-3">
-              <div className="border border-slate-200 rounded-lg p-4">
-                <div className="font-semibold text-black mb-1">
-                  MOU (Memorandum of Understanding)
+              {requirements.length === 0 ? (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                  No documents are currently assigned to this Host Shop.
                 </div>
-                <p className="text-sm text-black mb-3">Employer/worksite agreement with sponsor</p>
-                <a
-                  href="/docs/templates/EFH_Shop_MOU_Indiana.pdf"
-                  download
-                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-                >
-                  <FileText className="w-4 h-4" />
-                  Download Template
-                </a>
-              </div>
+              ) : (
+                requirements.map((req) => {
+                  const uploaded = uploadedByType.get(req.document_type);
+                  return (
+                    <div key={req.document_type} className="border border-slate-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="font-semibold text-black">{req.display_name}</div>
+                          <p className="mt-1 text-sm text-slate-700">{req.description}</p>
+                        </div>
+                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${uploaded ? 'bg-emerald-100 text-emerald-800' : req.required ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'}`}>
+                          {uploaded ? uploaded.status || 'Uploaded' : req.required ? 'Required' : 'Optional'}
+                        </span>
+                      </div>
+                      {uploaded ? <p className="mt-2 text-xs text-slate-600">Uploaded: {uploaded.file_name}</p> : null}
+                    </div>
+                  );
+                })
+              )}
 
               <div className="border border-slate-200 rounded-lg p-4">
-                <div className="font-semibold text-black mb-1">NDA + IP Acknowledgment</div>
-                <p className="text-sm text-black mb-3">
-                  Confidentiality + IP protection for EFH systems
-                </p>
-                <a
-                  href="/docs/templates/EFH_NDA_IP_Acknowledgment.pdf"
-                  download
-                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-                >
-                  <FileText className="w-4 h-4" />
-                  Download Template
-                </a>
-              </div>
-
-              <div className="border border-slate-200 rounded-lg p-4">
-                <div className="font-semibold text-black mb-1">Non-Compete Agreement</div>
-                <p className="text-sm text-black mb-3">Restricts use of EFH curriculum and IP</p>
-                <a
-                  href="/docs/templates/EFH_Non_Compete_Indiana.pdf"
-                  download
-                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-                >
-                  <FileText className="w-4 h-4" />
-                  Download Template
-                </a>
-              </div>
-
-              <div className="border border-slate-200 rounded-lg p-4">
-                <div className="font-semibold text-black mb-1">W-9 Form</div>
-                <p className="text-sm text-black mb-3">IRS tax form for vendor/payroll setup</p>
+                <div className="font-semibold text-black mb-1">IRS Form W-9</div>
+                <p className="text-sm text-black mb-3">Use the current IRS-issued form when a W-9 is requested.</p>
                 <a
                   href="https://www.irs.gov/pub/irs-pdf/fw9.pdf"
                   target="_blank"
@@ -255,28 +209,23 @@ export function ShopDocumentUpload({
                   className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   <FileText className="w-4 h-4" />
-                  Download IRS Form W-9 (blank)
+                  Open IRS Form W-9
                 </a>
               </div>
             </div>
 
             <div className="mt-6 pt-6 border-t border-slate-200">
-              <p className="text-xs text-black">
-                <strong>Note:</strong> Download templates, sign them, and upload the signed PDFs.
-                Your sponsor will review and approve each document.
+              <p className="text-xs text-slate-700">
+                Sponsor-specific agreements are assigned through the onboarding record. The portal no longer publishes unverified or stale legal-template downloads.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Back Link */}
         <div className="mt-6 text-center">
-          <a
-            href="/shop/onboarding"
-            className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
-          >
-            ← Back to Onboarding
-          </a>
+          <Link href="/partners/host-shops" className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold">
+            ← Back to Host Shops
+          </Link>
         </div>
       </div>
     </div>

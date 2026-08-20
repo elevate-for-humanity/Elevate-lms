@@ -16,7 +16,29 @@ export const metadata: Metadata = {
   title: 'About Elevate for Humanity | Elizabeth Greene & Workforce Development',
   description:
     'Meet Elizabeth Greene, Founder and CEO of Elevate for Humanity, and learn how Elevate connects workforce training, registered apprenticeship, testing, funding navigation, employer partnerships, and technology in Indianapolis.',
+  keywords: [
+    'Elizabeth Greene Elevate for Humanity',
+    'workforce development Indianapolis',
+    'registered apprenticeship Indiana',
+    'career training Indianapolis',
+    'WIOA training provider Indiana',
+  ],
   alternates: { canonical: 'https://www.elevateforhumanity.org/about' },
+  openGraph: {
+    type: 'profile',
+    url: 'https://www.elevateforhumanity.org/about',
+    title: 'Elizabeth Greene & Elevate for Humanity Workforce Development',
+    description:
+      'Meet Elizabeth Greene and explore Elevate for Humanity career training, registered apprenticeship, workforce funding navigation, testing, and employer partnerships in Indianapolis.',
+    images: [
+      {
+        url: '/images/team/elizabeth-greene.webp',
+        width: 1200,
+        height: 1200,
+        alt: 'Elizabeth Greene, Founder and CEO of Elevate for Humanity workforce development organization in Indianapolis',
+      },
+    ],
+  },
 };
 
 const founderCredentials = [
@@ -56,6 +78,8 @@ const capabilities = [
     icon: GraduationCap,
     href: '/programs',
     image: '/images/pages/cna-nursing-real.webp',
+    imageAlt:
+      'Career and technical training for healthcare and workforce careers at Elevate for Humanity in Indianapolis',
   },
   {
     title: 'Registered Apprenticeship',
@@ -63,6 +87,8 @@ const capabilities = [
     icon: ShieldCheck,
     href: '/apprenticeships',
     image: '/images/pages/apprenticeships-page-1.webp',
+    imageAlt:
+      'Registered apprenticeship and work-based learning pathway through Elevate for Humanity in Indiana',
   },
   {
     title: 'Funding Navigation',
@@ -71,6 +97,8 @@ const capabilities = [
     icon: CheckCircle2,
     href: '/funding',
     image: '/images/pages/funding-impact-1.webp',
+    imageAlt:
+      'WIOA and Workforce Ready Grant funding navigation for career training in Indiana',
   },
   {
     title: 'Employer Partnerships',
@@ -79,6 +107,8 @@ const capabilities = [
     icon: Handshake,
     href: '/employers',
     image: '/images/pages/about-employer-partners.webp',
+    imageAlt:
+      'Employer partnerships, apprenticeship host sites, and workforce talent development in Indianapolis',
   },
 ];
 
@@ -124,7 +154,7 @@ export default function AboutPage() {
           <div className="relative min-h-[390px] overflow-hidden rounded-3xl border border-white/10 shadow-2xl sm:min-h-[520px]">
             <Image
               src="/images/team/elizabeth-greene.webp"
-              alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity"
+              alt="Elizabeth Greene, Founder and CEO of Elevate for Humanity workforce development organization in Indianapolis"
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 45vw"
@@ -268,7 +298,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2">
-            {capabilities.map(({ title, description, icon: Icon, href, image }) => (
+            {capabilities.map(({ title, description, icon: Icon, href, image, imageAlt }) => (
               <article
                 key={title}
                 className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
@@ -277,7 +307,7 @@ export default function AboutPage() {
                   <div className="relative h-56 overflow-hidden sm:h-64">
                     <Image
                       src={image}
-                      alt=""
+                      alt={imageAlt}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       sizes="(max-width: 768px) 100vw, 50vw"

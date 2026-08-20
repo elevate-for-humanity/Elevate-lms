@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
 
     const expectedAmount = expectedPriceCents(program);
     if (!expectedAmount) {
-      logger.error('[Affirm capture] No canonical self-pay price found', { program });
+      logger.error('[Affirm capture] No canonical self-pay price found', undefined, { program });
       return redirectToCheckout(request, program, applicationId, 'price_unavailable');
     }
 

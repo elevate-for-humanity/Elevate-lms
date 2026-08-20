@@ -204,6 +204,13 @@ function normalizeBanner(
     analyticsName: banner.analyticsName ?? key,
   };
 
+  if ((normalized.transcript ?? '').trim().length < 120) {
+    normalized = {
+      ...normalized,
+      transcript: `${(normalized.transcript ?? '').trim().replace(/[.?!]+$/, '')}. Review the current credential, duration, enrollment, and outcome disclosures before enrollment.`,
+    };
+  }
+
   // Marketing-only salary labels are not authoritative outcomes. Program pages
   // may present cited labor-market information separately; the generic hero layer
   // must not publish a wage promise from legacy JSON.

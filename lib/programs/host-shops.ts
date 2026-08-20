@@ -102,7 +102,7 @@ function parseMedia(value: unknown): HostShopMedia[] {
         source: typeof row.source === 'string' ? row.source : undefined,
       };
     })
-    .filter((item): item is HostShopMedia => Boolean(item));
+    .filter((item): item is NonNullable<typeof item> => item !== null);
 }
 
 function isPubliclyListedHostShop(shop: HostShop): boolean {

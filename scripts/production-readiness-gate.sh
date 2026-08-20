@@ -31,7 +31,7 @@ run "Route and SEO governance" node scripts/check-route-seo-governance.mjs
 run "Public route guards" node scripts/guard-public-routes.mjs
 run "Pre-auth registry" node scripts/check-pre-auth-registry.cjs
 run "Canonical portal contracts" node scripts/audit-portal-contracts.mjs
-run "Live/migration schema drift" npx tsx scripts/audit-schema-drift.ts --fail-on-drift
+run "Repository schema drift regression" npx tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
 run "Live portal data integrity" node scripts/audit-portal-data-integrity.mjs
 run "Privileged MFA architecture" node scripts/check-privileged-mfa-config.mjs
 

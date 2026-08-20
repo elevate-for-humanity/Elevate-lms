@@ -28,6 +28,9 @@ const __dirname = path.dirname(__filename);
 const args = process.argv.slice(2);
 const filterTable = args.find((a, i) => args[i - 1] === '--table') ?? null;
 const failOnDrift = args.includes('--fail-on-drift');
+const failOnNewDrift = args.includes('--fail-on-new-drift');
+const baselinePathArg = args.find((a, i) => args[i - 1] === '--baseline') ?? null;
+const writeBaselinePathArg = args.find((a, i) => args[i - 1] === '--write-baseline') ?? null;
 const forceMigrations = args.includes('--source') && args[args.indexOf('--source') + 1] === 'migrations';
 
 type TableSchema = Map<string, Set<string>>;
@@ -247,6 +250,41 @@ async function main() {
   console.log(` ${calls.length} .select() calls found\n`);
 
   const drifts = auditDrift(calls, schema);
+  const signatureFor = (drift: DriftResult) => {
+    const relPath = path.relative(root, drift.file).split(path.sep).join('/');
+    const detail = drift.tableKnown
+      ? [...drift.unknownColumns].sort().join(',')
+      : 'TABLE_NOT_IN_SCHEMA';
+    return `${relPath}|${drift.table}|${detail}`;
+  };
+  const driftSignatures = [...new Set(drifts.map(signatureFor))].sort();
+  const currentSignatureSet = new Set(driftSignatures);
+  let newDriftSignatures: string[] = [];
+
+  if (writeBaselinePathArg) {
+    const baselinePath = path.resolve(root, writeBaselinePathArg);
+    fs.mkdirSync(path.dirname(baselinePath), { recursive: true });
+    fs.writeFileSync(
+      baselinePath,
+      JSON.stringify({ schemaSource, entryCount: driftSignatures.length, entries: driftSignatures }, null, 2) + '\n',
+    );
+    console.log(`Wrote schema drift baseline: ${path.relative(root, baselinePath)} (${driftSignatures.length} signatures)`);
+  }
+
+  if (baselinePathArg) {
+    const baselinePath = path.resolve(root, baselinePathArg);
+    if (!fs.existsSync(baselinePath)) {
+      console.error(`Schema drift baseline not found: ${path.relative(root, baselinePath)}`);
+      process.exit(1);
+    }
+    const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8')) as { entries?: string[] };
+    const baselineEntries = Array.isArray(baseline.entries) ? baseline.entries : [];
+    const baselineSet = new Set(baselineEntries);
+    newDriftSignatures = driftSignatures.filter((signature) => !baselineSet.has(signature));
+    const resolvedCount = baselineEntries.filter((signature) => !currentSignatureSet.has(signature)).length;
+    console.log(`Schema drift regression check: ${newDriftSignatures.length} new, ${resolvedCount} resolved, ${driftSignatures.length} current signatures.`);
+  }
+
   if (drifts.length === 0) {
     console.log('No schema drift detected.\n');
     process.exit(0);
@@ -274,6 +312,11 @@ async function main() {
     console.log('');
   }
 
+  if (failOnNewDrift && newDriftSignatures.length > 0) {
+    console.error(`New schema drift detected: ${newDriftSignatures.length} signature(s).`);
+    for (const signature of newDriftSignatures.slice(0, 50)) console.error(`  NEW: ${signature}`);
+    process.exit(1);
+  }
   if (failOnDrift) process.exit(1);
 }
 

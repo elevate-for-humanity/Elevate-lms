@@ -65,7 +65,7 @@ export default async function ApprovalsPage() {
           <div className="flex items-center gap-3"><ShieldCheck className="h-7 w-7 text-brand-red-700" /><h2 className="text-3xl font-black">Registered Apprenticeship</h2></div>
           <div className="mt-5 rounded-3xl border border-slate-200 p-6 sm:p-8">
             <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Sponsor of Record</dt><dd className="mt-1 font-black">{barber.sponsor.legalName}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Sponsor of Record</dt><dd className="mt-1 font-black">{barber.sponsor.sponsor}</dd></div>
               <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Registration</dt><dd className="mt-1 font-black">{barber.sponsor.registrationNumber}</dd></div>
               <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Occupation</dt><dd className="mt-1 font-black">{barber.standard.occupationTitle}</dd></div>
               <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Approach</dt><dd className="mt-1 font-black capitalize">{barber.standard.approach}</dd></div>

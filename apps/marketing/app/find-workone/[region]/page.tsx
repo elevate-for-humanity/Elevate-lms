@@ -24,7 +24,7 @@ export async function generateMetadata({
 
   return {
     title: `${region.name} WorkOne Centers | Indiana Workforce Funding`,
-    description: `WorkOne career centers in ${region.name}. WIOA and Workforce Ready Grant intake for ${PLATFORM_DEFAULTS.orgName} ETPL-approved training.`,
+    description: `WorkOne career centers in ${region.name}. Ask WorkOne about WIOA or Workforce Ready Grant eligibility for individually eligible ${PLATFORM_DEFAULTS.orgName} training programs.`,
     alternates: { canonical: `https://www.elevateforhumanity.org/find-workone/${slug}` },
   };
 }

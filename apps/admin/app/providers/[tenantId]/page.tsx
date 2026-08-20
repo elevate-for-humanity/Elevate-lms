@@ -1,20 +1,12 @@
-
 import { Metadata } from 'next';
-
 import { redirect, notFound } from 'next/navigation';
-
-import { createClient } from '@/lib/supabase/server';
-
-import { requireAdminClient } from '@/lib/supabase/admin';
-
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
 import Link from 'next/link';
-
+import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
   Building2,
   CheckCircle,
-  XCircle,
   Clock,
   AlertTriangle,
   Users,
@@ -22,12 +14,15 @@ import {
   GraduationCap,
   ShieldCheck,
 } from 'lucide-react';
-
 import ProviderActions from './ProviderActions';
-
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 60;
+
+function providerOnboardingComplete(step: { status?: string | null; completed_at?: string | null }) {
+  const status = String(step.status || '').trim().toLowerCase();
+  return Boolean(step.completed_at) || ['complete', 'completed', 'approved', 'verified'].includes(status);
+}
 
 export async function generateMetadata({
   params,
@@ -49,7 +44,6 @@ export default async function ProviderDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Guard against null user
   if (!user) redirect('/login');
   const db = await requireAdminClient();
   if (!db) return <div className="p-8 text-red-600">Database unavailable</div>;
@@ -64,7 +58,6 @@ export default async function ProviderDetailPage({
     redirect('/unauthorized');
   }
 
-  // Fetch tenant
   const { data: tenant } = await supabase
     .from('tenants')
     .select('*')
@@ -73,7 +66,6 @@ export default async function ProviderDetailPage({
 
   if (!tenant) notFound();
 
-  // Parallel data fetches
   const [
     { data: providerUsers },
     { data: programs, count: programCount },
@@ -100,7 +92,7 @@ export default async function ProviderDetailPage({
       .order('expires_at', { ascending: true }),
     supabase
       .from('provider_onboarding_steps')
-      .select('*')
+      .select('id, step, status, completed_at, created_at')
       .eq('tenant_id', tenantId)
       .order('created_at'),
     supabase
@@ -115,7 +107,7 @@ export default async function ProviderDetailPage({
       .eq('tenant_id', tenantId),
   ]);
 
-  const onboardingDone = (onboardingSteps ?? []).filter((s) => s.completed).length;
+  const onboardingDone = (onboardingSteps ?? []).filter(providerOnboardingComplete).length;
   const onboardingTotal = (onboardingSteps ?? []).length;
   const onboardingPct =
     onboardingTotal > 0 ? Math.round((onboardingDone / onboardingTotal) * 100) : 0;
@@ -132,14 +124,13 @@ export default async function ProviderDetailPage({
         <Breadcrumbs
           items={[
             { label: 'Admin', href: '/dashboard' },
-            { label: 'Providers', href: '/admin/providers' },
+            { label: 'Providers', href: '/providers' },
             { label: tenant.name },
           ]}
         />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 pb-16 space-y-6">
-        {/* Header */}
         <div className="bg-white rounded-xl border border-slate-200 p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -171,7 +162,6 @@ export default async function ProviderDetailPage({
           </div>
         </div>
 
-        {/* Alerts */}
         {expiringArtifacts.length > 0 && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -185,18 +175,12 @@ export default async function ProviderDetailPage({
           </div>
         )}
 
-        {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { icon: BookOpen, label: 'Programs', value: programCount ?? 0, href: null },
-            { icon: Users, label: 'Enrollments', value: enrollmentCount ?? 0, href: null },
-            {
-              icon: GraduationCap,
-              label: 'Staff',
-              value: (providerUsers ?? []).length,
-              href: null,
-            },
-            { icon: ShieldCheck, label: 'Onboarding', value: `${onboardingPct}%`, href: null },
+            { icon: BookOpen, label: 'Programs', value: programCount ?? 0 },
+            { icon: Users, label: 'Enrollments', value: enrollmentCount ?? 0 },
+            { icon: GraduationCap, label: 'Staff', value: (providerUsers ?? []).length },
+            { icon: ShieldCheck, label: 'Onboarding', value: `${onboardingPct}%` },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-xl border border-slate-200 p-4">
               <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
@@ -209,35 +193,36 @@ export default async function ProviderDetailPage({
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
-          {/* Onboarding checklist */}
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <h2 className="font-semibold text-slate-900 mb-4">Onboarding Checklist</h2>
             {(onboardingSteps ?? []).length === 0 ? (
               <p className="text-sm text-slate-500">No onboarding steps seeded yet.</p>
             ) : (
               <div className="space-y-2">
-                {(onboardingSteps ?? []).map((step) => (
-                  <div key={step.id} className="flex items-center gap-3 text-sm">
-                    {step.completed ? (
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    ) : (
-                      <Clock className="w-4 h-4 text-slate-300 flex-shrink-0" />
-                    )}
-                    <span className={step.completed ? 'text-slate-700' : 'text-slate-400'}>
-                      {step.step.replace(/_/g, ' ')}
-                    </span>
-                    {step.completed_at && (
-                      <span className="text-xs text-slate-400 ml-auto">
-                        {new Date(step.completed_at).toLocaleDateString()}
+                {(onboardingSteps ?? []).map((step) => {
+                  const complete = providerOnboardingComplete(step);
+                  return (
+                    <div key={step.id} className="flex items-center gap-3 text-sm">
+                      {complete ? (
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      ) : (
+                        <Clock className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                      )}
+                      <span className={complete ? 'text-slate-700' : 'text-slate-400'}>
+                        {step.step.replace(/_/g, ' ')}
                       </span>
-                    )}
-                  </div>
-                ))}
+                      {step.completed_at && (
+                        <span className="text-xs text-slate-400 ml-auto">
+                          {new Date(step.completed_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          {/* Compliance artifacts */}
           <div className="bg-white rounded-xl border border-slate-200 p-5">
             <h2 className="font-semibold text-slate-900 mb-4">Compliance Documents</h2>
             {(complianceArtifacts ?? []).length === 0 ? (
@@ -285,7 +270,6 @@ export default async function ProviderDetailPage({
           </div>
         </div>
 
-        {/* Programs */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-slate-900">Programs ({programCount ?? 0})</h2>
@@ -318,7 +302,6 @@ export default async function ProviderDetailPage({
           )}
         </div>
 
-        {/* Staff */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
           <h2 className="font-semibold text-slate-900 mb-4">Staff</h2>
           {(providerUsers ?? []).length === 0 ? (
@@ -340,7 +323,6 @@ export default async function ProviderDetailPage({
           )}
         </div>
 
-        {/* Audit log */}
         <div className="bg-white rounded-xl border border-slate-200 p-5">
           <h2 className="font-semibold text-slate-900 mb-4">Audit Log</h2>
           {(auditEvents ?? []).length === 0 ? (

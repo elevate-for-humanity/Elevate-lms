@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { DollarSign, ExternalLink, Phone, MapPin, CheckCircle } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { CheckCircle, DollarSign, FileCheck2, ShieldCheck } from 'lucide-react';
 
 interface FundingInfoBlockProps {
   programName: string;
@@ -19,128 +18,74 @@ export default function FundingInfoBlock({
 }: FundingInfoBlockProps) {
   return (
     <div className="space-y-5">
-      {/* Funding explanation */}
-      <div className="bg-brand-green-50 border border-brand-green-200 rounded-2xl p-6">
-        <div className="flex items-center gap-2 mb-3">
-          <DollarSign className="w-5 h-5 text-brand-green-700" />
-          <h3 className="font-bold text-brand-green-900">This Program May Cost You $0</h3>
+      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="w-6 h-6 text-brand-red-600 flex-none mt-0.5" />
+          <div>
+            <h3 className="font-bold text-slate-900 text-lg">Funding must be verified for this exact program</h3>
+            <p className="text-slate-600 text-sm leading-relaxed mt-2">
+              Do not assume {programName} is WIOA-, Workforce Ready Grant-, or otherwise funded from
+              this enrollment page. A funding source named during screening is not an approval. The
+              responsible agency must verify participant and program eligibility and provide the
+              applicable written authorization before Elevate treats the enrollment as funded.
+            </p>
+          </div>
         </div>
-        <p className="text-brand-green-800 text-sm leading-relaxed mb-4">
-          {programName} is approved for federal and state workforce funding. Eligible Indiana 
-          residents can have <strong>100% of tuition, books, and certification exam fees covered</strong> through 
-          programs like {fundingSources.join(', ')}. Eligibility is based on income, employment status, 
-          and other factors determined by your local workforce office.
-        </p>
-        <div className="space-y-2 mb-4">
-          {fundingSources.map((source) => (
-            <div key={source} className="flex items-center gap-2 text-sm text-brand-green-800">
-              <CheckCircle className="w-4 h-4 text-brand-green-600 shrink-0" />
-              <span>{source} — approved training provider</span>
+
+        {fundingSources.length > 0 && (
+          <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p className="text-sm font-bold text-amber-950">Sources requested or considered</p>
+            <p className="text-xs text-amber-900 mt-1">
+              These labels are informational only and do not establish eligibility or coverage.
+            </p>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {fundingSources.map((source) => (
+                <span key={source} className="rounded-full bg-white border border-amber-200 px-3 py-1 text-xs font-semibold text-amber-950">
+                  {source}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-5 grid sm:grid-cols-3 gap-3">
+          {[
+            ['1', 'Confirm program status', 'Verify the exact program record rather than relying on provider-level status.'],
+            ['2', 'Confirm participant eligibility', 'The responsible funding source determines whether the participant qualifies.'],
+            ['3', 'Obtain authorization', 'Document the approved amount and terms before recording the enrollment as funded.'],
+          ].map(([number, title, text]) => (
+            <div key={number} className="bg-white border border-slate-200 rounded-xl p-4">
+              <div className="w-7 h-7 rounded-full bg-slate-950 text-white flex items-center justify-center text-xs font-bold">{number}</div>
+              <p className="font-bold text-slate-900 text-sm mt-3">{title}</p>
+              <p className="text-xs text-slate-600 leading-relaxed mt-1">{text}</p>
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-xl border border-brand-green-200 p-4">
-          <p className="font-semibold text-slate-900 text-sm mb-2">How to Check Your Eligibility:</p>
-          <ol className="space-y-2 text-sm text-slate-700">
-            <li className="flex items-start gap-2">
-              <span className="bg-brand-green-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
-              <span>Visit <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 font-semibold hover:underline inline-flex items-center gap-1">www.indianacareerconnect.com <ExternalLink className="w-3 h-3" /></a> and create an account</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="bg-brand-green-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
-              <span>Search for &quot;{PLATFORM_DEFAULTS.orgName}&quot; under training providers</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="bg-brand-green-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
-              <span>Schedule an appointment with your local <strong>WorkOne</strong> office to complete an eligibility assessment</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="bg-brand-green-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
-              <span>Once approved, your WorkOne case manager will issue a training voucher — you pay nothing</span>
-            </li>
-          </ol>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-3">
-          <a
-            href="https://www.indianacareerconnect.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-brand-green-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-green-800 transition"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Indiana Career Connect
-          </a>
-          <a
-            href={`tel:${PLATFORM_DEFAULTS.supportPhone.replace(/[^0-9]/g, "")}`}
-            className="inline-flex items-center gap-2 bg-white border border-brand-green-300 text-brand-green-800 text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-brand-green-50 transition"
-          >
-            <Phone className="w-4 h-4" />
-            Call Us: {PLATFORM_DEFAULTS.supportPhone}
-          </a>
+        <div className="flex flex-wrap gap-3 mt-5">
+          <Link href="/funding" className="inline-flex items-center gap-2 bg-slate-950 text-white text-sm font-bold px-5 py-2.5 rounded-lg">
+            <FileCheck2 className="w-4 h-4" /> Review Funding Guidance
+          </Link>
+          <Link href="/apply" className="inline-flex items-center gap-2 border border-slate-300 text-slate-900 text-sm font-bold px-5 py-2.5 rounded-lg">
+            Start Application
+          </Link>
         </div>
       </div>
 
-      {/* WorkOne locations */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
-        <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-brand-blue-600" />
-          WorkOne Locations (Indianapolis Area)
-        </h3>
-        <div className="grid sm:grid-cols-2 gap-3 text-sm">
-          <div className="bg-white rounded-lg border border-slate-200 p-3">
-            <p className="font-semibold text-slate-900">WorkOne Indy — West</p>
-            <p className="text-slate-600">3400 W 16th St, Indianapolis, IN 46222</p>
-            <p className="text-slate-500">(317) 916-4600</p>
-          </div>
-          <div className="bg-white rounded-lg border border-slate-200 p-3">
-            <p className="font-semibold text-slate-900">WorkOne Indy — East</p>
-            <p className="text-slate-600">2511 E 46th St, Suite B, Indianapolis, IN 46205</p>
-            <p className="text-slate-500">(317) 916-4600</p>
-          </div>
-          <div className="bg-white rounded-lg border border-slate-200 p-3">
-            <p className="font-semibold text-slate-900">EmployIndy</p>
-            <p className="text-slate-600">1845 W 18th St, Suite B, Indianapolis, IN 46202</p>
-            <p className="text-slate-500">(317) 639-4400</p>
-          </div>
-          <div className="bg-white rounded-lg border border-slate-200 p-3">
-            <p className="font-semibold text-slate-900">WorkOne Express — Library</p>
-            <p className="text-slate-600">40 E St. Clair St, Indianapolis, IN 46204</p>
-            <p className="text-slate-500">(317) 275-4100</p>
-          </div>
+      <div className="bg-white border border-slate-200 rounded-2xl p-6">
+        <div className="flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-slate-700" />
+          <h3 className="font-bold text-slate-900">Published self-pay reference</h3>
         </div>
-      </div>
-
-      {/* Self-pay section */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-        <h3 className="font-bold text-amber-900 mb-2">Don&apos;t Qualify for Funding? We Have Options.</h3>
-        <p className="text-amber-800 text-sm leading-relaxed mb-3">
-          If you don&apos;t qualify for WIOA or other workforce funding, you can still enroll. 
-          We offer flexible self-pay options so cost is never a barrier to your career:
+        <p className="text-sm text-slate-600 mt-3 leading-relaxed">
+          Current page reference: <strong>${selfPayPrice.toLocaleString()}</strong>
+          {regularPrice && regularPrice !== selfPayPrice ? ` (other displayed price: $${regularPrice.toLocaleString()})` : ''}.
+          Confirm the current program page and enrollment agreement before payment; they control the participant&apos;s actual charges and terms.
         </p>
-        <ul className="space-y-1.5 text-sm text-amber-800">
-          <li className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span><strong>Payment plan</strong> — choose your down payment and weekly amount</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span><strong>Affirm</strong> — monthly financing, 0% APR available, instant decision</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span><strong>Sezzle</strong> — 4 interest-free payments every 2 weeks</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span><strong>Pay in full</strong> — one-time payment{regularPrice && regularPrice > selfPayPrice ? ` at sale price $${selfPayPrice.toLocaleString()}` : ''}</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <span><strong>Employer sponsorship</strong> — your employer can pay directly</span>
-          </li>
-        </ul>
+        <div className="mt-4 flex items-start gap-2 text-xs text-slate-600">
+          <CheckCircle className="w-4 h-4 flex-none mt-0.5" />
+          <span>Any financing, installment, employer-payment, or third-party option is subject to its own current terms and approval requirements.</span>
+        </div>
       </div>
     </div>
   );

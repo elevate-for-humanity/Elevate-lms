@@ -33,12 +33,100 @@ export type StartWorkspaceTrialResult =
     }
   | { ok: false; error: string; status?: number };
 
+type AdminDb = Awaited<ReturnType<typeof requireAdminClient>>;
+
 function getProvisionError(result: { ok: boolean; error?: string }, fallback: string): string {
   return result.error ?? fallback;
 }
 
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function trialEndFromStart(startedAt: string): string {
+  return new Date(new Date(startedAt).getTime() + TRIAL_DURATION_DAYS * 86400000).toISOString();
+}
+
+async function ensureManagedTrialLicense(params: {
+  db: AdminDb;
+  organizationId: string;
+  trialStartedAt: string;
+  trialEndsAt: string;
+}): Promise<{ ok: true; status: string } | { ok: false; error: string }> {
+  const { db, organizationId, trialStartedAt, trialEndsAt } = params;
+  const requestedEnd = new Date(trialEndsAt);
+  if (Number.isNaN(requestedEnd.getTime())) {
+    return { ok: false, error: 'Trial expiration timestamp is invalid' };
+  }
+
+  const { data: existing, error: lookupError } = await db
+    .from('managed_licenses')
+    .select('id,status,tier,trial_started_at,trial_ends_at,expires_at')
+    .eq('organization_id', organizationId)
+    .maybeSingle();
+
+  if (lookupError) {
+    logger.error('[startWorkspaceTrial] managed license lookup failed', lookupError, { organizationId });
+    return { ok: false, error: 'Could not verify trial license' };
+  }
+
+  const now = new Date();
+
+  if (!existing) {
+    const status = requestedEnd <= now ? 'expired' : 'active';
+    const { error: insertError } = await db.from('managed_licenses').insert({
+      organization_id: organizationId,
+      status,
+      tier: 'trial',
+      plan_id: 'workspace-trial',
+      trial_started_at: trialStartedAt,
+      trial_ends_at: requestedEnd.toISOString(),
+      expires_at: requestedEnd.toISOString(),
+    });
+    if (insertError) {
+      logger.error('[startWorkspaceTrial] managed license insert failed', insertError, { organizationId });
+      return { ok: false, error: 'Failed to create trial license' };
+    }
+    return { ok: true, status };
+  }
+
+  if (existing.tier !== 'trial') {
+    // A paid/managed license already owns access. Never replace or downgrade it
+    // merely because the user revisited the trial form.
+    return { ok: true, status: existing.status };
+  }
+
+  const existingEndRaw = existing.expires_at || existing.trial_ends_at;
+  const existingEnd = existingEndRaw ? new Date(existingEndRaw) : null;
+  const effectiveEnd =
+    existingEnd && !Number.isNaN(existingEnd.getTime()) && existingEnd < requestedEnd
+      ? existingEnd
+      : requestedEnd;
+  const shouldExpire = effectiveEnd <= now;
+  const protectedStatuses = new Set(['canceled', 'suspended', 'past_due', 'expired']);
+  const nextStatus = shouldExpire
+    ? 'expired'
+    : protectedStatuses.has(existing.status)
+      ? existing.status
+      : 'active';
+
+  const { error: updateError } = await db
+    .from('managed_licenses')
+    .update({
+      status: nextStatus,
+      trial_started_at: existing.trial_started_at || trialStartedAt,
+      trial_ends_at: effectiveEnd.toISOString(),
+      expires_at: effectiveEnd.toISOString(),
+      updated_at: now.toISOString(),
+    })
+    .eq('id', existing.id);
+
+  if (updateError) {
+    logger.error('[startWorkspaceTrial] managed license repair failed', updateError, { organizationId });
+    return { ok: false, error: 'Failed to reconcile trial license' };
+  }
+
+  return { ok: true, status: nextStatus };
 }
 
 export async function startWorkspaceTrial(
@@ -57,12 +145,12 @@ export async function startWorkspaceTrial(
 
   const db = await requireAdminClient();
 
-  // Trial creation is intentionally idempotent. A user who refreshes, retries
-  // after a network failure, or returns to the trial form must recover the
-  // workspace that was already created instead of receiving a dead-end 409.
+  // Trial creation is idempotent, but recovery must never extend the original
+  // clock. Missing historical trial_ends_at values are deterministically derived
+  // from the workspace creation timestamp and persisted through the license.
   const { data: existingWorkspace, error: existingWorkspaceError } = await db
     .from('customer_workspaces')
-    .select('id, slug, workspace_url, tenant_id, organization_id, trial_ends_at, status, metadata')
+    .select('id, slug, workspace_url, tenant_id, organization_id, trial_ends_at, status, metadata, created_at')
     .eq('owner_email', email)
     .in('status', ['pending', 'provisioning', 'active'])
     .order('created_at', { ascending: false })
@@ -87,9 +175,17 @@ export async function startWorkspaceTrial(
       (typeof metadata.public_preview_url === 'string' && metadata.public_preview_url) ||
       existingWorkspace.workspace_url ||
       `https://${existingWorkspace.slug}.app.elevateforhumanity.org`;
-    const trialEndsAt =
-      existingWorkspace.trial_ends_at ||
-      new Date(Date.now() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+    const trialStartedAt = existingWorkspace.created_at || new Date().toISOString();
+    const trialEndsAt = existingWorkspace.trial_ends_at || trialEndFromStart(trialStartedAt);
+    const license = await ensureManagedTrialLicense({
+      db,
+      organizationId: existingWorkspace.organization_id,
+      trialStartedAt,
+      trialEndsAt,
+    });
+    if (!license.ok) {
+      return { ok: false, error: license.error, status: 500 };
+    }
 
     return {
       ok: true,
@@ -101,7 +197,7 @@ export async function startWorkspaceTrial(
       publicPreviewUrl,
       dashboardUrl: tenantAdminUrl(existingWorkspace.slug, '/admin'),
       trialEndsAt,
-      status: existingWorkspace.status || 'active',
+      status: license.status === 'expired' ? 'expired' : (existingWorkspace.status || 'active'),
       recovered: true,
     };
   }
@@ -127,15 +223,15 @@ export async function startWorkspaceTrial(
     slug = ensureUniqueSlugCandidate(slug, true);
   }
 
-  const trialEndsAt = new Date();
-  trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
+  const trialStartedAt = new Date().toISOString();
+  const trialEndsAt = trialEndFromStart(trialStartedAt);
 
   const provisioned = await provisionWorkspace({
     displayName: organizationName,
     slug,
     plan: input.plan ?? 'builder',
     contactEmail: email,
-    trialEndsAt: trialEndsAt.toISOString(),
+    trialEndsAt,
   });
 
   if (!provisioned.ok) {
@@ -146,18 +242,24 @@ export async function startWorkspaceTrial(
     };
   }
 
-  const { error: licenseError } = await db.from('managed_licenses').insert({
-    organization_id: provisioned.organizationId,
-    status: 'active',
-    tier: 'trial',
-    plan_id: 'workspace-trial',
-    trial_started_at: new Date().toISOString(),
-    trial_ends_at: trialEndsAt.toISOString(),
-    expires_at: trialEndsAt.toISOString(),
+  const license = await ensureManagedTrialLicense({
+    db,
+    organizationId: provisioned.organizationId,
+    trialStartedAt,
+    trialEndsAt,
   });
 
-  if (licenseError) {
-    logger.error('[startWorkspaceTrial] managed_licenses insert failed', licenseError);
+  if (!license.ok || license.status !== 'active') {
+    const licenseError = license.ok ? `Trial license is ${license.status}` : license.error;
+    await db
+      .from('customer_workspaces')
+      .update({
+        status: 'failed',
+        provision_error: licenseError,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', provisioned.workspaceId);
+    return { ok: false, error: 'Failed to provision active trial license', status: 500 };
   }
 
   if (input.ownerName?.trim()) {
@@ -172,7 +274,7 @@ export async function startWorkspaceTrial(
     organizationId: provisioned.organizationId,
     organizationName,
     subdomain: slug,
-    trialEndsAt: trialEndsAt.toISOString(),
+    trialEndsAt,
     contactEmail: email,
     industry: input.industry?.trim() || 'Training Provider',
     websiteMode: input.websiteMode ?? 'new_site',
@@ -219,7 +321,7 @@ export async function startWorkspaceTrial(
     workspaceUrl: website.publicUrl,
     publicPreviewUrl: website.publicUrl,
     dashboardUrl,
-    trialEndsAt: trialEndsAt.toISOString(),
+    trialEndsAt,
     status: 'active',
   };
 }

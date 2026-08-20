@@ -9,6 +9,7 @@ import {
   FileText,
   Inbox,
   ShieldCheck,
+  Sparkles,
   TrendingUp,
 } from 'lucide-react';
 
@@ -92,7 +93,7 @@ function OperationalShortcuts() {
       <div className="mb-4">
         <h2 className="text-xl font-black text-slate-950">Operational workspaces</h2>
         <p className="mt-1 text-sm font-medium text-slate-700">
-          These are canonical admin routes. No record IDs or external demo URLs are embedded in the dashboard.
+          Use these when you want a manual record view. The Admin AI remains the primary control surface.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -227,6 +228,33 @@ export function AdminDashboardContent({
       </section>
 
       <DegradedBanner data={data} />
+
+      {canAccessDevStudio && (
+        <section className="mb-8 overflow-hidden rounded-3xl border border-blue-200 bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/70 shadow-sm">
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-3xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-xs font-black uppercase tracking-wider text-blue-800">
+                  <Sparkles className="h-4 w-4" /> Admin AI
+                </div>
+                <h2 className="mt-4 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+                  Tell the platform what you need done.
+                </h2>
+                <p className="mt-3 text-sm font-medium leading-6 text-slate-700 sm:text-base">
+                  Build courses, review applications, inspect records, publish website changes, run workflows, verify compliance, diagnose deployments, and use advanced platform tools from one governed conversation.
+                </p>
+              </div>
+              <Link
+                href="/studio"
+                className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-slate-800"
+              >
+                Open Admin AI <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       <OperationalShortcuts />
 
       <DashboardPanelErrorBoundary name="Publish website">
@@ -329,21 +357,6 @@ export function AdminDashboardContent({
           }
         />
       </div>
-
-      {canAccessDevStudio && (
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-950 p-5 text-white shadow-sm">
-          <p className="text-xs font-black uppercase tracking-wider text-slate-300">Developer access</p>
-          <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h2 className="font-black">Dev Studio</h2>
-              <p className="mt-1 text-sm text-slate-300">Repository, workflows, deployment, and platform diagnostics.</p>
-            </div>
-            <Link href="/studio" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-black text-slate-950">
-              Open Studio <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

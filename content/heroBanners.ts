@@ -5,12 +5,22 @@
  * video registry and always wins so stale JSON cannot duplicate the homepage
  * film across unrelated pages. Posters are explicit and semantic; no heuristic
  * image substitution is allowed.
+ *
+ * IMPORTANT: legacy hero JSON is untrusted marketing copy. Every public string
+ * passes through the claim sanitizer below before it can render. This prevents a
+ * stale data file from bypassing the program-level funding registry or restoring
+ * unsupported wage, placement, credential, compliance, or automatic-approval
+ * claims after a page has been corrected.
  */
 
 import { loadJsonOnce } from '@/lib/data/json-cache';
 import { PROGRAMS } from '@/lib/programs/canonical-data';
 import { PROGRAM_IMAGES, getProgramHeroImage } from '@/lib/images/programImages';
 import { getHeroVideoForPageKey } from '@/lib/video/registry';
+import {
+  sanitizePublicFundingList,
+  sanitizePublicFundingText,
+} from '@/lib/programs/public-funding-copy';
 
 export interface HeroBannerCta {
   label: string;
@@ -76,6 +86,32 @@ const SHARED_GENERIC_VIDEO_FILES = new Set([
   'it-technology.mp4',
 ]);
 
+const UNSUPPORTED_HERO_SENTENCE =
+  /(?:\b(?:every|all)\s+(?:program|student|graduate)|\bmost\s+(?:programs?|students?)|\bjob offers?\b|\bjob placement rate\b|\bstarting (?:pay|wages?|salary)\b|\bcommonly earn\b|\bguaranteed employment\b|\bcredential(?:s)? (?:is|are) issued automatically\b|\bcertification is issued automatically\b|\bchecks? eligibility automatically\b|\bWIOA\s*&\s*DOL compliant\b|\b100% compliant\b|\bstate-approved curricula\b|\bclinical rotations included\b|\blaunch in (?:two|2) weeks\b|\bno paper\b|\breports? generate themselves\b|\bWOTC documentation is generated automatically\b)/i;
+
+function splitSentences(text: string): string[] {
+  return text
+    .split(/(?<=[.!?])\s+|\n+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function sanitizeHeroText(text: string | undefined, key: string, fallback = ''): string {
+  if (!text?.trim()) return fallback;
+  const fundingSafe = sanitizePublicFundingText(text, key, fallback);
+  if (!fundingSafe) return fallback;
+  const safe = splitSentences(fundingSafe).filter(
+    (sentence) => !UNSUPPORTED_HERO_SENTENCE.test(sentence),
+  );
+  return safe.join(' ').trim() || fallback;
+}
+
+function sanitizeHeroTrustIndicators(values: string[] | undefined, key: string): string[] {
+  return sanitizePublicFundingList(values, key)
+    .map((value) => sanitizeHeroText(value, key))
+    .filter(Boolean);
+}
+
 function isSharedGenericVideo(src?: string): boolean {
   if (!src) return false;
   const pathname = src.split('?')[0]?.split('#')[0] ?? '';
@@ -108,8 +144,12 @@ function semanticInlinePoster(key: string, banner: RawHeroBannerConfig): string 
   const fallbackTitle = key
     .replace(/[-_]+/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase());
-  const title = (banner.belowHeroHeadline ?? banner.headline ?? banner.microLabel ?? fallbackTitle).trim();
-  const label = (banner.microLabel ?? 'Elevate for Humanity').trim();
+  const title = sanitizeHeroText(
+    banner.belowHeroHeadline ?? banner.headline ?? banner.microLabel ?? fallbackTitle,
+    key,
+    fallbackTitle,
+  );
+  const label = sanitizeHeroText(banner.microLabel ?? 'Elevate for Humanity', key, 'Elevate for Humanity');
   const compactTitle = title.length > 72 ? `${title.slice(0, 69).trim()}...` : title;
   const compactLabel = label.length > 40 ? `${label.slice(0, 37).trim()}...` : label;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="${escapeSvgText(compactTitle)}"><rect width="1600" height="900" fill="#eef4fb"/><rect x="0" y="0" width="18" height="900" fill="#b91c1c"/><rect x="72" y="250" width="1456" height="400" rx="30" fill="#ffffff"/><text x="112" y="360" fill="#1d4f7a" font-family="Arial,Helvetica,sans-serif" font-size="42" font-weight="700" letter-spacing="2">${escapeSvgText(compactLabel.toUpperCase())}</text><text x="112" y="470" fill="#0f172a" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="800">${escapeSvgText(compactTitle)}</text><circle cx="800" cy="590" r="54" fill="#b91c1c"/><polygon points="784,560 784,620 832,590" fill="#ffffff"/><text x="112" y="790" fill="#475569" font-family="Arial,Helvetica,sans-serif" font-size="30">Elevate for Humanity · ${escapeSvgText(key)}</text></svg>`;
@@ -136,18 +176,40 @@ function normalizeBanner(
   const desktop = dedicated?.video_url || (allowJsonVideo ? jsonDesktop : undefined);
   const mobile = dedicated?.video_url || (allowJsonVideo ? jsonMobile : undefined);
 
+  const rawHeadline = banner.belowHeroHeadline ?? banner.headline ?? '';
+  const rawSubheadline = banner.belowHeroSubheadline ?? banner.subheadline ?? '';
+
   let normalized: HeroBannerConfig = {
     ...banner,
     pageKey: banner.pageKey ?? key,
     videoSrcDesktop: desktop,
     videoSrcMobile: mobile,
     posterImage: posterFor(key, banner),
-    belowHeroHeadline: banner.belowHeroHeadline ?? banner.headline ?? '',
-    belowHeroSubheadline: banner.belowHeroSubheadline ?? banner.subheadline ?? '',
+    microLabel: sanitizeHeroText(banner.microLabel, key),
+    eyebrow: sanitizeHeroText(banner.eyebrow, key),
+    belowHeroHeadline: sanitizeHeroText(rawHeadline, key, rawHeadline),
+    belowHeroSubheadline: sanitizeHeroText(
+      rawSubheadline,
+      key,
+      'Review the current program requirements, cost, credential pathway, and any applicable funding process before enrollment.',
+    ),
     primaryCta: banner.primaryCta ?? banner.ctaPrimary ?? { label: 'View Programs', href: '/programs' },
     secondaryCta: banner.secondaryCta ?? banner.ctaSecondary,
+    trustIndicators: sanitizeHeroTrustIndicators(banner.trustIndicators, key),
+    transcript: sanitizeHeroText(
+      banner.transcript,
+      key,
+      'Review the current program record and disclosures for controlling requirements and outcomes.',
+    ),
     analyticsName: banner.analyticsName ?? key,
   };
+
+  // Marketing-only salary labels are not authoritative outcomes. Program pages
+  // may present cited labor-market information separately; the generic hero layer
+  // must not publish a wage promise from legacy JSON.
+  if ('salaryRangeLabel' in normalized) {
+    delete (normalized as HeroBannerConfig & { salaryRangeLabel?: string }).salaryRangeLabel;
+  }
 
   const picture = normalized.posterImage;
   const desktopShared = !dedicated && isSharedGenericVideo(normalized.videoSrcDesktop);
@@ -173,20 +235,20 @@ function normalizeBanner(
       ...normalized,
       posterImage: posterFor(key, banner),
       voiceoverSrc: '/audio/heroes/home.mp3',
-      microLabel: 'The AI-Powered Workforce Operating System',
+      microLabel: 'Workforce Training & Technology',
       eyebrow: 'Career Training & Workforce Development',
       belowHeroHeadline: 'Career Training, Registered Apprenticeships & Workforce Technology in Indiana',
       belowHeroSubheadline:
-        'DOL-registered apprenticeship sponsor and WIOA-approved training provider serving learners, employers, and workforce agencies in Indianapolis and across Indiana. Funded training in healthcare, skilled trades, CDL, and technology often at no cost for eligible participants.',
+        'Explore program-specific training, registered-apprenticeship activity, employer services, and workforce-funding pathways. Funding and participant eligibility require the responsible agency\'s authorization.',
       primaryCta: { label: 'Get Started', href: '/apply' },
       secondaryCta: { label: 'For Employers & Agencies', href: '/partners', variant: 'secondary' },
       trustIndicators: [
-        'AI-Driven Career Navigation',
-        'Automated Compliance Tracking',
+        'Program-Specific Funding Records',
+        'Documented Apprenticeship Standards',
         'Credential Verification Workflows',
       ],
       transcript:
-        'Elevate for Humanity is an AI-powered workforce operating system — not just a training provider. We automate the journey from recruitment to employment. Our platform supports credentialing, compliance tracking, employer placement, and apprenticeship coordination through one connected ecosystem.',
+        'Elevate for Humanity connects career training, documented apprenticeship activity, credential workflows, employer services, and workforce operations through one platform. Program, funding, credential, and outcome claims remain subject to their controlling records and responsible authorities.',
       analyticsName: 'home',
     };
   }
@@ -196,15 +258,14 @@ function normalizeBanner(
     const programBanner = normalized as ProgramHeroBannerConfig;
     const credential = programBanner.credentialLabel || barber.credential || 'Indiana Barber License';
     const duration = programBanner.durationLabel || barber.durationRange;
-    const salary = programBanner.salaryRangeLabel || barber.careerOutcomeRange;
     normalized = {
       ...normalized,
       microLabel: 'DOL Registered Apprenticeship',
-      belowHeroHeadline: 'Earn your Indiana Barber License through registered apprenticeship.',
-      belowHeroSubheadline: `Complete the approved competency-based registered apprenticeship standard, including ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing hours are tracked separately under the applicable state requirements.`,
+      belowHeroHeadline: 'Indiana Barber registered-apprenticeship pathway.',
+      belowHeroSubheadline: `Complete the approved competency-based registered-apprenticeship standard, including ${barber.relatedInstructionHours} verified Related Technical Instruction hours. Indiana licensing requirements and approval are controlled separately by the applicable state authority.`,
       primaryCta: { label: 'Enroll Now', href: '/programs/barber-apprenticeship/apply' },
       secondaryCta: { label: 'Request Information', href: '/programs/barber-apprenticeship/request-info', variant: 'secondary' },
-      transcript: `The Barber Apprenticeship prepares participants for the ${credential} through structured competency-based training and verified Related Technical Instruction. Program duration ${duration.toLowerCase()}. Career outcomes ${salary.toLowerCase()}.`,
+      transcript: `The Barber Apprenticeship provides structured competency-based training and verified Related Technical Instruction toward the ${credential} pathway. Published duration is ${duration.toLowerCase()}; licensing and employment outcomes are not guaranteed by program completion.`,
     };
   }
 

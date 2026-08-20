@@ -83,6 +83,7 @@ const requiredFiles = [
   'supabase/migrations/20260818221500_dev_studio_claim_evidence_and_benchmarks.sql',
   'lib/programs/funding-registry.ts',
   'lib/programs/public-funding-copy.ts',
+  'content/heroBanners.ts',
   'supabase/migrations/20260820023000_program_regulatory_claim_controls.sql',
   'supabase/migrations/20260820030000_claim_evidence_runtime_hardening.sql',
   'supabase/migrations/20260820031500_correct_program_regulatory_evidence.sql',
@@ -92,6 +93,23 @@ for (const file of requiredFiles) {
     console.error(`❌ Required claim-governance file is missing: ${file}`);
     failures += 1;
   }
+}
+
+if (existsSync('content/heroBanners.ts')) {
+  const heroRenderer = readFileSync('content/heroBanners.ts', 'utf8');
+  const requiredHeroControls = [
+    'sanitizePublicFundingText',
+    'sanitizePublicFundingList',
+    'sanitizeHeroText',
+    'UNSUPPORTED_HERO_SENTENCE',
+  ];
+  for (const control of requiredHeroControls) {
+    if (!heroRenderer.includes(control)) {
+      console.error(`❌ Canonical hero renderer is missing claim control: ${control}`);
+      failures += 1;
+    }
+  }
+  if (!failures) console.log('✅ Canonical hero claim sanitizer is enforced.');
 }
 
 if (existsSync('apps/marketing/app/layout.tsx')) {

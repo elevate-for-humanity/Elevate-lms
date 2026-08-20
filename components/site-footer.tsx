@@ -40,9 +40,7 @@ export function SiteFooter() {
             <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-semibold leading-6 text-emerald-950">
               Career programs are supported by our nonprofit partner, Selfish Inc. d/b/a Rise Forward Foundation, through available community and wraparound resources. Support is subject to eligibility and program availability.
             </p>
-            <Link href="/rise-forward-foundation" className="mt-3 inline-flex text-sm font-black text-emerald-800 hover:underline">
-              Learn about Rise Forward Foundation
-            </Link>
+            <Link href="/rise-forward-foundation" className="mt-3 inline-flex text-sm font-black text-emerald-800 hover:underline">Learn about Rise Forward Foundation</Link>
             <div className="mt-5 flex gap-3">
               <a href="https://facebook.com/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-700 text-white hover:bg-blue-800" aria-label="Facebook"><Facebook className="h-5 w-5" /></a>
               <a href="https://linkedin.com/company/elevateforhumanity" target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-800 text-white hover:bg-blue-900" aria-label="LinkedIn"><Linkedin className="h-5 w-5" /></a>
@@ -135,9 +133,11 @@ export function SiteFooter() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap gap-4 text-sm font-medium text-slate-700">
               <Link href="/privacy" className="hover:text-slate-950 hover:underline">Privacy Policy</Link>
-              <Link href="/legal" className="hover:text-slate-950 hover:underline">Terms of Service</Link>
+              <Link href="/terms-of-service" className="hover:text-slate-950 hover:underline">Terms of Service</Link>
+              <Link href="/security-and-data-protection" className="hover:text-slate-950 hover:underline">Security &amp; Data</Link>
               <Link href="/accessibility" className="hover:text-slate-950 hover:underline">Accessibility</Link>
               <Link href="/federal-compliance" className="hover:text-slate-950 hover:underline">Federal Compliance</Link>
+              <Link href="/legal" className="hover:text-slate-950 hover:underline">Legal &amp; Policies</Link>
               <a href="https://www.dol.gov/agencies/eta/apprenticeship" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-slate-950 hover:underline">DOL Apprenticeship <ExternalLink className="h-3 w-3" /></a>
             </div>
             <p className="text-sm font-medium text-slate-700">© {new Date().getFullYear()} {PLATFORM_DEFAULTS.orgName}. All rights reserved.</p>

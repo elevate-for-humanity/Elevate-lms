@@ -61,7 +61,6 @@ for (const standaloneNavigation of ['<aside', 'fixed inset-y-0', 'lg:sticky']) {
   if (studioNavigation.includes(standaloneNavigation)) fail(`Studio navigation reintroduced a standalone sidebar: ${standaloneNavigation}`);
 }
 
-// Conversation-first invariant: /studio is the only AI operating surface.
 const studioRoot = read('apps/admin/app/studio/page.tsx');
 for (const invariant of ['UnifiedEllieChat', "requireRole(['super_admin', 'admin'])", 'Advanced capability surfaces']) {
   if (!studioRoot.includes(invariant)) fail(`conversation-first Studio root missing invariant: ${invariant}`);
@@ -128,6 +127,13 @@ for (const invariant of ['generateBlueprintFromAI', "generation_authority: 'cour
 }
 for (const forbiddenWrite of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert", ".from('lms_courses').insert", ".from('curriculum_lessons').insert"]) {
   if (courseDraftAdapter.includes(forbiddenWrite)) fail(`Admin AI course draft adapter contains direct persistence: ${forbiddenWrite}`);
+}
+
+const adminAiChat = read('apps/admin/app/api/devstudio/chat/route.ts');
+if (!adminAiChat.includes("await import('@/lib/course-factory')")) fail('Admin AI course save does not delegate to canonical Course Factory');
+if (!adminAiChat.includes('normalizeGeneratedCourseForGovernance')) fail('Admin AI course save does not run post-generation governance');
+for (const forbiddenWrite of [".from('lms_courses').insert", ".from('modules').insert", ".from('curriculum_lessons').insert"]) {
+  if (adminAiChat.includes(forbiddenWrite)) fail(`Admin AI reintroduced parallel course persistence: ${forbiddenWrite}`);
 }
 
 const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');

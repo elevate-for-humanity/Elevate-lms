@@ -31,6 +31,7 @@ const nextConfig = {
       { source: '/partners/workforce', destination: '/workforce', permanent: true },
       { source: '/host-shop/dashboard/board', destination: '/host-shop/dashboard', permanent: true },
       { source: '/host-shop/dashboard/apprentices/new', destination: '/host-shop/dashboard/match-requests', permanent: true },
+      { source: '/videos/orientation-full.mp4', destination: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/programs-overview-video-with-narration.mp4', permanent: false },
       { source: '/apply', destination: 'https://www.elevateforhumanity.org/apply/student', permanent: true },
       { source: '/eligibility', destination: 'https://www.elevateforhumanity.org/eligibility/quiz', permanent: true },
       { source: '/programs', destination: 'https://www.elevateforhumanity.org/programs', permanent: true },

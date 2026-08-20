@@ -1,12 +1,18 @@
 import { after, NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { requireAdminClient } from '@/lib/supabase/admin';
-import type { VideoJob } from '@/lib/video/job-queue';
+import { markRendering, type VideoJob } from '@/lib/video/job-queue';
 import { processClaimedVideoJob } from '@/lib/video/process-video-job';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 600;
+
+function renderConcurrency(): number {
+  const parsed = Number(process.env.VIDEO_RENDER_CONCURRENCY ?? '2');
+  if (!Number.isFinite(parsed)) return 2;
+  return Math.max(1, Math.min(Math.trunc(parsed), 4));
+}
 
 export async function POST(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -26,8 +32,12 @@ export async function POST(request: NextRequest) {
     })
     .eq('status', 'rendering')
     .lt('started_at', staleBefore)
-    .select('lesson_id');
-  const recoveredLessonIds = (recovered ?? []).map((row) => row.lesson_id).filter(Boolean);
+    .select('lesson_id,asset_kind,asset_key');
+
+  const recoveredLessonIds = (recovered ?? [])
+    .filter((row) => (row.asset_kind ?? 'lesson') === 'lesson')
+    .map((row) => row.lesson_id)
+    .filter(Boolean);
   if (recoveredLessonIds.length > 0) {
     await db
       .from('course_lessons')
@@ -35,6 +45,7 @@ export async function POST(request: NextRequest) {
       .in('id', recoveredLessonIds);
   }
 
+  const maxConcurrent = renderConcurrency();
   const { count: activeCount, error: activeError } = await db
     .from('video_jobs')
     .select('id', { count: 'exact', head: true })
@@ -42,14 +53,22 @@ export async function POST(request: NextRequest) {
   if (activeError) {
     return NextResponse.json({ error: 'Unable to inspect the video queue' }, { status: 500 });
   }
-  if ((activeCount ?? 0) > 0) {
-    return NextResponse.json({ ok: true, started: 0, reason: 'render-in-progress' });
+  if ((activeCount ?? 0) >= maxConcurrent) {
+    return NextResponse.json({
+      ok: true,
+      started: 0,
+      reason: 'render-capacity-full',
+      active: activeCount ?? 0,
+      maxConcurrent,
+    });
   }
 
   const { data: candidate, error: queueError } = await db
     .from('video_jobs')
     .select('*')
     .eq('status', 'queued')
+    // Main lesson media is learner-critical; microclips drain immediately after.
+    .order('asset_kind', { ascending: false })
     .order('queued_at', { ascending: true })
     .limit(1)
     .maybeSingle();
@@ -70,10 +89,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, started: 0, reason: 'already-claimed' });
   }
 
-  await db
-    .from('course_lessons')
-    .update({ video_status: 'rendering', video_error: null })
-    .eq('id', claimed.lesson_id);
+  // State synchronization is asset-aware in the canonical job manager. Never
+  // mutate the parent lesson's full-video status for a microclip job.
+  await markRendering(claimed.id);
 
   after(async () => {
     await processClaimedVideoJob(claimed as VideoJob).catch((error) => {
@@ -82,7 +100,16 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json(
-    { ok: true, started: 1, jobId: claimed.id, lessonId: claimed.lesson_id },
+    {
+      ok: true,
+      started: 1,
+      jobId: claimed.id,
+      lessonId: claimed.lesson_id,
+      assetKind: claimed.asset_kind ?? 'lesson',
+      assetKey: claimed.asset_key ?? null,
+      activeBeforeClaim: activeCount ?? 0,
+      maxConcurrent,
+    },
     { status: 202 },
   );
 }

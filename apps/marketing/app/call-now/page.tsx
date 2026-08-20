@@ -10,7 +10,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const metadata: Metadata = {
   title: 'Get Started',
   description:
-    'Get immediate help with enrollment, programs, funding, and support — all self-service, start everything online.',
+    'Get help with enrollment, programs, funding review, and support. Program admission and funding decisions depend on the requirements that apply to each participant and program.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/call-now',
   },
@@ -18,38 +18,38 @@ export const metadata: Metadata = {
 
 const START_OPTIONS = [
   {
-    title: 'Enroll in a Program',
+    title: 'Apply to a Program',
     description:
-      'Apply online in minutes. Pick your program, check eligibility, and start training in as little as 2 weeks.',
-    href: '/start-trial',
-    action: 'Apply Now',
+      'Submit the student application, review the exact program requirements, and complete the admission, payment, funding-authorization, and onboarding steps that apply.',
+    href: '/apply/student',
+    action: 'Start Application',
     image: '/images/pages/training-classroom.webp',
     imageAlt: 'Students participating in career training',
   },
   {
     title: 'Ask a Question',
     description:
-      'Not sure which program is right for you? Submit an inquiry and get a personalized response within 24 hours.',
+      'Not sure which program is right for you? Submit an inquiry so the admissions team can review your question and respond.',
     href: '/inquiry',
     action: 'Get Info',
     image: '/images/pages/career-counseling.jpg',
     imageAlt: 'Student receiving advising and support',
   },
   {
-    title: 'Check Funding Eligibility',
+    title: 'Review Funding Eligibility',
     description:
-      'See if you qualify for funded training through WIOA, WRG, or Job Ready Indy. Takes less than 2 minutes.',
-    href: '/wioa-eligibility',
-    action: 'Check Eligibility',
+      'Complete a preliminary eligibility review, then confirm any WIOA, Workforce Ready Grant, employer, or other third-party funding with the responsible agency. The website does not issue funding approval.',
+    href: '/check-eligibility',
+    action: 'Review Eligibility',
     image: '/images/pages/admin-wioa-hero.webp',
     imageAlt: 'Workforce funding and eligibility support',
   },
   {
     title: 'Employer Partnership',
     description:
-      'Hire trained graduates, access tax credits, and post jobs. Set up your employer account online.',
-    href: '/employer/dashboard',
-    action: 'Partner With Us',
+      'Learn about hiring, apprenticeship host-site participation, work-based learning, and employer training pathways. Incentives and reimbursements require separate eligibility and authorization.',
+    href: '/employers',
+    action: 'Employer Information',
     image: '/images/pages/business-meeting.webp',
     imageAlt: 'Employer and workforce partnership meeting',
   },
@@ -65,7 +65,7 @@ const START_OPTIONS = [
   {
     title: 'Technical Support',
     description:
-      'Having trouble with your account, courses, or the platform? Submit a support ticket and get help fast.',
+      'Having trouble with your account, courses, or the platform? Submit a support request for technical assistance.',
     href: '/support',
     action: 'Get Support',
     image: '/images/pages/contact-hero.jpg',
@@ -87,7 +87,7 @@ export default function GetStartedPage() {
         alt="Career training and workforce support at Elevate for Humanity"
         microLabel="Get Started"
         belowHeroHeadline="How Can We Help?"
-        belowHeroSubheadline="Everything you need is available online — choose what you need below."
+        belowHeroSubheadline="Choose the application, information, funding-review, employer, or support path you need."
         analyticsName="get-started"
       />
 
@@ -129,15 +129,15 @@ export default function GetStartedPage() {
 
       <section className="py-16">
         <div className="mx-auto max-w-4xl px-4 text-center">
-          <h2 className="mb-8 text-2xl font-bold text-slate-950">Everything Is Self-Service</h2>
+          <h2 className="mb-8 text-2xl font-bold text-slate-950">What You Can Do Online</h2>
           <div className="grid gap-6 md:grid-cols-3">
             {[
-              'Apply online in minutes',
-              'Check eligibility instantly',
-              'Get answers from our FAQ',
-              'Submit inquiries 24/7',
-              'Track your application status',
-              'Enroll and start training',
+              'Submit an application',
+              'Complete a preliminary eligibility review',
+              'Review program and funding information',
+              'Submit inquiries and support requests',
+              'Track available application status information',
+              'Complete required onboarding steps',
             ].map((item) => (
               <div key={item} className="flex items-center justify-center gap-2">
                 <span className="flex-shrink-0 text-slate-600" aria-hidden="true">
@@ -147,6 +147,11 @@ export default function GetStartedPage() {
               </div>
             ))}
           </div>
+          <p className="mx-auto mt-8 max-w-3xl text-sm leading-6 text-slate-600">
+            Preliminary website tools do not create admission, funding, certification, licensure,
+            employment, or benefit eligibility. Those outcomes depend on the program and the
+            responsible approving organization.
+          </p>
         </div>
       </section>
     </div>

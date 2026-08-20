@@ -15,6 +15,10 @@ jobs:
     name: CI Preflight
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -39,8 +43,15 @@ jobs:
         run: node scripts/platform-doctor-static.mjs
       - name: Canonical portal contracts
         run: node scripts/audit-portal-contracts.mjs
-      - name: Portal/database schema drift
+      - name: Portal/database schema drift — live production contract
+        if: github.event_name != 'pull_request'
         run: pnpm audit:schema:strict
+      - name: Portal/database schema drift — PR advisory
+        if: github.event_name == 'pull_request'
+        run: pnpm audit:schema
+      - name: Live portal data integrity
+        if: github.event_name != 'pull_request'
+        run: node scripts/audit-portal-data-integrity.mjs
       - name: Assemble canonical PWA runtime assets
         run: |
           node scripts/sync-pwa-public.mjs marketing

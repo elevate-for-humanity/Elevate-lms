@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { checkAdminIP } from '@/lib/api/admin-ip-guard';
 import { createMiddlewareSupabaseClient } from '@/lib/supabase/middleware';
+import { PRIVILEGED_MFA_ROLES } from '@/lib/auth/privileged-mfa';
 import {
   ADMIN_ROLES,
   INSTRUCTOR_ROLES,
@@ -161,6 +162,30 @@ export async function middleware(req: NextRequest) {
 
   if (!hasAnyRole(effectiveRoles, requiredRoles(pathname), { adminOverride: false })) {
     return withCookies(NextResponse.redirect(new URL('/unauthorized', req.url)));
+  }
+
+  const privileged = effectiveRoles.some((role) => PRIVILEGED_MFA_ROLES.includes(role));
+  if (privileged && pathname !== '/mfa') {
+    const { data: aal, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const aal2 = !aalError && aal.currentLevel === 'aal2';
+
+    if (!aal2) {
+      if (pathname.startsWith('/api/')) {
+        return withCookies(
+          NextResponse.json(
+            {
+              error: 'MFA_REQUIRED',
+              message: 'AAL2 multi-factor authentication is required for privileged access.',
+            },
+            { status: 403 },
+          ),
+        );
+      }
+
+      const mfaUrl = new URL('/mfa', req.url);
+      mfaUrl.searchParams.set('redirect', `${pathname}${search}`);
+      return withCookies(NextResponse.redirect(mfaUrl));
+    }
   }
 
   return withCookies(NextResponse.next({ request: { headers: requestHeaders } }));

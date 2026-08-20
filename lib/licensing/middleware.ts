@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkLicenseAccess } from './billing-authority';
+import { requireAdminClient } from '@/lib/supabase/admin';
+import { checkLicenseAccess, type BillingAuthority } from './billing-authority';
 
 /**
- * License validation for API routes
- * Use this in API route handlers to check license status
+ * License validation for API routes.
+ *
+ * Platform/workspace billing is canonical in `managed_licenses`. The legacy
+ * `licenses` table represents white-label/deployment licenses and is retained
+ * only as a compatibility fallback for organizations that have not migrated.
  *
  * Uses billing authority rules:
  * - DB-Authoritative tiers: Access via expires_at
@@ -32,7 +36,6 @@ export async function validateLicenseForAPI(
     };
   }
 
-  // Get user
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -43,7 +46,6 @@ export async function validateLicenseForAPI(
     };
   }
 
-  // Get user's organization
   const { data: profile } = await supabase
     .from('profiles')
     .select('organization_id')
@@ -51,17 +53,48 @@ export async function validateLicenseForAPI(
     .maybeSingle();
 
   if (!profile?.organization_id) {
-    // User not associated with an organization - might be direct student
-    // Allow access but no org features
+    // Direct learners without an organization do not consume organization
+    // platform licensing and are governed by enrollment/course entitlements.
     return { valid: true, organizationId: undefined };
   }
 
-  // Get license
-  const { data: license } = await supabase
-    .from('licenses')
+  // License state is operational billing data. Resolve the organization from
+  // the authenticated user's RLS-scoped profile first, then read billing state
+  // server-side so ordinary organization members do not need SELECT access to
+  // the managed license table itself.
+  const billingDb = await requireAdminClient();
+  const { data: managedLicense, error: managedLicenseError } = await billingDb
+    .from('managed_licenses')
     .select('*')
     .eq('organization_id', profile.organization_id)
     .maybeSingle();
+
+  if (managedLicenseError) {
+    return {
+      valid: false,
+      error: NextResponse.json({ error: 'Unable to verify organization license' }, { status: 503 }),
+    };
+  }
+
+  let license = managedLicense;
+  let licenseSource: 'managed_licenses' | 'licenses' = 'managed_licenses';
+
+  // Backward compatibility only for legacy white-label/deployment customers.
+  if (!license) {
+    const { data: legacyLicense, error: legacyLicenseError } = await billingDb
+      .from('licenses')
+      .select('*')
+      .eq('organization_id', profile.organization_id)
+      .maybeSingle();
+    if (legacyLicenseError) {
+      return {
+        valid: false,
+        error: NextResponse.json({ error: 'Unable to verify organization license' }, { status: 503 }),
+      };
+    }
+    license = legacyLicense;
+    licenseSource = 'licenses';
+  }
 
   if (!license) {
     return {
@@ -70,7 +103,6 @@ export async function validateLicenseForAPI(
     };
   }
 
-  // Use billing authority rules for access check
   if (options.requireActive) {
     const accessResult = checkLicenseAccess({
       id: license.id,
@@ -80,12 +112,13 @@ export async function validateLicenseForAPI(
       current_period_end: license.current_period_end,
       stripe_subscription_id: license.stripe_subscription_id,
       stripe_customer_id: license.stripe_customer_id,
+      canceled_at: license.canceled_at,
+      suspended_at: license.suspended_at,
     });
 
     if (!accessResult.hasAccess) {
-      // Determine specific error code for UI handling
       let code = 'LICENSE_INACTIVE';
-      if (accessResult.reason.includes('expired')) {
+      if (accessResult.reason.includes('expired') || license.status === 'expired') {
         code = license.tier === 'trial' ? 'TRIAL_EXPIRED' : 'LICENSE_EXPIRED';
       } else if (accessResult.reason.includes('subscription')) {
         code = 'SUBSCRIPTION_REQUIRED';
@@ -106,9 +139,8 @@ export async function validateLicenseForAPI(
     }
   }
 
-  // Check usage limits if requested
   if (options.checkLimit) {
-    const { data: usage } = await supabase
+    const { data: usage } = await billingDb
       .from('license_usage')
       .select('*')
       .eq('license_id', license.id)
@@ -141,13 +173,11 @@ export async function validateLicenseForAPI(
   return {
     valid: true,
     organizationId: profile.organization_id,
-    license,
+    license: { ...license, source: licenseSource },
   };
 }
 
-/**
- * Higher-order function to wrap API handlers with license validation
- */
+/** Higher-order function to wrap API handlers with license validation. */
 export function withLicenseValidation(
   handler: (
     request: NextRequest,
@@ -172,9 +202,7 @@ export function withLicenseValidation(
   };
 }
 
-/**
- * Check if a feature is available for the current license plan
- */
+/** Check if a feature is available for the current license plan. */
 export function isPlanFeatureAvailable(planId: string, feature: string): boolean {
   const planFeatures: Record<string, string[]> = {
     starter: ['basic_lms', 'student_portal', 'course_management', 'basic_reports'],

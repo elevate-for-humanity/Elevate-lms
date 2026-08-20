@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     const currency = String(commerce.currency || 'usd').toLowerCase();
 
     if (!Number.isSafeInteger(priceInCents) || priceInCents <= 0 || !/^[a-z]{3}$/.test(currency)) {
-      logger.error('Course checkout rejected invalid server pricing', {
+      logger.error('Course checkout rejected invalid server pricing', undefined, {
         courseId,
         priceInCents,
         currency,

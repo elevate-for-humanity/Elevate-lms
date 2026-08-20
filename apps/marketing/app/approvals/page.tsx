@@ -1,435 +1,114 @@
-export const revalidate = 3600;
-
-import { Metadata } from 'next';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ExternalLink, FileCheck, ShieldCheck } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
+import { listPublicRegulatoryEvidence } from '@/lib/compliance/public-regulatory-evidence';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Approvals',
-  description: 'Elevate For Humanity - Career training and workforce development',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/approvals',
-  },
+  title: 'Approvals & Regulatory Evidence',
+  description: `Evidence-backed public approval, funding, and registered-apprenticeship records for ${PLATFORM_DEFAULTS.orgName}.`,
+  alternates: { canonical: 'https://www.elevateforhumanity.org/approvals' },
 };
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { Award, Building2, Shield, Users, FileCheck, CheckCircle } from 'lucide-react';
-import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+function label(statusType: string) {
+  if (statusType === 'etpl') return 'ETPL / INTraining';
+  if (statusType === 'wioa') return 'WIOA training pathway';
+  if (statusType === 'wrg') return 'Workforce Ready Grant';
+  return statusType.toUpperCase();
+}
 
-export default function ApprovalsPage() {
+export default async function ApprovalsPage() {
+  let evidence: Awaited<ReturnType<typeof listPublicRegulatoryEvidence>> = [];
+  let evidenceError = false;
+  try {
+    evidence = await listPublicRegulatoryEvidence();
+  } catch {
+    evidenceError = true;
+  }
+
+  const byProgram = new Map<string, typeof evidence>();
+  for (const row of evidence) {
+    const rows = byProgram.get(row.slug) ?? [];
+    rows.push(row);
+    byProgram.set(row.slug, rows);
+  }
+
+  const barber = RAPIDS_CONFIG.programs.barber;
+
   return (
-    <div className="bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: 'Approvals' }]} />
+    <main className="min-h-screen bg-white text-slate-950">
+      <div className="border-b border-slate-200">
+        <div className="mx-auto max-w-6xl px-4 py-3"><Breadcrumbs items={[{ label: 'Approvals & Evidence' }]} /></div>
       </div>
-      {/* Hero Section with Background Image */}
-      <section className="relative h-48 md:h-64 w-full overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg=="
-          src="/images/pages/approvals-page-1.webp"
-          alt={`${PLATFORM_DEFAULTS.orgName} institutional approvals and governance`}
-          fill
-          className="object-cover"
-          priority
-          quality={90}
-          sizes="100vw" 
-        />
+
+      <section className="bg-slate-950 px-4 py-16 text-white">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-300">Public Evidence Registry</p>
+          <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">Approvals are shown at the level the evidence supports.</h1>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">Provider status, program approval, participant eligibility, registered-apprenticeship status, testing relationships, and funding authorization are different things. This page does not combine them into a blanket “approved” claim.</p>
+        </div>
       </section>
 
-      {/* Institutional Governance */}
-      <section className="py-12 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-white rounded-2xl p-8 border border-slate-200">
-            <h2 className="text-xl font-bold text-slate-900 mb-3">Institutional Governance</h2>
-            <p className="text-base text-slate-700 leading-relaxed mb-4">
-              {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute operates under 2Exclusive LLC-S
-              and coordinates apprenticeship sponsorship, instruction, and partner training sites
-              under formal agreements and applicable regulatory standards.
-            </p>
-            <dl className="grid sm:grid-cols-3 gap-4 text-sm">
-              <div>
-                <dt className="font-semibold text-slate-500 uppercase tracking-wide text-xs">
-                  Legal Entity
-                </dt>
-                <dd className="text-slate-900 font-medium mt-1">2Exclusive LLC-S</dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-500 uppercase tracking-wide text-xs">
-                  DBA
-                </dt>
-                <dd className="text-slate-900 font-medium mt-1">
-                  {PLATFORM_DEFAULTS.orgName} Career &amp; Technical Institute
-                </dd>
-              </div>
-              <div>
-                <dt className="font-semibold text-slate-500 uppercase tracking-wide text-xs">
-                  Role
-                </dt>
-                <dd className="text-slate-900 font-medium mt-1">
-                  Registered Apprenticeship Sponsor, Training Provider, Workforce Intermediary
-                </dd>
-              </div>
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-semibold leading-6 text-amber-950">
+          Public funding is never guaranteed. A listed or approved program still requires the responsible agency to determine participant eligibility, covered costs, current availability, and written authorization.
+        </div>
+
+        <section className="mt-10">
+          <div className="flex items-center gap-3"><ShieldCheck className="h-7 w-7 text-brand-red-700" /><h2 className="text-3xl font-black">Registered Apprenticeship</h2></div>
+          <div className="mt-5 rounded-3xl border border-slate-200 p-6 sm:p-8">
+            <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Sponsor of Record</dt><dd className="mt-1 font-black">{RAPIDS_CONFIG.sponsorOfRecord}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Registration</dt><dd className="mt-1 font-black">{RAPIDS_CONFIG.registrationId}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Occupation</dt><dd className="mt-1 font-black">{barber.occupation}</dd></div>
+              <div><dt className="text-xs font-black uppercase tracking-wider text-slate-500">Approach</dt><dd className="mt-1 font-black capitalize">{barber.approach}</dd></div>
             </dl>
-            <div className="mt-4">
-              <Link
-                href="/legal/governance"
-                className="text-brand-red-600 font-semibold text-sm hover:underline"
-              >
-                View full Governance &amp; Program Structure →
-              </Link>
-            </div>
+            <p className="mt-6 leading-7 text-slate-700">The canonical Barber registered-program record requires {barber.competencyCount} verified competencies and {barber.relatedInstructionHours} verified RTI hours. Supervised work, wage, and state-licensing records are maintained separately according to the applicable program and licensing requirements.</p>
+            <div className="mt-5 flex flex-wrap gap-3"><Link href="/programs/barber-apprenticeship" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">View Barber Apprenticeship</Link><Link href="/compliance/apprenticeship-structure" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-black">Review apprenticeship structure</Link></div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* State & Workforce Approvals */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-4 mb-12">
-            <Shield className="w-12 h-12 text-brand-blue-600" />
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-2xl md:text-3xl lg:text-2xl md:text-3xl">
-              State & Workforce Approvals
-            </h2>
-          </div>
+        <section className="mt-12">
+          <div className="flex items-center gap-3"><FileCheck className="h-7 w-7 text-brand-blue-700" /><h2 className="text-3xl font-black">Indiana workforce program evidence</h2></div>
+          <p className="mt-3 max-w-3xl leading-7 text-slate-700">The cards below come from production regulatory-evidence records where <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">public_claim_allowed</code> is explicitly true.</p>
 
-          <div className="space-y-8">
-            {/* INTraining */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    INTraining Approved Provider – Indiana Department of Workforce Development
-                  </h3>
-                  <div className="space-y-2 text-lg text-black">
-                    <p>
-                      <strong>Program:</strong> Emergency Health & Safety Technician
-                    </p>
-                    <p>
-                      <strong>Program Location ID:</strong> 10004621
-                    </p>
+          {evidenceError ? (
+            <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-semibold text-amber-950">The live regulatory evidence registry could not be loaded. No program approval claim is substituted from static marketing copy.</div>
+          ) : byProgram.size === 0 ? (
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm font-semibold text-slate-700">No program-level public approval rows are currently marked claimable.</div>
+          ) : (
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              {[...byProgram.entries()].map(([slug, rows]) => (
+                <article key={slug} className="rounded-3xl border border-slate-200 p-6">
+                  <h3 className="text-2xl font-black">{rows[0]?.title ?? slug}</h3>
+                  <div className="mt-5 space-y-4">
+                    {rows.map((row) => (
+                      <div key={`${row.authority}-${row.statusType}`} className="rounded-2xl bg-slate-50 p-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2"><span className="rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-wide text-slate-800">{label(row.statusType)}</span><span className="text-xs font-bold uppercase text-emerald-700">{row.statusValue}</span></div>
+                        <p className="mt-3 text-sm font-bold text-slate-900">{row.authority}</p>
+                        {row.sourceReference ? <p className="mt-2 text-sm leading-6 text-slate-600">{row.sourceReference}</p> : null}
+                        {row.sourceUrl ? <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-black text-brand-blue-700 hover:underline">Open public source <ExternalLink className="h-4 w-4" /></a> : null}
+                      </div>
+                    ))}
                   </div>
-                </div>
-              </div>
+                  <Link href={`/programs/${slug}`} className="mt-5 inline-flex rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-black">View program</Link>
+                </article>
+              ))}
             </div>
+          )}
+        </section>
 
-            {/* ETPL */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Eligible Training Provider (ETP) – WIOA-funded training
-                  </h3>
-                  <p className="text-lg text-black">
-                    Approved to serve participants funded through the Workforce Innovation and
-                    Opportunity Act (WIOA)
-                  </p>
-                </div>
-              </div>
-            </div>
+        <section className="mt-12 grid gap-6 lg:grid-cols-2">
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6"><h2 className="text-2xl font-black">Provider-level public source</h2><p className="mt-3 leading-7 text-slate-700">Indiana DWD’s Workforce Ready Grant provider directory publicly lists Elevate for Humanity as a provider in Indianapolis. Provider listing does not mean every Elevate program or every applicant is WRG-funded.</p><a href="https://www.in.gov/dwd/nextleveljobs/providers/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-1.5 font-black text-brand-blue-700 hover:underline">Indiana provider directory <ExternalLink className="h-4 w-4" /></a></div>
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6"><h2 className="text-2xl font-black">Testing and certification relationships</h2><p className="mt-3 leading-7 text-slate-700">Testing-center, exam-provider, credential, and curriculum relationships are maintained separately from workforce-program approvals. Review the Testing Center and individual program pages for the exact provider and credential applicable to a service.</p><Link href="/testing" className="mt-5 inline-flex rounded-xl bg-slate-950 px-5 py-3 text-sm font-black text-white">Review Testing Center</Link></div>
+        </section>
 
-            {/* WRG */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Workforce Ready Grant (WRG) Training Provider
-                  </h3>
-                  <p className="text-lg text-black">
-                    Selected programs available at no cost to eligible adults through Indiana's
-                    Workforce Ready Grant
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ITAP */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">ITAP / INDOT Registration</h3>
-                  <p className="text-lg text-black">
-                    2Exclusive LLC-S registered with INDOT's ITAP for transportation and
-                    construction-aligned workforce services
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <section className="mt-12 rounded-3xl bg-slate-950 p-7 text-white"><h2 className="text-2xl font-black">Need the underlying record?</h2><p className="mt-3 max-w-3xl leading-7 text-slate-300">For agency, procurement, licensing, or due-diligence review, request the current approval notice, registration record, program-location identifier, or supporting document applicable to the exact claim being evaluated.</p><Link href="/contact" className="mt-5 inline-flex rounded-xl bg-brand-red-600 px-5 py-3 font-black">Request supporting evidence</Link></section>
       </section>
-
-      {/* Federal Approvals */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-4 mb-12">
-            <Building2 className="w-12 h-12 text-brand-orange-600" />
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-2xl md:text-3xl lg:text-2xl md:text-3xl">
-              Federal Approvals & Registration
-            </h2>
-          </div>
-
-          <div className="space-y-8">
-            {/* DOL Apprenticeship */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-red-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    U.S. Department of Labor Registered Apprenticeship Sponsor
-                  </h3>
-                  <div className="space-y-2 text-lg text-black">
-                    <p>
-                      <strong>Program:</strong> Emergency Health & Safety Technician
-                    </p>
-                    <p>
-                      <strong>RAPIDS Program ID:</strong> 2025-IN-132301
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SAM.gov */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-red-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">SAM.gov Active Entity</h3>
-                  <p className="text-lg text-black">
-                    Registered active federal government contractor.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Certification & Testing Partnerships */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-4 mb-12">
-            <Award aria-label="award" className="w-12 h-12 text-brand-orange-600" />
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-2xl md:text-3xl lg:text-2xl md:text-3xl">
-              Certification & Testing Partnerships
-            </h2>
-          </div>
-
-          <div className="space-y-8">
-            {/* Certiport */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Certiport Authorized Testing Center
-                  </h3>
-                  <p className="text-lg text-black mb-4">
-                    Authorized to administer industry-standard-recognized certification exams for:
-                  </p>
-                  <ul className="grid md:grid-cols-2 gap-3">
-                    <li className="flex items-center gap-2 text-black">
-                      <span className="text-brand-green-600">•</span> Microsoft Office Specialist
-                      (MOS)
-                    </li>
-                    <li className="flex items-center gap-2 text-black">
-                      <span className="text-brand-green-600">•</span> IC3 Digital Literacy
-                    </li>
-                    <li className="flex items-center gap-2 text-black">
-                      <span className="text-brand-green-600">•</span> IT Specialist (Networking,
-                      Security, Python, Databases, HTML/CSS/JS)
-                    </li>
-                    <li className="flex items-center gap-2 text-black">
-                      <span className="text-brand-green-600">•</span> Adobe Certified Professional
-                    </li>
-                    <li className="flex items-center gap-2 text-black">
-                      <span className="text-brand-green-600">•</span> Entrepreneurship & Small
-                      Business (ESB)
-                    </li>
-                    <li className="flex items-center gap-2 text-black">
-                      <span className="text-brand-green-600">•</span> Communication Skills for
-                      Business (CSB)
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Elevate LMS */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    Elevate LMS Partner School – Client Well-Being & Safety Certification
-                  </h3>
-                  <p className="text-lg text-black mb-3">
-                    Training in domestic violence awareness, human trafficking awareness, and
-                    infection control (2-hour course)
-                  </p>
-                  <p className="text-black">
-                    <strong>School promo code:</strong>{' '}
-                    <code className="bg-slate-200 px-2 py-2 rounded">efhcti-rise295</code> (for
-                    enrolled students and staff)
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* CareerSafe */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-orange-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    CareerSafe / OSHA-aligned Safety Training
-                  </h3>
-                  <p className="text-lg text-black">
-                    Integrated into trades and safety pathways for workplace safety certification
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Nonprofit & Diversity Certifications */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-4 mb-12">
-            <Users className="w-12 h-12 text-brand-blue-600" />
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-2xl md:text-3xl lg:text-2xl md:text-3xl">
-              Nonprofit & Diversity Certifications
-            </h2>
-          </div>
-
-          <div className="space-y-8">
-            {/* 501(c)(3) */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    501(c)(3) Nonprofit – Selfish Inc
-                  </h3>
-                  <p className="text-lg text-black">
-                    IRS-recognized tax-exempt charitable organization
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Candid */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">Candid/Guidestar Registered</h3>
-                  <p className="text-lg text-black">
-                    Verified profile on Candid/Guidestar, the nation's leading organizational
-                    transparency platform
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ByBlack */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
-              <div className="flex items-start gap-4">
-                <span className="text-slate-400 flex-shrink-0">•</span>
-                <div>
-                  <h3 className="text-lg md:text-lg font-bold mb-3">
-                    ByBlack Certified Black-Owned Business
-                  </h3>
-                  <p className="text-lg text-black">
-                    Certified by U.S. Black Chambers & ByBlack.us
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why This Matters */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-4 mb-12">
-            <FileCheck className="w-12 h-12 text-white" />
-            <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-white text-2xl md:text-3xl lg:text-2xl md:text-3xl">
-              Why This Matters
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-lg md:text-lg font-bold text-white mb-4">For Students</h3>
-              <p className="text-black text-lg leading-relaxed">
-                Our students can access funded training through WRG, WIOA, Job Ready Indy, and
-                apprenticeships. Your training is legitimate, recognized, and leads to real
-                employment.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-lg md:text-lg font-bold text-white mb-4">For Employers</h3>
-              <p className="text-black text-lg leading-relaxed">
-                Our employers can trust that our programs are standards-aligned and reportable.
-                Graduates meet industry-standard requirements and are job-ready from day one.
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-lg md:text-lg font-bold text-white mb-4">For Partners</h3>
-              <p className="text-black text-lg leading-relaxed">
-                Workforce boards, schools, reenstart programs, and community partners can
-                confidently refer people to Elevate For Humanity knowing we meet state and federal
-                quality benchmarks.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-2xl md:text-2xl md:text-3xl font-bold mb-6 text-2xl md:text-3xl lg:text-2xl md:text-3xl">
-            Ready to Get Started?
-          </h2>
-          <p className="text-base md:text-lg text-black mb-8 leading-relaxed">
-            Start your career transformation today through our state-approved, federally recognized
-            training programs.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition-all shadow-lg"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/programs"
-              className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-slate-200 transition-all shadow-lg"
-            >
-              View Programs
-            </Link>
-            <Link
-              href="/contact"
-              className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-slate-200 transition-all shadow-lg"
-            >
-              Contact Us
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

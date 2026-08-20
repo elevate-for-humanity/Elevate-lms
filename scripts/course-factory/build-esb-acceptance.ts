@@ -16,6 +16,7 @@ const MIN_VISIBLE_CHARS = 1500;
 const MEDIA_POLL_MS = 20_000;
 const MEDIA_TIMEOUT_MS = 75 * 60_000;
 const FORBIDDEN_BRANDS = ['certiport', 'pearson vue', 'gmetrix', 'xed', 'cci learning'];
+const AI_SECRET_KEYS = ['OPENAI_API_KEY', 'GROQ_API_KEY', 'GEMINI_API_KEY', 'ANTHROPIC_API_KEY', 'AZURE_OPENAI_API_KEY'] as const;
 
 function visibleLength(html: string) {
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().length;
@@ -23,6 +24,36 @@ function visibleLength(html: string) {
 
 function fail(message: string): never {
   throw new Error(`[ESB acceptance] ${message}`);
+}
+
+async function hydrateProductionAISecrets(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+): Promise<string[]> {
+  const available: string[] = [];
+
+  for (const key of AI_SECRET_KEYS) {
+    if (process.env[key]?.trim()) {
+      available.push(key);
+      continue;
+    }
+
+    const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
+    if (error) {
+      console.warn(`[ESB acceptance] ${key} could not be hydrated from platform secrets: ${error.message}`);
+      continue;
+    }
+    if (typeof data === 'string' && data.trim()) {
+      process.env[key] = data.trim();
+      available.push(key);
+    }
+  }
+
+  if (!available.length) {
+    fail('no production AI provider credential is available');
+  }
+
+  console.log(`[ESB acceptance] AI provider pool hydrated (${available.length} configured provider credential(s))`);
+  return available;
 }
 
 function lowerText(value: unknown): string {
@@ -248,6 +279,7 @@ async function waitForMedia(courseId: string, lessons: Array<Record<string, any>
 
 async function main() {
   const db = await requireAdminClient();
+  const providerKeys = await hydrateProductionAISecrets(db);
   const blueprint = await getBlueprintBySlug(COURSE_SLUG);
   if (!blueprint) fail('unbranded Entrepreneurship blueprint could not be resolved');
   assertNoProviderBranding('resolved blueprint', blueprint);
@@ -265,6 +297,7 @@ async function main() {
     expected_lessons: EXPECTED_LESSONS,
     expected_main_videos: EXPECTED_MAIN_VIDEOS,
     expected_microclips: EXPECTED_MICROCLIPS,
+    provider_count: providerKeys.length,
     blueprint: blueprint.credentialCode,
   });
 

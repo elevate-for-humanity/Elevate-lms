@@ -1,15 +1,21 @@
 import { courseFactory } from '../../lib/course-factory';
-import { entrepreneurshipBlueprint } from '../../lib/curriculum/blueprints/entrepreneurship';
+import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
 
 const COURSE_SLUG = 'entrepreneurship';
 const EXPECTED_MODULES = 5;
 const EXPECTED_LESSONS = 35;
+const EXPECTED_CHECKPOINTS = 4;
 const EXPECTED_CHECKPOINT_QUESTIONS = 10;
+const EXPECTED_PRACTICE_QUESTIONS = 50;
 const EXPECTED_FINAL_QUESTIONS = 50;
+const EXPECTED_QUICK_CLIPS_PER_LESSON = 2;
+const EXPECTED_MAIN_VIDEOS = EXPECTED_LESSONS;
+const EXPECTED_MICROCLIPS = EXPECTED_LESSONS * EXPECTED_QUICK_CLIPS_PER_LESSON;
 const MIN_VISIBLE_CHARS = 1500;
-const MEDIA_POLL_MS = 30_000;
-const MEDIA_TIMEOUT_MS = 45 * 60_000;
+const MEDIA_POLL_MS = 20_000;
+const MEDIA_TIMEOUT_MS = 75 * 60_000;
+const FORBIDDEN_BRANDS = ['certiport', 'pearson vue', 'gmetrix', 'xed', 'cci learning'];
 
 function visibleLength(html: string) {
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().length;
@@ -17,6 +23,20 @@ function visibleLength(html: string) {
 
 function fail(message: string): never {
   throw new Error(`[ESB acceptance] ${message}`);
+}
+
+function lowerText(value: unknown): string {
+  try {
+    return JSON.stringify(value ?? '').toLowerCase();
+  } catch {
+    return String(value ?? '').toLowerCase();
+  }
+}
+
+function assertNoProviderBranding(label: string, value: unknown) {
+  const text = lowerText(value);
+  const match = FORBIDDEN_BRANDS.find((brand) => text.includes(brand));
+  if (match) fail(`${label} still contains third-party course branding: ${match}`);
 }
 
 async function logAcceptance(
@@ -30,7 +50,7 @@ async function logAcceptance(
     actor_id: null,
     action: 'updated',
     metadata: {
-      acceptance_test: 'esb-course-builder-v2',
+      acceptance_test: 'esb-full-commercial-experience-v3',
       stage,
       github_sha: process.env.GITHUB_SHA ?? null,
       ...metadata,
@@ -39,137 +59,189 @@ async function logAcceptance(
   if (error) throw new Error(`[ESB acceptance] failed to write audit telemetry: ${error.message}`);
 }
 
+function readExperience(contentJson: unknown): Record<string, any> | null {
+  if (!contentJson || typeof contentJson !== 'object' || Array.isArray(contentJson)) return null;
+  const experience = (contentJson as Record<string, any>).experience;
+  return experience && typeof experience === 'object' && !Array.isArray(experience)
+    ? experience as Record<string, any>
+    : null;
+}
+
 function experienceIsComplete(contentJson: unknown) {
-  if (!contentJson || typeof contentJson !== 'object') return false;
-  const row = contentJson as Record<string, any>;
-  const experience = row.experience;
-  if (!experience || typeof experience !== 'object') return false;
+  const experience = readExperience(contentJson);
+  if (!experience) return false;
   return (
+    experience.readingGuide &&
+    Array.isArray(experience.readingGuide.sections) && experience.readingGuide.sections.length >= 3 &&
     typeof experience.narrationScript === 'string' && experience.narrationScript.trim().length >= 200 &&
     typeof experience.visualPrompt === 'string' && experience.visualPrompt.trim().length >= 40 &&
-    Array.isArray(experience.flashcards) && experience.flashcards.length >= 4 &&
+    Array.isArray(experience.flashcards) && experience.flashcards.length >= 6 &&
+    Array.isArray(experience.quickClips) && experience.quickClips.length >= EXPECTED_QUICK_CLIPS_PER_LESSON &&
     Array.isArray(experience.knowledgeChecks) && experience.knowledgeChecks.length >= 3 &&
+    Array.isArray(experience.exercises) && experience.exercises.length >= 1 &&
+    Array.isArray(experience.resources) && experience.resources.length >= 2 &&
+    Array.isArray(experience.glossary) && experience.glossary.length >= 4 &&
     Boolean(experience.scenario) &&
     Boolean(experience.caseStudy) &&
     Boolean(experience.practicalTask) &&
-    Boolean(experience.remediation)
+    experience.remediation && Array.isArray(experience.remediation.targetedActions) &&
+    experience.readiness && Array.isArray(experience.readiness.evidenceSignals)
   );
 }
 
 async function auditPersistedPackage(courseId: string) {
   const db = await requireAdminClient();
-
-  const [{ data: course, error: courseError }, { data: modules, error: moduleError }, { data: lessons, error: lessonError }] =
-    await Promise.all([
-      db
-        .from('courses')
-        .select('id,slug,title,status,is_active,generation_status,generation_progress,review_status,published_at,total_lessons,program_id')
-        .eq('id', courseId)
-        .single(),
-      db.from('course_modules').select('id,slug,title,order_index,is_published,is_draft').eq('course_id', courseId),
-      db
-        .from('course_lessons')
-        .select(
-          'id,slug,title,lesson_type,order_index,content,content_json,learning_objectives,quiz_questions,passing_score,generation_status,is_published,status,video_status,video_url,video_job_id,script,bullet_points,scene_data',
-        )
-        .eq('course_id', courseId),
-    ]);
+  const [
+    { data: course, error: courseError },
+    { data: modules, error: moduleError },
+    { data: lessons, error: lessonError },
+  ] = await Promise.all([
+    db
+      .from('courses')
+      .select('id,slug,title,description,status,is_active,generation_status,generation_progress,review_status,published_at,total_lessons,program_id')
+      .eq('id', courseId)
+      .single(),
+    db.from('course_modules').select('id,slug,title,description,order_index,is_published,is_draft,domain_key').eq('course_id', courseId),
+    db
+      .from('course_lessons')
+      .select('id,slug,title,lesson_type,order_index,content,content_json,learning_objectives,quiz_questions,passing_score,generation_status,is_published,status,video_status,video_url,video_job_id,script,bullet_points,scene_data,resources,activities,partner_exam_code,domain_key')
+      .eq('course_id', courseId),
+  ]);
 
   if (courseError || !course) fail(`course query failed: ${courseError?.message ?? 'not found'}`);
   if (moduleError) fail(`module query failed: ${moduleError.message}`);
   if (lessonError) fail(`lesson query failed: ${lessonError.message}`);
 
-  if ((modules ?? []).length !== EXPECTED_MODULES) {
-    fail(`expected ${EXPECTED_MODULES} modules; found ${(modules ?? []).length}`);
-  }
-  if ((lessons ?? []).length !== EXPECTED_LESSONS) {
-    fail(`expected ${EXPECTED_LESSONS} lessons; found ${(lessons ?? []).length}`);
-  }
+  if ((modules ?? []).length !== EXPECTED_MODULES) fail(`expected ${EXPECTED_MODULES} modules; found ${(modules ?? []).length}`);
+  if ((lessons ?? []).length !== EXPECTED_LESSONS) fail(`expected ${EXPECTED_LESSONS} lessons; found ${(lessons ?? []).length}`);
+
+  assertNoProviderBranding('course', course);
+  assertNoProviderBranding('modules', modules);
 
   const slugs = new Set<string>();
+  let checkpoints = 0;
+  let practiceAssessments = 0;
+  let finals = 0;
+
   for (const lesson of lessons ?? []) {
     if (slugs.has(lesson.slug)) fail(`duplicate lesson slug: ${lesson.slug}`);
     slugs.add(lesson.slug);
+    assertNoProviderBranding(`lesson ${lesson.slug}`, lesson);
+    if (lesson.partner_exam_code) fail(`${lesson.slug} still has partner_exam_code=${lesson.partner_exam_code}`);
 
-    if (lesson.generation_status !== 'generated') {
+    if (lesson.generation_status !== 'generated' && lesson.generation_status !== 'published') {
       fail(`${lesson.slug} generation_status=${lesson.generation_status ?? 'null'}`);
     }
 
     const content = (lesson.content ?? {}) as Record<string, any>;
     const html = typeof content.html === 'string' ? content.html : '';
-    if (visibleLength(html) < MIN_VISIBLE_CHARS) {
-      fail(`${lesson.slug} has only ${visibleLength(html)} visible instructional characters`);
-    }
-
-    if (!Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length < 1) {
-      fail(`${lesson.slug} has no persisted learning objectives`);
-    }
-
-    if (!experienceIsComplete(lesson.content_json)) {
-      fail(`${lesson.slug} is missing the complete interactive learner experience contract`);
-    }
-
-    if (typeof lesson.script !== 'string' || lesson.script.trim().length < 200) {
-      fail(`${lesson.slug} is missing narration script`);
-    }
-    if (!Array.isArray(lesson.bullet_points) || lesson.bullet_points.length < 3) {
-      fail(`${lesson.slug} is missing lesson-specific bullet points`);
-    }
-    if (!lesson.scene_data || typeof lesson.scene_data !== 'object') {
-      fail(`${lesson.slug} is missing visual scene data`);
-    }
+    if (visibleLength(html) < MIN_VISIBLE_CHARS) fail(`${lesson.slug} has only ${visibleLength(html)} visible instructional characters`);
+    if (!Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length < 3) fail(`${lesson.slug} has insufficient learning objectives`);
+    if (!experienceIsComplete(lesson.content_json)) fail(`${lesson.slug} is missing the full learning-experience contract`);
+    if (!Array.isArray(lesson.resources) || lesson.resources.length < 2) fail(`${lesson.slug} has fewer than 2 materialized learner resources`);
+    if (!Array.isArray(lesson.activities) || lesson.activities.length < 1) fail(`${lesson.slug} has no materialized learn-by-doing activity`);
+    if (typeof lesson.script !== 'string' || lesson.script.trim().length < 200) fail(`${lesson.slug} is missing narration script`);
+    if (!Array.isArray(lesson.bullet_points) || lesson.bullet_points.length < 3) fail(`${lesson.slug} is missing lesson-specific bullet points`);
+    if (!lesson.scene_data || typeof lesson.scene_data !== 'object') fail(`${lesson.slug} is missing scene/readiness data`);
+    if (!lesson.domain_key) fail(`${lesson.slug} is missing domain mapping`);
 
     const questions = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions : [];
-    if (lesson.lesson_type === 'checkpoint' && questions.length < EXPECTED_CHECKPOINT_QUESTIONS) {
-      fail(`${lesson.slug} checkpoint has ${questions.length}/${EXPECTED_CHECKPOINT_QUESTIONS} questions`);
+    if (lesson.lesson_type === 'checkpoint') {
+      checkpoints += 1;
+      if (questions.length < EXPECTED_CHECKPOINT_QUESTIONS) fail(`${lesson.slug} checkpoint has ${questions.length}/${EXPECTED_CHECKPOINT_QUESTIONS} questions`);
     }
-    if (lesson.lesson_type === 'exam' && questions.length < EXPECTED_FINAL_QUESTIONS) {
-      fail(`${lesson.slug} final exam has ${questions.length}/${EXPECTED_FINAL_QUESTIONS} questions`);
+    if (lesson.lesson_type === 'exam' && lesson.slug.includes('practice')) {
+      practiceAssessments += 1;
+      if (questions.length < EXPECTED_PRACTICE_QUESTIONS) fail(`${lesson.slug} practice exam has ${questions.length}/${EXPECTED_PRACTICE_QUESTIONS} questions`);
     }
-    if (['checkpoint', 'quiz', 'exam'].includes(lesson.lesson_type) && !lesson.passing_score) {
-      fail(`${lesson.slug} assessment has no passing score`);
+    if (lesson.lesson_type === 'exam' && (lesson.slug.includes('final') || lesson.slug.includes('course-exam'))) {
+      finals += 1;
+      if (questions.length < EXPECTED_FINAL_QUESTIONS) fail(`${lesson.slug} final exam has ${questions.length}/${EXPECTED_FINAL_QUESTIONS} questions`);
     }
+    if (['checkpoint', 'quiz', 'exam'].includes(lesson.lesson_type) && !lesson.passing_score) fail(`${lesson.slug} assessment has no passing score`);
   }
+
+  if (checkpoints !== EXPECTED_CHECKPOINTS) fail(`expected ${EXPECTED_CHECKPOINTS} checkpoints; found ${checkpoints}`);
+  if (practiceAssessments !== 1) fail(`expected one practice/readiness exam; found ${practiceAssessments}`);
+  if (finals !== 1) fail(`expected one final exam; found ${finals}`);
 
   return { db, course, modules: modules ?? [], lessons: lessons ?? [] };
 }
 
-async function waitForMedia(courseId: string) {
+async function auditCanonicalAssessmentRows(courseId: string, lessons: Array<Record<string, any>>) {
   const db = await requireAdminClient();
+  for (const lesson of lessons) {
+    if (!['checkpoint', 'exam'].includes(lesson.lesson_type)) continue;
+    const expected = Array.isArray(lesson.quiz_questions) ? lesson.quiz_questions.length : 0;
+    const { count, error } = await db
+      .from('assessment_questions')
+      .select('id', { count: 'exact', head: true })
+      .eq('lesson_id', lesson.id);
+    if (error) fail(`canonical assessment query failed for ${lesson.slug}: ${error.message}`);
+    if ((count ?? 0) !== expected) fail(`${lesson.slug} canonical assessment rows ${(count ?? 0)}/${expected}`);
+  }
+}
+
+async function auditMediaJobs(courseId: string, lessons: Array<Record<string, any>>) {
+  const db = await requireAdminClient();
+  const lessonIds = lessons.map((lesson) => lesson.id);
+  const { data: jobs, error } = await db
+    .from('video_jobs')
+    .select('id,lesson_id,asset_kind,asset_key,status,video_url,error_message')
+    .eq('course_id', courseId)
+    .in('lesson_id', lessonIds);
+  if (error) fail(`video job query failed: ${error.message}`);
+
+  const activeJobs = jobs ?? [];
+  const mainJobs = activeJobs.filter((job) => (job.asset_kind ?? 'lesson') === 'lesson');
+  const microJobs = activeJobs.filter((job) => job.asset_kind === 'microclip');
+  if (mainJobs.length !== EXPECTED_MAIN_VIDEOS) fail(`expected ${EXPECTED_MAIN_VIDEOS} main video jobs; found ${mainJobs.length}`);
+  if (microJobs.length !== EXPECTED_MICROCLIPS) fail(`expected ${EXPECTED_MICROCLIPS} microclip jobs; found ${microJobs.length}`);
+
+  const uniqueMicro = new Set(microJobs.map((job) => `${job.lesson_id}:${job.asset_key ?? ''}`));
+  if (uniqueMicro.size !== EXPECTED_MICROCLIPS) fail(`microclip jobs are duplicated or missing: ${uniqueMicro.size}/${EXPECTED_MICROCLIPS} unique`);
+}
+
+async function waitForMedia(courseId: string, lessons: Array<Record<string, any>>) {
+  const db = await requireAdminClient();
+  const lessonIds = lessons.map((lesson) => lesson.id);
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
-  let lastReported = -1;
+  let lastMessage = '';
 
   while (Date.now() < deadline) {
-    const { data, error } = await db
-      .from('course_lessons')
-      .select('slug,video_status,video_url,video_error')
-      .eq('course_id', courseId);
+    const { data: jobs, error } = await db
+      .from('video_jobs')
+      .select('lesson_id,asset_kind,asset_key,status,video_url,error_message')
+      .eq('course_id', courseId)
+      .in('lesson_id', lessonIds);
     if (error) fail(`video status query failed: ${error.message}`);
 
-    const rows = data ?? [];
-    const failed = rows.filter((row) => row.video_status === 'failed');
+    const rows = jobs ?? [];
+    const failed = rows.filter((row) => row.status === 'failed');
     if (failed.length) {
-      fail(`video generation failed for ${failed.length} lesson(s): ${failed.slice(0, 5).map((row) => row.slug).join(', ')}`);
+      fail(`media generation failed for ${failed.length} asset(s): ${failed.slice(0, 5).map((row) => `${row.asset_kind}:${row.asset_key ?? row.lesson_id}`).join(', ')}`);
     }
 
-    const complete = rows.filter(
-      (row) => row.video_status === 'complete' && typeof row.video_url === 'string' && row.video_url.length > 0,
-    ).length;
-    console.log(`[ESB acceptance] media ${complete}/${EXPECTED_LESSONS} complete`);
-    if (complete !== lastReported) {
-      lastReported = complete;
-      await logAcceptance(db, courseId, 'media_progress', { complete, expected: EXPECTED_LESSONS });
+    const mainComplete = rows.filter((row) => (row.asset_kind ?? 'lesson') === 'lesson' && row.status === 'complete' && typeof row.video_url === 'string' && row.video_url.length > 0).length;
+    const microComplete = rows.filter((row) => row.asset_kind === 'microclip' && row.status === 'complete' && typeof row.video_url === 'string' && row.video_url.length > 0).length;
+    const message = `main ${mainComplete}/${EXPECTED_MAIN_VIDEOS}, microclips ${microComplete}/${EXPECTED_MICROCLIPS}`;
+    if (message !== lastMessage) {
+      lastMessage = message;
+      console.log(`[ESB acceptance] media ${message}`);
+      await logAcceptance(db, courseId, 'media_progress', { mainComplete, microComplete });
     }
-    if (complete === EXPECTED_LESSONS) return;
-
+    if (mainComplete === EXPECTED_MAIN_VIDEOS && microComplete === EXPECTED_MICROCLIPS) return;
     await new Promise((resolve) => setTimeout(resolve, MEDIA_POLL_MS));
   }
 
-  fail(`video pipeline did not complete all ${EXPECTED_LESSONS} lessons within ${MEDIA_TIMEOUT_MS / 60_000} minutes`);
+  fail(`media pipeline did not complete ${EXPECTED_MAIN_VIDEOS} lesson videos and ${EXPECTED_MICROCLIPS} microclips before timeout`);
 }
 
 async function main() {
   const db = await requireAdminClient();
+  const blueprint = await getBlueprintBySlug(COURSE_SLUG);
+  if (!blueprint) fail('unbranded Entrepreneurship blueprint could not be resolved');
+  assertNoProviderBranding('resolved blueprint', blueprint);
 
   const { data: existingCourse, error: existingError } = await db
     .from('courses')
@@ -177,77 +249,62 @@ async function main() {
     .eq('slug', COURSE_SLUG)
     .maybeSingle();
   if (existingError) fail(`could not resolve existing ESB course: ${existingError.message}`);
-  if (!existingCourse?.program_id) fail('ESB course is not tied to a canonical program_id');
+  if (!existingCourse?.id) fail('existing Entrepreneurship course not found');
 
   await logAcceptance(db, existingCourse.id, 'started', {
     expected_modules: EXPECTED_MODULES,
     expected_lessons: EXPECTED_LESSONS,
-    blueprint: entrepreneurshipBlueprint.credentialCode,
+    expected_main_videos: EXPECTED_MAIN_VIDEOS,
+    expected_microclips: EXPECTED_MICROCLIPS,
+    blueprint: blueprint.credentialCode,
   });
 
-  console.log('[ESB acceptance] running registered ESB v2 blueprint through canonical Course Factory');
+  console.log('[ESB acceptance] running unbranded ESB course through canonical Course Factory');
   const build = await courseFactory({
-    programId: existingCourse.program_id,
-    blueprint: entrepreneurshipBlueprint,
+    blueprint,
     mode: 'replace',
     contentSource: 'ai',
     videoMode: 'queue',
   });
 
-  if (!build.ok || !build.courseId) {
-    fail(`Course Factory failed: ${(build.errors ?? []).join('; ')}`);
-  }
-  if (build.moduleCount !== EXPECTED_MODULES || build.lessonCount !== EXPECTED_LESSONS) {
-    fail(`Course Factory returned ${build.moduleCount ?? 0} modules/${build.lessonCount ?? 0} lessons`);
-  }
-  if ((build.generationFailures ?? []).length > 0) {
-    fail(`generation failures: ${JSON.stringify(build.generationFailures)}`);
-  }
-  if ((build.videosQueued ?? 0) !== EXPECTED_LESSONS) {
-    fail(`expected ${EXPECTED_LESSONS} video jobs to queue; queued ${build.videosQueued ?? 0}`);
-  }
+  if (!build.ok || !build.courseId) fail(`Course Factory failed: ${(build.errors ?? []).join('; ')}`);
+  if (build.moduleCount !== EXPECTED_MODULES || build.lessonCount !== EXPECTED_LESSONS) fail(`Course Factory returned ${build.moduleCount ?? 0} modules/${build.lessonCount ?? 0} lessons`);
+  if ((build.generationFailures ?? []).length > 0) fail(`generation failures: ${JSON.stringify(build.generationFailures)}`);
 
   const beforePublish = await auditPersistedPackage(build.courseId);
-  if (beforePublish.course.status !== 'draft' || beforePublish.course.is_active) {
-    fail('Course Factory must persist a complete package as draft before final promotion');
-  }
+  await auditCanonicalAssessmentRows(build.courseId, beforePublish.lessons);
+  await auditMediaJobs(build.courseId, beforePublish.lessons);
+
+  if (beforePublish.course.status !== 'draft' || beforePublish.course.is_active) fail('Course Factory must persist a complete package as draft before final promotion');
   await logAcceptance(db, build.courseId, 'factory_package_passed', {
     modules: build.moduleCount,
     lessons: build.lessonCount,
     assessments_generated: build.assessmentsGenerated ?? 0,
-    videos_queued: build.videosQueued ?? 0,
+    media_jobs_reported: build.videosQueued ?? 0,
   });
 
-  await waitForMedia(build.courseId);
-  await logAcceptance(db, build.courseId, 'media_complete', { videos: EXPECTED_LESSONS });
+  await waitForMedia(build.courseId, beforePublish.lessons);
+  await logAcceptance(db, build.courseId, 'media_complete', { mainVideos: EXPECTED_MAIN_VIDEOS, microclips: EXPECTED_MICROCLIPS });
 
   const { data: publishResult, error: publishError } = await db.rpc('publish_course_from_staging', {
     p_course_id: build.courseId,
-    p_program_id: existingCourse.program_id,
+    p_program_id: existingCourse.program_id ?? null,
   });
-  if (publishError) fail(`final publish gate rejected ESB: ${publishError.message}`);
+  if (publishError) fail(`final publish gate rejected Entrepreneurship course: ${publishError.message}`);
 
   const afterPublish = await auditPersistedPackage(build.courseId);
-  if (afterPublish.course.status !== 'published' || !afterPublish.course.is_active) {
-    fail(`final course state is ${afterPublish.course.status}, active=${afterPublish.course.is_active}`);
-  }
-  if (afterPublish.course.generation_status !== 'published' || afterPublish.course.generation_progress !== 100) {
-    fail('generation state is not consistent with final publication');
-  }
-  if (!afterPublish.course.published_at || afterPublish.course.total_lessons !== EXPECTED_LESSONS) {
-    fail('published_at/total_lessons metadata is incomplete');
-  }
-  if (afterPublish.modules.some((module) => !module.is_published || module.is_draft)) {
-    fail('one or more modules are not in the final published state');
-  }
-  if (afterPublish.lessons.some((lesson) => !lesson.is_published || lesson.status !== 'published')) {
-    fail('one or more lessons are not in the final published state');
-  }
+  await auditCanonicalAssessmentRows(build.courseId, afterPublish.lessons);
+  if (afterPublish.course.status !== 'published' || !afterPublish.course.is_active) fail(`final course state is ${afterPublish.course.status}, active=${afterPublish.course.is_active}`);
+  if (afterPublish.course.generation_status !== 'published' || afterPublish.course.generation_progress !== 100) fail('generation state is not consistent with final publication');
+  if (!afterPublish.course.published_at || afterPublish.course.total_lessons !== EXPECTED_LESSONS) fail('published_at/total_lessons metadata is incomplete');
+  if (afterPublish.modules.some((module) => !module.is_published || module.is_draft)) fail('one or more modules are not in the final published state');
+  if (afterPublish.lessons.some((lesson) => !lesson.is_published || lesson.status !== 'published')) fail('one or more lessons are not in the final published state');
 
   await logAcceptance(db, build.courseId, 'passed', {
     modules: EXPECTED_MODULES,
     lessons: EXPECTED_LESSONS,
-    videos: EXPECTED_LESSONS,
+    main_videos: EXPECTED_MAIN_VIDEOS,
+    microclips: EXPECTED_MICROCLIPS,
     publish_result: publishResult as unknown,
   });
 
@@ -255,8 +312,8 @@ async function main() {
     courseId: build.courseId,
     modules: EXPECTED_MODULES,
     lessons: EXPECTED_LESSONS,
-    assessmentsGenerated: build.assessmentsGenerated,
-    videosQueued: build.videosQueued,
+    mainVideos: EXPECTED_MAIN_VIDEOS,
+    microclips: EXPECTED_MICROCLIPS,
     publishResult,
   });
 }

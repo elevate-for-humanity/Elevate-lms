@@ -184,9 +184,6 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
     mode: 'anonymous',
     reason: 'Route is authenticated; user_id set from session.',
   },
-  { table: 'studio_chat_history', mode: 'anonymous', reason: 'Route is authenticated.' },
-  { table: 'studio_comments', mode: 'anonymous', reason: 'Route is authenticated.' },
-  { table: 'studio_shares', mode: 'anonymous', reason: 'Route is authenticated.' },
   {
     table: 'workflow_enrollments',
     mode: 'anonymous',
@@ -228,46 +225,6 @@ export const PRE_AUTH_TABLES: PreAuthTableConfig[] = [
     table: 'funding_cases',
     mode: 'anonymous',
     reason: 'Written by funding update route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_deploy_tokens',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_favorites',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_pr_tracking',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_recent_files',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_repos',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_sessions',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_settings',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
-  },
-  {
-    table: 'studio_workflow_tracking',
-    mode: 'anonymous',
-    reason: 'Written by authenticated studio route. user_id is set at write time.',
   },
   {
     table: 'tenant_orders',

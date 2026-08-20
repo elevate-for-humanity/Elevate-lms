@@ -1,258 +1,124 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+
+import type { Metadata } from 'next';
 import Image from 'next/image';
-import { blurDataURL } from '@/lib/ui/blur-placeholder';
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Shield, Circle, FileText, Lock, Download, ExternalLink } from 'lucide-react';
+import { ShieldCheck, Database, Accessibility, FileCheck2, LockKeyhole, ArrowRight } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
-export const revalidate = 3600;
 export const metadata: Metadata = {
-  title: `Compliance Documentation | ${PLATFORM_DEFAULTS.orgName} Store`,
-  description: 'Complete compliance documentation for WIOA, FERPA, WCAG, and grant reporting. Enterprise-grade workforce training platform.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/store/compliance',
-  },
+  title: `Compliance Controls & Evidence | ${PLATFORM_DEFAULTS.orgName} Store`,
+  description:
+    'Review implemented workforce reporting, privacy, access-control, accessibility, audit, and credential-verification controls with explicit acceptance boundaries.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/store/compliance' },
 };
 
-export default async function CompliancePage() {
-  const supabase = await createClient();
+const controls = [
+  {
+    icon: Database,
+    title: 'Workforce Reporting Infrastructure',
+    description:
+      'Participant, service, employment-outcome, performance, PIRL mapping/export, and report-run data structures support workforce reporting workflows when source data is recorded.',
+    href: '/store/compliance/wioa',
+    cta: 'Review reporting controls',
+  },
+  {
+    icon: LockKeyhole,
+    title: 'Education Data Access Controls',
+    description:
+      'Authentication, role-based access, tenant scoping, row-level security, consent records, and audit events are used to protect supported learner and program workflows. These controls support FERPA-aligned administration; they are not a blanket legal certification.',
+    href: '/privacy',
+    cta: 'Review privacy practices',
+  },
+  {
+    icon: Accessibility,
+    title: 'Accessibility Program',
+    description:
+      'The platform includes accessibility-focused components and release checks. Conformance must be demonstrated by automated and manual testing against the production experience; this page does not assert an unverified WCAG certification.',
+    href: '/accessibility',
+    cta: 'Review accessibility statement',
+  },
+  {
+    icon: FileCheck2,
+    title: 'Audit & Evidence Records',
+    description:
+      'Applications, enrollments, attendance, apprenticeship hours, learner risk events, interventions, credentials, regulatory evidence, and selected administrative actions can retain auditable records in the canonical database.',
+    href: '/licenses/enterprise-review',
+    cta: 'Open enterprise review',
+  },
+];
 
-  
-  // Fetch compliance documents
-  const { data: documents } = await supabase
-    .from('documents')
-    .select('*')
-    .order('category');
+const boundaries = [
+  'No SOC 2, PCI DSS, HIPAA, GDPR, Section 508, COPPA, or similar certification is represented unless a current attestation or authoritative evidence is available for the exact scope claimed.',
+  'Funding and WIOA statements are program-specific; participant eligibility and authorization remain decisions of the responsible agency.',
+  'Accessibility is treated as a tested release requirement, not as a marketing badge that substitutes for production testing.',
+  'Reporting tools do not make incomplete or inaccurate source data compliant by themselves.',
+  'Security controls must be verified against the deployed application, Supabase policies, and role boundaries before enterprise acceptance.',
+];
+
+export default function CompliancePage() {
   return (
     <div className="min-h-screen bg-white">
-
-      {/* Hero Image */}
-      <section className="relative h-[160px] sm:h-[220px] md:h-[280px] overflow-hidden">
-          <Image
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mP8z8BQDwADhQGAWjR9awAAAABJRU5ErkJggg==" src="/images/pages/admin-compliance-hero.webp" alt="Elevate store" fill sizes="100vw" className="object-cover" priority />
-      </section>
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Compliance" }]} />
-      </div>
-<section className="text-slate-900 py-20">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <Shield className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-5xl font-black mb-6">
-            Enterprise-Grade Compliance
-          </h1>
-          <p className="text-xl text-white max-w-3xl mx-auto">
-            Built for workforce development with WIOA, FERPA, WCAG AA, and grant reporting compliance out of the box.
-          </p>
-        </div>
-      </section>
-
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Compliance Standards</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
-              <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/store-compliance-wioa-detail.webp" alt="WIOA compliance reporting dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-4">WIOA Compliance</h3>
-              <p className="text-slate-900 mb-4">
-                Workforce Innovation and Opportunity Act (WIOA) compliant data collection, reporting, and performance tracking.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Participant intake and eligibility tracking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Performance metrics (employment, wages, credentials)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Quarterly and annual reporting</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
-                  <span>PIRL (Participant Individual Record Layout) export</span>
-                </li>
-              </ul>
-              <Link
-                href="/store/compliance/wioa"
-                className="inline-flex items-center gap-2 text-brand-green-600 font-semibold hover:text-brand-green-700"
-              >
-                View WIOA Documentation
-                <ExternalLink className="w-4 h-4" />
-              </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
-              <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/store-compliance-wcag-hero.jpg" alt="FERPA student data protection dashboard" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-4">FERPA Protection</h3>
-              <p className="text-slate-900 mb-4">
-                Family Educational Rights and Privacy Act (FERPA) compliant student data protection and access controls.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Encrypted data storage (AES-256)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Role-based access control (RBAC)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Audit logging and access tracking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Student consent management</span>
-                </li>
-              </ul>
-              <Link
-                href="/store/compliance/ferpa"
-                className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:text-brand-blue-700"
-              >
-                View FERPA Documentation
-                <ExternalLink className="w-4 h-4" />
-              </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8 text-brand-blue-600" />
-              </div>
-              <h3 className="text-2xl font-bold mb-4">WCAG AA Accessibility</h3>
-              <p className="text-slate-900 mb-4">
-                Web Content Accessibility Guidelines (WCAG) 2.1 Level AA compliant for inclusive learning.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Screen reader compatible</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Keyboard navigation support</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Color contrast compliance</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
-                  <span>Closed captions and transcripts</span>
-                </li>
-              </ul>
-              <Link
-                href="/store/compliance/wcag"
-                className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:text-brand-blue-700"
-              >
-                View WCAG Documentation
-                <ExternalLink className="w-4 h-4" />
-              </Link>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-slate-200">
-              <div className="relative w-full aspect-video" style={{ aspectRatio: '16/10' }}>
-                <Image src="/images/pages/admin-compliance-audit-hero.jpg" alt="Grant reporting and compliance documentation" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" placeholder="empty" />
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-4">Grant Reporting</h3>
-              <p className="text-slate-900 mb-4">
-                Automated reporting for federal and state workforce grants with customizable templates.
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
-                  <span>Automated data collection</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
-                  <span>Custom report templates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
-                  <span>Outcome tracking and metrics</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
-                  <span>Export to Excel, PDF, CSV</span>
-                </li>
-              </ul>
-              <Link
-                href="/store/compliance/grant-reporting"
-                className="inline-flex items-center gap-2 text-brand-orange-600 font-semibold hover:text-brand-orange-700"
-              >
-                View Grant Documentation
-                <ExternalLink className="w-4 h-4" />
-              </Link>
-            </div>
+      <section className="relative h-[220px] overflow-hidden md:h-[300px]">
+        <Image src="/images/pages/admin-compliance-hero.webp" alt="Compliance and audit review" fill sizes="100vw" className="object-cover" priority />
+        <div className="absolute inset-0 bg-slate-950/65" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto w-full max-w-7xl px-4 text-white">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-blue-200">Enterprise review</p>
+            <h1 className="mt-3 max-w-4xl text-4xl font-black md:text-5xl">Compliance Controls &amp; Evidence</h1>
+            <p className="mt-4 max-w-3xl text-lg text-slate-200">Inspect implemented controls, evidence sources, and acceptance boundaries instead of relying on unsupported compliance badges.</p>
           </div>
         </div>
       </section>
 
+      <div className="mx-auto max-w-7xl px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Compliance' }]} />
+      </div>
+
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Additional Compliance</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { title: 'SOC 2 Type II', description: 'Security and availability controls', status: 'In Progress' },
-              { title: 'GDPR Ready', description: 'EU data protection compliance', status: 'Compliant' },
-              { title: 'Section 508', description: 'Federal accessibility standards', status: 'Compliant' },
-              { title: 'COPPA', description: 'Children\'s online privacy protection', status: 'Compliant' },
-              { title: 'PCI DSS', description: 'Payment card data security', status: 'Compliant' },
-              { title: 'HIPAA Ready', description: 'Healthcare data protection', status: 'Available' },
-            ].map((item, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold">{item.title}</h3>
-                  <span className={`px-3 py-2 rounded-full text-xs font-bold ${
-                    item.status === 'Compliant' ? 'bg-brand-green-100 text-brand-green-800' :
-                    item.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-brand-blue-100 text-brand-blue-800'
-                  }`}>
-                    {item.status}
-                  </span>
-                </div>
-                <p className="text-sm text-slate-700">{item.description}</p>
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-12 text-center">
+            <ShieldCheck className="mx-auto h-12 w-12 text-blue-700" />
+            <h2 className="mt-4 text-3xl font-black text-slate-950">Implemented control areas</h2>
+            <p className="mx-auto mt-3 max-w-3xl text-slate-600">Each area below describes a system capability that can be inspected. Legal or certification conclusions depend on the governing requirements and evidence for the specific deployment.</p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {controls.map(({ icon: Icon, title, description, href, cta }) => (
+              <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 p-7">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100"><Icon className="h-6 w-6 text-blue-700" /></div>
+                <h3 className="text-xl font-bold text-slate-950">{title}</h3>
+                <p className="mt-3 leading-relaxed text-slate-600">{description}</p>
+                <Link href={href} className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-700 hover:underline">{cta}<ArrowRight className="h-4 w-4" /></Link>
               </div>
             ))}
           </div>
         </div>
       </section>
 
+      <section className="border-y border-slate-200 bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-4">
+          <h2 className="text-3xl font-black text-slate-950">Acceptance boundaries</h2>
+          <p className="mt-3 text-slate-600">These boundaries prevent a buyer, learner, agency, or administrator from mistaking an implemented control for a certification or guaranteed legal outcome.</p>
+          <ul className="mt-8 space-y-4">
+            {boundaries.map((boundary) => (
+              <li key={boundary} className="flex gap-3 rounded-xl border border-slate-200 bg-white p-5 text-slate-700">
+                <ShieldCheck className="mt-0.5 h-5 w-5 flex-none text-blue-700" />
+                <span>{boundary}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-white rounded-2xl p-12 text-center">
-            <Download className="w-16 h-16 text-brand-blue-600 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold mb-4">Download Complete Documentation</h2>
-            <p className="text-xl text-slate-900 mb-8 max-w-2xl mx-auto">
-              Get the full compliance documentation package including technical specifications, audit reports, and implementation guides.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition">
-                <Download className="w-5 h-5" />
-                Download Documentation (PDF)
-              </button>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-white transition border-2 border-brand-blue-600"
-              >
-                Request Compliance Audit
-              </Link>
-            </div>
+        <div className="mx-auto max-w-5xl px-4 text-center">
+          <h2 className="text-3xl font-black text-slate-950">Review the actual evidence package</h2>
+          <p className="mx-auto mt-4 max-w-3xl text-slate-600">Enterprise acceptance should inspect architecture, access control, data flows, audit records, regulatory evidence, credential integrity, accessibility tests, and production health together.</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link href="/licenses/enterprise-review" className="rounded-xl bg-slate-950 px-8 py-4 font-bold text-white hover:bg-slate-800">Enterprise Review</Link>
+            <Link href="/contact" className="rounded-xl border border-slate-300 px-8 py-4 font-bold text-slate-900 hover:bg-slate-50">Request Evidence Review</Link>
           </div>
         </div>
       </section>

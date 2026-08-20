@@ -15,6 +15,9 @@ const adminLayout = requireFile('apps/admin/app/layout.tsx');
 const adminHeader = requireFile('components/admin/AdminHeader.tsx');
 const dashboard = requireFile('components/admin/dashboard/DashboardShell.tsx');
 const defaultSite = requireFile('lib/tenant/default-site-config.ts');
+const startWorkspaceTrial = requireFile('lib/workspace/start-workspace-trial.ts');
+const trialLifecycle = requireFile('apps/admin/app/api/cron/trial-lifecycle/route.ts');
+const licensingMiddleware = requireFile('lib/licensing/middleware.ts');
 
 for (const forbidden of ['AdminFooter', 'LiveChatWidget']) {
   if (adminLayout.includes(forbidden)) {
@@ -63,9 +66,46 @@ if (!defaultSite.includes('features: []')) {
   failures.push('Website Builder defaults must start with no invented features');
 }
 
+// Platform/workspace trials are canonical in managed_licenses. The white-label
+// licenses table must not regain ownership of the 14-day trial lifecycle.
+if (!startWorkspaceTrial.includes(".from('managed_licenses')")) {
+  failures.push('Workspace trial provisioning must persist a managed_licenses record');
+}
+if (!startWorkspaceTrial.includes('trialEndFromStart')) {
+  failures.push('Workspace trial recovery must derive expiration from the original trial clock');
+}
+if (startWorkspaceTrial.includes('Date.now() + TRIAL_DURATION_DAYS')) {
+  failures.push('Workspace trial recovery must not reset the 14-day clock from the current time');
+}
+if (!startWorkspaceTrial.includes('Failed to provision active trial license')) {
+  failures.push('Workspace trial provisioning must fail closed when licensing cannot be established');
+}
+
+if (!trialLifecycle.includes(".from('managed_licenses')")) {
+  failures.push('Trial lifecycle cron must operate on managed_licenses');
+}
+if (trialLifecycle.includes(".from('licenses')")) {
+  failures.push('Trial lifecycle cron must not expire white-label licenses');
+}
+if (!trialLifecycle.includes("status: 'expired'")) {
+  failures.push('Trial lifecycle cron must persist an explicit expired state');
+}
+
+const managedLicenseIndex = licensingMiddleware.indexOf(".from('managed_licenses')");
+const legacyLicenseIndex = licensingMiddleware.indexOf(".from('licenses')");
+if (managedLicenseIndex < 0) {
+  failures.push('API licensing must resolve managed_licenses as the canonical platform entitlement');
+}
+if (legacyLicenseIndex >= 0 && managedLicenseIndex >= 0 && legacyLicenseIndex < managedLicenseIndex) {
+  failures.push('Legacy licenses fallback must never precede managed_licenses entitlement resolution');
+}
+if (!licensingMiddleware.includes("code = license.tier === 'trial' ? 'TRIAL_EXPIRED'")) {
+  failures.push('API licensing must return an explicit TRIAL_EXPIRED code');
+}
+
 if (failures.length) {
   console.error(failures.map((failure) => `PRODUCTION CONTRACT ERROR: ${failure}`).join('\n'));
   process.exit(1);
 }
 
-console.log('Portal production contracts verified: authenticated Admin has no public widgets, stale proof IDs, or external nav dependencies; Website Builder does not seed fake business claims.');
+console.log('Portal production contracts verified: Admin/public boundaries, Website Builder defaults, and canonical managed-trial licensing are enforced.');

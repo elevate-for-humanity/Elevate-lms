@@ -4,11 +4,25 @@ import { ESTHETICIAN_APPRENTICESHIP } from '@/data/programs/esthetician-apprenti
 import ProgramDetailPage from '@/components/programs/ProgramDetailPage';
 import HeroVideo from '@/components/marketing/HeroVideo';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
-import heroBanners from '@/content/heroBanners';
+import heroBanners, { type HeroBannerConfig } from '@/content/heroBanners';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+const SAFE_HERO_COPY = {
+  microLabel: 'Indiana Esthetics Pathway',
+  belowHeroHeadline: 'Esthetician Apprenticeship Pathway — Indiana',
+  belowHeroSubheadline:
+    'Supervised esthetics education and practice aligned to Indiana’s 700-hour education requirement, with documented progress and licensing preparation.',
+  trustIndicators: [
+    'Indiana 700-hour esthetics education requirement',
+    'Supervised practice',
+    'Licensing preparation',
+  ],
+  transcript:
+    'Explore Elevate’s Indiana esthetician apprenticeship pathway with supervised esthetics education and practice, related instruction, documented progress, and preparation for state licensing requirements.',
+} as const;
 
 export default async function EstheticianApprenticeshipPage() {
   // Supabase remains the publication authority. The exact published slug must
@@ -37,10 +51,6 @@ export default async function EstheticianApprenticeshipPage() {
     fundingOptions: ['self_pay'],
     badge: 'Indiana Esthetics Pathway',
     badgeColor: 'blue',
-    outcomes: ESTHETICIAN_APPRENTICESHIP.outcomes.map((outcome) => ({
-      ...outcome,
-      statement: outcome.statement.replace('Complete 700 hours of supervised spa/salon training', 'Complete the required 700 hours of Indiana esthetics education and supervised practice'),
-    })),
     complianceAlignment: [
       {
         standard: 'Indiana State Board of Cosmetology and Barber Examiners — Esthetics Education',
@@ -48,47 +58,37 @@ export default async function EstheticianApprenticeshipPage() {
           'Indiana publishes a 700-hour minimum education requirement for esthetician applicants. Program completion and licensure remain subject to current state requirements and board review.',
       },
     ],
-    pricingIncludes: [
-      '700 hours of esthetics education and supervised practice',
-      'Related instruction and progress documentation',
-      'Infection-control training',
-      'CPR/First Aid training where included in the current enrollment package',
-      'Licensing preparation',
-    ],
-    paymentTerms:
-      'Review the current published self-pay price and checkout terms before enrollment. Third-party installment availability is determined at checkout.',
-    faqs: [
-      {
-        question: 'How many esthetics education hours does Indiana require?',
-        answer:
-          'Indiana currently publishes a 700-hour minimum education requirement for esthetician applicants. Current licensing requirements should be confirmed with the Indiana Professional Licensing Agency before enrollment and application for licensure.',
-      },
-      {
-        question: 'Is this occupation federally registered in RAPIDS through Elevate?',
-        answer:
-          'Federal Registered Apprenticeship status is not currently published for the esthetician occupation in Elevate’s canonical RAPIDS registry. The page therefore describes an Indiana esthetics apprenticeship pathway without claiming federal registration.',
-      },
-    ],
     metaTitle: 'Esthetician Apprenticeship Pathway | Indiana | Elevate for Humanity',
     metaDescription:
       'Indiana esthetician apprenticeship pathway with supervised training, related instruction, documented progress and preparation for Indiana’s 700-hour esthetics education and licensing requirements.',
   });
 
-  const banner = heroBanners['esthetician-apprenticeship'] ?? null;
+  const rawBanner = heroBanners['esthetician-apprenticeship'] ?? null;
+  const safeBanner: HeroBannerConfig | null = rawBanner
+    ? {
+        ...rawBanner,
+        microLabel: SAFE_HERO_COPY.microLabel,
+        belowHeroHeadline: SAFE_HERO_COPY.belowHeroHeadline,
+        belowHeroSubheadline: SAFE_HERO_COPY.belowHeroSubheadline,
+        trustIndicators: [...SAFE_HERO_COPY.trustIndicators],
+        transcript: SAFE_HERO_COPY.transcript,
+      }
+    : null;
+
   const structuredData = buildBeautyProgramStructuredData(program);
-  const heroOverride = banner?.videoSrcDesktop ? (
+  const heroOverride = safeBanner?.videoSrcDesktop ? (
     <HeroVideo
-      videoSrcDesktop={banner.videoSrcDesktop}
-      videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
-      posterImage={banner.posterImage || program.heroImage}
-      voiceoverSrc={banner.voiceoverSrc}
-      microLabel="Indiana Esthetics Pathway"
-      analyticsName={banner.analyticsName}
-      belowHeroHeadline="Esthetician Apprenticeship Pathway — Indiana"
-      belowHeroSubheadline="Supervised esthetics education and practice aligned to Indiana’s 700-hour education requirement, with documented progress and licensing preparation."
-      ctas={[banner.primaryCta, banner.secondaryCta].filter(Boolean) as any}
-      trustIndicators={['Indiana 700-hour esthetics education requirement', 'Supervised practice', 'Licensing preparation']}
-      transcript="Explore Elevate’s Indiana esthetician apprenticeship pathway with supervised esthetics education and practice, related instruction, documented progress, and preparation for state licensing requirements."
+      videoSrcDesktop={safeBanner.videoSrcDesktop}
+      videoSrcMobile={safeBanner.videoSrcMobile ?? safeBanner.videoSrcDesktop}
+      posterImage={safeBanner.posterImage || program.heroImage}
+      voiceoverSrc={undefined}
+      microLabel={SAFE_HERO_COPY.microLabel}
+      analyticsName={safeBanner.analyticsName}
+      belowHeroHeadline={SAFE_HERO_COPY.belowHeroHeadline}
+      belowHeroSubheadline={SAFE_HERO_COPY.belowHeroSubheadline}
+      ctas={[safeBanner.primaryCta, safeBanner.secondaryCta].filter(Boolean) as any}
+      trustIndicators={[...SAFE_HERO_COPY.trustIndicators]}
+      transcript={SAFE_HERO_COPY.transcript}
     />
   ) : undefined;
 
@@ -98,7 +98,7 @@ export default async function EstheticianApprenticeshipPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
       />
-      <ProgramDetailPage program={program} banner={banner} heroOverride={heroOverride}>
+      <ProgramDetailPage program={program} banner={safeBanner} heroOverride={heroOverride}>
         <BeautyApprenticeshipAuthority program={program} />
       </ProgramDetailPage>
     </>

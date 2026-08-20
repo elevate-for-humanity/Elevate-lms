@@ -30,7 +30,6 @@ function walk(dir, out = []) {
   return out;
 }
 
-// All historical generation/orchestration entry points must delegate to Course Factory.
 const requiredDelegations = [
   ['lib/course-builder/pipeline.ts', "from '@/lib/course-factory'", 'legacy pipeline'],
   ['lib/course-builder/program-auto-course.ts', "from '@/lib/course-factory'", 'program auto-course'],
@@ -46,7 +45,6 @@ for (const [rel, needle, label] of requiredDelegations) {
   assertContains(rel, needle, `${label} must delegate to the canonical Course Factory`);
 }
 
-// Course Builder UI surfaces must not call the retired two-stage draft writer.
 for (const rel of [...walk('components/admin/course-builder'), ...walk('components/course')]) {
   const text = fs.readFileSync(path.join(root, rel), 'utf8');
   if (text.includes('/api/admin/courses/generate')) {
@@ -54,7 +52,6 @@ for (const rel of [...walk('components/admin/course-builder'), ...walk('componen
   }
 }
 
-// Historical Supabase AI creator must remain non-executable.
 const edge = read('supabase/functions/ai-course-create/index.ts');
 if (
   !edge.includes('COURSE_FACTORY_REQUIRED') ||
@@ -65,28 +62,23 @@ if (
   );
 }
 
-// These files legitimately touch all three canonical tables but do NOT own a
-// generation pipeline. Each exception has a narrow role and is reviewed here
-// explicitly so a new full-package writer cannot appear unnoticed.
 const specializedPackageWriters = new Set([
-  // cloning preserves existing course/program content; it does not generate curriculum
   'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
   'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
-  // version rollback restores an immutable prior snapshot
   'lib/course-factory/versioning.ts',
-  // generic/manual entity CRUD and lifecycle services
+  // Runs only after canonical Course Factory persistence. It normalizes
+  // governance metadata, assessments, flashcards, progression rules, and
+  // duration state; it does not generate or own a parallel course package.
+  'lib/course-factory/post-generation-governance.ts',
   'lib/db/courses.ts',
   'lib/lms/course-service.ts',
-  // Studio contains individual manual create/edit operations; its full build delegates above
   'lib/studio/tools.ts',
-  // non-runtime verification/seed utilities
   'scripts/e2e-test.ts',
   'scripts/run-pipeline-e2e.ts',
   'scripts/seed/apprenticeship-courses.mjs',
   'scripts/smoke-test-pipeline.ts',
 ]);
 
-// A newly introduced complete package writer is forbidden by default.
 for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk('supabase/functions')]) {
   const normalized = rel.split(path.sep).join('/');
   if (normalized === 'lib/course-factory/publisher.ts' || specializedPackageWriters.has(normalized)) {

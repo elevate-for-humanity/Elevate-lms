@@ -12,6 +12,8 @@ on:
       - 'lib/course-builder/video-queue.ts'
       - 'lib/video/job-queue.ts'
       - 'supabase/migrations/20260820121500_harden_course_publish_completeness_gate.sql'
+  issues:
+    types: [opened]
 
 permissions:
   contents: read
@@ -30,6 +32,7 @@ env:
 
 jobs:
   build-audit-publish:
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
     timeout-minutes: 75
     concurrency:

@@ -121,7 +121,7 @@ jobs:
         run: pnpm exec tsx scripts/audit-schema-drift.ts --write-baseline scripts/schema-drift-baseline.json
       - name: Verify schema drift regression gate
         run: pnpm exec tsx scripts/audit-schema-drift.ts --baseline scripts/schema-drift-baseline.json --fail-on-new-drift
-      - name: Commit verified patch
+      - name: Commit verified patch to PR branch
         run: |
           git config user.name 'Elevate CI Fix'
           git config user.email 'actions@users.noreply.github.com'
@@ -131,5 +131,4 @@ jobs:
             exit 0
           fi
           git commit -m 'fix(release): clear typecheck hero logger and schema blockers'
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git push origin HEAD:refs/heads/release/green-gates-20260820

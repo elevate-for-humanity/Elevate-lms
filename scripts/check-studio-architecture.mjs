@@ -8,8 +8,11 @@ const exists = (file) => fs.existsSync(path.join(root, file));
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const fail = (message) => failures.push(message);
 
-const forbidden = ['components/studio/StudioShell.tsx'];
-for (const file of forbidden) if (exists(file)) fail(`parallel Studio implementation exists: ${file}`);
+const forbidden = [
+  'components/studio/StudioShell.tsx',
+  'scripts/studio-tables.sql',
+];
+for (const file of forbidden) if (exists(file)) fail(`parallel/obsolete Studio implementation exists: ${file}`);
 
 for (const file of [
   'apps/admin/app/layout.tsx',
@@ -130,10 +133,23 @@ for (const forbiddenWrite of [".from('courses').insert", ".from('course_modules'
 }
 
 const adminAiChat = read('apps/admin/app/api/devstudio/chat/route.ts');
-if (!adminAiChat.includes("await import('@/lib/course-factory')")) fail('Admin AI course save does not delegate to canonical Course Factory');
-if (!adminAiChat.includes('normalizeGeneratedCourseForGovernance')) fail('Admin AI course save does not run post-generation governance');
+if (!adminAiChat.includes("await import('@/lib/course-factory')")) fail('Admin AI does not delegate course creation to canonical Course Factory');
+if (!adminAiChat.includes('normalizeGeneratedCourseForGovernance')) fail('Admin AI course creation does not run post-generation governance');
+if (adminAiChat.includes('intake_submissions')) fail('Admin AI references retired/nonexistent intake_submissions instead of canonical applications');
 for (const forbiddenWrite of [".from('lms_courses').insert", ".from('modules').insert", ".from('curriculum_lessons').insert"]) {
   if (adminAiChat.includes(forbiddenWrite)) fail(`Admin AI reintroduced parallel course persistence: ${forbiddenWrite}`);
+}
+const buildCourseBlock = adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'save_course':/i)?.[1] ?? '';
+for (const invariant of ["await import('@/lib/course-factory')", 'dryRun: false', "__type: 'course_saved'", 'normalizeGeneratedCourseForGovernance']) {
+  if (!buildCourseBlock.includes(invariant)) fail(`build_course is not a one-step governed Course Factory operation: ${invariant}`);
+}
+if (buildCourseBlock.includes('/api/admin/courses/ai-builder/generate')) {
+  fail('build_course regressed to draft-only compatibility endpoint instead of canonical persistence');
+}
+
+const preAuthRegistry = read('lib/pre-auth-tables.ts');
+if (/table:\s*'studio_(?:chat_history|comments|shares|deploy_tokens|favorites|pr_tracking|recent_files|repos|sessions|settings|workflow_tracking)'/.test(preAuthRegistry)) {
+  fail('pre-auth registry contains retired legacy Studio tables');
 }
 
 const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
@@ -169,4 +185,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: conversation-first Admin AI plus ${routes.length} advanced capability surfaces inside the hardened Admin shell; no second AI workspace, public-shell leakage, standalone shell, parallel API routes, or legacy admin/devstudio namespace.`);
+console.log(`Studio architecture verified: conversation-first Admin AI plus ${routes.length} advanced capability surfaces inside the hardened Admin shell; one-step governed course creation, canonical application data, no second AI workspace, no obsolete Studio schema bootstrap, no parallel API routes, and no legacy admin/devstudio namespace.`);

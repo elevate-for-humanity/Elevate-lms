@@ -46,10 +46,6 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const degradedSections: DegradedSection[] = [];
   const now = Date.now();
   const todayIso = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
-  const monthStartDate = new Date();
-  monthStartDate.setDate(1);
-  monthStartDate.setHours(0, 0, 0, 0);
-  const monthStartIso = monthStartDate.toISOString();
 
   const auth = await supabase.auth.getUser();
   const userId = auth.data.user?.id ?? null;
@@ -72,6 +68,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     barberSubsRes,
     cosmetologySubsRes,
     barberPaymentsRes,
+    revenueAllTimeRes,
+    revenueThisMonthRes,
     systemHealth,
   ] = await Promise.all([
     userId ? db.from('profiles').select('full_name,role').eq('id', userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
@@ -91,6 +89,8 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     db.from('barber_subscriptions').select('id,customer_email,customer_name,amount_paid_at_checkout,created_at').gt('amount_paid_at_checkout', 0).order('created_at', { ascending: false }).limit(100),
     db.from('cosmetology_subscriptions').select('id,customer_email,customer_name,amount_paid_at_checkout,created_at').gt('amount_paid_at_checkout', 0).order('created_at', { ascending: false }).limit(100),
     db.from('barber_payments').select('id,amount_paid,payment_date,created_at').gt('amount_paid', 0).order('created_at', { ascending: false }).limit(100),
+    db.rpc('get_revenue_all_time'),
+    db.rpc('get_revenue_this_month'),
     getSystemHealth(db),
   ]);
 
@@ -211,8 +211,11 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   }
   recentPayments.sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime());
 
-  const revenueAllTimeCents = recentPayments.reduce((sum, row) => sum + row.amountCents, 0);
-  const revenueThisMonthCents = recentPayments.filter((row) => row.paidAt >= monthStartIso).reduce((sum, row) => sum + row.amountCents, 0);
+  if (revenueAllTimeRes.error || revenueThisMonthRes.error) {
+    if (!degradedSections.includes('dashboard_data')) degradedSections.push('dashboard_data');
+  }
+  const revenueAllTimeCents = n(revenueAllTimeRes.data);
+  const revenueThisMonthCents = n(revenueThisMonthRes.data);
 
   const complianceAlerts = complianceRows.map((row: any) => ({
     id: row.id,
@@ -305,7 +308,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
   const kpis = [
     { label: 'Pending Applications', value: counts.pendingApplications, delta: 0, deltaLabel: 'Live pending count', href: '/admin/applications', urgent: counts.pendingApplications > 0, sub: `${pendingApplications.filter((row) => row.urgent).length} aged 3+ days` },
     { label: 'Active Enrollments', value: counts.activeEnrollments, delta: 0, deltaLabel: 'Live active count', href: '/admin/students?status=active', urgent: inactiveLearners.length > 0, sub: `${inactiveLearners.length} inactive 7+ days` },
-    { label: 'Revenue This Month', value: revenueThisMonthCents, delta: 0, deltaLabel: 'Tracked payments only', href: '/admin/integrations/stripe', urgent: false, sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time` },
+    { label: 'Revenue This Month', value: revenueThisMonthCents, delta: 0, deltaLabel: 'Database aggregate', href: '/admin/integrations/stripe', urgent: false, sub: `$${(revenueAllTimeCents / 100).toLocaleString('en-US')} tracked all time` },
     { label: 'Certificates Issued', value: counts.certificatesIssued, delta: 0, deltaLabel: 'Live certificate count', href: '/admin/certificates', urgent: false },
     { label: 'Pending Program Holders', value: counts.pendingProgramHolders, delta: 0, deltaLabel: 'Awaiting approval', href: '/admin/program-holders', urgent: counts.pendingProgramHolders > 0 },
     { label: 'Pending Documents', value: counts.pendingDocuments, delta: 0, deltaLabel: 'Awaiting review', href: '/admin/program-holder-documents', urgent: counts.pendingDocuments > 0 },

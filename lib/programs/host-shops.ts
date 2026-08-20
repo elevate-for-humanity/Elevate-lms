@@ -1,7 +1,7 @@
 /**
  * Canonical approved Host Shop loader.
  * Operational approval remains authoritative; public partner profiles only enrich
- * approved records with promotional media, website, map, and verified address data.
+ * approved records with promotional media, website, and source-verified public contact data.
  */
 
 import { requireAdminClient } from '@/lib/supabase/admin';
@@ -109,6 +109,23 @@ function isPubliclyListedHostShop(shop: HostShop): boolean {
   return !shop.name.toLowerCase().includes('prestige');
 }
 
+function approvedAddress(shop: HostShop) {
+  return [shop.address, shop.city, shop.state, shop.zip].filter(Boolean).join(', ');
+}
+
+function approvedMapsUrl(shop: HostShop) {
+  const value = approvedAddress(shop);
+  return value ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${shop.name} ${value}`)}` : undefined;
+}
+
+function approvedDescription(shop: HostShop) {
+  const programNames = shop.programs.map((slug) => PROGRAM_LABELS[slug] ?? slug);
+  const location = [shop.city, shop.state].filter(Boolean).join(', ');
+  const supervisor = shop.supervisor ? ` under approved supervisor ${shop.supervisor}` : '';
+  const pathways = programNames.length === 1 ? programNames[0] : programNames.join(' and ');
+  return `${shop.name} is an approved Elevate Host Site${location ? ` in ${location}` : ''} for ${pathways}${supervisor}. The approved worksite provides supervised work-based learning subject to current apprentice placement capacity.`;
+}
+
 export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]> {
   let db: Awaited<ReturnType<typeof requireAdminClient>>;
   try {
@@ -130,7 +147,7 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
       .order('shop_name'),
     db
       .from('public_host_shops')
-      .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, state, zip, media_gallery, video_url, google_maps_url'),
+      .select('public_slug, display_name, description, logo_url, flyer_url, website_url, website, phone, address_line1, city, state, zip, media_gallery, video_url, source_url'),
   ]);
 
   const barberShops: HostShop[] = (barberRows ?? []).map((shop) => ({
@@ -178,23 +195,23 @@ export async function getApprovedShops(program?: ProgramKey): Promise<HostShop[]
         const nameMatch = businessKey(shop.name) && businessKey(shop.name) === businessKey(row.display_name);
         return Boolean(phoneMatch || addressMatch || nameMatch);
       });
-      if (!profile) return shop;
-      return {
+
+      const sourceVerifiedPublicPhone = profile?.phone && (profile.source_url || profile.website_url || profile.website)
+        ? profile.phone
+        : shop.phone;
+      const enriched: HostShop = {
         ...shop,
-        address: profile.address_line1 || shop.address,
-        city: profile.city || shop.city,
-        state: profile.state || shop.state,
-        zip: profile.zip || shop.zip,
-        phone: profile.phone || shop.phone,
-        publicSlug: profile.public_slug ?? undefined,
-        description: profile.description ?? undefined,
-        website: profile.website_url || profile.website || undefined,
-        googleMapsUrl: profile.google_maps_url ?? undefined,
-        logoUrl: profile.logo_url ?? undefined,
-        flyerUrl: profile.flyer_url ?? undefined,
-        videoUrl: profile.video_url ?? undefined,
-        mediaGallery: parseMedia(profile.media_gallery),
+        phone: sourceVerifiedPublicPhone || shop.phone,
+        publicSlug: profile?.public_slug ?? undefined,
+        description: profile?.description || approvedDescription(shop),
+        website: profile?.website_url || profile?.website || undefined,
+        googleMapsUrl: approvedMapsUrl(shop),
+        logoUrl: profile?.logo_url ?? undefined,
+        flyerUrl: profile?.flyer_url ?? undefined,
+        videoUrl: profile?.video_url ?? undefined,
+        mediaGallery: parseMedia(profile?.media_gallery),
       };
+      return enriched;
     });
 
   if (program) {

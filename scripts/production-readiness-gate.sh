@@ -32,6 +32,7 @@ run "Public route guards" node scripts/guard-public-routes.mjs
 run "Pre-auth registry" node scripts/check-pre-auth-registry.cjs
 run "Canonical portal contracts" node scripts/audit-portal-contracts.mjs
 run "Live/migration schema drift" npx tsx scripts/audit-schema-drift.ts --fail-on-drift
+run "Live portal data integrity" node scripts/audit-portal-data-integrity.mjs
 run "Privileged MFA architecture" node scripts/check-privileged-mfa-config.mjs
 
 if [[ -f scripts/audit-public-html.mjs ]]; then

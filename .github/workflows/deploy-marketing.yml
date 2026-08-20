@@ -185,30 +185,46 @@ jobs:
             health_status=$(curl -sS --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
             version_status=$(curl -sS --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
             home_status=$(curl -sS --max-time 15 -o /tmp/www-home.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
-            page_status=$(curl -sS --max-time 15 -o /tmp/www-page.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
+            barber_status=$(curl -sS --max-time 15 -o /tmp/www-barber.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/barber-apprenticeship?deploy=${EXPECTED_SHA}" || true)
+            esthetics_status=$(curl -sS --max-time 15 -o /tmp/www-esthetics.html -w "%{http_code}" "https://www.elevateforhumanity.org/programs/esthetician-apprenticeship?deploy=${EXPECTED_SHA}" || true)
+            sitemap_status=$(curl -sS --max-time 15 -o /tmp/www-sitemap.xml -w "%{http_code}" "https://www.elevateforhumanity.org/sitemap.xml?deploy=${EXPECTED_SHA}" || true)
             razors_status=$(curl -sS --max-time 15 -o /tmp/razors-image.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/partners/razors-image-storefront.webp?deploy=${EXPECTED_SHA}" || true)
             hero_status=$(curl -sS --max-time 15 -o /tmp/home-hero.webp -w "%{http_code}" "https://www.elevateforhumanity.org/images/heroes/hero-homepage.webp?deploy=${EXPECTED_SHA}" || true)
             LIVE_SHA="$(node -e "try{const d=require('/tmp/www-version.json');process.stdout.write(d.commitSha||d.commit||'')}catch(e){}")"
             razors_bytes=$(wc -c < /tmp/razors-image.webp 2>/dev/null || echo 0)
             hero_bytes=$(wc -c < /tmp/home-hero.webp 2>/dev/null || echo 0)
-            echo "Attempt $i/30: health=$health_status version=$version_status home=$home_status barber=$page_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes live_sha=${LIVE_SHA:-missing}"
+            echo "Attempt $i/30: health=$health_status version=$version_status home=$home_status barber=$barber_status esthetics=$esthetics_status sitemap=$sitemap_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes live_sha=${LIVE_SHA:-missing}"
+
+            html_ok=false
+            if grep -qi '<html' /tmp/www-home.html \
+              && grep -q 'Barber Apprenticeship' /tmp/www-barber.html \
+              && grep -q 'Esthetician Apprenticeship Pathway' /tmp/www-esthetics.html \
+              && grep -q '700-hour' /tmp/www-esthetics.html \
+              && ! grep -q 'Professional Esthetician & Client Services' /tmp/www-esthetics.html \
+              && ! grep -q 'DOL Registered Apprenticeship' /tmp/www-esthetics.html \
+              && grep -q '/programs/esthetician-apprenticeship' /tmp/www-sitemap.xml; then
+              html_ok=true
+            fi
+
             if [ "$health_status" = "200" ] \
               && [ "$version_status" = "200" ] \
               && [ "$home_status" = "200" ] \
-              && [ "$page_status" = "200" ] \
+              && [ "$barber_status" = "200" ] \
+              && [ "$esthetics_status" = "200" ] \
+              && [ "$sitemap_status" = "200" ] \
               && [ "$razors_status" = "200" ] \
               && [ "$hero_status" = "200" ] \
               && [ "$razors_bytes" -gt 1000 ] \
               && [ "$hero_bytes" -gt 1000 ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
-              && grep -q "Career Training, Registered Apprenticeships & Workforce Technology in Indiana" /tmp/www-home.html \
-              && grep -q "Barber Apprenticeship" /tmp/www-page.html; then
-              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with required visual assets"
+              && [ "$html_ok" = "true" ]; then
+              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live, healthy, canonical, and Esthetician content is not mixed with the certificate program"
               exit 0
             fi
             sleep 20
           done
-          echo "::error::DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required visual assets"
+          echo "::error::DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required runtime, canonical, and Esthetician regression checks"
           cat /tmp/www-health.json 2>/dev/null || true
           cat /tmp/www-version.json 2>/dev/null || true
+          grep -Eo '<title>[^<]+' /tmp/www-esthetics.html 2>/dev/null || true
           exit 1

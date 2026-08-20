@@ -1,10 +1,10 @@
 /**
- * /terms - Legacy route redirecting to canonical /legal
+ * /terms - Legacy alias for canonical /terms-of-service
  */
 import { permanentRedirect } from 'next/navigation';
 
 export default function TermsRedirect() {
-  permanentRedirect('/legal');
+  permanentRedirect('/terms-of-service');
 }
 
 export const metadata = {

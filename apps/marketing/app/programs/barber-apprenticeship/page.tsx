@@ -1,48 +1,34 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, BadgeCheck, BookOpen, Building2, Scissors, ShieldCheck } from 'lucide-react';
-import HeroVideo from '@/components/marketing/HeroVideo';
 import HeroPicture from '@/components/marketing/HeroPicture';
 import BeautyTheoryDailyPolicy from '@/components/programs/beauty/BeautyTheoryDailyPolicy';
 import FeaturedHostPartners from '@/components/programs/beauty/FeaturedHostPartners';
 import BarberWorkforceNetworkMap from '@/components/programs/beauty/BarberWorkforceNetworkMap';
 import BeautyApprenticeshipAuthority, { buildBeautyProgramStructuredData } from '@/components/programs/beauty/BeautyApprenticeshipAuthority';
-import heroBanners from '@/content/heroBanners';
 import { loadProgramForPage } from '@/lib/programs/load-program-page';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
+const BARBER_HERO_IMAGE =
+  'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images/images/barber-hero-new.webp';
+
 export default async function BarberApprenticeshipPage() {
   const loaded = await loadProgramForPage('barber-apprenticeship');
   if (!loaded) return notFound();
 
   const program = loaded.program;
-  const banner = heroBanners['barber-apprenticeship'] ?? null;
-  const structuredData = buildBeautyProgramStructuredData(program);
+  const structuredData = buildBeautyProgramStructuredData({
+    ...program,
+    heroImage: BARBER_HERO_IMAGE,
+  });
 
-  const hero = banner?.videoSrcDesktop ? (
-    <HeroVideo
-      videoSrcDesktop={banner.videoSrcDesktop}
-      videoSrcMobile={banner.videoSrcMobile ?? banner.videoSrcDesktop}
-      posterImage={banner.posterImage || program.heroImage}
-      voiceoverSrc={banner.voiceoverSrc}
-      microLabel={banner.microLabel}
-      analyticsName={banner.analyticsName}
-      belowHeroHeadline="Registered Barber Apprenticeship"
-      belowHeroSubheadline="Competency-based registered apprenticeship with verified Related Technical Instruction, supervised host-shop training, digital progress records, and Indiana licensing preparation."
-      ctas={[
-        { label: 'Apply for Barber Apprenticeship', href: program.cta.applyHref },
-        { label: 'Become a Host Shop', href: '/partners/host-shops' },
-      ]}
-      trustIndicators={['DOL Registered Apprenticeship', 'Host-Shop Training', 'Digital OJL / RTI Records']}
-      transcript={banner.transcript}
-    />
-  ) : (
+  const hero = (
     <HeroPicture
-      src={program.heroImage}
-      alt={program.heroImageAlt || 'Barber apprenticeship training'}
+      src={BARBER_HERO_IMAGE}
+      alt="Barber apprentice completing supervised hands-on training in Indiana"
       belowHeroHeadline="Registered Barber Apprenticeship"
       belowHeroSubheadline="Competency-based registered apprenticeship with verified Related Technical Instruction, supervised host-shop training, digital progress records, and Indiana licensing preparation."
       ctas={[
@@ -179,6 +165,12 @@ export async function generateMetadata() {
       description: 'Competency-based registered barber apprenticeship with verified RTI, supervised host-shop training, digital progress records, and Indiana licensing preparation.',
       url: 'https://www.elevateforhumanity.org/programs/barber-apprenticeship',
       type: 'website',
+      images: [
+        {
+          url: BARBER_HERO_IMAGE,
+          alt: 'Barber apprentice completing supervised hands-on training in Indiana',
+        },
+      ],
     },
   };
 }

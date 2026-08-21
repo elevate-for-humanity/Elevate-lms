@@ -48,18 +48,19 @@ def ensure_repo() -> None:
     WAN_REPO.parent.mkdir(parents=True, exist_ok=True)
     if not (WAN_REPO / ".git").exists():
         if WAN_REPO.exists():
-            for child in WAN_REPO.iterdir():
-                if child.is_dir():
-                    import shutil
-                    shutil.rmtree(child)
-                else:
-                    child.unlink()
+            import shutil
+            shutil.rmtree(WAN_REPO)
         run(["git", "clone", "--filter=blob:none", "--no-checkout", WAN_GIT_URL, str(WAN_REPO)])
 
-    current = run(["git", "rev-parse", "HEAD"], cwd=WAN_REPO, capture=True) if (WAN_REPO / "HEAD").exists() else ""
+    current = ""
+    if (WAN_REPO / ".git" / "HEAD").exists():
+        try:
+            current = run(["git", "rev-parse", "HEAD"], cwd=WAN_REPO, capture=True)
+        except subprocess.CalledProcessError:
+            current = ""
     if current != WAN_GIT_REF:
         run(["git", "fetch", "--depth", "1", "origin", WAN_GIT_REF], cwd=WAN_REPO)
-        run(["git", "checkout", "--detach", "FETCH_HEAD"], cwd=WAN_REPO)
+        run(["git", "checkout", "--force", "--detach", "FETCH_HEAD"], cwd=WAN_REPO)
         current = run(["git", "rev-parse", "HEAD"], cwd=WAN_REPO, capture=True)
     if current != WAN_GIT_REF:
         raise RuntimeError(f"Wan revision mismatch: expected {WAN_GIT_REF}, got {current}")

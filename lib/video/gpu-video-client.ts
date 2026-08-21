@@ -1,22 +1,27 @@
 import 'server-only';
 
 import { getSecret } from '@/lib/secrets';
+import type { MediaOperation } from './media-director';
 
 export type GpuVideoProvider = 'wan' | 'ltx';
 
 export interface GpuVideoRequest {
   prompt: string;
   provider?: GpuVideoProvider;
+  operation?: MediaOperation;
   width?: number;
   height?: number;
   durationSeconds?: number;
   seed?: number;
   imageUrl?: string;
+  sourceVideoUrl?: string;
+  negativePrompt?: string;
 }
 
 export interface GpuVideoResult {
   ok: boolean;
   provider: GpuVideoProvider;
+  operation?: MediaOperation;
   jobId: string;
   assetPath: string;
   bytes?: number;
@@ -72,11 +77,14 @@ export async function generateGpuVideo(input: GpuVideoRequest): Promise<GpuVideo
     body: JSON.stringify({
       prompt: input.prompt,
       provider: input.provider || (process.env.GPU_VIDEO_PROVIDER as GpuVideoProvider) || 'wan',
+      operation: input.operation || (input.sourceVideoUrl ? 'videoToVideo' : input.imageUrl ? 'imageToVideo' : 'textToVideo'),
       width: input.width ?? 1280,
       height: input.height ?? 704,
       duration_seconds: input.durationSeconds ?? 5,
       seed: input.seed,
       image_url: input.imageUrl,
+      source_video_url: input.sourceVideoUrl,
+      negative_prompt: input.negativePrompt,
     }),
     cache: 'no-store',
     signal: AbortSignal.timeout(Number(process.env.GPU_VIDEO_REQUEST_TIMEOUT_MS || 1_800_000)),

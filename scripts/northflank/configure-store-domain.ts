@@ -2,7 +2,9 @@
 /**
  * Register/verify store.elevateforhumanity.org with Northflank and assign it to
  * the isolated elevate-store service. If Cloudflare credentials are present,
- * the script also upserts the required CNAME automatically.
+ * the script can also upsert the required CNAME automatically. If DNS is
+ * authoritative elsewhere (for example Durable), the existing CNAME is used
+ * and Northflank verification/assignment still completes.
  */
 import { nfFetch, projectApiPath, resolveProjectId, resolveTeamId } from './lib';
 
@@ -109,18 +111,18 @@ async function upsertCloudflareCname(target: string): Promise<void> {
 }
 
 async function verifyNorthflank(teamId: string): Promise<Subdomain> {
-  for (let attempt = 1; attempt <= 24; attempt += 1) {
+  for (let attempt = 1; attempt <= 36; attempt += 1) {
     try {
       await nfFetch(
         `/teams/${teamId}/domains/${encodeURIComponent(DOMAIN)}/subdomains/@/verify`,
         { method: 'POST', body: JSON.stringify({}) },
       );
     } catch {
-      // Northflank can return a verification error while DNS is propagating.
+      // Northflank can return a verification error while DNS/SSL is propagating.
     }
     const row = await readSubdomain(teamId);
     if (row.verified) return row;
-    console.log(`Waiting for Northflank domain verification (${attempt}/24)...`);
+    console.log(`Waiting for Northflank domain verification (${attempt}/36)...`);
     await new Promise((resolve) => setTimeout(resolve, 10_000));
   }
   throw new Error(`${DOMAIN} did not verify in Northflank after DNS propagation window`);
@@ -180,7 +182,14 @@ async function main() {
   }
 
   if (!subdomain.content) throw new Error(`Northflank did not return a CNAME target for ${DOMAIN}`);
-  await upsertCloudflareCname(subdomain.content);
+
+  if (process.env.CLOUDFLARE_API_TOKEN?.trim()) {
+    await upsertCloudflareCname(subdomain.content);
+  } else {
+    console.log(`Cloudflare credentials not supplied; using existing authoritative DNS for ${DOMAIN}.`);
+    console.log(`Expected CNAME: ${DOMAIN} -> ${subdomain.content}`);
+  }
+
   subdomain = await verifyNorthflank(teamId);
   if (!subdomain.verified) throw new Error(`${DOMAIN} is not verified`);
   await assignDomain(teamId, projectId);

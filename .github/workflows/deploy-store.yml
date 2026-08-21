@@ -108,13 +108,8 @@ jobs:
       - name: Register branded store domain in Northflank and expose CNAME target
         run: pnpm exec tsx scripts/northflank/configure-store-domain.ts
 
-      - name: Wire branded store domain through Cloudflare API when credentials are available
-        if: env.CLOUDFLARE_API_TOKEN != ''
+      - name: Verify and assign branded store domain
         run: pnpm exec tsx scripts/northflank/configure-store-domain.ts --execute
-
-      - name: Record branded-domain credential status
-        if: env.CLOUDFLARE_API_TOKEN == ''
-        run: echo 'Cloudflare API token is not present in GitHub production secrets. Northflank domain registration and CNAME target were still created; publish that CNAME at the authoritative DNS provider, then rerun this workflow.'
 
       - name: Trigger one exact-SHA build
         id: build
@@ -176,10 +171,20 @@ jobs:
           echo "Accepted isolated store runtime at ${RUNTIME_URL}"
 
       - name: Branded store domain acceptance
-        if: env.CLOUDFLARE_API_TOKEN != ''
+        shell: bash
         run: |
-          curl -fsS --max-time 20 https://store.elevateforhumanity.org/api/ping >/dev/null
-          curl -fsS --max-time 30 https://store.elevateforhumanity.org/store >/dev/null
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            if curl -fsS --max-time 20 https://store.elevateforhumanity.org/api/ping >/dev/null 2>&1 \
+              && curl -fsS --max-time 30 https://store.elevateforhumanity.org/store >/dev/null 2>&1; then
+              echo 'Accepted branded store domain https://store.elevateforhumanity.org'
+              exit 0
+            fi
+            echo "Waiting for branded store DNS/SSL (${i}/60)..."
+            sleep 10
+          done
+          echo 'Branded store domain did not become healthy within the acceptance window.' >&2
+          exit 1
 
       - name: Report store acceptance status
         if: always()
@@ -187,7 +192,7 @@ jobs:
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           if [ "${{ job.status }}" = "success" ]; then
             STATE=success
-            DESC="Dedicated store built, deployed, isolated and checkout-guard accepted"
+            DESC="Dedicated store built, deployed, isolated and branded domain accepted"
           else
             STATE=failure
             DESC="Store production acceptance failed; inspect workflow logs"

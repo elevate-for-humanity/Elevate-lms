@@ -94,7 +94,13 @@ function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextRespons
     return NextResponse.redirect(url, 307);
   }
 
-  if (isStoreRuntimeAllowed(pathname)) return null;
+  if (isStoreRuntimeAllowed(pathname)) {
+    // This deployment can be reached through Northflank's generated code.run
+    // host before the branded CNAME is attached. Do not pass an allowed store
+    // route into generic custom-domain tenant resolution: code.run is the store
+    // service host, not a customer website domain.
+    return NextResponse.next();
+  }
 
   // The isolated commerce deployment must not accidentally become a second
   // public copy of the full marketing site. Keep one canonical marketing host

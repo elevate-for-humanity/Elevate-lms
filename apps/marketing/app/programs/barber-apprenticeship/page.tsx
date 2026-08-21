@@ -137,7 +137,7 @@ export default async function BarberApprenticeshipPage() {
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">See the apprenticeship</p>
             <h2 id="barber-visual-story-heading" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Theory, practice, and workplace learning belong together.</h2>
-            <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">On a phone, each stage now reads as a visual story instead of another wall of text.</p>
+            <p className="mt-4 text-base leading-7 text-slate-700 sm:text-lg">More views of classroom instruction, hands-on barbering, and the host-shop experience.</p>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {VISUAL_STORY.map((item) => (
@@ -188,22 +188,10 @@ export default async function BarberApprenticeshipPage() {
 
       <section className="px-4 py-14 sm:py-18">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_1.2fr] lg:items-end">
-            <div className="relative min-h-[240px] overflow-hidden rounded-3xl bg-slate-100 sm:min-h-[320px]">
-              <Image
-                src="/images/pages/shop-hero.webp"
-                alt="Licensed barber shop serving as an apprenticeship host site"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 42vw"
-                loading="lazy"
-              />
-            </div>
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
-              <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
-              <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
-            </div>
+          <div className="mb-8 max-w-3xl">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-red-700 sm:text-sm">Host-shop network</p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Train where the work happens.</h2>
+            <p className="mt-3 text-base leading-7 text-slate-700">Approved host shops provide the supervised work setting. Placement availability is verified during enrollment and is not implied by a public listing.</p>
           </div>
           <FeaturedHostPartners />
           <div className="mt-10"><BarberWorkforceNetworkMap /></div>

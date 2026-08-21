@@ -25,7 +25,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="4.3.0")
+app = FastAPI(title="Elevate GPU Media Worker", version="4.4.0")
 OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
@@ -87,6 +87,16 @@ def _model_state() -> dict:
     }
 
 
+def _provider_ready(state: dict, provider: str) -> bool:
+    if provider == "wan":
+        model_ready = state["wanInstalled"] and state["wanModelReady"] and state["wanVramReady"]
+    elif provider == "ltx":
+        model_ready = state["ltxInstalled"]
+    else:
+        return False
+    return bool(state["cuda"] and state["ffmpeg"] and model_ready)
+
+
 def _assert_public_http_url(value: str) -> None:
     parsed = urlparse(value)
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
@@ -102,7 +112,7 @@ def _download_image(url: str | None, work: Path) -> str | None:
         return None
     _assert_public_http_url(url)
     target = work / "conditioning-image"
-    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.3"})
+    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.4"})
     with urlopen(req, timeout=30) as response, target.open("wb") as out:
         content_type = response.headers.get("content-type", "")
         if not content_type.startswith("image/"):
@@ -179,16 +189,25 @@ def health():
     return {"ok": True, "service": "elevate-media-gpu-worker"}
 
 
+@app.get("/health/ready")
+def health_ready():
+    """Sanitized readiness for the platform load balancer; no diagnostics/secrets."""
+    state = _model_state()
+    provider = os.getenv("GPU_VIDEO_PROVIDER", "wan").lower()
+    return {
+        "ready": _provider_ready(state, provider),
+        "service": "elevate-media-gpu-worker",
+        "provider": provider,
+        "bootstrapState": state.get("bootstrap", {}).get("state", "unknown"),
+    }
+
+
 @app.get("/ready")
 def ready(authorization: str | None = Header(default=None)):
     _authorize(authorization)
     state = _model_state()
     provider = os.getenv("GPU_VIDEO_PROVIDER", "wan").lower()
-    if provider == "wan":
-        model_ready = state["wanInstalled"] and state["wanModelReady"] and state["wanVramReady"]
-    else:
-        model_ready = state["ltxInstalled"]
-    return {"ready": bool(state["cuda"] and state["ffmpeg"] and model_ready), "provider": provider, **state}
+    return {"ready": _provider_ready(state, provider), "provider": provider, **state}
 
 
 @app.post("/v1/video/generate")
@@ -198,12 +217,8 @@ async def generate(req: GenerateRequest, authorization: str | None = Header(defa
     if provider not in {"ltx", "wan"}:
         raise HTTPException(status_code=400, detail="provider must be ltx or wan")
     state = _model_state()
-    if not state["cuda"]:
-        raise HTTPException(status_code=503, detail="CUDA GPU unavailable")
-    if provider == "wan" and not (state["wanInstalled"] and state["wanModelReady"] and state["wanVramReady"]):
-        raise HTTPException(status_code=503, detail="Wan runtime/model/GPU is not ready")
-    if provider == "ltx" and not state["ltxInstalled"]:
-        raise HTTPException(status_code=503, detail="LTX runtime unavailable")
+    if not _provider_ready(state, provider):
+        raise HTTPException(status_code=503, detail=f"{provider} runtime/model/GPU is not ready")
 
     _cleanup_expired_assets()
     job_id = str(uuid.uuid4())

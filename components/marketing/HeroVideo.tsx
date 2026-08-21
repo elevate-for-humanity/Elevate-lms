@@ -4,15 +4,6 @@ import Image from 'next/image';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
-const RETIRED_VIDEO_FILENAMES = new Set(['barber-hero-final.mp4']);
-
-function allowVideoSource(source?: string): string {
-  if (!source) return '';
-  const clean = source.split('#')[0]?.split('?')[0] ?? source;
-  const filename = clean.split('/').pop()?.toLowerCase() ?? '';
-  return RETIRED_VIDEO_FILENAMES.has(filename) ? '' : source;
-}
-
 export interface HeroVideoCta {
   label: string;
   href: string;
@@ -76,10 +67,8 @@ export default function HeroVideo({
   const transcriptId = useId();
 
   const mediaClass = mediaFit === 'contain' ? 'object-contain' : 'object-cover';
-  const safeDesktop = allowVideoSource(videoSrcDesktop);
-  const safeMobile = allowVideoSource(videoSrcMobile);
-  const desktopSource = safeDesktop || safeMobile || '';
-  const mobileSource = safeMobile || safeDesktop || '';
+  const desktopSource = videoSrcDesktop || videoSrcMobile || '';
+  const mobileSource = videoSrcMobile || videoSrcDesktop || '';
   const showVideo = Boolean(desktopSource) && !videoFailed;
 
   useEffect(() => {
@@ -106,9 +95,6 @@ export default function HeroVideo({
     };
   }, []);
 
-  // Voiceover playback is intentionally independent from hero viewport visibility.
-  // Once the user has interacted with the page, narration continues while they
-  // scroll through the content and only stops on explicit user action or unmount.
   useEffect(() => {
     if (!voiceoverSrc || !userActivated || manualAudioOverride) return;
     const audio = audioRef.current;

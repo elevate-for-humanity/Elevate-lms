@@ -9,7 +9,7 @@ export type ProvisionTrialWebsiteParams = {
   organizationId: string;
   organizationName: string;
   subdomain: string;
-  trialEndsAt: string;
+  trialEndsAt?: string | null;
   contactEmail?: string;
   industry?: string;
   websiteMode?: 'new_site' | 'existing_site' | 'api_embed';
@@ -27,7 +27,7 @@ export async function provisionTrialWebsite(
     organizationId,
     organizationName,
     subdomain,
-    trialEndsAt,
+    trialEndsAt = null,
     contactEmail,
     industry,
     websiteMode = 'new_site',

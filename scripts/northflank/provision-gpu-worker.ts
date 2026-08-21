@@ -5,8 +5,10 @@ import { nfFetch, combinedServiceCreatePath, combinedServicePatchPath, projectAp
 
 const SOURCE_PROJECT = process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 const SOURCE_SECRET_GROUP = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
-const GPU_PROJECT = process.env.NORTHFLANK_GPU_PROJECT_ID || 'elevate-gpu';
-const GPU_REGION = process.env.NORTHFLANK_GPU_REGION || 'asia-southeast';
+// Project-scoped Northflank tokens cannot create sibling projects. Keep the GPU
+// worker isolated as its own service + volume inside the existing project unless
+// a broader token explicitly supplies another GPU project.
+const GPU_PROJECT = process.env.NORTHFLANK_GPU_PROJECT_ID || SOURCE_PROJECT;
 const GPU_SERVICE = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-media-gpu-worker';
 const GPU_VOLUME = process.env.NORTHFLANK_GPU_VOLUME_ID || 'elevate-gpu-models';
 const GPU_PLAN = process.env.NORTHFLANK_GPU_DEPLOYMENT_PLAN || 'nf-gpu-a100-80-1g';
@@ -23,7 +25,7 @@ async function exists(path: string) { try { await nfFetch(path); return true; } 
 
 async function ensureProject() {
   if (await exists(`/projects/${GPU_PROJECT}`)) return;
-  await nfFetch('/projects', { method: 'POST', body: JSON.stringify({ name: GPU_PROJECT, description: 'Elevate isolated GPU inference project', color: '#7C3AED', region: GPU_REGION }) });
+  throw new Error(`Northflank project ${GPU_PROJECT} is outside this token scope. Use NORTHFLANK_GPU_PROJECT_ID=${SOURCE_PROJECT} or a team-scoped token.`);
 }
 
 async function sourceRuntimeSecrets(): Promise<Record<string, string>> {
@@ -32,9 +34,7 @@ async function sourceRuntimeSecrets(): Promise<Record<string, string>> {
   const keep = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'HF_TOKEN'];
   const out: Record<string, string> = {};
   for (const key of keep) if (typeof variables[key] === 'string' && variables[key]) out[key] = variables[key];
-  if (!out.NEXT_PUBLIC_SUPABASE_URL || !out.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('GPU worker requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from the production secret group');
-  }
+  if (!out.NEXT_PUBLIC_SUPABASE_URL || !out.SUPABASE_SERVICE_ROLE_KEY) throw new Error('GPU worker requires Supabase URL/service-role credentials from the production secret group');
   return out;
 }
 
@@ -49,8 +49,7 @@ async function ensureVolume() {
 
 function servicePayload(secret: string, sourceSecrets: Record<string, string>) {
   return {
-    name: GPU_SERVICE,
-    description: 'Elevate self-hosted generative video GPU worker',
+    name: GPU_SERVICE, description: 'Elevate self-hosted generative video GPU worker',
     billing: { deploymentPlan: GPU_PLAN, buildPlan: 'nf-compute-200-8', gpu: { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } } },
     infrastructure: { architecture: 'x86' },
     deployment: { instances: 1, docker: { configType: 'default' }, gpu: { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } }, storage: { ephemeralStorage: { storageSize: 65536 }, shmSize: Number(process.env.NORTHFLANK_GPU_SHM_MB || '81920') } },
@@ -59,10 +58,8 @@ function servicePayload(secret: string, sourceSecrets: Record<string, string>) {
     buildSettings: { dockerfile: { buildEngine: 'buildkit', dockerFilePath: DOCKERFILE, dockerWorkDir: '/', buildkit: { useCache: true, cacheStorageSize: 32768 } } },
     buildConfiguration: { isAllowList: true, pathIgnoreRules: ['services/media-gpu-worker/**','lib/video/gpu-video-client.ts','lib/video/process-video-job.ts','scripts/northflank/provision-gpu-worker.ts','.github/workflows/gpu-worker.yml'], ciIgnoreFlagsEnabled: true, ciIgnoreFlags: ['[skip ci]','[ci skip]','[northflank skip]','[skip northflank]'] },
     runtimeEnvironment: {
-      ...sourceSecrets,
-      SERVICE_ROLE: 'gpu-media-worker', GPU_WORKER_SECRET: secret,
-      GPU_VIDEO_PROVIDER: process.env.GPU_VIDEO_PROVIDER || 'wan', GPU_MAX_CONCURRENCY: process.env.GPU_MAX_CONCURRENCY || '1', GPU_JOB_TIMEOUT_SECONDS: process.env.GPU_JOB_TIMEOUT_SECONDS || '1800',
-      GPU_OUTPUT_DIR: '/data/output', MODEL_RUNTIME_ROOT: '/models/runtime', WAN_REPO: '/models/runtime/wan2.2', WAN_VENV: '/models/runtime/wan-venv', WAN_PYTHON: '/models/runtime/wan-venv/bin/python', WAN_CHECKPOINT_DIR: '/models/Wan2.2-TI2V-5B', LTX_REPO: '/models/runtime/ltx-video', HF_HOME: '/models/huggingface', MODEL_BOOTSTRAP_ENABLED: 'true',
+      ...sourceSecrets, SERVICE_ROLE: 'gpu-media-worker', GPU_WORKER_SECRET: secret,
+      GPU_VIDEO_PROVIDER: process.env.GPU_VIDEO_PROVIDER || 'wan', GPU_MAX_CONCURRENCY: process.env.GPU_MAX_CONCURRENCY || '1', GPU_JOB_TIMEOUT_SECONDS: process.env.GPU_JOB_TIMEOUT_SECONDS || '1800', GPU_OUTPUT_DIR: '/data/output', MODEL_RUNTIME_ROOT: '/models/runtime', WAN_REPO: '/models/runtime/wan2.2', WAN_VENV: '/models/runtime/wan-venv', WAN_PYTHON: '/models/runtime/wan-venv/bin/python', WAN_CHECKPOINT_DIR: '/models/Wan2.2-TI2V-5B', LTX_REPO: '/models/runtime/ltx-video', HF_HOME: '/models/huggingface', MODEL_BOOTSTRAP_ENABLED: 'true',
     },
     healthChecks: [
       { protocol: 'HTTP', type: 'startupProbe', path: '/health', port: PORT, initialDelaySeconds: 15, periodSeconds: 15, timeoutSeconds: 5, failureThreshold: 80 },
@@ -108,13 +105,11 @@ async function wireAdmin(url: string, secret: string) {
 async function main() {
   const execute = process.argv.includes('--execute');
   const secret = process.env.GPU_WORKER_SECRET || crypto.randomBytes(32).toString('hex');
-  console.log(`${execute ? 'EXECUTE' : 'DRY RUN'} GPU project=${GPU_PROJECT} region=${GPU_REGION} service=${GPU_SERVICE} plan=${GPU_PLAN} gpu=${GPU_TYPE}x${GPU_COUNT} volumeMB=${MODEL_VOLUME_MB}`);
+  console.log(`${execute ? 'EXECUTE' : 'DRY RUN'} GPU project=${GPU_PROJECT} service=${GPU_SERVICE} plan=${GPU_PLAN} gpu=${GPU_TYPE}x${GPU_COUNT} volumeMB=${MODEL_VOLUME_MB}`);
   if (!execute) return;
-  const sourceSecrets = await sourceRuntimeSecrets();
-  await ensureProject(); await ensureVolume(); await ensureService(secret, sourceSecrets);
+  const sourceSecrets = await sourceRuntimeSecrets(); await ensureProject(); await ensureVolume(); await ensureService(secret, sourceSecrets);
   const url = await waitForUrl(); await wireAdmin(url, secret);
-  console.log(`GPU worker provisioned and Admin wired: ${url}`);
-  console.log('GPU_WORKER_SECRET generated/applied without printing its value.');
+  console.log(`GPU worker provisioned and Admin wired: ${url}`); console.log('GPU_WORKER_SECRET generated/applied without printing its value.');
 }
 
 main().catch((error) => { console.error(error); process.exit(1); });

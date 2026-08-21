@@ -17,6 +17,7 @@ concurrency:
 
 permissions:
   contents: read
+  statuses: write
 
 jobs:
   validate-and-provision:
@@ -38,6 +39,14 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Mark GPU acceptance pending
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d '{"state":"pending","context":"GPU Media Acceptance","description":"Validating and provisioning L4/Wan media worker"}' >/dev/null
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -55,6 +64,9 @@ jobs:
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
 
+      - name: Validate provisioner parses
+        run: pnpm exec tsx scripts/northflank/provision-gpu-media.ts
+
       - name: Typecheck GPU integration
         run: pnpm exec tsc --noEmit --pretty false --project tsconfig.json
 
@@ -66,3 +78,19 @@ jobs:
 
       - name: Provision L4 worker and run real Wan acceptance
         run: pnpm exec tsx scripts/northflank/provision-gpu-media.ts --execute
+
+      - name: Report GPU acceptance status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            STATE=success
+            DESC="L4/Wan worker provisioned and real MP4 acceptance passed"
+          else
+            STATE=failure
+            DESC="GPU worker validation/provisioning failed; inspect workflow logs"
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d "{\"state\":\"${STATE}\",\"context\":\"GPU Media Acceptance\",\"description\":\"${DESC}\"}" >/dev/null

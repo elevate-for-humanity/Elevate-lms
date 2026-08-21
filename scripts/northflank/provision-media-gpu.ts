@@ -6,7 +6,6 @@
  * expensive GPU is isolated in its own project so web workloads remain CPU-only.
  *
  * Required: NORTHFLANK_API_TOKEN (team-scoped token capable of creating projects)
- * Optional overrides are documented below.
  */
 
 import crypto from 'node:crypto';
@@ -28,27 +27,34 @@ const ADMIN_SERVICE_ID = process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-adm
 const REPO = 'https://github.com/elevate-for-humanity/Elevate-lms';
 const DOCKERFILE = '/services/media-gpu-worker/Dockerfile';
 const PORT = 8080;
-const GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE || 'l4';
+const REQUESTED_GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE?.trim() || '';
 const GPU_COUNT = Math.max(1, Number(process.env.NORTHFLANK_GPU_COUNT || '1'));
 const GPU_PLAN = process.env.NORTHFLANK_GPU_COMPUTE_PLAN || 'nf-compute-800-32';
 const BUILD_PLAN = process.env.NORTHFLANK_GPU_BUILD_PLAN || 'nf-compute-800-32';
 const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models';
 const MODEL_VOLUME_MB = Math.max(102400, Number(process.env.NORTHFLANK_GPU_MODEL_VOLUME_MB || '153600'));
+const STORAGE_CLASS = process.env.NORTHFLANK_GPU_STORAGE_CLASS || 'ssd';
 const BRANCH = process.env.NORTHFLANK_GIT_BRANCH || 'main';
 const GPU_SECRET_GROUP = process.env.NORTHFLANK_GPU_SECRET_GROUP_ID || 'elevate-media-gpu-env';
 const ADMIN_GPU_SECRET_GROUP = process.env.NORTHFLANK_ADMIN_GPU_SECRET_GROUP_ID || 'elevate-gpu-client-env';
 
-interface Plan {
-  id?: string;
-  name?: string;
-  gpuResource?: number;
-  gpuType?: string;
-  configuration?: unknown;
-  [key: string]: unknown;
+interface GpuDevice {
+  id: string;
+  name: string;
+  manufacturer: string;
+  memoryInfo?: { sizeInMiB?: number };
+  countOptions?: number[];
+  pricing?: { onDemand?: number };
 }
 
-interface PlanResponse {
-  plans?: Plan[];
+interface Region {
+  id: string;
+  name?: string;
+  gpuDevices?: GpuDevice[];
+}
+
+interface RegionResponse {
+  regions?: Region[];
 }
 
 function gpuSecret(): string {
@@ -62,8 +68,8 @@ function gpuSecret(): string {
     .digest('hex');
 }
 
-function gpuConfig() {
-  return { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } };
+function gpuConfig(gpuType: string) {
+  return { enabled: true, configuration: { gpuType, gpuCount: GPU_COUNT, timesliced: false } };
 }
 
 async function projectExists(projectId: string): Promise<boolean> {
@@ -84,42 +90,71 @@ async function ensureGpuProject(execute: boolean): Promise<void> {
   console.log(`Creating isolated GPU project ${GPU_PROJECT_ID} in ${GPU_REGION}...`);
   await nfFetch('/projects', {
     method: 'POST',
-    body: JSON.stringify({ name: GPU_PROJECT_ID, displayName: GPU_PROJECT_NAME, description: 'Isolated self-hosted Wan/LTX video inference', region: GPU_REGION }),
+    body: JSON.stringify({
+      name: GPU_PROJECT_NAME,
+      description: 'Isolated self-hosted Wan/LTX video inference',
+      color: '#6D28D9',
+      region: GPU_REGION,
+    }),
   });
-}
-
-function containsGpu(plan: Plan): boolean {
-  const text = JSON.stringify(plan).toLowerCase();
-  return text.includes('gpu') || text.includes('l4') || text.includes('a10') || text.includes('a100') || text.includes('h100');
-}
-
-async function verifyGpuEntitlement(execute: boolean): Promise<void> {
-  if (!execute && !(await projectExists(GPU_PROJECT_ID))) return;
-  const response = await nfFetch<PlanResponse>(projectApiPath(GPU_PROJECT_ID, '/plans'));
-  const plans = response.plans ?? [];
-  const gpuPlans = plans.filter(containsGpu);
-  if (!gpuPlans.length) {
-    throw new Error(
-      `Northflank project ${GPU_PROJECT_ID} exposes no GPU plans. GPU entitlement/credit must be enabled on the Northflank account before a billable GPU service can be created.`,
-    );
+  if (!(await projectExists(GPU_PROJECT_ID))) {
+    // Northflank derives the project ID from name. If an account naming policy
+    // produces a different slug, fail rather than provisioning into ambiguity.
+    throw new Error(`Northflank created the GPU project but ${GPU_PROJECT_ID} was not addressable. Set NORTHFLANK_GPU_PROJECT_ID to the returned project id.`);
   }
-  console.log(`GPU entitlement confirmed (${gpuPlans.length} GPU-capable plan record(s)); requested gpuType=${GPU_TYPE}.`);
 }
 
-function servicePayload() {
+async function resolveGpuDevice(): Promise<GpuDevice> {
+  const response = await nfFetch<RegionResponse>('/regions');
+  const region = (response.regions ?? []).find((item) => item.id === GPU_REGION);
+  if (!region) throw new Error(`Northflank region ${GPU_REGION} is unavailable to this account.`);
+  const devices = region.gpuDevices ?? [];
+  if (!devices.length) {
+    throw new Error(`Northflank region ${GPU_REGION} currently advertises no GPU devices.`);
+  }
+
+  let selected: GpuDevice | undefined;
+  if (REQUESTED_GPU_TYPE) {
+    selected = devices.find((device) => device.id === REQUESTED_GPU_TYPE);
+    if (!selected) {
+      throw new Error(`Requested GPU ${REQUESTED_GPU_TYPE} is not available in ${GPU_REGION}. Available: ${devices.map((d) => d.id).join(', ')}`);
+    }
+  } else {
+    selected = devices
+      .filter((device) => device.manufacturer.toLowerCase().includes('nvidia'))
+      .filter((device) => (device.memoryInfo?.sizeInMiB ?? 0) >= 24 * 1024)
+      .filter((device) => (device.countOptions?.length ? device.countOptions.includes(GPU_COUNT) : true))
+      .sort((a, b) => {
+        const aL4 = /\bl4\b/i.test(`${a.id} ${a.name}`) ? 0 : 1;
+        const bL4 = /\bl4\b/i.test(`${b.id} ${b.name}`) ? 0 : 1;
+        return aL4 - bL4 || (a.pricing?.onDemand ?? Number.MAX_SAFE_INTEGER) - (b.pricing?.onDemand ?? Number.MAX_SAFE_INTEGER);
+      })[0];
+  }
+
+  if (!selected) {
+    throw new Error(`No NVIDIA GPU with at least 24 GB VRAM and count=${GPU_COUNT} is available in ${GPU_REGION}.`);
+  }
+  if ((selected.memoryInfo?.sizeInMiB ?? 0) < 24 * 1024) {
+    throw new Error(`GPU ${selected.id} has insufficient VRAM (${selected.memoryInfo?.sizeInMiB ?? 0} MiB); Wan requires a 24 GB class GPU.`);
+  }
+  console.log(`Selected GPU ${selected.name} (${selected.id}), VRAM=${selected.memoryInfo?.sizeInMiB ?? 0}MiB.`);
+  return selected;
+}
+
+function servicePayload(gpuType: string) {
   return {
     name: GPU_SERVICE_ID,
     description: 'Elevate self-hosted Wan/LTX cinematic video worker',
     billing: {
       deploymentPlan: GPU_PLAN,
       buildPlan: BUILD_PLAN,
-      gpu: gpuConfig(),
+      gpu: gpuConfig(gpuType),
     },
     deployment: {
+      type: 'deployment',
       instances: 1,
       docker: { configType: 'default' },
-      gpu: gpuConfig(),
-      strategy: { type: 'recreate' },
+      gpu: gpuConfig(gpuType),
       gracePeriodSeconds: 60,
       storage: {
         shmSize: 8192,
@@ -128,9 +163,8 @@ function servicePayload() {
       volumes: [
         {
           id: MODEL_VOLUME_ID,
-          name: MODEL_VOLUME_ID,
           mounts: [{ containerMountPath: '/models', volumeMountPath: '' }],
-          spec: { storageClassName: 'ssd', storageSize: MODEL_VOLUME_MB },
+          spec: { storageClassName: STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
         },
       ],
     },
@@ -219,11 +253,11 @@ async function serviceExists(): Promise<boolean> {
   }
 }
 
-async function ensureService(execute: boolean): Promise<void> {
-  const payload = servicePayload();
+async function ensureService(execute: boolean, gpuType: string): Promise<void> {
+  const payload = servicePayload(gpuType);
   const exists = await serviceExists();
   if (!execute) {
-    console.log(`[dry-run] ${exists ? 'patch' : 'create'} ${GPU_PROJECT_ID}/${GPU_SERVICE_ID} gpu=${GPU_TYPE}x${GPU_COUNT} volume=${MODEL_VOLUME_MB}MB`);
+    console.log(`[dry-run] ${exists ? 'patch' : 'create'} ${GPU_PROJECT_ID}/${GPU_SERVICE_ID} gpu=${gpuType}x${GPU_COUNT} volume=${MODEL_VOLUME_MB}MB`);
     return;
   }
   if (exists) {
@@ -246,17 +280,20 @@ async function upsertSecretGroup(projectId: string, groupId: string, serviceId: 
   } catch {
     exists = false;
   }
-  if (!exists) {
-    await nfFetch(projectApiPath(projectId, '/secrets'), {
-      method: 'POST',
-      body: JSON.stringify({ name: groupId, description: 'Elevate GPU media runtime credentials', priority: 20, type: 'secret', secretType: 'environment', restrictions, secrets: { variables } }),
-    });
-    return;
-  }
-  await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`), {
-    method: 'POST',
-    body: JSON.stringify({ name: groupId, description: 'Elevate GPU media runtime credentials', priority: 20, type: 'secret', secretType: 'environment', restrictions, secrets: { variables } }),
+  const body = JSON.stringify({
+    name: groupId,
+    description: 'Elevate GPU media runtime credentials',
+    priority: 20,
+    type: 'secret',
+    secretType: 'environment',
+    restrictions,
+    secrets: { variables },
   });
+  if (!exists) {
+    await nfFetch(projectApiPath(projectId, '/secrets'), { method: 'POST', body });
+  } else {
+    await nfFetch(projectApiPath(projectId, `/secrets/${groupId}`), { method: 'POST', body });
+  }
 }
 
 function collectStrings(value: unknown, out: string[]): void {
@@ -303,12 +340,12 @@ async function main() {
   console.log(execute ? '=== PROVISION GPU MEDIA ===' : '=== GPU MEDIA DRY RUN ===');
   console.log(`GPU project: ${GPU_PROJECT_ID} (${GPU_REGION})`);
   console.log(`GPU service: ${GPU_SERVICE_ID}`);
-  console.log(`GPU: ${GPU_TYPE} x${GPU_COUNT}; compute=${GPU_PLAN}; modelVolume=${MODEL_VOLUME_MB}MB`);
-  console.log(`Web project remains unchanged: ${WEB_PROJECT_ID}`);
+  console.log(`Compute=${GPU_PLAN}; modelVolume=${MODEL_VOLUME_MB}MB; storageClass=${STORAGE_CLASS}`);
+  console.log(`Web project remains CPU-only and unchanged: ${WEB_PROJECT_ID}`);
 
+  const selected = await resolveGpuDevice();
   await ensureGpuProject(execute);
-  await verifyGpuEntitlement(execute);
-  await ensureService(execute);
+  await ensureService(execute, selected.id);
   if (!execute) return;
 
   const secret = gpuSecret();
@@ -326,6 +363,7 @@ async function main() {
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `gpu_project_id=${GPU_PROJECT_ID}\n`);
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `gpu_service_id=${GPU_SERVICE_ID}\n`);
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `gpu_worker_url=${endpoint}\n`);
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, `gpu_type=${selected.id}\n`);
   }
 }
 

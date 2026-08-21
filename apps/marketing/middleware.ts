@@ -22,6 +22,22 @@ const ELEVATE_PUBLIC_HOSTS = new Set([
   'testing.elevateforhumanity.org',
 ]);
 
+const STORE_RUNTIME_ALLOWED_PREFIXES = [
+  '/store',
+  '/login',
+  '/signup',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/auth',
+  '/api/store',
+  '/api/webhooks/store',
+  '/api/webhooks/stripe',
+  '/api/auth',
+  '/api/ping',
+  '/api/health',
+] as const;
+
 function isProtectedPortal(pathname: string) {
   return PROTECTED_PORTAL_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
@@ -63,10 +79,37 @@ function isCustomTenantHost(host: string) {
   return true;
 }
 
+function isStoreRuntimeAllowed(pathname: string): boolean {
+  return STORE_RUNTIME_ALLOWED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
+function handleStoreOnlyRuntime(req: NextRequest, pathname: string): NextResponse | null {
+  if (process.env.STORE_ONLY_RUNTIME !== 'true') return null;
+
+  if (pathname === '/') {
+    const url = req.nextUrl.clone();
+    url.pathname = '/store';
+    return NextResponse.redirect(url, 307);
+  }
+
+  if (isStoreRuntimeAllowed(pathname)) return null;
+
+  // The isolated commerce deployment must not accidentally become a second
+  // public copy of the full marketing site. Keep one canonical marketing host
+  // while the store service owns only commerce/auth/checkout surfaces.
+  const canonical = new URL(`https://www.elevateforhumanity.org${pathname}${req.nextUrl.search}`);
+  return NextResponse.redirect(canonical, 307);
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
   if (isStaticRequest(pathname)) return NextResponse.next();
+
+  const storeRuntimeResponse = handleStoreOnlyRuntime(req, pathname);
+  if (storeRuntimeResponse) return storeRuntimeResponse;
 
   const host = requestHost(req);
   const requestHeaders = new Headers(req.headers);

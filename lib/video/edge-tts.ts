@@ -4,13 +4,14 @@
  * Narration priority:
  *   1. Edge TTS (zero-cost public endpoint)
  *   2. ElevenLabs authenticated MP3
- *   3. Gemini authenticated WAV
+ *   3. Gemini authenticated TTS, transcoded to MP3
  *   4. OpenAI authenticated MP3
  *
  * Edge TTS can reject datacenter traffic with HTTP 403. Production therefore
  * never depends on that public endpoint as the sole narration provider.
  */
 
+import { spawn } from 'node:child_process';
 import { tts } from 'edge-tts';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/ai/openai-client';
 import { logger } from '@/lib/logger';
@@ -40,24 +41,29 @@ const OPENAI_VOICE_MAP: Record<EdgeTTSVoice, 'alloy' | 'echo' | 'fable' | 'onyx'
   'en-US-DavisNeural': 'echo',
 };
 
-function pcm16MonoToWav(pcm: Buffer, sampleRate = 24000): Buffer {
-  const header = Buffer.alloc(44);
-  const dataLength = pcm.length;
-  const byteRate = sampleRate * 2;
-  header.write('RIFF', 0);
-  header.writeUInt32LE(36 + dataLength, 4);
-  header.write('WAVE', 8);
-  header.write('fmt ', 12);
-  header.writeUInt32LE(16, 16);
-  header.writeUInt16LE(1, 20);
-  header.writeUInt16LE(1, 22);
-  header.writeUInt32LE(sampleRate, 24);
-  header.writeUInt32LE(byteRate, 28);
-  header.writeUInt16LE(2, 32);
-  header.writeUInt16LE(16, 34);
-  header.write('data', 36);
-  header.writeUInt32LE(dataLength, 40);
-  return Buffer.concat([header, pcm]);
+async function pcm16MonoToMp3(pcm: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn('ffmpeg', [
+      '-hide_banner', '-loglevel', 'error',
+      '-f', 's16le', '-ar', '24000', '-ac', '1', '-i', 'pipe:0',
+      '-codec:a', 'libmp3lame', '-b:a', '128k', '-f', 'mp3', 'pipe:1',
+    ]);
+    const output: Buffer[] = [];
+    const errors: Buffer[] = [];
+    ffmpeg.stdout.on('data', (chunk: Buffer) => output.push(chunk));
+    ffmpeg.stderr.on('data', (chunk: Buffer) => errors.push(chunk));
+    ffmpeg.on('error', reject);
+    ffmpeg.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`ffmpeg narration transcode failed (${code}): ${Buffer.concat(errors).toString('utf8').slice(0, 500)}`));
+        return;
+      }
+      const result = Buffer.concat(output);
+      if (!result.length) reject(new Error('ffmpeg narration transcode returned empty MP3'));
+      else resolve(result);
+    });
+    ffmpeg.stdin.end(pcm);
+  });
 }
 
 async function generateGeminiNarration(text: string): Promise<Buffer> {
@@ -74,9 +80,7 @@ async function generateGeminiNarration(text: string): Promise<Buffer> {
         contents: [{ parts: [{ text }] }],
         generationConfig: {
           responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName } },
-          },
+          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
         },
       }),
     },
@@ -88,7 +92,7 @@ async function generateGeminiNarration(text: string): Promise<Buffer> {
   const json = await response.json();
   const encoded = json?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
   if (typeof encoded !== 'string' || !encoded) throw new Error('Gemini TTS returned no audio data');
-  return pcm16MonoToWav(Buffer.from(encoded, 'base64'));
+  return pcm16MonoToMp3(Buffer.from(encoded, 'base64'));
 }
 
 async function generateElevenLabsNarration(text: string): Promise<Buffer> {
@@ -100,10 +104,7 @@ async function generateElevenLabsNarration(text: string): Promise<Buffer> {
     {
       method: 'POST',
       headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
-      body: JSON.stringify({
-        text,
-        model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_multilingual_v2',
-      }),
+      body: JSON.stringify({ text, model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_multilingual_v2' }),
     },
   );
   if (!response.ok) {
@@ -119,20 +120,14 @@ async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promi
   const mappedVoice = OPENAI_VOICE_MAP[voice] ?? 'alloy';
   try {
     const response = await openai.audio.speech.create({
-      model: 'gpt-4o-mini-tts',
-      voice: mappedVoice,
-      input: text,
+      model: 'gpt-4o-mini-tts', voice: mappedVoice, input: text,
       instructions: 'Speak as a clear, professional workforce instructor. Use a natural teaching pace, warm confidence, and precise pronunciation.',
       response_format: 'mp3',
     });
     return Buffer.from(await response.arrayBuffer());
   } catch (primaryError) {
-    logger.warn('[Narration] gpt-4o-mini-tts failed; trying tts-1-hd', {
-      error: primaryError instanceof Error ? primaryError.message : String(primaryError),
-    });
-    const response = await openai.audio.speech.create({
-      model: 'tts-1-hd', voice: mappedVoice, input: text, response_format: 'mp3',
-    });
+    logger.warn('[Narration] gpt-4o-mini-tts failed; trying tts-1-hd', { error: primaryError instanceof Error ? primaryError.message : String(primaryError) });
+    const response = await openai.audio.speech.create({ model: 'tts-1-hd', voice: mappedVoice, input: text, response_format: 'mp3' });
     return Buffer.from(await response.arrayBuffer());
   }
 }
@@ -146,27 +141,21 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     const audio = await tts(normalizedText, { voice, rate, pitch, volume });
     return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
   } catch (edgeError) {
-    logger.warn('[Narration] Edge TTS unavailable; trying authenticated providers', {
-      error: edgeError instanceof Error ? edgeError.message : String(edgeError),
-    });
+    logger.warn('[Narration] Edge TTS unavailable; trying authenticated providers', { error: edgeError instanceof Error ? edgeError.message : String(edgeError) });
   }
 
   if (process.env.ELEVENLABS_API_KEY?.trim()) {
     try { return await generateElevenLabsNarration(normalizedText); }
     catch (error) { logger.warn('[Narration] ElevenLabs unavailable; trying Gemini', { error: error instanceof Error ? error.message : String(error) }); }
   }
-
   if (process.env.GEMINI_API_KEY?.trim()) {
     try { return await generateGeminiNarration(normalizedText); }
     catch (error) { logger.warn('[Narration] Gemini TTS unavailable; trying OpenAI', { error: error instanceof Error ? error.message : String(error) }); }
   }
-
   return generateOpenAINarration(normalizedText, voice);
 }
 
-export function buildLessonScript(lesson: {
-  title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string;
-}): string {
+export function buildLessonScript(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): string {
   const { title, moduleTitle, objective, keyPoints, example, summary } = lesson;
   return `
 Welcome to ${moduleTitle}.
@@ -189,9 +178,7 @@ Take a moment to review what you've learned, then complete the knowledge check t
 `.trim();
 }
 
-export function buildSegmentScripts(lesson: {
-  title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string;
-}): [string, string, string, string, string] {
+export function buildSegmentScripts(lesson: { title: string; moduleTitle: string; objective: string; keyPoints: string[]; example: string; summary: string }): [string, string, string, string, string] {
   const { title, moduleTitle, objective, keyPoints, example, summary } = lesson;
   return [
     `Welcome to ${moduleTitle}. In this lesson, we'll explore: ${title}. By the end, you will be able to: ${objective}`,

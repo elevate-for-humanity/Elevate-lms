@@ -105,13 +105,16 @@ jobs:
         id: runtime
         run: pnpm exec tsx scripts/northflank/resolve-store-runtime-url.ts
 
-      - name: Wire branded store domain when Cloudflare credentials are available
+      - name: Register branded store domain in Northflank and expose CNAME target
+        run: pnpm exec tsx scripts/northflank/configure-store-domain.ts
+
+      - name: Wire branded store domain through Cloudflare API when credentials are available
         if: env.CLOUDFLARE_API_TOKEN != ''
         run: pnpm exec tsx scripts/northflank/configure-store-domain.ts --execute
 
       - name: Record branded-domain credential status
         if: env.CLOUDFLARE_API_TOKEN == ''
-        run: echo 'Cloudflare API token is not present in GitHub production secrets; accepting the isolated Northflank runtime URL while leaving branded DNS unchanged.'
+        run: echo 'Cloudflare API token is not present in GitHub production secrets. Northflank domain registration and CNAME target were still created; publish that CNAME at the authoritative DNS provider, then rerun this workflow.'
 
       - name: Trigger one exact-SHA build
         id: build

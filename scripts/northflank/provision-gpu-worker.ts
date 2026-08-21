@@ -5,9 +5,6 @@ import { nfFetch, combinedServiceCreatePath, combinedServicePatchPath, projectAp
 
 const SOURCE_PROJECT = process.env.NORTHFLANK_PROJECT_ID || 'elevate-platform';
 const SOURCE_SECRET_GROUP = process.env.NORTHFLANK_SECRET_GROUP_ID || 'elevate-production-env';
-// Project-scoped Northflank tokens cannot create sibling projects. Keep the GPU
-// worker isolated as its own service + volume inside the existing project unless
-// a broader token explicitly supplies another GPU project.
 const GPU_PROJECT = process.env.NORTHFLANK_GPU_PROJECT_ID || SOURCE_PROJECT;
 const GPU_SERVICE = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-media-gpu-worker';
 const GPU_VOLUME = process.env.NORTHFLANK_GPU_VOLUME_ID || 'elevate-gpu-models';
@@ -22,11 +19,7 @@ const DOCKERFILE = '/services/media-gpu-worker/Dockerfile';
 const PORT = 8080;
 
 async function exists(path: string) { try { await nfFetch(path); return true; } catch { return false; } }
-
-async function ensureProject() {
-  if (await exists(`/projects/${GPU_PROJECT}`)) return;
-  throw new Error(`Northflank project ${GPU_PROJECT} is outside this token scope. Use NORTHFLANK_GPU_PROJECT_ID=${SOURCE_PROJECT} or a team-scoped token.`);
-}
+async function ensureProject() { if (await exists(`/projects/${GPU_PROJECT}`)) return; throw new Error(`Northflank project ${GPU_PROJECT} is outside this token scope.`); }
 
 async function sourceRuntimeSecrets(): Promise<Record<string, string>> {
   const group = await nfFetch<any>(projectApiPath(SOURCE_PROJECT, `/secrets/${SOURCE_SECRET_GROUP}`));
@@ -44,23 +37,20 @@ async function ensureVolume() {
     await nfFetch(path, { method: 'POST', body: JSON.stringify({ mounts: [{ volumeMountPath: '', containerMountPath: '/models' }], spec: { storageSize: MODEL_VOLUME_MB } }) });
     return;
   }
-  await nfFetch(projectApiPath(GPU_PROJECT, '/volumes'), { method: 'POST', body: JSON.stringify({ name: GPU_VOLUME, mounts: [{ volumeMountPath: '', containerMountPath: '/models' }], spec: { storageClassName: 'ssd', storageSize: MODEL_VOLUME_MB } }) });
+  await nfFetch(projectApiPath(GPU_PROJECT, '/volumes'), { method: 'POST', body: JSON.stringify({ name: GPU_VOLUME, mounts: [{ volumeMountPath: '', containerMountPath: '/models' }], spec: { storageClassName: 'nf-multi-rw', storageSize: MODEL_VOLUME_MB } }) });
 }
 
 function servicePayload(secret: string, sourceSecrets: Record<string, string>) {
   return {
     name: GPU_SERVICE, description: 'Elevate self-hosted generative video GPU worker',
-    billing: { deploymentPlan: GPU_PLAN, buildPlan: 'nf-compute-200-8', gpu: { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } } },
+    billing: { deploymentPlan: GPU_PLAN, buildPlan: 'nf-compute-800-8', gpu: { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } } },
     infrastructure: { architecture: 'x86' },
     deployment: { instances: 1, docker: { configType: 'default' }, gpu: { enabled: true, configuration: { gpuType: GPU_TYPE, gpuCount: GPU_COUNT, timesliced: false } }, storage: { ephemeralStorage: { storageSize: 65536 }, shmSize: Number(process.env.NORTHFLANK_GPU_SHM_MB || '81920') } },
     ports: [{ name: 'gpu', internalPort: PORT, public: true, protocol: 'HTTP' }],
     buildSource: 'git', vcsData: { projectUrl: REPO, projectType: 'github', projectBranch: BRANCH }, disabledCI: true,
     buildSettings: { dockerfile: { buildEngine: 'buildkit', dockerFilePath: DOCKERFILE, dockerWorkDir: '/', buildkit: { useCache: true, cacheStorageSize: 32768 } } },
     buildConfiguration: { isAllowList: true, pathIgnoreRules: ['services/media-gpu-worker/**','lib/video/gpu-video-client.ts','lib/video/process-video-job.ts','scripts/northflank/provision-gpu-worker.ts','.github/workflows/gpu-worker.yml'], ciIgnoreFlagsEnabled: true, ciIgnoreFlags: ['[skip ci]','[ci skip]','[northflank skip]','[skip northflank]'] },
-    runtimeEnvironment: {
-      ...sourceSecrets, SERVICE_ROLE: 'gpu-media-worker', GPU_WORKER_SECRET: secret,
-      GPU_VIDEO_PROVIDER: process.env.GPU_VIDEO_PROVIDER || 'wan', GPU_MAX_CONCURRENCY: process.env.GPU_MAX_CONCURRENCY || '1', GPU_JOB_TIMEOUT_SECONDS: process.env.GPU_JOB_TIMEOUT_SECONDS || '1800', GPU_OUTPUT_DIR: '/data/output', MODEL_RUNTIME_ROOT: '/models/runtime', WAN_REPO: '/models/runtime/wan2.2', WAN_VENV: '/models/runtime/wan-venv', WAN_PYTHON: '/models/runtime/wan-venv/bin/python', WAN_CHECKPOINT_DIR: '/models/Wan2.2-TI2V-5B', LTX_REPO: '/models/runtime/ltx-video', HF_HOME: '/models/huggingface', MODEL_BOOTSTRAP_ENABLED: 'true',
-    },
+    runtimeEnvironment: { ...sourceSecrets, SERVICE_ROLE: 'gpu-media-worker', GPU_WORKER_SECRET: secret, GPU_VIDEO_PROVIDER: process.env.GPU_VIDEO_PROVIDER || 'wan', GPU_MAX_CONCURRENCY: process.env.GPU_MAX_CONCURRENCY || '1', GPU_JOB_TIMEOUT_SECONDS: process.env.GPU_JOB_TIMEOUT_SECONDS || '1800', GPU_OUTPUT_DIR: '/data/output', MODEL_RUNTIME_ROOT: '/models/runtime', WAN_REPO: '/models/runtime/wan2.2', WAN_VENV: '/models/runtime/wan-venv', WAN_PYTHON: '/models/runtime/wan-venv/bin/python', WAN_CHECKPOINT_DIR: '/models/Wan2.2-TI2V-5B', LTX_REPO: '/models/runtime/ltx-video', HF_HOME: '/models/huggingface', MODEL_BOOTSTRAP_ENABLED: 'true' },
     healthChecks: [
       { protocol: 'HTTP', type: 'startupProbe', path: '/health', port: PORT, initialDelaySeconds: 15, periodSeconds: 15, timeoutSeconds: 5, failureThreshold: 80 },
       { protocol: 'HTTP', type: 'readinessProbe', path: '/ready', port: PORT, initialDelaySeconds: 30, periodSeconds: 20, timeoutSeconds: 5, failureThreshold: 120, successThreshold: 1 },

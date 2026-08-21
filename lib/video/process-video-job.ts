@@ -11,6 +11,8 @@ import {
   gpuVideoAvailable,
 } from './gpu-video-client';
 import { markComplete, markFailed, type VideoJob } from './job-queue';
+import { directMedia, scenePrompt, type MediaCharacterReference } from './media-director';
+import { recordMediaProvenance } from './media-provenance';
 import { inferDomainKey, renderLessonVideo } from './remotion-render';
 import { uploadLessonMediaBuffer } from './upload-lesson-media';
 
@@ -35,6 +37,20 @@ async function hydrateMediaRuntimeSecrets(): Promise<void> {
 
 function safeAssetKey(value: string): string {
   return value.replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80) || 'clip';
+}
+
+function mediaCharacters(sceneData: Record<string, unknown>): MediaCharacterReference[] {
+  if (!Array.isArray(sceneData.characters)) return [];
+  return sceneData.characters
+    .filter((value): value is Record<string, unknown> => Boolean(value && typeof value === 'object'))
+    .map((value, index) => ({
+      id: typeof value.id === 'string' && value.id ? value.id : `character-${index + 1}`,
+      name: typeof value.name === 'string' ? value.name : undefined,
+      referenceImageUrl: typeof value.reference_image_url === 'string' ? value.reference_image_url : undefined,
+      appearancePrompt: typeof value.appearance_prompt === 'string' ? value.appearance_prompt : undefined,
+      voiceId: typeof value.voice_id === 'string' ? value.voice_id : undefined,
+      consentRecordId: typeof value.consent_record_id === 'string' ? value.consent_record_id : undefined,
+    }));
 }
 
 /** Render one already-claimed video job using local generative scenes when available, with Remotion as the zero-failure fallback. */
@@ -62,22 +78,36 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   const sceneData = job.scene_data && typeof job.scene_data === 'object' ? (job.scene_data as Record<string, unknown>) : {};
   const isMicroclip = job.asset_kind === 'microclip';
   const renderId = isMicroclip ? `${job.lesson_id}-${safeAssetKey(job.asset_key ?? job.id)}` : job.lesson_id;
+  const characters = mediaCharacters(sceneData);
+  const storyboard = directMedia({
+    title: job.lesson_title,
+    objective: bulletPoints[0] ?? job.lesson_title,
+    script,
+    sceneData,
+    characters,
+    defaultDurationSeconds: 5,
+  });
 
   try {
-    // Microclips are the cinematic insert layer. Prefer self-hosted Wan/LTX, but
-    // never make learner-critical media dependent on GPU capacity. The GPU
-    // service is intentionally not trusted with storage credentials: Admin
-    // downloads the generated MP4, persists it through canonical course media
-    // storage, then deletes the GPU worker's temporary asset.
+    // Cinematic inserts are now directed through a canonical storyboard. This
+    // makes camera, continuity, reference media, operation type, and provenance
+    // explicit instead of hiding them inside a single free-form prompt.
     if (isMicroclip && (await gpuVideoAvailable())) {
-      const visualPrompt = typeof sceneData.visual_prompt === 'string' ? sceneData.visual_prompt : script;
-      const requestedDuration = Math.min(15, Math.max(3, Number(sceneData.duration_seconds) || 5));
+      const scene = storyboard.scenes[0];
+      const requestedDuration = Math.min(15, Math.max(1, scene.durationSeconds));
       const gpuStartedAt = Date.now();
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
       try {
         generated = await generateGpuVideo({
-          prompt: visualPrompt,
+          prompt: scenePrompt(scene, storyboard.characters),
+          operation: scene.operation,
+          width: storyboard.width,
+          height: storyboard.height,
           durationSeconds: requestedDuration,
+          seed: scene.seed,
+          imageUrl: scene.referenceImageUrl,
+          sourceVideoUrl: scene.sourceVideoUrl,
+          negativePrompt: scene.negativePrompt,
         });
         if (generated) {
           const buffer = await downloadGpuVideoAsset(generated);
@@ -95,7 +125,14 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'attempt',
                 externalRef: job.id,
                 idempotencyKey: `gpu-attempt:${job.id}:success`,
-                metadata: { provider: generated.provider, success: true, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: {
+                  provider: generated.provider,
+                  operation: scene.operation,
+                  success: true,
+                  course_id: job.course_id,
+                  lesson_id: job.lesson_id,
+                  storyboard_hash: storyboard.promptHash,
+                },
               }),
               recordPlatformUsage(db, {
                 tenantId,
@@ -105,7 +142,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'second',
                 externalRef: job.id,
                 idempotencyKey: `gpu-video-seconds:${job.id}`,
-                metadata: { provider: generated.provider, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: { provider: generated.provider, operation: scene.operation, course_id: job.course_id, lesson_id: job.lesson_id },
               }),
               recordPlatformUsage(db, {
                 tenantId,
@@ -115,7 +152,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'second',
                 externalRef: job.id,
                 idempotencyKey: `gpu-render-seconds:${job.id}`,
-                metadata: { provider: generated.provider, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: { provider: generated.provider, operation: scene.operation, course_id: job.course_id, lesson_id: job.lesson_id },
               }),
               recordPlatformUsage(db, {
                 tenantId,
@@ -125,11 +162,27 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
                 unit: 'byte',
                 externalRef: job.id,
                 idempotencyKey: `gpu-output-bytes:${job.id}`,
-                metadata: { provider: generated.provider, course_id: job.course_id, lesson_id: job.lesson_id },
+                metadata: { provider: generated.provider, operation: scene.operation, course_id: job.course_id, lesson_id: job.lesson_id },
+              }),
+              recordMediaProvenance(db, {
+                tenantId,
+                courseId: job.course_id,
+                lessonId: job.lesson_id,
+                videoJobId: job.id,
+                storyboard,
+                scene,
+                provider: generated.provider,
+                model: generated.provider === 'wan' ? 'Wan2.2-TI2V-5B' : 'LTX-Video',
+                operation: scene.operation,
+                referenceUrls: [scene.referenceImageUrl, scene.sourceVideoUrl].filter((value): value is string => Boolean(value)),
+                likenessConsentRecordIds: storyboard.characters.map((character) => character.consentRecordId).filter((value): value is string => Boolean(value)),
+                moderationDecision: 'approved',
+                generatedAssetUrl: videoUrl,
+                generatedBytes: buffer.length,
               }),
             ]);
           } catch (meterError) {
-            logger.error('[video-worker] GPU output succeeded but usage metering failed', meterError, {
+            logger.error('[video-worker] GPU output succeeded but usage/provenance recording failed', meterError, {
               jobId: job.id,
               tenantId,
             });
@@ -153,6 +206,8 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
             idempotencyKey: `gpu-attempt:${job.id}:failed`,
             metadata: {
               success: false,
+              operation: scene.operation,
+              storyboard_hash: storyboard.promptHash,
               course_id: job.course_id,
               lesson_id: job.lesson_id,
               elapsed_seconds: Math.max(0, (Date.now() - gpuStartedAt) / 1000),
@@ -167,6 +222,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
         }
         logger.warn('[video-worker] GPU scene failed; falling back to Remotion', {
           jobId: job.id,
+          operation: scene.operation,
           error: gpuError instanceof Error ? gpuError.message : String(gpuError),
         });
       } finally {
@@ -174,6 +230,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       }
     }
 
+    const primaryScene = storyboard.scenes[0];
     const result = await renderLessonVideo({
       lessonId: renderId,
       title: job.lesson_title,
@@ -190,7 +247,7 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
       domainKey: inferDomainKey(courseTitle, job.lesson_title),
       instructorId: instructor.id,
       courseName: courseTitle,
-      visualPrompt: typeof sceneData.visual_prompt === 'string' ? sceneData.visual_prompt : undefined,
+      visualPrompt: scenePrompt(primaryScene, storyboard.characters),
     });
     if (!result.success || !result.videoUrl) {
       await markFailed(job.id, result.error ?? 'Render returned no playable video URL');

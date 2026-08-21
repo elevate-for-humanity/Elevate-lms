@@ -2,6 +2,8 @@ import 'server-only';
 
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { enqueueJob } from '@/lib/jobs/queue';
+import { normalizeWorkspaceTier } from '@/lib/workspace/tier-limits';
 import { executeWorkflow } from '@/lib/workflows/engine';
 import { getOrganizationFeatures } from '@/lib/platform/organization-features';
 import { emitPlatformEvent, PlatformEventType } from '@/lib/platform/orchestration/events';
@@ -143,6 +145,76 @@ async function hydrateEventContext(
   return base;
 }
 
+async function ensurePlatformWorkspaceProvisioned(
+  db: Awaited<ReturnType<typeof requireAdminClient>>,
+  event: PlatformEventRow,
+  payload: Record<string, unknown>,
+): Promise<boolean> {
+  const tenantId = event.subject_id || event.tenant_id;
+  if (!tenantId) throw new Error('Platform workspace provisioning requires a tenant');
+
+  const { data: workspace, error: workspaceError } = await db
+    .from('customer_workspaces')
+    .select('id,tenant_id,organization_id,slug,status,template_slug,workspace_url')
+    .eq('tenant_id', tenantId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (workspaceError) throw workspaceError;
+  if (!workspace?.id || !workspace.organization_id || !workspace.slug) {
+    throw new Error(`Cannot provision tenant ${tenantId}: canonical customer workspace is missing`);
+  }
+
+  const planSlug = String(payload.plan_slug ?? payload.plan ?? 'professional');
+  const subscriptionTier = normalizeWorkspaceTier(planSlug);
+  const now = new Date().toISOString();
+  const { error: updateError } = await db
+    .from('customer_workspaces')
+    .update({
+      subscription_tier: subscriptionTier,
+      trial_ends_at: null,
+      provision_error: null,
+      updated_at: now,
+    } as Record<string, unknown>)
+    .eq('id', workspace.id);
+  if (updateError) throw updateError;
+
+  const { data: website, error: websiteError } = await db
+    .from('user_websites')
+    .select('id,is_published')
+    .eq('organization_id', workspace.organization_id)
+    .maybeSingle();
+  if (websiteError) throw websiteError;
+
+  const ready = workspace.status === 'active' && Boolean(website?.id) && website?.is_published !== false;
+  if (ready) return true;
+
+  await enqueueJob({
+    jobType: 'workspace_provision',
+    correlationId: `platform-workspace:${workspace.id}`,
+    stripeEventId: event.id,
+    tenantId,
+    payload: {
+      workspace_id: workspace.id,
+      tenant_id: tenantId,
+      organization_id: workspace.organization_id,
+      slug: workspace.slug,
+      template_slug: workspace.template_slug ?? 'workforce-platform-v1',
+      subscription_tier: subscriptionTier,
+      source_platform_event_id: event.id,
+      source_correlation_id: event.correlation_id ?? event.id,
+    },
+  });
+
+  logger.info('[orchestration] platform workspace provisioning queued', {
+    tenantId,
+    workspaceId: workspace.id,
+    planSlug,
+    subscriptionTier,
+  });
+  return false;
+}
+
 async function handleProvisioningRequested(
   db: Awaited<ReturnType<typeof requireAdminClient>>,
   event: PlatformEventRow,
@@ -163,6 +235,14 @@ async function handleProvisioningRequested(
     if (!entitlements.features.length) {
       throw new Error(`Cannot provision tenant ${event.subject_id}: no active entitlements`);
     }
+
+    if (kind === 'platform_workspace') {
+      const ready = await ensurePlatformWorkspaceProvisioned(db, event, payload);
+      // Do not claim provisioning is complete while an async workspace job is
+      // still creating the actual site/workspace. The workspace job emits the
+      // completion event when the resource is real and published.
+      if (!ready) return;
+    }
   }
 
   const { error } = await db.from('provisioning_events').insert({
@@ -177,6 +257,7 @@ async function handleProvisioningRequested(
       app_slug: payload.app_slug ?? null,
       plan: payload.plan ?? payload.plan_slug ?? null,
       automated: true,
+      verified_resource: true,
     },
     environment: process.env.NODE_ENV ?? 'production',
   });
@@ -194,7 +275,7 @@ async function handleProvisioningRequested(
     correlationId: event.correlation_id ?? event.id,
     idempotencyKey: `provisioning-completed:${event.id}`,
     dispatch: false,
-    payload: { kind, source_event_id: event.id },
+    payload: { kind, source_event_id: event.id, verified_resource: true },
   });
 }
 

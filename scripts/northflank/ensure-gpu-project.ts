@@ -56,6 +56,15 @@ function gpuMemoryMiB(gpu: R): number {
   return Number(gpu.memoryInfo?.sizeInMiB || gpu.memoryMiB || gpu.vramMiB || 0);
 }
 
+function canonicalGpuPlan(gpuType: string): string {
+  const configured = process.env.NORTHFLANK_GPU_DEPLOYMENT_PLAN?.trim();
+  if (configured) return configured;
+  // Northflank's general /plans endpoint currently omits managed GPU plans even
+  // when /regions exposes the GPU. The validated managed-GPU plan convention is
+  // nf-gpu-<gpuType>-<count>g (for example nf-gpu-l4-24-1g).
+  return `nf-gpu-${gpuType}-${GPU_COUNT}g`;
+}
+
 async function discover() {
   const regions = rows(await nfFetch<R>('/regions'), 'regions');
   const region = regions.find((item) => item.id === REGION || item.name === REGION);
@@ -67,16 +76,17 @@ async function discover() {
   const gpuType = String(l4.id || l4.type || l4.name);
   if (!gpuType) throw new Error('Northflank returned an L4 GPU without a usable type identifier');
 
+  let deploymentPlan = '';
   const planResponses: R[] = [];
   for (const path of [projectApiPath(PROJECT_ID, '/plans'), '/plans']) {
     try { planResponses.push(await nfFetch<R>(path)); } catch {}
   }
   const plans = planResponses.flatMap((value) => rows(value, 'plans'));
   const l4Plans = plans.filter((plan) => /l4/i.test(`${plan.id || ''} ${plan.name || ''}`) && (!Array.isArray(plan.type) || plan.type.includes('deployment')));
-  const plan = l4Plans.find((item) => String(item.id || '').includes(`${GPU_COUNT}g`)) || l4Plans[0];
-  if (!plan?.id) throw new Error(`L4 is available in ${REGION}, but no L4 deployment plan was returned by Northflank`);
+  const listedPlan = l4Plans.find((item) => String(item.id || '').includes(`${GPU_COUNT}g`)) || l4Plans[0];
+  deploymentPlan = listedPlan?.id ? String(listedPlan.id) : canonicalGpuPlan(gpuType);
 
-  return { gpuType, deploymentPlan: String(plan.id), vramMiB: gpuMemoryMiB(l4) };
+  return { gpuType, deploymentPlan, vramMiB: gpuMemoryMiB(l4), planSource: listedPlan?.id ? 'api' : 'canonical' };
 }
 
 function exportEnv(values: Record<string, string>) {
@@ -98,6 +108,7 @@ async function main() {
     gpuType: discovered.gpuType,
     vramMiB: discovered.vramMiB,
     deploymentPlan: discovered.deploymentPlan,
+    planSource: discovered.planSource,
   });
 }
 

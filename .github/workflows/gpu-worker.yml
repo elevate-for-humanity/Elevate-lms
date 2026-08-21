@@ -27,9 +27,6 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_PROJECT_ID: elevate-platform
       NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
-      # Keep GPU inference in the existing us-east1 production project so Admin
-      # can reach it through the same Northflank service mesh. The region exposes
-      # NVIDIA L4 24GB and avoids a second cross-region control plane.
       NORTHFLANK_GPU_PROJECT_NAME: elevate-platform
       NORTHFLANK_GPU_REGION: us-east1
       NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
@@ -82,12 +79,32 @@ jobs:
       - name: Provision L4 worker and run real Wan acceptance
         run: pnpm exec tsx scripts/northflank/provision-gpu-media.ts --execute
 
+      - name: Restart Admin to load GPU client secret group
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            "https://api.northflank.com/v1/projects/${NORTHFLANK_PROJECT_ID}/services/${NORTHFLANK_ADMIN_SERVICE_ID}/restart" >/dev/null
+
+      - name: Verify Admin recovered after GPU wiring
+        run: |
+          for attempt in $(seq 1 36); do
+            if curl -fsS --max-time 10 https://admin.elevateforhumanity.org/api/health >/tmp/admin-health.json; then
+              cat /tmp/admin-health.json
+              exit 0
+            fi
+            echo "Waiting for Admin health after GPU secret wiring (${attempt}/36)"
+            sleep 10
+          done
+          echo "Admin did not recover after GPU secret wiring" >&2
+          exit 1
+
       - name: Report GPU acceptance status
         if: always()
         run: |
           if [ "${{ job.status }}" = "success" ]; then
             STATE=success
-            DESC="L4/Wan worker provisioned and real MP4 acceptance passed"
+            DESC="L4/Wan worker provisioned, MP4 accepted, Admin GPU wiring healthy"
           else
             STATE=failure
             DESC="GPU worker validation/provisioning failed; inspect workflow logs"

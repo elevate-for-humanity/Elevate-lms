@@ -2,15 +2,6 @@ name: GPU Worker Build, Provision and Acceptance
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'services/media-gpu-worker/**'
-      - 'lib/video/gpu-video-client.ts'
-      - 'lib/video/process-video-job.ts'
-      - 'scripts/northflank/ensure-gpu-project.ts'
-      - 'scripts/northflank/provision-gpu-worker.ts'
-      - '.github/workflows/gpu-worker.yml'
 
 concurrency:
   group: gpu-worker-production

@@ -44,6 +44,7 @@ const INFRA_KEYS = new Set([
   'NEXT_TELEMETRY_DISABLED',
   'SERVICE_ROLE',
   'SERVICE_NAME',
+  'STORE_ONLY_RUNTIME',
 ]);
 
 function loadManifestKeys(): string[] {
@@ -158,7 +159,8 @@ async function main() {
   const lmsId = resolveLmsServiceId() || 'elevate-lms';
   const adminId = resolveAdminServiceId() || 'elevate-admin';
   const marketingId = process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing';
-  const serviceIds = [...new Set([marketingId, lmsId, adminId])];
+  const storeId = process.env.NORTHFLANK_STORE_SERVICE_ID?.trim();
+  const serviceIds = [...new Set([marketingId, lmsId, adminId, ...(storeId ? [storeId] : [])])];
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);
   const restrictions = {

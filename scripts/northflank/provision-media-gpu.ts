@@ -57,11 +57,15 @@ interface RegionResponse {
   regions?: Region[];
 }
 
+interface VolumeRecord {
+  id?: string;
+  spec?: { storageSize?: number; storageClassName?: string };
+  status?: string;
+}
+
 function gpuSecret(): string {
   const explicit = process.env.GPU_WORKER_SECRET?.trim();
   if (explicit) return explicit;
-  // Stable secret without storing another credential in GitHub: derive an HMAC
-  // from the existing Northflank deployment token. The token itself is never logged.
   return crypto
     .createHmac('sha256', getToken())
     .update(`elevate-gpu-worker-v1:${GPU_PROJECT_ID}:${GPU_SERVICE_ID}`)
@@ -88,7 +92,7 @@ async function ensureGpuProject(execute: boolean): Promise<void> {
     return;
   }
   console.log(`Creating isolated GPU project ${GPU_PROJECT_ID} in ${GPU_REGION}...`);
-  await nfFetch('/projects', {
+  const created = await nfFetch<Record<string, unknown>>('/projects', {
     method: 'POST',
     body: JSON.stringify({
       name: GPU_PROJECT_NAME,
@@ -98,9 +102,12 @@ async function ensureGpuProject(execute: boolean): Promise<void> {
     }),
   });
   if (!(await projectExists(GPU_PROJECT_ID))) {
-    // Northflank derives the project ID from name. If an account naming policy
-    // produces a different slug, fail rather than provisioning into ambiguity.
-    throw new Error(`Northflank created the GPU project but ${GPU_PROJECT_ID} was not addressable. Set NORTHFLANK_GPU_PROJECT_ID to the returned project id.`);
+    const returnedId = typeof created?.id === 'string' ? created.id : undefined;
+    throw new Error(
+      `Northflank created the GPU project but ${GPU_PROJECT_ID} was not addressable.` +
+        (returnedId ? ` Returned project id: ${returnedId}.` : '') +
+        ' Set NORTHFLANK_GPU_PROJECT_ID to the returned project id.',
+    );
   }
 }
 
@@ -109,9 +116,7 @@ async function resolveGpuDevice(): Promise<GpuDevice> {
   const region = (response.regions ?? []).find((item) => item.id === GPU_REGION);
   if (!region) throw new Error(`Northflank region ${GPU_REGION} is unavailable to this account.`);
   const devices = region.gpuDevices ?? [];
-  if (!devices.length) {
-    throw new Error(`Northflank region ${GPU_REGION} currently advertises no GPU devices.`);
-  }
+  if (!devices.length) throw new Error(`Northflank region ${GPU_REGION} currently advertises no GPU devices.`);
 
   let selected: GpuDevice | undefined;
   if (REQUESTED_GPU_TYPE) {
@@ -131,9 +136,7 @@ async function resolveGpuDevice(): Promise<GpuDevice> {
       })[0];
   }
 
-  if (!selected) {
-    throw new Error(`No NVIDIA GPU with at least 24 GB VRAM and count=${GPU_COUNT} is available in ${GPU_REGION}.`);
-  }
+  if (!selected) throw new Error(`No NVIDIA GPU with at least 24 GB VRAM and count=${GPU_COUNT} is available in ${GPU_REGION}.`);
   if ((selected.memoryInfo?.sizeInMiB ?? 0) < 24 * 1024) {
     throw new Error(`GPU ${selected.id} has insufficient VRAM (${selected.memoryInfo?.sizeInMiB ?? 0} MiB); Wan requires a 24 GB class GPU.`);
   }
@@ -160,13 +163,6 @@ function servicePayload(gpuType: string) {
         shmSize: 8192,
         ephemeralStorage: { storageSize: 32768 },
       },
-      volumes: [
-        {
-          id: MODEL_VOLUME_ID,
-          mounts: [{ containerMountPath: '/models', volumeMountPath: '' }],
-          spec: { storageClassName: STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
-        },
-      ],
     },
     ports: [{ name: 'http', internalPort: PORT, protocol: 'HTTP', public: true }],
     buildSource: 'git',
@@ -210,35 +206,16 @@ function servicePayload(gpuType: string) {
     },
     healthChecks: [
       {
-        protocol: 'HTTP',
-        type: 'startupProbe',
-        path: '/health',
-        port: PORT,
-        initialDelaySeconds: 15,
-        periodSeconds: 10,
-        timeoutSeconds: 5,
-        failureThreshold: 60,
+        protocol: 'HTTP', type: 'startupProbe', path: '/health', port: PORT,
+        initialDelaySeconds: 15, periodSeconds: 10, timeoutSeconds: 5, failureThreshold: 60,
       },
       {
-        protocol: 'HTTP',
-        type: 'readinessProbe',
-        path: '/health/ready',
-        port: PORT,
-        initialDelaySeconds: 10,
-        periodSeconds: 30,
-        timeoutSeconds: 5,
-        failureThreshold: 120,
-        successThreshold: 1,
+        protocol: 'HTTP', type: 'readinessProbe', path: '/health/ready', port: PORT,
+        initialDelaySeconds: 10, periodSeconds: 30, timeoutSeconds: 5, failureThreshold: 120, successThreshold: 1,
       },
       {
-        protocol: 'HTTP',
-        type: 'livenessProbe',
-        path: '/health',
-        port: PORT,
-        initialDelaySeconds: 60,
-        periodSeconds: 30,
-        timeoutSeconds: 5,
-        failureThreshold: 5,
+        protocol: 'HTTP', type: 'livenessProbe', path: '/health', port: PORT,
+        initialDelaySeconds: 60, periodSeconds: 30, timeoutSeconds: 5, failureThreshold: 5,
       },
     ],
   };
@@ -257,7 +234,7 @@ async function ensureService(execute: boolean, gpuType: string): Promise<void> {
   const payload = servicePayload(gpuType);
   const exists = await serviceExists();
   if (!execute) {
-    console.log(`[dry-run] ${exists ? 'patch' : 'create'} ${GPU_PROJECT_ID}/${GPU_SERVICE_ID} gpu=${gpuType}x${GPU_COUNT} volume=${MODEL_VOLUME_MB}MB`);
+    console.log(`[dry-run] ${exists ? 'patch' : 'create'} ${GPU_PROJECT_ID}/${GPU_SERVICE_ID} gpu=${gpuType}x${GPU_COUNT}`);
     return;
   }
   if (exists) {
@@ -266,6 +243,45 @@ async function ensureService(execute: boolean, gpuType: string): Promise<void> {
     await nfFetch(combinedServiceCreatePath(GPU_PROJECT_ID), { method: 'POST', body: JSON.stringify(payload) });
   }
   console.log(`${exists ? 'Updated' : 'Created'} GPU service ${GPU_SERVICE_ID}.`);
+}
+
+async function getVolume(): Promise<VolumeRecord | null> {
+  try {
+    return await nfFetch<VolumeRecord>(projectApiPath(GPU_PROJECT_ID, `/volumes/${MODEL_VOLUME_ID}`));
+  } catch {
+    return null;
+  }
+}
+
+async function ensureModelVolume(execute: boolean): Promise<void> {
+  const existing = await getVolume();
+  const mounts = [{ volumeMountPath: '', containerMountPath: '/models' }];
+  if (!execute) {
+    console.log(`[dry-run] ${existing ? 'update' : 'create'} volume ${MODEL_VOLUME_ID} size=${MODEL_VOLUME_MB}MB mount=/models`);
+    return;
+  }
+
+  if (!existing) {
+    await nfFetch(projectApiPath(GPU_PROJECT_ID, '/volumes'), {
+      method: 'POST',
+      body: JSON.stringify({
+        name: MODEL_VOLUME_ID,
+        mounts,
+        spec: { storageClassName: STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
+        attachedObjects: [{ id: GPU_SERVICE_ID, type: 'service' }],
+      }),
+    });
+    console.log(`Created persistent model volume ${MODEL_VOLUME_ID} (${MODEL_VOLUME_MB}MB) mounted at /models.`);
+    return;
+  }
+
+  const currentSize = Number(existing.spec?.storageSize || 0);
+  const requestedSize = Math.max(currentSize, MODEL_VOLUME_MB);
+  await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${MODEL_VOLUME_ID}`), {
+    method: 'POST',
+    body: JSON.stringify({ mounts, spec: { storageSize: requestedSize } }),
+  });
+  console.log(`Verified persistent model volume ${MODEL_VOLUME_ID}: ${requestedSize}MB mounted at /models.`);
 }
 
 async function upsertSecretGroup(projectId: string, groupId: string, serviceId: string, variables: Record<string, string>): Promise<void> {
@@ -297,17 +313,9 @@ async function upsertSecretGroup(projectId: string, groupId: string, serviceId: 
 }
 
 function collectStrings(value: unknown, out: string[]): void {
-  if (typeof value === 'string') {
-    out.push(value);
-    return;
-  }
-  if (Array.isArray(value)) {
-    value.forEach((item) => collectStrings(item, out));
-    return;
-  }
-  if (value && typeof value === 'object') {
-    Object.values(value as Record<string, unknown>).forEach((item) => collectStrings(item, out));
-  }
+  if (typeof value === 'string') { out.push(value); return; }
+  if (Array.isArray(value)) { value.forEach((item) => collectStrings(item, out)); return; }
+  if (value && typeof value === 'object') Object.values(value as Record<string, unknown>).forEach((item) => collectStrings(item, out));
 }
 
 function candidateEndpoint(value: unknown): string | null {
@@ -323,9 +331,13 @@ function candidateEndpoint(value: unknown): string | null {
 
 async function resolvePublicEndpoint(): Promise<string> {
   for (let attempt = 1; attempt <= 60; attempt += 1) {
-    const ports = await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${GPU_SERVICE_ID}/ports`));
-    const found = candidateEndpoint(ports);
-    if (found) return found.replace(/\/$/, '');
+    try {
+      const ports = await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${GPU_SERVICE_ID}/ports`));
+      const found = candidateEndpoint(ports);
+      if (found) return found.replace(/\/$/, '');
+    } catch {
+      // Some Northflank service variants expose generated endpoint data only on service GET.
+    }
     const service = await nfFetch(projectApiPath(GPU_PROJECT_ID, `/services/${GPU_SERVICE_ID}`));
     const serviceUrl = candidateEndpoint(service);
     if (serviceUrl) return serviceUrl.replace(/\/$/, '');
@@ -346,6 +358,7 @@ async function main() {
   const selected = await resolveGpuDevice();
   await ensureGpuProject(execute);
   await ensureService(execute, selected.id);
+  await ensureModelVolume(execute);
   if (!execute) return;
 
   const secret = gpuSecret();

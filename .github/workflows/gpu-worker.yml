@@ -13,7 +13,7 @@ on:
 
 concurrency:
   group: gpu-worker-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -41,11 +41,12 @@ jobs:
 
       - name: Mark GPU acceptance pending
         run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           curl -fsS -X POST \
             -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d '{"state":"pending","context":"GPU Media Acceptance","description":"Provisioning NVIDIA L4/Wan worker and real MP4 acceptance"}' >/dev/null
+            -d "{\"state\":\"pending\",\"context\":\"GPU Media Acceptance\",\"description\":\"Provisioning NVIDIA L4/Wan worker and real MP4 acceptance\",\"target_url\":\"${RUN_URL}\"}" >/dev/null
 
       - uses: pnpm/action-setup@v4
         with:
@@ -82,6 +83,7 @@ jobs:
       - name: Report GPU acceptance status
         if: always()
         run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           if [ "${{ job.status }}" = "success" ]; then
             STATE=success
             DESC="L4/Wan worker provisioned; model volume ready; real MP4 accepted"
@@ -93,4 +95,4 @@ jobs:
             -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d "{\"state\":\"${STATE}\",\"context\":\"GPU Media Acceptance\",\"description\":\"${DESC}\"}" >/dev/null
+            -d "{\"state\":\"${STATE}\",\"context\":\"GPU Media Acceptance\",\"description\":\"${DESC}\",\"target_url\":\"${RUN_URL}\"}" >/dev/null

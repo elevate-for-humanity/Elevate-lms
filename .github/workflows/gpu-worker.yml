@@ -68,9 +68,9 @@ jobs:
       - name: Validate canonical GPU provisioner
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts
 
-      - name: Typecheck GPU integration
-        run: pnpm exec tsc --noEmit --pretty false --project tsconfig.json
-
+      # The Admin production build is the authoritative TypeScript/Next.js gate
+      # for lib/video integration. Do not make GPU provisioning wait on an
+      # unrelated monorepo-wide tsc pass.
       - name: Build CUDA worker image
         run: docker build -f services/media-gpu-worker/Dockerfile -t elevate-gpu-worker:${GITHUB_SHA} .
 

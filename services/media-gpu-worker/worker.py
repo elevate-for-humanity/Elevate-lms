@@ -25,7 +25,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="4.1.0")
+app = FastAPI(title="Elevate GPU Media Worker", version="4.2.0")
 OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
@@ -66,18 +66,24 @@ def _model_state() -> dict:
     wan = Path(os.getenv("WAN_REPO", "/models/runtime/wan2.2"))
     wan_ckpt = Path(os.getenv("WAN_CHECKPOINT_DIR", "/models/Wan2.2-TI2V-5B"))
     wan_python = Path(os.getenv("WAN_PYTHON", "/models/runtime/wan-venv/bin/python"))
+    bootstrap = _bootstrap_state()
     cuda = torch.cuda.is_available()
     vram = torch.cuda.get_device_properties(0).total_memory if cuda else 0
+    model_marker = wan_ckpt / ".elevate-model-ready"
     return {
         "cuda": cuda,
         "gpu": torch.cuda.get_device_name(0) if cuda else None,
         "vramBytes": vram,
         "ltxInstalled": (ltx / "inference.py").exists(),
         "wanInstalled": (wan / "generate.py").exists() and wan_python.exists(),
-        "wanModelReady": wan_ckpt.exists() and any(wan_ckpt.iterdir()) if wan_ckpt.exists() else False,
+        "wanModelReady": bool(
+            wan_ckpt.exists()
+            and model_marker.exists()
+            and bootstrap.get("state") == "ready"
+        ),
         "wanVramReady": bool(vram >= MIN_WAN_VRAM_BYTES),
         "ffmpeg": shutil.which("ffmpeg") is not None,
-        "bootstrap": _bootstrap_state(),
+        "bootstrap": bootstrap,
     }
 
 
@@ -96,7 +102,7 @@ def _download_image(url: str | None, work: Path) -> str | None:
         return None
     _assert_public_http_url(url)
     target = work / "conditioning-image"
-    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.1"})
+    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.2"})
     with urlopen(req, timeout=30) as response, target.open("wb") as out:
         content_type = response.headers.get("content-type", "")
         if not content_type.startswith("image/"):

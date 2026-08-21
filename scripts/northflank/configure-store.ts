@@ -2,22 +2,25 @@
 /**
  * Provision or update the isolated Elevate subscription/store runtime.
  *
- * The store intentionally reuses the canonical Marketing application/image so
- * commerce, auth and Stripe webhook code are not duplicated. STORE_ONLY_RUNTIME
- * limits this service to /store, auth and commerce APIs while the public website
+ * The store reuses the canonical Marketing application/image so commerce,
+ * authentication and Stripe fulfillment stay single-source. STORE_ONLY_RUNTIME
+ * constrains this deployment to commerce/auth surfaces while the public website
  * remains owned by elevate-marketing.
- *
- * Usage:
- *   pnpm exec tsx scripts/northflank/configure-store.ts          # validate/dry run
- *   pnpm exec tsx scripts/northflank/configure-store.ts --execute
  */
-import { combinedServiceCreatePath, combinedServicePatchPath, nfFetch, projectApiPath, resolveProjectId } from './lib';
+import {
+  combinedServiceCreatePath,
+  combinedServicePatchPath,
+  nfFetch,
+  projectApiPath,
+  resolveProjectId,
+} from './lib';
 
 const SERVICE_ID = process.env.NORTHFLANK_STORE_SERVICE_ID || 'elevate-store';
-const SERVICE_NAME = process.env.NORTHFLANK_STORE_SERVICE_NAME || 'Elevate Subscription Store';
+const SERVICE_LABEL = process.env.NORTHFLANK_STORE_SERVICE_NAME || 'Elevate Subscription Store';
 const REPO = 'https://github.com/elevate-for-humanity/Elevate-lms';
 const DOCKERFILE = '/Dockerfile.marketing';
 const PORT = 3000;
+const STORE_URL = process.env.NEXT_PUBLIC_STORE_URL || 'https://store.elevateforhumanity.org';
 
 function required(name: string): string {
   const value = process.env[name]?.trim();
@@ -30,21 +33,32 @@ function buildArguments(): Record<string, string> {
     NEXT_PUBLIC_SUPABASE_URL: required('NEXT_PUBLIC_SUPABASE_URL'),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: required('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
-    NEXT_PUBLIC_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+    NEXT_PUBLIC_PUBLIC_SITE_URL:
+      process.env.NEXT_PUBLIC_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+    NEXT_PUBLIC_STORE_URL: STORE_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://app.elevateforhumanity.org',
     NEXT_PUBLIC_LMS_URL: process.env.NEXT_PUBLIC_LMS_URL || 'https://app.elevateforhumanity.org',
-    NEXT_PUBLIC_ADMIN_URL: process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
+    NEXT_PUBLIC_ADMIN_URL:
+      process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.elevateforhumanity.org',
   };
 }
 
 function payload() {
-  const deploymentPlan = process.env.NORTHFLANK_STORE_DEPLOYMENT_PLAN || process.env.NORTHFLANK_DEPLOYMENT_PLAN || 'nf-compute-400';
-  const buildPlan = process.env.NORTHFLANK_STORE_BUILD_PLAN || process.env.NORTHFLANK_BUILD_PLAN || 'nf-compute-800-32';
+  const deploymentPlan =
+    process.env.NORTHFLANK_STORE_DEPLOYMENT_PLAN ||
+    process.env.NORTHFLANK_DEPLOYMENT_PLAN ||
+    'nf-compute-400';
+  const buildPlan =
+    process.env.NORTHFLANK_STORE_BUILD_PLAN ||
+    process.env.NORTHFLANK_BUILD_PLAN ||
+    'nf-compute-800-32';
   const storageSize = Number(process.env.NORTHFLANK_STORE_BUILD_STORAGE_MB || '32768');
 
   return {
-    name: SERVICE_NAME,
-    description: 'Isolated customer commerce and subscription runtime for Elevate platform SaaS',
+    // Northflank derives/addresses the service by this value. Keep it stable and
+    // machine-safe; SERVICE_LABEL remains descriptive only.
+    name: SERVICE_ID,
+    description: `${SERVICE_LABEL} — isolated customer commerce and subscription runtime`,
     billing: { deploymentPlan, buildPlan },
     infrastructure: { architecture: 'x86' },
     deployment: {
@@ -69,6 +83,8 @@ function payload() {
       SERVICE_ROLE: 'store',
       SERVICE_NAME: SERVICE_ID,
       STORE_ONLY_RUNTIME: 'true',
+      STORE_URL,
+      NEXT_PUBLIC_STORE_URL: STORE_URL,
       PORT: String(PORT),
       HOSTNAME: '0.0.0.0',
       NODE_ENV: 'production',
@@ -108,6 +124,8 @@ function payload() {
       },
     ],
     buildSource: 'git',
+    // Release orchestration owns exact-SHA builds/deployments so Northflank CI
+    // cannot race a second build from the same push.
     disabledCI: true,
     vcsData: {
       projectUrl: REPO,
@@ -148,13 +166,13 @@ async function main() {
   const projectId = resolveProjectId();
   if (!projectId) throw new Error('NORTHFLANK_PROJECT_ID is required');
 
-  // Always validate build arguments before touching production.
   const desired = payload();
   const serviceExists = await exists(projectId);
   console.log(execute ? '=== EXECUTE ===' : '=== DRY RUN ===');
   console.log(`Project: ${projectId}`);
   console.log(`Service: ${SERVICE_ID} (${serviceExists ? 'existing' : 'new'})`);
   console.log(`Dockerfile: ${DOCKERFILE}`);
+  console.log(`Store URL: ${STORE_URL}`);
   console.log('Runtime isolation: STORE_ONLY_RUNTIME=true');
 
   if (!execute) {
@@ -168,14 +186,9 @@ async function main() {
   const method = serviceExists ? 'PATCH' : 'POST';
   await nfFetch(path, { method, body: JSON.stringify(desired) });
 
-  const buildResult = await nfFetch<any>(projectApiPath(projectId, `/services/${SERVICE_ID}/build`), {
-    method: 'POST',
-    body: JSON.stringify({}),
-  });
-
+  // Do not trigger a build here. The release workflow uses trigger-build.ts so
+  // one exact SHA owns one build id and can be verified before deployment.
   console.log(`Store service ${serviceExists ? 'updated' : 'created'} successfully.`);
-  console.log(`Build triggered: ${buildResult?.id || 'accepted'}`);
-  console.log('Next required step: run sync-env.ts with NORTHFLANK_STORE_SERVICE_ID=elevate-store so the shared production secret group is attached.');
 }
 
 main().catch((error) => {

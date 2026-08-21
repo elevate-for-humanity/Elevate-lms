@@ -1,0 +1,97 @@
+name: Stop GPU Cost Leakage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/gpu-cost-stop.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: northflank-gpu-cost-stop
+  cancel-in-progress: false
+
+jobs:
+  stop-gpu-costs:
+    name: Audit and remove unfinished GPU resources
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
+      NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
+    steps:
+      - name: Validate credentials
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -n "$NORTHFLANK_API_TOKEN"
+
+      - name: Audit and stop unfinished GPU spend
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+
+          echo '--- GPU project before cleanup ---'
+          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-before.json || true
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-before.json || true
+          node - <<'NODE'
+          const fs=require('fs');
+          for (const f of ['/tmp/services-before.json','/tmp/volumes-before.json']) {
+            try {
+              const j=JSON.parse(fs.readFileSync(f,'utf8'));
+              const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.services)?j.data.services:Array.isArray(j.data?.volumes)?j.data.volumes:[]);
+              console.log(f, d.map(x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize,attached:x.attachedObjects}))); 
+            } catch(e) { console.log(f,'unavailable'); }
+          }
+          NODE
+
+          service_code=$(curl -sS -o /tmp/service.json -w '%{http_code}' "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" || true)
+          if [ "$service_code" = "200" ]; then
+            echo "Deleting unfinished GPU service ${NORTHFLANK_GPU_SERVICE_ID} and attached child resources"
+            curl -fsS -X DELETE "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}?delete_child_objects=true"
+          else
+            echo "GPU service is not present (HTTP $service_code); checking orphan model volumes"
+          fi
+
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after-service.json || true
+          node - <<'NODE' > /tmp/orphan-volume-ids.txt
+          const fs=require('fs');
+          try {
+            const j=JSON.parse(fs.readFileSync('/tmp/volumes-after-service.json','utf8'));
+            const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.volumes)?j.data.volumes:[]);
+            for (const v of d) {
+              const name=String(v.name||'').toLowerCase();
+              const id=String(v.id||'');
+              const attached=Array.isArray(v.attachedObjects)?v.attachedObjects:[];
+              if ((id==='elevate-gpu-models' || name==='elevate gpu models') && attached.length===0) console.log(id);
+            }
+          } catch(e) {}
+          NODE
+
+          while IFS= read -r vid; do
+            [ -z "$vid" ] && continue
+            echo "Deleting orphan GPU model volume $vid"
+            curl -fsS -X DELETE "${auth[@]}" "$base/volumes/$vid"
+          done < /tmp/orphan-volume-ids.txt
+
+          echo '--- GPU project after cleanup ---'
+          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-after.json || true
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after.json || true
+          node - <<'NODE'
+          const fs=require('fs');
+          for (const f of ['/tmp/services-after.json','/tmp/volumes-after.json']) {
+            try {
+              const j=JSON.parse(fs.readFileSync(f,'utf8'));
+              const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.services)?j.data.services:Array.isArray(j.data?.volumes)?j.data.volumes:[]);
+              console.log(f, d.map(x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize,attached:x.attachedObjects})));
+            } catch(e) { console.log(f,'unavailable'); }
+          }
+          NODE

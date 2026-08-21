@@ -16,6 +16,7 @@ const SERVICE_ID = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-gpu-worker'
 const ADMIN_SERVICE_ID = process.env.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin';
 const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models';
 const MODEL_VOLUME_MB = Number(process.env.NORTHFLANK_GPU_MODEL_VOLUME_MB || '153600');
+const MODEL_STORAGE_CLASS = process.env.NORTHFLANK_GPU_MODEL_STORAGE_CLASS || 'nvme';
 const GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE || 'l4-24';
 const GPU_COUNT = Number(process.env.NORTHFLANK_GPU_COUNT || '1');
 // Confirmed by the Northflank API: nf-compute-* plans are rejected for managed GPU workloads.
@@ -74,6 +75,7 @@ async function preflight() {
     vramMiB: gpu.memoryInfo?.sizeInMiB,
     gpuPlan: GPU_DEPLOYMENT_PLAN,
     buildPlan: BUILD_PLAN,
+    modelStorageClass: MODEL_STORAGE_CLASS,
     deploymentEphemeralMb: GPU_DEPLOYMENT_EPHEMERAL_MB,
     buildEphemeralMb: BUILD_EPHEMERAL_MB,
   });
@@ -88,10 +90,10 @@ async function ensureVolume(): Promise<string> {
       body: JSON.stringify({
         name: 'Elevate GPU Models',
         mounts: [{ volumeMountPath: '', containerMountPath: '/models' }],
-        spec: { storageClassName: 'ssd', storageSize: MODEL_VOLUME_MB },
+        spec: { storageClassName: MODEL_STORAGE_CLASS, storageSize: MODEL_VOLUME_MB },
       }),
     });
-    log('Created model volume', { id: volume.id, storageSize: MODEL_VOLUME_MB });
+    log('Created model volume', { id: volume.id, storageSize: MODEL_VOLUME_MB, storageClassName: MODEL_STORAGE_CLASS });
   } else if (Number(volume.spec?.storageSize || 0) < MODEL_VOLUME_MB) {
     await nfFetch(projectApiPath(GPU_PROJECT_ID, `/volumes/${volume.id}`), {
       method: 'POST',
@@ -348,6 +350,7 @@ async function main() {
     service: SERVICE_ID,
     gpuPlan: GPU_DEPLOYMENT_PLAN,
     modelVolumeMb: MODEL_VOLUME_MB,
+    modelStorageClass: MODEL_STORAGE_CLASS,
     deploymentEphemeralMb: GPU_DEPLOYMENT_EPHEMERAL_MB,
   });
   if (!execute) return;

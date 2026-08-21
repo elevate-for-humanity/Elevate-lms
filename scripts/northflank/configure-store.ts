@@ -58,7 +58,7 @@ function payload() {
     // Northflank derives/addresses the service by this value. Keep it stable and
     // machine-safe; SERVICE_LABEL remains descriptive only.
     name: SERVICE_ID,
-    description: `${SERVICE_LABEL} — isolated customer commerce and subscription runtime`,
+    description: `${SERVICE_LABEL} - isolated customer commerce and subscription runtime`,
     billing: { deploymentPlan, buildPlan },
     infrastructure: { architecture: 'x86' },
     deployment: {

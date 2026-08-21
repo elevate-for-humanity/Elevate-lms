@@ -8,7 +8,7 @@ import crypto from 'node:crypto';
 import { getToken } from './lib';
 
 const GPU_PROJECT_ID = process.env.NORTHFLANK_GPU_PROJECT_ID || 'elevate-media-gpu';
-const GPU_SERVICE_ID = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-media-gpu-worker';
+const GPU_SERVICE_ID = process.env.NORTHFLANK_GPU_SERVICE_ID || 'elevate-gpu-worker';
 const baseUrl = (process.env.GPU_VIDEO_WORKER_URL || process.argv[2] || '').replace(/\/$/, '');
 
 function secret(): string {

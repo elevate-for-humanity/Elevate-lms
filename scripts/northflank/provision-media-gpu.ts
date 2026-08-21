@@ -29,8 +29,16 @@ const DOCKERFILE = '/services/media-gpu-worker/Dockerfile';
 const PORT = 8080;
 const REQUESTED_GPU_TYPE = process.env.NORTHFLANK_GPU_TYPE?.trim() || '';
 const GPU_COUNT = Math.max(1, Number(process.env.NORTHFLANK_GPU_COUNT || '1'));
-const GPU_PLAN = process.env.NORTHFLANK_GPU_COMPUTE_PLAN || 'nf-compute-800-32';
+const GPU_PLAN_OVERRIDE = process.env.NORTHFLANK_GPU_COMPUTE_PLAN?.trim() || '';
 const BUILD_PLAN = process.env.NORTHFLANK_GPU_BUILD_PLAN || 'nf-compute-800-32';
+const GPU_EPHEMERAL_STORAGE_MB = Math.max(
+  256000,
+  Number(process.env.NORTHFLANK_GPU_EPHEMERAL_STORAGE_MB || '256000'),
+);
+const BUILD_EPHEMERAL_STORAGE_MB = Math.max(
+  32768,
+  Number(process.env.NORTHFLANK_GPU_BUILD_STORAGE_MB || '32768'),
+);
 const MODEL_VOLUME_ID = process.env.NORTHFLANK_GPU_MODEL_VOLUME_ID || 'elevate-gpu-models';
 const MODEL_VOLUME_MB = Math.max(102400, Number(process.env.NORTHFLANK_GPU_MODEL_VOLUME_MB || '153600'));
 const STORAGE_CLASS = process.env.NORTHFLANK_GPU_STORAGE_CLASS || 'ssd';
@@ -74,6 +82,10 @@ function gpuSecret(): string {
 
 function gpuConfig(gpuType: string) {
   return { enabled: true, configuration: { gpuType, gpuCount: GPU_COUNT, timesliced: false } };
+}
+
+function gpuDeploymentPlan(gpuType: string): string {
+  return GPU_PLAN_OVERRIDE || `nf-gpu-${gpuType}-${GPU_COUNT}g`;
 }
 
 async function projectExists(projectId: string): Promise<boolean> {
@@ -145,11 +157,12 @@ async function resolveGpuDevice(): Promise<GpuDevice> {
 }
 
 function servicePayload(gpuType: string) {
+  const deploymentPlan = gpuDeploymentPlan(gpuType);
   return {
     name: GPU_SERVICE_ID,
     description: 'Elevate self-hosted Wan/LTX cinematic video worker',
     billing: {
-      deploymentPlan: GPU_PLAN,
+      deploymentPlan,
       buildPlan: BUILD_PLAN,
       gpu: gpuConfig(gpuType),
     },
@@ -161,7 +174,7 @@ function servicePayload(gpuType: string) {
       gracePeriodSeconds: 60,
       storage: {
         shmSize: 8192,
-        ephemeralStorage: { storageSize: 32768 },
+        ephemeralStorage: { storageSize: GPU_EPHEMERAL_STORAGE_MB },
       },
     },
     ports: [{ name: 'http', internalPort: PORT, protocol: 'HTTP', public: true }],
@@ -175,7 +188,7 @@ function servicePayload(gpuType: string) {
         dockerWorkDir: '/',
         buildkit: { useCache: true, cacheStorageSize: 32768 },
       },
-      storage: { ephemeralStorage: { storageSize: 32768 } },
+      storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_STORAGE_MB } },
     },
     buildConfiguration: {
       isAllowList: true,
@@ -190,7 +203,7 @@ function servicePayload(gpuType: string) {
       ],
       ciIgnoreFlagsEnabled: true,
       ciIgnoreFlags: ['[skip ci]', '[ci skip]', '[northflank skip]', '[skip northflank]'],
-      storage: { ephemeralStorage: { storageSize: 32768 } },
+      storage: { ephemeralStorage: { storageSize: BUILD_EPHEMERAL_STORAGE_MB } },
     },
     runtimeEnvironment: {
       SERVICE_ROLE: 'media-gpu-worker',
@@ -234,7 +247,10 @@ async function ensureService(execute: boolean, gpuType: string): Promise<void> {
   const payload = servicePayload(gpuType);
   const exists = await serviceExists();
   if (!execute) {
-    console.log(`[dry-run] ${exists ? 'patch' : 'create'} ${GPU_PROJECT_ID}/${GPU_SERVICE_ID} gpu=${gpuType}x${GPU_COUNT}`);
+    console.log(
+      `[dry-run] ${exists ? 'patch' : 'create'} ${GPU_PROJECT_ID}/${GPU_SERVICE_ID} ` +
+        `gpu=${gpuType}x${GPU_COUNT} plan=${gpuDeploymentPlan(gpuType)} ephemeral=${GPU_EPHEMERAL_STORAGE_MB}MB`,
+    );
     return;
   }
   if (exists) {
@@ -242,7 +258,10 @@ async function ensureService(execute: boolean, gpuType: string): Promise<void> {
   } else {
     await nfFetch(combinedServiceCreatePath(GPU_PROJECT_ID), { method: 'POST', body: JSON.stringify(payload) });
   }
-  console.log(`${exists ? 'Updated' : 'Created'} GPU service ${GPU_SERVICE_ID}.`);
+  console.log(
+    `${exists ? 'Updated' : 'Created'} GPU service ${GPU_SERVICE_ID}: ` +
+      `plan=${gpuDeploymentPlan(gpuType)} ephemeral=${GPU_EPHEMERAL_STORAGE_MB}MB.`,
+  );
 }
 
 async function getVolume(): Promise<VolumeRecord | null> {
@@ -352,7 +371,10 @@ async function main() {
   console.log(execute ? '=== PROVISION GPU MEDIA ===' : '=== GPU MEDIA DRY RUN ===');
   console.log(`GPU project: ${GPU_PROJECT_ID} (${GPU_REGION})`);
   console.log(`GPU service: ${GPU_SERVICE_ID}`);
-  console.log(`Compute=${GPU_PLAN}; modelVolume=${MODEL_VOLUME_MB}MB; storageClass=${STORAGE_CLASS}`);
+  console.log(
+    `GPU plan=${GPU_PLAN_OVERRIDE || 'derived from selected GPU'}; buildPlan=${BUILD_PLAN}; ` +
+      `deploymentEphemeral=${GPU_EPHEMERAL_STORAGE_MB}MB; modelVolume=${MODEL_VOLUME_MB}MB; storageClass=${STORAGE_CLASS}`,
+  );
   console.log(`Web project remains CPU-only and unchanged: ${WEB_PROJECT_ID}`);
 
   const selected = await resolveGpuDevice();

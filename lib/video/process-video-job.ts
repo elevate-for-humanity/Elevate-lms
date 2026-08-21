@@ -2,6 +2,7 @@ import 'server-only';
 
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
+import { recordPlatformUsage } from '@/lib/platform/usage-metering';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   deleteGpuVideoAsset,
@@ -40,8 +41,13 @@ function safeAssetKey(value: string): string {
 export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   await hydrateMediaRuntimeSecrets();
   const db = createAdminClient();
-  const { data: course } = await db.from('courses').select('title').eq('id', job.course_id).maybeSingle();
+  const { data: course } = await db
+    .from('courses')
+    .select('title,tenant_id')
+    .eq('id', job.course_id)
+    .maybeSingle();
   const courseTitle = course?.title ?? 'Elevate LMS';
+  const tenantId = typeof course?.tenant_id === 'string' ? course.tenant_id : null;
   const instructor = getInstructorForCourse(courseTitle);
   const script = job.script?.trim() || job.lesson_title;
   const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];
@@ -57,22 +63,100 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
     // storage, then deletes the GPU worker's temporary asset.
     if (isMicroclip && (await gpuVideoAvailable())) {
       const visualPrompt = typeof sceneData.visual_prompt === 'string' ? sceneData.visual_prompt : script;
+      const requestedDuration = Math.min(15, Math.max(3, Number(sceneData.duration_seconds) || 5));
+      const gpuStartedAt = Date.now();
       let generated: Awaited<ReturnType<typeof generateGpuVideo>> = null;
       try {
         generated = await generateGpuVideo({
           prompt: visualPrompt,
-          durationSeconds: Math.min(15, Math.max(3, Number(sceneData.duration_seconds) || 5)),
+          durationSeconds: requestedDuration,
         });
         if (generated) {
           const buffer = await downloadGpuVideoAsset(generated);
           const videoUrl = await uploadLessonMediaBuffer(buffer, renderId, 'mp4');
+          const renderSeconds = Math.max(0, (Date.now() - gpuStartedAt) / 1000);
+          const outputSeconds = generated.durationSeconds ?? requestedDuration;
+
+          try {
+            await Promise.all([
+              recordPlatformUsage(db, {
+                tenantId,
+                source: 'video.gpu-worker',
+                metric: 'video_generation_attempt',
+                quantity: 1,
+                unit: 'attempt',
+                externalRef: job.id,
+                idempotencyKey: `gpu-attempt:${job.id}:success`,
+                metadata: { provider: generated.provider, success: true, course_id: job.course_id, lesson_id: job.lesson_id },
+              }),
+              recordPlatformUsage(db, {
+                tenantId,
+                source: 'video.gpu-worker',
+                metric: 'gpu_video_seconds',
+                quantity: outputSeconds,
+                unit: 'second',
+                externalRef: job.id,
+                idempotencyKey: `gpu-video-seconds:${job.id}`,
+                metadata: { provider: generated.provider, course_id: job.course_id, lesson_id: job.lesson_id },
+              }),
+              recordPlatformUsage(db, {
+                tenantId,
+                source: 'video.gpu-worker',
+                metric: 'gpu_render_seconds',
+                quantity: renderSeconds,
+                unit: 'second',
+                externalRef: job.id,
+                idempotencyKey: `gpu-render-seconds:${job.id}`,
+                metadata: { provider: generated.provider, course_id: job.course_id, lesson_id: job.lesson_id },
+              }),
+              recordPlatformUsage(db, {
+                tenantId,
+                source: 'video.gpu-worker',
+                metric: 'gpu_output_bytes',
+                quantity: buffer.length,
+                unit: 'byte',
+                externalRef: job.id,
+                idempotencyKey: `gpu-output-bytes:${job.id}`,
+                metadata: { provider: generated.provider, course_id: job.course_id, lesson_id: job.lesson_id },
+              }),
+            ]);
+          } catch (meterError) {
+            logger.error('[video-worker] GPU output succeeded but usage metering failed', meterError, {
+              jobId: job.id,
+              tenantId,
+            });
+          }
+
           await markComplete(job.id, {
             video_url: videoUrl,
-            duration_seconds: generated.durationSeconds,
+            duration_seconds: outputSeconds,
           });
           return;
         }
       } catch (gpuError) {
+        try {
+          await recordPlatformUsage(db, {
+            tenantId,
+            source: 'video.gpu-worker',
+            metric: 'video_generation_attempt',
+            quantity: 1,
+            unit: 'attempt',
+            externalRef: job.id,
+            idempotencyKey: `gpu-attempt:${job.id}:failed`,
+            metadata: {
+              success: false,
+              course_id: job.course_id,
+              lesson_id: job.lesson_id,
+              elapsed_seconds: Math.max(0, (Date.now() - gpuStartedAt) / 1000),
+              error: gpuError instanceof Error ? gpuError.message.slice(0, 500) : String(gpuError).slice(0, 500),
+            },
+          });
+        } catch (meterError) {
+          logger.warn('[video-worker] Unable to meter failed GPU attempt', {
+            jobId: job.id,
+            error: meterError instanceof Error ? meterError.message : String(meterError),
+          });
+        }
         logger.warn('[video-worker] GPU scene failed; falling back to Remotion', {
           jobId: job.id,
           error: gpuError instanceof Error ? gpuError.message : String(gpuError),

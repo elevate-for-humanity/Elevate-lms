@@ -20,7 +20,7 @@ permissions:
 
 concurrency:
   group: northflank-gpu-video-deploy
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy-gpu-worker:

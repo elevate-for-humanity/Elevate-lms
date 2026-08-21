@@ -25,24 +25,28 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="4.4.1")
+app = FastAPI(title="Elevate GPU Media Worker", version="5.0.0")
 OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
 ASSET_TTL_SECONDS = max(300, int(os.getenv("GPU_ASSET_TTL_SECONDS", "7200")))
 MIN_WAN_VRAM_BYTES = int(float(os.getenv("WAN_MIN_VRAM_GB", "22")) * 1024**3)
 WAN_FPS = max(1, int(os.getenv("WAN_FPS", "24")))
+ALLOWED_OPERATIONS = {"textToVideo", "imageToVideo", "videoToVideo", "extend", "remix", "loop", "interpolate"}
 _sem = asyncio.Semaphore(MAX_CONCURRENCY)
 
 
 class GenerateRequest(BaseModel):
     prompt: str = Field(min_length=3, max_length=8000)
     provider: str = "wan"
+    operation: str = "textToVideo"
     width: int = Field(default=1280, ge=256, le=1920)
     height: int = Field(default=704, ge=256, le=1080)
     duration_seconds: int = Field(default=5, ge=1, le=15)
     seed: int | None = None
     image_url: str | None = None
+    source_video_url: str | None = None
+    negative_prompt: str | None = None
 
 
 def _authorize(value: str | None) -> None:
@@ -76,14 +80,11 @@ def _model_state() -> dict:
         "vramBytes": vram,
         "ltxInstalled": (ltx / "inference.py").exists(),
         "wanInstalled": (wan / "generate.py").exists() and wan_python.exists(),
-        "wanModelReady": bool(
-            wan_ckpt.exists()
-            and model_marker.exists()
-            and bootstrap.get("state") == "ready"
-        ),
+        "wanModelReady": bool(wan_ckpt.exists() and model_marker.exists() and bootstrap.get("state") == "ready"),
         "wanVramReady": bool(vram >= MIN_WAN_VRAM_BYTES),
         "ffmpeg": shutil.which("ffmpeg") is not None,
         "bootstrap": bootstrap,
+        "operations": sorted(ALLOWED_OPERATIONS),
     }
 
 
@@ -100,25 +101,60 @@ def _provider_ready(state: dict, provider: str) -> bool:
 def _assert_public_http_url(value: str) -> None:
     parsed = urlparse(value)
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
-        raise ValueError("conditioning image must use http(s)")
+        raise ValueError("conditioning media must use http(s)")
     for info in socket.getaddrinfo(parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80)):
         ip = ipaddress.ip_address(info[4][0])
         if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
-            raise ValueError("conditioning image host is not public")
+            raise ValueError("conditioning media host is not public")
 
 
-def _download_image(url: str | None, work: Path) -> str | None:
+def _download_media(url: str | None, work: Path, kind: str) -> str | None:
     if not url:
         return None
     _assert_public_http_url(url)
-    target = work / "conditioning-image"
-    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.4"})
-    with urlopen(req, timeout=30) as response, target.open("wb") as out:
-        content_type = response.headers.get("content-type", "")
-        if not content_type.startswith("image/"):
-            raise ValueError("conditioning URL did not return an image")
+    target = work / f"conditioning-{kind}"
+    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/5.0"})
+    with urlopen(req, timeout=60) as response, target.open("wb") as out:
+        content_type = response.headers.get("content-type", "").lower()
+        expected = "image/" if kind == "image" else "video/"
+        if not content_type.startswith(expected):
+            raise ValueError(f"conditioning URL did not return {kind}")
+        length = int(response.headers.get("content-length") or "0")
+        max_bytes = 50 * 1024 * 1024 if kind == "image" else 250 * 1024 * 1024
+        if length and length > max_bytes:
+            raise ValueError(f"conditioning {kind} exceeds size limit")
         shutil.copyfileobj(response, out)
+    if target.stat().st_size > max_bytes:
+        target.unlink(missing_ok=True)
+        raise ValueError(f"conditioning {kind} exceeds size limit")
     return str(target)
+
+
+def _extract_video_frame(video: str, work: Path, operation: str) -> str:
+    target = work / "video-reference.jpg"
+    if operation == "extend":
+        cmd = ["ffmpeg", "-y", "-sseof", "-0.15", "-i", video, "-frames:v", "1", "-q:v", "2", str(target)]
+    else:
+        cmd = ["ffmpeg", "-y", "-ss", "0", "-i", video, "-frames:v", "1", "-q:v", "2", str(target)]
+    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=60)
+    if not target.exists() or target.stat().st_size == 0:
+        raise RuntimeError("unable to extract video conditioning frame")
+    return str(target)
+
+
+def _operation_prompt(req: GenerateRequest) -> str:
+    prompt = req.prompt.strip()
+    prefixes = {
+        "videoToVideo": "Transform the supplied video reference while preserving motion continuity and composition.",
+        "extend": "Continue naturally from the final frame of the supplied video with seamless temporal continuity.",
+        "remix": "Remix the supplied video reference into a new cinematic interpretation while preserving subject identity.",
+        "loop": "Create a seamless perfect loop where the ending naturally returns to the opening composition and motion.",
+        "interpolate": "Create a smooth cinematic transition from the supplied visual reference toward the requested scene.",
+        "imageToVideo": "Animate the supplied reference image while preserving subject identity and visual details.",
+        "textToVideo": "",
+    }
+    negative = f" Avoid: {req.negative_prompt}." if req.negative_prompt else ""
+    return f"{prefixes.get(req.operation, '')} {prompt}.{negative}".strip()
 
 
 def _run_ltx(req: GenerateRequest, output: Path, image: str | None) -> None:
@@ -127,7 +163,7 @@ def _run_ltx(req: GenerateRequest, output: Path, image: str | None) -> None:
     config = os.getenv("LTX_PIPELINE_CONFIG", "configs/ltxv-13b-0.9.8-distilled.yaml")
     fps = int(os.getenv("LTX_FPS", "24"))
     frames = ((max(9, req.duration_seconds * fps) - 1) // 8) * 8 + 1
-    cmd = [python, str(repo / "inference.py"), "--prompt", req.prompt, "--height", str(req.height), "--width", str(req.width), "--num_frames", str(frames), "--pipeline_config", config, "--output_path", str(output)]
+    cmd = [python, str(repo / "inference.py"), "--prompt", _operation_prompt(req), "--height", str(req.height), "--width", str(req.width), "--num_frames", str(frames), "--pipeline_config", config, "--output_path", str(output)]
     if req.seed is not None:
         cmd += ["--seed", str(req.seed)]
     if image:
@@ -146,19 +182,7 @@ def _run_wan(req: GenerateRequest, output: Path, image: str | None) -> None:
     python = os.getenv("WAN_PYTHON", "/models/runtime/wan-venv/bin/python")
     ckpt = os.getenv("WAN_CHECKPOINT_DIR", "/models/Wan2.2-TI2V-5B")
     size = "1280*704" if req.width >= req.height else "704*1280"
-    cmd = [
-        python,
-        str(repo / "generate.py"),
-        "--task", "ti2v-5B",
-        "--size", size,
-        "--frame_num", str(_wan_frame_count(req.duration_seconds)),
-        "--ckpt_dir", ckpt,
-        "--prompt", req.prompt,
-        "--save_file", str(output),
-        "--offload_model", "True",
-        "--convert_model_dtype",
-        "--t5_cpu",
-    ]
+    cmd = [python, str(repo / "generate.py"), "--task", "ti2v-5B", "--size", size, "--frame_num", str(_wan_frame_count(req.duration_seconds)), "--ckpt_dir", ckpt, "--prompt", _operation_prompt(req), "--save_file", str(output), "--offload_model", "True", "--convert_model_dtype", "--t5_cpu"]
     if req.seed is not None:
         cmd += ["--base_seed", str(req.seed)]
     if image:
@@ -186,25 +210,15 @@ def _cleanup_expired_assets() -> None:
 
 @app.get("/health")
 def health():
-    return {"ok": True, "service": "elevate-media-gpu-worker"}
+    return {"ok": True, "service": "elevate-media-gpu-worker", "version": "5.0.0"}
 
 
 @app.get("/health/ready")
 def health_ready():
-    """Sanitized fail-closed readiness for the Northflank load balancer."""
     state = _model_state()
     provider = os.getenv("GPU_VIDEO_PROVIDER", "wan").lower()
     is_ready = _provider_ready(state, provider)
-    return JSONResponse(
-        status_code=200 if is_ready else 503,
-        content={
-            "ready": is_ready,
-            "service": "elevate-media-gpu-worker",
-            "provider": provider,
-            "bootstrapState": state.get("bootstrap", {}).get("state", "unknown"),
-        },
-        headers={"Cache-Control": "no-store"},
-    )
+    return JSONResponse(status_code=200 if is_ready else 503, content={"ready": is_ready, "service": "elevate-media-gpu-worker", "provider": provider, "bootstrapState": state.get("bootstrap", {}).get("state", "unknown"), "operations": sorted(ALLOWED_OPERATIONS)}, headers={"Cache-Control": "no-store"})
 
 
 @app.get("/ready")
@@ -221,6 +235,13 @@ async def generate(req: GenerateRequest, authorization: str | None = Header(defa
     provider = req.provider.lower()
     if provider not in {"ltx", "wan"}:
         raise HTTPException(status_code=400, detail="provider must be ltx or wan")
+    if req.operation not in ALLOWED_OPERATIONS:
+        raise HTTPException(status_code=400, detail="unsupported video operation")
+    if req.operation == "imageToVideo" and not req.image_url:
+        raise HTTPException(status_code=400, detail="imageToVideo requires image_url")
+    if req.operation in {"videoToVideo", "extend", "remix"} and not req.source_video_url:
+        raise HTTPException(status_code=400, detail=f"{req.operation} requires source_video_url")
+
     state = _model_state()
     if not _provider_ready(state, provider):
         raise HTTPException(status_code=503, detail=f"{provider} runtime/model/GPU is not ready")
@@ -231,7 +252,10 @@ async def generate(req: GenerateRequest, authorization: str | None = Header(defa
     try:
         with tempfile.TemporaryDirectory(prefix=f"elevate-gpu-{job_id}-") as temp:
             work = Path(temp)
-            image = await asyncio.to_thread(_download_image, req.image_url, work)
+            image = await asyncio.to_thread(_download_media, req.image_url, work, "image")
+            source_video = await asyncio.to_thread(_download_media, req.source_video_url, work, "video")
+            if source_video and req.operation in {"videoToVideo", "extend", "remix", "interpolate"}:
+                image = await asyncio.to_thread(_extract_video_frame, source_video, work, req.operation)
             async with _sem:
                 runner = _run_ltx if provider == "ltx" else _run_wan
                 await asyncio.to_thread(runner, req, output, image)
@@ -251,7 +275,7 @@ async def generate(req: GenerateRequest, authorization: str | None = Header(defa
             torch.cuda.empty_cache()
         raise HTTPException(status_code=502, detail=str(exc)[:500]) from exc
 
-    return {"ok": True, "jobId": job_id, "provider": provider, "assetPath": f"/v1/video/{job_id}", "bytes": output.stat().st_size, "durationSeconds": req.duration_seconds}
+    return {"ok": True, "jobId": job_id, "provider": provider, "operation": req.operation, "assetPath": f"/v1/video/{job_id}", "bytes": output.stat().st_size, "durationSeconds": req.duration_seconds}
 
 
 @app.get("/v1/video/{job_id}")

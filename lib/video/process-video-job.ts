@@ -43,11 +43,19 @@ export async function processClaimedVideoJob(job: VideoJob): Promise<void> {
   const db = createAdminClient();
   const { data: course } = await db
     .from('courses')
-    .select('title,tenant_id')
+    .select('title,org_id')
     .eq('id', job.course_id)
     .maybeSingle();
   const courseTitle = course?.title ?? 'Elevate LMS';
-  const tenantId = typeof course?.tenant_id === 'string' ? course.tenant_id : null;
+  let tenantId: string | null = null;
+  if (course?.org_id) {
+    const { data: organization } = await db
+      .from('organizations')
+      .select('tenant_id')
+      .eq('id', course.org_id)
+      .maybeSingle();
+    tenantId = typeof organization?.tenant_id === 'string' ? organization.tenant_id : null;
+  }
   const instructor = getInstructorForCourse(courseTitle);
   const script = job.script?.trim() || job.lesson_title;
   const bulletPoints = Array.isArray(job.bullet_points) ? job.bullet_points : [];

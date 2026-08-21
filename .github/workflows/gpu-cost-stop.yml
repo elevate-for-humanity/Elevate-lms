@@ -5,10 +5,13 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/gpu-cost-stop.yml'
+  issues:
+    types: [opened, edited]
   workflow_dispatch:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: northflank-gpu-cost-stop
@@ -16,6 +19,7 @@ concurrency:
 
 jobs:
   stop-gpu-costs:
+    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[GPU COST STOP]')
     name: Audit and remove unfinished GPU resources
     runs-on: ubuntu-latest
     environment: production
@@ -33,65 +37,81 @@ jobs:
           test -n "$NORTHFLANK_API_TOKEN"
 
       - name: Audit and stop unfinished GPU spend
+        id: cleanup
         shell: bash
         run: |
           set -Eeuo pipefail
           base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
           auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
 
-          echo '--- GPU project before cleanup ---'
-          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-before.json || true
-          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-before.json || true
-          node - <<'NODE'
-          const fs=require('fs');
-          for (const f of ['/tmp/services-before.json','/tmp/volumes-before.json']) {
-            try {
-              const j=JSON.parse(fs.readFileSync(f,'utf8'));
-              const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.services)?j.data.services:Array.isArray(j.data?.volumes)?j.data.volumes:[]);
-              console.log(f, d.map(x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize,attached:x.attachedObjects}))); 
-            } catch(e) { console.log(f,'unavailable'); }
-          }
-          NODE
+          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-before.json || echo '{"data":[]}' > /tmp/services-before.json
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-before.json || echo '{"data":[]}' > /tmp/volumes-before.json
 
           service_code=$(curl -sS -o /tmp/service.json -w '%{http_code}' "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" || true)
+          service_deleted=false
           if [ "$service_code" = "200" ]; then
-            echo "Deleting unfinished GPU service ${NORTHFLANK_GPU_SERVICE_ID} and attached child resources"
             curl -fsS -X DELETE "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}?delete_child_objects=true"
-          else
-            echo "GPU service is not present (HTTP $service_code); checking orphan model volumes"
+            service_deleted=true
           fi
 
-          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after-service.json || true
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after-service.json || echo '{"data":[]}' > /tmp/volumes-after-service.json
           node - <<'NODE' > /tmp/orphan-volume-ids.txt
           const fs=require('fs');
-          try {
-            const j=JSON.parse(fs.readFileSync('/tmp/volumes-after-service.json','utf8'));
-            const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.volumes)?j.data.volumes:[]);
-            for (const v of d) {
-              const name=String(v.name||'').toLowerCase();
-              const id=String(v.id||'');
-              const attached=Array.isArray(v.attachedObjects)?v.attachedObjects:[];
-              if ((id==='elevate-gpu-models' || name==='elevate gpu models') && attached.length===0) console.log(id);
-            }
-          } catch(e) {}
-          NODE
-
-          while IFS= read -r vid; do
-            [ -z "$vid" ] && continue
-            echo "Deleting orphan GPU model volume $vid"
-            curl -fsS -X DELETE "${auth[@]}" "$base/volumes/$vid"
-          done < /tmp/orphan-volume-ids.txt
-
-          echo '--- GPU project after cleanup ---'
-          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-after.json || true
-          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after.json || true
-          node - <<'NODE'
-          const fs=require('fs');
-          for (const f of ['/tmp/services-after.json','/tmp/volumes-after.json']) {
-            try {
-              const j=JSON.parse(fs.readFileSync(f,'utf8'));
-              const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.services)?j.data.services:Array.isArray(j.data?.volumes)?j.data.volumes:[]);
-              console.log(f, d.map(x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize,attached:x.attachedObjects})));
-            } catch(e) { console.log(f,'unavailable'); }
+          const j=JSON.parse(fs.readFileSync('/tmp/volumes-after-service.json','utf8'));
+          const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.volumes)?j.data.volumes:[]);
+          for (const v of d) {
+            const name=String(v.name||'').toLowerCase();
+            const id=String(v.id||'');
+            const attached=Array.isArray(v.attachedObjects)?v.attachedObjects:[];
+            if ((id==='elevate-gpu-models' || name==='elevate gpu models') && attached.length===0) console.log(id);
           }
           NODE
+
+          orphan_deleted=0
+          while IFS= read -r vid; do
+            [ -z "$vid" ] && continue
+            curl -fsS -X DELETE "${auth[@]}" "$base/volumes/$vid"
+            orphan_deleted=$((orphan_deleted+1))
+          done < /tmp/orphan-volume-ids.txt
+
+          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-after.json || echo '{"data":[]}' > /tmp/services-after.json
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after.json || echo '{"data":[]}' > /tmp/volumes-after.json
+
+          node - "$service_deleted" "$orphan_deleted" <<'NODE' > /tmp/summary.txt
+          const fs=require('fs');
+          const serviceDeleted=process.argv[2];
+          const orphanDeleted=process.argv[3];
+          function rows(path, key) {
+            const j=JSON.parse(fs.readFileSync(path,'utf8'));
+            if (Array.isArray(j.data)) return j.data;
+            if (Array.isArray(j.data?.[key])) return j.data[key];
+            return [];
+          }
+          const sb=rows('/tmp/services-before.json','services');
+          const vb=rows('/tmp/volumes-before.json','volumes');
+          const sa=rows('/tmp/services-after.json','services');
+          const va=rows('/tmp/volumes-after.json','volumes');
+          const compact=x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize});
+          console.log(`service_deleted=${serviceDeleted}`);
+          console.log(`orphan_volumes_deleted=${orphanDeleted}`);
+          console.log(`services_before=${JSON.stringify(sb.map(compact))}`);
+          console.log(`volumes_before=${JSON.stringify(vb.map(compact))}`);
+          console.log(`services_after=${JSON.stringify(sa.map(compact))}`);
+          console.log(`volumes_after=${JSON.stringify(va.map(compact))}`);
+          NODE
+          cat /tmp/summary.txt
+
+      - name: Post cleanup result
+        if: always() && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let summary = 'Cleanup step did not produce a summary.';
+            try { summary = fs.readFileSync('/tmp/summary.txt', 'utf8'); } catch {}
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `GPU cost-stop result: **${{ job.status }}**\n\n\`\`\`text\n${summary}\n\`\`\``
+            });

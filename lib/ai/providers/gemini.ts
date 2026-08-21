@@ -1,6 +1,8 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+// Keep only currently supported stable Gemini text models. Gemini 2.0 Flash and
+// Flash-Lite were shut down in 2026 and were returning 404 in production.
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 /**
@@ -17,11 +19,9 @@ export class GeminiProvider implements AIProvider {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
-    const model = options.model || GEMINI_MODELS[0];
     const systemMsg = options.messages.find((m) => m.role === 'system')?.content || '';
     const userMsgs = options.messages.filter((m) => m.role !== 'system');
 
-    // Try models in order (fallback on 429/503)
     const models = options.model ? [options.model] : GEMINI_MODELS;
     let lastError: Error | null = null;
 
@@ -45,8 +45,15 @@ export class GeminiProvider implements AIProvider {
         });
 
         if (!res.ok) {
-          if (res.status === 429 || res.status === 503) continue; // try next model
-          throw new Error(`Gemini ${m} returned ${res.status}`);
+          const responseText = await res.text().catch(() => '');
+          const error = new Error(
+            `Gemini ${m} returned ${res.status}${responseText ? `: ${responseText.slice(0, 240)}` : ''}`,
+          );
+          lastError = error;
+          // Capacity/rate-limit and retired/unavailable model failures should
+          // fall through to another supported Gemini model first.
+          if ([404, 429, 503].includes(res.status)) continue;
+          throw error;
         }
 
         const data = await res.json();

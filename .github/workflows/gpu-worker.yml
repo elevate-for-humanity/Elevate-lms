@@ -14,7 +14,7 @@ on:
 
 concurrency:
   group: gpu-worker-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -67,8 +67,8 @@ jobs:
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
 
-      - name: Validate TypeScript media integration
-        run: pnpm exec tsc --noEmit --pretty false
+      - name: Validate Admin media integration
+        run: pnpm run typecheck:admin
 
       - name: Verify Northflank credential
         run: test -n "$NORTHFLANK_API_TOKEN"

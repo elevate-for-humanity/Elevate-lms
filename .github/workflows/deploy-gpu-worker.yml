@@ -21,7 +21,7 @@ permissions:
 
 concurrency:
   group: northflank-gpu-video-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-gpu-worker:
@@ -50,7 +50,7 @@ jobs:
       BUILD_SHA: ${{ github.sha }}
 
     steps:
-      - name: Post GPU workflow run ID immediately
+      - name: Post run ID
         if: github.event_name == 'issues'
         uses: actions/github-script@v7
         with:
@@ -59,16 +59,14 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `GPU deployment started: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nCommit: \`${context.sha}\``
+              body: `GPU deployment started: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\nCommit: \`${context.sha}\``
             });
 
-      - name: Checkout exact main revision
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           clean: true
-
-      - name: Prove release SHA belongs to main
+      - name: Prove exact main SHA
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -84,30 +82,19 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Install repository dependencies deterministically
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
-      - name: Validate GPU worker Python
+      - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Validate worker source
         run: |
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
 
-      - name: Validate GPU integration TypeScript
-        run: pnpm exec tsc --noEmit --pretty false
-
-      - name: Build CUDA worker image locally
-        run: docker build -f services/media-gpu-worker/Dockerfile -t elevate-media-gpu-worker:${{ github.sha }} .
-
-      - name: Provision isolated Northflank GPU project/service and wire Admin
+      - name: Provision GPU topology and wire Admin secrets
         id: provision
         run: pnpm tsx scripts/northflank/provision-media-gpu.ts --execute
-
-      - name: Export provisioned GPU topology
+      - name: Export GPU topology
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -116,95 +103,61 @@ jobs:
           test -n "${{ steps.provision.outputs.gpu_worker_url }}"
           echo "NORTHFLANK_PROJECT_ID=${{ steps.provision.outputs.gpu_project_id }}" >> "$GITHUB_ENV"
           echo "GPU_VIDEO_WORKER_URL=${{ steps.provision.outputs.gpu_worker_url }}" >> "$GITHUB_ENV"
-          echo "GPU_TYPE=${{ steps.provision.outputs.gpu_type }}" >> "$GITHUB_ENV"
 
-      - name: Trigger exact-SHA GPU worker build
+      - name: Build exact GPU worker SHA
         id: gpu_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_GPU_SERVICE_ID"
-
-      - name: Require concrete GPU build id
-        run: test -n "${{ steps.gpu_build.outputs.build_id }}"
-
-      - name: Wait for GPU image build
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --timeout-ms 3600000
-
-      - name: Verify exact GPU image build
-        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --sha "${{ github.sha }}"
-
+      - name: Wait and verify GPU build
+        run: |
+          test -n "${{ steps.gpu_build.outputs.build_id }}"
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --timeout-ms 3600000
+          pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --sha "${{ github.sha }}"
       - name: Deploy exact GPU image
-        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --sha "${{ github.sha }}"
+        run: |
+          pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --sha "${{ github.sha }}"
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_GPU_SERVICE_ID" --timeout-ms 7200000
 
-      - name: Wait for GPU deployment
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_GPU_SERVICE_ID" --timeout-ms 7200000
-
-      - name: Require live CUDA, model bootstrap, and real Wan MP4
+      - name: Real Wan production acceptance
         env:
           GPU_READY_TIMEOUT_MS: '7200000'
           GPU_GENERATION_TIMEOUT_MS: '2400000'
         run: pnpm tsx scripts/northflank/accept-media-gpu.ts "$GPU_VIDEO_WORKER_URL"
 
-      - name: Redeploy Admin so GPU client secrets are loaded
+      - name: Build exact Admin SHA
         id: admin_build
         env:
           NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-
-      - name: Wait for exact Admin build
+      - name: Wait, verify, and deploy Admin
         env:
           NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --timeout-ms 3600000
+        run: |
+          test -n "${{ steps.admin_build.outputs.build_id }}"
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --timeout-ms 3600000
+          pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
+          pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
+          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
 
-      - name: Verify exact Admin build
-        env:
-          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
-        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
-
-      - name: Deploy Admin with GPU client configuration
-        env:
-          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
-        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
-
-      - name: Wait for Admin deployment
-        env:
-          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
-        run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
-
-      - name: Smoke Admin after GPU wiring
+      - name: Prove Admin and Admin-to-GPU readiness
         shell: bash
         run: |
           set -Eeuo pipefail
-          for i in $(seq 1 30); do
+          for i in $(seq 1 40); do
             ping=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/ping || true)
             health=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health || true)
-            if [ "$ping" = 200 ] && [ "$health" = 200 ] && grep -q '"ok":true' /tmp/admin-ping.json && grep -q '"ready":true' /tmp/admin-health.json; then
-              echo 'Admin is healthy with GPU client configuration loaded.'
-              break
-            fi
-            if [ "$i" = 30 ]; then
-              cat /tmp/admin-ping.json 2>/dev/null || true
-              cat /tmp/admin-health.json 2>/dev/null || true
-              exit 1
-            fi
-            sleep 15
-          done
-
-      - name: Prove Admin can authenticate to the GPU worker
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          for i in $(seq 1 30); do
-            status=$(curl -sS --max-time 15 -o /tmp/admin-gpu.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health/gpu-video || true)
-            if [ "$status" = 200 ] && grep -q '"ready":true' /tmp/admin-gpu.json; then
-              echo 'Admin GPU client is authenticated and ready.'
+            gpu=$(curl -sS --max-time 15 -o /tmp/admin-gpu.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health/gpu-video || true)
+            if [ "$ping" = 200 ] && [ "$health" = 200 ] && [ "$gpu" = 200 ] && grep -q '"ready":true' /tmp/admin-health.json && grep -q '"ready":true' /tmp/admin-gpu.json; then
               cat /tmp/admin-gpu.json
               exit 0
             fi
             sleep 15
           done
+          cat /tmp/admin-ping.json 2>/dev/null || true
+          cat /tmp/admin-health.json 2>/dev/null || true
           cat /tmp/admin-gpu.json 2>/dev/null || true
           exit 1
 
-      - name: Post final GPU deployment result to issue
+      - name: Post final result
         if: always() && github.event_name == 'issues'
         uses: actions/github-script@v7
         with:
@@ -213,5 +166,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `GPU deployment run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nJob result: **${{ job.status }}**\n\nCommit: \`${context.sha}\``
+              body: `GPU deployment run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\nJob result: **${{ job.status }}**\nCommit: \`${context.sha}\``
             });

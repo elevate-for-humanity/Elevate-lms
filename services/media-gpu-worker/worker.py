@@ -1,25 +1,36 @@
-"""Elevate self-hosted GPU video inference service."""
+"""Elevate self-hosted GPU video inference service.
+
+The GPU worker owns only inference and short-lived generated files. Durable
+course storage remains in Admin so this service never needs Supabase or R2
+credentials.
+"""
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
 import os
 import shutil
+import socket
 import subprocess
 import tempfile
+import time
 import uuid
 from pathlib import Path
+from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-import boto3
 import torch
 from fastapi import FastAPI, Header, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="3.0.0")
-OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/tmp/elevate-gpu-output"))
+app = FastAPI(title="Elevate GPU Media Worker", version="4.0.0")
+OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
+ASSET_TTL_SECONDS = max(300, int(os.getenv("GPU_ASSET_TTL_SECONDS", "7200")))
+MIN_WAN_VRAM_BYTES = int(float(os.getenv("WAN_MIN_VRAM_GB", "22")) * 1024**3)
 _sem = asyncio.Semaphore(MAX_CONCURRENCY)
 
 
@@ -54,24 +65,41 @@ def _model_state() -> dict:
     wan = Path(os.getenv("WAN_REPO", "/models/runtime/wan2.2"))
     wan_ckpt = Path(os.getenv("WAN_CHECKPOINT_DIR", "/models/Wan2.2-TI2V-5B"))
     wan_python = Path(os.getenv("WAN_PYTHON", "/models/runtime/wan-venv/bin/python"))
+    cuda = torch.cuda.is_available()
+    vram = torch.cuda.get_device_properties(0).total_memory if cuda else 0
     return {
-        "cuda": torch.cuda.is_available(),
-        "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "vramBytes": torch.cuda.get_device_properties(0).total_memory if torch.cuda.is_available() else 0,
+        "cuda": cuda,
+        "gpu": torch.cuda.get_device_name(0) if cuda else None,
+        "vramBytes": vram,
         "ltxInstalled": (ltx / "inference.py").exists(),
         "wanInstalled": (wan / "generate.py").exists() and wan_python.exists(),
         "wanModelReady": wan_ckpt.exists() and any(wan_ckpt.iterdir()) if wan_ckpt.exists() else False,
+        "wanVramReady": bool(vram >= MIN_WAN_VRAM_BYTES),
         "ffmpeg": shutil.which("ffmpeg") is not None,
         "bootstrap": _bootstrap_state(),
     }
 
 
+def _assert_public_http_url(value: str) -> None:
+    parsed = urlparse(value)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise ValueError("conditioning image must use http(s)")
+    for info in socket.getaddrinfo(parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80)):
+        ip = ipaddress.ip_address(info[4][0])
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+            raise ValueError("conditioning image host is not public")
+
+
 def _download_image(url: str | None, work: Path) -> str | None:
     if not url:
         return None
+    _assert_public_http_url(url)
     target = work / "conditioning-image"
-    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/3.0"})
+    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.0"})
     with urlopen(req, timeout=30) as response, target.open("wb") as out:
+        content_type = response.headers.get("content-type", "")
+        if not content_type.startswith("image/"):
+            raise ValueError("conditioning URL did not return an image")
         shutil.copyfileobj(response, out)
     return str(target)
 
@@ -94,8 +122,7 @@ def _run_wan(req: GenerateRequest, output: Path, image: str | None) -> None:
     repo = Path(os.getenv("WAN_REPO", "/models/runtime/wan2.2"))
     python = os.getenv("WAN_PYTHON", "/models/runtime/wan-venv/bin/python")
     ckpt = os.getenv("WAN_CHECKPOINT_DIR", "/models/Wan2.2-TI2V-5B")
-    landscape = req.width >= req.height
-    size = "1280*704" if landscape else "704*1280"
+    size = "1280*704" if req.width >= req.height else "704*1280"
     cmd = [python, str(repo / "generate.py"), "--task", "ti2v-5B", "--size", size, "--ckpt_dir", ckpt, "--prompt", req.prompt, "--save_file", str(output), "--offload_model", "True", "--convert_model_dtype", "--t5_cpu"]
     if req.seed is not None:
         cmd += ["--seed", str(req.seed)]
@@ -104,48 +131,22 @@ def _run_wan(req: GenerateRequest, output: Path, image: str | None) -> None:
     subprocess.run(cmd, cwd=repo, check=True, timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")))
 
 
-def _hydrate_storage_secrets() -> None:
-    required = ["R2_ENDPOINT", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_PUBLIC_BASE_URL"]
-    missing = [key for key in required if not os.getenv(key)]
-    if not missing:
-        return
-    supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL") or os.getenv("SUPABASE_URL")
-    service_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-    if not supabase_url or not service_key:
-        return
-    for key in missing:
+def _asset_path(job_id: str) -> Path:
+    try:
+        uuid.UUID(job_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail="Asset not found") from exc
+    return OUTPUT_DIR / f"{job_id}.mp4"
+
+
+def _cleanup_expired_assets() -> None:
+    cutoff = time.time() - ASSET_TTL_SECONDS
+    for candidate in OUTPUT_DIR.glob("*.mp4"):
         try:
-            request = Request(
-                f"{supabase_url.rstrip('/')}/rest/v1/rpc/get_platform_secret",
-                data=json.dumps({"p_key": key}).encode(),
-                headers={
-                    "apikey": service_key,
-                    "Authorization": f"Bearer {service_key}",
-                    "Content-Type": "application/json",
-                },
-                method="POST",
-            )
-            with urlopen(request, timeout=15) as response:
-                value = json.loads(response.read().decode())
-            if isinstance(value, str) and value.strip():
-                os.environ[key] = value.strip()
-        except Exception:
+            if candidate.stat().st_mtime < cutoff:
+                candidate.unlink(missing_ok=True)
+        except OSError:
             continue
-
-
-def _upload(path: Path, job_id: str) -> str:
-    _hydrate_storage_secrets()
-    endpoint = os.getenv("R2_ENDPOINT")
-    bucket = os.getenv("R2_BUCKET")
-    access = os.getenv("R2_ACCESS_KEY_ID")
-    secret = os.getenv("R2_SECRET_ACCESS_KEY")
-    public = os.getenv("R2_PUBLIC_BASE_URL", "").rstrip("/")
-    if not all([endpoint, bucket, access, secret, public]):
-        raise RuntimeError("Durable R2 storage is not configured")
-    key = f"generated-scenes/{job_id}.mp4"
-    client = boto3.client("s3", endpoint_url=endpoint, aws_access_key_id=access, aws_secret_access_key=secret, region_name="auto")
-    client.upload_file(str(path), bucket, key, ExtraArgs={"ContentType": "video/mp4", "CacheControl": "public,max-age=31536000,immutable"})
-    return f"{public}/{key}"
 
 
 @app.get("/health")
@@ -156,8 +157,11 @@ def health():
 @app.get("/ready")
 def ready():
     state = _model_state()
-    provider = os.getenv("GPU_VIDEO_PROVIDER", "wan")
-    model_ready = state["wanInstalled"] and state["wanModelReady"] if provider == "wan" else state["ltxInstalled"]
+    provider = os.getenv("GPU_VIDEO_PROVIDER", "wan").lower()
+    if provider == "wan":
+        model_ready = state["wanInstalled"] and state["wanModelReady"] and state["wanVramReady"]
+    else:
+        model_ready = state["ltxInstalled"]
     return {"ready": bool(state["cuda"] and state["ffmpeg"] and model_ready), "provider": provider, **state}
 
 
@@ -170,30 +174,52 @@ async def generate(req: GenerateRequest, authorization: str | None = Header(defa
     state = _model_state()
     if not state["cuda"]:
         raise HTTPException(status_code=503, detail="CUDA GPU unavailable")
-    if provider == "wan" and not (state["wanInstalled"] and state["wanModelReady"]):
-        raise HTTPException(status_code=503, detail="Wan model is still bootstrapping")
+    if provider == "wan" and not (state["wanInstalled"] and state["wanModelReady"] and state["wanVramReady"]):
+        raise HTTPException(status_code=503, detail="Wan runtime/model/GPU is not ready")
     if provider == "ltx" and not state["ltxInstalled"]:
         raise HTTPException(status_code=503, detail="LTX runtime unavailable")
+
+    _cleanup_expired_assets()
     job_id = str(uuid.uuid4())
-    with tempfile.TemporaryDirectory(prefix=f"elevate-gpu-{job_id}-") as temp:
-        work = Path(temp)
-        output = work / "output.mp4"
-        try:
+    output = OUTPUT_DIR / f"{job_id}.mp4"
+    try:
+        with tempfile.TemporaryDirectory(prefix=f"elevate-gpu-{job_id}-") as temp:
+            work = Path(temp)
             image = await asyncio.to_thread(_download_image, req.image_url, work)
             async with _sem:
                 runner = _run_ltx if provider == "ltx" else _run_wan
                 await asyncio.to_thread(runner, req, output, image)
-            if not output.exists() or output.stat().st_size == 0:
-                raise RuntimeError("Generator produced no video")
-            video_url = await asyncio.to_thread(_upload, output, job_id)
-        except subprocess.TimeoutExpired as exc:
-            raise HTTPException(status_code=504, detail="GPU generation timed out") from exc
-        except subprocess.CalledProcessError as exc:
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-            raise HTTPException(status_code=502, detail=f"{provider} inference failed") from exc
-        except Exception as exc:
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-            raise HTTPException(status_code=502, detail=str(exc)[:500]) from exc
-    return {"ok": True, "jobId": job_id, "provider": provider, "videoUrl": video_url, "durationSeconds": req.duration_seconds}
+        if not output.exists() or output.stat().st_size == 0:
+            raise RuntimeError("Generator produced no video")
+    except subprocess.TimeoutExpired as exc:
+        output.unlink(missing_ok=True)
+        raise HTTPException(status_code=504, detail="GPU generation timed out") from exc
+    except subprocess.CalledProcessError as exc:
+        output.unlink(missing_ok=True)
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        raise HTTPException(status_code=502, detail=f"{provider} inference failed") from exc
+    except Exception as exc:
+        output.unlink(missing_ok=True)
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        raise HTTPException(status_code=502, detail=str(exc)[:500]) from exc
+
+    return {"ok": True, "jobId": job_id, "provider": provider, "assetPath": f"/v1/video/{job_id}", "bytes": output.stat().st_size, "durationSeconds": req.duration_seconds}
+
+
+@app.get("/v1/video/{job_id}")
+def get_asset(job_id: str, authorization: str | None = Header(default=None)):
+    _authorize(authorization)
+    path = _asset_path(job_id)
+    if not path.exists() or path.stat().st_size == 0:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    return FileResponse(path, media_type="video/mp4", filename=f"{job_id}.mp4")
+
+
+@app.delete("/v1/video/{job_id}")
+def delete_asset(job_id: str, authorization: str | None = Header(default=None)):
+    _authorize(authorization)
+    path = _asset_path(job_id)
+    path.unlink(missing_ok=True)
+    return {"ok": True}

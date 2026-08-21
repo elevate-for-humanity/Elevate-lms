@@ -41,7 +41,8 @@ export default function RootWidgets() {
   const isStoreRoute = pathname?.startsWith('/store') ?? false;
 
   // Mount non-critical widgets only after the browser is idle.
-  // This keeps the main thread free during first paint and hydration.
+  // Route-level speech cancellation must remain active immediately, before
+  // the deferred widget bundle, so narration cannot continue across pages.
   const [idle, setIdle] = useState(false);
 
   useEffect((): void => {
@@ -54,15 +55,17 @@ export default function RootWidgets() {
     }
   }, []);
 
-  if (!idle) return null;
-
   return (
     <>
       <SpeechCanceller />
-      {!isStoreRoute && <GlobalAvatar />}
-      <FacebookPixel />
-      {!isStoreRoute && <ConditionalAIBubble />}
-      <CookieConsent />
+      {idle ? (
+        <>
+          {!isStoreRoute && <GlobalAvatar />}
+          <FacebookPixel />
+          {!isStoreRoute && <ConditionalAIBubble />}
+          <CookieConsent />
+        </>
+      ) : null}
     </>
   );
 }

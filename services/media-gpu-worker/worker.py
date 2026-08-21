@@ -25,12 +25,13 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="4.0.0")
+app = FastAPI(title="Elevate GPU Media Worker", version="4.1.0")
 OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
 ASSET_TTL_SECONDS = max(300, int(os.getenv("GPU_ASSET_TTL_SECONDS", "7200")))
 MIN_WAN_VRAM_BYTES = int(float(os.getenv("WAN_MIN_VRAM_GB", "22")) * 1024**3)
+WAN_FPS = max(1, int(os.getenv("WAN_FPS", "24")))
 _sem = asyncio.Semaphore(MAX_CONCURRENCY)
 
 
@@ -95,7 +96,7 @@ def _download_image(url: str | None, work: Path) -> str | None:
         return None
     _assert_public_http_url(url)
     target = work / "conditioning-image"
-    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.0"})
+    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.1"})
     with urlopen(req, timeout=30) as response, target.open("wb") as out:
         content_type = response.headers.get("content-type", "")
         if not content_type.startswith("image/"):
@@ -118,14 +119,34 @@ def _run_ltx(req: GenerateRequest, output: Path, image: str | None) -> None:
     subprocess.run(cmd, cwd=repo, check=True, timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")))
 
 
+def _wan_frame_count(duration_seconds: int) -> int:
+    # Wan requires frame_num = 4n+1. Choose the nearest valid count to the
+    # requested duration at the model's native 24 FPS.
+    target = max(5, int(round(duration_seconds * WAN_FPS)))
+    n = max(1, int(round((target - 1) / 4)))
+    return 4 * n + 1
+
+
 def _run_wan(req: GenerateRequest, output: Path, image: str | None) -> None:
     repo = Path(os.getenv("WAN_REPO", "/models/runtime/wan2.2"))
     python = os.getenv("WAN_PYTHON", "/models/runtime/wan-venv/bin/python")
     ckpt = os.getenv("WAN_CHECKPOINT_DIR", "/models/Wan2.2-TI2V-5B")
     size = "1280*704" if req.width >= req.height else "704*1280"
-    cmd = [python, str(repo / "generate.py"), "--task", "ti2v-5B", "--size", size, "--ckpt_dir", ckpt, "--prompt", req.prompt, "--save_file", str(output), "--offload_model", "True", "--convert_model_dtype", "--t5_cpu"]
+    cmd = [
+        python,
+        str(repo / "generate.py"),
+        "--task", "ti2v-5B",
+        "--size", size,
+        "--frame_num", str(_wan_frame_count(req.duration_seconds)),
+        "--ckpt_dir", ckpt,
+        "--prompt", req.prompt,
+        "--save_file", str(output),
+        "--offload_model", "True",
+        "--convert_model_dtype",
+        "--t5_cpu",
+    ]
     if req.seed is not None:
-        cmd += ["--seed", str(req.seed)]
+        cmd += ["--base_seed", str(req.seed)]
     if image:
         cmd += ["--image", image]
     subprocess.run(cmd, cwd=repo, check=True, timeout=int(os.getenv("GPU_JOB_TIMEOUT_SECONDS", "1800")))

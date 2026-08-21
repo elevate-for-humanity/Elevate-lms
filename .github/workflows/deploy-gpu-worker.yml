@@ -1,6 +1,8 @@
 name: Deploy GPU Video Worker
 
 on:
+  issues:
+    types: [opened, edited]
   workflow_dispatch:
     inputs:
       confirm_gpu_cost:
@@ -10,14 +12,87 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: northflank-gpu-video-deploy
   cancel-in-progress: false
 
 jobs:
+  cost-stop:
+    if: github.event_name == 'issues' && startsWith(github.event.issue.title, '[GPU COST STOP]')
+    name: Audit and stop unfinished GPU spend
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 10
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
+      NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
+      NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
+    steps:
+      - name: Cleanup and capture evidence
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -n "$NORTHFLANK_API_TOKEN"
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-before.json || echo '{"data":[]}' > /tmp/services-before.json
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-before.json || echo '{"data":[]}' > /tmp/volumes-before.json
+
+          service_code=$(curl -sS -o /tmp/service.json -w '%{http_code}' "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" || true)
+          service_deleted=false
+          if [ "$service_code" = "200" ]; then
+            curl -fsS -X DELETE "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}?delete_child_objects=true"
+            service_deleted=true
+          fi
+
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-mid.json || echo '{"data":[]}' > /tmp/volumes-mid.json
+          node - <<'NODE' > /tmp/orphans.txt
+          const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/volumes-mid.json','utf8'));
+          const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.volumes)?j.data.volumes:[]);
+          for (const v of d) {
+            const id=String(v.id||''), name=String(v.name||'').toLowerCase();
+            const attached=Array.isArray(v.attachedObjects)?v.attachedObjects:[];
+            if ((id==='elevate-gpu-models' || name==='elevate gpu models') && attached.length===0) console.log(id);
+          }
+          NODE
+          orphan_deleted=0
+          while IFS= read -r vid; do
+            [ -z "$vid" ] && continue
+            curl -fsS -X DELETE "${auth[@]}" "$base/volumes/$vid"
+            orphan_deleted=$((orphan_deleted+1))
+          done < /tmp/orphans.txt
+
+          sleep 3
+          curl -fsS "${auth[@]}" "$base/services" > /tmp/services-after.json || echo '{"data":[]}' > /tmp/services-after.json
+          curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after.json || echo '{"data":[]}' > /tmp/volumes-after.json
+          node - "$service_deleted" "$orphan_deleted" <<'NODE' > /tmp/summary.txt
+          const fs=require('fs');
+          function rows(path,key){const j=JSON.parse(fs.readFileSync(path,'utf8')); if(Array.isArray(j.data)) return j.data; if(Array.isArray(j.data?.[key])) return j.data[key]; return [];}
+          const compact=x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize});
+          console.log(`service_deleted=${process.argv[2]}`);
+          console.log(`orphan_volumes_deleted=${process.argv[3]}`);
+          console.log(`services_before=${JSON.stringify(rows('/tmp/services-before.json','services').map(compact))}`);
+          console.log(`volumes_before=${JSON.stringify(rows('/tmp/volumes-before.json','volumes').map(compact))}`);
+          console.log(`services_after=${JSON.stringify(rows('/tmp/services-after.json','services').map(compact))}`);
+          console.log(`volumes_after=${JSON.stringify(rows('/tmp/volumes-after.json','volumes').map(compact))}`);
+          NODE
+          cat /tmp/summary.txt
+
+      - name: Post cleanup result
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('fs');
+            let summary='Cleanup step produced no summary.';
+            try { summary=fs.readFileSync('/tmp/summary.txt','utf8'); } catch {}
+            await github.rest.issues.createComment({owner:context.repo.owner,repo:context.repo.repo,issue_number:context.issue.number,body:`GPU cost-stop result: **${{ job.status }}**\n\n\`\`\`text\n${summary}\n\`\`\``});
+
   deploy-gpu-worker:
-    if: github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
     name: Provision, deploy, and accept GPU video worker
     runs-on: ubuntu-latest
     environment: production
@@ -42,13 +117,11 @@ jobs:
       WAN_MIN_VRAM_GB: '22'
       GITHUB_SHA: ${{ github.sha }}
       BUILD_SHA: ${{ github.sha }}
-
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           clean: true
-
       - name: Prove exact main SHA
         shell: bash
         run: |
@@ -57,7 +130,6 @@ jobs:
           test "$(git rev-parse HEAD)" = "${{ github.sha }}"
           git merge-base --is-ancestor "${{ github.sha }}" origin/main
           test -z "$(git status --porcelain)"
-
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -68,22 +140,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
       - name: Validate GPU source and provisioning contracts
         run: |
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
           pnpm tsx scripts/northflank/provision-gpu-worker.ts
-
       - name: Provision, exact-SHA deploy, bootstrap Wan, and generate real MP4
         run: pnpm tsx scripts/northflank/provision-gpu-worker.ts --execute
-
       - name: Build exact Admin SHA
         id: admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-
       - name: Wait, verify, and deploy Admin
         run: |
           set -Eeuo pipefail
@@ -92,7 +159,6 @@ jobs:
           pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
           pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
           pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
-
       - name: Prove Admin and Admin-to-GPU readiness
         shell: bash
         run: |

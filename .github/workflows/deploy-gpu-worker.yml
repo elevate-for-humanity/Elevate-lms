@@ -29,7 +29,6 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
       NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
-      NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
     steps:
       - name: Cleanup and capture evidence
         shell: bash
@@ -41,39 +40,47 @@ jobs:
           curl -fsS "${auth[@]}" "$base/services" > /tmp/services-before.json || echo '{"data":[]}' > /tmp/services-before.json
           curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-before.json || echo '{"data":[]}' > /tmp/volumes-before.json
 
-          service_code=$(curl -sS -o /tmp/service.json -w '%{http_code}' "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" || true)
-          service_deleted=false
-          if [ "$service_code" = "200" ]; then
-            curl -fsS -X DELETE "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}?delete_child_objects=true"
-            service_deleted=true
-          fi
+          deleted_services=0
+          for sid in elevate-gpu-worker elevate-media-gpu-worker; do
+            code=$(curl -sS -o "/tmp/${sid}.json" -w '%{http_code}' "${auth[@]}" "$base/services/$sid" || true)
+            if [ "$code" = "200" ]; then
+              echo "Deleting GPU service $sid and child resources"
+              curl -fsS -X DELETE "${auth[@]}" "$base/services/$sid?delete_child_objects=true"
+              deleted_services=$((deleted_services+1))
+            fi
+          done
 
+          sleep 5
+          deleted_volumes=0
           curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-mid.json || echo '{"data":[]}' > /tmp/volumes-mid.json
-          node - <<'NODE' > /tmp/orphans.txt
+          node - <<'NODE' > /tmp/gpu-volume-ids.txt
           const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/volumes-mid.json','utf8'));
           const d=Array.isArray(j.data)?j.data:(Array.isArray(j.data?.volumes)?j.data.volumes:[]);
           for (const v of d) {
             const id=String(v.id||''), name=String(v.name||'').toLowerCase();
-            const attached=Array.isArray(v.attachedObjects)?v.attachedObjects:[];
-            if ((id==='elevate-gpu-models' || name==='elevate gpu models') && attached.length===0) console.log(id);
+            if (id==='elevate-gpu-models' || name==='elevate gpu models') console.log(id);
           }
           NODE
-          orphan_deleted=0
           while IFS= read -r vid; do
             [ -z "$vid" ] && continue
-            curl -fsS -X DELETE "${auth[@]}" "$base/volumes/$vid"
-            orphan_deleted=$((orphan_deleted+1))
-          done < /tmp/orphans.txt
+            code=$(curl -sS -o "/tmp/delete-volume-${vid}.json" -w '%{http_code}' -X DELETE "${auth[@]}" "$base/volumes/$vid" || true)
+            if [ "$code" = "200" ] || [ "$code" = "202" ] || [ "$code" = "204" ]; then
+              deleted_volumes=$((deleted_volumes+1))
+            else
+              echo "Volume delete returned HTTP $code for $vid"
+              cat "/tmp/delete-volume-${vid}.json" || true
+            fi
+          done < /tmp/gpu-volume-ids.txt
 
-          sleep 3
+          sleep 5
           curl -fsS "${auth[@]}" "$base/services" > /tmp/services-after.json || echo '{"data":[]}' > /tmp/services-after.json
           curl -fsS "${auth[@]}" "$base/volumes" > /tmp/volumes-after.json || echo '{"data":[]}' > /tmp/volumes-after.json
-          node - "$service_deleted" "$orphan_deleted" <<'NODE' > /tmp/summary.txt
+          node - "$deleted_services" "$deleted_volumes" <<'NODE' > /tmp/summary.txt
           const fs=require('fs');
           function rows(path,key){const j=JSON.parse(fs.readFileSync(path,'utf8')); if(Array.isArray(j.data)) return j.data; if(Array.isArray(j.data?.[key])) return j.data[key]; return [];}
           const compact=x=>({id:x.id,name:x.name,status:x.status,plan:x.billing?.deploymentPlan,storageMB:x.spec?.storageSize});
-          console.log(`service_deleted=${process.argv[2]}`);
-          console.log(`orphan_volumes_deleted=${process.argv[3]}`);
+          console.log(`services_deleted=${process.argv[2]}`);
+          console.log(`volumes_deleted=${process.argv[3]}`);
           console.log(`services_before=${JSON.stringify(rows('/tmp/services-before.json','services').map(compact))}`);
           console.log(`volumes_before=${JSON.stringify(rows('/tmp/volumes-before.json','volumes').map(compact))}`);
           console.log(`services_after=${JSON.stringify(rows('/tmp/services-after.json','services').map(compact))}`);
@@ -104,7 +111,7 @@ jobs:
       NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
       NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
       NORTHFLANK_GPU_REGION: us-central
-      NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
+      NORTHFLANK_GPU_SERVICE_ID: elevate-gpu-worker
       NORTHFLANK_GPU_TYPE: l4-24
       NORTHFLANK_GPU_COUNT: '1'
       NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g

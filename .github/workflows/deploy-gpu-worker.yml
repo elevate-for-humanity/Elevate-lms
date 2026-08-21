@@ -1,22 +1,15 @@
 name: Deploy GPU Video Worker
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'services/media-gpu-worker/**'
-      - 'lib/video/gpu-video-client.ts'
-      - 'lib/video/process-video-job.ts'
-      - 'apps/admin/app/api/health/gpu-video/route.ts'
-      - 'scripts/northflank/provision-gpu-worker.ts'
-      - '.github/workflows/deploy-gpu-worker.yml'
-  issues:
-    types: [opened, edited]
   workflow_dispatch:
+    inputs:
+      confirm_gpu_cost:
+        description: 'Type DEPLOY_GPU to provision the paid GPU worker'
+        required: true
+        type: string
 
 permissions:
   contents: read
-  issues: write
 
 concurrency:
   group: northflank-gpu-video-deploy
@@ -24,7 +17,7 @@ concurrency:
 
 jobs:
   deploy-gpu-worker:
-    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[GPU DEPLOY]')
+    if: github.event.inputs.confirm_gpu_cost == 'DEPLOY_GPU'
     name: Provision, deploy, and accept GPU video worker
     runs-on: ubuntu-latest
     environment: production
@@ -51,18 +44,6 @@ jobs:
       BUILD_SHA: ${{ github.sha }}
 
     steps:
-      - name: Post run ID
-        if: github.event_name == 'issues'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `GPU deployment started: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\nCommit: \`${context.sha}\``
-            });
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -130,15 +111,3 @@ jobs:
           cat /tmp/admin-health.json 2>/dev/null || true
           cat /tmp/admin-gpu.json 2>/dev/null || true
           exit 1
-
-      - name: Post final result
-        if: always() && github.event_name == 'issues'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `GPU deployment run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\nJob result: **${{ job.status }}**\nCommit: \`${context.sha}\``
-            });

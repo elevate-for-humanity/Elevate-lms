@@ -28,15 +28,26 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function storeOrigin(request: NextRequest): string {
+  const requestedOrigin = request.nextUrl.origin.replace(/\/$/, '');
   const configured =
     process.env.STORE_URL?.trim() ||
     process.env.NEXT_PUBLIC_STORE_URL?.trim();
-  if (configured) return configured.replace(/\/$/, '');
+  if (!configured) return requestedOrigin;
 
-  // Keep local/dev and the existing www-hosted store functional. Production
-  // store runtime supplies STORE_URL so Stripe returns customers to the isolated
-  // commerce service instead of creating a cross-host checkout loop.
-  return request.nextUrl.origin;
+  try {
+    const configuredUrl = new URL(configured);
+    if (configuredUrl.hostname.toLowerCase() === request.nextUrl.hostname.toLowerCase()) {
+      return configuredUrl.origin;
+    }
+  } catch {
+    // Invalid configuration must never break checkout; stay on the active host.
+  }
+
+  // This is important while the isolated Northflank runtime is live before a
+  // branded store DNS alias is connected. Stripe must return the buyer to the
+  // host that actually served checkout instead of redirecting to an unavailable
+  // configured hostname.
+  return requestedOrigin;
 }
 
 export async function POST(request: NextRequest) {

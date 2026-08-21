@@ -27,7 +27,17 @@ import { syncPlatformSubscriptionLifecycle } from '@/lib/platform/subscription-l
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SITE_URL = 'https://www.elevateforhumanity.org';
+function storeOrigin(request: NextRequest): string {
+  const configured =
+    process.env.STORE_URL?.trim() ||
+    process.env.NEXT_PUBLIC_STORE_URL?.trim();
+  if (configured) return configured.replace(/\/$/, '');
+
+  // Keep local/dev and the existing www-hosted store functional. Production
+  // store runtime supplies STORE_URL so Stripe returns customers to the isolated
+  // commerce service instead of creating a cross-host checkout loop.
+  return request.nextUrl.origin;
+}
 
 export async function POST(request: NextRequest) {
   await hydrateProcessEnv();
@@ -206,6 +216,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const origin = storeOrigin(request);
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     line_items: [
@@ -217,8 +228,8 @@ export async function POST(request: NextRequest) {
     client_reference_id: user.id,
     metadata,
     subscription_data: { metadata },
-    success_url: `${SITE_URL}/store/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${SITE_URL}/store/plans?checkout=cancelled`,
+    success_url: `${origin}/store/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/store/plans?checkout=cancelled`,
   });
 
   if (!session.url) return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });

@@ -21,10 +21,10 @@ const GPU_COUNT = Number(process.env.NORTHFLANK_GPU_COUNT || '1');
 // Confirmed by the Northflank API: nf-compute-* plans are rejected for managed GPU workloads.
 const GPU_DEPLOYMENT_PLAN = process.env.NORTHFLANK_GPU_DEPLOYMENT_PLAN || `nf-gpu-${GPU_TYPE}-${GPU_COUNT}g`;
 const BUILD_PLAN = process.env.NORTHFLANK_GPU_BUILD_PLAN || 'nf-compute-800-16';
-// L4 managed nodes currently require at least 256000MB deployment ephemeral storage.
-// Use Northflank's supported 256GiB allocation while keeping model weights on the
-// separate persistent /models volume.
-const GPU_DEPLOYMENT_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_EPHEMERAL_MB || '262144');
+// Northflank's managed L4 node contract is exactly 256000 MB for deployment
+// ephemeral storage. 262144 MiB looks like 256 GiB, but the Northflank API
+// rejects it because the platform limit is expressed as 256000 MB.
+const GPU_DEPLOYMENT_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_EPHEMERAL_MB || '256000');
 const BUILD_EPHEMERAL_MB = Number(process.env.NORTHFLANK_GPU_BUILD_EPHEMERAL_MB || '32768');
 const RUNTIME_PORT = 8080;
 const REPO = 'https://github.com/elevate-for-humanity/Elevate-lms';
@@ -64,8 +64,8 @@ async function preflight() {
   if (!plans.some((plan) => plan.id === BUILD_PLAN && Array.isArray(plan.type) && plan.type.includes('build'))) {
     throw new Error(`Build plan ${BUILD_PLAN} is not available`);
   }
-  if (GPU_DEPLOYMENT_EPHEMERAL_MB < 256000) {
-    throw new Error(`L4 deployment ephemeral storage must be at least 256000MB; got ${GPU_DEPLOYMENT_EPHEMERAL_MB}`);
+  if (GPU_DEPLOYMENT_EPHEMERAL_MB !== 256000) {
+    throw new Error(`Northflank L4 deployment ephemeral storage must be exactly 256000MB; got ${GPU_DEPLOYMENT_EPHEMERAL_MB}`);
   }
   log('Preflight passed', {
     gpuProject: GPU_PROJECT_ID,

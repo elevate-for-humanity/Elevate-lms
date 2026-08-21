@@ -8,12 +8,12 @@ on:
       - 'services/media-gpu-worker/**'
       - 'lib/video/gpu-video-client.ts'
       - 'lib/video/process-video-job.ts'
-      - 'scripts/northflank/provision-gpu-media.ts'
+      - 'scripts/northflank/provision-gpu-worker.ts'
       - '.github/workflows/gpu-worker.yml'
 
 concurrency:
   group: gpu-worker-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -22,16 +22,16 @@ permissions:
 jobs:
   validate-and-provision:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_PROJECT_ID: elevate-platform
+      NORTHFLANK_GPU_PROJECT_ID: elevate-platform
       NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
-      NORTHFLANK_GPU_PROJECT_NAME: elevate-platform
       NORTHFLANK_GPU_REGION: us-east1
-      NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
+      NORTHFLANK_GPU_SERVICE_ID: elevate-gpu-worker
+      NORTHFLANK_GPU_MODEL_VOLUME_ID: elevate-gpu-models
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
-      NORTHFLANK_GPU_TYPE: l4-24
       NORTHFLANK_GPU_COUNT: '1'
       GPU_VIDEO_PROVIDER: wan
     steps:
@@ -45,7 +45,7 @@ jobs:
             -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d '{"state":"pending","context":"GPU Media Acceptance","description":"Validating and provisioning L4 24GB/Wan media worker"}' >/dev/null
+            -d '{"state":"pending","context":"GPU Media Acceptance","description":"Provisioning NVIDIA L4/Wan worker and real MP4 acceptance"}' >/dev/null
 
       - uses: pnpm/action-setup@v4
         with:
@@ -64,8 +64,8 @@ jobs:
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
 
-      - name: Validate provisioner parses
-        run: pnpm exec tsx scripts/northflank/provision-gpu-media.ts
+      - name: Validate canonical GPU provisioner
+        run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts
 
       - name: Typecheck GPU integration
         run: pnpm exec tsc --noEmit --pretty false --project tsconfig.json
@@ -76,38 +76,18 @@ jobs:
       - name: Verify Northflank credential
         run: test -n "$NORTHFLANK_API_TOKEN"
 
-      - name: Provision L4 worker and run real Wan acceptance
-        run: pnpm exec tsx scripts/northflank/provision-gpu-media.ts --execute
-
-      - name: Restart Admin to load GPU client secret group
-        run: |
-          curl -fsS -X POST \
-            -H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" \
-            -H "Content-Type: application/json" \
-            "https://api.northflank.com/v1/projects/${NORTHFLANK_PROJECT_ID}/services/${NORTHFLANK_ADMIN_SERVICE_ID}/restart" >/dev/null
-
-      - name: Verify Admin recovered after GPU wiring
-        run: |
-          for attempt in $(seq 1 36); do
-            if curl -fsS --max-time 10 https://admin.elevateforhumanity.org/api/health >/tmp/admin-health.json; then
-              cat /tmp/admin-health.json
-              exit 0
-            fi
-            echo "Waiting for Admin health after GPU secret wiring (${attempt}/36)"
-            sleep 10
-          done
-          echo "Admin did not recover after GPU secret wiring" >&2
-          exit 1
+      - name: Provision worker, model volume, secrets, and run real Wan acceptance
+        run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts --execute
 
       - name: Report GPU acceptance status
         if: always()
         run: |
           if [ "${{ job.status }}" = "success" ]; then
             STATE=success
-            DESC="L4/Wan worker provisioned, MP4 accepted, Admin GPU wiring healthy"
+            DESC="L4/Wan worker provisioned; model volume ready; real MP4 accepted"
           else
             STATE=failure
-            DESC="GPU worker validation/provisioning failed; inspect workflow logs"
+            DESC="GPU provisioning or real MP4 acceptance failed; inspect workflow logs"
           fi
           curl -fsS -X POST \
             -H "Authorization: Bearer ${{ github.token }}" \

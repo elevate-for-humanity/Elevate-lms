@@ -37,7 +37,14 @@ const nextConfig = {
 
   async rewrites() {
     return {
-      beforeFiles: [...legacyImageRewrites(), ...verifiedImageRewrites()],
+      beforeFiles: [
+        {
+          source: '/videos/beauty-barber.mp4',
+          destination: 'https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/barber-hero-final.mp4',
+        },
+        ...legacyImageRewrites(),
+        ...verifiedImageRewrites(),
+      ],
       afterFiles: [],
       fallback: [],
     };

@@ -62,6 +62,7 @@ export default function HeroVideo({
   const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const [userActivated, setUserActivated] = useState(false);
   const [manualAudioOverride, setManualAudioOverride] = useState(false);
   const transcriptId = useId();
@@ -73,6 +74,7 @@ export default function HeroVideo({
 
   useEffect(() => {
     setVideoFailed(false);
+    setVideoReady(false);
     setMuted(true);
     setManualAudioOverride(false);
     const video = videoRef.current;
@@ -175,21 +177,26 @@ export default function HeroVideo({
           <video
             key={`${mobileSource}|${desktopSource}`}
             ref={videoRef}
+            poster={posterImage}
             preload="auto"
             autoPlay
             loop
             playsInline
             muted
             disablePictureInPicture
+            onLoadedData={() => setVideoReady(true)}
             onCanPlay={() => {
+              setVideoReady(true);
               const video = videoRef.current;
               if (video?.paused) void video.play().catch(() => {});
             }}
+            onPlaying={() => setVideoReady(true)}
             onError={() => {
+              setVideoReady(false);
               setVideoFailed(true);
               setMuted(true);
             }}
-            className={`absolute inset-0 z-10 h-full w-full ${mediaClass} object-center`}
+            className={`absolute inset-0 z-10 h-full w-full bg-transparent ${mediaClass} object-center transition-opacity duration-300 ${videoReady ? 'opacity-100' : 'opacity-0'}`}
             aria-label={analyticsName ? `${analyticsName} video` : 'Hero video'}
           >
             {mobileSource && mobileSource !== desktopSource ? (

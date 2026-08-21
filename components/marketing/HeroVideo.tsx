@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
@@ -75,8 +74,10 @@ export default function HeroVideo({
     setVideoFailed(false);
     setMuted(true);
     setManualAudioOverride(false);
+
     const video = videoRef.current;
     if (!video || !desktopSource) return;
+
     video.muted = true;
     void video.play().catch(() => {});
   }, [desktopSource, mobileSource]);
@@ -87,6 +88,7 @@ export default function HeroVideo({
     window.addEventListener('touchstart', unlock, { passive: true, once: true });
     window.addEventListener('keydown', unlock, { once: true });
     window.addEventListener('wheel', unlock, { passive: true, once: true });
+
     return () => {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('touchstart', unlock);
@@ -97,6 +99,7 @@ export default function HeroVideo({
 
   useEffect(() => {
     if (!voiceoverSrc || !userActivated || manualAudioOverride) return;
+
     const audio = audioRef.current;
     const video = videoRef.current;
     if (!audio) return;
@@ -109,22 +112,27 @@ export default function HeroVideo({
     void audio.play().then(() => setMuted(false)).catch(() => setMuted(true));
   }, [manualAudioOverride, userActivated, voiceoverSrc]);
 
-  useEffect(() => () => {
-    videoRef.current?.pause();
-    audioRef.current?.pause();
-  }, []);
+  useEffect(
+    () => () => {
+      videoRef.current?.pause();
+      audioRef.current?.pause();
+    },
+    [],
+  );
 
   async function toggleSound() {
     const video = videoRef.current;
     const audio = audioRef.current;
     setUserActivated(true);
     setManualAudioOverride(true);
+
     if (!muted) {
       audio?.pause();
       if (video) video.muted = true;
       setMuted(true);
       return;
     }
+
     try {
       if (voiceoverSrc && audio) {
         if (video) {
@@ -155,22 +163,10 @@ export default function HeroVideo({
   return (
     <div className={`w-full ${className}`}>
       <section
-        className={`relative isolate flex w-full items-end overflow-hidden bg-slate-900 ${heightClassName}`}
+        className={`relative isolate flex w-full items-end overflow-hidden bg-slate-900 bg-cover bg-center bg-no-repeat ${heightClassName}`}
+        style={posterImage ? { backgroundImage: `url(${posterImage})` } : undefined}
         aria-label={analyticsName ? `${analyticsName} hero` : 'Hero'}
       >
-        {posterImage ? (
-          <Image
-            src={posterImage}
-            alt=""
-            fill
-            priority
-            fetchPriority="high"
-            sizes="100vw"
-            className={`absolute inset-0 z-0 h-full w-full ${mediaClass} object-center`}
-            aria-hidden="true"
-          />
-        ) : null}
-
         {showVideo ? (
           <video
             key={`${mobileSource}|${desktopSource}`}
@@ -208,30 +204,64 @@ export default function HeroVideo({
         ) : null}
 
         {voiceoverSrc ? (
-          <audio ref={audioRef} src={voiceoverSrc} preload="metadata" aria-hidden="true" className="hidden" onEnded={() => setMuted(true)} />
+          <audio
+            ref={audioRef}
+            src={voiceoverSrc}
+            preload="metadata"
+            aria-hidden="true"
+            className="hidden"
+            onEnded={() => setMuted(true)}
+          />
         ) : null}
 
         {hasHeroContent ? (
           <div className="relative z-30 mx-auto w-full max-w-7xl px-5 pb-9 pt-24 sm:px-8 sm:pb-12 lg:px-10 lg:pb-16">
             <div className="max-w-4xl">
-              {microLabel ? <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/95 sm:text-sm">{microLabel}</p> : null}
+              {microLabel ? (
+                <p className="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-white/95 sm:text-sm">
+                  {microLabel}
+                </p>
+              ) : null}
+
               {children ?? (
                 <>
-                  {belowHeroHeadline ? <h1 className="max-w-4xl text-4xl font-black leading-[1.02] tracking-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl">{belowHeroHeadline}</h1> : null}
-                  {belowHeroSubheadline ? <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/90 sm:text-lg sm:leading-8">{belowHeroSubheadline}</p> : null}
+                  {belowHeroHeadline ? (
+                    <h1 className="max-w-4xl text-4xl font-black leading-[1.02] tracking-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl">
+                      {belowHeroHeadline}
+                    </h1>
+                  ) : null}
+
+                  {belowHeroSubheadline ? (
+                    <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-white/90 sm:text-lg sm:leading-8">
+                      {belowHeroSubheadline}
+                    </p>
+                  ) : null}
+
                   {ctas?.length ? (
                     <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                       {ctas.map((cta) => (
-                        <a key={`${cta.href}-${cta.label}`} href={cta.href} className={cta.variant === 'secondary'
-                          ? 'inline-flex min-h-12 items-center justify-center rounded-xl border border-white/70 bg-slate-950/25 px-7 py-3.5 text-center text-sm font-black text-white backdrop-blur-sm transition hover:bg-white hover:text-slate-950'
-                          : 'inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-7 py-3.5 text-center text-sm font-black text-white shadow-lg transition hover:bg-brand-red-700'}>{cta.label}</a>
+                        <a
+                          key={`${cta.href}-${cta.label}`}
+                          href={cta.href}
+                          className={
+                            cta.variant === 'secondary'
+                              ? 'inline-flex min-h-12 items-center justify-center rounded-xl border border-white/70 bg-slate-950/25 px-7 py-3.5 text-center text-sm font-black text-white backdrop-blur-sm transition hover:bg-white hover:text-slate-950'
+                              : 'inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-red-600 px-7 py-3.5 text-center text-sm font-black text-white shadow-lg transition hover:bg-brand-red-700'
+                          }
+                        >
+                          {cta.label}
+                        </a>
                       ))}
                     </div>
                   ) : null}
+
                   {trustIndicators?.length ? (
                     <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
                       {Array.from(new Set(trustIndicators)).map((item) => (
-                        <li key={item} className="flex items-center gap-2 text-sm font-bold text-white/90"><span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-500" />{item}</li>
+                        <li key={item} className="flex items-center gap-2 text-sm font-bold text-white/90">
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-red-500" aria-hidden="true" />
+                          {item}
+                        </li>
                       ))}
                     </ul>
                   ) : null}
@@ -241,9 +271,15 @@ export default function HeroVideo({
           </div>
         ) : null}
 
-        {(voiceoverSrc || showVideo) ? (
-          <button type="button" onClick={() => void toggleSound()} aria-label={muted ? 'Play hero audio' : 'Pause hero audio'} className="absolute bottom-4 right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/70 bg-slate-950/45 px-4 py-2 text-xs font-black text-white backdrop-blur-sm transition hover:bg-slate-950/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white">
-            {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}<span>{muted ? 'Play audio' : 'Pause audio'}</span>
+        {voiceoverSrc || showVideo ? (
+          <button
+            type="button"
+            onClick={() => void toggleSound()}
+            aria-label={muted ? 'Play hero audio' : 'Pause hero audio'}
+            className="absolute bottom-4 right-4 z-40 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/70 bg-slate-950/45 px-4 py-2 text-xs font-black text-white backdrop-blur-sm transition hover:bg-slate-950/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+          >
+            {muted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            <span>{muted ? 'Play audio' : 'Pause audio'}</span>
           </button>
         ) : null}
       </section>
@@ -251,8 +287,21 @@ export default function HeroVideo({
       {transcript ? (
         <div className="border-b border-slate-100 bg-slate-50">
           <div className="mx-auto max-w-4xl px-6 py-3">
-            <button type="button" onClick={() => setTranscriptOpen((open) => !open)} aria-expanded={transcriptOpen} aria-controls={transcriptId} className="flex min-h-11 items-center gap-2 rounded text-xs font-semibold text-slate-800 transition-colors hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"><span>{transcriptOpen ? '▲' : '▼'}</span>Video transcript</button>
-            {transcriptOpen ? <p id={transcriptId} className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800">{transcript}</p> : null}
+            <button
+              type="button"
+              onClick={() => setTranscriptOpen((open) => !open)}
+              aria-expanded={transcriptOpen}
+              aria-controls={transcriptId}
+              className="flex min-h-11 items-center gap-2 rounded text-xs font-semibold text-slate-800 transition-colors hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+            >
+              <span>{transcriptOpen ? '▲' : '▼'}</span>
+              Video transcript
+            </button>
+            {transcriptOpen ? (
+              <p id={transcriptId} className="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-800">
+                {transcript}
+              </p>
+            ) : null}
           </div>
         </div>
       ) : null}

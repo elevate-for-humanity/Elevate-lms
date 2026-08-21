@@ -27,11 +27,14 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_PROJECT_ID: elevate-platform
       NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
-      NORTHFLANK_GPU_PROJECT_NAME: Elevate Media GPU
-      NORTHFLANK_GPU_REGION: us-central
+      # Keep GPU inference in the existing us-east1 production project so Admin
+      # can reach it through the same Northflank service mesh. The region exposes
+      # NVIDIA L4 24GB and avoids a second cross-region control plane.
+      NORTHFLANK_GPU_PROJECT_NAME: elevate-platform
+      NORTHFLANK_GPU_REGION: us-east1
       NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
-      NORTHFLANK_GPU_TYPE: l4
+      NORTHFLANK_GPU_TYPE: l4-24
       NORTHFLANK_GPU_COUNT: '1'
       GPU_VIDEO_PROVIDER: wan
     steps:
@@ -45,7 +48,7 @@ jobs:
             -H "Authorization: Bearer ${{ github.token }}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
-            -d '{"state":"pending","context":"GPU Media Acceptance","description":"Validating and provisioning L4/Wan media worker"}' >/dev/null
+            -d '{"state":"pending","context":"GPU Media Acceptance","description":"Validating and provisioning L4 24GB/Wan media worker"}' >/dev/null
 
       - uses: pnpm/action-setup@v4
         with:

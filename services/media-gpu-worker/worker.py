@@ -22,10 +22,10 @@ from urllib.request import Request, urlopen
 
 import torch
 from fastapi import FastAPI, Header, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="4.4.0")
+app = FastAPI(title="Elevate GPU Media Worker", version="4.4.1")
 OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
@@ -191,15 +191,20 @@ def health():
 
 @app.get("/health/ready")
 def health_ready():
-    """Sanitized readiness for the platform load balancer; no diagnostics/secrets."""
+    """Sanitized fail-closed readiness for the Northflank load balancer."""
     state = _model_state()
     provider = os.getenv("GPU_VIDEO_PROVIDER", "wan").lower()
-    return {
-        "ready": _provider_ready(state, provider),
-        "service": "elevate-media-gpu-worker",
-        "provider": provider,
-        "bootstrapState": state.get("bootstrap", {}).get("state", "unknown"),
-    }
+    is_ready = _provider_ready(state, provider)
+    return JSONResponse(
+        status_code=200 if is_ready else 503,
+        content={
+            "ready": is_ready,
+            "service": "elevate-media-gpu-worker",
+            "provider": provider,
+            "bootstrapState": state.get("bootstrap", {}).get("state", "unknown"),
+        },
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get("/ready")

@@ -1,10 +1,13 @@
 /**
  * Universal narration adapter used by the Remotion lesson renderer.
  *
- * Edge TTS remains the zero-cost first attempt, but it is an unofficial public
- * endpoint and can reject datacenter traffic with HTTP 403. Production must not
- * lose every course video when that happens, so the same adapter falls back to
- * authenticated OpenAI speech when OpenAI is configured.
+ * Narration priority:
+ *   1. Edge TTS (zero-cost public endpoint)
+ *   2. ElevenLabs authenticated MP3
+ *   3. OpenAI authenticated MP3
+ *
+ * Edge TTS can reject datacenter traffic with HTTP 403. Production therefore
+ * never depends on that public endpoint as the sole narration provider.
  */
 
 import { tts } from 'edge-tts';
@@ -36,10 +39,39 @@ const OPENAI_VOICE_MAP: Record<EdgeTTSVoice, 'alloy' | 'echo' | 'fable' | 'onyx'
   'en-US-DavisNeural': 'echo',
 };
 
-async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {
-  if (!isOpenAIConfigured()) {
-    throw new Error('Edge TTS failed and OpenAI narration is not configured');
+async function generateElevenLabsNarration(text: string): Promise<Buffer> {
+  const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
+  if (!apiKey) throw new Error('ELEVENLABS_API_KEY not configured');
+
+  // Official ElevenLabs quickstart voice. Deployments may override this with a
+  // licensed voice through ELEVENLABS_VOICE_ID without changing application code.
+  const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || 'JBFqnCBsd6RMkjVDRZzb';
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=mp3_44100_128`,
+    {
+      method: 'POST',
+      headers: {
+        'xi-api-key': apiKey,
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        text,
+        model_id: process.env.ELEVENLABS_MODEL_ID?.trim() || 'eleven_multilingual_v2',
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '');
+    throw new Error(`ElevenLabs TTS returned ${response.status}${detail ? `: ${detail.slice(0, 240)}` : ''}`);
   }
+
+  return Buffer.from(await response.arrayBuffer());
+}
+
+async function generateOpenAINarration(text: string, voice: EdgeTTSVoice): Promise<Buffer> {
+  if (!isOpenAIConfigured()) throw new Error('OpenAI narration is not configured');
 
   const openai = getOpenAIClient();
   const mappedVoice = OPENAI_VOICE_MAP[voice] ?? 'alloy';
@@ -83,11 +115,22 @@ export async function generateEdgeTTS(text: string, options: EdgeTTSOptions = {}
     const audio = await tts(normalizedText, { voice, rate, pitch, volume });
     return Buffer.isBuffer(audio) ? audio : Buffer.from(audio);
   } catch (edgeError) {
-    logger.warn('[Narration] Edge TTS unavailable; using authenticated fallback', {
+    logger.warn('[Narration] Edge TTS unavailable; trying ElevenLabs', {
       error: edgeError instanceof Error ? edgeError.message : String(edgeError),
     });
-    return generateOpenAINarration(normalizedText, voice);
   }
+
+  if (process.env.ELEVENLABS_API_KEY?.trim()) {
+    try {
+      return await generateElevenLabsNarration(normalizedText);
+    } catch (elevenError) {
+      logger.warn('[Narration] ElevenLabs unavailable; trying OpenAI speech', {
+        error: elevenError instanceof Error ? elevenError.message : String(elevenError),
+      });
+    }
+  }
+
+  return generateOpenAINarration(normalizedText, voice);
 }
 
 export function buildLessonScript(lesson: {

@@ -13,7 +13,7 @@ on:
 
 concurrency:
   group: gpu-worker-production
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -26,9 +26,7 @@ jobs:
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_PROJECT_ID: elevate-platform
-      NORTHFLANK_GPU_PROJECT_ID: elevate-platform
       NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
-      NORTHFLANK_GPU_REGION: us-east1
       NORTHFLANK_GPU_SERVICE_ID: elevate-gpu-worker
       NORTHFLANK_GPU_MODEL_VOLUME_ID: elevate-gpu-models
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
@@ -65,15 +63,16 @@ jobs:
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
 
+      - name: Validate TypeScript media integration
+        run: pnpm exec tsc --noEmit --pretty false
+
       - name: Validate canonical GPU provisioner
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts
 
-      # Northflank builds the CUDA image from this exact GITHUB_SHA below. That
-      # production image build is the authoritative Docker/CUDA build gate.
       - name: Verify Northflank credential
         run: test -n "$NORTHFLANK_API_TOKEN"
 
-      - name: Provision worker, model volume, exact-SHA CUDA build, secrets, and real Wan acceptance
+      - name: Provision worker, persistent model volume, exact-SHA CUDA build, secrets, and real Wan acceptance
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts --execute
 
       - name: Report GPU acceptance status

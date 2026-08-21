@@ -1,0 +1,81 @@
+name: GPU Worker Build and Provision
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'services/media-gpu-worker/**'
+      - 'lib/video/gpu-video-client.ts'
+      - 'lib/video/process-video-job.ts'
+      - 'scripts/northflank/provision-gpu-worker.ts'
+      - '.github/workflows/gpu-worker.yml'
+
+concurrency:
+  group: gpu-worker-production
+  cancel-in-progress: false
+
+jobs:
+  validate-and-provision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+      NORTHFLANK_PROJECT_ID: elevate-platform
+      NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
+      NORTHFLANK_GPU_PROJECT_ID: elevate-gpu
+      NORTHFLANK_GPU_REGION: asia-southeast
+      NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
+      NORTHFLANK_GPU_VOLUME_ID: elevate-gpu-models
+      NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
+      NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-a100-80-1g
+      NORTHFLANK_GPU_TYPE: a100-80
+      NORTHFLANK_GPU_COUNT: '1'
+      GPU_VIDEO_PROVIDER: wan
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Validate Python worker sources
+        run: |
+          python -m py_compile services/media-gpu-worker/worker.py
+          python -m py_compile services/media-gpu-worker/bootstrap_models.py
+
+      - name: Typecheck GPU integration
+        run: pnpm exec tsc --noEmit --pretty false --project tsconfig.json
+
+      - name: Build CUDA worker image
+        run: docker build -f services/media-gpu-worker/Dockerfile -t elevate-gpu-worker:${GITHUB_SHA} .
+
+      - name: Verify Northflank credential exists
+        run: test -n "$NORTHFLANK_API_TOKEN"
+
+      - name: Provision GPU project, volume, worker and Admin wiring
+        run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts --execute
+
+      - name: Verify provisioned service exists
+        run: |
+          node - <<'NODE'
+          const token = process.env.NORTHFLANK_API_TOKEN;
+          const project = process.env.NORTHFLANK_GPU_PROJECT_ID;
+          const service = process.env.NORTHFLANK_GPU_SERVICE_ID;
+          const res = await fetch(`https://api.northflank.com/v1/projects/${project}/services/${service}`, {headers:{Authorization:`Bearer ${token}`}});
+          if (!res.ok) throw new Error(`GPU service verification failed: ${res.status} ${await res.text()}`);
+          const body = await res.json();
+          console.log(`GPU service exists: ${body?.data?.id || service}`);
+          NODE

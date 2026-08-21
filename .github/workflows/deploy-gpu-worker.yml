@@ -7,6 +7,7 @@ on:
       - 'services/media-gpu-worker/**'
       - 'lib/video/gpu-video-client.ts'
       - 'lib/video/process-video-job.ts'
+      - 'apps/admin/app/api/health/gpu-video/route.ts'
       - 'scripts/northflank/provision-media-gpu.ts'
       - 'scripts/northflank/accept-media-gpu.ts'
       - '.github/workflows/deploy-gpu-worker.yml'
@@ -161,10 +162,28 @@ jobs:
             health=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health || true)
             if [ "$ping" = 200 ] && [ "$health" = 200 ] && grep -q '"ok":true' /tmp/admin-ping.json && grep -q '"ready":true' /tmp/admin-health.json; then
               echo 'Admin is healthy with GPU client configuration loaded.'
+              break
+            fi
+            if [ "$i" = 30 ]; then
+              cat /tmp/admin-ping.json 2>/dev/null || true
+              cat /tmp/admin-health.json 2>/dev/null || true
+              exit 1
+            fi
+            sleep 15
+          done
+
+      - name: Prove Admin can authenticate to the GPU worker
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          for i in $(seq 1 30); do
+            status=$(curl -sS --max-time 15 -o /tmp/admin-gpu.json -w '%{http_code}' https://admin.elevateforhumanity.org/api/health/gpu-video || true)
+            if [ "$status" = 200 ] && grep -q '"ready":true' /tmp/admin-gpu.json; then
+              echo 'Admin GPU client is authenticated and ready.'
+              cat /tmp/admin-gpu.json
               exit 0
             fi
             sleep 15
           done
-          cat /tmp/admin-ping.json 2>/dev/null || true
-          cat /tmp/admin-health.json 2>/dev/null || true
+          cat /tmp/admin-gpu.json 2>/dev/null || true
           exit 1

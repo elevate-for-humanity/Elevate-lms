@@ -25,7 +25,7 @@ from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-app = FastAPI(title="Elevate GPU Media Worker", version="4.2.0")
+app = FastAPI(title="Elevate GPU Media Worker", version="4.3.0")
 OUTPUT_DIR = Path(os.getenv("GPU_OUTPUT_DIR", "/data/output"))
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENCY = max(1, int(os.getenv("GPU_MAX_CONCURRENCY", "1")))
@@ -102,7 +102,7 @@ def _download_image(url: str | None, work: Path) -> str | None:
         return None
     _assert_public_http_url(url)
     target = work / "conditioning-image"
-    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.2"})
+    req = Request(url, headers={"User-Agent": "ElevateGPUWorker/4.3"})
     with urlopen(req, timeout=30) as response, target.open("wb") as out:
         content_type = response.headers.get("content-type", "")
         if not content_type.startswith("image/"):
@@ -126,8 +126,6 @@ def _run_ltx(req: GenerateRequest, output: Path, image: str | None) -> None:
 
 
 def _wan_frame_count(duration_seconds: int) -> int:
-    # Wan requires frame_num = 4n+1. Choose the nearest valid count to the
-    # requested duration at the model's native 24 FPS.
     target = max(5, int(round(duration_seconds * WAN_FPS)))
     n = max(1, int(round((target - 1) / 4)))
     return 4 * n + 1
@@ -178,11 +176,12 @@ def _cleanup_expired_assets() -> None:
 
 @app.get("/health")
 def health():
-    return {"ok": True, **_model_state(), "maxConcurrency": MAX_CONCURRENCY}
+    return {"ok": True, "service": "elevate-media-gpu-worker"}
 
 
 @app.get("/ready")
-def ready():
+def ready(authorization: str | None = Header(default=None)):
+    _authorize(authorization)
     state = _model_state()
     provider = os.getenv("GPU_VIDEO_PROVIDER", "wan").lower()
     if provider == "wan":

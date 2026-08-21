@@ -68,16 +68,12 @@ jobs:
       - name: Validate canonical GPU provisioner
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts
 
-      # The Admin production build is the authoritative TypeScript/Next.js gate
-      # for lib/video integration. Do not make GPU provisioning wait on an
-      # unrelated monorepo-wide tsc pass.
-      - name: Build CUDA worker image
-        run: docker build -f services/media-gpu-worker/Dockerfile -t elevate-gpu-worker:${GITHUB_SHA} .
-
+      # Northflank builds the CUDA image from this exact GITHUB_SHA below. That
+      # production image build is the authoritative Docker/CUDA build gate.
       - name: Verify Northflank credential
         run: test -n "$NORTHFLANK_API_TOKEN"
 
-      - name: Provision worker, model volume, secrets, and run real Wan acceptance
+      - name: Provision worker, model volume, exact-SHA CUDA build, secrets, and real Wan acceptance
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts --execute
 
       - name: Report GPU acceptance status

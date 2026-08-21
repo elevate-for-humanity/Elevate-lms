@@ -62,7 +62,7 @@ export default function HomePage() {
   return (
     <>
       <StructuredData />
-      <HomeHeroVideo banner={{ ...heroBanners.home, posterImage: '/images/pages/comp-home-hero.webp' }} />
+      <HomeHeroVideo banner={heroBanners.home} />
       <MarqueeBanner />
       <HomePlatformOverview />
       <HomeCareerPathways />

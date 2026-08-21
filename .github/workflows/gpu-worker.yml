@@ -13,7 +13,7 @@ on:
 
 concurrency:
   group: gpu-worker-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: read

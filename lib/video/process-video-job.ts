@@ -7,7 +7,9 @@ import { markComplete, markFailed, type VideoJob } from './job-queue';
 import { inferDomainKey, renderLessonVideo } from './remotion-render';
 
 async function hydrateMediaRuntimeSecrets(): Promise<void> {
-  const missing = ['OPENAI_API_KEY', 'PEXELS_API_KEY'].filter((key) => !process.env[key]?.trim());
+  const missing = ['ELEVENLABS_API_KEY', 'OPENAI_API_KEY', 'PEXELS_API_KEY'].filter(
+    (key) => !process.env[key]?.trim(),
+  );
   if (!missing.length) return;
 
   const db = createAdminClient();

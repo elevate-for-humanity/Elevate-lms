@@ -27,10 +27,15 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_PROJECT_ID: elevate-platform
       NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
+      NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
+      NORTHFLANK_GPU_REGION: us-central
       NORTHFLANK_GPU_SERVICE_ID: elevate-gpu-worker
       NORTHFLANK_GPU_MODEL_VOLUME_ID: elevate-gpu-models
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
+      NORTHFLANK_GPU_TYPE: l4-24
       NORTHFLANK_GPU_COUNT: '1'
+      NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g
+      NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-16
       GPU_VIDEO_PROVIDER: wan
     steps:
       - uses: actions/checkout@v4

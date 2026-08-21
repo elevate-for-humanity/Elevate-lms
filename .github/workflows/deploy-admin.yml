@@ -2,14 +2,14 @@ name: Deploy Admin
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'apps/admin/**'
       - 'lib/**'
       - 'packages/**'
       - 'components/admin/**'
       - 'components/studio/**'
+      - 'components/pwa/**'
       - 'public/**'
       - 'scripts/northflank/**'
       - 'scripts/verify-admin-instrumentation-boundary.mjs'
@@ -30,8 +30,6 @@ on:
 permissions:
   contents: read
 
-# Serialize exact-SHA production releases. A newer main commit must not cancel an
-# active Northflank Admin build and leave production on a stale or unhealthy image.
 concurrency:
   group: northflank-admin-deploy
   cancel-in-progress: false
@@ -61,9 +59,7 @@ jobs:
     steps:
       - name: Checkout repository history
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          clean: true
+        with: { fetch-depth: 0, clean: true }
 
       - name: Prove deployment SHA belongs to main
         shell: bash
@@ -72,11 +68,10 @@ jobs:
           REQUESTED_SHA="${{ github.sha }}"
           git fetch origin main --depth=200
           RESOLVED_SHA="$(git rev-parse "$REQUESTED_SHA^{commit}" 2>/dev/null || true)"
-          test -n "$RESOLVED_SHA" || { echo '::error::Deployment SHA cannot be resolved'; exit 1; }
-          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main || { echo "::error::Refusing production deploy of SHA not contained in main: $RESOLVED_SHA"; exit 1; }
-          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)" || { echo '::error::Checkout SHA mismatch'; exit 1; }
+          test -n "$RESOLVED_SHA"
+          git merge-base --is-ancestor "$RESOLVED_SHA" origin/main
+          test "$RESOLVED_SHA" = "$(git rev-parse HEAD)"
           test "$(git status --porcelain)" = ""
-          echo "Verified production Admin SHA $RESOLVED_SHA"
 
       - name: Set build environment variables
         run: |
@@ -86,20 +81,12 @@ jobs:
       - name: Generate version file
         run: |
           cat > public/version.json <<EOF
-          {
-            "service": "admin",
-            "commit": "${{ github.sha }}",
-            "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          }
+          {"service":"admin","commit":"${{ github.sha }}","builtAt":"$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
           EOF
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.2
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.28.2 }
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
@@ -107,51 +94,32 @@ jobs:
 
       - name: Install dependencies deterministically
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-
       - name: Enforce Admin instrumentation boundary
         run: node scripts/verify-admin-instrumentation-boundary.mjs
-
       - name: Enforce portal production contracts
         run: node scripts/verify-portal-production-contracts.mjs
-
       - name: Enforce canonical Northflank Admin runtime configuration
         run: pnpm tsx scripts/northflank/configure-services.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --execute
-
+      - name: Enforce canonical Admin domain assignment
+        run: pnpm tsx scripts/northflank/configure-admin-domain.ts
       - name: Verify Admin health-check contract
         run: pnpm tsx scripts/northflank/verify-health-checks.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
 
       - name: Trigger Admin build
         id: trigger_admin_build
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
-
       - name: Require concrete build id
-        run: |
-          set -euo pipefail
-          test -n "${{ steps.trigger_admin_build.outputs.build_id }}" || { echo '::error::Northflank trigger returned no build_id'; exit 1; }
-
+        run: test -n "${{ steps.trigger_admin_build.outputs.build_id }}"
       - name: Wait for Admin build to complete
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --timeout-ms 3600000
-
       - name: Verify exact Admin build succeeded
-        run: |
-          pnpm tsx scripts/northflank/verify-build.ts \
-            "$NORTHFLANK_ADMIN_SERVICE_ID" \
-            --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" \
-            --sha "${{ github.sha }}"
-
+        run: pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
       - name: Deploy exact Admin build
-        run: |
-          pnpm tsx scripts/northflank/trigger-deployment.ts \
-            "$NORTHFLANK_ADMIN_SERVICE_ID" \
-            --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" \
-            --sha "${{ github.sha }}"
-
+        run: pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.trigger_admin_build.outputs.build_id }}" --sha "${{ github.sha }}"
       - name: Wait for Admin deployment
         run: pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --timeout-ms 3600000
-
       - name: Verify deployed SHA matches main
-        env:
-          EXPECTED_SHA: ${{ github.sha }}
+        env: { EXPECTED_SHA: '${{ github.sha }}' }
         run: pnpm tsx scripts/northflank/verify-deployed-sha.ts elevate-admin --trust-deploy-status
 
       - name: Smoke Admin liveness and readiness
@@ -160,27 +128,24 @@ jobs:
           for i in $(seq 1 20); do
             ping_status=$(curl -sS --max-time 10 -o /tmp/admin-ping.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/ping || true)
             health_status=$(curl -sS --max-time 10 -o /tmp/admin-health.json -w "%{http_code}" https://admin.elevateforhumanity.org/api/health || true)
-            ping_body=$(cat /tmp/admin-ping.json 2>/dev/null || true)
-            health_body=$(cat /tmp/admin-health.json 2>/dev/null || true)
-            if [ "$ping_status" = "200" ] && [ "$health_status" = "200" ] \
-              && echo "$ping_body" | grep -q '"ok":true' \
-              && echo "$health_body" | grep -q '"ready":true'; then
-              echo "Admin liveness and readiness passed."
-              exit 0
-            fi
-            echo "Admin not ready: ping=${ping_status} health=${health_status}. Retry ${i}/20."
+            if [ "$ping_status" = 200 ] && [ "$health_status" = 200 ] && grep -q '"ok":true' /tmp/admin-ping.json && grep -q '"ready":true' /tmp/admin-health.json; then exit 0; fi
             sleep 15
           done
-          echo "::error::Admin health contract failed after deploy."
-          cat /tmp/admin-ping.json 2>/dev/null || true
-          cat /tmp/admin-health.json 2>/dev/null || true
           exit 1
 
-      - name: Smoke canonical admin route
+      - name: Smoke canonical Admin and installed-PWA contracts
         run: |
           set -euo pipefail
-          status=$(curl -sS --max-time 15 -o /tmp/admin-dashboard.html -w "%{http_code}" https://admin.elevateforhumanity.org/dashboard || true)
-          case "$status" in
-            2*|3*) echo "Canonical admin route served HTTP ${status}." ;;
-            *) echo "::error::Canonical admin route failed HTTP ${status}."; cat /tmp/admin-dashboard.html || true; exit 1 ;;
-          esac
+          for url in \
+            'https://admin.elevateforhumanity.org/dashboard' \
+            'https://admin.elevateforhumanity.org/dashboard?utm_source=homescreen&utm_medium=pwa' \
+            'https://admin.elevateforhumanity.org/manifest-admin.json' \
+            'https://admin.elevateforhumanity.org/sw-admin.js' \
+            'https://admin.elevateforhumanity.org/offline.html'; do
+            status=$(curl -sS -L --max-time 20 -o /tmp/admin-smoke -w "%{http_code}" "$url" || true)
+            case "$status" in 2*|3*) ;; *) echo "::error::$url failed HTTP $status"; exit 1;; esac
+          done
+          manifest=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/manifest-admin.json)
+          echo "$manifest" | grep -q '"start_url"[[:space:]]*:[[:space:]]*"/dashboard"' || { echo '::error::Admin manifest does not use canonical /dashboard start_url'; exit 1; }
+          worker=$(curl -fsSL --max-time 20 https://admin.elevateforhumanity.org/sw-admin.js)
+          echo "$worker" | grep -q 'Service Worker — Admin Domain' || { echo '::error::Admin service worker is not the canonical worker'; exit 1; }

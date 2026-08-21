@@ -8,8 +8,7 @@ on:
       - 'lib/video/gpu-video-client.ts'
       - 'lib/video/process-video-job.ts'
       - 'apps/admin/app/api/health/gpu-video/route.ts'
-      - 'scripts/northflank/provision-media-gpu.ts'
-      - 'scripts/northflank/accept-media-gpu.ts'
+      - 'scripts/northflank/provision-gpu-worker.ts'
       - '.github/workflows/deploy-gpu-worker.yml'
   issues:
     types: [opened, edited]
@@ -33,16 +32,18 @@ jobs:
     env:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_TEAM_ID: ${{ secrets.NORTHFLANK_TEAM_ID || 'elevates-team' }}
-      NORTHFLANK_WEB_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
+      NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
       NORTHFLANK_ADMIN_SERVICE_ID: ${{ secrets.NORTHFLANK_ADMIN_SERVICE_ID || 'elevate-admin' }}
       NORTHFLANK_GPU_PROJECT_ID: elevate-media-gpu
-      NORTHFLANK_GPU_PROJECT_NAME: Elevate Media GPU
       NORTHFLANK_GPU_REGION: us-central
       NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
-      NORTHFLANK_GPU_COMPUTE_PLAN: nf-gpu-l4-24-1g
-      NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-32
+      NORTHFLANK_GPU_TYPE: l4-24
+      NORTHFLANK_GPU_COUNT: '1'
+      NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g
+      NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-16
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
-      NORTHFLANK_GPU_STORAGE_CLASS: ssd
+      NORTHFLANK_GPU_EPHEMERAL_MB: '262144'
+      NORTHFLANK_GPU_BUILD_EPHEMERAL_MB: '32768'
       GPU_VIDEO_PROVIDER: wan
       GPU_MAX_CONCURRENCY: '1'
       WAN_MIN_VRAM_GB: '22'
@@ -66,6 +67,7 @@ jobs:
         with:
           fetch-depth: 0
           clean: true
+
       - name: Prove exact main SHA
         shell: bash
         run: |
@@ -85,53 +87,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
-      - name: Validate worker source
+
+      - name: Validate GPU source and provisioning contracts
         run: |
           python -m py_compile services/media-gpu-worker/worker.py
           python -m py_compile services/media-gpu-worker/bootstrap_models.py
+          pnpm tsx scripts/northflank/provision-gpu-worker.ts
 
-      - name: Provision GPU topology and wire Admin secrets
-        id: provision
-        run: pnpm tsx scripts/northflank/provision-media-gpu.ts --execute
-      - name: Export GPU topology
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          test -n "${{ steps.provision.outputs.gpu_project_id }}"
-          test -n "${{ steps.provision.outputs.gpu_service_id }}"
-          test -n "${{ steps.provision.outputs.gpu_worker_url }}"
-          echo "NORTHFLANK_PROJECT_ID=${{ steps.provision.outputs.gpu_project_id }}" >> "$GITHUB_ENV"
-          echo "GPU_VIDEO_WORKER_URL=${{ steps.provision.outputs.gpu_worker_url }}" >> "$GITHUB_ENV"
-
-      - name: Build exact GPU worker SHA
-        id: gpu_build
-        run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_GPU_SERVICE_ID"
-      - name: Wait and verify GPU build
-        run: |
-          test -n "${{ steps.gpu_build.outputs.build_id }}"
-          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --timeout-ms 3600000
-          pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --sha "${{ github.sha }}"
-      - name: Deploy exact GPU image
-        run: |
-          pnpm tsx scripts/northflank/trigger-deployment.ts "$NORTHFLANK_GPU_SERVICE_ID" --build-id "${{ steps.gpu_build.outputs.build_id }}" --sha "${{ github.sha }}"
-          pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_GPU_SERVICE_ID" --timeout-ms 7200000
-
-      - name: Real Wan production acceptance
-        env:
-          GPU_READY_TIMEOUT_MS: '7200000'
-          GPU_GENERATION_TIMEOUT_MS: '2400000'
-        run: pnpm tsx scripts/northflank/accept-media-gpu.ts "$GPU_VIDEO_WORKER_URL"
+      - name: Provision, exact-SHA deploy, bootstrap Wan, and generate real MP4
+        run: pnpm tsx scripts/northflank/provision-gpu-worker.ts --execute
 
       - name: Build exact Admin SHA
         id: admin_build
-        env:
-          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
         run: pnpm tsx scripts/northflank/trigger-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID"
+
       - name: Wait, verify, and deploy Admin
-        env:
-          NORTHFLANK_PROJECT_ID: ${{ secrets.NORTHFLANK_PROJECT_ID || 'elevate-platform' }}
         run: |
+          set -Eeuo pipefail
           test -n "${{ steps.admin_build.outputs.build_id }}"
           pnpm tsx scripts/northflank/wait-service.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --timeout-ms 3600000
           pnpm tsx scripts/northflank/verify-build.ts "$NORTHFLANK_ADMIN_SERVICE_ID" --build-id "${{ steps.admin_build.outputs.build_id }}" --sha "${{ github.sha }}"

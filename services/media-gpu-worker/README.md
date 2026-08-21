@@ -1,31 +1,44 @@
 # Elevate GPU Media Worker
 
-Dedicated CUDA inference service for generative lesson scenes. It is intentionally isolated from Admin, LMS, and Marketing.
+Dedicated CUDA inference service for self-hosted generative lesson scenes. It is intentionally isolated from Admin, LMS, and Marketing so GPU/model failures cannot take down the learner or administrative applications.
 
-## API
+## Production API
 
-- `GET /health` — worker/model readiness.
+- `GET /health` — unauthenticated process/liveness probe.
+- `GET /ready` — bearer-authenticated CUDA, VRAM, runtime, FFmpeg, and model-readiness probe.
 - `POST /v1/video/generate` — bearer-authenticated text/image-to-video generation.
+- `GET /v1/video/{jobId}` — authenticated temporary MP4 download.
+- `DELETE /v1/video/{jobId}` — authenticated temporary asset cleanup.
 
-Required environment:
+The GPU worker owns inference only. Admin downloads each generated MP4, persists it through the canonical course-media storage layer, writes the durable URL to `video_jobs`/lesson experience, and then deletes the worker's temporary asset.
+
+## Runtime
+
+Required:
 
 - `GPU_WORKER_SECRET`
-- `GPU_MAX_CONCURRENCY` (default `1`)
-- `GPU_JOB_TIMEOUT_SECONDS` (default `1800`)
+- NVIDIA CUDA-capable GPU
+- persistent `/models` volume
 
-LTX configuration:
+Production defaults:
 
-- `LTX_REPO=/opt/ltx-video`
-- `LTX_PIPELINE_CONFIG`
-- `LTX_FPS`
-
-Wan configuration:
-
-- `WAN_REPO=/opt/wan2.2`
+- `GPU_VIDEO_PROVIDER=wan`
+- `GPU_MAX_CONCURRENCY=1`
+- `GPU_JOB_TIMEOUT_SECONDS=1800`
+- `WAN_REPO=/models/runtime/wan2.2`
+- `WAN_VENV=/models/runtime/wan-venv`
+- `WAN_PYTHON=/models/runtime/wan-venv/bin/python`
 - `WAN_CHECKPOINT_DIR=/models/Wan2.2-TI2V-5B`
+- `HF_HOME=/models/huggingface`
 
-The deployment must provide NVIDIA/CUDA GPU capacity and mount/download model weights outside Git. LTX local generation should be provisioned with at least 16 GB VRAM; larger models/settings require more. Wan TI2V-5B is the preferred initial Wan profile for 720p T2V/I2V.
+`bootstrap_models.py` idempotently installs the pinned Wan runtime and downloads the TI2V-5B weights onto the persistent model volume. `/ready` remains false until CUDA, minimum VRAM, FFmpeg, the pinned runtime, and the model marker all pass.
 
-The worker returns an output path to the orchestrator. Production integration should copy the generated MP4 to the platform's durable media storage and persist provider/model/provenance in the media job record.
+## Northflank deployment
 
-Do not run this container inside the Admin or LMS service. Deploy it as an isolated GPU service and connect it through the Media Director/provider adapter.
+`scripts/northflank/provision-gpu-worker.ts` is the single canonical infrastructure controller. It selects/creates an L4-capable GPU project without moving the existing web services, provisions a persistent 150 GB model volume, configures the GPU worker, triggers an exact-SHA build, wires the restricted worker secret into Admin, waits for model readiness, and performs a real 5-second Wan 720p MP4 acceptance render.
+
+`.github/workflows/gpu-worker.yml` runs this contract from `main`. A deployment is not considered green merely because the container starts; the `GPU Media Acceptance` status passes only after the real generated MP4 is downloaded and validated.
+
+## Failure behavior
+
+The local GPU is the preferred cinematic microclip generator. If it is unavailable or a generation fails, the canonical Admin media processor falls back to the existing Remotion instructional-video pipeline. This prevents GPU availability from becoming a critical dependency for course delivery.

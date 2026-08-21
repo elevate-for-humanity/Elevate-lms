@@ -28,9 +28,7 @@ const READY_TIMEOUT_MS = Number(process.env.GPU_PROVISION_READY_TIMEOUT_MS || 90
 const ACCEPTANCE_TIMEOUT_MS = Number(process.env.GPU_PROVISION_ACCEPTANCE_TIMEOUT_MS || 30 * 60 * 1000);
 
 type R = Record<string, any>;
-
 type Plans = { deploymentPlan: string; buildPlan: string };
-
 type GpuDevice = {
   id: string;
   name?: string;
@@ -90,18 +88,40 @@ async function discoverL4(): Promise<GpuDevice> {
   return l4;
 }
 
-async function resolvePlans(): Promise<Plans> {
+async function resolvePlans(gpu: GpuDevice): Promise<Plans> {
   const response = await nfFetch<R>('/plans');
   const plans = arrayFrom(response, 'plans');
-  const deployment = plans
-    .filter((p) => Array.isArray(p.type) && p.type.includes('deployment'))
-    .filter((p) => Number(p.cpuResource) >= 8 && Number(p.ramResource) >= 32768)
-    .sort((a, b) => Number(a.amountPerHour || 0) - Number(b.amountPerHour || 0))[0] ||
-    plans
-      .filter((p) => Array.isArray(p.type) && p.type.includes('deployment'))
-      .filter((p) => Number(p.cpuResource) >= 4 && Number(p.ramResource) >= 16384)
+
+  // Northflank managed GPU workloads require a dedicated GPU deployment plan;
+  // ordinary nf-compute-* plans are rejected even when deployment.gpu is set.
+  // The managed-cloud plan convention is nf-gpu-<gpuType>-<count>g.
+  const derivedGpuPlan = `nf-gpu-${gpu.id}-${GPU_COUNT}g`;
+  const requestedGpuPlan = process.env.NORTHFLANK_GPU_DEPLOYMENT_PLAN?.trim() || derivedGpuPlan;
+
+  // If the account catalog exposes GPU plans, validate the requested plan. Some
+  // accounts currently omit managed GPU plans from /plans even though /regions
+  // exposes the GPU entitlement, so absence from the catalog is not fatal.
+  const gpuPlans = plans.filter(
+    (p) => typeof p.id === 'string' && (p.id.startsWith('nf-gpu-') || p.configuration?.resources?.gpu),
+  );
+  if (gpuPlans.length && !gpuPlans.some((p) => p.id === requestedGpuPlan)) {
+    const compatible = gpuPlans.find((p) => String(p.id).includes(gpu.id));
+    if (!compatible?.id) {
+      throw new Error(
+        `Northflank exposes GPU plans but none match ${gpu.id}. Available: ${gpuPlans.map((p) => p.id).join(', ')}`,
+      );
+    }
+    log('Requested GPU plan not listed; using compatible account GPU plan', {
+      requested: requestedGpuPlan,
+      selected: compatible.id,
+    });
+    const build = plans
+      .filter((p) => Array.isArray(p.type) && p.type.includes('build'))
+      .filter((p) => Number(p.cpuResource) >= 4)
       .sort((a, b) => Number(a.amountPerHour || 0) - Number(b.amountPerHour || 0))[0];
-  if (!deployment?.id) throw new Error('No deployment plan with >=4 vCPU / 16GB RAM is available');
+    if (!build?.id) throw new Error('No valid Northflank build plan is available');
+    return { deploymentPlan: compatible.id, buildPlan: build.id };
+  }
 
   const build = plans
     .filter((p) => Array.isArray(p.type) && p.type.includes('build'))
@@ -109,13 +129,11 @@ async function resolvePlans(): Promise<Plans> {
     .sort((a, b) => Number(a.amountPerHour || 0) - Number(b.amountPerHour || 0))[0];
   if (!build?.id) throw new Error('No valid Northflank build plan is available');
 
-  log('Compute plans selected', {
-    deploymentPlan: deployment.id,
-    cpu: deployment.cpuResource,
-    ramMb: deployment.ramResource,
+  log('GPU/build plans selected', {
+    deploymentPlan: requestedGpuPlan,
     buildPlan: build.id,
   });
-  return { deploymentPlan: deployment.id, buildPlan: build.id };
+  return { deploymentPlan: requestedGpuPlan, buildPlan: build.id };
 }
 
 async function ensureModelVolume(): Promise<string> {
@@ -270,8 +288,6 @@ async function ensureService(plans: Plans, gpu: GpuDevice, volumeId: string): Pr
   });
   log(`${exists ? 'Updated' : 'Created'} ${SERVICE_ID}`);
 
-  // Explicit attachment is idempotent and also fixes pre-existing services that
-  // were created before the canonical persistent volume contract existed.
   try {
     await nfFetch(projectApiPath(PROJECT_ID, `/volumes/${volumeId}/attach`), {
       method: 'POST',
@@ -491,7 +507,7 @@ async function main() {
 
   await projectDetails();
   const gpu = await discoverL4();
-  const plans = await resolvePlans();
+  const plans = await resolvePlans(gpu);
   const volumeId = await ensureModelVolume();
   await ensureService(plans, gpu, volumeId);
   await triggerExactBuild();

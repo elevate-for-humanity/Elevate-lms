@@ -12,8 +12,9 @@ interface SafeHeroVideoProps {
 /**
  * Shared hero-video surface.
  *
- * The poster stays visible until playback actually starts, and remains as the
- * fallback if the video cannot load or autoplay. Hero videos play once.
+ * The poster is physically mounted behind the video layer, remains visible
+ * until playback actually starts, and stays available as the fallback if the
+ * video cannot load or autoplay. Hero videos play once.
  */
 export function SafeHeroVideo({
   src,
@@ -36,7 +37,7 @@ export function SafeHeroVideo({
     video.loop = false;
     video.currentTime = 0;
     void video.play().catch(() => {
-      // Autoplay can be blocked. Keep the poster visible as the safe fallback.
+      // Autoplay can be blocked. Keep the mounted poster visible underneath.
     });
 
     return () => video.pause();
@@ -48,7 +49,7 @@ export function SafeHeroVideo({
         src={poster}
         alt=""
         aria-hidden="true"
-        className={className}
+        className={`${className} z-0`}
       />
       {!hasFailed ? (
         <video
@@ -69,7 +70,7 @@ export function SafeHeroVideo({
             setIsPlaying(false);
             setHasFailed(true);
           }}
-          className={`${className} transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+          className={`${className} z-10 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
         >
           <source src={src} type="video/mp4" />
         </video>

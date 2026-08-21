@@ -8,6 +8,7 @@ on:
       - 'services/media-gpu-worker/**'
       - 'lib/video/gpu-video-client.ts'
       - 'lib/video/process-video-job.ts'
+      - 'scripts/northflank/ensure-gpu-project.ts'
       - 'scripts/northflank/provision-gpu-worker.ts'
       - '.github/workflows/gpu-worker.yml'
 
@@ -32,9 +33,7 @@ jobs:
       NORTHFLANK_GPU_SERVICE_ID: elevate-gpu-worker
       NORTHFLANK_GPU_MODEL_VOLUME_ID: elevate-gpu-models
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
-      NORTHFLANK_GPU_TYPE: l4-24
       NORTHFLANK_GPU_COUNT: '1'
-      NORTHFLANK_GPU_DEPLOYMENT_PLAN: nf-gpu-l4-24-1g
       NORTHFLANK_GPU_BUILD_PLAN: nf-compute-800-16
       GPU_VIDEO_PROVIDER: wan
     steps:
@@ -71,11 +70,14 @@ jobs:
       - name: Validate TypeScript media integration
         run: pnpm exec tsc --noEmit --pretty false
 
-      - name: Validate canonical GPU provisioner
-        run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts
-
       - name: Verify Northflank credential
         run: test -n "$NORTHFLANK_API_TOKEN"
+
+      - name: Ensure GPU project and discover available NVIDIA L4 resources
+        run: pnpm exec tsx scripts/northflank/ensure-gpu-project.ts
+
+      - name: Validate canonical GPU provisioner against discovered resources
+        run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts
 
       - name: Provision worker, persistent model volume, exact-SHA CUDA build, secrets, and real Wan acceptance
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts --execute

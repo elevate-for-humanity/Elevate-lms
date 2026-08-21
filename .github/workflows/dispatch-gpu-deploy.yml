@@ -1,0 +1,35 @@
+name: Dispatch GPU Video Worker Deploy
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+
+jobs:
+  dispatch:
+    if: startsWith(github.event.issue.title, '[GPU DEPLOY EXECUTE]') && contains(github.event.issue.body, 'DEPLOY_GPU')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch guarded GPU provisioning workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          gh workflow run deploy-gpu-worker.yml \
+            --repo "${GITHUB_REPOSITORY}" \
+            --ref main \
+            -f confirm_gpu_cost=DEPLOY_GPU
+      - name: Record dispatch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'Confirmed GPU provisioning workflow dispatched from `main`. The guarded deployment workflow will provision the L4 worker, persistent model volume, Wan runtime, Admin wiring, and real MP4 acceptance test.'
+            });

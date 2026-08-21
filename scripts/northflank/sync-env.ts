@@ -159,8 +159,15 @@ async function main() {
   const lmsId = resolveLmsServiceId() || 'elevate-lms';
   const adminId = resolveAdminServiceId() || 'elevate-admin';
   const marketingId = process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing';
+  const gpuId = process.env.NORTHFLANK_GPU_SERVICE_ID?.trim();
   const storeId = process.env.NORTHFLANK_STORE_SERVICE_ID?.trim();
-  const serviceIds = [...new Set([marketingId, lmsId, adminId, ...(storeId ? [storeId] : [])])];
+  const serviceIds = [...new Set([
+    marketingId,
+    lmsId,
+    adminId,
+    ...(gpuId ? [gpuId] : []),
+    ...(storeId ? [storeId] : []),
+  ])];
 
   const groupId = await findOrCreateSecretGroup(projectId, secretId, serviceIds);
   const restrictions = {

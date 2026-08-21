@@ -25,8 +25,7 @@ jobs:
       NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
       NORTHFLANK_PROJECT_ID: elevate-platform
       NORTHFLANK_ADMIN_SERVICE_ID: elevate-admin
-      NORTHFLANK_GPU_PROJECT_ID: elevate-gpu
-      NORTHFLANK_GPU_REGION: asia-southeast
+      NORTHFLANK_GPU_PROJECT_ID: elevate-platform
       NORTHFLANK_GPU_SERVICE_ID: elevate-media-gpu-worker
       NORTHFLANK_GPU_VOLUME_ID: elevate-gpu-models
       NORTHFLANK_GPU_MODEL_VOLUME_MB: '153600'
@@ -65,7 +64,7 @@ jobs:
       - name: Verify Northflank credential exists
         run: test -n "$NORTHFLANK_API_TOKEN"
 
-      - name: Provision GPU project, volume, worker and Admin wiring
+      - name: Provision GPU volume, worker and Admin wiring
         run: pnpm exec tsx scripts/northflank/provision-gpu-worker.ts --execute
 
       - name: Verify provisioned service exists

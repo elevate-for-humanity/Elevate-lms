@@ -52,6 +52,8 @@ env:
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
   AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+  ADMIN_URL: ${{ secrets.ADMIN_URL }}
+  CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
 jobs:
   build-audit-publish:

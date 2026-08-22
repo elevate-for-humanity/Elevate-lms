@@ -9,6 +9,7 @@ on:
       - '.github/workflows/registered-apprenticeship-e2e.yml'
       - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
       - 'scripts/check-registered-apprenticeship-architecture.mjs'
+      - 'scripts/qa/provision-apprenticeship-e2e.mjs'
   workflow_run:
     workflows:
       - Deploy LMS
@@ -31,10 +32,8 @@ jobs:
     timeout-minutes: 25
     env:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org
-      E2E_APPRENTICE_EMAIL: ${{ secrets.E2E_APPRENTICE_EMAIL }}
-      E2E_APPRENTICE_PASSWORD: ${{ secrets.E2E_APPRENTICE_PASSWORD }}
-      E2E_HOST_SHOP_EMAIL: ${{ secrets.E2E_HOST_SHOP_EMAIL }}
-      E2E_HOST_SHOP_PASSWORD: ${{ secrets.E2E_HOST_SHOP_PASSWORD }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,16 +46,6 @@ jobs:
           node-version: '22'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - name: Require dedicated E2E identities
-        shell: bash
-        run: |
-          set -euo pipefail
-          for name in E2E_APPRENTICE_EMAIL E2E_APPRENTICE_PASSWORD E2E_HOST_SHOP_EMAIL E2E_HOST_SHOP_PASSWORD; do
-            if [[ -z "${!name:-}" ]]; then
-              echo "::error::$name is not configured. Authenticated apprenticeship certification cannot be skipped."
-              exit 1
-            fi
-          done
       - name: Verify production LMS is ready
         shell: bash
         run: |
@@ -78,12 +67,23 @@ jobs:
           exit 1
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+      - name: Require Supabase QA provisioning authority
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${NEXT_PUBLIC_SUPABASE_URL:-}" || { echo '::error::NEXT_PUBLIC_SUPABASE_URL is not configured'; exit 1; }
+          test -n "${SUPABASE_SERVICE_ROLE_KEY:-}" || { echo '::error::SUPABASE_SERVICE_ROLE_KEY is not configured'; exit 1; }
+      - name: Provision disposable Host Shop + Apprentice identities
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs provision
       - name: Install Chromium
         run: pnpm exec playwright install chromium --with-deps
       - name: Run registered-apprenticeship architecture gate
         run: node scripts/check-registered-apprenticeship-architecture.mjs
       - name: Run authenticated production E2E
         run: pnpm exec playwright test tests/e2e/registered-apprenticeship-authenticated.spec.ts --config playwright.config.ts --project=chromium
+      - name: Clean disposable Host Shop + Apprentice identities
+        if: always()
+        run: node scripts/qa/provision-apprenticeship-e2e.mjs cleanup
       - name: Upload failure evidence
         if: failure()
         uses: actions/upload-artifact@v4
@@ -104,4 +104,4 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Host Shop + Apprentice production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Scope: authenticated Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; authenticated Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; Host Shop competency write + restore; Apprentice-to-Host-Shop RBAC denial.\n- Result source: GitHub Actions production Playwright gate."
+          gh issue comment 791 --repo "$GITHUB_REPOSITORY" --body "### Host Shop + Apprentice production QA: ${QA_STATUS^^}\n\n- SHA: \`${QA_SHA}\`\n- Trigger: \`${QA_EVENT}\`\n- Run: ${QA_RUN_URL}\n- Fixture: disposable CI-created Host Shop and Apprentice; cleanup runs on success or failure.\n- Scope: authenticated Apprentice dashboard/hours/RTI/competencies/documents/attendance/profile/handbook; authenticated Host Shop dashboard/apprentices/pending-hours/documents/competencies/attendance/wages/reports/profile; Host Shop competency write + restore; Apprentice-to-Host-Shop RBAC denial.\n- Result source: GitHub Actions production Playwright gate."

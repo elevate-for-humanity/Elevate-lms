@@ -54,7 +54,7 @@ const lessonSchema = z.object({
   slug: z.string().min(1),
   title: z.string().min(1),
   orderIndex: z.number().int().min(0),
-  lessonType: z.enum(['video','reading','quiz','assignment','practical','checkpoint','exam','live_session','fieldwork','observation']),
+  lessonType: z.enum(['lesson','video','reading','quiz','assignment','practical','checkpoint','exam','live_session','fieldwork','observation']),
   durationMinutes: z.number().positive(),
   learningObjectives: z.array(z.string()).min(1),
   content: z.record(z.string(), z.unknown()),
@@ -215,13 +215,14 @@ export async function deleteCourseLesson(input: unknown) {
 export async function reorderCourseLessons(input: unknown) {
   const body = reorderLessonsSchema.parse(input);
   const db = await requireAdminClient();
+  const now = new Date().toISOString();
   const [first, second] = await Promise.all([
     db.from('course_lessons')
-      .update({ order_index: body.lessonA.orderIndex, updated_at: new Date().toISOString() })
+      .update({ order_index: body.lessonA.orderIndex, updated_at: now })
       .eq('id', body.lessonA.id)
       .eq('course_id', body.courseId),
     db.from('course_lessons')
-      .update({ order_index: body.lessonB.orderIndex, updated_at: new Date().toISOString() })
+      .update({ order_index: body.lessonB.orderIndex, updated_at: now })
       .eq('id', body.lessonB.id)
       .eq('course_id', body.courseId),
   ]);

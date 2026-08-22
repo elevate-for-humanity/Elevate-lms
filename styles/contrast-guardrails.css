@@ -1,9 +1,6 @@
 /*
- * Platform typography/contrast guardrails.
- *
- * Scope is opt-in via .efh-contrast on each app root. Text inherits the
- * surface foreground instead of being forced to a light gray or dark color
- * that can disappear against the current background.
+ * Platform typography/contrast/accessibility guardrails.
+ * Scope is opt-in via .efh-contrast on each app root.
  */
 
 .efh-contrast {
@@ -13,8 +10,6 @@
   text-rendering: optimizeLegibility;
 }
 
-/* Body copy must inherit the active surface color. This overrides older base
- * typography that forced paragraphs to slate-900 even inside dark panels. */
 .efh-contrast :is(p, li, label, td, th, dd, dt, blockquote, figcaption) {
   color: inherit;
   text-underline-offset: 0.16em;
@@ -37,13 +32,49 @@
   opacity: 1;
 }
 
-/* Production body copy should never render as a thin/light weight. */
 .efh-contrast .font-light {
   font-weight: 500 !important;
 }
 
 .efh-contrast :is(p, li, label, td, th, dd, dt):not(.font-bold):not(.font-semibold):not(.font-black) {
   font-weight: 500;
+}
+
+/* WCAG 2.2 focus appearance: never rely on browser-default focus being visible. */
+.efh-contrast :is(a, button, input, select, textarea, summary, [role='button'], [role='link'], [tabindex]):focus-visible {
+  outline: 3px solid #2563eb !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+/* Touch/click targets should not collapse below a usable minimum on primary controls. */
+.efh-contrast :is(button, [role='button'], input[type='button'], input[type='submit'], input[type='reset']) {
+  min-height: 44px;
+}
+
+/* Links embedded in prose must remain visually identifiable without color alone. */
+.efh-contrast :is(p, li, dd, figcaption) a:not([class]) {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+}
+
+/* Respect users who request less animation or motion. */
+@media (prefers-reduced-motion: reduce) {
+  .efh-contrast *,
+  .efh-contrast *::before,
+  .efh-contrast *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Improve readability for forced-colors/high-contrast environments. */
+@media (forced-colors: active) {
+  .efh-contrast :is(a, button, input, select, textarea, summary) {
+    forced-color-adjust: auto;
+  }
 }
 
 /* Dark surfaces must never inherit the root dark foreground. */
@@ -109,8 +140,6 @@
   color: #e2e8f0 !important;
 }
 
-/* Correct dark utility text applied directly to a dark panel or one of its
- * immediate children. Nested light cards keep their own dark foreground. */
 .efh-contrast
   :is(
     .bg-black,
@@ -196,7 +225,6 @@
   color: #ffffff !important;
 }
 
-/* Restore dark text whenever a light card is nested inside a dark section. */
 .efh-contrast :is(.bg-white, .bg-slate-50, .bg-gray-50) {
   color: #0f172a;
 }

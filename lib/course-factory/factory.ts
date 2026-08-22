@@ -300,7 +300,8 @@ async function enrichBlueprint(
             readiness: { domainKey: 'final_readiness', masteryThreshold: 80, evidenceSignals: ['module completion', 'practice assessment performance', 'practical evidence'] },
           },
         });
-        lesson.quizQuestions = finalExam.questions.map((question) => ({
+        lesson.quizQuestions = finalExam.questions.map((question, questionIndex) => ({
+          id: `${lesson.slug}-q-${questionIndex + 1}`,
           question: question.question,
           options: question.options,
           correctAnswer: question.correct,
@@ -360,7 +361,8 @@ async function enrichBlueprint(
             readiness: { domainKey: lesson.domainKey || courseModule.domainKey || slugify(courseModule.title), masteryThreshold: 80, evidenceSignals: ['lesson completion', 'applied exercise completion', 'checkpoint performance'] },
           },
         });
-        lesson.quizQuestions = assessment.questions.map((question) => ({
+        lesson.quizQuestions = assessment.questions.map((question, questionIndex) => ({
+          id: `${lesson.slug}-q-${questionIndex + 1}`,
           question: question.question,
           options: question.options,
           correctAnswer: question.correct,
@@ -381,7 +383,8 @@ async function enrichBlueprint(
       lesson.content = generated.content;
       lesson.learningPoints = generated.learning_points;
       lesson.scenario = generated.scenario;
-      lesson.quizQuestions = generated.quiz_questions.map((question) => ({
+      lesson.quizQuestions = generated.quiz_questions.map((question, questionIndex) => ({
+        id: `${lesson.slug}-q-${questionIndex + 1}`,
         question: question.question,
         options: question.options,
         correctAnswer: question.correct,
@@ -425,9 +428,10 @@ export async function courseFactory(
     let program: Record<string, any> | null = null;
 
     if (!blueprint) {
-      const loaded = await loadBlueprintWithProgram(programSlug, input.programId);
-      blueprint = loaded.blueprint ? cloneBlueprint(loaded.blueprint) : null;
-      program = loaded.program;
+      const db = await requireAdminClient();
+      const loaded = await loadBlueprintWithProgram(db, { programId: input.programId, programSlug });
+      blueprint = loaded?.blueprint ? cloneBlueprint(loaded.blueprint) : null;
+      program = loaded?.program ?? null;
     }
 
     if (!blueprint) {
@@ -449,13 +453,12 @@ export async function courseFactory(
     tracker.emit('resolve', 'Assembling credential and workforce evidence.', 7);
     const evidence = await buildCourseEvidenceContext({
       programSlug,
-      program,
       blueprint,
       state: input.state,
     });
     tracker.emit(
       'resolve',
-      `Evidence ready from ${evidence.sources.map((source) => source.kind).join(', ') || 'registered blueprint'}.`,
+      `Evidence ready from ${evidence.sources.join(', ') || 'registered blueprint'}.`,
       9,
     );
 
@@ -463,7 +466,7 @@ export async function courseFactory(
     if (!audit.valid) {
       return {
         ok: false,
-        errors: audit.errors,
+        errors: audit.errors.map((error) => error.message),
         moduleCount: blueprint.modules.length,
         lessonCount: blueprint.modules.reduce(
           (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
@@ -489,7 +492,7 @@ export async function courseFactory(
     if (!packageAudit.valid) {
       return {
         ok: false,
-        errors: packageAudit.errors,
+        errors: packageAudit.errors.map((error) => error.message),
         moduleCount: enriched.blueprint.modules.length,
         lessonCount: enriched.blueprint.modules.reduce(
           (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),

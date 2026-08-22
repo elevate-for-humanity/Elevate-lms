@@ -1,11 +1,11 @@
 /**
  * Course validation for the canonical Course Factory.
  *
- * Structural blueprint rules remain owned by the curriculum blueprint validator.
- * This adapter adds generated-content validation so Course Factory has one
- * validation stage without duplicating the authoritative blueprint contract.
+ * Registered blueprints are validated structurally before enrichment. Generated
+ * lesson experience, content and assessment requirements are enforced once the
+ * package contains generated content. This prevents preflight from rejecting a
+ * valid blueprint merely because generation has not happened yet.
  */
-
 import type { CredentialBlueprint, BlueprintModule } from '@/lib/curriculum/blueprints/types';
 import { validateBlueprint as validateBlueprintStructure } from '@/lib/curriculum/blueprints/validateBlueprint';
 import { logger } from '@/lib/logger';
@@ -28,10 +28,6 @@ export interface ValidationResult {
   warningCount: number;
 }
 
-/**
- * Infer the canonical persistence type. Practice/benchmark assessments are
- * scored exam simulations, not ordinary reading lessons.
- */
 export function inferStepType(slug: string): string {
   const lower = slug.toLowerCase();
   if (lower.includes('checkpoint')) return 'checkpoint';
@@ -63,9 +59,7 @@ function readExperience(content: string): Record<string, any> | null {
       parsed.experience &&
       typeof parsed.experience === 'object' &&
       !Array.isArray(parsed.experience)
-    ) {
-      return parsed.experience as Record<string, any>;
-    }
+    ) return parsed.experience as Record<string, any>;
   } catch {
     return null;
   }
@@ -87,7 +81,6 @@ function validateLesson(
   const warnings: ValidationError[] = [];
   const stepType = inferStepType(lesson.slug);
   const lowerSlug = lesson.slug.toLowerCase();
-
   const needsContent = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
   const needsQuiz = ['checkpoint', 'quiz', 'exam'].includes(stepType);
   const needsObjective = ['lesson', 'checkpoint', 'lab', 'assignment'].includes(stepType);
@@ -137,11 +130,9 @@ function validateLesson(
   if (stepType === 'exam' && (lowerSlug.includes('final') || lowerSlug.includes('course-exam')) && questionCount > 0 && questionCount < 25) {
     errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'quizQuestions', message: 'Final exam requires at least 25 questions' });
   }
-
   if (needsQuiz && lesson.passingScore != null && (lesson.passingScore < 0 || lesson.passingScore > 100)) {
     errors.push({ type: 'error', module: moduleSlug, lesson: lesson.slug, field: 'passingScore', message: 'Passing score must be between 0 and 100' });
   }
-
   return [...errors, ...warnings];
 }
 
@@ -156,11 +147,19 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   }
 
   const lessons = (blueprint.modules ?? []).flatMap((courseModule) => courseModule.lessons ?? []);
-  for (const courseModule of blueprint.modules ?? []) {
-    for (const lesson of courseModule.lessons ?? []) {
-      for (const issue of validateLesson(lesson, courseModule.slug)) {
-        if (issue.type === 'error') allErrors.push(issue);
-        else allWarnings.push(issue);
+  const generatedPackage = lessons.some((lesson) =>
+    Boolean(lesson.content?.trim()) ||
+    Boolean(lesson.objective?.trim()) ||
+    Boolean(lesson.quizQuestions?.length),
+  );
+
+  if (generatedPackage) {
+    for (const courseModule of blueprint.modules ?? []) {
+      for (const lesson of courseModule.lessons ?? []) {
+        for (const issue of validateLesson(lesson, courseModule.slug)) {
+          if (issue.type === 'error') allErrors.push(issue);
+          else allWarnings.push(issue);
+        }
       }
     }
   }
@@ -183,9 +182,12 @@ export function validateBlueprint(blueprint: CredentialBlueprint): ValidationRes
   };
 
   if (!result.ok) {
-    logger.warn('[course-factory/validator] Course package validation failed', { errors: allErrors.length, warnings: allWarnings.length });
+    logger.warn('[course-factory/validator] Course package validation failed', {
+      phase: generatedPackage ? 'generated-package' : 'blueprint-structure',
+      errors: allErrors.length,
+      warnings: allWarnings.length,
+    });
   }
-
   return result;
 }
 

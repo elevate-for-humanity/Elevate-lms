@@ -14,6 +14,7 @@ on:
       - 'supabase/migrations/20260822183500_agentic_build_foundation.sql'
       - 'supabase/migrations/20260822190000_retire_paris_application_authority.sql'
       - 'supabase/migrations/20260822191500_link_agentic_application_documents.sql'
+      - 'supabase/migrations/20260822193000_documents_application_owner_types.sql'
       - 'scripts/check-agentic-admissions-contract.mjs'
       - '.github/workflows/agentic-admissions-acceptance.yml'
   workflow_dispatch:

@@ -5,6 +5,13 @@ import { getOpenBadgeStatus } from '@/lib/credentials/open-badges';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+function hasCryptographicProof(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const credential = value as { proof?: unknown };
+  if (Array.isArray(credential.proof)) return credential.proof.length > 0;
+  return !!credential.proof && typeof credential.proof === 'object';
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ verificationCode: string }> },
@@ -26,9 +33,7 @@ export async function GET(
     return NextResponse.json({ error: 'Credential not found' }, { status: 404 });
   }
 
-  const definition = Array.isArray(data.credentials)
-    ? data.credentials[0]
-    : data.credentials;
+  const definition = Array.isArray(data.credentials) ? data.credentials[0] : data.credentials;
 
   if (!definition?.is_active || !definition?.is_published) {
     return NextResponse.json({ error: 'Credential not available' }, { status: 404 });
@@ -40,7 +45,10 @@ export async function GET(
     revokedAt: data.revoked_at,
   });
 
-  if (!data.open_badge_credential) {
+  const signedBadgeReady =
+    data.open_badge_status === 'issued' && hasCryptographicProof(data.open_badge_credential);
+
+  if (!signedBadgeReady) {
     return NextResponse.json(
       {
         verificationCode: data.verification_code,
@@ -49,6 +57,7 @@ export async function GET(
         status,
         badgeUrl: data.badge_url,
         openBadgeStatus: data.open_badge_status,
+        verifiableCredentialAvailable: false,
       },
       {
         headers: {
@@ -58,19 +67,13 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(
-    {
-      ...data.open_badge_credential,
-      _verification: {
-        status,
-        verificationCode: data.verification_code,
-      },
+  // Return the signed credential byte-for-byte as stored. Do not append custom
+  // properties here: issuer certification uses JSON-LD safe-mode validation,
+  // which rejects terms that are not defined by an associated context.
+  return NextResponse.json(data.open_badge_credential, {
+    headers: {
+      'Content-Type': 'application/ld+json; charset=utf-8',
+      'Cache-Control': 'public, max-age=60, s-maxage=300',
     },
-    {
-      headers: {
-        'Content-Type': 'application/ld+json; charset=utf-8',
-        'Cache-Control': 'public, max-age=60, s-maxage=300',
-      },
-    },
-  );
+  });
 }

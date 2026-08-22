@@ -4,15 +4,23 @@ import { requireAdminClient } from '@/lib/supabase/admin';
 import { getMyPartnerContext, getSessionUser } from '@/lib/partner/access';
 import { PlatformShell } from '@/components/platform/PlatformShell';
 import { getHostShopOnboardingPaths, resolveHostShopProgram } from '@/lib/partners/host-shop-onboarding';
+import { requireRole } from '@/lib/auth/require-role';
+import { HOST_SHOP_ROLES } from '@/lib/rbac/role-matrix';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * Single authorization + readiness boundary for every /host-shop/dashboard/* route.
- * A valid Host Shop relationship is required. Operational access remains locked
- * until MOU, onboarding, and required document verification are complete.
+ * A canonical Host Shop role and a valid Host Shop relationship are required.
+ * Operational access remains locked until MOU, onboarding, and required document
+ * verification are complete.
  */
 export default async function HostShopDashboardLayout({ children }: { children: React.ReactNode }) {
+  // Relationship data alone is not permission to enter the Host Shop portal.
+  // Apprentices can legitimately have an active placement at a shop, so enforce
+  // the canonical role taxonomy before resolving partner/shop context.
+  await requireRole(HOST_SHOP_ROLES);
+
   const context = await getMyPartnerContext();
 
   if (!context) {

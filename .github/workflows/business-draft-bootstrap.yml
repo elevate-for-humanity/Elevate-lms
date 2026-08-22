@@ -67,20 +67,46 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+        id: install
+        shell: bash
+        run: |
+          set +e
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/business-install.log 2>&1
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 120 /tmp/business-install.log
+          exit 0
 
       - name: Enforce architecture before generation
+        id: architecture
+        shell: bash
         run: |
-          node scripts/check-course-factory-authority.mjs
-          node scripts/check-studio-architecture.mjs
-          node scripts/audit-course-builder-procurement.mjs
+          set +e
+          : > /tmp/business-architecture.log
+          node scripts/check-course-factory-authority.mjs >> /tmp/business-architecture.log 2>&1
+          code1=$?
+          node scripts/check-studio-architecture.mjs >> /tmp/business-architecture.log 2>&1
+          code2=$?
+          node scripts/audit-course-builder-procurement.mjs >> /tmp/business-architecture.log 2>&1
+          code3=$?
+          code=0
+          if [ "$code1" != "0" ] || [ "$code2" != "0" ] || [ "$code3" != "0" ]; then code=1; fi
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 220 /tmp/business-architecture.log
+          exit 0
 
       - name: Build canonical Business draft and queue media
         id: build
         env:
           NODE_OPTIONS: --conditions=react-server
+        shell: bash
         run: |
           set +e
+          if [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.architecture.outputs.exit_code }}" != "0" ]; then
+            echo "Preflight failed: install=${{ steps.install.outputs.exit_code }} architecture=${{ steps.architecture.outputs.exit_code }}" > /tmp/business-draft.log
+            echo "exit_code=1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           pnpm tsx scripts/course-factory/bootstrap-business-draft.ts > /tmp/business-draft.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
@@ -92,19 +118,29 @@ jobs:
         uses: actions/github-script@v7
         env:
           TESTED_SHA: ${{ steps.tested.outputs.sha }}
+          INSTALL_EXIT_CODE: ${{ steps.install.outputs.exit_code }}
+          ARCHITECTURE_EXIT_CODE: ${{ steps.architecture.outputs.exit_code }}
           BUILD_EXIT_CODE: ${{ steps.build.outputs.exit_code }}
         with:
           script: |
             const fs = require('fs');
+            const install = process.env.INSTALL_EXIT_CODE || 'not-run';
+            const architecture = process.env.ARCHITECTURE_EXIT_CODE || 'not-run';
             const code = process.env.BUILD_EXIT_CODE || 'not-run';
+            const installLog = fs.existsSync('/tmp/business-install.log') ? fs.readFileSync('/tmp/business-install.log', 'utf8').slice(-9000) : 'No install log.';
+            const architectureLog = fs.existsSync('/tmp/business-architecture.log') ? fs.readFileSync('/tmp/business-architecture.log', 'utf8').slice(-12000) : 'No architecture log.';
             const log = fs.existsSync('/tmp/business-draft.log') ? fs.readFileSync('/tmp/business-draft.log', 'utf8').slice(-28000) : 'No build log.';
+            const ok = install === '0' && architecture === '0' && code === '0';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `BUSINESS DRAFT BOOTSTRAP ${code === '0' ? 'PASS' : 'FAIL'}\n\nTested SHA: ${process.env.TESTED_SHA}\n\n\`\`\`text\n${log}\n\`\`\``,
+              body: `BUSINESS DRAFT BOOTSTRAP ${ok ? 'PASS' : 'FAIL'}\n\nTested SHA: ${process.env.TESTED_SHA}\nInstall: ${install}\nArchitecture: ${architecture}\nBuild: ${code}\n\nInstall:\n\`\`\`text\n${installLog}\n\`\`\`\n\nArchitecture:\n\`\`\`text\n${architectureLog}\n\`\`\`\n\nBuild:\n\`\`\`text\n${log}\n\`\`\``,
             });
 
       - name: Fail when bootstrap failed
         if: always()
-        run: test "${{ steps.build.outputs.exit_code }}" = "0"
+        run: |
+          test "${{ steps.install.outputs.exit_code }}" = "0"
+          test "${{ steps.architecture.outputs.exit_code }}" = "0"
+          test "${{ steps.build.outputs.exit_code }}" = "0"

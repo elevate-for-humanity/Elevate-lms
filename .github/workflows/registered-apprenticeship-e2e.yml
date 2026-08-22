@@ -24,9 +24,11 @@ permissions:
   contents: read
   issues: write
 
+# Production certification should represent the newest main/deployed runtime,
+# not wait behind obsolete QA runs created by earlier SHAs.
 concurrency:
   group: registered-apprenticeship-e2e
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   production-authenticated-e2e:

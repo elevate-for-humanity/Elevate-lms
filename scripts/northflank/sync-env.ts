@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 /**
- * Sync shared production secrets/config to the Northflank project secret group.
+ * Sync shared production secrets/config to the main Northflank web project.
  *
- * Infrastructure/runtime shape (PORT, HOSTNAME, SERVICE_ROLE, Dockerfile,
- * health checks) is intentionally owned by configure-services.ts so a shared
- * secret sync cannot change how containers listen or route.
+ * Marketing, LMS, Admin, and Store live in the main web project. The standalone
+ * GPU worker lives in a separate Northflank project and MUST NOT be added to
+ * this project's service restrictions. GPU client wiring for Admin is managed
+ * separately by provision-gpu-worker.ts.
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -159,13 +160,14 @@ async function main() {
   const lmsId = resolveLmsServiceId() || 'elevate-lms';
   const adminId = resolveAdminServiceId() || 'elevate-admin';
   const marketingId = process.env.NORTHFLANK_MARKETING_SERVICE_ID || 'elevate-marketing';
-  const gpuId = process.env.NORTHFLANK_GPU_SERVICE_ID?.trim();
   const storeId = process.env.NORTHFLANK_STORE_SERVICE_ID?.trim();
+
+  // The standalone GPU service is intentionally excluded here because it lives
+  // in NORTHFLANK_GPU_PROJECT_ID, not this main web project.
   const serviceIds = [...new Set([
     marketingId,
     lmsId,
     adminId,
-    ...(gpuId ? [gpuId] : []),
     ...(storeId ? [storeId] : []),
   ])];
 

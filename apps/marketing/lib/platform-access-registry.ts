@@ -105,6 +105,7 @@ export const STAFF_AND_PARTNER_PORTALS: readonly PlatformAccessCard[] = [
   ['employer', 'Employer', 'https://app.elevateforhumanity.org/employer/dashboard'],
   ['parent', 'Parent', 'https://app.elevateforhumanity.org/parent-portal/dashboard'],
   ['workforce', 'Workforce', 'https://app.elevateforhumanity.org/workforce/dashboard'],
+  ['creator', 'Creator Studio', 'https://app.elevateforhumanity.org/creator/products'],
   ['instructor', 'Instructor', 'https://admin.elevateforhumanity.org/instructor/dashboard'],
   ['staff', 'Staff', 'https://admin.elevateforhumanity.org/staff-portal/dashboard'],
   ['testing-center', 'Testing Center', 'https://admin.elevateforhumanity.org/testing-center'],

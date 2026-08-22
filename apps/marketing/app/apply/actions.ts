@@ -1,6 +1,7 @@
 'use server';
 
-import { getAdminClient } from '@/lib/supabase/admin';
+import crypto from 'node:crypto';
+import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 
 export async function submitStudentApplication(data: {
   role?: string;
@@ -28,57 +29,59 @@ export async function submitStudentApplication(data: {
     throw new Error('Missing required application fields.');
   }
 
-  const supabase = await getAdminClient();
-  if (!supabase) {
-    throw new Error('Application service is temporarily unavailable.');
-  }
-
-  const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
-  const notes = [
-    `Reference: ${referenceNumber}`,
-    `Program Interest: ${program}`,
-    data.requestedFundingSource
-      ? `Funding Source: ${data.requestedFundingSource}`
-      : '',
-    data.goals ? `Goals: ${data.goals}` : '',
-    data.applicationType ? `Application Type: ${data.applicationType}` : '',
-  ]
-    .filter(Boolean)
-    .join('\n');
-
-  const { data: application, error } = await supabase
-    .from('applications')
-    .insert({
-      first_name: firstName,
-      last_name: lastName,
+  // This server action is a compatibility caller only. All public application
+  // writes must pass through the canonical Marketing /api/applications boundary
+  // so deduplication, funding state, auditing, account provisioning, WorkOne
+  // continuity, and enrollment safeguards cannot drift by entry point.
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl;
+  const canonicalUrl = new URL('/api/applications', siteUrl);
+  const fundingType = data.requestedFundingSource || data.fundingSource || null;
+  const response = await fetch(canonicalUrl, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Origin: canonicalUrl.origin,
+      'X-Idempotency-Key': `server-action-${crypto.randomUUID()}`,
+    },
+    cache: 'no-store',
+    body: JSON.stringify({
+      firstName,
+      lastName,
+      email,
       phone,
-      email,
-      city: 'Not provided',
-      zip: data.zipCode?.trim() || '00000',
-      program_interest: program,
-      support_notes: notes,
-      status: 'submitted',
-      source: data.source || `program-page-${program}`,
-      contact_preference: 'phone',
-      reference_number: referenceNumber,
-    })
-    .select('id, reference_number')
-    .maybeSingle();
-
-  if (error || !application) {
-    console.error('[submitStudentApplication] insert failed', {
-      code: error?.code,
-      message: error?.message,
+      zip: data.zipCode?.trim() || '',
       program,
-      email,
-    });
-    throw new Error('Failed to save application.');
+      programSlug: program,
+      fundingType,
+      fundingSource: fundingType,
+      goals: data.goals || '',
+      applicationType: data.applicationType || '',
+      personalStatement: data.personalStatement || '',
+      source: data.source || `program-page-${program}`,
+      preferredContact: 'phone',
+    }),
+  });
+
+  const result = (await response.json().catch(() => ({}))) as {
+    ok?: boolean;
+    id?: string;
+    referenceNumber?: string;
+    error?: string;
+    existing?: boolean;
+  };
+
+  if (!response.ok || !result.ok || !result.id) {
+    throw new Error(result.error || 'Failed to save application.');
   }
 
   return {
     success: true,
-    applicationId: application.id,
-    referenceNumber: application.reference_number || referenceNumber,
-    message: 'Application received. You will be contacted shortly.',
+    applicationId: result.id,
+    referenceNumber: result.referenceNumber,
+    existing: Boolean(result.existing),
+    message: result.existing
+      ? 'Your existing application is still active. Continue using the same application.'
+      : 'Application received. You will be contacted shortly.',
   };
 }

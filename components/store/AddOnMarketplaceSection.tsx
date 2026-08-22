@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Plus, ArrowRight, Zap, Trophy } from 'lucide-react';
+import { Check, Plus, ArrowRight } from 'lucide-react';
 import { ADD_ON_MARKETPLACE } from '@/lib/store/platform-pricing';
 
 interface Props {
@@ -68,6 +68,10 @@ const ONE_TIME_ADDONS = [
   },
 ];
 
+const PUBLIC_SUBSCRIPTION_ADDONS = ADD_ON_MARKETPLACE.filter(
+  (addon) => !addon.hiddenFromMarketplace,
+);
+
 export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
   return (
     <>
@@ -76,10 +80,10 @@ export function AddOnMarketplaceSection({ selectedSlugs, onToggle }: Props) {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-slate-900 mb-2">Subscription Add-Ons</h2>
           <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">
-            Monthly modules you can add to your base plan. A barber can start at $29/month. A workforce training provider can grow to $250–500/month by adding LMS, workforce, apprenticeship, employer portal, and AI modules.
+            Monthly modules you can add to your base plan. Start with the capabilities your organization needs, then expand without creating another disconnected system.
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ADD_ON_MARKETPLACE.map((addon) => {
+            {PUBLIC_SUBSCRIPTION_ADDONS.map((addon) => {
               const selected = selectedSlugs.includes(addon.slug);
               return (
                 <div

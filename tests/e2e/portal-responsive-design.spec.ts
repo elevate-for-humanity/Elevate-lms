@@ -5,6 +5,10 @@ const APPRENTICE_EMAIL = process.env.E2E_APPRENTICE_EMAIL || '';
 const APPRENTICE_PASSWORD = process.env.E2E_APPRENTICE_PASSWORD || '';
 const HOST_EMAIL = process.env.E2E_HOST_SHOP_EMAIL || '';
 const HOST_PASSWORD = process.env.E2E_HOST_SHOP_PASSWORD || '';
+const LEARNER_EMAIL = process.env.E2E_LEARNER_EMAIL || '';
+const LEARNER_PASSWORD = process.env.E2E_LEARNER_PASSWORD || '';
+const PROGRAM_HOLDER_EMAIL = process.env.E2E_PROGRAM_HOLDER_EMAIL || '';
+const PROGRAM_HOLDER_PASSWORD = process.env.E2E_PROGRAM_HOLDER_PASSWORD || '';
 
 async function login(page: Page, email: string, password: string) {
   await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded' });
@@ -141,6 +145,44 @@ test.describe('Authenticated portal responsive design certification', () => {
         await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
       }
       await page.screenshot({ path: testInfo.outputPath(`host-shop-${testInfo.project.name}.png`), fullPage: true });
+    });
+  });
+
+  test.describe('Learner', () => {
+    test.skip(!LEARNER_EMAIL || !LEARNER_PASSWORD, 'Disposable Learner identity is required');
+
+    test('critical Learner surfaces fit the active device viewport', async ({ page }, testInfo) => {
+      await login(page, LEARNER_EMAIL, LEARNER_PASSWORD);
+      for (const path of [
+        '/lms/dashboard',
+        '/lms/courses',
+        '/lms/certificates',
+        '/lms/calendar',
+        '/lms/messages',
+        '/lms/support',
+        '/lms/apply/status',
+      ]) {
+        await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
+      }
+      await page.screenshot({ path: testInfo.outputPath(`learner-${testInfo.project.name}.png`), fullPage: true });
+    });
+  });
+
+  test.describe('Program Holder', () => {
+    test.skip(!PROGRAM_HOLDER_EMAIL || !PROGRAM_HOLDER_PASSWORD, 'Disposable Program Holder identity is required');
+
+    test('critical Program Holder surfaces fit the active device viewport', async ({ page }, testInfo) => {
+      await login(page, PROGRAM_HOLDER_EMAIL, PROGRAM_HOLDER_PASSWORD);
+      for (const path of [
+        '/program-holder/dashboard',
+        '/program-holder/students',
+        '/program-holder/portal/students',
+        '/program-holder/portal/reports',
+        '/program-holder/rights-responsibilities',
+      ]) {
+        await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
+      }
+      await page.screenshot({ path: testInfo.outputPath(`program-holder-${testInfo.project.name}.png`), fullPage: true });
     });
   });
 });

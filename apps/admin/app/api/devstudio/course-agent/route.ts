@@ -9,8 +9,10 @@ import {
   listAgenticEvents,
   listAgenticMessages,
   loadAgenticProject,
+  updateAgenticProjectMetadata,
 } from '@/lib/agentic/project-service';
 import { startAgenticRun } from '@/lib/agentic/orchestrator';
+import { runPersistedCourseProcurementHealthCheckWithClient } from '@/lib/course-builder/persisted-publish-service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,6 +30,101 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}));
   const action = text(body.action) ?? 'start';
+
+  if (action === 'resume-after-review') {
+    const projectId = text(body.projectId);
+    if (!projectId) return NextResponse.json({ error: 'projectId is required' }, { status: 400 });
+
+    const project = await loadAgenticProject({ projectId, userId: auth.id });
+    if (!project || project.target_type !== 'course') {
+      return NextResponse.json({ error: 'Course agent project not found.' }, { status: 404 });
+    }
+    if (!project.target_id) {
+      return NextResponse.json({ error: 'The agentic project is not linked to a canonical course yet.' }, { status: 409 });
+    }
+
+    const db = await requireAdminClient();
+    const health = await runPersistedCourseProcurementHealthCheckWithClient(db, project.target_id);
+    if (!health.pass) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Course is not ready to resume publication.',
+          blocking_issues: health.blocking_issues,
+          metrics: health.metrics,
+        },
+        { status: 422 },
+      );
+    }
+
+    const { data: run, error: runError } = await db
+      .from('agentic_build_runs')
+      .select('id,status')
+      .eq('project_id', project.id)
+      .in('status', ['running', 'waiting_for_approval'])
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (runError) throw runError;
+    if (!run) return NextResponse.json({ error: 'No resumable course build run exists.' }, { status: 409 });
+
+    const { data: waitingTasks, error: taskError } = await db
+      .from('agentic_build_tasks')
+      .select('id,worker,status')
+      .eq('run_id', run.id)
+      .eq('status', 'waiting_review');
+    if (taskError) throw taskError;
+
+    for (const task of waitingTasks ?? []) {
+      if (task.worker !== 'compliance-qa') continue;
+      const { error } = await db
+        .from('agentic_build_tasks')
+        .update({
+          status: 'completed',
+          output: {
+            procurement: health.metrics,
+            blocking_issues: [],
+            human_review_verified: true,
+          },
+          error: null,
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', task.id)
+        .eq('run_id', run.id);
+      if (error) throw error;
+    }
+
+    await updateAgenticProjectMetadata({
+      project,
+      metadata: {
+        publication_approved: true,
+        publication_approved_by: auth.id,
+        publication_approved_at: new Date().toISOString(),
+      },
+      status: 'active',
+    });
+
+    await db.from('agentic_build_events').insert({
+      project_id: project.id,
+      run_id: run.id,
+      event_type: 'agentic.course.publication_approved',
+      summary: 'Authorized human review verified; agentic publication may resume.',
+      payload: {
+        course_id: project.target_id,
+        actor_id: auth.id,
+        procurement: health.metrics,
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      projectId: project.id,
+      runId: run.id,
+      courseId: project.target_id,
+      procurement: health.metrics,
+      publicationApproved: true,
+    });
+  }
 
   if (action !== 'start') {
     return NextResponse.json({ error: `Unsupported action: ${action}` }, { status: 400 });

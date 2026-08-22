@@ -2,13 +2,13 @@
 
 /**
  * Admin Content Editor
- * 
+ *
  * Page for editing content blocks, pages, and library items.
- * Uses RichTextEditor for rich text editing.
+ * Uses the canonical RichTextEditor directly.
  */
 
 import { useState } from 'react';
-import { DynamicRichTextEditor } from '@/lib/dynamic-imports';
+import { RichTextEditor } from '@/components/RichTextEditor';
 import { Save, Eye, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -35,7 +35,7 @@ export default function AdminContentEditorPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/admin"
               className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
             >
@@ -46,7 +46,7 @@ export default function AdminContentEditorPage() {
               <p className="text-sm text-slate-600">Edit pages, blocks, and library content</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {lastSaved && (
               <span className="text-sm text-slate-500">
@@ -79,7 +79,7 @@ export default function AdminContentEditorPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <DynamicRichTextEditor
+          <RichTextEditor
             value={content}
             onChange={setContent}
             placeholder="Start writing your content..."

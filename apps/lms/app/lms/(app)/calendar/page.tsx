@@ -1,24 +1,11 @@
-import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { BookOpen, CalendarDays } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { CalendarWidget } from '@/components/CalendarWidget';
-import { CalendarIntegration } from '@/components/CalendarIntegration';
+import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
-import { getErrorContext, normalizeError } from '@/lib/errors/normalize-error';
-import {
-  Calendar as CalendarIcon,
-  Clock,
-  MapPin,
-  Video,
-  BookOpen,
-  Users,
-  Bell,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-} from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'My Calendar | Student Portal',
@@ -27,12 +14,12 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-function getDaysInMonth(year: number, month: number) {
-  return new Date(year, month + 1, 0).getDate();
-}
-
-function getFirstDayOfMonth(year: number, month: number) {
-  return new Date(year, month, 1).getDay();
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+  });
 }
 
 export default async function CalendarPage() {
@@ -41,356 +28,116 @@ export default async function CalendarPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect('/login');
-  }
+  if (!user) redirect('/login');
 
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
-  const currentDay = now.getDate();
-  const monthNames = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  let events: any[] = [];
-  let upcomingAssignments: any[] = [];
-  let enrolledCourses: any[] = [];
+  let upcomingAssignments: Array<{
+    id: string;
+    title: string;
+    due_date: string;
+    course_id: string | null;
+    courseTitle?: string;
+  }> = [];
 
   try {
-    const { data: calEnrollments } = await supabase
-      .from('program_enrollments')
-      .select('id, course_id')
-      .eq('user_id', user.id)
-      .eq('status', 'active');
+    const { data: enrollments, error: enrollmentError } = await supabase
+      .from('course_enrollments')
+      .select('course_id')
+      .eq('student_id', user.id)
+      .in('status', ['active', 'enrolled', 'in_progress', 'completed']);
 
-    if (calEnrollments) {
-      const calCourseIds = calEnrollments.map((e: any) => e.course_id).filter(Boolean);
-      if (calCourseIds.length) {
-        const { data: calCourses } = await supabase
-          .from('courses')
-          .select('id, title, description')
-          .in('id', calCourseIds);
-        enrolledCourses = calCourses || [];
-      }
-    }
+    if (enrollmentError) throw enrollmentError;
 
-    const { data: calendarEvents } = await supabase
-      .from('calendar_events')
-      .select('*')
-      .or(`user_id.eq.${user.id},is_public.eq.true`)
-      .gte('start_time', new Date(currentYear, currentMonth, 1).toISOString())
-      .lte('start_time', new Date(currentYear, currentMonth + 1, 0).toISOString())
-      .order('start_time');
+    const courseIds = [...new Set((enrollments ?? []).map((row) => row.course_id).filter(Boolean))] as string[];
 
-    if (calendarEvents) {
-      events = calendarEvents;
-    }
+    if (courseIds.length > 0) {
+      const [{ data: assignments, error: assignmentsError }, { data: courses, error: coursesError }] =
+        await Promise.all([
+          supabase
+            .from('assignments')
+            .select('id, title, due_date, course_id')
+            .in('course_id', courseIds)
+            .gte('due_date', new Date().toISOString())
+            .order('due_date', { ascending: true })
+            .limit(8),
+          supabase.from('courses').select('id, title').in('id', courseIds),
+        ]);
 
-    const { data: assignments } = await supabase
-      .from('assignments')
-      .select('id, title, description, due_date, course_id, max_points')
-      .in(
-        'course_id',
-        enrolledCourses
-          .map((c: any) => c.id)
-          .filter(Boolean)
-          .concat(['00000000-0000-0000-0000-000000000000']),
-      )
-      .gte('due_date', now.toISOString())
-      .order('due_date')
-      .limit(5);
+      if (assignmentsError) throw assignmentsError;
+      if (coursesError) throw coursesError;
 
-    if (assignments) {
-      upcomingAssignments = assignments;
+      const courseTitles = new Map((courses ?? []).map((course) => [String(course.id), String(course.title)]));
+      upcomingAssignments = (assignments ?? []).map((assignment) => ({
+        id: String(assignment.id),
+        title: String(assignment.title),
+        due_date: String(assignment.due_date),
+        course_id: assignment.course_id ? String(assignment.course_id) : null,
+        courseTitle: assignment.course_id ? courseTitles.get(String(assignment.course_id)) : undefined,
+      }));
     }
   } catch (error) {
-    // Non-fatal — calendar renders empty if data unavailable
-    // Log so we know when this happens in production
-    logger.error('[calendar] data load error', normalizeError(error, 'Calendar data load error'), getErrorContext(error));
+    logger.error('[calendar] canonical assignment load failed', error);
   }
-
-  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
-  const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
-  const calendarDays: (number | null)[] = [];
-
-  for (let i = 0; i < firstDay; i++) {
-    calendarDays.push(null);
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    calendarDays.push(day);
-  }
-
-  const getEventsForDay = (day: number) => {
-    return events.filter((event) => {
-      const eventDate = new Date(event.start_time);
-      return (
-        eventDate.getDate() === day &&
-        eventDate.getMonth() === currentMonth &&
-        eventDate.getFullYear() === currentYear
-      );
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
 
   return (
-    <div className="min-h-screen bg-white py-8">
-      <div className="max-w-7xl mx-auto px-4 py-4">
+    <main className="min-h-screen bg-slate-50 py-8">
+      <div className="mx-auto max-w-7xl px-4">
         <Breadcrumbs items={[{ label: 'My Programs', href: '/lms/courses' }, { label: 'Calendar' }]} />
-      </div>
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">My Calendar</h1>
-            <p className="text-slate-600 mt-1">
-              Track your classes, assignments, and important dates
-            </p>
-          </div>
-          <div className="mt-4 md:mt-0 flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:bg-white transition">
-              <Bell className="w-4 h-4" />
-              Reminders
-            </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
-              <Plus className="w-4 h-4" />
-              Add Event
-            </button>
-          </div>
-        </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-              <div className="flex items-center justify-between p-6 border-b border-slate-200">
-                <button className="p-2 hover:bg-white rounded-lg transition">
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <h2 className="text-xl font-bold text-slate-900">
-                  {monthNames[currentMonth]} {currentYear}
-                </h2>
-                <button className="p-2 hover:bg-white rounded-lg transition">
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-7 border-b border-slate-200">
-                {dayNames.map((day) => (
-                  <div
-                    key={day}
-                    className="p-3 text-center text-sm font-semibold text-slate-600 bg-white"
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-7">
-                {calendarDays.map((day, index) => {
-                  const dayEvents = day ? getEventsForDay(day) : [];
-                  const isToday = day === currentDay;
-
-                  return (
-                    <div
-                      key={index}
-                      className={`min-h-[100px] p-2 border-b border-r border-slate-100 ${
-                        day ? 'hover:bg-white cursor-pointer' : 'bg-white'
-                      }`}
-                    >
-                      {day && (
-                        <>
-                          <div
-                            className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${
-                              isToday ? 'bg-brand-blue-600 text-white' : 'text-slate-700'
-                            }`}
-                          >
-                            {day}
-                          </div>
-                          <div className="mt-1 space-y-1">
-                            {dayEvents.slice(0, 2).map((event, i) => (
-                              <div
-                                key={i}
-                                className={`text-xs px-2 py-1 rounded truncate ${
-                                  event.event_type === 'class'
-                                    ? 'bg-brand-blue-100 text-brand-blue-700'
-                                    : event.event_type === 'assignment'
-                                      ? 'bg-brand-orange-100 text-brand-orange-700'
-                                      : event.event_type === 'exam'
-                                        ? 'bg-brand-red-100 text-brand-red-700'
-                                        : 'bg-brand-green-100 text-brand-green-700'
-                                }`}
-                              >
-                                {event.title}
-                              </div>
-                            ))}
-                            {dayEvents.length > 2 && (
-                              <div className="text-xs text-slate-500 px-2">
-                                +{dayEvents.length - 2} more
-                              </div>
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+        <header className="mb-8 mt-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-800">
+              <CalendarDays className="h-6 w-6" aria-hidden="true" />
             </div>
-
-            <div className="mt-4 flex flex-wrap gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-brand-blue-500"></div>
-                <span className="text-slate-600">Classes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-brand-orange-500"></div>
-                <span className="text-slate-600">Assignments</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-brand-red-500"></div>
-                <span className="text-slate-600">Exams</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-brand-green-500"></div>
-                <span className="text-slate-600">Events</span>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-950">My Calendar</h1>
+              <p className="mt-1 text-slate-700">Classes, deadlines, assignments, and scheduled events in one place.</p>
             </div>
           </div>
+        </header>
 
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-brand-blue-600" />
-                Today&apos;s Schedule
-              </h3>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+          <CalendarWidget userId={user.id} />
 
-              {events.filter((e) => new Date(e.start_time).toDateString() === now.toDateString())
-                .length > 0 ? (
-                <div className="space-y-3">
-                  {events
-                    .filter((e) => new Date(e.start_time).toDateString() === now.toDateString())
-                    .map((event, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 bg-white rounded-lg">
-                        <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          {event.event_type === 'class' ? (
-                            <BookOpen className="w-5 h-5 text-brand-blue-600" />
-                          ) : event.is_virtual ? (
-                            <Video className="w-5 h-5 text-brand-blue-600" />
-                          ) : (
-                            <MapPin className="w-5 h-5 text-brand-blue-600" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-slate-900 truncate">{event.title}</div>
-                          <div className="text-sm text-slate-600 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {formatTime(event.start_time)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <div className="text-center py-6">
-                  <CalendarIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-600">No events scheduled for today</p>
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-brand-orange-600" />
-                Upcoming Assignments
-              </h3>
+          <aside className="space-y-6" aria-label="Calendar details">
+            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-slate-950">
+                <BookOpen className="h-5 w-5 text-orange-700" aria-hidden="true" />
+                Upcoming assignments
+              </h2>
 
               {upcomingAssignments.length > 0 ? (
-                <div className="space-y-3">
-                  {upcomingAssignments.map((assignment, i) => (
-                    <Link
-                      key={i}
-                      href={`/lms/assignments/${assignment.id}`}
-                      className="block p-3 bg-white rounded-lg hover:bg-white transition"
-                    >
-                      <div className="font-medium text-slate-900 truncate">{assignment.title}</div>
-                      <div className="text-sm text-slate-600">{assignment.courses?.title}</div>
-                      <div className="text-sm text-brand-orange-600 font-medium mt-1">
-                        Due: {formatDate(assignment.due_date)}
-                      </div>
-                    </Link>
+                <ul className="mt-4 space-y-3">
+                  {upcomingAssignments.map((assignment) => (
+                    <li key={assignment.id}>
+                      <Link
+                        href={`/lms/assignments/${assignment.id}`}
+                        className="block rounded-lg border border-slate-200 p-3 hover:border-blue-300 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-700"
+                      >
+                        <p className="font-semibold text-slate-950">{assignment.title}</p>
+                        {assignment.courseTitle ? (
+                          <p className="mt-1 text-sm text-slate-600">{assignment.courseTitle}</p>
+                        ) : null}
+                        <p className="mt-1 text-sm font-medium text-orange-800">Due {formatDate(assignment.due_date)}</p>
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
-                <div className="text-center py-6">
-                  <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                  <p className="text-slate-600">No upcoming assignments</p>
-                </div>
+                <p className="mt-4 text-sm leading-6 text-slate-600">No upcoming assignments are scheduled for your enrolled courses.</p>
               )}
-            </div>
+            </section>
 
-            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
-              <h3 className="font-bold mb-4">Quick Actions</h3>
-              <div className="space-y-2">
-                <Link
-                  href="/lms/assignments"
-                  className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition"
-                >
-                  View All Assignments
-                </Link>
-                <Link
-                  href="/lms/grades"
-                  className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition"
-                >
-                  Check Grades
-                </Link>
-                <Link
-                  href="/lms/support"
-                  className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition"
-                >
-                  Get Help
-                </Link>
+            <section className="rounded-xl bg-slate-950 p-6 text-white">
+              <h2 className="text-lg font-bold">Course tools</h2>
+              <div className="mt-4 grid gap-2">
+                <Link href="/lms/assignments" className="rounded-lg bg-white/10 px-4 py-3 text-center font-semibold hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white">View all assignments</Link>
+                <Link href="/lms/grades" className="rounded-lg bg-white/10 px-4 py-3 text-center font-semibold hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white">Check grades</Link>
+                <Link href="/lms/support" className="rounded-lg bg-white/10 px-4 py-3 text-center font-semibold hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white">Get help</Link>
               </div>
-            </div>
-          </div>
-
-          {/* Calendar Widget */}
-          <div className="mt-8">
-            <CalendarWidget userId={user.id} />
-          </div>
-
-          {/* Calendar Integration */}
-          <div className="mt-8">
-            <CalendarIntegration />
-          </div>
+            </section>
+          </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

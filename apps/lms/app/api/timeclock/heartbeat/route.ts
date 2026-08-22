@@ -33,12 +33,13 @@ async function _POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const body = await request.json();
-    const { progress_entry_id, lat, lng, accuracy_m } = body;
+    const { progress_entry_id: progressEntryId, entry_id: legacyEntryId, lat, lng, accuracy_m } = body;
+    const progress_entry_id = progressEntryId || legacyEntryId;
 
-    // Validate payload
+    // Accept the canonical field plus the existing apprentice UI field for backwards compatibility.
     if (!progress_entry_id || lat === undefined || lng === undefined) {
       return NextResponse.json(
-        { error: 'Missing required fields: progress_entry_id, lat, lng' },
+        { error: 'Missing required fields: progress_entry_id (or entry_id), lat, lng' },
         { status: 400 },
       );
     }

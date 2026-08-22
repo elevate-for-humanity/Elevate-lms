@@ -115,11 +115,14 @@ for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']
 }
 
 const courseDraftAdapter = read('apps/admin/app/api/admin/courses/ai-builder/generate/route.ts');
-for (const invariant of ['generateBlueprintFromAI', "generation_authority: 'course-factory'", "persistence_authority: 'courseFactory()'", 'draft_only: true']) {
-  if (!courseDraftAdapter.includes(invariant)) fail(`Admin AI course draft adapter bypasses canonical Course Builder/Course Factory contract: ${invariant}`);
+if (!courseDraftAdapter.includes('COURSE_BUILDER_ROOT_REQUIRED')) {
+  fail('retired Admin AI course draft adapter is not pinned to the canonical Course Builder root');
+}
+for (const forbiddenLegacyBehavior of ['generateBlueprintFromAI', "generation_authority: 'course-factory'", "persistence_authority: 'courseFactory()'", 'draft_only: true']) {
+  if (courseDraftAdapter.includes(forbiddenLegacyBehavior)) fail(`retired Admin AI course draft adapter still contains legacy generation behavior: ${forbiddenLegacyBehavior}`);
 }
 for (const forbiddenWrite of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert", ".from('lms_courses').insert", ".from('curriculum_lessons').insert"]) {
-  if (courseDraftAdapter.includes(forbiddenWrite)) fail(`Admin AI course draft adapter contains direct persistence: ${forbiddenWrite}`);
+  if (courseDraftAdapter.includes(forbiddenWrite)) fail(`retired Admin AI course draft adapter contains direct persistence: ${forbiddenWrite}`);
 }
 
 // Studio may retain the historical '@/lib/course-factory' import path only because

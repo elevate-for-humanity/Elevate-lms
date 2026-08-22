@@ -75,6 +75,12 @@ export async function POST(request: NextRequest) {
   if (addons.some((addon) => !addon)) {
     return NextResponse.json({ error: 'One or more add-ons are invalid' }, { status: 400 });
   }
+  if (addons.some((addon) => addon?.hiddenFromMarketplace)) {
+    return NextResponse.json(
+      { error: 'One or more legacy add-ons are no longer available for new purchase' },
+      { status: 400 },
+    );
+  }
 
   const admin = await requireAdminClient();
   const tenantId = await resolveTenantIdForUser(user.id);

@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarDays, FileText, Search, Bookmark } from 'lucide-react';
+import { CalendarDays, FileText, Search, Bookmark, Sparkles } from 'lucide-react';
 
 type Row = Record<string, any>;
+
+type GrantsSetupContext = {
+  organization?: string;
+  purpose?: string;
+  amount?: string;
+  geography?: string;
+};
 
 interface Props {
   user: { id: string; email?: string | null };
@@ -12,6 +19,7 @@ interface Props {
   savedGrants: Row[];
   applications: Row[];
   trialDaysRemaining: number;
+  setupContext?: GrantsSetupContext | null;
 }
 
 function opportunityName(row: Row): string {
@@ -24,7 +32,9 @@ function deadlineLabel(value: unknown): string {
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString();
 }
 
-export function GrantsApp({ subscription, opportunities, savedGrants, applications, trialDaysRemaining }: Props) {
+export function GrantsApp({ subscription, opportunities, savedGrants, applications, trialDaysRemaining, setupContext }: Props) {
+  const setupEntries = setupContext ? Object.entries(setupContext).filter(([, value]) => Boolean(value)) : [];
+
   return (
     <main className="bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-7xl">
@@ -42,6 +52,16 @@ export function GrantsApp({ subscription, opportunities, savedGrants, applicatio
           <span className="rounded-full bg-white px-4 py-2 font-semibold text-slate-700 ring-1 ring-slate-200">Status: {subscription.status || 'unknown'}</span>
           {subscription.status === 'trial' && <span className="rounded-full bg-amber-50 px-4 py-2 font-semibold text-amber-800 ring-1 ring-amber-200">{Math.max(0, trialDaysRemaining)} trial days remaining</span>}
         </div>
+
+        {setupEntries.length > 0 && (
+          <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+            <div className="flex items-center gap-2 text-emerald-900"><Sparkles className="h-5 w-5" /><h2 className="font-black">Guided discovery context</h2></div>
+            <p className="mt-2 text-sm leading-6 text-emerald-900">Your plain-English funding answers were carried into this workspace. They define the starting search context; opportunity availability still depends on the records and feeds available to Elevate.</p>
+            <dl className="mt-4 grid gap-3 md:grid-cols-2">
+              {setupEntries.map(([key, value]) => <div key={key} className="rounded-xl bg-white p-4"><dt className="text-xs font-black uppercase tracking-wide text-slate-500">{key}</dt><dd className="mt-1 text-sm text-slate-900">{value}</dd></div>)}
+            </dl>
+          </section>
+        )}
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
           <Stat icon={Search} label="Open opportunities" value={opportunities.length} />

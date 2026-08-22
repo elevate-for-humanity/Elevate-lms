@@ -21,6 +21,7 @@ const walk = (dir, out = []) => {
 };
 
 const rootRoute = 'apps/admin/app/api/admin/course-builder/route.ts';
+const studioChatRoute = 'apps/admin/app/api/devstudio/chat/route.ts';
 const rootText = read(rootRoute);
 for (const required of [
   "from '@/lib/course-builder/orchestrator'",
@@ -64,6 +65,7 @@ const retiredMutationRoutes = [
   'apps/admin/app/api/admin/course-builder/lesson/route.ts',
   'apps/admin/app/api/admin/course-builder/lesson-patch/route.ts',
   'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts',
+  'apps/admin/app/api/admin/courses/ai-builder/generate/route.ts',
   'apps/lms/app/api/ai/generate-and-publish-course/route.ts',
   'apps/admin/app/api/admin/courses/generate/publish/route.ts',
   'supabase/functions/ai-course-create/index.ts',
@@ -100,10 +102,13 @@ for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk(
 }
 
 for (const rel of walk('apps')) {
-  if (rel === rootRoute) continue;
+  if (rel === rootRoute || retiredMutationRoutes.includes(rel)) continue;
   const text = read(rel);
   if (text.includes("@/lib/course-factory/factory")) failures.push(`${rel}: runtime route imports private Course Factory engine`);
-  if (/\bcourseFactory\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP complete-course caller detected; use ${rootRoute}`);
+  if (/\bcourseFactory\s*\(/.test(text) && rel.includes('/api/')) {
+    const studioFacadeAllowed = rel === studioChatRoute && text.includes("await import('@/lib/course-factory')") && !text.includes("@/lib/course-factory/factory");
+    if (!studioFacadeAllowed) failures.push(`${rel}: independent HTTP complete-course caller detected; use ${rootRoute}`);
+  }
   if (/\bpublishCourse\s*\(/.test(text) && rel.includes('/api/')) failures.push(`${rel}: independent HTTP publication caller detected; use ${rootRoute}`);
 }
 
@@ -119,9 +124,16 @@ const forbiddenEndpointRefs = [
   '/api/admin/courses/generate/publish',
   '/api/ai/generate-and-publish-course',
 ];
+const endpointReferenced = (text, endpoint) => {
+  if (endpoint === '/api/admin/course-builder/program') {
+    text = text.replaceAll('/api/admin/course-builder/program-map', '');
+  }
+  return text.includes(endpoint);
+};
 for (const rel of [...walk('apps'), ...walk('components'), ...walk('lib')]) {
+  if (retiredMutationRoutes.includes(rel)) continue;
   const text = read(rel);
-  for (const endpoint of forbiddenEndpointRefs) if (text.includes(endpoint)) failures.push(`${rel}: retired endpoint referenced: ${endpoint}`);
+  for (const endpoint of forbiddenEndpointRefs) if (endpointReferenced(text, endpoint)) failures.push(`${rel}: retired endpoint referenced: ${endpoint}`);
 }
 
 if (failures.length) {
@@ -129,4 +141,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder orchestration/editing/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no parallel complete-package or publication authority detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder orchestration/editing/publication facade -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; no raw-engine, parallel complete-package, or parallel publication authority detected.');

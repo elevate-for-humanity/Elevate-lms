@@ -1,10 +1,11 @@
 -- Repair student applications that were marked approved without any canonical
 -- enrollment or funding/payment evidence, then prevent that partial-success
--- state from recurring.
+-- state from recurring. The canonical application state machine permits
+-- approved -> under_review for remediation, so do not bypass governance.
 
 UPDATE public.applications a
 SET
-  status = 'pending_funding',
+  status = 'under_review',
   updated_at = now()
 WHERE a.type = 'student'
   AND a.status = 'approved'

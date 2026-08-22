@@ -9,9 +9,11 @@ import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
 import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
 import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
+import { FundingQuickCheck } from '@/components/home/FundingQuickCheck';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
 import { HomeFoundationPartner } from '@/components/home/HomeFoundationPartner';
+import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 import StructuredData from '@/components/StructuredData';
@@ -20,15 +22,15 @@ export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${PLATFORM_DEFAULTS.orgName} | AI-Powered 360° Humanitarian Workforce Hub`,
+    absolute: `${PLATFORM_DEFAULTS.orgName} | Career Training & Apprenticeships in Indianapolis`,
   },
   description:
-    'AI-powered humanitarian workforce hub connecting career training, an integrated LMS, hands-on learning, testing, credentials, registered apprenticeships, workforce funding, employment, employers, supportive services, and public-sector partners.',
+    'Explore career training, registered apprenticeships, workforce funding pathways, testing, credentials, and employer-connected programs in Indianapolis and across Indiana. Funding eligibility is determined by the responsible agency.',
   keywords: [
-    'humanitarian workforce hub',
-    'AI workforce platform',
-    'learning management system',
-    'workforce training Indianapolis',
+    'career training Indianapolis',
+    'job training Indianapolis',
+    'workforce development Indiana',
+    'registered apprenticeships Indiana',
     'Indiana workforce training',
     'DOL registered apprenticeship sponsor',
     'Indiana ETPL training provider',
@@ -41,9 +43,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: 'https://www.elevateforhumanity.org' },
   openGraph: {
-    title: `${PLATFORM_DEFAULTS.orgName} | AI-Powered 360° Humanitarian Workforce Hub`,
+    title: `${PLATFORM_DEFAULTS.orgName} | Career Training & Apprenticeships`,
     description:
-      'Training, LMS learning, hands-on experience, testing, apprenticeships, credentials, workforce funding, employment, employers, supportive services, and advancement in one connected ecosystem.',
+      'Career training, registered apprenticeships, funding navigation, testing, credentials, employer connections, and workforce technology in one connected platform.',
     url: 'https://www.elevateforhumanity.org',
     siteName: PLATFORM_DEFAULTS.orgName,
     images: [
@@ -51,7 +53,7 @@ export const metadata: Metadata = {
         url: '/images/pages/comp-home-hero.webp',
         width: 1200,
         height: 630,
-        alt: `${PLATFORM_DEFAULTS.orgName} workforce and humanitarian hub`,
+        alt: `${PLATFORM_DEFAULTS.orgName} career training and workforce programs`,
       },
     ],
     type: 'website',
@@ -64,17 +66,19 @@ export default function HomePage() {
       <StructuredData />
       <HomeHeroVideo banner={heroBanners.home} />
       <MarqueeBanner />
-      <HomePlatformOverview />
-      <HomeCareerPathways />
-      <HomeHowItWorks />
-      <HomeFunding />
-      <HomeApprenticeshipInfra />
-      <HomeEmployerStrip />
-      <HomeBeautyPriority />
-      <HomeFoundationPartner />
       <HomeTrustBar />
+      <FundingQuickCheck />
+      <HomeCareerPathways />
+      <HomeBeautyPriority />
+      <HomeHowItWorks />
+      <HomeApprenticeshipInfra />
+      <HomeFunding />
+      <HomeEmployerStrip />
+      <HomePlatformOverview />
+      <HomeFoundationPartner />
       <HomeFinalCTA />
       <ParisFloatingButton />
+      <HomeMobileActions />
     </>
   );
 }

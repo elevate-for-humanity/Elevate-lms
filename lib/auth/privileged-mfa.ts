@@ -55,7 +55,12 @@ export async function checkPrivilegedMfa(
   };
 }
 
-/** Privileged MFA is a production security invariant, not a rollout feature flag. */
+/**
+ * MFA enrollment remains available from security settings, but it is not a
+ * global gate in front of portal login, role dashboards, learner/employer
+ * portals, or the general admin dashboard. Sensitive actions can opt into MFA
+ * explicitly without trapping ordinary portal navigation behind /mfa.
+ */
 export function privilegedMfaEnforcementEnabled(): boolean {
-  return true;
+  return false;
 }

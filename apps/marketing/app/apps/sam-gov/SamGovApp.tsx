@@ -1,9 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { Building2, Bell, FileText, ShieldCheck } from 'lucide-react';
+import { Building2, Bell, FileText, ShieldCheck, Sparkles } from 'lucide-react';
 
 type Row = Record<string, any>;
+
+type SamSetupContext = {
+  entity?: string;
+  status?: string;
+  goal?: string;
+  team?: string;
+};
 
 interface Props {
   user: { id: string; email?: string | null };
@@ -12,13 +19,16 @@ interface Props {
   documents: Row[];
   alerts: Row[];
   trialDaysRemaining: number;
+  setupContext?: SamSetupContext | null;
 }
 
 function entityName(entity: Row): string {
   return entity.legal_business_name || entity.entity_name || entity.name || entity.uei || 'Entity';
 }
 
-export function SamGovApp({ subscription, entities, documents, alerts, trialDaysRemaining }: Props) {
+export function SamGovApp({ subscription, entities, documents, alerts, trialDaysRemaining, setupContext }: Props) {
+  const setupEntries = setupContext ? Object.entries(setupContext).filter(([, value]) => Boolean(value)) : [];
+
   return (
     <main className="bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-7xl">
@@ -38,6 +48,16 @@ export function SamGovApp({ subscription, entities, documents, alerts, trialDays
           <span className="rounded-full bg-white px-4 py-2 font-semibold text-slate-700 ring-1 ring-slate-200">Status: {subscription.status || 'unknown'}</span>
           {subscription.status === 'trial' && <span className="rounded-full bg-amber-50 px-4 py-2 font-semibold text-amber-800 ring-1 ring-amber-200">{Math.max(0, trialDaysRemaining)} trial days remaining</span>}
         </div>
+
+        {setupEntries.length > 0 && (
+          <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+            <div className="flex items-center gap-2 text-emerald-900"><Sparkles className="h-5 w-5" /><h2 className="font-black">Guided setup context</h2></div>
+            <p className="mt-2 text-sm leading-6 text-emerald-900">Your plain-English setup answers were carried into this workspace. Use them as the starting context for entity setup and compliance planning; review all data before relying on it.</p>
+            <dl className="mt-4 grid gap-3 md:grid-cols-2">
+              {setupEntries.map(([key, value]) => <div key={key} className="rounded-xl bg-white p-4"><dt className="text-xs font-black uppercase tracking-wide text-slate-500">{key}</dt><dd className="mt-1 text-sm text-slate-900">{value}</dd></div>)}
+            </dl>
+          </section>
+        )}
 
         <section className="mt-8 grid gap-4 sm:grid-cols-3">
           <Stat icon={Building2} label="Entities" value={entities.length} />

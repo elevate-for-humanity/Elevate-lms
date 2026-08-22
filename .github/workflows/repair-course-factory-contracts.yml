@@ -1,6 +1,11 @@
 name: Repair Course Factory Contracts
 
 on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/trigger-course-factory-contract-repair.txt'
   issues:
     types: [opened, reopened]
 
@@ -9,7 +14,7 @@ permissions:
 
 jobs:
   repair:
-    if: github.event.issue.title == 'RUN COURSE FACTORY CONTRACT REPAIR'
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN COURSE FACTORY CONTRACT REPAIR'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -71,5 +76,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add lib/course-factory/factory.ts lib/course-factory/publisher.ts
           git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Contracts already aligned."
+            exit 0
+          fi
           git commit -m "fix(course-factory): align canonical contracts"
+          git pull --rebase origin main
           git push origin HEAD:main

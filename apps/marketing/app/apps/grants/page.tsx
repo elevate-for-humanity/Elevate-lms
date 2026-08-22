@@ -22,7 +22,13 @@ type GrantsSetupContext = {
 function cleanSetupValue(value: string | string[] | undefined, max = 500): string | undefined {
   const raw = Array.isArray(value) ? value[0] : value;
   if (!raw) return undefined;
-  const cleaned = raw.trim().replace(/[\u0000-\u001F\u007F]/g, '').slice(0, max);
+  const cleaned = Array.from(raw.trim())
+    .filter((character) => {
+      const code = character.charCodeAt(0);
+      return code > 31 && code !== 127;
+    })
+    .join('')
+    .slice(0, max);
   return cleaned || undefined;
 }
 

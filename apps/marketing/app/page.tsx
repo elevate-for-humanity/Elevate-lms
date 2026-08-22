@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
 import MarqueeBanner from '@/components/MarqueeBanner';
-import { HomePlatformOverview } from '@/components/home/HomePlatformOverview';
+import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
@@ -74,7 +74,7 @@ export default function HomePage() {
       <HomeApprenticeshipInfra />
       <HomeFunding />
       <HomeEmployerStrip />
-      <HomePlatformOverview />
+      <HomePlatformPreview />
       <HomeFoundationPartner />
       <HomeFinalCTA />
       <ParisFloatingButton />

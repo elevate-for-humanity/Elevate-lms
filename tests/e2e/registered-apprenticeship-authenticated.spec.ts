@@ -40,6 +40,18 @@ async function expectPortalRoute(page: Page, path: string, expectedText?: RegExp
   if (expectedText) await expect(page.locator('body')).toContainText(expectedText);
 }
 
+async function expectBrowserDeniedFromPortal(page: Page, path: string) {
+  const response = await page.goto(`${BASE}${path}`, { waitUntil: 'domcontentloaded' });
+  expect(response?.status() ?? 200, `${path} returned a server error`).toBeLessThan(500);
+  await expect
+    .poll(() => new URL(page.url()).pathname, {
+      message: `${path} remained accessible to the wrong portal role`,
+      timeout: 15_000,
+    })
+    .not.toMatch(/^\/host-shop\/dashboard(?:\/|$)/);
+  expect(page.url(), `${path} did not resolve to an authorization/login boundary`).toMatch(/\/(?:unauthorized|host-shop\/login|login)(?:\?|$)/);
+}
+
 test.describe('Registered apprenticeship authorization', () => {
   test.skip(!APPRENTICE_EMAIL || !APPRENTICE_PASSWORD, 'Authenticated apprentice credentials are required');
 
@@ -59,17 +71,19 @@ test.describe('Registered apprenticeship authorization', () => {
     ];
     for (const path of readOnlySurfaces) await expectPortalRoute(page, path);
 
+    // Keep a direct API assertion for server-side authorization.
     const forbidden = await page.request.patch(`${BASE}/api/host-shop/competencies`, {
       data: { enrollmentId: '00000000-0000-0000-0000-000000000000', competencyId: 'not-authorized', completed: true },
       failOnStatusCode: false,
     });
     expect([401, 403]).toContain(forbidden.status());
 
-    const hostDashboard = await page.request.get(`${BASE}/host-shop/dashboard`, {
-      failOnStatusCode: false,
-      maxRedirects: 0,
-    });
-    expect([302, 303, 307, 308, 401, 403]).toContain(hostDashboard.status());
+    // App Router page redirects are a browser-navigation contract. A raw
+    // APIRequestContext response can expose the streamed RSC shell as HTTP 200
+    // even though the authenticated browser is redirected by the server layout.
+    // Verify the actual production user path rather than treating raw status as
+    // equivalent to portal access.
+    await expectBrowserDeniedFromPortal(page, '/host-shop/dashboard');
   });
 });
 

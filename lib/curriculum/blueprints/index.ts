@@ -76,6 +76,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     { prsIndianaBlueprint },
     { itHelpDeskBlueprint },
     { entrepreneurshipBlueprint },
+    { businessEntrepreneurshipBlueprint },
   ] = await Promise.all([
     import('./bookkeeping-quickbooks'),
     import('./barber-apprenticeship'),
@@ -88,6 +89,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     import('./prs-indiana'),
     import('./it-help-desk'),
     import('./entrepreneurship'),
+    import('./business-entrepreneurship'),
   ]);
 
   const elevateEsbBlueprint: CredentialBlueprint = {
@@ -101,9 +103,6 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     barberApprenticeshipBlueprint,
     estheticianBlueprint,
     nailTechnicianBlueprint,
-    // Cosmetology uses the shared course engine but intentionally receives no
-    // registered-apprenticeship config unless an active approved standard is
-    // added to the canonical registered-program contract.
     cosmetologyBlueprint,
     crsIndianaBlueprint,
     peerRecoverySpecialistBlueprint,
@@ -111,6 +110,7 @@ export async function getAllBlueprints(): Promise<CredentialBlueprint[]> {
     prsIndianaBlueprint,
     itHelpDeskBlueprint,
     elevateEsbBlueprint,
+    businessEntrepreneurshipBlueprint,
   ].map(sanitizeBlueprint);
 
   const explicitProgramSlugs = new Set(explicitBlueprints.map((bp) => bp.programSlug));
@@ -143,10 +143,6 @@ export async function getBlueprintByProgramSlug(
   return registry.find((bp) => bp.programSlug === programSlug) ?? null;
 }
 
-/**
- * Returns the external courses declared on a blueprint for a given program slug.
- * Returns an empty array if the program has no blueprint or no external courses.
- */
 export async function getExternalCoursesForProgram(
   programSlug: string,
 ): Promise<NonNullable<CredentialBlueprint['externalCourses']>> {

@@ -172,7 +172,7 @@ async function provision() {
         access_granted_at: new Date().toISOString(),
         funding_source: 'SELF_PAY',
         funding_pathway: 'qa_e2e',
-        funding_status: 'self_pay',
+        funding_status: 'unfunded_self_continuing',
         payment_status: 'qa_test',
         funding_verified: false,
         organization_id: program.organization_id,

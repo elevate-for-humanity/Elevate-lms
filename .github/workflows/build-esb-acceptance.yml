@@ -14,18 +14,20 @@ on:
       - 'lib/curriculum/lesson-content-schema.ts'
       - 'lib/curriculum/normalize-lesson-content.ts'
       - 'lib/course-factory/**'
-      - 'lib/course-builder/video-queue.ts'
+      - 'lib/course-builder/**'
+      - 'lib/devstudio/course-builder-controller.ts'
       - 'lib/video/**'
       - 'components/lms/**'
       - 'apps/lms/app/lms/courses/**'
       - 'apps/lms/app/api/learner/interactions/**'
       - 'apps/admin/app/api/admin/course-builder/route.ts'
+      - 'apps/admin/app/api/devstudio/chat/route.ts'
       - 'apps/admin/app/api/internal/videos/process-queue/route.ts'
   issues:
     types: [opened, reopened]
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 env:
@@ -47,6 +49,46 @@ env:
   AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
 
 jobs:
+  course-architecture-consolidation:
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, 'wire course architecture consolidation job')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply canonical Studio to Course Builder migration
+        run: node scripts/one-time-course-architecture-consolidation.mjs
+
+      - name: Verify authority before commit
+        run: |
+          node scripts/check-course-factory-authority.mjs
+          node scripts/check-studio-architecture.mjs
+
+      - name: Commit migration directly to main
+        run: |
+          git config user.name "elevateforhumanity"
+          git config user.email "Elizabethpowell6262@gmail.com"
+          git add apps/admin/app/api/devstudio/chat/route.ts \
+            apps/admin/app/api/admin/course-builder/route.ts \
+            apps/admin/app/api/admin/course-builder/publish/route.ts \
+            apps/admin/app/api/admin/lms/courses/generate/route.ts \
+            'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts' \
+            apps/admin/app/api/admin/courses/ai-builder/route.ts \
+            lib/course-builder/orchestrator.ts \
+            lib/devstudio/course-builder-controller.ts \
+            lib/course-factory/index.ts \
+            scripts/check-course-factory-authority.mjs \
+            scripts/check-studio-architecture.mjs \
+            docs/COURSE-BUILDER-CANONICAL-ARCHITECTURE.md
+          git commit -m "Consolidate Studio controlled Course Builder authority"
+          git push origin HEAD:main
+
   build-audit-publish:
     if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' || github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
@@ -134,7 +176,7 @@ jobs:
               : fs.existsSync('/tmp/course-acceptance.log')
                 ? fs.readFileSync('/tmp/course-acceptance.log', 'utf8').slice(-32000)
                 : 'Course Builder did not produce a log.';
-            const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
+            const label = context.payload.issue?.title?.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

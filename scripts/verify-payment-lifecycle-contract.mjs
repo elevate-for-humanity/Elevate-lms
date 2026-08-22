@@ -25,6 +25,8 @@ const billingPortal = 'apps/marketing/app/api/store/billing-portal/route.ts';
 const stripeWebhook = 'apps/marketing/app/api/webhooks/stripe/route.ts';
 const preSwitchDispatcher = 'lib/payments/career-course-webhook.ts';
 const subscriptionProcessor = 'lib/platform/process-subscription-event.ts';
+const featureCatalog = 'lib/platform/feature-catalog.ts';
+const unifiedCourseMigration = 'supabase/migrations/20260822101500_add_unified_course_platform_addon.sql';
 
 for (const path of [
   affirmCapture,
@@ -34,6 +36,8 @@ for (const path of [
   stripeWebhook,
   preSwitchDispatcher,
   subscriptionProcessor,
+  featureCatalog,
+  unifiedCourseMigration,
 ]) read(path);
 
 // Affirm: bind financing to an application/program, verify amount, make network
@@ -61,6 +65,19 @@ requireText(platformCheckout, 'await stripe.subscriptions.update(current.id', 'P
 requireText(platformCheckout, 'await syncPlatformSubscriptionLifecycle(admin, updated)', 'Plan changes must immediately sync canonical subscription state');
 requireText(platformCheckout, "checkout_type: 'platform_saas'", 'Stripe checkout metadata must identify the canonical SaaS family');
 requireText(platformCheckout, "mode: 'subscription'", 'Platform checkout must create a recurring Stripe Checkout session');
+requireText(platformCheckout, 'addon?.hiddenFromMarketplace', 'Platform checkout must block hidden legacy add-ons from new purchase');
+requireText(platformCheckout, 'legacy add-ons are no longer available for new purchase', 'Legacy add-on checkout rejection must remain explicit');
+
+// Unified Course Creation & Learning Platform must resolve through one canonical
+// commercial code and grant the complete builder/factory/LMS/certificate bundle.
+requireText(featureCatalog, "'course-creation-learning-platform': 'course-creation-learning-platform'", 'Unified course product must normalize to its canonical add-on code');
+requireText(featureCatalog, "'course-creation-learning-platform': [", 'Unified course product must have a code-side entitlement fallback');
+requireText(featureCatalog, 'PlatformFeature.COURSE_BUILDER', 'Unified course product must grant Course Builder');
+requireText(featureCatalog, 'PlatformFeature.COURSE_FACTORY', 'Unified course product must grant Course Factory');
+requireText(featureCatalog, 'PlatformFeature.LMS', 'Unified course product must grant LMS');
+requireText(featureCatalog, 'PlatformFeature.CERTIFICATES', 'Unified course product must grant certificates');
+requireText(unifiedCourseMigration, "'course-creation-learning-platform'", 'Database catalog must seed the unified course product');
+requireText(unifiedCourseMigration, "array['course_builder','course_factory','ai_content','lms','certificates']", 'Database entitlement bundle must match the unified course product');
 
 // Canonical webhook: signed event construction, exactly-once protection, and
 // fail-closed handling for destructive recurring/refund events.

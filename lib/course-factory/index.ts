@@ -1,17 +1,13 @@
 /**
  * Course Factory
- * 
- * Unified course generation system.
- * 
+ *
+ * Canonical course generation system.
+ *
  * Usage:
- * 
+ *
  * ```typescript
- * import { courseFactory, createCourse, validateBlueprint } from '@/lib/course-factory';
- * 
- * // Simple API
- * const result = await createCourse({ programSlug: 'hvac' });
- * 
- * // Full API with progress
+ * import { courseFactory, validateBlueprint } from '@/lib/course-factory';
+ *
  * const result = await courseFactory({
  *   programSlug: 'hvac',
  *   mode: 'replace',
@@ -19,8 +15,7 @@
  * }, (stage, message) => {
  *   console.log(`${stage}: ${message}`);
  * });
- * 
- * // Validate a blueprint
+ *
  * const validation = validateBlueprint(blueprint);
  * if (!validation.valid) {
  *   console.error('Validation failed:', validation.errors);
@@ -30,7 +25,7 @@
 
 // ─── Main API ─────────────────────────────────────────────────────────────────
 
-export { courseFactory, createCourse, factoryFromSlug } from './factory';
+export { courseFactory } from './factory';
 export type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
 
 // ─── Blueprint API ─────────────────────────────────────────────────────────────

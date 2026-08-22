@@ -1,6 +1,11 @@
 /**
  * Individual (per-user) subscription plans for Elevate Store apps.
  * Billed monthly via Stripe — see app/api/apps/upgrade/route.ts APP_PRICES.
+ *
+ * IMPORTANT: these plans grant access to one authenticated user account.
+ * Organization-wide seats, shared entity ownership, white-label delivery and
+ * contractual SLAs are enterprise procurement capabilities and must not be
+ * represented here unless backed by an organization entitlement contract.
  */
 
 export type IndividualAppSlug = 'website-builder' | 'sam-gov' | 'grants';
@@ -57,12 +62,11 @@ const WEBSITE_BUILDER_PLANS: IndividualPlanDefinition[] = [
     priceMonthly: 199,
     priceLabel: '$199/mo',
     features: [
-      'Unlimited websites',
-      'White-label builder',
-      'API access',
-      'Dedicated support',
-      'Multi-user access',
+      'Unlimited websites for the licensed user',
+      'Advanced builder controls',
       'Import existing sites',
+      'Priority support',
+      'Organization licensing available through procurement review',
     ],
   },
 ];
@@ -73,7 +77,7 @@ const SAM_GOV_PLANS: IndividualPlanDefinition[] = [
     name: 'Starter',
     priceMonthly: 49,
     priceLabel: '$49/mo',
-    features: ['1 entity', 'Registration wizard', 'Renewal reminders', 'Email support'],
+    features: ['1 entity', 'Registration workspace', 'Renewal reminders', 'Email support'],
   },
   {
     id: 'professional',
@@ -81,14 +85,14 @@ const SAM_GOV_PLANS: IndividualPlanDefinition[] = [
     priceMonthly: 149,
     priceLabel: '$149/mo',
     popular: true,
-    features: ['5 entities', 'Compliance dashboard', 'Team members', 'Priority support'],
+    features: ['Up to 5 entity records', 'Compliance dashboard', 'Document organization', 'Priority support'],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     priceMonthly: 399,
     priceLabel: '$399/mo',
-    features: ['Unlimited entities', 'White-label', 'Dedicated manager', 'SLA'],
+    features: ['Unlimited entity records for the licensed user', 'Advanced compliance workspace', 'Priority support', 'Organization licensing available through procurement review'],
   },
 ];
 
@@ -98,7 +102,7 @@ const GRANTS_PLANS: IndividualPlanDefinition[] = [
     name: 'Starter',
     priceMonthly: 79,
     priceLabel: '$79/mo',
-    features: ['50 grant searches/mo', 'Basic AI matching', 'Deadline alerts', '3 team members'],
+    features: ['50 grant searches/mo', 'Basic matching workflow', 'Deadline visibility', 'Saved-grant organization'],
   },
   {
     id: 'professional',
@@ -106,14 +110,14 @@ const GRANTS_PLANS: IndividualPlanDefinition[] = [
     priceMonthly: 199,
     priceLabel: '$199/mo',
     popular: true,
-    features: ['Unlimited searches', 'Application tracking', 'Budget tools', '10 team members'],
+    features: ['Expanded discovery capacity', 'Application tracking', 'Budget workflow tools where enabled', 'Priority support'],
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     priceMonthly: 499,
     priceLabel: '$499/mo',
-    features: ['Agency features', 'API', 'Compliance automation', 'Unlimited team'],
+    features: ['Advanced grants workspace', 'Compliance workflow support', 'Priority support', 'Organization licensing available through procurement review'],
   },
 ];
 

@@ -1,0 +1,85 @@
+name: Agentic Admissions Acceptance
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/marketing/app/apply/**'
+      - 'apps/marketing/app/api/applications/**'
+      - 'apps/marketing/app/api/paris/application-interview/**'
+      - 'apps/marketing/app/api/paris/applications/**'
+      - 'lib/agentic/**'
+      - 'lib/paris/admissions/**'
+      - 'lib/zora/admissions/**'
+      - 'supabase/migrations/20260822183500_agentic_build_foundation.sql'
+      - 'supabase/migrations/20260822190000_retire_paris_application_authority.sql'
+      - 'supabase/migrations/20260822191500_link_agentic_application_documents.sql'
+      - 'scripts/check-agentic-admissions-contract.mjs'
+      - '.github/workflows/agentic-admissions-acceptance.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: agentic-admissions-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  acceptance:
+    name: Agentic Admissions Acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Mark acceptance pending
+        run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d "{\"state\":\"pending\",\"context\":\"Agentic Admissions Acceptance\",\"description\":\"Validating PARIS admissions authority, types and marketing build\",\"target_url\":\"${RUN_URL}\"}" >/dev/null
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Validate agentic admissions authority contract
+        run: node scripts/check-agentic-admissions-contract.mjs
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
+
+      - name: Typecheck marketing application
+        run: pnpm run typecheck:marketing
+
+      - name: Build marketing application
+        run: pnpm run build:marketing
+
+      - name: Report acceptance status
+        if: always()
+        run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [ "${{ job.status }}" = "success" ]; then
+            STATE=success
+            DESC="PARIS admissions contract, typecheck and marketing build passed"
+          else
+            STATE=failure
+            DESC="PARIS admissions acceptance failed; inspect workflow logs"
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}" \
+            -d "{\"state\":\"${STATE}\",\"context\":\"Agentic Admissions Acceptance\",\"description\":\"${DESC}\",\"target_url\":\"${RUN_URL}\"}" >/dev/null

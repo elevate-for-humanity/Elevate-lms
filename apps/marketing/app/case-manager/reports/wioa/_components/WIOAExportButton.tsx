@@ -3,11 +3,7 @@
 import { useState } from 'react';
 import { Download } from 'lucide-react';
 
-type Props = {
-  caseManagerId: string;
-};
-
-export default function WIOAExportButton({ caseManagerId }: Props) {
+export default function WIOAExportButton() {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState('');
 
@@ -15,11 +11,8 @@ export default function WIOAExportButton({ caseManagerId }: Props) {
     setDownloading(true);
     setError('');
     try {
-      const response = await fetch('/api/case-manager/wioa-export', {
-        method: 'GET',
-        cache: 'no-store',
-        headers: { 'X-Case-Manager': caseManagerId },
-      });
+      // Identity and caseload scope are resolved exclusively from the authenticated session.
+      const response = await fetch('/api/case-manager/wioa-export', { method: 'GET', cache: 'no-store' });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Unable to export WIOA report.');
@@ -45,12 +38,7 @@ export default function WIOAExportButton({ caseManagerId }: Props) {
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <button
-        type="button"
-        onClick={download}
-        disabled={downloading}
-        className="inline-flex items-center gap-2 rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800 disabled:opacity-60"
-      >
+      <button type="button" onClick={download} disabled={downloading} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-brand-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-blue-800 disabled:opacity-60">
         <Download className="h-4 w-4" aria-hidden="true" />
         {downloading ? 'Preparing…' : 'Export CSV'}
       </button>

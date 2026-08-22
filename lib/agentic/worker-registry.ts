@@ -88,7 +88,6 @@ const WORKERS: AgenticWorkerDefinition[] = [
     capabilities: ['accessibility', 'claims_review', 'completion_validation', 'security_checks'],
     targetTypes: ['website', 'course', 'program', 'workflow', 'store_workspace', 'dev_studio', 'marketing_campaign'],
     costClass: 'low',
-    approvalRequired: true,
   },
   {
     name: 'publisher',

@@ -4,7 +4,6 @@ const CACHE_VERSION = '__CACHE_VERSION__';
 const CDN = 'https://cuxzzpsyufcewtmicszk.supabase.co/storage/v1/object/public/images';
 
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
-const COURSE_CACHE = `${CACHE_VERSION}-courses`;
 
 const PRECACHE_ASSETS = [
   '/offline.html',
@@ -57,7 +56,11 @@ self.addEventListener('activate', (event) => {
       const names = await caches.keys();
       await Promise.all(
         names
-          .filter((name) => name.startsWith('elevate-lms-') && !name.startsWith(CACHE_VERSION))
+          .filter(
+            (name) =>
+              (name.startsWith('elevate-lms-') && !name.startsWith(CACHE_VERSION)) ||
+              name.endsWith('-courses'),
+          )
           .map((name) => caches.delete(name)),
       );
       await self.clients.claim();
@@ -83,11 +86,15 @@ self.addEventListener('fetch', (event) => {
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Never cache authenticated HTML/RSC, application APIs, auth routes, or range
-  // requests. Course-page offline caching is explicit through CACHE_COURSE below;
-  // generic /lms/* responses are intentionally not cached.
+  // Never cache authenticated HTML/RSC, application APIs, auth routes, range
+  // requests, or protected dashboard/course navigations. Navigations are always
+  // network-only with the public offline shell as the only fallback.
   if (request.mode === 'navigate') {
-    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')));
+    event.respondWith(
+      fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() =>
+        caches.match('/offline.html'),
+      ),
+    );
     return;
   }
 
@@ -97,7 +104,9 @@ self.addEventListener('fetch', (event) => {
     url.searchParams.has('_rsc') ||
     url.pathname.startsWith('/api/') ||
     /\/(?:login|logout|unauthorized)(?:\/|$)/.test(url.pathname) ||
-    /\/(?:lms\/dashboard|apprentice|employer|host-shop|workforce|parent-portal)(?:\/|$)/.test(url.pathname)
+    /\/(?:lms\/dashboard|lms\/courses|apprentice|employer|host-shop|workforce|parent-portal)(?:\/|$)/.test(
+      url.pathname,
+    )
   ) {
     return;
   }
@@ -117,46 +126,24 @@ self.addEventListener('fetch', (event) => {
 });
 
 self.addEventListener('message', (event) => {
-  const { type, payload } = event.data || {};
+  const { type } = event.data || {};
 
   switch (type) {
-    case 'CACHE_COURSE':
-      if (Array.isArray(payload?.urls)) {
-        event.waitUntil(
-          caches.open(COURSE_CACHE).then((cache) =>
-            Promise.allSettled(
-              payload.urls.map(async (rawUrl) => {
-                const url = new URL(rawUrl, self.location.origin);
-                if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-                const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow' });
-                const response = await fetch(request);
-                await safeCachePut(cache, request, response);
-              }),
-            ),
-          ),
-        );
-      }
-      break;
-
-    case 'CLEAR_COURSE_CACHE':
-      event.waitUntil(caches.delete(COURSE_CACHE));
-      break;
-
     case 'SKIP_WAITING':
       self.skipWaiting();
       break;
 
     case 'GET_CACHE_SIZE':
       event.waitUntil(
-        Promise.all([
-          caches.open(STATIC_CACHE).then((cache) => cache.keys()),
-          caches.open(COURSE_CACHE).then((cache) => cache.keys()),
-        ]).then(([staticKeys, courseKeys]) => {
-          event.source?.postMessage({
-            type: 'CACHE_SIZE',
-            payload: { static: staticKeys.length, courses: courseKeys.length },
-          });
-        }),
+        caches
+          .open(STATIC_CACHE)
+          .then((cache) => cache.keys())
+          .then((staticKeys) => {
+            event.source?.postMessage({
+              type: 'CACHE_SIZE',
+              payload: { static: staticKeys.length, courses: 0 },
+            });
+          }),
       );
       break;
   }

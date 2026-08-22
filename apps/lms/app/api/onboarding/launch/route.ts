@@ -1,4 +1,4 @@
-// PUBLIC ROUTE: one-shot business launch (workspace + website + optional LMS seed)
+// PUBLIC ROUTE: one-shot business launch (workspace + website; LMS authoring is deferred to Course Builder)
 import { NextRequest } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError, safeOk } from '@/lib/api/safe-error';
@@ -90,26 +90,11 @@ async function _POST(request: NextRequest) {
       }
     }
 
-    let lmsSeeded = false;
-    if (body.includeLms) {
-      const adminDb = await requireAdminClient();
-      const { data: existing } = await adminDb
-        .from('courses')
-        .select('id')
-        .eq('organization_id', trial.organizationId)
-        .limit(1)
-        .maybeSingle();
-      if (!existing?.id) {
-        await adminDb.from('courses').insert({
-          title: `${organizationName} Training Program`,
-          slug: `${trial.slug}-intro-program`,
-          status: 'draft',
-          organization_id: trial.organizationId,
-          description: 'Auto-generated starter program — customize in Course Studio.',
-        } as Record<string, unknown>);
-        lmsSeeded = true;
-      }
-    }
+    // A public LMS onboarding route must never create or author canonical courses.
+    // When LMS setup is requested, create the workspace now and defer course creation
+    // to the authenticated Studio -> Course Builder authority after the owner signs in.
+    const lmsSeeded = false;
+    const lmsSeedDeferred = body.includeLms === true;
 
     return safeOk({
       workspaceId: trial.workspaceId,
@@ -120,9 +105,13 @@ async function _POST(request: NextRequest) {
       trialEndsAt: trial.trialEndsAt,
       aiSiteEnhanced,
       lmsSeeded,
+      lmsSeedDeferred,
       nextSteps: [
         { label: 'View public site', href: trial.publicPreviewUrl },
         { label: 'Open admin dashboard', href: trial.dashboardUrl },
+        ...(lmsSeedDeferred
+          ? [{ label: 'Build your first course', href: '/studio/courses' }]
+          : []),
         { label: 'Choose a plan', href: '/store/plans' },
       ],
     });

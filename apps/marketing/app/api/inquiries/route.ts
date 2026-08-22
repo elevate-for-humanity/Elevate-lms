@@ -1,173 +1,145 @@
-import { internalFetch } from '@/lib/api/internal-fetch';
-// PUBLIC ROUTE: public inquiry form
-import { logger } from '@/lib/logger';
-
+// PUBLIC ROUTE: canonical public information-request / lead intake.
 import { NextResponse } from 'next/server';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
+import { sendEmail } from '@/lib/email/sendgrid';
+import { logger } from '@/lib/logger';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
 export const dynamic = 'force-dynamic';
 
-// Public endpoint — anonymous inquiry submissions
+function escapeHtml(value: unknown): string {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 async function _POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
     if (rateLimited) return rateLimited;
 
-    // Rate limiting
-
-    const body = await req.json();
-
-    // Validate required fields
-    if (!body.name || !body.email) {
+    const body = (await req.json()) as Record<string, any>;
+    const name = String(body.name || '').trim();
+    const email = String(body.email || '').trim().toLowerCase();
+    if (!name || !email) {
       return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
     }
-
-    const supabase = await requireAdminClient();
-
-    if (!supabase) {
-      return NextResponse.json(
-        {
-          error:
-            'Service temporarily unavailable. Please call 317-314-3757 for immediate assistance.',
-        },
-        { status: 503 },
-      );
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'A valid email is required' }, { status: 400 });
     }
 
-    // Parse name into first and last
-    const nameParts = body.name.trim().split(' ');
+    const nameParts = name.split(/\s+/).filter(Boolean);
     const firstName = nameParts[0] || 'Unknown';
     const lastName = nameParts.slice(1).join(' ') || 'Inquiry';
+    const program = String(body.program || 'general-inquiry').trim() || 'general-inquiry';
+    const source = String(body.source || 'inquiry_form').trim() || 'inquiry_form';
+    const phone = body.phone ? String(body.phone).trim() : null;
+    const message = body.message ? String(body.message).trim() : '';
+    const fundingQuestion = body.fundingQuestion ? String(body.fundingQuestion).trim() : '';
+    const fundingInterest = body.fundingInterest || body.fundingSource || null;
 
-    const programId = body.program || 'general-inquiry';
+    const db = await requireAdminClient();
 
-    // Check for existing application (prevent duplicates)
-    const { data: existing } = await supabase
-      .from('applications')
-      .select('id, status, created_at')
-      .eq('email', body.email.toLowerCase())
-      .eq('program_interest', programId)
-      .not('status', 'in', '("rejected","withdrawn")')
+    // Information requests are CRM leads, not admissions applications. Reuse a
+    // recent matching lead so refreshes/retries do not manufacture duplicates.
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: existingLead } = await db
+      .from('leads')
+      .select('id, created_at')
+      .eq('email', email)
+      .eq('program_interest', program)
+      .gte('created_at', sevenDaysAgo)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .maybeSingle();
 
-    if (existing) {
-      return NextResponse.json(
-        {
-          error: 'You have already submitted an application for this program.',
-          message: `Your application (ID: ${existing.id.slice(0, 8)}) is currently ${existing.status}. An advisor will contact you soon.`,
-          existingId: existing.id,
-          status: existing.status,
-          submittedAt: existing.created_at,
-        },
-        { status: 409 }, // Conflict
-      );
+    let leadId = existingLead?.id as string | undefined;
+    let existing = Boolean(existingLead?.id);
+    if (!leadId) {
+      const notes = [
+        message ? `Message: ${message}` : '',
+        fundingQuestion ? `Funding question: ${fundingQuestion}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n') || null;
+
+      const { data: lead, error } = await db
+        .from('leads')
+        .insert({
+          first_name: firstName,
+          last_name: lastName,
+          full_name: name,
+          email,
+          phone,
+          program_interest: program,
+          funding_interest: fundingInterest,
+          state: body.state ? String(body.state).trim() : null,
+          source,
+          status: 'new',
+          stage: 'inquiry',
+          notes,
+          eligibility_data: {
+            inquiry: true,
+            city: body.city || null,
+            zip: body.zip || body.zipCode || null,
+            contact_preference: body.contactPreference || 'email',
+          },
+        })
+        .select('id')
+        .single();
+      if (error || !lead) {
+        logger.error('[api/inquiries] lead insert failed', {
+          code: error?.code,
+          message: error?.message,
+        });
+        return NextResponse.json({ error: 'Failed to save inquiry' }, { status: 500 });
+      }
+      leadId = lead.id;
+      existing = false;
     }
 
-    // Store as a simple application using actual table columns
-    const insertData = {
-      first_name: firstName,
-      last_name: lastName,
-      email: body.email.toLowerCase(),
-      phone: body.phone || null,
-      city: body.city || 'Not provided',
-      zip: body.zip || '00000',
-      program_interest: programId, // Store program name/slug here
-      status: 'pending',
-      source: 'inquiry_form',
-      contact_preference: body.contactPreference || 'email',
-    };
-
-    const { data, error } = await supabase
-      .from('applications')
-      .insert(insertData)
-      .select()
-      .single();
-
-    if (error) {
-      logger.error('Supabase insert error', {
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      });
-      return NextResponse.json({ error: 'Failed to save inquiry' }, { status: 500 });
+    // Only send a new notification when a new lead was created. A retry should
+    // return the existing inquiry without sending duplicate advisor emails.
+    if (!existing && leadId) {
+      const programLabel = program
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (character) => character.toUpperCase());
+      await Promise.allSettled([
+        sendEmail({
+          to: email,
+          subject: `Information Request Received — ${programLabel} | ${PLATFORM_DEFAULTS.orgName}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto"><h2>We received your information request</h2><p>Hello ${escapeHtml(firstName)},</p><p>We received your request for information about <strong>${escapeHtml(programLabel)}</strong>. An advisor can help you understand program, funding, and next-step options.</p><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin:18px 0"><strong>Inquiry reference:</strong> ${escapeHtml(leadId)}</div><p>This is an information request, not a submitted enrollment application. When you are ready to apply, PARIS can guide you through the application at <a href="${PLATFORM_DEFAULTS.siteUrl}/apply/student?program=${encodeURIComponent(program)}">${PLATFORM_DEFAULTS.siteUrl}/apply/student</a>.</p><p>Questions? Call ${PLATFORM_DEFAULTS.supportPhone}.</p></div>`,
+        }),
+        sendEmail({
+          to: 'elevate4humanityedu@gmail.com',
+          subject: `New Program Inquiry — ${name} — ${programLabel}`,
+          html: `<div style="font-family:Arial,sans-serif"><h2>New Information Request</h2><p><strong>Name:</strong> ${escapeHtml(name)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p><p><strong>Phone:</strong> ${escapeHtml(phone || 'Not provided')}</p><p><strong>Program:</strong> ${escapeHtml(programLabel)}</p>${message ? `<p><strong>Message:</strong> ${escapeHtml(message)}</p>` : ''}${fundingQuestion ? `<p><strong>Funding question:</strong> ${escapeHtml(fundingQuestion)}</p>` : ''}<p><strong>CRM lead:</strong> ${escapeHtml(leadId)}</p><p><a href="https://admin.${PLATFORM_DEFAULTS.canonicalDomain}/crm/leads">Open CRM leads</a></p></div>`,
+        }),
+      ]);
     }
 
-    // Send email notifications
-    try {
-      // Confirmation to applicant
-      await internalFetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/api/email/send`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: body.email,
-            subject: `Inquiry Received - ${PLATFORM_DEFAULTS.orgName}`,
-            html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #ea580c;">Thank you for your inquiry!</h2>
-              <p>Hi ${firstName},</p>
-              <p>We've received your inquiry and an advisor will contact you within 1-2 business days.</p>
-              ${body.program ? `<p>You expressed interest in: <strong>${body.program}</strong></p>` : ''}
-
-              <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                <p style="margin: 0 0 8px 0; font-size: 14px; color: #64748b;">Your Application ID:</p>
-                <p style="margin: 0; font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a;">${data.id}</p>
-              </div>
-
-              <div style="text-align: center; margin: 24px 0;">
-                <a href="${PLATFORM_DEFAULTS.siteUrl}/apply/track?id=${data.id}&email=${encodeURIComponent(body.email)}" style="display: inline-block; background: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Track Application Status</a>
-              </div>
-
-              <p>Questions? Call us at <a href="tel:${PLATFORM_DEFAULTS.supportPhone}" style="color: #ea580c; font-weight: bold;">${PLATFORM_DEFAULTS.supportPhone}</a></p>
-              <p>Best regards,<br><strong>${PLATFORM_DEFAULTS.orgName} Team</strong></p>
-            </div>
-          `,
-          }),
-        },
-      );
-
-      // Notification to staff
-      await internalFetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL || PLATFORM_DEFAULTS.siteUrl}/api/email/send`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: 'elevate4humanityedu@gmail.com',
-            subject: `New Inquiry: ${body.name}${body.program ? ` - ${body.program}` : ''}`,
-            html: `
-            <h2>New Inquiry Received</h2>
-            <p><strong>Name:</strong> ${body.name}</p>
-            <p><strong>Email:</strong> ${body.email}</p>
-            <p><strong>Phone:</strong> ${body.phone || 'Not provided'}</p>
-            ${body.program ? `<p><strong>Program Interest:</strong> ${body.program}</p>` : ''}
-            ${body.message ? `<p><strong>Message:</strong><br>${body.message}</p>` : ''}
-            <p><a href="${PLATFORM_DEFAULTS.siteUrl}/admin/applications">View in Admin Portal</a></p>
-          `,
-          }),
-        },
-      );
-    } catch (emailError) {
-      logger.error('Unhandled error', emailError instanceof Error ? emailError : undefined);
-    }
-
-    return NextResponse.json(
-      {
-        ok: true,
-        id: data.id,
-        email: data.email,
-        program: data.program_id,
-      },
-      { status: 200 },
-    );
+    return NextResponse.json({
+      ok: true,
+      id: leadId,
+      leadId,
+      existing,
+      recordType: 'lead',
+      program,
+      message: existing
+        ? 'Your recent information request is already on file.'
+        : 'Your information request was received.',
+    });
   } catch (error) {
+    logger.error('[api/inquiries] unexpected error', error instanceof Error ? error : undefined);
     return NextResponse.json({ error: 'Unexpected error processing inquiry' }, { status: 500 });
   }
 }
+
 export const POST = withApiAudit('/api/inquiries', _POST);

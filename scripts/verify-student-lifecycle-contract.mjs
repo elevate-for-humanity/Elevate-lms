@@ -109,8 +109,12 @@ requireText(approvalApi, ".select('program_id, program_slug, program_interest, f
 requireText(approvalApi, ".from('programs')", 'Admin approval must resolve a program record when application.program_id is absent');
 requireText(approvalApi, "'PROGRAM_NOT_RESOLVED:", 'Admin approval must fail closed when no canonical program can be resolved');
 requireText(approvalApi, 'programId: resolvedProgramId', 'Admin approval must pass the resolved program into the single approval pipeline');
-requireText(approvalPipeline, ".from('program_enrollments').upsert", 'single approval pipeline must activate canonical program enrollment');
-requireText(approvalPipeline, ".from('course_enrollments').insert", 'single approval pipeline must grant LMS course access');
+requireText(approvalPipeline, ".from('program_enrollments')", 'single approval pipeline must activate canonical program enrollment');
+requireText(approvalPipeline, ".from('course_enrollments')", 'single approval pipeline must verify database-provisioned LMS course access');
+forbidText(approvalPipeline, ".from('course_enrollments').insert", 'application code must not duplicate the database course-enrollment writer');
+forbidText(approvalPipeline, 'resolveCourseId(', 'runtime approval must not use the deprecated static program/course fallback');
+requireText(approvalPipeline, 'Canonical course provisioning did not complete', 'single approval pipeline must fail closed when course provisioning is incomplete');
+requireText(approvalPipeline, 'Failed to finalize application approval', 'single approval pipeline must surface final approval failures');
 requireText(approvalPipeline, "status: 'approved'", 'single approval pipeline must mark application approved only in the enrollment pipeline');
 requireText(approvalPipeline, "enrollment_status: 'active'", 'single approval pipeline must activate the learner profile');
 requireText(approvalPipeline, 'ensureDigitalBinder({', 'single approval pipeline must provision the digital binder');
@@ -122,4 +126,4 @@ if (failures.length) {
 }
 
 console.log('[student-lifecycle-contract] PASS');
-console.log('application -> confirmation -> paired minimized tracker -> pending account -> canonical approval -> LMS access contracts are canonical');
+console.log('application -> confirmation -> paired minimized tracker -> pending account -> canonical approval -> database-provisioned LMS access contracts are canonical');

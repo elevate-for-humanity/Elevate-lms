@@ -57,6 +57,30 @@ jobs:
           test -n "$NORTHFLANK_API_TOKEN"
           test -n "$NORTHFLANK_TEAM_ID"
 
+      - name: Delete legacy Northflank GPU services only
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
+          auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
+          for sid in elevate-media-gpu-worker elevate-gpu-worker-build; do
+            code=$(curl -sS -o "/tmp/${sid}.json" -w '%{http_code}' "${auth[@]}" "$base/services/$sid" || true)
+            if [ "$code" = "200" ]; then
+              echo "Deleting legacy GPU service: $sid"
+              del=$(curl -sS -o "/tmp/${sid}-delete.json" -w '%{http_code}' -X DELETE "${auth[@]}" "$base/services/$sid?delete_child_objects=true" || true)
+              if [ "$del" != "200" ] && [ "$del" != "202" ] && [ "$del" != "204" ]; then
+                cat "/tmp/${sid}-delete.json" || true
+                exit 1
+              fi
+            elif [ "$code" = "404" ]; then
+              echo "$sid already absent"
+            else
+              echo "Unexpected HTTP $code checking $sid"
+              cat "/tmp/${sid}.json" || true
+              exit 1
+            fi
+          done
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.28.2
@@ -121,24 +145,20 @@ jobs:
           base="https://api.northflank.com/v1/teams/${NORTHFLANK_TEAM_ID}/projects/${NORTHFLANK_GPU_PROJECT_ID}"
           auth=(-H "Authorization: Bearer ${NORTHFLANK_API_TOKEN}" -H 'Content-Type: application/json')
           curl -fsS "${auth[@]}" "$base/services/${NORTHFLANK_GPU_SERVICE_ID}" >/tmp/gpu-final.json
+          curl -fsS "${auth[@]}" "$base/services" >/tmp/gpu-services-final.json
           node <<'NODE'
           const fs=require('fs');
           const raw=JSON.parse(fs.readFileSync('/tmp/gpu-final.json','utf8'));
           const s=raw.data||raw;
+          const allRaw=JSON.parse(fs.readFileSync('/tmp/gpu-services-final.json','utf8'));
+          const all=Array.isArray(allRaw.data)?allRaw.data:(Array.isArray(allRaw.data?.services)?allRaw.data.services:[]);
+          const gpu=all.filter(x=>String(x.id||'').includes('gpu'));
           const rules=s.buildConfiguration?.pathIgnoreRules||[];
           const instances=Number(s.deployment?.instances ?? s.deployment?.spec?.instances ?? 0);
           const expected=['services/media-gpu-worker/**','scripts/northflank/provision-gpu-worker.ts'];
-          const out={
-            id:s.id||s.name,
-            disabledCI:s.disabledCI,
-            instances,
-            isAllowList:s.buildConfiguration?.isAllowList,
-            pathIgnoreRules:rules,
-            buildStatus:s.status?.build?.status||null,
-            deploymentStatus:s.status?.deployment?.status||null
-          };
-          console.log(JSON.stringify(out,null,2));
+          console.log(JSON.stringify({canonical:s.id||s.name,instances,disabledCI:s.disabledCI,isAllowList:s.buildConfiguration?.isAllowList,pathIgnoreRules:rules,gpuServices:gpu.map(x=>x.id)},null,2));
           if ((s.id||s.name)!=='elevate-gpu-worker') throw new Error('Canonical GPU service missing');
+          if (gpu.some(x=>['elevate-media-gpu-worker','elevate-gpu-worker-build'].includes(String(x.id)))) throw new Error('Legacy GPU service still exists');
           if (s.disabledCI!==false) throw new Error('GPU CI is disabled');
           if (s.buildConfiguration?.isAllowList!==true) throw new Error('GPU build rules are not allow-list mode');
           if (!expected.every(r=>rules.includes(r))) throw new Error('GPU path rules did not persist');

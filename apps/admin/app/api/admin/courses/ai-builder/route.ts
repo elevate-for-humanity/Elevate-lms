@@ -1,10 +1,9 @@
 /**
  * POST /api/admin/courses/ai-builder
  *
- * Retired legacy endpoint. Canonical AI course generation is
- * POST /api/admin/lms/courses/generate.
+ * RETIRED legacy endpoint. Canonical AI course generation is
+ * POST /api/admin/course-builder with action=generate.
  */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -29,24 +28,21 @@ const InputSchema = z.object({
 async function _POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
   const body = await request.json().catch(() => null);
   const parsed = InputSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: 'Invalid input', details: parsed.error.flatten() },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
   }
 
   return NextResponse.json(
     {
       error: 'LEGACY_SYSTEM_DISABLED',
-      message: 'Use POST /api/admin/lms/courses/generate.',
-      canonicalEndpoint: '/api/admin/lms/courses/generate',
+      message: 'Use POST /api/admin/course-builder with action=generate.',
+      canonicalEndpoint: '/api/admin/course-builder',
+      action: 'generate',
     },
     { status: 410 },
   );

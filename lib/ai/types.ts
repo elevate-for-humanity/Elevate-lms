@@ -221,7 +221,7 @@ export interface TaskFilterOptions {
 export interface WebhookConfig {
   id: string;
   url: string;
-  eventTypes: string[];
+  eventTypes: EventType[];
   secret: string;
   enabled: boolean;
   createdAt: number;

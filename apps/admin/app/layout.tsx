@@ -14,6 +14,7 @@ import AdminHeader from '@/components/admin/AdminHeader';
 import { I18nProvider } from '@/lib/i18n/context';
 import { AdminPwaRegister } from '@/components/pwa/AdminPwaRegister';
 import { AdminUpdateNotice } from '@/components/pwa/AdminUpdateNotice';
+import { OfflineStatusBanner } from '@/components/pwa/OfflineStatusBanner';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 
@@ -76,6 +77,7 @@ export default async function AdminGroupLayout({
         <SupabaseConfigBootstrap />
         <AdminPwaRegister />
         <AdminUpdateNotice />
+        <OfflineStatusBanner mode="admin" />
         <I18nProvider>
           <div className="min-h-dvh min-w-0 overflow-x-clip bg-slate-50">
             <BuildVersionSync />

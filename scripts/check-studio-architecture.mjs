@@ -23,6 +23,8 @@ for (const file of [
   'components/studio/UnifiedEllieChat.tsx',
   'lib/devstudio/workspace-registry.ts',
   'lib/devstudio/ellie-message-router.ts',
+  'lib/devstudio/course-builder-controller.ts',
+  'lib/course-builder/orchestrator.ts',
   'services/studio-browser/server.mjs',
   'apps/admin/app/api/devstudio/browser/session/route.ts',
   'apps/admin/app/api/devstudio/browser/agent/route.ts',
@@ -37,13 +39,7 @@ for (const file of [
 ]) if (!exists(file)) fail(`canonical Studio file is missing: ${file}`);
 
 const adminLayout = read('apps/admin/app/layout.tsx');
-for (const sharedSurface of [
-  'AdminHeader',
-  'BuildVersionSync',
-  'AdminPwaRegister',
-  'AdminUpdateNotice',
-  'SupabaseConfigBootstrap',
-]) {
+for (const sharedSurface of ['AdminHeader','BuildVersionSync','AdminPwaRegister','AdminUpdateNotice','SupabaseConfigBootstrap']) {
   if (!adminLayout.includes(sharedSurface)) fail(`Admin layout is missing privileged shared surface: ${sharedSurface}`);
 }
 for (const publicSurface of ['AdminFooter', 'LiveChatWidget']) {
@@ -76,9 +72,7 @@ const legacyAiPage = read('apps/admin/app/studio/ai/page.tsx');
 if (!legacyAiPage.includes("redirect('/studio')")) fail('legacy /studio/ai is not redirected to the canonical Admin AI surface');
 
 const registry = read('lib/devstudio/workspace-registry.ts');
-if (/id:\s*'ai'/.test(registry) || /route:\s*'\/studio\/ai'/.test(registry)) {
-  fail('workspace registry reintroduced a second AI/chat workspace');
-}
+if (/id:\s*'ai'/.test(registry) || /route:\s*'\/studio\/ai'/.test(registry)) fail('workspace registry reintroduced a second AI/chat workspace');
 const routes = [...registry.matchAll(/route:\s*'([^']+)'/g)].map((match) => match[1]);
 for (const route of routes) {
   const relative = route.replace(/^\/studio\/?/, '');
@@ -91,9 +85,7 @@ const messageRouter = read('lib/devstudio/ellie-message-router.ts');
 for (const outcome of ['build (a )?course', 'create (a )?course', 'generate (a )?course', 'build (a )?website', 'publish (the )?website']) {
   if (!messageRouter.includes(outcome)) fail(`Admin AI router does not recognize outcome-oriented tool request: ${outcome}`);
 }
-if (/COMMAND_RE[\s\S]{0,300}build courses?/i.test(messageRouter)) {
-  fail('course creation was routed back to raw command execution');
-}
+if (/COMMAND_RE[\s\S]{0,300}build courses?/i.test(messageRouter)) fail('course creation was routed back to raw command execution');
 
 const canonicalRoot = path.join(root, 'apps/admin/app/api/admin/dev-studio');
 const runtimeRoot = path.join(root, 'apps/admin/app/api/devstudio');
@@ -118,39 +110,50 @@ const checkerPath = path.join(root, 'scripts/check-studio-architecture.mjs');
 for (const sourceRoot of ['apps/admin', 'components', 'lib', 'scripts', 'tests']) {
   for (const file of sourceFiles(path.join(root, sourceRoot))) {
     if (file === checkerPath) continue;
-    if (read(path.relative(root, file)).includes('/api/admin/devstudio')) {
-      fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
-    }
+    if (read(path.relative(root, file)).includes('/api/admin/devstudio')) fail(`legacy /api/admin/devstudio reference exists: ${path.relative(root, file)}`);
   }
 }
 
 const courseDraftAdapter = read('apps/admin/app/api/admin/courses/ai-builder/generate/route.ts');
 for (const invariant of ['generateBlueprintFromAI', "generation_authority: 'course-factory'", "persistence_authority: 'courseFactory()'", 'draft_only: true']) {
-  if (!courseDraftAdapter.includes(invariant)) fail(`Admin AI course draft adapter bypasses canonical Course Factory contract: ${invariant}`);
+  if (!courseDraftAdapter.includes(invariant)) fail(`Admin AI course draft adapter bypasses canonical Course Builder/Course Factory contract: ${invariant}`);
 }
 for (const forbiddenWrite of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert", ".from('lms_courses').insert", ".from('curriculum_lessons').insert"]) {
   if (courseDraftAdapter.includes(forbiddenWrite)) fail(`Admin AI course draft adapter contains direct persistence: ${forbiddenWrite}`);
 }
 
+// Studio may retain the historical '@/lib/course-factory' import path only because
+// that public barrel is now a Course Builder facade. Raw factory.ts access is forbidden.
+const courseFactoryBarrel = read('lib/course-factory/index.ts');
+if (!courseFactoryBarrel.includes("export { courseFactory } from '../course-builder/orchestrator'")) {
+  fail('public Course Factory barrel bypasses Course Builder orchestration');
+}
+const studioController = read('lib/devstudio/course-builder-controller.ts');
+if (!studioController.includes("from '../course-builder/orchestrator'")) fail('Studio Course Builder controller does not delegate to canonical orchestrator');
+const courseOrchestrator = read('lib/course-builder/orchestrator.ts');
+if (!courseOrchestrator.includes("from '../course-factory/factory'")) fail('Course Builder orchestrator is not the owner of private Course Factory execution');
+
 const adminAiChat = read('apps/admin/app/api/devstudio/chat/route.ts');
-if (!adminAiChat.includes("await import('@/lib/course-factory')")) fail('Admin AI does not delegate course creation to canonical Course Factory');
+if (!adminAiChat.includes("await import('@/lib/course-factory')") && !adminAiChat.includes("await import('@/lib/devstudio/course-builder-controller')")) {
+  fail('Admin AI does not delegate course creation through the canonical Course Builder facade/controller');
+}
+if (adminAiChat.includes("@/lib/course-factory/factory")) fail('Admin AI imports the private Course Factory engine directly');
 if (!adminAiChat.includes('normalizeGeneratedCourseForGovernance')) fail('Admin AI course creation does not run post-generation governance');
 if (adminAiChat.includes('intake_submissions')) fail('Admin AI references retired/nonexistent intake_submissions instead of canonical applications');
 for (const forbiddenWrite of [".from('lms_courses').insert", ".from('modules').insert", ".from('curriculum_lessons').insert"]) {
   if (adminAiChat.includes(forbiddenWrite)) fail(`Admin AI reintroduced parallel course persistence: ${forbiddenWrite}`);
 }
 const buildCourseBlock = adminAiChat.match(/case 'build_course': \{([\s\S]*?)case 'save_course':/i)?.[1] ?? '';
-for (const invariant of ["await import('@/lib/course-factory')", 'dryRun: false', "__type: 'course_saved'", 'normalizeGeneratedCourseForGovernance']) {
-  if (!buildCourseBlock.includes(invariant)) fail(`build_course is not a one-step governed Course Factory operation: ${invariant}`);
+for (const invariant of ['dryRun: false', "__type: 'course_saved'", 'normalizeGeneratedCourseForGovernance']) {
+  if (!buildCourseBlock.includes(invariant)) fail(`build_course is not a one-step governed Course Builder operation: ${invariant}`);
 }
-if (buildCourseBlock.includes('/api/admin/courses/ai-builder/generate')) {
-  fail('build_course regressed to draft-only compatibility endpoint instead of canonical persistence');
+if (!buildCourseBlock.includes("await import('@/lib/course-factory')") && !buildCourseBlock.includes("await import('@/lib/devstudio/course-builder-controller')")) {
+  fail('build_course does not enter the Course Builder facade/controller');
 }
+if (buildCourseBlock.includes('/api/admin/courses/ai-builder/generate')) fail('build_course regressed to draft-only compatibility endpoint instead of canonical persistence');
 
 const preAuthRegistry = read('lib/pre-auth-tables.ts');
-if (/table:\s*'studio_(?:chat_history|comments|shares|deploy_tokens|favorites|pr_tracking|recent_files|repos|sessions|settings|workflow_tracking)'/.test(preAuthRegistry)) {
-  fail('pre-auth registry contains retired legacy Studio tables');
-}
+if (/table:\s*'studio_(?:chat_history|comments|shares|deploy_tokens|favorites|pr_tracking|recent_files|repos|sessions|settings|workflow_tracking)'/.test(preAuthRegistry)) fail('pre-auth registry contains retired legacy Studio tables');
 
 const courseApplication = read('apps/admin/app/studio/courses/[courseId]/page.tsx');
 for (const dependency of ['CourseProvider', 'CourseStudioApplication', 'StudioWorkspace', 'loadCourseSession']) {
@@ -158,12 +161,7 @@ for (const dependency of ['CourseProvider', 'CourseStudioApplication', 'StudioWo
 }
 
 const courseCatalog = read('components/admin/course-builder/UnifiedCourseBuilder.tsx');
-for (const forbiddenDependency of [
-  '/api/admin/course-builder/course',
-  'LiveCourseBuilder',
-  'CourseInteractionStudio',
-  'WorkspacePayload',
-]) {
+for (const forbiddenDependency of ['/api/admin/course-builder/course','LiveCourseBuilder','CourseInteractionStudio','WorkspacePayload']) {
   if (courseCatalog.includes(forbiddenDependency)) fail(`course catalog reintroduced a parallel course state path: ${forbiddenDependency}`);
 }
 
@@ -185,4 +183,4 @@ if (failures.length) {
   console.error(failures.map((message) => `STUDIO ARCHITECTURE ERROR: ${message}`).join('\n'));
   process.exit(1);
 }
-console.log(`Studio architecture verified: conversation-first Admin AI plus ${routes.length} advanced capability surfaces inside the hardened Admin shell; one-step governed course creation, canonical application data, no second AI workspace, no obsolete Studio schema bootstrap, no parallel API routes, and no legacy admin/devstudio namespace.`);
+console.log(`Studio architecture verified: Studio control plane plus ${routes.length} advanced capability surfaces; Course Builder facade/orchestrator owns course execution, canonical application data is preserved, and no parallel Studio API/schema authority exists.`);

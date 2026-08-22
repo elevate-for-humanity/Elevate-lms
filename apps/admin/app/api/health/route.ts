@@ -1,34 +1,45 @@
 /**
  * GET /api/health
  *
- * Readiness probe - verifies application is initialized and ready to serve
- * requests. This intentionally performs no external dependency checks so
- * Northflank readiness cannot remove every pod because of a downstream outage.
+ * Dependency-aware service health. Northflank readiness uses /api/ready so a
+ * downstream outage is reported truthfully without evicting every runnable pod.
  */
 
 import { NextResponse } from 'next/server';
+import { checkSupabaseHealth, getRuntimeReadiness } from '@/lib/health/service-health';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
+  const readiness = getRuntimeReadiness();
+  const supabase = await checkSupabaseHealth();
+  const healthy = readiness.ready && supabase.ok;
+
   return NextResponse.json(
     {
       service: 'admin',
-      status: 'healthy',
-      ready: true,
+      status: healthy ? 'healthy' : 'unhealthy',
+      ready: healthy,
       canonicalDashboard: '/dashboard',
-      healthContract: 'admin-v2',
-      commit: process.env.GIT_SHA ?? process.env.GITHUB_SHA ?? 'unknown',
-      buildId: process.env.NEXT_PUBLIC_BUILD_ID ?? 'unknown',
-      builtAt: process.env.BUILD_TIMESTAMP ?? 'unknown',
+      healthContract: 'admin-v3',
+      commit: readiness.commit,
+      buildId: readiness.buildId,
+      builtAt: readiness.builtAt,
+      configuration: {
+        ok: readiness.ready,
+        missing: readiness.missing,
+      },
+      dependencies: {
+        supabase,
+      },
       environment: process.env.NODE_ENV,
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
     },
     {
-      status: 200,
+      status: healthy ? 200 : 503,
       headers: {
         'Cache-Control': 'no-store',
       },

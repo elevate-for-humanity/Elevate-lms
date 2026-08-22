@@ -49,13 +49,13 @@ export type CourseFactoryPipelineInput = {
 
 /**
  * Shared browser client for every Course Builder creation surface.
- * All authoring UIs consume the same streaming Course Factory endpoint.
+ * All authoring UIs consume the single streaming Course Factory endpoint.
  */
 export async function runCourseFactoryPipeline(
   input: CourseFactoryPipelineInput,
   onEvent?: (event: CourseFactoryPipelineEvent) => void,
 ): Promise<CourseFactoryPipelineResult> {
-  const response = await fetch('/api/admin/course-builder/pipeline', {
+  const response = await fetch('/api/admin/course-builder', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
     cache: 'no-store',

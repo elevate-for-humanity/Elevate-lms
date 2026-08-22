@@ -1,6 +1,7 @@
 // Bulk operations for admin functions
 
 import { createClient } from '@/lib/supabase/server';
+import { requireAdminClient } from '@/lib/supabase/admin';
 import { auditLog } from './auditLog';
 
 export async function bulkEnrollStudents(studentIds: string[], courseId: string, actorId: string) {
@@ -52,39 +53,87 @@ export async function bulkUnenrollStudents(studentIds: string[], courseId: strin
 }
 
 export async function bulkIssueCertificates(studentIds: string[], courseId: string, actorId: string) {
-  const supabase = await createClient();
+  const db = await requireAdminClient();
   try {
-    const { data: course } = await supabase
-      .from('lms_courses')
-      .select('title, program_name')
+    const { data: course, error: courseError } = await db
+      .from('courses')
+      .select('id,title,program_id')
       .eq('id', courseId)
       .maybeSingle();
-    if (!course) return { success: false, error: 'Course not found' };
+    if (courseError || !course) return { success: false, error: 'Course not found' };
 
-    const { data: students } = await supabase.from('profiles').select('id, full_name').in('id', studentIds);
-    if (!students) return { success: false, error: 'Students not found' };
+    const { data: students, error: studentError } = await db
+      .from('profiles')
+      .select('id,full_name,email')
+      .in('id', studentIds);
+    if (studentError || !students) return { success: false, error: 'Students not found' };
 
-    const certificates = students.map((student) => ({
-      student_id: student.id,
-      student_name: student.full_name,
-      course_id: courseId,
-      course_title: course.title,
-      program_name: course.program_name,
-      certificate_number: `CERT-${Date.now()}-${student.id.slice(0, 8)}`,
-      issued_date: new Date().toISOString(),
-      verification_code: Math.random().toString(36).substring(2, 10).toUpperCase(),
-    }));
-    const { data, error }: any = await supabase.from('certificates').insert(certificates).select();
-    if (error) return { success: false, error: 'Operation failed' };
+    const { resolveCourseEnrollment } = await import('@/lib/enrollment/resolve-course-enrollment');
+    const { checkCourseCompletion } = await import('@/lib/course-completion');
+    const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
+
+    const results: Array<{ studentId: string; success: boolean; certificateId?: string; error?: string }> = [];
+
+    for (const student of students) {
+      const enrollment = await resolveCourseEnrollment(student.id, courseId);
+      if (!enrollment) {
+        results.push({ studentId: student.id, success: false, error: 'Learner is not enrolled in this course' });
+        continue;
+      }
+
+      const completion = await checkCourseCompletion(student.id, courseId);
+      if (!completion.isComplete) {
+        results.push({
+          studentId: student.id,
+          success: false,
+          error: `Course requirements not met: ${completion.missingRequirements.join('; ')}`,
+        });
+        continue;
+      }
+
+      const issued = await issueCertificate({
+        supabase: db,
+        enrollmentId: enrollment.id,
+        studentId: student.id,
+        studentName: student.full_name || student.email || 'Learner',
+        studentEmail: student.email || undefined,
+        courseId,
+        courseTitle: course.title,
+        issuedBy: actorId,
+        competencyEvidence: {
+          seatTimeHours: completion.recordedSeatTimeHours,
+          seatTimeSeconds: Math.round(completion.recordedSeatTimeHours * 3600),
+          examSessionId: completion.examSession?.id || null,
+          examProvider: completion.examSession?.provider || null,
+          examResult: completion.examSession?.result || null,
+          examScore: completion.examSession?.score || null,
+          examProctorId: completion.examSession?.proctor_id || null,
+          examDate: completion.examSession?.completed_at || null,
+          completionVerifiedAt: new Date().toISOString(),
+          completionMethod: 'admin_bulk_after_verified_course_completion',
+        },
+      });
+
+      if (!issued.success || !issued.certificate) {
+        results.push({ studentId: student.id, success: false, error: issued.error || 'Certificate issuance failed' });
+        continue;
+      }
+
+      results.push({ studentId: student.id, success: true, certificateId: issued.certificate.id });
+    }
+
+    const issuedCount = results.filter((result) => result.success).length;
+    const failed = results.length - issuedCount;
 
     await auditLog({
       action: 'certificate.issue',
       actor_user_id: actorId,
       entity: 'certificate',
       entity_id: courseId,
-      metadata: { course_id: courseId, certificate_count: studentIds.length },
+      metadata: { course_id: courseId, requested: studentIds.length, issued: issuedCount, failed },
     });
-    return { success: true, issued: data?.length || 0, data };
+
+    return { success: failed === 0, issued: issuedCount, failed, results };
   } catch {
     return { success: false, error: 'Operation failed' };
   }

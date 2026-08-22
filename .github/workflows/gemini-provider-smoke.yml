@@ -44,16 +44,8 @@ jobs:
               ok=true
               break
             fi
-            detail=$(python - <<'PY'
-import json
-try:
- d=json.load(open('/tmp/gemini-body.json'))
- print(str(d.get('error',{}).get('message',''))[:180].replace('\n',' '))
-except Exception:
- print('')
-PY
-)
-            echo "$model HTTP $status ${detail}" >> /tmp/gemini-smoke.txt
+            detail=$(tr '\n' ' ' < /tmp/gemini-body.json | head -c 220)
+            echo "$model HTTP $status $detail" >> /tmp/gemini-smoke.txt
           done
           echo "ok=$ok" >> "$GITHUB_OUTPUT"
 

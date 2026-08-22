@@ -1,5 +1,10 @@
--- Allow a revoked certificate to be replaced while preserving one active
--- certificate per learner/course and one active program certificate per learner.
+-- Canonical revocation metadata plus revocation-aware uniqueness.
+-- Historical certificate rows are preserved. A revoked certificate may be
+-- replaced while there remains at most one active certificate per scope.
+
+alter table public.certificates
+  add column if not exists revoked_at timestamptz,
+  add column if not exists revoked_reason text;
 
 drop index if exists public.uq_certificates_student_course;
 create unique index uq_certificates_student_course

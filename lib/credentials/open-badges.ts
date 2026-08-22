@@ -2,6 +2,8 @@ import crypto from 'node:crypto';
 
 export const OPEN_BADGES_CONTEXT =
   'https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json';
+export const VC_CREDENTIAL_SCHEMA_CONTEXT =
+  'https://purl.imsglobal.org/spec/vccs/v1p0/context.json';
 export const OPEN_BADGES_CREDENTIAL_SCHEMA =
   'https://purl.imsglobal.org/spec/ob/v3p0/schema/json/ob_v3p0_achievementcredential_schema.json';
 
@@ -113,11 +115,6 @@ export function createRecipientSalt(): string {
   return crypto.randomBytes(16).toString('hex');
 }
 
-/**
- * Open Badges 3.0 hashed IdentityObject binding.
- * Per 1EdTech guidance the normalized identifier is concatenated with the
- * credential salt and then SHA-256 hashed; the algorithm prefix is retained.
- */
 export function hashRecipientIdentifier(identifier: string, salt: string): string {
   const normalized = identifier.trim().toLowerCase();
   const digest = crypto.createHash('sha256').update(`${normalized}${salt}`).digest('hex');
@@ -151,7 +148,11 @@ export function buildOpenBadgeCredential(input: BuildOpenBadgeInput): OpenBadgeC
   };
 
   return {
-    '@context': ['https://www.w3.org/ns/credentials/v2', OPEN_BADGES_CONTEXT],
+    '@context': [
+      'https://www.w3.org/ns/credentials/v2',
+      OPEN_BADGES_CONTEXT,
+      VC_CREDENTIAL_SCHEMA_CONTEXT,
+    ],
     id: credentialUrl,
     type: ['VerifiableCredential', 'OpenBadgeCredential'],
     issuer: getOpenBadgeIssuerProfile(),
@@ -183,6 +184,9 @@ export function validateOpenBadgeStructure(credential: OpenBadgeCredential): str
 
   if (!credential['@context']?.includes(OPEN_BADGES_CONTEXT)) {
     errors.push('Missing Open Badges 3.0 JSON-LD context');
+  }
+  if (!credential['@context']?.includes(VC_CREDENTIAL_SCHEMA_CONTEXT)) {
+    errors.push('Missing 1EdTech credential schema JSON-LD context');
   }
   if (!credential.type?.includes('OpenBadgeCredential')) {
     errors.push('type must include OpenBadgeCredential');

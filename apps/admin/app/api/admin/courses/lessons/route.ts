@@ -3,10 +3,24 @@ import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { AdminAction, logAdminAudit } from '@/lib/admin/audit-log';
 import { withApiAudit } from '@/lib/audit/withApiAudit';
 
 export const dynamic = 'force-dynamic';
+
+async function forwardCourseBuilder(req: NextRequest, body: Record<string, unknown>) {
+  const url = new URL('/api/admin/course-builder', req.url);
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  const cookie = req.headers.get('cookie');
+  const authorization = req.headers.get('authorization');
+  if (cookie) headers.set('cookie', cookie);
+  if (authorization) headers.set('authorization', authorization);
+  return fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  });
+}
 
 async function _GET(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'api');
@@ -16,8 +30,6 @@ async function _GET(req: NextRequest) {
 
   try {
     const db = await requireAdminClient();
-    if (!db) return safeError('Database unavailable', 503);
-
     const courseId = req.nextUrl.searchParams.get('courseId') || '';
     if (!courseId) return safeError('courseId is required', 400);
 
@@ -42,44 +54,63 @@ async function _POST(req: NextRequest) {
 
   try {
     const db = await requireAdminClient();
-    if (!db) return safeError('Database unavailable', 503);
-
     const body = await req.json();
+    const courseId = String(body.course_id || '').trim();
+    const title = String(body.title || '').trim();
+    if (!courseId || !title) return safeError('course_id and title are required', 400);
 
-    // Derive next order_index if not provided
-    let orderIndex = body.order_index ?? 0;
-    if (orderIndex === 0 && body.course_id) {
+    const { data: firstModule, error: moduleError } = await db
+      .from('course_modules')
+      .select('id')
+      .eq('course_id', courseId)
+      .order('order_index')
+      .limit(1)
+      .maybeSingle();
+    if (moduleError) return safeError('Failed to resolve course module', 400);
+    const moduleId = String(body.module_id || firstModule?.id || '').trim();
+    if (!moduleId) return safeError('Create a course module before adding lessons', 409);
+
+    let orderIndex = Number.isInteger(body.order_index) ? body.order_index : 0;
+    if (!Number.isInteger(body.order_index)) {
       const { count } = await db
         .from('course_lessons')
         .select('id', { count: 'exact', head: true })
-        .eq('course_id', body.course_id);
-      orderIndex = (count ?? 0);
+        .eq('course_id', courseId);
+      orderIndex = count ?? 0;
     }
+    const slug = String(body.slug || title)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 80) || `lesson-${orderIndex + 1}`;
+    const rawType = String(body.lesson_type ?? body.step_type ?? 'lesson');
+    const lessonType = ['lesson','video','reading','quiz','assignment','practical','checkpoint','exam','live_session','fieldwork','observation'].includes(rawType)
+      ? rawType
+      : 'lesson';
+    const contentText = typeof body.content === 'string' ? body.content : '';
 
-    const payload = {
-      course_id: body.course_id,
-      module_id: body.module_id ?? null,
-      title: body.title,
-      content: body.content ?? null,
-      video_url: body.video_url ?? null,
-      duration_minutes: body.duration_minutes ?? null,
-      order_index: orderIndex,
-      lesson_type: body.lesson_type ?? body.step_type ?? 'lesson',
-      is_published: body.is_published ?? false,
-    };
-
-    const { data, error } = await db.from('course_lessons').insert(payload).select('*').single();
-    if (error) return safeError(`Failed to create lesson: ${error.message}`, 400);
-
-    await logAdminAudit({
-      action: AdminAction.LESSON_CREATED,
-      actorId: auth.id,
-      entityType: 'course_lessons',
-      entityId: data.id,
-      metadata: { course_id: payload.course_id },
+    const response = await forwardCourseBuilder(req, {
+      action: 'save-lesson',
+      lesson: {
+        courseId,
+        moduleId,
+        slug,
+        title,
+        orderIndex,
+        lessonType,
+        durationMinutes: Math.max(1, Number(body.duration_minutes) || 15),
+        learningObjectives: Array.isArray(body.learning_objectives) && body.learning_objectives.length
+          ? body.learning_objectives
+          : [`Apply the concepts and procedures introduced in ${title}.`],
+        content: { html: contentText },
+        renderedHtml: contentText || null,
+        videoUrl: body.video_url || null,
+        isRequired: true,
+      },
     });
-
-    return NextResponse.json({ data });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) return NextResponse.json(result, { status: response.status });
+    return NextResponse.json({ data: result.lesson });
   } catch (err) {
     return safeInternalError(err, 'Unexpected error');
   }
@@ -92,37 +123,23 @@ async function _PATCH(req: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const db = await requireAdminClient();
-    if (!db) return safeError('Database unavailable', 503);
-
     const body = await req.json();
-    const id = String(body.id || '').trim();
-    if (!id) return safeError('Lesson id is required', 400);
-
-    const payload: Record<string, unknown> = {
-      title: body.title,
-      content: body.content ?? null,
-      video_url: body.video_url ?? null,
-      duration_minutes: body.duration_minutes ?? null,
-      order_index: body.order_index ?? 0,
-      updated_at: new Date().toISOString(),
-    };
-    if (body.lesson_type !== undefined) payload.lesson_type = body.lesson_type;
-    if (body.module_id !== undefined) payload.module_id = body.module_id;
-    if (body.is_published !== undefined) payload.is_published = body.is_published;
-
-    const { data, error } = await db.from('course_lessons').update(payload).eq('id', id).select('*').single();
-    if (error) return safeError(`Failed to update lesson: ${error.message}`, 400);
-
-    await logAdminAudit({
-      action: AdminAction.LESSON_UPDATED,
-      actorId: auth.id,
-      entityType: 'course_lessons',
-      entityId: id,
-      metadata: { title: String(payload.title) },
+    const lessonId = String(body.id || '').trim();
+    if (!lessonId) return safeError('Lesson id is required', 400);
+    const response = await forwardCourseBuilder(req, {
+      action: 'patch-lesson',
+      lesson: {
+        lessonId,
+        ...(body.title !== undefined ? { title: body.title } : {}),
+        ...(body.content !== undefined ? { content: body.content } : {}),
+        ...(body.video_url !== undefined ? { video_url: body.video_url } : {}),
+        ...(body.lesson_type !== undefined ? { step_type: body.lesson_type } : {}),
+        ...(body.duration_minutes !== undefined ? { duration_minutes: body.duration_minutes } : {}),
+      },
     });
-
-    return NextResponse.json({ data });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) return NextResponse.json(result, { status: response.status });
+    return NextResponse.json({ data: result.lesson });
   } catch (err) {
     return safeInternalError(err, 'Unexpected error');
   }
@@ -136,27 +153,26 @@ async function _PUT(req: NextRequest) {
 
   try {
     const db = await requireAdminClient();
-    if (!db) return safeError('Database unavailable', 503);
-
     const body = await req.json();
-    const lessonA = body.lessonA as { id: string; order_index: number };
-    const lessonB = body.lessonB as { id: string; order_index: number };
+    const lessonA = body.lessonA as { id?: string; order_index?: number };
+    const lessonB = body.lessonB as { id?: string; order_index?: number };
     if (!lessonA?.id || !lessonB?.id) return safeError('Reorder payload is required', 400);
+    const { data: lesson, error } = await db
+      .from('course_lessons')
+      .select('course_id')
+      .eq('id', lessonA.id)
+      .maybeSingle();
+    if (error || !lesson?.course_id) return safeError('Unable to resolve course for reorder', 400);
 
-    const { error: errA } = await db.from('course_lessons').update({ order_index: lessonA.order_index }).eq('id', lessonA.id);
-    if (errA) return safeError('Failed to reorder lessons', 400);
-    const { error: errB } = await db.from('course_lessons').update({ order_index: lessonB.order_index }).eq('id', lessonB.id);
-    if (errB) return safeError('Failed to reorder lessons', 400);
-
-    await logAdminAudit({
-      action: AdminAction.LESSON_UPDATED,
-      actorId: auth.id,
-      entityType: 'course_lessons',
-      entityId: lessonA.id,
-      metadata: { operation: 'reorder', paired_lesson_id: lessonB.id },
+    const response = await forwardCourseBuilder(req, {
+      action: 'reorder-lessons',
+      courseId: lesson.course_id,
+      lessonA: { id: lessonA.id, orderIndex: Number(lessonA.order_index) },
+      lessonB: { id: lessonB.id, orderIndex: Number(lessonB.order_index) },
     });
-
-    return NextResponse.json({ success: true });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) return NextResponse.json(result, { status: response.status });
+    return NextResponse.json({ success: true, data: result.result });
   } catch (err) {
     return safeInternalError(err, 'Unexpected error');
   }
@@ -169,24 +185,15 @@ async function _DELETE(req: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
-    const db = await requireAdminClient();
-    if (!db) return safeError('Database unavailable', 503);
-
     const body = await req.json();
-    const id = String(body.id || '').trim();
-    if (!id) return safeError('Lesson id is required', 400);
-
-    const { error } = await db.from('course_lessons').delete().eq('id', id);
-    if (error) return safeError(`Failed to delete lesson: ${error.message}`, 400);
-
-    await logAdminAudit({
-      action: AdminAction.LESSON_DELETED,
-      actorId: auth.id,
-      entityType: 'course_lessons',
-      entityId: id,
-      metadata: {},
+    const lessonId = String(body.id || '').trim();
+    if (!lessonId) return safeError('Lesson id is required', 400);
+    const response = await forwardCourseBuilder(req, {
+      action: 'delete-lesson',
+      lesson: { lessonId },
     });
-
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) return NextResponse.json(result, { status: response.status });
     return NextResponse.json({ success: true });
   } catch (err) {
     return safeInternalError(err, 'Unexpected error');

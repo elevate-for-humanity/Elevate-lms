@@ -30,6 +30,15 @@ function fail(message: string): never {
   throw new Error(`[Business Course Builder] ${message}`);
 }
 
+function instructionalText(value: unknown): string {
+  if (typeof value === 'string') return value.replace(/<[^>]*>/g, ' ');
+  if (Array.isArray(value)) return value.map(instructionalText).join(' ');
+  if (value && typeof value === 'object') {
+    return Object.values(value as Record<string, unknown>).map(instructionalText).join(' ');
+  }
+  return '';
+}
+
 async function hydrateAISecrets(db: Awaited<ReturnType<typeof requireAdminClient>>) {
   const available: string[] = [];
   for (const key of AI_SECRET_KEYS) {
@@ -152,13 +161,13 @@ async function auditCourse(courseId: string) {
             try {
               return JSON.parse(raw) as Record<string, unknown>;
             } catch {
-              return null;
+              return { html: raw };
             }
           })()
         : (raw as Record<string, unknown> | null);
-    const html = typeof content?.html === 'string' ? content.html : '';
-    if (html.replace(/<[^>]*>/g, ' ').trim().length < 1000) {
-      fail(`${lesson.slug} insufficient content`);
+    const payloadLength = instructionalText(content).replace(/\s+/g, ' ').trim().length;
+    if (payloadLength < 1000) {
+      fail(`${lesson.slug} insufficient instructional payload (${payloadLength} characters)`);
     }
     if (!Array.isArray(lesson.learning_objectives) || lesson.learning_objectives.length < 3) {
       fail(`${lesson.slug} missing objectives`);

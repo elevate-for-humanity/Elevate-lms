@@ -4,349 +4,257 @@ import { notFound } from 'next/navigation';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
+import { resolveCaseManagerParticipant } from '@/lib/case-manager/participant-scope';
+import { loadParticipant360ByApplication } from '@/lib/participants/participant-360';
 import AddPlacementForm from './_components/AddPlacementForm';
 
 export const metadata: Metadata = {
-  title: 'Participant Detail | Case Manager',
+  title: 'Participant 360 | Case Manager',
   robots: { index: false, follow: false },
 };
-
 export const dynamic = 'force-dynamic';
 
-interface Props {
-  params: Promise<{ id: string }>;
+interface Props { params: Promise<{ id: string }> }
+
+function text(value: unknown, fallback = '—') {
+  return value === null || value === undefined || value === '' ? fallback : String(value);
+}
+function date(value: unknown) {
+  if (!value) return '—';
+  const parsed = new Date(String(value));
+  return Number.isNaN(parsed.getTime()) ? '—' : parsed.toLocaleDateString('en-US');
+}
+function badge(status: unknown) {
+  const value = String(status || '').toLowerCase();
+  if (['verified', 'active', 'approved', 'completed', 'issued'].includes(value)) return 'bg-emerald-100 text-emerald-900';
+  if (['pending', 'in_progress', 'submitted'].includes(value)) return 'bg-amber-100 text-amber-900';
+  if (['rejected', 'lost', 'expired', 'revoked'].includes(value)) return 'bg-red-100 text-red-900';
+  return 'bg-slate-100 text-slate-800';
 }
 
 export default async function ParticipantDetailPage({ params }: Props) {
   const { id } = await params;
-  const { user } = await requireRole(['case_manager', 'admin', 'staff']);
-
+  const { user, effectiveRoles } = await requireRole(['case_manager', 'admin', 'staff']);
   const supabase = await createClient();
   const admin = await requireAdminClient();
   const db = admin || supabase;
 
-  // Verify this application is assigned to this case manager (or user is admin)
-  const { data: assignment } = await supabase
-    .from('case_manager_assignments')
-    .select('application_id')
-    .eq('application_id', id)
-    .eq('case_manager_id', user.id)
-    .maybeSingle();
+  const scoped = await resolveCaseManagerParticipant(id, { db, userId: user.id, effectiveRoles });
+  if (!scoped) notFound();
 
-  // Admins can view any participant
-  const { data: profileData } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
+  const record = await loadParticipant360ByApplication(db, id);
+  if (!record) notFound();
 
-  const isAdmin = ['admin', 'staff'].includes(profileData?.role ?? '');
-
-  if (!assignment && !isAdmin) notFound();
-
-  // Fetch application
-  const { data: app } = await supabase
-    .from('applications')
-    .select('id, first_name, last_name, email, phone, program_interest, status, created_at, notes')
-    .eq('id', id)
-    .maybeSingle();
-
-  if (!app) notFound();
-
-  // Look up profile by email
-  const { data: learnerProfile } = await supabase
-    .from('profiles')
-    .select('id, full_name, email, phone, city, state, date_of_birth')
-    .eq('email', app.email)
-    .maybeSingle();
-
-  const learnerId = learnerProfile?.id ?? null;
-
-  // Enrollments
-  const { data: enrollments } = learnerId
-    ? await supabase
-        .from('program_enrollments')
-        .select(
-          'id, status, progress_percent, funding_source, enrolled_at, programs:program_id(name, title)',
-        )
-        .eq('user_id', learnerId)
-        .order('enrolled_at', { ascending: false })
-    : { data: [] };
-
-  // Credentials
-  const { data: credentials } = learnerId
-    ? await supabase
-        .from('credentials')
-        .select('id, credential_name, credential_type, issued_date, expiry_date, status')
-        .eq('user_id', learnerId)
-        .order('issued_date', { ascending: false })
-    : { data: [] };
-
-  // Placements
-  const { data: placements } = learnerId
-    ? await supabase
-        .from('placement_records')
-        .select(
-          'id, employer_name, job_title, employment_type, hourly_wage, start_date, status, verified_at',
-        )
-        .eq('learner_id', learnerId)
-        .order('created_at', { ascending: false })
-    : { data: [] };
-
-  // WIOA record
-  const { data: wioa } = learnerId
-    ? await supabase
-        .from('wioa_participants')
-        .select('id, wioa_program, eligibility_status, enrollment_date, exit_date, exit_reason')
-        .eq('user_id', learnerId)
-        .maybeSingle()
-    : { data: null };
-
-  const statusBadge = (status: string) => {
-    if (status === 'verified' || status === 'active' || status === 'approved')
-      return 'bg-brand-green-100 text-brand-green-800';
-    if (status === 'pending') return 'bg-yellow-100 text-yellow-800';
-    if (status === 'rejected' || status === 'lost') return 'bg-red-100 text-red-800';
-    return 'bg-slate-100 text-slate-900';
-  };
+  const app = record.application;
+  const profile = record.profile;
+  const participantName =
+    profile?.full_name ||
+    `${app.first_name ?? ''} ${app.last_name ?? ''}`.trim() ||
+    'Participant';
+  const activeEnrollments = record.enrollments.filter((row: any) =>
+    ['active', 'enrolled', 'in_progress'].includes(String(row.enrollment_state || row.status || '').toLowerCase()),
+  );
+  const verifiedPlacements = record.placements.filter((row: any) => String(row.status).toLowerCase() === 'verified');
+  const verifiedCredentials = record.credentials.filter((row: any) =>
+    ['active', 'issued', 'verified'].includes(String(row.status || 'active').toLowerCase()),
+  );
+  const unresolvedDocuments = record.documents.filter((row: any) =>
+    !['approved', 'verified', 'complete', 'completed'].includes(String(row.verification_status || row.status || '').toLowerCase()),
+  );
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Breadcrumb */}
-        <nav className="text-xs text-slate-700 mb-4">
-          <Link href="/case-manager/dashboard" className="hover:underline">
-            Dashboard
-          </Link>
-          <span className="mx-1">/</span>
-          <Link href="/case-manager/participants" className="hover:underline">
-            Participants
-          </Link>
-          <span className="mx-1">/</span>
-          <span>
-            {app.first_name} {app.last_name}
-          </span>
+    <main className="min-h-screen bg-slate-50 text-slate-950">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <nav aria-label="Breadcrumb" className="mb-5 text-sm text-slate-600">
+          <Link href="/case-manager/dashboard" className="font-semibold hover:underline">Dashboard</Link>
+          <span className="mx-2">/</span>
+          <Link href="/case-manager/participants" className="font-semibold hover:underline">Participants</Link>
+          <span className="mx-2">/</span><span>{participantName}</span>
         </nav>
 
-        <h1 className="text-2xl font-bold text-slate-900">
-          {app.first_name} {app.last_name}
-        </h1>
-        <p className="text-sm text-slate-700 mt-1">
-          {app.email} {app.phone ? `· ${app.phone}` : ''}
-        </p>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-3">
-          {/* Left column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Enrollments */}
-            <Section title="Enrollments">
-              {!enrollments?.length ? (
-                <p className="text-sm text-slate-700">No enrollments found.</p>
-              ) : (
-                <table className="min-w-full divide-y divide-slate-100 text-sm">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Program
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Status
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Progress
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Funding
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {enrollments.map((e: any) => (
-                      <tr key={e.id}>
-                        <td className="px-3 py-2 font-medium text-slate-900">
-                          {(e.programs as any)?.title || (e.programs as any)?.name || '—'}
-                        </td>
-                        <td className="px-3 py-2">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(e.status)}`}
-                          >
-                            {e.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-2 text-slate-900">{e.progress_percent ?? 0}%</td>
-                        <td className="px-3 py-2 text-slate-700">{e.funding_source ?? '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </Section>
-
-            {/* Placements */}
-            <Section title="Employment Placements">
-              {!placements?.length ? (
-                <p className="text-sm text-slate-700 mb-4">No placements recorded.</p>
-              ) : (
-                <table className="min-w-full divide-y divide-slate-100 text-sm mb-4">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Employer
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Title
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Type
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Wage
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {placements.map((p: any) => (
-                      <tr key={p.id}>
-                        <td className="px-3 py-2 font-medium text-slate-900">
-                          {p.employer_name ?? '—'}
-                        </td>
-                        <td className="px-3 py-2 text-slate-900">{p.job_title ?? '—'}</td>
-                        <td className="px-3 py-2 text-slate-700">{p.employment_type ?? '—'}</td>
-                        <td className="px-3 py-2 text-slate-700">
-                          {p.hourly_wage ? `$${p.hourly_wage}/hr` : '—'}
-                        </td>
-                        <td className="px-3 py-2">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(p.status)}`}
-                          >
-                            {p.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-              {learnerId && <AddPlacementForm learnerId={learnerId} caseManagerId={user.id} />}
-            </Section>
-
-            {/* Credentials */}
-            <Section title="Credentials">
-              {!credentials?.length ? (
-                <p className="text-sm text-slate-700">No credentials on record.</p>
-              ) : (
-                <table className="min-w-full divide-y divide-slate-100 text-sm">
-                  <thead className="bg-slate-50">
-                    <tr>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Credential
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Type
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Issued
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Expires
-                      </th>
-                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700 uppercase">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {credentials.map((c: any) => (
-                      <tr key={c.id}>
-                        <td className="px-3 py-2 font-medium text-slate-900">
-                          {c.credential_name}
-                        </td>
-                        <td className="px-3 py-2 text-slate-700">{c.credential_type ?? '—'}</td>
-                        <td className="px-3 py-2 text-slate-700">
-                          {c.issued_date ? new Date(c.issued_date).toLocaleDateString() : '—'}
-                        </td>
-                        <td className="px-3 py-2 text-slate-700">
-                          {c.expiry_date ? new Date(c.expiry_date).toLocaleDateString() : '—'}
-                        </td>
-                        <td className="px-3 py-2">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusBadge(c.status ?? 'active')}`}
-                          >
-                            {c.status ?? 'active'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </Section>
-          </div>
-
-          {/* Right column — sidebar */}
-          <div className="space-y-4">
-            {/* Application info */}
-            <div className="rounded-xl border border-slate-200 bg-white p-4">
-              <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
-                Application
-              </h3>
-              <dl className="space-y-2 text-sm">
-                <Row label="Status" value={app.status ?? '—'} />
-                <Row label="Program" value={app.program_interest ?? '—'} />
-                <Row label="Applied" value={new Date(app.created_at).toLocaleDateString()} />
-                {app.notes && <Row label="Notes" value={app.notes} />}
-              </dl>
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.16em] text-blue-800">Participant 360</p>
+          <div className="mt-2 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{participantName}</h1>
+              <p className="mt-2 text-sm font-medium text-slate-600">
+                {text(profile?.email || app.email)} {profile?.phone || app.phone ? `· ${profile?.phone || app.phone}` : ''}
+              </p>
+              <p className="mt-1 text-xs font-semibold text-slate-500">Canonical learner ID: {record.learnerId || 'Not linked yet'}</p>
             </div>
-
-            {/* WIOA */}
-            {wioa && (
-              <div className="rounded-xl border border-slate-200 bg-white p-4">
-                <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wide mb-3">
-                  WIOA
-                </h3>
-                <dl className="space-y-2 text-sm">
-                  <Row label="Program" value={wioa.wioa_program ?? '—'} />
-                  <Row label="Eligibility" value={wioa.eligibility_status ?? '—'} />
-                  <Row
-                    label="Enrolled"
-                    value={
-                      wioa.enrollment_date
-                        ? new Date(wioa.enrollment_date).toLocaleDateString()
-                        : '—'
-                    }
-                  />
-                  {wioa.exit_date && (
-                    <Row label="Exited" value={new Date(wioa.exit_date).toLocaleDateString()} />
-                  )}
-                </dl>
-              </div>
-            )}
+            <div className="flex flex-wrap gap-2">
+              <Status value={app.status || 'application'} />
+              {record.wioa ? <Status value={record.wioa.eligibility_status || record.wioa.status || 'WIOA record'} /> : null}
+            </div>
           </div>
+        </section>
+
+        {Object.keys(record.sourceErrors).length > 0 ? (
+          <section role="alert" className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 p-5 text-amber-950">
+            <h2 className="font-black">Some record sources are unavailable</h2>
+            <p className="mt-1 text-sm font-medium">No values were fabricated. The unavailable sources are shown so data/schema issues can be corrected.</p>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm">
+              {Object.entries(record.sourceErrors).map(([source, error]) => <li key={source}><strong>{source}:</strong> {error}</li>)}
+            </ul>
+          </section>
+        ) : null}
+
+        <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="Participant summary">
+          <Metric label="Active enrollments" value={activeEnrollments.length} />
+          <Metric label="Credentials" value={verifiedCredentials.length} />
+          <Metric label="Verified placements" value={verifiedPlacements.length} />
+          <Metric label="Open documents" value={unresolvedDocuments.length} />
+          <Metric label="Case notes" value={record.caseNotes.length} />
+        </section>
+
+        <div className="mt-7 grid gap-6 xl:grid-cols-[1.55fr_0.85fr]">
+          <div className="space-y-6">
+            <Section title="Enrollments & training">
+              <DataTable
+                headers={['Program', 'Status', 'Progress', 'Funding', 'Enrolled']}
+                empty="No enrollments found."
+                rows={record.enrollments.map((e: any) => [
+                  e.programs?.title || e.programs?.name || e.program_slug || 'Program',
+                  <Status key="status" value={e.enrollment_state || e.status || 'unknown'} />,
+                  `${Number(e.progress_percent ?? e.progress ?? 0)}%`,
+                  text(e.funding_source),
+                  date(e.enrolled_at || e.created_at),
+                ])}
+              />
+            </Section>
+
+            <Section title="Funding & authorized services">
+              <DataTable
+                headers={['Source', 'Status', 'Amount', 'Assigned']}
+                empty="No funding assignments linked to this participant's enrollments."
+                rows={record.fundingAssignments.map((f: any) => [
+                  f.funding_sources?.name || f.funding_source || f.source || 'Funding source',
+                  <Status key="status" value={f.status || 'assigned'} />,
+                  f.amount != null ? `$${Number(f.amount).toLocaleString()}` : '—',
+                  date(f.created_at || f.assigned_at),
+                ])}
+              />
+            </Section>
+
+            <Section title="Apprenticeship">
+              <DataTable
+                headers={['Program / Employer', 'Status', 'Hours', 'Started']}
+                empty="No apprenticeship enrollment linked to this participant."
+                rows={record.apprenticeshipEnrollments.map((a: any) => [
+                  a.program_name || a.employer_name || a.occupation || 'Apprenticeship',
+                  <Status key="status" value={a.status || 'active'} />,
+                  a.total_hours_completed != null ? `${a.total_hours_completed} / ${a.total_hours_required ?? '—'}` : '—',
+                  date(a.start_date || a.created_at),
+                ])}
+              />
+            </Section>
+
+            <Section title="Employment placements">
+              <DataTable
+                headers={['Employer', 'Title', 'Type', 'Wage', 'Status']}
+                empty="No placements recorded."
+                rows={record.placements.map((p: any) => [
+                  text(p.employer_name), text(p.job_title), text(p.employment_type),
+                  p.hourly_wage ? `$${Number(p.hourly_wage).toFixed(2)}/hr` : '—',
+                  <Status key="status" value={p.status || 'unknown'} />,
+                ])}
+              />
+              {record.learnerId ? <div className="mt-5 border-t border-slate-100 pt-5"><AddPlacementForm learnerId={record.learnerId} caseManagerId={user.id} /></div> : null}
+            </Section>
+
+            <Section title="Credentials">
+              <DataTable
+                headers={['Credential', 'Type', 'Issued', 'Expires', 'Status']}
+                empty="No credentials on record."
+                rows={record.credentials.map((c: any) => [
+                  c.credential_name || c.name || 'Credential', text(c.credential_type || c.type),
+                  date(c.issued_date || c.issued_at), date(c.expiry_date || c.expires_at),
+                  <Status key="status" value={c.status || 'active'} />,
+                ])}
+              />
+            </Section>
+
+            <Section title="Documents & evidence">
+              <DataTable
+                headers={['Document', 'Type', 'Status', 'Uploaded']}
+                empty="No participant documents found."
+                rows={record.documents.map((d: any) => [
+                  d.file_name || d.title || d.document_type || 'Document', text(d.document_type),
+                  <Status key="status" value={d.verification_status || d.status || 'pending'} />, date(d.created_at || d.uploaded_at),
+                ])}
+              />
+            </Section>
+
+            <Section title="Case notes">
+              {record.caseNotes.length ? <div className="space-y-3">{record.caseNotes.map((n: any) => (
+                <article key={n.id} className="rounded-xl border border-slate-200 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-bold">{n.category || 'Case note'}</p><time className="text-xs font-semibold text-slate-500">{date(n.created_at)}</time></div>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{n.note || n.notes || n.content || '—'}</p>
+                  {n.author_name ? <p className="mt-2 text-xs font-semibold text-slate-500">By {n.author_name}</p> : null}
+                </article>
+              ))}</div> : <Empty>No case notes found.</Empty>}
+            </Section>
+
+            <Section title="Recent activity & communications">
+              <div className="grid gap-5 lg:grid-cols-2">
+                <div><h3 className="mb-3 font-black">Activity</h3>{record.activity.length ? <Timeline rows={record.activity} /> : <Empty>No learner activity recorded.</Empty>}</div>
+                <div><h3 className="mb-3 font-black">Communications</h3>{record.communications.length ? <Timeline rows={record.communications} /> : <Empty>No communications recorded.</Empty>}</div>
+              </div>
+            </Section>
+          </div>
+
+          <aside className="space-y-5">
+            <Section title="Application">
+              <dl className="space-y-3 text-sm">
+                <Row label="Status" value={text(app.status)} />
+                <Row label="Program" value={text(app.program_interest || app.program_name)} />
+                <Row label="Applied" value={date(app.created_at)} />
+                <Row label="City / State" value={[profile?.city, profile?.state].filter(Boolean).join(', ') || '—'} />
+                {app.notes ? <Row label="Intake notes" value={text(app.notes)} /> : null}
+              </dl>
+            </Section>
+
+            <Section title="WIOA / workforce record">
+              {record.wioa ? <dl className="space-y-3 text-sm">
+                <Row label="Program" value={text(record.wioa.wioa_program || record.wioa.program || record.wioa.program_id)} />
+                <Row label="Eligibility" value={text(record.wioa.eligibility_status || record.wioa.status)} />
+                <Row label="Enrollment" value={date(record.wioa.enrollment_date)} />
+                <Row label="Exit" value={date(record.wioa.exit_date)} />
+                {record.wioa.exit_reason ? <Row label="Exit reason" value={text(record.wioa.exit_reason)} /> : null}
+              </dl> : <Empty>No WIOA participant record linked.</Empty>}
+            </Section>
+
+            <Section title="Record integrity">
+              <dl className="space-y-3 text-sm">
+                <Row label="Identity link" value={record.learnerId ? 'Linked to profile/user ID' : 'Application only'} />
+                <Row label="Data sources loaded" value={String(10 - Object.keys(record.sourceErrors).length)} />
+                <Row label="Data source errors" value={String(Object.keys(record.sourceErrors).length)} />
+              </dl>
+            </Section>
+          </aside>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
-      <div className="px-4 py-3 border-b border-slate-100 bg-slate-50">
-        <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
-      </div>
-      <div className="p-4">{children}</div>
-    </div>
-  );
+  return <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="border-b border-slate-100 bg-slate-50 px-5 py-4"><h2 className="font-black text-slate-950">{title}</h2></div><div className="p-5">{children}</div></section>;
 }
-
+function Metric({ label, value }: { label: string; value: number }) {
+  return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><p className="text-3xl font-black">{value}</p><p className="mt-1 text-sm font-semibold text-slate-600">{label}</p></article>;
+}
+function Status({ value }: { value: unknown }) {
+  return <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-black ${badge(value)}`}>{text(value, 'unknown')}</span>;
+}
 function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-2">
-      <dt className="text-slate-700 shrink-0">{label}</dt>
-      <dd className="text-slate-900 text-right">{value}</dd>
-    </div>
-  );
+  return <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-2 last:border-0"><dt className="shrink-0 font-semibold text-slate-600">{label}</dt><dd className="text-right font-bold text-slate-900">{value}</dd></div>;
+}
+function Empty({ children }: { children: React.ReactNode }) { return <p className="rounded-xl bg-slate-50 p-4 text-sm font-medium text-slate-600">{children}</p>; }
+function DataTable({ headers, rows, empty }: { headers: string[]; rows: React.ReactNode[][]; empty: string }) {
+  if (!rows.length) return <Empty>{empty}</Empty>;
+  return <div className="overflow-x-auto"><table className="min-w-full text-left text-sm"><thead><tr className="border-b border-slate-200">{headers.map((header) => <th key={header} className="px-3 py-3 text-xs font-black uppercase tracking-wide text-slate-600">{header}</th>)}</tr></thead><tbody className="divide-y divide-slate-100">{rows.map((row, index) => <tr key={index}>{row.map((cell, cellIndex) => <td key={cellIndex} className="px-3 py-3 align-top font-medium text-slate-700">{cell}</td>)}</tr>)}</tbody></table></div>;
+}
+function Timeline({ rows }: { rows: any[] }) {
+  return <ol className="space-y-3">{rows.slice(0, 20).map((row: any, index) => <li key={row.id || index} className="border-l-2 border-slate-200 pl-3"><p className="text-sm font-bold text-slate-900">{row.title || row.event_type || row.action || row.subject || row.type || row.channel || 'Activity'}</p><p className="mt-1 line-clamp-3 text-xs leading-5 text-slate-600">{row.description || row.message || row.body || row.details || row.status || ''}</p><time className="mt-1 block text-xs font-semibold text-slate-400">{date(row.created_at || row.sent_at || row.updated_at)}</time></li>)}</ol>;
 }

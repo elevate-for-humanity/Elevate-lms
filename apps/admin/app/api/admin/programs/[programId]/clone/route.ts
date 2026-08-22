@@ -1,309 +1,175 @@
 /**
- * POST /api/admin/programs/[programId]/clone
+ * Deep-clone a program into a new draft.
  *
- * Deep-clones a program and its full curriculum into a new draft.
- *
- * Clones:
- *   programs (core fields → new slug, title suffixed " (Copy)", status=draft)
- *   program_outcomes
- *   program_credentials
- *   program_modules → program_lessons
- *   program_ctas
- *   program_tracks
- *   course_modules → course_lessons  (the LMS execution layer)
- *   program_course_map entry for the new program slug
- *
- * Does NOT clone:
- *   enrollments, progress, completions, certificates — learner data is never copied
- *   media files — URLs are copied as references, not re-uploaded
- *
- * Body (optional):
- *   { title?: string; slug?: string }
- *   If omitted, title gets " (Copy)" suffix and slug gets "-copy" suffix.
- *
- * Returns: { ok, program: { id, slug, title } }
+ * Program-owned records are cloned here. Any canonical LMS course package attached
+ * to the source program is cloned only through Course Builder's clone service.
  */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { safeError, safeInternalError } from '@/lib/api/safe-error';
-import { registerProgramCourse } from '@/lib/course-builder/program-resolver';
+import { cloneCanonicalCourse } from '@/lib/course-builder/clone-service';
+import { resolveCourseIdFromDb } from '@/lib/course-builder/program-resolver';
 import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+function stripRow(row: Record<string, any>, keys: string[]) {
+  const copy = { ...row };
+  for (const key of keys) delete copy[key];
+  return copy;
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ programId: string }> },
 ) {
-  const rl = await applyRateLimit(request, 'strict');
-  if (rl) return rl;
+  const rateLimited = await applyRateLimit(request, 'strict');
+  if (rateLimited) return rateLimited;
 
   const auth = await apiRequireAdmin(request);
   if (auth.error) return auth.error;
 
   const { programId } = await params;
   const body = await request.json().catch(() => ({}));
-
   const db = await requireAdminClient();
-  if (!db) return safeError('Service unavailable', 503);
 
-  // ── 1. Load source program ────────────────────────────────────────────────
-
-  const { data: src, error: srcErr } = await db
+  const { data: source, error: sourceError } = await db
     .from('programs')
     .select('*')
     .eq('id', programId)
     .maybeSingle();
+  if (sourceError) return safeInternalError(sourceError, 'Failed to load source program');
+  if (!source) return safeError('Program not found', 404);
 
-  if (srcErr) return safeInternalError(srcErr, 'Failed to load source program');
-  if (!src) return safeError('Program not found', 404);
+  const newTitle = typeof body.title === 'string' && body.title.trim()
+    ? body.title.trim()
+    : `${source.title} (Copy)`;
+  const baseSlug = typeof body.slug === 'string' && body.slug.trim()
+    ? body.slug.trim()
+    : `${source.slug}-copy`;
 
-  // ── 2. Resolve new slug + title ───────────────────────────────────────────
-
-  const newTitle = (body.title as string | undefined)?.trim() || `${src.title} (Copy)`;
-  const baseSlug = (body.slug as string | undefined)?.trim() || `${src.slug}-copy`;
-
-  // Ensure slug is unique — append -2, -3, etc. if needed.
   let newSlug = baseSlug;
-  let attempt = 1;
-  while (true) {
-    const { data: existing } = await db
+  for (let attempt = 1; ; attempt += 1) {
+    const { data: existing, error } = await db
       .from('programs')
       .select('id')
       .eq('slug', newSlug)
       .maybeSingle();
+    if (error) return safeInternalError(error, 'Failed to resolve program slug');
     if (!existing) break;
-    attempt++;
-    newSlug = `${baseSlug}-${attempt}`;
+    newSlug = `${baseSlug}-${attempt + 1}`;
   }
 
-  // ── 3. Clone programs row ─────────────────────────────────────────────────
-
-  const {
-    id: _id,
-    created_at: _ca,
-    updated_at: _ua,
-    slug: _slug,
-    title: _title,
-    status: _status,
-    published: _pub,
-    ...rest
-  } = src;
-
-  const { data: newProgram, error: progErr } = await db
+  const now = new Date().toISOString();
+  const programRest = stripRow(source as Record<string, any>, [
+    'id', 'created_at', 'updated_at', 'slug', 'title', 'status', 'published',
+  ]);
+  const { data: newProgram, error: programError } = await db
     .from('programs')
     .insert({
-      ...rest,
+      ...programRest,
       title: newTitle,
       slug: newSlug,
       status: 'draft',
       published: false,
       is_active: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at: now,
+      updated_at: now,
     })
-    .select('id, slug, title')
+    .select('id,slug,title')
     .single();
-
-  if (progErr) return safeInternalError(progErr, 'Failed to create program clone');
-  const newProgramId = newProgram.id;
-
-  const errors: string[] = [];
-
-  // ── 4. Clone program_outcomes ─────────────────────────────────────────────
-
-  const { data: outcomes } = await db
-    .from('program_outcomes')
-    .select('*')
-    .eq('program_id', programId)
-    .order('outcome_order');
-
-  if (outcomes?.length) {
-    const { error } = await db
-      .from('program_outcomes')
-      .insert(
-        outcomes.map(({ id: _, program_id: __, ...o }) => ({ ...o, program_id: newProgramId })),
-      );
-    if (error) { logger.error('[clone] outcomes insert failed', undefined, { programId, error: error.message }); errors.push('outcomes: insert failed'); }
+  if (programError || !newProgram) {
+    return safeInternalError(programError ?? new Error('Program clone was not created'), 'Failed to create program clone');
   }
 
-  // ── 5. Clone program_credentials ─────────────────────────────────────────
+  const warnings: string[] = [];
+  const copySimpleRows = async (table: string, orderColumn?: string) => {
+    let query = db.from(table).select('*').eq('program_id', programId);
+    if (orderColumn) query = query.order(orderColumn);
+    const { data, error } = await query;
+    if (error) {
+      warnings.push(`${table}: load failed`);
+      logger.error('[program-clone] related row load failed', undefined, { table, programId, error: error.message });
+      return;
+    }
+    if (!data?.length) return;
+    const rows = data.map((row: Record<string, any>) => ({
+      ...stripRow(row, ['id', 'program_id', 'created_at', 'updated_at']),
+      program_id: newProgram.id,
+      created_at: row.created_at ? now : undefined,
+      updated_at: row.updated_at ? now : undefined,
+    }));
+    for (const row of rows) {
+      if (row.created_at === undefined) delete row.created_at;
+      if (row.updated_at === undefined) delete row.updated_at;
+    }
+    const { error: insertError } = await db.from(table).insert(rows);
+    if (insertError) {
+      warnings.push(`${table}: insert failed`);
+      logger.error('[program-clone] related row insert failed', undefined, { table, programId, error: insertError.message });
+    }
+  };
 
-  const { data: creds } = await db
-    .from('program_credentials')
-    .select('*')
-    .eq('program_id', programId)
-    .order('sort_order');
+  await copySimpleRows('program_outcomes', 'outcome_order');
+  await copySimpleRows('program_credentials', 'sort_order');
+  await copySimpleRows('program_ctas', 'sort_order');
+  await copySimpleRows('program_tracks', 'sort_order');
 
-  if (creds?.length) {
-    const { error } = await db
-      .from('program_credentials')
-      .insert(creds.map(({ id: _, program_id: __, ...c }) => ({ ...c, program_id: newProgramId })));
-    if (error) { logger.error('[clone] credentials insert failed', undefined, { programId, error: error.message }); errors.push('credentials: insert failed'); }
-  }
-
-  // ── 6. Clone program_ctas ─────────────────────────────────────────────────
-
-  const { data: ctas } = await db
-    .from('program_ctas')
-    .select('*')
-    .eq('program_id', programId)
-    .order('sort_order');
-
-  if (ctas?.length) {
-    const { error } = await db
-      .from('program_ctas')
-      .insert(ctas.map(({ id: _, program_id: __, ...c }) => ({ ...c, program_id: newProgramId })));
-    if (error) { logger.error('[clone] ctas insert failed', undefined, { programId, error: error.message }); errors.push('ctas: insert failed'); }
-  }
-
-  // ── 7. Clone program_tracks ───────────────────────────────────────────────
-
-  const { data: tracks } = await db
-    .from('program_tracks')
-    .select('*')
-    .eq('program_id', programId)
-    .order('sort_order');
-
-  if (tracks?.length) {
-    const { error } = await db
-      .from('program_tracks')
-      .insert(
-        tracks.map(({ id: _, program_id: __, ...t }) => ({ ...t, program_id: newProgramId })),
-      );
-    if (error) { logger.error('[clone] tracks insert failed', undefined, { programId, error: error.message }); errors.push('tracks: insert failed'); }
-  }
-
-  // ── 8. Clone program_modules + program_lessons ────────────────────────────
-
-  const { data: modules } = await db
+  const { data: modules, error: moduleLoadError } = await db
     .from('program_modules')
     .select('*, program_lessons(*)')
     .eq('program_id', programId)
     .order('sort_order');
-
-  for (const mod of modules ?? []) {
-    const { program_lessons: lessons, id: _mid, program_id: _pid, ...modRest } = mod as any;
-
-    const { data: newMod, error: modErr } = await db
-      .from('program_modules')
-      .insert({ ...modRest, program_id: newProgramId })
-      .select('id')
-      .single();
-
-    if (modErr || !newMod) {
-      logger.error('[clone] module insert failed', undefined, { programId, title: mod.title, error: modErr?.message });
-      errors.push(`module '${mod.title}': insert failed`);
-      continue;
-    }
-
-    if (lessons?.length) {
-      const { error: lessonErr } = await db
-        .from('program_lessons')
-        .insert(
-          lessons.map(({ id: _, module_id: __, ...l }: any) => ({ ...l, module_id: newMod.id })),
-        );
-      if (lessonErr) { logger.error('[clone] lessons insert failed', undefined, { programId, module: mod.title, error: lessonErr.message }); errors.push(`lessons in '${mod.title}': insert failed`); }
-    }
-  }
-
-  // ── 9. Clone LMS execution layer (course_modules + course_lessons) ────────
-
-  // Find the source course via program_course_map or legacy map.
-  const { data: srcMapping } = await db
-    .from('program_course_map')
-    .select('course_id')
-    .eq('program_slug', src.slug)
-    .maybeSingle();
-
-  if (srcMapping?.course_id) {
-    const srcCourseId = srcMapping.course_id;
-
-    // Load source course
-    const { data: srcCourse } = await db
-      .from('courses')
-      .select('*')
-      .eq('id', srcCourseId)
-      .maybeSingle();
-
-    if (srcCourse) {
-      const {
-        id: _cid,
-        created_at: _cca,
-        updated_at: _cua,
-        slug: _cslug,
-        ...courseRest
-      } = srcCourse;
-
-      const { data: newCourse, error: courseErr } = await db
-        .from('courses')
-        .insert({
-          ...courseRest,
-          slug: newSlug,
-          status: 'draft',
-          updated_at: new Date().toISOString(),
-        })
+  if (moduleLoadError) {
+    warnings.push('program_modules: load failed');
+  } else {
+    for (const module of modules ?? []) {
+      const lessons = Array.isArray((module as any).program_lessons) ? (module as any).program_lessons : [];
+      const moduleRow = stripRow(module as Record<string, any>, [
+        'id', 'program_id', 'program_lessons', 'created_at', 'updated_at',
+      ]);
+      const { data: newModule, error: moduleError } = await db
+        .from('program_modules')
+        .insert({ ...moduleRow, program_id: newProgram.id })
         .select('id')
         .single();
-
-      if (courseErr || !newCourse) {
-        logger.error('[clone] course insert failed', undefined, { programId, error: courseErr?.message });
-        errors.push('course clone: insert failed');
-      } else {
-        const newCourseId = newCourse.id;
-
-        // Clone course_modules + course_lessons
-        const { data: courseMods } = await db
-          .from('course_modules')
-          .select('*, course_lessons(*)')
-          .eq('course_id', srcCourseId)
-          .order('order_index');
-
-        for (const cmod of courseMods ?? []) {
-          const {
-            course_lessons: clessons,
-            id: _cmid,
-            course_id: _ccid,
-            ...cmodRest
-          } = cmod as any;
-
-          const { data: newCmod, error: cmodErr } = await db
-            .from('course_modules')
-            .insert({ ...cmodRest, course_id: newCourseId })
-            .select('id')
-            .single();
-
-          if (cmodErr || !newCmod) {
-            logger.error('[clone] course_module insert failed', undefined, { programId, title: cmod.title, error: cmodErr?.message });
-            errors.push(`course_module '${cmod.title}': insert failed`);
-            continue;
-          }
-
-          if (clessons?.length) {
-            const { error: clessonErr } = await db.from('course_lessons').insert(
-              clessons.map(({ id: _, course_id: __, course_module_id: ___, ...cl }: any) => ({
-                ...cl,
-                course_id: newCourseId,
-                course_module_id: newCmod.id,
-              })),
-            );
-            if (clessonErr) { logger.error('[clone] course_lessons insert failed', undefined, { programId, module: cmod.title, error: clessonErr.message }); errors.push(`course_lessons in '${cmod.title}': insert failed`); }
-          }
-        }
-
-        // Register the new program → course mapping
-        await registerProgramCourse(db, newSlug, newCourseId);
+      if (moduleError || !newModule) {
+        warnings.push(`program module '${module.title}': insert failed`);
+        continue;
+      }
+      if (lessons.length) {
+        const lessonRows = lessons.map((lesson: Record<string, any>) => ({
+          ...stripRow(lesson, ['id', 'module_id', 'created_at', 'updated_at']),
+          module_id: newModule.id,
+        }));
+        const { error: lessonError } = await db.from('program_lessons').insert(lessonRows);
+        if (lessonError) warnings.push(`program lessons in '${module.title}': insert failed`);
       }
     }
   }
 
+  try {
+    const sourceCourseId = await resolveCourseIdFromDb(db, source.slug);
+    if (sourceCourseId) {
+      await cloneCanonicalCourse({
+        courseId: sourceCourseId,
+        title: newTitle,
+        slug: newSlug,
+        programId: newProgram.id,
+        programSlug: newSlug,
+      });
+    }
+  } catch (error) {
+    warnings.push('canonical course package: clone failed');
+    logger.error('[program-clone] canonical course clone failed', error, { programId, newProgramId: newProgram.id });
+  }
+
   return NextResponse.json({
-    ok: true,
-    program: { id: newProgramId, slug: newSlug, title: newTitle },
-    ...(errors.length ? { warnings: errors } : {}),
-  });
+    ok: warnings.length === 0,
+    program: newProgram,
+    ...(warnings.length ? { warnings } : {}),
+  }, { status: warnings.length ? 207 : 200 });
 }

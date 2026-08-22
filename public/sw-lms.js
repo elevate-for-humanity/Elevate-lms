@@ -20,9 +20,14 @@ function isCacheableResponse(response) {
 }
 
 async function safeCachePut(cache, request, response) {
-  if (!isCacheableResponse(response)) return;
-  try { await cache.put(request, response.clone()); }
-  catch (error) { console.warn('[SW-lms] Cache put skipped:', error?.message || String(error)); }
+  if (!isCacheableResponse(response)) return false;
+  try {
+    await cache.put(request, response.clone());
+    return true;
+  } catch (error) {
+    console.warn('[SW-lms] Cache put skipped:', error?.message || String(error));
+    return false;
+  }
 }
 
 self.addEventListener('install', (event) => {
@@ -65,8 +70,6 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Protected HTML and data always remain network-only. Offline support is the
-  // static shell plus explicitly downloaded course media and queued mutations.
   if (request.mode === 'navigate') {
     event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')));
     return;
@@ -89,24 +92,36 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(staleWhileRevalidate(request).then((response) => response || fetch(request)));
 });
 
+async function cacheCourseResources(urls) {
+  const cache = await caches.open(COURSE_CACHE);
+  let cachedCount = 0;
+  const uniqueUrls = Array.from(new Set(Array.isArray(urls) ? urls : []));
+  await Promise.allSettled(uniqueUrls.map(async (rawUrl) => {
+    const url = new URL(rawUrl, self.location.origin);
+    if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+    if (!/\.(?:pdf|png|jpe?g|webp|avif|gif|svg|mp3|m4a|ogg|wav|mp4|webm|vtt)$/i.test(url.pathname)) return;
+    const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow', credentials: 'same-origin' });
+    const response = await fetch(request);
+    if (await safeCachePut(cache, request, response)) cachedCount += 1;
+  }));
+  return { cachedCount, requestedCount: uniqueUrls.length };
+}
+
 self.addEventListener('message', (event) => {
   const { type, payload } = event.data || {};
+  const reply = (message) => event.ports?.[0]?.postMessage(message);
+
   switch (type) {
     case 'CACHE_COURSE':
-      if (Array.isArray(payload?.urls)) {
-        event.waitUntil(caches.open(COURSE_CACHE).then((cache) => Promise.allSettled(payload.urls.map(async (rawUrl) => {
-          const url = new URL(rawUrl, self.location.origin);
-          if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-          // Never persist authenticated HTML. Offline course support is limited
-          // to explicitly selected static media/documents.
-          if (!/\.(?:pdf|png|jpe?g|webp|avif|gif|svg|mp3|m4a|ogg|wav|mp4|webm|vtt)$/i.test(url.pathname)) return;
-          const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow' });
-          const response = await fetch(request);
-          await safeCachePut(cache, request, response);
-        }))));
-      }
+      event.waitUntil(cacheCourseResources(payload?.urls)
+        .then((result) => reply({ ok: true, ...result }))
+        .catch((error) => reply({ ok: false, error: error?.message || 'Offline resource download failed' })));
       break;
-    case 'CLEAR_COURSE_CACHE': event.waitUntil(caches.delete(COURSE_CACHE)); break;
+    case 'CLEAR_COURSE_CACHE':
+      event.waitUntil(caches.delete(COURSE_CACHE)
+        .then(() => reply({ ok: true }))
+        .catch((error) => reply({ ok: false, error: error?.message || 'Offline resource cleanup failed' })));
+      break;
     case 'SYNC_TIMECLOCK': event.waitUntil(syncTimeclockActions()); break;
     case 'SKIP_WAITING': self.skipWaiting(); break;
     case 'GET_CACHE_SIZE':

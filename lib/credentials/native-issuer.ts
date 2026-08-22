@@ -74,8 +74,7 @@ async function signCredential(
 
 /**
  * Issues an Elevate-owned Open Badge from the canonical learner_credentials row.
- * Partner-delivered/proctored credentials remain external and are never re-issued
- * as if Elevate were the certifying authority.
+ * Only credentials owned by an internal credentialing partner may use this path.
  */
 export async function issueNativeOpenBadge(
   learnerCredentialId: string,
@@ -85,33 +84,46 @@ export async function issueNativeOpenBadge(
   const { data: award, error } = await db
     .from('learner_credentials')
     .select(
-      `id, learner_id, credential_id, verification_code, issued_at, expires_at, status,
-       open_badge_status, open_badge_credential, recipient_identity_salt,
-       credentials!inner(id, name, description, issuer_type, issuing_authority,
-         open_badges_enabled, achievement_type, achievement_criteria_narrative,
-         achievement_criteria_url, badge_image_url, alignment, is_active, is_published)`
+      'id, learner_id, credential_id, verification_code, issued_at, expires_at, status, open_badge_status, open_badge_credential, recipient_identity_salt',
     )
     .eq('id', learnerCredentialId)
     .maybeSingle();
 
   if (error || !award) return { success: false, error: 'Learner credential not found' };
 
-  const definition = Array.isArray(award.credentials) ? award.credentials[0] : award.credentials;
-  if (!definition) return { success: false, error: 'Credential definition not found' };
-  if (definition.issuer_type !== 'elevate_issued') {
+  const { data: definition, error: definitionError } = await db
+    .from('credentials')
+    .select(
+      'id, name, description, partner_id, issuing_authority, open_badges_enabled, achievement_type, achievement_criteria_narrative, achievement_criteria_url, badge_image_url, alignment',
+    )
+    .eq('id', award.credential_id)
+    .maybeSingle();
+
+  if (definitionError || !definition) {
+    return { success: false, error: 'Credential definition not found' };
+  }
+
+  if (!definition.partner_id) {
     return {
       success: false,
-      error: 'Only Elevate-issued credentials may be issued as native Open Badges',
+      error: 'Credential must have an internal credentialing partner before native badge issuance',
+    };
+  }
+
+  const { data: partner } = await db
+    .from('credentialing_partners')
+    .select('name, type')
+    .eq('id', definition.partner_id)
+    .maybeSingle();
+
+  if (partner?.type !== 'internal') {
+    return {
+      success: false,
+      error: 'Only credentials owned by an internal issuer may be issued as native Open Badges',
     };
   }
   if (!definition.open_badges_enabled) {
     return { success: false, error: 'Open Badges is not enabled for this credential definition' };
-  }
-  if (!definition.is_active || !definition.is_published) {
-    return {
-      success: false,
-      error: 'Credential definition must be active and published before badge issuance',
-    };
   }
   if (award.status !== 'active') {
     return { success: false, error: `Credential status ${award.status} cannot be issued` };

@@ -2,6 +2,13 @@ name: Registered Apprenticeship E2E
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/registered-apprenticeship-e2e.yml'
+      - 'tests/e2e/registered-apprenticeship-authenticated.spec.ts'
+      - 'scripts/check-registered-apprenticeship-architecture.mjs'
   workflow_run:
     workflows:
       - Deploy LMS
@@ -14,7 +21,7 @@ concurrency:
 
 jobs:
   production-authenticated-e2e:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     name: Apprentice + Host Shop authenticated persistence
     runs-on: ubuntu-latest
     timeout-minutes: 25

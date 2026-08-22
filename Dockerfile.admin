@@ -83,6 +83,13 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/public ./apps/admin/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
 
+# The Admin-owned video worker bundles Remotion compositions at runtime.
+# Standalone output tracing cannot discover a source directory opened by path,
+# so ship the canonical root Remotion project at the exact Admin cwd path used
+# by lib/video/remotion-render.ts. This remains one composition tree, not a fork.
+COPY --from=builder --chown=nextjs:nodejs /app/remotion-src ./apps/admin/remotion-src
+RUN test -f /app/apps/admin/remotion-src/index.ts
+
 RUN test -f /app/public/sw-admin.js \
     && test -f /app/apps/admin/public/sw-admin.js
 

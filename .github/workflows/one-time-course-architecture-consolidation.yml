@@ -1,0 +1,66 @@
+name: One-Time Course Architecture Consolidation
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  consolidate:
+    if: github.event.issue.title == 'RUN COURSE ARCHITECTURE CONSOLIDATION'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Apply consolidation
+        run: node scripts/one-time-course-architecture-consolidation.mjs
+
+      - name: Verify architecture gates
+        run: |
+          node scripts/check-course-factory-authority.mjs
+          node scripts/check-studio-architecture.mjs
+
+      - name: Commit directly to main
+        run: |
+          git config user.name "elevateforhumanity"
+          git config user.email "Elizabethpowell6262@gmail.com"
+          git add apps/admin/app/api/devstudio/chat/route.ts \
+            apps/admin/app/api/admin/course-builder/route.ts \
+            apps/admin/app/api/admin/course-builder/publish/route.ts \
+            apps/admin/app/api/admin/lms/courses/generate/route.ts \
+            'apps/admin/app/api/admin/courses/[courseId]/generate-missing/route.ts' \
+            apps/admin/app/api/admin/courses/ai-builder/route.ts \
+            lib/course-builder/orchestrator.ts \
+            lib/devstudio/course-builder-controller.ts \
+            lib/course-factory/index.ts \
+            scripts/check-course-factory-authority.mjs \
+            scripts/check-studio-architecture.mjs \
+            docs/COURSE-BUILDER-CANONICAL-ARCHITECTURE.md
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Consolidate Studio controlled Course Builder authority"
+            git push origin HEAD:main
+          fi
+
+      - name: Report result
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Course architecture consolidation workflow finished with job status: **${{ job.status }}**.\n\nHead checked from main: ${context.sha}`
+            });

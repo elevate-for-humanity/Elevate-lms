@@ -1,18 +1,13 @@
 import type { Metadata } from 'next';
 import HomeHeroVideo from '@/components/ui/HomeHeroVideo';
 import heroBanners from '@/content/heroBanners';
-import MarqueeBanner from '@/components/MarqueeBanner';
-import { HomePlatformPreview } from '@/components/home/HomePlatformPreview';
 import { HomeTrustBar } from '@/components/home/HomeTrustBar';
 import { HomeHowItWorks } from '@/components/home/HomeHowItWorks';
 import { HomeCareerPathways } from '@/components/home/HomeCareerPathways';
-import { HomeBeautyPriority } from '@/components/home/HomeBeautyPriority';
-import { HomeApprenticeshipInfra } from '@/components/home/HomeApprenticeshipInfra';
 import { HomeFunding } from '@/components/home/HomeFunding';
 import { FundingQuickCheck } from '@/components/home/FundingQuickCheck';
 import { HomeEmployerStrip } from '@/components/home/HomeEmployerStrip';
 import { HomeFinalCTA } from '@/components/home/HomeFinalCTA';
-import { HomeFoundationPartner } from '@/components/home/HomeFoundationPartner';
 import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
@@ -65,17 +60,12 @@ export default function HomePage() {
     <>
       <StructuredData />
       <HomeHeroVideo banner={heroBanners.home} />
-      <MarqueeBanner />
       <HomeTrustBar />
       <FundingQuickCheck />
       <HomeCareerPathways />
-      <HomeBeautyPriority />
       <HomeHowItWorks />
-      <HomeApprenticeshipInfra />
       <HomeFunding />
       <HomeEmployerStrip />
-      <HomePlatformPreview />
-      <HomeFoundationPartner />
       <HomeFinalCTA />
       <ParisFloatingButton />
       <HomeMobileActions />

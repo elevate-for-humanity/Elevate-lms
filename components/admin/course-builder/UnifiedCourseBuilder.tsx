@@ -64,7 +64,7 @@ export default function UnifiedCourseBuilder() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (tab !== 'blueprints' || blueprints.length) return;
-    fetch('/api/admin/course-builder/load-blueprint')
+    fetch('/api/admin/course-builder?action=blueprints')
       .then((r) => r.json())
       .then((data) => setBlueprints(Array.isArray(data.blueprints) ? data.blueprints : []))
       .catch(() => setBlueprints([]));
@@ -325,10 +325,11 @@ function BlueprintPanel({
     setRunning(true);
     setResult('');
     try {
-      const res = await fetch('/api/admin/course-builder/generate-from-blueprint', {
+      const res = await fetch('/api/admin/course-builder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'generate-from-blueprint',
           blueprintId,
           programId,
           mode: 'refresh',

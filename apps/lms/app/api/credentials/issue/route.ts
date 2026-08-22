@@ -51,15 +51,22 @@ async function _POST(req: NextRequest) {
 
     const { data: definition, error: definitionError } = await db
       .from('credentials')
-      .select('id, name, issuer_type, is_active, is_published, open_badges_enabled')
+      .select('id, name, partner_id, open_badges_enabled')
       .eq('id', data.credentialId)
       .maybeSingle();
 
     if (definitionError || !definition) {
       return NextResponse.json({ error: 'Credential definition not found' }, { status: 404 });
     }
-    if (!definition.is_active) {
-      return NextResponse.json({ error: 'Credential definition is inactive' }, { status: 409 });
+
+    let isInternalIssuer = false;
+    if (definition.partner_id) {
+      const { data: partner } = await db
+        .from('credentialing_partners')
+        .select('type')
+        .eq('id', definition.partner_id)
+        .maybeSingle();
+      isInternalIssuer = partner?.type === 'internal';
     }
 
     const { data: existing } = await db
@@ -92,14 +99,14 @@ async function _POST(req: NextRequest) {
         issued_at: issuedAt,
         expires_at: data.expiresAt ?? null,
         issued_by: session.user.id,
-        exam_attempt_id: data.attemptId ?? null,
         exam_score: data.examScore ?? null,
         status: 'active',
         open_badge_status:
-          definition.issuer_type === 'elevate_issued' && definition.open_badges_enabled
-            ? 'pending'
-            : 'not_issued',
-        metadata: data.metadata ?? {},
+          isInternalIssuer && definition.open_badges_enabled ? 'pending' : 'not_issued',
+        metadata: {
+          ...(data.metadata ?? {}),
+          ...(data.attemptId ? { credential_attempt_id: data.attemptId } : {}),
+        },
       })
       .select('id, verification_code, issued_at, expires_at, status, open_badge_status')
       .maybeSingle();
@@ -120,7 +127,7 @@ async function _POST(req: NextRequest) {
     }
 
     let openBadge: Awaited<ReturnType<typeof issueNativeOpenBadge>> | null = null;
-    if (definition.issuer_type === 'elevate_issued' && definition.open_badges_enabled) {
+    if (isInternalIssuer && definition.open_badges_enabled) {
       openBadge = await issueNativeOpenBadge(award.id);
     }
 
@@ -134,15 +141,12 @@ async function _POST(req: NextRequest) {
         credential_name: definition.name,
         learner_id: data.studentId,
         program_id: data.programId ?? null,
+        issuer_authority: isInternalIssuer ? 'internal' : 'external',
         open_badge_status: openBadge?.success ? openBadge.status : award.open_badge_status,
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      award,
-      openBadge,
-    });
+    return NextResponse.json({ success: true, award, openBadge });
   } catch (error) {
     logger.error(
       'Credential issuance error',

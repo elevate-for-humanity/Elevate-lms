@@ -29,6 +29,7 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     name: Apprentice + Host Shop authenticated persistence
     runs-on: ubuntu-latest
+    environment: production
     timeout-minutes: 25
     env:
       PLAYWRIGHT_BASE_URL: https://app.elevateforhumanity.org

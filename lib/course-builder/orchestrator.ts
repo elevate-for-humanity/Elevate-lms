@@ -20,6 +20,8 @@ const courseProgramConfigSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().min(1),
   slug: z.string().min(1),
+  description: z.string().optional(),
+  isActive: z.boolean().optional(),
   credentialTarget: z.enum(['INTERNAL','STATE_BOARD','IC&RC','NAADAC','CUSTOM','DOL_APPRENTICESHIP']),
   minimumHours: z.number().positive(),
   requiresFinalExam: z.boolean(),
@@ -65,6 +67,8 @@ export async function saveCourseProgramConfiguration(input: unknown) {
   const payload = {
     title: body.title,
     slug: body.slug,
+    description: body.description ?? '',
+    is_active: body.isActive ?? true,
     status: body.status,
     duration_hours: body.minimumHours,
     compliance_profile_key: body.regulatory.complianceProfileKey,

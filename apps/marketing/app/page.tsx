@@ -10,6 +10,7 @@ import { HomeMobileActions } from '@/components/home/HomeMobileActions';
 import { PLATFORM_DEFAULTS } from '@/lib/config/platform-config';
 import { ParisFloatingButton } from '@/components/paris/ParisFloatingButton';
 import StructuredData from '@/components/StructuredData';
+import { getApprovedHomeHeroAsset } from '@/lib/media/home-hero-asset';
 
 export const revalidate = 300;
 
@@ -53,11 +54,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const generatedHero = await getApprovedHomeHeroAsset();
+  const banner = generatedHero
+    ? {
+        ...heroBanners.home,
+        videoSrcDesktop: generatedHero.publicUrl,
+        videoSrcMobile: generatedHero.publicUrl,
+        transcript: generatedHero.transcript || heroBanners.home.transcript,
+      }
+    : heroBanners.home;
+
   return (
     <>
       <StructuredData />
-      <HomeHeroVideo banner={heroBanners.home} />
+      <HomeHeroVideo banner={banner} />
       <HomeCareerPathways />
       <HomeApprenticeshipInfra />
       <HomeFunding />

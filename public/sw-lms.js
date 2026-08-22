@@ -16,163 +16,112 @@ const PRECACHE_ASSETS = [
 ];
 
 function isCacheableResponse(response) {
-  return Boolean(
-    response &&
-      response.status === 200 &&
-      response.ok &&
-      !response.redirected &&
-      response.type !== 'opaqueredirect',
-  );
+  return Boolean(response && response.status === 200 && response.ok && !response.redirected && response.type !== 'opaqueredirect');
 }
 
 async function safeCachePut(cache, request, response) {
   if (!isCacheableResponse(response)) return;
-  try {
-    await cache.put(request, response.clone());
-  } catch (error) {
-    console.warn('[SW-lms] Cache put skipped:', error?.message || String(error));
-  }
+  try { await cache.put(request, response.clone()); }
+  catch (error) { console.warn('[SW-lms] Cache put skipped:', error?.message || String(error)); }
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    (async () => {
-      const cache = await caches.open(STATIC_CACHE);
-      const results = await Promise.allSettled(
-        PRECACHE_ASSETS.map(async (asset) => {
-          const req = new Request(asset, { cache: 'reload', redirect: 'follow' });
-          const res = await fetch(req);
-          if (!isCacheableResponse(res)) return;
-          await safeCachePut(cache, req, res);
-        }),
-      );
-      const failures = results.filter((result) => result.status === 'rejected');
-      if (failures.length) console.warn('[SW-lms] Optional precache failures:', failures.length);
-      await self.skipWaiting();
-    })(),
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(STATIC_CACHE);
+    const results = await Promise.allSettled(PRECACHE_ASSETS.map(async (asset) => {
+      const req = new Request(asset, { cache: 'reload', redirect: 'follow' });
+      const res = await fetch(req);
+      if (isCacheableResponse(res)) await safeCachePut(cache, req, res);
+    }));
+    const failures = results.filter((result) => result.status === 'rejected');
+    if (failures.length) console.warn('[SW-lms] Optional precache failures:', failures.length);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    (async () => {
-      const names = await caches.keys();
-      await Promise.all(
-        names
-          .filter((name) => name.startsWith('elevate-lms-') && !name.startsWith(CACHE_VERSION))
-          .map((name) => caches.delete(name)),
-      );
-      await self.clients.claim();
-      await syncTimeclockActions();
-    })(),
-  );
+  event.waitUntil((async () => {
+    const names = await caches.keys();
+    await Promise.all(names
+      .filter((name) => name.startsWith('elevate-lms-') && !name.startsWith(CACHE_VERSION))
+      .map((name) => caches.delete(name)));
+    await self.clients.claim();
+    await syncTimeclockActions();
+  })());
 });
 
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(STATIC_CACHE);
   const cached = await cache.match(request);
-  const network = fetch(request)
-    .then(async (response) => {
-      await safeCachePut(cache, request, response);
-      return response;
-    })
-    .catch(() => null);
+  const network = fetch(request).then(async (response) => {
+    await safeCachePut(cache, request, response);
+    return response;
+  }).catch(() => null);
   return cached || network;
 }
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
-
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
+  // Protected HTML and data always remain network-only. Offline support is the
+  // static shell plus explicitly downloaded course media and queued mutations.
   if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')),
-    );
+    event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }).catch(() => caches.match('/offline.html')));
     return;
   }
 
   if (
-    request.headers.has('range') ||
-    request.headers.get('RSC') === '1' ||
-    url.searchParams.has('_rsc') ||
-    url.pathname.startsWith('/api/') ||
-    /\/(?:login|logout|unauthorized)(?:\/|$)/.test(url.pathname) ||
+    request.headers.has('range') || request.headers.get('RSC') === '1' || url.searchParams.has('_rsc') ||
+    url.pathname.startsWith('/api/') || /\/(?:login|logout|unauthorized)(?:\/|$)/.test(url.pathname) ||
     /\/(?:lms\/dashboard|apprentice|employer|host-shop|workforce|parent-portal)(?:\/|$)/.test(url.pathname)
-  ) {
-    return;
-  }
+  ) return;
 
   if (/^\/_next\/(?:static|data)\//.test(url.pathname)) {
     event.respondWith(fetch(request, { cache: 'no-store', redirect: 'follow' }));
     return;
   }
 
-  const isStaticAsset =
-    /\.(?:woff2?|ttf|eot|png|jpe?g|webp|avif|gif|svg|ico)$/i.test(url.pathname) ||
-    url.pathname.startsWith('/images/') ||
-    url.pathname.startsWith('/icons/');
-
+  const isStaticAsset = /\.(?:woff2?|ttf|eot|png|jpe?g|webp|avif|gif|svg|ico)$/i.test(url.pathname) ||
+    url.pathname.startsWith('/images/') || url.pathname.startsWith('/icons/');
   if (!isStaticAsset) return;
   event.respondWith(staleWhileRevalidate(request).then((response) => response || fetch(request)));
 });
 
 self.addEventListener('message', (event) => {
   const { type, payload } = event.data || {};
-
   switch (type) {
     case 'CACHE_COURSE':
       if (Array.isArray(payload?.urls)) {
-        event.waitUntil(
-          caches.open(COURSE_CACHE).then((cache) =>
-            Promise.allSettled(
-              payload.urls.map(async (rawUrl) => {
-                const url = new URL(rawUrl, self.location.origin);
-                if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
-                if (!/\.(?:pdf|png|jpe?g|webp|avif|gif|svg|mp3|m4a|ogg|wav|mp4|webm|vtt)$/i.test(url.pathname)) return;
-                const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow' });
-                const response = await fetch(request);
-                await safeCachePut(cache, request, response);
-              }),
-            ),
-          ),
-        );
+        event.waitUntil(caches.open(COURSE_CACHE).then((cache) => Promise.allSettled(payload.urls.map(async (rawUrl) => {
+          const url = new URL(rawUrl, self.location.origin);
+          if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
+          // Never persist authenticated HTML. Offline course support is limited
+          // to explicitly selected static media/documents.
+          if (!/\.(?:pdf|png|jpe?g|webp|avif|gif|svg|mp3|m4a|ogg|wav|mp4|webm|vtt)$/i.test(url.pathname)) return;
+          const request = new Request(url.toString(), { cache: 'reload', redirect: 'follow' });
+          const response = await fetch(request);
+          await safeCachePut(cache, request, response);
+        }))));
       }
       break;
-
-    case 'CLEAR_COURSE_CACHE':
-      event.waitUntil(caches.delete(COURSE_CACHE));
-      break;
-
-    case 'SYNC_TIMECLOCK':
-      event.waitUntil(syncTimeclockActions());
-      break;
-
-    case 'SKIP_WAITING':
-      self.skipWaiting();
-      break;
-
+    case 'CLEAR_COURSE_CACHE': event.waitUntil(caches.delete(COURSE_CACHE)); break;
+    case 'SYNC_TIMECLOCK': event.waitUntil(syncTimeclockActions()); break;
+    case 'SKIP_WAITING': self.skipWaiting(); break;
     case 'GET_CACHE_SIZE':
-      event.waitUntil(
-        Promise.all([
-          caches.open(STATIC_CACHE).then((cache) => cache.keys()),
-          caches.open(COURSE_CACHE).then((cache) => cache.keys()),
-        ]).then(([staticKeys, courseKeys]) => {
-          event.source?.postMessage({
-            type: 'CACHE_SIZE',
-            payload: { static: staticKeys.length, courses: courseKeys.length },
-          });
-        }),
-      );
+      event.waitUntil(Promise.all([
+        caches.open(STATIC_CACHE).then((cache) => cache.keys()),
+        caches.open(COURSE_CACHE).then((cache) => cache.keys()),
+      ]).then(([staticKeys, courseKeys]) => event.source?.postMessage({
+        type: 'CACHE_SIZE', payload: { static: staticKeys.length, courses: courseKeys.length },
+      })));
       break;
   }
 });
 
 self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-timeclock' || event.tag === 'sync-offline-actions') {
-    event.waitUntil(syncTimeclockActions());
-  }
+  if (event.tag === 'sync-timeclock' || event.tag === 'sync-offline-actions') event.waitUntil(syncTimeclockActions());
 });
 
 function openOfflineActionDB() {
@@ -218,59 +167,45 @@ function deleteOfflineAction(db, id) {
   });
 }
 
-async function updateQueuedShiftReferences(db, clientShiftId, serverProgressEntryId) {
-  if (!clientShiftId || !serverProgressEntryId) return;
-  const tx = db.transaction('offline-actions', 'readwrite');
-  const store = tx.objectStore('offline-actions');
-  const request = store.getAll();
-  await new Promise((resolve, reject) => {
+function putOfflineAction(db, entry) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('offline-actions', 'readwrite');
+    const request = tx.objectStore('offline-actions').put(entry);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve();
   });
-  for (const queued of request.result || []) {
+}
+
+async function updateQueuedShiftReferences(db, clientShiftId, serverProgressEntryId) {
+  if (!clientShiftId || !serverProgressEntryId) return;
+  const queuedActions = await getAllOfflineActions(db);
+  for (const queued of queuedActions) {
     if (queued?.type !== 'timeclock') continue;
     try {
       const payload = JSON.parse(queued.body || '{}');
       if (payload.client_shift_id !== clientShiftId || payload.action === 'clock_in') continue;
       if (!payload.progress_entry_id || String(payload.progress_entry_id).startsWith('offline:')) {
         payload.progress_entry_id = serverProgressEntryId;
-        queued.body = JSON.stringify(payload);
-        store.put(queued);
+        await putOfflineAction(db, { ...queued, body: JSON.stringify(payload) });
       }
     } catch {
       // Malformed records are handled by the main replay loop.
     }
   }
-  await new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
 }
 
 async function deleteShiftActions(db, clientShiftId) {
   if (!clientShiftId) return;
-  const tx = db.transaction('offline-actions', 'readwrite');
-  const store = tx.objectStore('offline-actions');
-  const request = store.getAll();
-  await new Promise((resolve, reject) => {
-    request.onerror = () => reject(request.error);
-    request.onsuccess = () => resolve();
-  });
-  for (const queued of request.result || []) {
+  const queuedActions = await getAllOfflineActions(db);
+  for (const queued of queuedActions) {
     if (queued?.type !== 'timeclock') continue;
     try {
       const payload = JSON.parse(queued.body || '{}');
-      if (payload.client_shift_id === clientShiftId) store.delete(queued.id);
+      if (payload.client_shift_id === clientShiftId) await deleteOfflineAction(db, queued.id);
     } catch {
       // Leave unrelated malformed records to the main replay loop.
     }
   }
-  await new Promise((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-    tx.onabort = () => reject(tx.error);
-  });
 }
 
 async function notifyClients(message) {
@@ -280,9 +215,8 @@ async function notifyClients(message) {
 
 async function syncTimeclockActions() {
   let db;
-  try {
-    db = await openOfflineActionDB();
-  } catch (error) {
+  try { db = await openOfflineActionDB(); }
+  catch (error) {
     console.warn('[SW-lms] Offline queue unavailable:', error?.message || String(error));
     return;
   }
@@ -290,7 +224,6 @@ async function syncTimeclockActions() {
   const actions = (await getAllOfflineActions(db))
     .filter((entry) => entry?.type === 'timeclock')
     .sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0));
-
   if (!actions.length) return;
 
   const serverShiftIds = new Map();
@@ -299,9 +232,8 @@ async function syncTimeclockActions() {
 
   for (const queued of actions) {
     let payload;
-    try {
-      payload = JSON.parse(queued.body || '{}');
-    } catch {
+    try { payload = JSON.parse(queued.body || '{}'); }
+    catch {
       await deleteOfflineAction(db, queued.id);
       rejectedCount += 1;
       continue;
@@ -326,9 +258,7 @@ async function syncTimeclockActions() {
       if (response.ok) {
         if (data.progress_entry_id && clientShiftId) {
           serverShiftIds.set(clientShiftId, data.progress_entry_id);
-          if (payload.action === 'clock_in') {
-            await updateQueuedShiftReferences(db, clientShiftId, data.progress_entry_id);
-          }
+          if (payload.action === 'clock_in') await updateQueuedShiftReferences(db, clientShiftId, data.progress_entry_id);
         }
         await deleteOfflineAction(db, queued.id);
         syncedCount += 1;
@@ -337,19 +267,12 @@ async function syncTimeclockActions() {
 
       if (response.status === 401 || response.status >= 500) break;
 
-      if (payload.action === 'clock_in' && clientShiftId) {
-        await deleteShiftActions(db, clientShiftId);
-      } else {
-        await deleteOfflineAction(db, queued.id);
-      }
+      if (payload.action === 'clock_in' && clientShiftId) await deleteShiftActions(db, clientShiftId);
+      else await deleteOfflineAction(db, queued.id);
       rejectedCount += 1;
       await notifyClients({
         type: 'TIMECLOCK_SYNC_REJECTED',
-        data: {
-          client_shift_id: clientShiftId,
-          action: payload.action,
-          error: data.error || `Rejected with status ${response.status}`,
-        },
+        data: { client_shift_id: clientShiftId, action: payload.action, error: data.error || `Rejected with status ${response.status}` },
       });
     } catch {
       break;
@@ -363,30 +286,19 @@ async function syncTimeclockActions() {
 
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-
   let data;
-  try {
-    data = event.data.json();
-  } catch {
-    data = { title: 'Elevate LMS', body: event.data.text() };
-  }
-
+  try { data = event.data.json(); }
+  catch { data = { title: 'Elevate LMS', body: event.data.text() }; }
   const options = {
     body: data.body || 'You have a new notification',
-    icon: `${CDN}/icons/student-192.png`,
-    badge: `${CDN}/icons/student-192.png`,
-    vibrate: [100, 50, 100],
-    tag: data.tag || 'elevate-lms',
-    renotify: true,
-    data: { url: data.url || '/', type: data.type },
-    actions: data.actions || [],
+    icon: `${CDN}/icons/student-192.png`, badge: `${CDN}/icons/student-192.png`,
+    vibrate: [100, 50, 100], tag: data.tag || 'elevate-lms', renotify: true,
+    data: { url: data.url || '/', type: data.type }, actions: data.actions || [],
   };
-
   event.waitUntil(self.registration.showNotification(data.title || 'Elevate LMS', options));
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || '/';
-  event.waitUntil(clients.openWindow(url));
+  event.waitUntil(clients.openWindow(event.notification.data?.url || '/'));
 });

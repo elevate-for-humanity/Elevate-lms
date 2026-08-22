@@ -1,31 +1,14 @@
 /**
  * Course Factory
  *
- * Canonical course generation system.
- *
- * Usage:
- *
- * ```typescript
- * import { courseFactory, validateBlueprint } from '@/lib/course-factory';
- *
- * const result = await courseFactory({
- *   programSlug: 'hvac',
- *   mode: 'replace',
- *   contentSource: 'ai',
- * }, (stage, message) => {
- *   console.log(`${stage}: ${message}`);
- * });
- *
- * const validation = validateBlueprint(blueprint);
- * if (!validation.valid) {
- *   console.error('Validation failed:', validation.errors);
- * }
- * ```
+ * Private execution capabilities with a public Course Builder compatibility facade.
+ * Application callers that import courseFactory from this barrel cross the
+ * canonical Course Builder orchestration layer before factory.ts executes.
  */
 
 // ─── Main API ─────────────────────────────────────────────────────────────────
 
-export { courseFactory } from './factory';
+export { courseFactory } from '../course-builder/orchestrator';
 export type { FactoryInput, FactoryOutput, FactoryStage, ProgressCallback } from './types';
 
 // ─── Blueprint API ─────────────────────────────────────────────────────────────

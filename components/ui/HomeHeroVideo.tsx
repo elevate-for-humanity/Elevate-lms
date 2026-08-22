@@ -55,7 +55,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       belowHeroSubheadline={banner.belowHeroSubheadline}
       ctas={ctas}
       trustIndicators={trust}
-      overlayMode="default"
+      overlayMode="none"
       heightClassName="h-[52vh] min-h-[360px] max-h-[680px] md:h-[58vh] md:min-h-[480px] lg:h-[62vh]"
     />
   );

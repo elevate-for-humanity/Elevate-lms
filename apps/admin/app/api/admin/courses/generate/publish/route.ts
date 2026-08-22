@@ -8,12 +8,11 @@ export const dynamic = 'force-dynamic';
 /**
  * Retired compatibility endpoint.
  *
- * Course creation and publication now have exactly one authority:
- *   POST /api/admin/course-builder/pipeline       -> lib/course-factory
- *   POST /api/admin/lms/courses/[courseId]/publish -> persisted procurement gate
+ * Course creation has exactly one HTTP authority:
+ *   POST /api/admin/course-builder -> lib/course-factory
+ * Persisted publication still crosses the canonical course publisher/procurement gate.
  *
- * This endpoint intentionally performs no writes. Keeping a small authenticated
- * compatibility response is safer than preserving a second persistence engine.
+ * This endpoint intentionally performs no writes.
  */
 export async function POST(request: NextRequest) {
   const rateLimited = await applyRateLimit(request, 'strict');
@@ -25,9 +24,8 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(
     {
       error: 'LEGACY_COURSE_PUBLISHER_RETIRED',
-      message: 'Use the Unified Course Builder. Generate through /api/admin/course-builder/pipeline and publish the resulting canonical course through /api/admin/lms/courses/[courseId]/publish.',
-      canonicalGenerationEndpoint: '/api/admin/course-builder/pipeline',
-      canonicalPublishEndpoint: '/api/admin/lms/courses/[courseId]/publish',
+      message: 'Use the Unified Course Builder. Generate through /api/admin/course-builder and publish only through the canonical Course Factory publication gate.',
+      canonicalGenerationEndpoint: '/api/admin/course-builder',
     },
     { status: 410 },
   );

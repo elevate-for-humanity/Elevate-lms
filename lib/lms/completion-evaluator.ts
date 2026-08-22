@@ -1,19 +1,19 @@
 import 'server-only';
 
 /**
- * Canonical completion evaluator.
+ * Canonical program-completion authority.
  *
- * Course completion is evaluated from completion_rules plus canonical course data.
- * Program completion is derived from program_courses + program_enrollments and the
- * same course-completion engine. It does not depend on retired training_enrollments
- * or database functions/views that are absent from the live schema.
+ * Course completion is read from lib/course-completion.ts. Program completion is
+ * derived from program_courses plus program-level compliance requirements. This
+ * module is the only application service allowed to change a program enrollment
+ * to completed.
  */
 
 import { createAuditedAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { checkCourseCompletion } from '@/lib/course-completion';
-
-export type EntityType = 'course' | 'program';
+import { checkApprenticeshipEligibility } from '@/lib/hours/get-approved-hours';
+import { checkCertificateIssuanceEligibility } from '@/lib/services/credential-pipeline';
 
 interface CompletionRule {
   rule_type: string;
@@ -21,54 +21,21 @@ interface CompletionRule {
   threshold_value?: number | null;
 }
 
-interface CourseCompletionContext {
-  totalLessons: number;
-  completedLessons: number;
-  requiredLessons: number;
-  completedRequiredLessons: number;
-  minScore?: number;
-  achievedScore?: number;
-}
-
 interface ProgramCompletionContext {
   totalRequiredCourses: number;
   completedCourses: number;
 }
 
-export async function evaluateCourseCompletion(
-  courseId: string,
-  context: CourseCompletionContext,
-): Promise<boolean> {
-  const db = await createAuditedAdminClient({ systemActor: 'course_completion_eval' });
-  const { data: rules, error } = await db
-    .from('completion_rules')
-    .select('rule_type,config,threshold_value')
-    .eq('entity_type', 'course')
-    .eq('entity_id', courseId)
-    .eq('is_active', true);
-
-  if (error) throw error;
-  if (!rules?.length) {
-    return context.totalLessons > 0 && context.completedLessons >= context.totalLessons;
-  }
-
-  return rules.every((rule) => evaluateCourseRule(rule as CompletionRule, context));
-}
-
-function evaluateCourseRule(rule: CompletionRule, ctx: CourseCompletionContext): boolean {
-  switch (rule.rule_type) {
-    case 'all_lessons':
-      return ctx.totalLessons > 0 && ctx.completedLessons >= ctx.totalLessons;
-    case 'required_lessons':
-      return ctx.requiredLessons > 0 && ctx.completedRequiredLessons >= ctx.requiredLessons;
-    case 'min_score': {
-      const minScore = Number(rule.config?.min_score ?? rule.threshold_value ?? 70);
-      return ctx.achievedScore !== undefined && ctx.achievedScore >= minScore;
-    }
-    default:
-      logger.error('[completion] Unknown active course completion rule', new Error(rule.rule_type));
-      return false;
-  }
+export interface ProgramReadiness {
+  ready: boolean;
+  enrollmentId: string;
+  programId: string;
+  userId: string;
+  requiredCourseIds: string[];
+  completedCourses: number;
+  totalRequiredCourses: number;
+  missingRequirements: string[];
+  evidence: Record<string, unknown>;
 }
 
 async function evaluateProgramCompletion(
@@ -85,10 +52,7 @@ async function evaluateProgramCompletion(
 
   if (error) throw error;
   if (!rules?.length) {
-    return (
-      context.totalRequiredCourses > 0 &&
-      context.completedCourses >= context.totalRequiredCourses
-    );
+    return context.totalRequiredCourses > 0 && context.completedCourses >= context.totalRequiredCourses;
   }
 
   return rules.every((rawRule) => {
@@ -96,10 +60,7 @@ async function evaluateProgramCompletion(
     switch (rule.rule_type) {
       case 'all_courses':
       case 'required_courses':
-        return (
-          context.totalRequiredCourses > 0 &&
-          context.completedCourses >= context.totalRequiredCourses
-        );
+        return context.totalRequiredCourses > 0 && context.completedCourses >= context.totalRequiredCourses;
       case 'min_courses': {
         const requiredCount = Number(rule.config?.count ?? rule.threshold_value ?? 1);
         return context.completedCourses >= requiredCount;
@@ -113,6 +74,168 @@ async function evaluateProgramCompletion(
   });
 }
 
+async function getRequiredCourseIds(
+  programId: string,
+  fallbackCourseId?: string | null,
+): Promise<string[]> {
+  const db = await createAuditedAdminClient({ systemActor: 'program_completion_courses' });
+  const { data: links, error } = await db
+    .from('program_courses')
+    .select('course_id')
+    .eq('program_id', programId)
+    .eq('is_required', true)
+    .order('order_index');
+  if (error) throw error;
+
+  return [
+    ...new Set(
+      (links?.length ? links.map((link) => link.course_id) : [fallbackCourseId]).filter(Boolean),
+    ),
+  ] as string[];
+}
+
+export async function checkProgramReadiness(
+  programEnrollmentId: string,
+  userId: string,
+  programId: string,
+): Promise<ProgramReadiness> {
+  const db = await createAuditedAdminClient({
+    actorUserId: userId,
+    systemActor: 'program_completion_readiness',
+  });
+
+  const { data: enrollment, error: enrollmentError } = await db
+    .from('program_enrollments')
+    .select('id,program_id,course_id,user_id,student_id,status')
+    .eq('id', programEnrollmentId)
+    .eq('program_id', programId)
+    .maybeSingle();
+  if (enrollmentError) throw enrollmentError;
+  if (!enrollment) throw new Error('Program enrollment not found');
+  if (enrollment.user_id !== userId && enrollment.student_id !== userId) {
+    throw new Error('Program enrollment does not belong to learner');
+  }
+
+  const { data: program, error: programError } = await db
+    .from('programs')
+    .select(
+      'id,slug,title,name,issuance_policy,min_rti_hours,min_ojl_hours,requires_instructor_attestation,min_engagement_hours,non_exam_program',
+    )
+    .eq('id', programId)
+    .maybeSingle();
+  if (programError) throw programError;
+  if (!program) throw new Error('Program not found');
+
+  const requiredCourseIds = await getRequiredCourseIds(programId, enrollment.course_id);
+  const missingRequirements: string[] = [];
+  const evidence: Record<string, unknown> = {};
+
+  if (!requiredCourseIds.length) {
+    missingRequirements.push('Program has no required course configured');
+  }
+
+  const courseStatuses = await Promise.all(
+    requiredCourseIds.map(async (courseId) => ({
+      courseId,
+      status: await checkCourseCompletion(userId, courseId),
+    })),
+  );
+  const completedCourses = courseStatuses.filter(({ status }) => status.isComplete).length;
+  for (const { courseId, status } of courseStatuses) {
+    if (!status.isComplete) {
+      missingRequirements.push(
+        `Course ${courseId}: ${status.missingRequirements.join('; ') || 'completion requirements not met'}`,
+      );
+    }
+  }
+
+  const programRulesPassed = await evaluateProgramCompletion(programId, {
+    totalRequiredCourses: requiredCourseIds.length,
+    completedCourses,
+  });
+  if (!programRulesPassed) {
+    missingRequirements.push('Program completion rule requirements are not satisfied');
+  }
+
+  if (program.issuance_policy === 'apprenticeship_certificate') {
+    const apprenticeship = await checkApprenticeshipEligibility(db, userId, {
+      min_ojl_hours: program.min_ojl_hours,
+      min_rti_hours: program.min_rti_hours,
+      slug: program.slug,
+    });
+    evidence.apprenticeship = apprenticeship.evidence;
+    if (!apprenticeship.eligible) {
+      missingRequirements.push(...apprenticeship.blockingReasons);
+    }
+  }
+
+  const minEngagementHours = Number(program.min_engagement_hours || 0);
+  if (minEngagementHours > 0 && requiredCourseIds.length) {
+    const { data: progressRows, error: progressError } = await db
+      .from('lesson_progress')
+      .select('time_spent_seconds')
+      .eq('user_id', userId)
+      .in('course_id', requiredCourseIds);
+    if (progressError) throw progressError;
+    const engagementSeconds = (progressRows ?? []).reduce(
+      (sum, row) => sum + Math.max(0, Number(row.time_spent_seconds) || 0),
+      0,
+    );
+    const engagementHours = Math.round((engagementSeconds / 3600) * 10) / 10;
+    evidence.engagement = { hours: engagementHours, requiredHours: minEngagementHours };
+    if (engagementHours < minEngagementHours) {
+      missingRequirements.push(
+        `Instructional engagement: ${engagementHours} of ${minEngagementHours} hour(s) recorded`,
+      );
+    }
+  }
+
+  if (program.requires_instructor_attestation) {
+    const { data: attestations, error: attestationError } = await db
+      .from('instructor_attestations')
+      .select('id,attestation_type,hours_attested,attested_at')
+      .eq('student_id', userId)
+      .eq('program_id', programId);
+    if (attestationError) throw attestationError;
+
+    const attestedHours = (attestations ?? []).reduce(
+      (sum, attestation) => sum + Math.max(0, Number(attestation.hours_attested) || 0),
+      0,
+    );
+    evidence.instructorAttestation = {
+      count: attestations?.length ?? 0,
+      hours: attestedHours,
+      types: [...new Set((attestations ?? []).map((row) => row.attestation_type).filter(Boolean))],
+    };
+    if (!attestations?.length) {
+      missingRequirements.push('Required instructor attestation is missing');
+    }
+    if (minEngagementHours > 0 && attestedHours < minEngagementHours) {
+      missingRequirements.push(
+        `Instructor-attested engagement: ${attestedHours} of ${minEngagementHours} hour(s) required`,
+      );
+    }
+  }
+
+  const credentialGate = await checkCertificateIssuanceEligibility(userId, programId);
+  evidence.credentialGate = credentialGate;
+  if (!credentialGate.eligible) {
+    missingRequirements.push(credentialGate.reason || 'Primary credential requirements are not satisfied');
+  }
+
+  return {
+    ready: missingRequirements.length === 0,
+    enrollmentId: programEnrollmentId,
+    programId,
+    userId,
+    requiredCourseIds,
+    completedCourses,
+    totalRequiredCourses: requiredCourseIds.length,
+    missingRequirements,
+    evidence,
+  };
+}
+
 export async function checkProgramCompletion(
   userId: string,
   courseId: string,
@@ -122,29 +245,26 @@ export async function checkProgramCompletion(
     systemActor: 'program_completion_check',
   });
 
-  const { data: directLinks, error: directLinkError } = await db
-    .from('program_courses')
-    .select('program_id')
-    .eq('course_id', courseId)
-    .eq('is_required', true);
+  const [{ data: directLinks, error: directLinkError }, { data: course, error: courseError }] =
+    await Promise.all([
+      db.from('program_courses').select('program_id').eq('course_id', courseId).eq('is_required', true),
+      db.from('courses').select('program_id').eq('id', courseId).maybeSingle(),
+    ]);
   if (directLinkError) throw directLinkError;
+  if (courseError) throw courseError;
 
   const linkedProgramIds = [
-    ...new Set((directLinks ?? []).map((link) => link.program_id).filter(Boolean)),
+    ...new Set(
+      [...(directLinks ?? []).map((link) => link.program_id), course?.program_id].filter(Boolean),
+    ),
   ] as string[];
+  if (!linkedProgramIds.length) return [];
 
-  let enrollmentQuery = db
+  const { data: enrollments, error: enrollmentError } = await db
     .from('program_enrollments')
-    .select('id,program_id,course_id,status,user_id,student_id')
-    .or(`user_id.eq.${userId},student_id.eq.${userId}`);
-
-  if (linkedProgramIds.length) {
-    enrollmentQuery = enrollmentQuery.in('program_id', linkedProgramIds);
-  } else {
-    enrollmentQuery = enrollmentQuery.eq('course_id', courseId);
-  }
-
-  const { data: enrollments, error: enrollmentError } = await enrollmentQuery;
+    .select('id,program_id,status,user_id,student_id')
+    .or(`user_id.eq.${userId},student_id.eq.${userId}`)
+    .in('program_id', linkedProgramIds);
   if (enrollmentError) throw enrollmentError;
 
   const completedPrograms: Array<{
@@ -155,37 +275,8 @@ export async function checkProgramCompletion(
 
   for (const enrollment of enrollments ?? []) {
     if (!enrollment.program_id || enrollment.status?.toLowerCase() === 'completed') continue;
-
-    const { data: requiredLinks, error: linksError } = await db
-      .from('program_courses')
-      .select('course_id')
-      .eq('program_id', enrollment.program_id)
-      .eq('is_required', true)
-      .order('order_index');
-    if (linksError) throw linksError;
-
-    const requiredCourseIds = [
-      ...new Set(
-        (requiredLinks?.length
-          ? requiredLinks.map((link) => link.course_id)
-          : [enrollment.course_id || courseId]
-        ).filter(Boolean),
-      ),
-    ] as string[];
-
-    if (!requiredCourseIds.includes(courseId) || requiredCourseIds.length === 0) continue;
-
-    const statuses = await Promise.all(
-      requiredCourseIds.map((requiredCourseId) => checkCourseCompletion(userId, requiredCourseId)),
-    );
-    const completedCourses = statuses.filter((status) => status.isComplete).length;
-
-    const programComplete = await evaluateProgramCompletion(enrollment.program_id, {
-      totalRequiredCourses: requiredCourseIds.length,
-      completedCourses,
-    });
-
-    if (programComplete) {
+    const readiness = await checkProgramReadiness(enrollment.id, userId, enrollment.program_id);
+    if (readiness.requiredCourseIds.includes(courseId) && readiness.ready) {
       completedPrograms.push({
         program_enrollment_id: enrollment.id,
         program_id: enrollment.program_id,
@@ -202,22 +293,16 @@ export async function completeProgramEnrollment(
   userId: string,
   programId: string,
 ): Promise<void> {
+  // Re-check every gate here. Never trust a caller's prior readiness result.
+  const readiness = await checkProgramReadiness(programEnrollmentId, userId, programId);
+  if (!readiness.ready) {
+    throw new Error(`Program requirements not met: ${readiness.missingRequirements.join('; ')}`);
+  }
+
   const db = await createAuditedAdminClient({
     actorUserId: userId,
     systemActor: 'program_completion',
   });
-
-  const { data: enrollment, error: enrollmentError } = await db
-    .from('program_enrollments')
-    .select('id,program_id,user_id,student_id,status')
-    .eq('id', programEnrollmentId)
-    .eq('program_id', programId)
-    .maybeSingle();
-  if (enrollmentError) throw enrollmentError;
-  if (!enrollment) throw new Error('Program enrollment not found');
-  if (enrollment.user_id !== userId && enrollment.student_id !== userId) {
-    throw new Error('Program enrollment does not belong to learner');
-  }
 
   const [{ data: profile, error: profileError }, { data: program, error: programError }] =
     await Promise.all([
@@ -235,16 +320,7 @@ export async function completeProgramEnrollment(
   const studentName = profile?.full_name || profile?.email || 'Learner';
   const studentEmail = profile?.email || undefined;
   const programName = program.title || program.name || 'Program';
-  const programHours =
-    program.required_hours ?? program.total_hours ?? program.training_hours ?? null;
-
-  const { data: requiredCourses, error: requiredCoursesError } = await db
-    .from('program_courses')
-    .select('course_id')
-    .eq('program_id', programId)
-    .eq('is_required', true);
-  if (requiredCoursesError) throw requiredCoursesError;
-  const coursesCompleted = Math.max(1, requiredCourses?.length ?? 0);
+  const programHours = program.required_hours ?? program.total_hours ?? program.training_hours ?? null;
 
   const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
   const issued = await issueCertificate({
@@ -276,7 +352,8 @@ export async function completeProgramEnrollment(
       certificate_issued_at: completedAt,
       updated_at: completedAt,
     })
-    .eq('id', programEnrollmentId);
+    .eq('id', programEnrollmentId)
+    .eq('program_id', programId);
   if (completionUpdateError) throw completionUpdateError;
 
   let pdfUrl: string | null = null;
@@ -332,7 +409,7 @@ export async function completeProgramEnrollment(
         program_name: programName,
         completed_at: completedAt,
         total_hours: programHours,
-        courses_completed: coursesCompleted,
+        courses_completed: readiness.completedCourses,
         certificate_id: issued.certificate.id,
         pdf_url: pdfUrl,
       },

@@ -192,6 +192,8 @@ jobs:
           set -euo pipefail
           EXPECTED_SHA="${{ github.sha }}"
           for i in $(seq 1 30); do
+            ping_status=$(curl -sS --max-time 10 -o /tmp/www-ping.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/ping?deploy=${EXPECTED_SHA}" || true)
+            ready_status=$(curl -sS --max-time 10 -o /tmp/www-ready.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/ready?deploy=${EXPECTED_SHA}" || true)
             health_status=$(curl -sS --max-time 10 -o /tmp/www-health.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/health?deploy=${EXPECTED_SHA}" || true)
             version_status=$(curl -sS --max-time 10 -o /tmp/www-version.json -w "%{http_code}" "https://www.elevateforhumanity.org/api/version?deploy=${EXPECTED_SHA}" || true)
             home_status=$(curl -sS --max-time 15 -o /tmp/www-home.html -w "%{http_code}" "https://www.elevateforhumanity.org/?deploy=${EXPECTED_SHA}" || true)
@@ -205,7 +207,7 @@ jobs:
             razors_bytes=$(wc -c < /tmp/razors-image.webp 2>/dev/null || echo 0)
             hero_bytes=$(wc -c < /tmp/home-hero.webp 2>/dev/null || echo 0)
             audio_bytes=$(wc -c < /tmp/home-audio.mp3 2>/dev/null || echo 0)
-            echo "Attempt $i/30: health=$health_status version=$version_status home=$home_status barber=$barber_status esthetics=$esthetics_status sitemap=$sitemap_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes audio=$audio_status/$audio_bytes live_sha=${LIVE_SHA:-missing}"
+            echo "Attempt $i/30: ping=$ping_status ready=$ready_status health=$health_status version=$version_status home=$home_status barber=$barber_status esthetics=$esthetics_status sitemap=$sitemap_status razors=$razors_status/$razors_bytes hero=$hero_status/$hero_bytes audio=$audio_status/$audio_bytes live_sha=${LIVE_SHA:-missing}"
 
             html_ok=false
             if grep -qi '<html' /tmp/www-home.html \
@@ -221,8 +223,13 @@ jobs:
               html_ok=true
             fi
 
-            if [ "$health_status" = "200" ] \
+            if [ "$ping_status" = "200" ] \
+              && [ "$ready_status" = "200" ] \
+              && [ "$health_status" = "200" ] \
               && [ "$version_status" = "200" ] \
+              && grep -q '"ok":true' /tmp/www-ping.json \
+              && grep -q '"ready":true' /tmp/www-ready.json \
+              && grep -q '"healthy":true' /tmp/www-health.json \
               && [ "$home_status" = "200" ] \
               && [ "$barber_status" = "200" ] \
               && [ "$esthetics_status" = "200" ] \
@@ -235,12 +242,14 @@ jobs:
               && [ "$audio_bytes" -gt 1000 ] \
               && [ "$LIVE_SHA" = "$EXPECTED_SHA" ] \
               && [ "$html_ok" = "true" ]; then
-              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live with canonical homepage media and hero registry audit"
+              echo "MARKETING DEPLOYMENT VERIFIED: $EXPECTED_SHA is live, ready, dependency-healthy, and serving canonical homepage media"
               exit 0
             fi
             sleep 20
           done
           echo "::error::DEPLOYMENT FAILED: production did not converge to $EXPECTED_SHA with required runtime, homepage media, canonical, and Esthetician regression checks"
+          cat /tmp/www-ping.json 2>/dev/null || true
+          cat /tmp/www-ready.json 2>/dev/null || true
           cat /tmp/www-health.json 2>/dev/null || true
           cat /tmp/www-version.json 2>/dev/null || true
           grep -Eo '<title>[^<]+' /tmp/www-esthetics.html 2>/dev/null || true

@@ -16,7 +16,7 @@
 
 import { isAIAvailable } from '@/lib/ai/ai-service';
 import { logger } from '@/lib/logger';
-import { queueCourseLessonVideos } from '@/lib/course-builder/video-queue';
+import { queueCourseLessonVideos } from './media-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import type { CredentialBlueprint } from '@/lib/curriculum/blueprints/types';
 import { loadBlueprintWithProgram } from './blueprint-loader';
@@ -221,450 +221,348 @@ async function generateFreeFormBlueprint(
       },
     ],
     generationRules: {
-      allowRemediation: true,
-      allowExpansionLessons: true,
-      maxTotalLessons: expectedLessonCount,
-      requiresFinalExam: true,
-      generatorMode: 'flexible',
+      provider: 'ai',
+      temperature: 0.5,
+      originalContentRequired: true,
     },
-  };
+  } as CredentialBlueprint;
+}
+
+function isAssessmentStep(stepType: string): boolean {
+  return stepType === 'checkpoint' || stepType === 'quiz' || stepType === 'exam';
 }
 
 async function enrichBlueprint(
   blueprint: CredentialBlueprint,
+  courseTitle: string,
+  input: FactoryInput,
   progress: ProgressTracker,
-  standardsBlock: string,
-): Promise<{
-  blueprint: CredentialBlueprint;
-  assessmentsGenerated: number;
-  failures: Array<{ slug: string; reason: string }>;
-}> {
+): Promise<{ blueprint: CredentialBlueprint; assessmentsGenerated: number }> {
   const enriched = cloneBlueprint(blueprint);
-  const failures: Array<{ slug: string; reason: string }> = [];
-  let assessmentsGenerated = 0;
   const totalLessons = enriched.modules.reduce(
-    (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
+    (sum, courseModule) => sum + (courseModule.lessons ?? []).length,
     0,
   );
-  let processed = 0;
+  let lessonCounter = 0;
+  let assessmentsGenerated = 0;
 
   for (const courseModule of enriched.modules) {
-    for (const lesson of courseModule.lessons ?? []) {
+    const lessons = courseModule.lessons ?? [];
+    for (const lesson of lessons) {
+      lessonCounter += 1;
       const stepType = inferStepType(lesson.slug);
       progress.emit(
-        'enrich',
+        isAssessmentStep(stepType) ? 'assess' : 'enrich',
         `Building ${lesson.title}`,
-        totalLessons > 0 ? Math.round((processed / totalLessons) * 100) : 0,
+        Math.max(5, Math.min(75, Math.round((lessonCounter / Math.max(totalLessons, 1)) * 70))),
       );
 
-      try {
-        const generated = await generateLessonContent({
-          lesson,
-          moduleTitle: courseModule.title,
-          courseTitle: blueprint.credentialTitle,
-          state: blueprint.state ?? undefined,
-          standardsBlock: [
-            standardsBlock,
-            `Current module: ${courseModule.title}`,
-            `Current module domain: ${courseModule.domainKey ?? courseModule.slug}`,
-          ].join('\n'),
+      if (stepType === 'exam') {
+        const finalExam = await generateFinalExam(courseTitle, enriched.modules.length, 25);
+        lesson.objective = lesson.objective || `Demonstrate cumulative readiness for ${courseTitle}.`;
+        lesson.content = JSON.stringify({
+          html: `<h2>${lesson.title}</h2><p>This cumulative assessment measures readiness across the complete course.</p>`,
+          learning_points: [],
+          scenario: '',
+          experience: {
+            readingGuide: {
+              title: lesson.title,
+              summary: 'Complete this cumulative readiness assessment after reviewing all instructional modules and remediation guidance.',
+              sections: [
+                { heading: 'Readiness', body: 'Use your lesson notes, practice activities, and remediation feedback to prepare for this cumulative assessment and demonstrate course-wide competency.' },
+                { heading: 'Assessment Strategy', body: 'Read every question carefully, apply the evidence and decision rules taught in the course, and select the response best supported by the instructional material.' },
+                { heading: 'After the Exam', body: 'Review any missed objectives, complete the targeted remediation actions, and retry only after you can explain why the corrected answer is supported.' },
+              ],
+              keyTakeaways: ['Apply course-wide evidence.', 'Use targeted remediation after missed objectives.', 'Demonstrate mastery before completion.'],
+            },
+            narrationScript: 'You have reached the cumulative readiness assessment. Use the concepts, calculations, scenarios, and practical decisions you practiced throughout the course. Read each item carefully and rely on evidence rather than guessing.',
+            visualPrompt: 'Professional learner completing a cumulative workforce readiness assessment at a modern computer workstation with organized notes and progress evidence visible.',
+            flashcards: [
+              { id: 'exam-1', front: 'Readiness', back: 'Demonstrated ability to apply course competencies accurately and consistently.', tags: ['final'] },
+              { id: 'exam-2', front: 'Evidence', back: 'Information used to support a correct workplace or business decision.', tags: ['final'] },
+              { id: 'exam-3', front: 'Remediation', back: 'Targeted review and practice used to correct a weak objective.', tags: ['final'] },
+              { id: 'exam-4', front: 'Mastery', back: 'Performance at or above the required competency threshold.', tags: ['final'] },
+              { id: 'exam-5', front: 'Application', back: 'Using learned knowledge in a realistic decision or task.', tags: ['final'] },
+              { id: 'exam-6', front: 'Completion', back: 'Meeting all required instructional, assessment, and practical requirements.', tags: ['final'] },
+            ],
+            quickClips: [
+              { id: 'final-review', title: 'Final readiness review', objective: 'Prepare for the cumulative assessment', durationSeconds: 120, script: 'Review the key objectives, calculations, scenarios, and practical decisions from every module. Focus additional time on any domain where your knowledge checks or practice assessments showed weakness.', visualPrompt: 'Instructor reviewing a concise course readiness checklist with a learner before a cumulative assessment.' },
+              { id: 'final-strategy', title: 'Assessment strategy', objective: 'Apply evidence-based test strategy', durationSeconds: 120, script: 'For each question, identify what competency is being measured, eliminate choices that conflict with course evidence, and select the response that best applies the standard or decision rule taught in the lessons.', visualPrompt: 'Learner applying a structured evidence-based assessment strategy at a computer.' },
+            ],
+            knowledgeChecks: finalExam.questions.slice(0, 3).map((question) => ({ question: question.question, options: question.options, correct: question.correct, explanation: question.explanation })),
+            scenario: { title: 'Readiness decision', context: 'A learner has completed all modules and practice activities but still has one weak domain.', question: 'What should the learner do before the final attempt?', options: [{ text: 'Complete targeted remediation for the weak domain.', isCorrect: true, feedback: 'Targeted remediation addresses the identified competency gap.' }, { text: 'Ignore the weak domain and guess.', isCorrect: false, feedback: 'Ignoring evidence does not demonstrate readiness.' }] },
+            caseStudy: { title: 'Evidence review', context: 'Practice results show strong performance in most domains and repeated errors in one objective.', question: 'Which conclusion is best supported?', options: [{ text: 'The learner needs focused review on the repeated weak objective.', isCorrect: true, feedback: 'Repeated errors are evidence for targeted remediation.' }, { text: 'The learner should skip all further review.', isCorrect: false, feedback: 'The evidence indicates a specific remaining gap.' }] },
+            exercises: [{ id: 'final-plan', title: 'Build a final review plan', instructions: ['List weak objectives from practice results.', 'Assign a specific review and retry action to each objective.'], expectedArtifact: 'A targeted final review plan.', autoGrade: { type: 'checklist', criteria: ['Weak objectives identified', 'Specific remediation actions assigned'] } }],
+            practicalTask: { title: 'Readiness evidence check', description: 'Verify that required course evidence is complete before the final attempt.', instructions: ['Review module completion.', 'Review practice assessment results.', 'Confirm practical evidence and remediation are complete.'], evidence: 'Completed readiness evidence checklist.' },
+            resources: [{ type: 'checklist', title: 'Final readiness checklist', description: 'Use this checklist before beginning the final assessment.', content: 'Confirm all modules, knowledge checks, exercises, practical evidence, and remediation actions are complete before starting the final assessment.' }, { type: 'reference', title: 'Assessment strategy reference', description: 'Use this reference to apply evidence-based decision making during the final assessment.', content: 'Identify the tested objective, recall the relevant evidence or rule, eliminate unsupported options, and select the strongest supported answer.' }],
+            glossary: [{ term: 'Readiness', definition: 'Demonstrated preparation to perform the required course competencies.' }, { term: 'Mastery', definition: 'Performance meeting or exceeding the required threshold.' }, { term: 'Evidence', definition: 'Observable information supporting a competency decision.' }, { term: 'Remediation', definition: 'Targeted corrective learning after a demonstrated gap.' }],
+            remediation: { passingScore: 80, reviewMessage: 'Review missed domains and complete targeted remediation before retrying.', objectiveMap: ['Course-wide knowledge', 'Applied decision making', 'Readiness evidence'], targetedActions: [{ objective: 'Missed final-exam objective', action: 'Return to the mapped lesson, review its reading and flashcards, complete the exercise, then retry the related practice check.' }] },
+            readiness: { domainKey: 'final_readiness', masteryThreshold: 80, evidenceSignals: ['module completion', 'practice assessment performance', 'practical evidence'] },
+          },
         });
-
-        lesson.objective = generated.objective;
-        lesson.learningObjectives = [generated.objective, ...generated.learning_points].filter(
-          (value, index, values) => values.indexOf(value) === index,
-        );
-        lesson.content = generated.content;
-        lesson.quizQuestions = generated.quiz_questions.map((question, index) => ({
-          id: `${lesson.slug}-q${index + 1}`,
+        lesson.quizQuestions = finalExam.questions.map((question) => ({
           question: question.question,
           options: question.options,
           correctAnswer: question.correct,
           explanation: question.explanation,
         }));
-
-        if (stepType === 'checkpoint' || stepType === 'quiz') {
-          progress.emit('assess', `Generating checkpoint bank: ${lesson.title}`);
-          const rule = blueprint.assessmentRules?.find(
-            (entry) => entry.assessmentType === 'module',
-          );
-          const questionCount = Math.max(5, rule?.minQuestions ?? 8);
-          const assessment = await generateAssessment({
-            lessonSlug: lesson.slug,
-            lessonTitle: lesson.title,
-            moduleTitle: courseModule.title,
-            courseTitle: blueprint.credentialTitle,
-            questionCount,
-            questionTypes: ['multiple_choice', 'scenario'],
-          });
-          lesson.quizQuestions = assessment.questions.map((question, index) => ({
-            id: `${lesson.slug}-q${index + 1}`,
-            question: question.question,
-            options: question.options,
-            correctAnswer: question.correct,
-            explanation: question.explanation,
-          }));
-          lesson.passingScore = Math.round((rule?.passingThreshold ?? 0.7) * 100);
-          assessmentsGenerated += 1;
-        } else if (stepType === 'exam') {
-          progress.emit('assess', `Generating final exam bank: ${lesson.title}`);
-          const rule = blueprint.assessmentRules?.find((entry) => entry.assessmentType === 'final');
-          const questionCount = Math.max(25, rule?.minQuestions ?? 25);
-          const assessment = await generateFinalExam(
-            blueprint.credentialTitle,
-            blueprint.modules.length,
-            questionCount,
-          );
-          lesson.quizQuestions = assessment.questions.map((question, index) => ({
-            id: `${lesson.slug}-q${index + 1}`,
-            question: question.question,
-            options: question.options,
-            correctAnswer: question.correct,
-            explanation: question.explanation,
-          }));
-          lesson.passingScore = Math.round((rule?.passingThreshold ?? 0.75) * 100);
-          assessmentsGenerated += 1;
-        }
-
+        assessmentsGenerated += 1;
         synchronizeLessonExperience(lesson as unknown as Record<string, any>);
-      } catch (error) {
-        failures.push({
-          slug: lesson.slug,
-          reason: error instanceof Error ? error.message : String(error),
-        });
+        continue;
       }
 
-      processed += 1;
+      if (stepType === 'checkpoint' || stepType === 'quiz') {
+        const assessment = await generateAssessment({
+          lessonSlug: lesson.slug,
+          lessonTitle: lesson.title,
+          moduleTitle: courseModule.title,
+          courseTitle,
+          questionCount: 10,
+        });
+        lesson.objective = lesson.objective || `Demonstrate mastery of ${courseModule.title}.`;
+        lesson.content = JSON.stringify({
+          html: `<h2>${lesson.title}</h2><p>Use this assessment to verify your understanding before continuing.</p>`,
+          learning_points: [],
+          scenario: '',
+          experience: {
+            readingGuide: {
+              title: lesson.title,
+              summary: `Use this checkpoint to confirm mastery of the key concepts and applied decisions from ${courseModule.title} before continuing.`,
+              sections: [
+                { heading: 'Review the Module', body: `Review the objectives, examples, flashcards, and applied exercises from ${courseModule.title}. Focus on concepts you cannot yet explain or apply without assistance.` },
+                { heading: 'Use Evidence', body: 'For each checkpoint question, connect the answer to a specific concept, rule, calculation, or decision method from the module rather than relying on guessing.' },
+                { heading: 'Remediate Gaps', body: 'When an answer is missed, identify the underlying objective, return to the named learning material, complete targeted practice, and retry after you can explain the correct reasoning.' },
+              ],
+              keyTakeaways: ['Verify module mastery.', 'Use evidence to answer questions.', 'Remediate weak objectives before continuing.'],
+            },
+            narrationScript: `This checkpoint measures your readiness to continue after ${courseModule.title}. Use the concepts and applied practice from the module. If you miss an objective, complete the targeted review before retrying.`,
+            visualPrompt: `Professional learner completing a module checkpoint for ${courseModule.title} using organized notes and evidence at a modern workstation.`,
+            flashcards: [
+              { id: 'check-1', front: 'Checkpoint', back: 'A formative assessment used to verify readiness before progressing.', tags: ['checkpoint'] },
+              { id: 'check-2', front: 'Evidence', back: 'Information from instruction or practice that supports a decision.', tags: ['checkpoint'] },
+              { id: 'check-3', front: 'Mastery', back: 'Performance at or above the required learning threshold.', tags: ['checkpoint'] },
+              { id: 'check-4', front: 'Objective', back: 'A measurable skill or knowledge target for the module.', tags: ['checkpoint'] },
+              { id: 'check-5', front: 'Remediation', back: 'Focused review and practice used to correct a weak objective.', tags: ['checkpoint'] },
+              { id: 'check-6', front: 'Retry', back: 'A new attempt completed after targeted remediation.', tags: ['checkpoint'] },
+            ],
+            quickClips: [
+              { id: 'checkpoint-review', title: 'Checkpoint review', objective: 'Prepare for the module checkpoint', durationSeconds: 120, script: `Review the most important objectives from ${courseModule.title}. Use your lesson evidence to identify any concept you cannot yet explain, calculate, or apply confidently before beginning the checkpoint.`, visualPrompt: `Instructor reviewing key ${courseModule.title} objectives with a learner before a checkpoint.` },
+              { id: 'checkpoint-remediation', title: 'How to remediate a missed objective', objective: 'Use targeted remediation after a missed question', durationSeconds: 120, script: 'When you miss a checkpoint item, identify the mapped objective, return to the relevant reading and example, review the related flashcards, complete the applied exercise, and retry only when you can explain the reasoning.', visualPrompt: 'Learner following a targeted remediation checklist after a missed checkpoint objective.' },
+            ],
+            knowledgeChecks: assessment.questions.slice(0, 3).map((question) => ({ question: question.question, options: question.options, correct: question.correct, explanation: question.explanation })),
+            scenario: { title: 'Progression decision', context: 'A learner finishes the module but misses several questions tied to the same objective.', question: 'What is the correct next step?', options: [{ text: 'Complete targeted remediation for that objective before retrying.', isCorrect: true, feedback: 'Focused remediation addresses the demonstrated gap.' }, { text: 'Skip the objective and continue without review.', isCorrect: false, feedback: 'Progression should follow demonstrated mastery.' }] },
+            caseStudy: { title: 'Checkpoint evidence', context: 'A learner has strong practice results except for one repeated error pattern.', question: 'What does the evidence indicate?', options: [{ text: 'One objective needs additional focused practice.', isCorrect: true, feedback: 'Repeated errors identify a targeted gap.' }, { text: 'All learning should be restarted from the beginning.', isCorrect: false, feedback: 'The evidence supports targeted rather than blanket remediation.' }] },
+            exercises: [{ id: 'checkpoint-plan', title: 'Map missed objectives', instructions: ['Review practice evidence from the module.', 'Map each weak objective to a specific lesson and review action.'], expectedArtifact: 'A targeted module remediation plan.', autoGrade: { type: 'checklist', criteria: ['Weak objectives identified', 'Review actions mapped'] } }],
+            practicalTask: { title: 'Module readiness verification', description: 'Confirm required module evidence before progression.', instructions: ['Verify lesson completion.', 'Verify applied exercises.', 'Verify remediation for weak objectives.'], evidence: 'Completed module readiness checklist.' },
+            resources: [{ type: 'checklist', title: 'Module checkpoint checklist', description: 'Use before attempting the checkpoint.', content: `Confirm you can explain and apply the key objectives from ${courseModule.title}, then identify any objective needing additional review.` }, { type: 'reference', title: 'Targeted remediation guide', description: 'Use after a missed checkpoint objective.', content: 'Identify the objective, return to the mapped lesson, review the relevant reading and flashcards, complete the exercise, and retry the knowledge check.' }],
+            glossary: [{ term: 'Checkpoint', definition: 'A formative assessment used to verify readiness.' }, { term: 'Objective', definition: 'A measurable learning target.' }, { term: 'Mastery', definition: 'Performance at or above the required threshold.' }, { term: 'Remediation', definition: 'Targeted corrective learning for a demonstrated gap.' }],
+            remediation: { passingScore: 80, reviewMessage: 'Review weak objectives and complete targeted practice before retrying.', objectiveMap: ['Module knowledge', 'Applied decision making', 'Progression readiness'], targetedActions: [{ objective: 'Missed checkpoint objective', action: 'Return to the mapped lesson, review its reading and flashcards, complete the exercise, then retry the objective-aligned check.' }] },
+            readiness: { domainKey: lesson.domainKey || courseModule.domainKey || slugify(courseModule.title), masteryThreshold: 80, evidenceSignals: ['lesson completion', 'applied exercise completion', 'checkpoint performance'] },
+          },
+        });
+        lesson.quizQuestions = assessment.questions.map((question) => ({
+          question: question.question,
+          options: question.options,
+          correctAnswer: question.correct,
+          explanation: question.explanation,
+        }));
+        assessmentsGenerated += 1;
+        synchronizeLessonExperience(lesson as unknown as Record<string, any>);
+        continue;
+      }
+
+      const generated = await generateLessonContent({
+        lesson,
+        moduleTitle: courseModule.title,
+        courseTitle,
+        state: input.state ?? enriched.state,
+      });
+      lesson.objective = generated.objective;
+      lesson.content = generated.content;
+      lesson.learningPoints = generated.learning_points;
+      lesson.scenario = generated.scenario;
+      lesson.quizQuestions = generated.quiz_questions.map((question) => ({
+        question: question.question,
+        options: question.options,
+        correctAnswer: question.correct,
+        explanation: question.explanation,
+      }));
+      synchronizeLessonExperience(lesson as unknown as Record<string, any>);
     }
   }
 
-  return { blueprint: enriched, assessmentsGenerated, failures };
+  return { blueprint: enriched, assessmentsGenerated };
+}
+
+async function resolveProgramSlug(input: FactoryInput): Promise<string> {
+  if (input.programSlug?.trim()) return input.programSlug.trim();
+  if (input.blueprint?.programSlug) return input.blueprint.programSlug;
+  if (!input.programId) return slugify(input.title || 'generated-course');
+
+  const db = await requireAdminClient();
+  const { data, error } = await db
+    .from('programs')
+    .select('slug')
+    .eq('id', input.programId)
+    .maybeSingle();
+  if (error) throw new Error(`Unable to resolve program slug: ${error.message}`);
+  return data?.slug || slugify(input.title || 'generated-course');
 }
 
 export async function courseFactory(
   input: FactoryInput,
   onProgress?: ProgressCallback,
 ): Promise<FactoryOutput> {
-  const progress = new ProgressTracker();
-  if (onProgress) progress.addCallback(onProgress);
+  const tracker = new ProgressTracker();
+  if (onProgress) tracker.addCallback(onProgress);
 
   try {
-    progress.emit('init', 'Initializing canonical Course Factory.');
-    progress.emit('resolve', 'Resolving program and curriculum source.');
+    tracker.emit('init', 'Initializing canonical Course Factory.', 1);
+    const programSlug = await resolveProgramSlug(input);
 
-    const db = await requireAdminClient();
-    let program: { id: string; slug: string | null; title: string | null } | null = null;
+    tracker.emit('resolve', 'Resolving program and curriculum source.', 3);
+    let blueprint = input.blueprint ? cloneBlueprint(input.blueprint) : null;
+    let program: Record<string, any> | null = null;
 
-    if (input.programId || input.programSlug) {
-      let programQuery = db.from('programs').select('id, slug, title');
-      if (input.programId) programQuery = programQuery.eq('id', input.programId);
-      else if (input.programSlug) programQuery = programQuery.eq('slug', input.programSlug);
-
-      const { data, error: programError } = await programQuery.maybeSingle();
-      if (programError) throw programError;
-      if (!data?.id) {
-        return {
-          ok: false,
-          status: 'not_found',
-          errors: ['Canonical program record not found'],
-          warnings: [],
-        };
-      }
-      program = data as { id: string; slug: string | null; title: string | null };
-    } else if (!input.blueprint && !(input.title && input.topic)) {
-      return {
-        ok: false,
-        status: 'not_found',
-        errors: ['programId/programSlug or standalone title/topic is required'],
-        warnings: [],
-      };
+    if (!blueprint) {
+      const loaded = await loadBlueprintWithProgram(programSlug, input.programId);
+      blueprint = loaded.blueprint ? cloneBlueprint(loaded.blueprint) : null;
+      program = loaded.program;
     }
 
-    const resolved =
-      input.blueprint || !program
-        ? null
-        : await loadBlueprintWithProgram(db, {
-            programId: program.id,
-            programSlug: program.slug ?? input.programSlug,
-          });
-
-    let blueprint: CredentialBlueprint;
-    if (input.blueprint) {
-      blueprint = input.blueprint;
-    } else if (resolved?.blueprint) {
-      blueprint = resolved.blueprint;
-    } else if (input.title && input.topic && input.contentSource !== 'blueprint') {
+    if (!blueprint) {
       if (!isAIAvailable()) {
-        return {
-          ok: false,
-          status: 'no_blueprint',
-          errors: ['No registered blueprint exists and AI blueprint generation is unavailable'],
-          warnings: [],
-        };
+        throw new Error(`No registered blueprint found for ${programSlug}, and no AI provider is available.`);
       }
-      progress.emit(
-        'blueprint',
-        'No registered blueprint found; generating one in Course Factory.',
-      );
-      const generatedSlug =
-        program?.slug || input.programSlug || `${slugify(input.title)}-${Date.now().toString(36)}`;
-      blueprint = await generateFreeFormBlueprint(input, generatedSlug);
+      tracker.emit('blueprint', `Generating a new blueprint for ${programSlug}.`, 5);
+      blueprint = await generateFreeFormBlueprint(input, programSlug);
     } else {
-      return {
-        ok: false,
-        status: 'no_blueprint',
-        errors: ['No registered blueprint matches this program'],
-        warnings: [],
-      };
+      tracker.emit('blueprint', `Blueprint ready: ${blueprint.credentialTitle}`, 5);
     }
 
-    progress.emit('blueprint', `Blueprint ready: ${blueprint.credentialTitle}`);
-
-    const expectedLessonCount =
-      blueprint.expectedLessonCount ??
-      blueprint.modules.reduce(
-        (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
-        0,
-      );
-
-    let completeBlueprint = cloneBlueprint(blueprint);
-    let assessmentsGenerated = 0;
-    let generationFailures: Array<{ slug: string; reason: string }> = [];
-
-    if (input.contentSource === 'ai') {
-      if (!isAIAvailable()) {
-        return {
-          ok: false,
-          status: 'incomplete',
-          expectedLessonCount,
-          generationFailures: [{ slug: 'course', reason: 'AI service is not available' }],
-          errors: ['AI content generation was requested but the AI service is not available'],
-          warnings: [],
-        };
-      }
-
-      progress.emit('resolve', 'Assembling credential and workforce evidence.');
-      const evidence = await buildCourseEvidenceContext({
-        blueprint,
-        programSlug: program?.slug ?? input.programSlug ?? blueprint.programSlug,
-        state: input.state ?? blueprint.state,
-      });
-      if (!evidence.grounded) {
-        return {
-          ok: false,
-          status: 'incomplete',
-          expectedLessonCount,
-          errors: [
-            'Course generation blocked: no registered competencies or authoritative occupational evidence were available.',
-          ],
-          warnings: evidence.warnings,
-        };
-      }
-      progress.emit(
-        'resolve',
-        `Evidence ready from ${evidence.sources.join(', ')}${evidence.socCode ? ` for SOC ${evidence.socCode}` : ''}.`,
-      );
-
-      const generated = await enrichBlueprint(blueprint, progress, evidence.standardsBlock);
-      completeBlueprint = generated.blueprint;
-      assessmentsGenerated = generated.assessmentsGenerated;
-      generationFailures = generated.failures;
-
-      if (generationFailures.length > 0) {
-        progress.emit(
-          'error',
-          `Course generation stopped: ${generationFailures.length} lesson(s) failed generation.`,
-        );
-        return {
-          ok: false,
-          status: 'incomplete',
-          title: blueprint.credentialTitle,
-          moduleCount: blueprint.modules.length,
-          expectedLessonCount,
-          assessmentsGenerated,
-          generationFailures,
-          errors: [
-            'The factory will not persist a partially generated course',
-            ...generationFailures
-              .slice(0, 5)
-              .map((failure) => `${failure.slug}: ${failure.reason}`),
-          ],
-          warnings: [],
-        };
-      }
+    if (!program && input.programId) {
+      const db = await requireAdminClient();
+      const { data } = await db.from('programs').select('*').eq('id', input.programId).maybeSingle();
+      program = data;
     }
 
-    progress.emit('validate', 'Validating the complete course package.');
-    const validation = validateBlueprint(completeBlueprint);
-    if (!validation.valid) {
-      return {
-        ok: false,
-        status: 'validation_failed',
-        title: completeBlueprint.credentialTitle,
-        moduleCount: completeBlueprint.modules.length,
-        expectedLessonCount,
-        assessmentsGenerated,
-        errors: validation.errors.map(
-          (issue) =>
-            `${issue.module ?? 'course'}${issue.lesson ? `/${issue.lesson}` : ''}: ${issue.message}`,
-        ),
-        warnings: validation.warnings.map((issue) => issue.message),
-        dryRun: Boolean(input.dryRun),
-      };
-    }
-
-    const validatedLessonCount = completeBlueprint.modules.reduce(
-      (count, courseModule) => count + (courseModule.lessons?.length ?? 0),
-      0,
+    tracker.emit('resolve', 'Assembling credential and workforce evidence.', 7);
+    const evidence = await buildCourseEvidenceContext({
+      programSlug,
+      program,
+      blueprint,
+      state: input.state,
+    });
+    tracker.emit(
+      'resolve',
+      `Evidence ready from ${evidence.sources.map((source) => source.kind).join(', ') || 'registered blueprint'}.`,
+      9,
     );
 
-    if (input.dryRun) {
-      const completionRatio =
-        expectedLessonCount > 0 ? validatedLessonCount / expectedLessonCount : 1;
-      progress.emit('complete', 'Course package generated and validated in dry-run mode.', 100);
+    const audit = validateBlueprint(blueprint);
+    if (!audit.valid) {
       return {
-        ok: completionRatio >= 1,
-        status: completionRatio >= 1 ? 'success' : 'incomplete',
-        courseSlug: completeBlueprint.programSlug ?? undefined,
-        title: completeBlueprint.credentialTitle,
-        moduleCount: completeBlueprint.modules.length,
-        lessonCount: validatedLessonCount,
-        expectedLessonCount,
-        completionRatio,
-        assessmentsGenerated,
+        ok: false,
+        errors: audit.errors,
+        moduleCount: blueprint.modules.length,
+        lessonCount: blueprint.modules.reduce(
+          (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
+          0,
+        ),
+        assessmentsGenerated: 0,
         videosQueued: 0,
-        generationFailures,
-        warnings: validation.warnings.map((issue) => issue.message),
-        errors:
-          completionRatio >= 1
-            ? []
-            : ['Generated lesson count does not satisfy the blueprint contract'],
+      };
+    }
+
+    const courseTitle = input.title || blueprint.title || blueprint.credentialTitle;
+    if (!isAIAvailable() && input.contentSource !== 'blueprint') {
+      throw new Error('AI service is required to generate complete lesson and assessment content.');
+    }
+
+    const enriched =
+      input.contentSource === 'blueprint'
+        ? { blueprint, assessmentsGenerated: 0 }
+        : await enrichBlueprint(blueprint, courseTitle, input, tracker);
+
+    tracker.emit('validate', 'Validating the complete generated course package.', 80);
+    const packageAudit = validateBlueprint(enriched.blueprint);
+    if (!packageAudit.valid) {
+      return {
+        ok: false,
+        errors: packageAudit.errors,
+        moduleCount: enriched.blueprint.modules.length,
+        lessonCount: enriched.blueprint.modules.reduce(
+          (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
+          0,
+        ),
+        assessmentsGenerated: enriched.assessmentsGenerated,
+        videosQueued: 0,
+      };
+    }
+
+    if (input.dryRun) {
+      tracker.emit('complete', 'Dry run complete; nothing persisted.', 100);
+      return {
+        ok: true,
+        title: courseTitle,
+        moduleCount: enriched.blueprint.modules.length,
+        lessonCount: enriched.blueprint.modules.reduce(
+          (sum, courseModule) => sum + (courseModule.lessons?.length ?? 0),
+          0,
+        ),
+        assessmentsGenerated: enriched.assessmentsGenerated,
+        videosQueued: 0,
         dryRun: true,
       };
     }
 
-    progress.emit('publish', 'Persisting the canonical LMS course package.');
-    const publishResult = await publishCourse({
-      programId: program?.id ?? null,
-      courseSlug: completeBlueprint.programSlug ?? `course-${Date.now()}`,
-      courseTitle: completeBlueprint.credentialTitle,
-      blueprint: completeBlueprint.modules,
+    tracker.emit('publish', 'Persisting the validated course package.', 85);
+    const published = await publishCourse({
+      blueprint: enriched.blueprint,
+      courseTitle,
+      programId: input.programId,
+      contentSource: input.contentSource ?? 'ai',
       mode: input.mode ?? 'refresh',
-      contentSource:
-        input.contentSource === 'curriculum_lessons' ? 'curriculum_lessons' : 'blueprint',
-      videoConfig: { enabled: input.videoMode === 'queue' },
+      evidence,
     });
 
-    const retainedLessons = publishResult.lessonCount + publishResult.skippedCount;
-    const completionRatio = expectedLessonCount > 0 ? retainedLessons / expectedLessonCount : 1;
-
-    if (!publishResult.success || completionRatio < 1) {
-      if (publishResult.courseId) {
-        await db
-          .from('courses')
-          .update({ status: 'draft', is_active: false, updated_at: new Date().toISOString() })
-          .eq('id', publishResult.courseId);
-      }
-
-      return {
-        ok: false,
-        status: 'incomplete',
-        courseId: publishResult.courseId,
-        courseSlug: completeBlueprint.programSlug ?? undefined,
-        title: completeBlueprint.credentialTitle,
-        moduleCount: publishResult.moduleCount,
-        lessonCount: publishResult.lessonCount,
-        skippedCount: publishResult.skippedCount,
-        expectedLessonCount,
-        completionRatio,
-        assessmentsGenerated,
-        generationFailures,
-        errors: publishResult.errors.length
-          ? publishResult.errors
-          : ['Persisted lesson count does not satisfy the blueprint contract'],
-        warnings: publishResult.warnings,
-        dryRun: false,
-      };
-    }
-
     let videosQueued = 0;
-    if (input.videoMode === 'queue' && publishResult.courseId) {
-      progress.emit('media', 'Queuing missing lesson media from the canonical course.');
+    if (input.videoMode !== 'off' && published.courseId) {
+      tracker.emit('media', 'Queueing missing lesson videos and microclips.', 93);
       const media = await queueCourseLessonVideos({
-        courseId: publishResult.courseId,
-        onlyMissing: true,
-        limit: typeof input.videoQueueLimit === 'number' ? input.videoQueueLimit : null,
+        courseId: published.courseId,
+        onlyMissing: input.mode !== 'replace',
+        force: input.mode === 'replace',
+        limit: input.videoQueueLimit ?? null,
       });
-      videosQueued = media.queued ?? 0;
+      videosQueued = media.queued + media.microclipsQueued;
+      if (media.failed > 0) {
+        logger.warn('[course-factory] Some media jobs failed to enqueue', media);
+      }
     }
 
-    progress.emit('complete', 'Canonical course build complete.', 100);
+    tracker.emit('complete', 'Canonical Course Factory completed successfully.', 100);
     return {
       ok: true,
-      status: 'success',
-      courseId: publishResult.courseId,
-      courseSlug: completeBlueprint.programSlug ?? undefined,
-      title: completeBlueprint.credentialTitle,
-      moduleCount: publishResult.moduleCount,
-      lessonCount: publishResult.lessonCount,
-      skippedCount: publishResult.skippedCount,
-      expectedLessonCount,
-      completionRatio,
-      assessmentsGenerated,
+      courseId: published.courseId,
+      title: courseTitle,
+      moduleCount: published.moduleCount,
+      lessonCount: published.lessonCount,
+      assessmentsGenerated: enriched.assessmentsGenerated,
       videosQueued,
-      generationFailures,
-      warnings: publishResult.warnings,
       errors: [],
-      dryRun: false,
     };
   } catch (error) {
-    logger.error('[course-factory] Course factory failed', error);
-    progress.emit(
-      'error',
-      `Factory failed: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    const message = error instanceof Error ? error.message : String(error);
+    tracker.emit('error', message, 100);
+    logger.error('[course-factory] generation failed', error);
     return {
       ok: false,
-      status: 'db_error',
-      errors: [error instanceof Error ? error.message : String(error)],
-      warnings: [],
-      dryRun: Boolean(input.dryRun),
+      errors: [message],
+      moduleCount: 0,
+      lessonCount: 0,
+      assessmentsGenerated: 0,
+      videosQueued: 0,
     };
   }
-}
-
-export interface SimpleCourseInput {
-  programSlug: string;
-  mode?: 'replace' | 'missing-only' | 'refresh';
-  contentSource?: 'ai' | 'blueprint';
-  includeVideos?: boolean;
-}
-
-/**
- * Default creation behavior is a complete AI-authored package. Callers that
- * explicitly want a blueprint-only skeleton must opt into contentSource=blueprint.
- */
-export async function createCourse(input: SimpleCourseInput): Promise<FactoryOutput> {
-  return courseFactory({
-    programSlug: input.programSlug,
-    mode: input.mode ?? 'refresh',
-    contentSource: input.contentSource ?? 'ai',
-    videoMode: input.includeVideos === false ? 'off' : 'queue',
-  });
-}
-
-export async function factoryFromSlug(
-  slug: string,
-  options?: {
-    mode?: 'replace' | 'missing-only' | 'refresh';
-    contentSource?: 'ai' | 'blueprint';
-    includeVideos?: boolean;
-  },
-): Promise<FactoryOutput> {
-  return createCourse({
-    programSlug: slug,
-    mode: options?.mode ?? 'refresh',
-    contentSource: options?.contentSource ?? 'ai',
-    includeVideos: options?.includeVideos ?? true,
-  });
 }

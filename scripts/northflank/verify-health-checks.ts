@@ -6,7 +6,7 @@
  * - public internal port = 3000
  * - runtime PORT = 3000
  * - startup probe = /api/ping:3000
- * - readiness probe = /api/health:3000
+ * - readiness probe = /api/ready:3000
  * - reports current public-host status without blocking a recovery deployment
  */
 
@@ -62,12 +62,12 @@ async function main() {
     const internalPort = Number(sitePort?.internalPort);
     const runtimePort = readRuntimePort(service);
     const startupOk = hasProbe(service, 'startupProbe', '/api/ping');
-    const readinessOk = hasProbe(service, 'readinessProbe', '/api/health');
+    const readinessOk = hasProbe(service, 'readinessProbe', '/api/ready');
 
     console.log(`  internalPort=${internalPort || 'missing'}`);
     console.log(`  runtime PORT=${runtimePort ?? 'missing'}`);
     console.log(`  startup /api/ping:3000=${startupOk}`);
-    console.log(`  readiness /api/health:3000=${readinessOk}`);
+    console.log(`  readiness /api/ready:3000=${readinessOk}`);
 
     if (internalPort !== RUNTIME_PORT || runtimePort !== String(RUNTIME_PORT) || !startupOk || !readinessOk) {
       ok = false;

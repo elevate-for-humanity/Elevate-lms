@@ -3,7 +3,7 @@
  *
  * Single application HTTP boundary for course orchestration.
  * Studio controls this surface. Course Builder owns orchestration and delegates
- * execution to the private Course Factory through lib/course-builder/orchestrator.
+ * execution to private/internal Course Builder capability services.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
@@ -19,6 +19,12 @@ import {
   queueCourseMedia,
   normalizeGeneratedCourseForGovernance,
 } from '@/lib/course-builder/orchestrator';
+import {
+  saveCourseModule,
+  saveCourseLesson,
+  patchCourseLesson,
+  linkCourseScormPackage,
+} from '@/lib/course-builder/edit-service';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
@@ -42,6 +48,10 @@ type CourseBuilderAction =
   | 'generate-from-blueprint'
   | 'queue-media'
   | 'save-program-config'
+  | 'save-module'
+  | 'save-lesson'
+  | 'patch-lesson'
+  | 'link-scorm'
   | 'audit'
   | 'validate'
   | 'publish'
@@ -197,6 +207,46 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       logger.error('[course-builder] Program configuration failed', error);
       return NextResponse.json({ ok: false, error: 'Failed to save course configuration' }, { status: 400 });
+    }
+  }
+
+  if (action === 'save-module') {
+    try {
+      const module = await saveCourseModule(body.module ?? body);
+      return NextResponse.json({ ok: true, module });
+    } catch (error) {
+      logger.error('[course-builder] Module save failed', error);
+      return NextResponse.json({ ok: false, error: 'Failed to save module' }, { status: 400 });
+    }
+  }
+
+  if (action === 'save-lesson') {
+    try {
+      const lesson = await saveCourseLesson(body.lesson ?? body);
+      return NextResponse.json({ ok: true, lesson });
+    } catch (error) {
+      logger.error('[course-builder] Lesson save failed', error);
+      return NextResponse.json({ ok: false, error: 'Failed to save lesson' }, { status: 400 });
+    }
+  }
+
+  if (action === 'patch-lesson') {
+    try {
+      const lesson = await patchCourseLesson(body.lesson ?? body);
+      return NextResponse.json({ ok: true, lesson });
+    } catch (error) {
+      logger.error('[course-builder] Lesson patch failed', error);
+      return NextResponse.json({ ok: false, error: 'Failed to update lesson' }, { status: 400 });
+    }
+  }
+
+  if (action === 'link-scorm') {
+    try {
+      const packageRow = await linkCourseScormPackage(body, auth.id);
+      return NextResponse.json({ ok: true, package: packageRow });
+    } catch (error) {
+      logger.error('[course-builder] SCORM link failed', error);
+      return NextResponse.json({ ok: false, error: 'Failed to link SCORM package' }, { status: 400 });
     }
   }
 

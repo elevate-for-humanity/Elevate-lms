@@ -20,53 +20,92 @@ export default async function BulkCertificatesPage({
   await requireRole(['admin']);
   const { tab } = await searchParams;
   const activeTab = tab === 'manage' ? 'manage' : 'issue';
-
   const supabase = await createClient();
 
-  // --- Issue tab data ---
   const { data: templates } = await supabase
     .from('certificate_templates')
-    .select('id, name, description')
+    .select('id,name,description')
     .eq('status', 'active')
     .order('name');
 
   const { data: rawEligible, count: eligibleCount } = await supabase
     .from('program_enrollments')
-    .select('id, user_id, course_id, completed_at, courses!inner(title)', { count: 'exact' })
+    .select(
+      'id,user_id,student_id,course_id,program_id,completed_at,certificate_issued_at',
+      { count: 'exact' },
+    )
     .eq('status', 'completed')
-    .is('certificate_issued', null)
+    .not('completed_at', 'is', null)
+    .is('certificate_issued_at', null)
     .limit(20);
 
-  const issueUserIds = [...new Set((rawEligible ?? []).map((e: any) => e.user_id).filter(Boolean))];
-  const { data: issueProfiles } = issueUserIds.length
-    ? await supabase.from('profiles').select('id, full_name, email').in('id', issueUserIds)
-    : { data: [] };
-  const issueProfileMap = Object.fromEntries((issueProfiles ?? []).map((p: any) => [p.id, p]));
-  const eligibleParticipants = (rawEligible ?? []).map((e: any) => ({
-    ...e,
-    profiles: issueProfileMap[e.user_id] ?? null,
-  }));
+  const issueUserIds = [
+    ...new Set(
+      (rawEligible ?? [])
+        .map((enrollment) => enrollment.user_id || enrollment.student_id)
+        .filter(Boolean),
+    ),
+  ] as string[];
+  const issueProgramIds = [
+    ...new Set((rawEligible ?? []).map((enrollment) => enrollment.program_id).filter(Boolean)),
+  ] as string[];
+  const issueCourseIds = [
+    ...new Set((rawEligible ?? []).map((enrollment) => enrollment.course_id).filter(Boolean)),
+  ] as string[];
 
-  // --- Manage tab data ---
+  const [profileResult, programResult, courseResult] = await Promise.all([
+    issueUserIds.length
+      ? supabase.from('profiles').select('id,full_name,email').in('id', issueUserIds)
+      : Promise.resolve({ data: [] as any[] }),
+    issueProgramIds.length
+      ? supabase.from('programs').select('id,title,name').in('id', issueProgramIds)
+      : Promise.resolve({ data: [] as any[] }),
+    issueCourseIds.length
+      ? supabase.from('courses').select('id,title,course_name').in('id', issueCourseIds)
+      : Promise.resolve({ data: [] as any[] }),
+  ]);
+
+  const profileMap = new Map((profileResult.data ?? []).map((row: any) => [row.id, row]));
+  const programMap = new Map((programResult.data ?? []).map((row: any) => [row.id, row]));
+  const courseMap = new Map((courseResult.data ?? []).map((row: any) => [row.id, row]));
+
+  const eligibleParticipants = (rawEligible ?? []).map((enrollment) => {
+    const userId = enrollment.user_id || enrollment.student_id;
+    const program = enrollment.program_id ? programMap.get(enrollment.program_id) : null;
+    const course = enrollment.course_id ? courseMap.get(enrollment.course_id) : null;
+    return {
+      id: enrollment.id,
+      user_id: userId || '',
+      course_id: enrollment.course_id,
+      program_id: enrollment.program_id,
+      completed_at: enrollment.completed_at,
+      profiles: userId ? profileMap.get(userId) ?? null : null,
+      learning_title:
+        program?.title || program?.name || course?.title || course?.course_name || 'Completed program',
+    };
+  });
+
   const { data: certificationTypes } = await supabase
     .from('certification_types')
-    .select('id, name, provider, validity_months')
+    .select('id,name,provider,validity_months')
     .order('name');
 
   const { data: rawPending, count: pendingCount } = await supabase
     .from('user_certifications')
-    .select('id, user_id, certification_type_id, status, earned_date', { count: 'exact' })
+    .select('id,user_id,certification_type_id,status,earned_date', { count: 'exact' })
     .eq('status', 'pending')
     .limit(20);
 
-  const manageUserIds = [...new Set((rawPending ?? []).map((c: any) => c.user_id).filter(Boolean))];
+  const manageUserIds = [
+    ...new Set((rawPending ?? []).map((certification) => certification.user_id).filter(Boolean)),
+  ] as string[];
   const { data: manageProfiles } = manageUserIds.length
-    ? await supabase.from('profiles').select('id, full_name, email').in('id', manageUserIds)
+    ? await supabase.from('profiles').select('id,full_name,email').in('id', manageUserIds)
     : { data: [] };
-  const manageProfileMap = Object.fromEntries((manageProfiles ?? []).map((p: any) => [p.id, p]));
-  const pendingCertifications = (rawPending ?? []).map((c: any) => ({
-    ...c,
-    profiles: manageProfileMap[c.user_id] ?? null,
+  const manageProfileMap = new Map((manageProfiles ?? []).map((profile) => [profile.id, profile]));
+  const pendingCertifications = (rawPending ?? []).map((certification) => ({
+    ...certification,
+    profiles: manageProfileMap.get(certification.user_id) ?? null,
   }));
 
   return (
@@ -83,10 +122,9 @@ export default async function BulkCertificatesPage({
             </ol>
           </nav>
           <h1 className="text-3xl font-bold text-slate-900">Bulk Certificates &amp; Certifications</h1>
-          <p className="text-slate-600 mt-1">Issue new certificates or manage pending certification records</p>
+          <p className="text-slate-600 mt-1">Issue verified completion certificates or review certification records</p>
         </div>
 
-        {/* Tab bar */}
         <div className="flex gap-1 border-b border-slate-200 mb-8">
           <Link
             href="/certificates/bulk?tab=issue"

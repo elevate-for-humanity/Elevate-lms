@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { normalizeRoles, type UserRole } from '@/lib/rbac/role-matrix';
-import { getCaseManagerParticipants, hasCaseManagerOversight } from '@/lib/case-manager/participant-scope';
+import { getCaseManagerParticipants } from '@/lib/case-manager/participant-scope';
+import { caseManagerActorRole, requireCaseManagerApiAccess, type CaseManagerApiAuth } from '@/lib/case-manager/api-auth';
 import { logAction } from '@/lib/audit/logAction';
 
 export const runtime = 'nodejs';
@@ -16,38 +15,9 @@ const EMPLOYMENT_TYPES = new Set<EmploymentType>(['full_time', 'part_time', 'con
 const VERIFICATION_METHODS = new Set<VerificationMethod>(['employer_contact', 'pay_stub', 'offer_letter', 'self_report']);
 const STATUSES = new Set<PlacementStatus>(['verified', 'rejected', 'lost']);
 
-type PlacementAuth = {
-  supabase: Awaited<ReturnType<typeof createClient>>;
-  user: { id: string; email?: string } | null;
-  effectiveRoles: UserRole[];
-  error: NextResponse | null;
-};
-
-async function requireCaseManager(): Promise<PlacementAuth> {
-  const supabase = await createClient();
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  if (userError || !user) {
-    return { supabase, user: null, effectiveRoles: [], error: NextResponse.json({ error: 'Authentication required' }, { status: 401 }) };
-  }
-
-  const [{ data: profile }, { data: roleRows }] = await Promise.all([
-    supabase.from('profiles').select('role').eq('id', user.id).maybeSingle(),
-    supabase.from('user_roles').select('roles(name)').eq('user_id', user.id),
-  ]);
-  const effectiveRoles = normalizeRoles([
-    profile?.role,
-    ...(roleRows ?? []).map((row: any) => row.roles?.name),
-  ]);
-  if (!effectiveRoles.some((role) => ['case_manager', 'admin', 'super_admin', 'staff'].includes(role))) {
-    return { supabase, user: null, effectiveRoles, error: NextResponse.json({ error: 'Case manager access required' }, { status: 403 }) };
-  }
-
-  return { supabase, user: { id: user.id, email: user.email }, effectiveRoles, error: null };
-}
-
-async function allowedLearnerIds(auth: PlacementAuth): Promise<Set<string> | null> {
+async function allowedLearnerIds(auth: CaseManagerApiAuth): Promise<Set<string> | null> {
   if (!auth.user) return new Set();
-  if (hasCaseManagerOversight(auth.effectiveRoles)) return null;
+  if (auth.oversight) return null;
   const participants = await getCaseManagerParticipants({
     db: auth.supabase,
     userId: auth.user.id,
@@ -56,15 +26,10 @@ async function allowedLearnerIds(auth: PlacementAuth): Promise<Set<string> | nul
   return new Set(participants.map((participant) => participant.learnerId).filter((id): id is string => Boolean(id)));
 }
 
-function actorRole(roles: readonly string[]) {
-  return roles.find((role) => ['admin', 'super_admin', 'staff', 'case_manager'].includes(role)) || 'case_manager';
-}
-
 export async function POST(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-
-  const auth = await requireCaseManager();
+  const auth = await requireCaseManagerApiAccess();
   if (auth.error || !auth.user) return auth.error!;
 
   const body = await request.json().catch(() => ({}));
@@ -108,24 +73,21 @@ export async function POST(request: Request) {
     })
     .select('id, status')
     .single();
-
   if (error) return NextResponse.json({ error: 'Unable to save placement.' }, { status: 400 });
 
-  await logAction(auth.user.id, actorRole(auth.effectiveRoles), {
+  await logAction(auth.user.id, caseManagerActorRole(auth.effectiveRoles), {
     action: 'placement_created',
     entity_type: 'placement_record',
     entity_id: data.id,
     metadata: { learner_id: learnerId, employer_name: employerName, status: 'pending' },
   });
-
   return NextResponse.json({ ok: true, placement: data }, { status: 201 });
 }
 
 export async function PATCH(request: Request) {
   const rateLimited = await applyRateLimit(request, 'api');
   if (rateLimited) return rateLimited;
-
-  const auth = await requireCaseManager();
+  const auth = await requireCaseManagerApiAccess();
   if (auth.error || !auth.user) return auth.error!;
 
   const body = await request.json().catch(() => ({}));
@@ -173,12 +135,11 @@ export async function PATCH(request: Request) {
     .single();
   if (error) return NextResponse.json({ error: 'Unable to update placement.' }, { status: 400 });
 
-  await logAction(auth.user.id, actorRole(auth.effectiveRoles), {
+  await logAction(auth.user.id, caseManagerActorRole(auth.effectiveRoles), {
     action: 'placement_status_updated',
     entity_type: 'placement_record',
     entity_id: placementId,
     metadata: { from_status: existing.status, to_status: status, learner_id: existing.learner_id },
   });
-
   return NextResponse.json({ ok: true, placement: data });
 }

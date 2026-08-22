@@ -27,25 +27,26 @@ const logoUrl = `${siteUrl}/images/logo.png`;
 
 export const metadata: Metadata = {
   title: {
-    default: 'Elevate for Humanity | AI-Powered 360° Humanitarian Workforce Hub',
+    default: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
     template: '%s | Elevate for Humanity',
   },
   description:
-    'Elevate for Humanity is an AI-powered 360° humanitarian workforce hub connecting training, an integrated LMS, hands-on learning, testing, credentials, registered apprenticeships, workforce funding, employment, employers, supportive services, and public-sector partners.',
+    'Explore career training, registered apprenticeships, employer-connected learning, workforce funding pathways, testing, and credentials through Elevate for Humanity in Indiana.',
   applicationName: 'Elevate for Humanity',
   metadataBase: new URL(siteUrl),
   manifest: '/manifest-marketing.json',
   keywords: [
-    'humanitarian workforce hub',
-    'AI workforce platform',
-    'learning management system',
-    'registered apprenticeship',
-    'workforce training',
+    'career training Indianapolis',
+    'registered apprenticeship Indiana',
+    'workforce training Indiana',
+    'barber apprenticeship',
+    'beauty apprenticeship',
+    'HVAC training',
+    'CDL training',
+    'business training',
     'ETPL training provider',
-    'career testing and proctoring',
     'workforce funding',
-    'employer workforce development',
-    'supportive services',
+    'employer training partnerships',
   ],
   icons: {
     icon: [{ url: '/favicon.png', type: 'image/png', sizes: '192x192' }],
@@ -56,9 +57,9 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'Elevate for Humanity',
     url: siteUrl,
-    title: 'Elevate for Humanity | AI-Powered 360° Humanitarian Workforce Hub',
+    title: 'Elevate for Humanity | Career Training & Registered Apprenticeships',
     description:
-      'One connected ecosystem for learning, training, testing, apprenticeships, credentials, workforce funding, employment, employers, supportive services, and advancement.',
+      'Find a career path, understand your training and funding options, and connect with apprenticeship and employer opportunities in one place.',
     images: [{ url: logoUrl, width: 256, height: 256, alt: 'Elevate for Humanity logo' }],
   },
   robots: {
@@ -79,7 +80,7 @@ const organizationJsonLd = {
   '@type': ['Organization', 'EducationalOrganization'],
   '@id': `${siteUrl}/#organization`,
   name: 'Elevate for Humanity',
-  alternateName: 'AI-Powered 360° Humanitarian Workforce Hub',
+  alternateName: 'Elevate for Humanity Career & Technical Institute',
   legalName: '2Exclusive LLC-S',
   url: siteUrl,
   logo: {
@@ -98,18 +99,20 @@ const organizationJsonLd = {
     addressCountry: 'US',
   },
   description:
-    'AI-powered humanitarian workforce hub connecting education, an integrated LMS, testing and credentialing, registered apprenticeship, workforce funding, employment, employer services, supportive services, and partner operations.',
+    'Career and technical education provider connecting learners with training, registered apprenticeships, testing and credential pathways, workforce funding navigation, employers, and supportive services.',
   knowsAbout: [
-    'Learning Management Systems',
     'Registered Apprenticeship',
     'Career and Technical Training',
+    'Barber and Beauty Apprenticeships',
+    'HVAC Training',
+    'Commercial Driver Training',
+    'Business and Entrepreneurship Training',
     'Testing and Proctoring',
     'Credentialing',
     'Workforce Development',
     'Work-Based Learning',
     'WIOA',
     'Employer Services',
-    'Supportive Services',
   ],
 };
 

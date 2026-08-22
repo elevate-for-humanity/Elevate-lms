@@ -9,7 +9,9 @@ import { logger } from '@/lib/logger';
 export type UserRole =
   | 'student'
   | 'advisor'
+  | 'staff'
   | 'admin'
+  | 'org_admin'
   | 'super_admin'
   | 'partner'
   | 'program_holder'
@@ -74,7 +76,9 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   employer: 2,
   workforce_board: 3,
   advisor: 4,
+  staff: 4,
   admin: 5,
+  org_admin: 5,
   super_admin: 6,
 };
 

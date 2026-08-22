@@ -1,5 +1,6 @@
 name: Video Worker Scheduler
 
+# Canonical Course Builder render-queue trigger. Keep this workflow thin: the Admin runtime owns rendering.
 on:
   workflow_dispatch:
   schedule:

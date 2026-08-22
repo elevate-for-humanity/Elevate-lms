@@ -66,6 +66,21 @@ for (const capability of ['runPersistedCourseProcurementHealthCheck','publishPer
   if (!persistedPublish.includes(capability)) failures.push(`Persisted Course Builder publication service is missing ${capability}`);
 }
 
+const cloneService = read('lib/course-builder/clone-service.ts');
+for (const capability of ['cloneCanonicalCourse', ".from('courses')", ".from('course_modules')", ".from('course_lessons')", "review_status: 'draft'", 'approved = false']) {
+  if (!cloneService.includes(capability)) failures.push(`Course Builder clone service is missing ${capability}`);
+}
+for (const rel of [
+  'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
+  'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
+]) {
+  const text = read(rel);
+  if (!text.includes('cloneCanonicalCourse')) failures.push(`${rel}: clone route is not delegated to Course Builder clone service`);
+  for (const forbidden of [".from('courses').insert", ".from('course_modules').insert", ".from('course_lessons').insert"]) {
+    if (text.includes(forbidden)) failures.push(`${rel}: direct canonical clone write remains: ${forbidden}`);
+  }
+}
+
 const retiredMutationRoutes = [
   'apps/admin/app/api/admin/lms/courses/generate/route.ts',
   'apps/admin/app/api/admin/lms/courses/[courseId]/publish/route.ts',
@@ -111,8 +126,7 @@ if (!scormText.includes('RETIRED mutation')) failures.push('SCORM mutation route
 if (/export async function POST[\s\S]*?\.from\(['\"]scorm_packages['\"]\)[\s\S]{0,220}\.update\(/.test(scormText)) failures.push('SCORM POST still mutates outside Course Builder root');
 
 const specializedPackageWriters = new Set([
-  'apps/admin/app/api/admin/courses/[courseId]/clone/route.ts',
-  'apps/admin/app/api/admin/programs/[programId]/clone/route.ts',
+  'lib/course-builder/clone-service.ts',
   'lib/course-factory/versioning.ts',
   'lib/course-factory/post-generation-governance.ts',
   'lib/db/courses.ts',
@@ -126,7 +140,7 @@ for (const rel of [...walk('apps'), ...walk('lib'), ...walk('scripts'), ...walk(
   if (rel === 'lib/course-factory/publisher.ts' || specializedPackageWriters.has(rel)) continue;
   const text = read(rel);
   const writes = (table) => new RegExp(`\\.from\\(['\"]${table}['\"]\\)[\\s\\S]{0,280}\\.(?:insert|upsert|update|delete)\\(`).test(text);
-  if (writes('courses') && writes('course_modules') && writes('course_lessons')) failures.push(`${rel}: parallel complete course-package writer detected; complete packages must persist through Course Factory publisher`);
+  if (writes('courses') && writes('course_modules') && writes('course_lessons')) failures.push(`${rel}: parallel complete course-package writer detected; complete packages must persist through Course Factory publisher or Course Builder clone service`);
 }
 
 for (const rel of walk('apps')) {
@@ -178,4 +192,4 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
-console.log('Course Builder authority gate passed: Studio control plane -> root Course Builder generation/editing/review/media/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; legacy lesson/media routes are compatibility-only and no raw-engine, parallel package, review, media, or publication authority was detected.');
+console.log('Course Builder authority gate passed: Studio control plane -> Course Builder generation/editing/review/media/clone/publication -> private Course Factory/internal services -> canonical persistence/media/publish -> LMS; legacy lesson/media/clone routes are compatibility-only and no raw-engine, parallel package, review, media, clone, or publication authority was detected.');

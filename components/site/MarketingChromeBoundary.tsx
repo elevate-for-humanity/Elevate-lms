@@ -1,0 +1,33 @@
+import { headers } from 'next/headers';
+import Header from '@/components/site/Header';
+import { SiteFooter } from '@/components/site-footer';
+
+const OPERATIONAL_PREFIXES = ['/case-manager', '/workforce-board', '/provider'] as const;
+
+function isOperationalPath(pathname: string) {
+  const clean = pathname.split('?')[0] || '/';
+  return OPERATIONAL_PREFIXES.some((prefix) => clean === prefix || clean.startsWith(`${prefix}/`));
+}
+
+/**
+ * Marketing owns several authenticated workspaces for deployment reasons, but
+ * those pages must render as operational software rather than as public-site
+ * content. Middleware supplies x-pathname for every Marketing request.
+ */
+export async function MarketingChromeBoundary({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers();
+  const pathname = requestHeaders.get('x-pathname') || '/';
+  const operational = isOperationalPath(pathname);
+
+  if (operational) {
+    return <main id="main-content" tabIndex={-1} className="min-h-dvh focus:outline-none">{children}</main>;
+  }
+
+  return (
+    <>
+      <Header />
+      <main id="main-content" tabIndex={-1} className="site-main focus:outline-none">{children}</main>
+      <SiteFooter />
+    </>
+  );
+}

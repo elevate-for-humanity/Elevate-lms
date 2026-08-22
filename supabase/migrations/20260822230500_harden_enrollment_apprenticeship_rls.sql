@@ -2,6 +2,33 @@
 -- and placement records while preserving owner/partner workflows.
 
 -- program_enrollments -------------------------------------------------------
+-- Existing production rows predate tenant-aware enrollment writes. Backfill
+-- tenant ownership before replacing broad admin/staff policies, otherwise the
+-- cutover would make legitimate enrollments invisible to tenant-scoped staff.
+UPDATE public.program_enrollments pe
+SET
+  tenant_id = COALESCE(pe.tenant_id, p.tenant_id),
+  organization_id = COALESCE(pe.organization_id, p.organization_id)
+FROM public.profiles p
+WHERE p.id = COALESCE(pe.user_id, pe.student_id)
+  AND (pe.tenant_id IS NULL OR pe.organization_id IS NULL);
+
+UPDATE public.program_enrollments pe
+SET
+  tenant_id = COALESCE(pe.tenant_id, pr.tenant_id),
+  organization_id = COALESCE(pe.organization_id, pr.organization_id)
+FROM public.programs pr
+WHERE pr.id = pe.program_id
+  AND (pe.tenant_id IS NULL OR pe.organization_id IS NULL);
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM public.program_enrollments WHERE tenant_id IS NULL) THEN
+    RAISE EXCEPTION 'Refusing tenant RLS cutover: program_enrollments still contains rows without tenant_id';
+  END IF;
+END
+$$;
+
 DROP POLICY IF EXISTS program_enrollments_admin_write ON public.program_enrollments;
 DROP POLICY IF EXISTS program_enrollments_staff_read ON public.program_enrollments;
 CREATE POLICY program_enrollments_admin_write ON public.program_enrollments

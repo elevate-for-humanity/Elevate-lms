@@ -10,9 +10,6 @@ import { runCourseFactoryPipeline } from '@/components/admin/course-builder/runC
 const AutomaticCourseBuilder = dynamic(() => import('@/components/course/AutomaticCourseBuilder'), {
   ssr: false,
 });
-const VideoStudio = dynamic(() => import('@/apps/admin/app/video-generator/VideoGeneratorClient'), {
-  ssr: false,
-});
 
 type Tab = 'courses' | 'ai' | 'blueprints' | 'media';
 type CourseRow = {
@@ -79,44 +76,31 @@ export default function UnifiedCourseBuilder() {
               <Bot className="h-4 w-4" /> Unified Course Factory
             </div>
             <h1 className="mt-1 text-2xl font-black text-white">Course Builder</h1>
-            <p className="text-sm text-slate-400">
-              One authoring surface for curriculum, AI, blueprints, media, interactions, assessments
-              and compliance.
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">
+              Build, review, govern, publish, and maintain complete courses from one authority.
             </p>
           </div>
-          <div className="flex min-w-0 items-center gap-2">
-            <select
-              value={courseId}
-              onChange={(e) => setCourseId(e.target.value)}
-              className="min-h-10 min-w-[280px] rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-white"
-            >
-              <option value="">Select a course…</option>
-              {courses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.title} — {course.status ?? 'draft'}
-                </option>
-              ))}
-            </select>
+          <div className="flex flex-wrap items-center gap-2">
             <button
+              type="button"
               onClick={() => void loadCourses()}
-              className="rounded-lg border border-slate-700 p-2 hover:bg-slate-800"
-              title="Refresh courses"
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4" /> Refresh
             </button>
-            {courseId && (
+            {selectedCourse ? (
               <Link
-                href={`/studio/courses/${courseId}`}
-                className="rounded-lg bg-cyan-500 px-3 py-2 text-sm font-black text-slate-950 hover:bg-cyan-400"
+                href={`/studio/courses/${selectedCourse.id}`}
+                className="rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 hover:bg-cyan-400"
               >
-                Open course application
+                Open {selectedCourse.title}
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto border-b border-slate-800 bg-slate-900/70 px-4 py-2">
+      <div className="overflow-x-auto border-b border-slate-800 bg-slate-950 px-4 py-3">
         <div className="mx-auto flex max-w-[1600px] gap-2">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
@@ -159,12 +143,7 @@ export default function UnifiedCourseBuilder() {
           />
         )}
         {tab === 'media' && (
-          <>
-            <CourseInstructorMediaPanel courseId={courseId} />
-            <div className="overflow-hidden rounded-2xl bg-white text-slate-900">
-              <VideoStudio />
-            </div>
-          </>
+          <CourseInstructorMediaPanel courseId={courseId} />
         )}
       </main>
     </div>
@@ -260,25 +239,23 @@ function CreateCoursePanel({ onCreated }: { onCreated: (id: string) => void | Pr
       />
       <input
         name="audience"
-        required
-        placeholder="Target learners and entry requirements"
+        placeholder="Learner audience"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
       />
       <input
         name="programId"
         required
-        placeholder="Canonical program UUID (required for standards and workforce evidence)"
+        placeholder="Canonical program UUID"
         className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         <input
           name="moduleCount"
           type="number"
           min={1}
-          max={20}
+          max={40}
           defaultValue={6}
-          aria-label="Module count"
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+          className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
         />
         <input
           name="lessonsPerModule"
@@ -286,16 +263,17 @@ function CreateCoursePanel({ onCreated }: { onCreated: (id: string) => void | Pr
           min={1}
           max={20}
           defaultValue={5}
-          aria-label="Lessons per module"
-          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+          className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
         />
       </div>
-      {error && <p className="text-sm text-red-300">{error}</p>}
+      {error && <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{error}</p>}
       <button
+        type="submit"
         disabled={saving}
-        className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
+        className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
       >
-        {saving ? 'Running Course Factory…' : 'Build complete interactive course'}
+        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+        {saving ? 'Building…' : 'Build complete course'}
       </button>
     </form>
   );
@@ -308,88 +286,68 @@ function BlueprintPanel({
 }: {
   blueprints: BlueprintRow[];
   selectedCourse: CourseRow | null;
-  onGenerated: (id: string) => void | Promise<void>;
+  onGenerated: (courseId: string) => void | Promise<void>;
 }) {
-  const [blueprintId, setBlueprintId] = useState('');
-  const [programId, setProgramId] = useState(selectedCourse?.program_id ?? '');
-  const [running, setRunning] = useState(false);
-  const [result, setResult] = useState('');
-  useEffect(() => {
-    if (selectedCourse?.program_id) setProgramId(selectedCourse.program_id);
-  }, [selectedCourse?.program_id]);
-  async function generate() {
-    if (!blueprintId || !programId) {
-      setResult('Select a blueprint and enter the program UUID.');
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+  async function generate(blueprint: BlueprintRow) {
+    if (!selectedCourse?.program_id) {
+      setError('Select a course linked to a canonical program before generating from a blueprint.');
       return;
     }
-    setRunning(true);
-    setResult('');
+    setBusy(blueprint.id);
+    setError('');
     try {
       const res = await fetch('/api/admin/course-builder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'generate-from-blueprint',
-          blueprintId,
-          programId,
+          blueprintId: blueprint.id,
+          programId: selectedCourse.program_id,
           mode: 'refresh',
           contentSource: 'ai',
           videoMode: 'queue',
         }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.ok)
-        throw new Error((data.errors ?? [data.error ?? 'Generation failed']).join('; '));
-      setResult(`Generated ${data.moduleCount ?? 0} modules and ${data.lessonCount ?? 0} lessons.`);
-      if (data.courseId) await onGenerated(data.courseId);
+      const result = await res.json();
+      if (!res.ok || !result.courseId) throw new Error(result.error || 'Blueprint generation failed');
+      await onGenerated(result.courseId);
     } catch (e) {
-      setResult(e instanceof Error ? e.message : 'Generation failed');
+      setError(e instanceof Error ? e.message : 'Blueprint generation failed');
     } finally {
-      setRunning(false);
+      setBusy('');
     }
   }
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <h2 className="text-lg font-bold">Blueprint library</h2>
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {blueprints.map((bp) => (
-            <button
-              key={bp.id}
-              onClick={() => setBlueprintId(bp.id)}
-              className={`rounded-xl border p-4 text-left ${blueprintId === bp.id ? 'border-cyan-400 bg-cyan-950/30' : 'border-slate-700 bg-slate-950 hover:border-slate-500'}`}
-            >
-              <div className="font-bold">{bp.title}</div>
-              <div className="mt-1 text-xs text-slate-400">
-                {bp.state ?? 'Multi-state'} · {bp.modules} modules · {bp.lessons} lessons
-              </div>
-              <div className="mt-2 font-mono text-[11px] text-slate-500">{bp.id}</div>
-            </button>
-          ))}
-        </div>
+    <div className="space-y-4">
+      <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
+        <h2 className="text-lg font-bold">Credential blueprints</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          Generate through the same Course Builder authority. Blueprints provide regulated structure; Course Factory fills governed course content and media.
+        </p>
       </div>
-      <aside className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <h3 className="font-bold">Build from blueprint</h3>
-        <input
-          value={programId}
-          onChange={(e) => setProgramId(e.target.value)}
-          placeholder="Program UUID"
-          className="mt-4 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-        />
-        <button
-          onClick={generate}
-          disabled={running || !blueprintId}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 font-bold text-slate-950 disabled:opacity-50"
-        >
-          {running ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="h-4 w-4" />
-          )}
-          Generate + enrich + media
-        </button>
-        {result && <p className="mt-3 text-sm text-slate-300">{result}</p>}
-      </aside>
+      {error && <p className="rounded-lg border border-red-500/40 bg-red-950/30 p-3 text-sm text-red-200">{error}</p>}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {blueprints.map((blueprint) => (
+          <div key={blueprint.id} className="rounded-xl border border-slate-800 bg-slate-900 p-5">
+            <div className="text-xs font-bold uppercase tracking-wide text-cyan-400">{blueprint.state ?? 'General'}</div>
+            <h3 className="mt-1 font-bold text-white">{blueprint.title}</h3>
+            <p className="mt-2 text-sm text-slate-400">
+              {blueprint.modules} modules · {blueprint.lessons} lessons
+            </p>
+            <button
+              type="button"
+              onClick={() => void generate(blueprint)}
+              disabled={busy === blueprint.id || !selectedCourse?.program_id}
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950 disabled:opacity-40"
+            >
+              {busy === blueprint.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Generate governed course
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

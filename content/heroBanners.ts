@@ -187,8 +187,8 @@ function normalizeBanner(key: string, banner: RawHeroBannerConfig): HeroBannerCo
       belowHeroHeadline: 'Career Training, Registered Apprenticeships & Workforce Technology in Indiana',
       belowHeroSubheadline:
         'Explore program-specific training, registered-apprenticeship activity, employer services, and workforce-funding pathways. Funding and participant eligibility require the responsible agency\'s authorization.',
-      primaryCta: { label: 'Get Started', href: '/apply' },
-      secondaryCta: { label: 'For Employers & Agencies', href: '/partners', variant: 'secondary' },
+      primaryCta: { label: 'Check Eligibility', href: '/check-eligibility' },
+      secondaryCta: { label: 'Employers & Agencies', href: '/partners', variant: 'secondary' },
       trustIndicators: [
         'Program-Specific Funding Records',
         'Documented Apprenticeship Standards',

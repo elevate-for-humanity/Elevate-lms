@@ -117,6 +117,7 @@ export default function ParisApplicationWorkspace({
   const router = useRouter();
   const [session, setSession] = useState<InterviewResponse | null>(null);
   const [input, setInput] = useState('');
+  const [draftInputMode, setDraftInputMode] = useState<'text' | 'voice'>('text');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -139,6 +140,7 @@ export default function ParisApplicationWorkspace({
             send: 'Enviar',
             listening: 'Escuchando…',
             typeAnswer: 'Escriba su respuesta…',
+            voiceDraft: 'Transcripción de voz lista. Revísela o corríjala y luego presione Enviar.',
             submit: 'Enviar solicitud para revisión',
             submitting: 'Enviando solicitud…',
             saved: 'Guardado automáticamente',
@@ -156,6 +158,7 @@ export default function ParisApplicationWorkspace({
             send: 'Send',
             listening: 'Listening…',
             typeAnswer: 'Type your answer…',
+            voiceDraft: 'Voice transcription ready. Review or correct it, then press Send.',
             submit: 'Submit application for review',
             submitting: 'Submitting application…',
             saved: 'Saved automatically',
@@ -225,6 +228,7 @@ export default function ParisApplicationWorkspace({
     try {
       await callInterview({ action: 'answer', message: value, inputMode, locale });
       setInput('');
+      setDraftInputMode('text');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to save that answer.');
     } finally {
@@ -281,8 +285,10 @@ export default function ParisApplicationWorkspace({
     recognition.onresult = (event: any) => {
       const transcript = String(event.results?.[0]?.[0]?.transcript || '').trim();
       setInput(transcript);
+      setDraftInputMode('voice');
       setListening(false);
-      if (transcript) void sendAnswer(transcript, 'voice');
+      // Do not persist speech automatically. The applicant must see and review
+      // the transcription first, and may correct it before explicitly sending.
     };
     recognition.start();
   }
@@ -435,7 +441,7 @@ export default function ParisApplicationWorkspace({
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' && !event.shiftKey) {
                       event.preventDefault();
-                      void sendAnswer(input, 'text');
+                      void sendAnswer(input, draftInputMode);
                     }
                   }}
                   disabled={sending || Boolean(session.state.pendingConfirmation)}
@@ -444,7 +450,7 @@ export default function ParisApplicationWorkspace({
                 />
                 <button
                   type="button"
-                  onClick={() => void sendAnswer(input, 'text')}
+                  onClick={() => void sendAnswer(input, draftInputMode)}
                   disabled={sending || !input.trim() || Boolean(session.state.pendingConfirmation)}
                   className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-brand-red-600 text-white hover:bg-brand-red-700 disabled:opacity-50"
                   aria-label={t.send}
@@ -452,6 +458,9 @@ export default function ParisApplicationWorkspace({
                   {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
                 </button>
               </div>
+              {draftInputMode === 'voice' && input.trim() ? (
+                <p className="mt-2 text-xs font-medium text-slate-600" role="status">{t.voiceDraft}</p>
+              ) : null}
               {error ? <p className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p> : null}
             </div>
           ) : null}

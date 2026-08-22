@@ -37,6 +37,10 @@ export interface IssueCertificateParams {
   programName?: string;
   programHours?: number | null;
   competencyEvidence?: CompetencyEvidence;
+  templateId?: string | null;
+  signedBy?: string | null;
+  issuedBy?: string | null;
+  issueDate?: string | null;
 }
 
 export interface IssuedCertificateSummary {
@@ -92,6 +96,12 @@ async function findExistingCertificate(
   return data;
 }
 
+function normalizeIssueDate(value?: string | null): string {
+  if (!value) return new Date().toISOString();
+  const parsed = new Date(value.length === 10 ? `${value}T12:00:00.000Z` : value);
+  return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+}
+
 export async function issueCertificate(
   params: IssueCertificateParams,
 ): Promise<IssueCertificateResult> {
@@ -107,6 +117,10 @@ export async function issueCertificate(
     programName,
     programHours,
     competencyEvidence,
+    templateId,
+    signedBy,
+    issuedBy,
+    issueDate,
   } = params;
 
   try {
@@ -146,7 +160,7 @@ export async function issueCertificate(
     }
 
     const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-    const completionDate = new Date().toISOString();
+    const completionDate = normalizeIssueDate(issueDate);
     const verificationCode = certificateNumber.split('-').pop() || certificateNumber;
     const displayName = programName || courseTitle || 'Course Completion';
 
@@ -201,6 +215,9 @@ export async function issueCertificate(
         verification_code: verificationCode,
         verification_url: verificationUrl,
         metadata: certMetadata,
+        template_id: templateId || null,
+        signed_by: signedBy || PLATFORM_DEFAULTS.orgName,
+        issued_by: issuedBy || null,
       })
       .select()
       .single();

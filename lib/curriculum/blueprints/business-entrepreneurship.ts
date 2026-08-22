@@ -140,6 +140,8 @@ export const businessEntrepreneurshipBlueprint: CredentialBlueprint = {
   id: 'business-entrepreneurship-esb-retail-v1',
   version: '1.0.0',
   title: 'Business & Entrepreneurship — ESB + Business of Retail',
+  description:
+    'A five-week workforce business course integrating entrepreneurship, customer experience, retail operations, inventory and fulfillment, marketing and sales, pricing and financial decision-making, business planning, applied simulations, remediation, and final readiness assessment.',
   programSlug: 'business-administration',
   credentialSlug: 'business-entrepreneurship-esb-retail',
   credentialTitle: 'Business & Entrepreneurship — ESB + Business of Retail',

@@ -1,4 +1,4 @@
-name: Build Course Acceptance
+name: Build ESB Course Acceptance
 
 on:
   workflow_dispatch:
@@ -6,12 +6,9 @@ on:
     branches: [main]
     paths:
       - 'scripts/course-factory/build-esb-acceptance.ts'
-      - 'scripts/course-factory/build-business-program.ts'
       - '.github/workflows/build-esb-acceptance.yml'
       - 'lib/ai/ai-service.ts'
       - 'lib/curriculum/blueprints/entrepreneurship.ts'
-      - 'lib/curriculum/blueprints/business-entrepreneurship.ts'
-      - 'lib/curriculum/blueprints/index.ts'
       - 'lib/curriculum/lesson-content-schema.ts'
       - 'lib/curriculum/normalize-lesson-content.ts'
       - 'lib/course-factory/**'
@@ -50,11 +47,11 @@ env:
 
 jobs:
   build-audit-publish:
-    if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' || github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE'
+    if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     concurrency:
-      group: course-builder-production-acceptance
+      group: esb-course-builder-production-acceptance
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
@@ -76,10 +73,10 @@ jobs:
         shell: bash
         run: |
           set +e
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/course-install.log 2>&1
+          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/esb-install.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 160 /tmp/course-install.log > /tmp/course-install-tail.log || true
+          tail -n 160 /tmp/esb-install.log > /tmp/esb-install-tail.log || true
           exit 0
 
       - name: Require production Supabase credentials
@@ -92,7 +89,7 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Build, audit, render full media package, and publish course
+      - name: Build, audit, render full media package, and publish Entrepreneurship course
         id: acceptance
         shell: bash
         env:
@@ -100,22 +97,18 @@ jobs:
         run: |
           set +e
           if [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ]; then
-            echo "Preflight failed: install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }}" > /tmp/course-acceptance.log
+            echo "Preflight failed: install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }}" > /tmp/esb-acceptance.log
             echo "exit_code=1" >> "$GITHUB_OUTPUT"
-            tail -n 240 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
+            tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log || true
             exit 0
           fi
-          if [ "${{ github.event_name }}" = "issues" ] && [ "${{ github.event.issue.title }}" = "RUN BUSINESS COURSE BUILDER ACCEPTANCE" ]; then
-            pnpm tsx scripts/course-factory/build-business-program.ts > /tmp/course-acceptance.log 2>&1
-          else
-            pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/course-acceptance.log 2>&1
-          fi
+          pnpm tsx scripts/course-factory/build-esb-acceptance.ts > /tmp/esb-acceptance.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 240 /tmp/course-acceptance.log > /tmp/course-acceptance-tail.log || true
+          tail -n 240 /tmp/esb-acceptance.log > /tmp/esb-acceptance-tail.log || true
           exit 0
 
-      - name: Post acceptance result
+      - name: Post result to issue 703
         if: always() && github.event_name == 'issues'
         uses: actions/github-script@v7
         env:
@@ -129,14 +122,13 @@ jobs:
             const credentialCode = process.env.CREDENTIAL_EXIT_CODE || '1';
             const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
             const ok = installCode === '0' && credentialCode === '0' && acceptanceCode === '0';
-            const installTail = fs.existsSync('/tmp/course-install-tail.log')
-              ? fs.readFileSync('/tmp/course-install-tail.log', 'utf8').slice(-12000)
+            const installTail = fs.existsSync('/tmp/esb-install-tail.log')
+              ? fs.readFileSync('/tmp/esb-install-tail.log', 'utf8').slice(-12000)
               : 'Install step did not produce a log.';
-            const acceptanceTail = fs.existsSync('/tmp/course-acceptance-tail.log')
-              ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-24000)
+            const acceptanceTail = fs.existsSync('/tmp/esb-acceptance-tail.log')
+              ? fs.readFileSync('/tmp/esb-acceptance-tail.log', 'utf8').slice(-24000)
               : 'Acceptance step did not run.';
-            const label = context.payload.issue.title.includes('BUSINESS') ? 'BUSINESS COURSE BUILDER' : 'ESB ACCEPTANCE';
-            const body = `${label} ${ok ? 'PASS' : 'FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\nINSTALL\n\`\`\`text\n${installTail}\n\`\`\`\n\nACCEPTANCE\n\`\`\`text\n${acceptanceTail}\n\`\`\``;
+            const body = `${ok ? 'ESB ACCEPTANCE PASS' : 'ESB ACCEPTANCE FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\nINSTALL\n\`\`\`text\n${installTail}\n\`\`\`\n\nACCEPTANCE\n\`\`\`text\n${acceptanceTail}\n\`\`\``;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,

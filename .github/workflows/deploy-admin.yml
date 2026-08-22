@@ -32,7 +32,7 @@ permissions:
 
 concurrency:
   group: northflank-admin-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy-admin:

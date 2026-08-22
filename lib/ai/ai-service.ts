@@ -39,22 +39,42 @@ const imageProviders: Record<string, () => AIImageProvider> = {
 
 const chatProviderOrder = ['openai', 'anthropic', 'gemini', 'groq', 'azure'] as const;
 const CIRCUIT_RECOVERY_WAIT_MS = 31_000;
+const disabledChatProviders = new Set<string>();
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function isTerminalProviderError(error: unknown): boolean {
+  const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
+  return (
+    message.includes('401') ||
+    message.includes('invalid_api_key') ||
+    message.includes('invalid api key') ||
+    message.includes('no credits remaining') ||
+    message.includes('insufficient_quota') ||
+    message.includes('billing hard limit')
+  );
+}
+
+function disableProviderForProcess(providerName: string, error: unknown): void {
+  disabledChatProviders.add(providerName);
+  logger.warn(`[aiChat] provider "${providerName}" quarantined for this process after terminal credential/billing failure`, {
+    error: error instanceof Error ? error.message : String(error),
+  });
+}
+
 function resolveChatProvider(): AIProvider {
   const preferred = (process.env.AI_PROVIDER || 'openai') as AIProviderName;
 
-  if (preferred !== 'none' && chatProviders[preferred]) {
+  if (preferred !== 'none' && chatProviders[preferred] && !disabledChatProviders.has(preferred)) {
     const provider = chatProviders[preferred]();
     if (provider.isAvailable()) return provider;
     logger.warn(`AI provider "${preferred}" not available, trying fallbacks`);
   }
 
   for (const name of chatProviderOrder) {
-    if (name === preferred) continue;
+    if (name === preferred || disabledChatProviders.has(name)) continue;
     const provider = chatProviders[name]();
     if (provider.isAvailable()) {
       logger.info(`AI: using fallback provider "${name}"`);
@@ -73,7 +93,11 @@ function resolveChatCandidates(options: ChatCompletionOptions): AIProvider[] {
     : null;
   const preferred = explicit || String(process.env.AI_PROVIDER || 'openai');
   const names = [preferred, ...chatProviderOrder].filter(
-    (name, index, list) => name !== 'none' && Boolean(chatProviders[name]) && list.indexOf(name) === index,
+    (name, index, list) =>
+      name !== 'none' &&
+      Boolean(chatProviders[name]) &&
+      !disabledChatProviders.has(name) &&
+      list.indexOf(name) === index,
   );
 
   return names
@@ -98,7 +122,7 @@ function resolveImageProvider(): AIImageProvider {
 }
 
 export async function aiChat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-  const providers = resolveChatCandidates(options);
+  let providers = resolveChatCandidates(options);
   if (!providers.length) {
     throw new Error(
       'No AI chat provider available. Set OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY, or AZURE_OPENAI_API_KEY.',
@@ -111,6 +135,7 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
 
   for (let pass = 0; pass < passes; pass += 1) {
     for (const provider of providers) {
+      if (disabledChatProviders.has(provider.name)) continue;
       try {
         const providerOptions = { ...options, provider: provider.name as AIProviderName };
         const result = await withResilience(() => provider.chat(providerOptions), {
@@ -129,6 +154,9 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
         return { ...result, provider: provider.name };
       } catch (error) {
         lastError = error;
+        if (isTerminalProviderError(error)) {
+          disableProviderForProcess(provider.name, error);
+        }
         logger.warn(`[aiChat] provider "${provider.name}" failed; trying next configured provider`, {
           error: error instanceof Error ? error.message : String(error),
         });
@@ -136,10 +164,11 @@ export async function aiChat(options: ChatCompletionOptions): Promise<ChatComple
     }
 
     if (pass === 0 && allowCircuitRecoveryWait && lastError instanceof CircuitOpenError) {
-      logger.warn('[aiChat] all configured provider attempts ended with an open circuit; waiting for provider recovery window', {
+      logger.warn('[aiChat] configured provider attempts ended with an open circuit; waiting for provider recovery window', {
         waitMs: CIRCUIT_RECOVERY_WAIT_MS,
       });
       await sleep(CIRCUIT_RECOVERY_WAIT_MS);
+      providers = resolveChatCandidates(options);
       continue;
     }
 
@@ -252,7 +281,7 @@ export function isAIAvailable(): boolean {
 }
 
 export function resetProviders(): void {
-  // Provider resolution is request-local; there is no singleton cache.
+  disabledChatProviders.clear();
 }
 
 function preferredReasoningProvider(): 'anthropic' | 'azure' | 'default' {

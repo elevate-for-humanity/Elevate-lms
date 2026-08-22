@@ -62,28 +62,59 @@ export default async function PublicProgramPage({
   }
 
   const price = Number.parseInt(resolved.selfPayCost.replace(/[^0-9]/g, ''), 10);
-  const configuredBanner = heroBanners[resolved.slug] ?? null;
-  const banner: HeroBannerConfig = configuredBanner?.pageKey
-    ? configuredBanner
-    : {
+  const isBusinessProgram = resolved.slug === 'business-administration';
+  const configuredBanner = isBusinessProgram ? null : heroBanners[resolved.slug] ?? null;
+  const banner: HeroBannerConfig = isBusinessProgram
+    ? {
         pageKey: resolved.slug,
         posterImage: resolved.heroImage,
-        microLabel: resolved.category || resolved.programType,
-        belowHeroHeadline: resolved.title,
-        belowHeroSubheadline: resolved.subtitle,
+        microLabel: '5-Week Funded Business Training',
+        belowHeroHeadline: 'Business & Entrepreneurship — 5 Weeks',
+        belowHeroSubheadline:
+          'Indiana INTraining Program #10005173. Build entrepreneurship, small-business, customer service, retail operations, sales, and practical business-finance skills while preparing for ESB and Business of Retail industry credentials. Workforce funding may cover approved training costs for eligible participants with agency authorization.',
         primaryCta: {
           label: 'Apply Now',
           href: resolved.cta.applyHref,
           variant: 'primary',
         },
         secondaryCta: {
-          label: 'Request Information',
-          href: resolved.cta.requestInfoHref || `/contact?program=${encodeURIComponent(resolved.slug)}`,
+          label: 'Check Funding Eligibility',
+          href: '/check-eligibility',
           variant: 'secondary',
         },
+        trustIndicators: [
+          '5-Week Program',
+          'INTraining #10005173',
+          'Funding Available for Eligible Participants',
+          'ESB + Business of Retail Credential Preparation',
+        ],
         analyticsName: `program-${resolved.slug}`,
-        transcript: `${resolved.title}. ${resolved.subtitle}`,
-      };
+        transcript:
+          'Business and Entrepreneurship is a five-week Indiana workforce training program. Learners build entrepreneurship, small-business, customer service, retail operations, sales, pricing, profit, cash-flow, and business-planning skills while preparing for Entrepreneurship and Small Business and Business of Retail credential assessments. Funding requires participant eligibility and written agency authorization.',
+      }
+    : configuredBanner?.pageKey
+      ? configuredBanner
+      : {
+          pageKey: resolved.slug,
+          posterImage: resolved.heroImage,
+          microLabel: resolved.category || resolved.programType,
+          belowHeroHeadline: resolved.title,
+          belowHeroSubheadline: resolved.subtitle,
+          primaryCta: {
+            label: 'Apply Now',
+            href: resolved.cta.applyHref,
+            variant: 'primary',
+          },
+          secondaryCta: {
+            label: 'Request Information',
+            href:
+              resolved.cta.requestInfoHref ||
+              `/contact?program=${encodeURIComponent(resolved.slug)}`,
+            variant: 'secondary',
+          },
+          analyticsName: `program-${resolved.slug}`,
+          transcript: `${resolved.title}. ${resolved.subtitle}`,
+        };
 
   return (
     <>

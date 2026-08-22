@@ -1,18 +1,23 @@
 /**
  * /api/admin/course-builder
  *
- * Single HTTP boundary for Course Builder orchestration. Authoring surfaces send
- * an action to this route; complete-course generation always crosses
- * lib/course-factory. Capability engines (media, blueprints, AI, validation) are
- * internal services, not parallel course builders.
+ * Single application HTTP boundary for course orchestration.
+ * Studio controls this surface. Course Builder owns orchestration and delegates
+ * execution to the private Course Factory through lib/course-builder/orchestrator.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/admin/guards';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { courseFactory, loadAllBlueprints } from '@/lib/course-factory';
+import { loadAllBlueprints } from '@/lib/course-factory';
 import type { FactoryStage } from '@/lib/course-factory';
-import { normalizeGeneratedCourseForGovernance } from '@/lib/course-factory/post-generation-governance';
-import { queueCourseLessonVideos } from '@/lib/course-factory/media-service';
+import {
+  courseFactory,
+  auditCourseGovernance,
+  publishGovernedCourse,
+  repairCanonicalCourse,
+  queueCourseMedia,
+  normalizeGeneratedCourseForGovernance,
+} from '@/lib/course-builder/orchestrator';
 import { requireAdminClient } from '@/lib/supabase/admin';
 import { getInstructorForCourse } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
@@ -34,7 +39,12 @@ type PipelineStage =
 type CourseBuilderAction =
   | 'generate'
   | 'generate-from-blueprint'
-  | 'queue-media';
+  | 'queue-media'
+  | 'audit'
+  | 'validate'
+  | 'publish'
+  | 'repair'
+  | 'generate-missing';
 
 function toPipelineStage(stage: FactoryStage): PipelineStage {
   if (stage === 'enrich') return 'lessons';
@@ -98,11 +108,7 @@ export async function GET(req: NextRequest) {
       if (!courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
       const course = await loadCourse(courseId);
       if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-      return NextResponse.json({
-        ok: true,
-        course,
-        instructor: getInstructorForCourse(course.title),
-      });
+      return NextResponse.json({ ok: true, course, instructor: getInstructorForCourse(course.title) });
     }
 
     return NextResponse.json({ error: `Unsupported Course Builder GET action: ${action}` }, { status: 400 });
@@ -115,7 +121,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const rateLimited = await applyRateLimit(req, 'strict');
   if (rateLimited) return rateLimited;
-
   const auth = await apiRequireAdmin(req);
   if (auth.error) return auth.error;
 
@@ -161,13 +166,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === 'queue-media') {
-    if (!body.courseId) {
-      return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
-    }
+    if (!body.courseId) return NextResponse.json({ error: 'courseId is required' }, { status: 400 });
     try {
       const course = await loadCourse(body.courseId);
       if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-      const result = await queueCourseLessonVideos({
+      const result = await queueCourseMedia({
         courseId: body.courseId,
         onlyMissing: body.onlyMissing !== false,
         force: body.force === true,
@@ -182,6 +185,38 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       logger.error('[course-builder] Media queue failed', error);
       return NextResponse.json({ error: 'Unable to queue course media' }, { status: 500 });
+    }
+  }
+
+  if (action === 'audit' || action === 'validate') {
+    try {
+      const result = auditCourseGovernance((body.template ?? body) as any);
+      return NextResponse.json(result, { status: result.ok ? 200 : 400 });
+    } catch (error) {
+      logger.error('[course-builder] Governance audit failed', error);
+      return NextResponse.json({ ok: false, error: 'Course governance audit failed' }, { status: 400 });
+    }
+  }
+
+  if (action === 'publish') {
+    try {
+      const result = await publishGovernedCourse((body.template ?? body) as any);
+      return NextResponse.json(result, { status: result.ok ? 200 : 422 });
+    } catch (error) {
+      logger.error('[course-builder] Governed publication failed', error);
+      return NextResponse.json({ ok: false, error: 'Course publication failed' }, { status: 500 });
+    }
+  }
+
+  if (action === 'repair' || action === 'generate-missing') {
+    const courseId = typeof body.courseId === 'string' ? body.courseId.trim() : '';
+    if (!courseId) return NextResponse.json({ ok: false, error: 'courseId is required' }, { status: 400 });
+    try {
+      const result = await repairCanonicalCourse(courseId);
+      return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : 422 });
+    } catch (error) {
+      logger.error('[course-builder] Course repair failed', error);
+      return NextResponse.json({ ok: false, error: 'Course repair failed' }, { status: 500 });
     }
   }
 
@@ -234,11 +269,7 @@ export async function POST(req: NextRequest) {
 
         let governance: Awaited<ReturnType<typeof normalizeGeneratedCourseForGovernance>> | null = null;
         if (result.ok && result.courseId && !result.dryRun) {
-          write({
-            stage: 'validate',
-            message: 'Normalizing competency traceability and self-paced learning assets.',
-            progress: 96,
-          });
+          write({ stage: 'validate', message: 'Normalizing competency traceability and self-paced learning assets.', progress: 96 });
           governance = await normalizeGeneratedCourseForGovernance(result.courseId);
         }
 
@@ -259,7 +290,7 @@ export async function POST(req: NextRequest) {
         });
       } catch (error) {
         logger.error('[course-builder] Course Factory error', error);
-        write({ stage: 'error', message: 'Course Factory failed. Review server logs for details.' });
+        write({ stage: 'error', message: 'Course generation failed. Review server logs for details.' });
       } finally {
         controller.close();
       }

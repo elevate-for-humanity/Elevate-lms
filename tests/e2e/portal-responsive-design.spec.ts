@@ -16,9 +16,9 @@ const creds = {
   admin: [process.env.E2E_ADMIN_EMAIL || '', process.env.E2E_ADMIN_PASSWORD || ''],
 } as const;
 
-async function login(page: Page, email: string, password: string) {
-  const response = await page.goto(`${BASE}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-  expect(response?.status() ?? 200, 'Login route returned a server error').toBeLessThan(500);
+async function login(page: Page, loginBase: string, email: string, password: string) {
+  const response = await page.goto(`${loginBase}/login`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  expect(response?.status() ?? 200, `${loginBase}/login returned a server error`).toBeLessThan(500);
 
   const emailInput = page.locator('input[type="email"], input[name="email"]').first();
   const passwordInput = page.locator('input[type="password"]').first();
@@ -86,28 +86,28 @@ async function assertResponsivePage(page: Page, pathOrUrl: string) {
   }
 }
 
-async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], paths: string[]) {
-  await login(page, credentials[0], credentials[1]);
+async function certify(page: Page, testInfo: any, role: string, credentials: readonly string[], loginBase: string, paths: string[]) {
+  await login(page, loginBase, credentials[0], credentials[1]);
   for (const path of paths) await test.step(`${testInfo.project.name}: ${path}`, async () => assertResponsivePage(page, path));
   await page.screenshot({ path: testInfo.outputPath(`${role}-${testInfo.project.name}.png`), fullPage: true });
 }
 
-function roleSuite(name: string, key: keyof typeof creds, paths: string[]) {
+function roleSuite(name: string, key: keyof typeof creds, loginBase: string, paths: string[]) {
   test.describe(name, () => {
     const credentials = creds[key];
     test.skip(!credentials[0] || !credentials[1], `Disposable ${name} identity is required`);
-    test(`critical ${name} surfaces fit the active device viewport`, async ({ page }, testInfo) => certify(page, testInfo, key, credentials, paths));
+    test(`critical ${name} surfaces fit the active device viewport`, async ({ page }, testInfo) => certify(page, testInfo, key, credentials, loginBase, paths));
   });
 }
 
 test.describe('Authenticated portal responsive design certification', () => {
-  roleSuite('Apprentice', 'apprentice', ['/apprentice','/apprentice/hours','/apprentice/rti','/apprentice/competencies','/apprentice/documents','/apprentice/attendance','/apprentice/profile','/apprentice/handbook']);
-  roleSuite('Host Shop', 'hostShop', ['/host-shop/dashboard','/host-shop/dashboard/apprentices','/host-shop/dashboard/hours/pending','/host-shop/dashboard/documents','/host-shop/dashboard/competencies','/host-shop/dashboard/attendance/record','/host-shop/dashboard/wages','/host-shop/dashboard/reports','/host-shop/dashboard/profile']);
-  roleSuite('Learner', 'learner', ['/lms/dashboard','/lms/courses','/lms/certificates','/lms/calendar','/lms/messages','/lms/support','/lms/apply/status']);
-  roleSuite('Program Holder', 'programHolder', ['/program-holder/dashboard','/program-holder/students','/program-holder/portal/students','/program-holder/portal/reports','/program-holder/rights-responsibilities']);
-  roleSuite('Employer', 'employer', ['/employer/dashboard']);
-  roleSuite('Instructor', 'instructor', [`${ADMIN_BASE}/instructor/dashboard`]);
-  roleSuite('Staff', 'staff', [`${ADMIN_BASE}/staff-portal/dashboard`]);
-  roleSuite('Case Manager', 'caseManager', [`${MARKETING_BASE}/case-manager/dashboard`]);
-  roleSuite('Admin', 'admin', [`${ADMIN_BASE}/dashboard`]);
+  roleSuite('Apprentice', 'apprentice', BASE, ['/apprentice','/apprentice/hours','/apprentice/rti','/apprentice/competencies','/apprentice/documents','/apprentice/attendance','/apprentice/profile','/apprentice/handbook']);
+  roleSuite('Host Shop', 'hostShop', BASE, ['/host-shop/dashboard','/host-shop/dashboard/apprentices','/host-shop/dashboard/hours/pending','/host-shop/dashboard/documents','/host-shop/dashboard/competencies','/host-shop/dashboard/attendance/record','/host-shop/dashboard/wages','/host-shop/dashboard/reports','/host-shop/dashboard/profile']);
+  roleSuite('Learner', 'learner', BASE, ['/lms/dashboard','/lms/courses','/lms/certificates','/lms/calendar','/lms/messages','/lms/support','/lms/apply/status']);
+  roleSuite('Program Holder', 'programHolder', BASE, ['/program-holder/dashboard','/program-holder/students','/program-holder/portal/students','/program-holder/portal/reports','/program-holder/rights-responsibilities']);
+  roleSuite('Employer', 'employer', BASE, ['/employer/dashboard']);
+  roleSuite('Instructor', 'instructor', ADMIN_BASE, [`${ADMIN_BASE}/instructor/dashboard`]);
+  roleSuite('Staff', 'staff', ADMIN_BASE, [`${ADMIN_BASE}/staff-portal/dashboard`]);
+  roleSuite('Case Manager', 'caseManager', MARKETING_BASE, [`${MARKETING_BASE}/case-manager/dashboard`]);
+  roleSuite('Admin', 'admin', ADMIN_BASE, [`${ADMIN_BASE}/dashboard`]);
 });

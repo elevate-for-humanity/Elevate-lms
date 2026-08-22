@@ -242,7 +242,7 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
     slug: 'community-hub',
     name: 'Community Hub',
     priceMonthly: 39,
-    description: 'Branded community with posts, discussions, groups, events, memberships and gamification.',
+    description: 'Community functionality retained while tenant-level paid access enforcement is completed.',
     features: [
       PlatformFeature.COMMUNITY,
       PlatformFeature.COMMUNITY_GROUPS,
@@ -250,14 +250,8 @@ export const ADD_ON_MARKETPLACE: AddOnDefinition[] = [
       PlatformFeature.COMMUNITY_GAMIFICATION,
       PlatformFeature.COMMUNITY_MEMBERSHIPS,
     ],
-    bullets: [
-      'Community feed and comments',
-      'Groups and discussions',
-      'Events and RSVP',
-      'Points, badges and leaderboards',
-      'Free and paid membership tiers',
-      'AI Team community roles',
-    ],
+    bullets: ['Community experience available for managed evaluation', 'Paid entitlement enforcement is not yet self-service'],
+    hiddenFromMarketplace: true,
   },
   {
     slug: 'course-builder',

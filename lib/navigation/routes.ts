@@ -23,12 +23,14 @@ export const ROUTES = {
   workforcePortal: `${LMS_HOST}/workforce/dashboard`,
   hostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
   programHolderPortal: `${LMS_HOST}/program-holder/dashboard`,
+  creatorPortal: `${LMS_HOST}/creator/products`,
   // Compatibility aliases retained for old bookmarks; do not expose as separate navigation items.
   cosmetologyHostShopPortal: `${LMS_HOST}/host-shop/dashboard`,
   partnerPortal: `${LMS_HOST}/host-shop/dashboard`,
   adminPortal: `${ADMIN_HOST}/dashboard`,
   instructorPortal: `${ADMIN_HOST}/instructor/dashboard`,
   staffPortal: `${ADMIN_HOST}/staff-portal/dashboard`,
+  testingPortal: `${ADMIN_HOST}/testing-center`,
   adminLogin: `${ADMIN_HOST}/login`,
   // These operational workspaces still live on the Marketing service. Keep
   // their URLs absolute so shared navigation never resolves them against the

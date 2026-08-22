@@ -1,4 +1,3 @@
-// Production acceptance runner for Indiana INTraining Program #10005173.
 import { courseFactory } from '../../lib/course-factory';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
@@ -10,27 +9,42 @@ const EXPECTED_MAIN_VIDEOS = 35;
 const EXPECTED_MICROCLIPS = 70;
 const MEDIA_POLL_MS = 20_000;
 const MEDIA_TIMEOUT_MS = 75 * 60_000;
-const AI_SECRET_KEYS = ['OPENAI_API_KEY', 'GROQ_API_KEY', 'GEMINI_API_KEY', 'ANTHROPIC_API_KEY', 'AZURE_OPENAI_API_KEY'] as const;
+const AI_SECRET_KEYS = [
+  'GEMINI_API_KEY',
+  'GOOGLE_CLOUD_API_KEY',
+  'GROQ_API_KEY',
+  'CLOUDFLARE_ACCOUNT_ID',
+  'CLOUDFLARE_AI_API_TOKEN',
+  'CLOUDFLARE_API_TOKEN',
+  'OPENAI_API_KEY',
+  'ANTHROPIC_API_KEY',
+  'AZURE_OPENAI_API_KEY',
+] as const;
 
 function fail(message: string): never {
   throw new Error(`[Business Course Builder] ${message}`);
 }
 
 async function hydrateAISecrets(db: Awaited<ReturnType<typeof requireAdminClient>>) {
-  let count = 0;
+  const available: string[] = [];
   for (const key of AI_SECRET_KEYS) {
     if (process.env[key]?.trim()) {
-      count += 1;
+      available.push(key);
       continue;
     }
     const { data, error } = await db.rpc('get_platform_secret', { p_key: key });
     if (!error && typeof data === 'string' && data.trim()) {
       process.env[key] = data.trim();
-      count += 1;
+      available.push(key);
     }
   }
-  if (!count) fail('No production AI provider credential is available');
-  console.log(`[Business Course Builder] AI provider pool ready (${count})`);
+  const usableTextProviders = available.filter((key) =>
+    ['GEMINI_API_KEY', 'GOOGLE_CLOUD_API_KEY', 'GROQ_API_KEY', 'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'AZURE_OPENAI_API_KEY'].includes(key),
+  );
+  const cloudflareReady = available.includes('CLOUDFLARE_ACCOUNT_ID') &&
+    (available.includes('CLOUDFLARE_AI_API_TOKEN') || available.includes('CLOUDFLARE_API_TOKEN'));
+  if (!usableTextProviders.length && !cloudflareReady) fail('No AI provider credential is available');
+  console.log(`[Business Course Builder] provider credentials ready: ${available.join(', ')}`);
 }
 
 async function waitForMedia(courseId: string) {

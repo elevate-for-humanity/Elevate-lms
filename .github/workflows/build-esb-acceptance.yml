@@ -19,10 +19,12 @@ on:
       - 'lib/course-factory/**'
       - 'lib/course-builder/**'
       - 'lib/devstudio/course-builder-controller.ts'
+      - 'lib/platform/launch-foundation.ts'
       - 'lib/video/**'
       - 'components/lms/**'
       - 'apps/lms/app/lms/courses/**'
       - 'apps/lms/app/api/learner/interactions/**'
+      - 'apps/lms/app/api/onboarding/launch/route.ts'
       - 'apps/admin/app/api/admin/course-builder/**'
       - 'apps/admin/app/api/admin/lms/courses/generate/route.ts'
       - 'apps/admin/app/api/admin/courses/**'
@@ -59,7 +61,7 @@ jobs:
   build-audit-publish:
     if: github.event_name != 'issues' || github.event.issue.title == 'RUN ESB COURSE BUILDER ACCEPTANCE' || github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     concurrency:
       group: unified-course-builder-production-acceptance
       cancel-in-progress: false
@@ -119,6 +121,37 @@ jobs:
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           exit 0
 
+      - name: Verify relevant types, lint, Admin build, and LMS build
+        id: verification
+        shell: bash
+        run: |
+          set +e
+          : > /tmp/course-verification.log
+          if [ "${{ steps.install.outputs.exit_code }}" != "0" ]; then
+            echo "Dependency install failed; verification cannot run." >> /tmp/course-verification.log
+            echo "exit_code=1" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          code=0
+          pnpm typecheck:studio >> /tmp/course-verification.log 2>&1 || code=1
+          pnpm exec eslint \
+            apps/admin/app/api/admin/course-builder \
+            apps/admin/app/api/devstudio/chat/route.ts \
+            apps/admin/app/api/internal/videos/process-queue/route.ts \
+            lib/course-builder \
+            lib/course-factory \
+            lib/devstudio/course-builder-controller.ts \
+            lib/video \
+            apps/lms/app/lms/courses \
+            apps/lms/app/api/learner/interactions \
+            --quiet >> /tmp/course-verification.log 2>&1 || code=1
+          pnpm build:admin >> /tmp/course-verification.log 2>&1 || code=1
+          pnpm build:lms >> /tmp/course-verification.log 2>&1 || code=1
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 360 /tmp/course-verification.log
+          exit 0
+
       - name: Build, audit, render full media package, and publish requested course
         id: acceptance
         shell: bash
@@ -126,8 +159,8 @@ jobs:
           NODE_OPTIONS: --conditions=react-server
         run: |
           set +e
-          if [ "${{ steps.architecture.outputs.exit_code }}" != "0" ] || [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ]; then
-            echo "Preflight failed: architecture=${{ steps.architecture.outputs.exit_code }} install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }}" > /tmp/course-acceptance.log
+          if [ "${{ steps.architecture.outputs.exit_code }}" != "0" ] || [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ] || [ "${{ steps.verification.outputs.exit_code }}" != "0" ]; then
+            echo "Preflight failed: architecture=${{ steps.architecture.outputs.exit_code }} install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }} verification=${{ steps.verification.outputs.exit_code }}" > /tmp/course-acceptance.log
             echo "exit_code=1" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -149,6 +182,7 @@ jobs:
           ARCHITECTURE_EXIT_CODE: ${{ steps.architecture.outputs.exit_code }}
           INSTALL_EXIT_CODE: ${{ steps.install.outputs.exit_code }}
           CREDENTIAL_EXIT_CODE: ${{ steps.credentials.outputs.exit_code }}
+          VERIFICATION_EXIT_CODE: ${{ steps.verification.outputs.exit_code }}
           ACCEPTANCE_EXIT_CODE: ${{ steps.acceptance.outputs.exit_code }}
         with:
           script: |
@@ -156,11 +190,15 @@ jobs:
             const architectureCode = process.env.ARCHITECTURE_EXIT_CODE || 'not-run';
             const installCode = process.env.INSTALL_EXIT_CODE || 'not-run';
             const credentialCode = process.env.CREDENTIAL_EXIT_CODE || 'not-run';
+            const verificationCode = process.env.VERIFICATION_EXIT_CODE || 'not-run';
             const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
-            const ok = architectureCode === '0' && installCode === '0' && credentialCode === '0' && acceptanceCode === '0';
+            const ok = architectureCode === '0' && installCode === '0' && credentialCode === '0' && verificationCode === '0' && acceptanceCode === '0';
             const architectureTail = fs.existsSync('/tmp/course-architecture.log')
               ? fs.readFileSync('/tmp/course-architecture.log', 'utf8').slice(-16000)
               : 'Architecture checks did not produce a log.';
+            const verificationTail = fs.existsSync('/tmp/course-verification.log')
+              ? fs.readFileSync('/tmp/course-verification.log', 'utf8').slice(-22000)
+              : 'Verification checks did not produce a log.';
             const tail = fs.existsSync('/tmp/course-acceptance-tail.log')
               ? fs.readFileSync('/tmp/course-acceptance-tail.log', 'utf8').slice(-28000)
               : fs.existsSync('/tmp/course-acceptance.log')
@@ -171,14 +209,15 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nCommit: ${context.sha}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nAcceptance: ${acceptanceCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\``
+              body: `${label} ${ok ? 'PASS' : 'FAIL'}\n\nCommit: ${context.sha}\nArchitecture: ${architectureCode}\nInstall: ${installCode}\nCredentials: ${credentialCode}\nVerification: ${verificationCode}\nAcceptance: ${acceptanceCode}\n\nArchitecture:\n\`\`\`text\n${architectureTail}\n\`\`\`\n\nVerification:\n\`\`\`text\n${verificationTail}\n\`\`\`\n\nAcceptance:\n\`\`\`text\n${tail}\n\`\`\``
             });
 
-      - name: Fail workflow when architecture, preflight, or acceptance failed
+      - name: Fail workflow when architecture, build verification, preflight, or acceptance failed
         if: always()
         shell: bash
         run: |
           test "${{ steps.architecture.outputs.exit_code }}" = "0"
           test "${{ steps.install.outputs.exit_code }}" = "0"
           test "${{ steps.credentials.outputs.exit_code }}" = "0"
+          test "${{ steps.verification.outputs.exit_code }}" = "0"
           test "${{ steps.acceptance.outputs.exit_code }}" = "0"

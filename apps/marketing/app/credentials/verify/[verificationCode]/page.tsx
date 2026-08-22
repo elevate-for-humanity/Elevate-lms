@@ -24,8 +24,7 @@ export default async function CredentialVerificationPage({
       `verification_code, status, issued_at, expires_at, revoked_at, revoked_reason,
        badge_url, certificate_url, open_badge_status, open_badge_credential_url,
        open_badge_proof_type,
-       credentials!inner(name, description, issuing_authority, issuer_type,
-         badge_image_url, is_active, is_published)`
+       credentials!inner(name, description, issuing_authority, partner_id, badge_image_url)`
     )
     .eq('verification_code', verificationCode)
     .maybeSingle();
@@ -33,7 +32,17 @@ export default async function CredentialVerificationPage({
   if (error || !data) notFound();
 
   const definition = Array.isArray(data.credentials) ? data.credentials[0] : data.credentials;
-  if (!definition?.is_active || !definition?.is_published) notFound();
+  if (!definition) notFound();
+
+  let partner: { name: string; type: string } | null = null;
+  if (definition.partner_id) {
+    const { data: partnerData } = await db
+      .from('credentialing_partners')
+      .select('name, type')
+      .eq('id', definition.partner_id)
+      .maybeSingle();
+    partner = partnerData;
+  }
 
   const status = getOpenBadgeStatus({
     status: data.status,
@@ -43,6 +52,8 @@ export default async function CredentialVerificationPage({
 
   const badgeImage = data.badge_url || definition.badge_image_url;
   const verified = status === 'active';
+  const internalIssuer = partner?.type === 'internal';
+  const issuerName = definition.issuing_authority || partner?.name || 'Credential issuer';
 
   return (
     <main className="min-h-screen bg-slate-50 py-12">
@@ -70,7 +81,7 @@ export default async function CredentialVerificationPage({
                     : 'bg-amber-50 text-amber-800'
               }`}
             >
-              {verified ? 'Credential verified' : `Credential ${status}`}
+              {verified ? 'Credential record verified' : `Credential ${status}`}
             </div>
             <h1 className="text-3xl font-bold text-slate-950">{definition.name}</h1>
             <p className="mt-2 text-slate-600">{definition.description}</p>
@@ -79,7 +90,7 @@ export default async function CredentialVerificationPage({
           <dl className="grid gap-0 sm:grid-cols-2">
             <div className="border-b border-slate-200 p-5 sm:border-r">
               <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Issuer</dt>
-              <dd className="mt-1 font-medium text-slate-900">{definition.issuing_authority}</dd>
+              <dd className="mt-1 font-medium text-slate-900">{issuerName}</dd>
             </div>
             <div className="border-b border-slate-200 p-5">
               <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Verification ID</dt>
@@ -94,21 +105,19 @@ export default async function CredentialVerificationPage({
               <dd className="mt-1 text-slate-900">{formatDate(data.expires_at)}</dd>
             </div>
             <div className="p-5 sm:border-r">
-              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Credential type</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Credential authority</dt>
               <dd className="mt-1 text-slate-900">
-                {definition.issuer_type === 'elevate_issued'
-                  ? 'Elevate-issued credential'
-                  : 'External industry credential'}
+                {internalIssuer ? 'Elevate-issued credential' : 'External industry credential'}
               </dd>
             </div>
             <div className="p-5">
               <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Digital badge</dt>
               <dd className="mt-1 text-slate-900">
                 {data.open_badge_status === 'issued'
-                  ? 'Open Badges 3.0 credential issued'
+                  ? 'Signed Open Badges 3.0 credential issued'
                   : data.open_badge_status === 'pending'
-                    ? 'Signature pending'
-                    : 'Not issued as an Elevate Open Badge'}
+                    ? 'Open Badge signature pending'
+                    : 'No Elevate Open Badge issued'}
               </dd>
             </div>
           </dl>
@@ -120,12 +129,12 @@ export default async function CredentialVerificationPage({
           )}
 
           <div className="flex flex-wrap gap-3 border-t border-slate-200 p-6">
-            {data.open_badge_credential_url && (
+            {data.open_badge_status === 'issued' && data.open_badge_credential_url && (
               <a
                 href={data.open_badge_credential_url}
                 className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                View credential JSON-LD
+                View signed credential JSON-LD
               </a>
             )}
             {data.certificate_url && (

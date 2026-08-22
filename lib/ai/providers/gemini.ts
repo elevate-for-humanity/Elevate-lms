@@ -1,28 +1,41 @@
 import type { AIProvider, ChatCompletionOptions, ChatCompletionResult } from '../types';
 
-// Keep only currently supported stable Gemini text models. Gemini 2.0 Flash and
-// Flash-Lite were shut down in 2026 and were returning 404 in production.
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
+// Keep currently supported Gemini text models in a cost-efficient order for
+// long-form Course Builder generation. Older Gemini 2.x/2.5 models have been
+// retired or restricted for new API users and were returning 404 in production.
+const GEMINI_MODELS = [
+  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-3.6-flash',
+  'gemini-3.7-flash',
+  'gemini-3.1-pro-preview',
+];
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 /**
- * Google Gemini provider — free tier available, good fallback.
+ * Google Gemini provider — free/low-cost Flash models are preferred for
+ * high-volume Course Builder generation, with larger models as fallbacks.
  */
 export class GeminiProvider implements AIProvider {
   readonly name = 'gemini' as const;
 
   isAvailable(): boolean {
-    return !!process.env.GEMINI_API_KEY;
+    const key = process.env.GEMINI_API_KEY?.trim();
+    return Boolean(key && key.length > 10);
   }
 
   async chat(options: ChatCompletionOptions): Promise<ChatCompletionResult> {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (!apiKey) throw new Error('GEMINI_API_KEY not configured');
 
     const systemMsg = options.messages.find((m) => m.role === 'system')?.content || '';
     const userMsgs = options.messages.filter((m) => m.role !== 'system');
 
-    const models = options.model ? [options.model] : GEMINI_MODELS;
+    // Only honor an explicit model when it is actually a Gemini model. Course
+    // Builder callers often use provider-neutral/OpenAI model labels, which must
+    // not be sent to Google's model endpoint.
+    const models = options.model?.startsWith('gemini-') ? [options.model] : GEMINI_MODELS;
     let lastError: Error | null = null;
 
     for (const m of models) {
@@ -40,6 +53,7 @@ export class GeminiProvider implements AIProvider {
             generationConfig: {
               temperature: options.temperature ?? 0.7,
               maxOutputTokens: options.maxTokens || 2048,
+              responseMimeType: 'application/json',
             },
           }),
         });
@@ -50,14 +64,21 @@ export class GeminiProvider implements AIProvider {
             `Gemini ${m} returned ${res.status}${responseText ? `: ${responseText.slice(0, 240)}` : ''}`,
           );
           lastError = error;
-          // Capacity/rate-limit and retired/unavailable model failures should
-          // fall through to another supported Gemini model first.
+          // Retired/unavailable/capacity/rate-limit failures fall through to the
+          // next supported Gemini model before the global provider circuit opens.
           if ([404, 429, 503].includes(res.status)) continue;
           throw error;
         }
 
         const data = await res.json();
-        const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const content = data.candidates?.[0]?.content?.parts
+          ?.map((part: { text?: string }) => part?.text || '')
+          .join('') || '';
+
+        if (!content.trim()) {
+          lastError = new Error(`Gemini ${m} returned no text content`);
+          continue;
+        }
 
         return {
           content,

@@ -42,6 +42,7 @@ export interface IssueCertificateParams {
   signedBy?: string | null;
   issuedBy?: string | null;
   issueDate?: string | null;
+  expiresAt?: string | null;
   metadata?: Record<string, unknown>;
   credentialStack?: Record<string, unknown> | null;
   issuanceSnapshot?: Record<string, unknown> | null;
@@ -115,6 +116,12 @@ function normalizeIssueDate(value?: string | null): string {
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
 }
 
+function normalizeOptionalDate(value?: string | null): string | null {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
   if (value && typeof value === 'object') {
@@ -153,6 +160,7 @@ export async function issueCertificate(
     signedBy,
     issuedBy,
     issueDate,
+    expiresAt,
     metadata,
     credentialStack,
     issuanceSnapshot,
@@ -247,6 +255,7 @@ export async function issueCertificate(
         program_id: programId || null,
         enrollment_id: enrollmentId,
         certificate_number: certificateNumber,
+        serial: certificateNumber,
         course_title: courseTitle || null,
         program_name: programName || null,
         title: displayName,
@@ -256,6 +265,7 @@ export async function issueCertificate(
         completion_date: completionDate.split('T')[0],
         hours_completed: competencyEvidence?.seatTimeHours ?? programHours ?? null,
         issued_at: completionDate,
+        expires_at: normalizeOptionalDate(expiresAt),
         exam_session_id: competencyEvidence?.examSessionId || null,
         verification_code: verificationCode,
         verification_url: verificationUrl,

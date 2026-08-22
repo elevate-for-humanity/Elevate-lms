@@ -59,6 +59,12 @@ requireText('lib/paris/admissions/interview-engine.ts', "fundingEligibilityStatu
 requireText('lib/paris/admissions/interview-engine.ts', 'requiresWorkOne', 'WorkOne pathway branching');
 requireText('lib/paris/admissions/interview-engine.ts', 'claimedTransferHours', 'transfer-hours handling');
 requireText('lib/paris/admissions/interview-engine.ts', 'supporting evidence and sponsor review', 'transfer-hours review disclaimer');
+requireText('apps/marketing/app/api/applications/route.ts', "applicationStatus = 'pending_workone'", 'canonical WorkOne pending status');
+requireText('apps/marketing/app/api/applications/route.ts', 'Do not submit a second application.', 'single-application WorkOne instruction');
+requireText('apps/marketing/app/api/applications/route.ts', 'existing: true', 'active application reuse');
+forbidText('apps/marketing/app/api/applications/route.ts', 'Come back and reapply', 'duplicate-application WorkOne instruction');
+forbidText('apps/marketing/app/api/applications/route.ts', 'complete ICC and reapply', 'duplicate-application staff instruction');
+requireText('apps/marketing/app/apply/success/page.tsx', "application?.status === 'pending_workone'", 'pending WorkOne confirmation routing');
 requireText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', 'approveApplication', 'canonical approval pipeline');
 requireText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', "canonicalAuthority: 'applications'", 'canonical application authority response');
 forbidText('apps/marketing/app/api/paris/applications/[applicationId]/decision/route.ts', 'bypassPaymentGate: true', 'payment/funding gate bypass');
@@ -85,6 +91,7 @@ requireText('supabase/migrations/20260822193000_documents_application_owner_type
 requireText('supabase/migrations/20260822194500_agentic_run_credit_accounting.sql', 'increment_agentic_run_credits', 'atomic agentic run credit accounting');
 requireText('supabase/migrations/20260822195000_harden_agentic_application_document_link.sql', 'Agentic application link identity mismatch', 'identity-bound agentic document handoff');
 requireText('supabase/migrations/20260822195000_harden_agentic_application_document_link.sql', 'Agentic application link program mismatch', 'program-bound agentic document handoff');
+requireText('supabase/migrations/20260822195500_attach_agentic_application_to_user.sql', 'new.user_id := app_user_id', 'authenticated applicant project ownership');
 
 if (!process.exitCode) {
   console.log('AGENTIC_ADMISSIONS_CONTRACT_PASS');

@@ -2,18 +2,6 @@ name: Build Business Program Acceptance
 
 on:
   workflow_dispatch:
-  issues:
-    types: [opened, reopened]
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/course-factory/build-business-program.ts'
-      - 'lib/curriculum/blueprints/business-entrepreneurship.ts'
-      - 'lib/curriculum/blueprints/index.ts'
-      - '.github/workflows/build-business-program.yml'
-      - 'lib/course-factory/**'
-      - 'lib/course-builder/video-queue.ts'
-      - 'lib/video/**'
 
 permissions:
   contents: read
@@ -33,12 +21,11 @@ env:
 
 jobs:
   build-audit-publish:
-    if: github.event_name != 'issues' || github.event.issue.title == 'RUN BUSINESS COURSE BUILDER ACCEPTANCE'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     concurrency:
-      group: business-course-builder-production-acceptance
-      cancel-in-progress: true
+      group: business-course-builder-manual-acceptance
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,75 +42,16 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies deterministically
-        id: install
-        shell: bash
-        run: |
-          set +e
-          pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/business-install.log 2>&1
-          code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 200 /tmp/business-install.log > /tmp/business-install-tail.log || true
-          exit 0
+        run: pnpm install --frozen-lockfile --strict-peer-dependencies=false
 
       - name: Require production Supabase credentials
-        id: credentials
         shell: bash
         run: |
-          set +e
-          test -n "$SUPABASE_URL" && test -n "$SUPABASE_SERVICE_ROLE_KEY"
-          code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          exit 0
+          test -n "$SUPABASE_URL"
+          test -n "$SUPABASE_SERVICE_ROLE_KEY"
 
       - name: Build, audit, render, and publish business program
-        id: acceptance
         shell: bash
         env:
           NODE_OPTIONS: --conditions=react-server
-        run: |
-          set +e
-          if [ "${{ steps.install.outputs.exit_code }}" != "0" ] || [ "${{ steps.credentials.outputs.exit_code }}" != "0" ]; then
-            echo "Preflight failed: install=${{ steps.install.outputs.exit_code }} credentials=${{ steps.credentials.outputs.exit_code }}" > /tmp/business-course-builder.log
-            echo "exit_code=1" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          pnpm tsx scripts/course-factory/build-business-program.ts > /tmp/business-course-builder.log 2>&1
-          code=$?
-          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Post result to trigger issue
-        if: always() && github.event_name == 'issues'
-        uses: actions/github-script@v7
-        env:
-          INSTALL_EXIT_CODE: ${{ steps.install.outputs.exit_code }}
-          CREDENTIAL_EXIT_CODE: ${{ steps.credentials.outputs.exit_code }}
-          ACCEPTANCE_EXIT_CODE: ${{ steps.acceptance.outputs.exit_code }}
-        with:
-          script: |
-            const fs = require('fs');
-            const installCode = process.env.INSTALL_EXIT_CODE || '1';
-            const credentialCode = process.env.CREDENTIAL_EXIT_CODE || '1';
-            const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
-            const ok = installCode === '0' && credentialCode === '0' && acceptanceCode === '0';
-            const installTail = fs.existsSync('/tmp/business-install-tail.log')
-              ? fs.readFileSync('/tmp/business-install-tail.log', 'utf8').slice(-12000)
-              : 'Install step did not produce a log.';
-            const acceptanceTail = fs.existsSync('/tmp/business-course-builder.log')
-              ? fs.readFileSync('/tmp/business-course-builder.log', 'utf8').slice(-24000)
-              : 'Course Builder did not produce a log.';
-            const body = `${ok ? 'BUSINESS COURSE BUILDER PASS' : 'BUSINESS COURSE BUILDER FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\nINSTALL\n\`\`\`text\n${installTail}\n\`\`\`\n\nACCEPTANCE\n\`\`\`text\n${acceptanceTail}\n\`\`\``;
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body,
-            });
-
-      - name: Fail workflow when preflight or acceptance failed
-        if: always()
-        shell: bash
-        run: |
-          test "${{ steps.install.outputs.exit_code }}" = "0"
-          test "${{ steps.credentials.outputs.exit_code }}" = "0"
-          test "${{ steps.acceptance.outputs.exit_code }}" = "0"
+        run: pnpm tsx scripts/course-factory/build-business-program.ts

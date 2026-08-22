@@ -1,16 +1,18 @@
 /**
- * Unified enrollment resolver for dashboards
- * Queries all enrollment tables and returns normalized objects
- * Used by student-portal and other dashboards to render "Continue Learning" links
+ * Unified enrollment resolver for learner dashboards.
+ *
+ * Internal/program access is sourced exactly once from program_enrollments.
+ * Partner LMS access remains separate because it is a different delivery concern.
+ * Legacy training_enrollments / student_enrollments aliases are intentionally not
+ * queried here; compatibility surfaces must never become a second authority.
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { attachLmsCoursesToEnrollments } from '@/lib/db/enrollment-course-join';
 import {
   resolveDeliveryMode,
   getContinueLearningUrl,
-  DeliveryMode,
-  EnrollmentSource,
+  type DeliveryMode,
+  type EnrollmentSource,
 } from '@/lib/delivery/resolveDeliveryMode';
 
 export type NormalizedEnrollment = {
@@ -38,75 +40,102 @@ export type EnrollmentQueryResult = {
   error: string | null;
 };
 
-/**
- * Get all enrollments for a user across all enrollment tables
- * Returns normalized array sorted by most recent first
- */
+type ProgramRow = {
+  id: string;
+  slug: string | null;
+  name: string | null;
+  title: string | null;
+  delivery_mode: DeliveryMode | null;
+};
+
+type CourseRow = {
+  id: string;
+  title: string | null;
+  course_name: string | null;
+};
+
 export async function getUserEnrollments(userId: string): Promise<EnrollmentQueryResult> {
   const supabase = await createClient();
-
-  if (!supabase) {
-    return { enrollments: [], error: 'Database not configured' };
-  }
+  if (!supabase) return { enrollments: [], error: 'Database not configured' };
 
   const results: NormalizedEnrollment[] = [];
 
-  // Query training_enrollments directly (bypasses VIEW permission issues)
-  const { data: enrollments } = await supabase
+  const { data: programEnrollments, error: programEnrollmentError } = await supabase
     .from('program_enrollments')
     .select(
-      `
-      id, user_id, course_id, program_id, status, progress, created_at, updated_at,
-      course:training_courses (id, course_name, description)
-    `,
+      'id,user_id,student_id,course_id,program_id,program_slug,status,progress_percent,created_at,updated_at',
     )
-    .eq('user_id', userId);
+    .or(`user_id.eq.${userId},student_id.eq.${userId}`);
 
-  if (enrollments) {
-    // Fetch programs separately if program_ids exist
-    const programIds = enrollments.map((e) => e.program_id).filter(Boolean);
-    const programMap: Record<string, any> = {};
-    if (programIds.length > 0) {
-      const { data: programs } = await supabase
-        .from('programs')
-        .select('id, name, slug, delivery_mode')
-        .in('id', programIds);
-      if (programs) {
-        for (const p of programs) programMap[p.id] = p;
-      }
-    }
-
-    for (const e of enrollments) {
-      const program = e.program_id ? programMap[e.program_id] : null;
-      const course = e.course as any;
-      const { mode, inferred } = resolveDeliveryMode('enrollments', program);
-
-      const enrollment: NormalizedEnrollment = {
-        source_table: 'enrollments',
-        enrollment_id: e.id,
-        user_key: e.user_id,
-        program_id: e.program_id,
-        program_slug: program?.slug || null,
-        program_title: program?.name || null,
-        course_id: e.course_id,
-        course_title: course?.course_name || null,
-        provider_id: null,
-        provider_name: null,
-        status: e.status || 'active',
-        progress: e.progress || 0,
-        delivery_mode: mode,
-        inferred_delivery_mode: inferred,
-        continue_url: '',
-        created_at: e.created_at,
-        updated_at: e.updated_at,
-      };
-      enrollment.continue_url = getContinueLearningUrl(mode, enrollment);
-      results.push(enrollment);
-    }
+  if (programEnrollmentError) {
+    return { enrollments: [], error: programEnrollmentError.message };
   }
 
-  // Query partner_lms_enrollments table (external providers)
-  const { data: partnerEnrollments } = await supabase
+  const programIds = [
+    ...new Set((programEnrollments ?? []).map((row) => row.program_id).filter(Boolean)),
+  ] as string[];
+  const courseIds = [
+    ...new Set((programEnrollments ?? []).map((row) => row.course_id).filter(Boolean)),
+  ] as string[];
+
+  const [programResult, courseResult] = await Promise.all([
+    programIds.length
+      ? supabase
+          .from('programs')
+          .select('id,slug,name,title,delivery_mode')
+          .in('id', programIds)
+      : Promise.resolve({ data: [] as ProgramRow[], error: null }),
+    courseIds.length
+      ? supabase.from('courses').select('id,title,course_name').in('id', courseIds)
+      : Promise.resolve({ data: [] as CourseRow[], error: null }),
+  ]);
+
+  if (programResult.error) {
+    return { enrollments: [], error: programResult.error.message };
+  }
+  if (courseResult.error) {
+    return { enrollments: [], error: courseResult.error.message };
+  }
+
+  const programsById = new Map<string, ProgramRow>(
+    ((programResult.data ?? []) as ProgramRow[]).map((program) => [program.id, program]),
+  );
+  const coursesById = new Map<string, CourseRow>(
+    ((courseResult.data ?? []) as CourseRow[]).map((course) => [course.id, course]),
+  );
+
+  for (const row of programEnrollments ?? []) {
+    const program = row.program_id ? programsById.get(row.program_id) ?? null : null;
+    const course = row.course_id ? coursesById.get(row.course_id) ?? null : null;
+    const { mode, inferred } = resolveDeliveryMode('program_enrollments', program);
+    const userKey = row.user_id || row.student_id;
+    if (!userKey) continue;
+
+    const enrollment: NormalizedEnrollment = {
+      source_table: 'program_enrollments',
+      enrollment_id: row.id,
+      user_key: userKey,
+      program_id: row.program_id ?? null,
+      program_slug: program?.slug ?? row.program_slug ?? null,
+      program_title:
+        program?.title ?? program?.name ?? (row.program_slug ? formatProgramSlug(row.program_slug) : null),
+      course_id: row.course_id ?? null,
+      course_title: course?.title ?? course?.course_name ?? null,
+      provider_id: null,
+      provider_name: null,
+      status: row.status || 'active',
+      progress: Number(row.progress_percent ?? 0),
+      delivery_mode: mode,
+      inferred_delivery_mode: inferred,
+      continue_url: '',
+      created_at: row.created_at,
+      updated_at: row.updated_at ?? null,
+    };
+    enrollment.continue_url = getContinueLearningUrl(mode, enrollment);
+    results.push(enrollment);
+  }
+
+  const { data: partnerEnrollments, error: partnerError } = await supabase
     .from('partner_lms_enrollments')
     .select(
       `
@@ -117,79 +146,41 @@ export async function getUserEnrollments(userId: string): Promise<EnrollmentQuer
     )
     .eq('student_id', userId);
 
-  if (partnerEnrollments) {
-    for (const e of partnerEnrollments) {
-      const course = e.partner_lms_courses as any;
-      const provider = e.partner_lms_providers as any;
-      const { mode, inferred } = resolveDeliveryMode('partner_lms_enrollments', null);
-
-      const enrollment: NormalizedEnrollment = {
-        source_table: 'partner_lms_enrollments',
-        enrollment_id: e.id,
-        user_key: e.student_id,
-        program_id: null,
-        program_slug: course?.slug || null,
-        program_title: course?.title || e.course_name || null,
-        course_id: course?.id || null,
-        course_title: course?.title || e.course_name || null,
-        provider_id: provider?.id || null,
-        provider_name: provider?.name || null,
-        status: e.status || 'active',
-        progress: e.progress || 0,
-        delivery_mode: mode,
-        inferred_delivery_mode: inferred,
-        continue_url: '',
-        created_at: e.created_at,
-        updated_at: e.updated_at,
-      };
-      enrollment.continue_url = getContinueLearningUrl(mode, enrollment);
-      results.push(enrollment);
-    }
+  if (partnerError) {
+    return { enrollments: results, error: partnerError.message };
   }
 
-  // Query the canonical program enrollment table (barber apprenticeship / hybrid)
-  const { data: studentEnrollments } = await supabase
-    .from('program_enrollments')
-    .select('id, student_id, program_slug, status, progress, created_at, updated_at')
-    .eq('student_id', userId);
-
-  if (studentEnrollments) {
-    for (const e of studentEnrollments) {
-      const { mode, inferred } = resolveDeliveryMode('program_enrollments', null);
-
-      const enrollment: NormalizedEnrollment = {
-        source_table: 'program_enrollments',
-        enrollment_id: e.id,
-        user_key: e.student_id,
-        program_id: null,
-        program_slug: e.program_slug,
-        program_title: e.program_slug ? formatProgramSlug(e.program_slug) : null,
-        course_id: null,
-        course_title: null,
-        provider_id: null,
-        provider_name: null,
-        status: e.status || 'active',
-        progress: e.progress || 0,
-        delivery_mode: mode,
-        inferred_delivery_mode: inferred,
-        continue_url: '',
-        created_at: e.created_at,
-        updated_at: e.updated_at,
-      };
-      enrollment.continue_url = getContinueLearningUrl(mode, enrollment);
-      results.push(enrollment);
-    }
+  for (const row of partnerEnrollments ?? []) {
+    const course = row.partner_lms_courses as any;
+    const provider = row.partner_lms_providers as any;
+    const { mode, inferred } = resolveDeliveryMode('partner_lms_enrollments', null);
+    const enrollment: NormalizedEnrollment = {
+      source_table: 'partner_lms_enrollments',
+      enrollment_id: row.id,
+      user_key: row.student_id,
+      program_id: null,
+      program_slug: course?.slug || null,
+      program_title: course?.title || row.course_name || null,
+      course_id: course?.id || null,
+      course_title: course?.title || row.course_name || null,
+      provider_id: provider?.id || null,
+      provider_name: provider?.name || null,
+      status: row.status || 'active',
+      progress: Number(row.progress ?? 0),
+      delivery_mode: mode,
+      inferred_delivery_mode: inferred,
+      continue_url: '',
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    };
+    enrollment.continue_url = getContinueLearningUrl(mode, enrollment);
+    results.push(enrollment);
   }
 
-  // Sort by created_at descending (most recent first)
   results.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
   return { enrollments: results, error: null };
 }
 
-/**
- * Format program slug to title case
- */
 function formatProgramSlug(slug: string): string {
   return slug
     .split('-')
@@ -197,20 +188,15 @@ function formatProgramSlug(slug: string): string {
     .join(' ');
 }
 
-/**
- * Get active enrollments only (filters out completed/cancelled)
- */
 export async function getActiveEnrollments(userId: string): Promise<EnrollmentQueryResult> {
   const result = await getUserEnrollments(userId);
+  if (result.error) return result;
 
-  if (result.error) {
-    return result;
-  }
-
-  const activeStatuses = ['active', 'enrolled', 'in_progress', 'pending'];
-  const activeEnrollments = result.enrollments.filter((e) =>
-    activeStatuses.includes(e.status.toLowerCase()),
-  );
-
-  return { enrollments: activeEnrollments, error: null };
+  const activeStatuses = new Set(['active', 'enrolled', 'in_progress', 'pending']);
+  return {
+    enrollments: result.enrollments.filter((enrollment) =>
+      activeStatuses.has(enrollment.status.toLowerCase()),
+    ),
+    error: null,
+  };
 }

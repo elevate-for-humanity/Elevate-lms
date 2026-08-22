@@ -19,9 +19,12 @@ const TESTING_TYPES = new Set(['testing_fee', 'testing_enforcement']);
 
 export async function POST(request: NextRequest) {
   try {
-    await hydrateProcessEnv().catch(() => {});
+    await hydrateProcessEnv();
     const stripe = getStripe();
-    if (!stripe) return NextResponse.json({ received: true, warning: 'stripe_not_configured' });
+    if (!stripe) {
+      logger.error('[testing-webhook] Stripe client unavailable');
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
+    }
 
     const signature = request.headers.get('stripe-signature');
     if (!signature) return NextResponse.json({ error: 'Missing Stripe signature.' }, { status: 400 });
@@ -29,7 +32,7 @@ export async function POST(request: NextRequest) {
     const secrets = getCanonicalStripeWebhookSecrets();
     if (!secrets.length) {
       logger.error('[testing-webhook] No Stripe signing secret configured');
-      return NextResponse.json({ received: true, warning: 'webhook_secret_missing' });
+      return NextResponse.json({ error: 'Stripe webhook signing secret not configured' }, { status: 503 });
     }
 
     const rawBody = await request.text();
@@ -73,7 +76,7 @@ export async function POST(request: NextRequest) {
     await handleTestingCheckoutSession(session, db);
     return NextResponse.json({ received: true, provisioned: true });
   } catch (error) {
-    // Stripe should retry genuine processing failures.
+    // Stripe should retry genuine processing and configuration failures.
     logger.error('[testing-webhook] Processing failed', error);
     return NextResponse.json({ error: 'Webhook processing failed.' }, { status: 500 });
   }

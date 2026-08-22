@@ -1,4 +1,5 @@
 import { courseFactory } from '../../lib/course-factory';
+import { queueCourseLessonVideos } from '../../lib/course-factory/media-service';
 import { getBlueprintBySlug } from '../../lib/course-factory/blueprint-loader';
 import { requireAdminClient } from '../../lib/supabase/admin';
 import {
@@ -26,6 +27,16 @@ const AI_SECRET_KEYS = [
   'AZURE_OPENAI_API_KEY',
 ] as const;
 
+type AdminDb = Awaited<ReturnType<typeof requireAdminClient>>;
+type MediaJobRow = {
+  lesson_id: string | null;
+  asset_kind: string | null;
+  asset_key: string | null;
+  status: string | null;
+  video_url: string | null;
+  error_message: string | null;
+};
+
 function fail(message: string): never {
   throw new Error(`[Business Course Builder] ${message}`);
 }
@@ -39,7 +50,66 @@ function instructionalText(value: unknown): string {
   return '';
 }
 
-async function hydrateAISecrets(db: Awaited<ReturnType<typeof requireAdminClient>>) {
+function mediaAssetKey(row: MediaJobRow): string {
+  return `${row.lesson_id}:${row.asset_kind ?? 'lesson'}:${row.asset_key ?? ''}`;
+}
+
+function summarizeMedia(rows: MediaJobRow[]) {
+  const groups = new Map<string, MediaJobRow[]>();
+  for (const row of rows) {
+    const key = mediaAssetKey(row);
+    const current = groups.get(key) ?? [];
+    current.push(row);
+    groups.set(key, current);
+  }
+
+  let mainAssets = 0;
+  let microclipAssets = 0;
+  let mainComplete = 0;
+  let microclipsComplete = 0;
+  const failedOnly: MediaJobRow[][] = [];
+
+  for (const group of groups.values()) {
+    const kind = group[0]?.asset_kind ?? 'lesson';
+    const complete = group.some((row) => row.status === 'complete' && Boolean(row.video_url));
+    const pending = group.some((row) => row.status === 'queued' || row.status === 'rendering');
+    const failed = group.some((row) => row.status === 'failed');
+
+    if (kind === 'microclip') {
+      microclipAssets += 1;
+      if (complete) microclipsComplete += 1;
+    } else {
+      mainAssets += 1;
+      if (complete) mainComplete += 1;
+    }
+
+    if (!complete && !pending && failed) failedOnly.push(group);
+  }
+
+  return { mainAssets, microclipAssets, mainComplete, microclipsComplete, failedOnly };
+}
+
+async function loadCurrentMediaRows(db: AdminDb, courseId: string): Promise<MediaJobRow[]> {
+  const { data: lessons, error: lessonError } = await db
+    .from('course_lessons')
+    .select('id')
+    .eq('course_id', courseId);
+  if (lessonError) fail(`Lesson media identity query failed: ${lessonError.message}`);
+  const lessonIds = (lessons ?? []).map((lesson) => lesson.id).filter(Boolean);
+  if (lessonIds.length !== EXPECTED_LESSONS) {
+    fail(`Media verification expected ${EXPECTED_LESSONS} current lesson identities; found ${lessonIds.length}`);
+  }
+
+  const { data, error } = await db
+    .from('video_jobs')
+    .select('lesson_id,asset_kind,asset_key,status,video_url,error_message')
+    .eq('course_id', courseId)
+    .in('lesson_id', lessonIds);
+  if (error) fail(`Video job query failed: ${error.message}`);
+  return (data ?? []) as MediaJobRow[];
+}
+
+async function hydrateAISecrets(db: AdminDb) {
   const available: string[] = [];
   for (const key of AI_SECRET_KEYS) {
     if (process.env[key]?.trim()) {
@@ -80,7 +150,19 @@ async function kickMediaWorker() {
       signal: AbortSignal.timeout(45_000),
     });
   } catch {
-    // Queue polling below remains authoritative; a failed kick is not completion evidence.
+    // Persisted job state remains authoritative; the worker may also be running independently.
+  }
+}
+
+async function repairMissingMedia(courseId: string) {
+  const repair = await queueCourseLessonVideos({
+    courseId,
+    onlyMissing: true,
+    force: false,
+    limit: null,
+  });
+  if (repair.failed > 0) {
+    console.warn(`[Business Course Builder] ${repair.failed} media enqueue attempt(s) failed; persisted job state will determine whether retry is still possible.`);
   }
 }
 
@@ -89,35 +171,38 @@ async function waitForMedia(courseId: string) {
   const deadline = Date.now() + MEDIA_TIMEOUT_MS;
 
   while (Date.now() < deadline) {
+    await repairMissingMedia(courseId);
     await kickMediaWorker();
-    const { data, error } = await db
-      .from('video_jobs')
-      .select('asset_kind,status,video_url,error_message')
-      .eq('course_id', courseId);
-    if (error) fail(`Video job query failed: ${error.message}`);
+    const rows = await loadCurrentMediaRows(db, courseId);
+    const state = summarizeMedia(rows);
 
-    const rows = data ?? [];
-    const failed = rows.filter((row) => row.status === 'failed');
-    if (failed.length) {
-      fail(
-        `Media generation failed: ${failed
-          .slice(0, 3)
-          .map((row) => row.error_message ?? 'unknown')
-          .join(' | ')}`,
+    console.log(
+      `[Business Course Builder] media main ${state.mainComplete}/${EXPECTED_MAIN_VIDEOS}, micro ${state.microclipsComplete}/${EXPECTED_MICROCLIPS}`,
+    );
+
+    if (
+      state.mainAssets !== EXPECTED_MAIN_VIDEOS ||
+      state.microclipAssets !== EXPECTED_MICROCLIPS
+    ) {
+      console.log(
+        `[Business Course Builder] media assets present main ${state.mainAssets}/${EXPECTED_MAIN_VIDEOS}, micro ${state.microclipAssets}/${EXPECTED_MICROCLIPS}; repairing missing assets.`,
       );
     }
 
-    const main = rows.filter(
-      (row) => (row.asset_kind ?? 'lesson') === 'lesson' && row.status === 'complete' && row.video_url,
-    ).length;
-    const micro = rows.filter(
-      (row) => row.asset_kind === 'microclip' && row.status === 'complete' && row.video_url,
-    ).length;
+    if (
+      state.mainComplete === EXPECTED_MAIN_VIDEOS &&
+      state.microclipsComplete === EXPECTED_MICROCLIPS
+    ) {
+      return;
+    }
 
-    console.log(
-      `[Business Course Builder] media main ${main}/${EXPECTED_MAIN_VIDEOS}, micro ${micro}/${EXPECTED_MICROCLIPS}`,
-    );
-    if (main === EXPECTED_MAIN_VIDEOS && micro === EXPECTED_MICROCLIPS) return;
+    if (state.failedOnly.length > 0) {
+      const messages = state.failedOnly
+        .flatMap((group) => group.map((row) => row.error_message).filter(Boolean))
+        .slice(0, 3);
+      fail(`Media generation has unrecoverable failed assets: ${messages.join(' | ') || 'unknown renderer failure'}`);
+    }
+
     await new Promise((resolve) => setTimeout(resolve, MEDIA_POLL_MS));
   }
 
@@ -188,10 +273,7 @@ async function auditCourse(courseId: string) {
   }
 }
 
-async function getReusableCourse(
-  db: Awaited<ReturnType<typeof requireAdminClient>>,
-  programId: string,
-): Promise<string | null> {
+async function getReusableCourse(db: AdminDb, programId: string): Promise<string | null> {
   const { data: course, error } = await db
     .from('courses')
     .select('id,program_id')
@@ -265,17 +347,15 @@ async function main() {
   }
 
   await auditCourse(courseId);
+  await repairMissingMedia(courseId);
 
-  const { data: jobs, error: jobError } = await db
-    .from('video_jobs')
-    .select('id,asset_kind')
-    .eq('course_id', courseId);
-  if (jobError) fail(jobError.message);
-  const mainJobs = (jobs ?? []).filter((job) => (job.asset_kind ?? 'lesson') === 'lesson').length;
-  const microJobs = (jobs ?? []).filter((job) => job.asset_kind === 'microclip').length;
-  if (mainJobs !== EXPECTED_MAIN_VIDEOS || microJobs !== EXPECTED_MICROCLIPS) {
+  const initialMedia = summarizeMedia(await loadCurrentMediaRows(db, courseId));
+  if (
+    initialMedia.mainAssets !== EXPECTED_MAIN_VIDEOS ||
+    initialMedia.microclipAssets !== EXPECTED_MICROCLIPS
+  ) {
     fail(
-      `Expected ${EXPECTED_MAIN_VIDEOS}/${EXPECTED_MICROCLIPS} media jobs; found ${mainJobs}/${microJobs}`,
+      `Expected ${EXPECTED_MAIN_VIDEOS}/${EXPECTED_MICROCLIPS} distinct current media assets after repair; found ${initialMedia.mainAssets}/${initialMedia.microclipAssets}`,
     );
   }
 

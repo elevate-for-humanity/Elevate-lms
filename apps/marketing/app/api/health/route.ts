@@ -1,40 +1,49 @@
 /**
  * GET /api/health
  *
- * Readiness probe - exposes all build identities for debugging.
- * Read at runtime (server-side), not bundled.
+ * Dependency-aware service health. Northflank readiness uses /api/ready so a
+ * downstream outage is reported truthfully without evicting every runnable pod.
  */
 
 import { NextResponse } from 'next/server';
+import { checkSupabaseHealth, getRuntimeReadiness } from '@/lib/health/service-health';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
+  const readiness = getRuntimeReadiness();
+  const supabase = await checkSupabaseHealth();
+  const healthy = readiness.ready && supabase.ok;
+
   return NextResponse.json(
     {
       service: 'marketing',
-      status: 'healthy',
-      ready: true,
-      // Build identity (server runtime env — NOT bundled)
-      commit: process.env.GIT_SHA ?? 'MISSING',
-      github: process.env.GITHUB_SHA ?? 'MISSING',
-      // Client identity (bundled into JS at build time)
-      publicCommit: process.env.NEXT_PUBLIC_GIT_SHA ?? 'MISSING',
-      // Build metadata
-      buildId: process.env.NEXT_PUBLIC_BUILD_ID ?? 'MISSING',
-      buildTime: process.env.BUILD_TIMESTAMP ?? 'MISSING',
-      // Runtime context
+      status: healthy ? 'healthy' : 'unhealthy',
+      ready: healthy,
+      healthContract: 'marketing-v3',
+      commit: readiness.commit,
+      github: process.env.GITHUB_SHA ?? 'unknown',
+      publicCommit: process.env.NEXT_PUBLIC_GIT_SHA ?? 'unknown',
+      buildId: readiness.buildId,
+      buildTime: readiness.builtAt,
+      configuration: {
+        ok: readiness.ready,
+        missing: readiness.missing,
+      },
+      dependencies: {
+        supabase,
+      },
       nodeEnv: process.env.NODE_ENV,
       uptime: Math.floor(process.uptime()),
       timestamp: new Date().toISOString(),
     },
     {
-      status: 200,
+      status: healthy ? 200 : 503,
       headers: {
         'Cache-Control': 'no-store',
       },
-    }
+    },
   );
 }

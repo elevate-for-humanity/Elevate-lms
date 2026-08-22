@@ -13,13 +13,19 @@ env:
   CI: true
   NODE_ENV: production
   AI_CIRCUIT_RECOVERY_WAIT: '1'
+  AI_PROVIDER: gemini
   SUPABASE_URL: ${{ secrets.SUPABASE_URL || secrets.NEXT_PUBLIC_SUPABASE_URL }}
   NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
   SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  GOOGLE_CLOUD_API_KEY: ${{ secrets.GOOGLE_CLOUD_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_AI_API_TOKEN: ${{ secrets.CLOUDFLARE_AI_API_TOKEN }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
 
 jobs:
   build-audit-publish:
@@ -28,7 +34,7 @@ jobs:
     timeout-minutes: 120
     concurrency:
       group: business-course-builder-production-acceptance
-      cancel-in-progress: true
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,7 +58,7 @@ jobs:
           pnpm install --frozen-lockfile --strict-peer-dependencies=false > /tmp/business-install.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
-          tail -n 200 /tmp/business-install.log > /tmp/business-install-tail.log || true
+          tail -n 120 /tmp/business-install.log > /tmp/business-install-tail.log || true
           exit 0
 
       - name: Require production Supabase credentials
@@ -80,6 +86,7 @@ jobs:
           pnpm tsx scripts/course-factory/build-business-program.ts > /tmp/business-course-builder.log 2>&1
           code=$?
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          tail -n 320 /tmp/business-course-builder.log > /tmp/business-course-builder-tail.log || true
           exit 0
 
       - name: Post result to trigger issue
@@ -96,18 +103,16 @@ jobs:
             const credentialCode = process.env.CREDENTIAL_EXIT_CODE || '1';
             const acceptanceCode = process.env.ACCEPTANCE_EXIT_CODE || 'not-run';
             const ok = installCode === '0' && credentialCode === '0' && acceptanceCode === '0';
-            const installTail = fs.existsSync('/tmp/business-install-tail.log')
-              ? fs.readFileSync('/tmp/business-install-tail.log', 'utf8').slice(-12000)
-              : 'Install step did not produce a log.';
-            const acceptanceTail = fs.existsSync('/tmp/business-course-builder.log')
-              ? fs.readFileSync('/tmp/business-course-builder.log', 'utf8').slice(-24000)
-              : 'Course Builder did not produce a log.';
-            const body = `${ok ? 'BUSINESS COURSE BUILDER PASS' : 'BUSINESS COURSE BUILDER FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\nINSTALL\n\`\`\`text\n${installTail}\n\`\`\`\n\nACCEPTANCE\n\`\`\`text\n${acceptanceTail}\n\`\`\``;
+            const acceptanceTail = fs.existsSync('/tmp/business-course-builder-tail.log')
+              ? fs.readFileSync('/tmp/business-course-builder-tail.log', 'utf8').slice(-30000)
+              : fs.existsSync('/tmp/business-course-builder.log')
+                ? fs.readFileSync('/tmp/business-course-builder.log', 'utf8').slice(-30000)
+                : 'Course Builder did not produce a log.';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body,
+              body: `BUSINESS COURSE BUILDER ${ok ? 'PASS' : 'FAIL'}\n\nCommit: ${context.sha}\nInstall exit: ${installCode}\nCredential gate: ${credentialCode}\nAcceptance exit: ${acceptanceCode}\n\n\`\`\`text\n${acceptanceTail}\n\`\`\``
             });
 
       - name: Fail workflow when preflight or acceptance failed

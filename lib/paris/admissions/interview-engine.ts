@@ -25,7 +25,8 @@ export type ApplicationInterviewField =
   | 'transferHours'
   | 'transportationNeeds'
   | 'childcareNeeds'
-  | 'supportNeeds';
+  | 'supportNeeds'
+  | 'applicationCertification';
 
 export type ApplicationInterviewAnswers = Partial<Record<ApplicationInterviewField, string>>;
 
@@ -76,8 +77,10 @@ const TEXT = {
     transportationNeeds: 'Would transportation support help you participate in training?',
     childcareNeeds: 'Would childcare support help you participate in training?',
     supportNeeds: 'Is there any other support you want the admissions team to know you may need?',
+    applicationCertification: 'Before submission, do you certify that the information you provided is true and complete to the best of your knowledge and understand that supporting information may be verified?',
     fundingHelp: 'Submitting this application does not guarantee workforce funding. WorkOne or the responsible funding agency determines participant eligibility and authorization.',
     transferHelp: 'Claimed transfer hours require supporting evidence and sponsor review before any hours are credited.',
+    certificationHelp: 'Your confirmation is recorded with this application. It is not reused as a signature for any separate agreement that requires its own review and signature.',
   },
   es: {
     firstName: '¿Cuál es su nombre legal?',
@@ -105,8 +108,10 @@ const TEXT = {
     transportationNeeds: '¿El apoyo de transporte le ayudaría a participar en la capacitación?',
     childcareNeeds: '¿El apoyo de cuidado infantil le ayudaría a participar en la capacitación?',
     supportNeeds: '¿Hay algún otro apoyo que quiera que el equipo de admisiones sepa que podría necesitar?',
+    applicationCertification: 'Antes de enviar, ¿certifica que la información proporcionada es verdadera y completa según su leal saber y entender y comprende que la información de respaldo puede verificarse?',
     fundingHelp: 'Enviar esta solicitud no garantiza financiamiento laboral. WorkOne o la agencia responsable determina la elegibilidad y autorización del participante.',
     transferHelp: 'Las horas de transferencia reclamadas requieren evidencia y revisión del patrocinador antes de que se acrediten.',
+    certificationHelp: 'Su confirmación queda registrada con esta solicitud. No se reutiliza como firma para acuerdos separados que requieran su propia revisión y firma.',
   },
 } as const;
 
@@ -123,6 +128,7 @@ const CRITICAL_FIELDS = new Set<ApplicationInterviewField>([
   'program',
   'fundingSource',
   'transferHours',
+  'applicationCertification',
 ]);
 
 const BASE_REQUIRED: ApplicationInterviewField[] = [
@@ -140,6 +146,7 @@ const BASE_REQUIRED: ApplicationInterviewField[] = [
   'fundingSource',
   'employmentStatus',
   'highestEducation',
+  'applicationCertification',
 ];
 
 function normalized(value: string | undefined): string {
@@ -196,7 +203,7 @@ function questionOptions(field: ApplicationInterviewField, locale: ApplicationIn
     case 'fundingSource':
       return [
         { value: 'wioa', label: 'WIOA / WorkOne' },
-        { value: 'wrg', label: es ? 'Workforce Ready Grant' : 'Workforce Ready Grant' },
+        { value: 'wrg', label: 'Workforce Ready Grant' },
         { value: 'employer', label: es ? 'Patrocinio del empleador' : 'Employer sponsorship' },
         { value: 'self_pay', label: es ? 'Pago personal' : 'Self-pay' },
         { value: 'payment_plan', label: es ? 'Plan de pagos' : 'Payment plan' },
@@ -207,6 +214,11 @@ function questionOptions(field: ApplicationInterviewField, locale: ApplicationIn
       return [
         { value: 'yes', label: es ? 'Sí' : 'Yes' },
         { value: 'no', label: 'No' },
+      ];
+    case 'applicationCertification':
+      return [
+        { value: 'yes', label: es ? 'Sí, certifico' : 'Yes, I certify' },
+        { value: 'no', label: es ? 'No, necesito revisar' : 'No, I need to review' },
       ];
     case 'employmentStatus':
       return [
@@ -252,7 +264,9 @@ export function getNextApplicationInterviewQuestion(state: ApplicationInterviewS
       ? TEXT[state.locale].fundingHelp
       : next === 'transferHours'
         ? TEXT[state.locale].transferHelp
-        : undefined;
+        : next === 'applicationCertification'
+          ? TEXT[state.locale].certificationHelp
+          : undefined;
 
   return {
     field: next,
@@ -272,6 +286,16 @@ export function applyInterviewAnswer(
 ): ApplicationInterviewState {
   const value = rawValue.trim();
   if (!value) return state;
+
+  if (field === 'applicationCertification' && normalized(value) !== 'yes') {
+    return {
+      ...state,
+      answers: { ...state.answers, applicationCertification: '' },
+      confirmed: state.confirmed.filter((item) => item !== 'applicationCertification'),
+      pendingConfirmation: null,
+      lastQuestionField: field,
+    };
+  }
 
   if (CRITICAL_FIELDS.has(field) && !confirmCritical) {
     return {
@@ -308,7 +332,12 @@ export function createApplicationInterviewState(locale: ApplicationInterviewLoca
 }
 
 export function applicationInterviewReadyForSubmission(state: ApplicationInterviewState): boolean {
-  return calculateApplicationInterviewProgress(state).missing.length === 0 && !state.pendingConfirmation;
+  return (
+    calculateApplicationInterviewProgress(state).missing.length === 0 &&
+    !state.pendingConfirmation &&
+    normalized(state.answers.applicationCertification) === 'yes' &&
+    state.confirmed.includes('applicationCertification')
+  );
 }
 
 export function interviewStateToApplicationPayload(state: ApplicationInterviewState) {
@@ -316,6 +345,8 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
   const transferHours = claimedTransferHours(a.transferHours);
   const apprenticeship = isApprenticeshipProgram(a.program);
   const workOne = requiresWorkOne(a.fundingSource);
+  const hasWorkOneReferral = normalized(a.hasWorkOneReferral);
+  const needsWorkOneAppointment = workOne && hasWorkOneReferral === 'no';
   return {
     firstName: a.firstName,
     lastName: a.lastName,
@@ -333,9 +364,10 @@ export function interviewStateToApplicationPayload(state: ApplicationInterviewSt
     goals: a.goals,
     fundingType: a.fundingSource,
     funding: a.fundingSource,
+    fundingEligibilityStatus: needsWorkOneAppointment ? 'needs_appointment' : undefined,
     hasWorkOneReferral: workOne ? a.hasWorkOneReferral : undefined,
     workoneCenter: workOne ? a.workoneCenter : undefined,
-    workoneIntakeCompleted: workOne ? (normalized(a.hasWorkOneReferral) === 'yes' ? 'in_process' : 'not_started') : undefined,
+    workoneIntakeCompleted: workOne ? (hasWorkOneReferral === 'yes' ? 'in_process' : 'not_started') : undefined,
     employmentStatus: a.employmentStatus,
     currentEmployer: a.currentEmployer,
     highestEducation: a.highestEducation,

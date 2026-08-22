@@ -5,6 +5,7 @@ import './layout.css';
 import '../../../styles/contrast-guardrails.css';
 import { LmsPwaRegistration } from '@/components/pwa/LmsPwaRegistration';
 import { PwaInstallBanner } from '@/components/pwa/PwaInstallBanner';
+import { OfflineStatusBanner } from '@/components/pwa/OfflineStatusBanner';
 import { SupabasePublicConfigScript } from '@/components/supabase/SupabasePublicConfigScript';
 import { SupabaseConfigBootstrap } from '@/components/supabase/SupabaseConfigBootstrap';
 
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="efh-contrast">
         <SupabaseConfigBootstrap />
         <LmsPwaRegistration />
+        <OfflineStatusBanner mode="lms" />
         {children}
         <PwaInstallBanner
           message="Install the Elevate dashboard for faster access to courses, hours, documents, and progress."

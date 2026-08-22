@@ -1,7 +1,7 @@
 import type { ProgramSchema } from '@/lib/programs/program-schema';
 
 export const BUSINESS_ADMIN: ProgramSchema = {
-  slug: 'business',
+  slug: 'business-administration',
   title: 'Business & Entrepreneurship',
   videoSrc: '/videos/partner-business.mp4',
   subtitle: 'Five-week funded workforce training in entrepreneurship, small-business operations, retail management, customer service, sales, and practical business finance.',
@@ -72,7 +72,7 @@ export const BUSINESS_ADMIN: ProgramSchema = {
     { title: 'Retail Sales Specialist', salary: 'Varies by employer' },
     { title: 'Retail Supervisor / Assistant Manager', salary: 'Varies by employer' },
   ],
-  cta: { applyHref: '/apply?program=business-administration', requestInfoHref: '/programs/business-administration/request-info', careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=business+retail&location=Indiana', advisorHref: '/contact', courseHref: '/programs/business' },
+  cta: { applyHref: '/apply?program=business-administration', requestInfoHref: '/programs/business-administration/request-info', careerConnectHref: 'https://www.indianacareerconnect.com/jobs/search?q=business+retail&location=Indiana', advisorHref: '/contact', courseHref: '/programs/business-administration' },
   admissionRequirements: ['18 years or older', 'High school diploma or equivalent preferred', 'Basic computer and internet skills', 'No prior retail, accounting, or business experience required'],
   equipmentIncluded: 'LMS access, instructor-supported activities, business simulations, practice assessments, business finance exercises, and credential preparation are included. Credential exam administration is coordinated through the applicable credential provider.',
   modality: 'Hybrid — instructor-supported learning with LMS coursework, interactive practice, business simulations, and credential preparation',

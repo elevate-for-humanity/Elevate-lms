@@ -46,8 +46,17 @@ export async function cloneCanonicalCourse(input: unknown) {
     review_notes: _reviewNotes,
     submitted_for_review_at: _submittedAt,
     submitted_by: _submittedBy,
+    published_at: _publishedAt,
+    published_by: _publishedBy,
+    version: _version,
     ...courseRest
   } = source as Record<string, any>;
+
+  const sourceGenerationStatus = String(source.generation_status ?? 'draft');
+  const clonedGenerationStatus = sourceGenerationStatus === 'published' ? 'completed' : sourceGenerationStatus;
+  const clonedGenerationProgress = ['completed', 'verification_ready', 'certificate_ready'].includes(clonedGenerationStatus)
+    ? 100
+    : Number(source.generation_progress ?? 0);
 
   const { data: newCourse, error: courseError } = await db
     .from('courses')
@@ -64,6 +73,12 @@ export async function cloneCanonicalCourse(input: unknown) {
       review_notes: null,
       submitted_for_review_at: null,
       submitted_by: null,
+      published_at: null,
+      published_by: null,
+      version: 1,
+      generation_status: clonedGenerationStatus,
+      generation_progress: clonedGenerationProgress,
+      generation_paused: false,
       updated_at: new Date().toISOString(),
     })
     .select('id,slug,title,program_id')

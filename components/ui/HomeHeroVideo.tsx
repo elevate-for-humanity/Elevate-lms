@@ -47,7 +47,7 @@ export default function HomeHeroVideo({ banner }: HomeHeroVideoProps) {
       <HeroVideo
         videoSrcDesktop={withMediaRevision(banner.videoSrcDesktop)}
         videoSrcMobile={withMediaRevision(banner.videoSrcMobile)}
-        posterImage={banner.posterImage}
+        posterImage={undefined}
         voiceoverSrc={withMediaRevision(banner.voiceoverSrc)}
         transcript={banner.transcript}
         analyticsName={banner.analyticsName}
